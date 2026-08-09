@@ -273,8 +273,58 @@ public sealed class Trial<TSeen>
     /// </remarks>
     public Tally Run(long rounds, int sweep = 1000, double target = 0.9, int window = 2000)
     {
+        var running = RunAsync(new Alone(_brain.Held), rounds, sweep, target, window);
+
+        // A COUNCIL THAT WOULD HAVE MADE THIS WAIT IS REFUSED RATHER THAN WAITED FOR, and
+        // that is what keeps sync-over-async to one line that cannot fire. `Alone`
+        // completes every task before returning it, so this is a completed task being
+        // unwrapped; a fleet reaches `RunAsync` directly and never comes through here. If
+        // the check ever throws, something has quietly put a wire under the loop that a
+        // hundred synchronous call sites are still driving.
+        if (!running.IsCompleted)
+            throw new InvalidOperationException(
+                "the council did not answer on the calling thread, so this run would be "
+                + "blocking a thread on a wire — call `RunAsync`");
+
+        return running.GetAwaiter().GetResult();
+    }
+
+    /// <summary>Runs the world through the translation into whoever holds the commitments.</summary>
+    /// <param name="council">One population, or a fleet of them.</param>
+    /// <param name="rounds">How many rounds.</param>
+    /// <param name="sweep">How often to subsume, abstract and cull.</param>
+    /// <param name="target">The trailing accuracy <see cref="Tally.Reached"/> waits for.</param>
+    /// <param name="window">How many answered predictions that accuracy is over.</param>
+    /// <param name="ct">Cancellation.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>THE WORLD STILL PULLS AND THE ROUNDS STILL COME FROM THIS LOOP, WHICH IS FORK 53
+    /// LEFT OPEN RATHER THAN ANSWERED.</b> <see cref="IWorld{TSeen}.Next"/> is asked for
+    /// the next observation the moment the last one is settled, so a fleet's round is as
+    /// long as its slowest holder and never longer. What a learner whose rounds arrived on
+    /// the world's schedule would do differently is a different harness, and this is the
+    /// one that keeps every recorded number comparable.
+    /// </para>
+    /// <para>
+    /// <b>THE TALLY IS READ OFF THE BRAIN AND NOT OFF THE COUNCIL.</b> Residents, tables
+    /// and names are facts about what a machine holds; on a fleet they are facts about
+    /// several, and adding them up is not the same number. Said out loud because a
+    /// distributed run reporting one machine's residents would look exactly like a
+    /// distributed run reporting the fleet's.
+    /// </para>
+    /// </remarks>
+    public async Task<Tally> RunAsync(
+        ICouncil council,
+        long rounds,
+        int sweep = 1000,
+        double target = 0.9,
+        int window = 2000,
+        CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(council);
+
         var held = _brain.Held;
-        var cycle = new Cycle(held, rounds, sweep, target, window);
+        var cycle = new Cycle(council, rounds, sweep, target, window);
 
         long codes = 0;
 
@@ -288,9 +338,10 @@ public sealed class Trial<TSeen>
             // A ROUND THE WORLD COULD NOT SETTLE PASSES NOTHING RATHER THAN A NUMBER, and
             // that is the whole of what arms `Abstain`. Every world that always knows its
             // outcome reaches the same call it always did.
-            cycle.Step(
-                held.Moment(new HashSet<Code>(said)),
-                turn.Outcome is { } outcome ? Brain.Says(outcome) : null);
+            await cycle.StepAsync(
+                new HashSet<Code>(said),
+                turn.Outcome is { } outcome ? Brain.Says(outcome) : null,
+                ct).ConfigureAwait(false);
         }
 
         return new Tally

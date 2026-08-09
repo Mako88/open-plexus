@@ -52,7 +52,7 @@ public sealed class AbstainTests(ITestOutputHelper output)
     /// how often the world was quiet.
     /// </remarks>
     [Fact]
-    public void An_unsettled_round_moves_nothing_but_the_abstain_count()
+    public async Task An_unsettled_round_moves_nothing_but_the_abstain_count()
     {
         var held = new Population(new CommittingSettings(), seed: 1);
 
@@ -61,11 +61,11 @@ public sealed class AbstainTests(ITestOutputHelper output)
 
         held.Add(new Commitment([one], Brain.Says(0)));
 
-        var cycle = new Cycle(held, rounds: 10, sweep: 1000, target: 0.9, window: 2);
+        var cycle = new Cycle(new Alone(held), rounds: 10, sweep: 1000, target: 0.9, window: 2);
 
         var moment = new HashSet<Code> { one, two };
 
-        cycle.Step(moment, Brain.Says(0));
+        await cycle.StepAsync(moment, Brain.Says(0));
 
         var mind = held.All.Single();
 
@@ -74,7 +74,7 @@ public sealed class AbstainTests(ITestOutputHelper output)
         var accuracy = mind.Accuracy;
         var separations = mind.Separations.Count;
 
-        cycle.Step(moment, arrived: null);
+        await cycle.StepAsync(moment, arrived: null);
 
         Assert.Equal(1, cycle.Abstained);
         Assert.Equal(1, mind.Abstains);

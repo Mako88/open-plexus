@@ -98,7 +98,7 @@ public sealed record Spent
 /// </remarks>
 public sealed class Cycle
 {
-    private readonly Population _held;
+    private readonly ICouncil _council;
     private readonly int _sweep;
     private readonly double _target;
     private readonly int _window;
@@ -107,19 +107,19 @@ public sealed class Cycle
     private readonly Queue<bool> _trailing;
     private int _standing;
 
-    /// <param name="held">What the machine holds.</param>
+    /// <param name="council">Whoever votes, settles and sweeps — one machine or a fleet.</param>
     /// <param name="rounds">How many rounds the run will be, for the closing report.</param>
     /// <param name="sweep">How often to subsume, abstract and cull.</param>
     /// <param name="target">The trailing accuracy <see cref="Reached"/> waits for.</param>
     /// <param name="window">How many answered predictions that accuracy is over.</param>
-    public Cycle(Population held, long rounds, int sweep, double target, int window)
+    public Cycle(ICouncil council, long rounds, int sweep, double target, int window)
     {
-        ArgumentNullException.ThrowIfNull(held);
+        ArgumentNullException.ThrowIfNull(council);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(rounds);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(sweep);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(window);
 
-        _held = held;
+        _council = council;
         _sweep = sweep;
         _target = target;
         _window = window;
@@ -213,28 +213,14 @@ public sealed class Cycle
 
     private double _leads;
 
-    private long _firing;
-    private long _settling;
-    private long _sweeping;
-    private long _covering;
-    private long _mending;
-
     /// <summary>Where the wall clock went, by phase.</summary>
     /// <remarks>
-    /// <b>TICKS ARE ACCUMULATED AND DIVIDED ONCE</b>, because adding a hundred thousand
-    /// millisecond doubles loses more than the thing being measured.
+    /// <b>THE COUNCIL'S CLOCK AND NOT THE LOOP'S, WHICH IS WHERE THE PHASES ACTUALLY
+    /// ARE.</b> Firing, settling, sweeping, covering and repairing all happen on whoever
+    /// holds the commitments, so a loop timing them from outside would be timing its own
+    /// wait — and on a fleet that wait is the network rather than the mechanism.
     /// </remarks>
-    public Spent Spent => new()
-    {
-        Firing = Milliseconds(_firing),
-        Settling = Milliseconds(_settling),
-        Sweeping = Milliseconds(_sweeping),
-        Covering = Milliseconds(_covering),
-        Mending = Milliseconds(_mending),
-    };
-
-    private static double Milliseconds(long ticks) =>
-        ticks * 1000.0 / Stopwatch.Frequency;
+    public Spent Spent => _council.Spent;
 
     /// <summary>Rounds whose settlement could not say what followed.</summary>
     /// <remarks>
@@ -248,11 +234,23 @@ public sealed class Cycle
     public long Abstained { get; private set; }
 
     /// <summary>Predicts, scores, settles, sweeps, and repairs what was wrong.</summary>
-    /// <param name="moment">What is live, already folded through any minted names.</param>
+    /// <param name="moment">
+    /// What is live, <b>raw</b> — a minted name is folded in by whoever holds it.
+    /// </param>
     /// <param name="arrived">
     /// What followed it, or nothing where the settlement could not say.
     /// </param>
+    /// <param name="ct">Cancellation.</param>
     /// <remarks>
+    /// <para>
+    /// <b>ASYNCHRONOUS BECAUSE A GATHERING ARRIVES WHEN IT ARRIVES, AND THAT IS THE WHOLE
+    /// OF WHY THE HARNESS MOVED WITH IT.</b> The vote is a scatter to every holder and a
+    /// gather of whatever comes back, so a loop that could not wait could not take one —
+    /// and building a second loop that could is the duplication that would let two copies
+    /// of this start learning different things. In one process nothing here ever yields;
+    /// see <see cref="Alone"/> and <c>Machines.Trial.Run</c>, which refuses a council that
+    /// would have made it wait.
+    /// </para>
     /// <para>
     /// <b>A NULL OUTCOME IS THE THIRD VERDICT AND IT COULD NOT BE EXPRESSED HERE UNTIL
     /// NOW.</b> <c>Commitment.Settle</c> has always handled <c>Verdict.Abstain</c>
@@ -275,48 +273,36 @@ public sealed class Cycle
     /// and skipping them here would reintroduce it keyed on how often the world was quiet.
     /// </para>
     /// </remarks>
-    public void Step(IReadOnlySet<Code> moment, Code? arrived)
+    public async ValueTask StepAsync(
+        IReadOnlySet<Code> moment, Code? arrived, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(moment);
 
-        if (arrived is not { } outcome)
-        {
-            Rounds++;
-            Abstained++;
-
-            _held.Witness(moment);
-            _held.Settle(_held.Firing(moment), moment, arrived: null);
-
-            Sweep(Rounds - 1, Stopwatch.GetTimestamp());
-            return;
-        }
-
-        Step(moment, outcome);
-    }
-
-    /// <summary>The ordinary round, where the settlement said something.</summary>
-    /// <param name="moment">What is live.</param>
-    /// <param name="arrived">What followed it.</param>
-    private void Step(IReadOnlySet<Code> moment, Code arrived)
-    {
         var round = Rounds++;
 
-        var at = Stopwatch.GetTimestamp();
+        // THE VOTE IS TAKEN BEFORE THE SETTLEMENT IS KNOWN, AND THAT IS THE DEPLOYMENT
+        // ARRIVING RATHER THAN A REARRANGEMENT. A machine does not learn that the world is
+        // about to go quiet and then decline to predict; the observation arrives, it says
+        // what it expects, and the settlement either comes or does not. Reading it is
+        // free -- `Predict` writes nothing -- so a round the world cannot settle costs a
+        // vote nobody scores, which is what it costs in the world too.
+        var vote = await _council.AskAsync(moment, ct).ConfigureAwait(false);
 
-        // NOTED BEFORE ANYTHING READS IT, so a code is counted live in the very moment
-        // genesis may be asked about it. Recording it after covering would let the first
-        // moment a code appears be judged against a table that had not seen it.
-        _held.Witness(moment);
+        if (arrived is not { } outcome)
+        {
+            Abstained++;
 
-        var firing = _held.Firing(moment);
-        var vote = _held.Predict(firing);
-
-        at = Mark(ref _firing, at);
+            // NOTHING IS SCORED, WHICH IS THE WHOLE CONTENT OF THE THIRD VERDICT. Not
+            // `Silent`, because the population may well have spoken; not `Voted`, because
+            // there is nothing for a confidence to be a confidence about.
+            await Told(arrived: null, wrong: false, round, ct).ConfigureAwait(false);
+            return;
+        }
 
         if (vote.Expects is not { } said) Silent++;
         else
         {
-            var hit = said == arrived;
+            var hit = said == outcome;
 
             // GUARDED, BECAUSE A ZERO WEIGHT IS REACHABLE AND SILENT. Every accuracy
             // starts at nought and `Sharpness` raises it to a power, so the first
@@ -343,98 +329,33 @@ public sealed class Cycle
                 Reached = round;
         }
 
-        // THE SCORING ABOVE IS COUNTED WITH THE VOTE RATHER THAN GIVEN ITS OWN PHASE. It
-        // is a handful of comparisons and a queue push; a phase for it would report noise
-        // and invite somebody to optimise it.
-        at = Mark(ref _firing, at);
-
-        _held.Settle(firing, moment, arrived);
-
-        at = Mark(ref _settling, at);
-
-        at = Sweep(round, at);
-
-        // REPAIR NEED NOT WAIT FOR THE VOTE, AND WHETHER IT SHOULD IS AN ARM. The plan
-        // says an outvoted commitment still accrues its own hits and misses -- and then
-        // this early return meant it could never spend them, so how hard the machine
-        // searched was a function of how good its answers already were. `Mend` refuses
-        // anything short of the floor, over budget, or without a condition past the
-        // separation bar, so its own gates are not being loosened; only this one is.
-        // AND WHICH RULES MAY BE REPAIRED IS A DIFFERENT SETTING, ASKED INSIDE `Mend`.
-        // The two were one enum until the axes were separated, and this loop read the
-        // combined value in two places -- so a cell that changed the gate also changed
-        // where the call sat, and no comparison could move one without the other.
-        if (_held.Dials.Repairing == Repairing.EveryRound
-            && _held.Mend(firing, arrived) is not null)
-            Repaired++;
-
-        at = Mark(ref _mending, at);
-
-        if (vote.Expects == arrived) return;
-
-        // COVERING RUNS ONLY ON A FAILURE AND IS NOT MOVED WITH REPAIR. Genesis mints
-        // per live code, so running it every round walks the whole `code -> outcome`
-        // space -- which is the refutation that put `Surprising` back, and it would
-        // arrive again by this door.
-        //
-        // AND COVERING IS GATED AGAIN INSIDE, on whether anything that fired proposed
-        // what arrived -- a failure the population already had an account of is
-        // repair's business and not genesis's. `Surprising` is the dial.
-        Minted += _held.Cover(moment, arrived, firing);
-
-        at = Mark(ref _covering, at);
-
-        if (_held.Dials.Repairing == Repairing.AfterFailure
-            && _held.Mend(firing, arrived) is not null)
-            Repaired++;
-
-        Mark(ref _mending, at);
+        // WRONG IS THE FLEET'S VERDICT AND NEVER A HOLDER'S, which is why it is told
+        // rather than worked out where genesis runs. A shard that had nothing to say about
+        // a moment the population as a whole answered correctly has not witnessed a
+        // failure, and covering there would mint on every machine that happened to be
+        // quiet -- the ungated genesis refutation arriving through the distribution.
+        await Told(outcome, wrong: vote.Expects != outcome, round, ct).ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Subsumes, abstracts and culls if this is a sweep round.
-    /// </summary>
-    /// <param name="round">Which round it is.</param>
-    /// <param name="at">The running mark.</param>
-    /// <returns>A fresh mark.</returns>
+    /// <summary>Tells the council what the settlement said, and counts what it did.</summary>
+    /// <param name="arrived">What followed, or nothing where the settlement could not say.</param>
+    /// <param name="wrong">Whether the vote missed.</param>
+    /// <param name="round">Which round it is, for the sweep's calendar.</param>
+    /// <param name="ct">Cancellation.</param>
     /// <remarks>
-    /// <para>
-    /// <b>THE SWEEP IS NOT PART OF FAILING, and it sat inside the failure branch for the
-    /// whole of step one.</b> Once the learner is right most of the time, the chance of a
-    /// wrong round landing on a sweep round is the miss rate itself -- so subsumption and
-    /// culling ran a handful of times in thirty thousand rounds and read as mechanisms
-    /// that bought nothing.
-    /// </para>
-    /// <para>
-    /// <b>AND IT IS NOT PART OF SETTLING EITHER, WHICH IS WHY IT IS ITS OWN METHOD NOW.</b>
-    /// A round the world could not settle skips every other thing this loop does and must
-    /// still sweep, or the calendar becomes conditional on how often the world was quiet --
-    /// the same trap by a new door.
-    /// </para>
+    /// <b>THE SWEEP'S CALENDAR IS THE LOOP'S AND THE SWEEP IS THE COUNCIL'S.</b> Which
+    /// round it is cannot be a fact each holder works out for itself — a fleet whose
+    /// members swept on their own count would sweep at different moments, and rung five's
+    /// evidence is the whole population.
     /// </remarks>
-    private long Sweep(long round, long at)
+    private async ValueTask Told(Code? arrived, bool wrong, long round, CancellationToken ct)
     {
-        if (round % _sweep != _sweep - 1) return at;
+        var learnt = await _council
+            .TellAsync(arrived, wrong, sweeping: round % _sweep == _sweep - 1, ct)
+            .ConfigureAwait(false);
 
-        Subsumed += _held.Subsume();
-        _held.Abstract();
-        _held.Cull();
-
-        return Mark(ref _sweeping, at);
-    }
-
-    /// <summary>Charges the ticks since a mark to a phase, and returns a fresh mark.</summary>
-    /// <param name="phase">The running total to add to.</param>
-    /// <param name="since">When the phase started.</param>
-    /// <remarks>
-    /// <b>ONE CALL A PHASE RATHER THAN A <c>Stopwatch</c> EACH.</b> Five allocations a
-    /// round over thirty thousand rounds is a cost the instrument would be adding to the
-    /// thing it measures; a timestamp is a single counter read.
-    /// </remarks>
-    private static long Mark(ref long phase, long since)
-    {
-        var now = Stopwatch.GetTimestamp();
-        phase += now - since;
-        return now;
+        Minted += learnt.Minted;
+        Repaired += learnt.Repaired;
+        Subsumed += learnt.Subsumed;
     }
 }

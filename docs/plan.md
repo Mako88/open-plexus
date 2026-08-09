@@ -684,6 +684,12 @@ change of architecture entirely.
   PERTURBATION.** A divisor 1.36 at fifty rounds and 1.01 at twenty thousand mints a
   different population, so a mid-run reading and an end-of-run one are different
   measurements.
+- **SIX EXPLANATIONS IN ONE SESSION DIED TO CONTROLS AND EVERY ONE CHANGED SELECTION.**
+  Where the measurement says no right rule was present, a rule about who WINS cannot reach
+  it. Ask which half of generate-and-test a proposal touches before building it.
+- **AND THE INSTRUMENT THAT KILLS A STORY IS USUALLY BUILT FOR SOMETHING ELSE.** Twice in
+  one session a reading taken for a different question refuted the standing explanation,
+  so build the instrument before the seventh story.
 - **A `readonly record struct` HOLDING AN `ImmutableArray` COMPARES BY THE ARRAY'S
   IDENTITY.** Two separately built keys with identical contents are never equal, so an
   equality asserted on one fails on a world it has no complaint about.
@@ -825,60 +831,37 @@ change of architecture entirely.
   computed from inside can tell that this is such a world.
 - **MORE UNSOUND RULES WITH FEWER SOUND ONES SCORED HIGHER THERE**, so what the withheld
   score tracks is not how much of the world the population has got right.
-- **GENESIS STOPS AT ABOUT ROUND FIVE HUNDRED AND NEVER RUNS AGAIN.** Fourteen mints in the
-  first hundred rounds and nought in the next nineteen thousand, at both widths and both
-  skews. Everything after is repair on whatever the opening minted.
-- **AND TWO THIRDS OF WRONG ANSWERS ARE ROUNDS NO SOUND RULE ADVOCATED**, rising to all of
-  them on the skewed world. No vote rule can reach those, so every gate, weighing and
-  subsumption arm was aimed at a third of the problem.
-- **THE OVER-SPECIALISATION STORY IS REFUTED BY ITS OWN NUMBER.** A child beat a sound
-  parent on 2 of 436 wrong rounds at six bits and 46 of 982 at eleven, so the vote
-  preferring the narrower rule costs nothing measurable.
-- **AND `Weighing` MOVES THE UNCOVERED BUCKET RATHER THAN THE OUTVOTED ONE**, which makes
-  the winning rule a better SEARCH wearing a readout's name. Genesis mints the identical
-  count under all three; only what repair does with them differs.
-- **REPAIR RUNS FIFTEEN HUNDRED TIMES ON THE SKEWED WORLD AND FINDS NOTHING TRUE.**
-  Six-fold more repair and three-fold more residents leave `found` at exactly nought, so
-  what repair AIMS at is the defect and how much of it runs is not.
-- **AND THE VOTE REACHES WHAT THE BUDGET CANNOT.** `Weighing.Lifting` finds three of
-  sixteen there over eight seeds where every budget and mending cell finds nought, so
-  steering repair beats feeding it.
-- **THE BUDGET REFUSING NINE CANDIDATES IN TEN IS A FACT AND NOT A CAUSE**, which is a
-  share read as a bottleneck. Where a gate discards most of its input, ask what the input
-  was worth before asking for more of it.
-- **IT HOLDS TRUE RULES THAT FIRE ONLY WHERE GUESSING ALREADY WORKS.** On the skewed
-  world not one of nearly four thousand hard rounds has a sound rule advocating
-  correctly, while sound rules sit resident at perfect accuracy.
+- **GENESIS SATURATES ITS ONE-CODE SPACE IN THE OPENING HUNDRED ROUNDS** and never mints
+  again. Its whole reach is the vocabulary times the outcomes, so every rule longer than
+  one code has to come from repair.
+- **AND TWO THIRDS TO ALL OF EVERY WRONG ANSWER IS A ROUND NO SOUND RULE ADVOCATED.** No
+  vote rule can reach those, so every gate, weighing and subsumption arm was aimed at a
+  third of the problem.
+- **THE OVER-SPECIALISATION STORY IS REFUTED BY ITS OWN NUMBER.** A child beats a sound
+  parent on a fortieth of wrong rounds, so the vote preferring the narrower rule costs
+  nothing measurable.
+- **AND `Weighing` MOVES THE UNCOVERED BUCKET RATHER THAN THE OUTVOTED ONE**, which is a
+  better SEARCH wearing a readout's name. Genesis mints the identical count under all
+  three; only what repair does with them differs.
+- **IT HOLDS TRUE RULES THAT FIRE ONLY WHERE GUESSING ALREADY WORKS.** On the skewed world
+  no hard round has a sound rule advocating correctly, while sound rules sit resident at
+  perfect accuracy.
 - **AND `Found` MARKS THE BASIS RATHER THAN THE LEARNER, WHICH THIS DOC ALREADY WARNED.**
-  A world admits several correct rule sets; skew makes an all-agree rule cheap, sound and
-  useless. `Census.Paying` is the reading that cannot be gamed.
+  Skew makes an all-agree rule cheap, sound and useless. `Census.Paying` is the reading
+  that cannot be gamed.
 - **AND ACCURACY SEPARATES TRUTH FROM FALSEHOOD BEST ON THE WORLD IT LEARNS LEAST**, so
-  the fitness signal is not what fails there. The gap is widest under skew and narrowest
-  at eleven bits even.
-- **AND THE VOTE RULE'S SIGN FLIPS ON THAT READING, WHICH NO SCORE SHOWED.** A sum
-  carries most hard rounds where outcomes are even and none at all where they are skewed;
-  dividing by the base rate inverts both.
-- **THE VOTE CONSULTS COMMITMENTS THAT HAVE NO STATISTICS AND RANKS THEM ABOVE ONES THAT
-  DO.** The estimate averages over its first firings, so a rule right once weighs one and
-  beats a rule right ninety-five times in a hundred.
-- **AND IT COSTS NOTHING, WHICH IS THE FIFTH EXPLANATION THIS WEEK TO DIE TO ITS OWN
-  CONTROL.** They win about a sixth of wrong rounds at eleven bits and refusing them
-  changes no metric anywhere.
-- **BECAUSE THOSE ROUNDS WERE UNCOVERED ANYWAY.** Removing the untested winner hands the
-  seat to a different wrong rule, and the share is smallest exactly where the failure is
-  total.
-- **REPAIR'S CHOICE OF CONDITION IS THE MOST LOAD-BEARING THING MEASURED, AND IT PASSES ITS
-  OWN KILL CONDITION.** Drawing the condition at random holds no sound rule on any world
-  while repairing ten to thirty times more.
-- **SO REPAIR CHOOSES WELL FROM THE WRONG STARTING MATERIAL.** It builds true rules on the
-  skewed world and they pay nothing, because the seeds it is given are about the outcome
-  that was never the problem.
-- **EXCEPT THAT THE MINORITY SEEDS ARE THERE, WHICH KILLS THAT TOO.** Genesis mints nearly
-  as many roots for the rare outcome as for the common one on both skewed widths, so the
-  starting material is not what is missing.
-- **EVERY LINK IS SOUND AND THE CHAIN MAKES NOTHING**, which is where this stands. What is
-  unmeasured is what becomes of a minority-rooted lineage between its seed and a finished
-  rule.
+  the fitness signal is not what fails there.
+- **AND THE VOTE RULE'S SIGN FLIPS ON THAT READING, WHICH NO SCORE SHOWED.** A sum carries
+  most hard rounds where outcomes are even and none where they are skewed; dividing by the
+  base rate inverts both, and it is the only thing that has.
+- **REPAIR'S CHOICE OF CONDITION PASSES ITS OWN KILL CONDITION** and is the most
+  load-bearing thing measured. Drawing at random holds no sound rule on any world while
+  repairing many times more.
+- **AND EVERY LINK IS SOUND WHILE THE CHAIN MAKES NOTHING.** Minority seeds exist,
+  choosing works, repair runs, true rules come out — and none of them fires where the base
+  rate fails.
+- **WHAT IS UNMEASURED IS THE LINEAGE**: what becomes of a minority-rooted seed between its
+  start and a finished rule. It is the last link nothing has instrumented.
 
 ---
 

@@ -57,6 +57,38 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     /// </remarks>
     private const double Lifetime = 0.001;
 
+    /// <summary>
+    /// Trailing accuracy at three distances past the flip, as three formatted cells.
+    /// </summary>
+    /// <param name="flip">How often the target moves, or nought to leave it still.</param>
+    /// <param name="dials">The brain, per seed.</param>
+    /// <remarks>
+    /// <b>ONE COPY BECAUSE `DuplicationTests` REFUSED THE THIRD.</b> Every grid in this file
+    /// is the same curve read under a different setting, and three copies of the loop is
+    /// three chances for one grid's distances or seed count to drift from another's — which
+    /// would make rows that look comparable and are not. The reading is the row; the walk is
+    /// not.
+    /// </remarks>
+    private static string Curve(int flip, Func<int, CommittingSettings> dials)
+    {
+        var read = new List<string>();
+
+        foreach (var past in new[] { 250, 1_000, 5_000 })
+        {
+            var recent = new List<double>();
+
+            for (var seed = 1; seed <= Seeds; seed++)
+                recent.Add(new MultiplexerRun(
+                    new MultiplexerSettings { Address = 2, Switch = flip },
+                    new Brain(dials(seed), seed),
+                    seed).Run(Settled + past).Recent);
+
+            read.Add($"{Sweep.Spread(recent),18}");
+        }
+
+        return string.Join(" | ", read);
+    }
+
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_a_moving_target_costs_and_whether_the_local_estimate_pays_for_it()
@@ -96,23 +128,9 @@ public sealed class RecoveryTests(ITestOutputHelper output)
                 ("~0", Lifetime),
             })
             {
-                var read = new List<string>();
-
-                foreach (var past in new[] { 250, 1_000, 5_000 })
-                {
-                    var recent = new List<double>();
-
-                    for (var seed = 1; seed <= Seeds; seed++)
-                        recent.Add(new MultiplexerRun(
-                            new MultiplexerSettings { Address = 2, Switch = flip },
-                            new Brain(new CommittingSettings { Recency = recency }, seed),
-                            seed).Run(Settled + past).Recent);
-
-                    read.Add($"{Sweep.Spread(recent),18}");
-                }
-
                 output.WriteLine(
-                    $"{world,-11} | {arm,7} | " + string.Join(" | ", read));
+                    $"{world,-11} | {arm,7} | "
+                    + Curve(flip, _ => new CommittingSettings { Recency = recency }));
             }
         }
 
@@ -149,36 +167,62 @@ public sealed class RecoveryTests(ITestOutputHelper output)
 
         foreach (var gate in new[] { Surprising.Unaccounted, Surprising.AnyFailure })
         {
-            var read = new List<string>();
-            var minted = new List<double>();
+            var curve = Curve(Settled, _ => new CommittingSettings { Surprising = gate });
 
-            foreach (var past in new[] { 250, 1_000, 5_000 })
-            {
-                var recent = new List<double>();
-
-                for (var seed = 1; seed <= Seeds; seed++)
-                {
-                    var learned = new MultiplexerRun(
-                        new MultiplexerSettings { Address = 2, Switch = Settled },
-                        new Brain(new CommittingSettings { Surprising = gate }, seed),
-                        seed).Run(Settled + past);
-
-                    recent.Add(learned.Recent);
-
-                    if (past == 5_000) minted.Add(learned.Tally.Minted);
-                }
-
-                read.Add($"{Sweep.Spread(recent),18}");
-            }
+            var minted = Enumerable.Range(1, Seeds)
+                .Select(seed => (double)new MultiplexerRun(
+                    new MultiplexerSettings { Address = 2, Switch = Settled },
+                    new Brain(new CommittingSettings { Surprising = gate }, seed),
+                    seed).Run(Settled + 5_000).Tally.Minted)
+                .ToList();
 
             output.WriteLine(
-                $"{gate,-12} | " + string.Join(" | ", read)
-                + $" | {Sweep.Spread(minted, "F0")}");
+                $"{gate,-12} | " + curve + $" | {Sweep.Spread(minted, "F0")}");
         }
 
         // NO BAR. Whether the gate is what recovery waits on has never been measured, and a
         // threshold written before the first reading would be the answer rather than the
         // finding.
+    }
+
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_a_subsumption_that_demands_significance_recovers_faster()
+    {
+        // THE THIRD ACCOUNT, AND ITS PREDICTION IS IN THE COMMIT THAT SHIPPED THE READING
+        // BELOW RATHER THAN IN THIS COMMENT. Repair makes about nineteen children in the five
+        // thousand rounds after a flip and subsumption removes about twenty-five, so the
+        // population shrinks across the window it is meant to be rebuilding in.
+        //
+        // AND THE MECHANISM IS ALREADY NAMED. A fresh child inherits no table, so it must
+        // re-earn its statistics -- and under `Subsuming.Weaker` a rule that is merely NOT
+        // BETTER than its parent loses, which a child with almost no firings usually is.
+        // `Insignificant` demands the narrower rule be significantly better before the
+        // general one may take its place, by the two-proportion test repair already owns, and
+        // holds roughly twice the residents where it has been measured.
+        //
+        // WHAT WOULD KILL IT: no separation on the switching world, or the same movement on
+        // the stationary one. The second would mean the arm is doing something this question
+        // is not about, which is why the control is here rather than assumed away.
+        output.WriteLine($"{Seeds} seeds, target moves once at {Settled} rounds");
+        output.WriteLine("world       | subsuming      | 250 past the flip | 1000 | 5000");
+
+        foreach (var (world, flip) in new (string World, int Flip)[]
+        {
+            ("stationary", 0),
+            ("switching", Settled),
+        })
+        {
+            foreach (var rule in new[] { Subsuming.Weaker, Subsuming.Insignificant })
+            {
+                output.WriteLine(
+                    $"{world,-11} | {rule,-14} | "
+                    + Curve(flip, _ => new CommittingSettings { Subsuming = rule }));
+            }
+        }
+
+        // NO BAR, AND THE PREDICTION IS ELSEWHERE ON PURPOSE. A threshold here would be the
+        // answer rather than the reading; a prediction in a commit can be wrong in public.
     }
 
     [Fact]

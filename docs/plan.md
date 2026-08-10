@@ -775,8 +775,10 @@ change of architecture entirely.
   lifetime average on a stationary world and ahead once the trailing window is entirely past
   a flip. Fork 27's prediction, held.
 - **AND RELEARNING AFTER A FLIP IS SLOWER THAN LEARNING FROM NOTHING.** Five thousand rounds
-  past one flip the run sits well under what it reaches from scratch in fewer. A population
-  of confident wrong rules is an obstacle.
+  past one flip the run sits well under what it reaches from scratch in fewer.
+- **AND IT IS NOT THE OLD RULES SQUATTING, WHICH WAS THE OBVIOUS ACCOUNT.** One resident in
+  thirty-five is believed over a life and refuted lately; culling never runs below capacity
+  and subsumption turns the population over regardless.
 - **ROUNDS-TO-TARGET ACCELERATES IN THE RELEVANT BITS, WITH ERROR BARS AT LAST.** Six to
   eleven is under twofold; eleven to twenty is nearly sixfold. That is the number that
   predicts whether any of this reaches perception.
@@ -1044,5 +1046,5 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **69** | Naming until refused finds far more true rules and keeps a fleet agreeing. CLOSED AGAINST: it finds LONGER ones, and hard-round coverage falls while every count rises. Deleted with a revival row |
 | **70** | Proposals naming a pair already named mint nothing. ANSWERED: spending the ask on the best unnamed pair nearly triples the stacking on both eleven-bit worlds and sells nothing. Shipped, and the arm is deleted. Closed |
 | **68** | John's: does a conjunction EARN its narrowing? Its premise is half wrong -- reach halves with depth on even worlds and RISES under skew, where correlated codes let a long scope fire as often as a short one. Open |
-| **72** | Relearning after the target moves is slower than learning the same world from nothing. Culling fires only over capacity, so on a small world nothing ever removes a rule that was right and is now wrong. Open |
+| **72** | Relearning after the target moves is slower than learning the world from nothing, and NOT because old rules squat -- one resident in thirty-five is stale. Open on what does make it slow |
 | **71** | A minted name is a code, so repair adds it for the price of one. Should the separation bar be charged by what a scope's codes STAND FOR rather than by how many there are? Open |

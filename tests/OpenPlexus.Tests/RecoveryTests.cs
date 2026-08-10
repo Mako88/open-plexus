@@ -124,6 +124,78 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void The_wreckage_of_a_flip_is_not_what_is_resident_afterwards()
+    {
+        // THE OBVIOUS EXPLANATION FOR SLOW RECOVERY, AND THIS IS THE CONTROL THAT REFUSES
+        // IT. Relearning after the target moves is slower than learning the same world from
+        // nothing, and the reading that suggests itself is that the population is full of
+        // confidently wrong rules holding seats -- `Cull` returns early below `Capacity` and
+        // this world holds a few dozen commitments against two thousand, so nothing is ever
+        // culled at all.
+        //
+        // AND THE MACHINE ALREADY KEEPS BOTH STATISTICS NEEDED TO LOOK. `Reliability` is the
+        // G-Counter ratio over a commitment's whole life; `Accuracy` is the local decaying
+        // estimate. A rule that was right and is now wrong is one where the first is high and
+        // the second is not, and the gap between two numbers the design already carries needs
+        // no threshold anyone had to choose.
+        //
+        // WHAT IT SAYS IS THAT THE WRECKAGE IS NOT THERE. A handful of residents past a flip,
+        // almost none of them believed-over-a-life and refuted-lately, and subsumption
+        // removing a hundred and more over the run -- so the population turns over even where
+        // culling never runs, and slow recovery is NOT the old rules squatting. Whatever
+        // makes it slow is open, and it is not this.
+        var settings = new MultiplexerSettings { Address = 2 };
+
+        var brain = new Brain(new CommittingSettings(), 1);
+
+        new MultiplexerRun(settings with { Switch = Settled }, brain, seed: 1)
+            .Run(Settled + 5_000);
+
+        var experienced = brain.Held.All
+            .Where(one => one.Seen >= brain.Dials.Floor)
+            .ToList();
+
+        // BELIEVED OVER A LIFETIME AND REFUTED LATELY. Both bars are the same number and it
+        // is one the design already uses for a coin toss, so neither is tuned.
+        var stale = experienced.Count(one => one.Reliability > 0.5 && one.Accuracy < 0.5);
+
+        var culled = brain.Held.Lineages.Values.Sum(one => one.Culled);
+        var subsumed = brain.Held.Lineages.Values.Sum(one => one.Subsumed);
+
+        output.WriteLine(
+            $"{experienced.Count} experienced residents 5000 rounds past one flip, "
+            + $"{stale} believed over a lifetime and refuted lately");
+
+        output.WriteLine(
+            $"culled {culled}, subsumed {subsumed}, residents {brain.Held.Count} "
+            + $"against a capacity of {brain.Dials.Capacity}");
+
+        output.WriteLine(
+            $"mean reliability {experienced.Average(one => one.Reliability):F3}, "
+            + $"mean accuracy {experienced.Average(one => one.Accuracy):F3}");
+
+        // THE POPULATION IS NOWHERE NEAR THE CAPACITY, SO CULLING NEVER RUNS. Asserted rather
+        // than remarked, because it is the half of the story that IS true: nothing here
+        // deletes on a rule going bad, and the population turns over anyway.
+        Assert.True(
+            brain.Held.Count < brain.Dials.Capacity,
+            "this world now overshoots the capacity, so culling runs and the reading below "
+            + "is about a different machine");
+
+        Assert.Equal(0, culled);
+
+        // AND SUBSUMPTION IS WHAT MOVES INSTEAD, which is what makes the stale count small
+        // rather than an accident of one seed. If this ever reads nought the population is
+        // static and the paragraph above stops being the explanation.
+        Assert.True(subsumed > 0,
+            "nothing was subsumed either, so nothing whatever removes a commitment on this "
+            + "world and the small stale count needs another account");
+
+        // NO BAR ON `stale`. It is the reading, and a threshold on it would be a prediction
+        // dressed as a requirement -- in either direction.
+    }
+
+    [Fact]
     public void The_flip_is_reached_by_the_learner_and_not_only_by_the_world()
     {
         // A WORLD CAN MOVE AND THE LEARNER NEVER NOTICE, WHICH READS EXACTLY LIKE A LEARNER

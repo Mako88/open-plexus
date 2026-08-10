@@ -845,9 +845,9 @@ change of architecture entirely.
 - **AND THE SAME GATE IS BEHIND ON EVERY SEED ON `Arranged`, ON BOTH FRONT ENDS.**
   Self-limiting genesis stops early and never mints most of the rules that solve the
   world. Fork 40 asked whether that happens; it does.
-- **THREE DIALS WERE READ AS HAVING A PER-WORLD BEST VALUE, AND NOT ONE OF THEM DOES.**
-  `Sharpness`, `Weighing` and `Mending` were the whole case that a world reaches into the
-  brain; each fell to a different confusion, named below.
+- **THREE DIALS WERE THE WHOLE CASE THAT A WORLD REACHES INTO THE BRAIN, AND NOT ONE OF THEM
+  DOES.** Two are deleted with revival rows and the third was two settings crossed. What is
+  left of the case is below.
 - **AND `Mending` DID NOT SHOW THAT PATTERN ONCE ITS TWO AXES WERE SEPARATED.** Every-round
   repair leads on both worlds measured — unseparated on one, near two standard errors on
   the other — so the row above may be about a conflation.
@@ -860,17 +860,6 @@ change of architecture entirely.
 - **SO THE AXIS IS NOT TIMING THEN GATE.** Ungated after a failure sits with the every-round
   group, so what is ruinous is the gate after a failure specifically — and the paid test
   adds nothing once repair waits for the vote.
-- **AND `Sharpness` IS NOT AN AXIS UNDER `Strongest` AT ALL, WHICH IS THE SECOND LEG
-  FLAGGED.** Raising to a power is monotone, so the argmax never moves: three powers, one
-  identical run, at both widths. It is a parameter of `Summing`.
-- **AND AT ONE FIXED POWER THE SUM NOW LOSES, WHICH IT DID NOT WHEN THE VOTE STEERED THE
-  SEARCH.** Ten worlds: `Strongest` leads on three and is level on seven, `Summing` and
-  `Lifting` lead on none. The pre-registered rule kept both losers out.
-- **AND `Arranged` WAS THE REASON TO KEEP THE SUM, AND IT INVERTED.** Deleting the sum was
-  read as costing true rules there; under every-round repair all three weighings find the
-  same rules and the sum trails.
-- **SO TWO OF THE THREE DIALS ARE ONE DIAL WITH A DEAD COLUMN.** `Sharpness` is a parameter
-  of an arm that lost, so it stops existing rather than stops mattering.
 - **AND THE THIRD LEG WAS TWO SETTINGS.** `Mending` is a gate and a timing now; every
   reading behind the row moved both at once, and the timing leads on both worlds.
 - **THE VOTE THREW AWAY PART OF A WORLD IT HAD ALREADY SOLVED**, with every sound rule
@@ -941,8 +930,6 @@ change of architecture entirely.
 - **AND THE ARMS THAT PAY ARE EXACTLY THE ARMS THAT REDIRECT BLAME**, over three arms and
   two widths — a share of blame near nought pays near nought, and two unrelated ways of
   breaking the coupling both take it to four fifths and pay.
-- **SO `Weighing.Lifting` IS NOT A VOTE RULE.** It is blame redirection implemented in the
-  vote, which is why it is the only thing that has ever moved hard-round coverage.
 - **AND BREAKING THE COUPLING SURVIVED THE WORLD IT WAS PREDICTED TO RUIN.** `EveryRound`
   leads on `Arranged` at two standard errors over eight seeds, and is inside one on both
   even multiplexers. The kill condition was written down first and did not fire.
@@ -982,9 +969,6 @@ change of architecture entirely.
 - **UNDER `EveryRound` ALL THREE WEIGHINGS BUILD ONE POPULATION, EQUAL PER SEED** on sound
   rules, unsound rules, residents and rules found. Asserted now rather than observed, and it
   goes red under the old timing.
-- **SO `Lifting` WAS DOING TWO JOBS AND NOW DOES ONE.** Its whole effect on what gets BUILT
-  was blame redirection; the timing does that properly, and what is left is a vote rule
-  weighing a vote.
 - **AND EVERY VOTE ARM MEASURED BEFORE THAT TIMING SHIPPED WAS A SEARCH ARM TOO**, because
   repair ran only where the winner was wrong. Every reason to keep `Summing` was read under
   it, and `Strongest` costs no true rules now.

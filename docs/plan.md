@@ -798,8 +798,9 @@ change of architecture entirely.
 - **AND A LIFETIME BUDGET DOES NOT DEGRADE WITH THE MOVES, IT FAILS AT THE FIRST ONE.** Its
   LEVEL stops mattering there too — sixty-four and two hundred and fifty-six sit a fifth of a
   standard error apart once the world moves at all.
-- **AND `Budgeting.Earned` IS NEARLY FREE**, refusing a seventh of free's repairs at under two
-  standard errors and holding the same population — on a moving world and on a still one both.
+- **AND `Budgeting.Earned` TRACKS WHICHEVER FIXED BUDGET WINS.** Free where free wins, the cap
+  where the cap wins — because what it keys on, how often a parent is wrong, is what differs
+  between those worlds. First arm best on both.
 - **AND ON A STILL WORLD FREE IS NOT WORSE ANY MORE, WHICH IS THE LARGER SUSPICION.** A sum
   scales with the number of advocates and a maximum does not, so the budget's interior
   optimum may have been the deleted vote's crowd penalty.

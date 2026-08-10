@@ -408,6 +408,22 @@ public sealed record Census
     /// </remarks>
     public required long Unreachable { get; init; }
 
+    /// <summary>
+    /// Of the uncovered rounds that were reachable, those where every commitment expecting
+    /// the right answer was under the miss floor — <b>material in the room that repair is
+    /// barred from touching.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>A COMMITMENT THAT FIRES EXPECTING WHAT ARRIVED IS RIGHT ON THAT ROUND AND TAKES A
+    /// HIT FOR IT.</b> Its misses come from other rounds entirely, and
+    /// <see cref="Commitments.Population.Mend"/> refuses anything under
+    /// <see cref="Commitments.CommittingSettings.Floor"/> of them. So the rule that most
+    /// needs narrowing is never the culprit where it is needed, and may never accrue the
+    /// evidence to be narrowed anywhere else. This counts how often that is the state of
+    /// every candidate at once.
+    /// </remarks>
+    public required long Ineligible { get; init; }
+
     /// <summary>Wrong rounds decided by a commitment that had not yet been tested.</summary>
     /// <remarks>
     /// <para>
@@ -612,7 +628,7 @@ public sealed class Trial<TSeen>
 
         long codes = 0;
         long outvoted = 0, uncovered = 0, deeper = 0, hard = 0, carried = 0, untested = 0;
-        long unreachable = 0;
+        long unreachable = 0, ineligible = 0;
 
         // WHAT THE WORLD PRODUCES MOST, LEARNT AS IT GOES. Taking the base rate from the
         // world would score the machine against a number it is not allowed to see, and
@@ -692,7 +708,18 @@ public sealed class Trial<TSeen>
                         // can fire here either, however long the run goes on. Covering that
                         // round needs GENESIS, and genesis saturates its one-code space in
                         // the opening hundred rounds and never mints again.
-                        if (!firing.Any(one => one.Expects == arrived)) unreachable++;
+                        var present = firing.Where(one => one.Expects == arrived).ToList();
+
+                        if (present.Count == 0) unreachable++;
+
+                        // AND WHETHER REPAIR WAS EVER ALLOWED TO TOUCH WHAT WAS PRESENT.
+                        // A commitment that fires expecting what arrived is RIGHT this round
+                        // and takes a hit for it, so its misses come from other rounds
+                        // entirely -- and `Mend` refuses anything under `Floor` of them. Where
+                        // every present candidate is under the floor, the material is in the
+                        // room and the one operator that could sharpen it is barred.
+                        else if (present.TrueForAll(one => one.Misses < _brain.Dials.Floor))
+                            ineligible++;
                     }
                     else
                     {
@@ -776,6 +803,7 @@ public sealed class Trial<TSeen>
                     Outvoted = outvoted,
                     Uncovered = uncovered,
                     Unreachable = unreachable,
+                    Ineligible = ineligible,
                     Deeper = deeper,
                     Untested = untested,
                     Hard = hard,

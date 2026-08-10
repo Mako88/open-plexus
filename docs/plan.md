@@ -776,15 +776,11 @@ change of architecture entirely.
   a flip. Fork 27's prediction, held.
 - **AND RELEARNING AFTER A FLIP IS SLOWER THAN LEARNING FROM NOTHING.** Five thousand rounds
   past one flip the run sits well under what it reaches from scratch in fewer.
-- **AND IT IS NOT THE OLD RULES SQUATTING, WHICH WAS THE OBVIOUS ACCOUNT.** One resident in
-  thirty-five is believed over a life and refuted lately; culling never runs below capacity
-  and subsumption turns the population over regardless.
-- **AND IT IS NOT WAITING ON GENESIS EITHER.** Ungating it recovers identically, a tenth of a
-  standard error apart — because it mints the world's whole one-code space either way and has
-  nothing left to add.
-- **REPAIR MAKES NINETEEN CHILDREN IN THE WINDOW AND SUBSUMPTION REMOVES TWENTY-FIVE**, so
-  the population shrinks while it relearns — and stopping subsumption from removing them
-  changes nothing at all. Three accounts dead.
+- **AND THREE ACCOUNTS OF IT ARE DEAD.** Old rules squatting, genesis gated shut, subsumption
+  eating the repairs — each had a mechanism, each got a control, none of them is it.
+- **WHAT IS LEFT IS THAT REPAIR CANNOT CHANGE WHAT A COMMITMENT EXPECTS.** The lineages a
+  moved target needs are the ones that spent the whole run being wrong, and a budget is per
+  parent.
 - **ROUNDS-TO-TARGET ACCELERATES IN THE RELEVANT BITS, WITH ERROR BARS AT LAST.** Six to
   eleven is under twofold; eleven to twenty is nearly sixfold. That is the number that
   predicts whether any of this reaches perception.

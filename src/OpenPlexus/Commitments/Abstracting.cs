@@ -117,7 +117,7 @@ public sealed class Recurrence
     /// abstraction's name.</b>
     /// </para>
     /// </remarks>
-    internal static bool Eligible(Commitment one, CommittingSettings dials)
+    public static bool Eligible(Commitment one, CommittingSettings dials)
     {
         ArgumentNullException.ThrowIfNull(one);
         ArgumentNullException.ThrowIfNull(dials);

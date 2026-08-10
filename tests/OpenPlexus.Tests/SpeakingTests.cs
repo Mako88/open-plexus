@@ -139,8 +139,18 @@ public sealed class SpeakingTests(ITestOutputHelper output)
         output.WriteLine($"experienced | recent {earned.Recent:F4} "
             + $"| silent {earned.Silent} | residents {earned.Resident}");
 
+        // SILENCE IS IN THE DISJUNCTION BECAUSE DECLINING TO ANSWER IS AN ANSWER CHANGED,
+        // and it is the only reading this arm is guaranteed to move. Refusing a voter takes
+        // its seat away; whether anything ELSE then wins the round is a fact about who was
+        // left, and the plan's own revival row says the seat usually passes to another wrong
+        // rule. So a check standing on `recent` and `residents` alone reports the gate
+        // unwired exactly when the gate is working and the population is rich enough to
+        // cover for it -- which is what a bigger repair budget produced, at seven times the
+        // silence and not one point of accuracy.
         Assert.True(
-            anyone.Recent != earned.Recent || anyone.Resident != earned.Resident,
+            anyone.Recent != earned.Recent
+            || anyone.Resident != earned.Resident
+            || anyone.Silent != earned.Silent,
             "refusing the untested a vote changed nothing at all, so either every "
             + "commitment that fires is already past the floor or the gate is not wired");
     }

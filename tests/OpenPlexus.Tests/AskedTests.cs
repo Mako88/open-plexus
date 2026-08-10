@@ -56,6 +56,19 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// </summary>
     private const int Narrow = 2;
 
+    /// <summary>
+    /// A repair budget low enough that a third of the population cannot name alone —
+    /// <b>this file's precondition, and the shipped default is past it.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE SAME NUMBER AND THE SAME REASON AS <c>SplitNamingTests</c>, WHICH IS WHY BOTH
+    /// SAY WHY RATHER THAN JUST SAYING 64.</b> These tests ask what the WIRE costs rung
+    /// five, so they need shards too small to certify a redundancy unaided — otherwise a
+    /// holder names something before any bytes move and the exchange is credited with
+    /// nothing. That is a property of how much repair ran, not of the sockets.
+    /// </remarks>
+    private const int Sparse = 64;
+
     /// <summary>A population trained on the multiplexer, and the dials it ran under.</summary>
     /// <param name="address">Address bits.</param>
     /// <param name="weighing">How advocates for one expectation combine.</param>
@@ -76,6 +89,14 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// is better; <c>RepairingTests</c> is where that is measured, and it finds naming
     /// alive under both on every seed.
     /// </para>
+    /// <para>
+    /// <b>AND THE PIN DID NOT REACH THE BUDGET, WHICH IS THE SAME FAULT ONE DIAL ALONG.</b>
+    /// The paragraph above was written the day the timing changed and it names a class of
+    /// mistake — <i>whether a nameable sub-scope survives is a property of the trained
+    /// population, which every repair dial moves</i> — while pinning exactly one member of
+    /// that class. Raising the budget puts enough eligible scopes on each third that a
+    /// holder names three things alone, and the precondition below wants nought.
+    /// </para>
     /// </remarks>
     private static (CommittingSettings Dials, List<Commitment> All) Trained(
         int address, Weighing weighing = Weighing.Summing)
@@ -84,6 +105,7 @@ public sealed class AskedTests(ITestOutputHelper output)
         {
             Weighing = weighing,
             Repairing = Repairing.AfterFailure,
+            Budget = Sparse,
         };
         var brain = new Brain(dials, seed: 1);
 

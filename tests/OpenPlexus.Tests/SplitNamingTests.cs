@@ -42,6 +42,44 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     /// <summary>Eleven bits, because fork 34 says six mints nothing to split.</summary>
     private const int Address = 3;
 
+    /// <summary>
+    /// How much repair this world's population is built from — <b>pinned here rather than
+    /// inherited, because it decides whether this file's question exists at all.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THIS FILE'S PRECONDITION IS THAT A SHARD ALONE NAMES NOTHING, AND A SEARCH DIAL
+    /// BUYS PAST IT.</b> Every reading here is about what SPLITTING costs rung five, so it
+    /// needs a population a third of which cannot certify a redundancy by itself. Raise the
+    /// repair budget and each third holds enough eligible scopes to clear the gate unaided —
+    /// three holders naming three things where the fixture requires three naming none.
+    /// </para>
+    /// <para>
+    /// <b>SO THE CLAIM IS CONDITIONAL ON SHARD SIZE AND WAS NEVER WRITTEN THAT WAY.</b>
+    /// <i>Splitting a population does not remove a redundancy, it removes the ability to
+    /// certify one</i> is true of shards too small to reach the gate's counts, which is what
+    /// this world was. It is not a fact about splitting as such, and the plan says so now.
+    /// </para>
+    /// <para>
+    /// <b>AND THE TIMING IS PINNED BESIDE IT, BECAUSE THE TWO FAILURES ARE OPPOSITE AND ONE
+    /// NUMBER CANNOT DODGE BOTH.</b> Under <see cref="Repairing.EveryRound"/> a budget of 64
+    /// leaves the WHOLE population naming nothing, so the baseline assertion goes red; 256
+    /// gives every third enough to name alone, so the precondition goes red instead. What
+    /// this file needs is a population rich enough to name and shards too poor to — and that
+    /// is the window <c>AskedTests</c> already pinned for the identical reason, which is why
+    /// it was the only one of the three still green.
+    /// </para>
+    /// <para>
+    /// <b>SO THE TWO FILES PIN THE SAME PAIR, AND THEY MEASURE ONE MECHANISM ON TWO SIDES OF
+    /// A SOCKET.</b> A window that differed between them would make the in-process reading
+    /// and the wire reading incomparable, which is the whole point of having both.
+    /// </para>
+    /// </remarks>
+    private const int Sparse = 64;
+
+    /// <inheritdoc cref="Sparse"/>
+    private const Repairing Waiting = Repairing.AfterFailure;
+
     /// <summary>A trained population, its dials, and the name it proposes whole.</summary>
     /// <remarks>
     /// <b>WRITTEN ONCE BECAUSE THE CLONE BUDGET REFUSED THE THIRD COPY.</b> Three tests
@@ -52,7 +90,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     private static (CommittingSettings Dials, List<Commitment> All, ImmutableArray<Code>? Whole)
         Trained()
     {
-        var dials = new CommittingSettings();
+        var dials = new CommittingSettings { Budget = Sparse, Repairing = Waiting };
         var brain = new Brain(dials, seed: 1);
 
         new MultiplexerRun(new MultiplexerSettings { Address = Address }, brain, seed: 1)
@@ -86,7 +124,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
         // floor with a scope of two or more, and then wants three such scopes to exist and
         // a pair recurring across three of them. So the pool that gets split is this one,
         // and a resident count in the hundreds can sit on top of a pool in the tens.
-        var eligible = all.Count(one => one.Seen >= dials.Floor && one.Scope.Length >= 2);
+        var eligible = all.Count(one => Recurrence.Eligible(one, dials));
 
         output.WriteLine($"{all.Count} resident, {eligible} eligible to propose "
             + $"| whole population proposes "

@@ -496,7 +496,7 @@ public sealed record CommittingSettings
     /// <summary>How much noise the separation bar admits, before correction.</summary>
     public double Alpha { get; init; } = 0.05;
 
-    /// <summary>How many children one commitment may ever mint.</summary>
+    /// <summary>How many times one commitment may ever separate.</summary>
     /// <remarks>
     /// <para>
     /// <b>IT WAS WRITTEN DOWN AS A RUNAWAY GUARD AND IT IS A LEVEL.</b> At eight it
@@ -508,11 +508,25 @@ public sealed record CommittingSettings
     /// <para>
     /// <b>AND REMOVING IT IS WORSE AT EVERY WIDTH</b>, so it is not a cap to delete
     /// either — unbounded repair over-specialises and the score falls. An interior
-    /// optimum is what a LEVEL has, and this one moves with the number of relevant
-    /// bits while nothing reads that.
+    /// optimum is what a LEVEL has, and <c>BudgetCurveTests</c> is where it is read.
+    /// </para>
+    /// <para>
+    /// <b>AND THE OPTIMUM DOES NOT MOVE WITH THE RELEVANT BITS, WHICH IS THE PUZZLE THIS
+    /// NUMBER CARRIED FOR THE LIFE OF THE BRANCH.</b> Six bits and eleven both peak on the
+    /// 128-to-256 plateau and both are worse free, so this is not a per-world number and
+    /// no world is reaching into the brain through it. The moving optimum was measured
+    /// under <see cref="Repairing.AfterFailure"/>, where the lineages that would have spent
+    /// the budget were never blamed — so what moved with the width was the blame coupling,
+    /// which is the third thing that coupling has turned out to be.
+    /// </para>
+    /// <para>
+    /// <b>SO SIXTY-FOUR WAS THE LEVEL AND IT WAS TOO LOW, MEASURED AT FOUR WORLDS.</b> At
+    /// eleven bits even this leads it by 2.6 standard errors of trailing accuracy, 2.9 of
+    /// sound rules and 3.8 of hard-round coverage; at six bits it is level on accuracy and
+    /// ahead on coverage. Nothing measured is worse.
     /// </para>
     /// </remarks>
-    public int Budget { get; init; } = 64;
+    public int Budget { get; init; } = 256;
 
     /// <summary>How many commitments may be resident before the worst are dropped.</summary>
     public int Capacity { get; init; } = 2000;

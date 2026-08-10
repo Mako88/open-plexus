@@ -569,8 +569,8 @@ condition is a superstition.
 Named so nobody reintroduces them. These are about MEASUREMENT, so they survive the
 change of architecture entirely.
 
-- **A check can be wired and unable to fire**, which reads as passing. Arm anything
-  that has always read zero — `Surprise` is one, today.
+- **A check can be wired and unable to fire**, which reads as passing. Arm anything that has
+  always read zero; `Surprise` and `Abstain` were both found that way.
 - **A dial can be declared, documented, passed everywhere and connected to nothing.**
   Every run reports `Complaints`; read them.
 - **A fallback is a control arm nobody meant to run** — silence drifts an arm toward
@@ -954,15 +954,15 @@ change of architecture entirely.
   as a puzzle since the branch began: how often a parent re-derives is a function of width,
   and nothing else about the search is.
 - **FREEING IT PAYS ONLY ONCE BLAME REACHES THE LINEAGES, WHICH IS WHY IT READ AS INERT.**
-  Free under the shipped timing carries no hard round at all; free under `EveryRound`
-  carries most of them and more than doubles the sound rules.
+  Free under `AfterFailure` carries no hard round at all; free under `EveryRound` carries
+  most of them and more than doubles the sound rules.
 - **AND IT BUYS HARD ROUNDS AND SELLS EASY ONES ON AN EVEN WORLD**, which is the first arm
   measured here whose two scores point opposite ways. Coverage rises while trailing
   accuracy falls, and no single number can rank it.
 - **AND IT IS A DOSE RESPONSE RATHER THAN A STEP.** Over five tilts the minority's blame
   share and the hard rounds carried fall together and monotonically, while the arm that
   never consults the vote stays flat on coverage.
-- **AND AT THE STEEPEST TILT THE SHIPPED ARM'S ACCURACY RISES WHILE ITS COVERAGE REACHES
+- **AND AT THE STEEPEST TILT `AfterFailure`'S ACCURACY RISES WHILE ITS COVERAGE REACHES
   NOUGHT**, which is the base-rate trap drawn as a curve: the score goes up as the learning
   goes away.
 - **UNDER `EveryRound` ALL THREE WEIGHINGS BUILD ONE POPULATION, EQUAL PER SEED** on sound

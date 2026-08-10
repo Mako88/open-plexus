@@ -134,6 +134,33 @@ public sealed class DocsTests
         ("a measured comparison", @"\d[\d,.]* (?:\w+ )*against \d"),
     ];
 
+    /// <summary>
+    /// What a claim looks like when it is dated rather than stated — <b>the doc's own rule
+    /// about citing a TIME, made mechanical.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE RULE WAS WRITTEN AND THEN BROKEN THREE TIMES IN ONE FILE.</b> The plan already
+    /// says never to cite a time, because <i>one session ago</i> is true when written and
+    /// false forever after. What it did not say is that a DEFAULT is a time: <i>the shipped
+    /// timing</i> names whatever ships at the moment of reading, so a row comparing
+    /// <i>the shipped timing</i> against a named arm reverses the day that arm ships. One
+    /// such row ended up asserting the opposite of the mechanism it described.
+    /// </para>
+    /// <para>
+    /// <b>SO A ROW NAMES THE ARM AND NEVER THE SEAT.</b> <c>AfterFailure</c> means the same
+    /// thing forever; <i>the shipped timing</i> does not. Introducing this rule turned up
+    /// three rows already rotted — two comparing a default against the arm that had since
+    /// become it, and one calling a check unarmed that has been armed and load-bearing since.
+    /// </para>
+    /// </remarks>
+    private static readonly (string What, string Pattern)[] Dated =
+    [
+        ("a default named as a seat rather than an arm", @"(?i)\bthe shipped \w+"),
+        ("a claim dated by the session", @"(?i)\b(this|last|next) (session|morning|afternoon|week)\b"),
+        ("a claim dated by the day", @"(?i)\b(today|yesterday|tomorrow)\b(?!'s)"),
+    ];
+
     [Fact]
     public void No_single_item_outgrows_a_line()
     {
@@ -323,6 +350,52 @@ public sealed class DocsTests
             + "Put the number in the commit, in the XML comment beside the "
             + "mechanism, or in the test that asserts it:\n"
             + string.Join("\n", recorded.Take(10)));
+    }
+
+    [Fact]
+    public void No_row_is_dated_rather_than_stated()
+    {
+        // A ROW THAT NAMES A SEAT INSTEAD OF AN ARM REVERSES ITSELF WHEN THE SEAT CHANGES
+        // HANDS, and it does so silently -- nothing goes red, the sentence still parses, and
+        // it now says the opposite of what it was written to say. That is worse than a stale
+        // number, which at least looks like a number nobody has re-taken.
+        var lines = Plan().Split('\n');
+
+        var dated = new List<string>();
+
+        foreach (var (what, pattern) in Dated)
+            foreach (var line in lines)
+                if (Regex.IsMatch(line, pattern))
+                    dated.Add($"{what}: {line.Trim()}");
+
+        Assert.True(dated.Count == 0,
+            "the plan dates a claim instead of stating it. Name the arm, not the seat it "
+            + "currently holds -- `AfterFailure` means the same thing forever and `the "
+            + "shipped timing` does not:\n" + string.Join("\n", dated.Take(10)));
+    }
+
+    [Fact]
+    public void The_dating_check_can_still_fail()
+    {
+        // THE COMPANION, FOR THE SAME REASON THE ONE BELOW HAS ONE. A pattern set that
+        // matches nothing passes forever and reads exactly like a doc with no dated claims
+        // in it.
+        var dated = new[]
+        {
+            "Free under the shipped timing carries no hard round at all",
+            "which is what this session's grid settled",
+            "`Surprise` is one, today",
+        };
+
+        Assert.All(dated, line => Assert.True(
+            Dated.Any(rule => Regex.IsMatch(line, rule.Pattern)),
+            $"nothing in the rule set notices this is dated: {line}"));
+
+        // AND A ROW THAT MERELY MENTIONS A DAY IS NOT DATED, which is what the lookahead is
+        // for. Asserted, because a rule that reddens on ordinary prose gets deleted rather
+        // than obeyed.
+        Assert.DoesNotContain(Dated, rule =>
+            Regex.IsMatch("the depth cap is why it is not today's problem", rule.Pattern));
     }
 
     [Fact]

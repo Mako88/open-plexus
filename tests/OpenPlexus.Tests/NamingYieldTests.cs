@@ -441,6 +441,100 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void Naming_until_the_gate_refuses_terminates_and_reaches_a_different_population()
+    {
+        // TERMINATION IS THE CLAIM THIS TEST EXISTS FOR, and it is an argument in the source
+        // rather than a bound in it: every mint permanently excludes one pair, and every
+        // rewrite makes a scope contribute strictly fewer pairs. If either half is wrong the
+        // loop spins, so a run finishing at all is the reading -- and the derived backstop
+        // beside it is what turns a spin into a wrong number rather than a hung CI job.
+        //
+        // AND IT ASSERTS THAT THE ARMS DIFFER RATHER THAN WHICH IS BETTER. A prediction
+        // written into a wiring check fails two ways and reads the same.
+        var arms = new Dictionary<Minting, Learned>();
+
+        foreach (var arm in (Minting[])[Minting.Once, Minting.UntilRefused])
+        {
+            var brain = new Brain(new CommittingSettings { Minting = arm }, seed: 1);
+
+            arms[arm] = new MultiplexerRun(
+                new MultiplexerSettings { Address = Address }, brain, seed: 1).Run(6_000);
+        }
+
+        output.WriteLine("arm | asked | spoke | named | stacked | eligible | resident");
+
+        foreach (var (arm, learned) in arms)
+        {
+            output.WriteLine(
+                $"{arm,-12} | {learned.Tally.Asked,5} | {learned.Tally.Spoke,5} "
+                + $"| {learned.Named,5} | {learned.Stacked,7} | {learned.Eligible,8} "
+                + $"| {learned.Resident,8}");
+        }
+
+        // THE LOOP ASKED MORE THAN ONCE PER SWEEP, which is what says the dial reached the
+        // mechanism at all rather than being carried and dropped.
+        Assert.True(
+            arms[Minting.UntilRefused].Tally.Asked > arms[Minting.Once].Tally.Asked,
+            "the loop asked no more often than the single mint, so it never ran");
+
+        Assert.NotEqual(arms[Minting.Once].Named, arms[Minting.UntilRefused].Named);
+
+        // AND EVERY PROPOSAL IS STILL A DISTINCT NAME UNDER THE LOOP. That identity is what
+        // makes the loop terminate, so it is asserted where the loop runs and not only where
+        // one mint does.
+        Assert.Equal(
+            arms[Minting.UntilRefused].Tally.Spoke, arms[Minting.UntilRefused].Named);
+    }
+
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public async Task Whether_naming_until_the_gate_refuses_buys_depth()
+    {
+        // FORK 69'S GRID. The ceiling is a calendar rather than a fact about redundancy, and
+        // this is the arm that removes it. `stacked` is the reading that matters -- a name
+        // standing for a set containing a name is the only depth this rung has -- and the
+        // kill condition is that if neither `named` nor `stacked` moves outside the seed
+        // spread on any world, the ceiling was never binding and the dial goes.
+        //
+        // AND `resident` IS READ BESIDE THEM BECAUSE THE COST WOULD SHOW THERE. Naming
+        // rewrites scopes and a rewrite can collide, so a loop that names a dozen things in
+        // one sweep is a dozen chances to lose a commitment to a merge nobody asked for.
+        foreach (var (address, skew) in Fixture.Curve)
+        {
+            output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}: minting "
+                + $"arms, {Seeds} seeds, {Rounds} rounds ===");
+
+            foreach (var arm in (Minting[])[Minting.Once, Minting.UntilRefused])
+            {
+                var once = new Dictionary<int, Learned>();
+
+                Learned Cached(int seed)
+                {
+                    if (!once.TryGetValue(seed, out var ran))
+                        once[seed] = ran = new MultiplexerRun(
+                            new MultiplexerSettings { Address = address, Skew = skew },
+                            new Brain(new CommittingSettings { Minting = arm }, seed),
+                            seed).Run(Rounds);
+
+                    return ran;
+                }
+
+                await Fixture.ReadAsync(output, arm.ToString(), Seeds, Cached,
+                    ("named", one => one.Named),
+                    ("stacked", one => one.Stacked),
+                    ("asked", one => one.Tally.Asked),
+                    ("spoke", one => one.Tally.Spoke),
+                    ("eligible", one => one.Eligible),
+                    ("resident", one => one.Resident),
+                    ("sound", one => one.Sound),
+                    ("recent", one => one.Recent));
+            }
+
+            output.WriteLine("");
+        }
+    }
+
+    [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_bounds_rung_fives_yield_is_how_often_it_is_asked()
     {

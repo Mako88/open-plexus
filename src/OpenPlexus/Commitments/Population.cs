@@ -1433,56 +1433,84 @@ public sealed class Population
     /// </param>
     public int Abstract(Recurrence? heard = null)
     {
-        var counted = Recurrence.Of(All, _dials);
-
-        if (heard is not null) counted.Absorb(heard);
-
-        // COUNTED ON EVERY PATH OUT, INCLUDING THE ONE THAT SUCCEEDS, so the five refusals
-        // and `Spoke` add to `Asked` and a share can be read as a share. A partition that
-        // is only counted where it fails is a partition of nothing.
-        var reading = Abstracting.Propose(counted, _dials, _names);
-
-        Lately = reading;
-        _asked++;
-
-        switch (reading.Refused)
-        {
-            case Refused.Nothing: _spoke++; break;
-            case Refused.Scarce: _atScarce++; break;
-            case Refused.Unpaired: _atUnpaired++; break;
-            case Refused.Rare: _atRare++; break;
-            case Refused.Independent: _atIndependent++; break;
-            case Refused.Uncertain: _atUncertain++; break;
-        }
-
-        if (reading.Named is not { } shared) return 0;
-
-        var name = _names.Mint(shared);
-
         var said = 0;
 
-        foreach (var one in All.ToList())
+        // AND IT KEEPS ASKING UNTIL THE GATE SAYS NO, WHICH IS WHAT REMOVES A CEILING NOTHING
+        // CHOSE. Minting once an ask made the yield a function of the sweep calendar: twenty
+        // chances in a twenty-thousand-round run, of which eighteen already succeed. What a
+        // population has to name is a fact about the population, and it was being metered by
+        // a clock it shares with culling.
+        //
+        // IT TERMINATES BECAUSE A NAMED PAIR STOPS BEING A CANDIDATE, which is the rule that
+        // shipped one commit before this and is the whole of the argument. Every mint
+        // permanently excludes one pair; every rewrite makes a scope shorter, so the scope
+        // contributes strictly fewer pairs than it did. Both quantities are finite and
+        // neither can go back up.
+        //
+        // AND THE BOUND BESIDE IT IS DERIVED RATHER THAN A DIAL. `Candidates` is what the
+        // gate just searched, so it is an upper bound on how many distinct pairs could still
+        // be named -- a backstop against the argument above being wrong, not a limit anybody
+        // gets to tune.
+        var ceiling = int.MaxValue;
+
+        for (var round = 0; _dials.Minting == Minting.UntilRefused ? round < ceiling : round < 1;
+            round++)
         {
-            if (!shared.All(one.Scope.Contains)) continue;
+            var counted = Recurrence.Of(All, _dials);
 
-            var scope = one.Scope.Where(code => !shared.Contains(code)).Append(name).ToImmutableArray();
+            // THEIRS IS THE STATE AT THE START OF THE ROUND AND STAYS THAT WAY. Re-absorbing
+            // the same table each pass is right: the other holders did not move while this
+            // one was rewriting, and asking them again is a round trip this loop does not
+            // get to make.
+            if (heard is not null) counted.Absorb(heard);
 
-            var shorter = new Commitment(scope, one.Expects);
+            // COUNTED ON EVERY PATH OUT, INCLUDING THE ONE THAT SUCCEEDS, so the five refusals
+            // and `Spoke` add to `Asked` and a share can be read as a share. A partition that
+            // is only counted where it fails is a partition of nothing.
+            var reading = Abstracting.Propose(counted, _dials, _names);
 
-            // A COLLISION IS A MERGE NOBODY ASKED FOR. Two commitments can be the
-            // same claim once the name replaces the members, and taking the record
-            // of whichever was rewritten last would be a coin toss deciding what is
-            // believed -- so the second is left alone rather than silently folded.
-            if (Holds(shorter.Identity)) continue;
+            Lately = reading;
+            _asked++;
 
-            shorter.Carry(one);
+            switch (reading.Refused)
+            {
+                case Refused.Nothing: _spoke++; break;
+                case Refused.Scarce: _atScarce++; break;
+                case Refused.Unpaired: _atUnpaired++; break;
+                case Refused.Rare: _atRare++; break;
+                case Refused.Independent: _atIndependent++; break;
+                case Refused.Uncertain: _atUncertain++; break;
+            }
 
-            Remove(one, Loss.Renamed);
+            if (reading.Named is not { } shared) break;
 
-            Add(shorter);
-            Born(shorter, Birth.Renamed);
+            if (ceiling == int.MaxValue) ceiling = reading.Candidates + 1;
 
-            said++;
+            var name = _names.Mint(shared);
+
+            foreach (var one in All.ToList())
+            {
+                if (!shared.All(one.Scope.Contains)) continue;
+
+                var scope = one.Scope.Where(code => !shared.Contains(code)).Append(name).ToImmutableArray();
+
+                var shorter = new Commitment(scope, one.Expects);
+
+                // A COLLISION IS A MERGE NOBODY ASKED FOR. Two commitments can be the
+                // same claim once the name replaces the members, and taking the record
+                // of whichever was rewritten last would be a coin toss deciding what is
+                // believed -- so the second is left alone rather than silently folded.
+                if (Holds(shorter.Identity)) continue;
+
+                shorter.Carry(one);
+
+                Remove(one, Loss.Renamed);
+
+                Add(shorter);
+                Born(shorter, Birth.Renamed);
+
+                said++;
+            }
         }
 
         return said;

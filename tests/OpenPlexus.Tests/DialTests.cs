@@ -122,6 +122,17 @@ public sealed class DialTests(ITestOutputHelper output)
             + "attempt rather than limit it, and ungated burns per-parent budgets "
             + "on parents something else already covers",
 
+        ["Minting"] =
+            "AN ARM WITH A NUMBER BEHIND IT AND NO WINNER YET. Rung five runs on "
+            + "the sweep calendar and minted once a call, so a twenty-thousand-round "
+            + "run offered it twenty chances and it already took eighteen -- a "
+            + "ceiling set by a clock it shares with widening, subsumption and "
+            + "culling rather than by anything about redundancy. `UntilRefused` "
+            + "keeps asking until the gate says no, which only terminates because a "
+            + "named pair stopped being a candidate. Nothing drives it because the "
+            + "grid that deletes one of the two arms has not been read; when it is, "
+            + "the winner becomes the code and the loser a revival row",
+
         ["Budgeting"] =
             "NOT A DIAL AND NOT A LEVEL -- IT IS WHICH QUESTION `Budget` ASKS, and "
             + "one of the two answers cannot bind at all on any world here. A child "
@@ -710,6 +721,11 @@ public sealed class DialTests(ITestOutputHelper output)
         // shipped timing, so the two are not the same claim and the cell that separates
         // them is a world whose vocabulary reaches sixty-four. `BudgetingTests` carries
         // the tripwire that fires on the day one arrives.
-        Assert.Equal(28, HandSet.Count);
+        // AND TWENTY-NINE IS `Minting`, ARRIVING AS AN ARM AND EXPECTED TO LEAVE AS ONE,
+        // exactly as `Renaming` did an hour before it. The kill condition is in
+        // `NamingYieldTests`: if naming until the gate refuses raises neither `named` nor
+        // `stacked` outside the seed spread on any world, the row goes and the count returns
+        // to twenty-eight.
+        Assert.Equal(29, HandSet.Count);
     }
 }

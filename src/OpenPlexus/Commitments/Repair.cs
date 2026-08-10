@@ -640,6 +640,9 @@ public sealed record CommittingSettings
     /// <inheritdoc cref="Commitments.Budgeting"/>
     public Budgeting Budgeting { get; init; } = Budgeting.Attempts;
 
+    /// <inheritdoc cref="Commitments.Minting"/>
+    public Minting Minting { get; init; } = Minting.Once;
+
     /// <summary>What it takes for a narrower commitment to survive beside a general one.</summary>
     /// <remarks>
     /// <b>THE ARM FOR A CLAUSE THAT HAS NEVER FIRED.</b> See <see cref="Subsuming"/>: the

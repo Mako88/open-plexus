@@ -348,6 +348,33 @@ public readonly record struct Proposed
     public required ImmutableArray<Code>? Named { get; init; }
 }
 
+/// <summary>
+/// Whether rung five may name more than one thing per ask.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>THE CEILING NOBODY CHOSE.</b> <see cref="Population.Abstract"/> runs on the sweep
+/// calendar and minted at most once a call, so a twenty-thousand-round run offered the rung
+/// twenty chances and it already took eighteen of them. What a population has to name is a
+/// fact about the population, and it was being metered by a clock it shares with widening,
+/// subsumption and culling.
+/// </para>
+/// <para>
+/// <b>AND <see cref="UntilRefused"/> IS ONLY BUILDABLE BECAUSE A NAMED PAIR STOPS BEING A
+/// CANDIDATE.</b> Under the arm deleted one commit before this, the loop would have proposed
+/// the same pair forever wherever a rewrite collided. The two findings compose into one
+/// mechanism, and neither is a number.
+/// </para>
+/// </remarks>
+public enum Minting
+{
+    /// <summary>One name an ask, whatever else is worth naming. What has always run.</summary>
+    Once,
+
+    /// <summary>Keep asking until the gate refuses.</summary>
+    UntilRefused,
+}
+
 public static class Abstracting
 {
     /// <summary>The sub-scope most worth naming, or nothing if none has earned it.</summary>

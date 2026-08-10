@@ -46,7 +46,56 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # WHICH SWEEPS THE DISPATCH ASKED FOR, DECIDED BEFORE ANY RUNNER IS CLAIMED.
+  #
+  # THE FIRST VERSION STARTED EVERY ENTRY AND LET THE UNWANTED ONES EXIT EARLY, AND
+  # THAT IS NOT CHEAP -- IT IS A RUNNER SLOT EACH. A matrix of twenty-six spawns
+  # twenty-six jobs however fast twenty-five of them stop, and this account gets
+  # twenty at once, so three single-sweep dispatches queued seventy-eight jobs and
+  # starved the actual suite behind them. Skipping WORK is not skipping a JOB.
+  plan:
+    runs-on: ubuntu-latest
+
+    outputs:
+      sweeps: ${{ steps.pick.outputs.sweeps }}
+
+    steps:
+      # NAMED RATHER THAN DISCOVERED, WHICH IS WHY THE LIST IS HERE AND NOT A GLOB.
+      # Scanning the assembly for the trait would make the matrix a function of the
+      # tree, so a grid could appear or vanish with no commit saying so. Adding a
+      # sweep is a line in a diff.
+      - id: pick
+        env:
+          ONLY: ${{ inputs.only }}
+        run: |
+          all='[
+            "AbstainTests","ArrangingTests","AskedTests","BudgetCurveTests",
+            "BudgetTests","ChoosingTests","FleetTests","FoldingTests",
+            "GateCostTests","LatencyTests","LiftingTests","MendingTests",
+            "MonkTests","NarrowingTests","OverlapTests","PlacingTests",
+            "QueryCostTests","RefusalTests","SeparableTests","SharpeningTests",
+            "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",
+            "WeighingTests","WideningTests"
+          ]'
+
+          if [ -z "$ONLY" ]; then
+            picked=$(printf '%s' "$all" | jq -c '.')
+          else
+            picked=$(printf '%s' "$all" | jq -c --arg only "$ONLY" \
+              '[.[] | select(contains($only))]')
+          fi
+
+          echo "sweeps=$picked" >> "$GITHUB_OUTPUT"
+          echo "::notice::dispatching $picked"
+
   sweep:
+    needs: plan
+
+    # A DISPATCH NAMING NOTHING THAT EXISTS IS A TYPO, AND IT SHOULD LOOK LIKE ONE.
+    # An empty matrix is a hard error rather than a skipped job, so the guard is
+    # here and the notice above says what was actually chosen.
+    if: needs.plan.outputs.sweeps != '[]'
+
     runs-on: ubuntu-latest
 
     # THE HEAVIEST GRID HERE IS SIX CELLS OVER FOUR WORLDS AT EIGHT SEEDS, which
@@ -60,38 +109,10 @@ jobs:
       # the point. `tests.yml` says the same thing for the same reason.
       fail-fast: false
 
+      # ONE CLASS A RUNNER, AND ONLY THE CLASSES ASKED FOR. See `plan` above for
+      # why this is computed rather than written out here.
       matrix:
-        # ONE CLASS A RUNNER, NAMED RATHER THAN DISCOVERED. A glob over the test
-        # assembly would silently pick up whatever was added last and make the
-        # matrix a function of the tree, so a grid could appear or vanish with no
-        # commit saying so. Adding a sweep here is a line in a diff.
-        sweep:
-          - AbstainTests
-          - ArrangingTests
-          - AskedTests
-          - BudgetCurveTests
-          - BudgetTests
-          - ChoosingTests
-          - FleetTests
-          - FoldingTests
-          - GateCostTests
-          - LatencyTests
-          - LiftingTests
-          - MendingTests
-          - MonkTests
-          - NarrowingTests
-          - OverlapTests
-          - PlacingTests
-          - QueryCostTests
-          - RefusalTests
-          - SeparableTests
-          - SharpeningTests
-          - SpeakingTests
-          - SplitNamingTests
-          - SplitRepairTests
-          - SplitTests
-          - WeighingTests
-          - WideningTests
+        sweep: ${{ fromJSON(needs.plan.outputs.sweeps) }}
 
     steps:
       - uses: actions/checkout@v4
@@ -100,33 +121,10 @@ jobs:
         with:
           dotnet-version: "10.0.x"
 
-      # SKIPPED WHOLE WHEN THE DISPATCH NAMED SOMETHING ELSE. Filtering the matrix
-      # itself is not expressible here, so the runner starts and stops early --
-      # which costs seconds and keeps the matrix a plain list rather than a
-      # generated one.
-      # THROUGH `env` AND NEVER INTERPOLATED INTO THE SCRIPT. A `${{ }}` block is
-      # substituted as TEXT before bash ever sees the line, so a dispatch input
-      # spliced in directly is both a syntax error waiting to happen and somebody
-      # else's shell command. It was the syntax error first: `${{ x#*y }}` is bash
-      # expansion inside a GitHub expression, which parses as neither.
-      - name: Wanted
-        id: wanted
-        env:
-          ONLY: ${{ inputs.only }}
-          SWEEP: ${{ matrix.sweep }}
-        run: |
-          if [ -z "$ONLY" ] || [ "$SWEEP" != "${SWEEP#*"$ONLY"}" ]; then
-            echo "run=yes" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=no" >> "$GITHUB_OUTPUT"
-            echo "::notice::$SWEEP skipped -- the dispatch asked for '$ONLY'"
-          fi
-
       # THE SAME RESTORE `tests.yml` DOES, and the same reason it must hit rather
       # than fetch. Most sweeps here are on generated worlds and touch none of it;
       # the ones that do would otherwise pull six hundred megabytes per runner.
       - name: Restore corpora
-        if: steps.wanted.outputs.run == 'yes'
         uses: actions/cache/restore@v4
         with:
           path: |
@@ -139,7 +137,6 @@ jobs:
           key: corpora-v3-${{ hashFiles('corpora/fetch.sh') }}
 
       - name: Build
-        if: steps.wanted.outputs.run == 'yes'
         run: dotnet build --configuration Debug --nologo --no-incremental
 
       # DETAILED, BECAUSE THE GRID IS THE WHOLE OUTPUT. A sweep asserts nothing, so
@@ -147,7 +144,6 @@ jobs:
       # -- a green tick standing where the measurement should be, which is worse
       # than a failure because nobody goes looking.
       - name: Measure
-        if: steps.wanted.outputs.run == 'yes'
         run: |
           dotnet test --configuration Debug --nologo --no-build \
             --filter "kind=sweep&FullyQualifiedName~${{ matrix.sweep }}" \
@@ -159,7 +155,7 @@ jobs:
       # that produced them -- which is this repo's rule that a finding lives in the
       # commit and in the test, never only in a place that expires.
       - name: Keep the grid
-        if: always() && steps.wanted.outputs.run == 'yes'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: sweep-${{ matrix.sweep }}

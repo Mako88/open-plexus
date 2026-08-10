@@ -32,6 +32,21 @@ namespace OpenPlexus.Tests;
 /// rules held exactly is the one a memorising arm cannot reach — reported beside
 /// residents and unsound, which are what it would cost.
 /// </para>
+/// <para>
+/// <b>EVERY NUMBER THIS FILE HAS EVER RECORDED WAS TAKEN UNDER A TIMING IT NO LONGER
+/// RUNS, AND THAT IS NOT A CHANGE ANYBODY MADE HERE.</b> These cells name
+/// <see cref="CommittingSettings.Budget"/> and <see cref="Mending"/> and pin nothing else,
+/// so the arms inherited <see cref="Repairing.AfterFailure"/> when it was the default and
+/// inherit <see cref="Repairing.EveryRound"/> now. The recorded verdict — a free budget is
+/// worse at every width — is therefore about a machine where repair waited for the vote.
+/// </para>
+/// <para>
+/// <b>WHICH IS EXACTLY THE CONDITION THAT MADE THE BUDGET READ AS INERT, SO THE VERDICT IS
+/// SUSPECT IN A SPECIFIC DIRECTION.</b> Under the old timing the lineages that would have
+/// spent a loosened budget were never blamed, so nothing was waiting on either the count or
+/// the condition. <b>A gate asking whether a parent still has failures no child covers can
+/// only bind where that parent gets blamed at all.</b> Re-taken, this grid is fork 67.
+/// </para>
 /// </remarks>
 public sealed class BudgetTests(ITestOutputHelper output)
 {
@@ -63,11 +78,19 @@ public sealed class BudgetTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public async Task Whether_a_correctness_condition_beats_a_fixed_fork_count()
     {
+        // THE COUNT ARM IS THE SHIPPED BUDGET AND NOT THE OLD ONE, WHICH IS THE WHOLE POINT
+        // OF A CROSS. This grid asks whether a CONDITION beats a COUNT, so the count has to
+        // be the best count there is or the comparison is against a straw arm -- and
+        // `BudgetCurveTests` measured that 64 was well below the level. Sixty-four's rows are
+        // in this file's history and are not comparable anyway; they were taken under a
+        // timing this test no longer runs.
+        var counted = new CommittingSettings().Budget;
+
         var cells = new (string Cell, int Budget, Mending Mending)[]
         {
-            ("64 ungated", 64, Mending.Ungated),
-            ("64 uncovered", 64, Mending.Uncovered),
-            ("64 improving", 64, Mending.Improving),
+            ("shipped ungated", counted, Mending.Ungated),
+            ("shipped uncovered", counted, Mending.Uncovered),
+            ("shipped improving", counted, Mending.Improving),
             ("free ungated", Unlimited, Mending.Ungated),
             ("free uncovered", Unlimited, Mending.Uncovered),
             ("free improving", Unlimited, Mending.Improving),

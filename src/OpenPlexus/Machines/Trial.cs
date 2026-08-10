@@ -382,6 +382,32 @@ public sealed record Census
     /// </remarks>
     public required long Deeper { get; init; }
 
+    /// <summary>
+    /// Of the uncovered rounds, those where NOTHING that fired expected the right answer —
+    /// <b>the share no amount of repair could ever have reached.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE PARTITION THAT SAYS WHICH HALF OF GENERATE-AND-TEST IS SHORT.</b> Two thirds to
+    /// all of every wrong answer is a round no sound rule advocated, and this doc's own trap
+    /// says a rule about who WINS cannot reach those. What it does not say is whether they
+    /// are reachable at all — and that is decidable rather than arguable.
+    /// </para>
+    /// <para>
+    /// <b>REPAIR ADDS A CONDITION AND NEVER CHANGES WHAT A COMMITMENT EXPECTS, AND A CHILD
+    /// FIRES ONLY WHERE ITS PARENT DOES.</b> So a round where nothing expecting the right
+    /// answer fired cannot be covered by narrowing anything resident, this round or ever.
+    /// Covering it needs a new claim about a new outcome — which is GENESIS, and genesis
+    /// saturates its one-code space in the opening hundred rounds and never mints again.
+    /// </para>
+    /// <para>
+    /// <b>SO A HIGH SHARE HERE IS A CEILING AND A LOW ONE IS A SEARCH PROBLEM</b>, and every
+    /// gate, budget and timing arm ever measured on this bench is aimed at the second. That
+    /// is worth knowing before another one is built.
+    /// </para>
+    /// </remarks>
+    public required long Unreachable { get; init; }
+
     /// <summary>Wrong rounds decided by a commitment that had not yet been tested.</summary>
     /// <remarks>
     /// <para>
@@ -586,6 +612,7 @@ public sealed class Trial<TSeen>
 
         long codes = 0;
         long outvoted = 0, uncovered = 0, deeper = 0, hard = 0, carried = 0, untested = 0;
+        long unreachable = 0;
 
         // WHAT THE WORLD PRODUCES MOST, LEARNT AS IT GOES. Taking the base rate from the
         // world would score the machine against a number it is not allowed to see, and
@@ -653,7 +680,20 @@ public sealed class Trial<TSeen>
                     var advocate = firing.FirstOrDefault(one =>
                         one.Expects == arrived && _sound!(one.Scope, one.Expects));
 
-                    if (advocate is null) uncovered++;
+                    if (advocate is null)
+                    {
+                        uncovered++;
+
+                        // AND WHETHER ANYTHING COULD EVER HAVE COVERED IT, which is a
+                        // different question from whether anything did. Repair adds a
+                        // CONDITION and never changes what a commitment expects, and a child
+                        // fires only where its parent fires -- so if nothing expecting the
+                        // right answer fired this round, no descendant of anything resident
+                        // can fire here either, however long the run goes on. Covering that
+                        // round needs GENESIS, and genesis saturates its one-code space in
+                        // the opening hundred rounds and never mints again.
+                        if (!firing.Any(one => one.Expects == arrived)) unreachable++;
+                    }
                     else
                     {
                         outvoted++;
@@ -735,6 +775,7 @@ public sealed class Trial<TSeen>
                 {
                     Outvoted = outvoted,
                     Uncovered = uncovered,
+                    Unreachable = unreachable,
                     Deeper = deeper,
                     Untested = untested,
                     Hard = hard,

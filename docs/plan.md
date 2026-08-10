@@ -927,6 +927,9 @@ change of architecture entirely.
 - **AND TWO THIRDS TO ALL OF EVERY WRONG ANSWER IS A ROUND NO SOUND RULE ADVOCATED.** No
   vote rule can reach those, so every gate, weighing and subsumption arm was aimed at a
   third of the problem.
+- **AND THOSE ROUNDS ARE NOT A CEILING: UNDER TWO IN A HUNDRED ARE UNREACHABLE.** On the rest
+  something expecting the right answer DID fire — unsound, but present — so repair had the
+  material to narrow and did not.
 - **THE OVER-SPECIALISATION STORY IS REFUTED BY ITS OWN NUMBER.** A child beats a sound
   parent on a fortieth of wrong rounds, so the vote preferring the narrower rule costs
   nothing measurable.

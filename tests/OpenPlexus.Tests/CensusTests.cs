@@ -127,6 +127,16 @@ public sealed class CensusTests(ITestOutputHelper output)
                 $"{"",16} | recent {learned.Recent:F3} | hard {census.Hard,6} "
                 + $"| carried {census.Carried,6} | paying {census.Paying,7:P1} "
                 + $"| sound {learned.Sound,3}");
+
+            // AND WHICH HALF OF GENERATE-AND-TEST THE UNCOVERED ROUNDS BELONG TO. A round
+            // where nothing expecting the right answer fired cannot be reached by narrowing
+            // anything resident -- repair keeps the parent's expectation and a child fires
+            // only where its parent does -- so it is a ceiling rather than a search problem,
+            // and every gate, budget and timing arm on this bench is aimed at the other kind.
+            output.WriteLine(
+                $"{"",16} | uncovered {census.Uncovered,6} | of those unreachable "
+                + $"{census.Unreachable,6} | "
+                + $"{(census.Uncovered == 0 ? 0.0 : census.Unreachable / (double)census.Uncovered),6:P1}");
         }
     }
 

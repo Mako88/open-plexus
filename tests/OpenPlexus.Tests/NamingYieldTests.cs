@@ -363,6 +363,45 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void Skipping_named_pairs_reaches_a_bar_no_world_reaches_and_leaves_the_other_arm_alone()
+    {
+        // A CODE PATH GUARDED BY A CAP IS UNTESTED UNTIL SOMETHING REACHES THE CAP, and
+        // `Fresh` adds a second route to `Unpaired` that a run may never take: a population
+        // that has named every pair it holds has no candidate left, which is a completely
+        // different state from holding no pair at all.
+        var counted = Recurrence.Of(
+            [Seasoned(1, 2, 5), Seasoned(1, 2, 6), Seasoned(1, 2, 7), Seasoned(1, 2, 8)],
+            new CommittingSettings());
+
+        var fresh = new CommittingSettings { Renaming = Renaming.Fresh };
+
+        var names = new Naming();
+
+        // EVERY PAIR THOSE SCOPES CONTAIN, so nothing is left to consider. Naming only the
+        // winner would leave the runners-up and test something else.
+        foreach (var row in counted.Written().Rows.Where(one => one.Right is not null))
+            names.Mint([row.Left, row.Right!.Value]);
+
+        Assert.Equal(Refused.Unpaired, Abstracting.Propose(counted, fresh, names).Refused);
+
+        // AND THE SHIPPED ARM IS UNTOUCHED BY THE SAME CALL, which is the thing that would
+        // otherwise change every number this repo has ever taken. `Anything` skips nothing,
+        // so it still corrects for every pair in the table -- asserted against the table
+        // rather than against a remembered figure.
+        var pairs = counted.Written().Rows.Count(one => one.Right is not null);
+
+        var shipped = Abstracting.Propose(counted, new CommittingSettings(), names);
+
+        Assert.Equal(pairs, shipped.Candidates);
+        Assert.Equal(Refused.Nothing, shipped.Refused);
+
+        // AND PASSING NO VOCABULARY UNDER `Fresh` IS THE SHIPPED BEHAVIOUR RATHER THAN A
+        // THROW. The gate is also asked from a merge and from tests, where there is no one
+        // population whose names these would be.
+        Assert.Equal(pairs, Abstracting.Propose(counted, fresh).Candidates);
+    }
+
+    [Fact]
     public void The_two_renaming_arms_build_different_populations()
     {
         // A PREDICTION WRITTEN INTO A WIRING CHECK FAILS TWO WAYS AND READS THE SAME, so

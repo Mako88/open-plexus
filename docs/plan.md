@@ -732,6 +732,9 @@ change of architecture entirely.
   expensive to add.
 - **A SEARCH STEP OF TWO CODES IS A GATE PAID ONCE.** Repair clears the separation bar per
   code added; a minted name standing for two enters on that single clearance.
+- **DELETING THE LAST ARM DELETES THE CHECK THAT MADE THE DELETION LEGITIMATE.** *The vote
+  builds one population* was asserted across three weighings; with one left it cannot be
+  stated at all, so the property is an argument again.
 
 ---
 

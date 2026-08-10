@@ -948,6 +948,10 @@ change of architecture entirely.
 - **THOUGH IT FLATTENS PAST 128 WHILE COVERAGE KEEPS CLIMBING**, so the top of the curve is
   buying something else: a hard round can gain a sound advocate without ever having been
   answered wrongly.
+- **EVERY HARD ROUND THAT IS COVERED IS COVERED BY A REPAIRED RULE**, on all four worlds —
+  genesis contributes none. Repair is the only source of coverage a base rate cannot give.
+- **AND FOUR TO TWENTY-SIX PER CENT OF REPAIRS EVER BUY ONE**, falling with width and with
+  skew. That is the search's hit rate, and it is lowest where the world is hardest.
 - **THE OVER-SPECIALISATION STORY IS REFUTED BY ITS OWN NUMBER.** A child beats a sound
   parent on a fortieth of wrong rounds, so the vote preferring the narrower rule costs
   nothing measurable.

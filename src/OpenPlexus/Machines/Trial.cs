@@ -424,6 +424,25 @@ public sealed record Census
     /// </remarks>
     public required long Ineligible { get; init; }
 
+    /// <summary>
+    /// Distinct commitments that were a sound advocate on at least one hard round —
+    /// <b>how few rules do the work no base rate can do.</b>
+    /// </summary>
+    public required long Carriers { get; init; }
+
+    /// <summary>
+    /// Of those, the ones whose scope is longer than one code — <b>repairs that ever bought
+    /// a hard round, against the thousands that were made.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>FORK 73, AND IT IS THE ONE JOIN NOTHING HERE HAD.</b> Every budget arm counts
+    /// repairs and every coverage column counts rounds, so a child that buys hard rounds and
+    /// a child that buys none are the same line in every grid this bench prints. Covering
+    /// mints one code and nothing longer, so a scope past one came from repair — and this is
+    /// how many of them ever paid.
+    /// </remarks>
+    public required long Narrowed { get; init; }
+
     /// <summary>Wrong rounds decided by a commitment that had not yet been tested.</summary>
     /// <remarks>
     /// <para>
@@ -630,6 +649,9 @@ public sealed class Trial<TSeen>
         long outvoted = 0, uncovered = 0, deeper = 0, hard = 0, carried = 0, untested = 0;
         long unreachable = 0, ineligible = 0;
 
+        var carriers = new HashSet<Code>();
+        var narrowed = new HashSet<Code>();
+
         // WHAT THE WORLD PRODUCES MOST, LEARNT AS IT GOES. Taking the base rate from the
         // world would score the machine against a number it is not allowed to see, and
         // declaring it up front would make every skewed world need a hand-written
@@ -676,9 +698,30 @@ public sealed class Trial<TSeen>
                 {
                     hard++;
 
-                    if (!firing.IsDefaultOrEmpty && firing.Any(one =>
-                        one.Expects == arrived && _sound!(one.Scope, one.Expects)))
+                    // AND WHICH COMMITMENTS DID IT, NOT ONLY WHETHER ANY DID. Every budget
+                    // arm counts repairs and every coverage column counts rounds, and nothing
+                    // in this repo joins the two -- so a rule that buys hard rounds and a rule
+                    // that buys none are the same line in every grid. Fork 73.
+                    var payers = firing.IsDefaultOrEmpty
+                        ? []
+                        : firing.Where(one =>
+                            one.Expects == arrived && _sound!(one.Scope, one.Expects)).ToList();
+
+                    if (payers.Count > 0)
+                    {
                         carried++;
+
+                        foreach (var one in payers)
+                        {
+                            carriers.Add(one.Identity);
+
+                            // A SCOPE LONGER THAN ONE CODE CAME FROM REPAIR, because covering
+                            // mints one code and nothing longer. So this is the count of
+                            // repairs that ever bought a hard round, against the thousands
+                            // that were made.
+                            if (one.Scope.Length > 1) narrowed.Add(one.Identity);
+                        }
+                    }
                 }
 
                 if (!firing.IsDefaultOrEmpty && vote.Expects != arrived)
@@ -804,6 +847,8 @@ public sealed class Trial<TSeen>
                     Uncovered = uncovered,
                     Unreachable = unreachable,
                     Ineligible = ineligible,
+                    Carriers = carriers.Count,
+                    Narrowed = narrowed.Count,
                     Deeper = deeper,
                     Untested = untested,
                     Hard = hard,

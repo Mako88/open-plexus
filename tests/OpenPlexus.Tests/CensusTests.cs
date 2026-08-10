@@ -134,6 +134,11 @@ public sealed class CensusTests(ITestOutputHelper output)
             // only where its parent does -- so it is a ceiling rather than a search problem,
             // and every gate, budget and timing arm on this bench is aimed at the other kind.
             output.WriteLine(
+                $"{"",16} | carriers {census.Carriers,5} | of them from repair "
+                + $"{census.Narrowed,5} | repairs made {learned.Repaired,6} "
+                + $"| paid off {(learned.Repaired == 0 ? 0.0 : census.Narrowed / (double)learned.Repaired),6:P2}");
+
+            output.WriteLine(
                 $"{"",16} | uncovered {census.Uncovered,6} | unreachable "
                 + $"{census.Unreachable,5} "
                 + $"({(census.Uncovered == 0 ? 0.0 : census.Unreachable / (double)census.Uncovered):P1})"

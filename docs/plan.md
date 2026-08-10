@@ -765,6 +765,12 @@ change of architecture entirely.
   six or more.
 - **AND EVERY ARM THAT RAISED THE SOUND COUNT RAISED THE LONG ONES FASTEST**, which is why
   that count cannot rank anything on its own. `Census.Paying` is the column that can.
+- **THE LOCAL DECAYING ESTIMATE EARNS ITS KEEP ONLY WHERE THE TARGET MOVES.** Level with a
+  lifetime average on a stationary world and ahead once the trailing window is entirely past
+  a flip. Fork 27's prediction, held.
+- **AND RELEARNING AFTER A FLIP IS SLOWER THAN LEARNING FROM NOTHING.** Five thousand rounds
+  past one flip the run sits well under what it reaches from scratch in fewer. A population
+  of confident wrong rules is an obstacle.
 - **ROUNDS-TO-TARGET ACCELERATES IN THE RELEVANT BITS, WITH ERROR BARS AT LAST.** Six to
   eleven is under twofold; eleven to twenty is nearly sixfold. That is the number that
   predicts whether any of this reaches perception.
@@ -833,9 +839,9 @@ change of architecture entirely.
 - **AND THE SAME GATE IS BEHIND ON EVERY SEED ON `Arranged`, ON BOTH FRONT ENDS.**
   Self-limiting genesis stops early and never mints most of the rules that solve the
   world. Fork 40 asked whether that happens; it does.
-- **THREE DIALS IN A ROW HAVE A BEST VALUE THAT MOVES WITH THE WORLD.** `Sharpness`,
-  `Weighing` and `Mending` each win one world and ruin another, and no combination wins
-  two. That is a world reaching into the brain.
+- **THREE DIALS WERE READ AS HAVING A PER-WORLD BEST VALUE, AND NOT ONE OF THEM DOES.**
+  `Sharpness`, `Weighing` and `Mending` were the whole case that a world reaches into the
+  brain; each fell to a different confusion, named below.
 - **AND `Mending` DID NOT SHOW THAT PATTERN ONCE ITS TWO AXES WERE SEPARATED.** Every-round
   repair leads on both worlds measured — unseparated on one, near two standard errors on
   the other — so the row above may be about a conflation.
@@ -851,15 +857,14 @@ change of architecture entirely.
 - **AND `Sharpness` IS NOT AN AXIS UNDER `Strongest` AT ALL, WHICH IS THE SECOND LEG
   FLAGGED.** Raising to a power is monotone, so the argmax never moves: three powers, one
   identical run, at both widths. It is a parameter of `Summing`.
-- **AND AT ONE FIXED POWER THE SUM WINS NOWHERE, WHICH KILLED NEITHER ARM.** Eight worlds
-  and no separation either way, so the pre-registered trigger fired on a question whose
-  answer is that neither rule wins.
-- **BECAUSE THE PER-WORLD OPTIMUM IS ONE LEVEL UP FROM WHERE IT WAS LOOKED FOR.** Deleting
-  the sum costs the multiplexer four points and two of its eight true rules, and buys six
-  on `Arranged` — so the CHOICE moves with the world.
-- **SO TWO OF THE THREE ARE NOT INDEPENDENT, AND A GRID SWEPT OVER BOTH HAS A DEAD
-  COLUMN.** `DialTests` has the near miss — *the limit of high sharpness* — which is a
-  claim about `Summing` and weaker than a dial that stops existing.
+- **AND AT ONE FIXED POWER THE SUM NOW LOSES, WHICH IT DID NOT WHEN THE VOTE STEERED THE
+  SEARCH.** Ten worlds: `Strongest` leads on three and is level on seven, `Summing` and
+  `Lifting` lead on none. The pre-registered rule kept both losers out.
+- **AND `Arranged` WAS THE REASON TO KEEP THE SUM, AND IT INVERTED.** Deleting the sum was
+  read as costing true rules there; under every-round repair all three weighings find the
+  same rules and the sum trails.
+- **SO TWO OF THE THREE DIALS ARE ONE DIAL WITH A DEAD COLUMN.** `Sharpness` is a parameter
+  of an arm that lost, so it stops existing rather than stops mattering.
 - **AND THE THIRD LEG WAS TWO SETTINGS.** `Mending` is a gate and a timing now; every
   reading behind the row moved both at once, and the timing leads on both worlds.
 - **THE VOTE THREW AWAY PART OF A WORLD IT HAD ALREADY SOLVED**, with every sound rule
@@ -1005,7 +1010,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **24** | Budget controller aims at a moving target. Deleted |
 | **25** | The binding world — built to fail, failed as predicted, since lifted |
 | **26** | Genesis mints per live code per surprise: does deletion clear them faster than surprise makes them? The question was wrong — nothing gated it, so genesis simply walked a finite space. Closed |
-| **27** | Monotone counters merge, a local decaying estimate decides. Does the local one earn its keep? Open — predicted NO on a stationary world |
+| **27** | Monotone counters merge, a local decaying estimate decides. Does the local one earn its keep? ANSWERED and the prediction held: level with a lifetime average where the world holds still, ahead where the target moves |
 | **28** | The horizon is K occasions, K=1. Open |
 | **29** | Divergent local repair mints siblings. MEASURED, AND IT IS NOT SIBLINGS: two different parents on two machines reach the IDENTICAL child, so one rule is held twice and a sum counts its evidence per machine. Open on what that costs |
 | **30** | A negative condition needs a settled occasion, so it fires one settlement late. Open |
@@ -1049,4 +1054,5 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **69** | Naming until refused finds far more true rules and keeps a fleet agreeing. CLOSED AGAINST: it finds LONGER ones, and hard-round coverage falls while every count rises. Deleted with a revival row |
 | **70** | Proposals naming a pair already named mint nothing. ANSWERED: spending the ask on the best unnamed pair nearly triples the stacking on both eleven-bit worlds and sells nothing. Shipped, and the arm is deleted. Closed |
 | **68** | John's: does a conjunction EARN its narrowing? Its premise is half wrong -- reach halves with depth on even worlds and RISES under skew, where correlated codes let a long scope fire as often as a short one. Open |
+| **72** | Relearning after the target moves is slower than learning the same world from nothing. Culling fires only over capacity, so on a small world nothing ever removes a rule that was right and is now wrong. Open |
 | **71** | A minted name is a code, so repair adds it for the price of one. Should the separation bar be charged by what a scope's codes STAND FOR rather than by how many there are? Open |

@@ -573,7 +573,15 @@ public sealed record CommittingSettings
     /// robustness a crowd buys is exactly what the arm is for.
     /// </para>
     /// </remarks>
-    public Weighing Weighing { get; init; } = Weighing.Summing;
+    /// <remarks>
+    /// <b>AND THE GRID THAT KEPT <see cref="Weighing.Summing"/> WAS READ WHILE THE VOTE
+    /// STEERED THE SEARCH.</b> Deleting the sum was measured to cost the multiplexer two of
+    /// its eight true rules; under <see cref="Repairing.EveryRound"/> all three weighings
+    /// find the same rules to the last one, and <see cref="Weighing.Strongest"/> leads on
+    /// three worlds of ten and is level on the rest. <c>WeighingTests</c> pre-registered the
+    /// rule — a sum needs more than one world to keep its place — and the sum leads nowhere.
+    /// </remarks>
+    public Weighing Weighing { get; init; } = Weighing.Strongest;
 
     /// <summary>Whether repair waits for the VOTE to be wrong, or only for a commitment to be.</summary>
     /// <remarks>

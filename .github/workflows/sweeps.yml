@@ -86,7 +86,7 @@ jobs:
           all='[
             "AbstainTests","ArrangingTests","AskedTests","BudgetCurveTests",
             "BudgetTests","ChoosingTests","FleetTests","FoldingTests",
-            "GateCostTests","LatencyTests","LiftingTests","MendingTests",
+            "GateCostTests","LatencyTests","MendingTests",
             "MonkTests","NarrowingTests","OverlapTests","PlacingTests",
             "NamingYieldTests.Which_bar_takes",
             "NamingYieldTests.Whether_a_run_past",
@@ -95,9 +95,9 @@ jobs:
             "NamingYieldTests.What_bounds_rung_fives_yield",
             "NamingYieldTests.And_a_real_populations_best_pair",
             "QueryCostTests","RecoveryTests","RefusalTests","ScalingTests",
-            "SeparableTests","SharpeningTests",
+            "SeparableTests",
             "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",
-            "WeighingTests","WideningTests"
+            "WideningTests"
           ]'
 
           if [ -z "$ONLY" ]; then

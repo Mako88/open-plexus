@@ -223,15 +223,14 @@ public sealed class RepairingTests(ITestOutputHelper output)
                 ("everyround", Repairing.EveryRound),
             })
             {
-                foreach (var weighing in new[] { Weighing.Summing, Weighing.Lifting })
                 {
                     var taken = Take(
                         settings,
-                        new CommittingSettings { Repairing = repairing, Weighing = weighing },
+                        new CommittingSettings { Repairing = repairing },
                         Curve);
 
                     output.WriteLine(
-                        $"{timing,-13} {weighing,-8}  {Show(taken["paying"]),-20} "
+                        $"{timing,-13}  {Show(taken["paying"]),-20} "
                         + $"{Show(taken["recent"]),-20} {Show(taken["found"]),-20} "
                         + $"{taken["sound"].Mean:F1}");
                 }

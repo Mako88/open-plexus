@@ -203,10 +203,10 @@ public sealed class Cycle
     /// </para>
     /// <para>
     /// <b>RELATIVE RATHER THAN ABSOLUTE, BECAUSE THE ABSOLUTE ONE IS NOT COMPARABLE
-    /// BETWEEN RUNS.</b> Weights are accuracies raised to <c>Sharpness</c>, so a sharper
-    /// vote collapses every weight toward nought and its margins with them — two
-    /// settings would report different numbers for identical behaviour. The lead as a
-    /// share of the winner is in nought to one whatever the power is.
+    /// BETWEEN RUNS.</b> A weight is an accuracy, and it was once an accuracy raised to a
+    /// power — which collapsed every weight toward nought and its margins with them, so two
+    /// settings reported different numbers for identical behaviour. The lead as a share of
+    /// the winner is in nought to one either way, which is why it survived the dial.
     /// </para>
     /// <para>
     /// <b>AND IT IS THE SIGNAL FOR THE DIAL NOBODY CAN SET.</b> Near one, the winner
@@ -315,8 +315,8 @@ public sealed class Cycle
             var hit = said == outcome;
 
             // GUARDED, BECAUSE A ZERO WEIGHT IS REACHABLE AND SILENT. Every accuracy
-            // starts at nought and `Sharpness` raises it to a power, so the first
-            // rounds of any run vote with weights of exactly nought -- and a lead
+            // starts at nought, so the first rounds of any run vote with weights of
+            // exactly nought -- and a lead
             // divided by that is a NaN that poisons the mean for the whole run without
             // ever failing anything.
             Voted++;

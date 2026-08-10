@@ -81,6 +81,20 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// </remarks>
     private const int Sparse = 64;
 
+    /// <summary>
+    /// The seed the window is read on — <b>pinned with the pair, because it is part of the
+    /// same precondition and was the part nobody wrote down.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>SEED ONE FELL OUT OF THE WINDOW WHEN THE VOTE RULE CHANGED.</b> Under
+    /// <see cref="Repairing.AfterFailure"/> the vote decides what repair may run on, so a
+    /// readout change is a search change and *whole names, no shard names alone* moved with
+    /// it. Four seeds in twelve satisfy it at this budget and timing — 4, 8, 9 and 10 — so a
+    /// red here means taking another rather than re-tuning the pair, and
+    /// <c>SplitNamingTests</c> pins the same one for the same reason.
+    /// </remarks>
+    private const int Subject = 4;
+
     /// <summary>A population trained on the multiplexer, and the dials it ran under.</summary>
     /// <param name="address">Address bits.</param>
     /// <param name="weighing">How advocates for one expectation combine.</param>
@@ -111,17 +125,16 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     private static (CommittingSettings Dials, List<Commitment> All) Trained(
-        int address, Weighing weighing = Weighing.Summing)
+        int address)
     {
         var dials = new CommittingSettings
         {
-            Weighing = weighing,
             Repairing = Repairing.AfterFailure,
             Budget = Sparse,
         };
-        var brain = new Brain(dials, seed: 1);
+        var brain = new Brain(dials, Subject);
 
-        new MultiplexerRun(new MultiplexerSettings { Address = address }, brain, seed: 1)
+        new MultiplexerRun(new MultiplexerSettings { Address = address }, brain, Subject)
             .Run(Rounds);
 
         return (dials, brain.Held.All.ToList());
@@ -210,7 +223,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// Bit-identical and not within a tolerance, because under
-    /// <see cref="Weighing.Strongest"/> the aggregate is a maximum and a maximum composes
+    /// the aggregate is a maximum and a maximum composes
     /// exactly — the same claim <c>SplitTests</c> makes over objects, now made over bytes
     /// that were serialised, posted, and reconstructed by a machine holding no commitments
     /// at all.
@@ -218,7 +231,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     [Fact]
     public async Task A_vote_crossing_sockets_decides_exactly_as_one_population_would()
     {
-        var (dials, all) = Trained(Narrow, Weighing.Strongest);
+        var (dials, all) = Trained(Narrow);
 
         // A FRESH WHOLE POPULATION RATHER THAN THE TRAINED ONE. The trained population
         // carries whatever naming table the run minted and the shards are given none, so a
@@ -249,7 +262,7 @@ public sealed class AskedTests(ITestOutputHelper output)
                 await Wired.ArrivedAsync(gathering.Everyone),
                 $"only {gathering.Heard} of {gathering.Asked} holders answered");
 
-            var there = gathering.Decide(Weighing.Strongest);
+            var there = gathering.Decide();
 
             Assert.Equal(here.Expects, there.Expects);
             Assert.Equal(here.By, there.By);
@@ -377,7 +390,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     [Fact]
     public async Task A_death_that_takes_the_last_advocate_leaves_the_vote_with_no_answer()
     {
-        var (dials, all) = Trained(Narrow, Weighing.Strongest);
+        var (dials, all) = Trained(Narrow);
 
         // TWELVE, SO KILLING EVERY ADVOCATE STILL LEAVES A CROWD ANSWERING. The point is
         // not that a fleet went quiet -- that would be reachable by unplugging everything
@@ -431,7 +444,7 @@ public sealed class AskedTests(ITestOutputHelper output)
                 $"only {living.Heard} of {living.Asked} answered before the deaths");
 
             Assert.Equal(advocating.Count, living.Spoke);
-            Assert.NotNull(living.Decide(Weighing.Strongest).Expects);
+            Assert.NotNull(living.Decide().Expects);
         }
 
         foreach (var gone in advocating) await fleet.KillAsync(gone);
@@ -447,7 +460,7 @@ public sealed class AskedTests(ITestOutputHelper output)
             $"{bereaved.Heard} of {bereaved.Asked} answered after the deaths, and "
             + $"{surviving} were expected");
 
-        var vote = bereaved.Decide(Weighing.Strongest);
+        var vote = bereaved.Decide();
 
         // THE THIRD OUTCOME. Every surviving holder answered, none of them had anything to
         // advocate, and the vote comes back with no expectation at all -- which is not a
@@ -486,7 +499,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public async Task What_a_round_of_asks_costs_over_a_socket()
     {
-        var (dials, all) = Trained(Narrow, Weighing.Strongest);
+        var (dials, all) = Trained(Narrow);
 
         var moments = Moments(Narrow, many: 100);
 

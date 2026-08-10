@@ -87,21 +87,6 @@ public sealed class DialTests(ITestOutputHelper output)
             + "can afford to hold is a fact about the machine and not about the "
             + "run, so there is nothing here for a controller to hunt",
 
-        ["Sharpness"] =
-            "OPEN, AND IT IS A PARAMETER OF `Summing` RATHER THAN A DIAL OF THE "
-            + "BRAIN -- re-filed rather than deleted, and the difference is that a "
-            + "deletion would commit to `Strongest` on evidence that does not "
-            + "support it. Under `Weighing.Strongest` it decides NOTHING: an "
-            + "expectation is worth `max(a)^S`, raising to a power is monotone, so "
-            + "the argmax never moves and three powers produce one identical run at "
-            + "both widths. Under `Summing` it swings the score by nearly forty "
-            + "points. So the row above it and this one are not independent axes, "
-            + "and a grid swept over both has a dead column. ITS DELETION HAS A "
-            + "TRIGGER NOW rather than an argument: it goes when `Summing` goes, "
-            + "and what decides that is `Strongest` against `Summing` at ONE fixed "
-            + "power on more than one world. A power tuned per world is a world "
-            + "reaching into the brain and disqualifies the arm whatever it scores",
-
         ["Mending"] =
             "OPEN, AND IT IS HALF OF WHAT IT USED TO BE. This was one setting "
             + "deciding a gate and a timing at once, and every reading of it moved "
@@ -169,21 +154,6 @@ public sealed class DialTests(ITestOutputHelper output)
             + "condition a scope adds halves the moments it can fire in -- so "
             + "independent evidence falls exponentially in DEPTH and the bar "
             + "becomes a cap set by the size of the world",
-
-        ["Weighing"] =
-            "the arm for the line above, and a choice between two rules rather "
-            + "than a quantity -- as `Choosing` is. Whether an expectation is worth "
-            + "its advocates added up or its best one is not a level anything can "
-            + "hunt, and it exists because a SUM scales with the number of voters "
-            + "however steeply each is weighted, which is why `Sharpness` has a "
-            + "per-world peak at all. AND THE THIRD RULE IS WHERE FORK 46 POINTS: "
-            + "of five hundred residents on `Arranged`, fifteen to twenty-two "
-            + "decide every withheld answer, so what the vote does with its top "
-            + "advocate IS the score. AND MAKING IT ASK SUBSUMPTION'S OWN "
-            + "QUESTION EVERY ROUND IS WORSE, not better: it is inert under a "
-            + "permissive subsumption by construction, and where it can fire it "
-            + "costs four points and mints three hundred more commitments, "
-            + "because the vote steers repair as well as reporting it",
 
         ["Speaking"] =
             "whether a commitment may vote before it has been tested, and a "
@@ -621,26 +591,12 @@ public sealed class DialTests(ITestOutputHelper output)
         // old rule minted 414,087 commitments in twenty thousand rounds against
         // 23,296, ran seven and a half times slower, and scored LOWER. A dial nobody
         // can hunt is still worth having when the two rules differ by that much.
-        // AND TO TWENTY-TWO FOR `Weighing`, WHICH ARRIVES BECAUSE THE NUMBER ABOVE IT
-        // TURNED OUT TO BE UNHUNTABLE IN THE WORST WAY. `Sharpness` is a level whose
-        // optimum MOVES WITH THE WORLD -- `Arranged` reaches its exact target at ten
-        // and sits a fifth short at five, `Multiplexer` peaks at five and is worse at
-        // twenty at both widths. A per-world optimum on a brain dial is a world
-        // deciding how the brain thinks, which is the one thing this design says it
-        // will not have, so a controller on that number was never the answer.
-        //
-        // `Strongest` IS THE SHAPE THAT NEEDS NO NUMBER, and it half works: it reaches
-        // 1.000 on the arranged world at the DEFAULT power over five seeds, and it is
-        // worse than a sum on the clean multiplexer at both widths. Structurally it is
-        // the limit of high sharpness -- 105 repairs and 5.0 key rules at six bits,
-        // which is what `Sharpness = 20` gives to the digit.
-        //
         // AND TO TWENTY-THREE FOR `Mending`, WHICH IS THE THIRD IN A ROW AND IS WHY
         // THE COUNT RISING TWICE IN ONE SESSION IS THE FINDING RATHER THAN THE COST.
-        // `Sharpness`, `Weighing` and `Mending` all have a best value that moves
-        // between two worlds, and no combination of them is best on both -- so the
-        // answer is not another arm, and adding a fourth would be the same mistake
-        // with a different name.
+        // `Sharpness`, `Weighing` and `Mending` were read as each having a best value
+        // that moves between two worlds with no combination best on both. Two of the three
+        // are deleted now and the third turned out to be two settings crossed, so the row
+        // this paragraph was written to explain does not survive any of them.
         //
         // FORK 37 NAMES THE SIGNAL ALL THREE ARE STANDING IN FOR: whether a parent
         // still has failures no child covers. It is vote-independent and
@@ -678,17 +634,17 @@ public sealed class DialTests(ITestOutputHelper output)
         // at eleven bits, so rung five names nothing and the three tests that measure the
         // counts merge lose their subject entirely.
         //
-        // SO THE RULE ASKED WHETHER THE SUM WINS AND THE ANSWER IS THAT NEITHER DOES.
-        // `Arranged` is six points better without a power at all; `Multiplexer` is four
-        // worse and holds a third fewer true rules. That is a best value that MOVES WITH
-        // THE WORLD -- which is the defect the row above already names, arriving one level
-        // up: it is not `Sharpness` that has a per-world optimum, it is the choice between
-        // the two rules. Deleting an arm does not remove the world-dependence, it picks a
-        // side and stops measuring.
+        // SO THE RULE ASKED WHETHER THE SUM WINS AND THE ANSWER CAME BACK ONCE THE VOTE
+        // STOPPED STEERING THE SEARCH. Under `Repairing.EveryRound` all three weighings
+        // build populations equal PER SEED, so a vote arm is a readout at last -- and over
+        // ten worlds `Strongest` leads on three and the sum on none. Both losers are
+        // deleted with revival rows, and `Sharpness` goes with the arm it parameterised.
         //
-        // WHAT WOULD DECIDE IT IS A THIRD SHAPE THAT NEEDS NO NUMBER AND WINS BOTH, or a
-        // signal computed inside a run that says which world this is. Fork 45 is the same
-        // question about the repair gate, and neither has one.
+        // WHICH IS WHY THE COUNT FALLS BY TWO HERE AND THE FALL IS THE FINDING. Every
+        // earlier reading of these two was taken while the vote decided what repair ran on,
+        // so it moved the search and the readout at once; the timing separated them and the
+        // question answered itself.
+        //
         // AND TWENTY-SIX IS `Widening`, WHICH IS THE LADDER'S OTHER DIRECTION ARRIVING AS
         // AN ARM RATHER THAN AS A SETTING. It ships OFF, so every number recorded before
         // it existed still stands and it is measured on from a known baseline -- and it is
@@ -717,6 +673,6 @@ public sealed class DialTests(ITestOutputHelper output)
         // it is deleted anyway, because hard-round coverage fell 2.7 standard errors while
         // they rose. A pre-registered condition written on columns a skewed world can raise
         // is a pre-registration of the wrong question, and passing one is not a defence.
-        Assert.Equal(28, HandSet.Count);
+        Assert.Equal(26, HandSet.Count);
     }
 }

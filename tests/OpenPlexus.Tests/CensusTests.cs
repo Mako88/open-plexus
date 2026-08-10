@@ -34,12 +34,11 @@ public sealed class CensusTests(ITestOutputHelper output)
         int address,
         double skew,
         int seed,
-        Weighing weighing = Weighing.Summing,
         Surprising surprising = Surprising.Unaccounted) =>
         new MultiplexerRun(
             new MultiplexerSettings { Address = address, Skew = skew },
             new Brain(
-                new CommittingSettings { Weighing = weighing, Surprising = surprising }, seed),
+                new CommittingSettings { Surprising = surprising }, seed),
             seed,
             census: true).Run(Rounds);
 
@@ -74,14 +73,39 @@ public sealed class CensusTests(ITestOutputHelper output)
 
     /// <summary>
     /// <b>THE READING ITSELF: how much of the failure any vote rule could ever have
-    /// reached.</b>
+    /// reached, and whether what it holds covers the rounds guessing gets wrong.</b>
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>ONE WALK OVER FOUR WORLDS RATHER THAN TWO, WHICH IS WHAT THE VOTE ARMS COST.</b>
+    /// These were two readings because each crossed the four worlds with its own list of
+    /// weighing arms; the arms are deleted, and what was left was the same four runs taken
+    /// twice for two sets of columns. `DuplicationTests` refused it, correctly.
+    /// </para>
+    /// <para>
+    /// <b>A DOZEN PERFECTLY ACCURATE TRUE RULES AND AN ANSWER KEY SCORING NOUGHT ARE THE
+    /// SAME RUN.</b> On the skewed multiplexer every data bit is one four times in five,
+    /// so <i>all four data bits are one</i> holds on about two rounds in five and entails
+    /// the answer whatever the address selects. That rule is sound, never misses, and is
+    /// not in the key — this repo's own trap about a single answer key marking the basis
+    /// rather than the learner, walked into again.
+    /// </para>
+    /// <para>
+    /// <b>AND IT STILL HAS NOT LEARNT THE WORLD, WHICH IS WHAT THE SECOND ROW
+    /// SEPARATES.</b> That rule fires exactly when guessing the commoner answer already
+    /// works, so it buys nothing. <see cref="Census.Paying"/> asks the question no
+    /// alternative rule set can game: of the rounds where the base rate is WRONG, how many
+    /// had a true rule present and firing.
+    /// </para>
+    /// </remarks>
     [Fact]
     public void Where_the_wrong_answers_come_from()
     {
         output.WriteLine("outvoted — a sound rule for the right answer fired and lost");
         output.WriteLine("uncovered — nothing sound advocating the right answer fired");
         output.WriteLine("deeper — of the outvoted, lost to a LONGER scope");
+        output.WriteLine("hard — rounds whose answer was not the commonest one");
+        output.WriteLine("carried — of those, how many had a sound rule fire and say so");
         output.WriteLine("");
 
         foreach (var (address, skew) in new[] { (2, 0.0), (3, 0.0), (2, 0.8), (3, 0.8) })
@@ -97,51 +121,11 @@ public sealed class CensusTests(ITestOutputHelper output)
                 + $"| reachable {census.Reachable,6:P1} "
                 + $"| found {learned.Found}/{learned.Truths} "
                 + $"| residents {learned.Resident}");
-        }
-    }
 
-    /// <summary>
-    /// <b>WHETHER THE TRUE RULES IT HOLDS COVER THE ROUNDS GUESSING GETS WRONG — the
-    /// reading `Found` should have been.</b>
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>A DOZEN PERFECTLY ACCURATE TRUE RULES AND AN ANSWER KEY SCORING NOUGHT ARE THE
-    /// SAME RUN.</b> On the skewed multiplexer every data bit is one four times in five,
-    /// so <i>all four data bits are one</i> holds on about two rounds in five and entails
-    /// the answer whatever the address selects. That rule is sound, never misses, and is
-    /// not in the key — this repo's own trap about a single answer key marking the basis
-    /// rather than the learner, walked into again.
-    /// </para>
-    /// <para>
-    /// <b>AND IT STILL HAS NOT LEARNT THE WORLD, WHICH IS WHAT THIS SEPARATES.</b> That
-    /// rule fires exactly when guessing the commoner answer already works, so it buys
-    /// nothing. <see cref="Census.Paying"/> asks the question no alternative rule set can
-    /// game: of the rounds where the base rate is WRONG, how many had a true rule present
-    /// and firing.
-    /// </para>
-    /// </remarks>
-    [Fact]
-    public void Whether_the_true_rules_cover_the_rounds_that_guessing_misses()
-    {
-        output.WriteLine("hard: rounds whose answer was not the commonest one");
-        output.WriteLine("carried: of those, how many had a sound rule fire and say so");
-        output.WriteLine("");
-
-        foreach (var (address, skew) in new[] { (2, 0.0), (3, 0.0), (2, 0.8), (3, 0.8) })
-        {
-            foreach (var weighing in new[] { Weighing.Summing, Weighing.Lifting })
-            {
-                var learned = Run(address, skew, seed: 1, weighing);
-                var census = learned.Census!;
-
-                output.WriteLine(
-                    $"{address + (1 << address),2} bits skew {skew:F1} {weighing,-10} | "
-                    + $"recent {learned.Recent:F3} | hard {census.Hard,6} "
-                    + $"| carried {census.Carried,6} | paying {census.Paying,7:P1} "
-                    + $"| found {learned.Found,2}/{learned.Truths} "
-                    + $"| sound {learned.Sound,3}");
-            }
+            output.WriteLine(
+                $"{"",16} | recent {learned.Recent:F3} | hard {census.Hard,6} "
+                + $"| carried {census.Carried,6} | paying {census.Paying,7:P1} "
+                + $"| sound {learned.Sound,3}");
         }
     }
 
@@ -369,24 +353,24 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     [Fact]
-    public void Which_failures_each_vote_rule_moves_on_the_skewed_world()
+    public void Which_failures_the_vote_leaves_behind_on_the_skewed_world()
     {
+        // ONE ARM NOW, WHERE THIS ONCE CROSSED THREE. Two of them lost and are deleted, so
+        // what is left is the partition itself -- and the partition is what the reading was
+        // ever for: a wrong round is outvoted, uncovered, or deeper than the language
+        // reaches, and those three want completely different work.
         foreach (var address in new[] { 2, 3 })
         {
-            foreach (var weighing in new[]
-                { Weighing.Summing, Weighing.Strongest, Weighing.Lifting })
-            {
-                var learned = Run(address, skew: 0.8, seed: 1, weighing);
-                var census = learned.Census!;
+            var learned = Run(address, skew: 0.8, seed: 1);
+            var census = learned.Census!;
 
-                output.WriteLine(
-                    $"{address + (1 << address),2} bits {weighing,-10} | "
-                    + $"wrong {census.Wrong,6} | outvoted {census.Outvoted,5} "
-                    + $"| uncovered {census.Uncovered,6} | deeper {census.Deeper,4} "
-                    + $"| found {learned.Found,2}/{learned.Truths} "
-                    + $"| residents {learned.Resident,4} "
-                    + $"| minted {learned.Tally.Minted,6}");
-            }
+            output.WriteLine(
+                $"{address + (1 << address),2} bits | "
+                + $"wrong {census.Wrong,6} | outvoted {census.Outvoted,5} "
+                + $"| uncovered {census.Uncovered,6} | deeper {census.Deeper,4} "
+                + $"| found {learned.Found,2}/{learned.Truths} "
+                + $"| residents {learned.Resident,4} "
+                + $"| minted {learned.Tally.Minted,6}");
         }
     }
 

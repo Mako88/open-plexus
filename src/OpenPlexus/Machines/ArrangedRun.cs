@@ -101,8 +101,8 @@ public sealed record Judged
     /// that is often wrong — <see cref="Commitments.Population.Cull"/> returns early
     /// below capacity, and this world never reaches it. Which puts the remaining gap
     /// squarely on the vote rather than on the population, and the plan named that
-    /// failure before it happened: accuracy raised to a power is what stops a crowd of
-    /// mediocre rules outvoting one that is always right.
+    /// failure before it happened: an expectation being worth its best advocate and no
+    /// more is what stops a crowd of mediocre rules outvoting one that is always right.
     /// </remarks>
     public required int Rootless { get; init; }
 
@@ -111,11 +111,10 @@ public sealed record Judged
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE NUMBER THAT SAYS WHETHER SHARPENING THE VOTE COULD POSSIBLY HELP, AND IT
-    /// COSTS ONE PASS.</b> Every matching commitment votes for its expectation weighted
-    /// by its own accuracy raised to a power, which is XCS's answer to a crowd of
-    /// mediocre rules outvoting one that is always right. Raising the power only helps
-    /// if the crowd LOOKS worse from inside.
+    /// <b>THE NUMBER THAT SAYS WHETHER THE VOTE COULD POSSIBLY REACH THE GAP, AND IT
+    /// COSTS ONE PASS.</b> An expectation is worth its best advocate, so a crowd of
+    /// mediocre rules cannot outvote one that is always right at any scale — which only
+    /// helps if the crowd LOOKS worse from inside.
     /// </para>
     /// <para>
     /// <b>AND THERE IS EVERY REASON TO FEAR IT DOES NOT.</b> A rule is unsound when the

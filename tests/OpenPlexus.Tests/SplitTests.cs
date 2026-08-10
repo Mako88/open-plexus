@@ -68,9 +68,9 @@ public sealed class SplitTests(ITestOutputHelper output)
     /// populations rather than two ways of adding up one.
     /// </remarks>
     private static (Population Held, List<IReadOnlySet<Code>> Moments) Trained(
-        Weighing weighing, int seed)
+        int seed)
     {
-        var brain = new Brain(new CommittingSettings { Weighing = weighing }, seed);
+        var brain = new Brain(new CommittingSettings(), seed);
 
         new MultiplexerRun(new MultiplexerSettings { Address = Address }, brain, seed)
             .Run(Rounds);
@@ -139,29 +139,23 @@ public sealed class SplitTests(ITestOutputHelper output)
     // ---- the check that can fire -------------------------------------------
 
     /// <summary>
-    /// <b>BOTH SCALE-FREE RULES, BECAUSE THE PROPERTY IS THE AGGREGATE AND NOT THE
-    /// WEIGHT.</b>
+    /// <b>SCALE-FREE, BECAUSE THE PROPERTY IS THE AGGREGATE AND NOT THE WEIGHT.</b>
     /// </summary>
-    /// <param name="weighing">Which of the two maximum-shaped rules.</param>
     /// <remarks>
-    /// <b><see cref="Weighing.Lifting"/> DIVIDES BEFORE THE MAXIMUM AND THE MERGE NEVER
-    /// SEES THE DIVISOR</b>, which is exactly why it has to be asserted rather than
-    /// argued: the base rate is read from <see cref="Population.Witness"/>'s table on
-    /// whichever machine is speaking, so this passing is the claim that every holder has
-    /// the same table. Were the divisor ever to become a per-holder quantity — a count of
-    /// what that machine HOLDS rather than of what the world DID — this is the check that
-    /// would go red, and nothing else here would.
+    /// <b>THIS ONCE RAN OVER TWO MAXIMUM-SHAPED RULES AND THE SECOND IS DELETED.</b> The
+    /// base-rate divisor divided before the maximum and the merge never saw it, so this
+    /// check was the claim that every holder held the same divisor table. What survives is
+    /// the simpler and stronger half: a maximum of maxima is a maximum, at any number of
+    /// holders, exactly.
     /// </remarks>
-    [Theory]
-    [InlineData(Weighing.Strongest)]
-    [InlineData(Weighing.Lifting)]
-    public void A_vote_split_between_holders_is_the_same_vote(Weighing weighing)
+    [Fact]
+    public void A_vote_split_between_holders_is_the_same_vote()
     {
         // THE AGGREGATE IS A MAXIMUM UNDER BOTH, AND A MAXIMUM COMPOSES EXACTLY.
         // So this is not a tolerance and must never become one: every field of the vote
         // is bit-identical, including the margin, which is a subtraction of two doubles
         // that were each chosen rather than accumulated.
-        var (held, moments) = Trained(weighing, seed: 1);
+        var (held, moments) = Trained(seed: 1);
 
         var compared = 0;
         var contested = 0;
@@ -175,7 +169,7 @@ public sealed class SplitTests(ITestOutputHelper output)
 
             foreach (var holders in new[] { 2, 3, 5, 12 })
             {
-                var split = Population.Decide(Spread(firing, held, holders), weighing);
+                var split = Population.Decide(Spread(firing, held, holders));
 
                 Assert.Equal(whole.Expects, split.Expects);
                 Assert.Equal(whole.By, split.By);
@@ -202,52 +196,6 @@ public sealed class SplitTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public void Summing_agrees_on_the_answer_and_not_on_the_last_bits()
-    {
-        // FLOATING-POINT ADDITION IS NOT ASSOCIATIVE, AND A HOLDER SUMS ITS OWN ADVOCATES
-        // BEFORE THE MERGE SEES THEM. So `(a+b)+c` and `a+(b+c)` are what the two
-        // arrangements compute and they differ in the last bits -- which no ordering rule
-        // inside `Decide` can repair, because the information was already folded away.
-        //
-        // ASSERTED AS A DIFFERENT SHAPE OF CLAIM RATHER THAN A LOOSER ONE. The DECISION is
-        // exact; the weight is within an epsilon that scales with the sum. Writing this as
-        // `Weight` within a tolerance and leaving `Expects` unasserted would hide the
-        // question anybody actually has, which is whether the machine answers differently.
-        var (held, moments) = Trained(Weighing.Summing, seed: 1);
-
-        var compared = 0;
-        var apart = 0.0;
-        var flipped = 0;
-
-        foreach (var moment in moments)
-        {
-            var firing = held.Firing(moment);
-            if (firing.IsDefaultOrEmpty) continue;
-
-            var whole = held.Predict(firing);
-            var split = Population.Decide(Spread(firing, held, 12), Weighing.Summing);
-
-            if (whole.Expects != split.Expects) flipped++;
-
-            apart = Math.Max(apart, Math.Abs(whole.Weight - split.Weight));
-            compared++;
-        }
-
-        output.WriteLine($"{compared} moments, {flipped} answered differently, "
-            + $"largest weight gap {apart:E3}");
-
-        Assert.True(compared > 500, $"only {compared} comparisons");
-
-        // THE GAP IS BOUNDED WELL ABOVE ANY PLAUSIBLE ROUNDING AND WELL BELOW ANYTHING
-        // THAT COULD MOVE A DECISION, which is the only honest place to put it. A bar at
-        // exactly zero would be asserting that C# reorders nothing; a bar at 0.01 would
-        // pass through a genuine arithmetic bug.
-        Assert.True(apart < 1e-9, $"weights differ by {apart:E3}, which is not rounding");
-
-        Assert.Equal(0, flipped);
-    }
-
-    [Fact]
     public void What_a_holder_says_survives_being_written_as_bytes_and_read_back()
     {
         // ASKED BECAUSE THE OTHER PAYLOAD BUILT THIS SESSION COULD NOT CROSS. `Recurrence`
@@ -261,7 +209,7 @@ public sealed class SplitTests(ITestOutputHelper output)
         // codes differently at a band boundary -- and here a weight differing in its last
         // bit reorders a vote whose margin was thin. Fork 12 with the two halves on
         // different machines, where neither end can see that they disagree.
-        var (held, moments) = Trained(Weighing.Strongest, seed: 1);
+        var (held, moments) = Trained(seed: 1);
 
         var compared = 0;
 
@@ -280,8 +228,8 @@ public sealed class SplitTests(ITestOutputHelper output)
             // says the members survived; the same VOTE coming out says the arithmetic did,
             // and that is the thing a machine on the far side actually acts on.
             Assert.Equal(
-                Population.Decide(heard, Weighing.Strongest),
-                Population.Decide(arrived, Weighing.Strongest));
+                Population.Decide(heard),
+                Population.Decide(arrived));
 
             compared++;
         }
@@ -319,7 +267,7 @@ public sealed class SplitTests(ITestOutputHelper output)
         //
         // NO BAR, BECAUSE A THRESHOLD WRITTEN BEFORE THE FIRST READING IS A PREDICTION
         // DRESSED AS A REQUIREMENT. It prints a grid and the grid is the finding.
-        var (held, moments) = Trained(Weighing.Strongest, seed: 1);
+        var (held, moments) = Trained(seed: 1);
 
         const int Holders = 12;
         var edges = new[] { 0.0, 0.2, 0.4, 0.6, 0.8 };
@@ -346,7 +294,7 @@ public sealed class SplitTests(ITestOutputHelper output)
             for (var lost = 0; lost < Holders; lost++)
             {
                 var without = Population.Decide(
-                    Spread(firing, held, Holders, missing: lost), Weighing.Strongest);
+                    Spread(firing, held, Holders, missing: lost));
 
                 asked[bucket]++;
 

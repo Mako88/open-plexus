@@ -182,13 +182,11 @@ public sealed class PopulationTests
         Assert.Equal(Says(1), vote.Expects);
         Assert.True(vote.Margin > 0);
 
-        // AND AT A SHARPNESS OF ONE THE FAULT IS BACK, which is what says the dial is
-        // doing the work rather than decorating it.
-        var plain = new Population(new CommittingSettings { Sharpness = 1.0 }, seed: 1);
-
-        foreach (var one in held.All) plain.Add(one);
-
-        Assert.Equal(Says(0), plain.Predict(plain.Firing(Moment(1, 2, 3, 4))).Expects);
+        // AND THE OLD SECOND HALF OF THIS CHECK IS GONE WITH THE DIAL IT TURNED. It ran the
+        // same population at a sharpness of one and asserted the crowd won, which was what
+        // said the power was doing the work. The power was a workaround for a summed vote
+        // and both are deleted -- a maximum cannot be outvoted by a count at any power, so
+        // there is no setting left that brings the fault back.
     }
 
     [Fact]

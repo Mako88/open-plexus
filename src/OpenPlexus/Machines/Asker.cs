@@ -126,7 +126,6 @@ public sealed class Gathering : IDisposable
     }
 
     /// <summary>The vote over whoever answered.</summary>
-    /// <param name="weighing">How advocates for one expectation combine.</param>
     /// <remarks>
     /// <b>A VOTE WITH NOTHING IN IT COMES BACK WITH NO EXPECTATION, AND THAT IS THE THIRD
     /// OUTCOME ARRIVING.</b> The plan records <c>Abstain</c> as unarmed in any run because
@@ -134,7 +133,7 @@ public sealed class Gathering : IDisposable
     /// that has gone is the case it was written for, and it is reachable here for the first
     /// time.
     /// </remarks>
-    public Vote Decide(Weighing weighing)
+    public Vote Decide()
     {
         List<Testimony> said;
 
@@ -146,7 +145,7 @@ public sealed class Gathering : IDisposable
                     .Select(one => one.Said!.Value),
             ];
 
-        return Population.Decide(said, weighing);
+        return Population.Decide(said);
     }
 
     /// <summary>What every answering holder added, added up.</summary>

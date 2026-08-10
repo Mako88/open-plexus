@@ -561,6 +561,9 @@ condition is a superstition.
 | Subsumption weighed against DISTINCT occasions rather than firings | Chance on the noisy multiplexer, no sound rule left. Its halving explanation is measured true on even worlds only | A bar tracking depth as that world's reach does, which is not one direction |
 | `Minting.UntilRefused` — naming until the gate refuses | Every count rose and hard-round coverage fell 2.7 standard errors; the extra sound rules were the LONG ones | A gate charging a name by what it stands for — fork 71 |
 | A kill condition pre-registered on counts | `Minting`'s said the arm dies unless `named` or `stacked` moves. Both moved and it died anyway | Never on a column skew can raise. Pre-register on `Census.Paying` |
+| `Weighing.Summing` — an expectation worth its advocates added up | Led on none of ten worlds once the vote stopped steering the search, and a sum splits inexactly | A world where a crowd outweighs one always-right rule |
+| `Weighing.Lifting` — divide the best advocate by its answer's base rate | Beat `Strongest` nowhere in ten worlds, and trails worst where skew gives the divisor something to do | A world where an unusual answer on thin evidence is right |
+| `Sharpness` — accuracy raised to a power before the vote | A workaround for a sum's shape: it cannot move the argmax of a maximum, and the sum is gone | Never under a maximum; only a summed vote returns it |
 
 ---
 

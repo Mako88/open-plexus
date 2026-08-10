@@ -129,7 +129,7 @@ public sealed class Fleet : ICouncil
 
         if (gathering.Spoke > 1) Contested++;
 
-        var vote = gathering.Decide(_dials.Weighing);
+        var vote = gathering.Decide();
 
         Mark(ref _asking, at);
 

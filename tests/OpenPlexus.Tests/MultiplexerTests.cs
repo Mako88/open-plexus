@@ -13,7 +13,7 @@ namespace OpenPlexus.Tests;
 /// reach, and a key that drifted from the world would quietly become the thing being
 /// measured.
 /// </remarks>
-public sealed class MultiplexerTests
+public sealed class MultiplexerTests(Xunit.Abstractions.ITestOutputHelper output)
 {
     private static MultiplexerSettings World(
         int address = 2, double noise = 0.0, int flip = 0) => new()
@@ -241,5 +241,70 @@ public sealed class MultiplexerTests
         Assert.NotEqual(
             new Multiplexer(World(), seed: 13).Next(),
             new Multiplexer(World(), seed: 14).Next());
+    }
+
+    /// <summary>
+    /// <b>THE SKEWED WORLD SKEWS ITS OUTCOMES AND CHANGES NOTHING ELSE.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE TRUE RULE SET IS ASSERTED IDENTICAL, WHICH IS THE HALF THAT MAKES IT A
+    /// CONTROL.</b> A world that skewed its outcomes by changing what is true of it would
+    /// move two things at once, and every comparison against it would be unreadable — this
+    /// repo's own trap about a setting that decides two independent things while being named
+    /// for one. Only how often the answer is one may differ.
+    /// </para>
+    /// <para>
+    /// <b>IT ARRIVED HERE WITH THE VOTE ARM IT WAS BUILT FOR, AND OUTLIVED IT.</b> The
+    /// base-rate divisor is deleted; the world property it needed is a fact about the world
+    /// and every skewed grid on this bench still rests on it.
+    /// </para>
+    /// </remarks>
+    [Theory]
+    [InlineData(0.0, 1.0)]
+    [InlineData(0.8, 3.0)]
+    public void A_skewed_multiplexer_moves_its_outcomes_and_leaves_its_rules_alone(
+        double skew, double least)
+    {
+        var even = new MultiplexerSettings { Address = 2 };
+        var slanted = new MultiplexerSettings { Address = 2, Skew = skew };
+
+        var world = new Multiplexer(slanted, seed: 1);
+
+        // COUNTED PER DISTINCT ANSWER RATHER THAN AGAINST A NOMINATED ONE, so this says
+        // nothing about which code means one and cannot be wrong about it.
+        var seen = new Dictionary<Code, int>();
+        const int Draws = 20_000;
+
+        for (var draw = 0; draw < Draws; draw++)
+        {
+            var answer = world.Next().Answer;
+            seen[answer] = seen.GetValueOrDefault(answer) + 1;
+        }
+
+        var ratio = seen.Values.Max() / (double)seen.Values.Min();
+        var share = seen.Values.Max() / (double)Draws;
+
+        output.WriteLine($"skew {skew:F2} | the commoner answer is {share:P1} of the time "
+            + $"| outcome ratio {ratio:F2}x");
+
+        Assert.True(ratio >= least,
+            $"a skew of {skew:F2} produced an outcome ratio of {ratio:F2}x, under the "
+            + $"{least:F2}x this setting exists to reach");
+
+        // THE RULES ARE THE SAME RULES, WHICH IS WHAT KEEPS SOUNDNESS COMPARABLE ACROSS THE
+        // TWO ARMS. `Truths` reads the mapping and the mapping is drawn from the seed, so two
+        // worlds on one seed must agree exactly whatever their bits do.
+        //
+        // COMPARED BY CONTENT AND NOT BY THE RECORD, because `Truth` holds an
+        // `ImmutableArray` and that type's equality is the identity of the underlying array
+        // -- so two separately built keys with identical scopes are never equal and the
+        // assertion would fail on a world it had no complaint about.
+        static List<string> Shape(MultiplexerSettings settings) =>
+            [.. new Multiplexer(settings, seed: 1).Truths()
+                .Select(one => $"{string.Join("+", one.Scope.Order())}->{one.Expects}")
+                .Order()];
+
+        Assert.Equal(Shape(even), Shape(slanted));
     }
 }

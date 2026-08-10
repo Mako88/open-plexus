@@ -113,27 +113,18 @@ public sealed class ArrangingTests(ITestOutputHelper output)
             $"target {could.CoversUnseen:F3} on the unseen, from {could.Alone.Length} "
             + $"codes sound alone, {could.Least} of them enough");
 
-        // AND THE SCALE-FREE ARM AT THE DEFAULT POWER, WHICH IS THE WHOLE QUESTION. If
-        // `Strongest` reaches the target at five, the peak stops moving with the world
-        // and there is nothing left to tune. If it needs a power too, the count was
-        // never the fault and this rules that out.
-        foreach (var weighing in new[] { Weighing.Summing, Weighing.Strongest })
-        foreach (var sharpness in weighing == Weighing.Summing
-            ? new[] { 1.0, 5.0, 10.0, 20.0, 50.0 }
-            : [5.0])
+        // AND THE QUESTION IS SETTLED RATHER THAN SWEPT NOW. This crossed a summed vote at
+        // five powers against the scale-free one, to ask whether the peak moves with the
+        // world. Both the sum and the power are deleted -- the sum led on no world of ten --
+        // so what is left is one cell, and it is the cell that used to be the answer.
         {
             var (unseen, last) = Sweep(
                 Small,
-                new CommittingSettings
-                {
-                    Surprising = Surprising.AnyFailure,
-                    Sharpness = sharpness,
-                    Weighing = weighing,
-                },
+                new CommittingSettings { Surprising = Surprising.AnyFailure },
                 Looking.Tiled);
 
             output.WriteLine(
-                $"  {weighing,-9} sharpness {sharpness,4} | unseen {unseen.Average():F3} +/- "
+                $"  unseen {unseen.Average():F3} +/- "
                 + $"{Spread(unseen):F3} | "
                 + $"[{string.Join(" ", unseen.Select(one => one.ToString("F3")))}] | "
                 + $"last run: {last.Rules.Sound} sound {last.Rules.Unsound} unsound, "
@@ -171,7 +162,6 @@ public sealed class ArrangingTests(ITestOutputHelper output)
                 new CommittingSettings
                 {
                     Surprising = Surprising.AnyFailure,
-                    Weighing = Weighing.Strongest,
                     Mending = gate,
                     Repairing = when,
                     Subsuming = subsuming,
@@ -222,7 +212,6 @@ public sealed class ArrangingTests(ITestOutputHelper output)
                 new CommittingSettings
                 {
                     Surprising = Surprising.AnyFailure,
-                    Weighing = Weighing.Strongest,
                     Mending = gate,
                     Repairing = when,
                     Subsuming = Subsuming.Insignificant,

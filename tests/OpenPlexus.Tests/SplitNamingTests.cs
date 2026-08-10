@@ -92,6 +92,27 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     /// <inheritdoc cref="Sparse"/>
     private const Repairing Waiting = Repairing.AfterFailure;
 
+    /// <summary>
+    /// The seed the window is read on — <b>a fixture constant, and it moved when a dial
+    /// nothing here names moved.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE PRECONDITION IS A PROPERTY OF ONE RUN AND EVERY SEARCH DIAL MOVES IT.</b>
+    /// Seed one satisfied <i>whole names, no third names alone</i> until the vote rule
+    /// changed — and under <see cref="Repairing.AfterFailure"/> the vote decides what repair
+    /// may run on, so a readout change is a search change and the window moved with it. That
+    /// is the row this file already carried, arriving from a direction nobody watched.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS NOT A THIN WINDOW, WHICH IS WORTH KNOWING BEFORE THE NEXT HUNT.</b> Four
+    /// seeds in twelve satisfy the precondition at this budget and timing — 4, 8, 9 and 10 —
+    /// so a red here means finding another rather than re-tuning the pair. The assertions
+    /// below say which half failed.
+    /// </para>
+    /// </remarks>
+    private const int Subject = 4;
+
     /// <summary>A trained population, its dials, and the name it proposes whole.</summary>
     /// <remarks>
     /// <b>WRITTEN ONCE BECAUSE THE CLONE BUDGET REFUSED THE THIRD COPY.</b> Three tests
@@ -103,9 +124,9 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
         Trained()
     {
         var dials = new CommittingSettings { Budget = Sparse, Repairing = Waiting };
-        var brain = new Brain(dials, seed: 1);
+        var brain = new Brain(dials, Subject);
 
-        new MultiplexerRun(new MultiplexerSettings { Address = Address }, brain, seed: 1)
+        new MultiplexerRun(new MultiplexerSettings { Address = Address }, brain, Subject)
             .Run(Rounds);
 
         var all = brain.Held.All.ToList();

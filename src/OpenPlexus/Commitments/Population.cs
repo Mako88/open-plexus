@@ -30,7 +30,7 @@ public readonly record struct Vote
     /// <para>
     /// <b>WHO DECIDED, WHICH NO REPORT HAS EVER ASKED.</b> Every instrument here counts
     /// the POPULATION — how many are resident, how many are sound, how many were minted
-    /// and subsumed — and under <see cref="Weighing.Strongest"/> an expectation is worth
+    /// and subsumed — and under the vote an expectation is worth
     /// its best advocate and no more. So a population can be reshuffled at length while
     /// the same few commitments answer every question, and nothing would show it.
     /// </para>
@@ -45,7 +45,7 @@ public readonly record struct Vote
     /// <b>WELL DEFINED UNDER BOTH WEIGHINGS, WHICH IS WHY IT IS THE BEST ADVOCATE RATHER
     /// THAN THE WINNER.</b> A sum has no single winner to name; the strongest advocate
     /// for the winning expectation exists either way, and under
-    /// <see cref="Weighing.Strongest"/> it IS the decision.
+    /// the vote is a maximum, it IS the decision.
     /// </para>
     /// </remarks>
     public Code? By { get; init; }
@@ -286,21 +286,6 @@ public sealed class Population
 
     private long _moments;
 
-    /// <summary>
-    /// Per code: how many settlements it was the thing that ARRIVED.
-    /// </summary>
-    /// <remarks>
-    /// <b>A SECOND TABLE, BECAUSE <see cref="_liveness"/> COUNTS THE WRONG SIDE OF THE
-    /// ROUND AND READS AS AN ANSWER ANYWAY.</b> What is live in a moment is the evidence;
-    /// what arrives is the outcome, and on a world where those are different alphabets the
-    /// first table has no entry for an expectation at all. <see cref="Rate"/> was mounted
-    /// on it and returned the smoothing floor for every expectation — identical divisors,
-    /// so <see cref="Weighing.Lifting"/> ran on eight worlds and moved nothing, which read
-    /// exactly like a rule that had been measured and found inert.
-    /// </remarks>
-    private readonly Dictionary<Code, long> _arrivals = [];
-
-    private long _settlements;
 
     private long _wrong, _atFloor, _atBudget, _atCovered, _atImproving, _reached;
 
@@ -657,7 +642,7 @@ public sealed class Population
     {
         if (firing.IsDefaultOrEmpty) return default;
 
-        return Decide([Speak(firing)], _dials.Weighing);
+        return Decide([Speak(firing)]);
     }
 
 
@@ -674,10 +659,10 @@ public sealed class Population
     /// better evidence than one right nine times in ten.
     /// </para>
     /// <para>
-    /// <b>AND THE POWER IS APPLIED BEFORE ANYTHING LEAVES.</b> <c>Sharpness</c> is a brain
-    /// dial, so raising accuracy to it is the speaker's business — shipping a raw accuracy
-    /// and letting the reader sharpen it would put one machine's dial on another machine's
-    /// arithmetic, and two holders that disagreed about it would be undetectable.
+    /// <b>AND WHAT LEAVES IS AN ACCURACY AND NOTHING DONE TO IT.</b> A power used to be
+    /// applied here, on the argument that a brain dial is the speaker's business; the dial
+    /// is gone, and with it the way two holders disagreeing about it would have been
+    /// undetectable.
     /// </para>
     /// </remarks>
     public Testimony Speak(ImmutableArray<Commitment> firing)
@@ -702,28 +687,24 @@ public sealed class Population
             if (_dials.Speaking == Speaking.Experienced && commitment.Seen < _dials.Floor)
                 continue;
 
-            var weight = Math.Pow(commitment.Accuracy, _dials.Sharpness);
-
-            // DIVIDED HERE RATHER THAN AT THE MERGE, because the merge holds no
-            // population and therefore no table of what this world does. It changes
-            // nothing about the arithmetic: the divisor is one number per expectation
-            // and every holder has the same one, so scaling before the maximum and
-            // scaling after it are the same operation.
-            if (_dials.Weighing == Weighing.Lifting)
-                weight /= Rate(commitment.Expects);
+            // ACCURACY ITSELF, WITH NO POWER OVER IT. A power was applied here, and it was
+            // the workaround for a summed vote's shape: a sum over N advocates scales with N
+            // however steeply each is weighted, so raising it only made a crowd need more
+            // members. A maximum does not scale with N at all, and raising a maximum to a
+            // power is monotone -- it cannot move an argmax. Both are deleted rather than
+            // defaulted, and the plan carries their revival rows.
+            var weight = commitment.Accuracy;
 
             if (!loudest.TryGetValue(commitment.Expects, out var best) || weight > best.Weight)
                 loudest[commitment.Expects] = (weight, commitment.Identity);
 
-            // A SUM SCALES WITH THE NUMBER OF ADVOCATES AND A MAXIMUM DOES NOT, which
-            // is the whole of the difference. Raising accuracy to a power makes a crowd
-            // need more members to outvote one commitment that is always right; it
-            // never takes the count out of the decision. See `CommittingSettings.Weighing`.
+            // AN EXPECTATION IS WORTH ITS BEST ADVOCATE AND NO MORE, which is the whole of
+            // the strength-versus-accuracy refutation arriving through the vote. A thousand
+            // mediocre rules cannot outvote one that is always right, and the NUMBER of
+            // voters stops being part of the answer at any scale.
             weights[commitment.Expects] =
                 weights.TryGetValue(commitment.Expects, out var so_far)
-                    ? _dials.Weighing == Weighing.Summing
-                        ? so_far + weight
-                        : Math.Max(so_far, weight)
+                    ? Math.Max(so_far, weight)
                     : weight;
         }
 
@@ -755,7 +736,6 @@ public sealed class Population
     /// arithmetic.</b>
     /// </summary>
     /// <param name="heard">What each holder said. Order is not read.</param>
-    /// <param name="weighing">How advocates for one expectation combine.</param>
     /// <remarks>
     /// <para>
     /// <b>STATIC AND HOLDING NOTHING, BECAUSE THE MERGER IS NOT A PARTICIPANT.</b> Whoever
@@ -772,17 +752,14 @@ public sealed class Population
     /// it has been reopened twice already.
     /// </para>
     /// <para>
-    /// <b>AND UNDER <see cref="Weighing.Summing"/> A SHARDED VOTE IS STILL NOT BIT-IDENTICAL
-    /// TO A WHOLE ONE, WHICH ORDERING CANNOT FIX.</b> Floating-point addition is not
-    /// associative, and a holder has already summed its own advocates before the merge sees
-    /// them — so <c>(a+b)+c</c> and <c>a+(b+c)</c> are what the two arrangements compute,
-    /// and they differ in the last bits. Under <see cref="Weighing.Strongest"/> the
-    /// aggregate is a maximum and the two are exactly equal. Said out loud because
-    /// <c>SplitTests</c> asserts the strong claim on one and the weak one on the other, and
-    /// a reader who found that asymmetry without this note would take it for an oversight.
+    /// <b>AND A SHARDED VOTE IS BIT-IDENTICAL TO A WHOLE ONE, WHICH A SUM COULD NEVER
+    /// BE.</b> Floating-point addition is not associative, and a holder summing its own
+    /// advocates before the merge saw them made <c>(a+b)+c</c> and <c>a+(b+c)</c> the two
+    /// arrangements — differing in the last bits, so the split was only ever asserted
+    /// approximately. A maximum of maxima is a maximum exactly, at any number of holders.
     /// </para>
     /// </remarks>
-    public static Vote Decide(IReadOnlyCollection<Testimony> heard, Weighing weighing)
+    public static Vote Decide(IReadOnlyCollection<Testimony> heard)
     {
         ArgumentNullException.ThrowIfNull(heard);
 
@@ -818,13 +795,11 @@ public sealed class Population
 
             loudest[expects] = (at[0].Weight, at[0].By);
 
-            // A MAXIMUM FOR BOTH SCALE-FREE RULES, and the difference between them has
-            // already happened by here. `Lifting` divides by the base rate in `Speak`,
-            // where the table is; what arrives at the merge is a weight either way, and
-            // the merge may not know which kind it is holding.
-            weights[expects] = weighing == Weighing.Summing
-                ? at.Sum(one => one.Weight)
-                : at[0].Weight;
+            // A MAXIMUM, AND THE MERGE NEEDS TO KNOW NOTHING ELSE. What arrives is a
+            // weight per expectation per holder; the best of them is the answer, and
+            // taking a maximum of maxima is the same operation however many holders spoke.
+            // That is what makes the vote split exactly rather than approximately.
+            weights[expects] = at[0].Weight;
         }
 
         // ORDERED BY WEIGHT AND THEN BY CODE, so a tie -- which is what every
@@ -848,17 +823,6 @@ public sealed class Population
     public void Settle(ImmutableArray<Commitment> firing, IReadOnlySet<Code> moment, Code? arrived)
     {
         ArgumentNullException.ThrowIfNull(moment);
-
-        // COUNTED BEFORE ANYTHING IS TOLD, AND WHATEVER FIRED. A base rate is a fact
-        // about the WORLD, so a holder that held nothing relevant this round must still
-        // count what happened -- otherwise the divisor would be a fact about a
-        // population, it would differ per machine, and a sharded vote would stop being
-        // the whole vote. An abstain is not an arrival and is not counted.
-        if (arrived is { } outcome)
-        {
-            _settlements++;
-            _arrivals[outcome] = _arrivals.GetValueOrDefault(outcome) + 1;
-        }
 
         foreach (var commitment in firing)
             commitment.Settle(
@@ -964,37 +928,6 @@ public sealed class Population
             seen = seen with { Live = seen.Live + 1 };
         }
     }
-
-    /// <summary>
-    /// The share of moments a code has been live in — <b>an expectation's base rate, and
-    /// the divisor <see cref="Weighing.Lifting"/> is made of.</b>
-    /// </summary>
-    /// <param name="code">The code to ask about.</param>
-    /// <remarks>
-    /// <para>
-    /// <b>OVER SETTLEMENTS AND NEVER OVER MOMENTS, WHICH IS THE WHOLE OF WHAT THIS GOT
-    /// WRONG FIRST.</b> The obvious table was <see cref="Witness"/>'s, which already
-    /// counts how often a code is around and cost nothing to read. It counts the wrong
-    /// side of the round: an expectation is what ARRIVES, and on any world whose outcome
-    /// alphabet differs from its input alphabet no expectation is in that table at all —
-    /// so every divisor came back at the smoothing floor, every divisor was therefore
-    /// EQUAL, and dividing by a constant cannot move an argmax.
-    /// </para>
-    /// <para>
-    /// <b>AND IT IS THE SAME NUMBER ON EVERY MACHINE, WHICH IS WHAT LETS A LIFTED VOTE
-    /// SHARD EXACTLY.</b> A holder witnesses every moment it is asked to vote on whether
-    /// it holds anything relevant or not, so this is a count over the WORLD'S stream and
-    /// not over a population — replicas cannot move it and neither can a split.
-    /// </para>
-    /// <para>
-    /// <b>SMOOTHED, BECAUSE AN UNWITNESSED EXPECTATION WOULD DIVIDE BY NOUGHT.</b> Under
-    /// C2 a holder can hold a commitment about an outcome whose arrival it never saw, so
-    /// the unsmoothed ratio has a hole in it exactly where lateness put one. Laplace is
-    /// the arbitrary-free choice and it is stated rather than tuned.
-    /// </para>
-    /// </remarks>
-    public double Rate(Code code) =>
-        (_arrivals.GetValueOrDefault(code) + 1.0) / (_settlements + 1.0);
 
     /// <summary>Whether a code has been absent from a moment since it first appeared.</summary>
     /// <param name="code">The code to ask about.</param>

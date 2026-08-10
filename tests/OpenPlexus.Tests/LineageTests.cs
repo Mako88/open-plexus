@@ -158,7 +158,6 @@ public sealed class LineageTests(ITestOutputHelper output)
         var arms = new (string Name, CommittingSettings Dials)[]
         {
             ("shipped", new CommittingSettings()),
-            ("lifting", new CommittingSettings { Weighing = Weighing.Lifting }),
             ("everyround", new CommittingSettings { Repairing = Repairing.EveryRound }),
         };
 

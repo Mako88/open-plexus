@@ -41,8 +41,7 @@ public sealed record Examined
     /// <remarks>
     /// <b>FORK 46, AND IT IS THE ONE READING THAT COULD MAKE FOUR SESSIONS OF ARMS MAKE
     /// SENSE.</b> Every gate, weighing and subsumption rule tried so far changes the
-    /// POPULATION, and under <see cref="Commitments.Weighing.Strongest"/> the answer is
-    /// its best advocate and no more. Small against <see cref="Answered"/> means a
+    /// POPULATION, and the answer is its best advocate and no more. Small against <see cref="Answered"/> means a
     /// handful of rules are deciding the world and the rest are furniture — which would
     /// say the remaining gap is about which rule WINS rather than about which are held.
     /// </remarks>
@@ -389,7 +388,7 @@ public sealed record Census
     /// <b>WHETHER THE PROVISIONAL WEIGHT IS ACTUALLY STEALING DECISIONS, rather than
     /// merely being able to.</b> A commitment below the floor carries an accuracy averaged
     /// over a handful of firings, so one that has been right once weighs a perfect one and
-    /// the vote raises that to a power. That it CAN outvote an established rule is
+    /// takes the maximum outright. That it CAN outvote an established rule is
     /// arithmetic; that it DOES is a measurement, and nothing had taken it.
     /// </para>
     /// <para>
@@ -817,7 +816,7 @@ public sealed class Trial<TSeen>
                 })
                 .ToList();
 
-            var vote = Population.Decide(heard, _brain.Dials.Weighing);
+            var vote = Population.Decide(heard);
 
             if (vote.Expects is not { } said) continue;
 

@@ -32,66 +32,6 @@ public enum Surprising
     Unaccounted,
 }
 
-/// <summary>How the advocates for one expectation are added up.</summary>
-public enum Weighing
-{
-    /// <summary>Every advocate adds its weight. What ran before anything questioned it.</summary>
-    Summing,
-
-    /// <summary>An expectation is worth its best advocate and no more.</summary>
-    /// <remarks>
-    /// <b>AND UNDER IT THE VOTE PREFERS THE NARROWER RULE EVERY ROUND WHILE
-    /// <see cref="Population.Subsume"/> PREFERS THE GENERAL ONE EVERY THOUSANDTH.</b>
-    /// Making the vote defer unless the child has earned the seat — subsumption's own
-    /// bar, asked where the decision is made — was built and measured and is WORSE. See
-    /// the plan's revival row: it cannot be read as a change to the readout, because the
-    /// vote also steers repair.
-    /// </remarks>
-    Strongest,
-
-    /// <summary>
-    /// An expectation is worth how far its best advocate moves it from its own base
-    /// rate — <b>the answer the evidence most changed the mind about.</b>
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>JOHN'S: THE MOST NOVEL ANSWER THAT IS ALSO THE BEST GROUNDED, AND THERE IS
-    /// EXACTLY ONE READING OF <i>NOVEL</i> THAT SURVIVES.</b> <i>Few advocates</i> is
-    /// <see cref="Summing"/> upside down and changes with replication, so three copies of
-    /// a population would vote differently from one. <i>A young advocate</i> prefers the
-    /// rules that have no statistics yet, which is the strength-versus-accuracy
-    /// refutation arriving from the far end. What is left is a property of the ANSWER —
-    /// how often that outcome happens at all — which no amount of copying can move.
-    /// </para>
-    /// <para>
-    /// <b>WHICH MAKES IT LIFT, AND ASSOCIATION RULE MINING HIT THIS EXACT PROBLEM
-    /// FIRST.</b> Confidence alone favours whatever is common, because a rule predicting
-    /// the usual outcome is right by default; dividing by the base rate asks instead how
-    /// much the scope CHANGED the odds. Borrowed as the problem rather than as the
-    /// mechanism — the quantity here is a commitment's own accuracy over the share of
-    /// moments its expectation was live.
-    /// </para>
-    /// <para>
-    /// <b>AND IT IS SCALE-FREE IN THE SAME WAY <see cref="Strongest"/> IS, WHICH IS THE
-    /// PROPERTY THAT MADE IT WORTH BUILDING.</b> The aggregate is a maximum, so a crowd
-    /// still cannot outvote one commitment that is always right, replicas stay invisible
-    /// to the vote, and a sharded vote is bit-identical to a whole one — every holder
-    /// witnesses every moment, so the divisor is the same number on all of them.
-    /// </para>
-    /// <para>
-    /// <b>WHAT IT COSTS IS WRITTEN DOWN BEFORE THE GRID RUNS, TWICE.</b> A rare
-    /// expectation divides by a small number, so this arm will prefer an unusual answer
-    /// on thin evidence wherever the base rates are skewed — the multiplexer's outcomes
-    /// are near balanced and will barely move, and <see cref="Worlds.Arranged"/> is where
-    /// it should show. AND <see cref="CommittingSettings.Sharpness"/> BECOMES A LIVE AXIS
-    /// AGAIN: the argmax of <c>max(a)^S</c> never moves with <c>S</c>, but the argmax of
-    /// <c>max(a)^S / p</c> does, so the dead column `DialTests` recorded under
-    /// <see cref="Strongest"/> is not dead here and is unmeasured.
-    /// </para>
-    /// </remarks>
-    Lifting,
-}
-
 /// <summary>Whether a commitment may vote before it has been tested.</summary>
 /// <remarks>
 /// <para>
@@ -381,10 +321,10 @@ public enum Repairing
     /// <para>
     /// <b>AND IT IS THE ONLY THING HERE THAT SEPARATES THE READOUT FROM THE SEARCH.</b>
     /// Under <see cref="AfterFailure"/> the vote decides what repair may run on, so a
-    /// weighing rule and a search rule are one change — measured, not argued:
-    /// <see cref="Weighing.Summing"/> and <see cref="Weighing.Lifting"/> build populations
-    /// identical to three decimals under this timing and quite different ones under the
-    /// other. Every vote arm in this repo's history moved two things at once.
+    /// weighing rule and a search rule are one change — measured, not argued: the three
+    /// weighing arms this repo held built populations equal PER SEED under this timing and
+    /// quite different ones under the other. Every vote arm in this repo's history moved two
+    /// things at once, which is why two of the three could finally be deleted.
     /// </para>
     /// </remarks>
     EveryRound,
@@ -531,58 +471,6 @@ public sealed record CommittingSettings
     /// <summary>How many commitments may be resident before the worst are dropped.</summary>
     public int Capacity { get; init; } = 2000;
 
-    /// <summary>How sharply the vote favours the accurate over the many.</summary>
-    /// <remarks>
-    /// <para>
-    /// <b>THE STRENGTH-VERSUS-ACCURACY REFUTATION ARRIVES THROUGH THE VOTE, WHICH IS
-    /// WHERE NOBODY LOOKS FOR IT.</b> Summing accuracy over everything that advocates
-    /// an expectation lets three commitments that are right half the time outvote one
-    /// that is always right — so the population's COUNT decides and its accuracy does
-    /// not, which is strength-based fitness wearing a different hat.
-    /// </para>
-    /// <para>
-    /// <b>Raising accuracy to a power before summing is XCS's own answer</b>, and it
-    /// is why its fitness is a steep function of accuracy rather than accuracy
-    /// itself. At one this is a plain sum and the fault is back.
-    /// </para>
-    /// </remarks>
-    public double Sharpness { get; init; } = 5.0;
-
-    /// <summary>Whether an expectation is worth its voters added up, or its best one.</summary>
-    /// <remarks>
-    /// <para>
-    /// <b>AND <see cref="Sharpness"/> TURNS OUT TO BE A WORKAROUND FOR THE SHAPE OF THIS
-    /// ONE.</b> A sum over N advocates scales with N however steeply each is weighted,
-    /// so raising the power does not remove the count from the decision — it only makes
-    /// the count need more members to win. The fault the doc above names is not that the
-    /// weights are too flat; it is that the aggregate is a SUM.
-    /// </para>
-    /// <para>
-    /// <b>WHICH IS WHY THE PEAK MOVES BETWEEN WORLDS, AND THAT IS THE PART THAT MATTERS.</b>
-    /// On <see cref="Worlds.Arranged"/> the score reaches its exact target at a power of
-    /// ten and sits a fifth short at five; on <see cref="Worlds.Multiplexer"/> five is the
-    /// peak and twenty is worse at both widths. A dial with a per-world optimum is a
-    /// world reaching into the brain by the back door — the one thing this design says
-    /// it will not have — so the answer cannot be to tune it.
-    /// </para>
-    /// <para>
-    /// <b><see cref="Weighing.Strongest"/> IS SCALE-FREE, WHICH IS THE PROPERTY BEING
-    /// TESTED.</b> An expectation is worth its best advocate and no more, so a thousand
-    /// mediocre rules cannot outvote one that is always right at ANY power, and the
-    /// number of voters stops being part of the answer. Whether that costs the
-    /// robustness a crowd buys is exactly what the arm is for.
-    /// </para>
-    /// </remarks>
-    /// <remarks>
-    /// <b>AND THE GRID THAT KEPT <see cref="Weighing.Summing"/> WAS READ WHILE THE VOTE
-    /// STEERED THE SEARCH.</b> Deleting the sum was measured to cost the multiplexer two of
-    /// its eight true rules; under <see cref="Repairing.EveryRound"/> all three weighings
-    /// find the same rules to the last one, and <see cref="Weighing.Strongest"/> leads on
-    /// three worlds of ten and is level on the rest. <c>WeighingTests</c> pre-registered the
-    /// rule — a sum needs more than one world to keep its place — and the sum leads nowhere.
-    /// </remarks>
-    public Weighing Weighing { get; init; } = Weighing.Strongest;
-
     /// <summary>Whether repair waits for the VOTE to be wrong, or only for a commitment to be.</summary>
     /// <remarks>
     /// <para>
@@ -603,7 +491,7 @@ public sealed record CommittingSettings
     /// <para>
     /// <b>AND THE GATE TURNS OUT TO BE LOAD-BEARING, WHICH REFUTES THE PARAGRAPH ABOVE AS
     /// AN ARGUMENT FOR REMOVING IT.</b> On <see cref="Worlds.Multiplexer"/> at eleven bits,
-    /// dropping it takes 0.944 to 0.983 with <see cref="Weighing.Strongest"/>. On
+    /// dropping it takes 0.944 to 0.983 under the best-advocate vote. On
     /// <see cref="Worlds.Arranged"/> it is a disaster: 1.000 falls to 0.752, because the
     /// gated arm repairs NINE times in twenty thousand rounds and the ungated one mints
     /// 1,349 children that then compete in the vote. Sound rules rose from 36 to 137 and

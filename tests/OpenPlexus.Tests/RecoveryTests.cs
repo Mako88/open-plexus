@@ -219,7 +219,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
         // them. The trailing window is two thousand rounds, so a reading taken at the end is
         // taken well inside the last interval and is comparable across arms.
         output.WriteLine($"{Seeds} seeds, six bits, the target moves every {Moving} rounds");
-        output.WriteLine("budget         | moves: 0 | 1 | 2 | 4");
+        output.WriteLine("budget         | moves: 0 | 1 | 2 | 4 | repairs at 4 | residents");
 
         foreach (var (arm, dials) in new (string Arm, CommittingSettings Dials)[]
         {
@@ -246,6 +246,8 @@ public sealed class RecoveryTests(ITestOutputHelper output)
         })
         {
             var read = new List<string>();
+            var repaired = new List<double>();
+            var resident = new List<double>();
 
             // NOUGHT MOVES IS THE CONTROL AND IT IS THE SAME LENGTH OF RUN, so the row reads
             // across rather than down: what changes between the cells is how many times the
@@ -255,19 +257,40 @@ public sealed class RecoveryTests(ITestOutputHelper output)
                 var recent = new List<double>();
 
                 for (var seed = 1; seed <= Seeds; seed++)
-                    recent.Add(new MultiplexerRun(
+                {
+                    var learned = new MultiplexerRun(
                         new MultiplexerSettings
                         {
                             Address = 2,
                             Switch = moves == 0 ? 0 : Moving,
                         },
                         new Brain(dials, seed),
-                        seed).Run(Settled + (moves * Moving)).Recent);
+                        seed).Run(Settled + (moves * Moving));
+
+                    recent.Add(learned.Recent);
+
+                    // AT THE LAST CELL ONLY, WHICH IS WHERE A BUDGET HAS HAD THE MOST CHANCE
+                    // TO BIND.
+                    if (moves == 4)
+                    {
+                        repaired.Add(learned.Tally.Repaired);
+                        resident.Add(learned.Resident);
+                    }
+                }
 
                 read.Add($"{Sweep.Spread(recent),18}");
             }
 
-            output.WriteLine($"{arm,-14} | " + string.Join(" | ", read));
+            // AND THE TWO COLUMNS THAT SAY WHETHER A BUDGET BINDS AT ALL, WHICH ACCURACY
+            // CANNOT. Two rules that both recover are indistinguishable on a score and are
+            // not the same mechanism: one may be refusing repairs and the other refusing
+            // nothing, and only a count of what was BUILT separates them. This grid ranked
+            // `earned` against `free` on accuracy alone and could not say whether it was a
+            // budget or an off switch -- the same shape as a soundness count that cannot
+            // rank the arms that raised it.
+            output.WriteLine(
+                $"{arm,-14} | " + string.Join(" | ", read)
+                + $" | {Sweep.Spread(repaired, "F0")} | {Sweep.Spread(resident, "F0")}");
         }
 
         // NO BAR. What a world that keeps moving costs has never been measured here, and a

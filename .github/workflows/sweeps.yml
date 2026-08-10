@@ -73,8 +73,12 @@ jobs:
       #
       # SPLIT A CLASS WHEN IT HOLDS INDEPENDENT GRIDS, and leave it whole otherwise.
       # A dispatch naming the class still matches every method of it by substring, so
-      # `only=NamingYieldTests` picks up all four entries below and they land on four
-      # runners rather than one.
+      # `only=NamingYieldTests` picks up every entry of it below and they land on a
+      # runner each rather than all on one.
+      #
+      # AND A DUPLICATE ENTRY IS TWO RUNNERS DOING ONE JOB, which is invisible from the
+      # dispatch notice because the list it prints is the list it was given. One crept
+      # in here the first time an entry was removed and re-added.
       - id: pick
         env:
           ONLY: ${{ inputs.only }}
@@ -86,7 +90,7 @@ jobs:
             "MonkTests","NarrowingTests","OverlapTests","PlacingTests",
             "NamingYieldTests.Which_bar_takes",
             "NamingYieldTests.Whether_a_run_past",
-            "NamingYieldTests.Whether_naming_until",
+            "NamingYieldTests.What_the_minted_names",
             "NamingYieldTests.Whether_naming_until",
             "NamingYieldTests.What_bounds_rung_fives_yield",
             "NamingYieldTests.And_a_real_populations_best_pair",

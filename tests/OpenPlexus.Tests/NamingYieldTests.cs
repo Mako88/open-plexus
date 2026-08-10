@@ -518,6 +518,90 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void Naming_until_refused_makes_holders_disagree_about_their_vocabulary()
+    {
+        // A CONTROL RATHER THAN AN ARGUMENT, AND IT IS THE ONE THAT DECIDES WHETHER THE LOOP
+        // CAN SHIP. `Abstract` re-counts THIS holder's scopes each pass and re-absorbs the
+        // SAME `heard`, which is the others' counts from the start of the round. Pass one is
+        // therefore over the whole population and every holder proposes the same pair. Pass
+        // two is not: this holder's half has been rewritten and the others' half has not, so
+        // each holder is now reading a merged table nobody else has.
+        //
+        // AND `SplitNamingTests` CANNOT SEE THIS, which is why it lives here. Its convergence
+        // assertion asks the GATE once, over counts merged from populations nobody rewrote --
+        // a single proposal, where the divergence begins at the second.
+        // THE SHIPPED DIALS, BECAUSE A POOR POPULATION CANNOT SHOW THIS. The first take used
+        // `SplitNamingTests`' window -- a budget of 64 after a failure -- and every holder
+        // minted exactly ONE name under both arms, so the loop's second pass never ran and
+        // the question was not asked. A fixture too thin to reach the mechanism reads exactly
+        // like a mechanism that does not misbehave.
+        var dials = new CommittingSettings();
+        var brain = new Brain(dials, seed: 1);
+
+        new MultiplexerRun(
+            new MultiplexerSettings { Address = Address }, brain, seed: 1).Run(Rounds);
+
+        var all = brain.Held.All.ToList();
+
+        output.WriteLine("arm | vocabularies | distinct names between them");
+
+        var spread = new Dictionary<Minting, int>();
+
+        foreach (var arm in (Minting[])[Minting.Once, Minting.UntilRefused])
+        {
+            var shards = Fixture.Sharded(all, 3);
+
+            var holders = shards
+                .Select(shard =>
+                {
+                    var held = new Population(dials with { Minting = arm }, seed: 1);
+                    foreach (var one in shard) held.Add(one);
+                    return held;
+                })
+                .ToList();
+
+            // COUNTED BEFORE ANYTHING IS ABSTRACTED, which is the one round of exchange a
+            // deployment gets. Everybody speaks from the same moment.
+            var counted = holders
+                .Select(held => Recurrence.Of(held.All, dials))
+                .ToList();
+
+            var vocabularies = new List<string>();
+
+            for (var holder = 0; holder < holders.Count; holder++)
+            {
+                var heard = new Recurrence();
+
+                for (var other = 0; other < holders.Count; other++)
+                    if (other != holder) heard.Absorb(counted[other]);
+
+                holders[holder].Abstract(heard);
+
+                vocabularies.Add(string.Join(
+                    ",", holders[holder].Names.Means.Select(one => one.Key.Value).Order()));
+            }
+
+            spread[arm] = vocabularies.Distinct().Count();
+
+            output.WriteLine(
+                $"{arm,-12} | {spread[arm],12} | "
+                + $"{holders.Sum(held => held.Names.Count)}");
+        }
+
+        // ONE VOCABULARY UNDER THE SHIPPED ARM, WHICH IS THE WHOLE POINT OF MERGING COUNTS.
+        // Three holders minting three different sets of names is three languages, and it is
+        // the failure the entire naming-over-a-wire arc exists to prevent.
+        Assert.Equal(1, spread[Minting.Once]);
+
+        // AND MORE THAN ONE UNDER THE LOOP, WHICH IS WHY IT DOES NOT SHIP. Asserted as a
+        // DIFFERENCE rather than as a count, because how far they diverge is a fact about
+        // this world and the claim is only that they do.
+        Assert.True(spread[Minting.UntilRefused] > 1,
+            "the loop agreed after all, so this file's reason for existing is wrong and the "
+            + "arm's blocker is lifted -- read the plan's fork before deleting this");
+    }
+
+    [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public async Task Whether_naming_until_the_gate_refuses_buys_depth()
     {

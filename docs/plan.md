@@ -750,8 +750,12 @@ change of architecture entirely.
 - **AND MOST ASKS RE-DERIVE A NAME ALREADY HELD**, which mints nothing. That is the whole of
   the plateau, and it is repair's own fault one rung up.
 - **SPENDING THE ASK ON AN UNNAMED PAIR NEARLY TRIPLES THE STACKING**, which is the only
-  depth this rung has. Both eleven-bit worlds, outside the seed spread, with trailing
-  accuracy flat and sound rules moving the same way.
+  depth this rung has. Both eleven-bit worlds, outside the seed spread, accuracy flat.
+- **AND NAMING UNTIL THE GATE REFUSES FINDS HALF AGAIN AS MANY OF THE WORLD'S TRUE RULES**,
+  with five to seven times the stacking. On ONE MACHINE. The ceiling was a calendar.
+- **AND IT CANNOT SHIP, BECAUSE THE SECOND MINT IS WHERE HOLDERS STOP AGREEING.** The loop
+  re-counts local scopes against counts the others took before any rewrite, so every holder
+  reads a merged table nobody else has.
 - **ROUNDS-TO-TARGET GROWS FAST IN THE RELEVANT BITS.** Six, eleven and twenty differ
   by one relevant bit each; the cost between them does not grow by one. That is the
   number that predicts whether any of this reaches perception.
@@ -1030,6 +1034,6 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **66** | Is `Budget` a search limit or a re-derivation limit? ANSWERED: a re-derivation limit, whose level is interior and stable across width. It caps how often a parent re-derives, not how far it searches. Closed |
 | **64** | John's: emit *Z was absent* as its own code at settlement, so rung two needs no negation in the scope language and no new matcher. Bounded to the commitment's own hits, or the candidate set is the vocabulary. Open |
 | **67** | John's: a parent spends ENERGY to repair rather than a fixed count. RETAKEN: the uncovered condition does not replace it, and trades the same way. Its fuel is a population fact, so it is scarce where blame is. Closed |
-| **69** | Rung five's yield is bounded by a calendar it shares with widening, subsumption and culling. Does abstraction want its own cadence? `sweep` has never been swept by anything. Open |
+| **69** | Naming until the gate refuses finds half again as many true rules on one machine and makes three holders disagree. Open on carrying a rewrite into merged counts, which pair frequencies cannot express |
 | **70** | Proposals naming a pair already named mint nothing. ANSWERED: spending the ask on the best unnamed pair nearly triples the stacking on both eleven-bit worlds and sells nothing. Shipped, and the arm is deleted. Closed |
 | **68** | John's: does a conjunction EARN its narrowing? Its premise is half wrong -- reach halves with depth on even worlds and RISES under skew, where correlated codes let a long scope fire as often as a short one. Open |

@@ -804,6 +804,9 @@ change of architecture entirely.
 - **AND `Budgeting.Earned` IS NEVER THE WORSE FIXED ARM AND NOT ALWAYS THE BETTER.** It leans
   free where free wins and capped where the cap wins, but leaves most of free's coverage gain
   unclaimed at eleven bits even.
+- **AND THE SHORTFALL IS NOT VOLUME.** It buys seven repairs in ten of free's on both widths,
+  and turns that into three quarters of the coverage gain on one and under a third on the
+  other. WHICH repairs, not how many.
 - **AND ON A STILL WORLD FREE IS NOT WORSE ANY MORE, WHICH IS THE LARGER SUSPICION.** A sum
   scales with the number of advocates and a maximum does not, so the budget's interior
   optimum may have been the deleted vote's crowd penalty.

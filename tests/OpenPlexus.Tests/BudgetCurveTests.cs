@@ -61,10 +61,17 @@ public sealed class BudgetCurveTests(ITestOutputHelper output)
     /// spent it were never blamed, so a grid over both timings would be re-running a question
     /// already answered rather than asking this one.
     /// </remarks>
-    private static Learned Run(int address, double skew, int budget, int seed) =>
+    /// <param name="counting">What a parent's allowance is measured in.</param>
+    private static Learned Run(
+        int address,
+        double skew,
+        int budget,
+        int seed,
+        Budgeting counting = Budgeting.Attempts) =>
         new MultiplexerRun(
             new MultiplexerSettings { Address = address, Skew = skew },
-            new Brain(new CommittingSettings { Budget = budget }, seed),
+            new Brain(
+                new CommittingSettings { Budget = budget, Budgeting = counting }, seed),
             seed,
             census: true).Run(Rounds);
 
@@ -95,7 +102,18 @@ public sealed class BudgetCurveTests(ITestOutputHelper output)
             output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}, "
                 + $"{Seeds} seeds, {Rounds} rounds, every-round repair ===");
 
-            foreach (var budget in budgets)
+            // AND ONE CELL THAT IS NOT A LEVEL AT ALL, WHICH IS WHY IT IS APPENDED RATHER
+            // THAN INSERTED. `Budgeting.Earned` pays one attempt per `Floor` misses and does
+            // not read `Budget`, so it belongs on this curve as a row and nowhere on its
+            // x-axis. It sits with a free budget where a parent is often wrong and with a cap
+            // where it is not, measured on `Arranged` -- and this is where the columns skew
+            // cannot game say whether the same holds at four widths.
+            foreach (var (cell, budget, counting) in
+                budgets.Select(one => (
+                    one == Unlimited ? "free" : one.ToString(),
+                    one,
+                    Budgeting.Attempts))
+                    .Append(("earned", Unlimited, Budgeting.Earned)))
             {
                 // ONE RUN PER SEED, SHARED BY EVERY READING BELOW -- the same discipline
                 // `BudgetTests` records. Seven readings asked independently would run one
@@ -105,12 +123,10 @@ public sealed class BudgetCurveTests(ITestOutputHelper output)
                 Learned Cached(int seed)
                 {
                     if (!once.TryGetValue(seed, out var learned))
-                        once[seed] = learned = Run(address, skew, budget, seed);
+                        once[seed] = learned = Run(address, skew, budget, seed, counting);
 
                     return learned;
                 }
-
-                var cell = budget == Unlimited ? "free" : budget.ToString();
 
                 foreach (var reading in new (string What, Func<Learned, double> Of)[]
                 {

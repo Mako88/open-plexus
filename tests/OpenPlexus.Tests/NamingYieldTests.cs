@@ -362,6 +362,135 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         Assert.DoesNotContain(Refused.Independent, widened);
     }
 
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void And_a_real_populations_best_pair_is_followed_up_the_budget_ladder()
+    {
+        // THE ARM ABOVE IS A MODEL AND THIS IS THE THING ITSELF. Two aggregate columns can
+        // both fall for reasons that have nothing to do with each other -- a run holding a
+        // DIFFERENT best pair at every budget would print exactly the dilution signature
+        // while no redundancy was ever diluted. So the pair is fixed at the bottom of the
+        // ladder and followed, which is the only version of this question that has one
+        // subject.
+        //
+        // AND IT IS THE COUNTS AND NOT THE VERDICT THAT ARE READ, because a verdict is the
+        // two terms already multiplied together. `seen` against `scopes` is the share; the
+        // marginals are what independence is built from; the two of them are the whole
+        // mechanism and either can be flat while the other moves.
+        // AND OVER SEEDS, BECAUSE ONE SEED IS NOT A COMPARISON AND WILL HAPPILY INVERT.
+        // The first take of this grid ran on seed one and its z column went 2.21, 1.01,
+        // 1.82, 1.34 -- which is not a trend, and reading the ends of it as one would have
+        // been the single-run ordering this repo's traps list already names. The pair is
+        // chosen per seed, since each run holds its own structure.
+        var budgets = new[] { 16, 64, 256, Unlimited };
+
+        var scoped = budgets.ToDictionary(one => one, _ => new List<double>());
+        var paired = budgets.ToDictionary(one => one, _ => new List<double>());
+        var shared = budgets.ToDictionary(one => one, _ => new List<double>());
+        var apart = budgets.ToDictionary(one => one, _ => new List<double>());
+        var peaked = budgets.ToDictionary(one => one, _ => new List<double>());
+
+        for (var seed = 1; seed <= Seeds; seed++)
+        {
+            Follow(seed);
+        }
+
+        output.WriteLine($"{Seeds} seeds, {Rounds} rounds, 11 bits even, one pair per seed "
+            + "chosen at the smallest budget and followed");
+
+        output.WriteLine("budget |  scopes |   pairs |   share | expected |       z");
+
+        foreach (var budget in budgets)
+        {
+            output.WriteLine(
+                $"{(budget == Unlimited ? "free" : budget.ToString()),6} "
+                + $"| {scoped[budget].Average(),7:F1} | {paired[budget].Average(),7:F1} "
+                + $"| {shared[budget].Average(),7:F3} | {apart[budget].Average(),8:F3} "
+                + $"| {Spread(peaked[budget])}");
+        }
+
+        // NO BAR. What a redundancy's counts should do as a population grows has never been
+        // measured, and a threshold written before the first reading is a prediction dressed
+        // as a requirement. The grid is the finding.
+        return;
+
+        static string Spread(List<double> read)
+        {
+            var mean = read.Average();
+
+            var error = read.Count < 2
+                ? 0.0
+                : Math.Sqrt(read.Sum(one => (one - mean) * (one - mean)) / (read.Count - 1))
+                    / Math.Sqrt(read.Count);
+
+            return $"{mean,5:F2} +/-{error,5:F2}";
+        }
+
+        void Follow(int seed)
+        {
+            (Code Left, Code Right)? followed = null;
+
+            foreach (var budget in budgets)
+            {
+                var dials = new CommittingSettings { Budget = budget };
+                var brain = new Brain(dials, seed);
+
+                new MultiplexerRun(
+                    new MultiplexerSettings { Address = Address }, brain, seed).Run(Rounds);
+
+            var counted = Recurrence.Of(brain.Held.All, dials);
+            var read = Abstracting.Propose(counted, dials);
+
+            // THE TABLE READ THROUGH THE FORM THAT CROSSES A WIRE, because that is the
+            // public one and a probe reaching past it would be measuring something a holder
+            // could not be told.
+            var rows = counted.Written().Rows;
+
+            // THE SUBJECT IS CHOSEN ONCE, AT THE SMALLEST BUDGET, and never re-chosen. What
+            // the gate proposes there is the redundancy this world's structure actually
+            // holds; every row after it is that same pair being asked about in a bigger
+            // population.
+            followed ??= read.Named is { } first
+                ? (first[0], first[1])
+                : rows.Where(one => one.Right is not null)
+                    .OrderByDescending(one => one.Seen)
+                    .ThenBy(one => one.Left).ThenBy(one => one.Right!.Value)
+                    .Select(one => (one.Left, one.Right!.Value))
+                    .FirstOrDefault();
+
+            var pair = followed!.Value;
+
+            var seen = rows
+                .Where(one => one.Left == pair.Left && one.Right == pair.Right)
+                .Sum(one => one.Seen);
+
+            var left = rows.Where(one => one.Right is null && one.Left == pair.Left)
+                .Sum(one => one.Seen);
+
+            var right = rows.Where(one => one.Right is null && one.Left == pair.Right)
+                .Sum(one => one.Seen);
+
+            var scopes = counted.Scopes;
+
+            var share = scopes == 0 ? 0.0 : seen / (double)scopes;
+
+            var expected = scopes == 0
+                ? 0.0
+                : left / (double)scopes * (right / (double)scopes);
+
+            var z = expected is <= 0.0 or >= 1.0
+                ? double.NaN
+                : (share - expected) / Math.Sqrt(expected * (1.0 - expected) / scopes);
+
+                scoped[budget].Add(scopes);
+                paired[budget].Add(rows.Count(one => one.Right is not null));
+                shared[budget].Add(share);
+                apart[budget].Add(expected);
+                peaked[budget].Add(double.IsNaN(z) ? 0.0 : z);
+            }
+        }
+    }
+
     /// <param name="budget">How many separation attempts one parent may ever spend.</param>
     /// <param name="seed">The world's generator and the brain's.</param>
     /// <remarks>
@@ -369,12 +498,13 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     /// because the lineages that would have spent it were never blamed, so crossing the two
     /// here would re-run a question already closed rather than ask this one.
     /// </remarks>
-    private static (Learned Learned, Proposed? Lately) Run(int budget, int seed)
+    private static (Learned Learned, Proposed? Lately) Run(
+        int address, double skew, int budget, int seed)
     {
         var brain = new Brain(new CommittingSettings { Budget = budget }, seed);
 
         var learned = new MultiplexerRun(
-            new MultiplexerSettings { Address = Address }, brain, seed).Run(Rounds);
+            new MultiplexerSettings { Address = address, Skew = skew }, brain, seed).Run(Rounds);
 
         return (learned, brain.Held.Lately);
     }
@@ -383,15 +513,26 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public async Task Which_bar_takes_rung_fives_yield_as_the_repair_budget_grows()
     {
-        var budgets = new[] { 8, 16, 32, 64, 128, 256, Unlimited };
+        // THE SAME BUDGETS AND THE SAME FOUR WORLDS `BudgetCurveTests` READS, taken from one
+        // place so the two grids are comparable by construction rather than by both files
+        // having been written carefully.
+        //
+        // AND ALL FOUR, BECAUSE THE FIRST TAKE OF THIS GRID RAN ON ONE OF THEM AND CAME BACK
+        // WITH THE OPPOSITE OF THE OPEN DEFECT. On eleven bits even, names RISE with the
+        // budget and the peak z rises with them -- so whatever world the falling yield was
+        // read on, it is not that one. A partition taken where the effect is absent explains
+        // nothing, however clean it is.
+        foreach (var (address, skew) in Fixture.Curve)
+        {
+            output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}: every ask "
+                + $"charged to a bar, {Seeds} seeds, {Rounds} rounds ===");
 
-        // THE GRID MUST BRACKET WHAT SHIPS, or it is a curve about somebody else's brain.
-        Assert.Contains(new CommittingSettings().Budget, budgets);
+            foreach (var budget in Fixture.Budgets) await Cell(address, skew, budget);
+        }
 
-        output.WriteLine($"=== {Address + (1 << Address)} bits, even, {Seeds} seeds, "
-            + $"{Rounds} rounds, every-round repair ===");
+        return;
 
-        foreach (var budget in budgets)
+        async Task Cell(int address, double skew, int budget)
         {
             // ONE RUN PER SEED, SHARED BY EVERY READING BELOW. Readings asked
             // independently would run one configuration many times and print one
@@ -400,7 +541,8 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
 
             (Learned Learned, Proposed? Lately) Cached(int seed)
             {
-                if (!once.TryGetValue(seed, out var ran)) once[seed] = ran = Run(budget, seed);
+                if (!once.TryGetValue(seed, out var ran))
+                    once[seed] = ran = Run(address, skew, budget, seed);
 
                 return ran;
             }
@@ -452,3 +594,4 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         // dressed as a requirement. The grid is the finding.
     }
 }
+

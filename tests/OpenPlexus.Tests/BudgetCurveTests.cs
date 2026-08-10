@@ -75,7 +75,7 @@ public sealed class BudgetCurveTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public async Task Whether_an_interior_repair_budget_beats_both_measured_ends()
     {
-        var budgets = new[] { 8, 16, 32, 64, 128, 256, Unlimited };
+        var budgets = Fixture.Budgets;
 
         // THE GRID MUST BRACKET WHAT SHIPS, OR IT IS A CURVE ABOUT SOMEBODY ELSE'S BRAIN.
         // A default moved out from under this list would leave every row still printing and
@@ -90,7 +90,7 @@ public sealed class BudgetCurveTests(ITestOutputHelper output)
         // number this brain gets to keep unless the other width agrees: a dial whose best
         // value moves with the world is a world reaching into the brain, which is the one
         // thing the constraints refuse outright.
-        foreach (var (address, skew) in new[] { (3, 0.8), (3, 0.0), (2, 0.8), (2, 0.0) })
+        foreach (var (address, skew) in Fixture.Curve)
         {
             output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}, "
                 + $"{Seeds} seeds, {Rounds} rounds, every-round repair ===");

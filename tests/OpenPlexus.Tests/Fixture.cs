@@ -278,6 +278,30 @@ public static class Fixture
         ];
 
     /// <summary>
+    /// The repair budgets a curve is read at, from well below the level to no limit at all.
+    /// </summary>
+    /// <remarks>
+    /// <b>SHARED FOR THE REASON <see cref="ReadAsync"/> IS SHARED, AND THE CLONE BUDGET SAID
+    /// SO A SECOND TIME.</b> Two grids sweeping the budget are only comparable if they sweep
+    /// the same budgets, and a list written out per file is how one of them comes to bracket
+    /// a default the other does not. <c>BudgetCurveTests</c> asserts the shipped default is
+    /// in here, so every reader of this list inherits that guard rather than restating it.
+    /// </remarks>
+    public static IReadOnlyList<int> Budgets { get; } = [8, 16, 32, 64, 128, 256, int.MaxValue];
+
+    /// <summary>
+    /// The four multiplexers a budget curve is read on, as address bits and skew.
+    /// </summary>
+    /// <remarks>
+    /// <b>BOTH WIDTHS AND BOTH TILTS, BECAUSE THE TWO HALVES OF EVERY TRADE MEASURED HERE
+    /// LIVE ON DIFFERENT ONES.</b> Coverage and sound rules are bought where the base rate
+    /// pays nothing; trailing accuracy is sold where it pays. A curve on one of them reads as
+    /// a clean win in whichever direction it was taken.
+    /// </remarks>
+    public static IReadOnlyList<(int Address, double Skew)> Curve { get; } =
+        [(3, 0.8), (3, 0.0), (2, 0.8), (2, 0.0)];
+
+    /// <summary>
     /// Places every commitment on a holder, the way the ring would.
     /// </summary>
     /// <param name="all">The whole population.</param>

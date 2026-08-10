@@ -648,7 +648,14 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
                     ("eligible", one => one.Eligible),
                     ("resident", one => one.Resident),
                     ("sound", one => one.Sound),
-                    ("recent", one => one.Recent));
+                    ("recent", one => one.Recent),
+                    // WHAT NAMING COSTS, AND IT IS NOT IN ANY OTHER COLUMN HERE. A minted
+                    // name is ADDED to every moment holding its members and the fold runs to
+                    // a fixed point, so more names is more codes a moment -- and matching is
+                    // nine tenths of this machine's clock. The encoded front end already
+                    // taught this repo that good symbols cost an order more codes a moment;
+                    // this is the same bill arriving from the rung that makes them.
+                    ("codes", one => one.Tally.Codes));
             }
 
             output.WriteLine("");

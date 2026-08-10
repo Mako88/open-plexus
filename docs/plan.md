@@ -704,6 +704,17 @@ change of architecture entirely.
 - **AND A READOUT ARM IS A SEARCH ARM WHEREVER THE READOUT TRIGGERS THE SEARCH.** Every
   vote comparison in four sessions moved both, and the cell proving it is two weighings
   building one population once the trigger is cut.
+- **A FIXTURE INHERITS EVERY DIAL IT DOES NOT PIN, so a default moving rewrites an
+  experiment nobody edited.** `BudgetTests` crosses two settings and pins neither timing
+  nor budget; it changed arms silently and is a sweep, so CI never looked.
+- **AND A TEST CAN FAIL AT BOTH ENDS OF A DIAL FOR OPPOSITE REASONS.** One end left the
+  whole population unable to name, the other let every shard name alone — so pinning to
+  the old value fixes nothing while reading as a fix.
+- **A WORKFLOW IS THE ONE ARTIFACT WITH NO LOCAL CHECK, and it is wrong until a push says
+  otherwise.** Three faults in one file: an invalid expression, a concurrency group copied
+  from where it fit, and a matrix taking a runner per skip.
+- **AND SKIPPING WORK IS NOT SKIPPING A JOB.** A matrix entry that exits immediately still
+  took a runner slot, so single-sweep dispatches starved the suite behind them.
 
 ---
 

@@ -905,21 +905,12 @@ change of architecture entirely.
 - **SO `Repairing.EveryRound` SHIPS AND `AfterFailure` IS THE CONTROL.** Sixteen standard
   errors of hard-round coverage at eleven bits skewed, four of accuracy, and no world
   measured is worse on score.
-- **AND IT COSTS ABOUT A QUARTER OF THE NAMES**, which no grid here would have shown
-  because every reading was about rules. Rung five still fires on every seed at eleven
-  bits, and names nothing at six under either timing.
-- **AND THAT COST IS THE BUDGET'S RATHER THAN THE TIMING'S, WHICH INVERTS THE ORDERING.**
-  With the budget counting children the new timing mints the MOST names and more than
-  doubles the stacking, on top of the most sound rules.
-- **SO THE LAST OPEN TRADE IS COVERAGE AND NAMES AGAINST TRAILING ACCURACY**, and no
-  single number ranks it. Everything the machine holds goes up; what it scores on an even
-  world goes down.
+- **AND ITS NAMING AND SOUND-RULE COSTS WERE THE BUDGET'S, WHICH THE CURVE SETTLED.**
+  Both were read at a budget below the level; at the level neither cost survives, so the
+  trade this row used to carry does not exist.
 - **A SOCKET TEST INHERITED A REPAIR DIAL AND WENT RED WITH NOTHING WRONG ON THE WIRE.**
   Its precondition needs a population with something left to name, which every search dial
-  moves. Pinned where the fixture is built.
-- **ITS ONE COST IS WHAT IT HOLDS ON AN EVEN ELEVEN-BIT WORLD**: seventeen fewer sound
-  rules and a third fewer repairs at nearly five standard errors, while the score does not
-  move.
+  moves. Both naming files pin the timing and the budget now.
 - **AND A CHILD IS SUBSUMED ABOUT FOUR TIMES IN FIVE, WHERE THE CODE SAID IT NEVER
   HAPPENS.** A child that specialised on the wrong code is exactly as accurate as its
   parent, so the clause called unreachable is the population's main exit.
@@ -1019,7 +1010,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **62** | John's: partition into slots and give each R machines holding identical populations. A death costs nothing while a slot survives, replicas need no messages between them, and it answers fork 53. R scales with load |
 | **63** | John's: genesis mints ONE scope over the whole scene and repeated scenes narrow it by overlap, the rest fading out. Specific-to-general, the DUAL of repair — an intersection needs two examples where the gate needs twenty misses. Open |
 | **65** | The vote decides what repair may run on, so under skew blame lands on the majority lineages alone. `Repairing.EveryRound` breaks that and pays, at four to six times the repair. Open on what it costs at width |
-| **66** | A repair collision is charged to the parent's budget exactly as a birth is, and collisions outnumber births twenty to fifty fold. Is `Budget` a search limit or a re-derivation limit? Open |
+| **66** | Is `Budget` a search limit or a re-derivation limit? ANSWERED: a re-derivation limit, whose level is interior and stable across width. It caps how often a parent re-derives, not how far it searches. Closed |
 | **64** | John's: emit *Z was absent* as its own code at settlement, so rung two needs no negation in the scope language and no new matcher. Bounded to the commitment's own hits, or the candidate set is the vocabulary. Open |
 | **67** | John's: a parent spends ENERGY to repair rather than a fixed count. `BudgetTests` already crosses a count against *keep refining while failures are uncovered*, which is the same proposal. Its verdict predates the shipped timing. Open |
-| **68** | John's: does a conjunction EARN its narrowing? Repair tests whether the added code separates; nothing tests what it costs, and each condition roughly halves a rule's reach. Gain against reach needs no per-world number. Open |
+| **68** | John's: does a conjunction EARN its narrowing? Its premise is half wrong -- reach halves with depth on even worlds and RISES under skew, where correlated codes let a long scope fire as often as a short one. Open |

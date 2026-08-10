@@ -747,18 +747,14 @@ change of architecture entirely.
   carry the redundancy with them.
 - **SIX BITS IS REFUSED ON POWER RATHER THAN ON HAVING NOTHING TO NAME**, which sharpens
   fork 34. Pairs repay and beat chance and cannot be certified.
-- **AND MOST ASKS RE-DERIVE A NAME ALREADY HELD**, which mints nothing. That is the whole of
-  the plateau, and it is repair's own fault one rung up.
-- **SPENDING THE ASK ON AN UNNAMED PAIR NEARLY TRIPLES THE STACKING**, which is the only
-  depth this rung has. Both eleven-bit worlds, outside the seed spread, accuracy flat.
 - **AND NAMING UNTIL THE GATE REFUSES FINDS HALF AGAIN AS MANY OF THE WORLD'S TRUE RULES**,
   with five to seven times the stacking. On ONE MACHINE. The ceiling was a calendar.
 - **THE SECOND MINT WAS WHERE HOLDERS STOPPED AGREEING, AND COUNTING ONCE FIXES IT.** One
   table, walked identically everywhere, so the name set is a function of the merged counts
   alone — stale within a sweep and stale the same way on every machine.
-- **AND WHAT BLOCKS IT IS A FIXTURE STANDING ON ONE LUCKY SEED.** Three seeds in eight
-  already have nothing left to name under the SHIPPED arm; the distributed naming tests use
-  one that does, and the loop tips it over.
+- **AND THE FIXTURE THAT BLOCKED IT WAS STANDING ON ONE LUCKY SEED.** A run ends on a sweep
+  round, so a population is read at its most exhausted; running past one restores a subject
+  under both arms and the ship is a deletion now.
 - **ROUNDS-TO-TARGET GROWS FAST IN THE RELEVANT BITS.** Six, eleven and twenty differ
   by one relevant bit each; the cost between them does not grow by one. That is the
   number that predicts whether any of this reaches perception.

@@ -31,17 +31,87 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// <param name="skew">How often a data bit is one, or zero to leave them even.</param>
     /// <param name="seed">The world's generator and the brain's.</param>
     /// <param name="surprising">What genesis mints on.</param>
+    /// <param name="subsuming">What it takes for a narrower rule to survive its parent.</param>
     private static Learned Run(
         int address,
         double skew,
         int seed,
-        Surprising surprising = Surprising.Unaccounted) =>
+        Surprising surprising = Surprising.Unaccounted,
+        Subsuming subsuming = Subsuming.Weaker) =>
         new MultiplexerRun(
             new MultiplexerSettings { Address = address, Skew = skew },
             new Brain(
-                new CommittingSettings { Surprising = surprising }, seed),
+                new CommittingSettings { Surprising = surprising, Subsuming = subsuming },
+                seed),
             seed,
             census: true).Run(Rounds);
+
+    /// <summary>
+    /// <b>WHETHER THE CHAIN IS CAPPED BY ITS OWN INTERMEDIATE RUNGS DYING.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE REPAIRS THAT PAY SIT AT THE WORLD'S MINIMUM SOUND DEPTH</b> — three codes at six
+    /// bits, four at eleven — and repair adds one code at a time, so reaching one takes two or
+    /// three separations. Every rung below the last is UNSOUND by construction: it pins some
+    /// of what the truth needs and not all of it, so it is wrong on a share of its firings and
+    /// its accuracy says so.
+    /// </para>
+    /// <para>
+    /// <b>AND AN UNSOUND CHILD THAT IS NO BETTER THAN ITS PARENT IS EXACTLY WHAT SUBSUMPTION
+    /// REMOVES.</b> Under <see cref="Subsuming.Weaker"/> the general rule survives wherever it
+    /// is at least as accurate, and a child that has pinned one of three needed codes usually
+    /// is not better yet. So the chain may be capped not by the search but by the ladder being
+    /// kicked away halfway up.
+    /// </para>
+    /// <para>
+    /// <b>WHICH IS TESTABLE WITH AN ARM THAT ALREADY EXISTS.</b>
+    /// <see cref="Subsuming.Insignificant"/> demands the narrower rule be significantly better
+    /// before the general one may take its place, and holds roughly twice the residents where
+    /// it has been measured. If intermediate rungs dying is the cap, the share of repairs that
+    /// ever buy a hard round rises under it. If it is flat, the chain is not being cut and the
+    /// hit rate is about the search itself.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_subsumption_is_cutting_the_chain_before_it_reaches_a_sound_depth()
+    {
+        output.WriteLine("subsuming     | carriers | repairs | ever paid | their mean scope");
+
+        foreach (var (address, skew) in new[] { (2, 0.0), (3, 0.0), (3, 0.8) })
+        {
+            output.WriteLine($"--- {address + (1 << address)} bits, skew {skew:F1} ---");
+
+            foreach (var rule in new[] { Subsuming.Weaker, Subsuming.Insignificant })
+            {
+                var paid = new List<double>();
+                var scope = new List<double>();
+                var carried = new List<double>();
+
+                for (var seed = 1; seed <= 6; seed++)
+                {
+                    var learned = Run(address, skew, seed, subsuming: rule);
+                    var census = learned.Census!;
+
+                    carried.Add(census.Narrowed);
+                    scope.Add(census.Codes);
+
+                    paid.Add(learned.Repaired == 0
+                        ? 0.0
+                        : census.Narrowed / (double)learned.Repaired);
+                }
+
+                output.WriteLine(
+                    $"{rule,-13} | {Sweep.Spread(carried, "F1")} | "
+                    + $"{Sweep.Spread(paid)} | {Sweep.Spread(scope, "F2")}");
+            }
+        }
+
+        // NO BAR. Whether the ladder is being kicked away has never been measured, and a
+        // threshold written before the first reading would be the answer rather than the
+        // finding.
+    }
 
     /// <summary>
     /// <b>THE CENSUS COUNTS THE RUN'S OWN FAILURES AND NOT A SECOND OPINION ABOUT

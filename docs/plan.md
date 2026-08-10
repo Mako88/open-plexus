@@ -888,9 +888,11 @@ change of architecture entirely.
   returns at scale.
 - **AND THE GATE HAS ERROR BARS NOW: it leads on EVERY seed, counted both ways.** The
   accuracy ordering is no longer the single run this doc warns about.
-- **AND THE SAME GATE IS BEHIND ON EVERY SEED ON `Arranged`, ON BOTH FRONT ENDS.**
-  Self-limiting genesis stops early and never mints most of the rules that solve the
-  world. Fork 40 asked whether that happens; it does.
+- **AND THE SAME GATE STARVES GENESIS ON `Arranged`, HOLDING A TENTH OF THE SOUND ONE-CODE
+  RULES.** Fork 40 asked whether that happens; it does, by a factor of ten.
+- **AND THE ARM HOLDING TEN TIMES AS MANY SCORES NO BETTER** — which is the same finding as
+  no carrier ever being a one-code rule. Sound singles are not what pays, on two worlds by
+  two instruments.
 - **THREE DIALS WERE THE WHOLE CASE THAT A WORLD REACHES INTO THE BRAIN, AND NOT ONE OF THEM
   DOES.** Two are deleted with revival rows and the third was two settings crossed. What is
   left of the case is below.

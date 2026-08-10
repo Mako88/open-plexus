@@ -753,12 +753,11 @@ change of architecture entirely.
 - **AND TWENTY BITS PLATEAUS RATHER THAN BEING SLOW.** The same score at a hundred
   and fifty thousand rounds and at four hundred thousand, while sound rules keep
   rising — so it refines and stops improving.
-- **THE REPAIR BUDGET IS A LEVEL, AND 64 WAS BELOW IT.** `BudgetCurveTests` reads the
-  curve at four worlds: accuracy peaks on the 128-to-256 plateau and free is worse at
-  both widths. 256 ships.
-- **AND THE OPTIMUM DOES NOT MOVE WITH THE RELEVANT BITS.** Six and eleven peak
-  together, so what moved was the blame coupling under the old timing rather than the
-  budget.
+- **THE REPAIR BUDGET'S INTERIOR OPTIMUM WAS THE BALLOT.** Re-taken under the vote that does
+  not charge for size: hard-round coverage and sound rules rise monotonically to FREE at every
+  width, and only accuracy still peaks at 256 — by a hair.
+- **SO 256 IS A NUMBER ABOUT A DELETED VOTE AND NOT ABOUT THE SEARCH**, and shipping free
+  waits on the worlds this curve does not cover — every cell of it is a multiplexer.
 - **RUNG FIVE MINTS AT MOST ONE NAME AN ASK, AND THAT CEILING IS LOAD-BEARING.** Removing it
   was built and deleted — see the revival row. What it bounds is the search's STEP.
 - **SO *NAMES PER ELIGIBLE SCOPE* IS A RATIO WITH A CAPPED NUMERATOR**, and it falls as the

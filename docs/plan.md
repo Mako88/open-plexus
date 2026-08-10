@@ -795,8 +795,10 @@ change of architecture entirely.
   LEVEL stops mattering there too — sixty-four and two hundred and fifty-six sit a fifth of a
   standard error apart once the world moves at all.
 - **AND `Budgeting.Earned` IS NEARLY FREE**, refusing a seventh of free's repairs at under two
-  standard errors and holding the same population. Whether refusing anything is WANTED is
-  invisible on a world where the least-refusing arm wins.
+  standard errors and holding the same population — on a moving world and on a still one both.
+- **AND ON A STILL WORLD FREE IS NOT WORSE ANY MORE, WHICH IS THE LARGER SUSPICION.** A sum
+  scales with the number of advocates and a maximum does not, so the budget's interior
+  optimum may have been the deleted vote's crowd penalty.
 - **ROUNDS-TO-TARGET ACCELERATES IN THE RELEVANT BITS, WITH ERROR BARS AT LAST.** Six to
   eleven is under twofold; eleven to twenty is nearly sixfold. That is the number that
   predicts whether any of this reaches perception.

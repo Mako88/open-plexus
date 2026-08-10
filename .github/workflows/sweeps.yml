@@ -72,7 +72,7 @@ jobs:
             "AbstainTests","ArrangingTests","AskedTests","BudgetCurveTests",
             "BudgetTests","ChoosingTests","FleetTests","FoldingTests",
             "GateCostTests","LatencyTests","LiftingTests","MendingTests",
-            "MonkTests","NarrowingTests","OverlapTests","PlacingTests",
+            "MonkTests","NamingYieldTests","NarrowingTests","OverlapTests","PlacingTests",
             "QueryCostTests","RefusalTests","SeparableTests","SharpeningTests",
             "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",
             "WeighingTests","WideningTests"
@@ -83,6 +83,20 @@ jobs:
           else
             picked=$(printf '%s' "$all" | jq -c --arg only "$ONLY" \
               '[.[] | select(contains($only))]')
+          fi
+
+          # AND A DISPATCH THAT MATCHED NOTHING DIES HERE RATHER THAN DOWNSTREAM.
+          # The `if` on `sweep` turns an empty matrix into a SKIPPED job, and a run
+          # whose only measurement was skipped still concludes `success` -- so a
+          # sweep class not yet in the list above is indistinguishable from a grid
+          # that ran. That is the pass-shaped failure this repo keeps finding,
+          # wearing a workflow, and it cost a dispatch the first time a new sweep
+          # was added. The list is named rather than discovered on purpose; this is
+          # what makes forgetting to add to it loud.
+          if [ -n "$ONLY" ] && [ "$picked" = "[]" ]; then
+            echo "::error::'$ONLY' matches no sweep class. Add it to the list in" \
+              "this file, or check the spelling."
+            exit 1
           fi
 
           echo "sweeps=$picked" >> "$GITHUB_OUTPUT"

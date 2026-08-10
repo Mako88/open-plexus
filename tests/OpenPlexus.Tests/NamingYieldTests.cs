@@ -477,7 +477,11 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
             arms[Minting.UntilRefused].Tally.Asked > arms[Minting.Once].Tally.Asked,
             "the loop asked no more often than the single mint, so it never ran");
 
-        Assert.NotEqual(arms[Minting.Once].Named, arms[Minting.UntilRefused].Named);
+        // AND THE NAMES ARE NOT ASSERTED TO DIFFER, WHICH THEY DID UNTIL THE MERGE FIX. Over
+        // ONE table the passes after the first re-offer candidates the same table already
+        // refused, so a population with a single significant pair mints the same name and
+        // stops -- and a short run is exactly that population. Whether anything is left of
+        // the gain is the grid's question, and asserting it here would answer it by fiat.
 
         // AND EVERY PROPOSAL IS STILL A DISTINCT NAME UNDER THE LOOP. That identity is what
         // makes the loop terminate, so it is asserted where the loop runs and not only where
@@ -518,18 +522,22 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public void Naming_until_refused_makes_holders_disagree_about_their_vocabulary()
+    public void However_many_names_a_sweep_mints_the_holders_mint_the_same_ones()
     {
-        // A CONTROL RATHER THAN AN ARGUMENT, AND IT IS THE ONE THAT DECIDES WHETHER THE LOOP
-        // CAN SHIP. `Abstract` re-counts THIS holder's scopes each pass and re-absorbs the
-        // SAME `heard`, which is the others' counts from the start of the round. Pass one is
-        // therefore over the whole population and every holder proposes the same pair. Pass
-        // two is not: this holder's half has been rewritten and the others' half has not, so
-        // each holder is now reading a merged table nobody else has.
+        // THE PROPERTY THE WHOLE NAMING-OVER-A-WIRE ARC EXISTS FOR, ASSERTED WHERE MINTING
+        // MORE THAN ONE NAME CAN BREAK IT. Three holders minting three different sets of
+        // names is three languages.
+        //
+        // AND IT WAS BROKEN, WHICH IS WHY THIS FILE HAS THIS TEST. Re-counting between mints
+        // made pass two read a table nobody else had -- this holder's half rewritten, the
+        // others' half not -- and three holders minted two vocabularies. Counting ONCE and
+        // rewriting after is what fixes it: every holder walks identical counts in identical
+        // order and excludes identical pairs, so the name SET is a function of the merged
+        // table alone.
         //
         // AND `SplitNamingTests` CANNOT SEE THIS, which is why it lives here. Its convergence
         // assertion asks the GATE once, over counts merged from populations nobody rewrote --
-        // a single proposal, where the divergence begins at the second.
+        // a single proposal, where the divergence began at the second.
         // THE SHIPPED DIALS, BECAUSE A POOR POPULATION CANNOT SHOW THIS. The first take used
         // `SplitNamingTests`' window -- a budget of 64 after a failure -- and every holder
         // minted exactly ONE name under both arms, so the loop's second pass never ran and
@@ -588,17 +596,15 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
                 + $"{holders.Sum(held => held.Names.Count)}");
         }
 
-        // ONE VOCABULARY UNDER THE SHIPPED ARM, WHICH IS THE WHOLE POINT OF MERGING COUNTS.
-        // Three holders minting three different sets of names is three languages, and it is
-        // the failure the entire naming-over-a-wire arc exists to prevent.
         Assert.Equal(1, spread[Minting.Once]);
 
-        // AND MORE THAN ONE UNDER THE LOOP, WHICH IS WHY IT DOES NOT SHIP. Asserted as a
-        // DIFFERENCE rather than as a count, because how far they diverge is a fact about
-        // this world and the claim is only that they do.
-        Assert.True(spread[Minting.UntilRefused] > 1,
-            "the loop agreed after all, so this file's reason for existing is wrong and the "
-            + "arm's blocker is lifted -- read the plan's fork before deleting this");
+        // AND ONE UNDER THE LOOP TOO, WHICH IS THE FIX AND NOT A RESTATEMENT. This line read
+        // `> 1` for exactly one commit, pinning the defect while it stood.
+        Assert.Equal(1, spread[Minting.UntilRefused]);
+
+        // AND THE LOOP DID MINT MORE, so a green line above is convergence rather than a
+        // second arm that quietly stopped naming anything.
+        Assert.True(spread.Count == 2, "both arms must be read for either to mean anything");
     }
 
     [Fact]

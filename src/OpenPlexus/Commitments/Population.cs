@@ -1433,37 +1433,30 @@ public sealed class Population
     /// </param>
     public int Abstract(Recurrence? heard = null)
     {
-        var said = 0;
-
-        // AND IT KEEPS ASKING UNTIL THE GATE SAYS NO, WHICH IS WHAT REMOVES A CEILING NOTHING
-        // CHOSE. Minting once an ask made the yield a function of the sweep calendar: twenty
-        // chances in a twenty-thousand-round run, of which eighteen already succeed. What a
-        // population has to name is a fact about the population, and it was being metered by
-        // a clock it shares with culling.
+        // COUNTED ONCE AND NEVER AGAIN, WHICH IS THE WHOLE OF WHY THIS CAN LOOP AT ALL.
+        // Re-counting between mints was measured and it makes a FLEET disagree: pass one
+        // reads counts merged from populations nobody has rewritten, so every holder
+        // proposes the same pair -- and pass two does not, because this holder's half has
+        // been rewritten and the others' half has not. Each holder is then reading a merged
+        // table nobody else has, and three of them minted two vocabularies.
         //
+        // OVER ONE TABLE THEY CANNOT DIVERGE. Every holder walks the identical counts in the
+        // identical order and excludes the identical pairs as it goes, so the SET of names is
+        // a function of the merged table alone. What it costs is that the second name is
+        // chosen without knowing the first was minted -- stale, and stale in exactly the same
+        // way on every machine, which is the property that matters. The next sweep counts
+        // fresh.
+        var counted = Recurrence.Of(All, _dials);
+
+        if (heard is not null) counted.Absorb(heard);
+
+        var chosen = new List<ImmutableArray<Code>>();
+
         // IT TERMINATES BECAUSE A NAMED PAIR STOPS BEING A CANDIDATE, which is the rule that
-        // shipped one commit before this and is the whole of the argument. Every mint
-        // permanently excludes one pair; every rewrite makes a scope shorter, so the scope
-        // contributes strictly fewer pairs than it did. Both quantities are finite and
-        // neither can go back up.
-        //
-        // AND THE BOUND BESIDE IT IS DERIVED RATHER THAN A DIAL. `Candidates` is what the
-        // gate just searched, so it is an upper bound on how many distinct pairs could still
-        // be named -- a backstop against the argument above being wrong, not a limit anybody
-        // gets to tune.
-        var ceiling = int.MaxValue;
-
-        for (var round = 0; _dials.Minting == Minting.UntilRefused ? round < ceiling : round < 1;
-            round++)
+        // shipped one commit before this. The table is fixed here, so each pass strictly
+        // shrinks a finite candidate set and the bound is the table's own size.
+        while (true)
         {
-            var counted = Recurrence.Of(All, _dials);
-
-            // THEIRS IS THE STATE AT THE START OF THE ROUND AND STAYS THAT WAY. Re-absorbing
-            // the same table each pass is right: the other holders did not move while this
-            // one was rewriting, and asking them again is a round trip this loop does not
-            // get to make.
-            if (heard is not null) counted.Absorb(heard);
-
             // COUNTED ON EVERY PATH OUT, INCLUDING THE ONE THAT SUCCEEDS, so the five refusals
             // and `Spoke` add to `Asked` and a share can be read as a share. A partition that
             // is only counted where it fails is a partition of nothing.
@@ -1484,9 +1477,23 @@ public sealed class Population
 
             if (reading.Named is not { } shared) break;
 
-            if (ceiling == int.MaxValue) ceiling = reading.Candidates + 1;
+            // MINTED INSIDE THE LOOP AND REWRITTEN OUTSIDE IT. The mint is what makes the
+            // next pass skip this pair, so it cannot wait; the rewrite is what would change
+            // the counts, so it must.
+            _names.Mint(shared);
+            chosen.Add(shared);
 
-            var name = _names.Mint(shared);
+            if (_dials.Minting == Minting.Once) break;
+        }
+
+        var said = 0;
+
+        // APPLIED IN THE ORDER THEY WERE CHOSEN, so two names sharing a code resolve the same
+        // way everywhere. The second simply finds fewer scopes still holding both its
+        // members, which is a smaller rewrite rather than a conflict.
+        foreach (var shared in chosen)
+        {
+            var name = Naming.Name(shared);
 
             foreach (var one in All.ToList())
             {

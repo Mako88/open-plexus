@@ -557,7 +557,7 @@ condition is a superstition.
 | Refusing an untested commitment its vote | They do decide wrong rounds, and excluding them moves no metric -- the seat passes to another wrong rule | A world where the right rule is usually present and merely outvoted |
 | Generalising a rule for never being wrong | Not missing is nearly free for a narrow rule, so it picks the least-tested and mints unsound ones with wider reach | A gate reading how TESTED a rule is, not whether it was wrong |
 | Loosening the repair budget, or gating it on the parent | Six cells over eight seeds found no more of the world's rules while repairing many times over | A world where the candidates it refuses are good ones. None known |
-| Subsumption weighed against DISTINCT occasions rather than firings | Chance on the noisy multiplexer, no sound rule left. Each condition halves where a rule can fire, so the bar caps DEPTH by world size | A bar whose expectation shrinks with depth too |
+| Subsumption weighed against DISTINCT occasions rather than firings | Chance on the noisy multiplexer, no sound rule left. Its halving explanation is measured true on even worlds only | A bar tracking depth as that world's reach does, which is not one direction |
 
 ---
 

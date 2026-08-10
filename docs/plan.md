@@ -802,6 +802,9 @@ change of architecture entirely.
 - **AND ON A STILL WORLD FREE IS NOT WORSE ANY MORE, WHICH IS THE LARGER SUSPICION.** A sum
   scales with the number of advocates and a maximum does not, so the budget's interior
   optimum may have been the deleted vote's crowd penalty.
+- **AND FOUR SHIPPED DEFAULTS WERE CHOSEN PARTLY ON THAT COMPARISON.** `Subsuming.Weaker`,
+  `Mending.Ungated`, `Surprising.Unaccounted` and `Budget` at 256 each beat a
+  larger-population rival on accuracy. Each wants re-taking.
 - **ROUNDS-TO-TARGET ACCELERATES IN THE RELEVANT BITS, WITH ERROR BARS AT LAST.** Six to
   eleven is under twofold; eleven to twenty is nearly sixfold. That is the number that
   predicts whether any of this reaches perception.

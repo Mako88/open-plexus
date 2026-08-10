@@ -540,6 +540,7 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
             {
                 var speaking = 0;
                 var eligible = 0.0;
+                var which = new List<int>();
 
                 for (var seed = 1; seed <= Seeds; seed++)
                 {
@@ -561,12 +562,18 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
 
                     var all = brain.Held.All.ToList();
 
-                    if (Abstracting.Shared(all, dials) is not null) speaking++;
+                    if (Abstracting.Shared(all, dials) is not null)
+                    {
+                        speaking++;
+                        which.Add(seed);
+                    }
 
                     eligible += all.Count(one => Recurrence.Eligible(one, dials));
                 }
 
-                output.WriteLine($"{past,22} | {speaking,28} | {eligible / Seeds,8:F1}");
+                output.WriteLine(
+                    $"{past,22} | {speaking,28} | {eligible / Seeds,8:F1} "
+                    + $"| seeds {string.Join(" ", which)}");
             }
         }
 

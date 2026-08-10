@@ -37,7 +37,19 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class SplitNamingTests(ITestOutputHelper output)
 {
-    private const long Rounds = 20000;
+    /// <summary>
+    /// Rounds, <b>and the five hundred past the last sweep are the point of the number.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>A RUN ENDING ON A SWEEP ROUND IS READ AT ITS MOST EXHAUSTED, and this file's whole
+    /// subject is what a trained population would name NEXT.</b> At twenty thousand exactly,
+    /// three seeds in eight have nothing left to say — so the assertions here stood on seed
+    /// one happening to be one of the five that did, which is the single-seed ordering this
+    /// repo's traps list already names. Five hundred rounds of repair past the last sweep
+    /// rebuild a subject: six seeds in eight under the shipped naming and eight in eight when
+    /// naming runs until refused, seed one included under both.
+    /// </remarks>
+    private const long Rounds = 20_500;
 
     /// <summary>Eleven bits, because fork 34 says six mints nothing to split.</summary>
     private const int Address = 3;

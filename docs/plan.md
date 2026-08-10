@@ -455,6 +455,9 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **THOUGH A MAJORITY IS NOT ENOUGH WHILE THE TWO OUTCOMES COST DIFFERENTLY.** A right second
   code saves a miss floor; a wrong one mints a child too narrow to be sound, and what THAT
   costs is unmeasured.
+- **AND THE INDIRECT EVIDENCE SAYS EXPENSIVE.** The subsumption that prunes harder holds fewer
+  residents and buys MORE carriers, so a child that does not pay costs the search rather than
+  merely occupying it.
 - **SO SHORTENING IT NEEDS CONDITIONED COUNTS, WHICH IS THE TABLE THAT BLOWS UP** — argued
   rather than measured. A child could inherit its parent's table filtered by the added code,
   and that wants pair counts where the table is already commitments times codes.

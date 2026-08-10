@@ -753,9 +753,12 @@ change of architecture entirely.
   depth this rung has. Both eleven-bit worlds, outside the seed spread, accuracy flat.
 - **AND NAMING UNTIL THE GATE REFUSES FINDS HALF AGAIN AS MANY OF THE WORLD'S TRUE RULES**,
   with five to seven times the stacking. On ONE MACHINE. The ceiling was a calendar.
-- **AND IT CANNOT SHIP, BECAUSE THE SECOND MINT IS WHERE HOLDERS STOP AGREEING.** The loop
-  re-counts local scopes against counts the others took before any rewrite, so every holder
-  reads a merged table nobody else has.
+- **THE SECOND MINT WAS WHERE HOLDERS STOPPED AGREEING, AND COUNTING ONCE FIXES IT.** One
+  table, walked identically everywhere, so the name set is a function of the merged counts
+  alone — stale within a sweep and stale the same way on every machine.
+- **AND IT STILL CANNOT SHIP, BECAUSE IT FINISHES THE JOB AND FOUR FIXTURES MEASURE THE
+  UNFINISHED ONE.** A run that names until refused leaves nothing left to name, and every
+  distributed naming test asks a trained population what it would name next.
 - **ROUNDS-TO-TARGET GROWS FAST IN THE RELEVANT BITS.** Six, eleven and twenty differ
   by one relevant bit each; the cost between them does not grow by one. That is the
   number that predicts whether any of this reaches perception.
@@ -1034,6 +1037,6 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **66** | Is `Budget` a search limit or a re-derivation limit? ANSWERED: a re-derivation limit, whose level is interior and stable across width. It caps how often a parent re-derives, not how far it searches. Closed |
 | **64** | John's: emit *Z was absent* as its own code at settlement, so rung two needs no negation in the scope language and no new matcher. Bounded to the commitment's own hits, or the candidate set is the vocabulary. Open |
 | **67** | John's: a parent spends ENERGY to repair rather than a fixed count. RETAKEN: the uncovered condition does not replace it, and trades the same way. Its fuel is a population fact, so it is scarce where blame is. Closed |
-| **69** | Naming until the gate refuses finds half again as many true rules on one machine and makes three holders disagree. Open on carrying a rewrite into merged counts, which pair frequencies cannot express |
+| **69** | Naming until the gate refuses finds two fifths to two thirds more true rules and keeps a fleet agreeing, once the counting is done ONCE. Open on the four fixtures whose subject is a population with something left to name |
 | **70** | Proposals naming a pair already named mint nothing. ANSWERED: spending the ask on the best unnamed pair nearly triples the stacking on both eleven-bit worlds and sells nothing. Shipped, and the arm is deleted. Closed |
 | **68** | John's: does a conjunction EARN its narrowing? Its premise is half wrong -- reach halves with depth on even worlds and RISES under skew, where correlated codes let a long scope fire as often as a short one. Open |

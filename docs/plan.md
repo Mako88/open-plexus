@@ -748,6 +748,9 @@ change of architecture entirely.
   fork 34. Pairs repay and beat chance and cannot be certified.
 - **AND MOST ASKS RE-DERIVE A NAME ALREADY HELD**, which mints nothing. That is the whole of
   the plateau, and it is repair's own fault one rung up.
+- **SPENDING THE ASK ON AN UNNAMED PAIR NEARLY TRIPLES THE STACKING**, which is the only
+  depth this rung has. Both eleven-bit worlds, outside the seed spread, with trailing
+  accuracy flat and sound rules moving the same way.
 - **ROUNDS-TO-TARGET GROWS FAST IN THE RELEVANT BITS.** Six, eleven and twenty differ
   by one relevant bit each; the cost between them does not grow by one. That is the
   number that predicts whether any of this reaches perception.

@@ -733,6 +733,9 @@ change of architecture entirely.
   expensive to add.
 - **A SEARCH STEP OF TWO CODES IS A GATE PAID ONCE.** Repair clears the separation bar per
   code added; a minted name standing for two enters on that single clearance.
+- **AN EXPLANATION CAN BE ARITHMETICALLY TRUE AND STILL NOT BE WHAT MOVED THE NUMBER.** A sum
+  scales with the advocate count and a maximum does not; that predicted one sign change of
+  three and got two backwards.
 - **AN ACCURACY COMPARISON BETWEEN ARMS HOLDING DIFFERENT NUMBERS OF RULES WAS BIASED WHILE
   THE VOTE WAS A SUM.** The population is identical under both votes, measured; only the
   ballot changed, and a sum scales with the count.

@@ -1461,7 +1461,7 @@ public sealed class Population
         // COUNTED ON EVERY PATH OUT, INCLUDING THE ONE THAT SUCCEEDS, so the five refusals
         // and `Spoke` add to `Asked` and a share can be read as a share. A partition that
         // is only counted where it fails is a partition of nothing.
-        var reading = Abstracting.Propose(counted, _dials);
+        var reading = Abstracting.Propose(counted, _dials, _names);
 
         Lately = reading;
         _asked++;

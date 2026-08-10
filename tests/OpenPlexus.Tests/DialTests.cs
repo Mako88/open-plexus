@@ -122,6 +122,16 @@ public sealed class DialTests(ITestOutputHelper output)
             + "attempt rather than limit it, and ungated burns per-parent budgets "
             + "on parents something else already covers",
 
+        ["Renaming"] =
+            "AN ARM WITH A NUMBER BEHIND IT AND NO WINNER YET. Rung five mints at "
+            + "most one name an ask and gets twenty asks in a twenty-thousand-round "
+            + "run, and a third of its proposals at the shipped cadence -- two thirds "
+            + "at a tight one -- name a pair it has already named, which mints "
+            + "nothing because a name's identity is its members. `Fresh` spends the "
+            + "ask on the best UNNAMED pair instead. Nothing drives it because the "
+            + "grid that would delete one of the two arms has not been run; when it "
+            + "is, the winner becomes the code and the loser a revival row",
+
         ["Budgeting"] =
             "NOT A DIAL AND NOT A LEVEL -- IT IS WHICH QUESTION `Budget` ASKS, and "
             + "one of the two answers cannot bind at all on any world here. A child "
@@ -710,6 +720,14 @@ public sealed class DialTests(ITestOutputHelper output)
         // shipped timing, so the two are not the same claim and the cell that separates
         // them is a world whose vocabulary reaches sixty-four. `BudgetingTests` carries
         // the tripwire that fires on the day one arrives.
-        Assert.Equal(28, HandSet.Count);
+        // AND TWENTY-NINE IS `Renaming`, WHICH IS ARRIVING AS AN ARM AND IS EXPECTED TO
+        // LEAVE AS ONE. It exists because a number arrived first: rung five re-derives a
+        // third of its proposals at the shipped cadence and two thirds at a tight one, and a
+        // re-derivation mints nothing. `NamingYieldTests` carries the grid and the kill
+        // condition -- if `Fresh` raises neither `named` nor `stacked` outside the seed
+        // spread on any world, this row is deleted with a revival row and the count goes
+        // back to twenty-eight. That is the shape this file asks for: the count grows when a
+        // mechanism is added and MEASURED, and an arm only lives while it is compared.
+        Assert.Equal(29, HandSet.Count);
     }
 }

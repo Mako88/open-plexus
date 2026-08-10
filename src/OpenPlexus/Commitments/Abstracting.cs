@@ -348,6 +348,34 @@ public readonly record struct Proposed
     public required ImmutableArray<Code>? Named { get; init; }
 }
 
+/// <summary>
+/// Whether rung five may spend an ask on a pair it has already named.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>MEASURED BEFORE IT WAS A DIAL: TWO THIRDS OF PROPOSALS RE-DERIVE AN EXISTING NAME AT
+/// A TIGHT CADENCE, AND A THIRD DO AT THE SHIPPED ONE.</b> A name's identity is its members,
+/// so proposing a pair twice mints nothing — and rung five mints at most once an ask, so an
+/// ask spent on a known pair is an ask that cannot add vocabulary. That is not the same as
+/// wasted: repair may have built fresh children carrying the pair, and re-proposing shortens
+/// those. The question is which is worth the one chance.
+/// </para>
+/// <para>
+/// <b>AND SKIPPING THEM LOOSENS THE BAR RATHER THAN TIGHTENING IT, WHICH IS WHY THIS IS NOT
+/// SIMPLY A FILTER.</b> The correction multiplies by the candidates CONSIDERED, and a pair
+/// that could never be accepted was never a candidate. Under <see cref="Fresh"/> the gate
+/// stops correcting for a search it was not doing.
+/// </para>
+/// </remarks>
+public enum Renaming
+{
+    /// <summary>Take the strongest pair whatever it is, named before or not.</summary>
+    Anything,
+
+    /// <summary>Consider only pairs this population has not already named.</summary>
+    Fresh,
+}
+
 public static class Abstracting
 {
     /// <summary>The sub-scope most worth naming, or nothing if none has earned it.</summary>
@@ -376,7 +404,15 @@ public static class Abstracting
     /// </summary>
     /// <param name="counted">What recurred, from one holder or from all of them merged.</param>
     /// <param name="dials">The gate's numbers.</param>
-    public static Proposed Propose(Recurrence counted, CommittingSettings dials)
+    /// <param name="named">
+    /// What this population has already named, or nothing where the caller does not know or
+    /// does not care. <b>Read only under <see cref="Renaming.Fresh"/></b>, so a caller
+    /// passing nothing under that arm gets the shipped behaviour rather than a throw — the
+    /// gate is also asked from tests and from a merge, where there is no one population whose
+    /// vocabulary it would be.
+    /// </param>
+    public static Proposed Propose(
+        Recurrence counted, CommittingSettings dials, Naming? named = null)
     {
         ArgumentNullException.ThrowIfNull(counted);
         ArgumentNullException.ThrowIfNull(dials);
@@ -390,9 +426,12 @@ public static class Abstracting
 
         if (together.Count == 0) return Nothing(scopes, 0, Refused.Unpaired);
 
+        var skipping = dials.Renaming == Renaming.Fresh && named is not null;
+
         (Code, Code)? best = null;
         var strongest = double.NegativeInfinity;
         var repaying = 0;
+        var candidates = 0;
 
         // ORDERED, BECAUSE THE WINNER WAS OTHERWISE WHICHEVER TIE THE DICTIONARY REACHED
         // FIRST. Two pairs with the same z resolved by hash order, which is stable within
@@ -401,6 +440,13 @@ public static class Abstracting
         // nobody had opened yet, since before this there was only ever one table.
         foreach (var (pair, seen) in together.OrderBy(one => one.Key.Left).ThenBy(one => one.Key.Right))
         {
+            // A PAIR ALREADY NAMED CANNOT ADD VOCABULARY, so under `Fresh` it is not a
+            // candidate -- and it is dropped BEFORE the count that the correction divides
+            // among, because a candidate the gate would never accept is not one it searched.
+            if (skipping && named!.Knows(Naming.Name([pair.Left, pair.Right]))) continue;
+
+            candidates++;
+
             // THE DESCRIPTION-LENGTH BAR. Naming a pair costs two entries to say what
             // it means and saves one in every scope that holds it, so it only repays
             // from three scopes up. Below that a name is a longer way of saying the
@@ -432,13 +478,18 @@ public static class Abstracting
             best = pair;
         }
 
-        if (repaying == 0) return Nothing(scopes, together.Count, Refused.Rare);
+        // AND `Unpaired` IS REACHABLE FROM `Fresh` AS WELL AS FROM A HAND-WRITTEN TABLE:
+        // a population that has named every pair it holds has no candidate left, which is a
+        // completely different state from holding no pair.
+        if (candidates == 0) return Nothing(scopes, 0, Refused.Unpaired);
+
+        if (repaying == 0) return Nothing(scopes, candidates, Refused.Rare);
 
         // A PAIR NO COMMONER THAN CHANCE IS NOT A REDUNDANCY, and the old loop could not
         // say that it had found one. Selection began at nought, so this case and the one
         // above both came back as no candidate at all.
         if (best is not { } chosen || strongest <= 0.0)
-            return Nothing(scopes, together.Count, Refused.Independent) with
+            return Nothing(scopes, candidates, Refused.Independent) with
             {
                 Repaying = repaying,
                 Strongest = strongest,
@@ -447,12 +498,12 @@ public static class Abstracting
         // CORRECTED FOR THE PAIRS LOOKED AT, exactly as repair's bar is. Taking the
         // best of thousands of candidates clears any fixed bar on chance alone, and
         // that is the failure this whole gate exists against.
-        var corrected = Normal.Tail(strongest) * together.Count;
+        var corrected = Normal.Tail(strongest) * candidates;
 
         return new Proposed
         {
             Scopes = scopes,
-            Candidates = together.Count,
+            Candidates = candidates,
             Repaying = repaying,
             Strongest = strongest,
             Corrected = corrected,

@@ -732,9 +732,19 @@ change of architecture entirely.
 - **AND THE OPTIMUM DOES NOT MOVE WITH THE RELEVANT BITS.** Six and eleven peak
   together, so what moved was the blame coupling under the old timing rather than the
   budget.
-- **AND RUNG FIVE'S YIELD FALLS AS ITS MATERIAL GROWS.** Offered several times the
-  eligible scopes, it mints fewer names rather than more. `Tally.Eligible` is the
-  denominator nothing reported, and the cause is unmeasured.
+- **RUNG FIVE IS ASKED ON THE SWEEP CALENDAR AND MINTS AT MOST ONE NAME AN ASK**, so its
+  yield has a ceiling that has nothing to do with redundancy.
+- **SO *NAMES PER ELIGIBLE SCOPE* IS A RATIO WITH A CAPPED NUMERATOR**, and it falls as the
+  budget rises whatever abstraction does. The old row read that fall as the count's.
+- **AND THE ONLY BAR THAT EVER REFUSES AT ELEVEN BITS IS THE CORRECTION**, which loosens
+  rather than tightens as the population grows. `NamingYieldTests` partitions every ask.
+- **THE GATE IS SCALE-RELATIVE IN PRINCIPLE AND NO RUN SHOWS IT.** With the learner removed,
+  a fixed redundancy in a growing population walks to unnameable; on a run the extra scopes
+  carry the redundancy with them.
+- **SIX BITS IS REFUSED ON POWER RATHER THAN ON HAVING NOTHING TO NAME**, which sharpens
+  fork 34. Pairs repay and beat chance and cannot be certified.
+- **AND MOST ASKS RE-DERIVE A NAME ALREADY HELD**, which mints nothing. That is the whole of
+  the plateau, and it is repair's own fault one rung up.
 - **ROUNDS-TO-TARGET GROWS FAST IN THE RELEVANT BITS.** Six, eleven and twenty differ
   by one relevant bit each; the cost between them does not grow by one. That is the
   number that predicts whether any of this reaches perception.
@@ -979,7 +989,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **31** | The table spills without changing what fires, and reproducibly. Open |
 | **32** | Entailment depth capped at 1, horizon at K=1. Both come off when blame diffusion has a number — a cap with no trigger is a permanent decision nobody made. Open |
 | **33** | Unification's per-match cost against a subset test. Probed before the ladder's escalation policy, not after. Open |
-| **34** | Rung five names nothing at six bits and names and STACKS at eleven. The plan said this world had an answer key for it; it does not, because its structure is positional. Open |
+| **34** | Rung five names nothing at six bits and names and STACKS at eleven. SHARPENED: six bits is refused on POWER rather than on having nothing to name, so the structural reading is not what the gate is doing. Open |
 | **35** | More unsound commitments resident than sound ones, while the score holds. Is the vote robust to them, or are they why it stops short? Open |
 | **36** | Graded codes: does `Winnow` emitting several codes per reading make a position nameable, and what does it cost the search and the soundness check? Open |
 | **37** | The repair budget has an interior optimum moving with the relevant bits. And `Mending.Uncovered` is two mechanisms — a gate plus every-round repair — where the gate alone is far worse than no gate at all. Open |
@@ -1013,4 +1023,6 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **66** | Is `Budget` a search limit or a re-derivation limit? ANSWERED: a re-derivation limit, whose level is interior and stable across width. It caps how often a parent re-derives, not how far it searches. Closed |
 | **64** | John's: emit *Z was absent* as its own code at settlement, so rung two needs no negation in the scope language and no new matcher. Bounded to the commitment's own hits, or the candidate set is the vocabulary. Open |
 | **67** | John's: a parent spends ENERGY to repair rather than a fixed count. RETAKEN: the uncovered condition does not replace it, and trades the same way. Its fuel is a population fact, so it is scarce where blame is. Closed |
+| **69** | Rung five's yield is bounded by a calendar it shares with widening, subsumption and culling. Does abstraction want its own cadence? `sweep` has never been swept by anything. Open |
+| **70** | Proposals naming a pair already named mint nothing. `Renaming.Fresh` spends the ask on the best unnamed pair instead, and stops correcting for candidates it would refuse. Open, with a grid and a kill condition |
 | **68** | John's: does a conjunction EARN its narrowing? Its premise is half wrong -- reach halves with depth on even worlds and RISES under skew, where correlated codes let a long scope fire as often as a short one. Open |

@@ -363,6 +363,105 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void The_two_renaming_arms_build_different_populations()
+    {
+        // A PREDICTION WRITTEN INTO A WIRING CHECK FAILS TWO WAYS AND READS THE SAME, so
+        // this asserts that the arms DIFFER and not which of them is better. What direction
+        // `Fresh` moves the names is the grid's question, and a threshold here would be that
+        // grid's answer written before it ran.
+        //
+        // AND ONE HALF IS TRUE BY CONSTRUCTION, WHICH IS THE ONLY PART ASSERTED SHARPLY.
+        // `Fresh` cannot propose a pair it has named, so its re-derivation count is nought;
+        // `Anything` having one above nought is what says the dial is reaching the gate at
+        // all rather than being carried and dropped.
+        var arms = new Dictionary<Renaming, Learned>();
+
+        foreach (var arm in (Renaming[])[Renaming.Anything, Renaming.Fresh])
+        {
+            var brain = new Brain(new CommittingSettings { Renaming = arm }, seed: 1);
+
+            arms[arm] = new MultiplexerRun(
+                new MultiplexerSettings { Address = Address }, brain, seed: 1).Run(6_000);
+        }
+
+        output.WriteLine("arm | asked | spoke | again | named | stacked | eligible");
+
+        foreach (var (arm, learned) in arms)
+        {
+            output.WriteLine(
+                $"{arm,-8} | {learned.Tally.Asked,5} | {learned.Tally.Spoke,5} "
+                + $"| {learned.Tally.Again,5} | {learned.Named,5} | {learned.Stacked,7} "
+                + $"| {learned.Eligible,8}");
+        }
+
+        Assert.True(arms[Renaming.Anything].Tally.Again > 0,
+            "the shipped arm re-derived nothing here, so this world cannot show the axis");
+
+        Assert.Equal(0, arms[Renaming.Fresh].Tally.Again);
+
+        // AND THE ARMS REACH DIFFERENT POPULATIONS RATHER THAN THE SAME ONE BY A DIFFERENT
+        // ROUTE. `Mending.Outvoted` shipped for a while short-circuiting the mechanism being
+        // measured, so a sweep returned three identical arms for a gate that never ran --
+        // this is the cheap check against that shape.
+        Assert.NotEqual(
+            arms[Renaming.Anything].Named, arms[Renaming.Fresh].Named);
+    }
+
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public async Task Whether_spending_the_ask_on_an_unnamed_pair_buys_vocabulary()
+    {
+        // THE ONE THING THE PARTITION POINTED AT, BUILT AS AN ARM RATHER THAN A CHANGE.
+        // Rung five saturates: at the shipped budget it speaks on eighteen asks in twenty
+        // and mints ten to twelve names, and the gap is proposals naming a pair already
+        // named. `Fresh` spends those asks on the best unnamed pair instead.
+        //
+        // AND WHAT IT COSTS IS NOT NOTHING, WHICH IS WHY THIS IS A GRID. A re-derivation
+        // still shortens scopes repair has built since the last naming, so `Anything` is
+        // doing housekeeping the other arm defers. `stacked` is the reading that matters
+        // most -- a name standing for a set containing a name is the only depth this rung
+        // has, and it is what the recursion claim rests on.
+        foreach (var (address, skew) in Fixture.Curve)
+        {
+            output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}: renaming "
+                + $"arms, {Seeds} seeds, {Rounds} rounds ===");
+
+            foreach (var arm in (Renaming[])[Renaming.Anything, Renaming.Fresh])
+            {
+                var once = new Dictionary<int, Learned>();
+
+                Learned Cached(int seed)
+                {
+                    if (!once.TryGetValue(seed, out var ran))
+                        once[seed] = ran = new MultiplexerRun(
+                            new MultiplexerSettings { Address = address, Skew = skew },
+                            new Brain(new CommittingSettings { Renaming = arm }, seed),
+                            seed).Run(Rounds);
+
+                    return ran;
+                }
+
+                await Fixture.ReadAsync(output, arm.ToString(), Seeds, Cached,
+                    ("named", one => one.Named),
+                    ("stacked", one => one.Stacked),
+                    ("spoke", one => one.Tally.Spoke),
+                    ("again", one => one.Tally.Again),
+                    ("uncertain", one => one.Tally.AtUncertain),
+                    ("eligible", one => one.Eligible),
+                    ("sound", one => one.Sound),
+                    ("recent", one => one.Recent));
+            }
+
+            output.WriteLine("");
+        }
+
+        // AND THE KILL CONDITION IS WRITTEN DOWN FIRST. If `Fresh` does not raise `named` or
+        // `stacked` outside the seed spread on any world, the re-derivations were costing
+        // nothing, this dial is deleted with a revival row, and the saturation is a fact
+        // about how much this world has to name rather than about how the asks are spent.
+    }
+
+    [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_bounds_rung_fives_yield_is_how_often_it_is_asked()
     {

@@ -199,6 +199,68 @@ public sealed class RecoveryTests(ITestOutputHelper output)
 
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_an_earned_budget_keeps_free_s_recovery_without_free_s_standing_cost()
+    {
+        // THE CELL THAT DECIDES `Earned`, AND IT IS ON THE WORLD THAT HOLDS STILL. A moving
+        // world rewards forking as hard as possible, so the arm that refuses least wins there
+        // and nothing about a budget's WORTH is visible. `BudgetCurveTests` says free is worse
+        // than the interior optimum on a stationary world -- and says it on hard-round
+        // coverage and sound rules, not on a score, because a score is what a population that
+        // has over-specialised still holds up.
+        //
+        // SO THE QUESTION IS WHETHER ONE ARM CAN HAVE BOTH. Free recovers and costs; 256 does
+        // not recover and does not cost. `Earned` recovers, refuses a seventh of free's
+        // repairs, and if its stationary columns sit with 256 rather than with free then a
+        // budget earned from evidence is strictly better than a total -- which is the whole
+        // claim, and the only reading that can support it.
+        //
+        // AND `Census.Paying` LEADS, because it is the one column skew cannot lift and
+        // because every other reading here would let an over-specialised population look
+        // fine. That is this session's own lesson four times over.
+        output.WriteLine($"{Seeds} seeds, six bits, a world that holds still, {Settled} rounds");
+        output.WriteLine("budget         | paying | sound | residents | repairs | recent");
+
+        foreach (var (arm, dials) in new (string Arm, CommittingSettings Dials)[]
+        {
+            ("attempts 256", new CommittingSettings()),
+            ("attempts free", new CommittingSettings { Budget = int.MaxValue }),
+            ("earned", new CommittingSettings { Budgeting = Budgeting.Earned }),
+        })
+        {
+            var paying = new List<double>();
+            var sound = new List<double>();
+            var resident = new List<double>();
+            var repaired = new List<double>();
+            var recent = new List<double>();
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var learned = new MultiplexerRun(
+                    new MultiplexerSettings { Address = 2 },
+                    new Brain(dials, seed),
+                    seed,
+                    census: true).Run(Settled);
+
+                paying.Add(learned.Census!.Paying);
+                sound.Add(learned.Sound);
+                resident.Add(learned.Resident);
+                repaired.Add(learned.Tally.Repaired);
+                recent.Add(learned.Recent);
+            }
+
+            output.WriteLine(
+                $"{arm,-14} | {Sweep.Spread(paying)} | {Sweep.Spread(sound, "F1")} "
+                + $"| {Sweep.Spread(resident, "F0")} | {Sweep.Spread(repaired, "F0")} "
+                + $"| {Sweep.Spread(recent)}");
+        }
+
+        // NO BAR. Whether a budget earned from evidence dominates a total has never been
+        // measured, and a threshold written before the first reading would be the answer
+        // rather than the finding.
+    }
+
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_a_world_that_keeps_moving_costs_a_budget_that_never_returns()
     {
         // ONE FLIP IS THE EASY CASE AND C4 DESCRIBES THE HARD ONE. *No episode boundary* does

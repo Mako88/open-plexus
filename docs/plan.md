@@ -733,6 +733,9 @@ change of architecture entirely.
   expensive to add.
 - **A SEARCH STEP OF TWO CODES IS A GATE PAID ONCE.** Repair clears the separation bar per
   code added; a minted name standing for two enters on that single clearance.
+- **TWO ARMS THAT SCORE ALIKE NEED NOT BE THE SAME MECHANISM, AND A SCORE CANNOT SAY.** A cap
+  that refuses nothing and a cap that refuses a lot read identically until something counts
+  what was BUILT. Four grids in one session.
 - **DELETING THE LAST ARM DELETES THE CHECK THAT MADE THE DELETION LEGITIMATE.** *The vote
   builds one population* was asserted across three weighings; with one left it cannot be
   stated at all, so the property is an argument again.

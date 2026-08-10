@@ -782,9 +782,9 @@ change of architecture entirely.
 - **AND IT IS NOT WAITING ON GENESIS EITHER.** Ungating it recovers identically, a tenth of a
   standard error apart — because it mints the world's whole one-code space either way and has
   nothing left to add.
-- **WHAT IT IS WAITING ON IS SUBSUMPTION OUTPACING REPAIR.** In the five thousand rounds after
-  a flip repair makes about nineteen children and subsumption removes about twenty-five. The
-  population SHRINKS while it relearns.
+- **REPAIR MAKES NINETEEN CHILDREN IN THE WINDOW AND SUBSUMPTION REMOVES TWENTY-FIVE**, so
+  the population shrinks while it relearns — and stopping subsumption from removing them
+  changes nothing at all. Three accounts dead.
 - **ROUNDS-TO-TARGET ACCELERATES IN THE RELEVANT BITS, WITH ERROR BARS AT LAST.** Six to
   eleven is under twofold; eleven to twenty is nearly sixfold. That is the number that
   predicts whether any of this reaches perception.
@@ -1052,5 +1052,5 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **69** | Naming until refused finds far more true rules and keeps a fleet agreeing. CLOSED AGAINST: it finds LONGER ones, and hard-round coverage falls while every count rises. Deleted with a revival row |
 | **70** | Proposals naming a pair already named mint nothing. ANSWERED: spending the ask on the best unnamed pair nearly triples the stacking on both eleven-bit worlds and sells nothing. Shipped, and the arm is deleted. Closed |
 | **68** | John's: does a conjunction EARN its narrowing? Its premise is half wrong -- reach halves with depth on even worlds and RISES under skew, where correlated codes let a long scope fire as often as a short one. Open |
-| **72** | Relearning after the target moves is slower than learning the world from nothing. Not old rules squatting and not genesis gated; repair makes nineteen children in the window and subsumption removes twenty-five. Open on whether a laxer subsumption recovers faster |
+| **72** | Relearning after the target moves is slower than learning the world from nothing. Not old rules squatting, not genesis gated, not subsumption eating the repairs -- three predictions, three controls, none of them it. Open |
 | **71** | A minted name is a code, so repair adds it for the price of one. Should the separation bar be charged by what a scope's codes STAND FOR rather than by how many there are? Open |

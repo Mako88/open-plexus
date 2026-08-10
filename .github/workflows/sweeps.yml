@@ -84,7 +84,13 @@ jobs:
           ONLY: ${{ inputs.only }}
         run: |
           all='[
-            "AbstainTests","ArrangingTests","AskedTests","BudgetCurveTests",
+            "AbstainTests","AskedTests","BudgetCurveTests",
+            "ArrangingTests.What_an_unbounded_repair_budget",
+            "ArrangingTests.The_gap_between_what",
+            "ArrangingTests.What_the_vote_costs",
+            "ArrangingTests.And_the_other_half",
+            "ArrangingTests.Whether_the_gap_is_a_fact",
+            "ArrangingTests.Whether_the_gate_that_was_load_bearing",
             "BudgetTests","ChoosingTests","FleetTests","FoldingTests",
             "GateCostTests","LatencyTests","MendingTests",
             "MonkTests","NarrowingTests","OverlapTests","PlacingTests",

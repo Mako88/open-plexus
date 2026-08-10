@@ -19,6 +19,49 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     private static readonly ArrangedSettings Small =
         new() { Side = 3, Cell = 3, Clutter = 1, Hold = 4 };
 
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_an_unbounded_repair_budget_costs_on_the_world_that_reaches_the_capacity()
+    {
+        // THE GAP THE BUDGET CURVE LEFT, AND IT IS NAMED IN THAT COMMIT RATHER THAN FOUND
+        // AFTERWARDS. `BudgetCurveTests` says every column that is a fact about what was
+        // learnt rises monotonically to a FREE budget -- and every cell of it is a
+        // multiplexer, where the population never comes near `Capacity`. A dial wired to one
+        // world in ten and cashed in as though it were general is this doc's own trap.
+        //
+        // `Arranged` IS WHERE IT WOULD SHOW. Five hundred residents against a capacity of two
+        // thousand is closer than a multiplexer ever gets, culling actually runs, and the
+        // world's true rules are ONE CODE -- so this doc already carries the row that on a
+        // world whose rules are one code, any repair is damage. If unbounded repair costs
+        // anything anywhere, it costs it here.
+        //
+        // AND THE READING IS THE WITHHELD SET RATHER THAN A TRAILING WINDOW, which is what
+        // this world has that the multiplexer does not: scenes the run was never taught on.
+        // A population that over-specialises scores on what it has seen and not on those.
+        output.WriteLine("budget | unseen accuracy | spread | sound | unsound | residents");
+
+        foreach (var (arm, budget) in new (string Arm, int Budget)[]
+        {
+            ("256", new CommittingSettings().Budget),
+            ("free", int.MaxValue),
+        })
+        {
+            var (unseen, last) = Sweep(
+                Small,
+                new CommittingSettings { Surprising = Surprising.AnyFailure, Budget = budget },
+                Looking.Tiled);
+
+            output.WriteLine(
+                $"{arm,6} | {unseen.Average(),15:F3} | {Spread(unseen),6:F3} "
+                + $"| {last.Rules.Sound,5} | {last.Rules.Unsound,7} "
+                + $"| {last.Tally.Resident,9}");
+        }
+
+        // NO BAR. What unbounded repair costs on a world that reaches its capacity has never
+        // been measured, and a threshold written before the first reading would be the answer
+        // rather than the finding.
+    }
+
     /// <summary>Five seeds of one configuration, and what the last one left behind.</summary>
     /// <param name="world">The scene the seeds are drawn from.</param>
     /// <param name="dials">The brain, built once and handed to every seed.</param>

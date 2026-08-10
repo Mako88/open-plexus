@@ -19,10 +19,10 @@ nothing cancels it. Use it before shipping a default, or on a state worth return
 Everything else keeps rolling.
 
 **Run the structural guards locally every commit, as their own command.** `DocsTests`,
-`DeadCodeTests`, `DuplicationTests`, `DialTests`, `SeparationTests` and `InertDialTests` take
-seconds and go red for changes that look unrelated. Never chain the check into the commit —
-that has produced red commits more than once. Rebuild before running with `--no-build`, or
-the binary under test is the one from before the edit.
+`DeadCodeTests`, `DuplicationTests`, `DialTests`, `SeparationTests`, `InertDialTests` and
+`SweepListTests` take seconds and go red for changes that look unrelated. Never chain the
+check into the commit — that has produced red commits more than once. Rebuild before running
+with `--no-build`, or the binary under test is the one from before the edit.
 
 ## The measurements
 

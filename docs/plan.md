@@ -965,15 +965,15 @@ change of architecture entirely.
 - **AND AT THE STEEPEST TILT THE SHIPPED ARM'S ACCURACY RISES WHILE ITS COVERAGE REACHES
   NOUGHT**, which is the base-rate trap drawn as a curve: the score goes up as the learning
   goes away.
-- **UNDER `EveryRound` THE TWO WEIGHINGS BUILD THE IDENTICAL POPULATION**, to three
-  decimals on coverage, rules found and sound rules, on both skewed widths — and `Lifting`
-  still leads on trailing accuracy alone.
+- **UNDER `EveryRound` ALL THREE WEIGHINGS BUILD ONE POPULATION, EQUAL PER SEED** on sound
+  rules, unsound rules, residents and rules found. Asserted now rather than observed, and it
+  goes red under the old timing.
 - **SO `Lifting` WAS DOING TWO JOBS AND NOW DOES ONE.** Its whole effect on what gets BUILT
   was blame redirection; the timing does that properly, and what is left is a vote rule
   weighing a vote.
-- **AND EVERY VOTE ARM EVER MEASURED HERE WAS A SEARCH ARM TOO.** The shipped timing lets
-  the vote decide what repair runs on, so no change to it was ever only a readout. Two
-  identical columns say so.
+- **AND EVERY VOTE ARM MEASURED BEFORE THAT TIMING SHIPPED WAS A SEARCH ARM TOO**, because
+  repair ran only where the winner was wrong. Every reason to keep `Summing` was read under
+  it, and `Strongest` costs no true rules now.
 
 ---
 

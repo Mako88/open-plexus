@@ -52,9 +52,10 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     /// <remarks>
     /// <b>LONGER THAN THE TRAILING WINDOW AND SHORTER THAN A RECOVERY.</b> Two thousand
     /// rounds is what accuracy is read over, so a shorter interval would report a window
-    /// straddling two targets and nothing else; five thousand is also where the one-flip
-    /// curves say a capped arm has stopped falling and a free one has turned, so each
-    /// interval is long enough for the arms to have separated inside it.
+    /// straddling two targets and nothing else; five thousand is where the one-flip curves
+    /// are furthest apart — a free budget has turned the corner and started climbing while a
+    /// capped one is still falling — so each interval is long enough for the arms to have
+    /// separated inside it.
     /// </remarks>
     private const int Moving = 5_000;
 

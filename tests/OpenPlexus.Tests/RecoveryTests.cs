@@ -226,11 +226,23 @@ public sealed class RecoveryTests(ITestOutputHelper output)
             ("attempts 64", new CommittingSettings { Budget = 64 }),
             ("attempts 256", new CommittingSettings()),
             ("attempts free", new CommittingSettings { Budget = int.MaxValue }),
+            // KNOWN TO BE FREE AND KEPT AS THE CHECK THAT IT STILL IS. Distinct children
+            // are capped by the vocabulary far below sixty-four, so this cannot bind -- and
+            // a row that stopped matching the free one would mean the vocabulary had grown
+            // past the budget, which is the day `DialTests` has been waiting for.
             ("children 64", new CommittingSettings
             {
                 Budget = 64,
                 Budgeting = Budgeting.Children,
             }),
+
+            // THE ONE THAT IS NEITHER. `Budget` is not read at all under this rule: a parent
+            // may have attempted once for every `Floor` misses it has taken, so the
+            // allowance grows exactly when the parent is being wrong and stops when it is
+            // not. If it lands with the capped arms it binds and is the answer; if it lands
+            // on free it is free in disguise, which is the fault `Children` turned out to
+            // have.
+            ("earned", new CommittingSettings { Budgeting = Budgeting.Earned }),
         })
         {
             var read = new List<string>();

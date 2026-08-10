@@ -382,6 +382,43 @@ public enum Budgeting
     /// the budget depend on what the CULL did, which is not a fact about the search.
     /// </remarks>
     Children,
+
+    /// <summary>
+    /// One attempt for every <see cref="CommittingSettings.Floor"/> misses the parent has
+    /// taken — <b>a budget EARNED from evidence rather than granted for a lifetime.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE OTHER TWO ARE BOTH TOTALS AND C4 REFUSES A TOTAL.</b> <i>No episode boundary,
+    /// so nothing may depend on train-then-test</i> — and a count a parent may spend across
+    /// its whole life is a bet that its life is one episode. Measured: where the target
+    /// moves, a capped parent never recovers because it spent its allowance being wrong
+    /// before the move, and the two arms above are a total that binds and a total that
+    /// cannot reach its own cap.
+    /// </para>
+    /// <para>
+    /// <b>AND IT NEEDS NO NEW NUMBER, WHICH IS THE ONLY REASON IT IS BUILDABLE.</b>
+    /// <see cref="CommittingSettings.Floor"/> already means <i>enough misses to test a
+    /// proportion by</i>, and <see cref="Population.Mend"/> already refuses a parent under
+    /// it. This is that same rule applied repeatedly rather than once: the first attempt
+    /// costs the floor, the second costs another, and a parent that stops being wrong stops
+    /// earning. <see cref="CommittingSettings.Budget"/> is not read at all.
+    /// </para>
+    /// <para>
+    /// <b>AND THE HORIZON IS IN EVENTS RATHER THAN TIME, which is this design's own rule.</b>
+    /// A rate per thousand rounds would bind too and would be a clock — the thing settlement
+    /// was built to avoid. Misses are events, they are already counted, and they are exactly
+    /// the evidence that a repair is wanted.
+    /// </para>
+    /// <para>
+    /// <b>WHAT IT RISKS IS BEING FREE IN DISGUISE, and that is what the grid is for.</b> A
+    /// parent wrong on most rounds earns attempts quickly, so on a world where the population
+    /// is mostly wrong this may not bind at all — which is the fault <see cref="Children"/>
+    /// turned out to have, and the reason it is compared against both of them rather than
+    /// against a story.
+    /// </para>
+    /// </remarks>
+    Earned,
 }
 
 /// <summary>Every number the commitment machinery is allowed to have.</summary>

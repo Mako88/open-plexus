@@ -126,7 +126,13 @@ public sealed class DialTests(ITestOutputHelper output)
             + "BIT-IDENTICAL to no budget across twelve cells of two widths and two "
             + "worlds, so non-stationarity separates the SIZE of the budget and not "
             + "what it counts. The cell that would separate the two rules is still a "
-            + "vocabulary reaching sixty-four and nothing else",
+            + "vocabulary reaching sixty-four and nothing else. AND A THIRD CELL "
+            + "ARRIVES BECAUSE BOTH OF THE FIRST TWO ARE TOTALS, WHICH C4 REFUSES: "
+            + "`Earned` pays one attempt per `Floor` misses, so the allowance grows "
+            + "while a parent is being wrong and stops when it is not, and `Budget` "
+            + "is not read at all. It is the only cell here that assumes nothing "
+            + "about how long a parent lives, and whether it BINDS is the question "
+            + "-- `Children` was refused for turning out to be free in disguise",
 
         ["Repairing"] =
             "OPEN, AND IT ARRIVES BY SEPARATION RATHER THAN BY INVENTION, which is "

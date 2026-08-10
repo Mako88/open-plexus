@@ -1194,7 +1194,22 @@ public sealed class Population
 
     /// <inheritdoc cref="PastFloor"/>
     /// <summary>Whether a commitment has any of its repair budget left.</summary>
-    private bool PastBudget(Commitment one) => Children(one.Identity) < _dials.Budget;
+    /// <remarks>
+    /// <b>THE ALLOWANCE IS A CONSTANT UNDER TWO OF THE THREE RULES AND A FUNCTION OF THE
+    /// PARENT UNDER THE THIRD.</b> <see cref="Budgeting.Earned"/> pays one attempt per
+    /// <see cref="CommittingSettings.Floor"/> misses, so a parent that stops being wrong
+    /// stops earning and one that becomes wrong again is funded — which is what a design
+    /// forbidding episode boundaries needs and what a total cannot be.
+    /// </remarks>
+    private bool PastBudget(Commitment one) => Children(one.Identity) < Allowed(one);
+
+    /// <summary>How many attempts this parent may have made by now.</summary>
+    /// <param name="one">The parent.</param>
+    /// <inheritdoc cref="Budgeting"/>
+    private int Allowed(Commitment one) =>
+        _dials.Budgeting == Budgeting.Earned
+            ? (int)(one.Misses / _dials.Floor)
+            : _dials.Budget;
 
     /// <inheritdoc cref="PastFloor"/>
     /// <summary>Whether no child already covers this commitment's failure.</summary>
@@ -1220,10 +1235,15 @@ public sealed class Population
     /// <summary>What a commitment's repair budget has been spent on.</summary>
     /// <param name="name">What the commitment is called.</param>
     /// <inheritdoc cref="Budgeting"/>
+    /// <remarks>
+    /// <b>ONLY <see cref="Budgeting.Children"/> COUNTS NAMES.</b> <see cref="Budgeting.Earned"/>
+    /// limits the same thing <see cref="Budgeting.Attempts"/> does — how often a parent has
+    /// tried — and differs in what it is allowed to spend rather than in what spends it.
+    /// </remarks>
     private int Children(Code name) =>
         !_minted.TryGetValue(name, out var born) ? 0
-        : _dials.Budgeting == Budgeting.Attempts ? (int)born.Attempts
-        : born.Names.Count;
+        : _dials.Budgeting == Budgeting.Children ? born.Names.Count
+        : (int)born.Attempts;
 
     /// <summary>
     /// Whether forking this commitment has ever produced a better one.

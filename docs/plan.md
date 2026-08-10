@@ -452,6 +452,9 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **AND A PARENT'S TABLE PREDICTS ITS CHILD'S CHOICE A THIRD OF THE TIME.** Twenty-seven per
   cent to forty-five across three worlds, so a one-pass two-code step would add the wrong
   second code twice in three. The chain buys conditioning.
+- **SO SHORTENING IT NEEDS CONDITIONED COUNTS, WHICH IS THE TABLE THAT BLOWS UP** — argued
+  rather than measured. A child could inherit its parent's table filtered by the added code,
+  and that wants pair counts where the table is already commitments times codes.
 - **Quantisation boundary noise is the interface risk, and repair amplifies it.** Two
   identical worlds either side of a band emit unrelated codes, so specialising on the
   artifact MINTS it.

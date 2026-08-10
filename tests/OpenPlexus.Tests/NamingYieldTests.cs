@@ -756,6 +756,17 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         // AND `resident` IS READ BESIDE THEM BECAUSE THE COST WOULD SHOW THERE. Naming
         // rewrites scopes and a rewrite can collide, so a loop that names a dozen things in
         // one sweep is a dozen chances to lose a commitment to a merge nobody asked for.
+        //
+        // AND `paying` IS HERE BECAUSE THE FIRST TAKE OF THIS GRID COULD NOT RANK ITS OWN
+        // ARMS. Sound rules rose by two fifths to two thirds and `recent` did not move at
+        // all, while `resident` rose by a third to a half -- so a count of true rules growing
+        // roughly with the population it is drawn from is exactly what this repo's own trap
+        // says to distrust, and neither column beside it could say whether the extra rules
+        // ever fire anywhere that matters. `Census.Paying` is the one reading skew cannot
+        // game: of the rounds where the commonest answer is WRONG, how many had a sound rule
+        // fire and say so. If it does not move, the loop buys a bigger population and
+        // nothing else, and this repo has already shipped one arm on that column and refused
+        // another on it.
         foreach (var (address, skew) in Fixture.Curve)
         {
             output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}: minting "
@@ -771,12 +782,17 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
                         once[seed] = ran = new MultiplexerRun(
                             new MultiplexerSettings { Address = address, Skew = skew },
                             new Brain(new CommittingSettings { Minting = arm }, seed),
-                            seed).Run(Rounds);
+                            seed,
+                            census: true).Run(Rounds);
 
                     return ran;
                 }
 
                 await Fixture.ReadAsync(output, arm.ToString(), Seeds, Cached,
+                    // FIRST, BECAUSE IT IS THE ONLY COLUMN HERE THAT CAN RANK THE ARMS.
+                    // Everything below it is a count of what was built; this is what any of
+                    // it did on a round the base rate gets wrong.
+                    ("paying", one => one.Census!.Paying),
                     ("named", one => one.Named),
                     ("stacked", one => one.Stacked),
                     ("asked", one => one.Tally.Asked),

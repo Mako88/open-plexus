@@ -449,6 +449,9 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   statistics — a floor on how deep specialisation goes per unit of observation.
 - **AND THAT FLOOR IS WHAT THE CHAIN COSTS, MEASURED.** Every rung re-earns it, the world's
   true rules are three or four codes deep, and only the last rung ever pays.
+- **AND WHETHER A TWO-CODE STEP IS EVEN AVAILABLE IS UNMEASURED.** If the two best separating
+  codes on a parent separate the SAME misses, adding both buys nothing — fork 74's
+  precondition, and cheaper than fork 74.
 - **Quantisation boundary noise is the interface risk, and repair amplifies it.** Two
   identical worlds either side of a band emit unrelated codes, so specialising on the
   artifact MINTS it.

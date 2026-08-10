@@ -281,7 +281,8 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **Corrected for how many candidate Zs were considered.** Search four hundred codes,
   take the best, and noise clears any fixed bar; that is the machine that minted 715
   names on pure noise.
-- **A repair budget per parent**, so one commitment cannot fork forever.
+- **A repair budget per parent**, so one commitment cannot fork forever — and a TOTAL is a
+  lifetime, which C4 refuses. What it should count is open.
 - **And a control arm where Z is drawn at random** from the codes present in the
   misses. If discriminative-Z does not beat it, repair does nothing and the bet is
   dead.

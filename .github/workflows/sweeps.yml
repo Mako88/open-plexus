@@ -85,6 +85,7 @@ jobs:
             "GateCostTests","LatencyTests","LiftingTests","MendingTests",
             "MonkTests","NarrowingTests","OverlapTests","PlacingTests",
             "NamingYieldTests.Which_bar_takes",
+            "NamingYieldTests.Whether_a_run_past",
             "NamingYieldTests.Whether_naming_until",
             "NamingYieldTests.Whether_naming_until",
             "NamingYieldTests.What_bounds_rung_fives_yield",

@@ -522,6 +522,59 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     }
 
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_a_run_past_its_last_sweep_has_anything_left_to_name()
+    {
+        // THE QUESTION THAT DECIDES WHETHER A DIAL HAS TO BE KEPT. Four distributed naming
+        // fixtures ask a TRAINED population what it would name next, and a run that names
+        // until refused answers nothing -- it ends on a sweep round, so the last thing it did
+        // was exhaust itself. Either those files pin the arm, which keeps a knob so that
+        // tests have a subject, or a run ends far enough past its last sweep for repair to
+        // have built one. This measures which.
+        foreach (var arm in (Minting[])[Minting.Once, Minting.UntilRefused])
+        {
+            output.WriteLine($"--- {arm} ---");
+            output.WriteLine("rounds past last sweep | seeds with something to name | eligible");
+
+            foreach (var past in new[] { 0, 100, 250, 500, 1000 })
+            {
+                var speaking = 0;
+                var eligible = 0.0;
+
+                for (var seed = 1; seed <= Seeds; seed++)
+                {
+                    // THE FIXTURE'S OWN WINDOW, NOT THE SHIPPED ONE. `SplitNamingTests`
+                    // pins a deliberately poor population -- rich enough to name whole and
+                    // too poor for a third of it to name alone -- and that window is what
+                    // the loop may have closed.
+                    var dials = new CommittingSettings
+                    {
+                        Minting = arm,
+                        Budget = 64,
+                        Repairing = Repairing.AfterFailure,
+                    };
+                    var brain = new Brain(dials, seed);
+
+                    new MultiplexerRun(
+                        new MultiplexerSettings { Address = Address }, brain, seed)
+                        .Run(Rounds + past);
+
+                    var all = brain.Held.All.ToList();
+
+                    if (Abstracting.Shared(all, dials) is not null) speaking++;
+
+                    eligible += all.Count(one => Recurrence.Eligible(one, dials));
+                }
+
+                output.WriteLine($"{past,22} | {speaking,28} | {eligible / Seeds,8:F1}");
+            }
+        }
+
+        // NO BAR. Whether a knob is forced is what this reports, and a threshold written
+        // first would be the answer rather than the reading.
+    }
+
+    [Fact]
     public void However_many_names_a_sweep_mints_the_holders_mint_the_same_ones()
     {
         // THE PROPERTY THE WHOLE NAMING-OVER-A-WIRE ARC EXISTS FOR, ASSERTED WHERE MINTING

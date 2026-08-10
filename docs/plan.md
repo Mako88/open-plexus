@@ -778,9 +778,12 @@ change of architecture entirely.
   past one flip the run sits well under what it reaches from scratch in fewer.
 - **AND THREE ACCOUNTS OF IT ARE DEAD.** Old rules squatting, genesis gated shut, subsumption
   eating the repairs — each had a mechanism, each got a control, none of them is it.
-- **WHAT IS LEFT IS THAT REPAIR CANNOT CHANGE WHAT A COMMITMENT EXPECTS.** The lineages a
-  moved target needs are the ones that spent the whole run being wrong, and a budget is per
-  parent.
+- **AND WHAT IT IS BOUND BY IS THE REPAIR BUDGET.** Free recovers where sixty-four and two
+  hundred and fifty-six do not, by five standard errors — and on a world that holds still the
+  three arms are level.
+- **AND A PER-PARENT LIFETIME CAP IS WHAT C4 SAYS CANNOT BE ASSUMED.** A total spent over a
+  parent's life is a bet that its life is one episode; the constraint says there is no
+  episode boundary.
 - **ROUNDS-TO-TARGET ACCELERATES IN THE RELEVANT BITS, WITH ERROR BARS AT LAST.** Six to
   eleven is under twofold; eleven to twenty is nearly sixfold. That is the number that
   predicts whether any of this reaches perception.
@@ -1044,9 +1047,9 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **65** | The vote decides what repair may run on, so under skew blame lands on the majority lineages alone. `Repairing.EveryRound` breaks that and pays, at four to six times the repair. Open on what it costs at width |
 | **66** | Is `Budget` a search limit or a re-derivation limit? ANSWERED: a re-derivation limit, whose level is interior and stable across width. It caps how often a parent re-derives, not how far it searches. Closed |
 | **64** | John's: emit *Z was absent* as its own code at settlement, so rung two needs no negation in the scope language and no new matcher. Bounded to the commitment's own hits, or the candidate set is the vocabulary. Open |
-| **67** | John's: a parent spends ENERGY to repair rather than a fixed count. RETAKEN: the uncovered condition does not replace it, and trades the same way. Its fuel is a population fact, so it is scarce where blame is. Closed |
+| **67** | John's: a parent spends ENERGY to repair rather than a fixed count. Closed on stationary worlds -- REOPENED by fork 72, since a fixed total is what a moved target exhausts and fuel that returns is not |
 | **69** | Naming until refused finds far more true rules and keeps a fleet agreeing. CLOSED AGAINST: it finds LONGER ones, and hard-round coverage falls while every count rises. Deleted with a revival row |
 | **70** | Proposals naming a pair already named mint nothing. ANSWERED: spending the ask on the best unnamed pair nearly triples the stacking on both eleven-bit worlds and sells nothing. Shipped, and the arm is deleted. Closed |
 | **68** | John's: does a conjunction EARN its narrowing? Its premise is half wrong -- reach halves with depth on even worlds and RISES under skew, where correlated codes let a long scope fire as often as a short one. Open |
-| **72** | Relearning after the target moves is slower than learning the world from nothing. Not old rules squatting, not genesis gated, not subsumption eating the repairs -- three predictions, three controls, none of them it. Open |
+| **72** | Relearning after the target moves is slower than learning the world from nothing. ANSWERED: the repair budget, a per-parent LIFETIME cap the lineages that must relearn have already spent. Free recovers, the capped arms do not |
 | **71** | A minted name is a code, so repair adds it for the price of one. Should the separation bar be charged by what a scope's codes STAND FOR rather than by how many there are? Open |

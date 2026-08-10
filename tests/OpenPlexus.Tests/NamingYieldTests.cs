@@ -381,12 +381,14 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         // denominator. If they flatten, there really is a limit in the material and the
         // question survives.
         output.WriteLine($"{Seeds} seeds, {Rounds} rounds, 11 bits even, budget 256");
-        output.WriteLine("sweep every | asked | spoke | named | eligible | names/eligible");
+        output.WriteLine(
+            "sweep every | asked | spoke | again | named | eligible | names/eligible");
 
         foreach (var every in new[] { 2000, 1000, 500, 250, 125 })
         {
             var asked = new List<double>();
             var spoke = new List<double>();
+            var again = new List<double>();
             var named = new List<double>();
             var eligible = new List<double>();
 
@@ -400,13 +402,15 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
 
                 asked.Add(learned.Tally.Asked);
                 spoke.Add(learned.Tally.Spoke);
+                again.Add(learned.Tally.Again);
                 named.Add(learned.Named);
                 eligible.Add(learned.Eligible);
             }
 
             output.WriteLine(
                 $"{every,11} | {asked.Average(),5:F1} | {spoke.Average(),5:F1} "
-                + $"| {named.Average(),5:F1} | {eligible.Average(),8:F1} "
+                + $"| {again.Average(),5:F1} | {named.Average(),5:F1} "
+                + $"| {eligible.Average(),8:F1} "
                 + $"| {named.Average() / eligible.Average(),14:F3}");
         }
 

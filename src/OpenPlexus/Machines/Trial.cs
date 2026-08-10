@@ -237,6 +237,9 @@ public sealed record Tally
     /// <inheritdoc cref="Commitments.Population.Spoke"/>
     public required long Spoke { get; init; }
 
+    /// <inheritdoc cref="Commitments.Population.Again"/>
+    public required long Again { get; init; }
+
     /// <inheritdoc cref="Commitments.Population.AtScarce"/>
     public required long AtScarce { get; init; }
 
@@ -713,6 +716,7 @@ public sealed class Trial<TSeen>
                 Recurrence.Eligible(one, _brain.Dials) && one.Scope.Length >= 3)),
             Asked = holding.Sum(held => held.Asked),
             Spoke = holding.Sum(held => held.Spoke),
+            Again = holding.Sum(held => held.Again),
             AtScarce = holding.Sum(held => held.AtScarce),
             AtUnpaired = holding.Sum(held => held.AtUnpaired),
             AtRare = holding.Sum(held => held.AtRare),

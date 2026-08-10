@@ -81,6 +81,72 @@ public sealed class ScalingTests(ITestOutputHelper output)
     }
 
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_rounds_to_target_costs_as_the_relevant_bits_grow()
+    {
+        // THE NUMBER THIS PROJECT SAYS PREDICTS WHETHER ANY OF IT REACHES PERCEPTION, AND IT
+        // HAS ONLY EVER BEEN READ ON ONE SEED. The check above runs three widths at seed one
+        // and asserts the curve exists to be read; what it cannot do is say whether the
+        // ordering between two widths is a fact or a draw. This repo's own trap: one seed is
+        // not a comparison and will happily invert.
+        //
+        // AND ROUNDS-TO-TARGET IS A CENSORED MEASUREMENT, WHICH IS THE PART A MEAN GETS
+        // WRONG. A seed that never holds the target inside the cap reports nought, and
+        // averaging that in reads as a width that learnt FAST. Averaging it out reads as a
+        // width that learnt fast too, because the slow seeds are exactly the ones dropped. So
+        // the count that reached is printed beside the mean and the mean says it is
+        // conditional on reaching -- neither number means anything without the other.
+        const long Cap = 100_000;
+        const int Seeds = 8;
+
+        output.WriteLine($"{Seeds} seeds, cap {Cap} rounds, target 0.9 on a trailing window");
+        output.WriteLine(" bits | reached | rounds to target (of those) | recent | sound");
+
+        foreach (var address in new[] { 2, 3, 4 })
+        {
+            var reached = new List<double>();
+            var recent = new List<double>();
+            var sound = new List<double>();
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var learned = new MultiplexerRun(
+                    new MultiplexerSettings { Address = address },
+                    new Brain(new CommittingSettings(), seed),
+                    seed).Run(Cap);
+
+                if (learned.Reached > 0) reached.Add(learned.Reached);
+
+                recent.Add(learned.Recent);
+                sound.Add(learned.Sound);
+            }
+
+            output.WriteLine(
+                $"{address + (1 << address),5} | {reached.Count,3}/{Seeds} | "
+                + $"{Spread(reached),27} | {recent.Average(),6:F3} | {sound.Average(),5:F1}");
+        }
+
+        // NO BAR. What the exponent should be has never been measured, and a threshold
+        // written before the first reading with error bars would be the answer rather than
+        // the finding. A width where no seed reaches is a reading and not a gap.
+        return;
+
+        static string Spread(List<double> read)
+        {
+            if (read.Count == 0) return "none reached";
+
+            var mean = read.Average();
+
+            var error = read.Count < 2
+                ? 0.0
+                : Math.Sqrt(read.Sum(one => (one - mean) * (one - mean)) / (read.Count - 1))
+                    / Math.Sqrt(read.Count);
+
+            return $"{mean,9:F0} +/-{error,7:F0}";
+        }
+    }
+
+    [Fact]
     public void Rounds_to_target_reads_a_trailing_window_and_not_a_running_total()
     {
         // A LIFETIME ACCURACY CANNOT CROSS A BAR IT SPENT THE EARLY ROUNDS BELOW, so

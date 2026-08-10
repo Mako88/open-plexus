@@ -94,7 +94,7 @@ jobs:
             "NamingYieldTests.How_long_the_sound_rules",
             "NamingYieldTests.What_bounds_rung_fives_yield",
             "NamingYieldTests.And_a_real_populations_best_pair",
-            "QueryCostTests","RefusalTests","SeparableTests","SharpeningTests",
+            "QueryCostTests","RefusalTests","ScalingTests","SeparableTests","SharpeningTests",
             "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",
             "WeighingTests","WideningTests"
           ]'

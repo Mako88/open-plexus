@@ -124,6 +124,64 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     }
 
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_what_recovery_waits_for_is_genesis()
+    {
+        // THE CANDIDATE LEFT STANDING AFTER THE WRECKAGE STORY DIED, and it follows from what
+        // repair CANNOT do. A flip changes which answer a scope entails, and repair only ever
+        // adds a condition -- it cannot change what a commitment EXPECTS. So every rule the
+        // new target needs has to be minted, and minting is the one operator with a gate in
+        // front of it.
+        //
+        // AND THE GATE IS EXACTLY WRONG-SHAPED FOR THIS. `Surprising.Unaccounted` mints only
+        // where nothing that fired proposed what arrived -- and after a flip the population is
+        // dense, so with two outcomes something proposes the right answer about half the time
+        // by chance alone. Genesis goes quiet precisely when the population most needs new
+        // claims, and that is a self-limiting rule doing what fork 40 already caught it doing
+        // on `Arranged`.
+        //
+        // `AnyFailure` IS A CONTROL AND NOT A PROPOSAL. It walks the whole `code -> outcome`
+        // space and this repo's revival table says so; what it is for here is isolating
+        // whether the gate is what recovery waits on. If the two arms recover alike, genesis
+        // is not the bottleneck and the question is open again.
+        output.WriteLine($"{Seeds} seeds, target moves once at {Settled} rounds");
+        output.WriteLine("genesis      | rounds past the flip: 250 | 1000 | 5000 | minted");
+
+        foreach (var gate in new[] { Surprising.Unaccounted, Surprising.AnyFailure })
+        {
+            var read = new List<string>();
+            var minted = new List<double>();
+
+            foreach (var past in new[] { 250, 1_000, 5_000 })
+            {
+                var recent = new List<double>();
+
+                for (var seed = 1; seed <= Seeds; seed++)
+                {
+                    var learned = new MultiplexerRun(
+                        new MultiplexerSettings { Address = 2, Switch = Settled },
+                        new Brain(new CommittingSettings { Surprising = gate }, seed),
+                        seed).Run(Settled + past);
+
+                    recent.Add(learned.Recent);
+
+                    if (past == 5_000) minted.Add(learned.Tally.Minted);
+                }
+
+                read.Add($"{Sweep.Spread(recent),18}");
+            }
+
+            output.WriteLine(
+                $"{gate,-12} | " + string.Join(" | ", read)
+                + $" | {Sweep.Spread(minted, "F0")}");
+        }
+
+        // NO BAR. Whether the gate is what recovery waits on has never been measured, and a
+        // threshold written before the first reading would be the answer rather than the
+        // finding.
+    }
+
+    [Fact]
     public void The_wreckage_of_a_flip_is_not_what_is_resident_afterwards()
     {
         // THE OBVIOUS EXPLANATION FOR SLOW RECOVERY, AND THIS IS THE CONTROL THAT REFUSES

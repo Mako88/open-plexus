@@ -62,6 +62,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     /// </summary>
     /// <param name="flip">How often the target moves, or nought to leave it still.</param>
     /// <param name="dials">The brain, per seed.</param>
+    /// <param name="address">Address bits, so a finding can be asked at a second width.</param>
     /// <remarks>
     /// <b>ONE COPY BECAUSE `DuplicationTests` REFUSED THE THIRD.</b> Every grid in this file
     /// is the same curve read under a different setting, and three copies of the loop is
@@ -69,7 +70,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     /// would make rows that look comparable and are not. The reading is the row; the walk is
     /// not.
     /// </remarks>
-    private static string Curve(int flip, Func<int, CommittingSettings> dials)
+    private static string Curve(int flip, Func<int, CommittingSettings> dials, int address = 2)
     {
         var read = new List<string>();
 
@@ -79,7 +80,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
 
             for (var seed = 1; seed <= Seeds; seed++)
                 recent.Add(new MultiplexerRun(
-                    new MultiplexerSettings { Address = 2, Switch = flip },
+                    new MultiplexerSettings { Address = address, Switch = flip },
                     new Brain(dials(seed), seed),
                     seed).Run(Settled + past).Recent);
 
@@ -207,19 +208,28 @@ public sealed class RecoveryTests(ITestOutputHelper output)
         // says the budget has an interior optimum on a world that holds still. A grid that
         // moved on both worlds would be re-reading that curve rather than measuring recovery.
         output.WriteLine($"{Seeds} seeds, target moves once at {Settled} rounds");
-        output.WriteLine("world       | budget | rounds past the flip: 250 | 1000 | 5000");
+        output.WriteLine("bits | world       | budget | rounds past the flip: 250 | 1000 | 5000");
 
-        foreach (var (world, flip) in new (string World, int Flip)[]
+        // BOTH WIDTHS, BECAUSE A FINDING ON ONE IS A FINDING ABOUT ONE. Six bits was where
+        // this was first read; eleven is where the repair budget is known to have an interior
+        // optimum on a world that holds still, so it is also where a budget effect could most
+        // easily be that curve arriving in disguise. The stationary rows are what separate
+        // them.
+        foreach (var address in new[] { 2, 3 })
         {
-            ("stationary", 0),
-            ("switching", Settled),
-        })
-        {
-            foreach (var budget in new[] { 64, 256, int.MaxValue })
+            foreach (var (world, flip) in new (string World, int Flip)[]
             {
-                output.WriteLine(
-                    $"{world,-11} | {(budget == int.MaxValue ? "free" : budget.ToString()),6} | "
-                    + Curve(flip, _ => new CommittingSettings { Budget = budget }));
+                ("stationary", 0),
+                ("switching", Settled),
+            })
+            {
+                foreach (var budget in new[] { 64, 256, int.MaxValue })
+                {
+                    output.WriteLine(
+                        $"{address + (1 << address),4} | {world,-11} | "
+                        + $"{(budget == int.MaxValue ? "free" : budget.ToString()),6} | "
+                        + Curve(flip, _ => new CommittingSettings { Budget = budget }, address));
+                }
             }
         }
 

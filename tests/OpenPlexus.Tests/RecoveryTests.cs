@@ -71,6 +71,12 @@ public sealed class RecoveryTests(ITestOutputHelper output)
         // over separate runs of the same seed. Same world, same brain, same draw order up to
         // the flip -- only how long the run continues afterwards differs, which is what makes
         // the row a recovery curve rather than four unrelated numbers.
+        // AND WITH A SPREAD ON EVERY CELL, WHICH THE FIRST TAKE OF THIS GRID DID NOT HAVE.
+        // It printed four rows of bare means and they ordered cleanly, which is exactly the
+        // shape this repo's traps list warns about -- one seed is not a comparison and six
+        // means are not one either unless something says how far apart they are. The
+        // difference this grid exists to find is a few points, and a few points is inside a
+        // seed spread on plenty of worlds.
         output.WriteLine($"{Seeds} seeds, target moves once at {Settled} rounds");
         output.WriteLine("world       | recency | rounds past the flip: 250 | 1000 | 5000");
 
@@ -90,7 +96,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
                 ("~0", Lifetime),
             })
             {
-                var read = new List<double>();
+                var read = new List<string>();
 
                 foreach (var past in new[] { 250, 1_000, 5_000 })
                 {
@@ -102,12 +108,11 @@ public sealed class RecoveryTests(ITestOutputHelper output)
                             new Brain(new CommittingSettings { Recency = recency }, seed),
                             seed).Run(Settled + past).Recent);
 
-                    read.Add(recent.Average());
+                    read.Add($"{Sweep.Spread(recent),18}");
                 }
 
                 output.WriteLine(
-                    $"{world,-11} | {arm,7} | "
-                    + string.Join(" | ", read.Select(one => $"{one,24:F3}")));
+                    $"{world,-11} | {arm,7} | " + string.Join(" | ", read));
             }
         }
 

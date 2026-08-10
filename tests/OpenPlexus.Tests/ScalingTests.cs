@@ -123,27 +123,13 @@ public sealed class ScalingTests(ITestOutputHelper output)
 
             output.WriteLine(
                 $"{address + (1 << address),5} | {reached.Count,3}/{Seeds} | "
-                + $"{Spread(reached),27} | {recent.Average(),6:F3} | {sound.Average(),5:F1}");
+                + $"{(reached.Count == 0 ? "none reached" : Sweep.Spread(reached, "F0")),27} "
+                + $"| {recent.Average(),6:F3} | {sound.Average(),5:F1}");
         }
 
         // NO BAR. What the exponent should be has never been measured, and a threshold
         // written before the first reading with error bars would be the answer rather than
         // the finding. A width where no seed reaches is a reading and not a gap.
-        return;
-
-        static string Spread(List<double> read)
-        {
-            if (read.Count == 0) return "none reached";
-
-            var mean = read.Average();
-
-            var error = read.Count < 2
-                ? 0.0
-                : Math.Sqrt(read.Sum(one => (one - mean) * (one - mean)) / (read.Count - 1))
-                    / Math.Sqrt(read.Count);
-
-            return $"{mean,9:F0} +/-{error,7:F0}";
-        }
     }
 
     [Fact]

@@ -828,25 +828,13 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
                 $"{(budget == Unlimited ? "free" : budget.ToString()),6} "
                 + $"| {scoped[budget].Average(),7:F1} | {paired[budget].Average(),7:F1} "
                 + $"| {shared[budget].Average(),7:F3} | {apart[budget].Average(),8:F3} "
-                + $"| {Spread(peaked[budget])}");
+                + $"| {Sweep.Spread(peaked[budget], "F2")}");
         }
 
         // NO BAR. What a redundancy's counts should do as a population grows has never been
         // measured, and a threshold written before the first reading is a prediction dressed
         // as a requirement. The grid is the finding.
         return;
-
-        static string Spread(List<double> read)
-        {
-            var mean = read.Average();
-
-            var error = read.Count < 2
-                ? 0.0
-                : Math.Sqrt(read.Sum(one => (one - mean) * (one - mean)) / (read.Count - 1))
-                    / Math.Sqrt(read.Count);
-
-            return $"{mean,5:F2} +/-{error,5:F2}";
-        }
 
         void Follow(int seed)
         {

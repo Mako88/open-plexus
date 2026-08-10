@@ -116,6 +116,30 @@ public static class Sweep
     private const uint Purpose = 0x5EED_0001;
 
     /// <summary>
+    /// A column of per-seed readings as <c>mean +/- standard error</c>, for the grids that
+    /// print themselves rather than going through <see cref="Table"/>.
+    /// </summary>
+    /// <param name="read">One value a seed.</param>
+    /// <param name="format">How to render both numbers.</param>
+    /// <remarks>
+    /// <b>HERE BECAUSE IT WAS WRITTEN BY HAND THREE TIMES AND `DuplicationTests` REFUSED THE
+    /// THIRD.</b> Not every grid fits <see cref="AcrossAsync"/> — some cross two axes, some
+    /// print a curve along a row — but every one of them still owes a spread, and three
+    /// private copies of a standard error is three chances for one grid's bars to mean
+    /// something different from the grid it is read against. <see cref="Measured"/> already
+    /// computes both; this only formats them.
+    /// </remarks>
+    public static string Spread(IReadOnlyList<double> read, string format = "F3")
+    {
+        ArgumentNullException.ThrowIfNull(read);
+
+        var measured = new Measured { Arm = string.Empty, Values = [.. read] };
+
+        return $"{measured.Mean.ToString(format, CultureInfo.InvariantCulture)} "
+            + $"+/-{measured.StdErr.ToString(format, CultureInfo.InvariantCulture)}";
+    }
+
+    /// <summary>
     /// Runs one arm across <paramref name="seeds"/> seeds.
     /// </summary>
     /// <remarks>

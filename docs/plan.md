@@ -733,6 +733,9 @@ change of architecture entirely.
   expensive to add.
 - **A SEARCH STEP OF TWO CODES IS A GATE PAID ONCE.** Repair clears the separation bar per
   code added; a minted name standing for two enters on that single clearance.
+- **AN ACCURACY COMPARISON BETWEEN ARMS HOLDING DIFFERENT NUMBERS OF RULES WAS BIASED WHILE
+  THE VOTE WAS A SUM.** The population is identical under both votes, measured; only the
+  ballot changed, and a sum scales with the count.
 - **TWO ARMS THAT SCORE ALIKE NEED NOT BE THE SAME MECHANISM, AND A SCORE CANNOT SAY.** A cap
   that refuses nothing and a cap that refuses a lot read identically until something counts
   what was BUILT. Four grids in one session.

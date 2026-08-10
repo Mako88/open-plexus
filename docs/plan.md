@@ -960,6 +960,9 @@ change of architecture entirely.
 - **AND THE NAMING LOOP WAS THAT AXIS FROM THE OTHER END.** A minted name let repair step two
   codes and it OVERSHOT the minimum depth; one code at a time undershoots it for three steps.
   Nothing in the machine knows the depth.
+- **AND SUBSUMPTION IS NOT CUTTING THE CHAIN: KEEPING MORE RUNGS BUYS FEWER CARRIERS.** The
+  stricter rule holds more residents and lowers the hit rate on all three worlds. Pruning is
+  part of the search rather than a tax on it.
 - **THE OVER-SPECIALISATION STORY IS REFUTED BY ITS OWN NUMBER.** A child beats a sound
   parent on a fortieth of wrong rounds, so the vote preferring the narrower rule costs
   nothing measurable.

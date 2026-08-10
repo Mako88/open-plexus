@@ -55,6 +55,8 @@ public sealed class ScoreboardTests(ITestOutputHelper output)
     /// ordinary shift in either direction passes and a mechanism going missing
     /// does not.
     /// </param>
+    /// <param name="World">Which world the row is about.</param>
+    /// <param name="Result">What it scored.</param>
     /// <param name="Ceiling">
     /// The most this world may spend in messages. <b>Roughly twice what it spends
     /// today</b>, because the failure being caught is a walk that exploded rather

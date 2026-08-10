@@ -10,6 +10,22 @@
          greps xUnit analyser warnings too, so a local build that ignores them
          disagrees with the one that decides. -->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <!-- A `cref` INTO A DELETED TYPE IS A COMPILER ERROR, AND IT WAS NOT ONE HERE.
+         `DocsTests` says the XML comments beside the code cannot go stale because
+         CS1574 fails the build - true of the library, which generates a doc file,
+         and false of this project, which did not. So the day two vote arms were
+         deleted, five test files went on explaining themselves in terms of them
+         and nothing said a word. Turning the doc file on turns that class of rot
+         into a build failure here too. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- AND ONLY THAT CLASS. CS1591 wants a comment on every public member, which
+         for a test project means every `[Fact]` - a rule nobody wants and which
+         would bury the one that matters. What is kept is the checks that read what
+         a comment SAYS: a cref that does not resolve, a param that names no
+         parameter. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

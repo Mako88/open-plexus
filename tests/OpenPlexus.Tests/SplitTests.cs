@@ -57,7 +57,6 @@ public sealed class SplitTests(ITestOutputHelper output)
     /// <summary>
     /// A trained population, and moments it has never been taught on.
     /// </summary>
-    /// <param name="weighing">How advocates for one expectation combine.</param>
     /// <param name="seed">The world's generator and the brain's.</param>
     /// <remarks>
     /// <b>THE MOMENTS ARE DRAWN AFTER TRAINING AND NOTHING IS TAUGHT ON THEM.</b> Every

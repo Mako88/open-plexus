@@ -246,7 +246,7 @@ public sealed class RepairingTests(ITestOutputHelper output)
     /// <para>
     /// <b>`AskedTests` ASSERTS THAT A TRAINED POPULATION HAS SOMETHING WORTH NAMING BEFORE
     /// IT TESTS THE WIRE, AND UNDER <see cref="Repairing.EveryRound"/> IT HAS NOT.</b>
-    /// <see cref="Abstracting.Shared"/> came back empty at eleven bits, which is a fact
+    /// <see cref="Abstracting.Shared(Recurrence, CommittingSettings)"/> came back empty at eleven bits, which is a fact
     /// about the population rather than about the socket — and it is the one cost of this
     /// timing that no grid here would have shown, because every reading taken so far is
     /// about rules and none is about NAMES.
@@ -296,8 +296,6 @@ public sealed class RepairingTests(ITestOutputHelper output)
     }
 
     /// <summary>Every reading one arm produces on one world, across the seeds.</summary>
-    /// <param name="settings">The world.</param>
-    /// <param name="dials">The arm.</param>
     /// <remarks>
     /// <b>THE SEEDS ARE MIXED AND THE ARMS SHARE THEM</b>, which is what makes the second
     /// column a control rather than a second experiment — see <c>Sweep.ArmAsync</c>, whose
@@ -351,6 +349,8 @@ public sealed class RepairingTests(ITestOutputHelper output)
         }
     }
 
+    /// <param name="settings">The world.</param>
+    /// <param name="dials">The arm.</param>
     /// <param name="runs">How many seeds, since a curve gets fewer than a grid.</param>
     private static Dictionary<string, Measured> Take(
         MultiplexerSettings settings, CommittingSettings dials, int runs)

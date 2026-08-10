@@ -18,7 +18,7 @@ namespace OpenPlexus.Tests;
 /// world look like if I do X* was not a question the row could answer.
 /// </para>
 /// <para>
-/// <b>The measurement is <see cref="Consequence"/>'s and is untouched.</b> Same
+/// <b>The measurement is <c>Consequence</c>'s and is untouched.</b> Same
 /// three arms, same prequential scoring. Only what the front end says about order
 /// and what the prediction asks for change.
 /// </para>

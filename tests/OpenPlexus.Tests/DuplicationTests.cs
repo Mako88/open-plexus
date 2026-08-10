@@ -68,7 +68,7 @@ public sealed class DuplicationTests
     /// <remarks>
     /// <para>
     /// <b>ADDED 2026-08-04, AND THE REASON MATTERS MORE THAN THE PATTERN.</b> The
-    /// dials moved out of the worlds and into <see cref="WalkSettings"/>, so every
+    /// dials moved out of the worlds and into <c>WalkSettings</c>, so every
     /// world runner's constructor now reads <c>(settings, dials, seed, clusters,
     /// replicas)</c> — IDENTICALLY, ON PURPOSE. That uniformity is the whole point
     /// of the change: a world says what it is looking at and nothing else.

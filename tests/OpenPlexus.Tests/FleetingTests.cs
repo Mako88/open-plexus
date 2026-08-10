@@ -164,6 +164,7 @@ public sealed class FleetingTests
             + "have stopped costing a row at all and there is nothing here to bound");
     }
 
+    /// <param name="fleeting">Whether the arm under test is on.</param>
     /// <param name="row">
     /// The row cap. <b>Lift it for the width comparison</b> — the shipped 32 is
     /// below what either arm reaches, so both saturate and report the bound.

@@ -97,7 +97,6 @@ public sealed class AskedTests(ITestOutputHelper output)
 
     /// <summary>A population trained on the multiplexer, and the dials it ran under.</summary>
     /// <param name="address">Address bits.</param>
-    /// <param name="weighing">How advocates for one expectation combine.</param>
     /// <remarks>
     /// <para>
     /// <b>THE TIMING IS PINNED HERE BECAUSE THIS FILE IS ABOUT THE WIRE AND NOT ABOUT THE

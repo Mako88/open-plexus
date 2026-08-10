@@ -20,6 +20,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         new() { Side = 3, Cell = 3, Clutter = 1, Hold = 4 };
 
     /// <summary>Five seeds of one configuration, and what the last one left behind.</summary>
+    /// <param name="world">The scene the seeds are drawn from.</param>
     /// <param name="dials">The brain, built once and handed to every seed.</param>
     /// <param name="looking">How the picture is cut up.</param>
     /// <remarks>

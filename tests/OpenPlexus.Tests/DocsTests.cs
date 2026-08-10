@@ -23,6 +23,15 @@ namespace OpenPlexus.Tests;
 /// types deleted weeks earlier on the day it was switched on.
 /// </para>
 /// <para>
+/// <b>AND IT WAS ON FOR THE LIBRARY ONLY, WHICH MEANT THE TESTS ROTTED FREELY.</b> The
+/// sentence above was written about one project and read as being about the tree, so a test
+/// citing a deleted type compiled quietly — five files went on explaining themselves in
+/// terms of two vote arms that had been removed. It is on for this project now, with
+/// CS1591 muted so the rule is <i>what a comment SAYS must resolve</i> rather than <i>every
+/// member must have one</i>. Switching it on found twenty-six: six crefs into things that
+/// no longer exist, and twenty param tags that had drifted off their signatures.
+/// </para>
+/// <para>
 /// <b>So this file is down to what a compiler cannot check: is the one remaining
 /// doc still small, and do the fork numbers the code cites still resolve.</b>
 /// </para>

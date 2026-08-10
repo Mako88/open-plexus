@@ -136,8 +136,11 @@ public sealed class ClevrTests(ITestOutputHelper output)
     /// </remarks>
     private const int Scenes = 700;
 
+    /// <param name="refer">How a question names what it is about.</param>
+    /// <param name="pricing">How a scene is priced.</param>
+    /// <param name="scenes">How many scenes are drawn.</param>
     /// <param name="row">
-    /// The row cap. <b>Lift it for anything reading <see cref="ClevrResult.Widest"/></b>
+    /// The row cap. <b>Lift it for anything reading <c>ClevrResult.Widest</c></b>
     /// — entries are clipped at the cap, so a saturated row reports the bound and
     /// not the graph. See the row-growth test below.
     /// </param>

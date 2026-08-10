@@ -21,7 +21,7 @@ namespace OpenPlexus.Tests;
 /// </para>
 /// <para>
 /// <b>AND ABSTRACTION'S EVIDENCE IS THE POPULATION, WHICH IS PRECISELY WHAT GETS
-/// SPLIT.</b> <see cref="Abstracting.Shared"/> reads every resident scope, counts which
+/// SPLIT.</b> <see cref="Abstracting.Shared(Recurrence, CommittingSettings)"/> reads every resident scope, counts which
 /// pairs recur across them, and names the pair that beats what independent scopes would
 /// have produced. Sharding cuts the scopes each holder can see, so it moves all three
 /// terms at once: the count a pair must reach, the marginal frequencies it is tested

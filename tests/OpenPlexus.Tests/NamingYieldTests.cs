@@ -902,6 +902,8 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     }
 
     /// <param name="budget">How many separation attempts one parent may ever spend.</param>
+    /// <param name="address">Address bits.</param>
+    /// <param name="skew">How often a data bit is one, or zero to leave them even.</param>
     /// <param name="seed">The world's generator and the brain's.</param>
     /// <remarks>
     /// <b>THE SHIPPED TIMING, UNSWEPT.</b> The budget read as inert under the old timing

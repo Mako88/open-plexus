@@ -58,12 +58,10 @@ public sealed class GateCostTests(ITestOutputHelper output)
     private readonly Dictionary<(int Holders, int Seed), Learned> _ran = [];
 
     /// <summary>Runs the world with the repair gate seeing one holder's worth.</summary>
-    /// <param name="holders">How many machines the population is spread over.</param>
-    /// <param name="seed">The world's generator and the brain's.</param>
     /// <remarks>
     /// <para>
     /// <b>`Mending.Uncovered` EXPLICITLY, BECAUSE THE DEFAULT HAS NO GATE TO BLIND.</b>
-    /// <see cref="Mending.Outvoted"/> ships as the default and short-circuits the narrows
+    /// <c>Mending.Outvoted</c> ships as the default and short-circuits the narrows
     /// check outright, so a sweep run on defaults returns three identical arms — which is
     /// what the first version of this file did, and the wiring assertion below is what
     /// caught it. Fork 37 keeps `Uncovered` as a live arm, best on the clean multiplexer

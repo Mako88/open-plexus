@@ -14,12 +14,12 @@ namespace OpenPlexus.Tests;
 /// <b>THE SETTING DECIDES TWO INDEPENDENT THINGS AND IS NAMED FOR ONE.</b> Whether repair
 /// runs every round or only after the vote was wrong is decided in <c>Cycle</c>;
 /// whether a commitment something else already narrows may be repaired at all is decided
-/// in <c>Population.Mend</c>. <see cref="Mending.Outvoted"/> is after-failure with no
+/// in <c>Population.Mend</c>. <c>Mending.Outvoted</c> is after-failure with no
 /// gate, <see cref="Mending.Uncovered"/> is every-round WITH the gate — so the two differ
 /// in both, and no measurement of them can say which half did anything.
 /// </para>
 /// <para>
-/// <b><see cref="Mending.Neglected"/> IS THE CELL THAT SEPARATES THEM AND HAS NEVER BEEN
+/// <b><c>Mending.Neglected</c> IS THE CELL THAT SEPARATES THEM AND HAS NEVER BEEN
 /// READ AS ONE.</b> It waits for the failure like <c>Outvoted</c> and takes the gate like
 /// <c>Uncovered</c>, so <c>Outvoted</c> against it isolates the GATE and it against
 /// <c>Uncovered</c> isolates WHEN. The fourth cell — every round with no gate — is not a

@@ -187,6 +187,49 @@ public sealed class RecoveryTests(ITestOutputHelper output)
 
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_the_parents_that_must_relearn_have_spent_their_budget()
+    {
+        // THE FOURTH ACCOUNT, AND IT IS A STRUCTURAL ASYMMETRY RATHER THAN AN OPERATOR MISBE-
+        // HAVING. Repair adds a CONDITION and never changes what a commitment expects, so
+        // every rule a moved target needs has to descend from a parent that ALREADY expects
+        // the new answer -- and those are precisely the parents that spent twenty thousand
+        // rounds being wrong. `Budget` is per parent and counts attempts, and this doc's own
+        // row says most of it goes on re-derivation, so the lineages that must now do the
+        // work arrive at the flip with theirs largely gone.
+        //
+        // WHICH IS THE ONE THING THAT DIFFERS BETWEEN RELEARNING AND LEARNING FROM NOTHING.
+        // From scratch every parent has a full budget; after a flip the ones that matter do
+        // not. If that is the bottleneck, a free budget recovers faster and a smaller one is
+        // worse; if the three arms come back level, the budget is not what the window is
+        // short of and the asymmetry is somewhere else.
+        //
+        // AND THE STATIONARY CONTROL IS NOT OPTIONAL HERE, because `BudgetCurveTests` already
+        // says the budget has an interior optimum on a world that holds still. A grid that
+        // moved on both worlds would be re-reading that curve rather than measuring recovery.
+        output.WriteLine($"{Seeds} seeds, target moves once at {Settled} rounds");
+        output.WriteLine("world       | budget | rounds past the flip: 250 | 1000 | 5000");
+
+        foreach (var (world, flip) in new (string World, int Flip)[]
+        {
+            ("stationary", 0),
+            ("switching", Settled),
+        })
+        {
+            foreach (var budget in new[] { 64, 256, int.MaxValue })
+            {
+                output.WriteLine(
+                    $"{world,-11} | {(budget == int.MaxValue ? "free" : budget.ToString()),6} | "
+                    + Curve(flip, _ => new CommittingSettings { Budget = budget }));
+            }
+        }
+
+        // NO BAR. Which of the two the window is short of has never been measured, and a
+        // threshold written before the first reading would be the answer rather than the
+        // finding.
+    }
+
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_a_subsumption_that_demands_significance_recovers_faster()
     {
         // THE THIRD ACCOUNT, AND ITS PREDICTION IS IN THE COMMIT THAT SHIPPED THE READING

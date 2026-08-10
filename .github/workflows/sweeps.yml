@@ -97,6 +97,7 @@ jobs:
             "RecoveryTests.What_a_moving_target",
             "RecoveryTests.Whether_what_recovery_waits_for",
             "RecoveryTests.Whether_a_subsumption",
+            "RecoveryTests.Whether_the_parents_that_must_relearn",
             "QueryCostTests","RefusalTests","ScalingTests",
             "SeparableTests",
             "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",

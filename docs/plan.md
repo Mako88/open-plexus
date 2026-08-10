@@ -765,9 +765,12 @@ change of architecture entirely.
   six or more.
 - **AND EVERY ARM THAT RAISED THE SOUND COUNT RAISED THE LONG ONES FASTEST**, which is why
   that count cannot rank anything on its own. `Census.Paying` is the column that can.
-- **ROUNDS-TO-TARGET GROWS FAST IN THE RELEVANT BITS.** Six, eleven and twenty differ
-  by one relevant bit each; the cost between them does not grow by one. That is the
-  number that predicts whether any of this reaches perception.
+- **ROUNDS-TO-TARGET ACCELERATES IN THE RELEVANT BITS, WITH ERROR BARS AT LAST.** Six to
+  eleven is under twofold; eleven to twenty is nearly sixfold. That is the number that
+  predicts whether any of this reaches perception.
+- **AND THE WIDEST WIDTH IS CENSORED, SO IT UNDERSTATES.** A quarter of seeds never hold the
+  target inside the cap, and those are the slow ones. The true step is worse than the one
+  printed.
 - **`Abstain` FIRES AT LAST, AND WHAT ARMED IT WAS A SIGNATURE AND NOT A FLEET.** The loop
   took a non-nullable outcome, so no number of machines and no number of deaths could ever
   have produced one.

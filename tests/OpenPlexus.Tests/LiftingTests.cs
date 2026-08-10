@@ -32,6 +32,68 @@ public sealed class LiftingTests(ITestOutputHelper output)
 {
     private const long Rounds = 20_000;
 
+    [Fact]
+    public void Under_the_shipped_timing_the_three_rules_build_one_population_and_differ_only_in_the_answer()
+    {
+        // THE PROPERTY THE GRID BELOW CANNOT BE READ WITHOUT, AND IT HAS NEVER BEEN ASSERTED
+        // ANYWHERE. For most of this branch's life every vote arm was a SEARCH arm too:
+        // repair ran only on a round the winner got wrong, so changing who wins changed what
+        // gets built, and no comparison between vote rules was ever only a readout.
+        // `Repairing.EveryRound` cut that wire, and what is left should be three rules that
+        // answer differently over an identical population.
+        //
+        // AND IT IS ASSERTED PER SEED RATHER THAN ON A MEAN, because two populations can
+        // average alike and share not one commitment. Equality here says the arms did not
+        // merely end up the same size -- covering, repair, subsumption and culling all ran
+        // blind to the vote, which is what makes the sweep beside this a readout comparison.
+        //
+        // AND IT GOES RED UNDER `AfterFailure`, WHICH IS HOW IT IS KNOWN TO BE ABLE TO FIRE.
+        // A check written green is a check that may be wired to nothing.
+        //
+        // AND THE ANSWERS MUST DIFFER, OR THIS IS A CHECK ON THREE UNWIRED ARMS. A prediction
+        // written into a wiring check fails two ways and reads the same, so the difference is
+        // asserted where it lives and never in a direction.
+        var arms = new Dictionary<Weighing, List<Learned>>();
+
+        foreach (var weighing in new[] { Weighing.Summing, Weighing.Strongest, Weighing.Lifting })
+        {
+            arms[weighing] = [];
+
+            for (var seed = 1; seed <= 3; seed++)
+                arms[weighing].Add(new MultiplexerRun(
+                    // SKEWED, BECAUSE THAT IS WHERE THE THREE RULES ARE FURTHEST APART. On an
+                    // even world `Lifting` divides every candidate by the same number and IS
+                    // `Strongest` exactly, so a green line there would say nothing.
+                    new MultiplexerSettings { Address = 3, Skew = 0.8 },
+                    new Brain(new CommittingSettings { Weighing = weighing }, seed),
+                    seed).Run(6_000));
+        }
+
+        output.WriteLine("seed | arm        | sound | resident | found | recent");
+
+        foreach (var (weighing, runs) in arms)
+            for (var seed = 0; seed < runs.Count; seed++)
+                output.WriteLine(
+                    $"{seed + 1,4} | {weighing,-10} | {runs[seed].Sound,5} "
+                    + $"| {runs[seed].Resident,8} | {runs[seed].Found,5} "
+                    + $"| {runs[seed].Recent,6:F3}");
+
+        foreach (var weighing in new[] { Weighing.Strongest, Weighing.Lifting })
+            for (var seed = 0; seed < 3; seed++)
+            {
+                var against = arms[Weighing.Summing][seed];
+                var arm = arms[weighing][seed];
+
+                Assert.Equal(against.Sound, arm.Sound);
+                Assert.Equal(against.Unsound, arm.Unsound);
+                Assert.Equal(against.Resident, arm.Resident);
+                Assert.Equal(against.Found, arm.Found);
+            }
+
+        Assert.NotEqual(
+            arms[Weighing.Summing][0].Recent, arms[Weighing.Strongest][0].Recent);
+    }
+
     /// <summary>The spread of base rates over what a trained population expects.</summary>
     /// <param name="held">The population.</param>
     /// <remarks>

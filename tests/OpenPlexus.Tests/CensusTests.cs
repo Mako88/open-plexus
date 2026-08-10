@@ -136,7 +136,8 @@ public sealed class CensusTests(ITestOutputHelper output)
             output.WriteLine(
                 $"{"",16} | carriers {census.Carriers,5} | of them from repair "
                 + $"{census.Narrowed,5} | repairs made {learned.Repaired,6} "
-                + $"| paid off {(learned.Repaired == 0 ? 0.0 : census.Narrowed / (double)learned.Repaired),6:P2}");
+                + $"| paid off {(learned.Repaired == 0 ? 0.0 : census.Narrowed / (double)learned.Repaired),6:P2} "
+                + $"| their mean scope {census.Codes,5:F2}");
 
             output.WriteLine(
                 $"{"",16} | uncovered {census.Uncovered,6} | unreachable "

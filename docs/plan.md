@@ -952,6 +952,11 @@ change of architecture entirely.
   genesis contributes none. Repair is the only source of coverage a base rate cannot give.
 - **AND FOUR TO TWENTY-SIX PER CENT OF REPAIRS EVER BUY ONE**, falling with width and with
   skew. That is the search's hit rate, and it is lowest where the world is hardest.
+- **AND THE ONES THAT PAY SIT AT THE WORLD'S MINIMUM SOUND DEPTH** — three codes at six bits,
+  four at eleven, plus a fraction. Every step below it pays nothing by construction.
+- **WHICH MAKES THE HIT RATE AND THE SCALING EXPONENT ONE PHENOMENON.** A wider world needs a
+  longer chain and only a completed chain pays, so a relevant bit costs another step that must
+  not go wrong.
 - **THE OVER-SPECIALISATION STORY IS REFUTED BY ITS OWN NUMBER.** A child beats a sound
   parent on a fortieth of wrong rounds, so the vote preferring the narrower rule costs
   nothing measurable.

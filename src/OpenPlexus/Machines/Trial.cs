@@ -443,6 +443,19 @@ public sealed record Census
     /// </remarks>
     public required long Narrowed { get; init; }
 
+    /// <summary>
+    /// The mean scope length of the repairs that paid — <b>whether the coverage comes from
+    /// shallow narrowing or from deep chains.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE CHEAPEST DISCRIMINATOR FORK 73 HAS, AND IT NEEDS NOTHING NEW.</b> Repair adds
+    /// one code at a time, so a scope of four took three separations and a scope of two took
+    /// one. If the rules that buy hard rounds are the deep ones, the four in five repairs
+    /// that never pay are the price of reaching them and the budget is buying depth. If they
+    /// are the shallow ones, the deep chains are the waste and something should stop them.
+    /// </remarks>
+    public required double Codes { get; init; }
+
     /// <summary>Wrong rounds decided by a commitment that had not yet been tested.</summary>
     /// <remarks>
     /// <para>
@@ -650,7 +663,7 @@ public sealed class Trial<TSeen>
         long unreachable = 0, ineligible = 0;
 
         var carriers = new HashSet<Code>();
-        var narrowed = new HashSet<Code>();
+        var narrowed = new Dictionary<Code, int>();
 
         // WHAT THE WORLD PRODUCES MOST, LEARNT AS IT GOES. Taking the base rate from the
         // world would score the machine against a number it is not allowed to see, and
@@ -719,7 +732,7 @@ public sealed class Trial<TSeen>
                             // mints one code and nothing longer. So this is the count of
                             // repairs that ever bought a hard round, against the thousands
                             // that were made.
-                            if (one.Scope.Length > 1) narrowed.Add(one.Identity);
+                            if (one.Scope.Length > 1) narrowed[one.Identity] = one.Scope.Length;
                         }
                     }
                 }
@@ -849,6 +862,9 @@ public sealed class Trial<TSeen>
                     Ineligible = ineligible,
                     Carriers = carriers.Count,
                     Narrowed = narrowed.Count,
+                    Codes = narrowed.Count == 0
+                        ? 0.0
+                        : narrowed.Values.Average(),
                     Deeper = deeper,
                     Untested = untested,
                     Hard = hard,

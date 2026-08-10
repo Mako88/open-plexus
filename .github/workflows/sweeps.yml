@@ -98,6 +98,7 @@ jobs:
             "RecoveryTests.Whether_what_recovery_waits_for",
             "RecoveryTests.Whether_a_subsumption",
             "RecoveryTests.Whether_the_parents_that_must_relearn",
+            "RecoveryTests.Whether_a_budget_on_children",
             "QueryCostTests","RefusalTests","ScalingTests",
             "SeparableTests",
             "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",

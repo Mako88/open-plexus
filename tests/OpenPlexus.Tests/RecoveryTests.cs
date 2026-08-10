@@ -188,6 +188,67 @@ public sealed class RecoveryTests(ITestOutputHelper output)
 
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_a_budget_on_children_rather_than_attempts_is_what_C4_wanted()
+    {
+        // THE ANSWER TO FORK 72 NAMES A MECHANISM THAT IS ALREADY BUILT, and this is the
+        // reading that says whether it is the one. A per-parent budget in ATTEMPTS is a
+        // lifetime cap on EFFORT: spend it being wrong for twenty thousand rounds and there is
+        // none left when the target moves. `Budgeting.Children` charges only for a child the
+        // parent has not reached before, so it caps what a parent may HOLD rather than what it
+        // may try -- a memory bound instead of a time bound, and a memory bound assumes
+        // nothing about how long a parent lives.
+        //
+        // WHICH IS EXACTLY WHAT C4 ASKS FOR. *No episode boundary, so nothing may depend on
+        // train-then-test* -- and a total spent over a life is a bet that the life is one
+        // episode. This is the one arm in the census that is not such a bet.
+        //
+        // AND IT HAS READ AS INERT FOR THE LIFE OF THE BRANCH, WHICH IS THE POINT. Distinct
+        // children are capped by the vocabulary far below the budget -- twelve at six bits,
+        // twenty-two at eleven, against sixty-four -- so `Children` has never bound on any
+        // world here and is indistinguishable from a free budget. On a world that holds still
+        // that made it look like an arm with nothing to say. Free is what recovers, so a
+        // moving world is the cell that separates them, and `DialTests` has been carrying
+        // this row waiting for a world whose vocabulary reaches the budget when the separator
+        // was non-stationarity all along.
+        //
+        // THE PREDICTION: `Children` recovers like free on the switching world and sits with
+        // `Attempts` on the stationary one. If it recovers no better than `Attempts`, the
+        // budget's shape is not what matters and only its SIZE is -- which would make the
+        // finding about a number rather than about C4.
+        output.WriteLine($"{Seeds} seeds, target moves once at {Settled} rounds, budget 64");
+        output.WriteLine("bits | world       | budgeting | rounds past the flip: 250 | 1000 | 5000");
+
+        foreach (var address in new[] { 2, 3 })
+        {
+            foreach (var (world, flip) in new (string World, int Flip)[]
+            {
+                ("stationary", 0),
+                ("switching", Settled),
+            })
+            {
+                foreach (var counting in new[] { Budgeting.Attempts, Budgeting.Children })
+                {
+                    output.WriteLine(
+                        $"{address + (1 << address),4} | {world,-11} | {counting,-9} | "
+                        + Curve(
+                            flip,
+                            // SIXTY-FOUR RATHER THAN THE SHIPPED LEVEL, because the question is
+                            // what the budget COUNTS and not how big it is. At the shipped 256
+                            // the attempts arm is already close to free at six bits, which
+                            // would leave the two arms with nothing to differ about.
+                            _ => new CommittingSettings { Budget = 64, Budgeting = counting },
+                            address));
+                }
+            }
+        }
+
+        // NO BAR. Whether the budget's shape or its size is what recovery is short of has
+        // never been measured, and a threshold written before the first reading would be the
+        // answer rather than the finding.
+    }
+
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_the_parents_that_must_relearn_have_spent_their_budget()
     {
         // THE FOURTH ACCOUNT, AND IT IS A STRUCTURAL ASYMMETRY RATHER THAN AN OPERATOR MISBE-

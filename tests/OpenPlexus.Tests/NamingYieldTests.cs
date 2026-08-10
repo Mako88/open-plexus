@@ -658,6 +658,92 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     }
 
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_the_loops_extra_sound_rules_stand_on_a_name_at_all()
+    {
+        // THE STANDING EXPLANATION FOR A MEASURED GAIN, WITH NOTHING UNDER IT. Naming until
+        // the gate refuses holds two fifths to two thirds more rules TRUE of the world, and
+        // the vocabulary reading refuted the obvious account of why: not one name in 258
+        // groups the address, so what is minted is not the world's concept. What was written
+        // in its place was *shorter scopes are doing it*, which is a sentence and not a
+        // reading.
+        //
+        // AND THE MECHANISM IT PROPOSES IS DECIDABLE HERE, WHICH IS WHY THIS IS CHEAP. A
+        // minted name is ADDED to every moment holding its members, so it is a code like any
+        // other -- and repair adds ONE code at a time. A name standing for two bits is
+        // therefore a step of two: a four-code conjunction that took three separations to
+        // reach takes two, and each one has to clear the gate on its own evidence. If that is
+        // what pays, the loop's extra sound rules HOLD a name and are longer once spelled
+        // out. If they do not, naming's effect on what gets built is indirect and the
+        // sentence in the plan is wrong.
+        //
+        // SO THE READING IS TAKEN OVER THE SOUND RULES THEMSELVES rather than over the
+        // vocabulary, which is the half `What_the_minted_names_actually_stand_for` could not
+        // see. A name nobody built on is a name whatever it means.
+        foreach (var (address, skew) in Fixture.Curve)
+        {
+            output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}, "
+                + $"{Seeds} seeds, {Rounds} rounds ===");
+
+            output.WriteLine(
+                "arm          |  sound | on a name | mean codes | unfolded length 1..6+");
+
+            foreach (var arm in (Minting[])[Minting.Once, Minting.UntilRefused])
+            {
+                var sound = 0;
+                var standing = 0;
+                var members = 0.0;
+                var lengths = new int[7];
+
+                for (var seed = 1; seed <= Seeds; seed++)
+                {
+                    var settings = new MultiplexerSettings { Address = address, Skew = skew };
+                    var dials = new CommittingSettings { Minting = arm };
+                    var brain = new Brain(dials, seed);
+
+                    new MultiplexerRun(settings, brain, seed).Run(Rounds);
+
+                    var held = brain.Held;
+
+                    // THE SAME THREE FILTERS `Learned.Grade` APPLIES, IN THE SAME ORDER, so
+                    // the `sound` column here is the `sound` column there and the two grids
+                    // can be read against each other. A soundness count taken over a
+                    // different denominator is a different number wearing this one's name.
+                    var world = new Multiplexer(settings, seed);
+
+                    foreach (var one in held.All.Where(one => one.Seen >= dials.Floor))
+                    {
+                        var unfolded = held.Names.Unfold(one.Scope);
+
+                        if (!world.Checkable(unfolded)) continue;
+                        if (!world.Sound(unfolded, one.Expects)) continue;
+
+                        sound++;
+                        members += unfolded.Length;
+                        lengths[Math.Min(unfolded.Length, 6)]++;
+
+                        // THE SCOPE AS HELD AND NOT AS SPELLED OUT, which is the whole
+                        // question. A rule that reached four bits through a name is a rule
+                        // repair got to in two steps rather than three.
+                        if (one.Scope.Any(held.Names.Knows)) standing++;
+                    }
+                }
+
+                output.WriteLine(
+                    $"{arm,-12} | {sound,6} | {(sound == 0 ? 0.0 : standing / (double)sound),9:P1} "
+                    + $"| {(sound == 0 ? 0.0 : members / sound),10:F2} | "
+                    + string.Join(" ", lengths.Skip(1).Select(one => $"{one,5}")));
+            }
+
+            output.WriteLine("");
+        }
+
+        // NO BAR. Which of the two accounts is right is what this reports, and a threshold
+        // written first would be the answer rather than the reading. What it CANNOT settle is
+        // whether the step is worth having -- that is `paying` in the grid beside it.
+    }
+
+    [Fact]
     public void However_many_names_a_sweep_mints_the_holders_mint_the_same_ones()
     {
         // THE PROPERTY THE WHOLE NAMING-OVER-A-WIRE ARC EXISTS FOR, ASSERTED WHERE MINTING

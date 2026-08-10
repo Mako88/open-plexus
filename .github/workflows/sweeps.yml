@@ -91,6 +91,7 @@ jobs:
             "NamingYieldTests.Which_bar_takes",
             "NamingYieldTests.Whether_a_run_past",
             "NamingYieldTests.What_the_minted_names",
+            "NamingYieldTests.Whether_the_loops_extra",
             "NamingYieldTests.Whether_naming_until",
             "NamingYieldTests.What_bounds_rung_fives_yield",
             "NamingYieldTests.And_a_real_populations_best_pair",

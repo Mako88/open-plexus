@@ -484,6 +484,37 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         // one mint does.
         Assert.Equal(
             arms[Minting.UntilRefused].Tally.Spoke, arms[Minting.UntilRefused].Named);
+
+        // AND WHAT THE LOOP COSTS IS THE COUNTING IT REPEATS, WHICH IS SAID OUT LOUD RATHER
+        // THAN DISCOVERED ON A WIDE WORLD. `Recurrence.Of` walks every eligible scope and
+        // every pair within it, once per pass -- so a sweep naming a dozen things counts the
+        // population a dozen times. On a multiplexer that is a few hundred scopes of four
+        // codes and disappears; on a world holding ten thousand commitments it is the term
+        // that grows, and no world on this bench would show it.
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+
+        new MultiplexerRun(
+            new MultiplexerSettings { Address = Address },
+            new Brain(new CommittingSettings { Minting = Minting.UntilRefused }, seed: 1),
+            seed: 1).Run(6_000);
+
+        var looping = clock.Elapsed;
+
+        clock.Restart();
+
+        new MultiplexerRun(
+            new MultiplexerSettings { Address = Address },
+            new Brain(new CommittingSettings { Minting = Minting.Once }, seed: 1),
+            seed: 1).Run(6_000);
+
+        output.WriteLine(
+            $"6000 rounds: once {clock.Elapsed.TotalSeconds:F2}s, "
+            + $"until refused {looping.TotalSeconds:F2}s");
+
+        // NO BAR ON THE CLOCK. A wall time on this machine is not a fact about the mechanism
+        // and asserting one would make the suite fail on a busy runner -- this repo's own
+        // trap about a measurement inside a report. The number is printed so the ratio is
+        // visible when somebody takes this to a wide world.
     }
 
     [Fact]

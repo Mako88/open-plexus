@@ -884,8 +884,8 @@ change of architecture entirely.
   *did the population get this wrong* are different questions, and whether they align
   is a fact about the world. No per-round switch serves both.
 - **AND UNGATED EVERY ROUND MINTS THE FEWEST CHILDREN OF THE SIX, WHICH IS THE GATE AIMING
-  RATHER THAN LIMITING.** It holds the fewest residents and the fewest unsound rules and
-  still scores below both neighbours.
+  RATHER THAN LIMITING.** Fewest residents, fewest unsound rules — and under a best-advocate
+  vote it is level on score too, so it is cheaper for the same result.
 - **SO THE AXIS IS NOT TIMING THEN GATE.** Ungated after a failure sits with the every-round
   group, so what is ruinous is the gate after a failure specifically — and the paid test
   adds nothing once repair waits for the vote.

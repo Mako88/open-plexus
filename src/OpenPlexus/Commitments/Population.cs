@@ -1581,5 +1581,11 @@ public sealed class Population
             }
 
         _minted.Remove(commitment.Identity);
+
+        // AND THE INSTRUMENT'S TABLE WITH IT, OR IT IS A LEAK RATHER THAN A READING. `_runners`
+        // holds one entry per child ever born and nothing else would ever drop it -- on a
+        // world that mints hundreds of thousands it would outgrow the population it is about.
+        // This doc's own row: a cost can be in memory while every instrument watches time.
+        _runners.Remove(commitment.Identity);
     }
 }

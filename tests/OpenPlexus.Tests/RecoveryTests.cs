@@ -182,6 +182,64 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void What_the_operators_do_in_the_five_thousand_rounds_after_a_flip()
+    {
+        // TWO ACCOUNTS OF SLOW RECOVERY ARE DEAD AND THIS PARTITIONS WHAT IS LEFT. The old
+        // rules are not squatting and genesis is not gated shut; what remains is that the
+        // rules the new target needs are CONJUNCTIONS, and the only thing that builds a
+        // conjunction is repair -- which wants a floor of misses on a parent, a condition
+        // past a separation bar, and a budget.
+        //
+        // SO THE READING IS WHAT EACH OPERATOR DID IN THE WINDOW, and it is a subtraction
+        // rather than a new counter. The same seed run to twenty thousand and to twenty-five
+        // thousand differ only in the five thousand rounds after the flip, so the difference
+        // between their tallies is what those rounds cost -- and the same subtraction on a
+        // world that never flips is the control that says which of it is the flip and which
+        // is just five thousand more rounds.
+        output.WriteLine("world       | minted | repaired | subsumed | residents | recent");
+
+        foreach (var (world, flip) in new (string World, int Flip)[]
+        {
+            ("stationary", 0),
+            ("switching", Settled),
+        })
+        {
+            var minted = new List<double>();
+            var repaired = new List<double>();
+            var subsumed = new List<double>();
+            var residents = new List<double>();
+            var recent = new List<double>();
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var before = Run(flip, seed, Settled);
+                var after = Run(flip, seed, Settled + 5_000);
+
+                minted.Add(after.Tally.Minted - before.Tally.Minted);
+                repaired.Add(after.Tally.Repaired - before.Tally.Repaired);
+                subsumed.Add(after.Tally.Subsumed - before.Tally.Subsumed);
+                residents.Add(after.Resident - before.Resident);
+                recent.Add(after.Recent);
+            }
+
+            output.WriteLine(
+                $"{world,-11} | {Sweep.Spread(minted, "F1")} | {Sweep.Spread(repaired, "F1")} "
+                + $"| {Sweep.Spread(subsumed, "F1")} | {Sweep.Spread(residents, "F1")} "
+                + $"| {Sweep.Spread(recent)}");
+        }
+
+        // NO BAR. Which operator the recovery is waiting on has never been measured, and a
+        // threshold written before the first reading would be the answer rather than the
+        // finding.
+        return;
+
+        static Learned Run(int flip, int seed, long rounds) => new MultiplexerRun(
+            new MultiplexerSettings { Address = 2, Switch = flip },
+            new Brain(new CommittingSettings(), seed),
+            seed).Run(rounds);
+    }
+
+    [Fact]
     public void The_wreckage_of_a_flip_is_not_what_is_resident_afterwards()
     {
         // THE OBVIOUS EXPLANATION FOR SLOW RECOVERY, AND THIS IS THE CONTROL THAT REFUSES

@@ -785,6 +785,9 @@ change of architecture entirely.
 - **AND A PER-PARENT LIFETIME CAP IS WHAT C4 SAYS CANNOT BE ASSUMED.** A total spent over a
   parent's life is a bet that its life is one episode; the constraint says there is no
   episode boundary.
+- **AND `Budgeting.Children` IS NOT THE FIX, IT IS FREE WEARING A CAP'S NAME.** Bit-identical
+  to no budget on twelve cells of two widths. What should be counted so that it binds without
+  being a lifetime is open.
 - **ROUNDS-TO-TARGET ACCELERATES IN THE RELEVANT BITS, WITH ERROR BARS AT LAST.** Six to
   eleven is under twofold; eleven to twenty is nearly sixfold. That is the number that
   predicts whether any of this reaches perception.

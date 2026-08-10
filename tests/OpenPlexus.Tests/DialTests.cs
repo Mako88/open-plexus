@@ -120,7 +120,13 @@ public sealed class DialTests(ITestOutputHelper output)
             + "parent re-derives is a function of width and nothing else about the "
             + "search is. A controller would be hunting a level that is not there. "
             + "`BudgetingTests` holds the grid and a tripwire that goes red the day "
-            + "a world's vocabulary reaches the budget",
+            + "a world's vocabulary reaches the budget. AND A MOVING WORLD IS NOT "
+            + "THAT WORLD, which was worth checking because a free budget is what "
+            + "recovers when the target moves: `Children` at sixty-four is "
+            + "BIT-IDENTICAL to no budget across twelve cells of two widths and two "
+            + "worlds, so non-stationarity separates the SIZE of the budget and not "
+            + "what it counts. The cell that would separate the two rules is still a "
+            + "vocabulary reaching sixty-four and nothing else",
 
         ["Repairing"] =
             "OPEN, AND IT ARRIVES BY SEPARATION RATHER THAN BY INVENTION, which is "

@@ -756,8 +756,10 @@ change of architecture entirely.
 - **THE REPAIR BUDGET'S INTERIOR OPTIMUM WAS THE BALLOT.** Re-taken under the vote that does
   not charge for size: hard-round coverage and sound rules rise monotonically to FREE at every
   width, and only accuracy still peaks at 256 — by a hair.
-- **SO 256 IS A NUMBER ABOUT A DELETED VOTE AND NOT ABOUT THE SEARCH**, and shipping free
-  waits on the worlds this curve does not cover — every cell of it is a multiplexer.
+- **SO 256 IS A NUMBER ABOUT A DELETED VOTE AND NOT ABOUT THE SEARCH**, on the multiplexer.
+- **AND `Arranged` DOES NOT CONFIRM IT: free is a point worse on the withheld set** at one
+  standard error, holding 791 residents to 483. Where a world's rules are one code, repair is
+  damage — so the budget's worth is the world's.
 - **RUNG FIVE MINTS AT MOST ONE NAME AN ASK, AND THAT CEILING IS LOAD-BEARING.** Removing it
   was built and deleted — see the revival row. What it bounds is the search's STEP.
 - **SO *NAMES PER ELIGIBLE SCOPE* IS A RATIO WITH A CAPPED NUMERATOR**, and it falls as the

@@ -933,7 +933,10 @@ change of architecture entirely.
   material to narrow and did not.
 - **AND THE MISS FLOOR IS NOT THE BARRIER EITHER: a tenth at most are present but untouchable.**
   So on nine tenths repair was ALLOWED to narrow a parent expecting the right answer and did
-  not. What is left is blame and subsumption.
+  not. What is left is blame, subsumption, and QUANTITY.
+- **AND QUANTITY IS THE ONE ALREADY SUPPORTED.** A child fires only where its added code is
+  present, so covering everything a parent is right about takes MANY children — and
+  hard-round coverage rises monotonically with the repair budget.
 - **THE OVER-SPECIALISATION STORY IS REFUTED BY ITS OWN NUMBER.** A child beats a sound
   parent on a fortieth of wrong rounds, so the vote preferring the narrower rule costs
   nothing measurable.

@@ -363,6 +363,38 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void A_code_paired_with_itself_is_refused_rather_than_believed()
+    {
+        // A TYPE BUILT TO CROSS A WIRE TAKES WHATEVER ARRIVED, AND THIS ROW CANNOT BE MADE
+        // LOCALLY. `Recurrence.Of` walks a scope that is `Distinct().Order()`, so no pair it
+        // builds has a code twice -- but `From` reads a table a sender wrote, and the gate
+        // had no opinion about one.
+        //
+        // AND IT DOES NOT MERELY SLIP THROUGH, IT WINS. A self-pair is seen exactly as often
+        // as the code, so its share is p against an expectation of p squared and its z is
+        // enormous: it takes the argmax from every honest pair in the table, and the name
+        // minted for it throws because a name for fewer than two codes says nothing. A
+        // sender's bug crashing a receiver.
+        var dials = new CommittingSettings();
+
+        var poisoned = Table(
+            100,
+            [(1, 90), (2, 40), (3, 40)],
+            [(1, 1, 90), (2, 3, 30)]);
+
+        var read = Abstracting.Propose(poisoned, dials);
+
+        // THE HONEST PAIR WINS, which is the assertion that says the bad row was skipped
+        // rather than merely survived -- a throw and a wrong winner are both possible here
+        // and only one of them is loud.
+        Assert.Equal<IEnumerable<Code>>([Of(2), Of(3)], read.Named!.Value);
+
+        // AND IT IS NOT COUNTED AS A CANDIDATE EITHER, since the correction is for the
+        // search actually performed and this was never a candidate.
+        Assert.Equal(1, read.Candidates);
+    }
+
+    [Fact]
     public void Skipping_named_pairs_reaches_a_bar_no_world_reaches_and_leaves_the_other_arm_alone()
     {
         // A CODE PATH GUARDED BY A CAP IS UNTESTED UNTIL SOMETHING REACHES THE CAP, and

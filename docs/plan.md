@@ -713,6 +713,9 @@ change of architecture entirely.
 - **A WORKFLOW IS THE ONE ARTIFACT WITH NO LOCAL CHECK, and it is wrong until a push says
   otherwise.** Three faults in one file: an invalid expression, a concurrency group copied
   from where it fit, and a matrix taking a runner per skip.
+- **A LOCAL BUILDER'S INVARIANT IS NOT THE RECEIVED FORM'S.** No pair built here holds one
+  code twice; the wire form takes whatever arrived. Such a row wins the argmax by
+  construction, and the name minted for it throws.
 - **AND SKIPPING WORK IS NOT SKIPPING A JOB.** A matrix entry that exits immediately still
   took a runner slot, so single-sweep dispatches starved the suite behind them.
 

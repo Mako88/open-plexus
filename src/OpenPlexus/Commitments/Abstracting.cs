@@ -440,6 +440,15 @@ public static class Abstracting
         // nobody had opened yet, since before this there was only ever one table.
         foreach (var (pair, seen) in together.OrderBy(one => one.Key.Left).ThenBy(one => one.Key.Right))
         {
+            // A CODE CANNOT CO-OCCUR WITH ITSELF, AND SUCH A ROW WOULD WIN EVERY TIME.
+            // `Recurrence.Of` cannot make one -- a scope is `Distinct().Order()` -- but
+            // `From` takes whatever arrived, and a self-pair reads as a share of p against
+            // an expectation of p squared, so its z is enormous and it takes the argmax.
+            // The name minted for it then throws, because a name for fewer than two codes
+            // says nothing. A sender's bug crashing a receiver, in the one type built to
+            // cross a wire.
+            if (pair.Left == pair.Right) continue;
+
             // A PAIR ALREADY NAMED CANNOT ADD VOCABULARY, so under `Fresh` it is not a
             // candidate -- and it is dropped BEFORE the count that the correction divides
             // among, because a candidate the gate would never accept is not one it searched.

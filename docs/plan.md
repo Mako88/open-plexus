@@ -1010,7 +1010,7 @@ change of architecture entirely.
   errors of hard-round coverage at eleven bits skewed, four of accuracy, and no world
   measured is worse on score.
 - **AND ITS NAMING AND SOUND-RULE COSTS WERE THE BUDGET'S, WHICH THE CURVE SETTLED.**
-  Both were read at a budget below the level; at the level neither cost survives, so the
+  Both were read at a budget that starves the search; loosened, neither cost survives, so the
   trade this row used to carry does not exist.
 - **A SOCKET TEST INHERITED A REPAIR DIAL AND WENT RED WITH NOTHING WRONG ON THE WIRE.**
   Its precondition needs a population with something left to name, which every search dial
@@ -1024,9 +1024,9 @@ change of architecture entirely.
 - **SO `Budget` HAS NEVER LIMITED CHILDREN AND CANNOT.** A child adds one code, so distinct
   children are capped by the vocabulary — twenty-two at eleven bits against a budget of
   sixty-four. Every number ever taken under it is a re-derivation limit.
-- **AND THAT IS WHY ITS OPTIMUM MOVED WITH THE RELEVANT BITS**, which this doc has carried
-  as a puzzle since the branch began: how often a parent re-derives is a function of width,
-  and nothing else about the search is.
+- **AND THAT IS WHY ITS APPARENT OPTIMUM MOVED WITH THE RELEVANT BITS**, which this doc
+  carried as a puzzle for the life of the branch. Re-taken on the ungameable columns there is
+  no interior optimum at all.
 - **FREEING IT PAYS ONLY ONCE BLAME REACHES THE LINEAGES, WHICH IS WHY IT READ AS INERT.**
   Free under `AfterFailure` carries no hard round at all; free under `EveryRound` carries
   most of them and more than doubles the sound rules.

@@ -247,6 +247,107 @@ public sealed class Recurrence
     }
 }
 
+/// <summary>
+/// Which of rung five's bars stopped it, or none at all.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>THE PARTITION <see cref="Abstracting.Shared(Recurrence, CommittingSettings)"/> NEVER HAD, AND THE REASON A YIELD
+/// COULD FALL WITH NO ACCOUNT OF WHY.</b> The gate answers a pair or nothing, so every
+/// reading of it in this repo has been a count of the times it spoke — and a count of
+/// silences says nothing whatever about which of four completely different things
+/// happened. <c>Tally.Eligible</c> put a denominator under the successes; this puts one
+/// under the failures.
+/// </para>
+/// <para>
+/// <b>AND THE FOUR REFUSALS ARE NOT DEGREES OF ONE THING.</b> <see cref="Scarce"/> and
+/// <see cref="Rare"/> are the population being too small or too varied to hold a
+/// redundancy; <see cref="Independent"/> is a redundancy the counts say is not there;
+/// <see cref="Uncertain"/> is one that is there and cannot be certified. Only the last
+/// two are about the STATISTIC, and a mechanism moving between them is moving in a
+/// direction no name count can show.
+/// </para>
+/// </remarks>
+public enum Refused
+{
+    /// <summary>Nothing refused it, and a name was proposed.</summary>
+    Nothing,
+
+    /// <summary>Fewer than three eligible scopes existed to count over.</summary>
+    Scarce,
+
+    /// <summary>Eligible scopes existed and none of them contributed a pair.</summary>
+    /// <remarks>
+    /// <b>UNREACHABLE WHILE <see cref="Recurrence.Eligible"/> WANTS TWO CODES, and kept
+    /// because that is a fact about the caller and not about this gate.</b> A reading that
+    /// ever lands here is a reading taken over scopes some other rule admitted.
+    /// </remarks>
+    Unpaired,
+
+    /// <summary>No pair recurred across the three scopes a name has to repay.</summary>
+    Rare,
+
+    /// <summary>
+    /// A pair repaid and none was commoner than independent scopes would have made it.
+    /// </summary>
+    Independent,
+
+    /// <summary>The strongest pair did not clear the bar once corrected for the search.</summary>
+    Uncertain,
+}
+
+/// <summary>
+/// Everything the naming gate read and what it did with it — <b>the gate's own working,
+/// which is the only place its refusals can be told apart.</b>
+/// </summary>
+/// <remarks>
+/// <b>A READING RATHER THAN A LOG, so it can be counted rather than eyeballed.</b> This
+/// is what <see cref="Abstracting.Propose"/> returns on every ask, and
+/// <see cref="Abstracting.Shared(Recurrence, CommittingSettings)"/> is the one field of it
+/// the learner needs. Nothing here
+/// decides anything; a value that ever gates a mechanism has stopped being an instrument.
+/// </remarks>
+public readonly record struct Proposed
+{
+    /// <summary>Eligible scopes the counts were taken over.</summary>
+    public required int Scopes { get; init; }
+
+    /// <summary>
+    /// Distinct pairs considered — <b>the correction's multiplier, so it is a bar and not
+    /// merely a workload.</b>
+    /// </summary>
+    public required int Candidates { get; init; }
+
+    /// <summary>Of those, the pairs that recurred often enough to repay a name.</summary>
+    public required int Repaying { get; init; }
+
+    /// <summary>
+    /// The best z among the repaying pairs, whatever its sign — <b>and not the best among
+    /// the pairs that WON, which is what the selection loop reports.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>SIGNED, BECAUSE THE INTERESTING FAILURE IS BELOW NOUGHT AND THE GATE CANNOT SAY
+    /// SO.</b> Selection starts at zero and takes strict improvements, so a population
+    /// whose every repaying pair is RARER than chance reads identically to one that had no
+    /// repaying pair at all. Those are opposite findings.
+    /// <see cref="double.NegativeInfinity"/> where nothing repaid.
+    /// </remarks>
+    public required double Strongest { get; init; }
+
+    /// <summary>
+    /// <see cref="Strongest"/> put through the tail and multiplied by
+    /// <see cref="Candidates"/>, or <see cref="double.NaN"/> where there was nothing to
+    /// correct.
+    /// </summary>
+    public required double Corrected { get; init; }
+
+    /// <inheritdoc cref="Refused"/>
+    public required Refused Refused { get; init; }
+
+    /// <summary>The pair worth naming, or nothing.</summary>
+    public required ImmutableArray<Code>? Named { get; init; }
+}
+
 public static class Abstracting
 {
     /// <summary>The sub-scope most worth naming, or nothing if none has earned it.</summary>
@@ -262,22 +363,36 @@ public static class Abstracting
     /// <summary>The same question, asked of counts that may have come from many holders.</summary>
     /// <param name="counted">What recurred, from one holder or from all of them merged.</param>
     /// <param name="dials">The gate's numbers.</param>
-    public static ImmutableArray<Code>? Shared(Recurrence counted, CommittingSettings dials)
+    /// <remarks>
+    /// <b>ONE FIELD OF <see cref="Propose"/> AND NOT A SECOND IMPLEMENTATION.</b> Two copies of
+    /// a gate is two chances for an instrument to describe a machine that is not running,
+    /// which is the fault this repo has already paid for twice.
+    /// </remarks>
+    public static ImmutableArray<Code>? Shared(Recurrence counted, CommittingSettings dials) =>
+        Propose(counted, dials).Named;
+
+    /// <summary>
+    /// The same question, and everything the gate looked at on the way to answering it.
+    /// </summary>
+    /// <param name="counted">What recurred, from one holder or from all of them merged.</param>
+    /// <param name="dials">The gate's numbers.</param>
+    public static Proposed Propose(Recurrence counted, CommittingSettings dials)
     {
         ArgumentNullException.ThrowIfNull(counted);
         ArgumentNullException.ThrowIfNull(dials);
 
         var scopes = counted.Scopes;
 
-        if (scopes < 3) return null;
+        if (scopes < 3) return Nothing(scopes, 0, Refused.Scarce);
 
         var alone = counted.Alone;
         var together = counted.Together;
 
-        if (together.Count == 0) return null;
+        if (together.Count == 0) return Nothing(scopes, 0, Refused.Unpaired);
 
         (Code, Code)? best = null;
-        var strongest = 0.0;
+        var strongest = double.NegativeInfinity;
+        var repaying = 0;
 
         // ORDERED, BECAUSE THE WINNER WAS OTHERWISE WHICHEVER TIE THE DICTIONARY REACHED
         // FIRST. Two pairs with the same z resolved by hash order, which is stable within
@@ -292,6 +407,8 @@ public static class Abstracting
             // same thing.
             if (seen < 3) continue;
 
+            repaying++;
+
             var expected = alone[pair.Left] / (double)scopes
                 * (alone[pair.Right] / (double)scopes);
 
@@ -305,19 +422,57 @@ public static class Abstracting
                 : ((seen / (double)scopes) - expected)
                     / Math.Sqrt(expected * (1.0 - expected) / scopes);
 
+            // STRICT, SO A TIE GOES TO THE PAIR THE ORDERING REACHED FIRST rather than to
+            // the last one written. Starting below nought rather than at it is what lets
+            // the reading carry a negative peak; the choice below still needs a positive
+            // one, so what the learner sees is unchanged.
             if (z <= strongest) continue;
 
             strongest = z;
             best = pair;
         }
 
-        if (best is not { } chosen) return null;
+        if (repaying == 0) return Nothing(scopes, together.Count, Refused.Rare);
+
+        // A PAIR NO COMMONER THAN CHANCE IS NOT A REDUNDANCY, and the old loop could not
+        // say that it had found one. Selection began at nought, so this case and the one
+        // above both came back as no candidate at all.
+        if (best is not { } chosen || strongest <= 0.0)
+            return Nothing(scopes, together.Count, Refused.Independent) with
+            {
+                Repaying = repaying,
+                Strongest = strongest,
+            };
 
         // CORRECTED FOR THE PAIRS LOOKED AT, exactly as repair's bar is. Taking the
         // best of thousands of candidates clears any fixed bar on chance alone, and
         // that is the failure this whole gate exists against.
-        return Normal.Tail(strongest) * together.Count <= dials.Alpha
-            ? [chosen.Item1, chosen.Item2]
-            : null;
+        var corrected = Normal.Tail(strongest) * together.Count;
+
+        return new Proposed
+        {
+            Scopes = scopes,
+            Candidates = together.Count,
+            Repaying = repaying,
+            Strongest = strongest,
+            Corrected = corrected,
+            Refused = corrected <= dials.Alpha ? Refused.Nothing : Refused.Uncertain,
+            Named = corrected <= dials.Alpha
+                ? [chosen.Item1, chosen.Item2]
+                : null,
+        };
     }
+
+    /// <summary>A reading that got no further than one of the bars before the statistic.</summary>
+    private static Proposed Nothing(int scopes, int candidates, Refused why) =>
+        new()
+        {
+            Scopes = scopes,
+            Candidates = candidates,
+            Repaying = 0,
+            Strongest = double.NegativeInfinity,
+            Corrected = double.NaN,
+            Refused = why,
+            Named = null,
+        };
 }

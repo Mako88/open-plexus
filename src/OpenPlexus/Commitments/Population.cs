@@ -342,6 +342,65 @@ public sealed class Population
     /// </remarks>
     public long Searched => _reached;
 
+    private long _asked, _spoke, _atScarce, _atUnpaired, _atRare, _atIndependent, _atUncertain;
+
+    /// <summary>
+    /// How many times rung five was asked for a name.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE DENOMINATOR EVERY NAMING NUMBER IN THIS REPO HAS BEEN AN ABSOLUTE
+    /// AGAINST.</b> <see cref="Naming.Count"/> says how many names exist and nothing about
+    /// how many chances produced them, so a cell asked more often and a cell answering more
+    /// often are one number. This is fixed by the sweep calendar rather than by the search,
+    /// which is what makes it comparable across every dial that moves the population.
+    /// </para>
+    /// <para>
+    /// <b>AND <see cref="Spoke"/> PLUS THE FIVE REFUSALS PARTITION IT EXACTLY</b>, each ask
+    /// charged to the first bar that stopped it — the same shape as the repair gate's five,
+    /// for the same reason. A share that is large is a bar that is deciding the run.
+    /// </para>
+    /// </remarks>
+    public long Asked => _asked;
+
+    /// <summary>Of those, the asks that proposed a name.</summary>
+    /// <remarks>
+    /// <b>NOT THE SAME AS NAMES MINTED, AND THE GAP IS A REWRITE THAT COLLIDED.</b> A
+    /// proposal always mints; what it then fails to do is shorten anything, because the
+    /// rewritten claim is already held.
+    /// </remarks>
+    public long Spoke => _spoke;
+
+    /// <inheritdoc cref="Refused.Scarce"/>
+    public long AtScarce => _atScarce;
+
+    /// <inheritdoc cref="Refused.Unpaired"/>
+    public long AtUnpaired => _atUnpaired;
+
+    /// <inheritdoc cref="Refused.Rare"/>
+    public long AtRare => _atRare;
+
+    /// <inheritdoc cref="Refused.Independent"/>
+    public long AtIndependent => _atIndependent;
+
+    /// <inheritdoc cref="Refused.Uncertain"/>
+    public long AtUncertain => _atUncertain;
+
+    /// <summary>
+    /// What the gate saw the last time it was asked, or nothing where it never was.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE COUNTS BEHIND THE REFUSAL, BECAUSE TWO OPPOSITE MECHANISMS LAND ON
+    /// <see cref="Refused.Uncertain"/>.</b> The bar is a tail divided among the candidates,
+    /// so it tightens when the evidence weakens AND when the search widens — and a count of
+    /// refusals cannot tell a population that stopped sharing anything from one that started
+    /// sharing too many things. <see cref="Proposed.Strongest"/> and
+    /// <see cref="Proposed.Candidates"/> separate them.
+    /// <b>One reading and not a running mean</b>: at the end of a run this is the state the
+    /// population finished in, which is what every other resident count here already is.
+    /// </remarks>
+    public Proposed? Lately { get; private set; }
+
     private readonly Dictionary<Code, Commitment> _byName = [];
     private readonly Dictionary<Code, List<Commitment>> _byCode = [];
 
@@ -1377,7 +1436,25 @@ public sealed class Population
 
         if (heard is not null) counted.Absorb(heard);
 
-        if (Abstracting.Shared(counted, _dials) is not { } shared) return 0;
+        // COUNTED ON EVERY PATH OUT, INCLUDING THE ONE THAT SUCCEEDS, so the five refusals
+        // and `Spoke` add to `Asked` and a share can be read as a share. A partition that
+        // is only counted where it fails is a partition of nothing.
+        var reading = Abstracting.Propose(counted, _dials);
+
+        Lately = reading;
+        _asked++;
+
+        switch (reading.Refused)
+        {
+            case Refused.Nothing: _spoke++; break;
+            case Refused.Scarce: _atScarce++; break;
+            case Refused.Unpaired: _atUnpaired++; break;
+            case Refused.Rare: _atRare++; break;
+            case Refused.Independent: _atIndependent++; break;
+            case Refused.Uncertain: _atUncertain++; break;
+        }
+
+        if (reading.Named is not { } shared) return 0;
 
         var name = _names.Mint(shared);
 

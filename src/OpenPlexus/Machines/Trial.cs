@@ -224,6 +224,34 @@ public sealed record Tally
     /// </remarks>
     public required int Stackable { get; init; }
 
+    /// <inheritdoc cref="Commitments.Population.Asked"/>
+    /// <remarks>
+    /// <b>AND IT IS THE SWEEP CALENDAR RATHER THAN THE SEARCH, WHICH IS WHY THE SIX BELOW
+    /// COMPARE ACROSS DIALS AT ALL.</b> Rung five is asked once a sweep round whatever the
+    /// population is doing, so two cells run over the same rounds are asked the same number
+    /// of times — and a difference in what came back is then about the counts and not about
+    /// how often anybody looked.
+    /// </remarks>
+    public required long Asked { get; init; }
+
+    /// <inheritdoc cref="Commitments.Population.Spoke"/>
+    public required long Spoke { get; init; }
+
+    /// <inheritdoc cref="Commitments.Population.AtScarce"/>
+    public required long AtScarce { get; init; }
+
+    /// <inheritdoc cref="Commitments.Population.AtUnpaired"/>
+    public required long AtUnpaired { get; init; }
+
+    /// <inheritdoc cref="Commitments.Population.AtRare"/>
+    public required long AtRare { get; init; }
+
+    /// <inheritdoc cref="Commitments.Population.AtIndependent"/>
+    public required long AtIndependent { get; init; }
+
+    /// <inheritdoc cref="Commitments.Population.AtUncertain"/>
+    public required long AtUncertain { get; init; }
+
     /// <summary>Commitments that have spent their whole repair budget.</summary>
     public required int Exhausted { get; init; }
 
@@ -683,6 +711,13 @@ public sealed class Trial<TSeen>
                 held.All.Count(one => Recurrence.Eligible(one, _brain.Dials))),
             Stackable = holding.Sum(held => held.All.Count(one =>
                 Recurrence.Eligible(one, _brain.Dials) && one.Scope.Length >= 3)),
+            Asked = holding.Sum(held => held.Asked),
+            Spoke = holding.Sum(held => held.Spoke),
+            AtScarce = holding.Sum(held => held.AtScarce),
+            AtUnpaired = holding.Sum(held => held.AtUnpaired),
+            AtRare = holding.Sum(held => held.AtRare),
+            AtIndependent = holding.Sum(held => held.AtIndependent),
+            AtUncertain = holding.Sum(held => held.AtUncertain),
             Exhausted = holding.Sum(held => held.Exhausted(_brain.Dials.Budget)),
             Blamed = holding.Sum(held => held.Blamed),
             Unseparated = holding.Sum(held => held.Unseparated),

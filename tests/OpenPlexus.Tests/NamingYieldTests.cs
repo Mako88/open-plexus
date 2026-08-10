@@ -241,6 +241,127 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
             + $"pairs, {lately.Value.Repaying} repaying, peak z {lately.Value.Strongest:F3}");
     }
 
+    /// <summary>
+    /// A table holding one fixed redundancy in a population of a given size, where the
+    /// redundant codes are reused elsewhere at a fixed rate.
+    /// </summary>
+    /// <param name="scopes">How many scopes were counted.</param>
+    /// <param name="share">What fraction of them each of the two codes appears in.</param>
+    /// <param name="together">How many scopes hold BOTH, which is the redundancy itself.</param>
+    /// <remarks>
+    /// <b>THE REUSE IS THE POINT AND IT IS WHAT A BIGGER BUDGET BUYS.</b> Repair adds one
+    /// code from a vocabulary of twenty-two, so a population that grows is a population
+    /// re-deriving the same codes in more combinations — each code's own share holds up
+    /// while any PARTICULAR pair's share falls. Growing a population whose extra scopes used
+    /// fresh codes would be a different experiment and an easier one.
+    /// </remarks>
+    private static Recurrence Diluted(int scopes, double share, int together)
+    {
+        var each = (int)(scopes * share);
+
+        return Table(scopes, [(1, each), (2, each)], [(1, 2, together)]);
+    }
+
+    [Fact]
+    public void The_naming_gate_loses_a_fixed_redundancy_as_the_population_around_it_grows()
+    {
+        // A CONTROL RATHER THAN AN ARGUMENT, AND THE LEARNER IS NOT IN IT. Every reading of
+        // rung five in this repo has been taken through a population, so a yield that falls
+        // could be the gate or could be what repair was building. This is the gate alone,
+        // fed tables by hand, with one term moved at a time -- which is the only way to say
+        // whether the mechanism is even CAPABLE of the behaviour before asking whether it is
+        // what happened.
+        //
+        // AND THE TWO TERMS ARE MOVED SEPARATELY BECAUSE THE BAR TIGHTENS FROM BOTH SIDES.
+        // `Normal.Tail(z) * candidates <= Alpha` gets harder when z falls and when the
+        // candidate count rises, and a refusal is the same word either way. A grid sweeping
+        // both at once has a dead column and this repo has already paid for one.
+        var dials = new CommittingSettings();
+
+        output.WriteLine("--- the evidence, with the search held at one candidate ---");
+        output.WriteLine("scopes | pair in | codes in | peak z | corrected | verdict");
+
+        var walk = new List<Refused>();
+
+        foreach (var scopes in new[] { 50, 100, 200, 400, 800 })
+        {
+            var read = Abstracting.Propose(Diluted(scopes, 0.3, 12), dials);
+
+            walk.Add(read.Refused);
+
+            output.WriteLine(
+                $"{scopes,6} | {12,7} | {(int)(scopes * 0.3),8} | {read.Strongest,6:F2} "
+                + $"| {read.Corrected,9:F3} | {read.Refused}");
+        }
+
+        // THE REDUNDANCY NEVER CHANGED. Twelve scopes hold the pair at every row, and each
+        // code keeps appearing in three scopes in ten -- so nothing about what these two
+        // codes DO together moved. What moved is how much else there was.
+        //
+        // AND THE GATE WALKS FROM NAMING IT TO CALLING IT ANTI-CORRELATED. Certifying goes
+        // first and the sign goes second, because z is computed on a SHARE: a pair held at
+        // twelve scopes is a quarter of fifty and a sixtieth of eight hundred, while the
+        // independence it is tested against is built from marginals that did not move.
+        Assert.Equal(Refused.Nothing, walk[0]);
+        Assert.Equal(Refused.Independent, walk[^1]);
+
+        // SO THE GATE IS SCALE-RELATIVE IN THE DIRECTION THE OPEN DEFECT DESCRIBES, and
+        // that is a fact about the arithmetic rather than about any run. Whether a
+        // population actually grows this way is the sweep's question and not this one.
+        Assert.Contains(Refused.Uncertain, walk);
+
+        output.WriteLine("");
+        output.WriteLine("--- the search, with the evidence held exactly still ---");
+        output.WriteLine("other pairs | peak z | corrected | verdict");
+
+        var widened = new List<Refused>();
+
+        foreach (var others in new[] { 0, 10, 25, 50, 100 })
+        {
+            // FILLER PAIRS THAT REPAY AND LOSE, which is what a candidate has to be for
+            // this arm to isolate anything. Below the description-length bar they would not
+            // be counted at all; above the real pair they would take the argmax and this
+            // would be a grid about which pair wins.
+            var read = Abstracting.Propose(
+                Table(
+                    200,
+                    [
+                        (1, 40),
+                        (2, 40),
+                        .. Enumerable.Range(0, others)
+                            .SelectMany(one => new[]
+                            {
+                                ((ulong)(100 + one), 20),
+                                ((ulong)(300 + one), 20),
+                            }),
+                    ],
+                    [
+                        (1, 2, 16),
+                        .. Enumerable.Range(0, others)
+                            .Select(one => ((ulong)(100 + one), (ulong)(300 + one), 3)),
+                    ]),
+                dials);
+
+            widened.Add(read.Refused);
+
+            output.WriteLine(
+                $"{others,11} | {read.Strongest,6:F2} | {read.Corrected,9:F3} | {read.Refused}");
+        }
+
+        // THE EVIDENCE FOR THE REAL PAIR IS BYTE-FOR-BYTE THE SAME ON EVERY ROW and the
+        // peak does not move, so anything that changes here is the correction alone. That
+        // is the second way to lose a redundancy, and it is the one that gets WORSE the
+        // more a population has learnt to talk about.
+        Assert.Equal(Refused.Nothing, widened[0]);
+        Assert.Equal(Refused.Uncertain, widened[^1]);
+
+        // AND IT NEVER REACHES `Independent`, WHICH IS WHAT MAKES THE TWO SEPARABLE IN A
+        // GRID TAKEN THROUGH A RUN. Widening the search cannot make a pair look rarer than
+        // chance; only diluting the evidence can. So `independent` rising is the first
+        // mechanism and `uncertain` rising with a flat peak is the second.
+        Assert.DoesNotContain(Refused.Independent, widened);
+    }
+
     /// <param name="budget">How many separation attempts one parent may ever spend.</param>
     /// <param name="seed">The world's generator and the brain's.</param>
     /// <remarks>

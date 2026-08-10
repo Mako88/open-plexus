@@ -1115,7 +1115,12 @@ public sealed class Population
                 // one table could have picked both codes and the chain is a saving waiting to
                 // be taken; disagreement means conditioning on the first code is what the
                 // second choice needed, which is what a chain buys and one pass cannot.
-                if (_runners.TryGetValue(culprit.Identity, out var predicted))
+                // AND ONCE PER CHILD, WHICH IS WHAT THE COUNTER CLAIMS TO BE. A child may be
+                // repaired many times; comparing on every one of them would weigh a
+                // much-repaired lineage more heavily than a lineage repaired once, and the
+                // question is about a table predicting a choice rather than about how often
+                // a parent is chosen. The entry is spent when it is read.
+                if (_runners.Remove(culprit.Identity, out var predicted))
                 {
                     if (predicted == added) _agreed++;
                     else _differed++;

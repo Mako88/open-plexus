@@ -413,6 +413,15 @@ public sealed class Population
     /// </remarks>
     private readonly Dictionary<Code, Forks> _minted = [];
 
+    /// <summary>What each child's PARENT would have added second, by the child's name.</summary>
+    /// <remarks>
+    /// <b>AN INSTRUMENT AND NOT A MECHANISM, so nothing reads it to decide anything.</b> See
+    /// <see cref="Agreed"/>.
+    /// </remarks>
+    private readonly Dictionary<Code, Code> _runners = [];
+
+    private long _agreed, _differed;
+
     /// <inheritdoc cref="Lifetime"/>
     private readonly Dictionary<(Code Expects, int Depth), Lifetime> _lineage = [];
 
@@ -501,6 +510,22 @@ public sealed class Population
     /// that does nothing.
     /// </remarks>
     public CommittingSettings Dials => _dials;
+
+    /// <summary>
+    /// Children whose own first repair chose the code their PARENT'S table ranked second.
+    /// </summary>
+    /// <remarks>
+    /// <b>FORK 74 IN TWO COUNTERS.</b> A four-code truth costs three miss floors because a
+    /// fresh child re-earns one before adding the next; if a parent's table already knows
+    /// which code the child will want, the chain could be walked in one pass. Read against
+    /// <see cref="Differed"/> — a high share means the saving is real, a low one means
+    /// conditioning on the first code is what the second choice needed.
+    /// </remarks>
+    public long Agreed => _agreed;
+
+    /// <inheritdoc cref="Agreed"/>
+    /// <summary>Children whose own first repair chose something else.</summary>
+    public long Differed => _differed;
 
     /// <summary>How many commitments are resident.</summary>
     /// <remarks>
@@ -1084,7 +1109,22 @@ public sealed class Population
                 // a ceiling would turn a success into a demand for a rung.
                 separated = true;
 
+                // FORK 74'S READING, AND IT MINTS NOTHING. What the parent's table would have
+                // picked SECOND is recorded against the child, so that when the child later
+                // repairs from its OWN table the two choices can be compared. Agreement means
+                // one table could have picked both codes and the chain is a saving waiting to
+                // be taken; disagreement means conditioning on the first code is what the
+                // second choice needed, which is what a chain buys and one pass cannot.
+                if (_runners.TryGetValue(culprit.Identity, out var predicted))
+                {
+                    if (predicted == added) _agreed++;
+                    else _differed++;
+                }
+
                 var child = new Commitment([.. culprit.Scope, added], culprit.Expects);
+
+                if (Repair.Runner(culprit, _dials) is { } runner)
+                    _runners[child.Identity] = runner;
 
                 if (!_minted.TryGetValue(culprit.Identity, out var born))
                     _minted[culprit.Identity] = born = new Forks();

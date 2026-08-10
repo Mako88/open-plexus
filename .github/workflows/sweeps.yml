@@ -108,6 +108,7 @@ jobs:
             "RecoveryTests.What_a_world_that_keeps_moving",
             "RecoveryTests.Whether_an_earned_budget_keeps",
             "CensusTests.Whether_subsumption_is_cutting",
+            "CensusTests.Whether_a_parents_table_already_knows",
             "QueryCostTests","RefusalTests","ScalingTests",
             "SeparableTests",
             "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",

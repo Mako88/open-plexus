@@ -47,6 +47,67 @@ public sealed class CensusTests(ITestOutputHelper output)
             census: true).Run(Rounds);
 
     /// <summary>
+    /// <b>WHETHER A PARENT'S TABLE ALREADY KNOWS WHAT ITS CHILD WILL WANT — fork 74's
+    /// precondition, and it changes nothing.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A FOUR-CODE TRUTH COSTS THREE MISS FLOORS</b>, because a fresh child inherits no
+    /// table and must re-earn one before it may add the next code. That is what makes the
+    /// chain the cost it is: the repairs that pay sit at the world's minimum sound depth and
+    /// every shorter step pays nothing by construction.
+    /// </para>
+    /// <para>
+    /// <b>SO THE QUESTION IS WHETHER ONE TABLE COULD HAVE PICKED BOTH.</b> When a child is
+    /// born its parent's table has a runner-up; when that child later repairs it picks from
+    /// its OWN table, re-earned over its own firings and therefore conditioned on the code
+    /// the parent added. If the two agree, the second floor bought nothing that the first
+    /// table did not already know and a one-pass step is a saving. If they differ, the
+    /// conditioning is the whole point and no single pass can replace it.
+    /// </para>
+    /// <para>
+    /// <b>AND THE ANSWER MEANS SOMETHING EITHER WAY, which is why it is worth a run before a
+    /// mechanism.</b> Agreement makes fork 74 buildable; disagreement kills it and says why —
+    /// the same reason a minted name overshoots, arriving through the search rather than
+    /// through the vocabulary.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_a_parents_table_already_knows_what_its_child_will_want()
+    {
+        output.WriteLine("world            | agreed | differed | share the parent predicted");
+
+        foreach (var (address, skew) in new[] { (2, 0.0), (3, 0.0), (3, 0.8) })
+        {
+            var agreed = 0L;
+            var differed = 0L;
+
+            for (var seed = 1; seed <= 6; seed++)
+            {
+                var brain = new Brain(new CommittingSettings(), seed);
+
+                new MultiplexerRun(
+                    new MultiplexerSettings { Address = address, Skew = skew }, brain, seed)
+                    .Run(Rounds);
+
+                agreed += brain.Held.Agreed;
+                differed += brain.Held.Differed;
+            }
+
+            var asked = agreed + differed;
+
+            output.WriteLine(
+                $"{address + (1 << address),2} bits skew {skew:F1} | {agreed,6} | {differed,8} "
+                + $"| {(asked == 0 ? 0.0 : agreed / (double)asked),10:P1}");
+        }
+
+        // NO BAR. Whether a parent's table predicts its child's choice has never been
+        // measured, and a threshold written before the first reading would be the answer
+        // rather than the finding.
+    }
+
+    /// <summary>
     /// <b>WHETHER THE CHAIN IS CAPPED BY ITS OWN INTERMEDIATE RUNGS DYING.</b>
     /// </summary>
     /// <remarks>

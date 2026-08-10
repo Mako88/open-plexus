@@ -689,6 +689,67 @@ public static class Repair
         return Normal.Tail(strongest) * candidates <= dials.Alpha ? best : null;
     }
 
+    /// <summary>
+    /// The code this parent's table would have picked SECOND — <b>an instrument for fork 74
+    /// and it mints nothing.</b>
+    /// </summary>
+    /// <param name="parent">The commitment being asked about.</param>
+    /// <param name="dials">Every number the machinery is allowed to have.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>FORK 74 ASKS WHETHER A CHAIN COULD BE WALKED IN ONE PASS, and this is the half of
+    /// it that is decidable.</b> A four-code truth costs three miss floors because a fresh
+    /// child re-earns one before it may add the next. If a parent's table could pick both
+    /// codes at once the chain would collapse — but the table is not conditioned on the
+    /// first code, so whether it can is a question about the world rather than about the
+    /// arithmetic.
+    /// </para>
+    /// <para>
+    /// <b>SO THE READING IS WHETHER THIS AGREES WITH WHAT THE CHILD LATER CHOOSES.</b> A
+    /// child picks from its OWN table, re-earned over its own firings and therefore
+    /// conditioned on the code its parent added. Agreement means one table could have picked
+    /// both and the pass is a saving; disagreement means conditioning is what the second
+    /// choice needed, which is exactly what a chain buys and a single pass cannot.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS SUBJECT TO THE SAME BAR AS THE WINNER, or it would be comparing a
+    /// certified choice against an uncertified one.</b> The correction divides among the same
+    /// candidate count, because the search that found the runner-up is the same search.
+    /// </para>
+    /// </remarks>
+    public static Code? Runner(Commitment parent, CommittingSettings dials)
+    {
+        ArgumentNullException.ThrowIfNull(parent);
+        ArgumentNullException.ThrowIfNull(dials);
+
+        if (parent.Misses < dials.Floor || parent.Hits == 0) return null;
+
+        Code? best = null, second = null;
+        double strongest = 0.0, next = 0.0;
+        var candidates = 0;
+
+        foreach (var (code, seen) in parent.Separations)
+        {
+            candidates++;
+
+            var z = Divergence(seen.InHits, parent.Hits, seen.InMisses, parent.Misses);
+
+            if (z > strongest)
+            {
+                (second, next) = (best, strongest);
+                (best, strongest) = (code, z);
+            }
+            else if (z > next)
+            {
+                (second, next) = (code, z);
+            }
+        }
+
+        return second is not null && Normal.Tail(next) * candidates <= dials.Alpha
+            ? second
+            : null;
+    }
+
 
     /// <summary>
     /// The code whose ABSENCE separates this commitment's misses from its hits, or

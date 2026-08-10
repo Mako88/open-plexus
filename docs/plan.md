@@ -449,11 +449,9 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   statistics — a floor on how deep specialisation goes per unit of observation.
 - **AND THAT FLOOR IS WHAT THE CHAIN COSTS, MEASURED.** Every rung re-earns it, the world's
   true rules are three or four codes deep, and only the last rung ever pays.
-- **AND WHETHER A TWO-CODE STEP IS EVEN AVAILABLE IS UNMEASURED**, which is fork 74's
-  precondition and cheaper than fork 74.
-- **AND ITS DECIDABLE FORM IS WHETHER THE PARENT'S TABLE PREDICTS THE CHILD'S CHOICE.** If a
-  child's best code is its parent's runner-up, one table picks both and the step is real; if
-  not, conditioning is what the chain buys.
+- **AND A PARENT'S TABLE PREDICTS ITS CHILD'S CHOICE A THIRD OF THE TIME.** Twenty-seven per
+  cent to forty-five across three worlds, so a one-pass two-code step would add the wrong
+  second code twice in three. The chain buys conditioning.
 - **Quantisation boundary noise is the interface risk, and repair amplifies it.** Two
   identical worlds either side of a band emit unrelated codes, so specialising on the
   artifact MINTS it.
@@ -1116,7 +1114,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **69** | Naming until refused finds far more true rules and keeps a fleet agreeing. CLOSED AGAINST: it finds LONGER ones, and hard-round coverage falls while every count rises. Deleted with a revival row |
 | **70** | Proposals naming a pair already named mint nothing. ANSWERED: spending the ask on the best unnamed pair nearly triples the stacking on both eleven-bit worlds and sells nothing. Shipped, and the arm is deleted. Closed |
 | **68** | John's: does a conjunction EARN its narrowing? Its premise is half wrong -- reach halves with depth on even worlds and RISES under skew, where correlated codes let a long scope fire as often as a short one. Open |
-| **74** | A four-code truth costs three miss floors, because a fresh child re-earns one before adding the next. Could repair add several codes in one pass from the PARENT's table, each clearing the bar on its own evidence? Open |
+| **74** | A four-code truth costs three miss floors, since a fresh child re-earns one before adding the next. Could repair add several codes in one pass? CLOSED AGAINST: a parent's table predicts its child's own choice barely a third of the time |
 | **73** | What distinguishes a repair that buys hard-round coverage from one that does not? ANSWERED: depth. They sit at the world's minimum sound scope and every shorter step pays nothing. Open on walking a chain in fewer steps without overshooting |
 | **72** | Relearning after the target moves is slower than learning the world from nothing. ANSWERED: the repair budget, a per-parent LIFETIME cap the lineages that must relearn have already spent. Free recovers, the capped arms do not |
 | **71** | A minted name is a code, so repair adds it for the price of one. Should the separation bar be charged by what a scope's codes STAND FOR rather than by how many there are? Open |

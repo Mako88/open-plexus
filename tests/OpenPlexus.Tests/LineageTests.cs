@@ -143,13 +143,13 @@ public sealed class LineageTests(ITestOutputHelper output)
     /// only rounds repair may run on are the rounds where minority rules are right.
     /// </para>
     /// <para>
-    /// <b>TWO ARMS REACH THAT COUPLING FROM OPPOSITE ENDS AND NEITHER WAS BUILT FOR IT.</b>
-    /// <see cref="Weighing.Lifting"/> makes the vote say the rare answer, so the vote
-    /// starts being wrong on MAJORITY rounds and the blame lands on minority lineages.
-    /// <see cref="Repairing.EveryRound"/> removes the coupling outright. If this reading is
-    /// right both raise minority blame; if minority blame is flat under the arm that takes
-    /// hard-round coverage from nought to nearly all, the reading is wrong and goes the way
-    /// of the other six.
+    /// <b>TWO ARMS REACHED THAT COUPLING FROM OPPOSITE ENDS AND NEITHER WAS BUILT FOR IT.</b>
+    /// A vote arm that divided by the answer's base rate made the vote say the rare answer,
+    /// so it started being wrong on MAJORITY rounds and the blame landed on minority
+    /// lineages; <see cref="Repairing.EveryRound"/> removes the coupling outright. Both
+    /// raised minority blame, which is what said the reading was right — and the vote arm is
+    /// deleted now, because doing a job the timing does properly is not a reason to keep a
+    /// dial.
     /// </para>
     /// </remarks>
     [Fact]

@@ -420,9 +420,9 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
         // trusts the shape.
         //
         // AND EXACTLY RATHER THAN NEARLY, WHICH IS THE WHOLE POINT OF IT BEING COUNTS.
-        // `Population.Decide` carries a caveat that a sharded sum is not bit-identical
-        // under `Summing`, because floating-point addition is not associative. Integers
-        // have no such caveat, so this is an equality and must never become a tolerance.
+        // A sharded SUM was never bit-identical, because floating-point addition is not
+        // associative -- that arm is deleted and integers have no such caveat either way,
+        // so this is an equality and must never become a tolerance.
         var (dials, all, whole) = Trained();
 
         Assert.NotNull(whole);

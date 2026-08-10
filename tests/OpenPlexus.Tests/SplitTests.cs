@@ -23,9 +23,8 @@ namespace OpenPlexus.Tests;
 /// <para>
 /// <b>AND THE FIRST QUESTION IS AGREEMENT-WITH-ITSELF, WHICH HAS A KNOWN ANSWER.</b>
 /// Splitting a population changes no commitment, no accuracy and no dial — only who does
-/// the arithmetic. So a split vote that differs from a whole one under
-/// <see cref="Weighing.Strongest"/> is a DEFECT rather than a finding, and this file
-/// asserts that before it measures anything. The measurements below are only worth
+/// the arithmetic. So a split vote that differs from a whole one is a DEFECT rather than a
+/// finding, and this file asserts that before it measures anything. The measurements below are only worth
 /// reading because that assertion holds.
 /// </para>
 /// <para>
@@ -284,9 +283,9 @@ public sealed class SplitTests(ITestOutputHelper output)
             var whole = held.Predict(firing);
             if (whole.Weight <= 0) continue;
 
-            // RELATIVE RATHER THAN ABSOLUTE, matching `Cycle.Confidence` exactly. Weights
-            // are accuracies raised to `Sharpness`, so an absolute margin is not
-            // comparable between two settings of a dial nobody in this file is turning.
+            // RELATIVE RATHER THAN ABSOLUTE, matching `Cycle.Confidence` exactly. A weight
+            // is an accuracy and was once an accuracy raised to a power, which made an
+            // absolute margin incomparable between two settings; relative survived the dial.
             var confidence = whole.Margin / whole.Weight;
 
             var bucket = Math.Min(edges.Length - 1, (int)(confidence * edges.Length));

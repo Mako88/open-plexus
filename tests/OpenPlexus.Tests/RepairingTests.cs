@@ -194,14 +194,12 @@ public sealed class RepairingTests(ITestOutputHelper output)
     /// SHIPS.</b>
     /// </summary>
     /// <remarks>
-    /// <b>IF BOTH ACT ON THE SAME COUPLING THEY DO NOT ADD, AND THAT IS THE PREDICTION.</b>
-    /// <see cref="Weighing.Lifting"/> reaches the blame by making the vote say the rare
-    /// answer and <see cref="Repairing.EveryRound"/> by not consulting the vote at all, so
-    /// under the second the first has nothing left to redirect. A full two-by-two says
-    /// whether that is right — and it matters for what ships, because
-    /// <see cref="Weighing.Lifting"/> carries a cost the plan wrote down before it was ever
-    /// run: a rare expectation divides by a small number, so it prefers an unusual answer
-    /// on thin evidence. A dial kept for a job another dial already does is a cost with no
+    /// <b>BOTH ACTED ON THE SAME COUPLING AND SO DID NOT ADD, WHICH WAS THE PREDICTION.</b>
+    /// A vote arm dividing by the answer's base rate reached the blame by making the vote say
+    /// the rare answer, and <see cref="Repairing.EveryRound"/> reaches it by not consulting
+    /// the vote at all — so under the second the first had nothing left to redirect. That is
+    /// why it is deleted rather than kept: a dial kept for a job another dial already does is
+    /// a cost with no
     /// benefit.
     /// </remarks>
     [Fact]

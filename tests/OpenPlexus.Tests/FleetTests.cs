@@ -198,11 +198,11 @@ public sealed class FleetTests(ITestOutputHelper output)
             "a one-code commitment is held twice, so genesis is not placed"));
 
         // NO BAR ON HOW MANY, BECAUSE THIS IS THE FIRST READING OF IT. What it costs is a
-        // fact about the weighing rather than about the count: under `Strongest` an
-        // expectation is worth its best advocate and a rule held twice is worth exactly
-        // what it was, and under `Summing` its evidence is added up once per machine --
-        // which is the weigh-one-machine's-scopes-double fault, arriving from inside the
-        // population rather than from the merge.
+        // fact about the weighing rather than about the count, and the weighing that would
+        // have charged for it is deleted: an expectation is worth its best advocate, so a
+        // rule held twice is worth exactly what it was. A summed vote counted its evidence
+        // once per machine -- the weigh-one-machine's-scopes-double fault arriving from
+        // inside the population rather than from the merge -- and that is now unreachable.
         output.WriteLine(
             $"{Holders} holders on {Holders + 1} ports | {tally.Rounds} rounds | "
             + $"recent {tally.Recent:F3} | {tally.Resident} resident, "
@@ -212,7 +212,7 @@ public sealed class FleetTests(ITestOutputHelper output)
         output.WriteLine(
             $"{twice.Count} of {tally.Resident} commitments are held by more than one "
             + $"machine, every one of them a child two parents reached — fork 29, and "
-            + $"under `Summing` its evidence is counted once per machine");
+            + $"a maximum is what keeps its evidence from counting twice");
     }
 
     /// <summary>
@@ -221,7 +221,7 @@ public sealed class FleetTests(ITestOutputHelper output)
     /// <remarks>
     /// <para>
     /// <b>THE ONE NUMBER NOBODY HAS.</b> The merge is integer addition and the vote
-    /// composes exactly under <see cref="Weighing.Strongest"/> — both proved, neither
+    /// composes exactly, a maximum of maxima being a maximum — both proved, neither
     /// re-proved here. What is unknown is what a whole RUN does when the population is
     /// spread: the vote composes per round and the population does not, because genesis is
     /// placed, repair is local, subsumption sees only what one machine holds, and the

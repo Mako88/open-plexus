@@ -452,6 +452,9 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **AND A PARENT'S TABLE PREDICTS ITS CHILD'S FIRST CHOICE THREE TIMES IN TEN TO ONE IN TWO.**
   A majority only where the world is skewed, so a one-pass step would misfire on the even
   worlds and might not on the tilted one.
+- **THOUGH A MAJORITY IS NOT ENOUGH WHILE THE TWO OUTCOMES COST DIFFERENTLY.** A right second
+  code saves a miss floor; a wrong one mints a child too narrow to be sound, and what THAT
+  costs is unmeasured.
 - **SO SHORTENING IT NEEDS CONDITIONED COUNTS, WHICH IS THE TABLE THAT BLOWS UP** — argued
   rather than measured. A child could inherit its parent's table filtered by the added code,
   and that wants pair counts where the table is already commitments times codes.

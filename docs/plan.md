@@ -745,6 +745,9 @@ change of architecture entirely.
 - **THE GATE IS SCALE-RELATIVE IN PRINCIPLE AND NO RUN SHOWS IT.** With the learner removed,
   a fixed redundancy in a growing population walks to unnameable; on a run the extra scopes
   carry the redundancy with them.
+- **AND NOT ONE NAME IN TWO HUNDRED AND FIFTY-EIGHT IS THE WORLD'S CONCEPT.** Zero group the
+  address; they name data bits, or data mixed with address. The vocabulary compresses what
+  repair happened to build, which is a fact about the population.
 - **SIX BITS IS REFUSED ON POWER RATHER THAN ON HAVING NOTHING TO NAME**, which sharpens
   fork 34. Pairs repay and beat chance and cannot be certified.
 - **AND NAMING UNTIL THE GATE REFUSES FINDS HALF AGAIN AS MANY OF THE WORLD'S TRUE RULES**,
@@ -999,7 +1002,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **31** | The table spills without changing what fires, and reproducibly. Open |
 | **32** | Entailment depth capped at 1, horizon at K=1. Both come off when blame diffusion has a number — a cap with no trigger is a permanent decision nobody made. Open |
 | **33** | Unification's per-match cost against a subset test. Probed before the ladder's escalation policy, not after. Open |
-| **34** | Rung five names nothing at six bits and names and STACKS at eleven. SHARPENED: six bits is refused on POWER rather than on having nothing to name, so the structural reading is not what the gate is doing. Open |
+| **34** | Six bits is refused on POWER, not on having nothing to name; eleven names the wrong thing, with zero names in 258 grouping the address. Open on whether any world it reaches has a nameable concept |
 | **35** | More unsound commitments resident than sound ones, while the score holds. Is the vote robust to them, or are they why it stops short? Open |
 | **36** | Graded codes: does `Winnow` emitting several codes per reading make a position nameable, and what does it cost the search and the soundness check? Open |
 | **37** | The repair budget has an interior optimum moving with the relevant bits. And `Mending.Uncovered` is two mechanisms — a gate plus every-round repair — where the gate alone is far worse than no gate at all. Open |

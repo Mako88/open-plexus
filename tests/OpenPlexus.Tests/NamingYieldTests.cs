@@ -582,6 +582,82 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     }
 
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_the_minted_names_actually_stand_for()
+    {
+        // THE VOCABULARY HAS NEVER BEEN READ, ONLY COUNTED. Every naming number in this repo
+        // is a count or a ratio of counts; not one of them says what a single name MEANS. A
+        // rung whose whole claim is representation cannot be judged by how many things it
+        // named any more than a learner can be judged by how many rules it holds.
+        //
+        // AND THIS WORLD CAN ANSWER IT EXACTLY, WHICH IS WHY IT IS ASKED HERE. A code is a
+        // position and a value packed together -- `(position << 1) | value` -- so a name
+        // unfolds to a set of pinned bits, and the first `Address` positions ARE the address.
+        // A name grouping address bits alone is *this is address so-and-so*, which is the
+        // nearest thing to the concept the plan said this rung was for.
+        //
+        // WHAT IT CANNOT FIND IS ALSO DECIDABLE, AND FORK 34 SAYS SO. *Position p, whatever
+        // it says* would need both values of one bit in one name, and a scope pinning a bit
+        // both ways is satisfied by nothing -- so no scope holds that pair, and no pair
+        // counted from scopes can ever be it. Reported rather than argued: if the column
+        // below is ever non-zero, that reasoning is wrong.
+        foreach (var (address, skew) in Fixture.Curve)
+        {
+            var pure = 0;
+            var mixed = 0;
+            var data = 0;
+            var spanning = 0;
+            var members = 0.0;
+            var names = 0;
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var brain = new Brain(new CommittingSettings(), seed);
+
+                new MultiplexerRun(
+                    new MultiplexerSettings { Address = address, Skew = skew }, brain, seed)
+                    .Run(Rounds);
+
+                foreach (var name in brain.Held.Names.Means.Select(one => one.Key))
+                {
+                    // SPELLED ALL THE WAY BACK OUT, because a name may stand for a set
+                    // containing a name and the question is about the BITS underneath.
+                    var unfolded = brain.Held.Names.Unfold([name]);
+
+                    var positions = unfolded
+                        .Where(one => one.Modality == Multiplexer.Bit)
+                        .Select(one => (int)(one.Value >> 1))
+                        .ToList();
+
+                    if (positions.Count == 0) continue;
+
+                    names++;
+                    members += positions.Count;
+
+                    var addressed = positions.Count(one => one < address);
+
+                    if (addressed == positions.Count) pure++;
+                    else if (addressed == 0) data++;
+                    else mixed++;
+
+                    // BOTH VALUES OF ONE POSITION, which is the rung-four shape this rung is
+                    // not supposed to be able to reach.
+                    if (positions.Count != positions.Distinct().Count()) spanning++;
+                }
+            }
+
+            output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}, "
+                + $"{Seeds} seeds ===");
+            output.WriteLine(
+                $"  {names} names | address only {pure} | data only {data} | mixed {mixed} "
+                + $"| one position twice {spanning} | mean bits {(names == 0 ? 0 : members / names):F2}");
+        }
+
+        // NO BAR. What a vocabulary SHOULD look like has never been measured, and a threshold
+        // written before the first reading would be the answer rather than the finding.
+    }
+
+    [Fact]
     public void However_many_names_a_sweep_mints_the_holders_mint_the_same_ones()
     {
         // THE PROPERTY THE WHOLE NAMING-OVER-A-WIRE ARC EXISTS FOR, ASSERTED WHERE MINTING

@@ -559,6 +559,8 @@ condition is a superstition.
 | Loosening the repair budget, or gating it on the parent | Six cells over eight seeds found no more of the world's rules while repairing many times over | A world where the candidates it refuses are good ones. None known |
 | Rung five proposing a pair it has already named | Mints nothing, and spends a third of the rung's asks. Skipping them nearly tripled the stacking | A rung minting more than once an ask, so a spent chance costs less |
 | Subsumption weighed against DISTINCT occasions rather than firings | Chance on the noisy multiplexer, no sound rule left. Its halving explanation is measured true on even worlds only | A bar tracking depth as that world's reach does, which is not one direction |
+| `Minting.UntilRefused` — naming until the gate refuses | Every count rose and hard-round coverage fell 2.7 standard errors; the extra sound rules were the LONG ones | A gate charging a name by what it stands for — fork 71 |
+| A kill condition pre-registered on counts | `Minting`'s said the arm dies unless `named` or `stacked` moves. Both moved and it died anyway | Never on a column skew can raise. Pre-register on `Census.Paying` |
 
 ---
 
@@ -719,6 +721,14 @@ change of architecture entirely.
   construction, and the name minted for it throws.
 - **AND SKIPPING WORK IS NOT SKIPPING A JOB.** A matrix entry that exits immediately still
   took a runner slot, so single-sweep dispatches starved the suite behind them.
+- **A GRID CAN RANK ARMS ON COLUMNS A SKEWED WORLD RAISES FOR FREE, AND TWO DID.** Accuracy
+  has a floor of four in five; `found` and `sound` are reachable by rules firing where
+  guessing already works.
+- **AND A GRID ASKING FOR ITS RUNS PER COLUMN BUILDS EVERY POPULATION ONCE A COLUMN.** One
+  measurement printed as four, and the column that would have ranked the arms looked too
+  expensive to add.
+- **A SEARCH STEP OF TWO CODES IS A GATE PAID ONCE.** Repair clears the separation bar per
+  code added; a minted name standing for two enters on that single clearance.
 
 ---
 
@@ -736,8 +746,8 @@ change of architecture entirely.
 - **AND THE OPTIMUM DOES NOT MOVE WITH THE RELEVANT BITS.** Six and eleven peak
   together, so what moved was the blame coupling under the old timing rather than the
   budget.
-- **RUNG FIVE IS ASKED ON THE SWEEP CALENDAR AND MINTS AT MOST ONE NAME AN ASK**, so its
-  yield has a ceiling that has nothing to do with redundancy.
+- **RUNG FIVE MINTS AT MOST ONE NAME AN ASK, AND THAT CEILING IS LOAD-BEARING.** Removing it
+  was built and deleted — see the revival row. What it bounds is the search's STEP.
 - **SO *NAMES PER ELIGIBLE SCOPE* IS A RATIO WITH A CAPPED NUMERATOR**, and it falls as the
   budget rises whatever abstraction does. The old row read that fall as the count's.
 - **AND THE ONLY BAR THAT EVER REFUSES AT ELEVEN BITS IS THE CORRECTION**, which loosens
@@ -750,14 +760,11 @@ change of architecture entirely.
   repair happened to build, which is a fact about the population.
 - **SIX BITS IS REFUSED ON POWER RATHER THAN ON HAVING NOTHING TO NAME**, which sharpens
   fork 34. Pairs repay and beat chance and cannot be certified.
-- **AND NAMING UNTIL THE GATE REFUSES FINDS HALF AGAIN AS MANY OF THE WORLD'S TRUE RULES**,
-  with five to seven times the stacking. On ONE MACHINE. The ceiling was a calendar.
-- **THE SECOND MINT WAS WHERE HOLDERS STOPPED AGREEING, AND COUNTING ONCE FIXES IT.** One
-  table, walked identically everywhere, so the name set is a function of the merged counts
-  alone — stale within a sweep and stale the same way on every machine.
-- **AND THE FIXTURE THAT BLOCKED IT WAS STANDING ON ONE LUCKY SEED.** A run ends on a sweep
-  round, so a population is read at its most exhausted; running past one restores a subject
-  under both arms and the ship is a deletion now.
+- **A SOUND RULE IS NOT A GOOD RULE, AND NO READING SEPARATED THEM UNTIL A LENGTH WAS
+  TAKEN.** Four codes is the shortest truth eleven bits has; the mean is 5.30 and a third are
+  six or more.
+- **AND EVERY ARM THAT RAISED THE SOUND COUNT RAISED THE LONG ONES FASTEST**, which is why
+  that count cannot rank anything on its own. `Census.Paying` is the column that can.
 - **ROUNDS-TO-TARGET GROWS FAST IN THE RELEVANT BITS.** Six, eleven and twenty differ
   by one relevant bit each; the cost between them does not grow by one. That is the
   number that predicts whether any of this reaches perception.
@@ -1036,6 +1043,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **66** | Is `Budget` a search limit or a re-derivation limit? ANSWERED: a re-derivation limit, whose level is interior and stable across width. It caps how often a parent re-derives, not how far it searches. Closed |
 | **64** | John's: emit *Z was absent* as its own code at settlement, so rung two needs no negation in the scope language and no new matcher. Bounded to the commitment's own hits, or the candidate set is the vocabulary. Open |
 | **67** | John's: a parent spends ENERGY to repair rather than a fixed count. RETAKEN: the uncovered condition does not replace it, and trades the same way. Its fuel is a population fact, so it is scarce where blame is. Closed |
-| **69** | Naming until refused finds far more true rules and keeps a fleet agreeing. Open on four fixtures pinned to a seed that has something left to name, which three in eight do not |
+| **69** | Naming until refused finds far more true rules and keeps a fleet agreeing. CLOSED AGAINST: it finds LONGER ones, and hard-round coverage falls while every count rises. Deleted with a revival row |
 | **70** | Proposals naming a pair already named mint nothing. ANSWERED: spending the ask on the best unnamed pair nearly triples the stacking on both eleven-bit worlds and sells nothing. Shipped, and the arm is deleted. Closed |
 | **68** | John's: does a conjunction EARN its narrowing? Its premise is half wrong -- reach halves with depth on even worlds and RISES under skew, where correlated codes let a long scope fire as often as a short one. Open |
+| **71** | A minted name is a code, so repair adds it for the price of one. Should the separation bar be charged by what a scope's codes STAND FOR rather than by how many there are? Open |

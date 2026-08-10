@@ -441,144 +441,56 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public void Naming_until_the_gate_refuses_terminates_and_reaches_a_different_population()
-    {
-        // TERMINATION IS THE CLAIM THIS TEST EXISTS FOR, and it is an argument in the source
-        // rather than a bound in it: every mint permanently excludes one pair, and every
-        // rewrite makes a scope contribute strictly fewer pairs. If either half is wrong the
-        // loop spins, so a run finishing at all is the reading -- and the derived backstop
-        // beside it is what turns a spin into a wrong number rather than a hung CI job.
-        //
-        // AND IT ASSERTS THAT THE ARMS DIFFER RATHER THAN WHICH IS BETTER. A prediction
-        // written into a wiring check fails two ways and reads the same.
-        var arms = new Dictionary<Minting, Learned>();
-
-        foreach (var arm in (Minting[])[Minting.Once, Minting.UntilRefused])
-        {
-            var brain = new Brain(new CommittingSettings { Minting = arm }, seed: 1);
-
-            arms[arm] = new MultiplexerRun(
-                new MultiplexerSettings { Address = Address }, brain, seed: 1).Run(6_000);
-        }
-
-        output.WriteLine("arm | asked | spoke | named | stacked | eligible | resident");
-
-        foreach (var (arm, learned) in arms)
-        {
-            output.WriteLine(
-                $"{arm,-12} | {learned.Tally.Asked,5} | {learned.Tally.Spoke,5} "
-                + $"| {learned.Named,5} | {learned.Stacked,7} | {learned.Eligible,8} "
-                + $"| {learned.Resident,8}");
-        }
-
-        // THE LOOP ASKED MORE THAN ONCE PER SWEEP, which is what says the dial reached the
-        // mechanism at all rather than being carried and dropped.
-        Assert.True(
-            arms[Minting.UntilRefused].Tally.Asked > arms[Minting.Once].Tally.Asked,
-            "the loop asked no more often than the single mint, so it never ran");
-
-        // AND THE NAMES ARE NOT ASSERTED TO DIFFER, WHICH THEY DID UNTIL THE MERGE FIX. Over
-        // ONE table the passes after the first re-offer candidates the same table already
-        // refused, so a population with a single significant pair mints the same name and
-        // stops -- and a short run is exactly that population. Whether anything is left of
-        // the gain is the grid's question, and asserting it here would answer it by fiat.
-
-        // AND EVERY PROPOSAL IS STILL A DISTINCT NAME UNDER THE LOOP. That identity is what
-        // makes the loop terminate, so it is asserted where the loop runs and not only where
-        // one mint does.
-        Assert.Equal(
-            arms[Minting.UntilRefused].Tally.Spoke, arms[Minting.UntilRefused].Named);
-
-        // AND WHAT THE LOOP COSTS IS THE COUNTING IT REPEATS, WHICH IS SAID OUT LOUD RATHER
-        // THAN DISCOVERED ON A WIDE WORLD. `Recurrence.Of` walks every eligible scope and
-        // every pair within it, once per pass -- so a sweep naming a dozen things counts the
-        // population a dozen times. On a multiplexer that is a few hundred scopes of four
-        // codes and disappears; on a world holding ten thousand commitments it is the term
-        // that grows, and no world on this bench would show it.
-        var clock = System.Diagnostics.Stopwatch.StartNew();
-
-        new MultiplexerRun(
-            new MultiplexerSettings { Address = Address },
-            new Brain(new CommittingSettings { Minting = Minting.UntilRefused }, seed: 1),
-            seed: 1).Run(6_000);
-
-        var looping = clock.Elapsed;
-
-        clock.Restart();
-
-        new MultiplexerRun(
-            new MultiplexerSettings { Address = Address },
-            new Brain(new CommittingSettings { Minting = Minting.Once }, seed: 1),
-            seed: 1).Run(6_000);
-
-        output.WriteLine(
-            $"6000 rounds: once {clock.Elapsed.TotalSeconds:F2}s, "
-            + $"until refused {looping.TotalSeconds:F2}s");
-
-        // NO BAR ON THE CLOCK. A wall time on this machine is not a fact about the mechanism
-        // and asserting one would make the suite fail on a busy runner -- this repo's own
-        // trap about a measurement inside a report. The number is printed so the ratio is
-        // visible when somebody takes this to a wide world.
-    }
-
-    [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_a_run_past_its_last_sweep_has_anything_left_to_name()
     {
-        // THE QUESTION THAT DECIDES WHETHER A DIAL HAS TO BE KEPT. Four distributed naming
-        // fixtures ask a TRAINED population what it would name next, and a run that names
-        // until refused answers nothing -- it ends on a sweep round, so the last thing it did
-        // was exhaust itself. Either those files pin the arm, which keeps a knob so that
-        // tests have a subject, or a run ends far enough past its last sweep for repair to
-        // have built one. This measures which.
-        foreach (var arm in (Minting[])[Minting.Once, Minting.UntilRefused])
+        // WHETHER A TRAINED POPULATION STILL HAS A SUBJECT. Four distributed naming fixtures
+        // ask a finished run what it would name next, and a run ends ON a sweep round -- so
+        // the population they read is the one at its most exhausted, and whether they have a
+        // question to ask at all is a fact about where the run stopped rather than about
+        // anything those files are testing.
+        output.WriteLine("rounds past last sweep | seeds with something to name | eligible");
+
+        foreach (var past in new[] { 0, 100, 250, 500, 1000 })
         {
-            output.WriteLine($"--- {arm} ---");
-            output.WriteLine("rounds past last sweep | seeds with something to name | eligible");
+            var speaking = 0;
+            var eligible = 0.0;
+            var which = new List<int>();
 
-            foreach (var past in new[] { 0, 100, 250, 500, 1000 })
+            for (var seed = 1; seed <= Seeds; seed++)
             {
-                var speaking = 0;
-                var eligible = 0.0;
-                var which = new List<int>();
-
-                for (var seed = 1; seed <= Seeds; seed++)
+                // THE FIXTURE'S OWN WINDOW, NOT THE SHIPPED ONE. `SplitNamingTests` pins a
+                // deliberately poor population -- rich enough to name whole and too poor for
+                // a third of it to name alone -- and it is that window this has to read.
+                var dials = new CommittingSettings
                 {
-                    // THE FIXTURE'S OWN WINDOW, NOT THE SHIPPED ONE. `SplitNamingTests`
-                    // pins a deliberately poor population -- rich enough to name whole and
-                    // too poor for a third of it to name alone -- and that window is what
-                    // the loop may have closed.
-                    var dials = new CommittingSettings
-                    {
-                        Minting = arm,
-                        Budget = 64,
-                        Repairing = Repairing.AfterFailure,
-                    };
-                    var brain = new Brain(dials, seed);
+                    Budget = 64,
+                    Repairing = Repairing.AfterFailure,
+                };
+                var brain = new Brain(dials, seed);
 
-                    new MultiplexerRun(
-                        new MultiplexerSettings { Address = Address }, brain, seed)
-                        .Run(Rounds + past);
+                new MultiplexerRun(
+                    new MultiplexerSettings { Address = Address }, brain, seed)
+                    .Run(Rounds + past);
 
-                    var all = brain.Held.All.ToList();
+                var all = brain.Held.All.ToList();
 
-                    if (Abstracting.Shared(all, dials) is not null)
-                    {
-                        speaking++;
-                        which.Add(seed);
-                    }
-
-                    eligible += all.Count(one => Recurrence.Eligible(one, dials));
+                if (Abstracting.Shared(all, dials) is not null)
+                {
+                    speaking++;
+                    which.Add(seed);
                 }
 
-                output.WriteLine(
-                    $"{past,22} | {speaking,28} | {eligible / Seeds,8:F1} "
-                    + $"| seeds {string.Join(" ", which)}");
+                eligible += all.Count(one => Recurrence.Eligible(one, dials));
             }
+
+            output.WriteLine(
+                $"{past,22} | {speaking,28} | {eligible / Seeds,8:F1} "
+                + $"| seeds {string.Join(" ", which)}");
         }
 
-        // NO BAR. Whether a knob is forced is what this reports, and a threshold written
-        // first would be the answer rather than the reading.
+        // NO BAR. How far past a sweep a fixture has to stop is what this reports, and a
+        // threshold written first would be the answer rather than the reading.
     }
 
     [Fact]
@@ -659,112 +571,102 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
 
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
-    public void Whether_the_loops_extra_sound_rules_stand_on_a_name_at_all()
+    public void How_long_the_sound_rules_it_holds_are_and_how_many_stand_on_a_name()
     {
-        // THE STANDING EXPLANATION FOR A MEASURED GAIN, WITH NOTHING UNDER IT. Naming until
-        // the gate refuses holds two fifths to two thirds more rules TRUE of the world, and
-        // the vocabulary reading refuted the obvious account of why: not one name in 258
-        // groups the address, so what is minted is not the world's concept. What was written
-        // in its place was *shorter scopes are doing it*, which is a sentence and not a
-        // reading.
+        // A SOUND RULE IS NOT A GOOD RULE, AND NOTHING IN THIS REPO SEPARATED THEM UNTIL THIS
+        // GRID. The shortest scope that can be true of an eleven-bit multiplexer pins the
+        // three address bits and the one data bit they select -- four codes. Anything longer
+        // pins bits the truth does not depend on: still sound, still never wrong, and firing
+        // on a narrower slice of the world every code it adds. A count of true rules cannot
+        // tell those apart and a run's score need not either.
         //
-        // AND THE MECHANISM IT PROPOSES IS DECIDABLE HERE, WHICH IS WHY THIS IS CHEAP. A
-        // minted name is ADDED to every moment holding its members, so it is a code like any
-        // other -- and repair adds ONE code at a time. A name standing for two bits is
-        // therefore a step of two: a four-code conjunction that took three separations to
-        // reach takes two, and each one has to clear the gate on its own evidence. If that is
-        // what pays, the loop's extra sound rules HOLD a name and are longer once spelled
-        // out. If they do not, naming's effect on what gets built is indirect and the
-        // sentence in the plan is wrong.
+        // AND THE COLUMN BESIDE IT IS WHERE THEY COME FROM. A minted name is ADDED to every
+        // moment holding its members, so it is a code like any other and repair may add one --
+        // which makes a name a step of TWO codes past a bar that is paid once. That is the
+        // mechanism that deleted `Minting.UntilRefused`: asking until the gate refused took
+        // the share of sound rules standing on a name from 67% to 89% and the sound rules of
+        // six codes or more from 132 to 334, while the rules of the minimal four rose by a
+        // third. More of the world, said less usefully. See the plan's revival row.
         //
-        // SO THE READING IS TAKEN OVER THE SOUND RULES THEMSELVES rather than over the
-        // vocabulary, which is the half `What_the_minted_names_actually_stand_for` could not
-        // see. A name nobody built on is a name whatever it means.
+        // SO THIS IS KEPT AS THE STANDING READING OF WHAT THE SHIPPED ARM BUILDS, because the
+        // over-specialisation it measures is not a fact about the deleted loop -- the shipped
+        // arm already holds a mean of 5.30 codes where four would do.
         foreach (var (address, skew) in Fixture.Curve)
         {
+            var sound = 0;
+            var standing = 0;
+            var members = 0.0;
+            var lengths = new int[7];
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var settings = new MultiplexerSettings { Address = address, Skew = skew };
+                var dials = new CommittingSettings();
+                var brain = new Brain(dials, seed);
+
+                new MultiplexerRun(settings, brain, seed).Run(Rounds);
+
+                var held = brain.Held;
+
+                // THE SAME THREE FILTERS `Learned.Grade` APPLIES, IN THE SAME ORDER, so the
+                // `sound` column here is the `sound` column there and the two grids can be
+                // read against each other. A soundness count taken over a different
+                // denominator is a different number wearing this one's name.
+                var world = new Multiplexer(settings, seed);
+
+                foreach (var one in held.All.Where(one => one.Seen >= dials.Floor))
+                {
+                    var unfolded = held.Names.Unfold(one.Scope);
+
+                    if (!world.Checkable(unfolded)) continue;
+                    if (!world.Sound(unfolded, one.Expects)) continue;
+
+                    sound++;
+                    members += unfolded.Length;
+                    lengths[Math.Min(unfolded.Length, 6)]++;
+
+                    // THE SCOPE AS HELD AND NOT AS SPELLED OUT, which is the whole question.
+                    // A rule that reached four bits through a name is a rule repair got to in
+                    // two steps rather than three.
+                    if (one.Scope.Any(held.Names.Knows)) standing++;
+                }
+            }
+
             output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}, "
                 + $"{Seeds} seeds, {Rounds} rounds ===");
 
+            output.WriteLine("  sound | on a name | mean codes | unfolded length 1..6+");
+
             output.WriteLine(
-                "arm          |  sound | on a name | mean codes | unfolded length 1..6+");
-
-            foreach (var arm in (Minting[])[Minting.Once, Minting.UntilRefused])
-            {
-                var sound = 0;
-                var standing = 0;
-                var members = 0.0;
-                var lengths = new int[7];
-
-                for (var seed = 1; seed <= Seeds; seed++)
-                {
-                    var settings = new MultiplexerSettings { Address = address, Skew = skew };
-                    var dials = new CommittingSettings { Minting = arm };
-                    var brain = new Brain(dials, seed);
-
-                    new MultiplexerRun(settings, brain, seed).Run(Rounds);
-
-                    var held = brain.Held;
-
-                    // THE SAME THREE FILTERS `Learned.Grade` APPLIES, IN THE SAME ORDER, so
-                    // the `sound` column here is the `sound` column there and the two grids
-                    // can be read against each other. A soundness count taken over a
-                    // different denominator is a different number wearing this one's name.
-                    var world = new Multiplexer(settings, seed);
-
-                    foreach (var one in held.All.Where(one => one.Seen >= dials.Floor))
-                    {
-                        var unfolded = held.Names.Unfold(one.Scope);
-
-                        if (!world.Checkable(unfolded)) continue;
-                        if (!world.Sound(unfolded, one.Expects)) continue;
-
-                        sound++;
-                        members += unfolded.Length;
-                        lengths[Math.Min(unfolded.Length, 6)]++;
-
-                        // THE SCOPE AS HELD AND NOT AS SPELLED OUT, which is the whole
-                        // question. A rule that reached four bits through a name is a rule
-                        // repair got to in two steps rather than three.
-                        if (one.Scope.Any(held.Names.Knows)) standing++;
-                    }
-                }
-
-                output.WriteLine(
-                    $"{arm,-12} | {sound,6} | {(sound == 0 ? 0.0 : standing / (double)sound),9:P1} "
-                    + $"| {(sound == 0 ? 0.0 : members / sound),10:F2} | "
-                    + string.Join(" ", lengths.Skip(1).Select(one => $"{one,5}")));
-            }
+                $"{sound,7} | {(sound == 0 ? 0.0 : standing / (double)sound),9:P1} "
+                + $"| {(sound == 0 ? 0.0 : members / sound),10:F2} | "
+                + string.Join(" ", lengths.Skip(1).Select(one => $"{one,5}")));
 
             output.WriteLine("");
         }
 
-        // NO BAR. Which of the two accounts is right is what this reports, and a threshold
-        // written first would be the answer rather than the reading. What it CANNOT settle is
-        // whether the step is worth having -- that is `paying` in the grid beside it.
+        // NO BAR. How far past the minimum a population should sit has never been measured,
+        // and a threshold written before the first reading would be the answer rather than
+        // the finding.
     }
 
     [Fact]
-    public void However_many_names_a_sweep_mints_the_holders_mint_the_same_ones()
+    public void Three_holders_told_the_same_counts_mint_the_same_name_and_rewrite_alike()
     {
-        // THE PROPERTY THE WHOLE NAMING-OVER-A-WIRE ARC EXISTS FOR, ASSERTED WHERE MINTING
-        // MORE THAN ONE NAME CAN BREAK IT. Three holders minting three different sets of
-        // names is three languages.
+        // THE PROPERTY THE WHOLE NAMING-OVER-A-WIRE ARC EXISTS FOR. Three holders minting
+        // three different sets of names is three languages, and nothing downstream of that
+        // means anything.
         //
-        // AND IT WAS BROKEN, WHICH IS WHY THIS FILE HAS THIS TEST. Re-counting between mints
-        // made pass two read a table nobody else had -- this holder's half rewritten, the
-        // others' half not -- and three holders minted two vocabularies. Counting ONCE and
-        // rewriting after is what fixes it: every holder walks identical counts in identical
-        // order and excludes identical pairs, so the name SET is a function of the merged
-        // table alone.
+        // AND IT IS ASSERTED THROUGH `Abstract` RATHER THAN AT THE GATE, WHICH IS WHY IT LIVES
+        // HERE AND NOT IN `SplitNamingTests`. That file asks the gate a question over merged
+        // counts; this runs the whole operator, so the REWRITE is in scope -- a holder that
+        // agreed on the name and then rewrote a different set of scopes would pass there and
+        // fail here.
         //
-        // AND `SplitNamingTests` CANNOT SEE THIS, which is why it lives here. Its convergence
-        // assertion asks the GATE once, over counts merged from populations nobody rewrote --
-        // a single proposal, where the divergence began at the second.
-        // THE SHIPPED DIALS, BECAUSE A POOR POPULATION CANNOT SHOW THIS. The first take used
+        // THE SHIPPED DIALS, BECAUSE A POOR POPULATION CANNOT SHOW THIS. An earlier take used
         // `SplitNamingTests`' window -- a budget of 64 after a failure -- and every holder
-        // minted exactly ONE name under both arms, so the loop's second pass never ran and
-        // the question was not asked. A fixture too thin to reach the mechanism reads exactly
-        // like a mechanism that does not misbehave.
+        // minted exactly one name whatever was running, which is a fixture too thin to reach
+        // the mechanism reading exactly like a mechanism that does not misbehave.
         var dials = new CommittingSettings();
         var brain = new Brain(dials, seed: 1);
 
@@ -773,131 +675,46 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
 
         var all = brain.Held.All.ToList();
 
-        output.WriteLine("arm | vocabularies | distinct names between them");
-
-        var spread = new Dictionary<Minting, int>();
-
-        foreach (var arm in (Minting[])[Minting.Once, Minting.UntilRefused])
-        {
-            var shards = Fixture.Sharded(all, 3);
-
-            var holders = shards
-                .Select(shard =>
-                {
-                    var held = new Population(dials with { Minting = arm }, seed: 1);
-                    foreach (var one in shard) held.Add(one);
-                    return held;
-                })
-                .ToList();
-
-            // COUNTED BEFORE ANYTHING IS ABSTRACTED, which is the one round of exchange a
-            // deployment gets. Everybody speaks from the same moment.
-            var counted = holders
-                .Select(held => Recurrence.Of(held.All, dials))
-                .ToList();
-
-            var vocabularies = new List<string>();
-
-            for (var holder = 0; holder < holders.Count; holder++)
+        var holders = Fixture.Sharded(all, 3)
+            .Select(shard =>
             {
-                var heard = new Recurrence();
+                var held = new Population(dials, seed: 1);
+                foreach (var one in shard) held.Add(one);
+                return held;
+            })
+            .ToList();
 
-                for (var other = 0; other < holders.Count; other++)
-                    if (other != holder) heard.Absorb(counted[other]);
+        // COUNTED BEFORE ANYTHING IS ABSTRACTED, which is the one round of exchange a
+        // deployment gets. Everybody speaks from the same moment.
+        var counted = holders
+            .Select(held => Recurrence.Of(held.All, dials))
+            .ToList();
 
-                holders[holder].Abstract(heard);
+        var vocabularies = new List<string>();
 
-                vocabularies.Add(string.Join(
-                    ",", holders[holder].Names.Means.Select(one => one.Key.Value).Order()));
-            }
+        for (var holder = 0; holder < holders.Count; holder++)
+        {
+            var heard = new Recurrence();
 
-            spread[arm] = vocabularies.Distinct().Count();
+            for (var other = 0; other < holders.Count; other++)
+                if (other != holder) heard.Absorb(counted[other]);
 
-            output.WriteLine(
-                $"{arm,-12} | {spread[arm],12} | "
-                + $"{holders.Sum(held => held.Names.Count)}");
+            holders[holder].Abstract(heard);
+
+            vocabularies.Add(string.Join(
+                ",", holders[holder].Names.Means.Select(one => one.Key.Value).Order()));
         }
 
-        Assert.Equal(1, spread[Minting.Once]);
+        output.WriteLine($"vocabularies {vocabularies.Distinct().Count()} | names "
+            + $"{holders.Sum(held => held.Names.Count)} | {vocabularies[0]}");
 
-        // AND ONE UNDER THE LOOP TOO, WHICH IS THE FIX AND NOT A RESTATEMENT. This line read
-        // `> 1` for exactly one commit, pinning the defect while it stood.
-        Assert.Equal(1, spread[Minting.UntilRefused]);
+        Assert.Single(vocabularies.Distinct());
 
-        // AND THE LOOP DID MINT MORE, so a green line above is convergence rather than a
-        // second arm that quietly stopped naming anything.
-        Assert.True(spread.Count == 2, "both arms must be read for either to mean anything");
-    }
-
-    [Fact]
-    [Trait(Sweeps.Kind, Sweeps.Name)]
-    public async Task Whether_naming_until_the_gate_refuses_buys_depth()
-    {
-        // FORK 69'S GRID. The ceiling is a calendar rather than a fact about redundancy, and
-        // this is the arm that removes it. `stacked` is the reading that matters -- a name
-        // standing for a set containing a name is the only depth this rung has -- and the
-        // kill condition is that if neither `named` nor `stacked` moves outside the seed
-        // spread on any world, the ceiling was never binding and the dial goes.
-        //
-        // AND `resident` IS READ BESIDE THEM BECAUSE THE COST WOULD SHOW THERE. Naming
-        // rewrites scopes and a rewrite can collide, so a loop that names a dozen things in
-        // one sweep is a dozen chances to lose a commitment to a merge nobody asked for.
-        //
-        // AND `paying` IS HERE BECAUSE THE FIRST TAKE OF THIS GRID COULD NOT RANK ITS OWN
-        // ARMS. Sound rules rose by two fifths to two thirds and `recent` did not move at
-        // all, while `resident` rose by a third to a half -- so a count of true rules growing
-        // roughly with the population it is drawn from is exactly what this repo's own trap
-        // says to distrust, and neither column beside it could say whether the extra rules
-        // ever fire anywhere that matters. `Census.Paying` is the one reading skew cannot
-        // game: of the rounds where the commonest answer is WRONG, how many had a sound rule
-        // fire and say so. If it does not move, the loop buys a bigger population and
-        // nothing else, and this repo has already shipped one arm on that column and refused
-        // another on it.
-        foreach (var (address, skew) in Fixture.Curve)
-        {
-            output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}: minting "
-                + $"arms, {Seeds} seeds, {Rounds} rounds ===");
-
-            foreach (var arm in (Minting[])[Minting.Once, Minting.UntilRefused])
-            {
-                var once = new Dictionary<int, Learned>();
-
-                Learned Cached(int seed)
-                {
-                    if (!once.TryGetValue(seed, out var ran))
-                        once[seed] = ran = new MultiplexerRun(
-                            new MultiplexerSettings { Address = address, Skew = skew },
-                            new Brain(new CommittingSettings { Minting = arm }, seed),
-                            seed,
-                            census: true).Run(Rounds);
-
-                    return ran;
-                }
-
-                await Fixture.ReadAsync(output, arm.ToString(), Seeds, Cached,
-                    // FIRST, BECAUSE IT IS THE ONLY COLUMN HERE THAT CAN RANK THE ARMS.
-                    // Everything below it is a count of what was built; this is what any of
-                    // it did on a round the base rate gets wrong.
-                    ("paying", one => one.Census!.Paying),
-                    ("named", one => one.Named),
-                    ("stacked", one => one.Stacked),
-                    ("asked", one => one.Tally.Asked),
-                    ("spoke", one => one.Tally.Spoke),
-                    ("eligible", one => one.Eligible),
-                    ("resident", one => one.Resident),
-                    ("sound", one => one.Sound),
-                    ("recent", one => one.Recent),
-                    // WHAT NAMING COSTS, AND IT IS NOT IN ANY OTHER COLUMN HERE. A minted
-                    // name is ADDED to every moment holding its members and the fold runs to
-                    // a fixed point, so more names is more codes a moment -- and matching is
-                    // nine tenths of this machine's clock. The encoded front end already
-                    // taught this repo that good symbols cost an order more codes a moment;
-                    // this is the same bill arriving from the rung that makes them.
-                    ("codes", one => one.Tally.Codes));
-            }
-
-            output.WriteLine("");
-        }
+        // AND SOMETHING WAS ACTUALLY NAMED, so a green line above is convergence rather than
+        // three holders that all said nothing. A population with no redundancy converges for
+        // free and would pin nothing whatever.
+        Assert.All(holders, held => Assert.True(held.Names.Count > 0,
+            "no holder named anything, so agreement here is agreement about silence"));
     }
 
     [Fact]

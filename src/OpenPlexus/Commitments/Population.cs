@@ -1433,91 +1433,63 @@ public sealed class Population
     /// </param>
     public int Abstract(Recurrence? heard = null)
     {
-        // COUNTED ONCE AND NEVER AGAIN, WHICH IS THE WHOLE OF WHY THIS CAN LOOP AT ALL.
-        // Re-counting between mints was measured and it makes a FLEET disagree: pass one
-        // reads counts merged from populations nobody has rewritten, so every holder
-        // proposes the same pair -- and pass two does not, because this holder's half has
-        // been rewritten and the others' half has not. Each holder is then reading a merged
-        // table nobody else has, and three of them minted two vocabularies.
-        //
-        // OVER ONE TABLE THEY CANNOT DIVERGE. Every holder walks the identical counts in the
-        // identical order and excludes the identical pairs as it goes, so the SET of names is
-        // a function of the merged table alone. What it costs is that the second name is
-        // chosen without knowing the first was minted -- stale, and stale in exactly the same
-        // way on every machine, which is the property that matters. The next sweep counts
-        // fresh.
+        // ONE NAME AN ASK, AND THAT CEILING IS LOAD-BEARING RATHER THAN AN OVERSIGHT.
+        // Asking until the gate refused was built, measured over four worlds and eight seeds,
+        // and deleted: it minted three times the names and held two thirds more rules TRUE of
+        // the world while covering FEWER of the rounds the base rate gets wrong. See the
+        // plan's revival row -- what the extra names bought was over-specialisation, because
+        // a name is a step of two codes past a bar that is paid once.
         var counted = Recurrence.Of(All, _dials);
 
         if (heard is not null) counted.Absorb(heard);
 
-        var chosen = new List<ImmutableArray<Code>>();
+        // COUNTED ON EVERY PATH OUT, INCLUDING THE ONE THAT SUCCEEDS, so the five refusals
+        // and `Spoke` add to `Asked` and a share can be read as a share. A partition that
+        // is only counted where it fails is a partition of nothing.
+        var reading = Abstracting.Propose(counted, _dials, _names);
 
-        // IT TERMINATES BECAUSE A NAMED PAIR STOPS BEING A CANDIDATE, which is the rule that
-        // shipped one commit before this. The table is fixed here, so each pass strictly
-        // shrinks a finite candidate set and the bound is the table's own size.
-        while (true)
+        Lately = reading;
+        _asked++;
+
+        switch (reading.Refused)
         {
-            // COUNTED ON EVERY PATH OUT, INCLUDING THE ONE THAT SUCCEEDS, so the five refusals
-            // and `Spoke` add to `Asked` and a share can be read as a share. A partition that
-            // is only counted where it fails is a partition of nothing.
-            var reading = Abstracting.Propose(counted, _dials, _names);
-
-            Lately = reading;
-            _asked++;
-
-            switch (reading.Refused)
-            {
-                case Refused.Nothing: _spoke++; break;
-                case Refused.Scarce: _atScarce++; break;
-                case Refused.Unpaired: _atUnpaired++; break;
-                case Refused.Rare: _atRare++; break;
-                case Refused.Independent: _atIndependent++; break;
-                case Refused.Uncertain: _atUncertain++; break;
-            }
-
-            if (reading.Named is not { } shared) break;
-
-            // MINTED INSIDE THE LOOP AND REWRITTEN OUTSIDE IT. The mint is what makes the
-            // next pass skip this pair, so it cannot wait; the rewrite is what would change
-            // the counts, so it must.
-            _names.Mint(shared);
-            chosen.Add(shared);
-
-            if (_dials.Minting == Minting.Once) break;
+            case Refused.Nothing: _spoke++; break;
+            case Refused.Scarce: _atScarce++; break;
+            case Refused.Unpaired: _atUnpaired++; break;
+            case Refused.Rare: _atRare++; break;
+            case Refused.Independent: _atIndependent++; break;
+            case Refused.Uncertain: _atUncertain++; break;
         }
 
+        if (reading.Named is not { } shared) return 0;
+
+        _names.Mint(shared);
+
         var said = 0;
+        var name = Naming.Name(shared);
 
-        // APPLIED IN THE ORDER THEY WERE CHOSEN, so two names sharing a code resolve the same
-        // way everywhere. The second simply finds fewer scopes still holding both its
-        // members, which is a smaller rewrite rather than a conflict.
-        foreach (var shared in chosen)
+        foreach (var one in All.ToList())
         {
-            var name = Naming.Name(shared);
+            if (!shared.All(one.Scope.Contains)) continue;
 
-            foreach (var one in All.ToList())
-            {
-                if (!shared.All(one.Scope.Contains)) continue;
+            var scope = one.Scope.Where(code => !shared.Contains(code)).Append(name).ToImmutableArray();
 
-                var scope = one.Scope.Where(code => !shared.Contains(code)).Append(name).ToImmutableArray();
+            var shorter = new Commitment(scope, one.Expects);
 
-                var shorter = new Commitment(scope, one.Expects);
+            // A COLLISION IS A MERGE NOBODY ASKED FOR. Two commitments can be the
+            // same claim once the name replaces the members, and taking the record
+            // of whichever was rewritten last would be a coin toss deciding what is
+            // believed -- so the second is left alone rather than silently folded.
+            if (Holds(shorter.Identity)) continue;
 
-                // A COLLISION IS A MERGE NOBODY ASKED FOR. Two commitments can be the
-                // same claim once the name replaces the members, and taking the record
-                // of whichever was rewritten last would be a coin toss deciding what is
-                // believed -- so the second is left alone rather than silently folded.
-                if (Holds(shorter.Identity)) continue;
+            shorter.Carry(one);
 
-                shorter.Carry(one);
+            Remove(one, Loss.Renamed);
 
-                Remove(one, Loss.Renamed);
+            Add(shorter);
+            Born(shorter, Birth.Renamed);
 
-                Add(shorter);
-                Born(shorter, Birth.Renamed);
-
-                said++;
-            }
+            said++;
         }
 
         return said;

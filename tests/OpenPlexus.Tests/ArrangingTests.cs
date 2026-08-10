@@ -40,16 +40,30 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         // A population that over-specialises scores on what it has seen and not on those.
         output.WriteLine("budget | unseen accuracy | spread | sound | unsound | residents");
 
-        foreach (var (arm, budget) in new (string Arm, int Budget)[]
+        foreach (var (arm, dials) in new (string Arm, CommittingSettings Dials)[]
         {
-            ("256", new CommittingSettings().Budget),
-            ("free", int.MaxValue),
+            ("256", new CommittingSettings { Surprising = Surprising.AnyFailure }),
+            ("free", new CommittingSettings
+            {
+                Surprising = Surprising.AnyFailure,
+                Budget = int.MaxValue,
+            }),
+
+            // AND THE ARM WHOSE DISTINGUISHING PROPERTY ONLY APPEARS HERE. `Earned` pays one
+            // attempt per `Floor` misses, so it binds where misses are SCARCE -- and on the
+            // multiplexer they are not, which is why it came back indistinguishable from free
+            // on every cell of two worlds. This world's true rules are one code and its
+            // accuracy is high, so its parents are wrong far less often. If the rule binds
+            // anywhere on this bench it binds here, and if it does not it is a third off
+            // switch and goes the way of `Children`.
+            ("earned", new CommittingSettings
+            {
+                Surprising = Surprising.AnyFailure,
+                Budgeting = Budgeting.Earned,
+            }),
         })
         {
-            var (unseen, last) = Sweep(
-                Small,
-                new CommittingSettings { Surprising = Surprising.AnyFailure, Budget = budget },
-                Looking.Tiled);
+            var (unseen, last) = Sweep(Small, dials, Looking.Tiled);
 
             output.WriteLine(
                 $"{arm,6} | {unseen.Average(),15:F3} | {Spread(unseen),6:F3} "

@@ -788,6 +788,9 @@ change of architecture entirely.
 - **AND `Budgeting.Children` IS NOT THE FIX, IT IS FREE WEARING A CAP'S NAME.** Bit-identical
   to no budget on twelve cells of two widths. What should be counted so that it binds without
   being a lifetime is open.
+- **AND A LIFETIME BUDGET DOES NOT DEGRADE WITH THE MOVES, IT FAILS AT THE FIRST ONE.** Its
+  LEVEL stops mattering there too — sixty-four and two hundred and fifty-six sit a fifth of a
+  standard error apart once the world moves at all.
 - **ROUNDS-TO-TARGET ACCELERATES IN THE RELEVANT BITS, WITH ERROR BARS AT LAST.** Six to
   eleven is under twofold; eleven to twenty is nearly sixfold. That is the number that
   predicts whether any of this reaches perception.

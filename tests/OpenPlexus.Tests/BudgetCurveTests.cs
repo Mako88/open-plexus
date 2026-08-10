@@ -134,6 +134,15 @@ public sealed class BudgetCurveTests(ITestOutputHelper output)
                     // firing on a round the base rate gets wrong is what `found` and
                     // `recent` both fail to separate on a tilted world.
                     ("paying", one => one.Census!.Paying),
+                    // AND THE ROUNDS THE COVERAGE IS THE COMPLEMENT OF, because a rise in
+                    // `paying` is consistent with the quantity story and does not test it. A
+                    // child fires only where its added code is present, so it covers a SUBSET
+                    // of what its parent was right about -- if that is why two thirds of wrong
+                    // answers have no sound advocate, then buying more children buys more
+                    // advocates and this column falls as the budget rises. If it is flat while
+                    // `paying` climbs, the coverage is coming from somewhere else and the
+                    // quantity story is wrong.
+                    ("uncovered", one => one.Census!.Uncovered),
                     ("sound", one => one.Sound),
                     ("named", one => one.Named),
                     ("stacked", one => one.Stacked),

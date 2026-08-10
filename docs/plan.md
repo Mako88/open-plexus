@@ -715,9 +715,15 @@ change of architecture entirely.
 - **AND TWENTY BITS PLATEAUS RATHER THAN BEING SLOW.** The same score at a hundred
   and fifty thousand rounds and at four hundred thousand, while sound rules keep
   rising — so it refines and stops improving.
-- **THE REPAIR BUDGET IS A LEVEL AND WAS WRITTEN DOWN AS A GUARD.** Loosening it
-  crosses the target at twenty bits; removing it is worse at every width. An interior
-  optimum that moves with the relevant bits, and nothing reads that.
+- **THE REPAIR BUDGET IS A LEVEL, AND 64 WAS BELOW IT.** `BudgetCurveTests` reads the
+  curve at four worlds: accuracy peaks on the 128-to-256 plateau and free is worse at
+  both widths. 256 ships.
+- **AND THE OPTIMUM DOES NOT MOVE WITH THE RELEVANT BITS.** Six and eleven peak
+  together, so what moved was the blame coupling under the old timing rather than the
+  budget.
+- **AND RUNG FIVE'S YIELD FALLS AS ITS MATERIAL GROWS.** Offered several times the
+  eligible scopes, it mints fewer names rather than more. `Tally.Eligible` is the
+  denominator nothing reported, and the cause is unmeasured.
 - **ROUNDS-TO-TARGET GROWS FAST IN THE RELEVANT BITS.** Six, eleven and twenty differ
   by one relevant bit each; the cost between them does not grow by one. That is the
   number that predicts whether any of this reaches perception.

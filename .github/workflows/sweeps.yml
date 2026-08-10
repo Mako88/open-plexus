@@ -35,7 +35,14 @@ permissions:
 concurrency:
   # NEVER CANCEL A RUNNING MEASUREMENT. A half-finished sweep is not a partial
   # result, it is no result -- the grid prints when the fact returns.
-  group: sweeps-${{ github.ref }}
+  #
+  # AND THE GROUP CARRIES THE INPUT, WHICH `tests.yml`'S DOES NOT AND SHOULD NOT.
+  # Grouping by ref alone is right for a suite, where one run per branch is the
+  # whole idea. It is wrong here: three sweeps dispatched at once are three
+  # DIFFERENT measurements on one ref, and a per-ref group makes them queue behind
+  # each other -- GitHub keeps at most one pending run per group, so the third
+  # arrival cancelled the second at four seconds. Copied reasoning, wrong shape.
+  group: sweeps-${{ github.ref }}-${{ inputs.only }}
   cancel-in-progress: false
 
 jobs:

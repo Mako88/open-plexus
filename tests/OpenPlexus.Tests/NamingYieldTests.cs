@@ -364,6 +364,73 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
 
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_bounds_rung_fives_yield_is_how_often_it_is_asked()
+    {
+        // THE CEILING NOTHING HAS EVER REPORTED, AND IT IS NOT IN THE GATE AT ALL.
+        // `Abstract` mints at most ONE name per call and is called once a sweep round, so a
+        // twenty-thousand-round run at the default cadence offers rung five exactly twenty
+        // chances. `named` cannot exceed twenty however much a population holds.
+        //
+        // WHICH MAKES *NAMES PER ELIGIBLE SCOPE* A RATIO WITH A CAPPED NUMERATOR. The
+        // denominator is what repair built and grows with the budget without bound; the
+        // numerator is a calendar constant. It MUST fall once the gate saturates, and it
+        // would fall in exactly the same way if abstraction were perfect.
+        //
+        // SO THE READING IS TAKEN AGAINST THE CADENCE RATHER THAN AGAINST THE BUDGET. If
+        // names track the asks, the bound is the calendar and the open defect is about a
+        // denominator. If they flatten, there really is a limit in the material and the
+        // question survives.
+        output.WriteLine($"{Seeds} seeds, {Rounds} rounds, 11 bits even, budget 256");
+        output.WriteLine("sweep every | asked | spoke | named | eligible | names/eligible");
+
+        foreach (var every in new[] { 2000, 1000, 500, 250, 125 })
+        {
+            var asked = new List<double>();
+            var spoke = new List<double>();
+            var named = new List<double>();
+            var eligible = new List<double>();
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var brain = new Brain(new CommittingSettings(), seed);
+
+                var learned = new MultiplexerRun(
+                    new MultiplexerSettings { Address = Address }, brain, seed)
+                    .Run(Rounds, sweep: every);
+
+                asked.Add(learned.Tally.Asked);
+                spoke.Add(learned.Tally.Spoke);
+                named.Add(learned.Named);
+                eligible.Add(learned.Eligible);
+            }
+
+            output.WriteLine(
+                $"{every,11} | {asked.Average(),5:F1} | {spoke.Average(),5:F1} "
+                + $"| {named.Average(),5:F1} | {eligible.Average(),8:F1} "
+                + $"| {named.Average() / eligible.Average(),14:F3}");
+        }
+
+        // AND `sweep` IS NOT ONE AXIS, WHICH THE GRID SHOWS RATHER THAN HIDES. `Council`
+        // widens, subsumes, abstracts and culls inside one branch, so asking rung five more
+        // often also culls more often -- and `eligible` FALLS as the cadence tightens, which
+        // is the denominator being moved by a mechanism this reading is not about. A cell
+        // that separated them would need abstraction on its own calendar, and there is no
+        // such dial. This repo's own trap: a setting deciding two independent things while
+        // being named for one.
+        //
+        // SO WHAT THIS GRID SETTLES IS THE CEILING AND NOT THE SLOPE. At the shipped cadence
+        // rung five gets twenty chances in twenty thousand rounds and mints eleven or twelve
+        // distinct names, so the count is within a factor of two of a bound that has nothing
+        // to do with redundancy -- and every naming number in this repo was taken at that one
+        // value of a dial nothing has ever swept.
+
+        // NO BAR. What the cadence should cost rung five has never been measured, and a
+        // threshold written before the first reading is a prediction dressed as a
+        // requirement. The grid is the finding.
+    }
+
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void And_a_real_populations_best_pair_is_followed_up_the_budget_ladder()
     {
         // THE ARM ABOVE IS A MODEL AND THIS IS THE THING ITSELF. Two aggregate columns can

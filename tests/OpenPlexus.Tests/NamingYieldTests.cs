@@ -591,6 +591,17 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         // SO THIS IS KEPT AS THE STANDING READING OF WHAT THE SHIPPED ARM BUILDS, because the
         // over-specialisation it measures is not a fact about the deleted loop -- the shipped
         // arm already holds a mean of 5.30 codes where four would do.
+        //
+        // AND IT IS NOW A CHECK ON A CLAIM WHOSE ASSERTION WAS DELETED. `LiftingTests` used to
+        // pin that three weighings build populations equal PER SEED under
+        // `Repairing.EveryRound`; two of the three are gone, so with one rule left the
+        // identity cannot be stated and the property reverted to an argument about the code.
+        // This grid is the empirical half of it: taken under a summed vote it read 420 sound
+        // rules at eleven bits skewed, 66.9% of them standing on a name, a mean of 5.30 codes
+        // and a length spread of 152/136/132. Written down BEFORE the same grid was taken
+        // under the best-advocate vote, because a population that turns out to differ would
+        // mean the vote reaches the search after all and every arm comparison in this repo is
+        // back open.
         foreach (var (address, skew) in Fixture.Curve)
         {
             var sound = 0;

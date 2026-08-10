@@ -48,6 +48,16 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     /// <summary>Matched to the other multiplexer grids, so the rows are comparable.</summary>
     private const int Seeds = 6;
 
+    /// <summary>How often the target moves where it keeps moving.</summary>
+    /// <remarks>
+    /// <b>LONGER THAN THE TRAILING WINDOW AND SHORTER THAN A RECOVERY.</b> Two thousand
+    /// rounds is what accuracy is read over, so a shorter interval would report a window
+    /// straddling two targets and nothing else; five thousand is also where the one-flip
+    /// curves say a capped arm has stopped falling and a free one has turned, so each
+    /// interval is long enough for the arms to have separated inside it.
+    /// </remarks>
+    private const int Moving = 5_000;
+
     /// <summary>The local estimate turned off, as near as a rate can be turned off.</summary>
     /// <remarks>
     /// <b>NOT ZERO, BECAUSE ZERO IS A DIFFERENT MECHANISM AND NOT A SLOWER ONE.</b> At
@@ -182,6 +192,72 @@ public sealed class RecoveryTests(ITestOutputHelper output)
         }
 
         // NO BAR. Whether the gate is what recovery waits on has never been measured, and a
+        // threshold written before the first reading would be the answer rather than the
+        // finding.
+    }
+
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_a_world_that_keeps_moving_costs_a_budget_that_never_returns()
+    {
+        // ONE FLIP IS THE EASY CASE AND C4 DESCRIBES THE HARD ONE. *No episode boundary* does
+        // not mean the target moves once and settles; it means there is no round at which the
+        // world can be assumed to have stopped. Every recovery reading in this file so far
+        // moves the target a single time and then lets the run finish in peace, which is a
+        // world with an episode boundary in all but name.
+        //
+        // AND A LIFETIME BUDGET SHOULD DEGRADE WITH THE NUMBER OF MOVES rather than with any
+        // one of them. Each flip asks the parents that now expect the right answer to spend
+        // from a total that was never topped up, so the second move has less to spend than
+        // the first and the fourth may have nothing. That is a prediction about the SHAPE of
+        // the curve and not about a gap: `Attempts` should fall away move by move while a
+        // bound on what a parent HOLDS should not.
+        //
+        // READ AT THE END RATHER THAN PAST A FLIP, because with the target moving every five
+        // thousand rounds there is no *past the flip* -- the run is always between two of
+        // them. The trailing window is two thousand rounds, so a reading taken at the end is
+        // taken well inside the last interval and is comparable across arms.
+        output.WriteLine($"{Seeds} seeds, six bits, the target moves every {Moving} rounds");
+        output.WriteLine("budget         | moves: 0 | 1 | 2 | 4");
+
+        foreach (var (arm, dials) in new (string Arm, CommittingSettings Dials)[]
+        {
+            ("attempts 64", new CommittingSettings { Budget = 64 }),
+            ("attempts 256", new CommittingSettings()),
+            ("attempts free", new CommittingSettings { Budget = int.MaxValue }),
+            ("children 64", new CommittingSettings
+            {
+                Budget = 64,
+                Budgeting = Budgeting.Children,
+            }),
+        })
+        {
+            var read = new List<string>();
+
+            // NOUGHT MOVES IS THE CONTROL AND IT IS THE SAME LENGTH OF RUN, so the row reads
+            // across rather than down: what changes between the cells is how many times the
+            // target moved and nothing else whatever.
+            foreach (var moves in new[] { 0, 1, 2, 4 })
+            {
+                var recent = new List<double>();
+
+                for (var seed = 1; seed <= Seeds; seed++)
+                    recent.Add(new MultiplexerRun(
+                        new MultiplexerSettings
+                        {
+                            Address = 2,
+                            Switch = moves == 0 ? 0 : Moving,
+                        },
+                        new Brain(dials, seed),
+                        seed).Run(Settled + (moves * Moving)).Recent);
+
+                read.Add($"{Sweep.Spread(recent),18}");
+            }
+
+            output.WriteLine($"{arm,-14} | " + string.Join(" | ", read));
+        }
+
+        // NO BAR. What a world that keeps moving costs has never been measured here, and a
         // threshold written before the first reading would be the answer rather than the
         // finding.
     }

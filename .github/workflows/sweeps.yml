@@ -99,6 +99,7 @@ jobs:
             "RecoveryTests.Whether_a_subsumption",
             "RecoveryTests.Whether_the_parents_that_must_relearn",
             "RecoveryTests.Whether_a_budget_on_children",
+            "RecoveryTests.What_a_world_that_keeps_moving",
             "QueryCostTests","RefusalTests","ScalingTests",
             "SeparableTests",
             "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",

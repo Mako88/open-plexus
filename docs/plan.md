@@ -708,9 +708,9 @@ change of architecture entirely.
 - **SIX EXPLANATIONS IN ONE SESSION DIED TO CONTROLS AND EVERY ONE CHANGED SELECTION.**
   Where the measurement says no right rule was present, a rule about who WINS cannot reach
   it. Ask which half of generate-and-test a proposal touches before building it.
-- **AND THE INSTRUMENT THAT KILLS A STORY IS USUALLY BUILT FOR SOMETHING ELSE.** Twice in
-  one session a reading taken for a different question refuted the standing explanation,
-  so build the instrument before the seventh story.
+- **AND THE INSTRUMENT THAT KILLS A STORY IS USUALLY BUILT FOR SOMETHING ELSE.** Twice in one
+  session, then three times in another — so ask which grid already holds the number before
+  running a new one, and build the instrument before the seventh story.
 - **A `readonly record struct` HOLDING AN `ImmutableArray` COMPARES BY THE ARRAY'S
   IDENTITY.** Two separately built keys with identical contents are never equal, so an
   equality asserted on one fails on a world it has no complaint about.

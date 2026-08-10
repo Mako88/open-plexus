@@ -794,6 +794,9 @@ change of architecture entirely.
 - **AND A LIFETIME BUDGET DOES NOT DEGRADE WITH THE MOVES, IT FAILS AT THE FIRST ONE.** Its
   LEVEL stops mattering there too — sixty-four and two hundred and fifty-six sit a fifth of a
   standard error apart once the world moves at all.
+- **AND `Budgeting.Earned` IS NEARLY FREE**, refusing a seventh of free's repairs at under two
+  standard errors and holding the same population. Whether refusing anything is WANTED is
+  invisible on a world where the least-refusing arm wins.
 - **ROUNDS-TO-TARGET ACCELERATES IN THE RELEVANT BITS, WITH ERROR BARS AT LAST.** Six to
   eleven is under twofold; eleven to twenty is nearly sixfold. That is the number that
   predicts whether any of this reaches perception.

@@ -113,12 +113,27 @@ public sealed class WeighingTests(ITestOutputHelper output)
     /// decision rule is above rather than below.</b>
     /// </summary>
     /// <remarks>
+    /// <para>
     /// <b>PEAK TO PEAK IS NOT WHAT THIS IS, AND THAT IS THE WHOLE DESIGN.</b> Comparing
     /// each arm at its own best power is exactly the comparison the design forbids
     /// cashing in — the peak of <c>Sharpness</c> moves between worlds, so a per-world peak
     /// is the world choosing how the brain thinks. What is compared here is two rules with
     /// every number the brain has held constant, which is the only comparison a fixed brain
     /// is entitled to make.
+    /// </para>
+    /// <para>
+    /// <b>AND ACCURACY ALONE IS THE RIGHT COLUMN HERE, WHICH IT IS NOT IN EVERY GRID BESIDE
+    /// IT.</b> Four rows of this bench are skewed, where accuracy has a floor of four in five
+    /// and a soundness count can be raised by rules that fire where guessing already works —
+    /// so a grid ranking arms there usually owes a reading of
+    /// <see cref="Machines.Census.Paying"/>. This one does not, and the reason is measured
+    /// rather than assumed: under <see cref="Repairing.EveryRound"/> the three rules build
+    /// populations equal PER SEED on sound rules, unsound rules, residents and rules found.
+    /// Every ungameable column would print three identical rows. See
+    /// <c>LiftingTests.Under_the_shipped_timing_the_three_rules_build_one_population</c>,
+    /// which asserts that identity and goes red under the old timing — where it did not hold
+    /// and this grid was a search comparison wearing a readout's name.
+    /// </para>
     /// </remarks>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]

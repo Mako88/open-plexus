@@ -47,6 +47,21 @@ namespace OpenPlexus.Tests;
 /// the condition. <b>A gate asking whether a parent still has failures no child covers can
 /// only bind where that parent gets blamed at all.</b> Re-taken, this grid is fork 67.
 /// </para>
+/// <para>
+/// <b>AND RE-TAKEN, THE CONDITION DOES NOT REPLACE THE COUNT — IT TRADES THE SAME WAY THE
+/// COUNT DID.</b> On the even eleven-bit world the shipped count ungated holds the best
+/// trailing accuracy of the six cells, and adding the condition costs it while buying
+/// coverage and unsound rules together. Under skew the sign flips: free plus the condition
+/// carries far more of the hard rounds at the count's own accuracy. <b>No cell leads on both
+/// worlds</b>, which is the shape three dials before it had.
+/// </para>
+/// <para>
+/// <b>SO THE FUEL IS WRONG RATHER THAN THE IDEA.</b> <i>Has a child covered this failure</i>
+/// is a question about the POPULATION, so it is scarce exactly where blame is scarce and
+/// abundant where blame already flows — which is why it helps under skew and costs on an
+/// even world. A driver read off the commitment ITSELF has no such coupling; see fork 68,
+/// where what a rung gains and what it spends are both facts about one rule.
+/// </para>
 /// </remarks>
 public sealed class BudgetTests(ITestOutputHelper output)
 {

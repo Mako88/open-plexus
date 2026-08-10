@@ -271,6 +271,16 @@ public sealed class LiftingTests(ITestOutputHelper output)
     /// <b>AND IT IS THE SAME EIGHT RULES AS THE EVEN WORLD'S</b>, asserted above, so the
     /// found count is comparable straight across to every earlier multiplexer reading.
     /// </para>
+    /// <para>
+    /// <b>AND `found` IS NOT IMMUNE EITHER, WHICH THIS FILE SAID AND THE BENCH LATER
+    /// MEASURED.</b> Skew makes <i>all four data bits are one</i> hold on two rounds in five
+    /// and entail the answer whatever the address selects — sound, never wrong, in no answer
+    /// key, and firing exactly where guessing already works. So every column here except one
+    /// can be raised by a population that has learnt nothing this world is about.
+    /// <see cref="Census.Paying"/> is the one that cannot: of the rounds the base rate gets
+    /// WRONG, how many had a sound rule fire and say so. It leads the grid because it is the
+    /// only row in it that ranks anything.
+    /// </para>
     /// </remarks>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
@@ -282,12 +292,31 @@ public sealed class LiftingTests(ITestOutputHelper output)
             new MultiplexerRun(
                 new MultiplexerSettings { Address = address, Skew = 0.8 },
                 new Brain(new CommittingSettings { Weighing = weighing }, seed),
-                seed).Run(20_000);
+                seed,
+                census: true).Run(20_000);
+
+        // ONE RUN PER ARM PER SEED, SHARED BY EVERY READING BELOW -- the discipline four
+        // other grids in this suite already keep, and this one did not. Each reading asked
+        // for its own runs, so three arms over eight seeds at two widths were built FOUR
+        // times over and one measurement was printed as four. That is a hundred and
+        // forty-four runs of twenty thousand rounds spent on nothing, and it is why a fifth
+        // column looked expensive when it is now free.
+        var once = new Dictionary<(Weighing Weighing, int Address, int Seed), Learned>();
+
+        Learned Cached(Weighing weighing, int address, int seed)
+        {
+            if (!once.TryGetValue((weighing, address, seed), out var ran))
+                once[(weighing, address, seed)] = ran = Run(weighing, address, seed);
+
+            return ran;
+        }
 
         foreach (var address in new[] { 2, 3 })
         {
             foreach (var reading in new (string What, Func<Learned, double> Of)[]
             {
+                // FIRST, BECAUSE IT IS THE ONLY ROW HERE SKEW CANNOT GAME.
+                ("paying", one => one.Census!.Paying),
                 ("accuracy", one => one.Recent),
                 ("found", one => one.Found),
                 ("sound", one => one.Sound),
@@ -297,11 +326,11 @@ public sealed class LiftingTests(ITestOutputHelper output)
                 var arms = await Sweep.AcrossAsync(
                     Seeds,
                     ("summing", seed =>
-                        Task.FromResult(reading.Of(Run(Weighing.Summing, address, seed)))),
+                        Task.FromResult(reading.Of(Cached(Weighing.Summing, address, seed)))),
                     ("strongest", seed =>
-                        Task.FromResult(reading.Of(Run(Weighing.Strongest, address, seed)))),
+                        Task.FromResult(reading.Of(Cached(Weighing.Strongest, address, seed)))),
                     ("lifting", seed =>
-                        Task.FromResult(reading.Of(Run(Weighing.Lifting, address, seed)))));
+                        Task.FromResult(reading.Of(Cached(Weighing.Lifting, address, seed)))));
 
                 var ranked = arms.OrderByDescending(one => one.Mean).ToList();
                 var apart = ranked[0].Separation(ranked[1]);

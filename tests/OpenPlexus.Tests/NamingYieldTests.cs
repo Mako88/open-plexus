@@ -230,6 +230,13 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
             + $"unpaired={tally.AtUnpaired} rare={tally.AtRare} "
             + $"independent={tally.AtIndependent} uncertain={tally.AtUncertain}");
 
+        // AND EVERY PROPOSAL IS A DISTINCT NAME, which is the shipped behaviour stated as an
+        // identity rather than as a count that would read zero forever. A pair already named
+        // is not a candidate, so a proposal can only ever mint something new -- and if that
+        // stops holding, either the skip has come undone or names are arriving from
+        // somewhere this file does not know about.
+        Assert.Equal(tally.Spoke, learned.Named);
+
         // AND THE LAST READING IS THE STATE THE RUN FINISHED IN, which is what separates
         // the two mechanisms that both end in `Uncertain`.
         var lately = brain.Held.Lately;
@@ -395,17 +402,15 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public void Skipping_named_pairs_reaches_a_bar_no_world_reaches_and_leaves_the_other_arm_alone()
+    public void Skipping_named_pairs_reaches_a_bar_no_world_reaches()
     {
         // A CODE PATH GUARDED BY A CAP IS UNTESTED UNTIL SOMETHING REACHES THE CAP, and
-        // `Fresh` adds a second route to `Unpaired` that a run may never take: a population
-        // that has named every pair it holds has no candidate left, which is a completely
-        // different state from holding no pair at all.
+        // skipping named pairs adds a second route to `Unpaired` that a run may never take:
+        // a population that has named every pair it holds has no candidate left, which is a
+        // completely different state from holding no pair at all.
         var counted = Recurrence.Of(
             [Seasoned(1, 2, 5), Seasoned(1, 2, 6), Seasoned(1, 2, 7), Seasoned(1, 2, 8)],
             new CommittingSettings());
-
-        var fresh = new CommittingSettings { Renaming = Renaming.Fresh };
 
         var names = new Naming();
 
@@ -414,7 +419,9 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         foreach (var row in counted.Written().Rows.Where(one => one.Right is not null))
             names.Mint([row.Left, row.Right!.Value]);
 
-        Assert.Equal(Refused.Unpaired, Abstracting.Propose(counted, fresh, names).Refused);
+        Assert.Equal(
+            Refused.Unpaired,
+            Abstracting.Propose(counted, new CommittingSettings(), names).Refused);
 
         // AND THE SHIPPED ARM IS UNTOUCHED BY THE SAME CALL, which is the thing that would
         // otherwise change every number this repo has ever taken. `Anything` skips nothing,
@@ -422,114 +429,15 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         // rather than against a remembered figure.
         var pairs = counted.Written().Rows.Count(one => one.Right is not null);
 
-        var shipped = Abstracting.Propose(counted, new CommittingSettings(), names);
+        // AND PASSING NO VOCABULARY SKIPS NOTHING, which is what a merge and a test want:
+        // there is no one population whose names those would be. Asserted against the table
+        // rather than against a remembered figure, because the correction now multiplies by
+        // the candidates SEARCHED and an off-by-one there would move every naming number in
+        // the repo with nothing going red.
+        var whole = Abstracting.Propose(counted, new CommittingSettings());
 
-        Assert.Equal(pairs, shipped.Candidates);
-        Assert.Equal(Refused.Nothing, shipped.Refused);
-
-        // AND PASSING NO VOCABULARY UNDER `Fresh` IS THE SHIPPED BEHAVIOUR RATHER THAN A
-        // THROW. The gate is also asked from a merge and from tests, where there is no one
-        // population whose names these would be.
-        Assert.Equal(pairs, Abstracting.Propose(counted, fresh).Candidates);
-    }
-
-    [Fact]
-    public void The_two_renaming_arms_build_different_populations()
-    {
-        // A PREDICTION WRITTEN INTO A WIRING CHECK FAILS TWO WAYS AND READS THE SAME, so
-        // this asserts that the arms DIFFER and not which of them is better. What direction
-        // `Fresh` moves the names is the grid's question, and a threshold here would be that
-        // grid's answer written before it ran.
-        //
-        // AND ONE HALF IS TRUE BY CONSTRUCTION, WHICH IS THE ONLY PART ASSERTED SHARPLY.
-        // `Fresh` cannot propose a pair it has named, so its re-derivation count is nought;
-        // `Anything` having one above nought is what says the dial is reaching the gate at
-        // all rather than being carried and dropped.
-        var arms = new Dictionary<Renaming, Learned>();
-
-        foreach (var arm in (Renaming[])[Renaming.Anything, Renaming.Fresh])
-        {
-            var brain = new Brain(new CommittingSettings { Renaming = arm }, seed: 1);
-
-            arms[arm] = new MultiplexerRun(
-                new MultiplexerSettings { Address = Address }, brain, seed: 1).Run(6_000);
-        }
-
-        output.WriteLine("arm | asked | spoke | again | named | stacked | eligible");
-
-        foreach (var (arm, learned) in arms)
-        {
-            output.WriteLine(
-                $"{arm,-8} | {learned.Tally.Asked,5} | {learned.Tally.Spoke,5} "
-                + $"| {learned.Tally.Again,5} | {learned.Named,5} | {learned.Stacked,7} "
-                + $"| {learned.Eligible,8}");
-        }
-
-        Assert.True(arms[Renaming.Anything].Tally.Again > 0,
-            "the shipped arm re-derived nothing here, so this world cannot show the axis");
-
-        Assert.Equal(0, arms[Renaming.Fresh].Tally.Again);
-
-        // AND THE ARMS REACH DIFFERENT POPULATIONS RATHER THAN THE SAME ONE BY A DIFFERENT
-        // ROUTE. `Mending.Outvoted` shipped for a while short-circuiting the mechanism being
-        // measured, so a sweep returned three identical arms for a gate that never ran --
-        // this is the cheap check against that shape.
-        Assert.NotEqual(
-            arms[Renaming.Anything].Named, arms[Renaming.Fresh].Named);
-    }
-
-    [Fact]
-    [Trait(Sweeps.Kind, Sweeps.Name)]
-    public async Task Whether_spending_the_ask_on_an_unnamed_pair_buys_vocabulary()
-    {
-        // THE ONE THING THE PARTITION POINTED AT, BUILT AS AN ARM RATHER THAN A CHANGE.
-        // Rung five saturates: at the shipped budget it speaks on eighteen asks in twenty
-        // and mints ten to twelve names, and the gap is proposals naming a pair already
-        // named. `Fresh` spends those asks on the best unnamed pair instead.
-        //
-        // AND WHAT IT COSTS IS NOT NOTHING, WHICH IS WHY THIS IS A GRID. A re-derivation
-        // still shortens scopes repair has built since the last naming, so `Anything` is
-        // doing housekeeping the other arm defers. `stacked` is the reading that matters
-        // most -- a name standing for a set containing a name is the only depth this rung
-        // has, and it is what the recursion claim rests on.
-        foreach (var (address, skew) in Fixture.Curve)
-        {
-            output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}: renaming "
-                + $"arms, {Seeds} seeds, {Rounds} rounds ===");
-
-            foreach (var arm in (Renaming[])[Renaming.Anything, Renaming.Fresh])
-            {
-                var once = new Dictionary<int, Learned>();
-
-                Learned Cached(int seed)
-                {
-                    if (!once.TryGetValue(seed, out var ran))
-                        once[seed] = ran = new MultiplexerRun(
-                            new MultiplexerSettings { Address = address, Skew = skew },
-                            new Brain(new CommittingSettings { Renaming = arm }, seed),
-                            seed).Run(Rounds);
-
-                    return ran;
-                }
-
-                await Fixture.ReadAsync(output, arm.ToString(), Seeds, Cached,
-                    ("named", one => one.Named),
-                    ("stacked", one => one.Stacked),
-                    ("spoke", one => one.Tally.Spoke),
-                    ("again", one => one.Tally.Again),
-                    ("uncertain", one => one.Tally.AtUncertain),
-                    ("eligible", one => one.Eligible),
-                    ("sound", one => one.Sound),
-                    ("recent", one => one.Recent));
-            }
-
-            output.WriteLine("");
-        }
-
-        // AND THE KILL CONDITION IS WRITTEN DOWN FIRST. If `Fresh` does not raise `named` or
-        // `stacked` outside the seed spread on any world, the re-derivations were costing
-        // nothing, this dial is deleted with a revival row, and the saturation is a fact
-        // about how much this world has to name rather than about how the asks are spent.
+        Assert.Equal(pairs, whole.Candidates);
+        Assert.Equal(Refused.Nothing, whole.Refused);
     }
 
     [Fact]
@@ -551,14 +459,12 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         // denominator. If they flatten, there really is a limit in the material and the
         // question survives.
         output.WriteLine($"{Seeds} seeds, {Rounds} rounds, 11 bits even, budget 256");
-        output.WriteLine(
-            "sweep every | asked | spoke | again | named | eligible | names/eligible");
+        output.WriteLine("sweep every | asked | spoke | named | eligible | names/eligible");
 
         foreach (var every in new[] { 2000, 1000, 500, 250, 125 })
         {
             var asked = new List<double>();
             var spoke = new List<double>();
-            var again = new List<double>();
             var named = new List<double>();
             var eligible = new List<double>();
 
@@ -572,15 +478,13 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
 
                 asked.Add(learned.Tally.Asked);
                 spoke.Add(learned.Tally.Spoke);
-                again.Add(learned.Tally.Again);
                 named.Add(learned.Named);
                 eligible.Add(learned.Eligible);
             }
 
             output.WriteLine(
                 $"{every,11} | {asked.Average(),5:F1} | {spoke.Average(),5:F1} "
-                + $"| {again.Average(),5:F1} | {named.Average(),5:F1} "
-                + $"| {eligible.Average(),8:F1} "
+                + $"| {named.Average(),5:F1} | {eligible.Average(),8:F1} "
                 + $"| {named.Average() / eligible.Average(),14:F3}");
         }
 

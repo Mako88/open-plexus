@@ -44,7 +44,17 @@ concurrency:
   # waiting rather than the one working. So intermediate commits are skipped
   # without any finished work being thrown away, and whatever is newest when the
   # queue clears is what gets tested.
-  group: tests-${{ github.ref }}
+  # AND A COMMIT CAN OPT OUT OF BEING SKIPPED, WHICH IS WHAT MAKES PUSHING FREE.
+  # The behaviour above is right for a branch being pushed to steadily and wrong
+  # for the one commit somebody actually wants a verdict on -- a checkpoint before
+  # a default changes, a state worth returning to. Put `[checkpoint]` in the commit
+  # message and the group becomes unique to that SHA, so it queues behind nothing,
+  # cancels nothing, and nothing cancels it. Everything else keeps rolling.
+  #
+  # SO THE RULE IS: PUSH WHENEVER, AND MARK THE ONES THAT MUST CLEAR. Waiting for a
+  # suite before pushing buys nothing this already gives -- the newest commit is
+  # what gets tested when the queue clears, and a marked one is tested regardless.
+  group: tests-${{ github.ref }}-${{ contains(github.event.head_commit.message, '[checkpoint]') && github.sha || 'rolling' }}
   cancel-in-progress: false
 jobs:
   # THE CORPORA ARE FETCHED ONCE AND NOT ONCE PER SHARD, WHICH IS WHY THIS IS ITS OWN

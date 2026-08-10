@@ -557,6 +557,7 @@ condition is a superstition.
 | Refusing an untested commitment its vote | They do decide wrong rounds, and excluding them moves no metric -- the seat passes to another wrong rule | A world where the right rule is usually present and merely outvoted |
 | Generalising a rule for never being wrong | Not missing is nearly free for a narrow rule, so it picks the least-tested and mints unsound ones with wider reach | A gate reading how TESTED a rule is, not whether it was wrong |
 | Loosening the repair budget, or gating it on the parent | Six cells over eight seeds found no more of the world's rules while repairing many times over | A world where the candidates it refuses are good ones. None known |
+| Rung five proposing a pair it has already named | Mints nothing, and spends a third of the rung's asks. Skipping them nearly tripled the stacking | A rung minting more than once an ask, so a spent chance costs less |
 | Subsumption weighed against DISTINCT occasions rather than firings | Chance on the noisy multiplexer, no sound rule left. Its halving explanation is measured true on even worlds only | A bar tracking depth as that world's reach does, which is not one direction |
 
 ---
@@ -1030,5 +1031,5 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **64** | John's: emit *Z was absent* as its own code at settlement, so rung two needs no negation in the scope language and no new matcher. Bounded to the commitment's own hits, or the candidate set is the vocabulary. Open |
 | **67** | John's: a parent spends ENERGY to repair rather than a fixed count. RETAKEN: the uncovered condition does not replace it, and trades the same way. Its fuel is a population fact, so it is scarce where blame is. Closed |
 | **69** | Rung five's yield is bounded by a calendar it shares with widening, subsumption and culling. Does abstraction want its own cadence? `sweep` has never been swept by anything. Open |
-| **70** | Proposals naming a pair already named mint nothing. `Renaming.Fresh` spends the ask on the best unnamed pair instead, and stops correcting for candidates it would refuse. Open, with a grid and a kill condition |
+| **70** | Proposals naming a pair already named mint nothing. ANSWERED: spending the ask on the best unnamed pair nearly triples the stacking on both eleven-bit worlds and sells nothing. Shipped, and the arm is deleted. Closed |
 | **68** | John's: does a conjunction EARN its narrowing? Its premise is half wrong -- reach halves with depth on even worlds and RISES under skew, where correlated codes let a long scope fire as often as a short one. Open |

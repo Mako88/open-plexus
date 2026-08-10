@@ -348,34 +348,6 @@ public readonly record struct Proposed
     public required ImmutableArray<Code>? Named { get; init; }
 }
 
-/// <summary>
-/// Whether rung five may spend an ask on a pair it has already named.
-/// </summary>
-/// <remarks>
-/// <para>
-/// <b>MEASURED BEFORE IT WAS A DIAL: TWO THIRDS OF PROPOSALS RE-DERIVE AN EXISTING NAME AT
-/// A TIGHT CADENCE, AND A THIRD DO AT THE SHIPPED ONE.</b> A name's identity is its members,
-/// so proposing a pair twice mints nothing — and rung five mints at most once an ask, so an
-/// ask spent on a known pair is an ask that cannot add vocabulary. That is not the same as
-/// wasted: repair may have built fresh children carrying the pair, and re-proposing shortens
-/// those. The question is which is worth the one chance.
-/// </para>
-/// <para>
-/// <b>AND SKIPPING THEM LOOSENS THE BAR RATHER THAN TIGHTENING IT, WHICH IS WHY THIS IS NOT
-/// SIMPLY A FILTER.</b> The correction multiplies by the candidates CONSIDERED, and a pair
-/// that could never be accepted was never a candidate. Under <see cref="Fresh"/> the gate
-/// stops correcting for a search it was not doing.
-/// </para>
-/// </remarks>
-public enum Renaming
-{
-    /// <summary>Take the strongest pair whatever it is, named before or not.</summary>
-    Anything,
-
-    /// <summary>Consider only pairs this population has not already named.</summary>
-    Fresh,
-}
-
 public static class Abstracting
 {
     /// <summary>The sub-scope most worth naming, or nothing if none has earned it.</summary>
@@ -405,12 +377,28 @@ public static class Abstracting
     /// <param name="counted">What recurred, from one holder or from all of them merged.</param>
     /// <param name="dials">The gate's numbers.</param>
     /// <param name="named">
-    /// What this population has already named, or nothing where the caller does not know or
-    /// does not care. <b>Read only under <see cref="Renaming.Fresh"/></b>, so a caller
-    /// passing nothing under that arm gets the shipped behaviour rather than a throw — the
-    /// gate is also asked from tests and from a merge, where there is no one population whose
-    /// vocabulary it would be.
+    /// What this population has already named, or nothing where the caller has no one
+    /// vocabulary to speak of.
     /// </param>
+    /// <remarks>
+    /// <para>
+    /// <b>A PAIR ALREADY NAMED IS NOT A CANDIDATE, AND THE ARM THAT ALLOWED ONE IS DELETED.</b>
+    /// Proposing a pair twice mints nothing — a name's identity is its members — and this
+    /// mints at most once an ask, so an ask spent on a known pair cannot add vocabulary. The
+    /// old arm did that on a third of its asks at the shipped cadence. See the plan's
+    /// revival row.
+    /// </para>
+    /// <para>
+    /// <b>AND DROPPING THEM BEFORE THE CANDIDATE COUNT IS PRINCIPLE RATHER THAN GAIN.</b> The
+    /// correction multiplies by what was searched, and a pair that could never be accepted
+    /// was not searched — but the refusal counts did not move between the arms, so the whole
+    /// of the measured effect was the ask being spent where it could still buy a name.
+    /// </para>
+    /// <para>
+    /// <b>NOTHING PASSED MEANS NOTHING SKIPPED, which is what a merge and a test want.</b>
+    /// There is no one population whose vocabulary it would be.
+    /// </para>
+    /// </remarks>
     public static Proposed Propose(
         Recurrence counted, CommittingSettings dials, Naming? named = null)
     {
@@ -425,8 +413,6 @@ public static class Abstracting
         var together = counted.Together;
 
         if (together.Count == 0) return Nothing(scopes, 0, Refused.Unpaired);
-
-        var skipping = dials.Renaming == Renaming.Fresh && named is not null;
 
         (Code, Code)? best = null;
         var strongest = double.NegativeInfinity;
@@ -452,7 +438,7 @@ public static class Abstracting
             // A PAIR ALREADY NAMED CANNOT ADD VOCABULARY, so under `Fresh` it is not a
             // candidate -- and it is dropped BEFORE the count that the correction divides
             // among, because a candidate the gate would never accept is not one it searched.
-            if (skipping && named!.Knows(Naming.Name([pair.Left, pair.Right]))) continue;
+            if (named is not null && named.Knows(Naming.Name([pair.Left, pair.Right]))) continue;
 
             candidates++;
 

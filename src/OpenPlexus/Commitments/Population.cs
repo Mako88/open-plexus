@@ -342,7 +342,7 @@ public sealed class Population
     /// </remarks>
     public long Searched => _reached;
 
-    private long _asked, _spoke, _again;
+    private long _asked, _spoke;
     private long _atScarce, _atUnpaired, _atRare, _atIndependent, _atUncertain;
 
     /// <summary>
@@ -371,27 +371,6 @@ public sealed class Population
     /// rewritten claim is already held.
     /// </remarks>
     public long Spoke => _spoke;
-
-    /// <summary>
-    /// Of those, the proposals naming a pair this population had already named.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>REPAIR SPENDS MOST OF ITS BUDGET RE-DERIVING WHAT IT HOLDS, AND THIS ASKS WHETHER
-    /// THE RUNG ABOVE IT DOES THE SAME.</b> A name's identity is its members, so proposing a
-    /// pair twice mints nothing the second time — <see cref="Naming.Mint"/> is a
-    /// <c>TryAdd</c>, and the count of distinct names does not move. From a naming count
-    /// alone a re-derivation and a refusal are the same silence.
-    /// </para>
-    /// <para>
-    /// <b>AND IT IS REACHABLE DESPITE THE REWRITE, WHICH IS WHY IT IS COUNTED RATHER THAN
-    /// ARGUED.</b> <c>Abstract</c> skips a commitment whose shortened form is already held,
-    /// so that scope keeps both members and can propose the pair again; and repair is free to
-    /// mint a fresh child carrying them. <c>AbstractingTests</c> shows a second pass finding
-    /// nothing on a population nobody has added to, which is a different claim.
-    /// </para>
-    /// </remarks>
-    public long Again => _again;
 
     /// <inheritdoc cref="Refused.Scarce"/>
     public long AtScarce => _atScarce;
@@ -1477,12 +1456,6 @@ public sealed class Population
         }
 
         if (reading.Named is not { } shared) return 0;
-
-        // ASKED BEFORE MINTING, because minting is what makes the answer yes. `Mint` is a
-        // `TryAdd` on a name derived from its members, so after the call a fresh name and a
-        // re-derived one are indistinguishable -- which is how this could have been happening
-        // for the life of the rung with nothing able to say so.
-        if (_names.Knows(Naming.Name(shared))) _again++;
 
         var name = _names.Mint(shared);
 

@@ -64,6 +64,17 @@ jobs:
       # Scanning the assembly for the trait would make the matrix a function of the
       # tree, so a grid could appear or vanish with no commit saying so. Adding a
       # sweep is a line in a diff.
+      # AND AN ENTRY MAY BE A CLASS OR ONE METHOD OF ONE, WHICH IS THE ONLY LEVER ON
+      # WALL CLOCK HERE. The filter is a substring match on the fully-qualified name,
+      # so `NamingYieldTests.Which_bar` is as valid an entry as `NamingYieldTests` --
+      # and a class holding four grids of a couple of hundred runs each is four
+      # runners' work sitting on one. Splitting it is not parallelising a
+      # measurement: each runner is still one serial run at a serial run's load.
+      #
+      # SPLIT A CLASS WHEN IT HOLDS INDEPENDENT GRIDS, and leave it whole otherwise.
+      # A dispatch naming the class still matches every method of it by substring, so
+      # `only=NamingYieldTests` picks up all four entries below and they land on four
+      # runners rather than one.
       - id: pick
         env:
           ONLY: ${{ inputs.only }}
@@ -72,7 +83,11 @@ jobs:
             "AbstainTests","ArrangingTests","AskedTests","BudgetCurveTests",
             "BudgetTests","ChoosingTests","FleetTests","FoldingTests",
             "GateCostTests","LatencyTests","LiftingTests","MendingTests",
-            "MonkTests","NamingYieldTests","NarrowingTests","OverlapTests","PlacingTests",
+            "MonkTests","NarrowingTests","OverlapTests","PlacingTests",
+            "NamingYieldTests.Which_bar_takes",
+            "NamingYieldTests.Whether_spending_the_ask",
+            "NamingYieldTests.What_bounds_rung_fives_yield",
+            "NamingYieldTests.And_a_real_populations_best_pair",
             "QueryCostTests","RefusalTests","SeparableTests","SharpeningTests",
             "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",
             "WeighingTests","WideningTests"

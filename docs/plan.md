@@ -779,9 +779,9 @@ change of architecture entirely.
   past one flip the run sits well under what it reaches from scratch in fewer.
 - **AND THREE ACCOUNTS OF IT ARE DEAD.** Old rules squatting, genesis gated shut, subsumption
   eating the repairs — each had a mechanism, each got a control, none of them is it.
-- **AND WHAT IT IS BOUND BY IS THE REPAIR BUDGET.** Free recovers where sixty-four and two
-  hundred and fifty-six do not, by five standard errors — and on a world that holds still the
-  three arms are level.
+- **AND WHAT IT IS BOUND BY IS THE REPAIR BUDGET.** Free recovers where the capped arms do
+  not, by five standard errors at six bits and ten at eleven, while a world that holds still
+  stays level at both.
 - **AND A PER-PARENT LIFETIME CAP IS WHAT C4 SAYS CANNOT BE ASSUMED.** A total spent over a
   parent's life is a bet that its life is one episode; the constraint says there is no
   episode boundary.

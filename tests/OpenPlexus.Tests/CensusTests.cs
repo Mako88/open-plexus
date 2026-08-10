@@ -134,9 +134,11 @@ public sealed class CensusTests(ITestOutputHelper output)
             // only where its parent does -- so it is a ceiling rather than a search problem,
             // and every gate, budget and timing arm on this bench is aimed at the other kind.
             output.WriteLine(
-                $"{"",16} | uncovered {census.Uncovered,6} | of those unreachable "
-                + $"{census.Unreachable,6} | "
-                + $"{(census.Uncovered == 0 ? 0.0 : census.Unreachable / (double)census.Uncovered),6:P1}");
+                $"{"",16} | uncovered {census.Uncovered,6} | unreachable "
+                + $"{census.Unreachable,5} "
+                + $"({(census.Uncovered == 0 ? 0.0 : census.Unreachable / (double)census.Uncovered):P1})"
+                + $" | present but under the floor {census.Ineligible,6} "
+                + $"({(census.Uncovered == 0 ? 0.0 : census.Ineligible / (double)census.Uncovered):P1})");
         }
     }
 

@@ -931,6 +931,9 @@ change of architecture entirely.
 - **AND THOSE ROUNDS ARE NOT A CEILING: UNDER TWO IN A HUNDRED ARE UNREACHABLE.** On the rest
   something expecting the right answer DID fire — unsound, but present — so repair had the
   material to narrow and did not.
+- **AND THE MISS FLOOR IS NOT THE BARRIER EITHER: a tenth at most are present but untouchable.**
+  So on nine tenths repair was ALLOWED to narrow a parent expecting the right answer and did
+  not. What is left is blame and subsumption.
 - **THE OVER-SPECIALISATION STORY IS REFUTED BY ITS OWN NUMBER.** A child beats a sound
   parent on a fortieth of wrong rounds, so the vote preferring the narrower rule costs
   nothing measurable.

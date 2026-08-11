@@ -52,10 +52,18 @@ public sealed class DocsTests
     /// done, what was tried and what would revive it, the traps, and the fork index
     /// the code cites. <b>Anything built and decided is not on this list</b>,
     /// because it is in the code.
+    /// <para>
+    /// <b>AND ONE SECTION ARRIVES BETWEEN THE GOAL AND THE CONSTRAINTS, which is where it
+    /// belongs rather than where it was convenient.</b> The first north star is the thing
+    /// being built TOWARD — twenty phones and a body — and it sits after the goal because it
+    /// is not the goal, and before the constraints because several constraints only make
+    /// sense once you know what is going to be running on what.
+    /// </para>
     /// </remarks>
     private static readonly string[] Sections =
     [
         "The goal",
+        "The first north star",
         "The constraints",
         "TO BUILD",
         "DO NOT RE-TRY",

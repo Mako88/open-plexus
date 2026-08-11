@@ -28,6 +28,30 @@ refutes it — read its refutation table before repeating anything.
 - **The representation is the residue of repaired failures**, not a thing designed up
   front. Distinctions get minted to tell two conflated cases apart.
 
+## The first north star
+
+John's, and it is a stepping stone rather than the goal above. Written down because it
+FORBIDS things, and several of them are already measured.
+
+- **Twenty used phones on one wifi running the brain**, one stronger machine carrying the
+  body — camera at a frame or two a second, audio, temperature, motion.
+- **And a text conversation as a second body**, so one brain is judged on symbols and on a
+  stream of the world without being two brains.
+- **THE CONSTRAINTS WERE ALL WRITTEN FOR THIS, so it is a demonstration rather than a
+  benchmark.** No shared memory, late messages, a cluster vanishing mid-thought.
+- **AND TWENTY IS ALREADY THE MEASURED EDGE.** Placement by minimum code is capped by a
+  world's distinct roots, so fleet size and the front end's vocabulary are one number.
+- **WHAT IT NEEDS THAT DOES NOT EXIST IS SLOTS.** A fleet losing one message waits forever
+  and real wifi loses messages. Fork 53, answered in principle by fork 62, unbuilt.
+- **AND WHAT IT BREAKS IS NAMING.** Machines sharing most of a stream agree on names as
+  badly as machines sharing none, so rung five needs merged counts before a body arrives.
+- **AND EVERY GROUND-TRUTH INSTRUMENT GOES DARK.** Soundness, overshoot and hard-round
+  coverage all need a world that can be enumerated, so the generated worlds never leave.
+- **SO THE PROBE IS THE ONE INSTRUMENT THAT CROSSES.** Ask what the codes carry against what
+  the raw reading carries, per sensor, BEFORE building anything on that sensor.
+- **A SENSOR IS A WORLD AND A WORLD IS A STREAM**, so nothing here is a new kind of input —
+  what is missing is the plumbing, not a mechanism.
+
 ## The constraints
 
 Carried unchanged from `csharp`. They are about the machine, not the architecture.

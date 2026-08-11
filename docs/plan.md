@@ -1074,6 +1074,14 @@ change of architecture entirely.
   on far more of the rounds a base rate gets wrong.
 - **SO CULLING WAS DOING REAL WORK RATHER THAN DESTROYING WHAT WAS EARNED**, and what the
   flood costs is the wrong rules minted beside the reach.
+- **AND THE AIMED ARM TAKES MOST OF THE REACH FOR A FRACTION OF THE COST.** `Widening.Shared`
+  buys a majority of the coverage gain at both eleven-bit widths from a twentieth of the
+  proposals, and under skew costs no measurable accuracy at all.
+- **AND IT COSTS NO TRUE RULES WHERE THE FLOOD TRENDS DOWN**, which is what a population not
+  pinned at its ceiling looks like. The sound counts are inside their error bars, so this is
+  an absence of damage rather than a gain.
+- **AND IT IS THE FIRST WIDENING RULE THAT IS NOT DAMAGE WHERE THERE IS NOTHING TO SHORTEN.**
+  Six bits keeps its clean score while the ungated arm spends a fiftieth of a point of it.
 - **AND ACCURACY SEPARATES TRUTH FROM FALSEHOOD BEST ON THE WORLD IT LEARNS LEAST**, so
   the fitness signal is not what fails there.
 - **AND THE VOTE RULE'S SIGN FLIPS ON THAT READING, WHICH NO SCORE SHOWED.** A sum carries
@@ -1237,7 +1245,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **74** | Could one repair add two codes, sparing a miss floor? CLOSED AGAINST, built and measured: coverage falls two to four standard errors on three worlds while the carriers overshoot the minimum sound depth. Deleted with a revival row |
 | **78** | Gate widening on the clean record being significant against the base rate. CLOSED AGAINST, built: bit-identical on all four cells, because the miss floor already pays that bar below 0.88. Deleted with a revival row |
 | **79** | Is widening's accuracy cost the shortened rules or the ceiling they reach? CLOSED AGAINST the ceiling: four times the capacity leaves coverage flat and accuracy no better, while the unsound rules quadruple |
-| **80** | Nothing inside a rule can name its redundant code, since its tally skips its own scope. `Widening.Shared` asks two clean rules that disagree about exactly one code instead — rung five's trigger pointing down. Open |
+| **80** | Two clean rules disagreeing about one code name the redundant one that neither can see. MEASURED: a majority of the reach at a twentieth of the proposals, clear on the even world and bare under skew. Open on `Arranged` |
 | **81** | `Widening.Shared`'s evidence is two residents agreeing, so splitting the population splits the agreement — rung five's failure by a new door. What it loses per holder, and whether shipping the name frequencies recovers it exactly. Open |
 | **77** | Can `Budgeting.Children` bind now that `Budget` sits below the vocabulary? CLOSED AGAINST, and no grid was owed: under `Forking.Distinct` a name is added exactly when an attempt is charged |
 | **76** | Repair proposes the same child until its table drifts, so a budget buys re-derivations. Refusing a parent its spent codes multiplies its distinct children eightfold at one seed. Does quantity buy the uncovered rounds, or only more population? Open |

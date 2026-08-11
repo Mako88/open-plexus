@@ -203,16 +203,33 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// </summary>
     /// <param name="ct">Cancellation.</param>
     /// <remarks>
+    /// <para>
     /// <b>A PEER THAT CANNOT BE REACHED IS NOT AN ERROR, WHICH IS C3 AT STARTUP.</b> A
     /// machine that is not up yet, or never will be, must not stop this one from running —
     /// so a failed announcement is dropped and the peer simply does not know about these
     /// clusters until the next one.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS A FAN-OUT LIKE EVERY OTHER ONE HERE, WHICH IT WAS NOT UNTIL SOMETHING
+    /// TIMED A FLEET COMING UP.</b> This awaited each peer in turn, so a machine opening paid
+    /// the SUM of its peers rather than the slowest of them — the identical defect the class
+    /// remark describes at length for a broadcast, in the method underneath it, surviving the
+    /// commit that fixed the other two.
+    /// </para>
+    /// <para>
+    /// <b>AND WHAT IT COSTS IS PAID EXACTLY WHERE IT HURTS MOST.</b> A peer that is not there
+    /// costs a connect giving up — four seconds on a Windows loopback, and a real timeout on
+    /// a wifi — so a fleet coming up is the one moment when most posts fail, and serialising
+    /// it multiplied that by the number of machines. Twenty phones where two are off is the
+    /// arrangement this is for.
+    /// </para>
     /// </remarks>
     private async Task AnnounceAsync(CancellationToken ct = default)
     {
         var mine = Mine();
 
-        foreach (var peer in _peers) await PostAsync(peer, "announce", mine, ct).ConfigureAwait(false);
+        await Task.WhenAll(_peers.Select(peer => PostAsync(peer, "announce", mine, ct)))
+            .ConfigureAwait(false);
     }
 
     /// <summary>What this machine holds, as it would tell anyone.</summary>
@@ -591,7 +608,13 @@ public sealed class Posted : IBus, IAsyncDisposable
         // AND TO EVERY PEER, BECAUSE THE SENDER DOES NOT KNOW WHO LISTENS. Fork 11 routes
         // a finished thought by the CODES it reached rather than by an address, so the
         // only way to honour that across machines is for each to decide for itself.
-        foreach (var peer in _peers) await PostAsync(peer, "settled", settled, ct).ConfigureAwait(false);
+        //
+        // ALL AT ONCE, FOR THE REASON `AnnounceAsync` GIVES. This is the widest fan-out on
+        // the bus -- every machine, not every machine holding something -- and it awaited
+        // each peer in turn, so publishing a finished thought was paced by the whole fleet
+        // in series while the class remark above promised otherwise.
+        await Task.WhenAll(_peers.Select(peer => PostAsync(peer, "settled", settled, ct)))
+            .ConfigureAwait(false);
     }
 
     private async Task DeliverLocallyAsync(Settled settled, CancellationToken ct)

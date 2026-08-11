@@ -755,6 +755,9 @@ change of architecture entirely.
 - **AND THE CLOCK CAME FROM THE OTHER PATH.** The thinking side had never been timed across
   a socket, so the defect was found by measuring the learning side — a check on one
   mechanism reaching a fault in another.
+- **AND THE SAME SENTENCE WAS STILL FALSE OF TWO MORE METHODS IN THAT FILE, UNDERNEATH THE
+  COMMIT THAT FIXED THE OTHER TWO.** Announcing and publishing queued their peers. A fix
+  aimed at the callers a measurement happened to touch leaves the rest.
 - **A BUDGET CAN BE SATISFIED BY A COINCIDENCE.** `Machines.Holder` read as wired because a
   tuple field in another file was spelt `Holder`; renaming it put two unmounted types onto
   the dead-code list at once.

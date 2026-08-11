@@ -41,10 +41,19 @@ FORBIDS things, and several of them are already measured.
   benchmark.** No shared memory, late messages, a cluster vanishing mid-thought.
 - **AND TWENTY IS ALREADY THE MEASURED EDGE.** Placement by minimum code is capped by a
   world's distinct roots, so fleet size and the front end's vocabulary are one number.
-- **WHAT IT NEEDS THAT DOES NOT EXIST IS SLOTS.** A fleet losing one message waits forever
-  and real wifi loses messages. Fork 53, answered in principle by fork 62, unbuilt.
-- **AND WHAT IT BREAKS IS NAMING.** Machines sharing most of a stream agree on names as
-  badly as machines sharing none, so rung five needs merged counts before a body arrives.
+- **WHAT IT NEEDS IS THE DEATH HANDLING THE WALK ALREADY HAS.** A departure writes off what
+  was owed from the dead machine so the thought can settle — built, tested, and on the other
+  learner. Unported rather than unsolved.
+- **AND ONE INPUT MACHINE FEEDING TWENTY HOLDERS IS THE IDENTICAL CASE, NOT THE SHARED ONE.**
+  Every holder is told the same moment and the same settlement, so naming converges — the
+  divergence measured was between machines seeing DIFFERENT streams.
+- **SO A CAMERA PER PHONE IS THE ARRANGEMENT TO AVOID**, and it is the arrangement nobody
+  proposed. What breaks naming is many eyes, not many brains.
+- **AND A CURRICULUM IS ALLOWED AND C4 IS NOT ABOUT IT.** *No episode boundary* constrains
+  the LEARNER; what an experimenter feeds and in what order is outside the machine.
+- **SO A PRIMER BEFORE A TEST IS EXPECTED RATHER THAN A CHEAT** — the language before the
+  play, the room before the question. What is forbidden is the learner being able to tell
+  that a boundary happened.
 - **AND EVERY GROUND-TRUTH INSTRUMENT GOES DARK.** Soundness, overshoot and hard-round
   coverage all need a world that can be enumerated, so the generated worlds never leave.
 - **SO THE PROBE IS THE ONE INSTRUMENT THAT CROSSES.** Ask what the codes carry against what
@@ -1303,7 +1312,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **57** | Every node predicts its own output while the real wave verifies behind it. What it saves is a LAN millisecond and an internet hundred, so where it pays is deployment. What a holder predicts from is a commitment about one |
 | **58** | The gate's sign flips with the timing, and the whole two-by-two has been run rather than read off four rows and a revival note. What is ruinous is the gate AFTER a failure specifically. Open on any other world |
 | **59** | Dissolved rather than decided. The setting was a gate and a timing crossed, so the cell that isolated the gate axis is not a cell — it is a corner of a grid, and both axes are now settings. Closed |
-| **53** | The loop is asynchronous and holds no clock, so a fleet losing one message waits forever. ANSWERED IN PRINCIPLE by fork 62: act when one machine in every slot has answered, which is a completeness condition rather than a deadline. Unbuilt |
+| **53** | The commitment fleet losing one message waits forever. AND THE WALK ALREADY SOLVES IT: a departure writes off the routes owed from the dead cluster and the thought settles. Ported, not invented — `DepartureTests` holds the shape. Unbuilt here |
 | **60** | Genesis is placed and repair is not, so a fleet repairs once per HOLDER a round where one machine repairs once. How hard it searches is a deployment choice. Place repair, divide the budget, or exploit it? Open |
 | **61** | John's: place a commitment by the MINIMUM code of its sorted scope, so identical children land together and a lineage stays together. PRICED: level at three holders, three times the average at twelve, capped by a world's distinct roots |
 | **62** | John's: partition into slots and give each R machines holding identical populations. A death costs nothing while a slot survives, replicas need no messages between them, and it answers fork 53. R scales with load |

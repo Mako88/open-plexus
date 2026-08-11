@@ -449,16 +449,9 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   statistics — a floor on how deep specialisation goes per unit of observation.
 - **AND THAT FLOOR IS WHAT THE CHAIN COSTS, MEASURED.** Every rung re-earns it, the world's
   true rules are three or four codes deep, and only the last rung ever pays.
-- **AND A PARENT'S TABLE PREDICTS ITS CHILD'S FIRST CHOICE THREE TIMES IN TEN TO ONE IN TWO.**
-  A majority only where the world is skewed, so a one-pass step would misfire on the even
-  worlds and might not on the tilted one.
-- **THOUGH A MAJORITY IS NOT ENOUGH WHILE THE TWO OUTCOMES COST DIFFERENTLY.** A right second
-  code saves a miss floor; a wrong one mints a child too narrow to be sound, and what THAT
-  costs is unmeasured.
-- **AND THE INDIRECT EVIDENCE SAYS EXPENSIVE.** The subsumption that prunes harder holds fewer
-  residents and buys MORE carriers, so a child that does not pay costs the search rather than
-  merely occupying it.
-- **SO SHORTENING IT NEEDS CONDITIONED COUNTS, WHICH IS THE TABLE THAT BLOWS UP** — argued
+- **AND PAYING THAT FLOOR ONCE INSTEAD OF TWICE IS REFUTED, so what is left is a step that
+  lands where the truth is.** See fork 74's revival row and fork 75.
+- **AND AIMING ONE WOULD NEED CONDITIONED COUNTS, WHICH IS THE TABLE THAT BLOWS UP** — argued
   rather than measured. A child could inherit its parent's table filtered by the added code,
   and that wants pair counts where the table is already commitments times codes.
 - **Quantisation boundary noise is the interface risk, and repair amplifies it.** Two

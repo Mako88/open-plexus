@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Worlds;
@@ -491,6 +491,30 @@ public sealed record Census
     /// </remarks>
     public required long Hard { get; init; }
 
+    /// <summary>The outcome the world produced most often, as the run last saw it.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE ONE THING NEEDED TO ASK WHETHER A TRUE RULE COULD EVER PAY, and it was
+    /// computed every round and thrown away.</b> <see cref="Hard"/> counts rounds this is not
+    /// the answer to; nothing anywhere says WHICH outcome it is, so no reading can separate
+    /// the world's rules that expect it from the ones that do not.
+    /// </para>
+    /// <para>
+    /// <b>WHICH IS THE DIFFERENCE BETWEEN A RULE THAT CANNOT PAY AND ONE THAT DID NOT.</b> A
+    /// true rule expecting the commonest outcome fires only where guessing already works,
+    /// however accurate it is — so counting the world's rules a run has found says nothing
+    /// about coverage until the count is split this way. Two levers have now moved
+    /// <c>found</c> a long way with <see cref="Paying"/> flat, and neither could say whether
+    /// the rules arriving were the useless kind.
+    /// </para>
+    /// <para>
+    /// <b>TAKEN FROM WHAT ARRIVED RATHER THAN DECLARED, exactly as <see cref="Hard"/> is.</b>
+    /// A world does not tell anyone its base rate, and a harness reading one off the world
+    /// would be scoring against a fact the learner cannot see.
+    /// </para>
+    /// </remarks>
+    public required Code? Commonest { get; init; }
+
     /// <summary>Of those, how many had a SOUND rule fire and advocate the right answer.</summary>
     /// <remarks>
     /// <b>THE INSTRUMENT `Found` SHOULD HAVE BEEN ALL ALONG.</b> A world admits several
@@ -672,6 +696,11 @@ public sealed class Trial<TSeen>
         // two entries in it.
         var arrivals = new Dictionary<Code, long>();
 
+        // NOTHING UNTIL A ROUND HAS BEEN JUDGED, which is why it is nullable rather than a
+        // default code. A run whose census saw no settled round has no commonest outcome, and
+        // a zero code there would be a claim about the world rather than an absence.
+        Code? seenMost = null;
+
         // ONE POPULATION OR NONE, BECAUSE THE CENSUS ASKS WHAT A MACHINE HELD. On a fleet
         // no single population is the one that voted, and reaching into all of them to
         // find out would be the experimenter answering a question C1 says a machine may
@@ -706,6 +735,10 @@ public sealed class Trial<TSeen>
                     ? arrived
                     : arrivals.OrderByDescending(one => one.Value).ThenBy(one => one.Key)
                         .First().Key;
+
+                // KEPT AS THE RUN'S LAST WORD ON IT rather than recomputed at the end, so
+                // the answer reported is exactly the one the last round was judged against.
+                seenMost = commonest;
 
                 if (arrived != commonest)
                 {
@@ -869,6 +902,7 @@ public sealed class Trial<TSeen>
                     Untested = untested,
                     Hard = hard,
                     Carried = carried,
+                    Commonest = seenMost,
                 },
         };
     }

@@ -1012,6 +1012,12 @@ change of architecture entirely.
 - **AND `Found` MARKS THE BASIS RATHER THAN THE LEARNER, WHICH THIS DOC ALREADY WARNED.**
   Skew makes an all-agree rule cheap, sound and useless. `Census.Paying` is the reading
   that cannot be gamed.
+- **AND THE COUNT SPLITS AT LAST BY WHETHER A FOUND RULE COULD EVER PAY.** `Learned.Payable`
+  counts the world's rules held that expect something other than the commonest outcome, which
+  is the only kind that can fire where the base rate fails.
+- **AND THE SEARCH HAD NEARLY SATURATED THAT HALF BEFORE ANY OF THIS**, on one seed under
+  skew. A lever more than doubling `found` added one payable rule and six that fire only where
+  guessing already works.
 - **AND ACCURACY SEPARATES TRUTH FROM FALSEHOOD BEST ON THE WORLD IT LEARNS LEAST**, so
   the fitness signal is not what fails there.
 - **AND THE VOTE RULE'S SIGN FLIPS ON THAT READING, WHICH NO SCORE SHOWED.** A sum carries

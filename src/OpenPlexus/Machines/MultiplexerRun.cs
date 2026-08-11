@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 
@@ -26,6 +26,41 @@ public sealed record Learned
 
     /// <summary>How many of the world's own rules are held exactly.</summary>
     public required int Found { get; init; }
+
+    /// <summary>
+    /// Of those, how many expect something OTHER than the commonest outcome — <b>the split
+    /// that says whether a found rule could ever have paid.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A TRUE RULE EXPECTING THE COMMONEST OUTCOME FIRES ONLY WHERE GUESSING ALREADY
+    /// WORKS</b>, however accurate it is and however sound. So <see cref="Found"/> counts two
+    /// unlike things at once, and two levers have now moved it a long way with
+    /// <c>Census.Paying</c> flat — thirteen of sixteen against six under skew, and no more
+    /// hard rounds carried. Neither reading could say whether the rules arriving were the
+    /// useless kind.
+    /// </para>
+    /// <para>
+    /// <b>NAMED FOR WHAT IT BOUNDS RATHER THAN FOR WHAT IT COUNTS, so it cannot be read as
+    /// <c>Census.Paying</c>.</b> That one is a SHARE of the hard rounds actually carried;
+    /// this is a COUNT of the world's rules that could in principle carry one, and a grid
+    /// carrying both under one word would be two different questions in one column.
+    /// </para>
+    /// <para>
+    /// <b>IT IS AN UPPER BOUND ON WHAT COULD PAY AND NEVER A COUNT OF WHAT DID</b>, which is
+    /// the whole reason it sits beside <c>Census.Carried</c> rather than replacing it. A rule
+    /// expecting the rare outcome still has to FIRE on a round the rare outcome arrives on,
+    /// and a deep enough scope may never do so.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS NOUGHT WHERE THE CENSUS DID NOT RUN, which is not the same as no such
+    /// rule being held.</b> The commonest outcome is read off what arrived, so a run that was
+    /// never censused has nothing to split by — this repo's own trap about a check that is
+    /// wired and unable to fire, avoided by saying so here rather than by a number that looks
+    /// like a finding.
+    /// </para>
+    /// </remarks>
+    public required int Payable { get; init; }
 
     /// <summary>How many rules that basis holds.</summary>
     public required int Truths { get; init; }
@@ -122,11 +157,29 @@ public sealed record Learned
             Unsound = decidable.Count - true_,
             Unchecked = experienced.Count - decidable.Count,
             Truths = truths.Length,
-            Found = truths.Count(truth => held.All.Any(
-                one => one.Expects == truth.Expects
-                    && held.Names.Unfold(one.Scope).SequenceEqual(truth.Scope))),
+            Found = truths.Count(truth => Holds(held, truth)),
+
+            // AND THE SAME WALK SPLIT BY WHETHER THE RULE COULD EVER HAVE PAID. Written as a
+            // second `Count` over the same predicate rather than folded into one pass,
+            // because the grading here is read far more often than it is run and a pair of
+            // obvious walks is worth more than one clever one.
+            Payable = tally.Census?.Commonest is not { } commonest
+                ? 0
+                : truths.Count(truth =>
+                    truth.Expects != commonest && Holds(held, truth)),
         };
     }
+
+    /// <summary>Whether the population holds one of the world's rules exactly.</summary>
+    /// <remarks>
+    /// <b>PULLED OUT BECAUSE IT IS ASKED TWICE NOW</b> — once over every truth and once over
+    /// the truths expecting something other than the commonest outcome. Two copies of a scope
+    /// comparison is two chances for one of them to unfold a minted name and the other not
+    /// to, which is a fault that would read as a finding about which rules were found.
+    /// </remarks>
+    private static bool Holds(Commitments.Population held, Worlds.Truth truth) =>
+        held.All.Any(one => one.Expects == truth.Expects
+            && held.Names.Unfold(one.Scope).SequenceEqual(truth.Scope));
 }
 
 /// <summary>Step one, end to end, on the world it is judged on.</summary>

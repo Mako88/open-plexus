@@ -270,10 +270,12 @@ public sealed class ForkingTests(ITestOutputHelper output)
             output.WriteLine(
                 $"{address + (1 << address),2} bits skew {skew:F1} | repeated "
                 + $"born {repeated.Repaired,6} collided {Collisions(repeatedRun),7} "
-                + $"found {repeated.Found}/{repeated.Truths} | "
+                + $"found {repeated.Found}/{repeated.Truths} "
+                + $"payable {repeated.Payable} | "
                 + $"distinct born {distinct.Repaired,6} "
                 + $"collided {Collisions(distinctRun),7} "
-                + $"found {distinct.Found}/{distinct.Truths}");
+                + $"found {distinct.Found}/{distinct.Truths} "
+                + $"payable {distinct.Payable}");
 
             Assert.True(
                 Collisions(distinctRun) < Collisions(repeatedRun),

@@ -1018,6 +1018,12 @@ change of architecture entirely.
 - **AND THE SEARCH HAD NEARLY SATURATED THAT HALF BEFORE ANY OF THIS**, on one seed under
   skew. A lever more than doubling `found` added one payable rule and six that fire only where
   guessing already works.
+- **AND `Forking.Repeated` FINDS ONLY THE PAYABLE KIND, WHICH IS THE OPPOSITE OF THE WORRY.** A
+  rule expecting the commonest outcome is rarely wrong, so repair rarely drives it deep enough
+  to become one of the world's own.
+- **SO HARD-ROUND COVERAGE MAY SIMPLY TRACK HOW MANY PAYABLE TRUTHS ARE HELD**, and that count
+  is within one or two of every one there is. If it holds over seeds, the search is not the
+  thing that is broken under skew.
 - **AND ACCURACY SEPARATES TRUTH FROM FALSEHOOD BEST ON THE WORLD IT LEARNS LEAST**, so
   the fitness signal is not what fails there.
 - **AND THE VOTE RULE'S SIGN FLIPS ON THAT READING, WHICH NO SCORE SHOWED.** A sum carries

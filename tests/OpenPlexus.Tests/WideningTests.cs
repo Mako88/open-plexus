@@ -43,7 +43,9 @@ public sealed class WideningTests(ITestOutputHelper output)
     /// <param name="skew">How often a data bit is one, or zero to leave them even.</param>
     /// <param name="widening">Whether anything shortens a scope.</param>
     /// <param name="seed">The world's generator and the brain's.</param>
-    private static Learned Run(int address, double skew, Widening widening, int seed) =>
+    /// <param name="capacity">How many commitments the machine may hold.</param>
+    private static Learned Run(
+        int address, double skew, Widening widening, int seed, int? capacity = null) =>
         new MultiplexerRun(
             new MultiplexerSettings { Address = address, Skew = skew },
             new Brain(
@@ -57,6 +59,10 @@ public sealed class WideningTests(ITestOutputHelper output)
                     // machine its rows are about the next time one of them moves again.
                     Forking = Forking.Distinct,
                     Budget = 8,
+
+                    // AND THE DEFAULT IS SPELT OUT RATHER THAN INHERITED FOR THE SAME REASON
+                    // ONE LINE UP, since the grid below is entirely about this number.
+                    Capacity = capacity ?? new CommittingSettings().Capacity,
                 },
                 seed),
             seed,
@@ -74,41 +80,54 @@ public sealed class WideningTests(ITestOutputHelper output)
             output.WriteLine($"--- {address + (1 << address)} bits, skew {skew:F1} ---");
 
             foreach (var widening in new[] { Widening.Never, Widening.Unmissed })
-            {
-                var once = new Dictionary<int, Learned>();
-
-                Learned Cached(int seed)
-                {
-                    if (!once.TryGetValue(seed, out var learned))
-                        once[seed] = learned = Run(address, skew, widening, seed);
-
-                    return learned;
-                }
-
-                foreach (var reading in new (string What, Func<Learned, double> Of)[]
-                {
-                    ("paying", one => one.Census!.Paying),
-                    ("recent", one => one.Recent),
-                    ("sound", one => one.Sound),
-                    ("unsound", one => one.Unsound),
-                    ("residents", one => one.Resident),
-                    ("widened", one => one.Tally.Widened),
-                    ("subsumed", one => one.Tally.Subsumed),
-                })
-                {
-                    var arm = await Sweep.ArmAsync(
-                        reading.What,
-                        Seeds,
-                        seed => Task.FromResult(reading.Of(Cached(seed))));
-
-                    output.WriteLine(
-                        $"  {widening,-9} {reading.What,-10} | {arm.Mean,10:F3} "
-                        + $"+/-{arm.StdErr,8:F3} | n={arm.Seeds}");
-                }
-
-                output.WriteLine("");
-            }
+                await Report($"{widening}", seed => Run(address, skew, widening, seed));
         }
+    }
+
+    /// <summary>Every column of one cell, over the seeds, from one population a seed.</summary>
+    /// <param name="cell">What to print the rows under.</param>
+    /// <param name="run">How to build the population for a seed.</param>
+    /// <remarks>
+    /// <b>THE CACHE IS THE POINT AND NOT A TIDINESS.</b> A grid asking `Sweep` for its runs
+    /// per COLUMN builds every population once a column, so one measurement is paid for
+    /// seven times and the column that would rank the arms looks too expensive to add. That
+    /// is a line on this repo's trap list, and it is written once here so a second grid in
+    /// this file cannot reintroduce it by copying the wrong half.
+    /// </remarks>
+    private async Task Report(string cell, Func<int, Learned> run)
+    {
+        var once = new Dictionary<int, Learned>();
+
+        Learned Cached(int seed)
+        {
+            if (!once.TryGetValue(seed, out var learned))
+                once[seed] = learned = run(seed);
+
+            return learned;
+        }
+
+        foreach (var reading in new (string What, Func<Learned, double> Of)[]
+        {
+            ("paying", one => one.Census!.Paying),
+            ("recent", one => one.Recent),
+            ("sound", one => one.Sound),
+            ("unsound", one => one.Unsound),
+            ("residents", one => one.Resident),
+            ("widened", one => one.Tally.Widened),
+            ("subsumed", one => one.Tally.Subsumed),
+        })
+        {
+            var arm = await Sweep.ArmAsync(
+                reading.What,
+                Seeds,
+                seed => Task.FromResult(reading.Of(Cached(seed))));
+
+            output.WriteLine(
+                $"  {cell,-20} {reading.What,-10} | {arm.Mean,10:F3} "
+                + $"+/-{arm.StdErr,8:F3} | n={arm.Seeds}");
+        }
+
+        output.WriteLine("");
     }
 
     /// <summary>
@@ -134,6 +153,57 @@ public sealed class WideningTests(ITestOutputHelper output)
         Assert.True(on.Tally.Widened > 0,
             "generalisation is switched on and proposed nothing, so either no commitment "
             + "ever reaches a scope of two with no misses, or the operator is not wired");
+    }
+
+    /// <summary>
+    /// <b>WHETHER WIDENING'S ACCURACY COST IS THE SHORTENED RULES OR THE CEILING THEY
+    /// PUSH THE POPULATION INTO.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE GRID ABOVE HOLDS 2001 RESIDENTS OF A CAPACITY OF 2000 AT BOTH ELEVEN-BIT
+    /// WIDTHS, AND 302 AT SIX.</b> So the arm is pinned at the ceiling exactly where it
+    /// costs a tenth of the trailing accuracy and free of it where it costs least — which
+    /// is a confound rather than a finding, because this repo has already measured that
+    /// what is damage is REACHING a capacity rather than holding more.
+    /// </para>
+    /// <para>
+    /// <b>AND THE TWO STORIES PREDICT OPPOSITE THINGS OF ONE CONTROL.</b> If the cost is
+    /// the shortened rules being wrong, raising the ceiling changes nothing about accuracy
+    /// and merely lets more wrong rules sit resident. If the cost is eviction, the
+    /// shortened rules were never the problem: a flood of blind proposals sorts at the
+    /// median of the judged and pushes earned rules out from below, and room removes it.
+    /// </para>
+    /// <para>
+    /// <b>CROSSED RATHER THAN MEASURED OFF THE ARM, because raising a ceiling moves the
+    /// baseline too.</b> A bigger population without widening is a different machine, and
+    /// comparing a widened arm at one capacity against an unwidened one at another would
+    /// move both axes — the trap this repo has now paid for four times.
+    /// </para>
+    /// <para>
+    /// <b>AND <c>residents</c> AGAINST THE CAPACITY IS WHAT SAYS THE MECHANISM RAN, WHICH
+    /// NO SCORE CAN.</b> A ceiling that is never reached and one that evicts constantly
+    /// read the same in every other column, and this grid is unreadable unless the raised
+    /// arm comes back UNDER its own ceiling — otherwise 8000 is another pinned machine and
+    /// the control never happened.
+    /// </para>
+    /// </remarks>
+    /// <param name="address">Address bits.</param>
+    /// <param name="skew">How often a data bit is one, or zero to leave them even.</param>
+    [Theory]
+    [InlineData(3, 0.0)]
+    [InlineData(3, 0.8)]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public async Task Whether_the_cost_of_widening_is_the_ceiling_it_reaches(
+        int address, double skew)
+    {
+        output.WriteLine($"--- {address + (1 << address)} bits, skew {skew:F1} ---");
+
+        foreach (var capacity in new[] { 2_000, 8_000 })
+            foreach (var widening in new[] { Widening.Never, Widening.Unmissed })
+                await Report(
+                    $"cap={capacity} {widening}",
+                    seed => Run(address, skew, widening, seed, capacity));
     }
 
     /// <summary>

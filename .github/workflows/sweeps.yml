@@ -115,7 +115,8 @@ jobs:
             "QueryCostTests","RefusalTests","ScalingTests",
             "SeparableTests",
             "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",
-            "WideningTests"
+            "WideningTests.Whether_shortening_a_scope",
+            "WideningTests.Whether_the_cost_of_widening"
           ]'
 
           if [ -z "$ONLY" ]; then

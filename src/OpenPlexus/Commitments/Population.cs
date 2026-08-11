@@ -1126,10 +1126,23 @@ public sealed class Population
                     else _differed++;
                 }
 
-                var child = new Commitment([.. culprit.Scope, added], culprit.Expects);
+                var runner = Repair.Runner(culprit, _dials);
 
-                if (Repair.Runner(culprit, _dials) is { } runner)
-                    _runners[child.Identity] = runner;
+                // FORK 74'S MECHANISM, AND IT IS THE SAME `runner` THE INSTRUMENT READS. Under
+                // `Pair` the second code is SPENT as a code rather than kept as a prediction,
+                // so the two uses are exclusive by construction and the arm cannot be measured
+                // by the instrument that motivated it. Nothing is recorded below in that arm
+                // for the same reason: a two-code child's own next choice is a THIRD code, and
+                // scoring it against the prediction that is already in its scope would be a
+                // different question wearing the same counter's name.
+                var pairing = _dials.Stepping == Stepping.Pair && runner is not null;
+
+                var child = pairing
+                    ? new Commitment([.. culprit.Scope, added, runner!.Value], culprit.Expects)
+                    : new Commitment([.. culprit.Scope, added], culprit.Expects);
+
+                if (!pairing && runner is { } kept)
+                    _runners[child.Identity] = kept;
 
                 if (!_minted.TryGetValue(culprit.Identity, out var born))
                     _minted[culprit.Identity] = born = new Forks();

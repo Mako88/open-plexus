@@ -112,6 +112,7 @@ jobs:
             "QueryCostTests","RefusalTests","ScalingTests",
             "SeparableTests",
             "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",
+            "SteppingTests",
             "WideningTests"
           ]'
 

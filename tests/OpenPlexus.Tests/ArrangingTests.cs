@@ -177,6 +177,62 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         // written for rather than enforced by an assertion somebody would have to edit.
     }
 
+    /// <summary>
+    /// <b>WHETHER SHORTENING A SCOPE IS DAMAGE WHERE THE TRUTHS ARE ALREADY ONE CODE — the
+    /// ship gate, and it is the mirror of the grid above.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THIS WORLD IS WHERE AN OPERATOR THAT UNDOES REPAIR SHOULD DO BEST, AND ALSO WHERE
+    /// IT COULD DO THE MOST HARM.</b> Its truths are one code, this doc already carries the
+    /// row that any repair here is damage, and a handful of one-code rules hold the whole
+    /// withheld set. So generalisation is either the correction that world has been asking
+    /// for, or it deletes the only rules that were working — and both are large effects
+    /// rather than a wash.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS THE UNSEEN SET THAT DECIDES, WHICH IS WHY THE GATE IS HERE AND NOT ON
+    /// THE MULTIPLEXER.</b> A generated world has no withheld half, so nothing there can
+    /// distinguish a rule that reaches further from a rule that has memorised more. This is
+    /// the only bench with the instrument, and shortening a scope is exactly the change
+    /// where those two come apart.
+    /// </para>
+    /// <para>
+    /// <b>TEN SEEDS, FOR THE SAME REASON THE GRID ABOVE ASKS FOR THEM.</b> The last
+    /// falsifier run on this world read 0.755 against 0.702 with a spread of 0.053 and
+    /// carried nothing either way; a ship gate that cannot speak is not a gate.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_shortening_a_scope_is_damage_where_one_code_is_already_the_truth()
+    {
+        output.WriteLine("arm        | unseen accuracy | spread | sound | unsound | residents");
+
+        foreach (var widening in new[] { Widening.Never, Widening.Unmissed, Widening.Shared })
+        {
+            // THE SEARCH PAIR PINNED RATHER THAN INHERITED, and the grid above is why. Both
+            // of these moved while fixtures that named neither were re-taken silently under
+            // their own rows' names, so a grid about a THIRD operator states them.
+            var dials = new CommittingSettings
+            {
+                Widening = widening,
+                Forking = Forking.Distinct,
+                Budget = 8,
+            };
+
+            var (unseen, last) = Sweep(Small, dials, Looking.Tiled, seeds: 10);
+
+            output.WriteLine(
+                $"{widening,-10} | {unseen.Average(),15:F3} | {Spread(unseen),6:F3} "
+                + $"| {last.Rules.Sound,5} | {last.Rules.Unsound,7} "
+                + $"| {last.Tally.Resident,9} | widened {last.Tally.Widened}");
+        }
+
+        // NO BAR, for the same reason as the grid above: the prediction is on the method and
+        // read against the rows it was written for.
+    }
+
     /// <summary>The standard error of a handful of readings.</summary>
     private static double Spread(List<double> readings)
     {

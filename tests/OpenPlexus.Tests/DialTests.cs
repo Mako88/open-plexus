@@ -132,7 +132,16 @@ public sealed class DialTests(ITestOutputHelper output)
             + "while a parent is being wrong and stops when it is not, and `Budget` "
             + "is not read at all. It is the only cell here that assumes nothing "
             + "about how long a parent lives, and whether it BINDS is the question "
-            + "-- `Children` was refused for turning out to be free in disguise",
+            + "-- `Children` was refused for turning out to be free in disguise. "
+            + "AND THE CELL THAT WOULD SEPARATE IT DOES NOT EXIST, WHICH IS "
+            + "ARITHMETIC AND NOT A MISSING WORLD: `Mend` charges an attempt and "
+            + "adds a name in the same two lines, and `Forking.Distinct` refuses a "
+            + "parent every code it has spent -- so two codes are two scopes are "
+            + "two identities, and the set and the counter move together forever. "
+            + "`Children` is FREE under `Repeated` and a SYNONYM under `Distinct`, "
+            + "with no third thing available; measured bit-identical on two worlds "
+            + "and 36 against 452 repairs under the other rule. It is kept as "
+            + "exactly that check, which goes red the day forking changes",
 
         ["Repairing"] =
             "OPEN, AND IT ARRIVES BY SEPARATION RATHER THAN BY INVENTION, which is "

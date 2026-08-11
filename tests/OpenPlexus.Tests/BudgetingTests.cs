@@ -154,6 +154,82 @@ public sealed class BudgetingTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>
+    /// <b>WHAT `Children` COUNTS UNDER THE SHIPPED FORKING RULE, WHICH IS WHAT `Attempts`
+    /// COUNTS.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>FORK 77 SAID THE ARM COULD BIND FOR THE FIRST TIME NOW THAT <c>Budget</c> SITS
+    /// BELOW THE VOCABULARY, AND IT CANNOT — FOR A COMPLETELY DIFFERENT REASON.</b>
+    /// <see cref="Population.Mend"/> charges <c>Attempts</c> and adds to <c>Names</c> in the
+    /// same two lines, and <see cref="Forking.Distinct"/> refuses a parent every code it has
+    /// already spent. Two different codes added to one scope are two different scopes and so
+    /// two different identities — so under the shipped rule the set and the counter move
+    /// together forever and the two arms are one arm.
+    /// </para>
+    /// <para>
+    /// <b>SO THE ARM IS FREE UNDER ONE FORKING RULE AND A SYNONYM UNDER THE OTHER, AND
+    /// THERE IS NO THIRD THING IT COULD BE.</b> That is not a fact about a world or about a
+    /// budget's level, which is why no grid was owed after all and why this is a check
+    /// rather than a sweep.
+    /// </para>
+    /// <para>
+    /// <b>AND IT ASSERTS BOTH HALVES, because one alone passes for free.</b> Identity under
+    /// <see cref="Forking.Distinct"/> would also be what a harness that ignored the dial
+    /// produced; a DIFFERENCE under <see cref="Forking.Repeated"/> is what says the arm is
+    /// wired to anything at all. The second half is the reading the deletion rests on.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Counting_distinct_children_is_counting_attempts_once_forking_is_distinct()
+    {
+        static Learned Run(Forking forking, Budgeting budgeting, int address, double skew)
+        {
+            var seed = Seeds.Apart(1, Purpose);
+
+            return new MultiplexerRun(
+                new MultiplexerSettings { Address = address, Skew = skew },
+                new Brain(
+                    new CommittingSettings { Forking = forking, Budgeting = budgeting },
+                    seed),
+                seed,
+                census: true).Run(Rounds);
+        }
+
+        foreach (var (address, skew) in new[] { (2, 0.0), (3, 0.8) })
+        {
+            var attempts = Run(Forking.Distinct, Budgeting.Attempts, address, skew);
+            var children = Run(Forking.Distinct, Budgeting.Children, address, skew);
+
+            output.WriteLine(
+                $"{address + (1 << address)} bits skew {skew:F1} distinct | "
+                + $"attempts repaired={attempts.Repaired} resident={attempts.Resident} "
+                + $"sound={attempts.Sound} recent={attempts.Recent:F4} || "
+                + $"children repaired={children.Repaired} resident={children.Resident} "
+                + $"sound={children.Sound} recent={children.Recent:F4}");
+
+            Assert.Equal(attempts.Repaired, children.Repaired);
+            Assert.Equal(attempts.Resident, children.Resident);
+            Assert.Equal(attempts.Sound, children.Sound);
+            Assert.Equal(attempts.Recent, children.Recent);
+        }
+
+        // AND THE OTHER HALF, WITHOUT WHICH THE FIRST IS A CHECK ON NOTHING. Under the arm
+        // where a parent may arrive where it already is, a collision charges `Attempts` and
+        // adds no name -- so the two must come apart, and the six-bit world is where the
+        // collision count is largest per birth.
+        var repeated = Run(Forking.Repeated, Budgeting.Attempts, 2, 0.0);
+        var loosened = Run(Forking.Repeated, Budgeting.Children, 2, 0.0);
+
+        output.WriteLine(
+            $"6 bits repeated | attempts repaired={repeated.Repaired} "
+            + $"resident={repeated.Resident} || children repaired={loosened.Repaired} "
+            + $"resident={loosened.Resident}");
+
+        Assert.NotEqual(repeated.Repaired, loosened.Repaired);
+    }
+
     /// <summary>A mean and its standard error, in one column.</summary>
     /// <param name="values">One reading, one entry a seed.</param>
     private static string Show(IReadOnlyList<double> values) =>

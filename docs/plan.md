@@ -820,6 +820,11 @@ change of architecture entirely.
 - **AND `Budgeting.Children` IS NOT THE FIX, IT IS FREE WEARING A CAP'S NAME.** Bit-identical
   to no budget on twelve cells of two widths. What should be counted so that it binds without
   being a lifetime is open.
+- **AND IT CANNOT BIND UNDER `Forking.Distinct` EITHER, BY ARITHMETIC AND NOT BY WORLD.** A
+  spent code is refused, so a name is added exactly when an attempt is charged.
+- **SO IT IS FREE UNDER `Repeated` AND A SYNONYM UNDER `Distinct`, WITH NO THIRD THING
+  AVAILABLE.** A vocabulary reaching the budget would not have separated them, and never
+  could have.
 - **AND A LIFETIME BUDGET DOES NOT DEGRADE WITH THE MOVES, IT FAILS AT THE FIRST ONE.** Its
   LEVEL stops mattering there too — sixty-four and two hundred and fifty-six sit a fifth of a
   standard error apart once the world moves at all.
@@ -1212,7 +1217,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **74** | Could one repair add two codes, sparing a miss floor? CLOSED AGAINST, built and measured: coverage falls two to four standard errors on three worlds while the carriers overshoot the minimum sound depth. Deleted with a revival row |
 | **78** | Gate widening on the clean record being significant against the base rate. CLOSED AGAINST, built: bit-identical on all four cells, because the miss floor already pays that bar below 0.88. Deleted with a revival row |
 | **79** | Widening pins the population at capacity — 2001 residents of 2000 at both eleven-bit widths, 302 at six. Is the accuracy cost the shortened rules, or culling destroying earned ones to make room? Open |
-| **77** | `Budget` now sits BELOW a world's vocabulary, so `Budgeting.Children` can bind for the first time — it was refused for being a free budget wearing a limit's name, and that reason has expired. Owed a grid rather than a citation. Open |
+| **77** | Can `Budgeting.Children` bind now that `Budget` sits below the vocabulary? CLOSED AGAINST, and no grid was owed: under `Forking.Distinct` a name is added exactly when an attempt is charged |
 | **76** | Repair proposes the same child until its table drifts, so a budget buys re-derivations. Refusing a parent its spent codes multiplies its distinct children eightfold at one seed. Does quantity buy the uncovered rounds, or only more population? Open |
 | **75** | Nothing stops a chain at a sound depth. One code a step undershoots for three rungs; two overshoots by nine tenths of a code at both widths, by two independent mechanisms. What signal inside the machine could say STOP HERE? Open |
 | **73** | What distinguishes a repair that buys hard-round coverage from one that does not? ANSWERED: depth. They sit at the world's minimum sound scope and every shorter step pays nothing. Open on walking a chain in fewer steps without overshooting |

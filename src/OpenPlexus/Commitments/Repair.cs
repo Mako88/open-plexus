@@ -376,10 +376,27 @@ public enum Budgeting
     /// Only a child this parent has not reached before spends one.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// <b>DISTINCT CHILDREN RATHER THAN SUCCESSFUL ADDS, which is the difference that
     /// matters when something is culled.</b> A child minted, deleted and re-derived is one
     /// child a parent has thought of twice; counting adds would charge it twice and make
     /// the budget depend on what the CULL did, which is not a fact about the search.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS A SYNONYM FOR <see cref="Attempts"/> UNDER THE SHIPPED FORKING RULE,
+    /// WHICH IS ARITHMETIC RATHER THAN A WORLD.</b> <see cref="Population.Mend"/> charges an
+    /// attempt and adds a name in the same two lines, and <see cref="Forking.Distinct"/>
+    /// refuses a parent every code it has already spent — so two codes are two scopes are
+    /// two identities, and the set and the counter move together forever. Under
+    /// <see cref="Forking.Repeated"/> it is instead a FREE budget, measured at 36 repairs
+    /// against 452. There is no third thing it could be.
+    /// </para>
+    /// <para>
+    /// <b>SO IT IS KEPT AS THAT CHECK RATHER THAN AS AN ARM.</b> What it asserts is that
+    /// <see cref="CommittingSettings.Budget"/>'s meaning does not depend on which counter it
+    /// reads while forking is distinct, and it goes red the day forking changes —
+    /// <c>BudgetingTests</c> holds it.
+    /// </para>
     /// </remarks>
     Children,
 

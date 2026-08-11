@@ -875,12 +875,15 @@ change of architecture entirely.
 - **THREE ARE RE-TAKEN AND THE SIZE ACCOUNT EXPLAINS ONE.** `Surprising` and `Mending` moved
   the wrong way for a crowd penalty, so what the vote change does is not only charging for a
   population's size.
-- **ROUNDS-TO-TARGET ACCELERATES IN THE RELEVANT BITS, WITH ERROR BARS AT LAST.** Six to
-  eleven is under twofold; eleven to twenty is nearly sixfold. That is the number that
-  predicts whether any of this reaches perception.
-- **AND THE WIDEST WIDTH IS CENSORED, SO IT UNDERSTATES.** A quarter of seeds never hold the
-  target inside the cap, and those are the slow ones. The true step is worse than the one
-  printed.
+- **ROUNDS-TO-TARGET NO LONGER ACCELERATES IN THE RELEVANT BITS, AND IT USED TO.** Both steps
+  are near twofold, over five bits and then over nine — so the per-bit cost is flat or falling
+  rather than climbing.
+- **AND THE WIDEST WIDTH IS NO LONGER CENSORED, WHICH IS HALF OF WHY.** Every seed holds the
+  target inside the cap where a quarter of them used to miss it, so the reading has stopped
+  being conditional on the fast ones.
+- **AND NOTHING WAS BUILT FOR IT — IT IS THE SEARCH DIALS ARRIVING AT THE ONE NUMBER THAT
+  MATTERS.** The old row was taken on the old machine, which is what its own header warned
+  about, and no arm since aimed at width.
 - **`Abstain` FIRES AT LAST, AND WHAT ARMED IT WAS A SIGNATURE AND NOT A FLEET.** The loop
   took a non-nullable outcome, so no number of machines and no number of deaths could ever
   have produced one.

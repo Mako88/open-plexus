@@ -120,6 +120,15 @@ FORBIDS things, and several of them are already measured.
 - **AND A HELD-OUT QUESTION CAN BE WORD FOR WORD ONE ALREADY ASKED**, the corpus being
   templated over a small cast — so the unseen score is read beside a count of its twins
   rather than on its own.
+- **AND THE LEARNER IS AT THE CEILING THE VIEW ALLOWS, WHICH REFRAMES EVERY SCORE TAKEN
+  HERE.** Where the moment is one statement it answers all but a hair of what is present to
+  be answered, on a fifth of the population it is allowed to hold.
+- **SO IT IS A NEAR-PERFECT READER AND A HOPELESS SELECTOR**, which the two ends say
+  together. Shown only the right statement it is at the ceiling; shown the whole story,
+  where every answer is present, it takes under a third.
+- **AND NOTHING ABOUT THE LEARNER OR ITS SIZE IS THE BOTTLENECK**, which is worth knowing
+  before either is touched. What is missing is choosing where to look, and every remaining
+  rung is worth exactly what it buys that.
 - **AND WIDENING THE MOMENT BUYS THE DRAWN SCORE AND SELLS THE HELD-OUT ONE**, with the
   population ballooning and silence appearing. The gap opens as the bag widens, which is
   memorising caught by the one instrument a text world has.

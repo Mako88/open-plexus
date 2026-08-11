@@ -320,6 +320,56 @@ public sealed class RecalledTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// How often the answer is in the room at all — <b>the ceiling a score has to be read
+    /// against, and without it no number here means anything.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A SCORE WITH NO CEILING BESIDE IT CANNOT SEPARATE A POOR LEARNER FROM A POOR
+    /// VIEW.</b> At one statement of span the moment is the last thing said and the
+    /// question, so where the last statement is about somebody else the answering word is
+    /// not present — and nothing the population could ever hold would put it there. That
+    /// share is a fact about the WORLD and the span, decided before any learning happens.
+    /// </para>
+    /// <para>
+    /// <b>IT IS A CEILING RATHER THAN A TARGET, AND IT IS GENEROUS.</b> Being present is
+    /// necessary and nowhere near sufficient — two places in the room and no way to choose
+    /// clears this bar and answers wrongly half the time. So a learner AT the ceiling is
+    /// doing everything the view allows, and a learner far under it is leaving something on
+    /// the table that better learning could take.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_the_span_makes_answerable_at_all()
+    {
+        foreach (var span in new[] { 0, 1, 2, 3 })
+        {
+            var world = new Recalled(World(task: 1, span: span));
+
+            var reachable = 0;
+
+            for (var one = 0; one < world.Withheld.Count; one++)
+            {
+                var moment = new HashSet<Code>(Codify(world.Withheld[one].Seen));
+
+                if (moment.Contains(Babi.Of(world.Transcript[one].Answer))) reachable++;
+            }
+
+            var ceiling = reachable / (double)world.Withheld.Count;
+
+            // NEVER NOUGHT, WHICH WOULD MEAN NOBODY COULD ANSWER THIS EXAM AT ALL. One is
+            // a legitimate reading and the important one: the whole story always contains
+            // its own answer, so a span that shows everything has no information ceiling
+            // whatever -- and the score there is entirely about the learner and the bag.
+            Assert.InRange(ceiling, 0.01, 1.0);
+
+            output.WriteLine(
+                $"span {span,-2} | answer present in {ceiling:F3} of {world.Withheld.Count} "
+                + $"exam moments, over {world.Questions} drawn");
+        }
+    }
+
+    /// <summary>
     /// Which objective grows the population that answers best — <b>John's question, and
     /// one the field cannot answer for a learner shaped like this.</b>
     /// </summary>

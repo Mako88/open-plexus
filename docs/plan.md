@@ -1060,9 +1060,16 @@ change of architecture entirely.
 - **SO *THE RULE HAS NOT BEEN TESTED ENOUGH* IS NOT WHAT IS WRONG WITH IT**, measured
   bit-identical on four cells rather than argued. What is left is what the shortening does,
   not what the parent had earned.
-- **AND WHAT IT DOES IS PIN THE POPULATION AT ITS CEILING**: 2001 residents of a capacity of
-  2000 at both eleven-bit widths, against 302 at six bits. This repo's own row says what is
-  damage is REACHING the capacity rather than holding more.
+- **AND WHAT IT DOES IS PIN THE POPULATION AT ITS CEILING** at both eleven-bit widths, where
+  the unwidened arm never comes near it.
+- **AND THE CEILING IS NOT THE COST, WHICH A CONTROL SAID AND AN ARGUMENT DID NOT.** Four
+  times the capacity leaves coverage flat and trailing accuracy no better on either width — a
+  little worse on the even one.
+- **AND WITH ROOM IT HOLDS NO MORE TRUTHS THAN NO WIDENING AT ALL WHILE THE UNSOUND ONES
+  QUADRUPLE.** So the operator buys REACH rather than discovery: the same truths held, firing
+  on far more of the rounds a base rate gets wrong.
+- **SO CULLING WAS DOING REAL WORK RATHER THAN DESTROYING WHAT WAS EARNED**, and what the
+  flood costs is the wrong rules minted beside the reach.
 - **AND ACCURACY SEPARATES TRUTH FROM FALSEHOOD BEST ON THE WORLD IT LEARNS LEAST**, so
   the fitness signal is not what fails there.
 - **AND THE VOTE RULE'S SIGN FLIPS ON THAT READING, WHICH NO SCORE SHOWED.** A sum carries
@@ -1225,7 +1232,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **68** | John's: does a conjunction EARN its narrowing? Its premise is half wrong -- reach halves with depth on even worlds and RISES under skew, where correlated codes let a long scope fire as often as a short one. Open |
 | **74** | Could one repair add two codes, sparing a miss floor? CLOSED AGAINST, built and measured: coverage falls two to four standard errors on three worlds while the carriers overshoot the minimum sound depth. Deleted with a revival row |
 | **78** | Gate widening on the clean record being significant against the base rate. CLOSED AGAINST, built: bit-identical on all four cells, because the miss floor already pays that bar below 0.88. Deleted with a revival row |
-| **79** | Widening pins the population at capacity — 2001 residents of 2000 at both eleven-bit widths, 302 at six. Is the accuracy cost the shortened rules, or culling destroying earned ones to make room? Open |
+| **79** | Is widening's accuracy cost the shortened rules or the ceiling they reach? CLOSED AGAINST the ceiling: four times the capacity leaves coverage flat and accuracy no better, while the unsound rules quadruple |
 | **80** | Nothing inside a rule can name its redundant code, since its tally skips its own scope. `Widening.Shared` asks two clean rules that disagree about exactly one code instead — rung five's trigger pointing down. Open |
 | **77** | Can `Budgeting.Children` bind now that `Budget` sits below the vocabulary? CLOSED AGAINST, and no grid was owed: under `Forking.Distinct` a name is added exactly when an attempt is charged |
 | **76** | Repair proposes the same child until its table drifts, so a budget buys re-derivations. Refusing a parent its spent codes multiplies its distinct children eightfold at one seed. Does quantity buy the uncovered rounds, or only more population? Open |

@@ -210,6 +210,21 @@ public sealed class WideningTests(ITestOutputHelper output)
     /// arm comes back UNDER its own ceiling — otherwise 8000 is another pinned machine and
     /// the control never happened.
     /// </para>
+    /// <para>
+    /// <b>AND THE ANSWER IS THE FIRST STORY AND NOT THE SECOND.</b> The control held — the
+    /// raised arm comes back well under its ceiling and the unwidened one is bit-identical
+    /// at both capacities, so the crossing is clean. Room leaves hard-round coverage flat
+    /// and trailing accuracy no better, a little worse on the even world; what it buys is
+    /// unsound rules, roughly four times as many, while the sound count merely returns to
+    /// what no widening at all already held.
+    /// </para>
+    /// <para>
+    /// <b>WHICH IS THE REACH CLAIM CONFIRMED FROM A DIRECTION NOTHING ELSE COULD REACH.</b>
+    /// The same truths held and far more hard rounds carried is exactly <i>the rules that
+    /// could pay are held and do not fire</i>, answered — so what widening is for is real
+    /// and what it costs is the rules it mints beside them. That is the flood, and
+    /// <see cref="Widening.Shared"/> is the arm aimed at it.
+    /// </para>
     /// </remarks>
     /// <param name="address">Address bits.</param>
     /// <param name="skew">How often a data bit is one, or zero to leave them even.</param>

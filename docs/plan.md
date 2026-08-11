@@ -573,6 +573,7 @@ condition is a superstition.
 | `Weighing.Lifting` — divide the best advocate by its answer's base rate | Beat `Strongest` nowhere in ten worlds, and trails worst where skew gives the divisor something to do | A world where an unusual answer on thin evidence is right |
 | `Sharpness` — accuracy raised to a power before the vote | A workaround for a sum's shape: it cannot move the argmax of a maximum, and the sum is gone | Never under a maximum; only a summed vote returns it |
 | `Stepping.Pair` — winner and runner-up in one repair | Coverage falls 2 to 4 standard errors on three worlds, accuracy with it, and the carriers overshoot the minimum sound depth | A machine knowing when a scope is deep enough — fork 75 |
+| `Widening.Significant` — widen only where a clean record beats the base rate | Bit-identical on four cells: `Floor` demands twenty firings, and a perfect twenty clears every base rate under `n/(n+2.71)` | A world past that boundary. `WideningTests` fails the day one arrives |
 
 ---
 
@@ -1038,8 +1039,16 @@ change of architecture entirely.
   `Widening.Unmissed` buys two and a half to three standard errors of hard-round coverage at
   both eleven-bit widths.
 - **AND IT COSTS A TENTH OF THE TRAILING ACCURACY, so the trade is real and not rankable by one
-  number.** The diagnosis is confirmed and the operator is too blunt to ship; its own row
-  already names the gate that would fix it.
+  number.** The diagnosis is confirmed and the operator is too blunt to ship.
+- **AND THE GATE ITS ROW NAMED IS PAID BY THE MISS FLOOR BEFORE IT IS ASKED.** A clean record
+  over `Floor` firings already clears every base rate below 0.88, and the steepest world here
+  draws four in five.
+- **SO *THE RULE HAS NOT BEEN TESTED ENOUGH* IS NOT WHAT IS WRONG WITH IT**, measured
+  bit-identical on four cells rather than argued. What is left is what the shortening does,
+  not what the parent had earned.
+- **AND WHAT IT DOES IS PIN THE POPULATION AT ITS CEILING**: 2001 residents of a capacity of
+  2000 at both eleven-bit widths, against 302 at six bits. This repo's own row says what is
+  damage is REACHING the capacity rather than holding more.
 - **AND ACCURACY SEPARATES TRUTH FROM FALSEHOOD BEST ON THE WORLD IT LEARNS LEAST**, so
   the fitness signal is not what fails there.
 - **AND THE VOTE RULE'S SIGN FLIPS ON THAT READING, WHICH NO SCORE SHOWED.** A sum carries
@@ -1201,7 +1210,8 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **70** | Proposals naming a pair already named mint nothing. ANSWERED: spending the ask on the best unnamed pair nearly triples the stacking on both eleven-bit worlds and sells nothing. Shipped, and the arm is deleted. Closed |
 | **68** | John's: does a conjunction EARN its narrowing? Its premise is half wrong -- reach halves with depth on even worlds and RISES under skew, where correlated codes let a long scope fire as often as a short one. Open |
 | **74** | Could one repair add two codes, sparing a miss floor? CLOSED AGAINST, built and measured: coverage falls two to four standard errors on three worlds while the carriers overshoot the minimum sound depth. Deleted with a revival row |
-| **78** | Widening buys the stuck column and costs a tenth of the accuracy, because *never missed* is nearly free for a narrow rule. Gate it on whether that record is SIGNIFICANT against the base rate, by the test repair owns. Open |
+| **78** | Gate widening on the clean record being significant against the base rate. CLOSED AGAINST, built: bit-identical on all four cells, because the miss floor already pays that bar below 0.88. Deleted with a revival row |
+| **79** | Widening pins the population at capacity — 2001 residents of 2000 at both eleven-bit widths, 302 at six. Is the accuracy cost the shortened rules, or culling destroying earned ones to make room? Open |
 | **77** | `Budget` now sits BELOW a world's vocabulary, so `Budgeting.Children` can bind for the first time — it was refused for being a free budget wearing a limit's name, and that reason has expired. Owed a grid rather than a citation. Open |
 | **76** | Repair proposes the same child until its table drifts, so a budget buys re-derivations. Refusing a parent its spent codes multiplies its distinct children eightfold at one seed. Does quantity buy the uncovered rounds, or only more population? Open |
 | **75** | Nothing stops a chain at a sound depth. One code a step undershoots for three rungs; two overshoots by nine tenths of a code at both widths, by two independent mechanisms. What signal inside the machine could say STOP HERE? Open |

@@ -135,4 +135,79 @@ public sealed class WideningTests(ITestOutputHelper output)
             "generalisation is switched on and proposed nothing, so either no commitment "
             + "ever reaches a scope of two with no misses, or the operator is not wired");
     }
+
+    /// <summary>
+    /// <b>THE GATE THIS OPERATOR'S OWN ROW HAS ALWAYS NAMED IS PAID BY
+    /// <see cref="CommittingSettings.Floor"/> BEFORE IT IS ASKED.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE PROPOSAL WAS TO REFUSE A CLEAN RECORD THAT IS NOT SIGNIFICANT AGAINST THE
+    /// BASE RATE</b>, by the pooled two-proportion z repair already owns and at the same
+    /// <see cref="CommittingSettings.Alpha"/> — <i>zero misses over twenty firings is not
+    /// the same claim as zero over four hundred</i>. It was built, and it is bit-identical
+    /// to the ungated arm on all four cells of the grid above: 861 and 6058 and 12813
+    /// proposals, the same residents, the same <c>Paying</c>, the same trailing accuracy.
+    /// </para>
+    /// <para>
+    /// <b>AND THE REASON IS ARITHMETIC RATHER THAN A WORLD, WHICH IS WHY THIS IS A CHECK
+    /// AND NOT A ROW.</b> <see cref="Population.Widen"/> already refuses anything under
+    /// <see cref="CommittingSettings.Floor"/> settlements, and a perfect record over n
+    /// firings clears a one-sided bar at <c>alpha</c> for every base rate below roughly
+    /// <c>n / (n + 2.71)</c>. At the shipped floor of twenty that is 0.88, and the most
+    /// skewed world on this bench draws four in five.
+    /// </para>
+    /// <para>
+    /// <b>SO THE REVIVAL CONDITION IS A NUMBER RATHER THAN A HOPE, AND THIS IS WHAT WOULD
+    /// SPOT IT.</b> The day a world's commonest outcome passes the boundary below, or the
+    /// day the floor drops far enough to move the boundary under a world already here, the
+    /// gate stops being inert and is worth building again. Until then it is a second name
+    /// for <see cref="Widening.Unmissed"/>, and a grid of identical rows is this repo's own
+    /// trap about a bench with no question.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_gate_the_row_names_is_paid_by_the_miss_floor_before_it_is_asked()
+    {
+        var dials = new CommittingSettings();
+
+        // A CLEAN RECORD AT EXACTLY THE FLOOR, WHICH IS THE THINNEST ONE THE OPERATOR CAN
+        // EVER SEE. Anything it would refuse it would refuse here first.
+        var thinnest = dials.Floor;
+
+        double Refused(double rate)
+        {
+            const long Trials = 1_000_000L;
+
+            return Normal.Tail(
+                Repair.Ahead(thinnest, thinnest, (long)(rate * Trials), Trials));
+        }
+
+        foreach (var rate in new[] { 0.5, 0.8, 0.85, 0.9, 0.95 })
+            output.WriteLine($"  base rate {rate:F2} -> p={Refused(rate):F4}");
+
+        // THE WORLDS THIS BENCH HAS, NAMED RATHER THAN ASSUMED. `Multiplexer`'s answer is a
+        // data bit, so its commonest outcome IS the skew, and 0.8 is the steepest tilt any
+        // grid here runs.
+        Assert.True(Refused(0.5) <= dials.Alpha);
+        Assert.True(Refused(0.8) <= dials.Alpha,
+            "the steepest world on this bench now refuses a clean record at the floor, so "
+            + "the gate is no longer inert and `Widening.Significant` is worth building "
+            + "again -- see the revival row");
+
+        // AND WHERE IT WOULD BITE, so the check fails from BOTH sides. A bar that refuses
+        // nothing anywhere is not a bar, and asserting only the inert half would pass for
+        // free if `Ahead` ever returned a constant.
+        Assert.True(Refused(0.95) > dials.Alpha);
+
+        // THE BOUNDARY ITSELF, WHICH IS THE NUMBER THE REVIVAL ROW CITES. Below it the
+        // floor has already paid for the significance; above it the gate has something to
+        // say. It moves with the floor and with nothing else.
+        var boundary = thinnest / (thinnest + 2.71);
+
+        output.WriteLine($"boundary at floor {thinnest}: {boundary:F4}");
+
+        Assert.True(Refused(boundary - 0.02) <= dials.Alpha);
+        Assert.True(Refused(boundary + 0.02) > dials.Alpha);
+    }
 }

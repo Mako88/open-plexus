@@ -194,8 +194,12 @@ public sealed class DialTests(ITestOutputHelper output)
             + "code from a sound scope usually makes it unsound, so it mints about "
             + "four wrong rules per right one and each has wider reach than its "
             + "parent. It buys hard-round coverage at eleven bits and costs "
-            + "accuracy on every world. The driver would be a gate that reads how "
-            + "much a rule has been TESTED rather than whether it has been wrong",
+            + "accuracy on every world. AND THE GATE THAT WAS SUPPOSED TO FIX IT "
+            + "IS REFUTED: reading how much a rule has been TESTED is bit-identical "
+            + "to not reading it, because `Floor` already demands twenty firings "
+            + "and a perfect twenty is significant against every base rate under "
+            + "0.88. What is wrong with it is the shortening rather than the "
+            + "parent, and it pins the population at its capacity",
 
         ["Forking"] =
             "WHETHER A PARENT MAY PROPOSE A FORK IT HAS ALREADY MADE, and it is two "

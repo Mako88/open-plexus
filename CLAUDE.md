@@ -80,6 +80,30 @@ job skipped.
 **While a grid runs, keep working.** Build the next instrument, take a local reading, write
 the plan entry. Do not idle on a poll.
 
+## What this project is, so nothing below reads as a rebuke
+
+John's, and it is written here because everything after it is a list of ways things went
+wrong, and a list like that with no counterweight sets a tone he did not intend.
+
+**This is an experiment, and the expected outcome of an experiment is that it fails.** The
+refutation table is long because the work is real, not because anybody has been careless.
+Most of what has been built here was deleted, and the deletions are the findings — a repo
+where nothing had been refuted would be a repo where nothing had been learnt.
+
+**So try the thing that might not work, if it is worth knowing.** An arm that dies with a
+revival row has done its whole job. Guessing wrong in public, in a commit message, with the
+number that refuted you printed underneath, is the mechanism working exactly as designed.
+
+**And when a reading refutes something you said an hour ago, just say so and carry on.**
+Correct the record in a sentence, because a wrong number left standing costs the next
+session real time. Then stop. No apology, no preamble, no going back over how it happened —
+that is noise where a correction was enough, and a session spent hedging is worse for this
+work than a session spent being wrong quickly.
+
+**The loop is: try the next most obvious thing the evidence points at, watch it fail, work
+out why, repeat.** Enough turns of that and the problem is understood. There is no version
+of this that skips the failing part.
+
 ## The epistemics
 
 These are the parts worth more than the code.

@@ -596,6 +596,64 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// <b>THE COARSE CODE REACHES THE MOMENT AND NO SCOPE, AND EVERY OPERATOR REFUSES IT FOR
+    /// THE PROPERTY THAT MAKES IT WORTH HAVING.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE GRADED ARM IS WIRED AT THE FRONT END AND INERT BEHIND IT, which a grid of
+    /// nearly-identical rows could not have told apart from a null result.</b> Naming counts
+    /// pairs over SCOPES, so a code that never enters a scope can never enter a name — and
+    /// nothing in this machine can put this one in one.
+    /// </para>
+    /// <para>
+    /// <b>GENESIS REFUSES IT FOR NEVER HAVING BEEN ABSENT.</b> A position is live in every
+    /// moment, so <c>Varied</c> is false and it can never be a root — the gate that stopped
+    /// background becoming a parent, doing exactly its job to the one code that wanted
+    /// through.
+    /// </para>
+    /// <para>
+    /// <b>AND REPAIR REFUSES IT FOR SEPARATING NOTHING.</b> It is present in every hit and
+    /// every miss, so its two-proportion z is nought and it can never be the added
+    /// condition. Widening only removes codes. There is no third door.
+    /// </para>
+    /// <para>
+    /// <b>SO THE PROPERTY THAT MAKES IT NAMEABLE IS THE PROPERTY EVERY OPERATOR REFUSES IT
+    /// FOR</b>, and that is a fact about where naming looks rather than about the front end.
+    /// The plan has always said a minted name is <i>over co-firing codes</i>; the
+    /// implementation counts co-occurring SCOPE MEMBERS. Those are different sets, and the
+    /// difference is the whole of fork 34.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_code_that_is_never_absent_reaches_no_scope_and_so_no_name()
+    {
+        var brain = new Brain(new CommittingSettings(), seed: 1);
+
+        new MultiplexerRun(
+            new MultiplexerSettings { Address = 2 }, brain, seed: 1, graded: true)
+            .Run(Rounds);
+
+        var coarse = brain.Held.All
+            .SelectMany(one => one.Scope)
+            .Count(one => one.Modality == Multiplexer.Place);
+
+        var fine = brain.Held.All
+            .SelectMany(one => one.Scope)
+            .Count(one => one.Modality == Multiplexer.Bit);
+
+        output.WriteLine(
+            $"{brain.Held.Count} residents | {fine} fine codes in scopes | {coarse} coarse");
+
+        Assert.True(fine > 0, "the graded run learnt nothing at all, so this says nothing");
+
+        // ASSERTED AS THE FINDING RATHER THAN LEFT AS A GUESS. If this ever goes red, some
+        // operator has found a door for an always-present code and the whole account above
+        // is wrong -- which is a far more interesting failure than a passing test.
+        Assert.Equal(0, coarse);
+    }
+
+    /// <summary>
     /// <b>A COARSE CODE CHANGES WHAT CAN BE NAMED AND NOTHING ABOUT WHAT IS TRUE.</b>
     /// </summary>
     /// <remarks>

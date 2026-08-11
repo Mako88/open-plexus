@@ -818,6 +818,14 @@ change of architecture entirely.
 - **THE GATE IS SCALE-RELATIVE IN PRINCIPLE AND NO RUN SHOWS IT.** With the learner removed,
   a fixed redundancy in a growing population walks to unnameable; on a run the extra scopes
   carry the redundancy with them.
+- **AND EMITTING THE POSITION AS ITS OWN CODE DOES NOT FIX IT, WHICH IS THE OPPOSITE OF WHERE
+  THE FAULT WAS THOUGHT TO BE.** The code reaches every moment and not one scope, so no name
+  can contain it.
+- **BECAUSE GENESIS REFUSES IT FOR NEVER HAVING BEEN ABSENT AND REPAIR FOR SEPARATING
+  NOTHING** — the two gates that keep background out, doing their job to the one code that
+  wanted through. Widening only removes. There is no third door.
+- **SO THE PROPERTY THAT MAKES A CONCEPT NAMEABLE IS THE PROPERTY EVERY OPERATOR REFUSES IT
+  FOR**, and that is a fact about where naming looks rather than about the front end.
 - **AND NOT ONE NAME IN TWO HUNDRED AND FIFTY-EIGHT IS THE WORLD'S CONCEPT.** Zero group the
   address; they name data bits, or data mixed with address. The vocabulary compresses what
   repair happened to build, which is a fact about the population.
@@ -1226,8 +1234,9 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **33** | Unification's per-match cost against a subset test. Probed before the ladder's escalation policy, not after. Open |
 | **34** | Six bits is refused on POWER, not on having nothing to name; eleven names the wrong thing, with zero names in 258 grouping the address. Open on whether any world it reaches has a nameable concept |
 | **35** | More unsound commitments resident than sound ones, while the score holds. Is the vote robust to them, or are they why it stops short? Open |
-| **36** | Graded codes: does emitting several codes per reading make a POSITION nameable, and what does it cost the search and the soundness check? Open, and the multiplexer is the cheapest bench for it rather than `Winnow` |
-| **82** | The coarse code is `position` on a second modality beside `position*stride+value`. `Multiplexer.Sound` returns false on any other modality, so `Checkable` must refuse such a scope first or the experiment scores its own subject unsound |
+| **36** | Graded codes: does emitting several codes per reading make a POSITION nameable? BUILT AND MEASURED: the code reaches the moment and no scope, so no name. What blocks it is where naming LOOKS, not the front end |
+| **82** | The answer key had to learn the coarse alphabet before the arm ran, or it would have scored its own subject unsound. Done: a code that pins nothing is passed over by both the enumeration and the checkability test. Closed |
+| **83** | Naming counts pairs over SCOPE MEMBERS; the plan has always said *over co-firing codes*. Those are different sets, and every always-present code lives only in the second. Counting the moment instead is what fork 34 needs |
 | **37** | The repair budget's interior optimum was the ballot and does not survive a best-advocate vote. And `Mending.Uncovered` is two mechanisms — a gate plus every-round repair — where the gate alone is far worse than no gate at all. Open |
 | **38** | Spreading a reading over its range costs most of the score at both front ends. Is that fragmentation, or the search the extra codes buy? Open |
 | **39** | A reading under about ten dimensions has too few distinct wirings for a projection to expand into. Population coding has a floor, and it is not documented anywhere. Open |

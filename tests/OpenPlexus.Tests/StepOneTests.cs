@@ -1,4 +1,4 @@
-using OpenPlexus.Machines;
+﻿using OpenPlexus.Machines;
 using OpenPlexus.Commitments;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -117,9 +117,26 @@ public sealed class StepOneTests(ITestOutputHelper output)
         output.WriteLine(
             $"blind resident={blind.Resident} repaired={blind.Repaired} sound={blind.Sound}");
 
-        Assert.True(blind.Repaired > gated.Repaired * 5,
+        // THE MULTIPLE WAS FIVE AND IS THREE, AND THE FALL IS THE GATED ARM IMPROVING
+        // RATHER THAN THE BLIND ONE CALMING DOWN. Under `Forking.Repeated` a parent
+        // re-proposed the same child until its table drifted, so the gated arm minted a
+        // few hundred children and the blind one -- drawing a DIFFERENT code each time
+        // by construction -- minted ten times as many for free. The ratio was measuring
+        // how little the gated arm searched. Now both search, the gated arm mints 3,608
+        // and the blind one 13,477, and the gap is what over-specialising actually costs.
+        Assert.True(blind.Repaired > gated.Repaired * 3,
             $"the blind arm minted {blind.Repaired} against {gated.Repaired}");
 
+        // AND THE RESIDENTS SAY THE SAME THING WITHOUT A MULTIPLE IN IT, which is why
+        // this is added rather than the line above being loosened on its own. More rules
+        // held, none of them true.
+        Assert.True(blind.Resident > gated.Resident,
+            $"the blind arm held {blind.Resident} against {gated.Resident}");
+
+        // AND THE SHARP ONE, WHICH GOT SHARPER RATHER THAN WEAKER. Nothing sound at all
+        // against 378, where the bar below was written when the gated arm held about
+        // thirty. Repair's choice of condition passes its own kill condition by more
+        // under a search than it did under a re-derivation.
         Assert.Equal(0, blind.Sound);
         Assert.True(gated.Sound > 20, $"only {gated.Sound} sound commitments");
     }

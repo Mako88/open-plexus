@@ -36,45 +36,25 @@ public sealed class Bits : IQuantizer<IReadOnlyList<int>>
 {
     private readonly byte _modality;
     private readonly int _stride;
-    private readonly byte? _coarse;
 
     /// <param name="modality">The modality these codes ride on.</param>
     /// <param name="stride">
     /// One more than the largest value a position may hold. <b>Two, which is a bit.</b>
     /// </param>
-    /// <param name="coarse">
-    /// A second modality to emit the POSITION on with its value thrown away, or nothing to
-    /// emit one code a reading as this always has.
-    /// </param>
     /// <remarks>
-    /// <para>
-    /// <b>THE COARSE CODE IS A COARSER CUT ALONG THE SAME AXIS, WHICH IS THE ONLY KIND OF
-    /// FRONT-END CHANGE THIS DESIGN PERMITS.</b> Fixing a failure by changing the feature
-    /// BASIS is refused outright — a new feature is a minted name above the codes, never a
-    /// new thing to read. Reading the same position less finely is resolution, and
-    /// resolution is what a front end is allowed to vary.
-    /// </para>
-    /// <para>
-    /// <b>AND WHAT IT BUYS IS A SHARED PART WHERE THERE WAS NONE.</b> <i>Bit three is
-    /// zero</i> and <i>bit three is one</i> have nothing in common while a code carries
-    /// position and value fused together, so rung five cannot name the thing they share —
-    /// and the multiplexer's whole concept is <i>these positions are the address, whatever
-    /// they say</i>. With this the shared part IS a code, and naming can reach it.
-    /// </para>
-    /// <para>
-    /// <b>WHAT IT COSTS IS SEARCH, SAID BEFORE IT IS RUN.</b> Every moment carries twice the
-    /// codes, so the repair table is twice as wide and every candidate count doubles — which
-    /// loosens no bar, because the correction divides by the candidates considered. It is a
-    /// cost in time and memory rather than in the gate's honesty.
-    /// </para>
+    /// <b>ONE CODE A READING, AND A SECOND COARSER ONE WAS BUILT AND DELETED.</b> Emitting
+    /// the position with its value thrown away made the shared part of <i>bit three is
+    /// zero</i> and <i>bit three is one</i> into a code — and it reached no scope, because
+    /// genesis refuses a code that has never been absent and repair refuses one that
+    /// separates nothing. See the plan's revival row: what is wanted is the coarser view
+    /// where pairs are COUNTED, not where readings are emitted.
     /// </remarks>
-    public Bits(byte modality, int stride = 2, byte? coarse = null)
+    public Bits(byte modality, int stride = 2)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(stride, 2);
 
         _modality = modality;
         _stride = stride;
-        _coarse = coarse;
     }
 
     /// <inheritdoc/>
@@ -85,19 +65,10 @@ public sealed class Bits : IQuantizer<IReadOnlyList<int>>
     {
         ArgumentNullException.ThrowIfNull(observation);
 
-        var codes = ImmutableArray.CreateBuilder<Code>(
-            observation.Count * (_coarse is null ? 1 : 2));
+        var codes = ImmutableArray.CreateBuilder<Code>(observation.Count);
 
         for (var which = 0; which < observation.Count; which++)
-        {
             codes.Add(Of(_modality, which, observation[which], _stride));
-
-            // THE POSITION ITSELF, WHICH IS THE SAME READING CUT LESS FINELY. It rides on its
-            // own modality rather than on a spare value of this one, because a code's meaning
-            // has to be recoverable from it forever and packing two kinds of thing into one
-            // block is how a byte wrapped and made two pictures one observation.
-            if (_coarse is { } position) codes.Add(new Code(position, (ulong)which));
-        }
 
         return codes.ToImmutable();
     }

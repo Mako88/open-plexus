@@ -607,6 +607,7 @@ condition is a superstition.
 | `Sharpness` — accuracy raised to a power before the vote | A workaround for a sum's shape: it cannot move the argmax of a maximum, and the sum is gone | Never under a maximum; only a summed vote returns it |
 | `Stepping.Pair` — winner and runner-up in one repair | Coverage falls 2 to 4 standard errors on three worlds, accuracy with it, and the carriers overshoot the minimum sound depth | A machine knowing when a scope is deep enough — fork 75 |
 | `Widening.Significant` — widen only where a clean record beats the base rate | Bit-identical on four cells: `Floor` demands twenty firings, and a perfect twenty clears every base rate under `n/(n+2.71)` | A world past that boundary. `WideningTests` fails the day one arrives |
+| A front end emitting the POSITION beside the fused code | It reached every moment and no scope: genesis refuses a code never absent, repair one separating nothing | Never here; the coarser view belongs where pairs are COUNTED |
 
 ---
 
@@ -1285,7 +1286,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **33** | Unification's per-match cost against a subset test. Probed before the ladder's escalation policy, not after. Open |
 | **34** | Six bits is refused on POWER, not on having nothing to name; eleven names the wrong thing, with zero names in 258 grouping the address. Open on whether any world it reaches has a nameable concept |
 | **35** | More unsound commitments resident than sound ones, while the score holds. Is the vote robust to them, or are they why it stops short? Open |
-| **36** | Graded codes: does emitting several codes per reading make a POSITION nameable? BUILT AND MEASURED: the code reaches the moment and no scope, so no name. What blocks it is where naming LOOKS, not the front end |
+| **36** | Graded codes: does emitting several codes per reading make a POSITION nameable? BUILT, MEASURED AND DELETED: the code reaches the moment and no scope. What blocks it is where naming LOOKS, not the front end |
 | **82** | The answer key had to learn the coarse alphabet before the arm ran, or it would have scored its own subject unsound. Done: a code that pins nothing is passed over by both the enumeration and the checkability test. Closed |
 | **83** | Project each scope code to its COARSER form when counting pairs, so scopes pinning different address bits share the positions. Test the REWRITE first: a name no scope can be said in is a word with no referent |
 | **84** | A coarser view of a code is the front end's business, so `IQuantizer` must answer *what is the coarser form of this one*. Handed in once, and the first thing a world tells the brain about its alphabet |

@@ -514,7 +514,6 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         // counted from scopes can ever be it. Reported rather than argued: if the column
         // below is ever non-zero, that reasoning is wrong.
         foreach (var (address, skew) in Fixture.Curve)
-        foreach (var graded in new[] { false, true })
         {
             var pure = 0;
             var mixed = 0;
@@ -532,8 +531,7 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
                 new MultiplexerRun(
                     new MultiplexerSettings { Address = address, Skew = skew },
                     brain,
-                    seed,
-                    graded: graded)
+                    seed)
                     .Run(Rounds);
 
                 foreach (var name in brain.Held.Names.Means.Select(one => one.Key))
@@ -583,7 +581,7 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
             }
 
             output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}, "
-                + $"{Seeds} seeds, {(graded ? "graded" : "fused")} ===");
+                + $"{Seeds} seeds ===");
             output.WriteLine(
                 $"  {names} names | address only {pure} | data only {data} | mixed {mixed} "
                 + $"| one position twice {spanning} | positions only {placed} "
@@ -626,31 +624,51 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     [Fact]
-    public void A_code_that_is_never_absent_reaches_no_scope_and_so_no_name()
+    public void A_code_that_is_never_absent_separates_nothing_and_so_reaches_no_scope()
     {
-        var brain = new Brain(new CommittingSettings(), seed: 1);
+        // REPAIR'S DOOR. A code present in every hit and every miss has the same share on
+        // both sides, so the pooled two-proportion z is nought however many times it was
+        // seen -- it can never be the argmax and could never clear the bar if it were.
+        var everywhere = Repair.Divergence(inHits: 400, hits: 400, inMisses: 100, misses: 100);
 
-        new MultiplexerRun(
-            new MultiplexerSettings { Address = 2 }, brain, seed: 1, graded: true)
-            .Run(Rounds);
+        // AND ONE THAT VARIES, or the line above passes for free on a `Divergence` that
+        // returns nought to everything.
+        var sometimes = Repair.Divergence(inHits: 380, hits: 400, inMisses: 20, misses: 100);
 
-        var coarse = brain.Held.All
-            .SelectMany(one => one.Scope)
-            .Count(one => one.Modality == Multiplexer.Place);
+        output.WriteLine($"always present z={everywhere:F3} | discriminating z={sometimes:F3}");
 
-        var fine = brain.Held.All
-            .SelectMany(one => one.Scope)
-            .Count(one => one.Modality == Multiplexer.Bit);
+        Assert.Equal(0.0, everywhere);
+        Assert.True(sometimes > 0.0);
 
-        output.WriteLine(
-            $"{brain.Held.Count} residents | {fine} fine codes in scopes | {coarse} coarse");
+        // GENESIS'S DOOR, and it is the same property read the other way. `Varied` asks
+        // whether a code has ever been absent since it appeared, and a code live in every
+        // moment cannot root a commitment -- the gate that stopped background becoming a
+        // parent, which is exactly what an always-present code is.
+        var held = new Population(new CommittingSettings(), seed: 1);
 
-        Assert.True(fine > 0, "the graded run learnt nothing at all, so this says nothing");
+        var always = new Code(Multiplexer.Bit, 0);
+        var varies = new Code(Multiplexer.Bit, 1);
 
-        // ASSERTED AS THE FINDING RATHER THAN LEFT AS A GUESS. If this ever goes red, some
-        // operator has found a door for an always-present code and the whole account above
-        // is wrong -- which is a far more interesting failure than a passing test.
-        Assert.Equal(0, coarse);
+        for (var moment = 0; moment < 40; moment++)
+        {
+            var live = moment % 2 == 0
+                ? new HashSet<Code> { always, varies }
+                : [always];
+
+            held.Witness(live);
+            held.Cover(live, new Code(Multiplexer.Said, 0), []);
+        }
+
+        var rooted = held.All.Select(one => one.Scope[0]).ToHashSet();
+
+        output.WriteLine($"{held.Count} minted | rooted on {rooted.Count} distinct codes");
+
+        Assert.Contains(varies, rooted);
+
+        // THE FINDING, ASSERTED RATHER THAN GUESSED. If this goes red an always-present code
+        // has found a door, and the account of why fork 36 failed is wrong -- a far more
+        // interesting failure than a passing test.
+        Assert.DoesNotContain(always, rooted);
     }
 
     /// <summary>

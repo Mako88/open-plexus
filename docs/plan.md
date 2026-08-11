@@ -1071,6 +1071,15 @@ change of architecture entirely.
 - **AND HARD-ROUND COVERAGE STILL DOES NOT FOLLOW AT ELEVEN BITS**, moving under two standard
   errors on the even world and none at all under skew. So the two coverage columns come apart,
   and the quantity account was resting on the one that moves.
+- **AND THE PAIR HAS AN INTERIOR OPTIMUM THAT BEATS `Forking.Repeated` ON BOTH COLUMNS AT
+  ONCE**, which nothing on this bench has managed for a long time. `Budget` between four and
+  eight, on both eleven-bit worlds, on coverage AND trailing accuracy.
+- **SO `Budget` IS A LEVEL AT LAST RATHER THAN A RE-DERIVATION LIMIT, and it is only a level
+  once forking is distinct.** Two is worse than `Repeated` everywhere and a free one floods;
+  the two dials cannot be chosen apart.
+- **AND THE FLOODED VERSION IS FIVE STANDARD ERRORS OF DAMAGE ON `Arranged`**, whose truths
+  are one code and whose capacity it reaches. Whether a capped one is also damage there is the
+  cell that decides whether this ships.
 - **SO `Budget` HAS NEVER LIMITED CHILDREN AND CANNOT.** A child adds one code, so distinct
   children are capped by the vocabulary — twenty-two at eleven bits against a budget of
   sixty-four. Every number ever taken under it is a re-derivation limit.

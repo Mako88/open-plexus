@@ -138,17 +138,34 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_distinct_children_are_damage_where_one_code_is_already_the_truth()
     {
-        output.WriteLine("forking | unseen accuracy | spread | sound | unsound | residents");
+        output.WriteLine("arm        | unseen accuracy | spread | sound | unsound | residents");
 
-        foreach (var forking in new[] { Forking.Repeated, Forking.Distinct })
+        // AND THE BUDGET COMES WITH IT, BECAUSE THE TWO CANNOT BE CHOSEN APART. Distinct
+        // forking at the shipped budget floods this world to its capacity and is five
+        // standard errors down; on the multiplexer the same pair has an interior optimum
+        // around four to eight, where it beats the shipped rule on coverage AND accuracy. So
+        // the arm being refuted here is the FLOODED one, and asking whether a capped version
+        // is also damage is a different question that this grid can answer in one more row.
+        foreach (var (arm, forking, budget) in new (string Arm, Forking Forking, int? Budget)[]
+        {
+            ("repeated", Forking.Repeated, null),
+            ("distinct", Forking.Distinct, null),
+            ("distinct 8", Forking.Distinct, 8),
+            ("distinct 4", Forking.Distinct, 4),
+        })
         {
             // SHIPPED DIALS AND ONE THING MOVED, which is this repo's rule about measuring a
             // mechanism ON from a known baseline rather than OFF from all-on.
+            var dials = new CommittingSettings { Forking = forking };
+
             var (unseen, last) = Sweep(
-                Small, new CommittingSettings { Forking = forking }, Looking.Tiled, seeds: 10);
+                Small,
+                budget is null ? dials : dials with { Budget = budget.Value },
+                Looking.Tiled,
+                seeds: 10);
 
             output.WriteLine(
-                $"{forking,-7} | {unseen.Average(),15:F3} | {Spread(unseen),6:F3} "
+                $"{arm,-10} | {unseen.Average(),15:F3} | {Spread(unseen),6:F3} "
                 + $"| {last.Rules.Sound,5} | {last.Rules.Unsound,7} "
                 + $"| {last.Tally.Resident,9} | repairs {last.Tally.Repaired}");
         }

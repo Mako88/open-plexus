@@ -60,6 +60,12 @@ FORBIDS things, and several of them are already measured.
 - **SO A PRIMER BEFORE A TEST IS EXPECTED RATHER THAN A CHEAT** — the language before the
   play, the room before the question. What is forbidden is the learner being able to tell
   that a boundary happened.
+- **AND THE MEMORY QUESTION IS ANSWERED AND IS NOT ABOUT THE POPULATION.** A trained holder
+  is 1.3MB, so twenty is 26MB of brain — and a table is bounded by the ALPHABET, growing
+  2.36x when the vocabulary grows 2.33x.
+- **SO WHAT PRICES A CAMERA IS THE FRONT END'S VOCABULARY**, at residents times codes times
+  a hundred bytes. A thousand codes over five hundred residents is a phone's whole share,
+  and that is the number to take before a sensor is plumbed.
 - **AND EVERY GROUND-TRUTH INSTRUMENT GOES DARK.** Soundness, overshoot and hard-round
   coverage all need a world that can be enumerated, so the generated worlds never leave.
 - **SO THE PROBE IS THE ONE INSTRUMENT THAT CROSSES.** Ask what the codes carry against what
@@ -1322,7 +1328,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **53** | The commitment fleet losing one message waits forever. PORTED AND MEASURED: an ask watched failing to leave is written off exactly, so a fleet of four loses one and learns on. Open on the round a holder dies INSIDE |
 | **60** | Genesis is placed and repair is not, so a fleet repairs once per HOLDER a round where one machine repairs once. How hard it searches is a deployment choice. Place repair, divide the budget, or exploit it? Open |
 | **61** | John's: place a commitment by the MINIMUM code of its sorted scope, so identical children land together and a lineage stays together. PRICED: level at three holders, three times the average at twelve, capped by a world's distinct roots |
-| **62** | John's: partition into slots and give each R machines holding identical populations. A death costs nothing while a slot survives, replicas need no messages between them, and it alone reaches the round a death lands in. R scales with load |
+| **62** | John's: partition into slots and give each R machines holding identical populations. A death costs nothing while a slot survives, and it alone reaches a death mid-round. A slot is HANDED IN like `Places` rather than announced |
 | **63** | John's: genesis mints ONE scope over the whole scene and repeated scenes narrow it by overlap, the rest fading out. Specific-to-general, the DUAL of repair — an intersection needs two examples where the gate needs twenty misses. Open |
 | **65** | The vote decides what repair may run on, so under skew blame lands on the majority lineages alone. `Repairing.EveryRound` breaks that and pays, at four to six times the repair. Open on what it costs at width |
 | **66** | Is `Budget` a search limit or a re-derivation limit? ANSWERED: a re-derivation limit. Its level looked interior and stable across width, and that peak was the ballot -- on the ungameable columns there is none. Closed |

@@ -968,6 +968,9 @@ change of architecture entirely.
   which says nothing about the learner.
 - **SO THE MOST LOAD-BEARING NUMBER HERE LIVES IN A COMMIT MESSAGE**, which is a claim rather
   than a record. The run takes an encoder and nothing passes it one.
+- **AND THE GRID THAT WOULD REPLACE IT IS A RUNNER'S WORK RATHER THAN A TEST'S.** Five hundred
+  rounds on an embedding cost ten minutes and held eleven thousand rules — the search price of
+  good symbols, arriving as a wall clock.
 - **THE FRONT END IS THE CEILING AND THE LEARNER IS NOT — ON CIFAR.** Changing only the
   front end moves the same learner most of the way to the probe's score.
 - **AND ON `Arranged` IT IS FLATLY THE REVERSE.** A probe on the tiled codes loses
@@ -1333,7 +1336,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **40** | Does `Surprising.Unaccounted` starve genesis? YES, by a factor of ten in sound one-code rules on `Arranged` -- and it costs nothing on the withheld set, because a one-code rule never carries a hard round. Closed |
 | **41** | The held-out gap as a function of RECURRENCE. A bounded population shows none at four draws an image; the question is where it opens, and that is the number that says how big a bag a world needs. Open |
 | **42** | Rung five was called the only mechanism that raises a front-end floor. Patch tokens raised it to perfect on `Arranged` while abstracting nothing, so the question is now whether rung five buys anything a better-aimed projection does not. Open |
-| **43** | Given symbols worth having, a conjunctive rule learner reaches most of a linear probe on the same vectors. UNTESTED: no test runs the learner on encoder vectors, so the number is a commit message. Rebuild the grid before citing it |
+| **43** | Given symbols worth having, a conjunctive rule learner reaches most of a linear probe on the same vectors. THE GRID EXISTS AT LAST and is a sweep, five hundred rounds costing ten minutes. At that length it reads a third of the probe holding eleven thousand rules, which is a population still being born |
 | **44** | The tiled front end's patch is the arranged world's cell, so it is told where the parts are. Does the advantage survive a patch grid that does not divide the world's? Open |
 | **45** | Three repair gates, three worlds, three winners, and conjoining two keeps one and loses the other. Is there a per-COMMITMENT signal separating *needs specialising* from *is being outvoted*? Open |
 | **46** | Of five hundred residents, fifteen to twenty-two decide every withheld answer on `Arranged`, and the arm perfect there decides with four. A population-level arm cannot reach what it does not displace. Closed |

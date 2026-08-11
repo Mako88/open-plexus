@@ -94,6 +94,7 @@ jobs:
             "ArrangingTests.Whether_distinct_children_are_damage",
             "ArrangingTests.Whether_shortening_a_scope_is_damage",
             "BudgetTests","ChoosingTests","FleetTests","FoldingTests",
+            "EncodedTests.The_population_reaches_most",
             "ForkingTests.What_a_parents_attempts_buy",
             "ForkingTests.What_the_budget_caps",
             "GateCostTests","LatencyTests","MendingTests",

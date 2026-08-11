@@ -168,6 +168,20 @@ public enum Widening
     /// only rules that hold the withheld set. That is the prediction to run before this
     /// becomes the default, and not after.
     /// </para>
+    /// <para>
+    /// <b>AND IT IS POPULATION-WIDE, WHICH IS SAID HERE BECAUSE THAT IS HOW RUNG FIVE BROKE.</b>
+    /// Its evidence is two residents agreeing, so a holder counting only what it holds sees
+    /// fewer pairs — and a fleet that splits the population splits the agreement with it.
+    /// <see cref="Unmissed"/> is local by construction, reading one commitment at a time, so
+    /// the two arms are not the same kind of mechanism however alike their columns look.
+    /// </para>
+    /// <para>
+    /// <b>AND THE COUNT MERGES WHERE THE STRUCTURE WOULD NOT, WHICH IS THE LINE THIS REPO
+    /// ALREADY DREW.</b> What a holder would have to hear is how many machines reached each
+    /// shortened NAME — a frequency, exactly the shape <c>Recurrence</c> already ships for
+    /// abstraction, and not a commitment. So the fix if splitting silences it is known and
+    /// costs no round trip; what is unmeasured is how much it loses without one.
+    /// </para>
     /// </remarks>
     Shared,
 }

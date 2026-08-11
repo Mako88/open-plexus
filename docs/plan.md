@@ -764,6 +764,10 @@ change of architecture entirely.
 
 ## OPEN DEFECTS
 
+- **EVERY ROW HERE NAMING NO FORKING RULE WAS TAKEN UNDER `Forking.Repeated` AT A BUDGET OF
+  256**, where a parent re-proposed the same child and the budget capped re-derivation. Read
+  them as the old machine's until re-taken.
+
 - **MORE OF WHAT IT HOLDS IS UNSOUND THAN SOUND.** The vote scores well while
   carrying rules the soundness check refuses, at both widths — so what the vote
   tolerates is not what the world rewards.

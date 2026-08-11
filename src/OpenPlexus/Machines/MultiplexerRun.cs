@@ -24,6 +24,35 @@ public sealed record Learned
     /// <summary>Experienced commitments too general to settle by enumeration.</summary>
     public required int Unchecked { get; init; }
 
+    /// <summary>
+    /// Of the sound ones, how many strictly contain a SHORTER rule that is also sound —
+    /// <b>the chain having gone past a depth where it could have stopped.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>NOTHING IN THE MACHINE KNOWS WHEN A SCOPE IS DEEP ENOUGH, AND UNTIL THIS THERE
+    /// WAS NO NUMBER FOR IT.</b> The mean scope of the carriers says how deep the rules
+    /// that pay are; it cannot say whether that depth was NEEDED. This asks the world
+    /// directly: drop one code, is the remainder still true? A rule where some drop leaves
+    /// a truth is a rule that fires on fewer moments than a rule it already contains.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS A PROPERTY OF THE POPULATION RATHER THAN OF A LINEAGE, WHICH IS WHY IT
+    /// NEEDS NO NEW PLUMBING.</b> Whether the parent it descended from was itself sound is
+    /// a question about a history the brain does not keep; whether what it holds NOW is
+    /// longer than it had to be is decidable from the scope and the world's enumeration.
+    /// </para>
+    /// <para>
+    /// <b>AND THE FLOOR ON MISSES IS THE REASON THIS COULD BE NOUGHT.</b> Repair refuses a
+    /// parent under <c>Floor</c> misses, and a sound rule on a clean world never misses at
+    /// all — so on such a world the chain may already stop by construction, and the depth
+    /// the carriers sit at would be the route rather than the overshoot. That is a
+    /// different diagnosis from the one this reading was built to test, and only the
+    /// number tells them apart.
+    /// </para>
+    /// </remarks>
+    public required int Overshot { get; init; }
+
     /// <summary>How many of the world's own rules are held exactly.</summary>
     public required int Found { get; init; }
 
@@ -150,10 +179,26 @@ public sealed record Learned
         var decidable = experienced.Where(one => checkable(one.Scope)).ToList();
         var true_ = decidable.Count(one => sound(one.Scope, one.Expects));
 
+        // ONE DROP AT A TIME AND NOT EVERY SUBSET, WHICH IS THE CHEAP HALF AND THE ONLY HALF
+        // THAT MATTERS. If any shorter sound rule is contained at all then some single drop
+        // reaches a sound scope on the way down, because soundness here is a property of the
+        // pinned bits and dropping an irrelevant one cannot make a true rule false. So the
+        // one-code question answers the general one at a k-th of the cost.
+        var overshot = decidable.Count(one =>
+            one.Scope.Length > 1
+            && sound(one.Scope, one.Expects)
+            && one.Scope.Any(dropped =>
+            {
+                var shorter = one.Scope.Where(code => code != dropped).ToImmutableArray();
+
+                return checkable(shorter) && sound(shorter, one.Expects);
+            }));
+
         return new Learned
         {
             Tally = tally,
             Sound = true_,
+            Overshot = overshot,
             Unsound = decidable.Count - true_,
             Unchecked = experienced.Count - decidable.Count,
             Truths = truths.Length,

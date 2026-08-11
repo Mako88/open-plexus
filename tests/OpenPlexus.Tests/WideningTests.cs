@@ -111,6 +111,13 @@ public sealed class WideningTests(ITestOutputHelper output)
             ("paying", one => one.Census!.Paying),
             ("recent", one => one.Recent),
             ("sound", one => one.Sound),
+
+            // WHAT THIS OPERATOR EXISTS TO REMOVE, AND THE FIRST GRID THAT COULD SAY SO. A
+            // sound rule containing a shorter sound rule fires on fewer moments than a truth
+            // it already holds, which is the reach problem stated as a property of the
+            // population rather than as a score. If shortening scopes is worth anything at
+            // all, this is the column it is worth it ON.
+            ("overshot", one => one.Overshot),
             ("unsound", one => one.Unsound),
             ("residents", one => one.Resident),
             ("widened", one => one.Tally.Widened),
@@ -204,6 +211,47 @@ public sealed class WideningTests(ITestOutputHelper output)
                 await Report(
                     $"cap={capacity} {widening}",
                     seed => Run(address, skew, widening, seed, capacity));
+    }
+
+    /// <summary>
+    /// <b>THE OVERSHOOT READING FIRES, AND IT IS NOT THE SAME NUMBER AT BOTH WIDTHS.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A COLUMN THAT IS ALWAYS NOUGHT IS A CHECK THAT CANNOT FIRE</b>, which this repo
+    /// has now found twice by arming something that had always read zero. So the instrument
+    /// is asserted to have a subject before any row above is read as a comparison.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS ONE SEED A WIDTH ON PURPOSE, because this asks whether the number
+    /// EXISTS and not how big it is.</b> How much a population overshoots, and whether
+    /// shortening scopes reduces it, is the grid's question and carries error bars there.
+    /// </para>
+    /// <para>
+    /// <b>WHAT IT WOULD MEAN FOR THE TWO TO BE EQUAL IS WORTH SAYING FIRST.</b> Repair
+    /// refuses a parent under <c>Floor</c> misses and a sound rule on a clean world never
+    /// misses, so a chain that only ever narrows what is still wrong cannot pass a sound
+    /// depth by that route — it can only arrive at one along a lineage that was never sound.
+    /// A width where this reads nought is a width where every route was short enough for
+    /// that to be the whole story.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_overshoot_reading_has_a_subject_before_any_row_is_read()
+    {
+        var narrow = Run(2, skew: 0.0, Widening.Never, seed: 1);
+        var wide = Run(3, skew: 0.0, Widening.Never, seed: 1);
+
+        output.WriteLine(
+            $"6 bits: {narrow.Overshot} of {narrow.Sound} sound over-specialised");
+        output.WriteLine(
+            $"11 bits: {wide.Overshot} of {wide.Sound} sound over-specialised");
+
+        Assert.True(wide.Overshot > 0,
+            "no sound commitment at eleven bits contains a shorter sound one, so either the "
+            + "chain always stops at a minimum or the reading is not wired");
+
+        Assert.NotEqual(narrow.Overshot, wide.Overshot);
     }
 
     /// <summary>

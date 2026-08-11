@@ -989,6 +989,15 @@ change of architecture entirely.
 - **WHICH MAKES THE HIT RATE AND THE SCALING EXPONENT ONE PHENOMENON.** A wider world needs a
   longer chain and only a completed chain pays, so a relevant bit costs another step that must
   not go wrong.
+- **AND *TOO DEEP* IS A PROPERTY OF THE POPULATION AT LAST RATHER THAN OF A LINEAGE.** A
+  sound rule containing a shorter sound rule fires on fewer moments than a truth it already
+  holds, and `Learned.Overshot` asks the world that directly.
+- **AND MOST OF WHAT ELEVEN BITS HOLDS IS THAT**, against a small share at six — so the reach
+  problem and the depth problem are one reading, and whether widening removes it is the first
+  thing that column can settle.
+- **AND THE MISS FLOOR MEANS A CHAIN CANNOT WALK PAST A SOUND SCOPE ON A CLEAN WORLD**, since
+  a sound rule never misses. So what overshoots is the ROUTE: a lineage that was never sound
+  arriving somewhere longer than it had to be.
 - **AND THE NAMING LOOP WAS THAT AXIS FROM THE OTHER END.** A minted name let repair step two
   codes and it OVERSHOT the minimum depth; one code at a time undershoots it for three steps.
   Nothing in the machine knows the depth.
@@ -1219,7 +1228,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **79** | Widening pins the population at capacity — 2001 residents of 2000 at both eleven-bit widths, 302 at six. Is the accuracy cost the shortened rules, or culling destroying earned ones to make room? Open |
 | **77** | Can `Budgeting.Children` bind now that `Budget` sits below the vocabulary? CLOSED AGAINST, and no grid was owed: under `Forking.Distinct` a name is added exactly when an attempt is charged |
 | **76** | Repair proposes the same child until its table drifts, so a budget buys re-derivations. Refusing a parent its spent codes multiplies its distinct children eightfold at one seed. Does quantity buy the uncovered rounds, or only more population? Open |
-| **75** | Nothing stops a chain at a sound depth. One code a step undershoots for three rungs; two overshoots by nine tenths of a code at both widths, by two independent mechanisms. What signal inside the machine could say STOP HERE? Open |
+| **75** | Nothing stops a chain at a sound depth, and it has a number at last: most sound rules at eleven bits contain a shorter sound one. What signal inside the machine could say STOP HERE, and does widening remove it? Open |
 | **73** | What distinguishes a repair that buys hard-round coverage from one that does not? ANSWERED: depth. They sit at the world's minimum sound scope and every shorter step pays nothing. Open on walking a chain in fewer steps without overshooting |
 | **72** | Relearning after the target moves is slower than learning the world from nothing. ANSWERED: the repair budget, a per-parent LIFETIME cap the lineages that must relearn have already spent. Free recovers, the capped arms do not |
 | **71** | A minted name is a code, so repair adds it for the price of one. Should the separation bar be charged by what a scope's codes STAND FOR rather than by how many there are? Open |

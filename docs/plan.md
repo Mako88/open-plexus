@@ -1057,9 +1057,12 @@ change of architecture entirely.
 - **AND NOTHING EVER STOPPED A PARENT PROPOSING THE SAME CHILD, WHICH IS WHY.** The argmax
   is stable for thousands of rounds and a commitment's table skips only its OWN scope, so the
   re-derivation was deterministic rather than incidental.
-- **AND REFUSING IT ITS SPENT CODES TURNS THE BUDGET INTO A SEARCH, ON ONE SEED.** Births go
-  from 557 to 4,304 at eleven bits skewed while collisions fall from 29,790 to 1,383 — the
-  same budget buying an order more distinct children.
+- **AND REFUSING IT ITS SPENT CODES SOLVES SIX BITS AND FLOODS ELEVEN.** Perfect on every seed
+  there while holding no more than `Forking.Repeated`; at eleven it holds six times the
+  residents for under two standard errors of coverage.
+- **SO THE RE-DERIVATION WAS AN ACCIDENTAL POPULATION BRAKE**, and removing it needs a real
+  cap to replace it. `Budget` has never been one, being far above the vocabulary that bounds a
+  parent's distinct children.
 - **SO `Budget` HAS NEVER LIMITED CHILDREN AND CANNOT.** A child adds one code, so distinct
   children are capped by the vocabulary — twenty-two at eleven bits against a budget of
   sixty-four. Every number ever taken under it is a re-derivation limit.

@@ -53,12 +53,15 @@ public sealed class ForkingTests(ITestOutputHelper output)
     /// <param name="skew">How often a data bit is one, or zero to leave them even.</param>
     /// <param name="seed">The world's generator and the brain's.</param>
     /// <param name="forking">Whether a parent may propose a fork it has already made.</param>
+    /// <param name="budget">How many times one commitment may separate, or nothing for the default.</param>
     private static (Learned Learned, MultiplexerRun Run) Run(
-        int address, double skew, int seed, Forking forking)
+        int address, double skew, int seed, Forking forking, int? budget = null)
     {
+        var dials = new CommittingSettings { Forking = forking };
+
         var run = new MultiplexerRun(
             new MultiplexerSettings { Address = address, Skew = skew },
-            new Brain(new CommittingSettings { Forking = forking }, seed),
+            new Brain(budget is null ? dials : dials with { Budget = budget.Value }, seed),
             seed,
             census: true);
 
@@ -145,6 +148,102 @@ public sealed class ForkingTests(ITestOutputHelper output)
         // NO BAR. What a parent's attempts buy when they may not repeat has never been
         // measured, and a threshold written before the first reading would be the answer
         // rather than the finding.
+    }
+
+
+    /// <summary>
+    /// <b>WHAT `Budget` MEANS ONCE A PARENT'S ATTEMPTS BUY DISTINCT CHILDREN — the first
+    /// time this number has ever been a search limit.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>FORK 66 WAS CLOSED WITH THE ANSWER *A RE-DERIVATION LIMIT*, AND THAT ANSWER WAS
+    /// CONDITIONAL ON A MECHANISM NOBODY HAD CHANGED.</b> Under the rule that ships a parent
+    /// proposes the same child until its table drifts, so two hundred and fifty-six attempts
+    /// buy two or three distinct children and the number cannot cap a search it is not
+    /// running. Refuse a parent its spent codes and every attempt buys a NEW child, so the
+    /// same dial becomes what its documentation always claimed.
+    /// </para>
+    /// <para>
+    /// <b>AND IT DOES NOT BIND AT ITS SHIPPED VALUE, WHICH IS WHY THE LEVELS HERE ARE SMALL.</b>
+    /// A child adds one code, so a parent's distinct children are capped by the vocabulary —
+    /// twenty-two at eleven bits, against a budget of two hundred and fifty-six. Every level
+    /// above the vocabulary is the same arm, and the interesting range is the one nobody could
+    /// reach before.
+    /// </para>
+    /// <para>
+    /// <b>THE READING IT IS FOR IS THE ELEVEN-BIT FLOOD.</b> Distinct forking takes six bits to
+    /// a perfect score on every seed at the same population, and takes eleven bits to 1,144
+    /// residents for 1.6 standard errors of coverage — every count rising while the reading
+    /// barely moves, which is the shape of an arm this doc has already deleted once. If the
+    /// re-derivation was acting as an accidental brake, a real cap is what replaces it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_the_budget_caps_once_it_is_capping_a_search_rather_than_a_re_derivation()
+    {
+        output.WriteLine(
+            "arm              | paying | uncovered | carriers | hit rate "
+            + "| sound | unsound | residents | born | recent");
+
+        foreach (var (address, skew) in new[] { (3, 0.0), (3, 0.8) })
+        {
+            output.WriteLine($"--- {address + (1 << address)} bits, skew {skew:F1} ---");
+
+            // THE BASELINE FIRST AND NAMED AS ONE. Every number this repo holds was taken
+            // under it, so a column that does not beat it has bought nothing whatever it
+            // does to the counts.
+            foreach (var (arm, forking, budget) in new (string Arm, Forking Forking, int? Budget)[]
+            {
+                ("repeated 256", Forking.Repeated, null),
+                ("distinct 2", Forking.Distinct, 2),
+                ("distinct 4", Forking.Distinct, 4),
+                ("distinct 8", Forking.Distinct, 8),
+                ("distinct 256", Forking.Distinct, null),
+            })
+            {
+                var paying = new List<double>();
+                var open = new List<double>();
+                var carried = new List<double>();
+                var rate = new List<double>();
+                var sound = new List<double>();
+                var unsound = new List<double>();
+                var resident = new List<double>();
+                var born = new List<double>();
+                var recent = new List<double>();
+
+                for (var seed = 1; seed <= Seeds; seed++)
+                {
+                    var (learned, _) = Run(address, skew, seed, forking, budget);
+                    var census = learned.Census!;
+
+                    paying.Add(census.Paying);
+                    open.Add(census.Uncovered);
+                    carried.Add(census.Narrowed);
+                    sound.Add(learned.Sound);
+                    unsound.Add(learned.Unsound);
+                    resident.Add(learned.Resident);
+                    born.Add(learned.Repaired);
+                    recent.Add(learned.Recent);
+
+                    rate.Add(learned.Repaired == 0
+                        ? 0.0
+                        : census.Narrowed / (double)learned.Repaired);
+                }
+
+                output.WriteLine(
+                    $"{arm,-16} | {Sweep.Spread(paying)} | {Sweep.Spread(open, "F0")} "
+                    + $"| {Sweep.Spread(carried, "F1")} | {Sweep.Spread(rate)} "
+                    + $"| {Sweep.Spread(sound, "F1")} | {Sweep.Spread(unsound, "F1")} "
+                    + $"| {Sweep.Spread(resident, "F1")} | {Sweep.Spread(born, "F0")} "
+                    + $"| {Sweep.Spread(recent)}");
+            }
+        }
+
+        // NO BAR. What this dial does once it caps a search has never been measured, and a
+        // threshold written before the first reading would be the answer rather than the
+        // finding.
     }
 
     /// <summary>

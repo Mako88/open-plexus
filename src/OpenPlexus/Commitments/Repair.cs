@@ -421,6 +421,66 @@ public enum Budgeting
     Earned,
 }
 
+/// <summary>Whether a parent may propose a fork it has already made.</summary>
+/// <remarks>
+/// <para>
+/// <b>REPAIR IS DETERMINISTIC AND ITS TABLE MOVES SLOWLY, SO A PARENT PROPOSES THE SAME
+/// CHILD OVER AND OVER.</b> <see cref="Repair.Discriminator"/> returns the argmax of a tally
+/// that changes by one entry a firing, so the winner is stable for thousands of rounds — and
+/// the code it names is still in the tally next time, because a commitment's table skips its
+/// OWN scope and knows nothing of its children's. Measured: collisions run twenty to fifty
+/// times the births at every majority rung.
+/// </para>
+/// <para>
+/// <b>WHICH MAKES <see cref="CommittingSettings.Budget"/> A RE-DERIVATION LIMIT RATHER THAN A
+/// SEARCH LIMIT, AND THAT IS ALREADY WRITTEN DOWN AS A FINDING.</b> A parent under a budget of
+/// two hundred and fifty-six spends nearly all of it arriving where it already is. What has
+/// never been tried is spending those attempts somewhere else.
+/// </para>
+/// <para>
+/// <b>AND QUANTITY IS THE ONE ACCOUNT OF THE UNCOVERED ROUNDS THE EVIDENCE CONFIRMS.</b> A
+/// child fires only where its added code is present, so covering what a parent is right about
+/// takes MANY children — and <c>uncovered</c> falls monotonically as the budget rises, 1354 at
+/// eight to 472 free. If a parent's attempts bought distinct children, its effective search
+/// would be twenty to fifty times what every number here was taken under, at the same budget.
+/// </para>
+/// <para>
+/// <b>IT IS THE OPPOSITE HALF OF THE SEARCH FROM THE STEP LENGTH, WHICH IS WHY IT IS WORTH
+/// TRYING AFTER THAT FAILED.</b> A two-code step made each attempt reach DEEPER and lost
+/// coverage by overshooting; this makes each attempt reach somewhere ELSE at the same depth.
+/// Nothing about the chain's length changes, so the failure that closed fork 74 does not
+/// apply to it.
+/// </para>
+/// </remarks>
+public enum Forking
+{
+    /// <summary>
+    /// The best code in the table, whether or not this parent has already forked on it.
+    /// What every number here was taken under.
+    /// </summary>
+    Repeated,
+
+    /// <summary>The best code this parent has NOT already forked on.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE CORRECTION STILL DIVIDES BY THE WHOLE TABLE, WHICH IS THE PART THAT COULD HAVE
+    /// GONE WRONG SILENTLY.</b> Excluding a parent's spent codes shrinks the candidate set, and
+    /// a Bonferroni over a smaller set is a LOOSER bar — so a parent that had forked fifty
+    /// times would face an easier test than one that had forked once, and every late child
+    /// would enter on a bar its siblings never had to clear. The search that found the tenth
+    /// candidate is the same search that found the first, so it is charged the same.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS NOT A LOOSER BUDGET WEARING A DIFFERENT NAME.</b> Raising
+    /// <see cref="CommittingSettings.Budget"/> buys more attempts at the same argmax; this buys
+    /// a different child per attempt. The two are separable exactly because the budget curve
+    /// has already been taken — coverage rises with the budget and flattens past 128, which is
+    /// what a search running out of NEW proposals looks like from outside.
+    /// </para>
+    /// </remarks>
+    Distinct,
+}
+
 /// <summary>Every number the commitment machinery is allowed to have.</summary>
 public sealed record CommittingSettings
 {
@@ -596,6 +656,9 @@ public sealed record CommittingSettings
     /// <inheritdoc cref="Commitments.Widening"/>
     public Widening Widening { get; init; } = Widening.Never;
 
+    /// <inheritdoc cref="Commitments.Forking"/>
+    public Forking Forking { get; init; } = Forking.Repeated;
+
     /// <inheritdoc cref="Commitments.Speaking"/>
     public Speaking Speaking { get; init; } = Speaking.Anyone;
 }
@@ -626,6 +689,10 @@ public static class Repair
     /// <param name="parent">The commitment that is failing.</param>
     /// <param name="dials">The gate's numbers.</param>
     /// <param name="blind">The control arm's generator, when it is running.</param>
+    /// <param name="spent">
+    /// Codes this parent has already forked on, refused under
+    /// <see cref="Forking.Distinct"/> — and nothing at all under the rule that ships.
+    /// </param>
     /// <remarks>
     /// <para>
     /// <b>THE CONDITION MUST BE MORE PRESENT IN THE HITS, WHICH IS THE OPPOSITE OF
@@ -641,12 +708,21 @@ public static class Repair
     /// <see cref="Commitment.Separations"/> holds.
     /// </para>
     /// </remarks>
-    public static Code? Discriminator(Commitment parent, CommittingSettings dials, Random? blind)
+    public static Code? Discriminator(
+        Commitment parent,
+        CommittingSettings dials,
+        Random? blind,
+        IReadOnlySet<Code>? spent = null)
     {
         ArgumentNullException.ThrowIfNull(parent);
         ArgumentNullException.ThrowIfNull(dials);
 
         if (parent.Misses < dials.Floor || parent.Hits == 0) return null;
+
+        // WHAT THIS PARENT HAS ALREADY FORKED ON, AND ONLY WHERE THE ARM ASKS. Read once
+        // here rather than at each comparison, so the shipped rule pays a null check and
+        // not a lookup a candidate.
+        var refuse = dials.Forking == Forking.Distinct ? spent : null;
 
         if (dials.Choosing == Choosing.Present)
         {
@@ -655,9 +731,12 @@ public static class Repair
             // THE ARM DRAWS FROM THE CODES PRESENT IN THE MISSES, which is the
             // fairest control available: an arm drawing from every code would lose
             // to anything at all, and beating a straw man says nothing.
+            // AND IT HONOURS THE SAME REFUSAL, or the control would be searching a wider
+            // set than the mechanism and the comparison would be about two things.
             var present = parent.Separations
                 .Where(one => one.Value.InMisses > 0)
                 .Select(one => one.Key)
+                .Where(code => refuse?.Contains(code) != true)
                 .Order()
                 .ToList();
 
@@ -670,7 +749,13 @@ public static class Repair
 
         foreach (var (code, seen) in parent.Separations)
         {
+            // COUNTED BEFORE THE REFUSAL, WHICH IS THE WHOLE OF WHY THE BAR STAYS HONEST.
+            // A Bonferroni over the un-spent codes alone would loosen as a parent forks, so
+            // its tenth child would enter on a bar its first never had to clear. The search
+            // that reached the tenth candidate is the same search.
             candidates++;
+
+            if (refuse?.Contains(code) == true) continue;
 
             var z = Divergence(seen.InHits, parent.Hits, seen.InMisses, parent.Misses);
 

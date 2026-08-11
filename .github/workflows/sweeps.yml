@@ -92,6 +92,7 @@ jobs:
             "ArrangingTests.Whether_the_gap_is_a_fact",
             "ArrangingTests.Whether_the_gate_that_was_load_bearing",
             "BudgetTests","ChoosingTests","FleetTests","FoldingTests",
+            "ForkingTests",
             "GateCostTests","LatencyTests","MendingTests",
             "MonkTests","NarrowingTests","OverlapTests","PlacingTests",
             "NamingYieldTests.Which_bar_takes",

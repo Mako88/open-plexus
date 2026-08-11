@@ -1054,6 +1054,12 @@ change of architecture entirely.
 - **AND REPAIR SPENDS MOST OF ITS BUDGET RE-DERIVING WHAT IT HOLDS.** Collisions run twenty
   to fifty times the births at every majority rung, and a collision is charged to the
   parent's budget exactly as a child is.
+- **AND NOTHING EVER STOPPED A PARENT PROPOSING THE SAME CHILD, WHICH IS WHY.** The argmax
+  is stable for thousands of rounds and a commitment's table skips only its OWN scope, so the
+  re-derivation was deterministic rather than incidental.
+- **AND REFUSING IT ITS SPENT CODES TURNS THE BUDGET INTO A SEARCH, ON ONE SEED.** Births go
+  from 557 to 4,304 at eleven bits skewed while collisions fall from 29,790 to 1,383 — the
+  same budget buying an order more distinct children.
 - **SO `Budget` HAS NEVER LIMITED CHILDREN AND CANNOT.** A child adds one code, so distinct
   children are capped by the vocabulary — twenty-two at eleven bits against a budget of
   sixty-four. Every number ever taken under it is a re-derivation limit.
@@ -1151,6 +1157,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **70** | Proposals naming a pair already named mint nothing. ANSWERED: spending the ask on the best unnamed pair nearly triples the stacking on both eleven-bit worlds and sells nothing. Shipped, and the arm is deleted. Closed |
 | **68** | John's: does a conjunction EARN its narrowing? Its premise is half wrong -- reach halves with depth on even worlds and RISES under skew, where correlated codes let a long scope fire as often as a short one. Open |
 | **74** | Could one repair add two codes, sparing a miss floor? CLOSED AGAINST, built and measured: coverage falls two to four standard errors on three worlds while the carriers overshoot the minimum sound depth. Deleted with a revival row |
+| **76** | Repair proposes the same child until its table drifts, so a budget buys re-derivations. Refusing a parent its spent codes multiplies its distinct children eightfold at one seed. Does quantity buy the uncovered rounds, or only more population? Open |
 | **75** | Nothing stops a chain at a sound depth. One code a step undershoots for three rungs; two overshoots by nine tenths of a code at both widths, by two independent mechanisms. What signal inside the machine could say STOP HERE? Open |
 | **73** | What distinguishes a repair that buys hard-round coverage from one that does not? ANSWERED: depth. They sit at the world's minimum sound scope and every shorter step pays nothing. Open on walking a chain in fewer steps without overshooting |
 | **72** | Relearning after the target moves is slower than learning the world from nothing. ANSWERED: the repair budget, a per-parent LIFETIME cap the lineages that must relearn have already spent. Free recovers, the capped arms do not |

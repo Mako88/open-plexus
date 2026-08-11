@@ -197,6 +197,18 @@ public sealed class DialTests(ITestOutputHelper output)
             + "accuracy on every world. The driver would be a gate that reads how "
             + "much a rule has been TESTED rather than whether it has been wrong",
 
+        ["Forking"] =
+            "WHETHER A PARENT MAY PROPOSE A FORK IT HAS ALREADY MADE, and it is two "
+            + "rules that both do something rather than a level. Repair is "
+            + "deterministic and its table moves by one entry a firing, so the "
+            + "argmax is stable for thousands of rounds and a parent arrives where "
+            + "it already is -- twenty to fifty collisions a birth at every "
+            + "majority rung, which is why `Budget` has always been a re-derivation "
+            + "limit rather than a search limit. There is nothing here for a "
+            + "controller to hunt: whether to repeat is not a quantity. AND ITS "
+            + "HONEST END IS A DELETION EITHER WAY, since a winner becomes the code "
+            + "and a loser goes with a revival row",
+
         ["Choosing"] =
             "the control arm, and a choice between two rules that both do "
             + "something rather than a mechanism and its own absence. WHICH rule "
@@ -686,6 +698,13 @@ public sealed class DialTests(ITestOutputHelper output)
         // they rose. A pre-registered condition written on columns a skewed world can raise
         // is a pre-registration of the wrong question, and passing one is not a defence.
         //
+        // AND TWENTY-SEVEN IS `Forking`, WHICH ARRIVES BECAUSE THE ARM BEFORE IT FAILED IN
+        // A DIRECTION THAT NAMED THIS ONE. A two-code step made each attempt reach DEEPER
+        // and lost coverage by overshooting the world's minimum sound depth; this makes each
+        // attempt reach somewhere ELSE at the same depth, so the failure that closed fork 74
+        // does not carry over. The count going up for a second search arm in one session is
+        // the finding rather than the cost -- both were pre-registered for deletion.
+        //
         // `Stepping` ARRIVED AND LEFT WITHOUT THIS NUMBER EVER BEING PUSHED, WHICH IS THE
         // FIRST TIME THAT HAS HAPPENED AND IS WHAT THIS FILE IS FOR. Its entry said the
         // honest end was a deletion the day the reading landed; the reading landed and it
@@ -697,6 +716,6 @@ public sealed class DialTests(ITestOutputHelper output)
         // deletion was pre-registered costs nothing to try, so the budget this file keeps is
         // a budget on dials that STAY -- which is the only version of it that does not make
         // measuring an idea more expensive than not measuring it.
-        Assert.Equal(26, HandSet.Count);
+        Assert.Equal(27, HandSet.Count);
     }
 }

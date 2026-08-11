@@ -115,6 +115,15 @@ internal sealed class Forks
 
     /// <summary>The distinct children it has reached.</summary>
     public HashSet<Code> Names { get; } = [];
+
+    /// <summary>The codes it has already forked on.</summary>
+    /// <remarks>
+    /// <b>NOT DERIVABLE FROM <see cref="Names"/>, WHICH IS WHY IT IS A SECOND SET.</b> A
+    /// child's identity is a hash of its whole scope and its expectation, so the code that
+    /// was added to reach it cannot be read back out — and a parent that wants to propose
+    /// somewhere NEW has to be told where it has been.
+    /// </remarks>
+    public HashSet<Code> Codes { get; } = [];
 }
 
 /// <summary>How a commitment came to be held.</summary>
@@ -1093,7 +1102,13 @@ public sealed class Population
             {
                 blamed = true;
 
-                if (Repair.Discriminator(culprit, _dials, _blind) is not { } added)
+                // WHERE THIS PARENT HAS ALREADY FORKED, WHICH ONLY `Distinct` READS. A
+                // parent with no ledger yet has forked nowhere, so a missing entry and an
+                // empty set are the same answer and neither needs a branch here.
+                _minted.TryGetValue(culprit.Identity, out var ledger);
+
+                if (Repair.Discriminator(culprit, _dials, _blind, ledger?.Codes)
+                    is not { } added)
                 {
                     // THE PROBE, AND IT MINTS NOTHING. See `Absented`: asked only where the
                     // present-code search came back empty, so it costs a second walk of one
@@ -1131,11 +1146,16 @@ public sealed class Population
                 if (Repair.Runner(culprit, _dials) is { } runner)
                     _runners[child.Identity] = runner;
 
-                if (!_minted.TryGetValue(culprit.Identity, out var born))
-                    _minted[culprit.Identity] = born = new Forks();
+                if (ledger is null) _minted[culprit.Identity] = ledger = new Forks();
 
-                born.Attempts++;
-                born.Names.Add(child.Identity);
+                ledger.Attempts++;
+                ledger.Names.Add(child.Identity);
+
+                // AND WHERE IT WENT, CHARGED WHETHER OR NOT THE CHILD WAS NEW. A collision
+                // is this parent having reached that scope already, so recording it only on
+                // a birth would let `Distinct` propose the same place forever whenever the
+                // population got there first.
+                ledger.Codes.Add(added);
 
                 if (Add(child))
                 {

@@ -778,13 +778,9 @@ change of architecture entirely.
 - **AND TWENTY BITS PLATEAUS RATHER THAN BEING SLOW.** The same score at a hundred
   and fifty thousand rounds and at four hundred thousand, while sound rules keep
   rising — so it refines and stops improving.
-- **THE REPAIR BUDGET'S INTERIOR OPTIMUM WAS THE BALLOT.** Re-taken under the vote that does
-  not charge for size: hard-round coverage and sound rules rise monotonically to FREE at every
-  width, and only accuracy still peaks at 256 — by a hair.
-- **SO 256 IS A NUMBER ABOUT A DELETED VOTE AND NOT ABOUT THE SEARCH**, on the multiplexer.
-- **AND `Arranged` DOES NOT CONFIRM IT: free is a point worse on the withheld set** at one
-  standard error, holding 791 residents to 483. Where a world's rules are one code, repair is
-  damage — so the budget's worth is the world's.
+- **THE REPAIR BUDGET'S INTERIOR OPTIMUM WAS THE BALLOT, AND THE BALLOT IS DELETED.** Every
+  reading arguing for a large budget was taken under a vote that charged for a population's
+  size; on the ungameable columns there is no interior optimum. Fork 66.
 - **RUNG FIVE MINTS AT MOST ONE NAME AN ASK, AND THAT CEILING IS LOAD-BEARING.** Removing it
   was built and deleted — see the revival row. What it bounds is the search's STEP.
 - **SO *NAMES PER ELIGIBLE SCOPE* IS A RATIO WITH A CAPPED NUMERATOR**, and it falls as the
@@ -817,14 +813,9 @@ change of architecture entirely.
 - **AND A PER-PARENT LIFETIME CAP IS WHAT C4 SAYS CANNOT BE ASSUMED.** A total spent over a
   parent's life is a bet that its life is one episode; the constraint says there is no
   episode boundary.
-- **AND `Budgeting.Children` IS NOT THE FIX, IT IS FREE WEARING A CAP'S NAME.** Bit-identical
-  to no budget on twelve cells of two widths. What should be counted so that it binds without
-  being a lifetime is open.
-- **AND IT CANNOT BIND UNDER `Forking.Distinct` EITHER, BY ARITHMETIC AND NOT BY WORLD.** A
-  spent code is refused, so a name is added exactly when an attempt is charged.
-- **SO IT IS FREE UNDER `Repeated` AND A SYNONYM UNDER `Distinct`, WITH NO THIRD THING
-  AVAILABLE.** A vocabulary reaching the budget would not have separated them, and never
-  could have.
+- **AND `Budgeting.Children` CAN NEVER BE THE FIX: FREE UNDER `Repeated`, A SYNONYM UNDER
+  `Distinct`, AND NO THIRD THING AVAILABLE.** A spent code is refused, so a name is added
+  exactly when an attempt is charged. What should be counted instead is open.
 - **AND A LIFETIME BUDGET DOES NOT DEGRADE WITH THE MOVES, IT FAILS AT THE FIRST ONE.** Its
   LEVEL stops mattering there too — sixty-four and two hundred and fifty-six sit a fifth of a
   standard error apart once the world moves at all.

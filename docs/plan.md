@@ -1087,8 +1087,10 @@ change of architecture entirely.
   once forking is distinct.** Two is worse than `Repeated` everywhere and a free one floods;
   the two dials cannot be chosen apart.
 - **AND THE FLOODED VERSION IS FIVE STANDARD ERRORS OF DAMAGE ON `Arranged`**, whose truths
-  are one code and whose capacity it reaches. Whether a capped one is also damage there is the
-  cell that decides whether this ships.
+  are one code and whose capacity it reaches — while the CAPPED one leads there by two.
+- **SO WHAT IS DAMAGE IS REACHING THE CAPACITY RATHER THAN HOLDING MORE.** The winning arm
+  holds three times the residents of `Repeated` on that world and scores above it; the losing
+  one holds five times and is pinned at the ceiling.
 - **SO `Budget` HAS NEVER LIMITED CHILDREN AND CANNOT.** A child adds one code, so distinct
   children are capped by the vocabulary — twenty-two at eleven bits against a budget of
   sixty-four. Every number ever taken under it is a re-derivation limit.

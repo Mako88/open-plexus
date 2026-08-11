@@ -205,9 +205,14 @@ public sealed class DialTests(ITestOutputHelper output)
             + "it already is -- twenty to fifty collisions a birth at every "
             + "majority rung, which is why `Budget` has always been a re-derivation "
             + "limit rather than a search limit. There is nothing here for a "
-            + "controller to hunt: whether to repeat is not a quantity. AND ITS "
-            + "HONEST END IS A DELETION EITHER WAY, since a winner becomes the code "
-            + "and a loser goes with a revival row",
+            + "controller to hunt: whether to repeat is not a quantity. AND IT WON "
+            + "AND BECAME THE CODE, on four worlds and worse on none -- perfect at "
+            + "six bits, two standard errors of hard-round coverage at eleven both "
+            + "even and skewed, and two on `Arranged`'s withheld set where the "
+            + "prediction was that it would be damage. `Repeated` stays as the "
+            + "control rather than going with a revival row, because it is the "
+            + "baseline every reading recorded before it sits on -- the one arm here "
+            + "whose job is to be the old number",
 
         ["Choosing"] =
             "the control arm, and a choice between two rules that both do "

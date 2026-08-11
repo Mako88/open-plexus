@@ -456,8 +456,14 @@ public enum Forking
 {
     /// <summary>
     /// The best code in the table, whether or not this parent has already forked on it.
-    /// What every number here was taken under.
+    /// <b>The control, and what every number taken before this shipped was taken under.</b>
     /// </summary>
+    /// <remarks>
+    /// <b>KEPT RATHER THAN DELETED, WHICH IS THE EXCEPTION THIS REPO'S ARM RULE ALLOWS.</b> A
+    /// loser goes with a revival row — but this one is the baseline every recorded reading in
+    /// the tree sits on, and deleting it would make the whole history unreproducible rather
+    /// than merely superseded. It is the only arm here whose job is to be the old number.
+    /// </remarks>
     Repeated,
 
     /// <summary>The best code this parent has NOT already forked on.</summary>
@@ -562,8 +568,22 @@ public sealed record CommittingSettings
     /// sound rules and 3.8 of hard-round coverage; at six bits it is level on accuracy and
     /// ahead on coverage. Nothing measured is worse.
     /// </para>
+    /// <para>
+    /// <b>AND THEN IT FELL FROM TWO HUNDRED AND FIFTY-SIX TO EIGHT, WHICH IS NOT A RETRACTION
+    /// OF ANY OF THAT.</b> Every level above the vocabulary was the same arm while a parent
+    /// re-proposed the same child, so the readings above are about how much RE-DERIVATION a
+    /// lineage was allowed. Under <see cref="Forking.Distinct"/> an attempt buys a new child
+    /// and this caps the search for the first time — which is why the optimum moved from
+    /// "as large as measured" to a small number, and why fork 66's answer was right about the
+    /// machine it was taken on.
+    /// </para>
+    /// <para>
+    /// <b>EIGHT RATHER THAN FOUR ON THREE COLUMNS OF FOUR, and neither is free.</b> Two is
+    /// worse than repeating on every world; free floods `Arranged` to its capacity and is five
+    /// standard errors down there. The two dials are chosen together or not at all.
+    /// </para>
     /// </remarks>
-    public int Budget { get; init; } = 256;
+    public int Budget { get; init; } = 8;
 
     /// <summary>How many commitments may be resident before the worst are dropped.</summary>
     public int Capacity { get; init; } = 2000;
@@ -657,7 +677,7 @@ public sealed record CommittingSettings
     public Widening Widening { get; init; } = Widening.Never;
 
     /// <inheritdoc cref="Commitments.Forking"/>
-    public Forking Forking { get; init; } = Forking.Repeated;
+    public Forking Forking { get; init; } = Forking.Distinct;
 
     /// <inheritdoc cref="Commitments.Speaking"/>
     public Speaking Speaking { get; init; } = Speaking.Anyone;

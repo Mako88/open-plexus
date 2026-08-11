@@ -54,12 +54,23 @@ public sealed class SteppingTests(ITestOutputHelper output)
     /// <param name="skew">How often a data bit is one, or zero to leave them even.</param>
     /// <param name="seed">The world's generator and the brain's.</param>
     /// <param name="stepping">How many codes one repair adds.</param>
-    private static Learned Run(int address, double skew, int seed, Stepping stepping) =>
-        new MultiplexerRun(
+    /// <remarks>
+    /// <b>THE RUN IS RETURNED BESIDE THE SCORE BECAUSE `Population.Paired` IS NOT ON
+    /// <see cref="Learned"/>.</b> That record carries what every world shares; a count of
+    /// repairs that took two codes is about one arm on one branch of the machine, and
+    /// widening the shared record for it would put a column on every grid in the repo.
+    /// </remarks>
+    private static (Learned Learned, MultiplexerRun Run) Run(
+        int address, double skew, int seed, Stepping stepping)
+    {
+        var run = new MultiplexerRun(
             new MultiplexerSettings { Address = address, Skew = skew },
             new Brain(new CommittingSettings { Stepping = stepping }, seed),
             seed,
-            census: true).Run(Rounds);
+            census: true);
+
+        return (run.Run(Rounds), run);
+    }
 
     /// <summary>
     /// <b>THE READING: two arms, three worlds, and the ungameable columns.</b>
@@ -87,7 +98,7 @@ public sealed class SteppingTests(ITestOutputHelper output)
     {
         output.WriteLine(
             "stepping | paying | carriers | hit rate | their mean scope "
-            + "| sound | unsound | residents | repairs | recent");
+            + "| sound | unsound | residents | repairs | took two | recent");
 
         foreach (var (address, skew) in new[] { (2, 0.0), (3, 0.0), (3, 0.8) })
         {
@@ -103,12 +114,23 @@ public sealed class SteppingTests(ITestOutputHelper output)
                 var unsound = new List<double>();
                 var resident = new List<double>();
                 var repairs = new List<double>();
+                var took = new List<double>();
                 var recent = new List<double>();
 
                 for (var seed = 1; seed <= Seeds; seed++)
                 {
-                    var learned = Run(address, skew, seed, stepping);
+                    var (learned, run) = Run(address, skew, seed, stepping);
                     var census = learned.Census!;
+
+                    // THE SHARE OF REPAIR ATTEMPTS THAT ACTUALLY TOOK A SECOND CODE, which
+                    // is the only thing separating a mechanism that does nothing from one
+                    // that almost never gets to run. Nought under `OneCode` by construction.
+                    // AGAINST ATTEMPTS AND NOT BIRTHS: most attempts collide with a scope
+                    // the population already holds, so `Repaired` as a denominator gives a
+                    // share of thirty-nine.
+                    took.Add(run.Held.Stepped == 0
+                        ? 0.0
+                        : run.Held.Paired / (double)run.Held.Stepped);
 
                     paying.Add(census.Paying);
                     carried.Add(census.Narrowed);
@@ -129,7 +151,7 @@ public sealed class SteppingTests(ITestOutputHelper output)
                     + $"| {Sweep.Spread(rate)} | {Sweep.Spread(scope, "F2")} "
                     + $"| {Sweep.Spread(sound, "F1")} | {Sweep.Spread(unsound, "F1")} "
                     + $"| {Sweep.Spread(resident, "F1")} | {Sweep.Spread(repairs, "F0")} "
-                    + $"| {Sweep.Spread(recent)}");
+                    + $"| {Sweep.Spread(took)} | {Sweep.Spread(recent)}");
             }
         }
 
@@ -152,35 +174,32 @@ public sealed class SteppingTests(ITestOutputHelper output)
     /// same.
     /// </para>
     /// <para>
-    /// <b>AND IT ASKS FOR A DIFFERENCE ANYWHERE RATHER THAN IN ONE NAMED COLUMN.</b> Which
-    /// count moves first is a fact about the world, and pinning the check to one of them
-    /// would make it a prediction about the search wearing a wiring check's clothes — the
-    /// shape that fails two ways and reads the same. Any of the four moving is proof the
-    /// second code reached the scope; none of them moving is proof it did not.
+    /// <b>AND IT ASSERTS ON <c>Population.Paired</c> RATHER THAN ON A SCORE, which is the
+    /// difference between checking a wire and predicting a result.</b> That counter is nought
+    /// under one code at a time by construction and positive under a pair the moment a second
+    /// code reaches a scope — so it separates <i>unmounted</i> from <i>mounted and nothing to
+    /// do</i>, where every downstream count could coincide for reasons of its own.
     /// </para>
     /// </remarks>
     [Fact]
-    public void A_pair_step_builds_a_different_population_from_one_code_at_a_time()
+    public void A_pair_step_reaches_a_second_code_and_one_at_a_time_never_does()
     {
         foreach (var (address, skew) in new[] { (2, 0.0), (3, 0.8) })
         {
-            var one = Run(address, skew, seed: 1, Stepping.OneCode);
-            var pair = Run(address, skew, seed: 1, Stepping.Pair);
+            var (one, oneRun) = Run(address, skew, seed: 1, Stepping.OneCode);
+            var (pair, pairRun) = Run(address, skew, seed: 1, Stepping.Pair);
 
             output.WriteLine(
                 $"{address + (1 << address),2} bits skew {skew:F1} | one code "
-                + $"repairs {one.Repaired,6} residents {one.Resident,5} "
-                + $"sound {one.Sound,4} unsound {one.Unsound,4} | pair "
-                + $"repairs {pair.Repaired,6} residents {pair.Resident,5} "
-                + $"sound {pair.Sound,4} unsound {pair.Unsound,4}");
+                + $"born {one.Repaired,6} attempts {oneRun.Held.Stepped,6} "
+                + $"took two {oneRun.Held.Paired,6} | pair "
+                + $"born {pair.Repaired,6} attempts {pairRun.Held.Stepped,6} "
+                + $"took two {pairRun.Held.Paired,6}");
 
-            Assert.True(
-                one.Repaired != pair.Repaired
-                || one.Resident != pair.Resident
-                || one.Sound != pair.Sound
-                || one.Unsound != pair.Unsound,
-                "`Stepping.Pair` left every count identical to one code at a time, which "
-                + "means the second code never reached a scope — either `Repair.Runner` "
+            Assert.Equal(0, oneRun.Held.Paired);
+
+            Assert.True(pairRun.Held.Paired > 0,
+                "`Stepping.Pair` never added a second code, so either `Repair.Runner` "
                 + "certifies nothing on this world or the arm is not wired");
         }
     }

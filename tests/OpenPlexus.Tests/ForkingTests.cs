@@ -88,7 +88,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
     {
         output.WriteLine(
             "forking  | paying | uncovered | carriers | hit rate | their mean scope "
-            + "| sound | unsound | residents | born | collided | recent");
+            + "| sound | unsound | payable | residents | born | collided | recent");
 
         foreach (var (address, skew) in new[] { (2, 0.0), (3, 0.0), (3, 0.8) })
         {
@@ -103,6 +103,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
                 var scope = new List<double>();
                 var sound = new List<double>();
                 var unsound = new List<double>();
+                var payable = new List<double>();
                 var resident = new List<double>();
                 var born = new List<double>();
                 var collided = new List<double>();
@@ -125,6 +126,12 @@ public sealed class ForkingTests(ITestOutputHelper output)
                     scope.Add(census.Codes);
                     sound.Add(learned.Sound);
                     unsound.Add(learned.Unsound);
+
+                    // OF THE WORLD'S RULES HELD, HOW MANY COULD EVER FIRE WHERE THE BASE RATE
+                    // FAILS. `found` counts two unlike things at once and both levers on this
+                    // bench moved it without moving coverage; this is the half that bounds
+                    // what coverage could reach.
+                    payable.Add(learned.Payable);
                     resident.Add(learned.Resident);
                     born.Add(learned.Repaired);
                     collided.Add(Collisions(run));
@@ -140,6 +147,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
                     + $"| {Sweep.Spread(carried, "F1")} "
                     + $"| {Sweep.Spread(rate)} | {Sweep.Spread(scope, "F2")} "
                     + $"| {Sweep.Spread(sound, "F1")} | {Sweep.Spread(unsound, "F1")} "
+                    + $"| {Sweep.Spread(payable, "F1")} "
                     + $"| {Sweep.Spread(resident, "F1")} | {Sweep.Spread(born, "F0")} "
                     + $"| {Sweep.Spread(collided, "F0")} | {Sweep.Spread(recent)}");
             }
@@ -185,7 +193,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
     {
         output.WriteLine(
             "arm              | paying | uncovered | carriers | hit rate "
-            + "| sound | unsound | residents | born | recent");
+            + "| sound | unsound | payable | residents | born | recent");
 
         foreach (var (address, skew) in new[] { (3, 0.0), (3, 0.8) })
         {
@@ -209,6 +217,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
                 var rate = new List<double>();
                 var sound = new List<double>();
                 var unsound = new List<double>();
+                var payable = new List<double>();
                 var resident = new List<double>();
                 var born = new List<double>();
                 var recent = new List<double>();
@@ -223,6 +232,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
                     carried.Add(census.Narrowed);
                     sound.Add(learned.Sound);
                     unsound.Add(learned.Unsound);
+                    payable.Add(learned.Payable);
                     resident.Add(learned.Resident);
                     born.Add(learned.Repaired);
                     recent.Add(learned.Recent);
@@ -236,6 +246,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
                     $"{arm,-16} | {Sweep.Spread(paying)} | {Sweep.Spread(open, "F0")} "
                     + $"| {Sweep.Spread(carried, "F1")} | {Sweep.Spread(rate)} "
                     + $"| {Sweep.Spread(sound, "F1")} | {Sweep.Spread(unsound, "F1")} "
+                    + $"| {Sweep.Spread(payable, "F1")} "
                     + $"| {Sweep.Spread(resident, "F1")} | {Sweep.Spread(born, "F0")} "
                     + $"| {Sweep.Spread(recent)}");
             }

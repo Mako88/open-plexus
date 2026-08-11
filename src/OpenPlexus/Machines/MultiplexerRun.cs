@@ -241,7 +241,22 @@ public sealed class MultiplexerRun
     /// Whether to partition the wrong rounds by cause — <b>off by default, because it
     /// costs a second match every round.</b>
     /// </param>
-    public MultiplexerRun(MultiplexerSettings world, Brain brain, int seed, bool census = false)
+    /// <param name="graded">
+    /// Whether the front end also emits a code for each POSITION with its value thrown away
+    /// — <b>fork 36, and off by default because every number here was taken without it.</b>
+    /// </param>
+    /// <remarks>
+    /// <b>A WORLD-SIDE ARM AND NOT A BRAIN DIAL, WHICH IS THE WHOLE REASON IT MAY EXIST.</b>
+    /// A brain dial a world turns is the thing <c>SeparationTests</c> fails the build over;
+    /// how finely the front end cuts is the translation at the join, which this design says
+    /// is a third thing belonging to neither. Same brain, differently read.
+    /// </remarks>
+    public MultiplexerRun(
+        MultiplexerSettings world,
+        Brain brain,
+        int seed,
+        bool census = false,
+        bool graded = false)
     {
         ArgumentNullException.ThrowIfNull(brain);
 
@@ -249,7 +264,10 @@ public sealed class MultiplexerRun
         _brain = brain;
 
         _trial = new Trial<IReadOnlyList<int>>(
-            _world, new Bits(Multiplexer.Bit), brain, census ? _world.Sound : null);
+            _world,
+            new Bits(Multiplexer.Bit, coarse: graded ? Multiplexer.Place : null),
+            brain,
+            census ? _world.Sound : null);
     }
 
     /// <summary>What the brain holds.</summary>

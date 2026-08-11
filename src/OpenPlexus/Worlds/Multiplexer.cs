@@ -303,6 +303,34 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// <summary>The modality for what the multiplexer says.</summary>
     public const byte Said = 101;
 
+    /// <summary>The modality for one POSITION, whatever it says.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE CODE <see cref="Bit"/>'S OWN REMARK SAYS SEPARATES NOTHING, AND THAT IS
+    /// PRECISELY WHY IT IS WORTH EMITTING.</b> A code true in every round cannot win a
+    /// repair and can never be the condition that tells a failure from a hit. But rung five
+    /// does not name what separates — it names what is SHARED, and what the address bits
+    /// share is exactly their positions with the values thrown away.
+    /// </para>
+    /// <para>
+    /// <b>AND THE THING IT MAKES NAMEABLE IS DECIDABLY UNREACHABLE WITHOUT IT.</b>
+    /// <i>Position p, whatever it says</i> would otherwise need both values of one bit
+    /// inside one name, and a scope pinning a bit both ways is satisfied by nothing — so no
+    /// scope holds that pair and no name counted from scopes could ever be it. Fork 36 is
+    /// John's proposal for dissolving that, and this is the cheapest form of it: a coarser
+    /// cut along the SAME axis, which is the only kind of front-end change this design
+    /// permits.
+    /// </para>
+    /// <para>
+    /// <b>IT PINS NOTHING, so <see cref="Sound"/> and <see cref="Checkable"/> pass over
+    /// it.</b> A rule whose scope carries one of these claims no more about the world than
+    /// the same rule without it, and the enumeration is over the FINE codes alone — which
+    /// keeps the sharpest measurement here working rather than turning the experiment's own
+    /// subject into an unreadable row.
+    /// </para>
+    /// </remarks>
+    public const byte Place = 102;
+
     private readonly MultiplexerSettings _settings;
     private readonly Random _rng;
     private readonly HashSet<int>? _kept;
@@ -573,9 +601,19 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// what cannot be settled is reported as its own number rather than folded into
     /// the bad news.
     /// </remarks>
+    /// <remarks>
+    /// <b>AND IT COUNTS THE FINE CODES ALONE, because a <see cref="Place"/> code pins
+    /// nothing.</b> Counting one as though it constrained a position would call a scope
+    /// checkable that leaves that bit free, and the enumeration below would then be over the
+    /// wrong space — a scope reading sound on an assignment it never actually forbade.
+    /// </remarks>
     public bool Checkable(ImmutableArray<Code> scope) =>
         !scope.IsDefaultOrEmpty
-        && Bits - scope.Select(code => (int)(code.Value >> 1)).Distinct().Count() <= Widest;
+        && Bits - scope
+            .Where(code => code.Modality == Bit)
+            .Select(code => (int)(code.Value >> 1))
+            .Distinct()
+            .Count() <= Widest;
 
     /// <summary>
     /// Whether a scope really does entail an expectation, for every world it allows.
@@ -610,6 +648,13 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
 
         foreach (var code in scope)
         {
+            // A POSITION WITH ITS VALUE THROWN AWAY CONSTRAINS NOTHING AND IS NOT AN ERROR.
+            // It is true in every round, so a rule carrying one claims exactly what the same
+            // rule without it claims -- and skipping it here is what keeps the answer key in
+            // the same alphabet as the population. Scoring it unsound would mark the
+            // experiment's own subject wrong and read like a learner minting rubbish.
+            if (code.Modality == Place) continue;
+
             if (code.Modality != Bit) return false;
 
             var position = (int)(code.Value >> 1);

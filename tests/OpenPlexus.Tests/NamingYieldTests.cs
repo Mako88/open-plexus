@@ -514,11 +514,14 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         // counted from scopes can ever be it. Reported rather than argued: if the column
         // below is ever non-zero, that reasoning is wrong.
         foreach (var (address, skew) in Fixture.Curve)
+        foreach (var graded in new[] { false, true })
         {
             var pure = 0;
             var mixed = 0;
             var data = 0;
             var spanning = 0;
+            var placed = 0;
+            var grouped = 0;
             var members = 0.0;
             var names = 0;
 
@@ -527,7 +530,10 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
                 var brain = new Brain(new CommittingSettings(), seed);
 
                 new MultiplexerRun(
-                    new MultiplexerSettings { Address = address, Skew = skew }, brain, seed)
+                    new MultiplexerSettings { Address = address, Skew = skew },
+                    brain,
+                    seed,
+                    graded: graded)
                     .Run(Rounds);
 
                 foreach (var name in brain.Held.Names.Means.Select(one => one.Key))
@@ -541,10 +547,28 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
                         .Select(one => (int)(one.Value >> 1))
                         .ToList();
 
-                    if (positions.Count == 0) continue;
+                    // THE COARSE CODES, WHICH ARE THE WHOLE POINT OF THE GRADED ARM AND WHICH
+                    // THIS LOOP USED TO DROP ON THE FLOOR. A name made of them alone is
+                    // *these positions, whatever they say* -- the concept the row above says
+                    // no scope can hold, arriving as a code rather than as a pair.
+                    var places = unfolded
+                        .Where(one => one.Modality == Multiplexer.Place)
+                        .Select(one => (int)one.Value)
+                        .ToList();
+
+                    if (positions.Count == 0 && places.Count == 0) continue;
 
                     names++;
-                    members += positions.Count;
+                    members += positions.Count + places.Count;
+
+                    if (positions.Count == 0)
+                    {
+                        placed++;
+
+                        if (places.TrueForAll(one => one < address)) grouped++;
+
+                        continue;
+                    }
 
                     var addressed = positions.Count(one => one < address);
 
@@ -559,14 +583,66 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
             }
 
             output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}, "
-                + $"{Seeds} seeds ===");
+                + $"{Seeds} seeds, {(graded ? "graded" : "fused")} ===");
             output.WriteLine(
                 $"  {names} names | address only {pure} | data only {data} | mixed {mixed} "
-                + $"| one position twice {spanning} | mean bits {(names == 0 ? 0 : members / names):F2}");
+                + $"| one position twice {spanning} | positions only {placed} "
+                + $"| the address as positions {grouped} "
+                + $"| mean bits {(names == 0 ? 0 : members / names):F2}");
         }
 
         // NO BAR. What a vocabulary SHOULD look like has never been measured, and a threshold
         // written before the first reading would be the answer rather than the finding.
+    }
+
+    /// <summary>
+    /// <b>A COARSE CODE CHANGES WHAT CAN BE NAMED AND NOTHING ABOUT WHAT IS TRUE.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE TRAP THIS GUARDS WOULD HAVE MARKED THE EXPERIMENT'S OWN SUBJECT WRONG.</b>
+    /// <c>Multiplexer.Sound</c> returned false for any code that was not a bit, and
+    /// <c>Checkable</c> never looked at modality at all — so a graded scope would have sailed
+    /// past the first and been scored UNSOUND by the second, which reads exactly like a
+    /// learner minting rubbish. An answer key in the wrong alphabet, on this repo's own trap
+    /// list, caught before the arm was run rather than after.
+    /// </para>
+    /// <para>
+    /// <b>AND THE PROPERTY IS THE ONE THING THE WHOLE ARM RESTS ON.</b> A code for the
+    /// position with its value thrown away is true in every round, so a rule carrying one
+    /// claims exactly what the same rule without it claims. If that ever stops holding, the
+    /// front end has started saying what to conclude rather than what it is looking at.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_coarse_code_constrains_nothing_and_leaves_soundness_where_it_was()
+    {
+        var world = new Multiplexer(new MultiplexerSettings { Address = 2 }, seed: 1);
+
+        // THE SHORTEST TRUTH SIX BITS HAS: both address bits pinned, and the data bit they
+        // select pinned with them. Built from the world's own key so it cannot drift.
+        var truth = world.Truths()[0];
+
+        Assert.True(world.Checkable(truth.Scope));
+        Assert.True(world.Sound(truth.Scope, truth.Expects));
+
+        var carrying = truth.Scope.Add(new Code(Multiplexer.Place, 5));
+
+        Assert.True(world.Checkable(carrying),
+            "a scope pinning everything it pinned before is no longer checkable, so a coarse "
+            + "code is being counted as though it constrained a position");
+
+        Assert.True(world.Sound(carrying, truth.Expects),
+            "adding a code that is true in every round made a true rule false, which is the "
+            + "answer key and the population speaking different alphabets");
+
+        // AND THE OTHER DIRECTION, or the check passes for free on a `Sound` that says yes to
+        // everything. A scope of coarse codes alone pins nothing at all, so six bits are free
+        // and it cannot entail an answer.
+        var nothing = ImmutableArray.Create(
+            new Code(Multiplexer.Place, 0), new Code(Multiplexer.Place, 1));
+
+        Assert.False(world.Sound(nothing, truth.Expects));
     }
 
     [Fact]

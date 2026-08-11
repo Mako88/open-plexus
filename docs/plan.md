@@ -139,8 +139,14 @@ FORBIDS things, and several of them are already measured.
   examination costs rather than pays as built. The function-word rules crowd the population
   the questions needed.
 - **AND A STOP LIST IS THE OBVIOUS REPAIR AND IS REFUSED** — no parser, tagger or template
-  goes near this text. What is allowed is gating the objective on surprise, which is what
-  genesis already does one level in.
+  goes near this text. What is allowed is a frequency count, which is measured rather than
+  declared and is the honest proxy for surprise.
+- **SO DEMANDING THE RAREST WORD RESCUES THE KIND OF ANSWER AND NOT THE SCORE.** It stops
+  answering with prepositions and starts answering with places, and still lands under the
+  marginal — better in kind, still failing in degree.
+- **AND THAT ARM IS WHERE THE LADDER'S TRIGGER FINALLY FIRES, TWO ORDERS ABOVE ANY OTHER
+  READING HERE.** Predicting a rare word from a bag genuinely has nothing to separate on,
+  so the instrument works where the alphabet does not drown it.
 - **JOHN'S CURRICULUM PROPOSAL: TEACH IT ENGLISH, THEN SET IT A TEXT AND EXAMINE IT.** A
   primer before a test is allowed and expected — C4 constrains the learner and not the
   experimenter — and `Primer` already shows plain English to the walk.

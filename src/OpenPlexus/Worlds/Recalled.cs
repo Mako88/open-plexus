@@ -116,6 +116,29 @@ public enum Predicting
     /// exactly as the corpus wrote them.
     /// </remarks>
     Mixed,
+
+    /// <summary>
+    /// A statement with its RAREST word hidden, expecting that word.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE FAIR FORM OF <see cref="Masked"/>, AND IT EXISTS BECAUSE THE NAIVE FORM
+    /// FAILED FOR A REASON THAT IS NOT ABOUT CO-OCCURRENCE.</b> Hiding every word in turn
+    /// spends most of the demand on <i>the</i>, <i>to</i> and <i>back</i>, which is where a
+    /// bag of words predicts best and carries least — so the population fills with the
+    /// skeleton of English and answers a question with a preposition. Refuting an idea in
+    /// the one form that was always going to lose is not refuting it.
+    /// </para>
+    /// <para>
+    /// <b>AND FREQUENCY IS NOT A STOP LIST, WHICH IS THE LINE THIS HAS TO STAY THE RIGHT
+    /// SIDE OF.</b> No parser, tagger, template or hand-written word set goes near it — it
+    /// is a count over the corpus, the same kind of fact <see cref="Babi.Commonest"/> is.
+    /// What it is close to is worth saying out loud: a measured proxy for <i>informative</i>
+    /// rather than a declared one, and the honest version of gating on surprise, which is a
+    /// statistic only the brain holds.
+    /// </para>
+    /// </remarks>
+    Salient,
 }
 
 /// <summary>
@@ -246,6 +269,16 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
             .Select((word, at) => (word, at))
             .ToDictionary(one => one.word, one => one.at, StringComparer.Ordinal);
 
+        // HOW OFTEN EACH WORD IS WRITTEN, COUNTED OVER THE WHOLE FILE INCLUDING THE HELD
+        // STORIES. Which words a language uses often is a fact about the language rather
+        // than about this examination, and taking it from the drawn half alone would make
+        // the arm's choice move with how much was withheld.
+        var rarity = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        foreach (var line in text.Lines)
+            foreach (var word in Babi.Words(line.Text ?? string.Empty))
+                rarity[word] = rarity.GetValueOrDefault(word) + 1;
+
         // WHICH STORIES ARE HELD BACK, DECIDED BEFORE A SINGLE TURN IS BUILT. Every line of
         // them is skipped by every arm, so no objective can train on a sentence another
         // objective's examination is about.
@@ -278,7 +311,7 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
                 said.Add(line.Words);
                 wording.Add(line.Text ?? string.Empty);
 
-                if (!held) Reading(told, settings.Predicting, line, index);
+                if (!held) Reading(told, settings.Predicting, line, index, rarity);
                 continue;
             }
 
@@ -341,15 +374,29 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
         List<Turn<Asking>> told,
         Predicting predicting,
         Sentence line,
-        IReadOnlyDictionary<string, int> index)
+        IReadOnlyDictionary<string, int> index,
+        IReadOnlyDictionary<string, int> rarity)
     {
         if (predicting is Predicting.Asked) return;
 
         var words = Babi.Words(line.Text ?? string.Empty);
         if (words.Count < 2) return;
 
+        // ONE MOMENT A STATEMENT RATHER THAN ONE A WORD, which is most of what this arm
+        // changes. `Masked` demands every word of every sentence and so demands `the` far
+        // more often than any place; this demands one word, and picks the one the corpus
+        // says least often. Ties go to the earliest, which is arbitrary and fixed.
+        var only = predicting is Predicting.Salient
+            ? words.Select((word, at) => (word, at))
+                .OrderBy(one => rarity.GetValueOrDefault(one.word, 0))
+                .ThenBy(one => one.at)
+                .First().at
+            : -1;
+
         for (var at = 0; at < words.Count; at++)
         {
+            if (only >= 0 && at != only) continue;
+
             // THE MOMENT IS EVERY OTHER WORD, OR EVERY EARLIER ONE, AND THE DIFFERENCE IS
             // THE WHOLE EXPERIMENT. Both hand the learner a bag and demand one word back;
             // only the second one throws away half the evidence to do it.

@@ -188,6 +188,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     [Theory]
     [InlineData(Predicting.Asked)]
     [InlineData(Predicting.Masked)]
+    [InlineData(Predicting.Salient)]
     public void And_it_answers_in_words(Predicting predicting)
     {
         var (world, trial, brain) = Made(World(task: 1, span: 1, predicting: predicting));
@@ -347,7 +348,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     public void Which_objective_grows_the_best_population()
     {
         foreach (var predicting in new[]
-            { Predicting.Asked, Predicting.Masked, Predicting.Next, Predicting.Mixed })
+            { Predicting.Asked, Predicting.Masked, Predicting.Next, Predicting.Mixed, Predicting.Salient })
         {
             var (world, trial, brain) = Made(World(task: 1, predicting: predicting));
             var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);

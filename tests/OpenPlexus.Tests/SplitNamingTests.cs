@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -123,7 +123,16 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     private static (CommittingSettings Dials, List<Commitment> All, ImmutableArray<Code>? Whole)
         Trained()
     {
-        var dials = new CommittingSettings { Budget = Sparse, Repairing = Waiting };
+        var dials = new CommittingSettings
+        {
+            Budget = Sparse,
+            Repairing = Waiting,
+
+            // AND THE FORKING RULE, FOR THE REASON THE OTHER TWO ARE PINNED. This file's
+            // precondition is a population with something left to name, and every dial
+            // deciding what repair builds moves it.
+            Forking = Forking.Repeated,
+        };
         var brain = new Brain(dials, Subject);
 
         new MultiplexerRun(new MultiplexerSettings { Address = Address }, brain, Subject)

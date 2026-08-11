@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using OpenPlexus.Bus;
 using OpenPlexus.Codes;
@@ -130,6 +130,14 @@ public sealed class AskedTests(ITestOutputHelper output)
         {
             Repairing = Repairing.AfterFailure,
             Budget = Sparse,
+
+            // AND THE FORKING RULE, WHICH IS THE THIRD SEARCH DIAL TO REACH A WIRE TEST.
+            // This file's precondition is a population with something LEFT to name, and
+            // every dial that changes what repair builds moves it -- which is why the
+            // timing and the budget are already pinned here. `Forking.Distinct` gives a
+            // parent a different child per attempt and the population it leaves has
+            // nothing in common with the one these counts were written against.
+            Forking = Forking.Repeated,
         };
         var brain = new Brain(dials, Subject);
 

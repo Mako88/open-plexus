@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -62,18 +62,25 @@ public sealed class BudgetingTests(ITestOutputHelper output)
     [Fact]
     public void Whether_counting_distinct_children_instead_of_attempts_changes_anything()
     {
+        // THE PAIR EVERY ROW BELOW WAS TAKEN UNDER, PINNED RATHER THAN INHERITED. This
+        // grid's whole subject is what `Budget` counts, so a moved `Budget` or a moved
+        // `Forking` re-takes it silently under its own rows' names -- and both moved. Under
+        // `Forking.Repeated` a parent re-proposed the same child, which is exactly why
+        // `Children` could never bind and why the tripwire below is about the VOCABULARY.
+        var taken = new CommittingSettings { Forking = Forking.Repeated, Budget = 256 };
+
         var arms = new (string Name, CommittingSettings Dials)[]
         {
-            ("afterfailure attempts", new CommittingSettings()),
-            ("afterfailure children", new CommittingSettings
+            ("afterfailure attempts", taken),
+            ("afterfailure children", taken with
             {
                 Budgeting = Budgeting.Children,
             }),
-            ("everyround attempts", new CommittingSettings
+            ("everyround attempts", taken with
             {
                 Repairing = Repairing.EveryRound,
             }),
-            ("everyround children", new CommittingSettings
+            ("everyround children", taken with
             {
                 Repairing = Repairing.EveryRound,
                 Budgeting = Budgeting.Children,
@@ -90,7 +97,7 @@ public sealed class BudgetingTests(ITestOutputHelper output)
             // a limit's name. That is why `exhausted` is exactly nought below rather than
             // nearly nought, and it is the whole explanation.
             var vocabulary = 2 * (address + (1 << address));
-            var budget = new CommittingSettings().Budget;
+            var budget = taken.Budget;
 
             output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}, "
                 + $"{Runs} seeds, budget {budget} against {vocabulary} codes");
@@ -99,6 +106,13 @@ public sealed class BudgetingTests(ITestOutputHelper output)
             // goes red the day a world arrives whose vocabulary could reach the budget --
             // which is the day `Budgeting.Children` stops being a free budget and the
             // reading below has to be taken again rather than cited.
+            //
+            // AND IT FIRED, ON THE SHIPPED DEFAULT RATHER THAN ON A NEW WORLD. `Budget` fell
+            // from 256 to 8 while the vocabulary stayed at twelve and twenty-two, so at what
+            // now runs this condition is FALSE and `Children` can bind for the first time.
+            // The rows below are pinned to the pair they were measured under so they remain
+            // the comparison they claim to be; the live question is fork 77 and it is owed a
+            // grid rather than a citation of this one.
             Assert.True(vocabulary < budget,
                 $"a world here now has {vocabulary} codes against a budget of {budget}, so "
                 + "counting distinct children can finally bind -- the arm below is no "

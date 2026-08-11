@@ -1110,6 +1110,31 @@ public sealed class Population
                 if (Repair.Discriminator(culprit, _dials, _blind, ledger?.Codes)
                     is not { } added)
                 {
+                    // AND A REFUSAL BY THE ARM IS NOT A CEILING IN THE LANGUAGE, WHICH IS THE
+                    // ONE PLACE `Forking.Distinct` COULD HAVE CORRUPTED A SIGNAL SILENTLY.
+                    // `Unseparated` is the ladder's trigger -- no expression in the current
+                    // language separates the failures from the hits -- and a parent that has
+                    // already forked on every code in its table comes back empty for a
+                    // completely different reason. Counting that as a ceiling would summon a
+                    // rung on evidence that the search had merely been everywhere, which is
+                    // the hand-specified-bias failure arriving through an instrument.
+                    // ASKED AGAIN WITHOUT THE LEDGER, and only on the path that already came
+                    // back empty -- a second walk of one table on a small share of rounds,
+                    // which is the same price the absence probe below is charged.
+                    // AND ONLY WHERE THE SEARCH IS DETERMINISTIC, or asking twice would draw
+                    // twice. The control arm picks its condition from `_blind`, so a second
+                    // call there would consume the stream and make the arm's random sequence
+                    // a function of how often a parent had exhausted its codes -- fork 12 by
+                    // a door nobody would think to check.
+                    if (ledger is not null
+                        && _dials.Forking == Forking.Distinct
+                        && _dials.Choosing == Choosing.Separating
+                        && Repair.Discriminator(culprit, _dials, _blind) is not null)
+                    {
+                        separated = true;
+                        continue;
+                    }
+
                     // THE PROBE, AND IT MINTS NOTHING. See `Absented`: asked only where the
                     // present-code search came back empty, so it costs a second walk of one
                     // table on a small share of a small share of rounds -- and it may not

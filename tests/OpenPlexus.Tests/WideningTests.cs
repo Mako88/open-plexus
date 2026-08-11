@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -46,7 +46,19 @@ public sealed class WideningTests(ITestOutputHelper output)
     private static Learned Run(int address, double skew, Widening widening, int seed) =>
         new MultiplexerRun(
             new MultiplexerSettings { Address = address, Skew = skew },
-            new Brain(new CommittingSettings { Widening = widening }, seed),
+            new Brain(
+                new CommittingSettings
+                {
+                    Widening = widening,
+
+                    // PINNED AT WHAT SHIPS RATHER THAN LEFT TO INHERIT IT, because this grid
+                    // is being re-taken precisely BECAUSE those two moved. A fixture that
+                    // inherits the dial whose change prompted the re-take cannot say which
+                    // machine its rows are about the next time one of them moves again.
+                    Forking = Forking.Distinct,
+                    Budget = 8,
+                },
+                seed),
             seed,
             census: true).Run(Rounds);
 

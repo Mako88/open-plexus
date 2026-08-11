@@ -839,8 +839,15 @@ change of architecture entirely.
   means their VALUES select which other position matters, which is a functional dependency
   and not a co-occurrence.
 - **WHICH IS RUNG FOUR WEARING RUNG FIVE'S CLOTHES, AND THIS DOC ALREADY SAYS SO** — naming
-  reaches sets and never variables. So the cheap test is whether a minted coarse name can be
-  rewritten into anything, and that is decidable.
+  reaches sets and never variables.
+- **AND THE REWRITE IS ALREADY ANSWERED BY THE READING TAKEN.** No scope holds a coarse code,
+  so no scope can hold a coarse PAIR, so a coarse name can be rewritten into nothing at all.
+- **AND PROJECTING THE REWRITE TOO WOULD CHANGE WHAT A RULE CLAIMS WHILE KEEPING ITS
+  RECORD**, which is the one thing a rewrite may never do. Dropping the values is a
+  generalisation, not a restatement.
+- **SO A NAME OVER POSITIONS CAN ONLY ARRIVE AS A NEW CLAIM WITH A FRESH RECORD, WHICH IS
+  WIDENING AIMED BY A NAME.** That is the one mechanism joining this rung to the operator
+  that moved the stuck column.
 - **AND NOT ONE NAME IN TWO HUNDRED AND FIFTY-EIGHT IS THE WORLD'S CONCEPT.** Zero group the
   address; they name data bits, or data mixed with address. The vocabulary compresses what
   repair happened to build, which is a fact about the population.
@@ -1262,6 +1269,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **82** | The answer key had to learn the coarse alphabet before the arm ran, or it would have scored its own subject unsound. Done: a code that pins nothing is passed over by both the enumeration and the checkability test. Closed |
 | **83** | Project each scope code to its COARSER form when counting pairs, so scopes pinning different address bits share the positions. Test the REWRITE first: a name no scope can be said in is a word with no referent |
 | **84** | A coarser view of a code is the front end's business, so `IQuantizer` must answer *what is the coarser form of this one*. Handed in once, and the first thing a world tells the brain about its alphabet |
+| **85** | A coarse name can only enter a scope as a NEW claim with a fresh record, since projecting a rewrite would change what a rule says. That is widening aimed by a name, which joins this rung to the reach operator |
 | **37** | The repair budget's interior optimum was the ballot and does not survive a best-advocate vote. And `Mending.Uncovered` is two mechanisms — a gate plus every-round repair — where the gate alone is far worse than no gate at all. Open |
 | **38** | Spreading a reading over its range costs most of the score at both front ends. Is that fragmentation, or the search the extra codes buy? Open |
 | **39** | A reading under about ten dimensions has too few distinct wirings for a projection to expand into. Population coding has a floor, and it is not documented anywhere. Open |

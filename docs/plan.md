@@ -579,6 +579,10 @@ condition is a superstition.
 
 ## TRAPS
 
+- **A BUILD DURING A TEST RUN CAN ABORT IT WITH EVERY TEST PASSING.** The suite reported no
+  failures and died on a crashed host, with a build replacing the assemblies under it. The
+  mirror of the `--no-build` staleness rule.
+
 Named so nobody reintroduces them. These are about MEASUREMENT, so they survive the
 change of architecture entirely.
 

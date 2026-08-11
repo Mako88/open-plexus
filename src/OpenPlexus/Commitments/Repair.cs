@@ -148,6 +148,13 @@ public enum Widening
     /// proposes one per agreeing pair, and where nothing agrees it proposes nothing.
     /// </para>
     /// <para>
+    /// <b>TWO IS NOT A LEVEL, WHICH MATTERS BECAUSE EVERY OTHER NUMBER HERE WOULD BE.</b> One
+    /// agreeing parent IS <see cref="Unmissed"/>, so two is the smallest thing that is not
+    /// the arm this is compared against — the same shape as <i>has this code ever been
+    /// absent</i> rather than a threshold on how often. Three would be a dial, and there is
+    /// nothing here for a controller to hunt.
+    /// </para>
+    /// <para>
     /// <b>ITS RISK IS SILENCE, AND THE INSTRUMENT FOR THAT ALREADY EXISTS.</b> A world whose
     /// clean rules never come in near-identical pairs gives it nothing to do, and an arm that
     /// proposes nothing drifts toward the baseline for free — this repo's own trap about a

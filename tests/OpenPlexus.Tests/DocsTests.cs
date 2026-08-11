@@ -74,6 +74,13 @@ public sealed class DocsTests
     [
         "The goal",
         "The first north star",
+
+        // JOHN'S, AND IT EARNS A SECTION BECAUSE IT ANSWERS A QUESTION NOTHING ELSE HERE
+        // COULD. The ladder says which rungs exist and `TO BUILD` says what to do next;
+        // neither says whether the thing this rung needs is already in the tree. It is a
+        // status list rather than prose, so the item cap still governs it -- and the first
+        // pass of it turned up a capability that had never been on any list.
+        "THE CAPABILITY LIST",
         "The constraints",
         "TO BUILD",
         "DO NOT RE-TRY",

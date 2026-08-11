@@ -166,6 +166,32 @@ FORBIDS things, and several of them are already measured.
   written elsewhere with published baselines, and built so surface matching fails. A school
   comprehension test would read nothing until the components pass.
 
+## THE CAPABILITY LIST
+
+John's, and it exists so *have we built what this rung needs* stops being a memory
+exercise. One line a capability, and the status is the whole point of the row.
+
+- **A front end that manufactures symbols from a signal** — BUILT, several, and priced.
+- **A prediction that can be WRONG about something specific** — BUILT. The commitment, and
+  the whole difference from a count.
+- **Blame, aimed at what carried the prediction** — BUILT, capped at one hop.
+- **Specialisation on failure, gated** — BUILT. Rung one, and the only rung there is.
+- **Abstention, so a thing that could not be settled costs nothing** — BUILT and armed.
+- **A name minted over what co-fires** — BUILT. Rung five, gated by two bars.
+- **Learning with no coordinator, across machines that die** — BUILT and measured.
+- **Absence as a CONDITION** — NOT BUILT. Rung two. A front-end substitute was tried and
+  bought nothing on the one world that has asked.
+- **Order inside a scope** — NOT BUILT. Rung three. Handing recency over as a code helps
+  and does not reach what choosing the sentence by hand reaches.
+- **A condition naming no argument** — NOT BUILT. Rung four, and it is a different matcher
+  rather than a rung. The one text task measured demands it.
+- **A SITUATION MODEL, held apart from the rules** — NOT BUILT, AND NOT PREVIOUSLY ON ANY
+  LIST. The population holds what is true in general; nothing holds what is true NOW.
+- **Action, and a consequence that can surprise** — NOT BUILT. The plan's own goal sentence
+  is interventional and every world here is watched rather than acted in.
+- **A goal, as a commitment about a state that does not hold** — NOT BUILT.
+- **A commitment ABOUT commitments** — EXPRESSIBLE and not built, identity being a code.
+
 ## The constraints
 
 Carried unchanged from `csharp`. They are about the machine, not the architecture.

@@ -104,6 +104,23 @@ work than a session spent being wrong quickly.
 out why, repeat.** Enough turns of that and the problem is understood. There is no version
 of this that skips the failing part.
 
+**And pushing back is part of the job rather than a risk to manage — John, and he asked for
+this in writing.** He is a senior engineer and says plainly that parts of this are outside
+his background, so an approach that will not work, a solution that is merely adequate, or a
+premise that is wrong is worth saying out loud the moment it is seen. Seeing that is
+described as what this collaboration is FOR. Do not soften it into a question, and do not
+wait to be asked.
+
+**Say what would make you drop an arm before you run it, in one line — not what number you
+expect.** Predicting a value is a weaker form that invites anchoring and has already fired
+wrongly once here; see `Minting`'s revival row. Naming the result that would refute you is
+what actually stops a rise off a bad baseline reading as a win.
+
+**An idea John interjects mid-session is still a fork to record, and the bar for chasing one
+is lower than it reads.** The rule was written for interruptions. Several of his have been
+better than the arc they interrupted — if one is cheap and aimed at the live question, take
+it and say why.
+
 ## The epistemics
 
 These are the parts worth more than the code.

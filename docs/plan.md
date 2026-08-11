@@ -102,21 +102,12 @@ FORBIDS things, and several of them are already measured.
 - **SO THE FIRST CONVERSATION DEMANDS UNIFICATION RATHER THAN SEQUENCE**, which inverts
   what the ordering assumed. Binding the question's actor to a statement's actor is rung
   four, and no dose of recency reaches it.
-- **AND NAMING THE COINCIDENCE BUYS NOTHING, WHICH REFUTES THE CHEAPEST TEST OF THE MOST
-  EXPENSIVE RUNG.** A code for *the question named something the story named* sits inside
-  the control's spread, kept, dropped, or said in both directions.
-- **BECAUSE A MARKER SAYS WHEN TO TRUST THE PLACE IN FRONT OF YOU AND NEVER WHERE TO FIND
-  THE RIGHT ONE.** Where the last statement is about somebody else the answer is not in the
-  moment at all, so no scope over it can be right.
-- **SO THE TASK IS SELECT-THEN-READ AND BOTH HALVES ARE MISSING AT ONCE**, which is why one
-  rung at a time reads as nothing. Finding the newest statement matching the question is
-  sequence and unification together.
+- **AND THE TASK IS SELECT-THEN-READ, WHICH IS WHY ONE RUNG AT A TIME READS AS NOTHING.**
+  Finding the newest statement mentioning whoever was asked is sequence and unification at
+  once. Naming the coincidence alone is refuted — fork 87.
 - **A TRANSCRIPT IS AN INSTRUMENT AND THE CHEAPEST ONE HERE.** A score says how often and
   never which, so a population answering everything with the commonest word and one that
   has learnt the task read identically until the words are printed.
-- **AND HOW MUCH OF THE STORY IS IN THE MOMENT IS NOT MONOTONE**, which is the world's own
-  structure showing through a dial. One statement beats the whole story where one supports
-  the answer and loses where two do.
 - **AND A HELD-OUT QUESTION CAN BE WORD FOR WORD ONE ALREADY ASKED**, the corpus being
   templated over a small cast — so the unseen score is read beside a count of its twins
   rather than on its own.
@@ -156,12 +147,9 @@ FORBIDS things, and several of them are already measured.
 - **AND MIXING THE TWO IS WORSE THAN EITHER TEACHING ALONE**, so a primer before an
   examination costs rather than pays as built. The function-word rules crowd the population
   the questions needed.
-- **AND A STOP LIST IS THE OBVIOUS REPAIR AND IS REFUSED** — no parser, tagger or template
-  goes near this text. What is allowed is a frequency count, which is measured rather than
-  declared and is the honest proxy for surprise.
-- **SO DEMANDING THE RAREST WORD RESCUES THE KIND OF ANSWER AND NOT THE SCORE.** It stops
-  answering with prepositions and starts answering with places, and still lands under the
-  marginal — better in kind, still failing in degree.
+- **AND DEMANDING THE RAREST WORD RESCUES THE KIND OF ANSWER AND NOT THE SCORE.** It answers
+  with places rather than prepositions and still lands under the marginal. A stop list is
+  refused; a frequency count is measured rather than declared.
 - **AND THAT ARM IS WHERE THE LADDER'S TRIGGER FINALLY FIRES, TWO ORDERS ABOVE ANY OTHER
   READING HERE.** Predicting a rare word from a bag genuinely has nothing to separate on,
   so the instrument works where the alphabet does not drown it.

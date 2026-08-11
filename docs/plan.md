@@ -968,6 +968,9 @@ change of architecture entirely.
 - **AND QUANTITY IS THE ONE THE EVIDENCE CONFIRMS.** A child fires only where its added code
   is present, so covering what a parent is right about takes MANY children — and `uncovered`
   falls monotonically with the budget, 1354 at eight to 472 free.
+- **AND THE COLUMN IT CONFIRMS IT ON IS THE WRONG ONE, WHICH ONLY A BIGGER LEVER COULD SHOW.**
+  A mechanism halving `uncovered` on three worlds buys under two standard errors of hard-round
+  coverage on one and none on the others.
 - **THOUGH IT FLATTENS PAST 128 WHILE COVERAGE KEEPS CLIMBING**, so the top of the curve is
   buying something else: a hard round can gain a sound advocate without ever having been
   answered wrongly.
@@ -1063,6 +1066,12 @@ change of architecture entirely.
 - **SO THE RE-DERIVATION WAS AN ACCIDENTAL POPULATION BRAKE**, and removing it needs a real
   cap to replace it. `Budget` has never been one, being far above the vocabulary that bounds a
   parent's distinct children.
+- **AND IT HALVES `Census.Uncovered` OR BETTER ON EVERY WORLD, WHICH IS THE STRONGEST ANYTHING
+  HAS MOVED THAT COLUMN.** Rounds where nothing sound advocating the right answer fired fall
+  by two fifths to four fifths, the seed spread collapsing with them.
+- **AND HARD-ROUND COVERAGE STILL DOES NOT FOLLOW AT ELEVEN BITS**, moving under two standard
+  errors on the even world and none at all under skew. So the two coverage columns come apart,
+  and the quantity account was resting on the one that moves.
 - **SO `Budget` HAS NEVER LIMITED CHILDREN AND CANNOT.** A child adds one code, so distinct
   children are capped by the vocabulary — twenty-two at eleven bits against a budget of
   sixty-four. Every number ever taken under it is a re-derivation limit.

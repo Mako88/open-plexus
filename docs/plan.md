@@ -992,9 +992,13 @@ change of architecture entirely.
 - **AND *TOO DEEP* IS A PROPERTY OF THE POPULATION AT LAST RATHER THAN OF A LINEAGE.** A
   sound rule containing a shorter sound rule fires on fewer moments than a truth it already
   holds, and `Learned.Overshot` asks the world that directly.
-- **AND MOST OF WHAT ELEVEN BITS HOLDS IS THAT**, against a small share at six — so the reach
-  problem and the depth problem are one reading, and whether widening removes it is the first
-  thing that column can settle.
+- **AND IT IS A WIDTH PHENOMENON RATHER THAN A CONSTANT, WITH ERROR BARS.** Six bits holds
+  essentially none of it at either skew; eleven holds it in most of its sound rules.
+- **AND WIDENING REMOVES ABOUT A QUARTER OF IT WHILE PROPOSING THOUSANDS OF SHORTENINGS**,
+  which is the operator working and its aim being blunt in one reading.
+- **AND WHERE THERE IS NO OVERSHOOT IT BUYS NOTHING AND STILL COSTS ACCURACY.** At six bits
+  hard-round coverage is identical to the last digit at both skews. So the column predicts
+  where the operator is worth having.
 - **AND THE MISS FLOOR MEANS A CHAIN CANNOT WALK PAST A SOUND SCOPE ON A CLEAN WORLD**, since
   a sound rule never misses. So what overshoots is the ROUTE: a lineage that was never sound
   arriving somewhere longer than it had to be.
@@ -1237,7 +1241,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **81** | `Widening.Shared`'s evidence is two residents agreeing, so splitting the population splits the agreement — rung five's failure by a new door. What it loses per holder, and whether shipping the name frequencies recovers it exactly. Open |
 | **77** | Can `Budgeting.Children` bind now that `Budget` sits below the vocabulary? CLOSED AGAINST, and no grid was owed: under `Forking.Distinct` a name is added exactly when an attempt is charged |
 | **76** | Repair proposes the same child until its table drifts, so a budget buys re-derivations. Refusing a parent its spent codes multiplies its distinct children eightfold at one seed. Does quantity buy the uncovered rounds, or only more population? Open |
-| **75** | Nothing stops a chain at a sound depth, and it has a number at last: most sound rules at eleven bits contain a shorter sound one. What signal inside the machine could say STOP HERE, and does widening remove it? Open |
+| **75** | Nothing stops a chain at a sound depth. MEASURED: a width phenomenon — none at six bits, most sound rules at eleven — and widening removes a quarter. What signal INSIDE the machine says STOP HERE. Open |
 | **73** | What distinguishes a repair that buys hard-round coverage from one that does not? ANSWERED: depth. They sit at the world's minimum sound scope and every shorter step pays nothing. Open on walking a chain in fewer steps without overshooting |
 | **72** | Relearning after the target moves is slower than learning the world from nothing. ANSWERED: the repair budget, a per-parent LIFETIME cap the lineages that must relearn have already spent. Free recovers, the capped arms do not |
 | **71** | A minted name is a code, so repair adds it for the price of one. Should the separation bar be charged by what a scope's codes STAND FOR rather than by how many there are? Open |

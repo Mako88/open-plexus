@@ -120,6 +120,18 @@ FORBIDS things, and several of them are already measured.
 - **AND A HELD-OUT QUESTION CAN BE WORD FOR WORD ONE ALREADY ASKED**, the corpus being
   templated over a small cast — so the unseen score is read beside a count of its twins
   rather than on its own.
+- **JOHN'S CURRICULUM PROPOSAL: TEACH IT ENGLISH, THEN SET IT A TEXT AND EXAMINE IT.** A
+  primer before a test is allowed and expected — C4 constrains the learner and not the
+  experimenter — and `Primer` already shows plain English to the walk.
+- **AND A PRIMER TEACHES THIS LEARNER EXACTLY NOTHING, WHICH IS A MECHANISM AND NOT A
+  GUESS.** A round the world cannot settle takes no score, no genesis and no repair, so
+  reading with nothing to predict moves not one counter.
+- **SO WHAT A PRIMER NEEDS IS SOMETHING TO BE WRONG ABOUT WHILE IT READS**, and the
+  obvious candidate is the next word. That is rung three, so the curriculum and the
+  comprehension failure ask for the same missing mechanism.
+- **AND THE EXAM IS ALREADY THE RIGHT ONE.** Twenty tasks each isolating one prerequisite,
+  written elsewhere with published baselines, and built so surface matching fails. A school
+  comprehension test would read nothing until the components pass.
 
 ## The constraints
 
@@ -1422,4 +1434,6 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **71** | A minted name is a code, so repair adds it for the price of one. Should the separation bar be charged by what a scope's codes STAND FOR rather than by how many there are? Open |
 | **86** | The ladder's admission rule reads near nothing on text while the transcript shows the ceiling plainly. It asks whether repair found a separating code, and on a wide alphabet memorising always does — so the trigger cannot summon the rungs that go UP. What signal separates *nothing separates* from *nothing GENERAL separates*. Open |
 | **87** | `Recalled` answers with a place and never a person. ANSWERED AGAINST for a coincidence code: naming the shared word, dropping its identity, and saying the absence out loud all sit inside the control's spread. A marker says when to trust the place in front of you, never where to find the right one |
+| **89** | John's: prime it on general English before setting it a text to be examined on. `Primer` exists for the walk and ports cheaply, but a settled-nothing round moves no counter here — so a primer needs something to predict while reading. Next word is rung three. Open |
+| **90** | John's: is there a standardised comprehension exam that separates understanding from regurgitation? bAbI already is one at this rung. What is unpriced is the tier above — school exams and the passages built so the wrong answer is the one present verbatim. Open, and blocked until the components pass |
 | **88** | The front end intersects the question with EACH statement rather than with the whole story, and marks the words of the one that matched. That is the selection a coincidence code cannot make, done where no matcher changes. Open, and `Joined` is built to take it |

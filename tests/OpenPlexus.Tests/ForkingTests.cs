@@ -251,7 +251,10 @@ public sealed class ForkingTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <b>IT ASSERTS ON COLLISIONS RATHER THAN ON A SCORE, because that is the event the rule
-    /// is about.</b> A parent refused its own spent codes cannot arrive at its own earlier
+    /// is about.</b> How much of the world was FOUND is printed beside it and asserted on by
+    /// nothing — this repo's rule is that an accuracy is reported next to a count of the
+    /// world's own rules held, and the grid that carries the score has residents and sound
+    /// rules but not that. A parent refused its own spent codes cannot arrive at its own earlier
     /// child, so the count has to fall — and a run where it does not is unmounted rather than
     /// inert. Collisions do not reach nought, because two DIFFERENT parents can still reach
     /// one scope and nothing here forbids that.
@@ -266,9 +269,11 @@ public sealed class ForkingTests(ITestOutputHelper output)
 
             output.WriteLine(
                 $"{address + (1 << address),2} bits skew {skew:F1} | repeated "
-                + $"born {repeated.Repaired,6} collided {Collisions(repeatedRun),7} | "
+                + $"born {repeated.Repaired,6} collided {Collisions(repeatedRun),7} "
+                + $"found {repeated.Found}/{repeated.Truths} | "
                 + $"distinct born {distinct.Repaired,6} "
-                + $"collided {Collisions(distinctRun),7}");
+                + $"collided {Collisions(distinctRun),7} "
+                + $"found {distinct.Found}/{distinct.Truths}");
 
             Assert.True(
                 Collisions(distinctRun) < Collisions(repeatedRun),

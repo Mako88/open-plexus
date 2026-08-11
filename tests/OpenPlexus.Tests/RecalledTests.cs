@@ -25,8 +25,13 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class RecalledTests(ITestOutputHelper output)
 {
-    private static RecalledSettings World(int task, int span = 0, int withheld = 100) =>
-        new() { Corpus = Tree.Babi(), Task = task, Span = span, Withheld = withheld };
+    private static RecalledSettings World(
+        int task, int span = 1, int withheld = 40, Predicting predicting = Predicting.Asked) =>
+        new()
+        {
+            Corpus = Tree.Babi(), Task = task, Span = span,
+            Withheld = withheld, Predicting = predicting,
+        };
 
     /// <summary>The moment as the bagged control sees it, which is every word once.</summary>
     private static IEnumerable<Code> Codify(Asking asking) =>
@@ -44,8 +49,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
     [Fact]
     public void A_moment_is_the_question_and_as_much_of_the_story_as_the_span_allows()
     {
-        var whole = new Recalled(World(task: 1, span: 0, withheld: 0));
-        var last = new Recalled(World(task: 1, span: 1, withheld: 0));
+        var whole = new Recalled(World(task: 1, span: 0, withheld: 40));
+        var last = new Recalled(World(task: 1, span: 1, withheld: 40));
 
         Assert.Equal(whole.Questions, last.Questions);
         Assert.Equal(whole.Outcomes, last.Outcomes);
@@ -63,7 +68,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         }
 
         output.WriteLine($"task 1: {whole.Questions} questions, {whole.Outcomes} answers");
-        output.WriteLine($"answers: {string.Join(" ", whole.Answers)}");
+        output.WriteLine($"vocabulary: {string.Join(" ", whole.Vocabulary)}");
         output.WriteLine($"commonest: {whole.Commonest:F3}, blind draw: {1.0 / whole.Outcomes:F3}");
     }
 
@@ -88,9 +93,9 @@ public sealed class RecalledTests(ITestOutputHelper output)
     [Fact]
     public void A_withheld_question_can_be_word_for_word_one_that_was_asked()
     {
-        var world = new Recalled(World(task: 1, withheld: 100));
+        var world = new Recalled(World(task: 1, withheld: 40));
 
-        Assert.Equal(100, world.Withheld.Count);
+        Assert.NotEmpty(world.Withheld);
 
         var kept = world.Withheld
             .Select(one => string.Join(",", Codify(one.Seen)))
@@ -149,12 +154,26 @@ public sealed class RecalledTests(ITestOutputHelper output)
         Assert.True(tally.Recent > 2.0 * world.Commonest,
             $"the drawn stream scored {tally.Recent:F3} against {world.Commonest:F3}");
 
+        // THE CAVEAT PRINTED BESIDE THE SCORE AND IN THE SAME TEST, because they were once
+        // taken under different settings and quoted together -- a twin count read at one
+        // span next to an accuracy read at another, which flatters the accuracy by exactly
+        // the amount nobody could see. Two numbers that must be read together belong in one
+        // fact, where no future reader can pair the wrong ones.
+        var drawn = new HashSet<string>(StringComparer.Ordinal);
+        for (var draw = 0; draw < world.Questions; draw++)
+            drawn.Add(string.Join(",", Codify(world.Next().Seen)));
+
+        var twinned = world.Withheld.Count(one =>
+            drawn.Contains(string.Join(",", Codify(one.Seen))));
+
         output.WriteLine($"drawn      : {tally.Recent:F3}");
         output.WriteLine($"never asked: {unseen.Accuracy:F3} over {unseen.Asked}, "
             + $"{unseen.Silence:F3} silent");
         output.WriteLine($"marginal   : {world.Commonest:F3}, blind draw {1.0 / world.Outcomes:F3}");
         output.WriteLine($"held       : {brain.Held.Count} commitments, {brain.Held.Names.Count} names");
         output.WriteLine($"wanting    : {tally.Wanting:F3} of blamed rounds nothing separated");
+        output.WriteLine($"twins      : {twinned} of {unseen.Asked} exam moments appear "
+            + $"word for word among the {drawn.Count} distinct moments drawn");
     }
 
     /// <summary>
@@ -166,10 +185,12 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// with the commonest word and a population that has learnt the task produce the same
     /// line of output. The transcript is where that stops being true.
     /// </remarks>
-    [Fact]
-    public void And_it_answers_in_words()
+    [Theory]
+    [InlineData(Predicting.Asked)]
+    [InlineData(Predicting.Masked)]
+    public void And_it_answers_in_words(Predicting predicting)
     {
-        var (world, trial, brain) = Made(World(task: 1, span: 1));
+        var (world, trial, brain) = Made(World(task: 1, span: 1, predicting: predicting));
 
         trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
 
@@ -187,8 +208,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
             // drift out of step with the thing it names.
             var answer = vote.Expects is not { } expects
                 ? "(silent)"
-                : world.Answers.FirstOrDefault(
-                    one_ => Brain.Says(world.Answers.IndexOf(one_)) == expects) ?? "(unknown)";
+                : world.Vocabulary.FirstOrDefault(
+                    one_ => Brain.Says(world.Vocabulary.IndexOf(one_)) == expects) ?? "(unknown)";
 
             said.Add($"{(answer == asked.Answer ? " " : "x")} {asked.Story} | "
                 + $"{asked.Question} -> {answer} (corpus says {asked.Answer})");
@@ -198,7 +219,19 @@ public sealed class RecalledTests(ITestOutputHelper output)
         // printing below to mean anything. What it answered is scored by the fact above.
         Assert.DoesNotContain(said, one => one.Contains("(unknown)", StringComparison.Ordinal));
 
-        foreach (var line in said.Take(12)) output.WriteLine(line);
+        // WHAT IT REACHES FOR, COUNTED, BECAUSE A SCORE OF EXACTLY NOUGHT IS A DIAGNOSIS
+        // WAITING TO BE READ. An arm answering every question wrongly and never abstaining
+        // is not guessing badly -- it is answering something else consistently, and which
+        // something is the finding.
+        var reached = said
+            .Select(one => one.Split("-> ")[1].Split(' ')[0])
+            .GroupBy(one => one, StringComparer.Ordinal)
+            .OrderByDescending(one => one.Count())
+            .Take(4);
+
+        output.WriteLine($"{predicting}: {string.Join(", ", reached.Select(g => $"{g.Key} x{g.Count()}"))}");
+
+        foreach (var line in said.Take(8)) output.WriteLine(line);
     }
 
     /// <summary>
@@ -282,6 +315,51 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     + $"held {brain.Held.Count,5} names {brain.Held.Names.Count,4} "
                     + $"wanting {tally.Wanting:F3}");
             }
+        }
+    }
+
+    /// <summary>
+    /// Which objective grows the population that answers best — <b>John's question, and
+    /// one the field cannot answer for a learner shaped like this.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE EXAMINATION DOES NOT MOVE WHEN THE OBJECTIVE DOES, WHICH IS THE WHOLE OF THE
+    /// DESIGN.</b> An objective scored on its own target is unfalsifiable — a next-word arm
+    /// hits next words and says nothing about understanding. So every arm predicts a word
+    /// from one vocabulary, whole stories are held back from all four alike, and the same
+    /// withheld questions are put to whatever each one grew.
+    /// </para>
+    /// <para>
+    /// <b>SO THREE OF THE FOUR SIT AN EXAM THEY WERE NEVER TRAINED FOR</b>, which is
+    /// precisely the transfer question: did it learn the language, or this examination? A
+    /// masked arm has never seen a question in its life.
+    /// </para>
+    /// <para>
+    /// <b>AND THE DRAWN COLUMN IS NOT COMPARABLE ACROSS ARMS AND IS PRINTED ANYWAY.</b>
+    /// Each one draws a different stream, so its trailing accuracy is against its own
+    /// skew — it says whether an arm learnt ITS OWN task, which is what separates <i>the
+    /// objective is hopeless</i> from <i>the objective works and does not transfer</i>.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Which_objective_grows_the_best_population()
+    {
+        foreach (var predicting in new[]
+            { Predicting.Asked, Predicting.Masked, Predicting.Next, Predicting.Mixed })
+        {
+            var (world, trial, brain) = Made(World(task: 1, predicting: predicting));
+            var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
+            var unseen = tally.Unseen;
+
+            output.WriteLine(
+                $"{predicting,-7} | exam {unseen?.Accuracy ?? 0.0:F3} "
+                + $"silent {unseen?.Silence ?? 0.0:F3} over {unseen?.Asked ?? 0} | "
+                + $"own task {tally.Recent:F3} over {world.Questions} moments | "
+                + $"marginal {world.Commonest:F3} draw {1.0 / world.Outcomes:F3} | "
+                + $"held {brain.Held.Count,5} names {brain.Held.Names.Count,4} "
+                + $"wanting {tally.Wanting:F3}");
         }
     }
 

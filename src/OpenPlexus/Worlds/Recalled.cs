@@ -35,8 +35,87 @@ public sealed record RecalledSettings
     /// </remarks>
     public int Span { get; init; }
 
-    /// <summary>Questions from the end of the file that this world will never draw.</summary>
+    /// <summary>Stories from the end of the file that this world will never draw.</summary>
+    /// <remarks>
+    /// <b>WHOLE STORIES AND NOT WHOLE QUESTIONS, WHICH IS WHAT MAKES THE ARMS
+    /// COMPARABLE.</b> <see cref="Predicting.Asked"/> only ever draws questions, so holding
+    /// back a question hides its story too; every other arm draws the STATEMENTS, and would
+    /// train on the very sentence the examination is about. Holding the story back is the
+    /// only rule that means the same thing to all four.
+    /// </remarks>
     public int Withheld { get; init; }
+
+    /// <summary>What the learner is asked to be wrong about.</summary>
+    public Predicting Predicting { get; init; }
+}
+
+/// <summary>
+/// What a text world asks the learner to predict — <b>the choice this whole comparison
+/// exists to make, and one nothing in the field has made for a learner like this.</b>
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>NEXT-TOKEN AGAINST MASKED IS A SETTLED EXPERIMENT SOMEWHERE ELSE AND SETTLES
+/// NOTHING HERE.</b> Masked prediction beats next-token on comprehension at equal scale,
+/// and it does so because a gradient reaches both sides of the gap — which is a fact about
+/// backpropagation over embeddings and has no analogue in a population of commitments that
+/// are individually blamed. The prior is worth having and it is not an answer.
+/// </para>
+/// <para>
+/// <b>SO EVERY ARM PREDICTS A WORD FROM ONE ALPHABET, AND EVERY ARM SITS THE SAME
+/// EXAMINATION.</b> An objective judged on its own target is unfalsifiable — a next-word
+/// arm scores well at next words and says nothing about whether it understood anything.
+/// What is compared is the POPULATION each one grows, put to an identical set of withheld
+/// questions none of them was trained on.
+/// </para>
+/// </remarks>
+public enum Predicting
+{
+    /// <summary>
+    /// A question and the story in front of it, expecting the answer.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE CONTROL, AND ARGUABLY THE ONE CLOSEST TO HOW A CHILD IS TAUGHT.</b> Word
+    /// meaning is not mostly acquired by tabulating text — it arrives by ostension, with
+    /// somebody pointing and naming. A question with a right answer is that shape.
+    /// </remarks>
+    Asked,
+
+    /// <summary>
+    /// A statement with one word hidden, expecting the word that was hidden.
+    /// </summary>
+    /// <remarks>
+    /// <b>JOHN'S CO-OCCURRENCE, MADE FALSIFIABLE, WHICH IS THE WHOLE OF WHAT IT NEEDED.</b>
+    /// Counting what occurs together can never be wrong; hiding one of them and demanding it
+    /// back can. <b>And the hiding is not a detail</b> — a target still present in the moment
+    /// is answerable by naming something already there, so nothing could ever be refuted and
+    /// the one thing this architecture eats is gone.
+    /// </remarks>
+    Masked,
+
+    /// <summary>
+    /// The words of a statement so far, expecting the one that comes next.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE ARM NOBODY WANTS, HERE SO THE OTHERS MEAN SOMETHING.</b> Without it a
+    /// comparison between two objectives John already prefers would be a comparison with no
+    /// floor. <b>And a scope is a SET, so *the words so far* reaches this learner as a bag
+    /// with the order thrown away</b> — which is a real handicap on this arm rather than a
+    /// thumb on the scale, and it is the same missing rung three everything else here wants.
+    /// </remarks>
+    Next,
+
+    /// <summary>
+    /// Masked statements and asked questions, interleaved in the order written.
+    /// </summary>
+    /// <remarks>
+    /// <b>JOHN'S CURRICULUM, WHICH IS THE ONE ARM THAT IS NOT A CHOICE BETWEEN THE
+    /// OTHERS.</b> Read the language, then answer about it — and C4 permits it, because a
+    /// boundary the experimenter knows about is not a boundary the learner can detect. Here
+    /// there is not even a boundary to detect: the two kinds of moment arrive interleaved,
+    /// exactly as the corpus wrote them.
+    /// </remarks>
+    Mixed,
 }
 
 /// <summary>
@@ -147,17 +226,34 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
             Stories = false,
         });
 
-        // ORDINAL AND SORTED, BECAUSE THE INDEX IS THE OUTCOME. A hash set's order is not
-        // promised across runs, and an answer alphabet that renumbered itself would make
-        // two runs of the same seed disagree about what the machine said -- which is fork
-        // 12's property broken by a detail nothing else would ever look at.
-        Answers = [.. text.Alphabet.Order(StringComparer.Ordinal)];
+        // ONE ALPHABET FOR EVERY ARM, AND IT IS THE VOCABULARY RATHER THAN THE ANSWER SET.
+        // A masked arm predicts any word of a statement and an asked arm predicts an answer,
+        // so numbering only the answers would give the two objectives different outcome
+        // spaces -- and an accuracy is not comparable across two different spaces. Sorted
+        // ordinal because the index IS the outcome, and a set whose order is not promised
+        // would make two runs of one seed disagree about what the machine said.
+        var seen = new SortedSet<string>(StringComparer.Ordinal);
 
-        var index = Answers
-            .Select((answer, at) => (answer, at))
-            .ToDictionary(one => one.answer, one => one.at, StringComparer.Ordinal);
+        foreach (var line in text.Lines)
+        {
+            foreach (var word in Babi.Words(line.Text ?? string.Empty)) seen.Add(word);
+            if (line.Answer is { } answer) foreach (var word in Babi.Words(answer)) seen.Add(word);
+        }
+
+        Vocabulary = [.. seen];
+
+        var index = Vocabulary
+            .Select((word, at) => (word, at))
+            .ToDictionary(one => one.word, one => one.at, StringComparer.Ordinal);
+
+        // WHICH STORIES ARE HELD BACK, DECIDED BEFORE A SINGLE TURN IS BUILT. Every line of
+        // them is skipped by every arm, so no objective can train on a sentence another
+        // objective's examination is about.
+        var stories = text.Lines.Count == 0 ? 0 : text.Lines[^1].Story + 1;
+        var keeping = Math.Max(0, stories - settings.Withheld);
 
         var told = new List<Turn<Asking>>();
+        var quizzed = new List<Turn<Asking>>();
         var wrote = new List<Quizzed>();
         var story = -1;
         var said = new List<ImmutableArray<Code>>();
@@ -175,10 +271,14 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
                 wording.Clear();
             }
 
+            var held = line.Story >= keeping;
+
             if (!line.Asking)
             {
                 said.Add(line.Words);
                 wording.Add(line.Text ?? string.Empty);
+
+                if (!held) Reading(told, settings.Predicting, line, index);
                 continue;
             }
 
@@ -187,38 +287,98 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
             var before = new HashSet<Code>();
             for (var one = from; one < said.Count; one++) before.UnionWith(said[one]);
 
-            told.Add(new Turn<Asking>
+            // THE ANSWER AS A WORD RATHER THAN AS AN ANSWER, which is what lets an arm that
+            // never saw a question sit this examination at all. A compound answer takes its
+            // first word and is wrong by construction, which is the honest reading -- the
+            // two tasks whose answers are pairs were always unanswerable here.
+            var answering = Babi.Words(line.Answer!);
+
+            var turn = new Turn<Asking>
             {
                 Seen = new Asking { Story = before, Question = new HashSet<Code>(line.Words) },
-                Outcome = index[line.Answer!],
-            });
+                Outcome = index[answering[0]],
+            };
 
-            // THE SAME SLICE THE MOMENT WAS BUILT FROM, so a transcript can never show a
-            // statement the population was not given. A readback taken from the whole story
-            // while the moment held one line would read as a machine that ignored what it
-            // was told, which is a bug in the printing wearing a finding's clothes.
-            wrote.Add(new Quizzed
+            if (held)
             {
-                Story = string.Join(" ", wording.Skip(from)),
-                Question = line.Text ?? string.Empty,
-                Answer = line.Answer!,
-            });
+                quizzed.Add(turn);
+
+                // THE SAME SLICE THE MOMENT WAS BUILT FROM, so a transcript can never show a
+                // statement the population was not given. A readback taken from the whole
+                // story while the moment held one line would read as a machine that ignored
+                // what it was told, which is a bug in the printing wearing a finding's clothes.
+                wrote.Add(new Quizzed
+                {
+                    Story = string.Join(" ", wording.Skip(from)),
+                    Question = line.Text ?? string.Empty,
+                    Answer = line.Answer!,
+                });
+            }
+            else if (settings.Predicting is Predicting.Asked or Predicting.Mixed) told.Add(turn);
         }
 
-        var back = Math.Min(settings.Withheld, told.Count);
-
-        _kept = [.. told.Skip(told.Count - back)];
-        _asked = [.. told.Take(told.Count - back)];
-        Transcript = [.. wrote.Skip(wrote.Count - back)];
+        _kept = [.. quizzed];
+        _asked = told;
+        Transcript = [.. wrote];
 
         if (_asked.Count == 0)
             throw new ArgumentException(
-                $"task {settings.Task} has {told.Count} questions and {back} are held back, "
-                + "so there is nothing left to learn from", nameof(settings));
+                $"task {settings.Task} under {settings.Predicting} with {settings.Withheld} "
+                + "stories held back leaves nothing to learn from", nameof(settings));
     }
 
-    /// <summary>Every distinct answer the task expects, in the order the outcome index uses.</summary>
-    public ImmutableArray<string> Answers { get; }
+    /// <summary>
+    /// Turns one statement into whatever the objective asks the learner to be wrong about.
+    /// </summary>
+    /// <remarks>
+    /// <b>NOTHING AT ALL UNDER <see cref="Predicting.Asked"/>, WHICH IS THE POINT OF THE
+    /// CONTROL.</b> A statement with no question attached settles nothing, and a round that
+    /// settles nothing takes no score, no genesis and no repair — so plain English moves not
+    /// one counter. That is the whole reason a primer needed an objective before it could
+    /// teach anything here.
+    /// </remarks>
+    private static void Reading(
+        List<Turn<Asking>> told,
+        Predicting predicting,
+        Sentence line,
+        IReadOnlyDictionary<string, int> index)
+    {
+        if (predicting is Predicting.Asked) return;
+
+        var words = Babi.Words(line.Text ?? string.Empty);
+        if (words.Count < 2) return;
+
+        for (var at = 0; at < words.Count; at++)
+        {
+            // THE MOMENT IS EVERY OTHER WORD, OR EVERY EARLIER ONE, AND THE DIFFERENCE IS
+            // THE WHOLE EXPERIMENT. Both hand the learner a bag and demand one word back;
+            // only the second one throws away half the evidence to do it.
+            var moment = new HashSet<Code>();
+
+            for (var one = 0; one < words.Count; one++)
+            {
+                if (one == at) continue;
+                if (predicting is Predicting.Next && one > at) continue;
+
+                moment.Add(Babi.Of(words[one]));
+            }
+
+            if (moment.Count == 0) continue;
+
+            told.Add(new Turn<Asking>
+            {
+                Seen = new Asking { Story = moment, Question = new HashSet<Code>() },
+                Outcome = index[words[at]],
+            });
+        }
+    }
+
+    /// <summary>Every word the task uses, in the order the outcome index numbers them.</summary>
+    /// <remarks>
+    /// <b>THE OUTCOME SPACE EVERY ARM SHARES</b>, so a masked arm and an asked arm are
+    /// scored against the same alphabet and their accuracies mean the same thing.
+    /// </remarks>
+    public ImmutableArray<string> Vocabulary { get; }
 
     /// <summary>
     /// What each withheld question said, in the same order <see cref="Withheld"/> holds them.
@@ -233,20 +393,21 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
     public int Questions => _asked.Count;
 
     /// <inheritdoc/>
-    public int Outcomes => Answers.Length;
+    public int Outcomes => Vocabulary.Length;
 
     /// <summary>
-    /// What always answering the commonest answer would score.
+    /// What always giving the commonest answer would score ON THE EXAMINATION.
     /// </summary>
     /// <remarks>
-    /// <b>THE BAR THAT MATTERS, AND IT IS WELL ABOVE A BLIND DRAW.</b> bAbI answers are
-    /// skewed, so a population that has learnt nothing but the marginal already clears
-    /// <c>1/Outcomes</c> — and on a task with six answers that is the difference between a
-    /// result and a decoration.
+    /// <b>TAKEN OVER THE WITHHELD SET AND NEVER OVER THE DRAWN ONE, WHICH IS THE ONLY WAY
+    /// FOUR OBJECTIVES SHARE A BAR.</b> Each arm draws a different stream — masked moments,
+    /// next-word moments, questions — so a marginal read off what an arm SAW would be four
+    /// different numbers, and every score would be measured against its own arm's skew.
+    /// The examination is identical for all of them, so its marginal is too.
     /// </remarks>
-    public double Commonest => _asked.Count == 0 ? 0.0 : _asked
+    public double Commonest => _kept.Length == 0 ? 0.0 : _kept
         .GroupBy(one => one.Outcome!.Value)
-        .Max(group => group.Count()) / (double)_asked.Count;
+        .Max(group => group.Count()) / (double)_kept.Length;
 
     /// <inheritdoc/>
     /// <remarks>
@@ -264,10 +425,12 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
 
     /// <inheritdoc/>
     /// <remarks>
-    /// <b>THE LAST QUESTIONS OF THE FILE, WHICH ARE WHOLE STORIES THIS WORLD NEVER
-    /// TELLS.</b> A question drawn from the middle would leave its own statements in the
-    /// stream, so the words of the withheld answer would have been seen — which measures
-    /// recall of a sentence rather than generalisation from one.
+    /// <b>THE QUESTIONS OF WHOLE STORIES THIS WORLD NEVER TELLS, AND IT IS THE SAME SET
+    /// UNDER EVERY OBJECTIVE.</b> Holding back a question alone would work for
+    /// <see cref="Predicting.Asked"/>, which never draws a statement, and would leak
+    /// outright for every other arm — the masked stream would carry the very sentence the
+    /// examination is about. So a whole story goes, and the exam does not move when the
+    /// objective does.
     /// </remarks>
     public IReadOnlyList<Turn<Asking>> Withheld => _kept;
 }

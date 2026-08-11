@@ -123,6 +123,24 @@ FORBIDS things, and several of them are already measured.
 - **AND WIDENING THE MOMENT BUYS THE DRAWN SCORE AND SELLS THE HELD-OUT ONE**, with the
   population ballooning and silence appearing. The gap opens as the bag widens, which is
   memorising caught by the one instrument a text world has.
+- **AND WHICH OBJECTIVE TO PREDICT IS MEASURED NOW, WHICH THE FIELD CANNOT ANSWER FOR A
+  LEARNER LIKE THIS.** Four arms predict a word from one alphabet and sit one examination
+  none was trained for, so an arm is judged on the population it grew.
+- **BEING TOLD WHAT MATTERS WINS AND NOTHING ELSE TRANSFERS AT ALL.** A masked arm and a
+  next-word arm learn their own task and score exactly nothing on the questions, while the
+  arm that was asked a question answers them.
+- **BECAUSE A MASKED OBJECTIVE SPENDS ITS POPULATION WHERE PREDICTION IS EASIEST, WHICH IS
+  WHERE THE INFORMATION IS LOWEST.** It answers with function words and never once reaches
+  for a place, which the transcript shows and the score only hints at.
+- **SO OSTENSION IS NOT A SHORTCUT AROUND UNSUPERVISED READING, IT IS THE SIGNAL** — being
+  told which word the question is about is information no amount of co-occurrence contains.
+  That is the pointing-and-naming shape, and it is what pays.
+- **AND MIXING THE TWO IS WORSE THAN EITHER TEACHING ALONE**, so a primer before an
+  examination costs rather than pays as built. The function-word rules crowd the population
+  the questions needed.
+- **AND A STOP LIST IS THE OBVIOUS REPAIR AND IS REFUSED** — no parser, tagger or template
+  goes near this text. What is allowed is gating the objective on surprise, which is what
+  genesis already does one level in.
 - **JOHN'S CURRICULUM PROPOSAL: TEACH IT ENGLISH, THEN SET IT A TEXT AND EXAMINE IT.** A
   primer before a test is allowed and expected — C4 constrains the learner and not the
   experimenter — and `Primer` already shows plain English to the walk.
@@ -1437,6 +1455,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **71** | A minted name is a code, so repair adds it for the price of one. Should the separation bar be charged by what a scope's codes STAND FOR rather than by how many there are? Open |
 | **86** | The ladder's admission rule reads near nothing on text while the transcript shows the ceiling plainly. It asks whether repair found a separating code, and on a wide alphabet memorising always does — so the trigger cannot summon the rungs that go UP. What signal separates *nothing separates* from *nothing GENERAL separates*. Open |
 | **87** | `Recalled` answers with a place and never a person. ANSWERED AGAINST for a coincidence code: naming the shared word, dropping its identity, and saying the absence out loud all sit inside the control's spread. A marker says when to trust the place in front of you, never where to find the right one |
+| **91** | A masked objective spends the population on function words, being what a bag predicts best, and transfers nothing. Gate what is worth predicting on surprise, the way genesis is already gated on it — the one repair that is not a stop list. Open, and it is what would make a primer teach |
 | **89** | John's: prime it on general English before setting it a text to be examined on. `Primer` exists for the walk and ports cheaply, but a settled-nothing round moves no counter here — so a primer needs something to predict while reading. Next word is rung three. Open |
 | **90** | John's: is there a standardised comprehension exam that separates understanding from regurgitation? bAbI already is one at this rung. What is unpriced is the tier above — school exams and the passages built so the wrong answer is the one present verbatim. Open, and blocked until the components pass |
 | **88** | The front end intersects the question with EACH statement rather than with the whole story, and marks the words of the one that matched. That is the selection a coincidence code cannot make, done where no matcher changes. Open, and `Joined` is built to take it |

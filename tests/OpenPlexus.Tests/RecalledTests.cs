@@ -38,9 +38,9 @@ public sealed class RecalledTests(ITestOutputHelper output)
         new Joined(Joining.Bagged).Codify(asking).Order();
 
     private static (Recalled World, Trial<Asking> Trial, Brain Brain) Made(
-        RecalledSettings settings, Joining joining = Joining.Bagged)
+        RecalledSettings settings, Joining joining = Joining.Bagged, int capacity = 2000)
     {
-        var brain = new Brain(new CommittingSettings(), 1);
+        var brain = new Brain(new CommittingSettings { Capacity = capacity }, 1);
         var world = new Recalled(settings);
 
         return (world, new Trial<Asking>(world, new Joined(joining), brain), brain);
@@ -64,7 +64,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
             var near = last.Next();
 
             Assert.Equal(wide.Outcome, near.Outcome);
-            Assert.True(near.Seen.Story.Count <= wide.Seen.Story.Count);
+            Assert.True(near.Seen.Words.Count <= wide.Seen.Words.Count);
         }
 
         output.WriteLine($"task 1: {whole.Questions} questions, {whole.Outcomes} answers");
@@ -249,7 +249,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     {
         var matching = new Asking
         {
-            Story = new HashSet<Code> { Babi.Of("mary"), Babi.Of("garden") },
+            Story = [new HashSet<Code> { Babi.Of("mary"), Babi.Of("garden") }],
             Question = new HashSet<Code> { Babi.Of("where"), Babi.Of("mary") },
         };
 
@@ -315,6 +315,53 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     + $"silent {unseen?.Silence ?? 0.0:F3} | commonest {world.Commonest:F3} | "
                     + $"held {brain.Held.Count,5} names {brain.Held.Names.Count,4} "
                     + $"wanting {tally.Wanting:F3}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Whether recency as a CODE recovers what a narrow view was throwing away.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE CEILING SAYS THIS LEARNER IS A NEAR-PERFECT READER AND A HOPELESS SELECTOR,
+    /// AND THIS IS THE FIRST MECHANISM AIMED AT THE SECOND HALF.</b> Shown one statement it
+    /// answers all but a hair of what is present; shown the whole story, where everything
+    /// is present, it takes under a third. What it cannot do is say WHICH sentence, because
+    /// a scope is a subset test over a set and a set has no positions.
+    /// </para>
+    /// <para>
+    /// <b>THE PREDICTION, WRITTEN BEFORE THE ARM RAN: banded at the whole story it should
+    /// reach at least what the one-statement view reached.</b> The narrow view wins by
+    /// throwing information away, and a band hands the same information over while keeping
+    /// the rest — so anything short of that says the learner cannot use recency even when
+    /// it is spelled out in its own alphabet, which is a finding about the LEARNER and not
+    /// about the front end.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_recency_as_a_code_recovers_the_selection()
+    {
+        // AND THE CAPACITY IS AN AXIS RATHER THAN A CONSTANT, BECAUSE THE FIRST READING OF
+        // THIS ARM CAME BACK PINNED AT THE CAP. Banding multiplies the alphabet, so the
+        // banded population saturated where the control sat at a twentieth of the limit --
+        // and a comparison where one arm is against a wall and the other is not measures
+        // the wall. Both arms get both caps, which is the only way to tell which it was.
+        foreach (var capacity in new[] { 2000, 8000 })
+        {
+            foreach (var span in new[] { 0, 2 })
+            foreach (var joining in new[] { Joining.Bagged, Joining.Recent })
+            {
+                var (world, trial, brain) = Made(World(task: 1, span: span), joining, capacity);
+                var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
+                var unseen = tally.Unseen;
+
+                output.WriteLine(
+                    $"cap {capacity,4} span {span} {joining,-7} | exam {unseen?.Accuracy ?? 0.0:F3} "
+                    + $"silent {unseen?.Silence ?? 0.0:F3} | own {tally.Recent:F3} | "
+                    + $"marginal {world.Commonest:F3} | held {brain.Held.Count,5} "
+                    + $"names {brain.Held.Names.Count,4} wanting {tally.Wanting:F3}");
             }
         }
     }

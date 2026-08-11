@@ -116,6 +116,7 @@ jobs:
             "CensusTests.Whether_a_parents_table_already_knows",
             "QueryCostTests","RefusalTests","ScalingTests",
             "RecalledTests.Which_objective_grows",
+            "RecalledTests.Whether_recency_as_a_code",
             "RecalledTests.Whether_naming_the_coincidence",
             "RecalledTests.What_a_bag_of_words_costs",
             "SeparableTests",

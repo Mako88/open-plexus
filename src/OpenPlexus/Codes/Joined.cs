@@ -74,6 +74,33 @@ public enum Joining
     /// </para>
     /// </remarks>
     Either,
+
+    /// <summary>
+    /// Every word plainly, and again tagged with how many statements back it was.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>RECENCY AS A CODE, WHICH IS WHAT A SCOPE NEEDS TO EXPRESS *THE LATEST ONE*.</b> A
+    /// scope is a subset test over a set, so <i>most recent</i> is unsayable however the
+    /// bag is arranged — there is no position in a set. Minting <i>bedroom, one statement
+    /// back</i> as its own code makes it sayable, and the learner is free to prefer it, to
+    /// ignore it, or to specialise on it.
+    /// </para>
+    /// <para>
+    /// <b>AND THE PLAIN WORD IS KEPT BESIDE IT, WHICH IS THE POINT RATHER THAN A HEDGE.</b>
+    /// Emitting only the tagged form would make two occurrences of one word in different
+    /// sentences unrelatable, which is the quantisation-boundary fault this repo already
+    /// refuses. Several codes per reading so near readings overlap is
+    /// <see cref="Winnow"/>'s own answer, arriving on time rather than position.
+    /// </para>
+    /// <para>
+    /// <b>IT COSTS VOCABULARY, AND VOCABULARY IS THE MEMORY BUDGET HERE.</b> Residents times
+    /// codes is what a holder carries, so banding multiplies the alphabet by the number of
+    /// bands — which is why the bands are few and the oldest is a single catch-all rather
+    /// than a code per depth.
+    /// </para>
+    /// </remarks>
+    Recent,
 }
 
 /// <summary>
@@ -119,6 +146,15 @@ public sealed class Joined : IQuantizer<Asking>
     /// </remarks>
     public static readonly Code Sundered = new(Both, 1);
 
+    /// <summary>How many statements back get their own band before the rest share one.</summary>
+    /// <remarks>
+    /// <b>THREE, WHICH IS THE SHALLOWEST DEPTH THE MEASURED WORLD NEEDS.</b> Two supporting
+    /// facts is a named bAbI task, so a band for the latest and one for the one before it
+    /// is the minimum that could express either — and everything older shares a code
+    /// because a story is not bounded and an alphabet has to be.
+    /// </remarks>
+    public const int Bands = 3;
+
     private readonly Joining _joining;
 
     /// <param name="joining">What to do with the two halves.</param>
@@ -130,15 +166,17 @@ public sealed class Joined : IQuantizer<Asking>
     /// <inheritdoc/>
     public IReadOnlyCollection<Code> Codify(Asking observation)
     {
-        var said = new HashSet<Code>(observation.Story);
+        var said = new HashSet<Code>(observation.Words);
         said.UnionWith(observation.Question);
+
+        if (_joining == Joining.Recent) return Banding(said, observation);
 
         if (_joining == Joining.Bagged) return said;
 
         // THE INTERSECTION IS TAKEN OVER THE HALVES AND NEVER OVER THE UNION, which reads
         // as pedantry until the union has already lost the distinction. Every code in the
         // bag is in the bag; only the two halves know which are in both.
-        var shared = observation.Question.Where(observation.Story.Contains).ToList();
+        var shared = observation.Question.Where(observation.Words.Contains).ToList();
 
         // THE ONE ARM THAT SPEAKS WHEN THERE IS NOTHING TO SAY, which is its whole point.
         // Every other arm falls through to the plain bag here, and the bag is what cannot
@@ -151,6 +189,30 @@ public sealed class Joined : IQuantizer<Asking>
 
         if (_joining == Joining.Named) foreach (var one in shared) said.Add(new Code(Both, one.Value));
         else said.Add(Coincided);
+
+        return said;
+    }
+
+    /// <summary>
+    /// Every word again, carrying how many statements back it was said.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE QUESTION'S OWN WORDS ARE NOT BANDED, because they are not in the story and a
+    /// band on them would say something false.</b> A depth is a distance from the question,
+    /// so the question sits at no distance from itself.
+    /// </remarks>
+    private static HashSet<Code> Banding(HashSet<Code> said, Asking observation)
+    {
+        for (var back = 0; back < observation.Story.Count; back++)
+        {
+            // EVERYTHING PAST THE LAST BAND SHARES ITS CODE, so an alphabet stays finite
+            // over a story that is not. The catch-all says *older than this* rather than
+            // *this far back*, which is the honest reading of what it can support.
+            var band = Math.Min(back, Bands - 1);
+
+            foreach (var one in observation.Story[back])
+                said.Add(new Code(Both, unchecked(one.Value * Bands + (ulong)band + 2)));
+        }
 
         return said;
     }

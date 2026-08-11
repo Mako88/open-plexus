@@ -161,8 +161,37 @@ public enum Predicting
 /// </remarks>
 public readonly record struct Asking
 {
-    /// <summary>The words of the statements in front of the question.</summary>
-    public required IReadOnlySet<Code> Story { get; init; }
+    /// <summary>
+    /// The statements in front of the question, newest first.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>KEPT APART AND ORDERED, BECAUSE A BAG CANNOT BE ASKED WHICH SENTENCE A WORD CAME
+    /// FROM.</b> A world saying <i>these words were one sentence, and it was the latest</i>
+    /// is stating a fact about its signal — the same licence
+    /// <see cref="Codes.Coded.Groups"/> and <see cref="Codes.Coded.Sequence"/> already
+    /// carry. What to make of the order is the front end's, and every arm that wants none
+    /// of it flattens this in one call.
+    /// </para>
+    /// <para>
+    /// <b>NEWEST FIRST SO THAT A POSITION MEANS THE SAME THING IN EVERY STORY.</b> Counting
+    /// from the start would make <i>the second statement</i> a different distance from the
+    /// question in a two-line story and a nine-line one, so a code minted on it would name
+    /// two unrelated things.
+    /// </para>
+    /// </remarks>
+    public required IReadOnlyList<IReadOnlySet<Code>> Story { get; init; }
+
+    /// <summary>Every word of every statement, which is what a bag-of-words arm wants.</summary>
+    public IReadOnlySet<Code> Words
+    {
+        get
+        {
+            var all = new HashSet<Code>();
+            foreach (var one in Story) all.UnionWith(one);
+            return all;
+        }
+    }
 
     /// <summary>The words of the question itself.</summary>
     public required IReadOnlySet<Code> Question { get; init; }
@@ -317,8 +346,11 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
 
             var from = settings.Span == 0 ? 0 : Math.Max(0, said.Count - settings.Span);
 
-            var before = new HashSet<Code>();
-            for (var one = from; one < said.Count; one++) before.UnionWith(said[one]);
+            // NEWEST FIRST, which is the walk backwards from the question rather than
+            // forwards from the story's start.
+            var before = new List<IReadOnlySet<Code>>();
+            for (var one = said.Count - 1; one >= from; one--)
+                before.Add(new HashSet<Code>(said[one]));
 
             // THE ANSWER AS A WORD RATHER THAN AS AN ANSWER, which is what lets an arm that
             // never saw a question sit this examination at all. A compound answer takes its
@@ -414,7 +446,7 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
 
             told.Add(new Turn<Asking>
             {
-                Seen = new Asking { Story = moment, Question = new HashSet<Code>() },
+                Seen = new Asking { Story = [moment], Question = new HashSet<Code>() },
                 Outcome = index[words[at]],
             });
         }

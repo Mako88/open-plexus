@@ -126,6 +126,15 @@ FORBIDS things, and several of them are already measured.
 - **SO IT IS A NEAR-PERFECT READER AND A HOPELESS SELECTOR**, which the two ends say
   together. Shown only the right statement it is at the ceiling; shown the whole story,
   where every answer is present, it takes under a third.
+- **AND RECENCY HANDED OVER AS A CODE HELPS AND DOES NOT RECOVER WHAT NARROWING THE VIEW
+  ALREADY GAVE.** Banding each word by how many statements back it was nearly doubles the
+  whole-story score and still trails the one-statement view.
+- **SO A CRUDE SELECTOR THE EXPERIMENTER CHOSE BEATS A LEARNABLE ONE SPELLED OUT IN THE
+  ALPHABET**, which is the opposite of the prediction written before the arm ran. The
+  learner can use a position code and cannot use it well.
+- **AND THE GAIN EVAPORATES AS THE POPULATION IS ALLOWED TO GROW, WHICH IS THE MECHANISM.**
+  Four times the capacity buys its own task and sells the examination, so the extra rules
+  memorise the stream — what banding costs is SEARCH, measured at last.
 - **AND NOTHING ABOUT THE LEARNER OR ITS SIZE IS THE BOTTLENECK**, which is worth knowing
   before either is touched. What is missing is choosing where to look, and every remaining
   rung is worth exactly what it buys that.
@@ -1470,6 +1479,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **71** | A minted name is a code, so repair adds it for the price of one. Should the separation bar be charged by what a scope's codes STAND FOR rather than by how many there are? Open |
 | **86** | The ladder's admission rule reads near nothing on text while the transcript shows the ceiling plainly. It asks whether repair found a separating code, and on a wide alphabet memorising always does — so the trigger cannot summon the rungs that go UP. What signal separates *nothing separates* from *nothing GENERAL separates*. Open |
 | **87** | `Recalled` answers with a place and never a person. ANSWERED AGAINST for a coincidence code: naming the shared word, dropping its identity, and saying the absence out loud all sit inside the control's spread. A marker says when to trust the place in front of you, never where to find the right one |
+| **92** | Banding a word by how many statements back it was makes *the latest one* sayable, and buys about half of what simply narrowing the view buys. Its gain reverses as capacity grows, so the alphabet it adds is spent memorising. Does a band the learner MINTS rather than one it is handed behave differently? Open |
 | **91** | A masked objective spends the population on function words, being what a bag predicts best, and transfers nothing. Gate what is worth predicting on surprise, the way genesis is already gated on it — the one repair that is not a stop list. Open, and it is what would make a primer teach |
 | **89** | John's: prime it on general English before setting it a text to be examined on. `Primer` exists for the walk and ports cheaply, but a settled-nothing round moves no counter here — so a primer needs something to predict while reading. Next word is rung three. Open |
 | **90** | John's: is there a standardised comprehension exam that separates understanding from regurgitation? bAbI already is one at this rung. What is unpriced is the tier above — school exams and the passages built so the wrong answer is the one present verbatim. Open, and blocked until the components pass |

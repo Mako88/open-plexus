@@ -76,58 +76,6 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         // rather than the finding.
     }
 
-    /// <summary>
-    /// <b>WHAT A TWO-CODE REPAIR STEP COSTS WHERE THE WORLD'S RULES ARE ONE CODE —
-    /// fork 74's control, and the arm that can falsify its whole account.</b>
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>THE CASE FOR <see cref="Stepping.Pair"/> IS ENTIRELY ABOUT DEPTH.</b> A chain pays
-    /// a miss floor a rung and only its last rung pays anything back, so stepping twice at
-    /// once is a saving exactly where the truth is deep. This world's truths are ONE CODE,
-    /// and this doc already carries the row that there any repair is damage — so a step that
-    /// goes twice as far per attempt should be twice the damage, and that is a prediction
-    /// this world can refuse.
-    /// </para>
-    /// <para>
-    /// <b>WHICH MAKES IT THE FALSIFIER RATHER THAN A SECOND OPINION.</b> If a pair step is
-    /// level or better HERE, then whatever it does on the multiplexer is not about reaching a
-    /// sound depth in fewer steps — it is about something the depth story does not name, and
-    /// a grid showing it winning on both worlds would be evidence against the explanation
-    /// rather than for the mechanism.
-    /// </para>
-    /// <para>
-    /// <b>AND THE READING IS THE WITHHELD SET, which is what this world has and the
-    /// multiplexer does not.</b> Scenes the run was never taught on, so a population that
-    /// over-specialises scores on what it has seen and not on those — the exact failure a
-    /// second code minted on a parent's unconditioned table would produce.
-    /// </para>
-    /// </remarks>
-    [Fact]
-    [Trait(Sweeps.Kind, Sweeps.Name)]
-    public void Whether_a_two_code_repair_step_is_twice_the_damage_where_one_code_is_the_truth()
-    {
-        output.WriteLine("stepping | unseen accuracy | spread | sound | unsound | residents");
-
-        foreach (var stepping in new[] { Stepping.OneCode, Stepping.Pair })
-        {
-            // SHIPPED DIALS AND ONE THING MOVED, which is this repo's rule about measuring a
-            // mechanism ON from a known baseline rather than OFF from all-on. The budget arm
-            // above pins `AnyFailure` for its own reasons; borrowing that here would cross
-            // two axes and make the comparison a different one.
-            var (unseen, last) = Sweep(
-                Small, new CommittingSettings { Stepping = stepping }, Looking.Tiled);
-
-            output.WriteLine(
-                $"{stepping,-8} | {unseen.Average(),15:F3} | {Spread(unseen),6:F3} "
-                + $"| {last.Rules.Sound,5} | {last.Rules.Unsound,7} "
-                + $"| {last.Tally.Resident,9} | repairs {last.Tally.Repaired}");
-        }
-
-        // NO BAR. The prediction is on the method, where it is read against the grid it was
-        // written for rather than enforced by an assertion somebody would have to edit.
-    }
-
     /// <summary>Five seeds of one configuration, and what the last one left behind.</summary>
     /// <param name="world">The scene the seeds are drawn from.</param>
     /// <param name="dials">The brain, built once and handed to every seed.</param>

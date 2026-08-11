@@ -421,63 +421,6 @@ public enum Budgeting
     Earned,
 }
 
-/// <summary>How many codes one repair adds.</summary>
-/// <remarks>
-/// <para>
-/// <b>FORK 74, BUILT RATHER THAN ARGUED.</b> A fresh child inherits no table, so it must
-/// re-earn <see cref="CommittingSettings.Floor"/> misses before it may add its next code.
-/// The repairs that ever buy a hard round sit at the world's MINIMUM SOUND DEPTH — three
-/// codes at six bits, four at eleven — and genesis mints one, so every chain pays two or
-/// three floors and only the last rung of it pays anything at all. Adding two codes at once
-/// is the only proposal on the bench that shortens the chain rather than making each step
-/// likelier.
-/// </para>
-/// <para>
-/// <b>AND THE TRAP THIS REPO ALREADY NAMES DOES NOT APPLY, WHICH IS WHY IT IS BUILDABLE.</b>
-/// <i>A search step of two codes is a gate paid once</i> — a minted name standing for two
-/// codes enters on a single clearance. This does not: <see cref="Repair.Discriminator"/>
-/// certifies the first code and <see cref="Repair.Runner"/> certifies the second against the
-/// same bar and the same candidate correction. Two codes, two clearances, and the saving is
-/// the miss floor rather than the bar.
-/// </para>
-/// <para>
-/// <b>WHAT IS ALREADY MEASURED IS THE AGREEMENT AND IT CUTS AGAINST THIS.</b> A parent's
-/// table predicts its child's first choice under a third of the time where outcomes are even
-/// and 54.9% where they are skewed — so the second code a parent picks is usually not the
-/// one a child conditioned on the first would have picked. That is a reason to expect this to
-/// lose on the even worlds and it is NOT a reason not to run it, because the two outcomes
-/// cost differently: a right second code saves a floor and a wrong one mints a child too
-/// narrow to be sound, and nothing has ever priced the second against the first directly.
-/// </para>
-/// <para>
-/// <b>THE KILL CONDITION IS WRITTEN DOWN FIRST AND IT IS ABOUT DEPTH RATHER THAN SCORE.</b>
-/// One code at a time reaches three in two steps and four in three; a pair reaches three in
-/// one step and then FIVE, overshooting the four that eleven bits needs — which is exactly
-/// what the naming loop did when it let repair step two codes at once. So the prediction is
-/// that this pays at six bits and overshoots at eleven, and the reading that settles it is
-/// <c>Census.Paying</c> with the carriers' mean scope beside it, never accuracy alone.
-/// </para>
-/// </remarks>
-public enum Stepping
-{
-    /// <summary>One code a repair. What every number here was taken under.</summary>
-    OneCode,
-
-    /// <summary>
-    /// The separating code and the runner-up together, where both clear the bar.
-    /// </summary>
-    /// <remarks>
-    /// <b>IT DEGRADES TO <see cref="OneCode"/> RATHER THAN REFUSING, which is what keeps it
-    /// an arm and not a second gate.</b> <see cref="Repair.Runner"/> comes back empty
-    /// whenever the second-best candidate does not clear the corrected bar, and on that
-    /// round this mints exactly what the shipped rule mints. So the difference between the
-    /// arms is only the rounds where a second code was certifiable, and a grid showing them
-    /// level would mean that set is small rather than that stepping twice is worthless —
-    /// which is why the repair counts are read beside the score.
-    /// </remarks>
-    Pair,
-}
-
 /// <summary>Every number the commitment machinery is allowed to have.</summary>
 public sealed record CommittingSettings
 {
@@ -652,9 +595,6 @@ public sealed record CommittingSettings
 
     /// <inheritdoc cref="Commitments.Widening"/>
     public Widening Widening { get; init; } = Widening.Never;
-
-    /// <inheritdoc cref="Commitments.Stepping"/>
-    public Stepping Stepping { get; init; } = Stepping.OneCode;
 
     /// <inheritdoc cref="Commitments.Speaking"/>
     public Speaking Speaking { get; init; } = Speaking.Anyone;

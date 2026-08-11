@@ -579,6 +579,7 @@ condition is a superstition.
 | `Weighing.Summing` — an expectation worth its advocates added up | Led on none of ten worlds once the vote stopped steering the search, and a sum splits inexactly | A world where a crowd outweighs one always-right rule |
 | `Weighing.Lifting` — divide the best advocate by its answer's base rate | Beat `Strongest` nowhere in ten worlds, and trails worst where skew gives the divisor something to do | A world where an unusual answer on thin evidence is right |
 | `Sharpness` — accuracy raised to a power before the vote | A workaround for a sum's shape: it cannot move the argmax of a maximum, and the sum is gone | Never under a maximum; only a summed vote returns it |
+| `Stepping.Pair` — winner and runner-up in one repair | Coverage falls 2 to 4 standard errors on three worlds, accuracy with it, and the carriers overshoot the minimum sound depth | A machine knowing when a scope is deep enough — fork 75 |
 
 ---
 
@@ -756,6 +757,12 @@ change of architecture entirely.
 - **TWO ARMS THAT SCORE ALIKE NEED NOT BE THE SAME MECHANISM, AND A SCORE CANNOT SAY.** A cap
   that refuses nothing and a cap that refuses a lot read identically until something counts
   what was BUILT. Four grids in one session.
+- **A RATE WHOSE NUMERATOR COUNTS RULES SAYS NOTHING ABOUT HOW MUCH GOT COVERED.** The share
+  of repairs that ever buy a hard round rose by half while hard-round coverage fell, because
+  each deeper rule carries fewer rounds.
+- **AND A SHARE WHOSE HALVES COUNT DIFFERENT EVENTS ANNOUNCES ITSELF BY EXCEEDING ONE.**
+  Repairs that took two codes over children BORN read thirty-nine, because a lineage collides
+  twenty to fifty times a birth. Arithmetic caught what a name did not.
 - **DELETING THE LAST ARM DELETES THE CHECK THAT MADE THE DELETION LEGITIMATE.** *The vote
   builds one population* was asserted across three weighings; with one left it cannot be
   stated at all, so the property is an argument again.
@@ -976,6 +983,24 @@ change of architecture entirely.
 - **AND THE NAMING LOOP WAS THAT AXIS FROM THE OTHER END.** A minted name let repair step two
   codes and it OVERSHOT the minimum depth; one code at a time undershoots it for three steps.
   Nothing in the machine knows the depth.
+- **AND A STEP OF TWO OVERSHOOTS BY NINE TENTHS OF A CODE AT BOTH WIDTHS, MEASURED DIRECTLY.**
+  Hard-round coverage falls two to four standard errors on all three worlds while the
+  carriers' mean scope rises. Two mechanisms, one verdict.
+- **AND IT BUYS MORE CARRIERS AT A HIGHER HIT RATE WHILE COVERING LESS.** A deeper rule fires
+  less often, so the search's own quality number rose by half on the skewed world while the
+  world got covered worse.
+- **AND THE VOTE IS NOT THE CULPRIT, BECAUSE `Census.Paying` IS NOT A VOTE STATISTIC.**
+  Accuracy and coverage fell together, so what shrank is what the population holds rather than
+  which rule got the seat.
+- **SO NOTHING STOPS THE CHAIN, WHICH IS THE FINDING RATHER THAN THE STEP SIZE.** Six bits
+  reaches its minimum depth of three in ONE pair step and its carriers still average 4.41, so
+  repair keeps narrowing well past a sound scope.
+- **AND A STEP OF TWO FROM A ONE-CODE SEED MAKES EVERY EVEN DEPTH UNREACHABLE**, which
+  eleven bits needs. Nine tenths of the steps took two, so the scopes go one, three, five —
+  and the world's shortest truth is four.
+- **AND IT LOSES WORST WHERE THE DEPTH IS REACHABLE, so parity is not all of it.** Six bits
+  needs three and reaches it in one step, and falls furthest — a wrong second code mints an
+  unsound child that can then only reach five.
 - **AND SUBSUMPTION IS NOT CUTTING THE CHAIN: KEEPING MORE RUNGS BUYS FEWER CARRIERS.** The
   stricter rule holds more residents and lowers the hit rate on all three worlds. Pruning is
   part of the search rather than a tax on it.
@@ -1125,7 +1150,8 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **69** | Naming until refused finds far more true rules and keeps a fleet agreeing. CLOSED AGAINST: it finds LONGER ones, and hard-round coverage falls while every count rises. Deleted with a revival row |
 | **70** | Proposals naming a pair already named mint nothing. ANSWERED: spending the ask on the best unnamed pair nearly triples the stacking on both eleven-bit worlds and sells nothing. Shipped, and the arm is deleted. Closed |
 | **68** | John's: does a conjunction EARN its narrowing? Its premise is half wrong -- reach halves with depth on even worlds and RISES under skew, where correlated codes let a long scope fire as often as a short one. Open |
-| **74** | Could one repair add two codes, sparing a miss floor a fresh child re-earns? A parent's table predicts under a third of its children's choices, 54.9% under skew — settling nothing while the two outcomes cost differently. BUILT as `Stepping.Pair` |
+| **74** | Could one repair add two codes, sparing a miss floor? CLOSED AGAINST, built and measured: coverage falls two to four standard errors on three worlds while the carriers overshoot the minimum sound depth. Deleted with a revival row |
+| **75** | Nothing stops a chain at a sound depth. One code a step undershoots for three rungs; two overshoots by nine tenths of a code at both widths, by two independent mechanisms. What signal inside the machine could say STOP HERE? Open |
 | **73** | What distinguishes a repair that buys hard-round coverage from one that does not? ANSWERED: depth. They sit at the world's minimum sound scope and every shorter step pays nothing. Open on walking a chain in fewer steps without overshooting |
 | **72** | Relearning after the target moves is slower than learning the world from nothing. ANSWERED: the repair budget, a per-parent LIFETIME cap the lineages that must relearn have already spent. Free recovers, the capped arms do not |
 | **71** | A minted name is a code, so repair adds it for the price of one. Should the separation bar be charged by what a scope's codes STAND FOR rather than by how many there are? Open |

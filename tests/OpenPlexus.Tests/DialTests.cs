@@ -197,22 +197,6 @@ public sealed class DialTests(ITestOutputHelper output)
             + "accuracy on every world. The driver would be a gate that reads how "
             + "much a rule has been TESTED rather than whether it has been wrong",
 
-        ["Stepping"] =
-            "HOW MANY CODES ONE REPAIR ADDS, and it is a depth rather than a "
-            + "level -- one or two, with nothing in between and no third value "
-            + "worth having, since a step of three would overshoot the deepest "
-            + "truth any world here holds. Fork 74, and what it is aimed at is the "
-            + "miss floor a fresh child re-earns before it may add its next code: "
-            + "the repairs that ever buy a hard round sit at the world's minimum "
-            + "sound depth, three codes at six bits and four at eleven, so every "
-            + "chain pays two or three floors and only its last rung pays anything "
-            + "back. A controller would want to know that depth and nothing in the "
-            + "machine does -- which is the whole of why this is an arm. AND THE "
-            + "SECOND CODE CLEARS ITS OWN BAR, so this is not the trap about a "
-            + "search step of two codes being a gate paid once: `Runner` applies "
-            + "the same separation test and the same candidate correction the "
-            + "winner cleared, and what is saved is the floor rather than the bar",
-
         ["Choosing"] =
             "the control arm, and a choice between two rules that both do "
             + "something rather than a mechanism and its own absence. WHICH rule "
@@ -702,24 +686,17 @@ public sealed class DialTests(ITestOutputHelper output)
         // they rose. A pre-registered condition written on columns a skewed world can raise
         // is a pre-registration of the wrong question, and passing one is not a defence.
         //
-        // AND TWENTY-SEVEN IS `Stepping`, WHICH IS THE FIRST ARM ON THIS BENCH THAT TOUCHES
-        // THE LENGTH OF THE SEARCH RATHER THAN THE ODDS OF A STEP. Every gate, weighing,
-        // budget and subsumption rule here changes which rule gets the seat or which parent
-        // gets blamed; this changes how many miss floors a four-code truth costs, which the
-        // measurements say is the thing standing between the search and its hit rate.
+        // `Stepping` ARRIVED AND LEFT WITHOUT THIS NUMBER EVER BEING PUSHED, WHICH IS THE
+        // FIRST TIME THAT HAS HAPPENED AND IS WHAT THIS FILE IS FOR. Its entry said the
+        // honest end was a deletion the day the reading landed; the reading landed and it
+        // went. A repair stepping two codes at once loses hard-round coverage by two to four
+        // standard errors on three worlds, and its carriers overshoot the world's minimum
+        // sound depth by nine tenths of a code.
         //
-        // IT IS NOT A LEVEL AND THERE IS NO THIRD VALUE, which is what keeps it out of the
-        // family this file was written to be suspicious of. One code or two, and a step of
-        // three would overshoot the deepest truth any world on this bench holds -- so there
-        // is no interior optimum here for a controller to hunt even in principle. What a
-        // controller WOULD want is the world's minimum sound depth, and nothing in the
-        // machine computes it or could.
-        //
-        // AND ITS HONEST END IS A DELETION, WRITTEN DOWN BEFORE THE GRID RATHER THAN AFTER.
-        // Two rules that both mint, measured ON from the baseline every earlier number was
-        // taken under; the loser goes with a revival row the day the reading lands, exactly
-        // as `Rooting` and `Minting` did. An arm that has won and stayed an arm is dead code
-        // with a comparison attached.
-        Assert.Equal(27, HandSet.Count);
+        // AND THE COUNT NOT MOVING IS THE POINT RATHER THAN AN ACCIDENT. A dial whose
+        // deletion was pre-registered costs nothing to try, so the budget this file keeps is
+        // a budget on dials that STAY -- which is the only version of it that does not make
+        // measuring an idea more expensive than not measuring it.
+        Assert.Equal(26, HandSet.Count);
     }
 }

@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 using OpenPlexus.Codes;
 
@@ -420,7 +420,7 @@ public sealed class Population
     /// </remarks>
     private readonly Dictionary<Code, Code> _runners = [];
 
-    private long _agreed, _differed, _stepped, _paired;
+    private long _agreed, _differed;
 
     /// <inheritdoc cref="Lifetime"/>
     private readonly Dictionary<(Code Expects, int Depth), Lifetime> _lineage = [];
@@ -526,39 +526,6 @@ public sealed class Population
     /// <inheritdoc cref="Agreed"/>
     /// <summary>Children whose own first repair chose something else.</summary>
     public long Differed => _differed;
-
-    /// <summary>Repair attempts that reached a scope at all, born or collided.</summary>
-    /// <remarks>
-    /// <para>
-    /// <b>THE DENOMINATOR <see cref="Paired"/> NEEDS, AND IT IS NOT <c>Tally.Repaired</c>.</b>
-    /// That counts children BORN; this counts every attempt where a condition cleared the
-    /// bar, which is twenty to fifty times as many because a lineage spends most of its
-    /// budget re-deriving scopes the population already holds. Dividing one counter by the
-    /// other produced a share of thirty-nine, which is how a ratio announces that its two
-    /// halves are counting different events.
-    /// </para>
-    /// </remarks>
-    public long Stepped => _stepped;
-
-    /// <summary>Of those, the ones that added TWO codes rather than one.</summary>
-    /// <remarks>
-    /// <para>
-    /// <b>WHAT WAS BUILT, WHICH A SCORE CANNOT SAY.</b>
-    /// <see cref="Stepping.Pair"/> degrades to <see cref="Stepping.OneCode"/> wherever
-    /// <see cref="Repair.Runner"/> certifies nothing, so two arms landing on top of each
-    /// other is ambiguous between <i>a second code is worthless</i> and <i>a second code was
-    /// almost never available</i>. Those are opposite diagnoses and this repo has already
-    /// spent four grids in one session on the difference — a cap that refuses nothing and a
-    /// cap that refuses a lot read identically until something counts.
-    /// </para>
-    /// <para>
-    /// <b>AND IT IS A COUNT UNDER BOTH ARMS RATHER THAN UNDER ONE, so the denominator is
-    /// there without arithmetic.</b> Under <see cref="Stepping.OneCode"/> it is nought by
-    /// construction, which is what makes a run reporting anything else a wiring fault rather
-    /// than a finding.
-    /// </para>
-    /// </remarks>
-    public long Paired => _paired;
 
     /// <summary>How many commitments are resident.</summary>
     /// <remarks>
@@ -1142,12 +1109,6 @@ public sealed class Population
                 // a ceiling would turn a success into a demand for a rung.
                 separated = true;
 
-                // EVERY ATTEMPT THAT REACHED A SCOPE, WHICH IS THE ONLY HONEST DENOMINATOR
-                // FOR `Paired`. Counted here rather than at the birth below, because most
-                // of these collide with a name the population already holds and a share
-                // taken against births reads as a number far above one.
-                _stepped++;
-
                 // FORK 74'S READING, AND IT MINTS NOTHING. What the parent's table would have
                 // picked SECOND is recorded against the child, so that when the child later
                 // repairs from its OWN table the two choices can be compared. Agreement means
@@ -1165,25 +1126,10 @@ public sealed class Population
                     else _differed++;
                 }
 
-                var runner = Repair.Runner(culprit, _dials);
+                var child = new Commitment([.. culprit.Scope, added], culprit.Expects);
 
-                // FORK 74'S MECHANISM, AND IT IS THE SAME `runner` THE INSTRUMENT READS. Under
-                // `Pair` the second code is SPENT as a code rather than kept as a prediction,
-                // so the two uses are exclusive by construction and the arm cannot be measured
-                // by the instrument that motivated it. Nothing is recorded below in that arm
-                // for the same reason: a two-code child's own next choice is a THIRD code, and
-                // scoring it against the prediction that is already in its scope would be a
-                // different question wearing the same counter's name.
-                var pairing = _dials.Stepping == Stepping.Pair && runner is not null;
-
-                if (pairing) _paired++;
-
-                var child = pairing
-                    ? new Commitment([.. culprit.Scope, added, runner!.Value], culprit.Expects)
-                    : new Commitment([.. culprit.Scope, added], culprit.Expects);
-
-                if (!pairing && runner is { } kept)
-                    _runners[child.Identity] = kept;
+                if (Repair.Runner(culprit, _dials) is { } runner)
+                    _runners[child.Identity] = runner;
 
                 if (!_minted.TryGetValue(culprit.Identity, out var born))
                     _minted[culprit.Identity] = born = new Forks();

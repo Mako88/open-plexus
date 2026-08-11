@@ -91,7 +91,6 @@ jobs:
             "ArrangingTests.And_the_other_half",
             "ArrangingTests.Whether_the_gap_is_a_fact",
             "ArrangingTests.Whether_the_gate_that_was_load_bearing",
-            "ArrangingTests.Whether_a_two_code_repair_step",
             "BudgetTests","ChoosingTests","FleetTests","FoldingTests",
             "GateCostTests","LatencyTests","MendingTests",
             "MonkTests","NarrowingTests","OverlapTests","PlacingTests",
@@ -113,7 +112,6 @@ jobs:
             "QueryCostTests","RefusalTests","ScalingTests",
             "SeparableTests",
             "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",
-            "SteppingTests",
             "WideningTests"
           ]'
 

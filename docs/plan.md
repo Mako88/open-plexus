@@ -62,9 +62,12 @@ FORBIDS things, and several of them are already measured.
 - **AND THE ROUND A PHONE DIES INSIDE IS PORTED TOO, WHICH WAS THE LAST HARD BLOCKER.** A slot
   of two identical holders finishes on either one, so a machine that took the question and
   went silent costs a fleet nothing at all.
-- **AND THE REPLICAS STAY IDENTICAL HAVING SENT EACH OTHER NOTHING**, asserted on their
-  commitments rather than their counts. Redundancy costs coordination nothing here, which is
-  what makes twenty phones affordable.
+- **AND THE REPLICAS DRIFT APART, WHICH IS WHAT THE COMPLETENESS CONDITION COSTS.** A round
+  finishes on one of them, so the other is never waited on and can be handed the next moment
+  before the last settlement.
+- **SO IDENTICAL EVIDENCE CONVERGES AND EVIDENCE IN A DIFFERENT ORDER DOES NOT**, and nothing
+  was keeping the order but a fast machine. A failover replica is a similar population rather
+  than the same one.
 - **AND ONE INPUT MACHINE FEEDING TWENTY HOLDERS IS THE IDENTICAL CASE, NOT THE SHARED ONE.**
   Every holder is told the same moment and the same settlement, so naming converges — the
   divergence measured was between machines seeing DIFFERENT streams.
@@ -198,9 +201,12 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **A FLEET RUN REPRODUCES ITSELF EXACTLY, so fork 12 holds across sockets.** Every merge is
   ordered before it is combined and every placement is a fact about a commitment rather than
   about who asked or who answered first.
-- **WHICH IS WHY TWO REPLICAS NEED NO MESSAGES BETWEEN THEM.** Fed one stream they mint the
-  same children independently and stay identical, so redundancy costs coordination nothing
-  and divergence becomes a free check on C2.
+- **AND TWO REPLICAS DO NOT STAY IDENTICAL, WHICH WAS ARGUED HERE AND IS NOW MEASURED THE
+  OTHER WAY.** They drift on a slow runner and agree exactly on a fast box, so the claim was
+  a fact about latency.
+- **BECAUSE THE COMPLETENESS CONDITION IS WHAT LETS ONE FALL BEHIND.** A round ends on one
+  replica, so the other is never waited on and may take the next moment before the last
+  settlement. Order, not content.
 - **AND A REPLICA IS DEDUPLICATED BY WHAT IT SAYS RATHER THAN BY WHO SAID IT.**
   `Advocacy.By` already names the best advocate, so a merge can drop a duplicate exactly —
   and only where an expectation is worth that advocate.

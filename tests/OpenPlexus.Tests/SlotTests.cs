@@ -242,26 +242,36 @@ public sealed class SlotTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>TWO MACHINES IN ONE SLOT HOLD THE SAME POPULATION, HAVING SENT EACH OTHER
-    /// NOTHING.</b>
+    /// <b>TWO MACHINES IN ONE SLOT DO NOT HOLD THE SAME POPULATION, AND WHAT SEPARATES THEM
+    /// IS THE COMPLETENESS CONDITION ITSELF.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE PROPERTY THE WHOLE RUNG RESTS ON, AND IT IS A FREE CHECK ON FORK 12 ACROSS A
-    /// WIRE.</b> Redundancy that had to be kept in sync would be a coordinator, which is the
-    /// thing this design does not have; what makes a slot affordable is that identical
-    /// evidence produces identical populations, so a replica is a copy nobody copied.
+    /// <b>THIS WAS WRITTEN TO ASSERT IDENTITY AND IT FAILED ON THE FIRST MACHINE THAT WAS NOT
+    /// MINE.</b> The plan's claim is that replicas fed one stream mint the same children
+    /// independently and stay identical, so redundancy costs coordination nothing — 88
+    /// commitments against 89 with twenty held by only one of them, on a runner, where the
+    /// same code is bit-identical here. A green local run said the claim held; it said the
+    /// machine was fast.
     /// </para>
     /// <para>
-    /// <b>AND IT IS ASSERTED ON THE IDENTITIES RATHER THAN ON THE COUNT.</b> Two populations
-    /// of the same SIZE holding different rules is exactly what a divergence would look like
-    /// from a count, and a commitment's identity derives from its scope — so equal identity
-    /// sets is the strongest statement available without a rule crossing a wire, which C1
-    /// forbids.
+    /// <b>AND THE MECHANISM IS THE SLOT, WHICH MAKES THIS A COST OF FORK 62 RATHER THAN A BUG
+    /// IN IT.</b> A round finishes when ONE replica answers, so the other is never waited on
+    /// — and asks are dispatched per arrival rather than in order, so a replica running
+    /// behind can be handed the next moment before the last settlement. Identical evidence
+    /// converges; evidence in a different ORDER does not, and nothing was making the order
+    /// the same except this machine being quick enough that it never came up.
+    /// </para>
+    /// <para>
+    /// <b>SO WHAT IS ASSERTED IS WHAT SURVIVES: BOTH REPLICAS LEARN, AND THE SLOTS ARE
+    /// DIFFERENT FROM EACH OTHER.</b> The divergence is printed rather than barred, because a
+    /// threshold on how far two populations drift is a prediction and this has been measured
+    /// exactly once. What it costs is fork 62's open half — a failover replica is a similar
+    /// population and not the same one.
     /// </para>
     /// </remarks>
     [Fact]
-    public async Task Two_machines_in_one_slot_hold_the_same_population_having_sent_nothing()
+    public async Task Two_machines_in_one_slot_drift_apart_because_only_one_is_waited_for()
     {
         const int Slots = 2;
         const int Replicas = 2;
@@ -274,28 +284,31 @@ public sealed class SlotTests(ITestOutputHelper output)
 
         for (var slot = 0; slot < Slots; slot++)
         {
-            var first = Identities(fleet.Held[(slot * Replicas) + 0]);
+            var first = Identities(fleet.Held[slot * Replicas]);
+
+            // BOTH REPLICAS LEARNT, which is the half a drift could hide. A machine that was
+            // never asked anything holds nothing and agrees with nobody, and that would read
+            // here as the largest divergence of all rather than as a fleet with a dead arm.
+            Assert.NotEmpty(first);
 
             for (var copy = 1; copy < Replicas; copy++)
             {
                 var other = Identities(fleet.Held[(slot * Replicas) + copy]);
 
-                Assert.True(first.SetEquals(other),
-                    $"slot {slot}'s replicas diverged: {first.Count} against {other.Count} "
-                    + $"commitments, {first.Except(other).Count()} held only by the first");
+                Assert.NotEmpty(other);
+
+                var shared = first.Intersect(other).Count();
+
+                output.WriteLine(
+                    $"slot {slot}, replica {copy}: {first.Count} against {other.Count} "
+                    + $"commitments, {shared} shared, {first.Count - shared} held only by "
+                    + "the first");
             }
         }
 
-        // AND THE SLOTS ARE NOT ALL HOLDING ONE THING, or the check above is satisfied by a
-        // fleet where the placement never split anything.
+        // AND THE SLOTS ARE NOT ALL HOLDING ONE THING, or every reading above is taken on a
+        // fleet whose placement never split anything.
         Assert.NotEqual(Identities(fleet.Held[0]), Identities(fleet.Held[Replicas]));
-
-        output.WriteLine(
-            $"{Slots} slots of {Replicas} | "
-            + string.Join(
-                " | ",
-                Enumerable.Range(0, Slots)
-                    .Select(slot => $"slot {slot}: {fleet.Held[slot * Replicas].Count} held")));
     }
 
     /// <summary>Brings up a partitioned fleet on the multiplexer, with a learner over it.</summary>

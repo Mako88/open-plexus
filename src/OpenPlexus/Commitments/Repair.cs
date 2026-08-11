@@ -122,6 +122,40 @@ public enum Widening
     /// </para>
     /// </remarks>
     Unmissed,
+
+    /// <summary>
+    /// Only a shortening that TWO clean commitments reach is proposed.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE ONE THING THE TABLE CANNOT SAY, ASKED OF THE POPULATION INSTEAD.</b>
+    /// <see cref="Unmissed"/>'s own row explains why it proposes every drop: a commitment's
+    /// tally skips its scope codes, since every one of them is present in every firing, so
+    /// nothing inside a rule can name its redundant code. But two clean rules agreeing on
+    /// everything except one code, and on what follows, are evidence about that code from
+    /// OUTSIDE either of them.
+    /// </para>
+    /// <para>
+    /// <b>WHICH IS RUNG FIVE'S TRIGGER POINTING DOWN INSTEAD OF UP.</b> Abstraction mints a
+    /// name when several commitments share a sub-scope; this proposes a RULE for the shared
+    /// part when several commitments share it and disagree about the rest. Same evidence,
+    /// same direction of reasoning, and no new number.
+    /// </para>
+    /// <para>
+    /// <b>AND WHAT IT IS FOR IS THE FLOOD.</b> A scope of length k proposes k shortenings
+    /// under the other arm, so a population of clean narrow rules proposes thousands and
+    /// pins itself at its capacity — which is where widening costs the most accuracy. This
+    /// proposes one per agreeing pair, and where nothing agrees it proposes nothing.
+    /// </para>
+    /// <para>
+    /// <b>ITS RISK IS SILENCE, AND THE INSTRUMENT FOR THAT ALREADY EXISTS.</b> A world whose
+    /// clean rules never come in near-identical pairs gives it nothing to do, and an arm that
+    /// proposes nothing drifts toward the baseline for free — this repo's own trap about a
+    /// fallback being a control arm nobody meant to run. <c>widened</c> is the column that
+    /// says whether it ran.
+    /// </para>
+    /// </remarks>
+    Shared,
 }
 
 /// <summary>What it takes for a narrower commitment to survive beside a general one.</summary>

@@ -191,9 +191,10 @@ public sealed class DialTests(ITestOutputHelper output)
             + "either. Not a level; nothing to hunt",
 
         ["Widening"] =
-            "the ladder's other direction, and a mechanism against its own absence "
-            + "rather than two rules that both do something -- which the shape "
-            + "forbids, since there is no second way to not shorten a scope. "
+            "the ladder's other direction. It began as a mechanism against its own "
+            + "absence and is two rules that do something now, because the failure "
+            + "named the axis: WHAT SUMMONS a shortening, a clean record or two "
+            + "clean rules agreeing a code is droppable. "
             + "Measured ON from the baseline every earlier number was taken under, "
             + "which is what this repo's trap list asks for. NOT A LEVEL: whether "
             + "anything generalises is not a quantity. AND IT IS REFUTED AS BUILT, "
@@ -208,7 +209,13 @@ public sealed class DialTests(ITestOutputHelper output)
             + "to not reading it, because `Floor` already demands twenty firings "
             + "and a perfect twenty is significant against every base rate under "
             + "0.88. What is wrong with it is the shortening rather than the "
-            + "parent, and it pins the population at its capacity",
+            + "parent, and it pins the population at its capacity. SO THE SECOND "
+            + "ARM ASKS THE POPULATION WHAT NO TABLE CAN: a rule's tally skips its "
+            + "own scope codes, so nothing inside a commitment can name its "
+            + "redundant one -- but two clean rules agreeing on everything except "
+            + "one code, and on what follows, are evidence about that code from "
+            + "outside either of them. Rung five's trigger pointing down instead of "
+            + "up, and it proposes 34 shortenings where the other proposes 1715",
 
         ["Forking"] =
             "WHETHER A PARENT MAY PROPOSE A FORK IT HAS ALREADY MADE, and it is two "

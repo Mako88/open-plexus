@@ -1247,16 +1247,23 @@ public sealed class Population
         // A COPY, BECAUSE `Add` WRITES TO WHAT THIS WALKS. Every other sweep operator
         // here takes one for the same reason, and a run that mutated mid-walk would be
         // ordering-dependent in a way fork 12 has already been reopened over twice.
-        foreach (var one in All.ToList())
-        {
-            if (one.Scope.Length < 2) continue;
-            if (one.Seen < _dials.Floor || one.Misses > 0) continue;
+        var eligible = All.Where(Widenable).ToList();
 
+        // HOW MANY CLEAN PARENTS HAVE TO AGREE, AND IT IS THE WHOLE DIFFERENCE BETWEEN THE
+        // TWO ARMS. One is every drop of every clean rule; two is only the drops that two
+        // clean rules reach together, which is a code they DISAGREE about while agreeing on
+        // everything else and on what follows.
+        var counted = _dials.Widening == Widening.Shared ? Agreement(eligible) : null;
+
+        foreach (var one in eligible)
             foreach (var dropped in one.Scope)
             {
-                var shorter = one.Scope.Where(code => code != dropped).ToImmutableArray();
+                var proposed = Shortened(one, dropped);
 
-                var proposed = new Commitment(shorter, one.Expects);
+                if (counted is not null
+                    && (!counted.TryGetValue(proposed.Identity, out var parents)
+                        || parents < 2))
+                    continue;
 
                 // THE PLACEMENT GATE AGAIN, AND IT HAS TO BE ASKED HERE TOO. A shorter
                 // scope has a different minimum code, so a fleet would otherwise mint the
@@ -1268,9 +1275,49 @@ public sealed class Population
                 Born(proposed, Birth.Widened);
                 widened++;
             }
-        }
 
         return widened;
+    }
+
+    /// <summary>Whether anything could ever propose a shorter version of this.</summary>
+    /// <param name="one">The commitment being considered.</param>
+    /// <remarks>
+    /// <b>A ONE-CODE SCOPE IS LEFT ALONE, because the empty scope fires on everything and
+    /// says nothing</b> — a commitment matching every moment is a base rate wearing a rule's
+    /// clothes. The rest is <see cref="Widening.Unmissed"/>'s own condition, written once so
+    /// that the tally and the walk cannot come to ask different questions.
+    /// </remarks>
+    private bool Widenable(Commitment one) =>
+        one.Scope.Length >= 2 && one.Seen >= _dials.Floor && one.Misses == 0;
+
+    /// <summary>The same claim with one code taken out.</summary>
+    /// <param name="one">What to shorten.</param>
+    /// <param name="dropped">The code to leave out.</param>
+    private static Commitment Shortened(Commitment one, Code dropped) =>
+        new([.. one.Scope.Where(code => code != dropped)], one.Expects);
+
+    /// <summary>How many eligible commitments each shortening would come from.</summary>
+    /// <param name="eligible">Everything that could be shortened at all.</param>
+    /// <remarks>
+    /// <b>KEYED ON THE SHORTENED CLAIM'S IDENTITY, WHICH IS WHY IT NEEDS NO PAIRWISE
+    /// WALK.</b> Two clean rules differing in exactly one code and expecting the same thing
+    /// reach the same shorter scope, and a scope's identity is a hash of itself — so
+    /// agreement falls out of a dictionary over one pass rather than out of comparing every
+    /// resident against every other.
+    /// </remarks>
+    private static Dictionary<Code, int> Agreement(IEnumerable<Commitment> eligible)
+    {
+        var counted = new Dictionary<Code, int>();
+
+        foreach (var one in eligible)
+            foreach (var dropped in one.Scope)
+            {
+                var name = Shortened(one, dropped).Identity;
+
+                counted[name] = counted.TryGetValue(name, out var already) ? already + 1 : 1;
+            }
+
+        return counted;
     }
 
     /// <summary>Whether a commitment has missed enough times to be worth repairing.</summary>

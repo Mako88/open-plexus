@@ -79,7 +79,8 @@ public sealed class WideningTests(ITestOutputHelper output)
         {
             output.WriteLine($"--- {address + (1 << address)} bits, skew {skew:F1} ---");
 
-            foreach (var widening in new[] { Widening.Never, Widening.Unmissed })
+            foreach (var widening in
+                new[] { Widening.Never, Widening.Unmissed, Widening.Shared })
                 await Report($"{widening}", seed => Run(address, skew, widening, seed));
         }
     }
@@ -151,15 +152,30 @@ public sealed class WideningTests(ITestOutputHelper output)
     {
         var off = Run(2, skew: 0.0, Widening.Never, seed: 1);
         var on = Run(2, skew: 0.0, Widening.Unmissed, seed: 1);
+        var agreed = Run(2, skew: 0.0, Widening.Shared, seed: 1);
 
         output.WriteLine($"never: {off.Tally.Widened} proposed, {off.Resident} residents");
         output.WriteLine($"unmissed: {on.Tally.Widened} proposed, {on.Resident} residents");
+        output.WriteLine(
+            $"shared: {agreed.Tally.Widened} proposed, {agreed.Resident} residents");
 
         Assert.Equal(0, off.Tally.Widened);
 
         Assert.True(on.Tally.Widened > 0,
             "generalisation is switched on and proposed nothing, so either no commitment "
             + "ever reaches a scope of two with no misses, or the operator is not wired");
+
+        // AND THE AIMED ARM FIRES AND IS NOT THE OTHER ONE, which are two failures reading as
+        // one number. An arm proposing nothing is `Never` under another name and drifts to the
+        // baseline for free, and an arm proposing everything is `Unmissed` under another name
+        // -- so the grid is unreadable unless it sits strictly between them. No direction is
+        // asserted beyond that, because a wiring check that predicts an outcome fails
+        // backwards and passes for free.
+        Assert.True(agreed.Tally.Widened > 0,
+            "the agreement arm proposed nothing at all, so either no two clean rules here "
+            + "differ in exactly one code, or the tally is not read");
+
+        Assert.NotEqual(on.Tally.Widened, agreed.Tally.Widened);
     }
 
     /// <summary>

@@ -49,11 +49,22 @@ public sealed class ForkingTests(ITestOutputHelper output)
 
     private const int Seeds = 6;
 
+    /// <summary>The budget every reading in this file was taken under.</summary>
+    /// <remarks>
+    /// <b>PINNED BECAUSE THE DEFAULT MOVED UNDER THESE GRIDS THE MOMENT THEY DECIDED IT.</b>
+    /// A fixture inherits every dial it does not pin, so a default moving rewrites an
+    /// experiment nobody edited — this repo's own trap, made live by the very comparison
+    /// these grids were run to settle. Both readings here are <c>Repeated</c> against
+    /// <c>Distinct</c> at 256, and leaving them unpinned would silently re-take them at the
+    /// shipped eight and answer a different question under the old numbers' names.
+    /// </remarks>
+    private const int Taken = 256;
+
     /// <param name="address">Address bits.</param>
     /// <param name="skew">How often a data bit is one, or zero to leave them even.</param>
     /// <param name="seed">The world's generator and the brain's.</param>
     /// <param name="forking">Whether a parent may propose a fork it has already made.</param>
-    /// <param name="budget">How many times one commitment may separate, or nothing for the default.</param>
+    /// <param name="budget">How many times one commitment may separate, or nothing for <see cref="Taken"/>.</param>
     private static (Learned Learned, MultiplexerRun Run) Run(
         int address, double skew, int seed, Forking forking, int? budget = null)
     {
@@ -61,7 +72,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
 
         var run = new MultiplexerRun(
             new MultiplexerSettings { Address = address, Skew = skew },
-            new Brain(budget is null ? dials : dials with { Budget = budget.Value }, seed),
+            new Brain(dials with { Budget = budget ?? Taken }, seed),
             seed,
             census: true);
 
@@ -204,11 +215,11 @@ public sealed class ForkingTests(ITestOutputHelper output)
             // does to the counts.
             foreach (var (arm, forking, budget) in new (string Arm, Forking Forking, int? Budget)[]
             {
-                ("repeated 256", Forking.Repeated, null),
+                ("repeated 256", Forking.Repeated, Taken),
                 ("distinct 2", Forking.Distinct, 2),
                 ("distinct 4", Forking.Distinct, 4),
                 ("distinct 8", Forking.Distinct, 8),
-                ("distinct 256", Forking.Distinct, null),
+                ("distinct 256", Forking.Distinct, Taken),
             })
             {
                 var paying = new List<double>();

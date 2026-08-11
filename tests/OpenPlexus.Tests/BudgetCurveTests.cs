@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -71,7 +71,21 @@ public sealed class BudgetCurveTests(ITestOutputHelper output)
         new MultiplexerRun(
             new MultiplexerSettings { Address = address, Skew = skew },
             new Brain(
-                new CommittingSettings { Budget = budget, Budgeting = counting }, seed),
+                new CommittingSettings
+                {
+                    Budget = budget,
+                    Budgeting = counting,
+
+                // AND `Forking` IS PINNED, WHICH IT WAS NOT WHEN THIS DIAL SHIPPED ITS NEW
+                // VALUE. A fixture inherits every dial it does not pin, and this grid sweeps
+                // the one number whose meaning `Forking` decides -- under `Repeated` a parent
+                // re-proposed the same child and the budget capped RE-DERIVATION; under
+                // `Distinct` it caps the search. Left unpinned, the same rows would have
+                // quietly changed question. Pinned to what runs, so the curve is about the
+                // machine that exists; every reading recorded before it was taken under
+                // `Repeated` and is owed a re-take.
+                Forking = Forking.Distinct,
+                }, seed),
             seed,
             census: true).Run(Rounds);
 

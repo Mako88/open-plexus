@@ -148,8 +148,11 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         // is also damage is a different question that this grid can answer in one more row.
         foreach (var (arm, forking, budget) in new (string Arm, Forking Forking, int? Budget)[]
         {
-            ("repeated", Forking.Repeated, null),
-            ("distinct", Forking.Distinct, null),
+            // PINNED AT WHAT THESE TWO WERE TAKEN UNDER, because the comparison below moved
+            // the default and an unpinned fixture would re-take them at the new one under the
+            // old rows' names -- this repo's own trap, made live by this very grid.
+            ("repeated", Forking.Repeated, 256),
+            ("distinct", Forking.Distinct, 256),
             ("distinct 8", Forking.Distinct, 8),
             ("distinct 4", Forking.Distinct, 4),
         })

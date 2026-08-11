@@ -722,6 +722,9 @@ change of architecture entirely.
 - **A FIXTURE INHERITS EVERY DIAL IT DOES NOT PIN, so a default moving rewrites an
   experiment nobody edited.** `BudgetTests` crosses two settings and pins neither timing
   nor budget; it changed arms silently and is a sweep, so CI never looked.
+- **AND THE GRID THAT DECIDES A DEFAULT REWRITES ITSELF THE MOMENT IT WINS.** Four grids
+  swept `Budget` or `Forking` without pinning the other, so shipping the pair changed what
+  every one of them was asking under its own rows' names.
 - **AND A TEST CAN FAIL AT BOTH ENDS OF A DIAL FOR OPPOSITE REASONS.** One end left the
   whole population unable to name, the other let every shard name alone — so pinning to
   the old value fixes nothing while reading as a fix.

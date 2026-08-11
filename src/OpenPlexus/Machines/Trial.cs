@@ -645,12 +645,13 @@ public sealed class Trial<TSeen>
     /// <param name="ct">Cancellation.</param>
     /// <remarks>
     /// <para>
-    /// <b>THE WORLD STILL PULLS AND THE ROUNDS STILL COME FROM THIS LOOP, WHICH IS FORK 53
-    /// LEFT OPEN RATHER THAN ANSWERED.</b> <see cref="IWorld{TSeen}.Next"/> is asked for
-    /// the next observation the moment the last one is settled, so a fleet's round is as
-    /// long as its slowest holder and never longer. What a learner whose rounds arrived on
-    /// the world's schedule would do differently is a different harness, and this is the
-    /// one that keeps every recorded number comparable.
+    /// <b>THE WORLD STILL PULLS AND THE ROUNDS STILL COME FROM THIS LOOP, WHICH IS THE
+    /// HARNESS'S SHAPE AND WAS NEVER FORK 53'S.</b> <see cref="IWorld{TSeen}.Next"/> is
+    /// asked for the next observation the moment the last one is settled, so a fleet's round
+    /// is as long as its slowest holder and never longer. What a learner whose rounds
+    /// arrived on the world's schedule would do differently is a different harness, and this
+    /// is the one that keeps every recorded number comparable. A phone's camera pushing at
+    /// two frames a second is that other harness, and the north star will want it.
     /// </para>
     /// <para>
     /// <b>THE POPULATIONS ARE HANDED IN RATHER THAN READ OFF THE COUNCIL, AND C1 IS

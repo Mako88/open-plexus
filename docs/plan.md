@@ -806,6 +806,9 @@ change of architecture entirely.
 - **AND TWENTY BITS PLATEAUS RATHER THAN BEING SLOW.** The same score at a hundred
   and fifty thousand rounds and at four hundred thousand, while sound rules keep
   rising — so it refines and stops improving.
+- **AND THAT ROW IS OWED A RE-TAKE RATHER THAN A CITATION.** Every seed now clears the target
+  at that width inside a fraction of those rounds, so what the old plateau describes is a
+  machine that took far longer to arrive.
 - **THE REPAIR BUDGET'S INTERIOR OPTIMUM WAS THE BALLOT, AND THE BALLOT IS DELETED.** Every
   reading arguing for a large budget was taken under a vote that charged for a population's
   size; on the ungameable columns there is no interior optimum. Fork 66.

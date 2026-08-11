@@ -35,11 +35,14 @@ namespace OpenPlexus.Machines;
 /// a machine that was never given a question cannot answer it.
 /// </para>
 /// <para>
-/// <b>AND THE ROUND A HOLDER DIES INSIDE IS STILL OWED, WHICH IS THE HALF THIS DOES NOT
-/// REACH.</b> A holder that took the question and went before answering is indistinguishable
+/// <b>AND THE ROUND A HOLDER DIES INSIDE IS REACHED BY SLOTS AND BY NOTHING ELSE — fork
+/// 62.</b> A holder that took the question and went before answering is indistinguishable
 /// from a slow one under C2, and nothing but a deadline separates them — <i>a miss decided
-/// by a deadline</i> carries a revival row saying never. Fork 62's slots are that half, and
-/// its condition is completeness rather than elapsed time.
+/// by a deadline</i> carries a revival row saying never. So no observation ends that wait,
+/// and what ends it instead is not needing the machine: a slot holding R identical
+/// populations completes when any ONE of them speaks, which is a condition on the evidence
+/// rather than on the clock. Handed in through <see cref="Asker"/>, and without it every
+/// holder is a slot of one and this paragraph is the old one.
 /// </para>
 /// <para>
 /// <b>NOTHING HERE HOLDS A COMMITMENT, WHICH IS C1 BEING STRUCTURAL.</b> The asker cannot

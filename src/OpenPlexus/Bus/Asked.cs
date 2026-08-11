@@ -73,6 +73,20 @@ public readonly record struct Tabled
     /// <summary>Which holder counted this.</summary>
     public required MachineAddress From { get; init; }
 
+    /// <summary>
+    /// Which slot that holder is in — <b>fork 62, and what the exclusion above is actually
+    /// keyed on.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>BECAUSE A REPLICA'S OWN ROW ARRIVES UNDER SOMEBODY ELSE'S NAME.</b> Two machines
+    /// in one slot hold the identical population, so the row one of them sent IS the other's
+    /// row — and a reader dropping only what it recognises as its own would absorb a perfect
+    /// copy of its own scopes and then certify a redundancy it is the sole evidence for.
+    /// Under R=1 a slot is a holder and this is <see cref="From"/> spelt differently, which
+    /// is why nothing changes where there are no replicas.
+    /// </remarks>
+    public required string Slot { get; init; }
+
     /// <summary>What recurs across its scopes.</summary>
     public required Counts Counted { get; init; }
 }

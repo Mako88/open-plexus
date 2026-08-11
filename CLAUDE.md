@@ -4,6 +4,36 @@ Read `docs/plan.md` first. It is the only doc, it holds nothing finished, and fi
 in the commit that produced them and in the test that asserts them — never here and never
 there.
 
+## How a session runs, which you do not need to be told again
+
+John's standing instruction, written down so a new session starts itself. Orient, read the
+handoff if there is one, then **do all of the following without asking.**
+
+**Arm a five-minute `Monitor` and keep it armed.** Not `/loop`, not `schedule`, not a cron —
+those have misfired here and the Monitor tick has not. It is a heartbeat rather than a
+watcher: each tick is permission to carry on, so `while true; do echo ...; sleep 300; done`
+with `persistent: true` is exactly the shape wanted. Something like:
+
+```bash
+i=0; while true; do i=$((i+1)); echo "tick $i — next step or stop"; sleep 300; done
+```
+
+**Then work, and take forks yourself.** Where two routes are open, take the one likelier to
+pay, and if it does not, revert it and take the other. Do not stop to ask which. An idea John
+interjects mid-session is a fork to record rather than an instruction to chase.
+
+**Stop the monitor — do not let it tick on — when any of these is true:**
+
+- there is no obvious next step, or the next one genuinely needs John;
+- you are truly blocked;
+- context is filling and it is time to write the handoff.
+
+Stopping is a normal ending rather than a failure. Compact `docs/plan.md` on the way out, and
+leave the handoff in the last commit message and in the final reply.
+
+**Everything below this line still applies while the monitor runs** — the guards every
+commit, an arm only living while it is compared, and no dead code left behind.
+
 ## The suite, and why pushing is free
 
 **Push whenever. Do not hold a commit back waiting for CI.** `tests.yml` runs on every push

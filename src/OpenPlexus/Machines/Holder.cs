@@ -35,6 +35,16 @@ public sealed class Holder : IReceiveAsks
     private readonly Alone _round;
     private readonly IBus _bus;
 
+    /// <summary>Which slot this holder is in.</summary>
+    /// <remarks>
+    /// <b>HANDED IN LIKE <see cref="Population.Places"/> AND NEVER ANNOUNCED, which is fork
+    /// 62's one design decision.</b> A holder does not learn its partition from the wire and
+    /// could not — the bus does not know what a population is, let alone that two of them
+    /// are copies. It is told once, by whoever composed the fleet, and the only thing it
+    /// does with it is decide which row of a swept table is its own.
+    /// </remarks>
+    private readonly string _slot;
+
     /// <summary>
     /// One asker at a time reads the population.
     /// </summary>
@@ -50,7 +60,11 @@ public sealed class Holder : IReceiveAsks
     /// <param name="address">Where this holder is asked.</param>
     /// <param name="held">What it holds.</param>
     /// <param name="bus">How its answers get back.</param>
-    public Holder(MachineAddress address, Population held, IBus bus)
+    /// <param name="slot">
+    /// Which slot it is in, or nothing where the fleet is not partitioned — <b>a holder
+    /// alone is a slot of one named after itself.</b>
+    /// </param>
+    public Holder(MachineAddress address, Population held, IBus bus, string? slot = null)
     {
         ArgumentNullException.ThrowIfNull(held);
         ArgumentNullException.ThrowIfNull(bus);
@@ -59,6 +73,7 @@ public sealed class Holder : IReceiveAsks
         _held = held;
         _round = new Alone(held);
         _bus = bus;
+        _slot = slot ?? address.Value;
     }
 
     /// <inheritdoc/>
@@ -154,15 +169,18 @@ public sealed class Holder : IReceiveAsks
 
         Recurrence? heard = null;
 
-        // ITS OWN ROW DROPPED, WHICH IS WHY EVERY TABLE GOES TO EVERYONE. `Abstract` adds
-        // what it is told to what it counts here, so a merge including this machine would
-        // weigh its own scopes twice -- see `Tabled`.
+        // ITS OWN SLOT'S ROW DROPPED, WHICH IS WHY EVERY TABLE GOES TO EVERYONE. `Abstract`
+        // adds what it is told to what it counts here, so a merge including this machine
+        // would weigh its own scopes twice -- see `Tabled`. And it is the SLOT rather than
+        // the address because a replica's own row arrives under its twin's name: two
+        // machines fed one stream mint the same children and hold the same table, so
+        // dropping only what this machine signed would absorb an exact copy of it.
         if (ask.Sweeping && ask.Counted.Length > 0)
         {
             heard = new Recurrence();
 
             foreach (var tabled in ask.Counted
-                .Where(one => one.From != Address)
+                .Where(one => one.Slot != _slot)
                 .OrderBy(one => one.From.Value, StringComparer.Ordinal))
                 heard.Absorb(Recurrence.From(tabled.Counted));
         }

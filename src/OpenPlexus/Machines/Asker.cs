@@ -35,48 +35,119 @@ public sealed class Gathering : IDisposable
 {
     private readonly Dictionary<MachineAddress, Answer> _heard = [];
 
-    /// <summary>Who was asked and has neither answered nor been written off.</summary>
+    /// <summary>Which slot each holder that was asked belongs to.</summary>
+    private readonly Dictionary<MachineAddress, string> _slotOf = [];
+
+    /// <summary>
+    /// Per slot, who was asked and has neither answered nor been written off.
+    /// </summary>
     /// <remarks>
+    /// <para>
     /// <b>THE ROSTER RATHER THAN THE COUNT, WHICH IS THE WHOLE OF WHAT FORK 53 NEEDED
     /// HERE.</b> A count can only be compared with another count, so a gathering holding one
     /// could tell that somebody was missing and never which somebody — and a write-off has
     /// to name a machine or it is a decrement, which is a deadline with the clock hidden.
+    /// </para>
+    /// <para>
+    /// <b>AND GROUPED BY SLOT, WHICH IS FORK 62 AND IS THE OTHER HALF OF THE SAME
+    /// SENTENCE.</b> A write-off ends the wait for a holder the question never reached; a
+    /// slot ends the wait for a holder that TOOK the question and went, because somebody
+    /// else holding the identical population can answer in its place. Neither is a clock,
+    /// and the second is the only thing that reaches the round a machine dies inside.
+    /// </para>
     /// </remarks>
-    private readonly HashSet<MachineAddress> _owed;
+    private readonly Dictionary<string, HashSet<MachineAddress>> _owed = [];
+
+    /// <summary>Slots that have had an answer folded in.</summary>
+    private readonly HashSet<string> _spoken = [];
+
+    /// <summary>Slots nothing more is owed from, however that came about.</summary>
+    private readonly HashSet<string> _closed = [];
 
     private readonly Lock _gate = new();
     private readonly Action _closing;
 
+    private int _left;
     private int _unreached;
-    private bool _closed;
+    private int _echoed;
+    private bool _shut;
 
     /// <param name="asked">Who was asked.</param>
     /// <param name="closing">What to do when the asker stops caring.</param>
+    /// <param name="slots">
+    /// Which slot a holder is in, or nothing where the fleet is not partitioned.
+    /// </param>
     /// <remarks>
+    /// <para>
     /// <b>IT DOES NOT CARRY WHICH ASK IT IS, BECAUSE NOTHING OUTSIDE THE ASKER NEEDS TO
     /// KNOW.</b> The correlation is the <see cref="Asker"/>'s bookkeeping and holding it
     /// here as well would be a second copy of one fact — and this repo's dead-code budget
     /// is the check that asks whether a public member has a caller at all.
+    /// </para>
+    /// <para>
+    /// <b>A HOLDER ALONE IS A SLOT OF ONE NAMED AFTER ITSELF, so no partition is not a
+    /// special case.</b> With nothing handed in, every holder is its own slot and every
+    /// condition below reduces to counting holders — which is what makes R=1 bit-identical
+    /// to the machine before fork 62 rather than merely close to it.
+    /// </para>
     /// </remarks>
-    internal Gathering(IReadOnlyCollection<MachineAddress> asked, Action closing)
+    internal Gathering(
+        IReadOnlyCollection<MachineAddress> asked,
+        Action closing,
+        Func<MachineAddress, string>? slots = null)
     {
         Asked = asked.Count;
-        _owed = [.. asked];
         _closing = closing;
+
+        foreach (var who in asked)
+        {
+            var slot = slots?.Invoke(who) ?? who.Value;
+
+            _slotOf[who] = slot;
+
+            if (!_owed.TryGetValue(slot, out var here)) _owed[slot] = here = [];
+
+            here.Add(who);
+        }
+
+        _left = _owed.Count;
 
         // ASKING NOBODY IS ALREADY WHOLE, which is not a special case so much as the
         // degenerate one: a fleet of nought holders has been heard from in full, and
         // waiting on that would be waiting for an answer that cannot exist.
-        if (_owed.Count == 0) _everyone.TrySetResult();
+        if (_left == 0) _everyone.TrySetResult();
     }
 
     /// <summary>How many holders were asked.</summary>
     public int Asked { get; }
 
-    /// <summary>How many distinct holders have answered.</summary>
+    /// <summary>How many distinct holders have answered and been counted.</summary>
+    /// <remarks>
+    /// <b>ONE A SLOT, WHICH IS WHY THIS IS NOT SIMPLY HOW MANY MESSAGES CAME BACK.</b>
+    /// Replicas in a slot hold the identical population, so adding two of them up would
+    /// weigh one shard's scopes double — which is the fault this class's own header warns
+    /// about, arriving from the deployment rather than from a duplicate message. The second
+    /// voice is <see cref="Echoed"/>.
+    /// </remarks>
     public int Heard
     {
         get { lock (_gate) return _heard.Count; }
+    }
+
+    /// <summary>
+    /// How many holders answered a slot that had already spoken — <b>the check that says
+    /// the replicas are there rather than merely configured.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>A CHECK CAN BE WIRED AND UNABLE TO FIRE, WHICH IS WHY THE DROPPED ANSWERS ARE
+    /// COUNTED RATHER THAN DROPPED SILENTLY.</b> A fleet declared with two machines a slot
+    /// where one of them never answers is a fleet of one wearing redundancy's name, and it
+    /// survives every death test by being lucky about which machine died. This reads nought
+    /// in exactly that case and never in the healthy one.
+    /// </remarks>
+    public int Echoed
+    {
+        get { lock (_gate) return _echoed; }
     }
 
     /// <summary>How many answering holders had anything to advocate.</summary>
@@ -113,7 +184,17 @@ public sealed class Gathering : IDisposable
     /// twelve that heard eight reading like a fleet of eight — which is the C3 instrument
     /// and the reason the denominator is carried at all.
     /// </remarks>
-    public bool Whole => Heard == Asked;
+    /// <remarks>
+    /// <b>AND AN ECHO COUNTS TOWARDS IT, BECAUSE A REPLICA THAT SPOKE WAS HEARD FROM.</b>
+    /// What this asks is whether every machine put to answered, which is a question about the
+    /// fleet's health; what <see cref="Heard"/> asks is how much distinct evidence arrived,
+    /// which is a question about the vote. Under R=1 they are the same number and this is the
+    /// only place the difference shows.
+    /// </remarks>
+    public bool Whole
+    {
+        get { lock (_gate) return _heard.Count + _echoed == Asked; }
+    }
 
     /// <summary>
     /// Completes when every holder still owed an answer has given one, and never on a timer.
@@ -134,10 +215,11 @@ public sealed class Gathering : IDisposable
     /// the future, never a count.
     /// </para>
     /// <para>
-    /// <b>IT IS STILL NOT A PROMISE THAT IT COMPLETES.</b> A holder that took the question
-    /// and died before answering is owed for the rest of the run, because late and absent
-    /// are one thing under C2 — see <see cref="IBus.Unreached"/> for why that half is fork
-    /// 62's and not this one's.
+    /// <b>IT IS STILL NOT A PROMISE THAT IT COMPLETES, AND WHAT IT WAITS ON IS A SLOT.</b> A
+    /// holder that took the question and died is owed forever because late and absent are
+    /// one thing under C2 — so what finishes that round is another machine holding the same
+    /// population answering in its place. A slot every one of whose replicas is silent still
+    /// stops the round, correctly, and that is the promise this cannot make.
     /// </para>
     /// </remarks>
     public Task Everyone => _everyone.Task;
@@ -149,12 +231,33 @@ public sealed class Gathering : IDisposable
     /// <param name="answer">What arrived.</param>
     internal void Fold(Answer answer)
     {
-        bool whole;
+        var whole = false;
 
         lock (_gate)
         {
+            if (_slotOf.TryGetValue(answer.From, out var slot))
+            {
+                // A SLOT SPEAKS ONCE, AND THE SECOND VOICE IS DROPPED RATHER THAN ADDED.
+                // Replicas in a slot are fed one stream and mint the same children
+                // independently, so their answers are the same answer -- and `Merged`,
+                // `Added` and `Tables` all ADD what they are given. Two of them is one
+                // shard's evidence counted twice, which is the failure this class's header
+                // describes for a duplicate message and is the same failure by deployment.
+                if (!_spoken.Add(slot))
+                {
+                    // A DIFFERENT MACHINE IS A REPLICA; THE SAME ONE TWICE IS A DUPLICATE
+                    // MESSAGE, and only the first says anything about the fleet's shape.
+                    if (!_heard.ContainsKey(answer.From)) _echoed++;
+
+                    return;
+                }
+
+                _owed[slot].Remove(answer.From);
+
+                if (_closed.Add(slot)) whole = --_left == 0;
+            }
+
             _heard[answer.From] = answer;
-            whole = _owed.Remove(answer.From) && _owed.Count == 0;
         }
 
         if (whole) _everyone.TrySetResult();
@@ -179,14 +282,20 @@ public sealed class Gathering : IDisposable
     /// </remarks>
     internal void WriteOff(MachineAddress who)
     {
-        bool whole;
+        var whole = false;
 
         lock (_gate)
         {
-            if (!_owed.Remove(who)) return;
+            if (!_slotOf.TryGetValue(who, out var slot)) return;
+            if (!_owed[slot].Remove(who)) return;
 
             _unreached++;
-            whole = _owed.Count == 0;
+
+            // AND A SLOT IS ONLY LOST WHEN EVERY REPLICA IN IT IS, which is fork 62's whole
+            // arithmetic: with R=1 this fires on the first write-off and is exactly what
+            // fork 53 shipped, and with R=2 a fleet writes off one machine and waits on the
+            // one that can still answer for the same population.
+            if (_owed[slot].Count == 0 && _closed.Add(slot)) whole = --_left == 0;
         }
 
         if (whole) _everyone.TrySetResult();
@@ -262,7 +371,22 @@ public sealed class Gathering : IDisposable
                 .. _heard.Values
                     .Where(one => one.Counted is not null)
                     .OrderBy(one => one.From.Value, StringComparer.Ordinal)
-                    .Select(one => new Tabled { From = one.From, Counted = one.Counted! }),
+                    .Select(one => new Tabled
+                    {
+                        From = one.From,
+
+                        // THE SLOT TRAVELS AND THE PARTITION DOES NOT, which is the one
+                        // thing that had to cross for a replicated sweep to be right. A
+                        // holder drops the row belonging to its OWN slot, and under
+                        // replication that row carries somebody else's name — so filtering
+                        // by who sent it would have every replica absorb a copy of its own
+                        // scopes and certify a redundancy it is the sole evidence for.
+                        Slot = _slotOf.TryGetValue(one.From, out var slot)
+                            ? slot
+                            : one.From.Value,
+
+                        Counted = one.Counted!,
+                    }),
             ];
     }
 
@@ -290,9 +414,9 @@ public sealed class Gathering : IDisposable
     /// <summary>The asker stops caring, and a late answer to this ask is dropped.</summary>
     public void Dispose()
     {
-        if (_closed) return;
+        if (_shut) return;
 
-        _closed = true;
+        _shut = true;
         _closing();
     }
 }
@@ -317,17 +441,38 @@ public sealed class Gathering : IDisposable
 public sealed class Asker : IReceiveAnswers
 {
     private readonly IBus _bus;
+    private readonly Func<MachineAddress, string>? _slots;
     private readonly Dictionary<BroadcastId, Gathering> _open = [];
     private readonly Lock _gate = new();
 
     /// <param name="address">Where its answers come back to.</param>
     /// <param name="bus">How its asks go out.</param>
-    public Asker(MachineAddress address, IBus bus)
+    /// <param name="slots">
+    /// Which slot a holder is in — <b>fork 62, and it is HANDED IN rather than announced.</b>
+    /// </param>
+    /// <remarks>
+    /// <para>
+    /// <b>THE PARTITION IS THE EXPERIMENTER'S DEPLOYMENT FACT AND NOT SOMETHING ON THE
+    /// WIRE.</b> Putting it in <c>Posted.Roster</c> is the obvious build and it would teach
+    /// the transport what a holder HOLDS — <see cref="IBus"/> does not know what a cluster
+    /// is, and it has no business knowing that two machines hold the same population either.
+    /// This arrives the way <see cref="Population.Places"/> does: from whoever composed the
+    /// fleet, once, in the process that composed it.
+    /// </para>
+    /// <para>
+    /// <b>AND NOTHING IS A SPECIAL CASE, BECAUSE A HOLDER ALONE IS A SLOT OF ONE.</b> Left
+    /// null, every gathering below partitions into one slot per holder and behaves exactly
+    /// as it did before this existed.
+    /// </para>
+    /// </remarks>
+    public Asker(
+        MachineAddress address, IBus bus, Func<MachineAddress, string>? slots = null)
     {
         ArgumentNullException.ThrowIfNull(bus);
 
         Address = address;
         _bus = bus;
+        _slots = slots;
 
         // SUBSCRIBED AND NEVER UNSUBSCRIBED, WHICH IS `InputMachine`'S SHAPE FOR THE SAME
         // EVENT AND FOR THE SAME REASON. An asker outlives every gathering it opens and dies
@@ -407,10 +552,10 @@ public sealed class Asker : IReceiveAnswers
 
         await _bus.AskAsync(ask, ct, asked =>
         {
-            gathering = new Gathering(asked, () =>
-            {
-                lock (_gate) _open.Remove(ask.Broadcast);
-            });
+            gathering = new Gathering(
+                asked,
+                () => { lock (_gate) _open.Remove(ask.Broadcast); },
+                _slots);
 
             lock (_gate) _open[ask.Broadcast] = gathering;
         }).ConfigureAwait(false);

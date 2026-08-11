@@ -59,9 +59,12 @@ FORBIDS things, and several of them are already measured.
 - **THE SIGNAL IS A REFUSED CONNECTION AND NEVER A DEATH NOTICE**, so an impolite departure
   and a dropped message arrive by the same road. A machine never handed a question cannot
   answer it, which is exact rather than a guess.
-- **SO WHAT IS LEFT IS THE ROUND A PHONE DIES INSIDE**, where late and absent are one thing
-  and only a deadline separates them. Slots are that half and their condition is
-  completeness.
+- **AND THE ROUND A PHONE DIES INSIDE IS PORTED TOO, WHICH WAS THE LAST HARD BLOCKER.** A slot
+  of two identical holders finishes on either one, so a machine that took the question and
+  went silent costs a fleet nothing at all.
+- **AND THE REPLICAS STAY IDENTICAL HAVING SENT EACH OTHER NOTHING**, asserted on their
+  commitments rather than their counts. Redundancy costs coordination nothing here, which is
+  what makes twenty phones affordable.
 - **AND ONE INPUT MACHINE FEEDING TWENTY HOLDERS IS THE IDENTICAL CASE, NOT THE SHARED ONE.**
   Every holder is told the same moment and the same settlement, so naming converges — the
   divergence measured was between machines seeing DIFFERENT streams.
@@ -259,8 +262,11 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **Ten — the vote rule, which now GATES the rest rather than sitting beside it.** Deciding
   it was a score question and is not: replication, wire deduplication and fork 29 all need
   the scale-free one and nothing else does.
-- **Eleven — slots, because they make a death free and answer the loop's open half.** One
-  machine per slot answering is a completeness condition rather than a deadline.
+- **Eleven — slots, BUILT, and one machine per slot answering is a completeness condition
+  rather than a deadline.** `SlotTests` holds the control that stops without them.
+- **AND WHAT A SLOT COSTS THE SWEEP IS ONE FIELD, WHICH IS NOT WHERE IT WAS EXPECTED.** A
+  replica's own table arrives under its twin's name, so the row a holder drops is its
+  SLOT's rather than its own.
 - **Twelve — placement by the minimum code**, which is cheap, priced, and the only thing
   that stops two parents reaching one child twice. It costs balance past a dozen machines.
 - **Thirteen — rung two, whose payoff is written down BEFORE it is built.** About a third of
@@ -1340,7 +1346,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **53** | The commitment fleet losing one message waits forever. PORTED AND MEASURED: an ask watched failing to leave is written off exactly, so a fleet of four loses one and learns on. Open on the round a holder dies INSIDE |
 | **60** | Genesis is placed and repair is not, so a fleet repairs once per HOLDER a round where one machine repairs once. How hard it searches is a deployment choice. Place repair, divide the budget, or exploit it? Open |
 | **61** | John's: place a commitment by the MINIMUM code of its sorted scope, so identical children land together and a lineage stays together. PRICED: level at three holders, three times the average at twelve, capped by a world's distinct roots |
-| **62** | John's: partition into slots and give each R machines holding identical populations. A death costs nothing while a slot survives, and it alone reaches a death mid-round. A slot is HANDED IN like `Places` rather than announced |
+| **62** | John's: partition into slots, each holding R identical populations. BUILT AND MEASURED: a fleet learns on while a machine it still asks never answers, and the same fleet at R=1 stops for good. Replicas send each other nothing and stay identical. Open on what R buys against what it costs |
 | **63** | John's: genesis mints ONE scope over the whole scene and repeated scenes narrow it by overlap, the rest fading out. Specific-to-general, the DUAL of repair — an intersection needs two examples where the gate needs twenty misses. Open |
 | **65** | The vote decides what repair may run on, so under skew blame lands on the majority lineages alone. `Repairing.EveryRound` breaks that and pays, at four to six times the repair. Open on what it costs at width |
 | **66** | Is `Budget` a search limit or a re-derivation limit? ANSWERED: a re-derivation limit. Its level looked interior and stable across width, and that peak was the ballot -- on the ungameable columns there is none. Closed |

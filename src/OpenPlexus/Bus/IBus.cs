@@ -255,10 +255,13 @@ public interface IBus
     /// lets the denominator come down.
     /// </para>
     /// <para>
-    /// <b>AND THE HOLE LEFT IS THE DEPARTURE THAT HAPPENS AFTER THE ASK ARRIVES.</b> A
-    /// holder that took the question and died before answering is owed forever, correctly,
-    /// because late and absent are one thing under C2 and nothing but a deadline separates
-    /// them. Fork 62 is that half, and its condition is completeness rather than a clock.
+    /// <b>AND THE HOLE LEFT IS THE DEPARTURE THAT HAPPENS AFTER THE ASK ARRIVES, WHICH IS
+    /// FORK 62 AND IS NOT ON THIS BUS AT ALL.</b> A holder that took the question and died
+    /// is owed forever, correctly — late and absent are one thing under C2 and nothing but a
+    /// deadline separates them. What closes it is a partition into slots of R identical
+    /// holders, handed to <c>Machines.Asker</c> by whoever composed the fleet. Announcing it
+    /// here would teach the transport what a holder HOLDS, which is the separation this
+    /// interface exists to keep.
     /// </para>
     /// </remarks>
     event Action<BroadcastId, MachineAddress>? Unreached;

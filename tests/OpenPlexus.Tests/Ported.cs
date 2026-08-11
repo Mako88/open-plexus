@@ -32,6 +32,7 @@ namespace OpenPlexus.Tests;
 public sealed class Ported : IAsyncDisposable
 {
     private readonly List<IDisposable> _handles = [];
+    private readonly List<IDisposable> _subscriptions = [];
     private readonly List<Posted> _machines = [];
     private Posted _asking = null!;
 
@@ -95,7 +96,13 @@ public sealed class Ported : IAsyncDisposable
 
     /// <summary>Brings up an asker and one holder per population, and waits for the roster.</summary>
     /// <param name="holding">What each holder holds, already built.</param>
-    public static async Task<Ported> OpenAsync(IReadOnlyList<Population> holding)
+    /// <param name="slotOf">
+    /// Which slot the holder at an index is in, or nothing where the fleet is not
+    /// partitioned — <b>fork 62, handed in from here because this is what composes the
+    /// fleet.</b>
+    /// </param>
+    public static async Task<Ported> OpenAsync(
+        IReadOnlyList<Population> holding, Func<int, string>? slotOf = null)
     {
         ArgumentNullException.ThrowIfNull(holding);
 
@@ -104,16 +111,33 @@ public sealed class Ported : IAsyncDisposable
         var hosts = Enumerable.Range(0, holding.Count + 1).Select(_ => Wired.Free()).ToList();
         var peers = hosts.Select(one => new Peer(one)).ToList();
 
+        // THE MAP IS BUILT BEFORE THE ASKER BECAUSE THE ASKER IS HANDED IT, and the
+        // addresses are known before anything opens a port — which is the whole reason a
+        // partition can be a deployment fact rather than something announced.
+        var slots = new Dictionary<MachineAddress, string>();
+
+        for (var at = 0; at < holding.Count; at++)
+            if (slotOf is not null) slots[new MachineAddress($"holder-{at}")] = slotOf(at);
+
         fleet._asking = new Posted(hosts[0], peers);
-        fleet.Asker = new Asker(new MachineAddress("asker"), fleet._asking);
+
+        fleet.Asker = new Asker(
+            new MachineAddress("asker"),
+            fleet._asking,
+            slotOf is null ? null : one => slots[one]);
+
         fleet._handles.Add(fleet._asking.Subscribe(fleet.Asker));
 
         for (var at = 0; at < holding.Count; at++)
         {
             var bus = new Posted(hosts[at + 1], peers);
-            var holder = new Holder(new MachineAddress($"holder-{at}"), holding[at], bus);
+            var address = new MachineAddress($"holder-{at}");
+            var holder = new Holder(address, holding[at], bus, slotOf?.Invoke(at));
 
-            fleet._handles.Add(bus.Subscribe(holder));
+            var handle = bus.Subscribe(holder);
+
+            fleet._handles.Add(handle);
+            fleet._subscriptions.Add(handle);
             fleet._machines.Add(bus);
             fleet.Held.Add(holding[at]);
             fleet.Holders.Add(holder);
@@ -206,6 +230,79 @@ public sealed class Ported : IAsyncDisposable
         }
 
         return OpenAsync(holding);
+    }
+
+    /// <summary>
+    /// Brings up a fleet holding nothing, partitioned into slots with R machines a slot —
+    /// <b>fork 62.</b>
+    /// </summary>
+    /// <param name="slots">How many partitions of the population.</param>
+    /// <param name="replicas">How many machines hold each one.</param>
+    /// <param name="dials">The brain's numbers.</param>
+    /// <param name="seed">The control arm's generator, the same on every machine.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>THE REPLICAS COST NOTHING TO KEEP IN SYNC AND THAT IS WHY THIS IS ONLY A
+    /// PLACEMENT.</b> Every machine is told the same moment and the same settlement, and
+    /// <see cref="Population.Places"/> is a fact about a commitment rather than about who
+    /// asked — so two machines given one <c>slot</c> mint the same children from the same
+    /// stream and stay identical with no message between them. There is nothing here that
+    /// copies anything.
+    /// </para>
+    /// <para>
+    /// <b>AND <c>replicas: 1</c> IS THE FLEET THIS FILE ALREADY BUILT</b>, one slot a holder
+    /// and the slot named after nothing else — so a difference between the two arrangements
+    /// is the replication and never the composition.
+    /// </para>
+    /// </remarks>
+    public static Task<Ported> OpenAsync(
+        int slots, int replicas, CommittingSettings dials, int seed)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(slots);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(replicas);
+
+        var holding = new List<Population>(slots * replicas);
+
+        for (var slot = 0; slot < slots; slot++)
+            for (var copy = 0; copy < replicas; copy++)
+            {
+                var mine = (ulong)slot;
+
+                holding.Add(new Population(dials, seed)
+                {
+                    Places = one => one.Identity.Value % (ulong)slots == mine,
+                });
+            }
+
+        return OpenAsync(holding, at => $"slot-{at / replicas}");
+    }
+
+    /// <summary>
+    /// One holder stops answering while its machine stays up — <b>the death C3 leaves
+    /// nothing to observe, and fork 62's whole subject.</b>
+    /// </summary>
+    /// <param name="which">Which holder goes quiet.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>THE OTHER KIND OF DEATH, AND IT IS THE ONE NO WRITE-OFF CAN REACH.</b>
+    /// <see cref="KillAsync"/> closes the door, so a post is refused and the sender WATCHES
+    /// the question fail to leave — which is fork 53 and is exact. This drops the
+    /// subscription and leaves the listener up: the ask is accepted, acknowledged, routed
+    /// nowhere, and no answer ever comes. From the asker that is indistinguishable from a
+    /// machine that took the question and died holding it, which is precisely the case only
+    /// a deadline could separate and only a slot can survive.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS DETERMINISTIC, WHICH IS WHY IT IS THIS AND NOT A RACED KILL.</b> Killing
+    /// a machine mid-round means winning a race against a socket to make the test say
+    /// anything at all — so the round it lands in would vary run to run and a green suite
+    /// would be evidence about scheduling. A holder that never answers is that same
+    /// condition with the timing taken out and made permanent.
+    /// </para>
+    /// </remarks>
+    public void Mute(int which)
+    {
+        _subscriptions[which].Dispose();
     }
 
     /// <summary>

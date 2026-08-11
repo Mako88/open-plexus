@@ -606,6 +606,9 @@ condition is a superstition.
 - **A BUILD DURING A TEST RUN CAN ABORT IT WITH EVERY TEST PASSING.** The suite reported no
   failures and died on a crashed host, with a build replacing the assemblies under it. The
   mirror of the `--no-build` staleness rule.
+- **AND PUSHING FASTER THAN THE SUITE RUNS MEANS NOTHING IS EVER TESTED.** The concurrency
+  group cancels whatever is waiting, so a session committing every few minutes cancels its own
+  queue all day. Only a `[checkpoint]` escapes.
 
 Named so nobody reintroduces them. These are about MEASUREMENT, so they survive the
 change of architecture entirely.

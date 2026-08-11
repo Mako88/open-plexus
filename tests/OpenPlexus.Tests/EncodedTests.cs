@@ -40,6 +40,40 @@ public sealed class EncodedTests(ITestOutputHelper output)
     private static IEnumerable<Encoder> Both =>
         [Encoder.MobileNet(Encoders), Encoder.Clip(Encoders)];
 
+    /// <summary>The front end each arm here composes an encoder with.</summary>
+    private static Encoded Sensing(Encoder through, int width) =>
+        new(through, one => new Winnowing(CifarRun.Pixel, one), width);
+
+    /// <summary>
+    /// Readings paired with the outcomes that followed them.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE READINGS AND THE OUTCOMES TRAVEL TOGETHER AND THE ORDER IS THE JOIN</b>, so a
+    /// front end that returned its answers in a different order than it was asked would
+    /// mislabel every one of them rather than fail.
+    /// </remarks>
+    private static List<(IReadOnlyList<double> Reading, int Outcome)> Beside(
+        IReadOnlyList<Turn<IReadOnlyList<double>>> turns,
+        IReadOnlyList<IReadOnlyList<double>> readings) =>
+        [.. turns.Select((one, at) => (readings[at], one.Outcome!.Value))];
+
+    /// <summary>Just the readings, in the order they were drawn.</summary>
+    private static IReadOnlyList<IReadOnlyList<double>> Seen(
+        IReadOnlyList<Turn<IReadOnlyList<double>>> turns) => [.. turns.Select(one => one.Seen)];
+
+    /// <summary>What a probe scores on one front end's output.</summary>
+    /// <param name="world">The world, already drawn from.</param>
+    /// <param name="drawn">What it drew.</param>
+    /// <param name="readings">The same turns, through whatever front end is being asked about.</param>
+    private static double Probed(
+        Cifar world,
+        IReadOnlyList<Turn<IReadOnlyList<double>>> drawn,
+        Func<IReadOnlyList<Turn<IReadOnlyList<double>>>, IReadOnlyList<IReadOnlyList<double>>> readings) =>
+        Probe.Fit(
+            Beside(drawn, readings(drawn)),
+            Beside(world.Withheld, readings(world.Withheld)),
+            Cifar.Classes).Accuracy;
+
     [Fact]
     public void Each_encoder_emits_an_embedding_of_the_width_its_graph_declares()
     {
@@ -165,41 +199,22 @@ public sealed class EncodedTests(ITestOutputHelper output)
 
         var drawn = Enumerable.Range(0, 1500).Select(_ => world.Next()).ToList();
 
-        // THE READINGS AND THE OUTCOMES TRAVEL TOGETHER AND THE ORDER IS THE JOIN, so a
-        // front end that returns its answers in a different order than it was asked
-        // would mislabel every one of them rather than fail.
-        static List<(IReadOnlyList<double> Reading, int Outcome)> Beside(
-            IReadOnlyList<Turn<IReadOnlyList<double>>> turns,
-            IReadOnlyList<IReadOnlyList<double>> readings) =>
-            [.. turns.Select((one, at) => (readings[at], one.Outcome!.Value))];
+        var raw = Probed(world, drawn, Seen);
 
-        static IReadOnlyList<IReadOnlyList<double>> Seen(
-            IReadOnlyList<Turn<IReadOnlyList<double>>> turns) => [.. turns.Select(one => one.Seen)];
-
-        var raw = Probe.Fit(
-            Beside(drawn, Seen(drawn)),
-            Beside(world.Withheld, Seen(world.Withheld)),
-            Cifar.Classes);
-
-        output.WriteLine($"raw 32x32 colour ({world.Width,4}) : {raw.Accuracy:F3}");
+        output.WriteLine($"raw 32x32 colour ({world.Width,4}) : {raw:F3}");
 
         var scores = new List<double>();
 
         foreach (var encoder in Both)
         {
-            using var sense = new Encoded(
-                encoder, width => new Winnowing(CifarRun.Pixel, width), world.Width);
+            using var sense = Sensing(encoder, world.Width);
 
-            var got = Probe.Fit(
-                Beside(drawn, [.. sense.OfAll(Seen(drawn))]),
-                Beside(world.Withheld, [.. sense.OfAll(Seen(world.Withheld))]),
-                Cifar.Classes);
+            var got = Probed(world, drawn, turns => [.. sense.OfAll(Seen(turns))]);
 
             output.WriteLine(
-                $"{Path.GetFileName(Path.GetDirectoryName(encoder.Model)),-22} "
-                + $"({sense.Embedding,4}) : {got.Accuracy:F3}");
+                $"{Named(encoder),-22} ({sense.Embedding,4}) : {got:F3}");
 
-            scores.Add(got.Accuracy);
+            scores.Add(got);
         }
 
         output.WriteLine($"chance                        : {Cifar.Chance:F3}");
@@ -209,8 +224,85 @@ public sealed class EncodedTests(ITestOutputHelper output)
         // features are worthless -- and that failure would otherwise show up as a
         // disappointing score on the arm and be believed.
         Assert.All(scores, one => Assert.True(
-            one > raw.Accuracy + 0.10,
-            $"a frozen encoder scored {one:F3} against {raw.Accuracy:F3} on raw pixels; "
+            one > raw + 0.10,
+            $"a frozen encoder scored {one:F3} against {raw:F3} on raw pixels; "
             + "the preprocessing is the first thing to suspect"));
     }
+
+    /// <summary>
+    /// <b>THE POPULATION AND THE PROBE ON THE IDENTICAL VECTORS — fork 43, whose number has
+    /// only ever been a commit message.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE MOST LOAD-BEARING READING IN THIS PROJECT WAS A CLAIM RATHER THAN A
+    /// RECORD.</b> <i>Given symbols worth having, the commitment machinery is competitive</i>
+    /// is what separates <i>a fixed projection cannot manufacture the symbols</i> from
+    /// <i>a conjunctive rule learner cannot do perception</i> — and no test has ever run a
+    /// population on encoder vectors at all. <c>CifarRun</c> has taken an encoder since the
+    /// day the arm was built and nothing passed it one.
+    /// </para>
+    /// <para>
+    /// <b>THE ARMS SHARE A WORLD, A SEED AND A FRONT END, so the only difference is what
+    /// reads the codes.</b> Both are scored on the same withheld images, which the world
+    /// never draws — and the probe is fit on the distinct pictures the run was drawing from
+    /// rather than on its draws, so it is if anything the easier side of the comparison.
+    /// </para>
+    /// <para>
+    /// <b>AND THE BAR IS A SHARE OF THE PROBE RATHER THAN A SCORE</b>, because a score here
+    /// is a fact about how few images this is affordable over. What fork 43 claims is a
+    /// RATIO, and a ratio is what can go red when a change to the learner breaks it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_population_reaches_most_of_a_probe_on_the_same_embeddings()
+    {
+        const int Images = 1500;
+        const int Held = 500;
+        const long Rounds = 6000;
+
+        var settings = World(images: Images, withheld: Held);
+
+        foreach (var encoder in Both)
+        {
+            using var run = new CifarRun(
+                settings, new Brain(new CommittingSettings(), seed: 1), Fronting.Winnowed,
+                seed: 1, encoder);
+
+            var tally = run.Run(Rounds);
+
+            Assert.NotNull(tally.Unseen);
+
+            // THE SAME WORLD AGAIN RATHER THAN THE RUN'S, because the run's has been drawn
+            // from and a probe needs the draws in order. Same settings and same seed is the
+            // same world, which is fork 12 being relied on rather than restated.
+            var world = new Cifar(settings, seed: 1);
+            var drawn = Enumerable.Range(0, Images).Select(_ => world.Next()).ToList();
+
+            using var sense = Sensing(encoder, world.Width);
+
+            var probe = Probed(world, drawn, turns => [.. sense.OfAll(Seen(turns))]);
+
+            var share = tally.Unseen!.Accuracy / probe;
+
+            output.WriteLine(
+                $"{Named(encoder),-22} ({run.Reading,4}) : population "
+                + $"{tally.Unseen.Accuracy:F3} of probe {probe:F3} = {share:F2} | "
+                + $"{tally.Resident} resident, {tally.Unseen.Deciders} deciding, "
+                + $"silence {tally.Unseen.Silence:F3} | chance {Cifar.Chance:F3}");
+
+            Assert.True(tally.Unseen.Accuracy > Cifar.Chance,
+                $"the population scored {tally.Unseen.Accuracy:F3} against chance "
+                + $"{Cifar.Chance:F3}, so it learnt nothing from these vectors at all");
+
+            Assert.True(share > 0.60,
+                $"the population reached {share:F2} of the probe on the identical vectors, "
+                + "so fork 43's claim that the learner is competitive given good symbols "
+                + "does not hold on this arm");
+        }
+    }
+
+    /// <summary>Which encoder a run was through, for a line of output.</summary>
+    private static string Named(Encoder through) =>
+        Path.GetFileName(Path.GetDirectoryName(through.Model))!;
 }

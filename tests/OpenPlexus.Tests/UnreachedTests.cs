@@ -320,6 +320,21 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     /// claim is that the second ask is not paying what the first one did, which is a
     /// comparison rather than a clock.
     /// </para>
+    /// <para>
+    /// <b>AND THAT COMPARISON IS THE PLATFORM'S RATHER THAN THE MECHANISM'S, WHICH IT TOOK A
+    /// RED SHARD TO FIND OUT.</b> Four seconds is what a Windows loopback connect spends
+    /// giving up; a Linux runner answers a closed port with a reset immediately, so the FIRST
+    /// ask costs a millisecond and there is nothing left for the second to be half of. The
+    /// check then fails on a machine where the fault it guards against cannot happen — which
+    /// is the mirror of a check that cannot fire, and worse, because it reads as a defect.
+    /// </para>
+    /// <para>
+    /// <b>SO THE COUNTS ARE THE ASSERTION AND THE CLOCK IS A REPORT WHEREVER THERE IS A CLOCK
+    /// TO READ.</b> <see cref="Gathering.Asked"/> coming down and
+    /// <see cref="Gathering.Unreached"/> reading nought already say the dead holder was not
+    /// asked again, exactly, on every platform — <i>anything asserting a COST must assert a
+    /// count</i>, and the count was here all along.
+    /// </para>
     /// </remarks>
     [Fact]
     public async Task A_holder_that_could_not_be_reached_is_not_asked_again()
@@ -361,13 +376,25 @@ public sealed class UnreachedTests(ITestOutputHelper output)
 
         var after = clock.Elapsed.TotalMilliseconds;
 
-        Assert.True(after < learning / 2,
-            $"the second ask cost {after:F0} ms against the first's {learning:F0}, so the "
-            + "dead holder is still being waited on");
+        // AND THE CLOCK IS ONLY ASKED WHERE THE FIRST ASK PAID SOMETHING. A platform whose
+        // refused connect is instant leaves nothing for the second ask to be half of, and
+        // demanding it there fails the build over a cost that does not exist. Which case
+        // this run was is printed rather than swallowed, because a comparison that quietly
+        // did not happen is a check that cannot fire.
+        const double Payable = 100.0;
+
+        if (learning > Payable)
+            Assert.True(after < learning / 2,
+                $"the second ask cost {after:F0} ms against the first's {learning:F0}, so "
+                + "the dead holder is still being waited on");
 
         output.WriteLine(
             $"first ask {learning:F0} ms, asking {Holders} | second ask {after:F0} ms, "
-            + $"asking {second.Asked}");
+            + $"asking {second.Asked} | "
+            + (learning > Payable
+                ? "the refused connect cost enough to compare"
+                : $"the refused connect cost under {Payable:F0} ms here, so the counts "
+                + "carry this and the clock does not"));
     }
 
     /// <summary>Runs a fleet, and fails rather than hanging if it stops.</summary>

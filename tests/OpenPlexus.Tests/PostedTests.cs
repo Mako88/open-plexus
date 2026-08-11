@@ -29,6 +29,56 @@ public sealed class PostedTests(ITestOutputHelper output)
     /// <inheritdoc cref="Wired.Free"/>
     private static string Free() => Wired.Free();
 
+    /// <summary>
+    /// <b>NO TWO MACHINES ARE OFFERED THE SAME PORT, AND THEY CAN ALL HOLD IT AT ONCE.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE BUDGET FOR A FAILURE CLASS THAT ARRIVED ON CI AND CANNOT ARRIVE HERE ON
+    /// DEMAND.</b> <see cref="Wired.Free"/> releases a port before handing it over, because
+    /// the listener that wants it could not otherwise bind — so between one call and the next
+    /// the kernel is entitled to offer the same one again, and a fleet asking for five in a
+    /// row got two the same. What it looks like is a machine failing to open with a message
+    /// about an existing registration, in a shard where every test brings up a fleet.
+    /// </para>
+    /// <para>
+    /// <b>AND THE SECOND HALF IS WHAT THE FIRST DOES NOT SAY.</b> Distinct integers are not
+    /// the requirement — simultaneously bindable ones are, which is what a fleet actually
+    /// does with them. Binding them all at once asks the question in the form the failure
+    /// took, and a set of distinct-but-unusable ports would pass the count and fail this.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_two_machines_are_offered_one_port_and_all_of_them_bind_at_once()
+    {
+        const int Wanted = 24;
+
+        var hosts = Enumerable.Range(0, Wanted).Select(_ => Free()).ToList();
+
+        Assert.Equal(Wanted, hosts.Distinct(StringComparer.Ordinal).Count());
+
+        var doors = new List<System.Net.HttpListener>();
+
+        try
+        {
+            foreach (var host in hosts)
+            {
+                var door = new System.Net.HttpListener();
+
+                door.Prefixes.Add($"{host}/");
+                door.Start();
+
+                doors.Add(door);
+            }
+        }
+        finally
+        {
+            foreach (var door in doors) door.Abort();
+        }
+
+        output.WriteLine($"{Wanted} ports handed out and held at once");
+    }
+
     /// <summary>A cluster that keeps what it was handed.</summary>
     private sealed class Catches(ClusterAddress address) : IReceiveEnvelopes
     {

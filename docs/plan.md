@@ -649,6 +649,12 @@ condition is a superstition.
 - **AND PUSHING FASTER THAN THE SUITE RUNS MEANS NOTHING IS EVER TESTED.** The concurrency
   group cancels whatever is waiting, so a session committing every few minutes cancels its own
   queue all day. Only a `[checkpoint]` escapes.
+- **A COST MEASURED ON ONE PLATFORM CAN BE NOUGHT ON ANOTHER, AND A COMPARISON ASSERTING IT
+  THEN FAILS WHERE THE FAULT CANNOT HAPPEN.** A refused loopback connect is four seconds on
+  Windows and immediate on Linux, so a shard went red for a repair working perfectly.
+- **AND THAT SAME FOUR SECONDS PRICES THE LOCAL SUITE AND NOT CI.** A fleet pays it per
+  announcement to a machine not yet up, so a socket test is forty seconds here and a fifth of
+  a second there. Read a wire timing on CI.
 
 Named so nobody reintroduces them. These are about MEASUREMENT, so they survive the
 change of architecture entirely.

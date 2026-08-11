@@ -20,24 +20,60 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public static class Wired
 {
+    /// <summary>Every port this process has handed out, whether or not it is still bound.</summary>
+    private static readonly HashSet<int> Handed = [];
+
+    private static readonly Lock Gate = new();
+
     /// <summary>
-    /// A port nothing else is using.
+    /// A port nothing else is using, and nothing here has been given before.
     /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// The operating system would not offer an unused port.
+    /// </exception>
     /// <remarks>
+    /// <para>
     /// <b>TAKEN FROM THE OPERATING SYSTEM RATHER THAN COUNTED UP FROM A CONSTANT.</b> A
     /// fixed port makes a test that passes alone and fails beside anything else holding
     /// it — including a previous run of itself that has not finished releasing it, which
     /// is the flake that would get blamed on the bus.
+    /// </para>
+    /// <para>
+    /// <b>AND ASKING THE OPERATING SYSTEM TWICE CAN GET THE SAME ANSWER TWICE, WHICH IS THE
+    /// FAULT THIS SET EXISTS FOR.</b> The port is RELEASED before it is used — it has to be,
+    /// or the <c>HttpListener</c> that wants it could not bind — so between one call and the
+    /// next it is free and the kernel is entitled to offer it again. A fleet asks for five in
+    /// a row, and two of them being one port is a machine that fails to open with a message
+    /// about an existing registration. Seen on CI, on a shard where every test brings up a
+    /// fleet.
+    /// </para>
+    /// <para>
+    /// <b>THE SET IS NEVER EMPTIED, WHICH IS DELIBERATE AND IS THE OTHER HALF.</b> A fleet
+    /// that has been torn down may still hold its prefix for a moment, so a port coming free
+    /// is not the same event as a port becoming bindable — and remembering it for the life of
+    /// the process costs a few dozen integers.
+    /// </para>
     /// </remarks>
     public static string Free()
     {
-        using var taken = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
+        for (var attempt = 0; attempt < 64; attempt++)
+        {
+            using var taken = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
 
-        taken.Start();
-        var port = ((System.Net.IPEndPoint)taken.LocalEndpoint).Port;
-        taken.Stop();
+            taken.Start();
+            var port = ((System.Net.IPEndPoint)taken.LocalEndpoint).Port;
+            taken.Stop();
 
-        return $"http://localhost:{port}";
+            lock (Gate)
+                if (!Handed.Add(port)) continue;
+
+            return $"http://localhost:{port}";
+        }
+
+        throw new InvalidOperationException(
+            $"64 attempts at a free port all came back with one of the {Handed.Count} this "
+            + "process has already used, so the ephemeral range is exhausted or something "
+            + "is holding them");
     }
 
     /// <summary>

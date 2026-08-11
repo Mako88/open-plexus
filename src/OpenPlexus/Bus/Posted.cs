@@ -184,6 +184,9 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// <inheritdoc/>
     public event Action<ClusterAddress>? Deaths;
 
+    /// <inheritdoc/>
+    public event Action<BroadcastId, MachineAddress>? Unreached;
+
     /// <summary>Opens the door and tells everyone what this machine holds.</summary>
     /// <param name="ct">Cancellation.</param>
     public async Task OpenAsync(CancellationToken ct = default)
@@ -285,6 +288,12 @@ public sealed class Posted : IBus, IAsyncDisposable
         // AND LEAVING IS SILENT HERE, WHICH IS THE OPPOSITE OF A CLUSTER. See `IBus`: an
         // ask that reaches nobody is an answer that never arrives, and the asker counts
         // that for itself. A death notice would only ever cover the polite departures.
+        //
+        // AND `Unreached` IS NOT ONE, WHICH IS WHY THIS IS STILL SILENT WITH FORK 53 BUILT.
+        // That event fires where an ask fails to leave rather than where a holder goes, so
+        // it says nothing about departures and everything about deliveries -- the impolite
+        // death and the dropped message reach it by the same road, which is the road that
+        // does not need the dying machine to do anything.
         return Joins.At(_gate, _holders, holder.Address, holder);
     }
 
@@ -396,12 +405,61 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// <param name="there">Where it lives, if it does not.</param>
     /// <param name="ask">The question.</param>
     /// <param name="ct">Cancellation.</param>
+    /// <remarks>
+    /// <b>THE ONE DELIVERY ON THIS BUS WHOSE FAILURE SOMEBODY IS WAITING ON, WHICH IS WHY
+    /// IT IS THE ONE NOT SIMPLY SWALLOWED.</b> Every other path here loses a message and
+    /// costs whoever needed it a fact; this one loses a message and costs an asker its
+    /// denominator, so the gathering never completes and a fleet that is alive and idle
+    /// stops for good. See <see cref="IBus.Unreached"/>.
+    /// </remarks>
     private void Fire(
         MachineAddress who, IReceiveAsks? here, string? there, Ask ask, CancellationToken ct) =>
         Away(
-            () => here is not null
-                ? here.DeliverAsync(ask, ct)
-                : PostAsync(there!, $"ask/{Uri.EscapeDataString(who.Value)}", ask, ct),
+            async () =>
+            {
+                try
+                {
+                    if (here is not null)
+                    {
+                        await here.DeliverAsync(ask, ct).ConfigureAwait(false);
+                        return;
+                    }
+
+                    if (await PostAsync(
+                            there!, $"ask/{Uri.EscapeDataString(who.Value)}", ask, ct)
+                        .ConfigureAwait(false))
+                        return;
+                }
+                catch (Exception) when (!ct.IsCancellationRequested)
+                {
+                    // A HOLDER ON THIS MACHINE THAT THREW WHILE TAKING THE QUESTION, which
+                    // is `Refused` rather than `Dropped` and is the same event to whoever
+                    // asked: no answer to this ask is coming from there.
+                }
+
+                // AND IT COMES OFF THE ROSTER, WHICH IS THE WALK'S `died` PATH REACHED BY
+                // OBSERVATION RATHER THAN BY ANNOUNCEMENT. Measured before this line
+                // existed: a post to a machine that has closed its door costs a flat four
+                // seconds on loopback -- the transport's own give-up, not a wait anybody
+                // here chose -- so a fleet that kept asking a dead holder paid that every
+                // round and a four-thousand-round run became four hours. The write-off
+                // alone makes a fleet CORRECT after a death and this is what makes it
+                // usable.
+                //
+                // ONLY THE REMOTE HALF, because a local holder that threw is alive and
+                // still subscribed; unsubscribing it here would delete a machine over a
+                // fault in one answer.
+                //
+                // AND IT COMES BACK BY ANNOUNCING, WHICH IS THE ONLY WAY IN AND IS A PUSH.
+                // `Absorb` re-enters a holder the moment its machine opens, so a phone out
+                // of a tunnel rejoins by saying so. What this cannot recover is a machine
+                // that stayed up while one message to it was lost -- it is out until it
+                // announces again, which is the hiccup being charged a death's price. That
+                // is the trade fork 53 makes and it is written in the plan as one.
+                if (there is not null) lock (_gate) _holding.Remove(who);
+
+                Unreached?.Invoke(ask.Broadcast, who);
+            },
             ct);
 
     /// <summary>
@@ -678,15 +736,27 @@ public sealed class Posted : IBus, IAsyncDisposable
         }
     }
 
-    private async Task PostAsync(string host, string path, object what, CancellationToken ct)
+    /// <summary>Posts one message to one peer, and says whether it was handed over.</summary>
+    /// <param name="host">Which peer.</param>
+    /// <param name="path">What kind of message.</param>
+    /// <param name="what">The message.</param>
+    /// <param name="ct">Cancellation.</param>
+    /// <returns>
+    /// Whether the peer took it. <b>Read on the ask path alone, and ignored everywhere
+    /// else</b> — a report or an envelope that does not arrive is a loss somebody counts,
+    /// while an ask that does not arrive is an answer somebody is waiting on forever.
+    /// </returns>
+    private async Task<bool> PostAsync(string host, string path, object what, CancellationToken ct)
     {
         try
         {
-            if (!_clients.TryGetValue(host, out var client)) return;
+            if (!_clients.TryGetValue(host, out var client)) return false;
 
             await client.MakeRequest(
                 new SimpleRequest($"/{path}", HttpMethod.Post) { StringBody = Wire.Write(what) },
                 ct).ConfigureAwait(false);
+
+            return true;
         }
         catch (Exception) when (!ct.IsCancellationRequested)
         {
@@ -697,6 +767,8 @@ public sealed class Posted : IBus, IAsyncDisposable
             // AND IT IS COUNTED NOW, BECAUSE THE SENTENCE ABOVE IS TRUE OF A DEATH AND
             // FALSE OF A HICCUP. See `Dropped`.
             Interlocked.Increment(ref _dropped);
+
+            return false;
         }
     }
 

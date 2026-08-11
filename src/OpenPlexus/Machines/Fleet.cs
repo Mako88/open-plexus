@@ -27,13 +27,19 @@ namespace OpenPlexus.Machines;
 /// nothing at all.
 /// </para>
 /// <para>
-/// <b>IT WAITS FOR EVERYONE, AND THAT IS THE ARRANGEMENT RATHER THAN THE ANSWER.</b> Under
-/// C3 a holder that has died never answers, so a run that loses one stops here forever —
-/// and there is deliberately nothing in <see cref="Gathering"/> to decide otherwise on,
-/// because the obvious rule is a timeout and <i>a miss decided by a deadline</i> carries a
-/// revival row saying never. When to act on a partial gathering is fork 53's question and
-/// it needs a signal that is not a clock; what this measures until then is what distance
-/// costs a learner when nothing dies.
+/// <b>IT WAITS FOR EVERYONE STILL OWED, AND WHAT IS OWED COMES DOWN — fork 53, and the
+/// signal is not a clock.</b> A holder the question could not be handed to is written off by
+/// <see cref="Gathering.WriteOff"/>, so a fleet that has lost a machine finishes its rounds
+/// on the arrivals it can still expect rather than stopping here forever. What a deadline
+/// would have guessed at is instead observed: the sender watched the ask fail to leave, and
+/// a machine that was never given a question cannot answer it.
+/// </para>
+/// <para>
+/// <b>AND THE ROUND A HOLDER DIES INSIDE IS STILL OWED, WHICH IS THE HALF THIS DOES NOT
+/// REACH.</b> A holder that took the question and went before answering is indistinguishable
+/// from a slow one under C2, and nothing but a deadline separates them — <i>a miss decided
+/// by a deadline</i> carries a revival row saying never. Fork 62's slots are that half, and
+/// its condition is completeness rather than elapsed time.
 /// </para>
 /// <para>
 /// <b>NOTHING HERE HOLDS A COMMITMENT, WHICH IS C1 BEING STRUCTURAL.</b> The asker cannot

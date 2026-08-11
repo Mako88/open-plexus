@@ -53,6 +53,12 @@ public sealed class ClusterTests : IDisposable
             remove => inner.Deaths -= value;
         }
 
+        public event Action<BroadcastId, MachineAddress>? Unreached
+        {
+            add => inner.Unreached += value;
+            remove => inner.Unreached -= value;
+        }
+
         public int Messages
         {
             get { lock (_envelopes) return _messages; }

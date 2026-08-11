@@ -306,11 +306,18 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// everyone, which <see cref="Population.Decide"/> deliberately cannot tell.
     /// </para>
     /// <para>
-    /// <b>AND NOTHING WAITS ON A CLOCK FOR IT.</b> The dead holder is never written off and
-    /// never times out; it simply does not appear in the gathering, and the answer is
-    /// whatever the survivors said. A build that awaited its holders would have decided
-    /// this by the client's timeout, which is <i>a miss decided by a deadline</i> and
-    /// carries a revival row saying never.
+    /// <b>AND NOTHING WAITS ON A CLOCK FOR IT.</b> The dead holder never times out; the ask
+    /// is watched failing to leave, which writes it off exactly, and the answer is whatever
+    /// the survivors said. A build that awaited its holders would have decided this by the
+    /// client's timeout, which is <i>a miss decided by a deadline</i> and carries a revival
+    /// row saying never.
+    /// </para>
+    /// <para>
+    /// <b>AND THIS FILE POLLS FOR THE COUNT RATHER THAN AWAITING THE GATHERING, WHICH IS
+    /// LEFT AS IT WAS ON PURPOSE.</b> The poll was the only shape available before fork 53
+    /// and it asserts the numerator and the denominator, which is what this test is about;
+    /// that the round now FINISHES is a different claim and <c>UnreachedTests</c> is where it
+    /// is made, against a gathering that would hang if the write-off were removed.
     /// </para>
     /// </remarks>
     [Fact]

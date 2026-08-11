@@ -34,9 +34,20 @@ namespace OpenPlexus.Machines;
 public sealed class Gathering : IDisposable
 {
     private readonly Dictionary<MachineAddress, Answer> _heard = [];
+
+    /// <summary>Who was asked and has neither answered nor been written off.</summary>
+    /// <remarks>
+    /// <b>THE ROSTER RATHER THAN THE COUNT, WHICH IS THE WHOLE OF WHAT FORK 53 NEEDED
+    /// HERE.</b> A count can only be compared with another count, so a gathering holding one
+    /// could tell that somebody was missing and never which somebody — and a write-off has
+    /// to name a machine or it is a decrement, which is a deadline with the clock hidden.
+    /// </remarks>
+    private readonly HashSet<MachineAddress> _owed;
+
     private readonly Lock _gate = new();
     private readonly Action _closing;
 
+    private int _unreached;
     private bool _closed;
 
     /// <param name="asked">Who was asked.</param>
@@ -50,12 +61,13 @@ public sealed class Gathering : IDisposable
     internal Gathering(IReadOnlyCollection<MachineAddress> asked, Action closing)
     {
         Asked = asked.Count;
+        _owed = [.. asked];
         _closing = closing;
 
         // ASKING NOBODY IS ALREADY WHOLE, which is not a special case so much as the
         // degenerate one: a fleet of nought holders has been heard from in full, and
         // waiting on that would be waiting for an answer that cannot exist.
-        if (Asked == 0) _everyone.TrySetResult();
+        if (_owed.Count == 0) _everyone.TrySetResult();
     }
 
     /// <summary>How many holders were asked.</summary>
@@ -80,16 +92,31 @@ public sealed class Gathering : IDisposable
         get { lock (_gate) return _heard.Values.Count(one => one.Said is { Silent: false }); }
     }
 
+    /// <summary>How many holders were never handed the question at all.</summary>
+    /// <remarks>
+    /// <b>THE TERM THAT SEPARATES A SILENCE FROM A LOSS, AND IT IS NOT THE SAME AS
+    /// <see cref="Asked"/> MINUS <see cref="Heard"/>.</b> That difference is every holder
+    /// yet to speak, of which some are thinking and some are gone; this is the share the
+    /// sender watched fail to leave. A run reading only the first cannot tell a fleet that
+    /// was slow from a fleet that was smaller than it thought.
+    /// </remarks>
+    public int Unreached
+    {
+        get { lock (_gate) return _unreached; }
+    }
+
     /// <summary>Whether everyone asked has answered.</summary>
     /// <remarks>
-    /// <b>NOT A CONDITION ANYTHING MAY BLOCK ON FOREVER.</b> Under C3 a holder that has
-    /// died never answers, so this is false for the rest of the run — which is why it is
-    /// reported rather than awaited, and why the vote is defined over whoever spoke.
+    /// <b>NOT A CONDITION ANYTHING MAY BLOCK ON FOREVER, AND DELIBERATELY NOT WHAT
+    /// <see cref="Everyone"/> WAITS FOR SINCE FORK 53.</b> A round finished by a write-off
+    /// completes without being whole, and keeping the two apart is what stops a fleet of
+    /// twelve that heard eight reading like a fleet of eight — which is the C3 instrument
+    /// and the reason the denominator is carried at all.
     /// </remarks>
     public bool Whole => Heard == Asked;
 
     /// <summary>
-    /// Completes when everyone asked has answered, and never on a timer.
+    /// Completes when every holder still owed an answer has given one, and never on a timer.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -99,10 +126,18 @@ public sealed class Gathering : IDisposable
     /// how often somebody looked.
     /// </para>
     /// <para>
-    /// <b>IT IS NOT A PROMISE THAT IT COMPLETES.</b> Under C3 a dead holder never answers,
-    /// so this stays pending for the rest of the run; whether to give up, and on what
-    /// grounds, is the caller's decision — and there is deliberately nothing here to make
-    /// it on.
+    /// <b>AND WHAT IS OWED COMES DOWN AS WELL AS UP, WHICH IS FORK 53 AND WAS THE WHOLE
+    /// DIFFERENCE FROM THE WALK.</b> A holder the ask never reached is written off, exactly
+    /// as a departing cluster takes the routes heading into it, so a fleet that has lost a
+    /// machine finishes its round on the arrivals it can still expect. Nothing here is
+    /// decided by elapsed time and nothing is retracted: the write-off removes a claim on
+    /// the future, never a count.
+    /// </para>
+    /// <para>
+    /// <b>IT IS STILL NOT A PROMISE THAT IT COMPLETES.</b> A holder that took the question
+    /// and died before answering is owed for the rest of the run, because late and absent
+    /// are one thing under C2 — see <see cref="IBus.Unreached"/> for why that half is fork
+    /// 62's and not this one's.
     /// </para>
     /// </remarks>
     public Task Everyone => _everyone.Task;
@@ -119,7 +154,39 @@ public sealed class Gathering : IDisposable
         lock (_gate)
         {
             _heard[answer.From] = answer;
-            whole = _heard.Count >= Asked;
+            whole = _owed.Remove(answer.From) && _owed.Count == 0;
+        }
+
+        if (whole) _everyone.TrySetResult();
+    }
+
+    /// <summary>Writes off a holder the ask never reached, and never one that is merely quiet.</summary>
+    /// <param name="who">The holder that was not handed the question.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>THE LOSS IS EXACT RATHER THAN ESTIMATED, WHICH IS THE PROPERTY BORROWED FROM THE
+    /// WALK.</b> A departure there writes off the routes heading into one cluster because a
+    /// report said how many there were; here it writes off one answer because the sender
+    /// watched the question fail to leave. Neither is a guess about what a silent machine
+    /// might be doing, and that is the only kind of write-off this design permits.
+    /// </para>
+    /// <para>
+    /// <b>AND AN ANSWER THAT ARRIVES ANYWAY IS STILL FOLDED IN.</b> C2 allows the question
+    /// to have got through while the acknowledgement did not, so this removes a claim on an
+    /// answer rather than a right to one — the count is monotone in both directions it
+    /// matters, and the only thing given up is the waiting.
+    /// </para>
+    /// </remarks>
+    internal void WriteOff(MachineAddress who)
+    {
+        bool whole;
+
+        lock (_gate)
+        {
+            if (!_owed.Remove(who)) return;
+
+            _unreached++;
+            whole = _owed.Count == 0;
         }
 
         if (whole) _everyone.TrySetResult();
@@ -261,6 +328,12 @@ public sealed class Asker : IReceiveAnswers
 
         Address = address;
         _bus = bus;
+
+        // SUBSCRIBED AND NEVER UNSUBSCRIBED, WHICH IS `InputMachine`'S SHAPE FOR THE SAME
+        // EVENT AND FOR THE SAME REASON. An asker outlives every gathering it opens and dies
+        // with its bus, so there is no moment where dropping this would be right and one
+        // where it would silently stop writing off.
+        _bus.Unreached += OnUnreached;
     }
 
     /// <inheritdoc/>
@@ -362,5 +435,24 @@ public sealed class Asker : IReceiveAnswers
         at?.Fold(answer);
 
         return Task.CompletedTask;
+    }
+
+    /// <summary>One holder was never handed one ask, so that gathering stops waiting on it.</summary>
+    /// <param name="broadcast">Which ask never left.</param>
+    /// <param name="who">Which holder it was going to.</param>
+    /// <remarks>
+    /// <b>ONE GATHERING RATHER THAN ALL OF THEM, WHICH IS SHARPER THAN THE WALK'S EVENT AND
+    /// NOT MERELY DIFFERENT.</b> <c>InputMachine.OnDeath</c> walks every thought it holds
+    /// because a departed cluster strands routes in all of them; a question that failed to
+    /// leave failed for one question, and a holder unreachable for this ask may take the
+    /// next one. Writing off the others would be inferring a death from a dropped message,
+    /// which is the guess this whole path exists to avoid.
+    /// </remarks>
+    private void OnUnreached(BroadcastId broadcast, MachineAddress who)
+    {
+        Gathering? at;
+        lock (_gate) _open.TryGetValue(broadcast, out at);
+
+        at?.WriteOff(who);
     }
 }

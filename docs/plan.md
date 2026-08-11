@@ -41,9 +41,15 @@ FORBIDS things, and several of them are already measured.
   benchmark.** No shared memory, late messages, a cluster vanishing mid-thought.
 - **AND TWENTY IS ALREADY THE MEASURED EDGE.** Placement by minimum code is capped by a
   world's distinct roots, so fleet size and the front end's vocabulary are one number.
-- **WHAT IT NEEDS IS THE DEATH HANDLING THE WALK ALREADY HAS.** A departure writes off what
-  was owed from the dead machine so the thought can settle — built, tested, and on the other
-  learner. Unported rather than unsolved.
+- **AND THE DEATH HANDLING IS PORTED, SO THE HARD BLOCKER IS OFF IT.** A fleet writes off the
+  ask it watched fail to leave and finishes on what is still owed — four machines lost one
+  mid-run and went on learning.
+- **THE SIGNAL IS A REFUSED CONNECTION AND NEVER A DEATH NOTICE**, so an impolite departure
+  and a dropped message arrive by the same road. A machine never handed a question cannot
+  answer it, which is exact rather than a guess.
+- **SO WHAT IS LEFT IS THE ROUND A PHONE DIES INSIDE**, where late and absent are one thing
+  and only a deadline separates them. Slots are that half and their condition is
+  completeness.
 - **AND ONE INPUT MACHINE FEEDING TWENTY HOLDERS IS THE IDENTICAL CASE, NOT THE SHARED ONE.**
   Every holder is told the same moment and the same settlement, so naming converges — the
   divergence measured was between machines seeing DIFFERENT streams.
@@ -1313,10 +1319,10 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **57** | Every node predicts its own output while the real wave verifies behind it. What it saves is a LAN millisecond and an internet hundred, so where it pays is deployment. What a holder predicts from is a commitment about one |
 | **58** | The gate's sign flips with the timing, and the whole two-by-two has been run rather than read off four rows and a revival note. What is ruinous is the gate AFTER a failure specifically. Open on any other world |
 | **59** | Dissolved rather than decided. The setting was a gate and a timing crossed, so the cell that isolated the gate axis is not a cell — it is a corner of a grid, and both axes are now settings. Closed |
-| **53** | The commitment fleet losing one message waits forever. AND THE WALK ALREADY SOLVES IT: a departure writes off the routes owed from the dead cluster and the thought settles. Ported, not invented — `DepartureTests` holds the shape. Unbuilt here |
+| **53** | The commitment fleet losing one message waits forever. PORTED AND MEASURED: an ask watched failing to leave is written off exactly, so a fleet of four loses one and learns on. Open on the round a holder dies INSIDE |
 | **60** | Genesis is placed and repair is not, so a fleet repairs once per HOLDER a round where one machine repairs once. How hard it searches is a deployment choice. Place repair, divide the budget, or exploit it? Open |
 | **61** | John's: place a commitment by the MINIMUM code of its sorted scope, so identical children land together and a lineage stays together. PRICED: level at three holders, three times the average at twelve, capped by a world's distinct roots |
-| **62** | John's: partition into slots and give each R machines holding identical populations. A death costs nothing while a slot survives, replicas need no messages between them, and it answers fork 53. R scales with load |
+| **62** | John's: partition into slots and give each R machines holding identical populations. A death costs nothing while a slot survives, replicas need no messages between them, and it alone reaches the round a death lands in. R scales with load |
 | **63** | John's: genesis mints ONE scope over the whole scene and repeated scenes narrow it by overlap, the rest fading out. Specific-to-general, the DUAL of repair — an intersection needs two examples where the gate needs twenty misses. Open |
 | **65** | The vote decides what repair may run on, so under skew blame lands on the majority lineages alone. `Repairing.EveryRound` breaks that and pays, at four to six times the repair. Open on what it costs at width |
 | **66** | Is `Budget` a search limit or a re-derivation limit? ANSWERED: a re-derivation limit. Its level looked interior and stable across width, and that peak was the ballot -- on the ungameable columns there is none. Closed |

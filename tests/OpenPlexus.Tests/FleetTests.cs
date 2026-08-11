@@ -28,11 +28,11 @@ namespace OpenPlexus.Tests;
 /// nothing whatever about lateness.
 /// </para>
 /// <para>
-/// <b>NOR OF C3.</b> Nothing dies in any of this. A run that lost a holder would stop
-/// forever at the gathering it was waiting on, because there is deliberately nothing in
-/// this design to decide a partial gathering on — the obvious rule is a timeout, and
-/// <i>a miss decided by a deadline</i> carries a revival row saying never. When to act on
-/// a partial gathering is fork 53.
+/// <b>NOR OF C3.</b> Nothing dies in any of this, and every number below is a fleet whose
+/// machines are all present — which is what makes them comparable with the one-process
+/// curve. A run that LOSES a holder goes on, since fork 53 writes off an ask that could not
+/// be handed over; what that costs a curve is measured in <c>UnreachedTests</c> and is a
+/// different question from what distance costs.
 /// </para>
 /// </remarks>
 public sealed class FleetTests(ITestOutputHelper output)

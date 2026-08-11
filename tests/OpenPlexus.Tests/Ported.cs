@@ -48,11 +48,20 @@ public sealed class Ported : IAsyncDisposable
     /// Messages the fleet could not hand over or could not act on, across every machine.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// <b>THE ONE NUMBER THAT SEPARATES A RUN WHOSE ANSWER IS WRONG FROM A RUN WHOSE
     /// EVIDENCE NEVER ARRIVED.</b> A gathering waits for a denominator and nothing here
-    /// decides a missing holder by a clock, so one lost message stops a run forever on a
+    /// decides a missing holder by a clock, so a lost message can stop a run forever on a
     /// fleet where every machine is alive and idle — and the only reading that says so is
     /// this one.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS THE LOST ANSWER THAT DOES IT NOW, RATHER THAN ANY LOST MESSAGE.</b> Fork
+    /// 53 writes off an ask that failed to leave, so the outbound half no longer strands a
+    /// round; what is left is an answer that was sent and did not arrive, which is
+    /// indistinguishable from a slow one and is the case nothing may decide. The two are one
+    /// count here on purpose — a fleet losing either is a fleet whose wire is unwell.
+    /// </para>
     /// </remarks>
     public long Lost =>
         _machines.Concat([_asking]).Sum(one => one.Dropped + one.Refused);
@@ -78,7 +87,7 @@ public sealed class Ported : IAsyncDisposable
     /// <remarks>
     /// <b>A DEADLOCK DETECTOR IN EXACTLY THE SENSE <see cref="Wired.ArrivedAsync"/> IS.</b>
     /// Nothing in the library may decide a missing holder by a clock — <i>a miss decided by
-    /// a deadline</i> carries a revival row saying never — so a fleet that loses one message
+    /// a deadline</i> carries a revival row saying never — so a fleet that loses an ANSWER
     /// waits forever, correctly, and a suite that inherited that would hang rather than
     /// fail. This is generous enough to be uninteresting and is asserted on by nothing.
     /// </remarks>

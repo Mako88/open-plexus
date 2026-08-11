@@ -391,6 +391,13 @@ public sealed class MachineTests : IDisposable
             remove { }
         }
 
+        /// <summary>And no ask is ever put here, so none of them can fail to leave.</summary>
+        public event Action<BroadcastId, MachineAddress>? Unreached
+        {
+            add { }
+            remove { }
+        }
+
         private sealed class Handle : IDisposable
         {
             public void Dispose() { }

@@ -107,12 +107,21 @@ public interface IBus
     /// silence rather than an event.</b>
     /// </summary>
     /// <remarks>
+    /// <para>
     /// <b>UNLIKE A CLUSTER LEAVING, AND THE ASYMMETRY IS THE POINT.</b> A route in flight
     /// toward a dead cluster is stranded and the origin cannot write it off without being
     /// told, so <see cref="Deaths"/> exists. An ask that reaches nobody costs an answer
     /// that never arrives, which is a thing the asker can see for itself by counting —
     /// and a holder that crashed could not have sent a death notice anyway, so a design
     /// that needed one would work only for the departures that were polite.
+    /// </para>
+    /// <para>
+    /// <b>AND WHAT THE ASKER COULD SEE FOR ITSELF WAS THE NUMERATOR, WHICH IS WHERE FORK 53
+    /// SAT FOR A MONTH.</b> Counting the answers that came back tells a fleet it is missing
+    /// somebody and never lets it stop waiting; the term that does is
+    /// <see cref="Unreached"/>, which is the same silence observed one step earlier and from
+    /// the sending end, where politeness is not required.
+    /// </para>
     /// </remarks>
     IDisposable Subscribe(IReceiveAsks holder);
 
@@ -224,4 +233,33 @@ public interface IBus
     /// </para>
     /// </remarks>
     event Action<ClusterAddress>? Deaths;
+
+    /// <summary>
+    /// One holder was never handed one ask, so no answer to that ask is owed from it —
+    /// <b>fork 53, and it is the walk's write-off rather than a new idea.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>NOT A DEATH NOTICE, WHICH IS WHY IT NAMES AN ASK AND NOT JUST A MACHINE.</b>
+    /// <see cref="Deaths"/> says a cluster is gone and every route into it is stranded; this
+    /// says one question never left. That is the smaller claim and the exact one — a holder
+    /// that was not handed a question cannot answer it, and whether it is dead, wedged or
+    /// merely behind a wire that lost this one message does not change that by a bit.
+    /// </para>
+    /// <para>
+    /// <b>SO IT NEEDS NO POLITENESS AND NO CLOCK, WHICH IS WHAT THE ASYMMETRY ABOVE WAS
+    /// RIGHT ABOUT AND WHAT IT LEFT UNFINISHED.</b> A holder that crashed sends nothing, and
+    /// a refused connection is that arriving by a faster road than a timeout — the sender's
+    /// own failure to hand over, observed by the sender. The asker counting for itself was
+    /// the right instinct; what it could count was the numerator, and this is the term that
+    /// lets the denominator come down.
+    /// </para>
+    /// <para>
+    /// <b>AND THE HOLE LEFT IS THE DEPARTURE THAT HAPPENS AFTER THE ASK ARRIVES.</b> A
+    /// holder that took the question and died before answering is owed forever, correctly,
+    /// because late and absent are one thing under C2 and nothing but a deadline separates
+    /// them. Fork 62 is that half, and its condition is completeness rather than a clock.
+    /// </para>
+    /// </remarks>
+    event Action<BroadcastId, MachineAddress>? Unreached;
 }

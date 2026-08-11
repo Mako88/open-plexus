@@ -125,6 +125,16 @@ public sealed class HybridBus : IBus
     /// <inheritdoc/>
     public event Action<ClusterAddress>? Deaths;
 
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <b>NEARLY UNREACHABLE HERE, AND THAT IS A FACT ABOUT ONE PROCESS RATHER THAN ABOUT
+    /// THE MECHANISM.</b> A holder that has unsubscribed is not in the table, so it is never
+    /// in the roster and never owed anything; what is left is a holder that took the ask and
+    /// threw, which is the local spelling of a refused connection. Every other way to lose a
+    /// question needs a wire, so <see cref="Posted"/> is where fork 53 is measured.
+    /// </remarks>
+    public event Action<BroadcastId, MachineAddress>? Unreached;
+
     /// <summary>
     /// A delivery threw. <b>Surfaced rather than swallowed</b> — a send that
     /// returns before delivery has no other way to report failure, and
@@ -231,7 +241,10 @@ public sealed class HybridBus : IBus
         // remembers is dropped by design.
         ready?.Invoke(asked);
 
-        foreach (var (_, holder) in everyone) Dispatch(() => holder.DeliverAsync(ask, ct));
+        foreach (var (who, holder) in everyone)
+            Dispatch(
+                () => holder.DeliverAsync(ask, ct),
+                () => Unreached?.Invoke(ask.Broadcast, who));
 
         return ValueTask.FromResult(asked);
     }
@@ -402,7 +415,14 @@ public sealed class HybridBus : IBus
         lock (_gate) return _inFlight == 0 ? Task.CompletedTask : _quiet.Task;
     }
 
-    private void Dispatch(Func<Task> delivery) =>
+    private void Dispatch(Func<Task> delivery) => Dispatch(delivery, failed: null);
+
+    /// <param name="delivery">What to do.</param>
+    /// <param name="failed">
+    /// What to say when it throws, beyond reporting the fault. <b>Only the ask path passes
+    /// one</b>, because it is the only delivery here whose loss leaves somebody waiting.
+    /// </param>
+    private void Dispatch(Func<Task> delivery, Action? failed) =>
         _ = Task.Run(async () =>
         {
             try
@@ -427,6 +447,7 @@ public sealed class HybridBus : IBus
             }
             catch (Exception failure)
             {
+                failed?.Invoke();
                 Faults?.Invoke(failure);
             }
             finally

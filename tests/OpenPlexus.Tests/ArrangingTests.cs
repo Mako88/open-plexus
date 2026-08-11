@@ -85,20 +85,76 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     /// comparison and this repo has watched an ordering invert.</b> Written out twice
     /// before `DuplicationTests` refused the second, which is that budget doing its job
     /// on a measurement file rather than on the library.
+    /// <para>
+    /// <b>AND THE COUNT IS A PARAMETER BECAUSE FIVE WAS NOT ENOUGH ONCE.</b> A two-code
+    /// repair step read 0.702 here with a standard error of 0.053, which is a grid unable to
+    /// say anything about a difference of that size — so a comparison that expects a small
+    /// effect asks for more seeds rather than reporting a spread it cannot use. Five stays the
+    /// default so every number taken before this is still the number it was.
+    /// </para>
     /// </remarks>
+    /// <param name="seeds">How many seeds to run, defaulting to what every earlier grid used.</param>
     private static (List<double> Unseen, Grounded Last) Sweep(
-        ArrangedSettings world, CommittingSettings dials, Looking looking)
+        ArrangedSettings world, CommittingSettings dials, Looking looking, int seeds = 5)
     {
         var unseen = new List<double>();
         var last = default(Grounded);
 
-        foreach (var seed in new[] { 1, 2, 3, 4, 5 })
+        foreach (var seed in Enumerable.Range(1, seeds))
         {
             last = new ArrangedRun(world, new Brain(dials, seed), looking, seed).Run(20_000);
             unseen.Add(last.Tally.Unseen!.Accuracy);
         }
 
         return (unseen, last!);
+    }
+
+    /// <summary>
+    /// <b>WHAT DISTINCT CHILDREN COST WHERE THE WORLD'S RULES ARE ONE CODE — fork 76's
+    /// falsifier.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE CASE FOR REFUSING A PARENT ITS SPENT CODES IS ENTIRELY ABOUT QUANTITY.</b>
+    /// Covering what a parent is right about takes many children, and a budget spent
+    /// re-deriving one child buys none of them. This world's truths are ONE CODE, so there is
+    /// nothing for a child to cover and this doc already carries the row that here any repair
+    /// is damage — eight times the children should be eight times that damage.
+    /// </para>
+    /// <para>
+    /// <b>WHICH MAKES IT THE FALSIFIER RATHER THAN A SECOND OPINION.</b> If distinct children
+    /// are level or better HERE, then whatever they do on the multiplexer is not about
+    /// covering a parent's territory, and a grid winning on both worlds is evidence against
+    /// the account rather than for the mechanism.
+    /// </para>
+    /// <para>
+    /// <b>AND IT ASKS FOR TEN SEEDS BECAUSE THE LAST FALSIFIER RUN HERE COULD NOT SPEAK.</b>
+    /// A two-code step read 0.755 against 0.702 with a spread of 0.053, which carries nothing
+    /// either way — and reporting a direction off a grid that wide is how a noisy reading
+    /// becomes a finding.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_distinct_children_are_damage_where_one_code_is_already_the_truth()
+    {
+        output.WriteLine("forking | unseen accuracy | spread | sound | unsound | residents");
+
+        foreach (var forking in new[] { Forking.Repeated, Forking.Distinct })
+        {
+            // SHIPPED DIALS AND ONE THING MOVED, which is this repo's rule about measuring a
+            // mechanism ON from a known baseline rather than OFF from all-on.
+            var (unseen, last) = Sweep(
+                Small, new CommittingSettings { Forking = forking }, Looking.Tiled, seeds: 10);
+
+            output.WriteLine(
+                $"{forking,-7} | {unseen.Average(),15:F3} | {Spread(unseen),6:F3} "
+                + $"| {last.Rules.Sound,5} | {last.Rules.Unsound,7} "
+                + $"| {last.Tally.Resident,9} | repairs {last.Tally.Repaired}");
+        }
+
+        // NO BAR. The prediction is on the method, where it is read against the grid it was
+        // written for rather than enforced by an assertion somebody would have to edit.
     }
 
     /// <summary>The standard error of a handful of readings.</summary>

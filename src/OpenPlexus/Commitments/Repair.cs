@@ -563,7 +563,7 @@ public sealed record CommittingSettings
     /// ahead on coverage. Nothing measured is worse.
     /// </para>
     /// </remarks>
-    public int Budget { get; init; } = 256;
+    public int Budget { get; init; } = 8;
 
     /// <summary>How many commitments may be resident before the worst are dropped.</summary>
     public int Capacity { get; init; } = 2000;
@@ -657,7 +657,7 @@ public sealed record CommittingSettings
     public Widening Widening { get; init; } = Widening.Never;
 
     /// <inheritdoc cref="Commitments.Forking"/>
-    public Forking Forking { get; init; } = Forking.Repeated;
+    public Forking Forking { get; init; } = Forking.Distinct;
 
     /// <inheritdoc cref="Commitments.Speaking"/>
     public Speaking Speaking { get; init; } = Speaking.Anyone;

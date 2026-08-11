@@ -84,7 +84,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
     public void What_a_parents_attempts_buy_when_they_may_not_land_where_it_has_been()
     {
         output.WriteLine(
-            "forking  | paying | carriers | hit rate | their mean scope "
+            "forking  | paying | uncovered | carriers | hit rate | their mean scope "
             + "| sound | unsound | residents | born | collided | recent");
 
         foreach (var (address, skew) in new[] { (2, 0.0), (3, 0.0), (3, 0.8) })
@@ -94,6 +94,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
             foreach (var forking in new[] { Forking.Repeated, Forking.Distinct })
             {
                 var paying = new List<double>();
+                var open = new List<double>();
                 var carried = new List<double>();
                 var rate = new List<double>();
                 var scope = new List<double>();
@@ -110,6 +111,13 @@ public sealed class ForkingTests(ITestOutputHelper output)
                     var census = learned.Census!;
 
                     paying.Add(census.Paying);
+
+                    // THE COLUMN FORK 76 IS ABOUT, AND THE ONE THE BUDGET CURVE ALREADY
+                    // MOVED. Rounds where nothing sound advocating the right answer fired
+                    // fall from 1,354 to 472 as the budget rises, and quantity is the only
+                    // account of them the evidence confirms -- so if distinct children buy
+                    // anything, they buy it here and this is where it is read.
+                    open.Add(census.Uncovered);
                     carried.Add(census.Narrowed);
                     scope.Add(census.Codes);
                     sound.Add(learned.Sound);
@@ -125,7 +133,8 @@ public sealed class ForkingTests(ITestOutputHelper output)
                 }
 
                 output.WriteLine(
-                    $"{forking,-8} | {Sweep.Spread(paying)} | {Sweep.Spread(carried, "F1")} "
+                    $"{forking,-8} | {Sweep.Spread(paying)} | {Sweep.Spread(open, "F0")} "
+                    + $"| {Sweep.Spread(carried, "F1")} "
                     + $"| {Sweep.Spread(rate)} | {Sweep.Spread(scope, "F2")} "
                     + $"| {Sweep.Spread(sound, "F1")} | {Sweep.Spread(unsound, "F1")} "
                     + $"| {Sweep.Spread(resident, "F1")} | {Sweep.Spread(born, "F0")} "

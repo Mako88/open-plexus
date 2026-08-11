@@ -1034,6 +1034,12 @@ change of architecture entirely.
 - **SO THE RULES THAT COULD PAY ARE HELD AND DO NOT FIRE**, which is a reach problem rather
   than a search one. A scope deep enough to expect the rare outcome is present on few rounds by
   construction.
+- **AND THE ONE OPERATOR THAT TOUCHES REACH MOVES THE STUCK COLUMN, WHICH NOTHING ELSE HAS.**
+  `Widening.Unmissed` buys two and a half to three standard errors of hard-round coverage at
+  both eleven-bit widths.
+- **AND IT COSTS A TENTH OF THE TRAILING ACCURACY, so the trade is real and not rankable by one
+  number.** The diagnosis is confirmed and the operator is too blunt to ship; its own row
+  already names the gate that would fix it.
 - **AND ACCURACY SEPARATES TRUTH FROM FALSEHOOD BEST ON THE WORLD IT LEARNS LEAST**, so
   the fitness signal is not what fails there.
 - **AND THE VOTE RULE'S SIGN FLIPS ON THAT READING, WHICH NO SCORE SHOWED.** A sum carries

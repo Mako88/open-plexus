@@ -1021,9 +1021,12 @@ change of architecture entirely.
 - **AND `Forking.Repeated` FINDS ONLY THE PAYABLE KIND, WHICH IS THE OPPOSITE OF THE WORRY.** A
   rule expecting the commonest outcome is rarely wrong, so repair rarely drives it deep enough
   to become one of the world's own.
-- **SO HARD-ROUND COVERAGE MAY SIMPLY TRACK HOW MANY PAYABLE TRUTHS ARE HELD**, and that count
-  is within one or two of every one there is. If it holds over seeds, the search is not the
-  thing that is broken under skew.
+- **AND COVERAGE DOES NOT TRACK THE PAYABLE COUNT, WHICH SIX SEEDS SAY AND ONE DID NOT.** Under
+  skew both arms hold seven-plus of the eight payable truths while carrying four fifths of the
+  hard rounds.
+- **SO THE RULES THAT COULD PAY ARE HELD AND DO NOT FIRE**, which is a reach problem rather
+  than a search one. A scope deep enough to expect the rare outcome is present on few rounds by
+  construction.
 - **AND ACCURACY SEPARATES TRUTH FROM FALSEHOOD BEST ON THE WORLD IT LEARNS LEAST**, so
   the fitness signal is not what fails there.
 - **AND THE VOTE RULE'S SIGN FLIPS ON THAT READING, WHICH NO SCORE SHOWED.** A sum carries

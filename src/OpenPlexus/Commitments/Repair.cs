@@ -154,6 +154,20 @@ public enum Widening
     /// fallback being a control arm nobody meant to run. <c>widened</c> is the column that
     /// says whether it ran.
     /// </para>
+    /// <para>
+    /// <b>AND WHAT WOULD KILL IT IS WRITTEN DOWN BEFORE THE GRID, on the columns a skewed
+    /// world cannot raise for free.</b> It dies if it fails to take a clear majority of
+    /// <see cref="Unmissed"/>'s hard-round coverage gain over <see cref="Never"/> at both
+    /// eleven-bit widths — a cheaper arm that does not reach is not an improvement, it is a
+    /// quieter version of doing nothing.
+    /// </para>
+    /// <para>
+    /// <b>AND ITS SHIP GATE IS THE WORLD IT SHOULD RUIN, which is the shape that has worked
+    /// twice here.</b> On <see cref="Worlds.Arranged"/> the truths are one code and any
+    /// repair is damage, so an operator undoing repair could help there or could delete the
+    /// only rules that hold the withheld set. That is the prediction to run before this
+    /// becomes the default, and not after.
+    /// </para>
     /// </remarks>
     Shared,
 }

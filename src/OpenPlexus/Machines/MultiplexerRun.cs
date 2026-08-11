@@ -50,8 +50,22 @@ public sealed record Learned
     /// different diagnosis from the one this reading was built to test, and only the
     /// number tells them apart.
     /// </para>
+    /// <para>
+    /// <b>NOTHING WHERE IT WAS NOT ASKED FOR, BECAUSE IT IS THE MOST EXPENSIVE READING HERE
+    /// AND IT TIMED A CI SHARD OUT.</b> One soundness check enumerates every assignment the
+    /// scope leaves open — up to <c>2^Widest</c> — and this asks one per code of every sound
+    /// rule, each with one MORE bit free than the check it came from. On a wide world that is
+    /// hundreds of millions of assignments per graded run, and it is charged once per run
+    /// rather than once per round, which is why nothing else noticed.
+    /// </para>
+    /// <para>
+    /// <b>SO IT IS NULL RATHER THAN NOUGHT WHERE THE CENSUS IS OFF</b>, which is the same
+    /// shape <c>Census</c> itself uses and the only one that cannot be misread. A zero here
+    /// would say <i>nothing is over-specialised</i>, which is a finding, and the absence of a
+    /// reading is not one.
+    /// </para>
     /// </remarks>
-    public required int Overshot { get; init; }
+    public required int? Overshot { get; init; }
 
     /// <summary>How many of the world's own rules are held exactly.</summary>
     public required int Found { get; init; }
@@ -141,6 +155,9 @@ public sealed record Learned
     /// <param name="held">What the brain holds.</param>
     /// <param name="floor">How much a commitment must have seen before it is judged.</param>
     /// <param name="checkable">Whether the world can decide a scope exactly.</param>
+    /// <param name="detailed">
+    /// Whether to take <see cref="Overshot"/>, which is the most expensive reading here.
+    /// </param>
     /// <param name="sound">Whether a scope really does entail an expectation.</param>
     /// <remarks>
     /// <para>
@@ -165,7 +182,8 @@ public sealed record Learned
         Commitments.Population held,
         long floor,
         Func<ImmutableArray<Code>, bool> checkable,
-        Func<ImmutableArray<Code>, Code, bool> sound)
+        Func<ImmutableArray<Code>, Code, bool> sound,
+        bool detailed)
     {
         ArgumentNullException.ThrowIfNull(held);
         ArgumentNullException.ThrowIfNull(checkable);
@@ -184,7 +202,11 @@ public sealed record Learned
         // reaches a sound scope on the way down, because soundness here is a property of the
         // pinned bits and dropping an irrelevant one cannot make a true rule false. So the
         // one-code question answers the general one at a k-th of the cost.
-        var overshot = decidable.Count(one =>
+        //
+        // AND CHEAP IS RELATIVE: every drop frees one more bit than the check it came from,
+        // so on a wide world this is the most expensive thing in the file. It runs where the
+        // census runs and nowhere else.
+        int? overshot = !detailed ? null : decidable.Count(one =>
             one.Scope.Length > 1
             && sound(one.Scope, one.Expects)
             && one.Scope.Any(dropped =>
@@ -233,6 +255,7 @@ public sealed class MultiplexerRun
     private readonly Multiplexer _world;
     private readonly Brain _brain;
     private readonly Trial<IReadOnlyList<int>> _trial;
+    private readonly bool _census;
 
     /// <param name="world">The shape of the world.</param>
     /// <param name="brain">The one brain, already configured.</param>
@@ -247,6 +270,7 @@ public sealed class MultiplexerRun
 
         _world = new Multiplexer(world, seed);
         _brain = brain;
+        _census = census;
 
         _trial = new Trial<IReadOnlyList<int>>(
             _world, new Bits(Multiplexer.Bit), brain, census ? _world.Sound : null);
@@ -266,6 +290,6 @@ public sealed class MultiplexerRun
 
         return Learned.Grade(
             tally, _world.Truths(), _brain.Held, _brain.Dials.Floor,
-            _world.Checkable, _world.Sound);
+            _world.Checkable, _world.Sound, _census);
     }
 }

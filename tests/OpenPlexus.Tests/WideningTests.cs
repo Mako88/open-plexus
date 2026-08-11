@@ -118,7 +118,7 @@ public sealed class WideningTests(ITestOutputHelper output)
             // it already holds, which is the reach problem stated as a property of the
             // population rather than as a score. If shortening scopes is worth anything at
             // all, this is the column it is worth it ON.
-            ("overshot", one => one.Overshot),
+            ("overshot", one => one.Overshot!.Value),
             ("unsound", one => one.Unsound),
             ("residents", one => one.Resident),
             ("widened", one => one.Tally.Widened),

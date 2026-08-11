@@ -86,6 +86,12 @@ public sealed class MonkRun
         // finding.
         return Learned.Grade(
             tally, Monk.Truths(_puzzle), _brain.Held, _brain.Dials.Floor,
-            Monk.Checkable, (scope, expects) => Monk.Sound(_puzzle, scope, expects));
+            Monk.Checkable,
+            (scope, expects) => Monk.Sound(_puzzle, scope, expects),
+
+            // NO OVERSHOOT READING HERE. This world enumerates 432 instances however little
+            // a scope pins, so the drop-by-drop walk is cheap -- but nothing reads the column
+            // on this bench, and an instrument nobody reads is a cost with no reader.
+            detailed: false);
     }
 }

@@ -114,7 +114,7 @@ jobs:
             "RecoveryTests.Whether_an_earned_budget_keeps",
             "CensusTests.Whether_subsumption_is_cutting",
             "CensusTests.Whether_a_parents_table_already_knows",
-            "QueryCostTests","RefusalTests","ScalingTests",
+            "QueryCostTests","RecalledTests","RefusalTests","ScalingTests",
             "SeparableTests",
             "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",
             "WideningTests.Whether_shortening_a_scope",

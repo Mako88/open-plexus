@@ -48,6 +48,16 @@ public static class Tree
     }
 
     /// <summary>
+    /// The bAbI task files, which two worlds now read and once said so twice.
+    /// </summary>
+    /// <remarks>
+    /// <b>ONE PLACE BECAUSE THERE ARE TWO READERS OF IT.</b> <see cref="OpenPlexus.Worlds.Babi"/>
+    /// feeds the walk and <see cref="OpenPlexus.Worlds.Recalled"/> feeds the commitment
+    /// learner, and the corpus is the same eleven megabytes on disk either way.
+    /// </remarks>
+    public static string Babi() => Path.Combine(Corpus("tasks_1-20_v1-2"), "en");
+
+    /// <summary>
     /// Every hand-written C# file under a directory of the repo.
     /// </summary>
     /// <remarks>

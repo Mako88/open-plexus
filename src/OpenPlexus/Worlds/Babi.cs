@@ -74,6 +74,18 @@ public sealed record Sentence
     /// </summary>
     public ImmutableArray<Code> Answers { get; init; } = [];
 
+    /// <summary>
+    /// The line as the corpus wrote it, without its number or its answer column.
+    /// </summary>
+    /// <remarks>
+    /// <b>KEPT SO AN ANSWER CAN BE READ BACK IN ENGLISH, WHICH NOTHING COULD DO BEFORE.</b>
+    /// A word becomes <see cref="Babi.Of"/>'s hash and a hash goes nowhere back, so a run
+    /// that answered a question correctly could report a number and never the question. It
+    /// is shown to nobody and to nothing that learns — see <see cref="Recalled"/>, which
+    /// puts codes in the moment and this in the transcript.
+    /// </remarks>
+    public string? Text { get; init; }
+
     /// <summary>Whether this line is asking something.</summary>
     public bool Asking => Answer is not null;
 }
@@ -275,6 +287,7 @@ public sealed class Babi
                 Words = [.. words],
                 Answer = parts.Length > 1 ? parts[1].Trim() : null,
                 Answers = parts.Length > 1 ? [.. Words(parts[1]).Select(Of)] : [],
+                Text = parts[0].Trim(),
             });
         }
 

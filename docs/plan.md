@@ -90,6 +90,27 @@ FORBIDS things, and several of them are already measured.
   the raw reading carries, per sensor, BEFORE building anything on that sensor.
 - **A SENSOR IS A WORLD AND A WORLD IS A STREAM**, so nothing here is a new kind of input —
   what is missing is the plumbing, not a mechanism.
+- **AND TEXT REACHES THE COMMITMENT LEARNER AT LAST, WHICH WAS AN ARGUMENT AND IS NOW A
+  MEASUREMENT.** `Recalled` puts a story and a question about it to a population, and it
+  answers questions from stories it was never told, well clear of the marginal.
+- **SO THE CONTAINERS ARE NOT THE THING THAT WAS UNPROVEN**, and the fleet was never the
+  risk. What text teaches this learner is answered in one process on one box, which is
+  where it should have been asked.
+- **AND WHAT IT LEARNT IS A PLACE AND NEVER A PERSON, WHICH THE TRANSCRIPT SAYS AND NO
+  SCORE COULD.** It answers with a location present in the moment, so it is right exactly
+  when the last statement is about whoever was asked.
+- **SO THE FIRST CONVERSATION DEMANDS UNIFICATION RATHER THAN SEQUENCE**, which inverts
+  what the ordering assumed. Binding the question's actor to a statement's actor is rung
+  four, and no dose of recency reaches it.
+- **A TRANSCRIPT IS AN INSTRUMENT AND THE CHEAPEST ONE HERE.** A score says how often and
+  never which, so a population answering everything with the commonest word and one that
+  has learnt the task read identically until the words are printed.
+- **AND HOW MUCH OF THE STORY IS IN THE MOMENT IS NOT MONOTONE**, which is the world's own
+  structure showing through a dial. One statement beats the whole story where one supports
+  the answer and loses where two do.
+- **AND A HELD-OUT QUESTION CAN BE WORD FOR WORD ONE ALREADY ASKED**, the corpus being
+  templated over a small cast — so the unseen score is read beside a count of its twins
+  rather than on its own.
 
 ## The constraints
 
@@ -398,6 +419,12 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **The rule is decidable and already computed.** The language extends when, and only
   when, no expression in the current language separates the failures from the hits.
 - **Which is what repair discovers when nothing clears the bar.**
+- **AND IT DOES NOT FIRE ON TEXT, WHICH IS THE INSTRUMENT RATHER THAN THE WORLD.**
+  `Tally.Wanting` reads near nothing on a world whose ceiling the transcript shows plainly,
+  because on a wide alphabet something always separates.
+- **SO IT SAYS WHETHER REPAIR FOUND A CANDIDATE AND NEVER WHETHER THE GENERAL RULE IS
+  SAYABLE.** Memorising separates, so a specialise-only ladder's own trigger cannot summon
+  the two rungs that go up. Fork 86.
 - **And the ladder has two directions, which is the correction that matters most
   here.** Rungs one to four only make a commitment narrower.
 - **A specialise-only machine is arbitrarily accurate and conceptless** — it learns
@@ -1384,3 +1411,5 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **73** | What distinguishes a repair that buys hard-round coverage from one that does not? ANSWERED: depth. They sit at the world's minimum sound scope and every shorter step pays nothing. Open on walking a chain in fewer steps without overshooting |
 | **72** | Relearning after the target moves is slower than learning the world from nothing. ANSWERED: the repair budget, a per-parent LIFETIME cap the lineages that must relearn have already spent. Free recovers, the capped arms do not |
 | **71** | A minted name is a code, so repair adds it for the price of one. Should the separation bar be charged by what a scope's codes STAND FOR rather than by how many there are? Open |
+| **86** | The ladder's admission rule reads near nothing on text while the transcript shows the ceiling plainly. It asks whether repair found a separating code, and on a wide alphabet memorising always does — so the trigger cannot summon the rungs that go UP. What signal separates *nothing separates* from *nothing GENERAL separates*. Open |
+| **87** | `Recalled` answers with a place present in the moment and has no notion of who, so a right answer is the last statement being about whoever was asked. Binding the question's actor to a statement's actor is unification. Does the cheapest rung four — a code per role rather than a matcher — reach it? Open |

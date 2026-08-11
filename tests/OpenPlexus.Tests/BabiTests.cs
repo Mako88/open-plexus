@@ -31,19 +31,7 @@ public sealed class BabiTests(ITestOutputHelper output)
     /// green run that quietly never asked the question is the failure every check
     /// here exists to avoid — see <see cref="Tree"/>.
     /// </remarks>
-    private static string Corpus
-    {
-        get
-        {
-            var corpus = Path.Combine(Tree.Repo(), "corpora", "tasks_1-20_v1-2", "en");
-
-            Assert.True(Directory.Exists(corpus),
-                $"the bAbI corpus is not at {corpus}. Fetch it with:\n"
-                + "    bash corpora/fetch.sh");
-
-            return corpus;
-        }
-    }
+    private static string Corpus => Tree.Babi();
 
     private static BabiSettings World(int task, bool stories = true) => new()
     {

@@ -40,6 +40,33 @@ public sealed record RecalledSettings
 }
 
 /// <summary>
+/// A moment of text, with the question kept apart from what was said before it.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>WHICH WORDS WERE THE QUESTION IS A FACT ABOUT THE SIGNAL AND NOT A CONCLUSION</b>,
+/// so a world is allowed to say it — the same licence <see cref="Codes.Coded.Groups"/>
+/// carries for <i>these codes were one object</i>. What nothing here says is what to make
+/// of the split, which is the front end's business and then the learner's.
+/// </para>
+/// <para>
+/// <b>AND UNIONING THEM AT THE WORLD WOULD HAVE THROWN IT AWAY BEFORE ANYBODY COULD
+/// CHOOSE.</b> A bag of words is what a scope sees, and a bag cannot be asked whether the
+/// question named something the story named — so the one structural fact this task turns
+/// on would have been destroyed by the world, one call before the translation that wants
+/// it.
+/// </para>
+/// </remarks>
+public readonly record struct Asking
+{
+    /// <summary>The words of the statements in front of the question.</summary>
+    public required IReadOnlySet<Code> Story { get; init; }
+
+    /// <summary>The words of the question itself.</summary>
+    public required IReadOnlySet<Code> Question { get; init; }
+}
+
+/// <summary>
 /// What one withheld question said, in the English the corpus wrote it in.
 /// </summary>
 /// <remarks>
@@ -94,10 +121,10 @@ public sealed record Quizzed
 /// exists for — and it is a different finding from a low score.
 /// </para>
 /// </remarks>
-public sealed class Recalled : IWorld<Coded>, IWithholds<Coded>
+public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
 {
-    private readonly List<Turn<Coded>> _asked;
-    private readonly ImmutableArray<Turn<Coded>> _kept;
+    private readonly List<Turn<Asking>> _asked;
+    private readonly ImmutableArray<Turn<Asking>> _kept;
     private int _at;
 
     /// <param name="settings">Which text, how much is visible, and how much is held back.</param>
@@ -130,7 +157,7 @@ public sealed class Recalled : IWorld<Coded>, IWithholds<Coded>
             .Select((answer, at) => (answer, at))
             .ToDictionary(one => one.answer, one => one.at, StringComparer.Ordinal);
 
-        var told = new List<Turn<Coded>>();
+        var told = new List<Turn<Asking>>();
         var wrote = new List<Quizzed>();
         var story = -1;
         var said = new List<ImmutableArray<Code>>();
@@ -155,14 +182,14 @@ public sealed class Recalled : IWorld<Coded>, IWithholds<Coded>
                 continue;
             }
 
-            var seen = new HashSet<Code>(line.Words);
-
             var from = settings.Span == 0 ? 0 : Math.Max(0, said.Count - settings.Span);
-            for (var one = from; one < said.Count; one++) seen.UnionWith(said[one]);
 
-            told.Add(new Turn<Coded>
+            var before = new HashSet<Code>();
+            for (var one = from; one < said.Count; one++) before.UnionWith(said[one]);
+
+            told.Add(new Turn<Asking>
             {
-                Seen = Coded.Of(seen),
+                Seen = new Asking { Story = before, Question = new HashSet<Code>(line.Words) },
                 Outcome = index[line.Answer!],
             });
 
@@ -228,7 +255,7 @@ public sealed class Recalled : IWorld<Coded>, IWithholds<Coded>
     /// question after the statements that answer it, and reordering that is the one
     /// property a story has.
     /// </remarks>
-    public Turn<Coded> Next()
+    public Turn<Asking> Next()
     {
         var turn = _asked[_at];
         _at = (_at + 1) % _asked.Count;
@@ -242,5 +269,5 @@ public sealed class Recalled : IWorld<Coded>, IWithholds<Coded>
     /// stream, so the words of the withheld answer would have been seen — which measures
     /// recall of a sentence rather than generalisation from one.
     /// </remarks>
-    public IReadOnlyList<Turn<Coded>> Withheld => _kept;
+    public IReadOnlyList<Turn<Asking>> Withheld => _kept;
 }

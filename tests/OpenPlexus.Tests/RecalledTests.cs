@@ -28,12 +28,17 @@ public sealed class RecalledTests(ITestOutputHelper output)
     private static RecalledSettings World(int task, int span = 0, int withheld = 100) =>
         new() { Corpus = Tree.Babi(), Task = task, Span = span, Withheld = withheld };
 
-    private static (Recalled World, Trial<Coded> Trial, Brain Brain) Made(RecalledSettings settings)
+    /// <summary>The moment as the bagged control sees it, which is every word once.</summary>
+    private static IEnumerable<Code> Codify(Asking asking) =>
+        new Joined(Joining.Bagged).Codify(asking).Order();
+
+    private static (Recalled World, Trial<Asking> Trial, Brain Brain) Made(
+        RecalledSettings settings, Joining joining = Joining.Bagged)
     {
         var brain = new Brain(new CommittingSettings(), 1);
         var world = new Recalled(settings);
 
-        return (world, new Trial<Coded>(world, new Passthrough(), brain), brain);
+        return (world, new Trial<Asking>(world, new Joined(joining), brain), brain);
     }
 
     [Fact]
@@ -54,7 +59,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
             var near = last.Next();
 
             Assert.Equal(wide.Outcome, near.Outcome);
-            Assert.True(near.Seen.Codes.Count <= wide.Seen.Codes.Count);
+            Assert.True(near.Seen.Story.Count <= wide.Seen.Story.Count);
         }
 
         output.WriteLine($"task 1: {whole.Questions} questions, {whole.Outcomes} answers");
@@ -88,12 +93,12 @@ public sealed class RecalledTests(ITestOutputHelper output)
         Assert.Equal(100, world.Withheld.Count);
 
         var kept = world.Withheld
-            .Select(one => string.Join(",", one.Seen.Codes.Order()))
+            .Select(one => string.Join(",", Codify(one.Seen)))
             .ToList();
 
         var drawn = new HashSet<string>(StringComparer.Ordinal);
         for (var draw = 0; draw < world.Questions; draw++)
-            drawn.Add(string.Join(",", world.Next().Seen.Codes.Order()));
+            drawn.Add(string.Join(",", Codify(world.Next().Seen)));
 
         var twinned = kept.Count(one => drawn.Contains(one));
 
@@ -173,7 +178,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         for (var one = 0; one < world.Withheld.Count; one++)
         {
             var asked = world.Transcript[one];
-            var moment = brain.Held.Moment(new HashSet<Code>(world.Withheld[one].Seen.Codes));
+            var moment = brain.Held.Moment(new HashSet<Code>(Codify(world.Withheld[one].Seen)));
             var vote = brain.Held.Predict(brain.Held.Firing(moment));
 
             // THE OUTCOME CODE BACK INTO A WORD, WHICH IS THE ONLY PLACE THE MAPPING RUNS
@@ -194,6 +199,90 @@ public sealed class RecalledTests(ITestOutputHelper output)
         Assert.DoesNotContain(said, one => one.Contains("(unknown)", StringComparison.Ordinal));
 
         foreach (var line in said.Take(12)) output.WriteLine(line);
+    }
+
+    /// <summary>
+    /// The coincidence code says what it claims, on a moment built by hand.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE ARM IS WORTH NOTHING IF THE MARKER IS NOT WHERE IT SAYS IT IS</b>, and a
+    /// front end that silently marked nothing would read as <i>the coincidence does not
+    /// pay</i> — the same conclusion from a wire that was never connected. Two moments,
+    /// one sharing a word and one not.
+    /// </remarks>
+    [Fact]
+    public void The_coincidence_is_marked_only_where_there_is_one()
+    {
+        var matching = new Asking
+        {
+            Story = new HashSet<Code> { Babi.Of("mary"), Babi.Of("garden") },
+            Question = new HashSet<Code> { Babi.Of("where"), Babi.Of("mary") },
+        };
+
+        var missing = matching with
+        {
+            Question = new HashSet<Code> { Babi.Of("where"), Babi.Of("john") },
+        };
+
+        Assert.DoesNotContain(Joined.Coincided, new Joined(Joining.Bagged).Codify(matching));
+        Assert.Contains(Joined.Coincided, new Joined(Joining.Anonymous).Codify(matching));
+        Assert.DoesNotContain(Joined.Coincided, new Joined(Joining.Anonymous).Codify(missing));
+
+        // NAMED CARRIES WHICH WORD IT WAS, so it is not the anonymous code under another
+        // name — the whole difference between the two arms is this one assertion.
+        Assert.DoesNotContain(Joined.Coincided, new Joined(Joining.Named).Codify(matching));
+        Assert.Contains(
+            new Code(Joined.Both, Babi.Of("mary").Value),
+            new Joined(Joining.Named).Codify(matching));
+
+        // AND THE ABSENCE IS SAID OUT LOUD, which is the only arm that speaks when nothing
+        // coincided. `Sundered` and `Coincided` are exclusive by construction.
+        Assert.Contains(Joined.Sundered, new Joined(Joining.Either).Codify(missing));
+        Assert.DoesNotContain(Joined.Sundered, new Joined(Joining.Either).Codify(matching));
+        Assert.Contains(Joined.Coincided, new Joined(Joining.Either).Codify(matching));
+
+        output.WriteLine($"matched: {new Joined(Joining.Either).Codify(matching).Count} codes");
+        output.WriteLine($"missed : {new Joined(Joining.Either).Codify(missing).Count} codes");
+    }
+
+    /// <summary>
+    /// Whether naming the coincidence between a question and a story is what was missing.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE CONTROL IS IN THE FILE, WHICH IS THE ONLY REASON THE OTHER TWO MEAN
+    /// ANYTHING.</b> <see cref="Joining.Bagged"/> is every reading taken before this
+    /// existed, so the three run the same world, the same seed and the same brain and
+    /// differ in one call.
+    /// </para>
+    /// <para>
+    /// <b>AND THE TWO ARMS SEPARATE A LOOKUP FROM A VARIABLE.</b>
+    /// <see cref="Joining.Named"/> keeps which word was shared and reaches one rule per
+    /// person per place; <see cref="Joining.Anonymous"/> throws the identity away and
+    /// reaches one rule per place, which is what a variable buys. If they come back level
+    /// the identity was never the cost.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_naming_the_coincidence_pays()
+    {
+        foreach (var task in new[] { 1, 2 })
+        {
+            foreach (var joining in new[] { Joining.Bagged, Joining.Named, Joining.Anonymous, Joining.Either })
+            {
+                var (world, trial, brain) = Made(World(task, span: 1), joining);
+                var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
+                var unseen = tally.Unseen;
+
+                output.WriteLine(
+                    $"task {task} {joining,-9} | "
+                    + $"drawn {tally.Recent:F3} unseen {unseen?.Accuracy ?? 0.0:F3} "
+                    + $"silent {unseen?.Silence ?? 0.0:F3} | commonest {world.Commonest:F3} | "
+                    + $"held {brain.Held.Count,5} names {brain.Held.Names.Count,4} "
+                    + $"wanting {tally.Wanting:F3}");
+            }
+        }
     }
 
     /// <summary>

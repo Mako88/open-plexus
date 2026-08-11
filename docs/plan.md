@@ -102,6 +102,15 @@ FORBIDS things, and several of them are already measured.
 - **SO THE FIRST CONVERSATION DEMANDS UNIFICATION RATHER THAN SEQUENCE**, which inverts
   what the ordering assumed. Binding the question's actor to a statement's actor is rung
   four, and no dose of recency reaches it.
+- **AND NAMING THE COINCIDENCE BUYS NOTHING, WHICH REFUTES THE CHEAPEST TEST OF THE MOST
+  EXPENSIVE RUNG.** A code for *the question named something the story named* sits inside
+  the control's spread, kept, dropped, or said in both directions.
+- **BECAUSE A MARKER SAYS WHEN TO TRUST THE PLACE IN FRONT OF YOU AND NEVER WHERE TO FIND
+  THE RIGHT ONE.** Where the last statement is about somebody else the answer is not in the
+  moment at all, so no scope over it can be right.
+- **SO THE TASK IS SELECT-THEN-READ AND BOTH HALVES ARE MISSING AT ONCE**, which is why one
+  rung at a time reads as nothing. Finding the newest statement matching the question is
+  sequence and unification together.
 - **A TRANSCRIPT IS AN INSTRUMENT AND THE CHEAPEST ONE HERE.** A score says how often and
   never which, so a population answering everything with the commonest word and one that
   has learnt the task read identically until the words are printed.
@@ -1412,4 +1421,5 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **72** | Relearning after the target moves is slower than learning the world from nothing. ANSWERED: the repair budget, a per-parent LIFETIME cap the lineages that must relearn have already spent. Free recovers, the capped arms do not |
 | **71** | A minted name is a code, so repair adds it for the price of one. Should the separation bar be charged by what a scope's codes STAND FOR rather than by how many there are? Open |
 | **86** | The ladder's admission rule reads near nothing on text while the transcript shows the ceiling plainly. It asks whether repair found a separating code, and on a wide alphabet memorising always does — so the trigger cannot summon the rungs that go UP. What signal separates *nothing separates* from *nothing GENERAL separates*. Open |
-| **87** | `Recalled` answers with a place present in the moment and has no notion of who, so a right answer is the last statement being about whoever was asked. Binding the question's actor to a statement's actor is unification. Does the cheapest rung four — a code per role rather than a matcher — reach it? Open |
+| **87** | `Recalled` answers with a place and never a person. ANSWERED AGAINST for a coincidence code: naming the shared word, dropping its identity, and saying the absence out loud all sit inside the control's spread. A marker says when to trust the place in front of you, never where to find the right one |
+| **88** | The front end intersects the question with EACH statement rather than with the whole story, and marks the words of the one that matched. That is the selection a coincidence code cannot make, done where no matcher changes. Open, and `Joined` is built to take it |

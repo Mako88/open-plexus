@@ -120,6 +120,9 @@ FORBIDS things, and several of them are already measured.
 - **AND A HELD-OUT QUESTION CAN BE WORD FOR WORD ONE ALREADY ASKED**, the corpus being
   templated over a small cast — so the unseen score is read beside a count of its twins
   rather than on its own.
+- **AND WIDENING THE MOMENT BUYS THE DRAWN SCORE AND SELLS THE HELD-OUT ONE**, with the
+  population ballooning and silence appearing. The gap opens as the bag widens, which is
+  memorising caught by the one instrument a text world has.
 - **JOHN'S CURRICULUM PROPOSAL: TEACH IT ENGLISH, THEN SET IT A TEXT AND EXAMINE IT.** A
   primer before a test is allowed and expected — C4 constrains the learner and not the
   experimenter — and `Primer` already shows plain English to the walk.

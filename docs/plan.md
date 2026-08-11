@@ -35,6 +35,18 @@ FORBIDS things, and several of them are already measured.
 
 - **Twenty used phones on one wifi running the brain**, one stronger machine carrying the
   body — camera at a frame or two a second, audio, temperature, motion.
+- **AND THE PHONES ARE LAST RATHER THAN FIRST, WHICH IS JOHN'S ORDERING, 2026-08-11.** They
+  do not exist yet and will not be bought until this is worth showing somebody. So the
+  hardware is a conclusion of the prototype rather than a precondition for it.
+- **FIRST IS DOCKER CONTAINERS ON ONE BOX, THE BODY A SEPARATE PROCESS, AND THE ONLY SENSE
+  IS ENGLISH.** Talking to it is the first interactive test of the whole system, and it needs
+  no camera, no phone and no wifi — the fleet is already the thing being exercised.
+- **THEN THE PHONE AS THE BODY AND THE CONTAINERS AS THE BRAIN**, video and sensors in, if
+  one machine can hold enough containers to be a fleet. That is the arrangement that says
+  whether twenty of anything is needed before twenty of anything is bought.
+- **SO WHAT THE FOOTPRINT READING IS ABOUT CHANGES WITH THE RUNG.** Containers share one
+  machine's memory, so the whole fleet's brain is the number that matters there; on phones it
+  is one holder's share. Both come off the same reading.
 - **And a text conversation as a second body**, so one brain is judged on symbols and on a
   stream of the world without being two brains.
 - **THE CONSTRAINTS WERE ALL WRITTEN FOR THIS, so it is a demonstration rather than a

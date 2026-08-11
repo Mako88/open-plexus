@@ -46,9 +46,17 @@ public sealed class FootprintTests(ITestOutputHelper output)
     /// <para>
     /// <b>A BAR WRITTEN BEFORE THE FIRST READING IS USUALLY A PREDICTION DRESSED AS A
     /// REQUIREMENT, AND THIS ONE IS NOT MINE TO PREDICT.</b> It comes from outside the
-    /// measurement: a used phone has something like a gigabyte a process can actually have,
-    /// and a holder that wanted more than a sixteenth of that is a holder the arrangement
-    /// cannot carry. Nothing about the learner argues for 64MB; the phone does.
+    /// measurement entirely — <b>John's number, 2026-08-11</b>, and he is the one who knows
+    /// what the hardware is: used Android handsets with one to two gigabytes total, of which
+    /// the operating system and everything else take their share, leaving something between
+    /// half a gigabyte and a gigabyte a process can actually have.
+    /// </para>
+    /// <para>
+    /// <b>AND THE FIRST GUESS HERE WAS 64MB, WHICH WAS WRONG IN THE DIRECTION THAT MATTERS.</b>
+    /// A bar eight times too tight fails a population that would have run perfectly well on
+    /// the machine it was written about, and the failure would have read as the learner
+    /// being too fat rather than as the bar being invented. A number about somebody else's
+    /// hardware should come from whoever has the hardware.
     /// </para>
     /// <para>
     /// <b>SO A RED HERE IS A FINDING RATHER THAN A REGRESSION.</b> If a trained population
@@ -57,7 +65,7 @@ public sealed class FootprintTests(ITestOutputHelper output)
     /// long before twenty phones are in a room.
     /// </para>
     /// </remarks>
-    private const long Share = 64L * 1024 * 1024;
+    private const long Share = 512L * 1024 * 1024;
 
     /// <summary>What a trained population costs, and what it holds to cost it.</summary>
     /// <param name="rounds">How long it ran.</param>

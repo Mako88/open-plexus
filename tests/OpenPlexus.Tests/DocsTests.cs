@@ -42,7 +42,17 @@ public sealed class DocsTests
     /// The most words ONE item may spend. <b>The cap that replaced the doc-wide
     /// one</b> — see the test that reads it.
     /// </summary>
-    private const int Item = 45;
+    /// <remarks>
+    /// <b>RAISED FROM 45 ON 2026-08-11, AND BY WHAT IT COST RATHER THAN BY FEEL.</b> John's
+    /// rule for this budget is that it must stop a doc growing without ever stopping
+    /// information getting written down, and that day it did the second thing: a fork row
+    /// carrying a closed finding and a new design decision would not fit, so <i>R scales
+    /// with load</i> — John's own, from the fork he wrote — was deleted to afford the
+    /// sentence beside it. A cap that is paid for by deleting content is a cap set wrong.
+    /// Sixty still refuses the essay the rule was written against; eleven items were 38% of
+    /// the doc when it was, and none of them was near this.
+    /// </remarks>
+    private const int Item = 60;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

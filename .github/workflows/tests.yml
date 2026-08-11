@@ -237,12 +237,24 @@ jobs:
       # information; one red and three cancelled is one.
       fail-fast: false
 
+      # THE SOCKET SUITES GOT A RUNNER OF THEIR OWN, AND FOR CONTENTION RATHER THAN FOR
+      # LENGTH. `AskedTests`, `FleetTests` and `UnreachedTests` each bring up a fleet of real
+      # listeners on real ports and run whole learners over them, so they are the three that
+      # get slower beside each other -- and the three that were sitting in the catch-all
+      # shard, which is the one that has been running past the timeout above while the other
+      # three finish inside ten minutes.
+      #
+      # AND THE LIST IS CHECKED NOW, WHICH IS WHY MOVING ANYTHING IS SAFE. `ShardTests`
+      # fails the build if a class lands in two shards or in none -- the second being the
+      # one that costs nothing to make and reads as green forever. It also wants this to be
+      # a contiguous block of entries, so a comment goes here rather than between them.
       matrix:
         shard:
           - "(FullyQualifiedName~BindingTests|FullyQualifiedName~ClevrTests)"
           - "(FullyQualifiedName~HomeostatTests|FullyQualifiedName~EncodedTests)"
           - "(FullyQualifiedName~ArrangedTests|FullyQualifiedName~SensesTests|FullyQualifiedName~GradedTests|FullyQualifiedName~TailTests|FullyQualifiedName~TendingTests)"
-          - "(FullyQualifiedName!~BindingTests&FullyQualifiedName!~ClevrTests&FullyQualifiedName!~HomeostatTests&FullyQualifiedName!~EncodedTests&FullyQualifiedName!~ArrangedTests&FullyQualifiedName!~SensesTests&FullyQualifiedName!~GradedTests&FullyQualifiedName!~TailTests&FullyQualifiedName!~TendingTests)"
+          - "(FullyQualifiedName~AskedTests|FullyQualifiedName~FleetTests|FullyQualifiedName~UnreachedTests)"
+          - "(FullyQualifiedName!~BindingTests&FullyQualifiedName!~ClevrTests&FullyQualifiedName!~HomeostatTests&FullyQualifiedName!~EncodedTests&FullyQualifiedName!~ArrangedTests&FullyQualifiedName!~SensesTests&FullyQualifiedName!~GradedTests&FullyQualifiedName!~TailTests&FullyQualifiedName!~TendingTests&FullyQualifiedName!~AskedTests&FullyQualifiedName!~FleetTests&FullyQualifiedName!~UnreachedTests)"
 
     steps:
       - uses: actions/checkout@v4

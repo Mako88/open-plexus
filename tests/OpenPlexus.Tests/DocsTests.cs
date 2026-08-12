@@ -96,12 +96,11 @@ public sealed class DocsTests
 
         "The first north star",
 
-        // JOHN'S, AND IT EARNS A SECTION BECAUSE IT ANSWERS A QUESTION NOTHING ELSE HERE
-        // COULD. The ladder says which rungs exist and `TO BUILD` says what to do next;
-        // neither says whether the thing this rung needs is already in the tree. It is a
-        // status list rather than prose, so the item cap still governs it -- and the first
-        // pass of it turned up a capability that had never been on any list.
-        "THE CAPABILITY LIST",
+        // AND THE CAPABILITY LIST IS GONE INTO `THE ROUTE`, WHICH IS WHERE ITS QUESTION WAS
+        // ALREADY BEING ANSWERED. It existed so *have we built what this rung needs* stopped
+        // being a memory exercise, and a `NOW` leaf answers exactly that against the
+        // requirement the capability serves. Two lists holding one answer is how the two
+        // drift, and the route's is the copy a guard keeps honest.
         "The constraints",
         "TO BUILD",
         "DO NOT RE-TRY",

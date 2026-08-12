@@ -89,8 +89,15 @@ Forks 1 through 25 are `csharp`'s, and when that code is stripped, point `DocsTe
       one group a persistent SOURCE.
     - **OPEN** — nothing tracks a source through a CHANGE, so a thing that moves is a new
       one, and adhesion reaches a source and never an individual. Fork **106**.
+    - **OPEN** — minting an INDIVIDUAL is unbuilt. Where a thing never moves a source and a
+      thing are one set; where it moves they come apart and holding the category costs.
+    - **OPEN** — co-firing binds what is SIMULTANEOUS and never what persists, so a thing at
+      two moments does not co-occur with itself and no amount of it reaches the same thing
+      seen twice.
   - Every input an attribute of it
-    - **NOW** — nothing. Rung five names what co-fires and has never been run across two
+    - **NOW** — several front ends manufacture symbols from a signal, and each is priced.
+    - **OPEN** — nothing makes them attributes of one THING. Rung five names what co-fires,
+      which is what a seen ball and a heard *ball* do, and it has never run across two
       modalities.
     - **SETTLED** — the binding world was built to fail, failed as predicted, and has since
       lifted. Fork **25**.
@@ -111,9 +118,11 @@ Forks 1 through 25 are `csharp`'s, and when that code is stripped, point `DocsTe
       BINDING, which is roles rather than unification. Fork **105**.
     - **OPEN** — a second hop keyed on what the first reading supplied, banded by hop. Open
       at three facts. Fork **96**.
+    - **OPEN** — a commitment ABOUT commitments is expressible and not built, an identity
+      being a code. Metacognition, and where a self-model starts.
   - Concept and label independent
-    - **NOW** — concept-before-label is measured, and alternation groups things with no word
-      for them yet.
+    - **NOW** — rung five mints a name over what co-fires, gated by two bars.
+      Concept-before-label is measured, and alternation groups things with no word yet.
     - **OPEN** — label-first is unbuilt: being told a word for a thing nothing else is known
       about.
     - **DEAD** — graded codes to make a POSITION nameable; the code reached the moment and
@@ -126,9 +135,11 @@ Forks 1 through 25 are `csharp`'s, and when that code is stripped, point `DocsTe
       rather than by how many there are. Fork **71**.
     - **OPEN** — a category is the set of codes that are ALTERNATIVES, derived from moments
       alone. Open on the individual, which substitutability never reaches. Fork **97**.
+    - **OPEN** — a name over ALTERNATIVES is derivable and not admitted, rung five being the
+      wrong SHAPE: it names what CO-FIRES, and alternatives never do.
   - Understanding deepens without limit
     - **NOW** — repair. Specialisation on failure, gated, adding a narrower rule and never
-      editing the old.
+      editing the old. Rung one, and the only rung there is.
     - **OPEN** — it only ever NARROWS. Nothing broadens except rung five, whose trigger is
       redundancy.
     - **OPEN** — rung two, where a negative condition needs a settled occasion and so fires
@@ -159,6 +170,11 @@ Forks 1 through 25 are `csharp`'s, and when that code is stripped, point `DocsTe
       only more population. Fork **76**.
   - Which aspects are temporal
     - **NOW** — a forward store beside the population, retracting where the counters cannot.
+    - **OPEN** — rung three, order inside a scope, is unbuilt. Handing recency over as a code
+      helps and does not reach what choosing the sentence by hand reaches.
+    - **OPEN** — a referent is a THIRD store rather than the same one: *Mary's bedroom*
+      survives leaving the room and *Mary is in the bedroom* does not, so one store gets one
+      lifetime wrong whichever it takes.
     - **OPEN** — nothing SCORES the update, so what retracts is the experimenter's rule. Fork
       **104** carries it, under *what it is told must be settleable*.
     - **OPEN** — banding a word by how many statements back it was buys about half of what
@@ -171,7 +187,11 @@ Forks 1 through 25 are `csharp`'s, and when that code is stripped, point `DocsTe
     - **NOW** — subsumption keeps the general rule where both are equally accurate, and it
       reads a category's entailment.
     - **OPEN** — the gradient collapsed once already: the vote takes the narrowest every
-      round and subsumption the general one every thousandth.
+      round and subsumption the general one every thousandth. A second store needs an
+      evidence rule the first lacked, or it collapses the same way.
+    - **OPEN** — specificity as a gradient across the SITUATION stores too. Rules have that
+      gradient; situations have nowhere to keep one — repetition for a general rule,
+      assertion for a particular.
     - **DEAD** — compression as an edge, off as a trade. Revives where a link costs more than
       the compute to shrink what crosses it. Fork **21**.
     - **OPEN** — whether compression is self-regulating. On no signal found yet. Fork **23**.
@@ -192,11 +212,13 @@ Forks 1 through 25 are `csharp`'s, and when that code is stripped, point `DocsTe
       beats a fixed count. Fork **24**.
     - **OPEN** — more unsound commitments resident than sound ones while the score holds: is
       the vote robust to them, or are they why it stops short. Fork **35**.
-    - **OPEN** — a conflict is two beliefs asserting different members of ONE category for
-      the same key, which is the only retraction counters that only rise allow. Fork **99**.
+    - **OPEN** — mutual exclusion is unbuilt, so a belief can be wrong and never
+      CONTRADICTED. A miss says *I expected Y and got Z*; nothing says Y and Z cannot both
+      hold, which is the whole of what a conflict is. Fork **99**.
   - Learns by being wrong
-    - **NOW** — commitment, settlement, blame, repair. Reading is an objective at last: a
-      sentence a story, and withheld sentences the exam.
+    - **NOW** — commitment, settlement, blame capped at one hop, repair, and abstention so a
+      round that could not settle costs nothing. Reading is an objective at last: a sentence
+      a story, and withheld sentences the exam.
     - **OPEN** — what it converts is unread, and English's alphabet is far wider than
       anything here has run on. Fork **89**.
     - **OPEN** — the horizon is K occasions, K=1. Fork **28**.
@@ -224,7 +246,11 @@ Forks 1 through 25 are `csharp`'s, and when that code is stripped, point `DocsTe
     - **OPEN** — the store's update rule is the experimenter's, so nothing can be wrong about
       it. What must settle is *this statement changes what is known about that*. Fork **104**.
     - **OPEN** — a primer moves no counter, a round the world cannot settle taking no score,
-      no genesis and no repair.
+      no genesis and no repair. A world that asks is one way to fix that and an action with
+      a consequence is another; what is missing is any of them.
+    - **OPEN** — on a read corpus the OBJECTIVE is the wall and no gate reaches it: the
+      informative words are the unpredictable ones and the predictable ones are `to` and
+      `the`.
   - Original thought
     - **NOW** — nothing. Every world here is watched rather than acted in, and action, a
       consequence that can surprise, and a goal are all unbuilt.
@@ -440,97 +466,6 @@ FORBIDS things, and several of them are already measured.
 - **AND THE EXAM IS ALREADY THE RIGHT ONE.** Twenty tasks each isolating one prerequisite,
   written elsewhere with published baselines, and built so surface matching fails. A school
   comprehension test would read nothing until the components pass.
-
-## THE CAPABILITY LIST
-
-John's, and it exists so *have we built what this rung needs* stops being a memory
-exercise. One line a capability, and the status is the whole point of the row.
-
-- **A front end that manufactures symbols from a signal** — BUILT, several, and priced.
-- **A prediction that can be WRONG about something specific** — BUILT. The commitment, and
-  the whole difference from a count.
-- **Blame, aimed at what carried the prediction** — BUILT, capped at one hop.
-- **Specialisation on failure, gated** — BUILT. Rung one, and the only rung there is.
-- **Abstention, so a thing that could not be settled costs nothing** — BUILT and armed.
-- **A name minted over what co-fires** — BUILT. Rung five, gated by two bars.
-- **Learning with no coordinator, across machines that die** — BUILT and measured.
-- **Absence as a CONDITION** — NOT BUILT. Rung two. A front-end substitute was tried and
-  bought nothing on the one world that has asked.
-- **Order inside a scope** — NOT BUILT. Rung three. Handing recency over as a code helps
-  and does not reach what choosing the sentence by hand reaches.
-- **A condition naming no argument** — NOT BUILT. Rung four, a different matcher rather
-  than a rung. PRICED, and cheap: what blocks it is admission, not cost.
-- **A SITUATION MODEL, held apart from the rules** — BUILT IN THE FRONT END AND PRICED, and
-  the price is the first lift off `Roaming`'s marginal this branch has had.
-- **AND WHAT IT IS WORTH IS REACH THE TRANSCRIPT DOES NOT HOLD.** Every backward-reading arm
-  leaves the answer out of the moment on three questions in four, because the newest
-  statement about a thing names who moved it and never where.
-- **AND WHICH KEY THE FOLD FOLLOWS BEATS HOW FAR IT FOLLOWS IT.** Reach rises with depth and
-  the score peaks at one hop and falls back to the marginal, so what limits it is COMPANY.
-- **SO RECENCY OVER THE STORE ANSWERS WHAT FORK 95 COULD NOT STATE**, separating a verb from
-  a name without being told the distinction — the freshest entry is the one that moved.
-- **BUT NOTHING SCORES THE UPDATE, WHICH IS WHY IT IS THE FRONT END'S AND NOT THE BRAIN'S.**
-  A store the experimenter maintains is `Returning`'s handed index again: it works, and
-  what it measures is what such a store is WORTH. Fork 104.
-- **AND SPECIFICITY AS A GRADIENT ACROSS BOTH** — John's. *A person sleeps in a bedroom* and
-  *this is Mary's* are the same knowledge at two grains, held loosely and at once. Rules
-  have that gradient already; situations have nowhere to keep one.
-- **AND IT IS FORBIDDEN BY THE THING THAT MAKES THE POPULATION WORK, WHICH IS WHY IT WAS ON
-  NO LIST.** Counters only rise, so nothing here can say *that stopped being true*, and a
-  situation is exactly a store that must retract.
-- **AND A REFERENT IS A THIRD STORE RATHER THAN THE SAME ONE.** *Mary's bedroom* survives
-  leaving the room and *Mary is in the bedroom* does not, so one store gets one lifetime
-  wrong whichever lifetime it takes.
-- **A NAME OVER ALTERNATIVES** — DERIVABLE, MEASURED, AND NOT ADMITTED. Rung five is the
-  wrong SHAPE: it names what CO-FIRES, and alternatives never do.
-- **AND EXCLUSION PLUS SHARED COMPANY RECOVERS THEM FROM THE MOMENTS ALONE**, with no world
-  table, no vocabulary and no outcome read.
-- **AND THE COMPRESSION IS THERE AND WAS BEHIND A JUDGE RATHER THAN A REWRITE.** Genesis
-  roots on a category code like any other, so the coarse rule already existed and nothing
-  could see a member's rule is narrower. 606 rules folded, **196** judged. The operator fork
-  85 asked for is built, measured and gone.
-- **AND IT IS LOAD-BEARING TWICE OVER NOW, WHICH RAISES WHAT IT IS WORTH.** The same
-  never-co-occur test is rung four's admission gate, so building it once pays for two rungs.
-- **ONE CONCEPT REACHED BY SEVERAL SENSES** — NOT BUILT, and the mechanism already exists.
-  Rung five names what CO-FIRES, which is exactly what a seen ball and a heard *ball* do;
-  nothing has ever run it across two modalities.
-- **AND CO-FIRING BINDS WHAT IS SIMULTANEOUS AND NEVER WHAT PERSISTS.** A ball at two moments
-  does not co-occur with itself, so no amount of it reaches the same thing seen twice. That
-  is minting an individual, by another road.
-- **AND WHAT SEPARATES TWO SUBSTITUTABLE THINGS IS IN THE INPUT AND NOT IN ANY MOMENT OF
-  IT.** Sightings in RUNS put a thing's own codes beside each other in time and no twin's,
-  so ADHESION recovers eight groups of four where shared company finds four of eight, at
-  three seeds.
-- **AND IT PAYS AGAINST BEING TOLD**, 123 rules to a handed index's 179 over three seeds
-  against 604 with no category, every cell perfect. A given index still needs conjoining
-  with a look; this absorbs the rules that named its members.
-- **BUT WHAT IT RECOVERS IS A PERSISTENT SOURCE OF CODES AND NEVER AN INDIVIDUAL**, which
-  the same world says the moment things MOVE. The groups survive drift — eight places hold
-  four codes whoever stands in them — and the score does not, falling below holding no
-  category at all.
-- **SO A FIXED LANDMARK IS A CONJUNCTION, WHICH IS RUNG ONE AND WAS BUILT LONG AGO**, and
-  the identity reading was the cheaper explanation all along. Tracking a thing THROUGH a
-  change is what no derivation here reaches.
-- **SOMETHING TO BE WRONG ABOUT WHILE READING** — NOT BUILT, and it is why a primer moves no
-  counter. A world that asks is one way and an action with a consequence is another; what is
-  missing is any of them.
-- **AND ON THIS CORPUS THE OBJECTIVE ITSELF IS THE WALL, WHICH NO GATE REACHES.** A perfect
-  predictor of the rarest word scores barely over a blind draw, so the informative words are
-  the unpredictable ones and the predictable ones are `to` and `the`.
-- **MUTUAL EXCLUSION, so a belief can be CONTRADICTED and not merely wrong** — NOT BUILT. A
-  miss says *I expected Y and got Z*; nothing anywhere says Y and Z cannot both hold, which
-  is the whole of what a conflict is.
-- **MINTING AN INDIVIDUAL** — NOT BUILT, and adhesion reaches a persistent SOURCE rather
-  than a thing. Where a thing never moves the two are one set and it is worth a third of the
-  population; where it moves they come apart and the category costs.
-- **AND THE GRADIENT ALREADY COLLAPSED ONCE, IN THE STORE THAT HAS ONE.** The vote takes the
-  narrowest every round and subsumption the general one every thousandth, so a second store
-  needs an evidence rule the first lacked or it collapses the same way — repetition for a
-  general rule, assertion for a particular.
-- **Action, and a consequence that can surprise** — NOT BUILT. The plan's own goal sentence
-  is interventional and every world here is watched rather than acted in.
-- **A goal, as a commitment about a state that does not hold** — NOT BUILT.
-- **A commitment ABOUT commitments** — EXPRESSIBLE and not built, identity being a code.
 
 ## The constraints
 

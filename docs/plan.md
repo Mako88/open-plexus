@@ -230,6 +230,18 @@ exercise. One line a capability, and the status is the whole point of the row.
 - **AND THE CATEGORY COMES BACK WHOLE ONLY WHERE THE LEARNER IS FAILING**, which inverts the
   order this was planned in. The task answered outright returns half the cast off twenty-seven
   rules; the task below its own marginal returns all of it off twelve hundred.
+- **AND OFF THE RAW TEXT IT COMES BACK PERFECT, WHICH NEEDS NO POPULATION AT ALL.** The six
+  rooms, the four names, the four motion verbs and the three props, and on the task holding
+  both it separates the taking verbs from the dropping ones.
+- **AND HANDED OVER FREE IT PAYS, WHICH IS THE UPPER BOUND ON THE WHOLE OPERATOR AND WAS RUN
+  BEFORE IT.** Minting cannot beat being given, so a grid costing minutes prices a mechanism
+  costing a session.
+- **AND IT PAYS FIVE TIMES MORE UNDER THE BAG THAN UNDER THE ADDRESSED FRONT END**, which had
+  already done the selecting and left a category nothing to generalise over. Under the bag it
+  is bought for no extra population; under the addressed arm it costs a third more.
+- **AND NO ARM CLEARS ITS MARGINAL WHERE TWO FACTS ARE NEEDED, WHICH IS THE LIMIT.** A
+  category generalises across one slot and adds no hop, so it prices this rung and leaves fork
+  96 exactly where it was.
 - **MUTUAL EXCLUSION, so a belief can be CONTRADICTED and not merely wrong** — NOT BUILT. A
   miss says *I expected Y and got Z*; nothing anywhere says Y and Z cannot both hold, which
   is the whole of what a conflict is.
@@ -831,6 +843,9 @@ condition is a superstition.
 - **AND *THE ANSWER IS IN THE ROOM* IS NOT A BOUND ON THE SCORE.** An outcome is an index
   rather than a word, so the base rate is collected with nothing to read — and where the
   marginal is above that column a score sits above it with nothing wrong.
+- **AND A SEED SPREAD IS NOT ALWAYS A YARDSTICK, SO A KILL LINE RESTING ON ONE CAN BE
+  VACUOUS.** Three seeds returned the identical exam score in every cell of the category grid,
+  so *clear the control by more than the spread* admitted any gain at all.
 - **AND A PRECISION TAKEN AT THE ANSWER'S OWN SIZE IS THE EXPERIMENTER HOLDING THE KNIFE.**
   Nothing inside the machine knows a category has four members, so a top-k score can be
   perfect while no rule the machine could run reproduces it. Report the size-free cut beside.
@@ -1567,7 +1582,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **89** | John's: prime it on general English before setting it a text to be examined on. `Primer` exists for the walk and ports cheaply, but a settled-nothing round moves no counter here — so a primer needs something to predict while reading. Next word is rung three. Open |
 | **90** | John's: is there a standardised comprehension exam that separates understanding from regurgitation? bAbI already is one at this rung. What is unpriced is the tier above — school exams and the passages built so the wrong answer is the one present verbatim. Open, and blocked until the components pass |
 | **88** | The front end intersects the question with EACH statement. `Joining.Addressed` ANSWERS TASK ONE OUTRIGHT where the bag sits near the marginal, and falls to the base rate at two supporting facts — at its ceiling there too, so one hop is all it reaches and the learner never failed. Closed; fork 96 carries the reach |
-| **97** | John's: a category is the set of codes that are ALTERNATIVES, and the operator the multiplexer's address bits have always wanted. HALF ANSWERED before a line of it was written: the population's slot is a mixed bag and the text statistic cuts it without ever straddling two categories. Open on the operator itself |
+| **97** | John's: a category is the set of codes that are ALTERNATIVES, and the operator the multiplexer's address bits have always wanted. PRICED before it was built: handed over free they come back perfect, and pay five times more under the bag than under the front end that had done the selecting. Open on minting them |
 | **98** | John's: a concept forms BEFORE its label, so substitutability groups things with no word and the word later labels a category that already existed. THE PROBE PASSES on both categories and all three tasks, the category packed against one and the next thing out a third of the scale below. Closed, and fork 97 is unblocked |
 | **99** | John's: a conflict is two beliefs asserting different members of ONE category for the same key, which is the only route to retraction under counters that only rise. And malleability is the counters rather than a property — a per-belief weight is where the human puts the answer in. Open |
 | **96** | A second hop: read at the key the FIRST reading supplied. Where the question names the apple, the apple's newest statement says who picked it up and never where. Chaining is already expressible, a commitment's identity being a code; what stands in the way is fork 32's depth cap. Open, and next |

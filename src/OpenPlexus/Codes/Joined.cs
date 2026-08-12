@@ -220,10 +220,41 @@ public sealed class Joined : IQuantizer<Asking>
     /// </remarks>
     public const int Bands = 3;
 
+    /// <summary>The modality a category rides on.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>ITS OWN, AND NOT <c>Naming.Meant</c>, BECAUSE THE TWO FOLD THE OPPOSITE
+    /// WAY.</b> A minted name is present when ALL its members are, which is what makes it a
+    /// name for a co-firing set; a category is present when ANY member is, which is what
+    /// makes it a name for a set of alternatives. Sharing a modality would let a soundness
+    /// check spell one out as the other.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS A FRONT END SAYING WHAT IT IS LOOKING AT RATHER THAN WHAT TO CONCLUDE.</b>
+    /// <i>This code is one of a set that never co-occurs and keeps one company</i> is
+    /// arithmetic over what was seen, in the same licence <see cref="Codes.Coded.Groups"/>
+    /// carries for <i>these codes were one object</i>. Which category matters, and to what,
+    /// is left entirely to the learner.
+    /// </para>
+    /// </remarks>
+    public const byte Sorted = 43;
+
     private readonly Joining _joining;
+    private readonly IReadOnlyList<IReadOnlySet<Code>> _categories;
 
     /// <param name="joining">What to do with the two halves.</param>
-    public Joined(Joining joining) => _joining = joining;
+    /// <param name="categories">
+    /// Sets of codes that are ALTERNATIVES, each earning one extra code in any moment
+    /// holding any of its members. <b>An independent axis and never a
+    /// <see cref="Joining"/> value</b>, because a setting that decided two things while
+    /// being named for one is a trap this repo has already paid for — every arm below is a
+    /// cell of a grid rather than a point on a line.
+    /// </param>
+    public Joined(Joining joining, IReadOnlyList<IReadOnlySet<Code>>? categories = null)
+    {
+        _joining = joining;
+        _categories = categories ?? [];
+    }
 
     /// <inheritdoc/>
     public byte Modality => Both;
@@ -234,13 +265,13 @@ public sealed class Joined : IQuantizer<Asking>
         var said = new HashSet<Code>(observation.Words);
         said.UnionWith(observation.Question);
 
-        if (_joining == Joining.Recent) return Banding(said, observation);
+        if (_joining == Joining.Recent) return Sorting(Banding(said, observation));
 
-        if (_joining == Joining.Distinguished) return Situating(observation);
+        if (_joining == Joining.Distinguished) return Sorting(Situating(observation));
 
-        if (_joining == Joining.Addressed) return Addressing(said, observation);
+        if (_joining == Joining.Addressed) return Sorting(Addressing(said, observation));
 
-        if (_joining == Joining.Bagged) return said;
+        if (_joining == Joining.Bagged) return Sorting(said);
 
         // THE INTERSECTION IS TAKEN OVER THE HALVES AND NEVER OVER THE UNION, which reads
         // as pedantry until the union has already lost the distinction. Every code in the
@@ -259,7 +290,66 @@ public sealed class Joined : IQuantizer<Asking>
         if (_joining == Joining.Named) foreach (var one in shared) said.Add(new Code(Both, one.Value));
         else said.Add(Coincided);
 
-        return said;
+        return Sorting(said);
+    }
+
+    /// <summary>
+    /// The moment with a code added for every category any of whose members is in it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>ANY AND NEVER ALL, WHICH IS THE WHOLE DIFFERENCE FROM RUNG FIVE.</b> The members
+    /// are alternatives and by construction never co-occur, so a fold demanding all of them
+    /// would fire on nothing at all. <b>The plain code stays beside the category</b>, because
+    /// emitting only the category would make <i>mary</i> and <i>john</i> the same word — and
+    /// a general rule is worth having only while a particular one is still sayable, which is
+    /// the specificity gradient this repo has been circling.
+    /// </para>
+    /// <para>
+    /// <b>ONE PASS AND NOT A FIXED POINT, unlike <c>Naming.Fold</c>.</b> A category
+    /// over categories is expressible and nothing mints one yet, so iterating would be
+    /// machinery with no caller — and a loop that cannot turn twice is a loop written for a
+    /// mechanism that does not exist.
+    /// </para>
+    /// </remarks>
+    private HashSet<Code> Sorting(HashSet<Code> moment)
+    {
+        foreach (var category in _categories)
+            foreach (var member in category)
+                if (moment.Contains(member))
+                {
+                    moment.Add(Category(category));
+                    break;
+                }
+
+        return moment;
+    }
+
+    /// <summary>What a category of these members is called, on every machine, forever.</summary>
+    /// <param name="members">The alternatives it stands for, in any order.</param>
+    /// <remarks>
+    /// <b>DERIVED FROM THE MEMBERS AND NEVER FROM A POSITION IN A LIST.</b> Two front ends
+    /// that noticed the same alternation must reach the same code without speaking, which is
+    /// the rule <c>Naming.Name</c> stands on and the reason parent-plus-condition once
+    /// gave one scope two names. An index would make a category mean one thing here and
+    /// another on the machine that counted its statements in a different order.
+    /// </remarks>
+    public static Code Category(IReadOnlySet<Code> members)
+    {
+        ArgumentNullException.ThrowIfNull(members);
+
+        if (members.Count < 2)
+            throw new ArgumentException("a category of fewer than two codes says nothing", nameof(members));
+
+        var hash = Agreed.Fold(Agreed.Basis, (ulong)members.Count);
+
+        foreach (var code in members.Order())
+        {
+            hash = Agreed.Fold(hash, code.Modality);
+            hash = Agreed.Fold(hash, code.Value);
+        }
+
+        return new Code(Sorted, Agreed.Mix(hash));
     }
 
     /// <summary>

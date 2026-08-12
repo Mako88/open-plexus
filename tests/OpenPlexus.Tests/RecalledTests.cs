@@ -58,12 +58,13 @@ public sealed class RecalledTests(ITestOutputHelper output)
         new Joined(Joining.Bagged).Codify(asking).Order();
 
     private static (Recalled World, Trial<Asking> Trial, Brain Brain) Made(
-        RecalledSettings settings, Joining joining = Joining.Bagged, int capacity = 2000)
+        RecalledSettings settings, Joining joining = Joining.Bagged, int capacity = 2000,
+        IReadOnlyList<IReadOnlySet<Code>>? categories = null, int seed = 1)
     {
-        var brain = new Brain(new CommittingSettings { Capacity = capacity }, 1);
+        var brain = new Brain(new CommittingSettings { Capacity = capacity }, seed);
         var world = new Recalled(settings);
 
-        return (world, new Trial<Asking>(world, new Joined(joining), brain), brain);
+        return (world, new Trial<Asking>(world, new Joined(joining, categories), brain), brain);
     }
 
     [Fact]
@@ -854,6 +855,182 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     + $"commonest {world.Commonest:F3} chance {1.0 / world.Outcomes:F3} | "
                     + $"held {brain.Held.Count,5} names {brain.Held.Names.Count,4} "
                     + $"wanting {tally.Wanting:F3}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// A category fires on ANY member, and its code is the same one on every machine.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE ONE PROPERTY THAT SEPARATES THIS FROM RUNG FIVE, AND NOTHING ELSE ASSERTS
+    /// IT.</b> A minted name stands for a set that CO-FIRES and appears when all of it does;
+    /// a category stands for a set of ALTERNATIVES, which by construction never co-occur — so
+    /// an all-members fold would fire on nothing at all and the arm would read as inert
+    /// rather than as broken. <b>A mechanism that cannot fire looks exactly like one that
+    /// does not help</b>, which is a trap this repo has already paid for twice.
+    /// </para>
+    /// <para>
+    /// <b>AND THE CODE IS DERIVED FROM THE MEMBERS, WHICH IS THE CONSTRAINT AND NOT A
+    /// STYLE.</b> Two front ends counting the same statements in a different order must reach
+    /// the same code without speaking, or a category means one thing on one machine and
+    /// another on the next.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_category_fires_on_any_member_and_is_named_by_what_it_holds()
+    {
+        var people = new HashSet<Code> { Babi.Of("mary"), Babi.Of("john"), Babi.Of("sandra") };
+        var shuffled = new HashSet<Code> { Babi.Of("sandra"), Babi.Of("mary"), Babi.Of("john") };
+
+        Assert.Equal(Joined.Category(people), Joined.Category(shuffled));
+        Assert.Equal(Joined.Sorted, Joined.Category(people).Modality);
+
+        // A DIFFERENT SET IS A DIFFERENT CATEGORY, so dropping a member cannot silently
+        // rewrite what every scope holding the old name was claiming.
+        Assert.NotEqual(
+            Joined.Category(people),
+            Joined.Category(new HashSet<Code>(people) { Babi.Of("daniel") }));
+
+        Assert.Throws<ArgumentException>(() => Joined.Category(new HashSet<Code> { Babi.Of("mary") }));
+
+        // ONE STATEMENT BUILT BY HAND RATHER THAN DRAWN, because a drawn moment is a whole
+        // story and holds several names at once — which is a fine moment and a useless
+        // instrument, since a fold demanding all members might fire on it by luck.
+        var said = new Asking
+        {
+            Story = [new HashSet<Code> { Babi.Of("mary"), Babi.Of("went"), Babi.Of("kitchen") }],
+            Question = new HashSet<Code>(),
+        };
+
+        var bare = new HashSet<Code>(new Joined(Joining.Bagged).Codify(said));
+        var sorted = new HashSet<Code>(
+            new Joined(Joining.Bagged, new List<IReadOnlySet<Code>> { people }).Codify(said));
+
+        // ONE MEMBER IS ENOUGH AND THE OTHERS ARE NOT THERE, which is the whole assertion. A
+        // fold demanding all three would leave this moment untouched and the two sets would
+        // come back equal.
+        Assert.Single(bare, people.Contains);
+        Assert.Contains(Joined.Category(people), sorted);
+        Assert.DoesNotContain(Joined.Category(people), bare);
+
+        // AND THE PLAIN WORD SURVIVES BESIDE IT. Replacing a name with its category would
+        // make mary and john the same word, which is the general end of the gradient eating
+        // the particular one — the collapse this repo has already measured in the one store
+        // that has a gradient.
+        Assert.Equal(bare.Count + 1, sorted.Count);
+        Assert.Subset(sorted, bare);
+    }
+
+    /// <summary>
+    /// Whether a category is worth anything to this learner, handed over FREE.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE KILL TEST, AND IT IS RUN BEFORE THE MINTER RATHER THAN AFTER IT.</b> Minting a
+    /// category cannot beat being given one, so the arm that hands the learner every category
+    /// the statistic finds is an upper bound on the whole of fork 97. If the score does not
+    /// move here, no operator that computes these sets more cleverly can make it move, and
+    /// the design dies for the price of one grid instead of a mechanism.
+    /// </para>
+    /// <para>
+    /// <b>AND THE CATEGORIES ARE THE ONES THE STATISTIC PROPOSES AND NEVER THE ANSWER
+    /// KEY.</b> <see cref="Key"/> scores what comes back and is not consulted here — an arm
+    /// handed <i>person</i> and <i>place</i> by an experimenter would price a category nobody
+    /// can compute, which is a ceiling for a mechanism that does not exist.
+    /// </para>
+    /// <para>
+    /// <b>AND WHAT WOULD DROP IT WAS WRITTEN BEFORE IT RAN, AND WAS A BAD LINE:</b> clearing
+    /// the control by more than the seed spread. <b>The seed spread here is nought</b> — three
+    /// seeds returned the identical exam score in every cell — so the rule admits any gain at
+    /// all, and the verdict has to be read against the MARGINAL instead. Written down rather
+    /// than quietly replaced, because a kill line rewritten after the numbers is not one.
+    /// </para>
+    /// <para>
+    /// <b>THE KILL DID NOT FIRE, AND THE CATEGORIES COME BACK PERFECT.</b> The statistic
+    /// proposes the six rooms, the four names, the four motion verbs and the three props, and
+    /// on the task that has both it separates the taking verbs from the dropping ones — all
+    /// of it off the raw text with no learner and no key.
+    /// </para>
+    /// <para>
+    /// <b>AND IT PAYS FIVE TIMES MORE UNDER THE BAG THAN UNDER THE ADDRESSED FRONT END, WHICH
+    /// IS THE READING THE SECOND ARM EXISTS FOR.</b> Addressed hands the learner one statement
+    /// and has already done the selecting, so a category has almost nothing left to
+    /// generalise over and buys a point or two; the bag hands over the whole story and the
+    /// category buys five, on both tasks that need more than one fact.
+    /// </para>
+    /// <para>
+    /// <b>AND UNDER THE BAG IT IS BOUGHT FOR NOTHING</b>, where under the addressed arm it
+    /// costs a third more population. The task that sits at its capacity keeps the identical
+    /// budget and scores better with it, so what the category buys there is not more rules —
+    /// it is the same rules saying more.
+    /// </para>
+    /// <para>
+    /// <b>AND NO ARM CLEARS ITS MARGINAL ON THE TWO TASKS THAT NEED TWO FACTS, WHICH IS THE
+    /// LIMIT AND NOT A FOOTNOTE.</b> A category generalises across the members of one slot; it
+    /// does not add a hop, and a hop is what those tasks are missing. So this prices fork 97
+    /// and leaves fork 96 exactly where it was.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_a_category_handed_over_free_is_worth_anything()
+    {
+        foreach (var task in new[] { 1, 2, 3 })
+        {
+            var (naming, company) = Counted(task);
+
+            // EVERY CODE THE CORPUS EVER WROTE, cut by the same statistic and with nothing
+            // told to it. Restricting the candidates to the words that fill a population's
+            // slot would make the front end depend on a learner that has not run yet, and
+            // the point of this arm is to price the ceiling rather than the route to it.
+            var categories = Grouped(new HashSet<Code>(company.Keys), company)
+                .Where(group => group.Count >= 2)
+                .Select(group => (IReadOnlySet<Code>)new HashSet<Code>(group))
+                .ToList();
+
+            foreach (var category in categories)
+                output.WriteLine(
+                    $"task {task} | category [{string.Join(" ", category.Order().Select(one => naming[one]))}]");
+
+            // ONE SEED, AND THAT IS A MEASUREMENT RATHER THAN A SHORTCUT. Three seeds were
+            // run first and every cell returned the identical exam score to three places, so
+            // the seed reaches nothing this world exercises — which means a seed spread
+            // cannot be the yardstick here and the reading has to be taken against the
+            // marginal instead.
+            //
+            // AND BOTH FRONT ENDS, BECAUSE THE ADDRESSED ONE HAS ALREADY DONE THE NARROWING.
+            // It hands the learner one statement, where a category has almost nothing left to
+            // generalise over; the bag hands it the whole story. An arm measured only under
+            // the front end that solved the problem would be reporting the front end.
+            foreach (var joining in new[] { Joining.Bagged, Joining.Addressed })
+            {
+                var scored = new double[2];
+
+                foreach (var sorted in new[] { false, true })
+                {
+                    var (world, trial, brain) = Made(
+                        World(task, span: 0), joining, categories: sorted ? categories : null);
+
+                    var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
+
+                    scored[sorted ? 1 : 0] = tally.Unseen?.Accuracy ?? 0.0;
+
+                    output.WriteLine(
+                        $"task {task} {joining,-9} categories {(sorted ? "on " : "off")} | "
+                        + $"exam {tally.Unseen?.Accuracy ?? 0.0:F3} | own {tally.Recent:F3} | "
+                        + $"marginal {world.Commonest:F3} | held {brain.Held.Count,5} "
+                        + $"names {brain.Held.Names.Count,4} wanting {tally.Wanting:F3}");
+                }
+
+                // NEVER WORSE, IN EVERY CELL, which is the claim worth asserting rather than
+                // any one gain. A code the learner is free to ignore SHOULD cost nothing, and
+                // an arm that quietly took a point off somewhere would mean the extra
+                // alphabet was crowding the population — the exact fault that killed the
+                // mixed objective and the banding gain.
+                Assert.True(
+                    scored[1] >= scored[0],
+                    $"task {task} {joining}: categories on {scored[1]:F3} under off {scored[0]:F3}");
             }
         }
     }

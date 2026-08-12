@@ -80,7 +80,7 @@ condition that would revive them.
 | Relations are concepts too | A commitment IS a relation and carries a code, so relations nest | A relation naming no ARGUMENT is rung four, a different matcher rather than a rung |
 | Concept and label independent | Concept-before-label is measured; alternation groups things with no word | Label-first is unbuilt — being told a word for a thing nothing else is known about |
 | Understanding deepens without limit | Repair. Specialisation on failure, gated, adding a narrower rule and never editing the old | It only ever NARROWS. Nothing broadens except rung five, whose trigger is redundancy |
-| Which aspects are temporal | Nothing | Counters only rise. Needs an individual, a role and a category at once — fork 99 |
+| Which aspects are temporal | A forward store beside the population, retracting where the counters cannot | Nothing SCORES the update, so what retracts is the experimenter's rule — fork 104 |
 | Several grains at once | Subsumption keeps the general rule where both are equally accurate | The gradient collapsed once already: the vote takes the narrowest every round |
 | Malleability is the record | Accuracy-weighted vote, plus a recency-weighted local estimate that never merges | Nothing. This one works |
 | Learns by being wrong | Commitment, settlement, blame, repair. Reading is an objective at last — `Recalled` at `Task = 0` reads Tatoeba, a sentence a story, withheld sentences the exam | What it converts is unread, and English's alphabet is far wider than anything here has run on |
@@ -224,10 +224,10 @@ FORBIDS things, and several of them are already measured.
 - **SO WHAT RUNG FOUR IS WORTH ON TEXT IS PRICED, AND IT IS THE WHOLE TASK RATHER THAN A
   MARGIN.** That is the number fork 33 wanted before anybody pays for a matcher — and the
   caveat is that the task is NAMED for needing one statement.
-- **AND A SITUATION MODEL IS DOWNSTREAM OF RUNG FOUR RATHER THAN A WAY AROUND IT.** Holding
-  one state per thing is no use to a matcher that can only ask whether a code is PRESENT:
-  two states in the room is the selection problem again, whole. The store must be read BY
-  KEY, which is unification.
+- **AND A SITUATION MODEL WAS CALLED DOWNSTREAM OF RUNG FOUR AND IS NOT.** A store read at
+  the question's own words by the front end is arithmetic, and it lifts a world where every
+  backward-reading arm sat on the marginal. What rung four would buy is the read, not the
+  store.
 - **AND READING A STATEMENT MUST CHANGE SOMETHING, WHICH IS FORKS 89, 91 AND 93 AS ONE
   PROBLEM.** A primer moves no counter because nothing settles; a masked objective settles
   and learns function words; a situation is the thing a statement could change that a later
@@ -279,14 +279,14 @@ exercise. One line a capability, and the status is the whole point of the row.
 - **A NAME OVER ALTERNATIVES** — NOT BUILT, and rung five is the wrong SHAPE for it. It
   names what CO-FIRES; a category is a set of codes that never co-occur and share their
   contexts. The general end of the gradient has no vocabulary without it.
+- **AND IT IS LOAD-BEARING TWICE OVER NOW, WHICH RAISES WHAT IT IS WORTH.** The same
+  never-co-occur test is rung four's admission gate, so building it once pays for two rungs.
 - **ONE CONCEPT REACHED BY SEVERAL SENSES** — NOT BUILT, and the mechanism already exists.
   Rung five names what CO-FIRES, which is exactly what a seen ball and a heard *ball* do;
   nothing has ever run it across two modalities.
 - **AND CO-FIRING BINDS WHAT IS SIMULTANEOUS AND NEVER WHAT PERSISTS.** A ball at two moments
   does not co-occur with itself, so no amount of it reaches the same thing seen twice. That
   is minting an individual, by another road.
-- **AND IT BINDS WHAT IS SIMULTANEOUS AND NOT WHAT PERSISTS.** The ball at two moments never
-  co-occurs with itself, so co-firing cannot reach it. That is the individual again.
 - **SOMETHING TO BE WRONG ABOUT WHILE READING** — NOT BUILT, and it is why a primer moves no
   counter. A world that asks is one way and an action with a consequence is another; what is
   missing is any of them.

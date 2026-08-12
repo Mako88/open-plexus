@@ -245,6 +245,7 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
         var scored = 0;
 
         var byGroup = new Dictionary<int, (int Scored, int Better)>();
+        var byKind = new Dictionary<bool, (int Scored, int Better)>();
 
         double parentAccuracy = 0;
         double childAccuracy = 0;
@@ -308,6 +309,21 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
             // IS. If the share that survives rises with the group then the gate is a count
             // and costs nothing; if it is flat, the operator needs a real bar and the count
             // is a distraction.
+            // AND WHETHER THE VALUES THE HOLE COVERS ARE ALTERNATIVES, WHICH IS FORK 97'S
+            // DEFINITION OF A CATEGORY ARRIVING WHERE NOBODY PUT IT. *Bit three is nought*
+            // and *bit three is one* never co-occur; *bit three is nought* and *bit five is
+            // one* do. A hole over the first pair is a variable and over the second is a
+            // coincidence of position, and the two are told apart by a fact about the
+            // moments rather than by anything about the rules.
+            var covered = members.Select(child => child.Scope[hole]).Distinct().ToList();
+
+            var exclusive = covered.Count > 1
+                && moments.All(one => covered.Count(one.Moment.Contains) <= 1);
+
+            byKind.TryAdd(exclusive, (0, 0));
+            byKind[exclusive] = (byKind[exclusive].Scored + 1,
+                byKind[exclusive].Better + (parent >= kids ? 1 : 0));
+
             var bucket = Math.Min(members.Count, 6);
 
             byGroup.TryAdd(bucket, (0, 0));
@@ -332,6 +348,19 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
         foreach (var (size, tally) in byGroup.OrderBy(one => one.Key))
             output.WriteLine(
                 $"  covering {size}{(size == 6 ? "+" : " ")} siblings | {tally.Better,3} of "
+                + $"{tally.Scored,3} no worse ({tally.Better / (double)tally.Scored:P0})");
+
+        // AND THIS COLUMN IS A LEAD RATHER THAN A FINDING, WHICH IS SAID HERE BECAUSE IT
+        // WILL READ AS A FINDING. Fork 97's definition of a category is exactly what a hole
+        // wants — the values it covers should be ALTERNATIVES — and on this world almost no
+        // sibling group is one, because repair adds a discriminating code rather than a
+        // pair. A rate over a handful of cases carries nothing whichever way it falls, and
+        // this repo has already been caught once reading a ratio over a few rounds.
+        output.WriteLine("and whether those values are alternatives — TOO FEW TO READ:");
+
+        foreach (var (exclusive, tally) in byKind.OrderByDescending(one => one.Key))
+            output.WriteLine(
+                $"  values {(exclusive ? "never co-occur" : "co-occur     ")} | {tally.Better,3} of "
                 + $"{tally.Scored,3} no worse ({tally.Better / (double)tally.Scored:P0})");
 
         Assert.True(scored > 0, "no proposal ever fired, so nothing was scored");

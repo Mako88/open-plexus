@@ -643,6 +643,9 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   than the rules it replaces about nine times in ten. Fork 102.
 - **AND HOW MANY SIBLINGS A HOLE COVERS DOES NOT SEPARATE THEM**, so the first gate anybody
   would reach for is not one. What does is open.
+- **AND THE CANDIDATE IS FORK 97 ARRIVING WHERE NOBODY PUT IT.** A hole wants the values it
+  covers to be ALTERNATIVES, which is the category definition exactly — and almost no
+  sibling group on the world read is one, so it is a lead over a handful of cases.
 - **AND A VARIABLE NEEDS TWO PLACES IN THE MOMENT THAT CAN DISAGREE**, which no front end
   here emits — the question's words are unioned into the story's bag.
 - **Rung five, and it goes up.** When several commitments share a sub-scope, mint a

@@ -77,9 +77,11 @@ public sealed class StaleClaimTests
     /// </remarks>
     private static readonly string[] Current =
     [
+        // AND IT IS ONE SECTION NOW, `TO BUILD` AND `OPEN DEFECTS` HAVING FOLDED INTO THE
+        // ROUTE. That is a narrowing of the list and not of the check: everything those two
+        // sections held that spoke about the present is a leaf in here, so the same claims
+        // are read -- against the requirement they block rather than in a list of their own.
         "THE ROUTE",
-        "TO BUILD",
-        "OPEN DEFECTS",
     ];
 
     /// <summary>

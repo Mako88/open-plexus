@@ -87,60 +87,49 @@ public sealed class DocsTests
     /// John.
     /// </para>
     /// </remarks>
-    private const int Whole = 10_700;
+    private const int Whole = 9_900;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.
     /// </summary>
     /// <remarks>
-    /// <b>John's shape, 2026-08-04</b>: the goal, the constraints, what is not yet
-    /// done, what was tried and what would revive it, and the traps. <b>Anything
-    /// built and decided is not on this list</b>, because it is in the code.
+    /// <b>Anything built and decided is not on this list</b>, because it is in the code.
     /// <para>
-    /// <b>AND THE FORK INDEX IS GONE, WHICH IS WHAT THE ROUTE BECOMING A TREE BOUGHT.</b> It
-    /// was a flat table of ninety-four rows that had to be read in full to find the one
-    /// bearing on what you were doing, and half of it was settled questions kept only so a
-    /// citation would resolve. A fork now hangs off the requirement it serves, which is the
-    /// question a session actually arrives with — and the numbers still resolve, because
-    /// <see cref="Every_fork_the_code_cites_is_in_the_index"/> reads the whole doc rather
-    /// than one section of it.
+    /// <b>JOHN'S SHAPE, 2026-08-12, AND IT WENT FROM NINE SECTIONS TO FOUR.</b> The goal, the
+    /// architecture, the constraints and the first north star were four headings saying one
+    /// thing — here is what must be true when this is finished — and `TO BUILD` was a fifth
+    /// listing what is not built yet, which is what a route leaf already says. So the doc
+    /// splits on the only line that matters to a reader: what is FIXED against what MOVES.
     /// </para>
     /// <para>
-    /// <b>AND ONE SECTION ARRIVES BETWEEN THE GOAL AND THE CONSTRAINTS, which is where it
-    /// belongs rather than where it was convenient.</b> The first north star is the thing
-    /// being built TOWARD — twenty phones and a body — and it sits after the goal because it
-    /// is not the goal, and before the constraints because several constraints only make
-    /// sense once you know what is going to be running on what.
+    /// <b>AND `OPEN DEFECTS` WENT WITH THEM.</b> It was added when whole areas were being
+    /// deferred mid-rabbit-hole and a defect could sit unowned for weeks. Handoffs and a CI
+    /// that goes green every session carry that now, and a defect that outlives a session is
+    /// a `BROKEN` leaf against the requirement it blocks.
+    /// </para>
+    /// <para>
+    /// <b>AND THE FORK INDEX WENT EARLIER, WHICH IS WHAT THE ROUTE BECOMING A TREE BOUGHT.</b>
+    /// Ninety-four flat rows that had to be read whole to find the one bearing on your work.
+    /// The numbers still resolve, because
+    /// <see cref="Every_fork_the_code_cites_is_in_the_index"/> reads the whole doc rather
+    /// than one section of it.
     /// </para>
     /// </remarks>
     private static readonly string[] Sections =
     [
-        "The goal",
-
-        // JOHN'S, AND IT IS THE SECTION WRITTEN TO STAY STILL. `The goal` holds the BET --
-        // a commitment rather than a count -- and the capability list holds what is missing.
-        // Neither said what the thing is missing FROM, so a session arriving cold read the
-        // capability list as a menu and optimised whatever the handoff named. It sits above
-        // the north star because architecture outranks what it will run on.
-        "THE ARCHITECTURE",
-
-        // AND THE HOW SITS DIRECTLY UNDER THE WHAT, one row per architecture line and in that
-        // order. Without it the architecture is a wish and the capability list is a menu, and
-        // neither says which of the two a given mechanism is serving.
+        // FOUR, AND THE SPLIT IS THE FIXED AGAINST THE MOVING. `THE DESTINATION` holds what
+        // must be true when this is finished -- the bet, the requirements, the machine's
+        // invariants, the first target, and what the field already knows. None of it moves.
+        // `THE ROUTE` is where everything moves, and it is the only section a normal session
+        // edits.
+        "THE DESTINATION",
         "THE ROUTE",
 
-        "The first north star",
-
-        // AND THE CAPABILITY LIST IS GONE INTO `THE ROUTE`, WHICH IS WHERE ITS QUESTION WAS
-        // ALREADY BEING ANSWERED. It existed so *have we built what this rung needs* stopped
-        // being a memory exercise, and a `NOW` leaf answers exactly that against the
-        // requirement the capability serves. Two lists holding one answer is how the two
-        // drift, and the route's is the copy a guard keeps honest.
-        "The constraints",
-        "TO BUILD",
+        // AND THE TWO THAT ARE CROSS-CUTTING BY NATURE. A refutation belongs to the ARM it
+        // killed and a trap to the failure CLASS, neither of which is a requirement -- so
+        // folding them into the route would scatter them past finding.
         "DO NOT RE-TRY",
         "TRAPS",
-        "OPEN DEFECTS",
     ];
 
     /// <summary>
@@ -205,19 +194,29 @@ public sealed class DocsTests
 
     private static string Plan() => File.ReadAllText(Path.Combine(Docs(), "plan.md"));
 
-    /// <summary>The lines of one `##` section, heading excluded.</summary>
+    /// <summary>The lines under one heading, at any depth, the heading excluded.</summary>
+    /// <remarks>
+    /// <b>BY DEPTH RATHER THAN BY `##`</b>, because collapsing nine sections into four made
+    /// `THE ARCHITECTURE` a subsection — and a reader hard-coded to one level would have
+    /// silently returned nothing for it, which is a correspondence check passing on an empty
+    /// list.
+    /// </remarks>
     private static string[] Section(string heading)
     {
         var lines = Plan().Split('\n');
 
         var start = Array.FindIndex(lines, line =>
-            line.StartsWith("## " + heading, StringComparison.Ordinal));
+            line.TrimEnd().EndsWith(' ' + heading, StringComparison.Ordinal)
+            && line.StartsWith('#'));
 
-        Assert.True(start >= 0, $"the plan has no `## {heading}` section");
+        Assert.True(start >= 0, $"the plan has no `{heading}` heading");
+
+        var depth = lines[start].TakeWhile(character => character == '#').Count();
 
         return lines
             .Skip(start + 1)
-            .TakeWhile(line => !line.StartsWith("## ", StringComparison.Ordinal))
+            .TakeWhile(line => !line.StartsWith('#')
+                || line.TakeWhile(character => character == '#').Count() > depth)
             .ToArray();
     }
 
@@ -285,8 +284,14 @@ public sealed class DocsTests
     /// What a route leaf may open with. <b>A closed set, because the point of a status
     /// token is that a reader can sort by it without reading the clause.</b>
     /// </summary>
+    /// <remarks>
+    /// <b>`BROKEN` ARRIVED WHEN `OPEN DEFECTS` WENT.</b> That section was retired because
+    /// handoffs and a green CI carry what it used to, but a defect and an open question are
+    /// different urgencies and `OPEN` flattens them — one wants investigating and the other
+    /// wants fixing. The distinction cost one token rather than a section.
+    /// </remarks>
     private static readonly string[] Statuses =
-        ["NOW", "OPEN", "DEAD", "BLOCKED", "SETTLED"];
+        ["NOW", "OPEN", "DEAD", "BLOCKED", "BROKEN", "SETTLED"];
 
     /// <summary>Whether a line says what would bring an arm back.</summary>
     /// <remarks>

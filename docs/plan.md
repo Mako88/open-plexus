@@ -311,43 +311,27 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
   - Understanding deepens without limit
     - **NOW** — repair. Specialisation on failure, gated, adding a narrower rule and never
       editing the old. Rung one of the ladder, conjunction, and the only rung there is.
-    - **NOW** — the gate, which is the whole difference from overfitting: twenty misses
-      before a commitment may be repaired at all, because below that no test of a proportion
-      has power.
-    - **NOW** — and Z must clear a SEPARATION bar rather than merely be the argmax — a
-      two-proportion test between its rate in the misses and in the hits, corrected for how
-      many candidates were considered. Uncorrected, noise clears any fixed bar.
-    - **NOW** — and a control arm where Z is drawn at RANDOM from the codes in the misses. If
-      discriminative-Z does not beat it, repair does nothing and the bet is dead.
-    - **NOW** — and Z is what the HITS had, which is the opposite of what is easy to say. A
-      conjunctive child keeps the firings Z was in; backwards it mints a child reliably
-      wrong. A code commoner in the MISSES is the condition for a NEGATED one.
-    - **NOW** — the ladder's admission rule is decidable and already computed: the language
-      extends when, and only when, nothing in it separates the failures from the hits. Each
-      rung is admitted for ONE commitment, and only if the child clears the same bars.
-    - **NOW** — and when two rungs both clear, the SHORTER description chooses. MDL in the
-      one place it cannot mint noise, because it only ranks candidates already beating
-      chance.
-    - **OPEN** — the ladder's ORDER is still a bias, over when a construct is tried rather
-      than which are permitted. Weaker than mode declarations, and not nothing.
+    - **NOW** — the gate is the whole difference from overfitting: twenty misses before a
+      repair is allowed, and Z must clear a two-proportion SEPARATION bar between its rate in
+      the misses and in the hits, corrected for candidates considered. Uncorrected, noise
+      clears any bar.
+    - **NOW** — and Z is what the HITS had; backwards it mints a child reliably wrong, and a
+      code commoner in the MISSES is the condition for a NEGATED one. A random-Z arm runs
+      beside it: if discriminative-Z does not beat that, the bet is dead.
+    - **NOW** — the ladder's admission is decidable and already computed: the language
+      extends only when nothing in it separates failures from hits. A rung is admitted for
+      ONE commitment, and where two clear, the SHORTER description chooses.
+    - **OPEN** — it only ever NARROWS, rungs one to four making a scope smaller and nothing
+      broadening but rung five. A specialise-only machine is arbitrarily accurate and
+      conceptless, and the ladder's ORDER is a bias over when a construct is tried.
     - **OPEN** — a repair budget per parent, so one commitment cannot fork forever. A TOTAL
       is a lifetime, which C4 refuses, and what it should count is open.
-    - **OPEN** — a fresh child starts BLIND, inheriting no table, so it re-earns its
-      statistics: a floor every rung of a chain pays while only the last rung pays off.
-      Aiming one would need conditioned counts, which is the table that blows up.
-    - **OPEN** — nothing can be learnt from one example. The gate needs N misses by
-      construction, and the escape is not a smaller N — that is the 715-names failure — it is
-      rung five.
-    - **OPEN** — it only ever NARROWS. Nothing broadens except rung five, whose trigger is
-      redundancy.
-    - **OPEN** — rung two, negation, *X and NOT Z*. Unsound against a live moment, which is
-      incomplete under C2 and C3, so it may only be evaluated against a SETTLED occasion and
-      fires one settlement behind. That latency is the price of absence. Fork **30**.
-    - **OPEN** — and its candidate set must be bounded or the correction is hopeless.
-      Admissible is a code seen in this commitment's own hits, reusing the table repair keeps.
-    - **OPEN** — and the ladder has TWO DIRECTIONS, which is the correction that matters most
-      here. Rungs one to four only narrow, and a specialise-only machine is arbitrarily
-      accurate and conceptless.
+    - **OPEN** — a fresh child starts BLIND and re-earns its statistics, a floor every rung
+      of a chain pays while only the last pays off. Nothing is learnt from one example, and
+      the escape is rung five rather than a smaller N — that is the 715-names failure.
+    - **OPEN** — rung two, negation, *X and NOT Z*. Unsound against a live moment, so it may
+      only be read against a SETTLED occasion and fires one settlement behind; its candidates
+      must be bounded to codes seen in this commitment's own hits. Fork **30**.
     - **OPEN** — emit *Z was absent* as its own code at settlement, so rung two needs no new
       matcher. Bounded to the commitment's own hits. Fork **64**.
     - **OPEN** — `Mending.Uncovered` is a gate plus every-round repair, and the gate alone is
@@ -475,8 +459,8 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
     - **SETTLED** — split budgets, deep to act and shallow to predict. Fork **20**.
     - **OPEN** — TextWorld's shape is built here and watched before acted in; Crafter puts
       two unbuilt subsystems in front of the measurement. Open on twins. Fork **103**.
-- **WHAT THE MACHINE MUST SURVIVE** — the constraints have their own section; these are the
-  questions they leave open.
+- **WHAT THE MACHINE MUST SURVIVE** — C1 to C4 are under THE DESTINATION and do not move;
+  these are the questions they leave open.
   - The constraints hold under lateness and loss
     - **NOW** — merge monotone, decide local. Hits, misses and abstains are the only thing
       another node is ever told.

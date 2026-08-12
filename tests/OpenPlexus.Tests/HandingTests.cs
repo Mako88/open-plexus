@@ -48,8 +48,16 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// are for is the BASELINE any role mechanism has to beat, which this repo insists on
     /// having before an arm rather than after it.
     /// </remarks>
-    private sealed class Reciting(bool choosing) : IQuantizer<Recited>
+    private sealed class Reciting(Reading reading) : IQuantizer<Recited>
     {
+        /// <summary>The modality a precedence fact rides on.</summary>
+        /// <remarks>
+        /// <b>ITS OWN, BESIDE <see cref="Unifying"/>'S AND <see cref="Commitment"/>'S</b>, and
+        /// for their reason: it is derived from two codes rather than emitted by a sense, so
+        /// a world able to produce one would be writing the learner's rules.
+        /// </remarks>
+        private const byte Before = 208;
+
         /// <inheritdoc/>
         public byte Modality => 47;
 
@@ -58,7 +66,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         {
             var moment = new HashSet<Code>(observation.Asked);
 
-            if (!choosing)
+            if (reading == Reading.Bagged)
             {
                 foreach (var sentence in observation.Said) moment.UnionWith(sentence);
 
@@ -68,10 +76,74 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
             // MAX OVERLAP AND NOT FIRST-ANY-OVERLAP, which is the difference the fact
             // above measures: every sentence says `the` and so does the question, so the
             // arm already built lands on the newest sentence and reads the marginal.
-            moment.UnionWith(observation.Said[Selected(observation)]);
+            var chosen = observation.Said[Selected(observation)];
+
+            moment.UnionWith(chosen);
+
+            if (reading == Reading.Chosen) return moment;
+
+            // EVERY ORDERED PAIR, WHICH IS WHY THIS IS A PRICE AND NOT A MECHANISM. Handing
+            // the whole relation over exhaustively is the most a learner reading order could
+            // ever derive, so what it scores is the CEILING on a sequence rung rather than
+            // what one would earn -- and it is quadratic in a sentence's length, which is
+            // the cost that decides whether the rung belongs in the scope language instead.
+            for (var first = 0; first < chosen.Count; first++)
+            {
+                for (var second = first + 1; second < chosen.Count; second++)
+                {
+                    if (chosen[first] == chosen[second]) continue;
+
+                    moment.Add(Pair(chosen[first], chosen[second]));
+                }
+            }
 
             return moment;
         }
+
+        /// <summary>The code meaning <i>this one was said before that one</i>.</summary>
+        /// <param name="first">What came first.</param>
+        /// <param name="second">What came after it.</param>
+        /// <remarks>
+        /// <b>DERIVED FROM THE PAIR AND ORDERED, so two machines reach the same code with
+        /// nothing to ask</b> — the property every code here has, and
+        /// <see cref="Agreed"/> rather than <see cref="object.GetHashCode"/> because that
+        /// one is randomised per process.
+        /// </remarks>
+        private static Code Pair(Code first, Code second)
+        {
+            var hash = Agreed.Fold(Agreed.Basis, first.Modality);
+
+            hash = Agreed.Fold(hash, first.Value);
+            hash = Agreed.Fold(hash, second.Modality);
+            hash = Agreed.Fold(hash, second.Value);
+
+            return new Code(Before, Agreed.Mix(hash));
+        }
+    }
+
+    /// <summary>What the front end hands the learner, as three arms of one axis.</summary>
+    private enum Reading
+    {
+        /// <summary>Every word of every sentence. <b>The control, and provably the marginal.</b></summary>
+        Bagged,
+
+        /// <summary>The sentence sharing most with the question. <b>Provably a coin flip.</b></summary>
+        Chosen,
+
+        /// <summary>
+        /// The same, plus every ORDERED PAIR of its words — <b>the ceiling on a sequence
+        /// rung, handed over rather than learnt.</b>
+        /// </summary>
+        /// <remarks>
+        /// <b>AN INSTRUMENT AND NEVER A SHIPPABLE FRONT END, on the standing
+        /// <see cref="Unifying"/> holds: a price taken before a mechanism is designed.</b>
+        /// It is not the refuted arm that emitted a POSITION beside a fused code — that one
+        /// reached every moment and no scope, being never absent, and this is absent
+        /// whenever the two words stood the other way round. And it is not a fused code
+        /// either: every word is still present under its own identity, so nothing
+        /// downstream loses that it is the same john who stood first somewhere else.
+        /// </remarks>
+        Ordered,
     }
 
     private static Handing World(int seed = 1) =>
@@ -417,33 +489,44 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>What the learner actually reads against the two ceilings it is allowed</b> — the
-    /// baseline any role mechanism has to beat, taken before one is built.
+    /// The three arms against the three ceilings — <b>and ORDER is what carries roles here,
+    /// which is fork 105 answered without unification being built.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A CONTROL BEATS AN ARGUMENT, WHICH IS WHY THIS RUNS AT ALL WHEN BOTH CAPS ARE
+    /// <b>A CONTROL BEATS AN ARGUMENT, WHICH IS WHY THIS RUNS AT ALL WHEN EVERY CAP IS
     /// PROVED.</b> A proof says what the front end permits; it does not say whether the
-    /// learner converts it. Roaming's bagged arm came back with an EMPTY population because
-    /// a constant moment surprises nothing and genesis never fires — a whole arm reading the
-    /// marginal for a reason that has nothing to do with the marginal — and this world's bag
-    /// is constant by construction rather than by accident.
+    /// learner converts it. <see cref="Roaming"/>'s bagged arm came back with an EMPTY
+    /// population because a constant moment surprises nothing and genesis never fires — a
+    /// whole arm reading the marginal for a reason that has nothing to do with the marginal.
     /// </para>
     /// <para>
-    /// <b>AND THE BARS ARE THE PROOFS, SO THIS FAILS RATHER THAN PRINTS.</b> Choosing the
-    /// sentence must beat the bag, and it must not pass one half — the second is the one
-    /// worth having, because a run above it on a set-based learner would mean this file's
-    /// account of the world is wrong and every finding here is owed a re-take.
+    /// <b>THE KILL LINE WAS WRITTEN BEFORE THE RUN AND IT WAS A RESULT RATHER THAN A
+    /// VALUE:</b> if handing the order over does not pass 0.60, order is not what carries
+    /// roles here and unification is back. It passes at 1.000 on every seed, so <b>a
+    /// SEQUENCE rung and not a unifying one is what this world wants</b> — and rung three is
+    /// already on the route, unbuilt, while rung four is the expensive one everybody
+    /// expected to need.
+    /// </para>
+    /// <para>
+    /// <b>AND WHAT IT COSTS IS THE READING THAT DECIDES WHERE THE RUNG BELONGS.</b> The
+    /// ceiling is bought with POPULATION: every ordered pair of a sentence's words is handed
+    /// over, so the moment triples, genesis mints on all of it, and the task that four rules
+    /// would answer is answered by two hundred. A rung in the SCOPE LANGUAGE would propose a
+    /// precedence only where no plain code separates, which is the same ceiling without the
+    /// expansion — so this arm prices the build rather than replacing it.
     /// </para>
     /// </remarks>
     [Fact]
-    public void Choosing_the_sentence_doubles_the_bag_and_stops_at_the_coin_flip()
+    public void Handing_the_order_over_reaches_the_ceiling_the_coin_flip_stops_at()
     {
         var scores = new Dictionary<string, List<double>>();
         var populations = new Dictionary<string, List<int>>();
 
-        foreach (var (name, choosing) in new[] { ("bagged", false), ("chosen", true) })
+        foreach (var reading in new[] { Reading.Bagged, Reading.Chosen, Reading.Ordered })
         {
+            var name = reading.ToString().ToLowerInvariant();
+
             scores[name] = [];
             populations[name] = [];
 
@@ -455,7 +538,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
                 var brain = new Machines.Brain(
                     new CommittingSettings { Capacity = 4000 }, seed);
 
-                var tally = new Machines.Trial<Recited>(world, new Reciting(choosing), brain)
+                var tally = new Machines.Trial<Recited>(world, new Reciting(reading), brain)
                     .Run(5_000, sweep: 1000, target: 0.9, window: 2000);
 
                 var exam = tally.Unseen?.Accuracy ?? 0.0;
@@ -486,13 +569,36 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
             + $"{scores["bagged"].Max():F3} for the bag at its best, so the selection buys "
             + "nothing measurable and the middle rung of this world's ladder is not there");
 
-        // THE BAR THAT MATTERS, AND IT IS AN UPPER ONE. A set-based learner cannot pass a
-        // half here -- the chosen sentence names two people and is the same set whichever
-        // way round they stood. A run above it means the world stopped isolating binding.
+        // AN UPPER BAR, AND IT IS THE ONE THAT PROTECTS EVERY OTHER FINDING HERE. A
+        // set-based learner without the order cannot pass a half -- the chosen sentence
+        // names two people and is the same set whichever way round they stood. A run above
+        // it means the world stopped isolating binding.
         Assert.True(scores["chosen"].Max() < 0.60,
             $"choosing the sentence reads {scores["chosen"].Max():F3} at its best, past the "
             + "coin flip a set of two people permits -- so something in this world separates "
             + "the giver from the taker without order, and every finding in this file is "
             + "owed a re-take");
+
+        // THE KILL LINE, WRITTEN BEFORE THE RUN AND HELD DOWN WHERE IT CAME OUT. The line
+        // was 0.60; it reads 1.000 on all three seeds, so the bar sits at 0.90 rather than
+        // at the line -- if it ever falls back through this, order is not what carries roles
+        // and rung four is back on the list.
+        Assert.True(scores["ordered"].Min() > 0.90,
+            $"handing the order over reads {scores["ordered"].Min():F3} at its worst, so a "
+            + "sequence rung does not reach this world's ceiling and what fork 105 needs is "
+            + "unification after all");
+
+        // AND THE CEILING IS BOUGHT WITH POPULATION, WHICH IS WHY THIS ARM PRICES A BUILD
+        // RATHER THAN BEING ONE. Every ordered pair of the sentence is handed over, so the
+        // moment triples and genesis mints on all of it: a task four rules would answer is
+        // answered by two hundred. A rung in the scope language proposes a precedence only
+        // where no plain code separates, so it should reach the same ceiling far cheaper --
+        // and if this ratio ever collapses, the expansion was not what cost the population
+        // and that argument for moving the rung is gone.
+        Assert.True(populations["ordered"].Min() > 5 * populations["chosen"].Max(),
+            $"handing the order over holds {populations["ordered"].Min()} rules at fewest "
+            + $"against {populations["chosen"].Max()} at the coin flip's most, so the "
+            + "quadratic expansion is not what fills the population and moving the rung into "
+            + "the scope language would buy less than this reading claims");
     }
 }

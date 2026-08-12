@@ -581,6 +581,48 @@ public sealed class RecalledTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// Whether reading at the question's key survives needing more than one statement.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE CAVEAT ON THE PERFECT SCORE, MADE INTO A MEASUREMENT.</b> Task one is named
+    /// <i>single supporting fact</i>, so a front end that retrieves one statement by the
+    /// question's key is close to that task's own definition — and a grid that only ever ran
+    /// there would be reporting the corpus's structure as the arm's result. Tasks two and
+    /// three need two statements and three.
+    /// </para>
+    /// <para>
+    /// <b>PRE-REGISTERED, AND THE FAILURE IS THE INFORMATIVE OUTCOME.</b> One statement
+    /// cannot carry two supporting facts, so this should fall hard at task two — and where
+    /// it falls to is the number worth having: down to the bag says retrieval buys nothing
+    /// without chaining, and part of the way says one hop of it is already worth something.
+    /// </para>
+    /// <para>
+    /// <b>AND THE BAG RUNS BESIDE IT AT EVERY TASK</b>, because the tasks are not equally
+    /// hard and a score that fell because the corpus got harder would read exactly like an
+    /// arm that stopped working.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_addressing_survives_more_than_one_supporting_fact()
+    {
+        foreach (var task in new[] { 1, 2, 3 })
+        foreach (var joining in new[] { Joining.Bagged, Joining.Addressed })
+        {
+            var (world, trial, brain) = Made(World(task: task, span: 0), joining);
+            var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
+            var unseen = tally.Unseen;
+
+            output.WriteLine(
+                $"task {task} {joining,-9} | exam {unseen?.Accuracy ?? 0.0:F3} "
+                + $"silent {unseen?.Silence ?? 0.0:F3} | own {tally.Recent:F3} | "
+                + $"marginal {world.Commonest:F3} | held {brain.Held.Count,5} "
+                + $"names {brain.Held.Names.Count,4} wanting {tally.Wanting:F3}");
+        }
+    }
+
+    /// <summary>
     /// What displacement throws away, before anything has learnt anything.
     /// </summary>
     /// <remarks>

@@ -162,6 +162,12 @@ FORBIDS things, and several of them are already measured.
 - **SO WHAT A PRIMER NEEDS IS SOMETHING TO BE WRONG ABOUT WHILE IT READS**, and the
   obvious candidate is the next word. That is rung three, so the curriculum and the
   comprehension failure ask for the same missing mechanism.
+- **AND SELECTION IS THE WHOLE OF THE FIRST TASK, WHICH IS NO LONGER AN INFERENCE.** Handed
+  the statement its own question names, the population answers everything on a handful of
+  rules where the bag sits near the marginal. Nothing about the learner needed fixing.
+- **SO WHAT RUNG FOUR IS WORTH ON TEXT IS PRICED, AND IT IS THE WHOLE TASK RATHER THAN A
+  MARGIN.** That is the number fork 33 wanted before anybody pays for a matcher — and the
+  caveat is that the task is NAMED for needing one statement.
 - **AND A SITUATION MODEL IS DOWNSTREAM OF RUNG FOUR RATHER THAN A WAY AROUND IT.** Holding
   one state per thing is no use to a matcher that can only ask whether a code is PRESENT:
   two states in the room is the selection problem again, whole. The store must be read BY
@@ -1529,4 +1535,4 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **91** | A masked objective spends the population on function words, being what a bag predicts best, and transfers nothing. Gate what is worth predicting on surprise, the way genesis is already gated on it — the one repair that is not a stop list. Open, and it is what would make a primer teach |
 | **89** | John's: prime it on general English before setting it a text to be examined on. `Primer` exists for the walk and ports cheaply, but a settled-nothing round moves no counter here — so a primer needs something to predict while reading. Next word is rung three. Open |
 | **90** | John's: is there a standardised comprehension exam that separates understanding from regurgitation? bAbI already is one at this rung. What is unpriced is the tier above — school exams and the passages built so the wrong answer is the one present verbatim. Open, and blocked until the components pass |
-| **88** | The front end intersects the question with EACH statement rather than the whole story. BUILT as `Joining.Addressed`, and its ceiling is the pair no recency rule reached: it keeps less than the narrowest displacement setting and loses no answer. A probe rather than a mechanism, pricing rung four without being one. Open on the grid |
+| **88** | The front end intersects the question with EACH statement rather than the whole story. `Joining.Addressed` ANSWERS TASK ONE OUTRIGHT on a handful of rules where the bag sits near the marginal. A probe rather than a mechanism: it prices rung four without being one. Open on whether it survives two supporting facts |

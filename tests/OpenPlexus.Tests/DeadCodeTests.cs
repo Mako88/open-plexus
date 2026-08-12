@@ -242,6 +242,13 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["Holder"] = Composed,
         ["Fleet"] = Composed,
 
+        ["Returning"] = "A WORLD, AND THE LIBRARY NAMES `IWorld` RATHER THAN ANY OF "
+            + "THEM. It has no run of its own because `Trial` drives it directly, so "
+            + "there is not even a harness entry point for `src` to mention -- and a "
+            + "world the library named would be the library knowing what problem it is "
+            + "being pointed at, which is the fault `SeparationTests` guards from the "
+            + "other side. `ReturningTests` is its caller.",
+
         ["Unifying"] = "A PRICE AND NOT YET A MECHANISM, which is fork 33's own "
             + "instruction: probe unification's cost BEFORE the ladder's escalation "
             + "policy is designed, not after. Something in `src` calling it would mean "

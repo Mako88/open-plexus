@@ -860,6 +860,166 @@ public sealed class RecalledTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// Whether a SECOND hop puts the answer in the room, and which key rule gets it there.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE CEILING BEFORE THE MECHANISM, WHICH IS THE THIRD TIME THAT ORDER HAS PAID
+    /// TODAY.</b> One hop leaves the answer in the room on a quarter of task two and a
+    /// twelfth of task three, so the retrieval and not the learner is what those tasks are
+    /// short of. What no grid can say is whether a second hop would FIND it, and that is
+    /// decided with nothing learnt and in milliseconds.
+    /// </para>
+    /// <para>
+    /// <b>AND THE KEY RULE IS THE WHOLE ARM RATHER THAN A DETAIL, WHICH FORK 95 ALREADY PAID
+    /// TO DISCOVER.</b> Every statement of this corpus says <i>to</i> and <i>the</i>, so a
+    /// second hop keyed on whatever the first statement contained walks to the statement
+    /// before it and calls recency a chain. The rules below differ only in which words of
+    /// the first reading are allowed to be the next key.
+    /// </para>
+    /// <para>
+    /// <b>AND WHAT WOULD DROP IT IS WRITTEN BEFORE IT RAN:</b> no rule raising the
+    /// answer-present column above what one hop already reaches. A learner cannot find what
+    /// is not in the room, so a flat ceiling kills the arm whatever a score would have said.
+    /// </para>
+    /// <para>
+    /// <b>THE KILL DID NOT FIRE.</b> Two hops takes task two from a quarter to near a half and
+    /// task three from a twelfth to a quarter; three hops reaches four questions in seven and
+    /// two in five. The room is where the answers were missing, exactly as the one-hop column
+    /// said.
+    /// </para>
+    /// <para>
+    /// <b>AND ABOUT HALF OF THAT IS RECENCY RATHER THAN CHAINING, WHICH THE CONTROL SAYS AND
+    /// THE HEADLINE WOULD NOT HAVE.</b> Every statement here says <i>to</i> and <i>the</i>, so
+    /// a chain keyed on everything can walk back a sentence at a time and never follow a
+    /// referent — which is <c>span</c> under a longer name. Taking the newest three outright
+    /// already carries half of task two and two fifths of task three.
+    /// </para>
+    /// <para>
+    /// <b>SO THE MARGIN THAT IS ACTUALLY CHAINING'S IS A TENTH AT TWO HOPS ON TASK TWO AND
+    /// SHRINKS WITH DEPTH</b>, to under three points by three hops on task three. It is real
+    /// and it is far smaller than the ceiling rise, <b>and the arm must therefore be scored
+    /// against a SPAN-MATCHED control rather than against one hop</b> — widening the moment is
+    /// already known here to buy the drawn score and sell the held-out one.
+    /// </para>
+    /// <para>
+    /// <b>AND NO KEY RULE WINS TWICE, WHICH IS WHY NONE IS SHIPPED ON THIS EVIDENCE.</b>
+    /// Naive-everything leads at three hops, not-background at two, and in-a-category on task
+    /// three at two — every gap inside about one standard error on two hundred questions. The
+    /// hop is what pays; which word carries it is not yet decided by anything.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_a_second_hop_puts_the_answer_in_the_room()
+    {
+        foreach (var task in new[] { 1, 2, 3 })
+        {
+            var world = new Recalled(World(task: task, span: 0));
+            var (naming, company) = Counted(task);
+
+            var sorted = Grouped(new HashSet<Code>(company.Keys), company)
+                .Where(group => group.Count >= 2)
+                .SelectMany(group => group)
+                .ToHashSet();
+
+            var ceiling = new Dictionary<string, double>(StringComparer.Ordinal);
+
+            foreach (var rule in new[] { "the newest", "everything", "not background", "in a category" })
+            foreach (var hops in new[] { 1, 2, 3 })
+            {
+                var reached = 0;
+                var read = 0;
+
+                for (var one = 0; one < world.Withheld.Count; one++)
+                {
+                    var asking = world.Withheld[one].Seen;
+                    var answer = Babi.Of(world.Transcript[one].Answer);
+
+                    var background = new HashSet<Code>(asking.Story.Count == 0 ? [] : asking.Story[0]);
+                    for (var at = 1; at < asking.Story.Count; at++) background.IntersectWith(asking.Story[at]);
+
+                    var moment = new HashSet<Code>(asking.Question);
+                    var key = asking.Question;
+                    var from = 0;
+
+                    for (var hop = 0; hop < hops; hop++)
+                    {
+                        // THE CONTROL, AND IT HAD TO BE NAMED TO BE ONE. Every statement of
+                        // this corpus says *to* and *the*, so a chain keyed on everything the
+                        // last one held can walk back a sentence at a time and never once
+                        // follow a referent — which is `span` under a longer name, already
+                        // built and already measured. This arm takes the newest statements
+                        // outright, so the two columns say which mechanism is paying.
+                        var at = rule == "the newest"
+                            ? (from < asking.Story.Count ? from : -1)
+                            : Reading(asking, key, from);
+
+                        if (at < 0) break;
+
+                        moment.UnionWith(asking.Story[at]);
+                        read++;
+
+                        // THE NEXT KEY IS WHAT THIS READING SUPPLIED AND NEVER WHAT THE LAST
+                        // ONE ALREADY HELD — a key already used is the hop just taken, so
+                        // carrying it forward returns the same statement for ever.
+                        var next = asking.Story[at].Where(code => !key.Contains(code));
+
+                        next = rule switch
+                        {
+                            "not background" => next.Where(code => !background.Contains(code)),
+                            "in a category" => next.Where(sorted.Contains),
+                            _ => next,
+                        };
+
+                        // OLDER ONLY, because the chain runs backwards in time: what a
+                        // statement mentions was established before it, and searching
+                        // forwards would let anything later answer.
+                        key = new HashSet<Code>(next);
+                        from = at + 1;
+                    }
+
+                    if (moment.Contains(answer)) reached++;
+                }
+
+                ceiling[$"{rule}|{hops}"] = reached / (double)world.Withheld.Count;
+
+                output.WriteLine(
+                    $"task {task} {rule,-14} {hops} hop | answer present "
+                    + $"{reached / (double)world.Withheld.Count:F3} of {world.Withheld.Count} | "
+                    + $"statements read {read / (double)world.Withheld.Count:F2}");
+            }
+
+            // FOLLOWING A KEY BEATS TAKING THE NEWEST, AT EVERY DEPTH PAST THE FIRST AND ON
+            // EVERY TASK — but only the best rule does, and reading three statements by
+            // recency alone already carries most of what three hops carry. So the claim
+            // asserted is the ordering and never the size of the gap.
+            foreach (var hops in new[] { 2, 3 })
+                Assert.True(
+                    new[] { "everything", "not background", "in a category" }
+                        .Max(rule => ceiling[$"{rule}|{hops}"]) >= ceiling[$"the newest|{hops}"],
+                    $"task {task} at {hops} hops: no key rule beat taking the newest");
+        }
+    }
+
+    /// <summary>
+    /// Which statement, at or after <paramref name="from"/>, names anything in the key.
+    /// </summary>
+    /// <remarks>
+    /// <b>NEWEST FIRST IS THE ORDER THE WORLD HANDS THEM OVER</b>, so the first match IS the
+    /// newest one about whatever was asked, with no scoring and nothing to tie-break. Returns
+    /// a negative where nothing matches, which is a real case rather than an error: a
+    /// question naming something never said has no store entry to read.
+    /// </remarks>
+    private static int Reading(Asking asking, IReadOnlySet<Code> key, int from)
+    {
+        for (var at = from; at < asking.Story.Count; at++)
+            foreach (var one in asking.Story[at])
+                if (key.Contains(one)) return at;
+
+        return -1;
+    }
+
+    /// <summary>
     /// A category fires on ANY member, and its code is the same one on every machine.
     /// </summary>
     /// <remarks>

@@ -242,6 +242,11 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["Holder"] = Composed,
         ["Fleet"] = Composed,
 
+        ["Roaming"] = "A WORLD, ON THE SAME FOOTING AS `Returning`: `Trial` drives it "
+            + "through `IWorld`, so there is no run for `src` to name and naming the world "
+            + "itself would be the library knowing which problem it is pointed at. "
+            + "`RoamingTests` is its caller.",
+
         ["Returning"] = "A WORLD, AND THE LIBRARY NAMES `IWorld` RATHER THAN ANY OF "
             + "THEM. It has no run of its own because `Trial` drives it directly, so "
             + "there is not even a harness entry point for `src` to mention -- and a "

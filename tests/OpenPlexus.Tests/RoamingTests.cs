@@ -1,4 +1,6 @@
 using OpenPlexus.Codes;
+using OpenPlexus.Commitments;
+using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
@@ -140,5 +142,60 @@ public sealed class RoamingTests(ITestOutputHelper output)
             && shallow[30].Opening > shallow[120].Opening,
             "the shallow ceiling does not fall monotonically with the length of the walk, so "
             + "`Steps` is not the one axis this file reports it as");
+    }
+
+    /// <summary>
+    /// What the learner reads where nothing shallow works — <b>the first score on a world
+    /// whose held-out half is genuinely unseen.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>AT 120 STEPS, WHICH IS THE CELL THE CEILING GRID CHOSE RATHER THAN A ROUND
+    /// NUMBER.</b> The opening rule and recency both sit at the marginal there, so anything
+    /// over it is tracking rather than reading the transcript off.
+    /// </para>
+    /// <para>
+    /// <b>AND THE VOCABULARY IS TINY WHATEVER THE WALK'S LENGTH, WHICH IS THE PROPERTY THAT
+    /// MAKES THE BAG ARM MEAN SOMETHING.</b> Six rooms, four things and a handful of
+    /// function words, so a bagged moment is the same size after 120 statements as after
+    /// four — every word is present and none of them says WHEN. A bag here cannot be near
+    /// the marginal by accident.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_a_learner_reads_where_the_transcript_stops_answering_itself()
+    {
+        foreach (var joining in new[]
+            { Joining.Bagged, Joining.Recent, Joining.Addressed, Joining.Chained })
+        {
+            var world = new Roaming(World(120), seed: 1);
+            var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed: 1);
+
+            var tally = new Trial<Asking>(world, new Joined(joining), brain)
+                .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
+
+            var exam = tally.Unseen?.Accuracy ?? 0.0;
+
+            output.WriteLine(
+                $"{joining,-12}| exam {exam:F3} | own {tally.Recent:F3} "
+                + $"| held {brain.Held.Count}");
+        }
+
+        // AND THE BAGGED ARM COMES BACK WITH AN EMPTY POPULATION, WHICH IS A FINDING ABOUT
+        // THE FRONT END RATHER THAN A SCORE. Six rooms, four things and a few function
+        // words means that after 120 statements essentially every word of the vocabulary is
+        // present in every moment -- so the bag is the SAME MOMENT every round, nothing is
+        // ever surprising, and genesis never fires at all. A constant moment mints nothing.
+        //
+        // IT IS THE OPPOSITE END OF THE FAULT THE ENGLISH ARMS HIT. There a growing
+        // vocabulary outran the cap; here a tiny one makes the moment a constant. Both are
+        // the front end deciding what the learner can possibly see, and both look like the
+        // learner failing.
+
+        // NO BAR YET, AND SAYING SO IS THE POINT. This is the first reading any learner has
+        // taken on this world; a bar written beside it would be a level chosen from one run
+        // rather than a claim anything refutes. What the columns are FOR is the next
+        // session, and the ceiling grid above is what they are read against.
     }
 }

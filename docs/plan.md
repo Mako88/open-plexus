@@ -126,9 +126,6 @@ FORBIDS things, and several of them are already measured.
 - **AND THE GAIN EVAPORATES AS THE POPULATION IS ALLOWED TO GROW, WHICH IS THE MECHANISM.**
   Four times the capacity buys its own task and sells the examination, so the extra rules
   memorise the stream — what banding costs is SEARCH, measured at last.
-- **AND NOTHING ABOUT THE LEARNER OR ITS SIZE IS THE BOTTLENECK**, which is worth knowing
-  before either is touched. What is missing is choosing where to look, and every remaining
-  rung is worth exactly what it buys that.
 - **AND WIDENING THE MOMENT BUYS THE DRAWN SCORE AND SELLS THE HELD-OUT ONE**, with the
   population ballooning and silence appearing. The gap opens as the bag widens, which is
   memorising caught by the one instrument a text world has.

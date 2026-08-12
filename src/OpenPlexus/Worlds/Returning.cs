@@ -307,9 +307,15 @@ public sealed class Returning : IWorld<Coded>, IWithholds<Coded>
     /// </remarks>
     private Turn<Coded> Draw()
     {
-        var thing = _last >= 0 && _sightings.NextDouble() < _settings.Wandering
-            ? _last
-            : _sightings.Next(_settings.Things);
+        // THE SETTING IS TESTED BEFORE THE GENERATOR IS, WHICH IS NOT A MICRO-OPTIMISATION.
+        // A `NextDouble` drawn and thrown away shifts the whole stream, so a world at nought
+        // would be uniform and NOT the world every earlier reading was taken on -- and the
+        // rule counts here moved by five per cent before this line was written that way.
+        var thing = _settings.Wandering > 0.0
+            && _last >= 0
+            && _sightings.NextDouble() < _settings.Wandering
+                ? _last
+                : _sightings.Next(_settings.Things);
 
         _last = thing;
 

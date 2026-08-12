@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Commitments;
+using OpenPlexus.Commitments;
 using OpenPlexus.Bus;
 using OpenPlexus.Graph;
 using OpenPlexus.Thinking;
@@ -190,16 +190,16 @@ public sealed class DialTests(ITestOutputHelper output)
             + "exactly where the failure is total, so it is not the cause there "
             + "either. Not a level; nothing to hunt",
 
-        ["Recasting"] =
-            "fork 85. WHETHER a category may take a member's place in a scope, "
-            + "and on WHOSE evidence -- one experienced rule or two reaching the "
-            + "same coarse claim. NOT A LEVEL: whether a coarse name may enter a "
-            + "rule at all is not a quantity, and the pair is the same shape as "
-            + "`Widening`'s for the same reason. Measured ON from the baseline "
-            + "every earlier number was taken under. There is nothing for a "
-            + "controller to hunt until a run can say which grain a rule wanted, "
-            + "and the only thing that could say so is the subsumption bar that "
-            + "already judges both",
+        ["Coarsening"] =
+            "fork 85, and the half of it that survived. WHETHER subsumption may "
+            + "read a member's entailment of its category. NOT A LEVEL: whether "
+            + "one rule may absorb another is not a quantity. It is INERT without "
+            + "a vocabulary, so `Never` is a control rather than a shipped "
+            + "default -- a run never told which codes are alternatives cannot "
+            + "tell the two apart, and every number recorded before this existed "
+            + "is reproduced with it on. There is nothing for a controller to "
+            + "hunt: the accuracy bar that judges every other subsumption judges "
+            + "this one",
 
         ["Widening"] =
             "the ladder's other direction. It began as a mechanism against its own "
@@ -753,13 +753,15 @@ public sealed class DialTests(ITestOutputHelper output)
         // a budget on dials that STAY -- which is the only version of it that does not make
         // measuring an idea more expensive than not measuring it.
         //
-        // AND TWENTY-EIGHT IS `Recasting`, WHICH IS FORK 85 ARRIVING AS AN ARM AND ALREADY
-        // CARRYING ITS OWN DELETION. It ships OFF, so every number recorded before it stands
-        // and it is measured on from a known baseline. Its three positions are not a
-        // gradient: one lets subsumption READ a category's entailment, and two propose the
-        // coarse claim on different evidence -- and the first reading says the judge is the
-        // whole of the mechanism, so the honest end of this row is the two proposing
-        // positions going and the count falling to twenty-seven with them.
+        // AND TWENTY-EIGHT IS `Coarsening`, WHICH ARRIVED AS `Recasting` WITH THREE POSITIONS
+        // AND LOST TWO OF THEM IN THE SAME SESSION. Fork 85 asked for an operator that
+        // PROPOSES the coarse claim; it was built, measured over three seeds, and cost 60
+        // rules where reading the entailment cost none. So the two proposing positions are
+        // deleted with a revival row and what is left is a judge.
+        //
+        // THE COUNT DID NOT FALL WITH THEM, AND THAT IS THE HONEST BOOKKEEPING. A dial that
+        // arrives and loses most of itself in one session still leaves one behind, and this
+        // file's own rule is that the budget is on dials that STAY.
         Assert.Equal(28, HandSet.Count);
     }
 }

@@ -301,7 +301,6 @@ public sealed class LineageTests(ITestOutputHelper output)
         Repaired = into.Repaired + one.Repaired,
         Widened = into.Widened + one.Widened,
         Reborn = into.Reborn + one.Reborn,
-        Recast = into.Recast + one.Recast,
         Subsumed = into.Subsumed + one.Subsumed,
         Culled = into.Culled + one.Culled,
         Rewritten = into.Rewritten + one.Rewritten,

@@ -282,12 +282,8 @@ exercise. One line a capability, and the status is the whole point of the row.
   table, no vocabulary and no outcome read.
 - **AND THE COMPRESSION IS THERE AND WAS BEHIND A JUDGE RATHER THAN A REWRITE.** Genesis
   roots on a category code like any other, so the coarse rule already existed and nothing
-  could see that a member's rule is narrower. 606 rules folded, **196** once the entailment
-  is judged, over three seeds.
-- **SO PROPOSING THE COARSE CLAIM COSTS RULES INSTEAD OF SAVING THEM**, 256 from every
-  experienced rule and 207 from two agreeing. A recast needs a fresh record and must fire
-  before it can be judged, and the claim was already reachable — fork 85 answered against
-  the operator it asked for.
+  could see a member's rule is narrower. 606 rules folded, **196** judged. The operator fork
+  85 asked for is built, measured and gone.
 - **AND IT IS LOAD-BEARING TWICE OVER NOW, WHICH RAISES WHAT IT IS WORTH.** The same
   never-co-occur test is rung four's admission gate, so building it once pays for two rungs.
 - **ONE CONCEPT REACHED BY SEVERAL SENSES** — NOT BUILT, and the mechanism already exists.
@@ -880,6 +876,7 @@ condition is a superstition.
 
 | what | what refuted it | what would revive it |
 |---|---|---|
+| Proposing a category's claim as a new commitment | It costs population where reading the entailment costs none: a fresh record must fire before anything may judge it, and genesis already mints the coarse claim from the moment | A vocabulary the brain holds that no moment carries, so nothing else mints it |
 | Strength-based fitness for rules | XCS: it deletes low-reward rules that are still CORRECT in their niche | Never. Score a rule by how well it predicts, not by what it earns |
 | MDL alone as a minting gate | On `csharp`'s `Motif` the pure-noise control minted 715 names | Never alone. Pair it with beating chance |
 | Taking the argmax Z with no correction | The same finding read again: search enough candidates and noise clears any fixed bar | Never. Correct for the candidates considered, or the bar is decorative |

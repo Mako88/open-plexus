@@ -334,7 +334,7 @@ public sealed class Gathering : IDisposable
     /// </remarks>
     public Learnt Added()
     {
-        long minted = 0, repaired = 0, subsumed = 0, widened = 0, recast = 0;
+        long minted = 0, repaired = 0, subsumed = 0, widened = 0;
 
         lock (_gate)
             foreach (var answer in _heard.Values)
@@ -345,7 +345,6 @@ public sealed class Gathering : IDisposable
                 repaired += did.Repaired;
                 subsumed += did.Subsumed;
                 widened += did.Widened;
-                recast += did.Recast;
             }
 
         return new Learnt
@@ -354,7 +353,6 @@ public sealed class Gathering : IDisposable
             Repaired = repaired,
             Subsumed = subsumed,
             Widened = widened,
-            Recast = recast,
         };
     }
 

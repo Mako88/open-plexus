@@ -169,15 +169,6 @@ public sealed class Cycle
     /// </remarks>
     public long Widened { get; private set; }
 
-    /// <summary>Coarser commitments proposed by the rewrite.</summary>
-    /// <remarks>
-    /// <b>APART FROM <see cref="Widened"/> BECAUSE THEY GENERALISE IN DIFFERENT
-    /// DIRECTIONS.</b> Dropping a code makes a scope shorter and says less about more;
-    /// swapping a member for its category keeps the scope's length and says the same thing
-    /// about a KIND. Summed together, a run could not say which of the two a population's
-    /// drift was.
-    /// </remarks>
-    public long Recast { get; private set; }
 
     /// <summary>Commitments minted by genesis.</summary>
     /// <remarks>
@@ -378,6 +369,5 @@ public sealed class Cycle
         Repaired += learnt.Repaired;
         Subsumed += learnt.Subsumed;
         Widened += learnt.Widened;
-        Recast += learnt.Recast;
     }
 }

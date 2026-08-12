@@ -193,100 +193,49 @@ public enum Widening
     Shared,
 }
 
-/// <summary>Whether a CATEGORY may take a member's place in a scope — <b>fork 85.</b></summary>
+/// <summary>
+/// Whether subsumption may read a member's entailment of its CATEGORY — <b>fork 85, and
+/// the half of it that survived being measured.</b>
+/// </summary>
 /// <remarks>
 /// <para>
-/// <b>A CATEGORY IN THE MOMENT IS NOT A REWRITE OF THE RULES, AND THAT IS WHERE THE
-/// COMPRESSION WENT.</b> The front end adds a category code beside the plain one, so genesis
-/// still roots on the plain one and repair still specialises on it — <c>ReturningTests</c>
-/// measured 223 rules against 191 without categories and 24 with a handed index. The name
-/// arrived and the rewrite did not.
+/// <b>A CATEGORY IN THE MOMENT WAS NOT A REWRITE OF THE RULES AND THE COMPRESSION WAS NEVER
+/// BEHIND ONE.</b> Genesis roots on a category code exactly as it roots on anything else, so
+/// the coarse rule ALREADY EXISTED — <c>ReturningTests</c> measured 606 rules folded against
+/// 196 once this is on, at three seeds and an unmoved score. What did not exist was any way
+/// to see that <i>this look predicts Y</i> is narrower than <i>that kind of look predicts
+/// Y</i>: <see cref="Commitment.Narrows"/> is a subset test, and the two scopes are the same
+/// length with no code in common.
 /// </para>
 /// <para>
-/// <b>AND IT MUST BE A NEW CLAIM WITH A FRESH RECORD, WHICH IS THE WHOLE DIFFERENCE FROM
-/// <c>Population.Abstract</c>.</b> A minted name is entailed by its members, so rewriting a
-/// scope over one leaves what the rule claims untouched and the record moves with it. A
-/// category is entailed by ANY member, so the rewritten scope fires where the old one never
-/// did — it claims MORE. Carrying the record across would keep a rule's evidence while
-/// changing what it says, which is the one thing a rewrite may never do.
+/// <b>SO THE OPERATOR FORK 85 ASKED FOR IS DELETED AND THIS IS WHAT IS LEFT.</b> Proposing
+/// the coarse claim as a new commitment with a fresh record was built, measured and removed:
+/// it cost 60 rules over three seeds where this costs none, because a recast must fire
+/// <see cref="CommittingSettings.Floor"/> times before anything may judge it and the claim it
+/// makes was already reachable. See the plan's revival row — what would bring it back is a
+/// vocabulary the brain holds that no moment carries.
 /// </para>
 /// <para>
-/// <b>SO THE SPECIFIC STAYS UNTIL SUBSUMPTION TAKES IT, AND SUBSUMPTION IS THE JUDGE.</b>
-/// Nothing here decides that a category is the right grain; it proposes the claim at the
-/// coarser grain and lets the bar that already prefers the general one when both are equally
-/// accurate settle it. That is also what keeps the specificity gradient — a general rule and
-/// a particular one both live while the particular is still earning.
-/// </para>
-/// <para>
-/// <b>AN ARM AND NOT A REPLACEMENT, measured ON from a known baseline</b>, exactly as
-/// <see cref="Widening"/> is. <see cref="Never"/> is what ships and every number recorded
-/// before it existed was taken under it.
+/// <b>AND IT IS INERT WITHOUT <c>Population.Sorts</c>, so <see cref="Never"/> is a control
+/// rather than a shipped default.</b> A run that was never told which codes are alternatives
+/// cannot tell the two apart, which is why turning this on reproduces every number recorded
+/// before it existed.
 /// </para>
 /// </remarks>
-public enum Recasting
+public enum Coarsening
 {
     /// <summary>
-    /// A category is a code like any other, so nothing knows a member entails it. Every
-    /// measurement before this existed.
+    /// A category is a code like any other, so nothing knows a member entails it.
     /// </summary>
+    /// <remarks>
+    /// <b>THE CONTROL, AND IT HAS TO BE NAMED TO BE ONE.</b> Folding categories into the
+    /// moment without this is what says how much of the compression was the FOLD — and the
+    /// answer is 652 rules to 606, which is nearly none.
+    /// </remarks>
     Never,
 
-    /// <summary>
-    /// Nothing is proposed, and subsumption reads the entailment where it finds one.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>THE RUNG BELOW A REWRITE, AND IT HAD TO BE ITS OWN ARM BECAUSE IT TURNS OUT TO BE
-    /// MOST OF THE MECHANISM.</b> A category code is in the moment, so genesis roots on it
-    /// exactly as it roots on anything else and the population ALREADY holds coarse rules.
-    /// What it does not hold is any way to tell that <i>this look predicts Y</i> is a
-    /// narrower claim than <i>that kind of look predicts Y</i> — <c>Commitment.Narrows</c> is
-    /// a subset test and the two scopes are the same length with no code in common.
-    /// </para>
-    /// <para>
-    /// <b>SO THE FOLD WAS NEVER THE THING THAT WAS MISSING; THE JUDGE WAS.</b> That is the
-    /// correction this arm exists to make readable, and it is why the two levels above are
-    /// measured ON FROM THIS rather than from <see cref="Never"/>.
-    /// </para>
-    /// </remarks>
+    /// <summary>Subsumption reads the entailment wherever it finds one.</summary>
     Judged,
-
-    /// <summary>
-    /// <see cref="Judged"/>, and every experienced commitment proposes itself with one
-    /// member swapped for its category.
-    /// </summary>
-    /// <remarks>
-    /// <b>EXPERIENCE IS THE ONLY GATE, BECAUSE A CATEGORY IS NOT A GUESS ABOUT WHICH CODE IS
-    /// REDUNDANT.</b> <see cref="Widening.Unmissed"/> proposes every drop because nothing
-    /// inside a rule can name its redundant code; here the front end has already said which
-    /// codes are alternatives, so the proposal is aimed rather than generated. What it cannot
-    /// know is whether the rule's answer holds for the whole kind, and that is what firing
-    /// with a fresh record finds out.
-    /// </remarks>
-    Each,
-
-    /// <summary>
-    /// <see cref="Judged"/>, and only a recast that TWO experienced commitments reach.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>THE COMPRESSION ITSELF AS THE EVIDENCE, WHICH IS <see cref="Widening.Shared"/>'S
-    /// ARGUMENT ON A DIFFERENT AXIS.</b> Two rules differing only in which member of one
-    /// category they pin, and agreeing on what follows, are the case the rewrite exists for —
-    /// a rule per appearance that wanted to be a rule. Where nothing agrees, the category may
-    /// be real and the rule may still be about the member.
-    /// </para>
-    /// <para>
-    /// <b>AND ITS RISK IS THE SAME ONE: SILENCE.</b> A population that has learnt one member's
-    /// rule and not the other's gives it nothing to do, so it is slower by construction — the
-    /// recast count is the column that says whether it ran at all.
-    /// </para>
-    /// <para>
-    /// <b>AND IT SPLITS UNDER SHARDING WHERE <see cref="Each"/> DOES NOT</b>, for the reason
-    /// fork 81 gives: evidence that is two residents agreeing is evidence a fleet divides.
-    /// </para>
-    /// </remarks>
-    Agreed,
 }
 
 /// <summary>What it takes for a narrower commitment to survive beside a general one.</summary>
@@ -858,8 +807,8 @@ public sealed record CommittingSettings
     /// <inheritdoc cref="Commitments.Widening"/>
     public Widening Widening { get; init; } = Widening.Never;
 
-    /// <inheritdoc cref="Commitments.Recasting"/>
-    public Recasting Recasting { get; init; } = Recasting.Never;
+    /// <inheritdoc cref="Commitments.Coarsening"/>
+    public Coarsening Coarsening { get; init; } = Coarsening.Judged;
 
     /// <inheritdoc cref="Commitments.Forking"/>
     public Forking Forking { get; init; } = Forking.Distinct;

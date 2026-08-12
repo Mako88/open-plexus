@@ -128,8 +128,6 @@ public sealed record Tally
     /// <inheritdoc cref="Commitments.Cycle.Widened"/>
     public required long Widened { get; init; }
 
-    /// <inheritdoc cref="Commitments.Cycle.Recast"/>
-    public required long Recast { get; init; }
 
     /// <summary>Commitments minted by genesis, before anything culled them.</summary>
     /// <remarks>
@@ -852,7 +850,6 @@ public sealed class Trial<TSeen>
             Repaired = cycle.Repaired,
             Subsumed = cycle.Subsumed,
             Widened = cycle.Widened,
-            Recast = cycle.Recast,
             Minted = cycle.Minted,
             Resident = holding.Sum(held => held.Count),
             Separations = holding.Sum(

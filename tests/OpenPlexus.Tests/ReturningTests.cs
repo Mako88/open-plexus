@@ -74,11 +74,11 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// setting</b> — the same cell with and without them is what says whether a category
     /// buys anything.
     /// </param>
-    /// <param name="recasting">
-    /// Whether a category may take a member's place in a scope. <b>A second axis, and it
-    /// crosses the first rather than extending it</b> — the fold puts a coarse code in the
-    /// moment and the rewrite lets it into a rule, so a cell moving with both on says
-    /// nothing about which did it.
+    /// <param name="coarsening">
+    /// Whether subsumption may read a member's entailment of its category. <b>A second axis,
+    /// and it crosses the first rather than extending it</b> — the fold puts a coarse code in
+    /// the moment and this lets a rule about one absorb a rule about the other, so a cell
+    /// moving with both on says nothing about which did it.
     /// </param>
     /// <param name="seed">
     /// What draws the world and the brain's control arm. <b>One number for both</b>, so a
@@ -90,14 +90,14 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// groups would agree — but a rewrite reading a vocabulary the front end is not folding
     /// mints rules that can never fire, and nothing downstream would report it.
     /// </remarks>
-    private (double Exam, int Held, long Recast) Cell(
+    private (double Exam, int Held) Cell(
         ReturningSettings settings, string label,
-        Sorting? categories = null, Recasting recasting = Recasting.Never, int seed = 1)
+        Sorting? categories = null, Coarsening coarsening = Coarsening.Never, int seed = 1)
     {
         var world = new Returning(settings, seed: seed);
 
         var brain = new Brain(
-            new CommittingSettings { Capacity = 4000, Recasting = recasting }, seed: seed);
+            new CommittingSettings { Capacity = 4000, Coarsening = coarsening }, seed: seed);
 
         brain.Held.Sorts = categories;
 
@@ -113,9 +113,9 @@ public sealed class ReturningTests(ITestOutputHelper output)
         output.WriteLine(
             $"{label,-34}| exam {exam:F3} | own {tally.Recent:F3} "
             + $"| appearance reaches {world.Appearance:F2} "
-            + $"| held {brain.Held.Count,4} | recast {tally.Recast}");
+            + $"| held {brain.Held.Count,4}");
 
-        return (exam, brain.Held.Count, tally.Recast);
+        return (exam, brain.Held.Count);
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
         // over. If a relation recovers what appearance lost, then an individual is reachable
         // as a bundle of relations rather than as a stored name — which is concept-before-
         // label run again for referents, and needs no new operator at all.
-        var (placed, byPlace, _) = Cell(
+        var (placed, byPlace) = Cell(
             World(twinned: true, tagged: false, placed: true), "twinned anonymous placed");
 
         var byTag = Cell(World(twinned: true, tagged: true), "twinned tagged, re-read").Held;
@@ -260,8 +260,9 @@ public sealed class ReturningTests(ITestOutputHelper output)
 
         var sorting = new Sorting(found);
 
-        var (plain, byLook, _) = Cell(settings, "twinned anonymous placed");
-        var (sorted, byCategory, _) = Cell(settings, "  the same, categories folded in", sorting);
+        var (plain, byLook) = Cell(settings, "twinned anonymous placed");
+        var (sorted, byCategory) = Cell(
+            settings, "  the same, categories folded in", sorting, Coarsening.Never);
 
         var byTag = Cell(World(twinned: true, tagged: true), "twinned tagged, the floor").Held;
 
@@ -343,31 +344,28 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE FOLD IS THE CONTROL AND THE REWRITE IS THE ARM, WHICH IS WHY THIS IS A
-    /// SEPARATE FILE ENTRY RATHER THAN A THIRD CELL ABOVE.</b> The test above establishes
-    /// that a category in the moment moves the population by nothing at all; this asks
-    /// whether the same category, allowed to take a member's place in a rule with a fresh
-    /// record, collapses the rule-per-appearance the landmark cell holds.
+    /// <b>THE FOLD IS THE CONTROL AND THE JUDGE IS THE ARM.</b> The test above establishes
+    /// that a category in the moment moves the population by nearly nothing; this asks what
+    /// happens when subsumption is allowed to see that a rule pinning a MEMBER is narrower
+    /// than one pinning its category.
     /// </para>
     /// <para>
-    /// <b>AND THE TWO RECASTING ARMS DIFFER IN THEIR EVIDENCE RATHER THAN IN THEIR STEP.</b>
-    /// <see cref="Recasting.Each"/> proposes from one experienced rule;
-    /// <see cref="Recasting.Agreed"/> waits until two rules pinning different members reach
-    /// the same coarse claim, which is the compression itself asked for as evidence. Both are
-    /// judged by the subsumption bar that already existed.
+    /// <b>AND THE OPERATOR FORK 85 ACTUALLY ASKED FOR WAS BUILT HERE AND DELETED.</b> It
+    /// proposed the coarse claim as a new commitment with a fresh record — which is not
+    /// optional, since carrying the parent's would keep a rule's evidence while widening what
+    /// it claims — and it cost 60 rules over three seeds where the judge cost none. A
+    /// proposal must fire <see cref="CommittingSettings.Floor"/> times before anything may
+    /// judge it, and the claim it makes was already reachable, because genesis roots on the
+    /// coarse code exactly as it roots on anything else in the moment.
     /// </para>
     /// <para>
-    /// <b>WHAT WOULD KILL IT, SAID BEFORE IT RUNS: if the rewrite does not take the
-    /// population clearly below the plain cell at an exam score that has not collapsed, then
-    /// a coarse name entering a scope buys nothing and fork 85 is answered against.</b> A
-    /// rewrite that only ADDS claims is the worse outcome of the two, because it is the
-    /// vocabulary gaining a word with no referent — which is what the OPEN DEFECTS list
-    /// already predicted for a coarse name over positions, arriving here for a coarse name
-    /// over appearances.
+    /// <b>WHAT WOULD REVIVE IT is a vocabulary the brain holds that no moment carries.</b>
+    /// Every sentence above turns on the front end folding the category in; a category
+    /// derived and kept inside the population would have nothing minting its rules.
     /// </para>
     /// <para>
     /// <b>AND THE SCORE IS A GUARD RATHER THAN THE COLUMN.</b> The landmark cell already
-    /// answers nearly everything, so a rewrite cannot buy accuracy here and can only sell it
+    /// answers nearly everything, so nothing here can buy accuracy and anything can sell it
     /// — a population that compressed by generalising past what is true would show up as
     /// rules falling and the exam falling with them.
     /// </para>
@@ -384,15 +382,12 @@ public sealed class ReturningTests(ITestOutputHelper output)
         // another's.
         var arms = new[]
         {
-            ("no categories at all", (Sorting?)null, Recasting.Never),
-            ("  folded into the moment", null, Recasting.Never),
-            ("  and the entailment judged", null, Recasting.Judged),
-            ("  and recast, from each rule", null, Recasting.Each),
-            ("  and recast, from two agreeing", null, Recasting.Agreed),
+            ("no categories at all", Coarsening.Never),
+            ("  folded into the moment", Coarsening.Never),
+            ("  and the entailment judged", Coarsening.Judged),
         };
 
         var held = new int[arms.Length];
-        var proposed = new long[arms.Length];
         var scored = new double[arms.Length];
 
         foreach (var seed in new[] { 1, 2, 3 })
@@ -401,79 +396,51 @@ public sealed class ReturningTests(ITestOutputHelper output)
             // watching THIS run would have seen. A vocabulary derived once and reused would
             // make seeds two and three a test of how well seed one's categories travel,
             // which is a different question and a much easier one.
-            var watching = new Returning(settings, seed);
-
-            var sorting = new Sorting(Alternating.From(
-                Enumerable.Range(0, 4000)
-                    .Select(_ => (IReadOnlySet<Code>)new HashSet<Code>(watching.Next().Seen.Codes))
-                    .ToList(),
-                company: 0.5, floor: 20));
+            var sorting = new Sorting(
+                Alternating.From(Watched(settings, seed), company: 0.5, floor: 20));
 
             output.WriteLine($"seed {seed}, {sorting.Count} categories derived");
 
             for (var arm = 0; arm < arms.Length; arm++)
             {
-                var (label, _, recasting) = arms[arm];
-
                 var cell = Cell(
-                    settings, label, arm == 0 ? null : sorting, recasting, seed);
+                    settings, arms[arm].Item1, arm == 0 ? null : sorting, arms[arm].Item2, seed);
 
                 scored[arm] += cell.Exam / 3.0;
                 held[arm] += cell.Held;
-                proposed[arm] += cell.Recast;
             }
         }
 
         var byTag = Cell(World(twinned: true, tagged: true), "twinned tagged, the floor").Held;
 
         output.WriteLine(
-            $"over three seeds: {held[0]} rules plain, {held[1]} folded, {held[2]} judged, "
-            + $"{held[3]} recast from each and {held[4]} from two — against a handed index's "
-            + $"{byTag} a seed");
+            $"over three seeds: {held[0]} rules plain, {held[1]} folded and {held[2]} judged, "
+            + $"against a handed index's {byTag} a seed");
 
-        // THE CONTROL THAT SAYS THE DIAL IS WHAT MOVED, AND IT IS TWO CLAIMS RATHER THAN
-        // ONE. Folding a category into the moment must propose no recast and must leave
-        // subsumption syntactic, or the fold cell is not the control the rest is read
-        // against -- and it was not, for as long as `Sorts` alone reached the judge.
-        Assert.Equal(0, proposed[1]);
-        Assert.Equal(0, proposed[2]);
-
-        // AND THE INSTRUMENT CHECK ON THE ARM. Something that proposed nothing would drift
-        // toward the control for free and read as a mechanism that did no harm -- this
-        // repo's own trap about a fallback being a control arm nobody meant to run.
-        Assert.True(proposed[3] > 0 && proposed[4] > 0,
-            $"the rewrite proposed {proposed[3]} claims from each rule and {proposed[4]} from "
-            + "two agreeing, so an arm that reads as running is not");
-
-        // FINDING ONE, AND IT IS A CORRECTION RATHER THAN A RESULT: WHAT WAS MISSING WAS THE
-        // JUDGE AND NOT THE REWRITE. Genesis already roots on a category code, because it is
-        // in the moment like any other -- so the population already held coarse rules, and
-        // held every member's rule beside them because nothing could see that one entails the
-        // other. Teaching subsumption the entailment is most of the compression fork 85 was
-        // aimed at, and it proposes not one new claim to get it.
+        // THE FINDING, AND IT IS A CORRECTION RATHER THAN A RESULT: WHAT WAS MISSING WAS THE
+        // JUDGE AND NOT A REWRITE. Genesis already roots on a category code, because it is in
+        // the moment like any other -- so the population already held coarse rules, and held
+        // every member's rule beside them because nothing could see that one entails the
+        // other. Teaching subsumption the entailment is the whole of the compression fork 85
+        // was after, and it proposes not one new claim to get it.
+        //
+        // AND THE OPERATOR FORK 85 ASKED FOR IS DELETED, MEASURED. Proposing the coarse claim
+        // with a fresh record cost 60 rules over these three seeds where the judge costs
+        // none: a proposal must fire `Floor` times before anything may judge it, and the
+        // claim it makes was already reachable. The plan carries the revival row -- what
+        // would bring it back is a vocabulary the brain holds that no moment carries.
         Assert.True(held[2] < held[1] / 2,
             $"judging the entailment holds {held[2]} rules against the fold's {held[1]}, so "
             + "the coarse rules genesis mints are not absorbing their members and this "
             + "file's account of where the compression comes from is wrong");
 
-        // FINDING TWO: PROPOSING THE COARSE CLAIM COSTS RULES RATHER THAN SAVING THEM. A
-        // recast is a NEW claim with a fresh record, so it has to fire `Floor` times before
-        // subsumption may judge it at all -- and the claim it makes was already reachable,
-        // since genesis roots on the coarse code and repair may add it. That is fork 85
-        // answered against the operator it asked for: the fresh record is not optional, and
-        // where the moment carries the category nothing needed to propose it.
-        Assert.True(held[3] > held[2] && held[4] > held[2],
-            $"recasting holds {held[3]} from each rule and {held[4]} from two against "
-            + $"{held[2]} from the judge alone, so the proposals are paying for themselves "
-            + "and the fresh record has stopped costing what this file says it costs");
-
-        // AND THE ARM THAT WAITS FOR TWO PAYS LESS OF THAT PRICE, WHICH IS THE ONE THING
-        // SEPARATING THE TWO REWRITE RULES HERE. It proposes a fraction as many and lands
-        // nearer the judge, so what `Each` is buying is unjudged population.
-        Assert.True(proposed[4] < proposed[3] && held[4] < held[3],
-            $"the agreeing arm proposed {proposed[4]} against {proposed[3]} and holds "
-            + $"{held[4]} against {held[3]}, so waiting for two rules is not the cheaper "
-            + "proposal this file reports it as");
+        // AND THE FOLD ALONE IS THE CONTROL THAT SAYS SO. A category in the moment moves the
+        // population by nearly nothing, which is what made the judge look like a missing
+        // rewrite in the first place.
+        Assert.True(held[1] > held[0] * 0.8,
+            $"folding categories into the moment took the population from {held[0]} to "
+            + $"{held[1]}, so the fold compresses on its own now and the judge below is not "
+            + "the mechanism this file credits");
 
         // THE SCORE GUARD, ON EVERY ARM. A population that compressed by generalising past
         // what is true is the failure a rule count cannot tell from a success.
@@ -627,10 +594,10 @@ public sealed class ReturningTests(ITestOutputHelper output)
             var none = Cell(running, $"seed {seed}, no categories", seed: seed);
 
             var space = Cell(
-                running, "  categories from space", perPair, Recasting.Judged, seed);
+                running, "  categories from space", perPair, Coarsening.Judged, seed);
 
             var time = Cell(
-                running, "  categories from time", perThing, Recasting.Judged, seed);
+                running, "  categories from time", perThing, Coarsening.Judged, seed);
 
             var tagged = Cell(
                 World(twinned: true, tagged: true, wandering: 0.8),
@@ -727,7 +694,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
 
             var places = On(byTime, 25);
 
-            var sorted = Cell(settings, "  folded and judged", new Sorting(byTime), Recasting.Judged);
+            var sorted = Cell(settings, "  folded and judged", new Sorting(byTime), Coarsening.Judged);
             var plain = Cell(settings, "  no categories", seed: 1);
 
             lift[drifting] = sorted.Exam - plain.Exam;

@@ -59,12 +59,16 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
     private static (Recalled World, Trial<Asking> Trial, Brain Brain) Made(
         RecalledSettings settings, Joining joining = Joining.Bagged, int capacity = 2000,
-        IReadOnlyList<IReadOnlySet<Code>>? categories = null, int seed = 1, int hops = 2)
+        IReadOnlyList<IReadOnlySet<Code>>? categories = null, int seed = 1, int hops = 2,
+        bool banded = false)
     {
         var brain = new Brain(new CommittingSettings { Capacity = capacity }, seed);
         var world = new Recalled(settings);
 
-        return (world, new Trial<Asking>(world, new Joined(joining, categories, hops), brain), brain);
+        return (
+            world,
+            new Trial<Asking>(world, new Joined(joining, categories, hops, banded), brain),
+            brain);
     }
 
     [Fact]
@@ -900,9 +904,27 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// <b>AND THE CAUSE IS THAT A SCOPE IS A SET, so two statements in the room is the
     /// SELECTION problem again, whole.</b> Nothing in a bag says which statement a word came
     /// from, so a chain that fetched the right sentence hands the matcher no way to use it —
-    /// the same sentence this doc writes about a situation model. <b>The chain therefore wants
-    /// rung three rather than a deeper hop</b>, and the next arm is chaining with the
-    /// statements BANDED rather than unioned.
+    /// the same sentence this doc writes about a situation model.
+    /// </para>
+    /// <para>
+    /// <b>AND BANDING BY HOP CONFIRMS IT, WHICH IS THE ONE PLACE A DIAGNOSIS HERE HAS BEEN
+    /// PAID OUT RATHER THAN ARGUED.</b> Tagging each word with which hop found it makes
+    /// <i>the statement the question named</i> and <i>the one that named</i> different codes,
+    /// and the two-fact task goes from a fifth to a third — the best arm on it, half again
+    /// what the chain alone reached and clear of its marginal, where nothing else was.
+    /// </para>
+    /// <para>
+    /// <b>SO THE CHAIN WANTED RUNG THREE AND NOT A DEEPER HOP, and the retrieval was only ever
+    /// half a mechanism.</b> Silence collapses with it, from a sixth of the exam to a
+    /// two-hundredth, because an arm that can tell its statements apart stops abstaining on
+    /// the rounds that held two.
+    /// </para>
+    /// <para>
+    /// <b>AND IT REACHES TWO FACTS AND NOT THREE, WHICH IS THE HONEST EDGE.</b> The three-fact
+    /// task sits level with the plain bag and under its own marginal at every depth, so what
+    /// is measured here is a mechanism that scales to the task it was aimed at and stops.
+    /// <b>The band is capped at three</b>, so a fourth hop shares the oldest code and a longer
+    /// chain cannot say where its tail came from.
     /// </para>
     /// </remarks>
     [Fact]
@@ -921,9 +943,12 @@ public sealed class RecalledTests(ITestOutputHelper output)
                 ("addressed   ", World(task, span: 0), Joining.Addressed, 1),
                 ("chained x2  ", World(task, span: 0), Joining.Chained, 2),
                 ("chained x3  ", World(task, span: 0), Joining.Chained, 3),
+                ("banded x2   ", World(task, span: 0), Joining.Chained, 2),
+                ("banded x3   ", World(task, span: 0), Joining.Chained, 3),
             })
             {
-                var (world, trial, brain) = Made(settings, joining, hops: hops);
+                var (world, trial, brain) = Made(
+                    settings, joining, hops: hops, banded: label.StartsWith("banded", StringComparison.Ordinal));
                 var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
 
                 scored[label.Trim()] = tally.Unseen?.Accuracy ?? 0.0;
@@ -945,7 +970,20 @@ public sealed class RecalledTests(ITestOutputHelper output)
                 Assert.True(
                     scored["chained x2"] < scored["addressed"],
                     $"a second hop cost nothing on task 1: {scored["chained x2"]:F3}");
+
+                Assert.True(
+                    scored["banded x2"] > scored["chained x2"],
+                    "banding did not recover what the unioned chain gave away");
             }
+
+            // AND ON THE TWO-FACT TASK THE BANDED CHAIN IS THE BEST ARM THERE IS, which is the
+            // claim worth failing the build over. Every other arm here is a bag of some width
+            // or a chain the matcher cannot read, and one of those leading would mean the
+            // mechanism is width and never the hop.
+            if (task == 2)
+                Assert.True(
+                    scored["banded x2"] > scored.Where(one => one.Key != "banded x2").Max(one => one.Value),
+                    $"the banded chain did not lead on task 2: {scored["banded x2"]:F3}");
         }
     }
 

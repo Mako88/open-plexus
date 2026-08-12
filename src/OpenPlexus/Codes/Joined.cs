@@ -277,6 +277,7 @@ public sealed class Joined : IQuantizer<Asking>
     private readonly Joining _joining;
     private readonly IReadOnlyList<IReadOnlySet<Code>> _categories;
     private readonly int _hops;
+    private readonly bool _banded;
 
     /// <param name="joining">What to do with the two halves.</param>
     /// <param name="categories">
@@ -292,14 +293,22 @@ public sealed class Joined : IQuantizer<Asking>
     /// deeper chain is also a wider moment, and widening is already known here to buy the
     /// drawn score and sell the held-out one.
     /// </param>
+    /// <param name="banded">
+    /// Whether <see cref="Joining.Chained"/> also tags each word with WHICH HOP found it.
+    /// <b>An axis rather than a second arm, because the chain without it is the control that
+    /// says whether the banding is what pays</b> — and the chain alone is already measured to
+    /// raise what is in the room and not what is answered.
+    /// </param>
     public Joined(
-        Joining joining, IReadOnlyList<IReadOnlySet<Code>>? categories = null, int hops = 2)
+        Joining joining, IReadOnlyList<IReadOnlySet<Code>>? categories = null, int hops = 2,
+        bool banded = false)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(hops, 1);
 
         _joining = joining;
         _categories = categories ?? [];
         _hops = hops;
+        _banded = banded;
     }
 
     /// <inheritdoc/>
@@ -529,6 +538,16 @@ public sealed class Joined : IQuantizer<Asking>
 
             moment.UnionWith(observation.Story[at]);
             read++;
+
+            // AND WHICH HOP FOUND IT, WHERE THE ARM ASKS FOR IT. A scope is a subset test
+            // over a set, so *the statement the question named* and *the one that named*
+            // are the same words in one bag and unsayable apart -- which is why a chain
+            // that fetched the right sentence bought nothing. The band makes the
+            // difference sayable, and the plain word stays beside it so two occurrences of
+            // one word at different depths remain relatable.
+            if (_banded)
+                foreach (var code in observation.Story[at])
+                    moment.Add(new Code(Both, unchecked(code.Value * Bands + (ulong)Math.Min(hop, Bands - 1) + 2)));
 
             key = new HashSet<Code>(observation.Story[at]
                 .Where(code => !key.Contains(code) && !background.Contains(code)));

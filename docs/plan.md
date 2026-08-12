@@ -261,9 +261,16 @@ exercise. One line a capability, and the status is the whole point of the row.
   statement pins the population at capacity, the drawn score climbs, the held-out one does
   not, and silence appears — this doc's own widening finding, reproduced by a mechanism built
   for another reason.
-- **SO THE CHAIN WANTS RUNG THREE RATHER THAN A DEEPER HOP**, a scope being a set: two
-  statements in the room is the selection problem again, whole. The next arm is chaining with
-  the statements BANDED rather than unioned.
+- **SO THE CHAIN WANTED RUNG THREE RATHER THAN A DEEPER HOP**, a scope being a set: two
+  statements in the room is the selection problem again, whole.
+- **AND BANDING BY HOP PAYS IT OUT, WHICH IS A DIAGNOSIS CASHED RATHER THAN ARGUED.** Tagging
+  each word with which hop found it takes the two-fact task from a fifth to a third — the best
+  arm on it, half again the chain alone, and clear of a marginal nothing else cleared.
+- **AND SILENCE COLLAPSES WITH IT**, from a sixth of the exam to a two-hundredth: an arm that
+  can tell its statements apart stops abstaining on the rounds holding two.
+- **AND IT REACHES TWO FACTS AND NOT THREE.** The three-fact task sits level with the plain bag
+  and under its own marginal at every depth, and the band is capped at three so a longer chain
+  cannot say where its tail came from.
 - **MUTUAL EXCLUSION, so a belief can be CONTRADICTED and not merely wrong** — NOT BUILT. A
   miss says *I expected Y and got Z*; nothing anywhere says Y and Z cannot both hold, which
   is the whole of what a conflict is.
@@ -865,6 +872,9 @@ condition is a superstition.
 - **AND *THE ANSWER IS IN THE ROOM* IS NOT A BOUND ON THE SCORE.** An outcome is an index
   rather than a word, so the base rate is collected with nothing to read — and where the
   marginal is above that column a score sits above it with nothing wrong.
+- **A DOC CAN NAME THE WRONG BLOCKER AND BE BELIEVED FOR A WHOLE BRANCH.** Fork 96 was carried
+  as blocked on fork 32's cap, which is on ENTAILMENT depth; what held it to one hop was one
+  `return` in the front end. Read the code before costing the fix.
 - **AND A SEED SPREAD IS NOT ALWAYS A YARDSTICK, SO A KILL LINE RESTING ON ONE CAN BE
   VACUOUS.** Three seeds returned the identical exam score in every cell of the category grid,
   so *clear the control by more than the spread* admitted any gain at all.
@@ -1607,4 +1617,4 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **97** | John's: a category is the set of codes that are ALTERNATIVES, and the operator the multiplexer's address bits have always wanted. PRICED before it was built: handed over free they come back perfect, and pay five times more under the bag than under the front end that had done the selecting. Open on minting them |
 | **98** | John's: a concept forms BEFORE its label, so substitutability groups things with no word and the word later labels a category that already existed. THE PROBE PASSES on both categories and all three tasks, the category packed against one and the next thing out a third of the scale below. Closed, and fork 97 is unblocked |
 | **99** | John's: a conflict is two beliefs asserting different members of ONE category for the same key, which is the only route to retraction under counters that only rise. And malleability is the counters rather than a property — a per-belief weight is where the human puts the answer in. Open |
-| **96** | A second hop, read at the key the FIRST reading supplied. FORK 32 WAS THE WRONG BLOCKER — that cap is entailment's and this is retrieval. BUILT: two hops nearly triple the answer-present ceiling and the score does not follow, the bag at that width beating it almost everywhere. Open on banding the chain |
+| **96** | A second hop, keyed on what the FIRST reading supplied. Two hops nearly triple the ceiling; a unioned chain converts none of it and BANDING BY HOP converts it, best arm on the two-fact task and clear of its marginal. Open at three facts |

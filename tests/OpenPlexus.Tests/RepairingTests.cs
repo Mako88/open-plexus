@@ -49,6 +49,7 @@ public sealed class RepairingTests(ITestOutputHelper output)
     /// <b>WHAT THE COUPLING COSTS AND WHAT REMOVING IT COSTS, ON EVERY WIDTH AND SKEW.</b>
     /// </summary>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Repairing_without_waiting_for_the_vote_across_the_multiplexer_grid()
     {
         foreach (var (address, skew) in new[] { (2, 0.0), (3, 0.0), (2, 0.8), (3, 0.8) })
@@ -88,6 +89,7 @@ public sealed class RepairingTests(ITestOutputHelper output)
     /// the multiplexer says whether the arm PAYS and this says whether it may ship.
     /// </remarks>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Repairing_without_waiting_for_the_vote_on_the_world_it_is_predicted_to_ruin()
     {
         var small = new ArrangedSettings { Side = 3, Cell = 3, Clutter = 1, Hold = 4 };
@@ -147,6 +149,7 @@ public sealed class RepairingTests(ITestOutputHelper output)
     /// grid above is the reading.
     /// </remarks>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_the_timing_still_leads_when_each_arm_is_given_its_own_budget()
     {
         const int Unlimited = int.MaxValue;
@@ -203,6 +206,7 @@ public sealed class RepairingTests(ITestOutputHelper output)
     /// benefit.
     /// </remarks>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_lifting_still_buys_anything_once_repair_stops_waiting_for_the_vote()
     {
         foreach (var (address, skew) in new[] { (2, 0.8), (3, 0.8) })
@@ -259,6 +263,7 @@ public sealed class RepairingTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_the_new_timing_costs_the_rung_that_mints_names()
     {
         foreach (var address in new[] { 2, 3 })
@@ -315,6 +320,7 @@ public sealed class RepairingTests(ITestOutputHelper output)
     /// do not, the naming cost is the timing's own and belongs beside it as a price.
     /// </remarks>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_the_names_return_when_the_budget_counts_children()
     {
         output.WriteLine($"=== 11 bits even, {Curve} seeds");

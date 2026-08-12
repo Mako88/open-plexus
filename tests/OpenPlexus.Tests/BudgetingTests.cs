@@ -60,6 +60,7 @@ public sealed class BudgetingTests(ITestOutputHelper output)
     /// <b>WHAT THE BUDGET IS ACTUALLY SPENDING, UNDER BOTH TIMINGS.</b>
     /// </summary>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_counting_distinct_children_instead_of_attempts_changes_anything()
     {
         // THE PAIR EVERY ROW BELOW WAS TAKEN UNDER, PINNED RATHER THAN INHERITED. This

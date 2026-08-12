@@ -55,6 +55,41 @@ public sealed class DocsTests
     private const int Item = 60;
 
     /// <summary>
+    /// The most words the WHOLE doc may spend. <b>A ratchet: it only ever goes down.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>JOHN'S TEST, 2026-08-12, AND IT IS THE ONE THAT DECIDES: if it is long enough that
+    /// you would hesitate to load all of it, it is too long.</b> The whole point of collapsing
+    /// several docs into one was that a session could read the plan WHOLE before starting. A
+    /// doc read in pages is the pile of docs it replaced, wearing one filename.
+    /// </para>
+    /// <para>
+    /// <b>AND THE PER-ITEM CAP IS WHY THIS WAS NEEDED, WHICH IS A CORRECTION TO THE COMMENT
+    /// ABOVE IT.</b> Capping the item and not the doc fixed the right fault — an item becoming
+    /// an essay — and gave up the only thing that bounded the total. Both budgets were green
+    /// at nearly twenty-five thousand words, because twelve new ideas cost twelve lines and
+    /// nothing ever said stop. The session that measured this had read the doc in pages all
+    /// day without once noticing it was the failure.
+    /// </para>
+    /// <para>
+    /// <b>AND IT COSTS NO INFORMATION, WHICH IS THE OBJECTION THAT RETIRED THE OLD DOC-WIDE
+    /// CAP.</b> That objection was written when there was nowhere else to put things. There is
+    /// now: a finding belongs to the commit that produced it and the test that asserts it, a
+    /// mechanism to the XML comment the compiler enforces, a trap with a check to the check.
+    /// A doc-wide cap does not delete information — it evicts it to the home that keeps it
+    /// honest. What it must never do is delete an item to afford another.
+    /// </para>
+    /// <para>
+    /// <b>THE TARGET IS SIX THOUSAND</b>, roughly eight thousand tokens, which is loadable
+    /// without thinking about it. Every pass lowers this constant to what it achieved, so the
+    /// doc can never grow back past its own best. Raising it is not a refactor and wants
+    /// John.
+    /// </para>
+    /// </remarks>
+    private const int Whole = 17_700;
+
+    /// <summary>
     /// Every section the plan is allowed to have, in order.
     /// </summary>
     /// <remarks>
@@ -557,6 +592,26 @@ public sealed class DocsTests
             .ToList();
 
         Assert.Equal(Sections, found);
+    }
+
+    [Fact]
+    public void The_whole_doc_still_fits_in_one_reading()
+    {
+        // THE BUDGET THAT WAS MISSING, AND ITS ABSENCE IS WHY THIS DOC REACHED TWENTY-FIVE
+        // THOUSAND WORDS WITH EVERY OTHER CHECK GREEN. Read the constant's remarks: the rule
+        // is John's and it is about whether a session LOADS the thing, not about tidiness.
+        var words = Directory
+            .EnumerateFiles(Docs(), "*.md")
+            .Sum(path => File.ReadAllText(path)
+                .Split([' ', '\n', '\r', '\t'], StringSplitOptions.RemoveEmptyEntries)
+                .Length);
+
+        Assert.True(words <= Whole,
+            $"the plan is {words} words against a budget of {Whole}. It is meant to be read "
+            + "WHOLE at the start of a session, so this is the check that says it still can "
+            + "be. Move a finding to its commit and its test, a mechanism to the XML comment "
+            + "beside it, a trap to the check that catches it -- and never delete one item "
+            + "to afford another.");
     }
 
     [Fact]

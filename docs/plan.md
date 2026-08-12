@@ -9,7 +9,12 @@ refutes it — read its refutation table before repeating anything.
   in its XML comments, where the compiler enforces every reference.
 - **Findings live in the commit** that produced them, and in the test that asserts
   them. Never here.
-- **One line an item.** A cap per ITEM, not per doc.
+- **One line an item.** A cap per ITEM, and a cap on the WHOLE.
+- **JOHN'S TEST, AND IT IS THE ONE THAT DECIDES: if it is long enough that you would
+  hesitate to load all of it, it is too long.** This doc exists to be read whole at the
+  start of every session. A doc read in pages is the pile of docs it replaced.
+- **So the budget only ever goes DOWN**, and `DocsTests` fails the build the moment the
+  doc grows. What will not fit belongs in a commit, a test, or an XML comment.
 - **Built and decided means GONE FROM HERE, and no arm either.** A winner becomes the
   code; losers are deleted, leaving a revival row.
 
@@ -442,152 +447,43 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 
 ### The order, which is not the order of the sections below
 
-- **One — step one, on the multiplexer.** The learner alone, and the part most likely
-  to work.
-- **Two — rung five, before step one is polished.** If abstraction fails nothing
-  downstream matters, and the multiplexer has an answer key for it.
-- **Three — the scaling exponent.** How observations-to-target grows with the number
-  of relevant bits is what predicts whether this ever reaches perception.
-- **Four — a world where `Winnow` does real work**, with a frozen published encoder as
-  an arm against raw. `Cifar` is that world and BOTH HALVES ARE NOW MEASURED.
-- **The encoders are in `corpora/encoders` and `fetch.sh` gets them.** CLIP ViT-B/32
-  and MobileNetV3-Small, both frozen, so the red-ball property survives them.
-- **The cheap one needed its classifier cut off.** A vector of class scores is a
-  conclusion, and a front end may never have one.
-- **AND THE ANSWER CAME BACK AGAINST THE BET.** See the grid under OPEN DEFECTS: the
-  learner is fine and the front end is the ceiling.
-- **Five — `Arranged` is built, and it inverted step four's verdict.** Same parts in two
-  arrangements, opposite answers, soundness by enumeration on photons.
-- **Six — the repair gate, which everything pointed at until it did not.** Three rules,
-  three worlds, three winners, and no combination best on two.
-- **AND IT IS NOT THE LIVE PROBLEM, BECAUSE ALMOST NONE OF THE POPULATION IS READ.**
-  Fifteen of five hundred decide every withheld answer, so a gate that changes what is
-  HELD cannot reach what decides.
-- **SO THE LIVE PROBLEM IS WHICH RULE GETS THE SEAT**, and two arms at it have failed —
-  see the revival rows before trying a third.
-- **Eight — the rung the failures demand, and never the rung that sounds next.** Choosing
-  before a failure asks is hand-specified bias by a side door.
-- **AND ONE HAS ASKED NOW, WHICH IS WHAT STEP SEVEN WAS BUILT FOR.** `Monk` settles its
-  own ceiling by enumeration rather than inferring it from a score — fork 50 is the rung.
-- **AND THE ASKING IS A NUMBER RATHER THAN AN ARGUMENT AT LAST.** The share of repairable
-  rounds nothing in the language separates is a third on the counting concept and under two
-  in a hundred on every other world measured.
-- **THE CONDITION WAS DECIDABLE AND COMPUTED EVERY ROUND SINCE THE BRANCH BEGAN**, and read
-  by nothing — `Repair.Discriminator` coming back empty IS the rule the ladder is admitted
-  by. `Tally.Wanting` counts it.
-- **AND NEGATION IS DEMANDED AND IS NOT ENOUGH, WHICH IS THE ANSWER DISTINGUISHING THE
-  RUNGS.** An absence clears the same bar on about a third of the rounds nothing separated,
-  over eight seeds.
-- **SO THE OTHER TWO THIRDS SEPARATE ON NEITHER A PRESENT CODE NOR AN ABSENT ONE**, which is
-  the counting concept itself. Rung two would pay part of that gap and cannot close it.
-- **AND THE ABSENCE SHARE ELSEWHERE IS A RATIO OVER A HANDFUL OF ROUNDS**, so it carries
-  nothing either way. Only the world with hundreds of unseparated rounds can be read.
-- **Nine — the wire exists and one of the two learners is now on it.** `Posted` moves
-  envelopes, reports, finished thoughts, deaths, questions and settlements over real sockets.
-- **The WALK still learns nowhere but at home, which is what is left of fork 1.** An occasion
-  writes its edges into locally-held clusters, so nothing it learns reaches another machine.
-- **AND THE COMMITMENT LEARNER IS ON A BUS AT LAST, WHICH IS FORK 52'S TRANSPORT HALF.**
-  `Ask` and `Answer` carry counts and testimony between machines that share no object.
-- **PUSHED AND NEVER PULLED, WHICH IS JOHN'S RULE AND ALSO THE REVIVAL TABLE'S.** An awaited
-  request would decide a missing holder by the client's timeout, which is a deadline.
-- **AND THE LEARNER IS MOUNTED, WHICH COST THE HARNESS REWRITE THIS DOC BUDGETED FOR.**
-  `Cycle` is async over a council — one population or a fleet of them behind the same two
-  calls, so the learning loop still exists exactly once.
-- **A ROUND IS TWO ROUND TRIPS AND A SWEEP ROUND IS THREE.** A vote must come back before
-  the round can be scored, a settlement is pushed, and abstraction is the only operator
-  whose statistic is the whole population's.
-- **AND WHAT A FLEET HOLDS IS NOT DISJOINT, WHICH IS FORK 29 SHARPER THAN WRITTEN.** Genesis
-  is placed and repair is not, so two parents on two machines reach one child — held twice,
-  and a sum counts it twice.
-- **PLACING THE CHILD WOULD DELETE IT INSTEAD**, since repair is the only thing proposing a
-  scope longer than one code and nobody else would mint it. Minting it elsewhere puts a
-  commitment on the wire, which C1 refuses.
-- **AND PLACING BY ONE CODE CANNOT REACH MORE MACHINES THAN A WORLD HAS ROOTS**, which is
-  twenty-three at eleven bits. So a placement rule can be capped by the front end's
-  vocabulary, and twenty phones is already the edge.
-- **A FLEET RUN REPRODUCES ITSELF EXACTLY, so fork 12 holds across sockets.** Every merge is
-  ordered before it is combined and every placement is a fact about a commitment rather than
-  about who asked or who answered first.
-- **AND TWO REPLICAS DO NOT STAY IDENTICAL, WHICH WAS ARGUED HERE AND IS NOW MEASURED THE
-  OTHER WAY.** They drift on a slow runner and agree exactly on a fast box, so the claim was
-  a fact about latency.
-- **BECAUSE THE COMPLETENESS CONDITION IS WHAT LETS ONE FALL BEHIND.** A round ends on one
-  replica, so the other is never waited on and may take the next moment before the last
-  settlement. Order, not content.
-- **AND A REPLICA IS DEDUPLICATED BY WHAT IT SAYS RATHER THAN BY WHO SAID IT.**
-  `Advocacy.By` already names the best advocate, so a merge can drop a duplicate exactly —
-  and only where an expectation is worth that advocate.
-- **THE CURVE SURVIVES DISTRIBUTION AND THE POPULATION DOES NOT.** A fleet scores what one
-  process scores and holds twice the rules to do it, because a holder's repair gate can only
-  refuse what a commitment ON THAT MACHINE covers.
-- **AND SIX HOLDERS COST NO MORE THAN THREE**, so what distribution costs is paid at the
-  first split rather than per machine. That is the number that says whether twenty phones
-  are worse than two.
-- **AND AT ELEVEN BITS IT IS AHEAD ON TWO SEEDS OF THREE, WHICH INVERTS THE SIX-BIT
-  READING.** Genesis is placed and repair is not, so a fleet mints one child per HOLDER per
-  round where one machine mints one.
-- **SO HOW HARD A FLEET SEARCHES IS A DEPLOYMENT CHOICE**, which is a world reaching into
-  the brain one level out. It pays where the true rules are conjunctions and costs a little
-  where they are one code.
-- **AND THE REPAIR GATE HAD NOTHING TO DO WITH IT, WHICH A CONTROL SAID AND AN ARGUMENT DID
-  NOT.** `Mending` ships ungated, so the clause reading a placement never runs and a
-  simulated shard is bit-identical to no shard.
-- **Distance costs the DEPTH of a thought, measured.** A round costs about four and a half
-  times the per-hop delay, so a LAN is comfortable and the internet is a slower experiment.
-- **AND A ROUND OF ASKS IS UNDER A MILLISECOND ON LOOPBACK**, nine holders costing two and a
-  half times one — so the scatter is in flight at once rather than a queue.
-- **THE VOTE SPLITS EXACTLY, so fork 52's arithmetic half is closed.** `Speak` emits what a
-  holder claims and `Decide` merges any number of those; a commitment never crosses.
-- **And the transport half is untouched** — nothing is late and nothing dies in any of it,
-  so a green split says nothing whatever about C2 or C3.
-- **EXCEPT THAT A MERGED NAME HAS A DEATH THRESHOLD, AND IT SEPARATES TWO FAILURES.** Up to
-  a quarter of holders gone it names rightly or says nothing; past that it proposes a name
-  the whole population would not.
-- **WHAT BREAKS IS EVERY STATISTIC THAT IS POPULATION-WIDE**, and each mechanism was local
-  or not by accident rather than by decision.
-- **Rung five loses the power to CERTIFY a redundancy and goes silent**; its evidence is
-  the population and the population is what gets split.
-- **`Mending.Uncovered` loses the evidence to AIM a repair**, which is the same cause
-  failing in the opposite direction.
-- **AND THE GATE AIMS RATHER THAN LIMITS, WHICH IS NOT WHAT IT LOOKED LIKE.** `Mend` mints
-  once a round, so admitting covered commitments misdirects the attempt rather than adding
-  attempts.
-- **A COUNT MERGES AND A STRUCTURE DOES NOT, which is the line between the two fixes.**
-  `Recurrence` ships frequencies and recovers rung five exactly; `Narrows` has nothing to
-  add up and wants a round trip.
-- **AND `Abstract` TAKES WHAT OTHERS COUNTED, so the seam is in the learner rather than
-  beside it.** It is the only operator in `Population` asking for anything off the machine;
-  everything else decides local.
-- **AND MERGING THE COUNTS IS NOT AN OPTIMISATION, IT IS THE ONLY THING THAT WORKS.**
-  Machines sharing three quarters of a stream agree on names as poorly as machines sharing
-  none; only identical evidence converges.
-- **SO THE LAN CASE IS NOT SAFE EITHER.** Twenty phones on one wifi share most of what they
-  see and not all of it, and most is worth nothing here.
-- **Repair's own choice of condition survives splitting untouched**, being per-commitment —
-  so *decide local* is doing exactly what it was written to do.
-- **JOHN'S SPECULATION PROPOSAL, AND IT IS EARLY RATHER THAN WRONG.** Every node predicts
-  its own output at once while the real wave verifies behind it, which is lossless where a
-  learned short-circuit is not.
-- **Its depth to save is not in the vote** — that is one scatter-gather. The repair gate's
-  query is where it fits, being a boolean whose answer is usually no.
-- **AND WHAT SPECULATION COSTS WHEN WRONG IS WHAT DECIDES WHERE IT IS ALLOWED.** A mistaken
-  repair is a rule subsumption may remove; a mistaken vote is an answer already given.
-- **Ten — the vote rule, which now GATES the rest rather than sitting beside it.** Deciding
-  it was a score question and is not: replication, wire deduplication and fork 29 all need
-  the scale-free one and nothing else does.
-- **Eleven — slots, BUILT, and one machine per slot answering is a completeness condition
-  rather than a deadline.** `SlotTests` holds the control that stops without them.
-- **AND WHAT A SLOT COSTS THE SWEEP IS ONE FIELD, WHICH IS NOT WHERE IT WAS EXPECTED.** A
-  replica's own table arrives under its twin's name, so the row a holder drops is its
-  SLOT's rather than its own.
-- **Twelve — placement by the minimum code**, which is cheap, priced, and the only thing
-  that stops two parents reaching one child twice. It costs balance past a dozen machines.
-- **Thirteen — rung two, whose payoff is written down BEFORE it is built.** About a third of
-  a fifth on the one world that demands it, and a settlement of latency on every negative
-  scope forever.
-- **The two-learner head-to-head is a side quest and blocks nothing**, being cheap now
-  that both are co-resident.
-- **Resist polishing step one.** It is the least informative part when it passes.
+- **One — step one, on the multiplexer.** BUILT. The learner alone, and the part most likely
+  to work. **Resist polishing it**; it is the least informative part when it passes.
+- **Two — rung five, before step one is polished.** BUILT, gated by two bars. If abstraction
+  fails nothing downstream matters.
+- **Three — the scaling exponent.** How observations-to-target grows with the number of
+  relevant bits is what predicts whether this ever reaches perception. UNMEASURED.
+- **Four — a world where `Winnow` does real work**, a frozen published encoder as the arm
+  against raw. `Cifar` is it, both halves measured, and the answer came back against the bet:
+  the learner is fine and the front end is the ceiling.
+- **The encoders are in `corpora/encoders` and `fetch.sh` gets them**, frozen so the red-ball
+  property survives them — and the cheap one needed its classifier cut off, a vector of class
+  scores being a conclusion a front end may not have.
+- **Five — `Arranged`, which inverted step four's verdict.** Same parts in two arrangements,
+  opposite answers, soundness by enumeration on photons.
+- **Six — the repair gate, and it is NOT the live problem.** Almost none of the population is
+  read, so a gate changing what is HELD cannot reach what decides. The live problem is which
+  rule gets the SEAT, and two arms at it have failed — read the revival rows before a third.
+- **Seven — a world that settles its own ceiling by enumeration** rather than inferring it
+  from a score. BUILT: `Monk`, and it is what admitted the ladder.
+- **Eight — the rung the failures demand, never the rung that sounds next.** Choosing before
+  a failure asks is hand-specified bias by a side door. `Repair.Discriminator` coming back
+  empty IS the admission rule, and `Tally.Wanting` counts it.
+- **AND NEGATION IS DEMANDED AND IS NOT ENOUGH, WHICH DISTINGUISHES THE RUNGS.** An absence
+  clears the bar on about a third of the rounds nothing separated, so rung two pays part of
+  that gap and cannot close it.
+- **Nine — the wire, with both learners on it.** BUILT. **PUSHED AND NEVER PULLED, WHICH IS
+  JOHN'S RULE**: an awaited request would decide a missing holder by the client's timeout,
+  which is a deadline.
+- **Ten — the vote rule, which GATES the rest rather than sitting beside it.** Replication,
+  wire deduplication and fork **29** all need the scale-free one and nothing else does.
+- **Eleven and twelve — slots and placement by the minimum code.** BUILT. One machine per
+  slot answering is a completeness condition rather than a deadline, and minimum-code
+  placement is the only thing stopping two parents reaching one child twice.
+- **Thirteen — rung two, whose payoff is written down BEFORE it is built.** A share of the
+  one world that demands it, and a settlement of latency on every negative scope forever.
+- **The two-learner head-to-head is a side quest and blocks nothing**, both being co-resident
+  — one world, one front end, one held-out set and TWO READERS.
 
 ### The primitive
 
@@ -595,348 +491,132 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
                 → expects (a code that should follow)
                 + hits, misses, abstains
 
-- **It fires when its scope is a subset of the moment**, and is then right or wrong
-  about something specific. That is the entire difference from a count.
-- **A commitment's identity is a `Code`** — the same type a front end emits, so a
-  commitment can sit inside another commitment's scope.
-- **Which makes metacognition, chaining and abstraction expressible with no new
-  machinery.** A handle or an index special-cases all three later.
-- **Genesis is promiscuous and the gates do the work.** On a surprise, mint
-  `{c} → y` for each `c` that was live when `y` started.
-- **One code, because a whole-moment scope never fires twice**, and a covering
-  probability is a mode declaration wearing a hat.
-- **And because a one-code seed makes the bet falsifiable in the first world** rather
-  than after a dial hunt.
-- **So subsumption and deletion are step one, not later.** Cheap genesis is only
-  affordable if something clears it.
-- **`Surprise` gates genesis, and it is armed and load-bearing.** Ungated covering walks
-  the whole `code -> outcome` space; gated, it leads on every seed on the multiplexer and
-  is behind on every seed on `Arranged`.
-- **A moment's prediction is a weighted vote, not a winner.** Every matching
-  commitment votes for its expectation weighted by its own accuracy; highest total
-  wins.
-- **An outvoted commitment still accrues its own hits and misses**, which keeps C1 and
-  stops the winner monopolising the learning.
-- **And the weight is accuracy, never hit count** — the strength-versus-accuracy
-  refutation, arriving somewhere nobody expects it.
-- **A PLAIN SUM IS THE SAME FAULT AGAIN.** Three commitments right half the time
-  outvote one that is always right, so the population's COUNT decides. Accuracy is
-  raised to a power first, which is XCS's own answer.
-- **The margin between first and second is a confidence, free.** A persistently thin
-  margin is the two-conflated-cases signal, already instrumented.
-- **A miss is decided by settlement and never by a deadline** — *the settlement closed
-  and Y was not in it* — so lateness cannot manufacture one.
-- **`csharp` already built the machinery**: an outstanding-branch count and a
-  retirement that asks twice with no report in between. Mattern's shape, at one
-  machine's scale.
-- **The horizon is in events, not time.** A settlement closes after the next K
-  occasions; K=1 to start, which is decidable and order-independent.
-- **Abstain is the third outcome and C3 requires it.** A cluster dying mid-settlement
-  leaves both counters untouched, because a monotone count can never retract a slur.
-- **A prediction carries its provenance**, and each entailing commitment's reliability
-  travels with it, copied when it fired. A node is TOLD, never reads.
-- **Depth is capped at one until something measures it.** Blame diffusion is the
-  historical failure and the cap is why it does not arrive on day one.
-- **Failure blames the provenance, not the world.** Rank by the reliability that
-  arrived — stale under lateness, never wrong by race.
-- **Repair is SPECIALISATION, and it is gated.** *Whenever X, expect Y* becomes
-  *whenever X and Z, expect Y*, where Z clears the bars below.
-- **AND Z IS WHAT THE HITS HAD, WHICH IS THE OPPOSITE OF WHAT IS EASY TO SAY.** A
-  conjunctive child keeps the firings Z was in, so Z must lead in the HITS.
-  Backwards, it mints a child that is reliably wrong.
-- **A code more present in the MISSES is the right condition for a NEGATED one**,
-  which is rung two. Conflating the two is how one sentence describes both and fits
-  neither.
+- **It fires when its scope is a subset of the moment**, and is then right or wrong about
+  something specific. That is the entire difference from a count.
+- **A commitment's identity is a `Code`** — the same type a front end emits, so one can sit
+  inside another's scope, which makes metacognition, chaining and abstraction expressible
+  with no new machinery.
+- **Everything else about it is in the XML comments and the compiler enforces them.** Genesis
+  and its gate, the vote and its weighting, settlement, blame and repair all live beside the
+  code in `Commitments`; what forbids each alternative is a row in DO NOT RE-TRY.
 
 ### The repair gate, which is the whole difference from overfitting
 
-- **N misses before a commitment may be repaired at all.** Twenty as a floor, because
-  below it no test of a proportion has any power.
-- **Z must clear a separation bar and not merely be the argmax** — a two-proportion
-  test between its rate in the misses and in the hits.
-- **Corrected for how many candidate Zs were considered.** Search four hundred codes,
-  take the best, and noise clears any fixed bar; that is the machine that minted 715
-  names on pure noise.
+- **N misses before a commitment may be repaired at all.** Twenty as a floor, because below
+  it no test of a proportion has any power.
+- **Z must clear a separation bar and not merely be the argmax** — a two-proportion test
+  between its rate in the misses and in the hits, **corrected for how many candidates were
+  considered**. Search four hundred codes, take the best, and noise clears any fixed bar.
 - **A repair budget per parent**, so one commitment cannot fork forever — and a TOTAL is a
   lifetime, which C4 refuses. What it should count is open.
-- **And a control arm where Z is drawn at random** from the codes present in the
-  misses. If discriminative-Z does not beat it, repair does nothing and the bet is
-  dead.
-
-### Step one
-
-- **`Commitment`** — scope, expects, hits, misses, abstains.
-- **Genesis** — surprise mints one-code commitments.
-- **The vote** — accuracy-weighted, margin reported.
-- **Settlement** — hit, miss or abstain, by closure and never by a clock.
-- **Blame** — rank the provenance by the reliability it carried.
-- **Repair** — one added code, past every bar, against the random-Z arm.
-- **Subsumption and deletion** — or genesis buries the machine.
-- **The world is the multiplexer and it is not an analogy.** Address bits select which
-  data bit carries the answer, and which bits are irrelevant changes per instance.
-- **It is *several cues arrive together and only some carry the outcome*, exactly** —
-  the world `csharp`'s own plan lists as missing.
-- **Generated, so no corpus can contain its own answer**, and XCS's canonical
-  benchmark, so the external baseline is free.
-- **And its ground truth is checkable by enumeration**, so a rule can be asked
-  whether it is TRUE rather than whether it is the one expected. That is what catches
-  right-for-the-wrong-reason.
-- **A SINGLE ANSWER KEY WOULD MARK THE BASIS RATHER THAN THE LEARNER.** The world
-  admits several correct rule sets, and the first run found one that was not the key's
-  — scoring it against the key alone read as failure.
-
-### What step one has to hit
-
-- **The published accuracy, within ten thousand observations.** XCS is near-perfect in
-  a few thousand; far below it is informative rather than fatal.
-- **Discriminative-Z beating random-Z by a margin outside the seed spread**, ten
-  seeds, counted in both directions.
-- **A resident commitment count near the size of the true rule set.** High accuracy at
-  ten thousand commitments is memorisation, and the count is what catches it.
-- **How many resident commitments are SOUND** — true of the world, by enumeration
-  rather than against a basis. The number step one is judged on, reported beside the
-  unsound count because a count alone can be reached by minting everything.
-- **Eleven bits reported with no bar**, as the scaling number.
-- **The switching multiplexer** — flip the target mid-run, report steps to recover.
-  The direct test of whether the local decaying estimate earns its keep.
+- **And a control arm where Z is drawn at random** from the codes present in the misses. If
+  discriminative-Z does not beat it, repair does nothing and the bet is dead.
+- **AND Z IS WHAT THE HITS HAD, WHICH IS THE OPPOSITE OF WHAT IS EASY TO SAY.** A conjunctive
+  child keeps the firings Z was in, so Z must lead in the HITS; backwards it mints a child
+  reliably wrong. A code more present in the MISSES is the condition for a NEGATED one.
 
 ### The ladder, which is how the scope language extends without a human
 
-- **The rule is decidable and already computed.** The language extends when, and only
-  when, no expression in the current language separates the failures from the hits.
-- **Which is what repair discovers when nothing clears the bar.**
-- **AND IT DOES NOT FIRE ON TEXT, WHICH IS THE INSTRUMENT RATHER THAN THE WORLD.**
-  `Tally.Wanting` reads near nothing on a world whose ceiling the transcript shows plainly,
-  because on a wide alphabet something always separates.
-- **SO IT SAYS WHETHER REPAIR FOUND A CANDIDATE AND NEVER WHETHER THE GENERAL RULE IS
-  SAYABLE.** Memorising separates, so a specialise-only ladder's own trigger cannot summon
-  the two rungs that go up. Fork 86.
-- **And the ladder has two directions, which is the correction that matters most
-  here.** Rungs one to four only make a commitment narrower.
-- **A specialise-only machine is arbitrarily accurate and conceptless** — it learns
-  every multiplexer rule and holds no representation of *address bit*.
-- **Rung one, conjunction** — *X and Z*. Step one, and the only rung built.
-- **Rung two, negation** — *X and NOT Z*. What separates a failure from a hit is very
-  often that something was ABSENT.
-- **Negation is unsound against a live moment.** A live moment is incomplete under C2
-  and C3, so a late Z makes *not Z* true and nothing retracts it.
-- **So a negative condition may only be evaluated against a SETTLED occasion**, and a
-  negative-scope commitment fires one settlement behind a positive one.
-- **That latency is the price of absence**, and it is a constraint on the primitive
-  rather than a detail.
-- **And its candidate set must be bounded or the correction is hopeless.** Under
-  sparse coding almost every code is absent.
-- **Admissible: only a code that has appeared in this commitment's own hits** — *Z,
-  which I have seen here before, is missing now*. It reuses the table repair keeps.
-- **Rung three, sequence** — *X then Y* rather than *X and Y*. `csharp`'s `Kind.After`
-  is the shape.
-- **Rung four, roles** — a condition naming no argument is what buys transfer.
-  `csharp`'s `Kind.Role` is the part of its edge vocabulary worth keeping.
-- **And rung four is not a rung, it is a different matcher.** One to three keep
-  matching a subset test; naming no argument requires UNIFICATION.
-- **AND THE INDEX IT WAS SAID TO BREAK IS ALREADY BARELY WORKING**, so the cost was never
-  where the argument put it. Fork 33 is priced and closed.
-- **WHAT IS UNBUILT IS THE ADMISSION, WHICH THE PRICE DID NOT TOUCH.** Nothing proposes a
-  scope naming no argument, and a scope handed in by an experimenter is architecture.
-- **AND THE TRIGGER EXISTS AND IS MOSTLY NOISE.** Sibling groups — commitments differing in
-  one scope position — are abundant on both worlds, and a hole punched blindly is worse
-  than the rules it replaces about nine times in ten. Fork 102.
-- **AND HOW MANY SIBLINGS A HOLE COVERS DOES NOT SEPARATE THEM**, so the first gate anybody
-  would reach for is not one. What does is open.
-- **AND THE GATE IS FORK 97 ARRIVING WHERE NOBODY PUT IT.** A hole wants the values it
-  covers to be ALTERNATIVES, which is the category definition exactly — and pooled over
-  independent populations it separates the proposals that pay from the ones that do not
-  about as cleanly as anything here separates anything.
-- **AND IT IS A FACT ABOUT THE MOMENTS RATHER THAN ABOUT THE RULES, WHICH IS WHY NOTHING IN
-  THE POPULATION COULD HAVE SUPPLIED IT.** Two codes never co-occurring is what the world
-  did; two scopes differing in one position is what the learner did.
-- **SO WHAT IS LEFT OF FORK 102 IS THE BUILD**, the trigger being abundant, the gate being
-  measured and the matcher being priced and cheap.
-- **AND A VARIABLE NEEDS TWO PLACES IN THE MOMENT THAT CAN DISAGREE**, which no front end
-  here emits — the question's words are unioned into the story's bag.
-- **AND JOHN'S QUESTION RETIRES MOST OF THE RUNG: a category over the ARGUMENTS says what a
-  hole says, more narrowly and with the gate built in.** *These are the people* beats
-  *whichever code of this modality*, and the gate a hole needs is that test anyway.
-- **SO WHAT SURVIVES IS BINDING AND NEVER THE VARIABLE.** A scope is a subset test, so a
-  moment holding two people and two rooms cannot say which is in which however it is named.
-  That is roles — fork 105.
-- **Rung five, and it goes up.** When several commitments share a sub-scope, mint a
-  code for the shared part and rewrite them in terms of it.
-- **AND WHAT IT CAN NAME IS A SET, NEVER A VARIABLE.** The multiplexer's real
-  redundancy is *these positions are the address, whatever they say*. Naming sets
-  cannot reach that; it is rung four.
-- **SO THE TWO RUNGS ARE NOT INDEPENDENT.** A code carrying position AND value
-  together makes the shared thing unnameable. What is shared is the position, and
-  nothing emits a code for one.
-- **JOHN'S PROPOSAL, AND IT JOINS THEM.** Let `Winnow` emit SEVERAL codes per
-  reading, so near readings overlap. The shared part of *bit three is zero* and *bit
-  three is one* then IS a code, and naming can reach it.
-- **Which would buy part of rung four without unification** — a variable becoming a
-  shared sub-code rather than a binding. Cheapest test of the most expensive rung,
-  and unmeasured.
-- **What it costs is the soundness check.** A scope stops mapping to pinned bits, so
-  the sharpest measurement here stops working as written. Say so before running it.
-- **That code is then available inside any future scope**, including one that
-  abstracts again — the recursion DreamCoder gets `sort` out of.
-- **Its trigger is redundancy, not failure**, so it is the one rung a failure does not
-  summon. Gated by `Paying`'s two bars.
-- **And it is what makes the fixed front end survivable.** A minted name over
-  co-firing codes is a learned feature that lives above the codes.
-- **Load-bearing in four places**: hierarchy, transfer, learned features, and anything
-  resembling one-shot learning.
-- **Each rung is admitted for ONE commitment**, and only if the child clears the same
-  bars.
-- **The ladder's ORDER is still a bias** — over when a construct is tried, never over
-  which are permitted. Weaker than mode declarations, and not nothing.
-- **And when no rung clears, that is the signal the whole design exists for.** Two
-  conflated cases with nothing to tell them apart is positing with a reason.
-- **AND WHEN TWO RUNGS BOTH CLEAR, THE SHORTER DESCRIPTION CHOOSES.** That is MDL in the one
-  place it cannot mint noise, because it only ranks candidates that already beat chance —
-  which is what its revival row demands.
-- **Which can be aimed at the front end.** A failure nothing explains is a localised
-  demand for RESOLUTION: winnow these moments finer. It closes the loop to perception.
-
-### Beyond the primitive, and not step one
-
-- **A commitment ABOUT commitments** — metacognition, and where a self-model starts.
-  It needs no mechanism at all if identity is a `Code`.
-- **Action is EXPERIMENT** — act to test the commitment whose failure would be most
-  informative. Interventional by construction; see `csharp`'s `Kind.Meddled`.
-- **A goal is a commitment about a state that does not hold**, and planning is the
-  attribution machinery run backwards.
+- **The rule is decidable and already computed.** The language extends when, and only when,
+  no expression in the current language separates the failures from the hits — which is what
+  repair discovers when nothing clears the bar.
+- **AND IT SAYS WHETHER REPAIR FOUND A CANDIDATE, NEVER WHETHER THE GENERAL RULE IS SAYABLE.**
+  Memorising separates, so a specialise-only ladder's trigger cannot summon the rungs that go
+  UP. Fork **86**.
+- **The ladder has two directions, which is the correction that matters most here.** Rungs one
+  to four only narrow, and a specialise-only machine is arbitrarily accurate and conceptless.
+- **Rung one, conjunction** — *X and Z*. BUILT, and the only rung there is.
+- **Rung two, negation** — *X and NOT Z*. Unsound against a live moment, which is incomplete
+  under C2 and C3, so it may only be evaluated against a SETTLED occasion and fires one
+  settlement behind. That latency is the price of absence.
+- **And its candidate set must be bounded or the correction is hopeless** — admissible is a
+  code seen in this commitment's own hits, which reuses the table repair already keeps.
+- **Rung three, sequence** — *X then Y* rather than *X and Y*. `csharp`'s `Kind.After` is the
+  shape.
+- **Rung four, roles** — a condition naming no argument is what buys transfer, and it is a
+  different MATCHER rather than a rung: one to three keep a subset test, naming no argument
+  requires unification. **A variable needs two places in a moment that can disagree**, which
+  no front end here emits.
+- **Rung five, and it goes up.** Where several commitments share a sub-scope, mint a code for
+  the shared part and rewrite them in terms of it. Its trigger is REDUNDANCY rather than
+  failure, so it is the one rung a failure does not summon.
+- **AND WHAT IT NAMES IS A SET, NEVER A VARIABLE**, so the two rungs are not independent: a
+  code carrying position AND value together makes the shared thing unnameable.
+- **That code is available inside any future scope**, including one that abstracts again —
+  the recursion DreamCoder gets `sort` out of. Load-bearing for hierarchy, transfer, learned
+  features and anything resembling one-shot learning.
+- **Each rung is admitted for ONE commitment**, and only if the child clears the same bars.
+- **The ladder's ORDER is still a bias** — over when a construct is tried, never over which
+  are permitted. Weaker than mode declarations, and not nothing.
+- **AND WHEN TWO RUNGS BOTH CLEAR, THE SHORTER DESCRIPTION CHOOSES.** MDL in the one place it
+  cannot mint noise, because it only ranks candidates that already beat chance.
+- **And when no rung clears, that is the signal the whole design exists for.** Two conflated
+  cases with nothing to tell them apart is positing with a reason — and it can be aimed at
+  the front end as a localised demand for RESOLUTION, which closes the loop to perception.
 
 ### Known limits, carried as work rather than discovered later
 
-- **The scope language is the ceiling.** Whatever a scope cannot say cannot be learnt
-  — ILP's language-bias problem, and what killed the field. The ladder is finite.
-- **The multiplexer does not test the bet.** Its inputs are already symbols, so step
-  one measures the learner and measures the front end not at all.
-- **THE INTERFACE COSTS MOST OF THE SCORE, AND THAT IS NOW MEASURED.** Same function
-  and same learner, with readings spread rather than handed over as bits: both front
-  ends fall from the mid nineties to near chance plus a tenth.
-- **`Winnow` IS MOUNTED AT LAST**, on a world built for it — and that world cannot
-  stress it. Crowding contracts every dimension toward one point, which leaves the
-  projection's relative pattern untouched.
-- **So what is needed is a world whose dimensions move INDEPENDENTLY.** The pairing,
-  not population coding, is what the flat numbers are about. Say it before anyone
-  reads them as a refutation.
-- **The front end's resolution is a hard floor.** A fixed projection can split what is
-  separable at some resolution and can never invent a direction.
-- **AND THE FLOOR IS WHERE THE SCORE GOES, MEASURED RATHER THAN FEARED.** Same learner,
-  same world, raw pixels against a trained embedding — see `EncodedTests`.
-- **BUT HOW THE PROJECTION IS AIMED BEAT BOTH, AND RUNG FIVE WAS NOT INVOLVED.** Reading
-  one patch at a time loses nothing a linear probe can find; reading the whole picture
-  loses a tenth. See `Tiling`.
-- **Nothing can be learnt from one example.** The gate needs N misses by construction,
-  and the escape is not a smaller N — that is the 715-names failure — it is rung five.
-- **The table is what blows up, not the commitments.** Repair needs a table per code
-  seen while firing: commitments times distinct codes, both large under population
-  coding.
-- **MATCHING AND SETTLING ARE NINE TENTHS OF THE CLOCK AND THE SWEEP IS NOT THE COST**,
-  measured on a narrow world whose table never grows — so it says where the TIME goes and
-  nothing about the memory a wide one showed.
-- **A child fires only where its parent does, and matching ignores that**, going through
-  the code index instead. Rete's own problem; the wrinkle is that culling orphans a
-  child, and an orphan that stops firing reads as nothing.
-- **The tally is built for commitments repair may never read.** Nothing under the floor
-  of misses can be repaired, so gating the tally on that same floor costs one comparison
-  and may drop most of the table.
-- **And the table is a frequency count, which a sketch bounds** — at the price that
-  collisions overestimate, so the separation bar has to absorb the error or the
-  correction beside it goes back to being decorative.
-- **So the TABLE spills** — to SQLite, on the owning node, when a commitment goes
-  quiet or clears its gate, rehydrated only if it becomes a candidate again.
-- **The commitment itself is four fields and stays resident**, so no index of the
-  evicted is needed.
-- **A spill that changes what fires is an undeclared dial**, and one not reproducible
-  under a fixed seed reopens fork 12 a fourth time.
-- **A fresh child starts blind.** It inherits no table, so it must re-earn its
-  statistics — a floor on how deep specialisation goes per unit of observation.
-- **AND THAT FLOOR IS WHAT THE CHAIN COSTS, MEASURED.** Every rung re-earns it, the world's
-  true rules are three or four codes deep, and only the last rung ever pays.
-- **AND PAYING THAT FLOOR ONCE INSTEAD OF TWICE IS REFUTED, so what is left is a step that
-  lands where the truth is.** See fork 74's revival row and fork 75.
-- **AND AIMING ONE WOULD NEED CONDITIONED COUNTS, WHICH IS THE TABLE THAT BLOWS UP** — argued
-  rather than measured. A child could inherit its parent's table filtered by the added code,
-  and that wants pair counts where the table is already commitments times codes.
-- **Quantisation boundary noise is the interface risk, and repair amplifies it.** Two
-  identical worlds either side of a band emit unrelated codes, so specialising on the
-  artifact MINTS it.
-- **Counting degrades gracefully here and repairing does not.** `csharp` splits a
-  boundary across two cells and averages; this fragments. Said out loud as the cost.
-- **`Winnow` is the defence and it is mounted.** Overlapping winner sets mean a scope
-  that is a SUBSET still fires, so the boundary stops being a cliff — measured against
-  bands and inside two standard errors of them.
-- **And the defence is what makes absence expensive.** The sparsity that survives a
-  boundary is what unbounds the negative candidate set.
-- **What graded codes cost is SEARCH** — more possible scopes, and blame over more of
-  them. Measure it rather than assuming the robustness is free.
+- **The scope language is the ceiling.** Whatever a scope cannot say cannot be learnt —
+  ILP's language-bias problem, and what killed the field. The ladder is finite.
+- **The multiplexer does not test the bet.** Its inputs are already symbols, so step one
+  measures the learner and the front end not at all.
+- **THE INTERFACE COSTS MOST OF THE SCORE**, and the front end's resolution is a hard floor:
+  a fixed projection can split what is separable at some resolution and can never invent a
+  direction. **How the projection is AIMED beat both, with rung five uninvolved.**
+- **Nothing can be learnt from one example.** The gate needs N misses by construction, and
+  the escape is not a smaller N — that is the 715-names failure — it is rung five.
+- **The TABLE is what blows up, not the commitments**, needing an entry per code seen while
+  firing. So it spills to SQLite on the owning node, rehydrated only if it becomes a
+  candidate again — and a spill that changes what fires is an undeclared dial.
+- **A child fires only where its parent does, and matching ignores that**, going through the
+  code index instead. Rete's own problem; the wrinkle is that culling orphans a child, and an
+  orphan that stops firing reads as nothing.
+- **A fresh child starts blind**, inheriting no table, so it re-earns its statistics — a floor
+  every rung of a chain pays while only the last rung pays off. **Aiming one would need
+  conditioned counts, which is the table that blows up.**
+- **Quantisation boundary noise is the interface risk, and repair AMPLIFIES it.** Two
+  identical worlds either side of a band emit unrelated codes, so specialising on the artifact
+  mints it — counting degrades gracefully here and repairing does not. `Winnow` is the
+  defence and it is mounted, at the price that its sparsity unbounds the negative candidate
+  set.
 - **A miss could be PARTIAL, weighted by overlap.** Either elegant or a way to make
   everything mushy. Unmeasured.
-- **Blame diffuses when many commitments entail one prediction.** The historical
-  failure, and the depth cap is why it is not today's problem.
-- **Two nodes can repair one parent differently and mint SIBLINGS.** Survivable only
-  because fitness is accuracy and the worse one is subsumed.
+- **Blame diffuses when many commitments entail one prediction.** The historical failure, and
+  the depth cap is why it is not the live problem.
 
 ### What comes over from `csharp`, and what does not
 
-| | |
-|---|---|
-| `Agreed`, `Seeds` | The hash and the seed discipline. Load-bearing for the red-ball property |
-| `Code` | The identity type, and now a commitment's identity too |
-| `Bus`, `Ring`, `Addresses` | The distributed half. Its PAYLOADS are rewritten, since `Envelope`, `Settled` and `Report` are made of things on the Leave list |
-| `IQuantizer`, `Coded`, `Winnow`, `Grains`, `Banded`, `Passthrough` | Front ends, independent of what consumes them |
-| `LiveSet`, `Window`, `Occasion` | Moments and the stream |
-| `Surprise` | The gate on genesis. Armed, and it decided a world |
-| `Paying` | The gate on rung five. Both bars, never MDL alone |
-| `IRendezvous`, and the outstanding count inside `Thought` | The termination detection. The mechanism comes over though the type does not |
-| `Measurement`, `Questioned`, `Sweep`, `Plumbing`, `Seeds.Apart` | The harness. Its question-and-answer shape does not fit per-step prediction; budget the rewrite |
-| `DocsTests`, `DeadCodeTests`, `DuplicationTests`, `DialTests` | The budgets. Bring these FIRST |
-| The traps list and the refutation-table discipline | The epistemics engine, and the most valuable thing in the repo |
-| Every world as a PROBLEM | `Babi`, `Clevr`, `Clutrr` and the rest survive; every `*Run` is walk-shaped and does not |
-
-- **Leave, all of it rung-one machinery built on counting co-occurrence:** `Node`,
-  `Edge`, `Kind`, `Tie` · `Thought`, `Message`, `Arrival`, `Settled`, `Question`,
-  `WalkSettings` and every dial on it · `Chunk`, `Macro`, `Stated`, `Posit` ·
-  `Drives`, `Foresight`, `Consequence`, `Reflection`.
+- **Leave, all of it rung-one machinery built on counting co-occurrence:** `Node`, `Edge`,
+  `Kind`, `Tie` · `Thought`, `Message`, `Arrival`, `Settled`, `Question`, `WalkSettings` and
+  every dial on it · `Chunk`, `Macro`, `Stated`, `Posit` · `Drives`, `Foresight`,
+  `Consequence`, `Reflection`.
 - **Bring the IDEAS out of the minters without the mechanisms.** `Message.Chain`'s
   provenance, `Stated`'s star-not-a-clique, `Macro`'s sorted-versus-ordered naming,
   `Kind.Role`'s argument that a cell naming no argument transfers.
-- **Cite the idea, never the type** — a cite into deleted code is how a plan rots.
-- **And never cite a TIME either** — *one session ago* is true when written and false
-  forever after, which is the same rot from the other end.
-- **BOTH LEARNERS ARE STILL CO-RESIDENT HERE, so the head-to-head needs no branch at
-  all.** `Graph`, `Learning` and `Thinking` sit beside `Commitments` in this tree.
-- **So it is one world, one front end, one held-out set and TWO READERS** — the cleanest
-  comparison this repo could produce, and the rewrite this doc budgeted for is smaller
-  than it says.
-- **A `Question` broadcast from a moment's codes is a per-step prediction in the walk's
-  OWN terms**, so neither learner has to be bent to fit the other's harness.
+- **Cite the idea, never the type** — a cite into deleted code is how a plan rots. **And never
+  cite a TIME**: *one session ago* is true when written and false forever after.
 
 ### What the field already knows
 
-- **Borrow the problem, not the mechanism.** This is not a new idea and pretending
-  otherwise would waste months.
+- **Borrow the problem, not the mechanism.** This is not a new idea and pretending otherwise
+  would waste months.
 - **DreamCoder** (Ellis et al., 2021) — grows its own library under MDL pressure and
-  BOOTSTRAPS: learns `filter`, uses it to learn `max`, then `sort`. The existence
-  proof for representation-as-residue.
-- **Popper / Learning From Failures** (Cropper & Morel, 2021) — generate, test,
-  **constrain**. This design's core loop, already formalised — and GENERATE is the
-  half this plan kept forgetting.
-- **XCS** (Wilson) — accuracy-based fitness, because strength-based systems delete
-  low-reward rules still correct in their niche. Its covering, prediction array and
-  subsumption are all taken here.
-- **And its recency-weighted accuracy is the one thing deliberately not taken.**
-- **The Monk's problems** (UCI) — the classic symbolic benchmark, external baselines,
-  small. The second world, after the multiplexer.
-- **Monk-3 carries deliberate noise**, which tests the repair gate and nothing else.
-- **Monk-2 is a counting concept a conjunctive scope CANNOT express** — a
-  language-ceiling probe with a published number attached.
-- **Why none of it scaled**: noise sensitivity, hand-specified language bias, and no
-  way to learn from probabilistic or sensory background knowledge.
-- **And the failure was at the interface with perception, not in the logic** — the one
-  place this project is unusually well placed, because its substrate manufactures
-  symbols. That is the bet, said plainly.
+  BOOTSTRAPS: learns `filter`, uses it to learn `max`, then `sort`. The existence proof for
+  representation-as-residue.
+- **Popper / Learning From Failures** (Cropper & Morel, 2021) — generate, test, **constrain**.
+  This design's core loop, already formalised, and GENERATE is the half this plan kept
+  forgetting.
+- **XCS** (Wilson) — accuracy-based fitness, because strength-based systems delete low-reward
+  rules still correct in their niche. Its covering, prediction array and subsumption are all
+  taken here; its recency-weighted accuracy is the one thing deliberately not.
+- **The Monk's problems** (UCI) — the classic symbolic benchmark, external baselines, small.
+  Monk-3 carries deliberate noise, which tests the repair gate and nothing else; **Monk-2 is a
+  counting concept a conjunctive scope CANNOT express**, a language-ceiling probe with a
+  published number attached.
+- **Why none of it scaled**: noise sensitivity, hand-specified language bias, and no way to
+  learn from probabilistic or sensory background knowledge. **And the failure was at the
+  interface with perception, not in the logic** — the one place this project is unusually
+  well placed, because its substrate manufactures symbols. That is the bet, said plainly.
 
 ---
 

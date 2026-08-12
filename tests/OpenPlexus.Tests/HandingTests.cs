@@ -32,10 +32,47 @@ namespace OpenPlexus.Tests;
 /// short of the world rather than at it.
 /// </para>
 /// </remarks>
-public sealed class HandingTests
+public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
 {
     private const int People = 4;
     private const int Draws = 500;
+
+    /// <summary>
+    /// The two front ends whose ceilings are proved above, and nothing else — <b>a set of
+    /// codes either way, because that is all the learner can receive.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>WRITTEN HERE RATHER THAN IN <c>src</c> BECAUSE NEITHER IS A MECHANISM.</b> One is
+    /// the control and the other is a selector whose ceiling is a coin flip, so shipping
+    /// either would be shipping a thing already known not to answer the world. What they
+    /// are for is the BASELINE any role mechanism has to beat, which this repo insists on
+    /// having before an arm rather than after it.
+    /// </remarks>
+    private sealed class Reciting(bool choosing) : IQuantizer<Recited>
+    {
+        /// <inheritdoc/>
+        public byte Modality => 47;
+
+        /// <inheritdoc/>
+        public IReadOnlyCollection<Code> Codify(Recited observation)
+        {
+            var moment = new HashSet<Code>(observation.Asked);
+
+            if (!choosing)
+            {
+                foreach (var sentence in observation.Said) moment.UnionWith(sentence);
+
+                return moment;
+            }
+
+            // MAX OVERLAP AND NOT FIRST-ANY-OVERLAP, which is the difference the fact
+            // above measures: every sentence says `the` and so does the question, so the
+            // arm already built lands on the newest sentence and reads the marginal.
+            moment.UnionWith(observation.Said[Selected(observation)]);
+
+            return moment;
+        }
+    }
 
     private static Handing World(int seed = 1) =>
         new(new HandingSettings { People = People, Withheld = 0 }, seed);
@@ -377,5 +414,85 @@ public sealed class HandingTests
         // AND IT LOSES EVERY SETTLEMENT, because a settlement is `Expects == arrived` and
         // what arrives is a person. There is no answer this commitment can be right about.
         foreach (var person in cast) Assert.NotEqual(held.Expects, person);
+    }
+
+    /// <summary>
+    /// <b>What the learner actually reads against the two ceilings it is allowed</b> — the
+    /// baseline any role mechanism has to beat, taken before one is built.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A CONTROL BEATS AN ARGUMENT, WHICH IS WHY THIS RUNS AT ALL WHEN BOTH CAPS ARE
+    /// PROVED.</b> A proof says what the front end permits; it does not say whether the
+    /// learner converts it. Roaming's bagged arm came back with an EMPTY population because
+    /// a constant moment surprises nothing and genesis never fires — a whole arm reading the
+    /// marginal for a reason that has nothing to do with the marginal — and this world's bag
+    /// is constant by construction rather than by accident.
+    /// </para>
+    /// <para>
+    /// <b>AND THE BARS ARE THE PROOFS, SO THIS FAILS RATHER THAN PRINTS.</b> Choosing the
+    /// sentence must beat the bag, and it must not pass one half — the second is the one
+    /// worth having, because a run above it on a set-based learner would mean this file's
+    /// account of the world is wrong and every finding here is owed a re-take.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Choosing_the_sentence_doubles_the_bag_and_stops_at_the_coin_flip()
+    {
+        var scores = new Dictionary<string, List<double>>();
+        var populations = new Dictionary<string, List<int>>();
+
+        foreach (var (name, choosing) in new[] { ("bagged", false), ("chosen", true) })
+        {
+            scores[name] = [];
+            populations[name] = [];
+
+            foreach (var seed in new[] { 1, 2, 3 })
+            {
+                var world = new Handing(
+                    new HandingSettings { People = People, Withheld = 300 }, seed);
+
+                var brain = new Machines.Brain(
+                    new CommittingSettings { Capacity = 4000 }, seed);
+
+                var tally = new Machines.Trial<Recited>(world, new Reciting(choosing), brain)
+                    .Run(5_000, sweep: 1000, target: 0.9, window: 2000);
+
+                var exam = tally.Unseen?.Accuracy ?? 0.0;
+
+                scores[name].Add(exam);
+                populations[name].Add(brain.Held.Count);
+
+                output.WriteLine(
+                    $"{name,-8}| seed {seed} | exam {exam:F3} | own {tally.Recent:F3} "
+                    + $"| held {brain.Held.Count,4}");
+            }
+        }
+
+        // THE BAG DOES NOT SIT AT THE MARGINAL, IT SITS AT NOTHING, AND THE DIFFERENCE IS
+        // THE MECHANISM RATHER THAN THE SCORE. A constant moment surprises nothing, so
+        // genesis never fires, so the population is EMPTY and an empty population abstains
+        // rather than guessing -- which reads 0.000 where a guesser would read 0.25.
+        //
+        // SECOND TIME THIS REPO HAS HIT IT, WHICH IS WHY IT IS PINNED HERE AND NOT NOTED.
+        // `Roaming`'s bagged arm did the same for the opposite reason: there a tiny
+        // vocabulary made every moment identical after 120 statements, here the world makes
+        // it identical by construction. Both look like a learner failing and neither is.
+        foreach (var held in populations["bagged"])
+            Assert.Equal(0, held);
+
+        Assert.True(scores["chosen"].Min() > scores["bagged"].Max() + 0.10,
+            $"choosing the sentence reads {scores["chosen"].Min():F3} at its worst against "
+            + $"{scores["bagged"].Max():F3} for the bag at its best, so the selection buys "
+            + "nothing measurable and the middle rung of this world's ladder is not there");
+
+        // THE BAR THAT MATTERS, AND IT IS AN UPPER ONE. A set-based learner cannot pass a
+        // half here -- the chosen sentence names two people and is the same set whichever
+        // way round they stood. A run above it means the world stopped isolating binding.
+        Assert.True(scores["chosen"].Max() < 0.60,
+            $"choosing the sentence reads {scores["chosen"].Max():F3} at its best, past the "
+            + "coin flip a set of two people permits -- so something in this world separates "
+            + "the giver from the taker without order, and every finding in this file is "
+            + "owed a re-take");
     }
 }

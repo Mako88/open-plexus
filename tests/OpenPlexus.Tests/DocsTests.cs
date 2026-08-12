@@ -59,9 +59,17 @@ public sealed class DocsTests
     /// </summary>
     /// <remarks>
     /// <b>John's shape, 2026-08-04</b>: the goal, the constraints, what is not yet
-    /// done, what was tried and what would revive it, the traps, and the fork index
-    /// the code cites. <b>Anything built and decided is not on this list</b>,
-    /// because it is in the code.
+    /// done, what was tried and what would revive it, and the traps. <b>Anything
+    /// built and decided is not on this list</b>, because it is in the code.
+    /// <para>
+    /// <b>AND THE FORK INDEX IS GONE, WHICH IS WHAT THE ROUTE BECOMING A TREE BOUGHT.</b> It
+    /// was a flat table of ninety-four rows that had to be read in full to find the one
+    /// bearing on what you were doing, and half of it was settled questions kept only so a
+    /// citation would resolve. A fork now hangs off the requirement it serves, which is the
+    /// question a session actually arrives with — and the numbers still resolve, because
+    /// <see cref="Every_fork_the_code_cites_is_in_the_index"/> reads the whole doc rather
+    /// than one section of it.
+    /// </para>
     /// <para>
     /// <b>AND ONE SECTION ARRIVES BETWEEN THE GOAL AND THE CONSTRAINTS, which is where it
     /// belongs rather than where it was convenient.</b> The first north star is the thing
@@ -99,7 +107,6 @@ public sealed class DocsTests
         "DO NOT RE-TRY",
         "TRAPS",
         "OPEN DEFECTS",
-        "FORK NUMBERS THE CODE CITES",
     ];
 
     /// <summary>
@@ -163,6 +170,242 @@ public sealed class DocsTests
     private static string Docs() => Tree.Docs();
 
     private static string Plan() => File.ReadAllText(Path.Combine(Docs(), "plan.md"));
+
+    /// <summary>The lines of one `##` section, heading excluded.</summary>
+    private static string[] Section(string heading)
+    {
+        var lines = Plan().Split('\n');
+
+        var start = Array.FindIndex(lines, line =>
+            line.StartsWith("## " + heading, StringComparison.Ordinal));
+
+        Assert.True(start >= 0, $"the plan has no `## {heading}` section");
+
+        return lines
+            .Skip(start + 1)
+            .TakeWhile(line => !line.StartsWith("## ", StringComparison.Ordinal))
+            .ToArray();
+    }
+
+    /// <summary>
+    /// The bullets of a section, each with how deep it is nested.
+    /// </summary>
+    /// <remarks>
+    /// <b>Two spaces a level, which is what markdown nests by</b> — so a branch is depth
+    /// nought, the requirement under it is depth one, and anything at two or deeper is a
+    /// leaf. The route's shape is load-bearing rather than cosmetic, which is why three
+    /// checks read it this way instead of matching prose.
+    /// <para>
+    /// <b>AND A WRAPPED BULLET IS ONE BULLET, WHICH IS NOT A DETAIL.</b> The first version of
+    /// this read single lines, so a leaf's revival clause was invisible whenever it fell past
+    /// the line break — and two dead leaves passed the revival check purely because of where
+    /// their text happened to wrap. A guard whose verdict moves with line width is worse than
+    /// no guard, because it reads as green.
+    /// </para>
+    /// </remarks>
+    private static List<(int Depth, string Text)> Nested(IEnumerable<string> lines)
+    {
+        var bullets = new List<(int Depth, string Text)>();
+
+        foreach (var line in lines)
+        {
+            var trimmed = line.TrimStart();
+            var indent = line.Length - trimmed.Length;
+
+            if (trimmed.StartsWith("- ", StringComparison.Ordinal))
+                bullets.Add((indent / 2, trimmed[2..].Trim()));
+            else if (bullets.Count > 0 && trimmed.Length > 0 && indent > 0)
+                bullets[^1] = (bullets[^1].Depth, $"{bullets[^1].Text} {trimmed.Trim()}");
+        }
+
+        return bullets;
+    }
+
+    /// <summary>
+    /// Words too common to mean an entry is talking about the same thing as the
+    /// architecture line above it.
+    /// </summary>
+    /// <remarks>
+    /// <b>Short enough to be obviously incomplete, which is deliberate.</b> A missing
+    /// stopword only WEAKENS the correspondence check, since a spurious match lets a row
+    /// pass; it can never redden a doc that is right. So the list is grown when a real edit
+    /// slips through rather than guessed at up front.
+    /// </remarks>
+    private static readonly HashSet<string> Common =
+    [
+        "that", "this", "what", "with", "from", "have", "must", "never", "always",
+        "which", "when", "then", "than", "into", "about", "also", "does", "over",
+        "under", "every", "each", "their", "there", "here", "been", "were", "will",
+        "would", "could", "rather", "itself", "part", "held", "only",
+    ];
+
+    /// <summary>The words of a line that could carry a subject.</summary>
+    private static HashSet<string> Significant(string text) =>
+        Regex
+            .Matches(text, "[A-Za-z]{4,}")
+            .Select(match => match.Value.ToLowerInvariant())
+            .Where(word => !Common.Contains(word))
+            .ToHashSet(StringComparer.Ordinal);
+
+    /// <summary>
+    /// What a route leaf may open with. <b>A closed set, because the point of a status
+    /// token is that a reader can sort by it without reading the clause.</b>
+    /// </summary>
+    private static readonly string[] Statuses =
+        ["NOW", "OPEN", "DEAD", "BLOCKED", "SETTLED"];
+
+    /// <summary>Whether a line says what would bring an arm back.</summary>
+    /// <remarks>
+    /// <b>Syntactic like the findings rules, and for the same reason</b> — the check is
+    /// worth having only if nobody has to argue about whether a sentence counts. Naming the
+    /// `DO NOT RE-TRY` row that holds the condition is allowed, because that row is itself
+    /// guarded by <see cref="Every_refuted_row_says_what_would_revive_it"/>.
+    /// </remarks>
+    private static bool Revivable(string text) =>
+        Regex.IsMatch(text, @"(?i)\brevive[sd]?\b|\brevival\b")
+        || text.Contains("DO NOT RE-TRY", StringComparison.Ordinal);
+
+    /// <summary>The route's leaves — the fork-bearing lines, whatever branch they hang off.</summary>
+    private static List<string> Leaves() =>
+        Nested(Section("THE ROUTE"))
+            .Where(bullet => bullet.Depth >= 2)
+            .Select(bullet => bullet.Text)
+            .ToList();
+
+    [Fact]
+    public void The_route_tracks_the_architecture_one_for_one()
+    {
+        // THE CHECK THAT MAKES KEEPING THE TWO SECTIONS APART SAFE RATHER THAN MERELY TIDY.
+        // `THE ARCHITECTURE` is the one section that forbids mechanisms, so the route may
+        // not be nested inside it -- an edit to a child would drag an edit into the parent
+        // and the property would die quietly. Holding them one for one is what buys the
+        // separation, and nothing but this says so.
+        //
+        // IT ALREADY HAD SOMETHING TO CATCH. The route claimed a row per architecture line
+        // in its own opening sentence and had twelve against thirteen: *what it is told
+        // must be something it can be wrong about* had no row, its obstacle folded into the
+        // line above instead. The prose rule had been there for weeks and read as true.
+        var must = Nested(Section("THE ARCHITECTURE"))
+            .Where(bullet => bullet.Depth == 0)
+            .Select(bullet => bullet.Text)
+            .ToList();
+
+        Assert.NotEmpty(must);
+
+        var route = Nested(Section("THE ROUTE"));
+
+        var branch = route.FindIndex(bullet =>
+            bullet.Depth == 0
+            && bullet.Text.Contains("WHAT IT MUST DO", StringComparison.Ordinal));
+
+        Assert.True(branch >= 0, "`THE ROUTE` has no `WHAT IT MUST DO` branch");
+
+        var entries = route
+            .Skip(branch + 1)
+            .TakeWhile(bullet => bullet.Depth > 0)
+            .Where(bullet => bullet.Depth == 1)
+            .Select(bullet => bullet.Text)
+            .ToList();
+
+        Assert.True(must.Count == entries.Count,
+            $"`THE ARCHITECTURE` has {must.Count} lines and `WHAT IT MUST DO` has "
+            + $"{entries.Count} entries. Every architecture line gets one, in the same "
+            + "order -- an architecture line with no entry is a requirement nothing is "
+            + "carrying, and that is the state this check was written to end.");
+
+        // AND ORDER, BY A WORD THE TWO SHARE. Matching prose against prose would make the
+        // check a style rule; requiring one significant word in common says the entry is
+        // about that line without dictating how it is worded.
+        //
+        // WHAT IT DOES NOT CATCH, said out loud so nobody trusts it further than it goes:
+        // two adjacent lines sharing vocabulary can be swapped and still pass. *Told, never
+        // architected* and *what it is told must be settleable* are exactly that pair.
+        var adrift = entries
+            .Select((entry, index) => (entry, index))
+            .Where(row => !Significant(row.entry).Overlaps(Significant(must[row.index])))
+            .Select(row => $"entry {row.index + 1} `{row.entry}` shares no word with "
+                + $"`{Opening(must[row.index])}`")
+            .ToList();
+
+        Assert.True(adrift.Count == 0,
+            "an entry has drifted off the architecture line it is meant to carry:\n  "
+            + string.Join("\n  ", adrift));
+    }
+
+    [Fact]
+    public void Every_leaf_carries_exactly_one_status()
+    {
+        // A LEAF IS A LINE A READER SHOULD BE ABLE TO SORT WITHOUT READING. That only works
+        // if the token is at the front and there is exactly one of it -- a leaf saying both
+        // OPEN and SETTLED is a row that has been half-updated, which is the failure this
+        // doc's fork table had in a dozen places and no check could see.
+        var leaves = Leaves();
+
+        Assert.NotEmpty(leaves);
+
+        var wrong = leaves
+            .Where(leaf =>
+                Statuses.Count(status =>
+                    leaf.Contains($"**{status}**", StringComparison.Ordinal)) != 1
+                || !Statuses.Any(status =>
+                    leaf.StartsWith($"**{status}**", StringComparison.Ordinal)))
+            .ToList();
+
+        Assert.True(wrong.Count == 0,
+            $"{wrong.Count} route leaf/leaves must OPEN with exactly one of "
+            + string.Join(", ", Statuses) + " in bold:\n  "
+            + string.Join("\n  ", wrong.Take(10).Select(Opening)));
+    }
+
+    [Fact]
+    public void Every_dead_leaf_carries_a_revival_condition()
+    {
+        // THE SAME RULE `DO NOT RE-TRY` IS HELD TO, THROUGH THE DOOR THE TREE OPENS. A
+        // refutation is conditional on its configuration, and a leaf saying only that
+        // something failed is a superstition -- this repo has already had to revive two
+        // arms whose reason for being dead had quietly expired.
+        var mute = Leaves()
+            .Where(leaf => leaf.StartsWith("**DEAD**", StringComparison.Ordinal))
+            .Where(leaf => !Revivable(leaf))
+            .ToList();
+
+        Assert.True(mute.Count == 0,
+            $"{mute.Count} dead leaf/leaves say what failed and not what would bring it "
+            + "back. Say what revives it, or name the `DO NOT RE-TRY` row that does:\n  "
+            + string.Join("\n  ", mute.Take(10).Select(Opening)));
+    }
+
+    [Fact]
+    public void The_route_checks_can_still_fail()
+    {
+        // THE COMPANION THE THREE ABOVE NEED, and for the reason every other companion in
+        // this file exists: a predicate that accepts everything passes in silence and reads
+        // exactly like a doc that is in order.
+        Assert.Equal(
+            [(0, "a branch"), (1, "an entry"), (2, "a leaf")],
+            Nested(["- a branch", "  - an entry", "    - a leaf", "not a bullet"]));
+
+        // THE ONE THAT WAS MISSING, AND ITS ABSENCE LET TWO DEAD LEAVES PASS THE REVIVAL
+        // CHECK ON WHERE THEIR TEXT WRAPPED. A leaf is a bullet, not a line.
+        Assert.Equal(
+            [(2, "a leaf that revives when the wrapped half is read")],
+            Nested(["    - a leaf that revives when", "      the wrapped half is read"]));
+
+        Assert.False(Significant("Malleability is the record").Overlaps(
+            Significant("AND IT LEARNS BY BEING WRONG AND FINDING OUT")));
+
+        Assert.True(Significant("Malleability is the record").Overlaps(
+            Significant("AND HOW HARD A BELIEF IS TO SHIFT IS ITS OWN RECORD")));
+
+        // AND THE STOPWORDS MUST STILL BITE, or the overlap test above passes on any two
+        // English sentences and the order half of the correspondence check is worth nothing.
+        Assert.False(Significant("What it must never do").Overlaps(
+            Significant("EVERY INPUT IS AN ATTRIBUTE, WHICH MUST NEVER BE THE THING")));
+
+        Assert.True(Revivable("**DEAD** — refuted, and it revives when a world holds still"));
+        Assert.True(Revivable("**DEAD** — refuted; the row is in DO NOT RE-TRY"));
+        Assert.False(Revivable("**DEAD** — built, measured and deleted"));
+    }
 
     /// <summary>
     /// What a finding looks like in prose, so the doc can be kept clear of them.

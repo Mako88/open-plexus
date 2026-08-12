@@ -66,12 +66,20 @@ public sealed class StaleClaimTests
     /// claim about today would demand that a trap be deleted the moment its subject
     /// started working, which is the opposite of what a trap is for. What has to stay
     /// true is the sections a reader consults to decide what to BUILD.
+    /// <para>
+    /// <b>AND `THE ROUTE` REPLACED THE FORK INDEX HERE, WHICH IS NOT A RENAME.</b> The index
+    /// was a flat table and this list held it because that is where an <i>unwired</i> claim
+    /// used to live. The route now holds them — <i>nothing tracks a source through a
+    /// change</i>, <i>the walk still learns nowhere but at home</i> — and it holds them
+    /// against a REQUIREMENT rather than against a number, so a claim going stale there is
+    /// a requirement that has quietly been met and nobody noticed.
+    /// </para>
     /// </remarks>
     private static readonly string[] Current =
     [
+        "THE ROUTE",
         "TO BUILD",
         "OPEN DEFECTS",
-        "FORK NUMBERS THE CODE CITES",
     ];
 
     /// <summary>

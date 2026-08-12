@@ -669,227 +669,144 @@ condition is a superstition.
 
 ## TRAPS
 
-- **A BUILD DURING A TEST RUN CAN ABORT IT WITH EVERY TEST PASSING.** The suite reported no
-  failures and died on a crashed host, with a build replacing the assemblies under it. The
-  mirror of the `--no-build` staleness rule.
-- **AND A HAND-TYPED FILTER RUNS THE GRIDS CI EXCLUDES.** Naming a class names its sweeps
-  too, so two suites ran past forty minutes and had to be killed where `kind!=sweep&` in
-  front takes them to seconds. The facts were tagged correctly; the command was not, and
-  nothing anywhere fails when it is.
-- **AND PUSHING FASTER THAN THE SUITE RUNS MEANS NOTHING IS EVER TESTED.** The concurrency
-  group cancels whatever is waiting, so a session committing every few minutes cancels its own
-  queue all day. Only a `[checkpoint]` escapes.
-- **A COST MEASURED ON ONE PLATFORM CAN BE NOUGHT ON ANOTHER, AND A COMPARISON ASSERTING IT
-  THEN FAILS WHERE THE FAULT CANNOT HAPPEN.** A refused loopback connect is four seconds on
-  Windows and immediate on Linux, so a shard went red for a repair working perfectly.
-- **AND THAT SAME FOUR SECONDS PRICES THE LOCAL SUITE AND NOT CI.** A fleet pays it per
-  announcement to a machine not yet up, so a socket test is forty seconds here and a fifth of
-  a second there. Read a wire timing on CI.
+Grouped by FAILURE CLASS rather than by incident, because ninety separate lessons is a list
+nobody finishes. Each names the sharpest instance; the rest are in the commits that found
+them. **A class earning a check moves out of here into the check.**
 
+### The harness lies, and nothing goes red when it does
+
+- **A HAND-TYPED FILTER RUNS THE GRIDS CI EXCLUDES.** Naming a class names its sweeps too, so
+  two suites ran past forty minutes where `kind!=sweep&` in front takes them to seconds. The
+  facts were tagged correctly and the COMMAND was not.
+- **PUSHING FASTER THAN THE SUITE RUNS MEANS NOTHING IS EVER TESTED.** The concurrency group
+  cancels whatever is waiting, so a session committing every few minutes cancels its own queue
+  all day. Only a `[checkpoint]` escapes.
+- **A BUILD DURING A TEST RUN CAN ABORT IT WITH EVERY TEST PASSING**, the assemblies being
+  replaced underneath. The mirror of the `--no-build` staleness rule.
+- **A COST MEASURED ON ONE PLATFORM CAN BE NOUGHT ON ANOTHER.** A refused loopback connect is
+  four seconds on Windows and immediate on Linux, so a shard went red for a repair working
+  perfectly — and that same four seconds prices the local suite and not CI. Read a wire
+  timing on CI.
+- **A WORKFLOW IS THE ONE ARTIFACT WITH NO LOCAL CHECK**, and it is wrong until a push says
+  otherwise. And SKIPPING WORK IS NOT SKIPPING A JOB: a matrix entry that exits immediately
+  still took a runner slot.
+
+### A check that cannot fire reads exactly like a check that passes
+
+- **ARM ANYTHING THAT HAS ALWAYS READ ZERO.** `Surprise` and `Abstain` were both found wired
+  and unable to fire, and *promiscuous on purpose* meant EXHAUSTIVE for the life of the repo
+  because its gate was mounted nowhere.
+- **A GUARD MOUNTED ON ONE CALLER IS NOT MOUNTED**, and a CODE PATH GUARDED BY A CAP IS
+  UNTESTED UNTIL SOMETHING REACHES THE CAP. Both sat unexercised for the life of the repo
+  because no world was wide enough.
+- **A DOCUMENTED PROMISE IS NOT A CHECK.** `Posted` said a fan-out was posts in flight while
+  both of its fan-outs awaited each post in turn — false from the day it was written, directly
+  under the sentence describing the fault. A fix aimed at the callers one measurement touched
+  leaves the rest.
+- **A BUDGET CAN BE SATISFIED BY A COINCIDENCE**, and a CAST TO AN INTERFACE THE TYPE DOES NOT
+  IMPLEMENT IS CLEANUP THAT NEVER RUNS. Both compile and read as tidy.
+- **A PREDICTION WRITTEN INTO A WIRING CHECK FAILS TWO WAYS AND READS THE SAME.** Assert that
+  arms DIFFER, never which way.
+
+### A comparison that moves two things at once
+
+- **MEASURE ONE MECHANISM ON FROM A KNOWN BASELINE, NEVER ONE OFF FROM ALL-ON.**
+- **A SETTING CAN DECIDE TWO INDEPENDENT THINGS WHILE BEING NAMED FOR ONE**, so the cell that
+  separates them may already exist and never have been read as a control.
+- **A READOUT ARM IS A SEARCH ARM WHEREVER THE READOUT TRIGGERS THE SEARCH.** Every vote
+  comparison in four sessions moved both.
+- **A FIXTURE INHERITS EVERY DIAL IT DOES NOT PIN**, so a default moving rewrites an
+  experiment nobody edited — and THE GRID THAT DECIDES A DEFAULT REWRITES ITSELF THE MOMENT
+  IT WINS.
+- **A DEFAULT CAN SHORT-CIRCUIT THE MECHANISM BEING MEASURED**, so a sweep on defaults
+  returned three identical arms for a gate that was never running.
+- **A TEST CAN FAIL AT BOTH ENDS OF A DIAL FOR OPPOSITE REASONS**, so pinning to the old value
+  fixes nothing while reading as a fix. **Do not attribute a red test to your own change
+  without a baseline.**
+
+### A score reached the wrong way
+
+- **AN ACCURACY CAN BE HIT BY MEMORISING.** Report the commitment count beside every score,
+  and on a world with known ground truth report how much of it was found.
+- **A CORPUS CAN CONTAIN ITS OWN ANSWER, and then a score measures the leak.** A generated
+  world cannot, which is half of why the multiplexer is first.
+- **A GRID CAN RANK ARMS ON COLUMNS A SKEWED WORLD RAISES FOR FREE**, and a GRID OF IDENTICAL
+  ROWS IS A VERDICT ON THE WORLDS RATHER THAN ON THE ARM.
+- **A PRECISION TAKEN AT THE ANSWER'S OWN SIZE IS THE EXPERIMENTER HOLDING THE KNIFE.**
+  Nothing inside the machine knows a category has four members. Report the size-free cut.
 - **A FRONT-END ARM HAS A CEILING COMPUTABLE WITH NO LEARNING, AND IT COSTS MILLISECONDS
-  AGAINST A RUNNER'S HOUR.** Whether the answer survives the translation is decided before a
-  commitment exists. Take it FIRST; a grid cannot tell a rule that dropped the wrong
+  AGAINST A RUNNER'S HOUR.** Take it FIRST — a grid cannot tell a rule that dropped the wrong
   sentence from a learner that failed to use the right one.
-- **AND *THE ANSWER IS IN THE ROOM* IS NOT A BOUND ON THE SCORE.** An outcome is an index
-  rather than a word, so the base rate is collected with nothing to read — and where the
-  marginal is above that column a score sits above it with nothing wrong.
-- **A DOC CAN NAME THE WRONG BLOCKER AND BE BELIEVED FOR A WHOLE BRANCH.** Fork 96 was carried
-  as blocked on fork 32's cap, which is on ENTAILMENT depth; what held it to one hop was one
-  `return` in the front end. Read the code before costing the fix.
-- **AND A SEED SPREAD IS NOT ALWAYS A YARDSTICK, SO A KILL LINE RESTING ON ONE CAN BE
-  VACUOUS.** Three seeds returned the identical exam score in every cell of the category grid,
-  so *clear the control by more than the spread* admitted any gain at all.
-- **AND A PRECISION TAKEN AT THE ANSWER'S OWN SIZE IS THE EXPERIMENTER HOLDING THE KNIFE.**
-  Nothing inside the machine knows a category has four members, so a top-k score can be
-  perfect while no rule the machine could run reproduces it. Report the size-free cut beside.
-
-Named so nobody reintroduces them. These are about MEASUREMENT, so they survive the
-change of architecture entirely.
-
-- **A check can be wired and unable to fire**, which reads as passing. Arm anything that has
-  always read zero; `Surprise` and `Abstain` were both found that way.
-- **A dial can be declared, documented, passed everywhere and connected to nothing.**
-  Every run reports `Complaints`; read them.
-- **A fallback is a control arm nobody meant to run** — silence drifts an arm toward
-  the random bar for free. Report silence beside the score.
-- **A ranking arm needs something to rank, AND ITS STATISTIC MUST DISAGREE WITH THE
-  CONTROL'S.** Two comparable routes outsum one, so `Agreement` and `Sum` ordered
-  alike everywhere and four sessions read a tautology as a bug.
-- **Measure one mechanism ON from a known baseline, never one OFF from all-on.**
-- **AND A SETTING CAN DECIDE TWO INDEPENDENT THINGS WHILE BEING NAMED FOR ONE**, so every
-  comparison against it moves both axes. The cell that separates them may already exist
-  and never have been read as a control.
-- **READ THE REVIVAL ROWS BEFORE PROPOSING A MISSING ARM.** `Mending`'s fourth cell was
-  called absent here while its own row said *ignoring children* — the same axis in the
-  mechanism's words rather than the comparison's, which is how a search misses it.
-- **A small sample can look like a mechanism, AND IT HIDES A REAL EFFECT TOO.** Count
-  seeds in both directions.
-- **A number in a commit message is a claim, not a record.**
-- **A PERIODIC SWEEP INSIDE A CONDITIONAL RUNS AT THAT CONDITION'S RATE.** Subsumption
-  and culling sat inside the failure branch, so at high accuracy they ran a handful of
-  times in thirty thousand rounds and read as mechanisms that bought nothing.
-- **A dial can be wired to ONE WORLD IN TEN**, and cashed in citing a finding as
-  though it were general.
-- **A CORPUS CAN CONTAIN ITS OWN ANSWER, and then a score measures the leak.** A
-  generated world cannot, which is half of why the multiplexer is first.
-- **AN ACCURACY CAN BE HIT BY MEMORISING.** Report the commitment count beside every
-  score, and on a world with known ground truth report how much of it was found.
-- **Two arms can peak at different budgets.** Compare PEAK TO PEAK.
-- **AND A MECHANISM CAN BE RIGHT AND ITS OBVIOUS WIRING WRONG.** Minting a name is not
-  the same decision as where the name goes; `csharp` broke two controls learning that.
-- **A FILTER BEFORE A `Take` INVERTS AN EVICTION RULE WHEN THE POPULATION OVERSHOOTS.**
-  The ask exceeded the eligible list, so the accuracy ordering chose nothing:
-  everything experienced died and the young were immortal.
-- **AND THE TELL WAS A DISTRIBUTION, NOT A SCORE.** Every commitment in the population
-  topped out one short of the floor it was tested against. <b>A hard ceiling immediately
-  below a threshold is never a coincidence</b> — read the spread, not the mean.
-- **A GUARD MOUNTED ON ONE CALLER IS NOT MOUNTED.** `Tending` refused a modality block
-  that would not fit while `Banded` itself took anything; past 128 dimensions the byte
-  wrapped and two different pictures became one observation, silently.
-- **A CODE PATH GUARDED BY A CAP IS UNTESTED UNTIL SOMETHING REACHES THE CAP.** Both
-  of the above sat unexercised for the life of the repo because no world was wide
-  enough. `Graded` holds 371 commitments; `Cifar` holds ten thousand.
-- **ONE SEED IS NOT A COMPARISON AND WILL HAPPILY INVERT.** Winnowing beat bands on
-  seed one and lost to them over five. Error bars before ordering, every time.
-- **AND ITS DUAL: A PERIODIC SWEEP AGAINST A PER-ROUND RATE THAT SCALES WITH THE FRONT
-  END.** Culling on the calendar while genesis mints per live code holds a population at
-  many times its capacity. `Graded` is too small to show it.
-- **A GATE NAMED IN THE PLAN AND MOUNTED NOWHERE MAKES THE WORD IT GATES MEAN SOMETHING
-  ELSE.** *Promiscuous on purpose* meant EXHAUSTIVE for the life of the repo.
-- **A COST CAN BE IN MEMORY WHILE EVERY INSTRUMENT WATCHES TIME.** No report has ever
-  carried a byte count, so what actually bounded the run was invisible to all of them.
-- **AN ONLINE SCORE BELOW WHAT THE FINAL POPULATION GETS ON FRESH OBSERVATIONS IS A
-  CHURN SIGNAL.** It means the population is being destroyed and rebuilt faster than the
-  trailing window can read it, and the run understates its own machine.
-- **A DEPENDENCY'S DEFAULTS CAN BREAK REPRODUCIBILITY SILENTLY.** Parallel inference
-  reorders float reductions, and a code is a QUANTISED number — so a reading at a band
-  boundary codes differently run to run. Fork 12, arriving from outside.
-- **TAKING OUTPUT ZERO OF A GRAPH IS A SILENT WRONG ANSWER.** A pooled embedding and a
-  per-token hidden state are both plausible tensors and only one is a reading. Name it.
-- **A MEASUREMENT INSIDE A REPORT IS ASSERTED ON BY EVERY EQUALITY READING IT.** A wall
-  clock in a record turns reproducibility red and makes every `NotEqual` beside it pass
-  for free.
-- **A CLAIM ABOUT CORRECTNESS WILL DO DUTY AS A CLAIM ABOUT THROUGHPUT UNLESS SOMEBODY
-  MEASURES.** C2 says messages are late and never said how late; tolerating lateness by
-  construction is not tolerating any amount of it.
-- **AND A SIMULATED CONSTRAINT CAN BE HARSHER THAN THE REAL ONE.** `HybridBus` reorders on
-  purpose and TCP does not, so a green distributed run is evidence about bytes and routing
-  and says nothing about C2.
-- **AN ANSWER KEY IN THE WRONG ALPHABET SCORES NOUGHT AND LOOKS LIKE A VERDICT.** A key
-  expecting a code the population can never hold reports no rule true, which reads
-  exactly like a learner holding none.
-- **A MECHANISM IS LOCAL OR POPULATION-WIDE BY ACCIDENT UNTIL SOMETHING SPLITS IT**, and
-  nothing in one process can tell the two apart. Both halves of the ladder read the whole
-  population and neither said so anywhere.
-- **A PREDICTION WRITTEN INTO A WIRING CHECK FAILS TWO WAYS AND READS THE SAME.** Genuinely
-  unwired and wired-but-backwards are one message; assert that arms DIFFER, never which
-  way.
-- **A WINNER-TAKE-ALL ARGMAX IS CHAOTIC IN ITS EVIDENCE, and two ends of a sweep cannot
-  show it.** Naming picks one pair at a time, so a small difference changes the winner and
-  everything built on it.
-- **A TYPE CAN DROP MOST OF ITSELF ON THE WIRE AND STILL WRITE A PLAUSIBLE NUMBER.** Private
-  tables and tuple keys serialise to nothing; what arrives looks like a message and merges
-  as one.
-- **SO PIN A FORMAT FAILURE WITH A CHECK RATHER THAN A COMMENT**, and assert the round trip
-  on the ANSWER — equal fields say the members survived, the same decision says the
-  arithmetic did.
-- **AND A DEFAULT CAN SHORT-CIRCUIT THE MECHANISM BEING MEASURED.** `Mending.Outvoted`
-  ships and skips the narrows test, so a sweep on defaults returned three identical arms
-  for a gate that was never running.
-- **A DOCUMENTED PROMISE IS NOT A CHECK.** `Posted` said a fan-out was posts in flight
-  while both of its fan-outs awaited each post in turn — false from the day it was
-  written, and directly under the sentence describing the fault.
-- **AND THE CLOCK CAME FROM THE OTHER PATH.** The thinking side had never been timed across
-  a socket, so the defect was found by measuring the learning side — a check on one
-  mechanism reaching a fault in another.
-- **AND THE SAME SENTENCE WAS STILL FALSE OF TWO MORE METHODS IN THAT FILE, UNDERNEATH THE
-  COMMIT THAT FIXED THE OTHER TWO.** Announcing and publishing queued their peers. A fix
-  aimed at the callers a measurement happened to touch leaves the rest.
-- **A BUDGET CAN BE SATISFIED BY A COINCIDENCE.** `Machines.Holder` read as wired because a
-  tuple field in another file was spelt `Holder`; renaming it put two unmounted types onto
-  the dead-code list at once.
-- **AND A TIE-BREAK BY DICTIONARY WALK IS STABLE UNTIL THERE ARE TWO TABLES.** `Shared`
-  resolved equal candidates by whichever its table reached first — reproducible in one
-  process, arbitrary across a merge. Fork 12 by a new door.
-- **A POLITE SHUTDOWN WAITS ON CONNECTIONS THE OTHER SIDE IS KEEPING ALIVE.** A one-second
-  run had a teardown of minutes, so a grid of them read as a deadlock and the profile said
-  the wire was fine.
-- **AND A CAST TO AN INTERFACE THE TYPE DOES NOT IMPLEMENT IS CLEANUP THAT NEVER RUNS.** It
-  compiles, reads as tidy, and does nothing — the pass-shaped defect again, wearing a
-  disposal rather than a check.
-- **EVERY WORLD ON THE BENCH DREW ITS OUTCOMES EVENLY AND NOTHING MEASURED THAT.** Any
-  mechanism keyed on how COMMON an answer is was untestable here for the life of the
-  branch while reading as tested.
-- **AND A GRID OF IDENTICAL ROWS IS A VERDICT ON THE WORLDS RATHER THAN ON THE ARM.**
-  Dividing by a constant cannot move an argmax, so eight rows four decimals apart were
-  the bench saying it had no question.
-- **AN ESTIMATE IS NOISE BEFORE IT IS A STATISTIC, AND A CHAOTIC RUN KEEPS THE
-  PERTURBATION.** A divisor 1.36 at fifty rounds and 1.01 at twenty thousand mints a
-  different population, so a mid-run reading and an end-of-run one are different
-  measurements.
-- **SIX EXPLANATIONS IN ONE SESSION DIED TO CONTROLS AND EVERY ONE CHANGED SELECTION.**
-  Where the measurement says no right rule was present, a rule about who WINS cannot reach
-  it. Ask which half of generate-and-test a proposal touches before building it.
-- **AND THE INSTRUMENT THAT KILLS A STORY IS USUALLY BUILT FOR SOMETHING ELSE.** Twice in one
-  session, then three times in another — so ask which grid already holds the number before
-  running a new one, and build the instrument before the seventh story.
-- **A `readonly record struct` HOLDING AN `ImmutableArray` COMPARES BY THE ARRAY'S
-  IDENTITY.** Two separately built keys with identical contents are never equal, so an
-  equality asserted on one fails on a world it has no complaint about.
-- **AN EXACT PARTITION OF WHAT REACHED A MECHANISM SAYS NOTHING ABOUT WHAT NEVER
-  REACHED IT.** Five gate shares summed to the candidates exactly and read as complete;
-  the lineage that mattered was absent from the denominator.
-- **AND A GENERATE-SIDE OPERATOR TRIGGERED BY THE VOTE'S ERRORS INHERITS THE VOTE'S BLIND
-  SPOTS.** What may be repaired is then decided by what is already answered correctly,
-  which is not a fact about the thing being repaired.
-- **A LIST THAT APPENDS A DUPLICATE IS A COUNT WEARING A SET'S SHAPE**, and every reader
-  gets whichever it assumed. `_minted` was the repair budget and the child set at once.
-- **AND A READOUT ARM IS A SEARCH ARM WHEREVER THE READOUT TRIGGERS THE SEARCH.** Every
-  vote comparison in four sessions moved both, and the cell proving it is two weighings
-  building one population once the trigger is cut.
-- **A FIXTURE INHERITS EVERY DIAL IT DOES NOT PIN, so a default moving rewrites an
-  experiment nobody edited.** `BudgetTests` crosses two settings and pins neither timing
-  nor budget; it changed arms silently and is a sweep, so CI never looked.
-- **AND THE GRID THAT DECIDES A DEFAULT REWRITES ITSELF THE MOMENT IT WINS.** Four grids
-  swept `Budget` or `Forking` without pinning the other, so shipping the pair changed what
-  every one of them was asking under its own rows' names.
-- **AND A TEST CAN FAIL AT BOTH ENDS OF A DIAL FOR OPPOSITE REASONS.** One end left the
-  whole population unable to name, the other let every shard name alone — so pinning to
-  the old value fixes nothing while reading as a fix.
-- **A WORKFLOW IS THE ONE ARTIFACT WITH NO LOCAL CHECK, and it is wrong until a push says
-  otherwise.** Three faults in one file: an invalid expression, a concurrency group copied
-  from where it fit, and a matrix taking a runner per skip.
-- **A LOCAL BUILDER'S INVARIANT IS NOT THE RECEIVED FORM'S.** No pair built here holds one
-  code twice; the wire form takes whatever arrived. Such a row wins the argmax by
-  construction, and the name minted for it throws.
-- **AND SKIPPING WORK IS NOT SKIPPING A JOB.** A matrix entry that exits immediately still
-  took a runner slot, so single-sweep dispatches starved the suite behind them.
-- **A GRID CAN RANK ARMS ON COLUMNS A SKEWED WORLD RAISES FOR FREE, AND TWO DID.** Accuracy
-  has a floor of four in five; `found` and `sound` are reachable by rules firing where
-  guessing already works.
-- **AND A GRID ASKING FOR ITS RUNS PER COLUMN BUILDS EVERY POPULATION ONCE A COLUMN.** One
-  measurement printed as four, and the column that would have ranked the arms looked too
-  expensive to add.
-- **A SEARCH STEP OF TWO CODES IS A GATE PAID ONCE.** Repair clears the separation bar per
-  code added; a minted name standing for two enters on that single clearance.
-- **AN EXPLANATION CAN BE ARITHMETICALLY TRUE AND STILL NOT BE WHAT MOVED THE NUMBER.** A sum
-  scales with the advocate count and a maximum does not; that predicted one sign change of
-  three and got two backwards.
-- **AN ACCURACY COMPARISON BETWEEN ARMS HOLDING DIFFERENT NUMBERS OF RULES WAS BIASED WHILE
-  THE VOTE WAS A SUM.** The population is identical under both votes, measured; only the
-  ballot changed, and a sum scales with the count.
 - **TWO ARMS THAT SCORE ALIKE NEED NOT BE THE SAME MECHANISM, AND A SCORE CANNOT SAY.** A cap
   that refuses nothing and a cap that refuses a lot read identically until something counts
-  what was BUILT. Four grids in one session.
-- **A RATE WHOSE NUMERATOR COUNTS RULES SAYS NOTHING ABOUT HOW MUCH GOT COVERED.** The share
-  of repairs that ever buy a hard round rose by half while hard-round coverage fell, because
-  each deeper rule carries fewer rounds.
-- **AND A SHARE WHOSE HALVES COUNT DIFFERENT EVENTS ANNOUNCES ITSELF BY EXCEEDING ONE.**
-  Repairs that took two codes over children BORN read thirty-nine, because a lineage collides
-  twenty to fifty times a birth. Arithmetic caught what a name did not.
-- **DELETING THE LAST ARM DELETES THE CHECK THAT MADE THE DELETION LEGITIMATE.** *The vote
-  builds one population* was asserted across three weighings; with one left it cannot be
-  stated at all, so the property is an argument again.
+  what was BUILT.
+
+### A statistic whose halves count different things
+
+- **A RATE WHOSE NUMERATOR COUNTS RULES SAYS NOTHING ABOUT HOW MUCH GOT COVERED**, and A SHARE
+  WHOSE HALVES COUNT DIFFERENT EVENTS ANNOUNCES ITSELF BY EXCEEDING ONE.
+- **AN EXACT PARTITION OF WHAT REACHED A MECHANISM SAYS NOTHING ABOUT WHAT NEVER REACHED IT.**
+  The lineage that mattered was absent from the denominator.
+- **A LIST THAT APPENDS A DUPLICATE IS A COUNT WEARING A SET'S SHAPE**, and every reader gets
+  whichever it assumed.
+- **A PERIODIC SWEEP INSIDE A CONDITIONAL RUNS AT THAT CONDITION'S RATE**, so subsumption and
+  culling read as mechanisms that bought nothing. Its dual: a periodic sweep against a
+  per-round rate that scales with the front end holds a population far above its capacity.
+- **AN EXPLANATION CAN BE ARITHMETICALLY TRUE AND STILL NOT BE WHAT MOVED THE NUMBER.**
+
+### Too few seeds, or too much trust in the spread
+
+- **ONE SEED IS NOT A COMPARISON AND WILL HAPPILY INVERT.** Error bars before ordering, every
+  time, and count seeds in BOTH directions — a small sample hides a real effect as readily as
+  it invents one.
+- **A SEED SPREAD IS NOT ALWAYS A YARDSTICK**, so a kill line resting on one can be vacuous:
+  identical scores in every cell admit any gain at all.
+- **AN ESTIMATE IS NOISE BEFORE IT IS A STATISTIC, AND A CHAOTIC RUN KEEPS THE PERTURBATION**,
+  so a mid-run reading and an end-of-run one are different measurements.
+- **A WINNER-TAKE-ALL ARGMAX IS CHAOTIC IN ITS EVIDENCE**, and two ends of a sweep cannot
+  show it.
+
+### Reproducibility broken from outside the code
+
+- **A DEPENDENCY'S DEFAULTS CAN BREAK IT SILENTLY.** Parallel inference reorders float
+  reductions and a code is a QUANTISED number, so a reading at a band boundary codes
+  differently run to run.
+- **A TIE-BREAK BY DICTIONARY WALK IS STABLE UNTIL THERE ARE TWO TABLES** — reproducible in
+  one process, arbitrary across a merge.
+- **A MEASUREMENT INSIDE A REPORT IS ASSERTED ON BY EVERY EQUALITY READING IT.** A wall clock
+  in a record turns reproducibility red and makes every `NotEqual` beside it pass for free.
+- **A `readonly record struct` HOLDING AN `ImmutableArray` COMPARES BY THE ARRAY'S IDENTITY**,
+  so two separately built keys with identical contents are never equal.
+- **A TYPE CAN DROP MOST OF ITSELF ON THE WIRE AND STILL WRITE A PLAUSIBLE NUMBER.** Private
+  tables and tuple keys serialise to nothing. Pin a format failure with a check on the
+  ANSWER, never a comment.
+- **A LOCAL BUILDER'S INVARIANT IS NOT THE RECEIVED FORM'S.** No pair built here holds one
+  code twice; the wire form takes whatever arrived.
+
+### Reading the machine wrong
+
+- **A DOC CAN NAME THE WRONG BLOCKER AND BE BELIEVED FOR A WHOLE BRANCH.** Read the code
+  before costing the fix.
+- **READ THE REVIVAL ROWS BEFORE PROPOSING A MISSING ARM** — a row may name the same axis in
+  the mechanism's words rather than the comparison's, which is how a search misses it.
+- **THE TELL IS OFTEN A DISTRIBUTION, NOT A SCORE.** A hard ceiling immediately below a
+  threshold is never a coincidence; read the spread, not the mean.
+- **AN ONLINE SCORE BELOW WHAT THE FINAL POPULATION GETS ON FRESH OBSERVATIONS IS A CHURN
+  SIGNAL** — the population is being rebuilt faster than the trailing window can read it.
+- **A MECHANISM IS LOCAL OR POPULATION-WIDE BY ACCIDENT UNTIL SOMETHING SPLITS IT**, and
+  nothing in one process can tell the two apart.
+- **A COST CAN BE IN MEMORY WHILE EVERY INSTRUMENT WATCHES TIME**, and A CLAIM ABOUT
+  CORRECTNESS WILL DO DUTY AS A CLAIM ABOUT THROUGHPUT UNLESS SOMEBODY MEASURES.
+- **A SIMULATED CONSTRAINT CAN BE HARSHER THAN THE REAL ONE.** `HybridBus` reorders on purpose
+  and TCP does not, so a green distributed run says nothing about C2.
+- **AN ANSWER KEY IN THE WRONG ALPHABET SCORES NOUGHT AND LOOKS LIKE A VERDICT.**
+- **A FALLBACK IS A CONTROL ARM NOBODY MEANT TO RUN** — silence drifts an arm toward the
+  random bar for free. Report silence beside the score.
+- **DELETING THE LAST ARM DELETES THE CHECK THAT MADE THE DELETION LEGITIMATE**, so a property
+  asserted across three arms becomes an argument again with one left.
+- **THE INSTRUMENT THAT KILLS A STORY IS USUALLY BUILT FOR SOMETHING ELSE**, so ask which grid
+  already holds the number before running a new one. And ask which half of generate-and-test a
+  proposal touches: where no right rule was present, a rule about who WINS cannot reach it.
 
 ---
 

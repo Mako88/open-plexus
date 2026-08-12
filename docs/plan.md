@@ -789,6 +789,11 @@ condition is a superstition.
   announcement to a machine not yet up, so a socket test is forty seconds here and a fifth of
   a second there. Read a wire timing on CI.
 
+- **A FRONT-END ARM HAS A CEILING COMPUTABLE WITH NO LEARNING, AND IT COSTS MILLISECONDS
+  AGAINST A RUNNER'S HOUR.** Whether the answer survives the translation is decided before a
+  commitment exists. Take it FIRST; a grid cannot tell a rule that dropped the wrong
+  sentence from a learner that failed to use the right one.
+
 Named so nobody reintroduces them. These are about MEASUREMENT, so they survive the
 change of architecture entirely.
 
@@ -1514,7 +1519,8 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **86** | The ladder's admission rule reads near nothing on text while the transcript shows the ceiling plainly. It asks whether repair found a separating code, and on a wide alphabet memorising always does — so the trigger cannot summon the rungs that go UP. What signal separates *nothing separates* from *nothing GENERAL separates*. Open |
 | **87** | `Recalled` answers with a place and never a person. ANSWERED AGAINST for a coincidence code: naming the shared word, dropping its identity, and saying the absence out loud all sit inside the control's spread. A marker says when to trust the place in front of you, never where to find the right one |
 | **93** | John's: the brain must hold one knowledge at several grains — *a person sleeps in a bedroom*, and *this bedroom is Mary's*. SHARPENED: three stores rather than two, monotone counters forbid the retractable one, and the missing operator mints an INDIVIDUAL, which no rung covers. Fork 94 prices the cheap half |
-| **94** | Does overwriting dissolve the selection rather than help it? `Joining.Situated` drops a statement a newer one shares a key with, a key being any word outside the commonest N. N=0 is a one-statement span and N=vocabulary is the bag, so it must beat both its own ends. KILL: nothing beating `Recent`. Open |
+| **94** | Does overwriting dissolve the selection rather than help it? A statement is dropped when a newer one shares a key with it. HALF ANSWERED before any learning: keyed dropping beats a budget-matched blind control on both columns at once, so what goes is chosen rather than merely thinned. Open on the grid |
+| **95** | What makes a word a key. CORPUS FREQUENCY IS REFUTED, and arithmetically: the commonest motion verb outranks every name while the rarer ones fall below all of them, so no rank keeps names and drops verbs. The story's own intersection is better and leaks where a story mixes verbs. Open |
 | **92** | Banding a word by how many statements back it was makes *the latest one* sayable, and buys about half of what simply narrowing the view buys. Its gain reverses as capacity grows, so the alphabet it adds is spent memorising. Does a band the learner MINTS rather than one it is handed behave differently? Open |
 | **91** | A masked objective spends the population on function words, being what a bag predicts best, and transfers nothing. Gate what is worth predicting on surprise, the way genesis is already gated on it — the one repair that is not a stop list. Open, and it is what would make a primer teach |
 | **89** | John's: prime it on general English before setting it a text to be examined on. `Primer` exists for the walk and ports cheaply, but a settled-nothing round moves no counter here — so a primer needs something to predict while reading. Next word is rung three. Open |

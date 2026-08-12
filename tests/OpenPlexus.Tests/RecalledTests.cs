@@ -403,6 +403,10 @@ public sealed class RecalledTests(ITestOutputHelper output)
             // pay.
             foreach (var constant in new[] { 0, 2, 4, 8, 16, 32 })
                 Row(capacity, Joining.Situated, constant);
+
+            // AND THE ARM THAT IS TOLD NOTHING, WHICH THE CEILING SAYS IS THE BETTER KEY.
+            // It has no dial because the story supplies its own background.
+            Row(capacity, Joining.Distinguished, constant: 0);
         }
 
         void Row(int capacity, Joining joining, int constant)
@@ -557,6 +561,161 @@ public sealed class RecalledTests(ITestOutputHelper output)
                 $"span {span,-2} | answer present in {ceiling:F3} of {world.Withheld.Count} "
                 + $"exam moments, over {world.Questions} drawn");
         }
+    }
+
+    /// <summary>
+    /// What displacement throws away, before anything has learnt anything.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE SHARPER INSTRUMENT, AND IT COSTS NO LEARNING AT ALL.</b> A grid can only say
+    /// that an arm scored badly; it cannot say whether the rule dropped the wrong statement
+    /// or the learner failed to use the right one. This asks the question directly — after
+    /// displacement, is the answering word still in the room? — and it is decided by the
+    /// front end alone, on the withheld set, before a single commitment exists.
+    /// </para>
+    /// <para>
+    /// <b>SO THE TWO COLUMNS TOGETHER ARE THE WHOLE VERDICT ON THE RULE.</b> The bag always
+    /// contains its own answer, so a ceiling under one is displacement destroying something
+    /// it should have kept. What makes a rule GOOD is throwing a great deal away while that
+    /// ceiling holds — the same reading `Span` gets, from a mechanism that is allowed to
+    /// keep more than one sentence.
+    /// </para>
+    /// <para>
+    /// <b>AND BOTH COLUMNS MUST RISE WITH THE DIAL, WHICH IS AN INVARIANT RATHER THAN A
+    /// HOPE.</b> A larger constant set means fewer words are keys, so fewer statements are
+    /// superseded and the survivors are a superset of the survivors before it. A reading
+    /// that fell anywhere would be a wiring fault, and this repo has read one of those as a
+    /// refutation before.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_displacement_throws_away_before_anything_learns()
+    {
+        var world = new Recalled(World(task: 1, span: 0));
+
+        var bagged = new Joined(Joining.Bagged);
+        var whole = 0;
+
+        for (var one = 0; one < world.Withheld.Count; one++)
+            whole += bagged.Codify(world.Withheld[one].Seen).Count;
+
+        // THE ORDERING THE DIAL CUTS, PRINTED, BECAUSE THE CURVE BELOW IS UNREADABLE
+        // WITHOUT IT. Whether corpus frequency separates a key from a function word is the
+        // whole assumption this arm rests on, and it is a fact about the corpus rather than
+        // about the rule.
+        output.WriteLine(string.Join(" ", world.Vocabulary
+            .OrderByDescending(word => world.Frequency.GetValueOrDefault(Babi.Of(word)))
+            .ThenBy(word => word, StringComparer.Ordinal)
+            .Take(20)
+            .Select(word => $"{word}:{world.Frequency.GetValueOrDefault(Babi.Of(word))}")));
+
+        var wasCeiling = -1.0;
+        var wasWords = -1.0;
+
+        foreach (var constant in new[] { 0, 1, 2, 4, 8, 16, 32, 64 })
+        {
+            var front = new Joined(Joining.Situated, world.Frequency, constant);
+
+            var reachable = 0;
+            var kept = 0;
+
+            for (var one = 0; one < world.Withheld.Count; one++)
+            {
+                var moment = new HashSet<Code>(front.Codify(world.Withheld[one].Seen));
+
+                kept += moment.Count;
+
+                if (moment.Contains(Babi.Of(world.Transcript[one].Answer))) reachable++;
+            }
+
+            var ceiling = reachable / (double)world.Withheld.Count;
+            var words = kept / (double)whole;
+
+            // MONOTONE IN THE DIAL, BOTH OF THEM. See the remark: a larger constant set
+            // supersedes strictly less, so neither column may ever fall.
+            Assert.True(ceiling >= wasCeiling, $"ceiling fell at constant {constant}");
+            Assert.True(words >= wasWords, $"bag shrank at constant {constant}");
+
+            wasCeiling = ceiling;
+            wasWords = words;
+
+            output.WriteLine(
+                $"constant {constant,2} | answer present {ceiling:F3} | "
+                + $"kept {words:F3} of the bag");
+        }
+
+        // THE TOP OF THE DIAL IS THE BAG, WHICH THE MECHANISM TEST ASSERTS CODE FOR CODE AND
+        // THIS ASSERTS ON THE CORPUS. A ceiling under one there would mean the arm was
+        // dropping statements with no key to drop them on.
+        Assert.Equal(1.0, wasCeiling);
+
+        // AND THE ARM THAT IS TOLD NOTHING, READ IN THE SAME COLUMNS. It has no dial, so it
+        // is one row — and the pair of numbers is the whole comparison: a rule that throws
+        // more away for the same ceiling is a better rule, and the corpus arm above never
+        // manages both at once.
+        var told = new Joined(Joining.Distinguished);
+
+        var found = 0;
+        var held = 0;
+
+        for (var one = 0; one < world.Withheld.Count; one++)
+        {
+            var moment = new HashSet<Code>(told.Codify(world.Withheld[one].Seen));
+
+            held += moment.Count;
+
+            if (moment.Contains(Babi.Of(world.Transcript[one].Answer))) found++;
+        }
+
+        output.WriteLine(
+            $"distinguished | answer present {found / (double)world.Withheld.Count:F3} | "
+            + $"kept {held / (double)whole:F3} of the bag");
+
+        // AND THE CONTROL THAT SAYS WHETHER THE KEY IS DOING ANYTHING AT ALL, matched
+        // question by question on how many words survived. Both columns moving together is
+        // what removal AT A RATE looks like, and a rate is what dropping statements blindly
+        // gives — so without this the two rules above cannot be told from a coin.
+        //
+        // IT LIVES HERE RATHER THAN IN `Joining` ON PURPOSE. A control arm shipped in the
+        // front end would be an arm to delete later; a control computed in the test that
+        // reads it costs nothing and cannot be mistaken for a mechanism.
+        var draw = new Random(1);
+        var blind = 0;
+        var spent = 0;
+
+        for (var one = 0; one < world.Withheld.Count; one++)
+        {
+            var asking = world.Withheld[one].Seen;
+            var budget = told.Codify(asking).Count;
+
+            var shuffled = asking.Story.OrderBy(_ => draw.Next()).ToList();
+            var moment = new HashSet<Code>(asking.Question);
+
+            foreach (var statement in shuffled)
+            {
+                if (moment.Count >= budget) break;
+                moment.UnionWith(statement);
+            }
+
+            spent += moment.Count;
+
+            if (moment.Contains(Babi.Of(world.Transcript[one].Answer))) blind++;
+        }
+
+        var guessing = blind / (double)world.Withheld.Count;
+        var keyed = found / (double)world.Withheld.Count;
+
+        output.WriteLine(
+            $"blind         | answer present {guessing:F3} | "
+            + $"kept {spent / (double)whole:F3} of the bag");
+
+        // THE READING PUT IN THE TEST RATHER THAN IN A COMMIT MESSAGE. A key that beat the
+        // control on the ceiling while keeping MORE would be buying its advantage with
+        // budget; this keeps strictly less and answers strictly more, which is the only
+        // shape that says the choice of what to drop is doing the work.
+        Assert.True(keyed > guessing, $"keyed {keyed:F3} did not beat blind {guessing:F3}");
+        Assert.True(held <= spent, $"keyed kept {held} against blind {spent}");
     }
 
     /// <summary>

@@ -148,6 +148,37 @@ public enum Joining
     /// </para>
     /// </remarks>
     Situated,
+
+    /// <summary>
+    /// The same displacement, keyed on what this story does not share — <b>no corpus
+    /// statistic, no dial, and no threshold to straddle.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>BECAUSE FREQUENCY CANNOT SEPARATE A VERB FROM A NAME HERE, AND THAT IS
+    /// ARITHMETIC RATHER THAN BAD LUCK.</b> <see cref="Situated"/> cuts the vocabulary at a
+    /// rank, and on this corpus <i>went</i> is written more often than any of the four
+    /// people while <i>journeyed</i>, <i>travelled</i> and <i>moved</i> are written less
+    /// than all of them. The verbs straddle the names, so no rank keeps the names as keys
+    /// and drops the verbs — and a shared <i>went</i> supersedes statements about different
+    /// people.
+    /// </para>
+    /// <para>
+    /// <b>SO THE BACKGROUND IS TAKEN FROM THE STORY INSTEAD: a key is any word not in every
+    /// statement of it.</b> Where each sentence says <i>went to the</i>, those three are
+    /// background and <i>mary</i> is not — so <i>Mary went to the garden</i> supersedes
+    /// <i>Mary went to the kitchen</i> and leaves <i>John went to the office</i> standing,
+    /// with nothing told to the front end at all.
+    /// </para>
+    /// <para>
+    /// <b>AND ITS FAILURE MODE IS NAMED BEFORE IT RUNS, BECAUSE IT IS THE SAME ONE.</b> One
+    /// sentence saying <i>journeyed</i> drops <i>went</i> out of the intersection and makes
+    /// it a key again, so a story mixing its verbs supersedes across people exactly as
+    /// <see cref="Situated"/> does. The ceiling column says how often that happens without
+    /// anything having to learn.
+    /// </para>
+    /// </remarks>
+    Distinguished,
 }
 
 /// <summary>
@@ -250,7 +281,8 @@ public sealed class Joined : IQuantizer<Asking>
 
         if (_joining == Joining.Recent) return Banding(said, observation);
 
-        if (_joining == Joining.Situated) return Situating(observation);
+        if (_joining is Joining.Situated or Joining.Distinguished)
+            return Situating(observation);
 
         if (_joining == Joining.Bagged) return said;
 
@@ -302,6 +334,12 @@ public sealed class Joined : IQuantizer<Asking>
         var claimed = new HashSet<Code>();
         var keys = new List<Code>();
 
+        // WHERE THE BACKGROUND COMES FROM IS THE WHOLE DIFFERENCE BETWEEN THE TWO ARMS, and
+        // it is one line because the displacement below is identical. One is handed a rank
+        // over the corpus; the other works out, from this story alone, which words every
+        // sentence in it uses.
+        var constant = _joining == Joining.Distinguished ? Shared(observation) : _constant;
+
         foreach (var statement in observation.Story)
         {
             keys.Clear();
@@ -310,7 +348,7 @@ public sealed class Joined : IQuantizer<Asking>
 
             foreach (var one in statement)
             {
-                if (_constant.Contains(one)) continue;
+                if (constant.Contains(one)) continue;
 
                 if (claimed.Contains(one)) { superseded = true; break; }
 
@@ -325,6 +363,28 @@ public sealed class Joined : IQuantizer<Asking>
         }
 
         return said;
+    }
+
+    /// <summary>
+    /// The words every statement of this story uses, which are the ones that key nothing.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE INTERSECTION AND NOT A COUNT, because a threshold is the thing that failed.</b>
+    /// A word in every sentence distinguishes no two of them by construction, which is the
+    /// property wanted — and unlike a rank it cannot put a verb on the wrong side of the
+    /// names. <b>A story of one statement has itself as its background</b>, so nothing is a
+    /// key and nothing is superseded, which is right: there is nothing older to displace.
+    /// </remarks>
+    private static HashSet<Code> Shared(Asking observation)
+    {
+        if (observation.Story.Count == 0) return [];
+
+        var every = new HashSet<Code>(observation.Story[0]);
+
+        for (var one = 1; one < observation.Story.Count; one++)
+            every.IntersectWith(observation.Story[one]);
+
+        return every;
     }
 
     /// <summary>

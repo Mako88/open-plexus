@@ -638,6 +638,11 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   where the argument put it. Fork 33 is priced and closed.
 - **WHAT IS UNBUILT IS THE ADMISSION, WHICH THE PRICE DID NOT TOUCH.** Nothing proposes a
   scope naming no argument, and a scope handed in by an experimenter is architecture.
+- **AND THE TRIGGER EXISTS AND IS MOSTLY NOISE.** Sibling groups — commitments differing in
+  one scope position — are abundant on both worlds, and a hole punched blindly is worse
+  than the rules it replaces about nine times in ten. Fork 102.
+- **AND HOW MANY SIBLINGS A HOLE COVERS DOES NOT SEPARATE THEM**, so the first gate anybody
+  would reach for is not one. What does is open.
 - **AND A VARIABLE NEEDS TWO PLACES IN THE MOMENT THAT CAN DISAGREE**, which no front end
   here emits — the question's words are unioned into the story's bag.
 - **Rung five, and it goes up.** When several commitments share a sub-scope, mint a
@@ -1628,6 +1633,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **91** | A masked objective spends the population on function words. CLOSED AGAINST A GATE, and the premise was wrong: rarity already selects content words perfectly, and a perfect predictor of them barely beats a blind draw. The corpus is the wall — bAbI's, says fork 100 |
 | **89** | John's: prime it on general English before setting it a text to be examined on. Wired and reading, and what it converts is the live question — it answers what it read and transfers next to none of it. Open on the gap, which is the learner rather than the corpus or the objective |
 | **101** | The two English objectives read one corpus 15,312 times and 1,800, so no single capacity sizes both and every converts grid pinned. Match the LOAD, or find a comparison not needing it. `RecalledTests` fails on a saturated arm now. Open |
+| **102** | Anti-unification as rung four's admission: where commitments differ in one scope position, propose the parent with a hole. TRIGGER IS ABUNDANT AND MOSTLY NOISE — a blind hole is worse than what it replaces nine times in ten, and group size does not separate the rest. Open on what gates it |
 | **100** | Is reading real English predictive enough to teach this learner? Fork 91's *informative implies unpredictable* is bAbI's property and inverts on Tatoeba. bAbI is disqualified as a primer besides — its held-out half is all re-reading. Open on what the learner converts |
 | **90** | John's: is there a standardised comprehension exam that separates understanding from regurgitation? bAbI already is one at this rung. What is unpriced is the tier above — school exams and the passages built so the wrong answer is the one present verbatim. Open, and blocked until the components pass |
 | **88** | The front end intersects the question with EACH statement. `Joining.Addressed` ANSWERS TASK ONE OUTRIGHT where the bag sits near the marginal, and falls to the base rate at two supporting facts — at its ceiling there too, so one hop is all it reaches and the learner never failed. Closed; fork 96 carries the reach |

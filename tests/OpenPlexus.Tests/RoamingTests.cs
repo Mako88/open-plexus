@@ -183,7 +183,10 @@ public sealed class RoamingTests(ITestOutputHelper output)
             .Select(one => (Name: one.ToString(), Joined: new Joined(one)))
             .Concat(Enumerable.Range(0, 4).Select(depth =>
                 (Name: $"Resolved({depth})",
-                 Joined: new Joined(Joining.Resolved, resolution: depth))));
+                 Joined: new Joined(Joining.Resolved, resolution: depth))))
+            .Concat(Enumerable.Range(1, 3).Select(depth =>
+                (Name: $"Freshest({depth})",
+                 Joined: new Joined(Joining.Resolved, resolution: depth, freshest: true))));
 
         foreach (var (name, joined) in arms)
         {
@@ -253,6 +256,26 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + $"{reaching[nameof(Joining.Distinguished)]:F3} for the best backward-reading arm, "
             + "so maintaining a store forwards buys nothing a lookup does not and the whole "
             + "mechanism is `Addressed` by a longer road");
+
+        // AND WHICH KEY THE FOLD FOLLOWS IS WORTH MORE THAN HOW FAR IT FOLLOWS IT, WHICH IS
+        // NOT WHAT THE DEPTH AXIS ALONE SUGGESTED. Folding through every key reaches further
+        // and arrives with company; following the ONE key whose entry moved most recently
+        // reaches nearly as far and arrives nearly alone. Recency over the store knows
+        // nothing whatever about the text -- it does not know a verb from a name, which is
+        // the thing fork 95 could not be told -- and it separates them anyway, because in
+        // *john dropped the apple* john moved a statement ago and *dropped* has not moved
+        // since the last drop.
+        //
+        // SO THE BAR IS DOMINANCE AND NOT A LEVEL. The deepest freshest arm must beat the
+        // all-keys fold on BOTH columns at once, which is what says the rule is a selection
+        // and not a trade. If it ever stops, following one key is buying reach at the price
+        // of choice like everything else here and this file's account of it is wrong.
+        Assert.True(reaching["Freshest(3)"] > reaching["Resolved(1)"]
+            && pinning["Freshest(3)"] > pinning["Resolved(1)"],
+            $"following the freshest key reaches {reaching["Freshest(3)"]:F3} and pins "
+            + $"{pinning["Freshest(3)"]:F3}, against {reaching["Resolved(1)"]:F3} and "
+            + $"{pinning["Resolved(1)"]:F3} for folding through all of them -- so it does not "
+            + "dominate, and choosing a key is a trade rather than the answer to fork 95");
     }
 
     /// <summary>
@@ -284,8 +307,12 @@ public sealed class RoamingTests(ITestOutputHelper output)
             (nameof(Joining.Addressed), new Joined(Joining.Addressed)),
             (nameof(Joining.Chained), new Joined(Joining.Chained)),
         }
-        .Concat(Enumerable.Range(0, 4).Select(depth =>
-            ($"Resolved({depth})", new Joined(Joining.Resolved, resolution: depth))))
+        .Concat(new[] { 1, 3 }.SelectMany(depth => new[]
+        {
+            ($"Resolved({depth})", new Joined(Joining.Resolved, resolution: depth)),
+            ($"Freshest({depth})",
+                new Joined(Joining.Resolved, resolution: depth, freshest: true)),
+        }))
         .ToList();
 
         foreach (var (name, joined) in arms)

@@ -318,6 +318,7 @@ public sealed class Joined : IQuantizer<Asking>
     private readonly int _hops;
     private readonly bool _banded;
     private readonly int _resolution;
+    private readonly bool _freshest;
 
     /// <param name="joining">What to do with the two halves.</param>
     /// <param name="categories">
@@ -347,9 +348,20 @@ public sealed class Joined : IQuantizer<Asking>
     /// purpose</b>, for the reason the entailment depth is capped: an unbounded fold reaches
     /// everything the story ever said, which is the bag by a longer road.
     /// </param>
+    /// <param name="freshest">
+    /// Whether <see cref="Joining.Resolved"/> folds through ONE of a statement's other keys —
+    /// the one whose entry was written most recently — rather than through all of them.
+    /// <b>An axis rather than a second arm, and the cheapest thing that could answer fork
+    /// 95.</b> The story's own background calls every word not in every statement a key, so a
+    /// VERB is a key and folding through it drags the last unrelated statement it appeared in
+    /// along; which key is the one worth following is the question that rule cannot answer.
+    /// <b>Recency over the store is a candidate that knows nothing about the text</b> — in
+    /// <i>john dropped the apple</i> john has been written a statement ago and <i>dropped</i>
+    /// not since the last drop, so the freshest is the one that moved.
+    /// </param>
     public Joined(
         Joining joining, IReadOnlyList<IReadOnlySet<Code>>? categories = null, int hops = 2,
-        bool banded = false, int resolution = 1)
+        bool banded = false, int resolution = 1, bool freshest = false)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(hops, 1);
         ArgumentOutOfRangeException.ThrowIfNegative(resolution);
@@ -359,6 +371,7 @@ public sealed class Joined : IQuantizer<Asking>
         _hops = hops;
         _banded = banded;
         _resolution = resolution;
+        _freshest = freshest;
     }
 
     /// <inheritdoc/>
@@ -660,6 +673,11 @@ public sealed class Joined : IQuantizer<Asking>
         var background = Shared(observation);
         var keys = new List<Code>();
 
+        // WHEN EACH KEY WAS LAST WRITTEN, which is what the freshest rule reads and nothing
+        // else does. A statement index rather than a clock, so it is a fact about the story
+        // rather than about the machine that read it.
+        var wrote = new Dictionary<Code, int>();
+
         for (var back = observation.Story.Count - 1; back >= 0; back--)
         {
             var statement = observation.Story[back];
@@ -667,6 +685,20 @@ public sealed class Joined : IQuantizer<Asking>
             keys.Clear();
 
             foreach (var one in statement) if (!background.Contains(one)) keys.Add(one);
+
+            // THE ONE OTHER KEY WORTH FOLLOWING, WHERE THE ARM ASKS FOR ONE. Ties are broken
+            // by the code's own order rather than by which arrived first, because two keys
+            // written by one statement must resolve the same way on every machine -- the
+            // rule `Category` stands on, and the reason a position in a list is never a name.
+            var through = default(Code?);
+
+            if (_freshest)
+                foreach (var one in keys)
+                    if (wrote.TryGetValue(one, out var when)
+                        && (through is not { } best
+                            || when > wrote[best]
+                            || (when == wrote[best] && one.CompareTo(best) > 0)))
+                        through = one;
 
             // WRITTEN AFTER EVERY VALUE IS COMPUTED, never during. See the remarks: an entry
             // that could see a sibling written by the same statement would make the moment
@@ -684,6 +716,7 @@ public sealed class Joined : IQuantizer<Asking>
                     if (depth > 0)
                         foreach (var other in keys)
                             if (!other.Equals(keys[one])
+                                && (!_freshest || other.Equals(through))
                                 && levels[depth - 1].TryGetValue(other, out var held))
                                 value.UnionWith(held);
 
@@ -694,6 +727,11 @@ public sealed class Joined : IQuantizer<Asking>
             for (var depth = 0; depth <= _resolution; depth++)
                 for (var one = 0; one < keys.Count; one++)
                     levels[depth][keys[one]] = written[depth][one];
+
+            // COUNTED FORWARDS, SO A LARGER NUMBER IS NEWER. `Story` arrives newest first and
+            // this walk runs it backwards, so the loop's own index is a distance from the
+            // question and reads the opposite way round from the order things happened.
+            foreach (var key in keys) wrote[key] = observation.Story.Count - back;
         }
 
         var moment = new HashSet<Code>(observation.Question);

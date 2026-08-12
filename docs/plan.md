@@ -83,7 +83,7 @@ condition that would revive them.
 | Which aspects are temporal | Nothing | Counters only rise. Needs an individual, a role and a category at once — fork 99 |
 | Several grains at once | Subsumption keeps the general rule where both are equally accurate | The gradient collapsed once already: the vote takes the narrowest every round |
 | Malleability is the record | Accuracy-weighted vote, plus a recency-weighted local estimate that never merges | Nothing. This one works |
-| Learns by being wrong | Commitment, settlement, blame, repair. Measured on every world here | What supplies the settlement on a stream of text — a primer moves no counter |
+| Learns by being wrong | Commitment, settlement, blame, repair. Measured on every world here | Not the objective, and not a gate on it: bAbI draws its rooms at random, so reading it is unpredictable BY CONSTRUCTION. A primer needs a predictive text |
 | Told, never architected | A front end may say what it is looking at, never what to conclude. `SeparationTests` fails the build | Nothing enforces that what is TOLD is settleable rather than installed |
 | Original thought | Nothing | Every world here is watched rather than acted in; action and goals are both unbuilt |
 
@@ -280,6 +280,9 @@ exercise. One line a capability, and the status is the whole point of the row.
 - **SOMETHING TO BE WRONG ABOUT WHILE READING** — NOT BUILT, and it is why a primer moves no
   counter. A world that asks is one way and an action with a consequence is another; what is
   missing is any of them.
+- **AND ON THIS CORPUS THE OBJECTIVE ITSELF IS THE WALL, WHICH NO GATE REACHES.** A perfect
+  predictor of the rarest word scores barely over a blind draw, so the informative words are
+  the unpredictable ones and the predictable ones are `to` and `the`.
 - **MUTUAL EXCLUSION, so a belief can be CONTRADICTED and not merely wrong** — NOT BUILT. A
   miss says *I expected Y and got Z*; nothing anywhere says Y and Z cannot both hold, which
   is the whole of what a conflict is.
@@ -1619,7 +1622,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **94** | Does overwriting dissolve the selection rather than help it? REFUTED as a dissolution: across the dial the score falls as the ceiling rises, so the arm is at its ceiling only where it keeps ONE statement and every point it takes is bought by narrowing. Keyed dropping still beats a blind control. Open on `Distinguished` |
 | **95** | What makes a word a key. CORPUS FREQUENCY IS REFUTED, and arithmetically: the commonest motion verb outranks every name while the rarer ones fall below all of them, so no rank keeps names and drops verbs. The story's own intersection is better and leaks where a story mixes verbs. Open |
 | **92** | Banding a word by how many statements back it was makes *the latest one* sayable, and buys about half of what simply narrowing the view buys. Its gain reverses as capacity grows, so the alphabet it adds is spent memorising. Does a band the learner MINTS rather than one it is handed behave differently? Open |
-| **91** | A masked objective spends the population on function words, being what a bag predicts best, and transfers nothing. Gate what is worth predicting on surprise, the way genesis is already gated on it — the one repair that is not a stop list. Open, and it is what would make a primer teach |
+| **91** | A masked objective spends the population on function words, being what a bag predicts best, and transfers nothing. CLOSED AGAINST A GATE, and the premise was wrong: rarity already selects content words perfectly, and a PERFECT predictor of them scores barely over a blind draw. The corpus is the wall |
 | **89** | John's: prime it on general English before setting it a text to be examined on. `Primer` exists for the walk and ports cheaply, but a settled-nothing round moves no counter here — so a primer needs something to predict while reading. Next word is rung three. Open |
 | **90** | John's: is there a standardised comprehension exam that separates understanding from regurgitation? bAbI already is one at this rung. What is unpriced is the tier above — school exams and the passages built so the wrong answer is the one present verbatim. Open, and blocked until the components pass |
 | **88** | The front end intersects the question with EACH statement. `Joining.Addressed` ANSWERS TASK ONE OUTRIGHT where the bag sits near the marginal, and falls to the base rate at two supporting facts — at its ceiling there too, so one hop is all it reaches and the learner never failed. Closed; fork 96 carries the reach |

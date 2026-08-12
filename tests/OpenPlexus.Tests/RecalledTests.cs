@@ -993,6 +993,151 @@ public sealed class RecalledTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// Which word is worth predicting, decided by ALTERNATIVES rather than by rarity.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>FORK 91, AND THE FRONT-END INSTRUMENT FOR IT.</b> A masked objective spends its
+    /// population on function words because a bag predicts those best, and demanding the
+    /// RAREST word instead rescues the kind of answer and not the score. Fork 95 says why
+    /// arithmetically: on this corpus the commonest motion verb outranks every name while the
+    /// rarer verbs fall below all of them, so no rank keeps the names and drops the verbs.
+    /// </para>
+    /// <para>
+    /// <b>SO THE RULE PROPOSED HERE IS NOT A RANK AT ALL: a word is worth predicting if
+    /// something ELSE could have been there instead.</b> That is the alternation statistic
+    /// already measured — <i>the</i> and <i>to</i> belong to no category because they stand
+    /// with everything, and a word with no alternative was never a choice, so predicting it
+    /// cannot be informative. It is the surprise gate's question asked where no learning is
+    /// needed to answer it.
+    /// </para>
+    /// <para>
+    /// <b>AND WHAT WOULD DROP IT IS WRITTEN BEFORE IT RAN:</b> picking the same targets as
+    /// rarity already picks. A gate that changes no target changes no population, whatever
+    /// story is told about why it should.
+    /// </para>
+    /// <para>
+    /// <b>IT DID NOT PICK THE SAME TARGETS AND THE ARM DIES ANYWAY, FOR A BETTER REASON THAN
+    /// THE ONE PRE-REGISTERED.</b> Rarity already selects content words perfectly on the
+    /// one-fact task — every target a room, not a preposition among them — so target
+    /// selection was never what was broken, and the plan's own note that it <i>rescues the
+    /// kind of answer and not the score</i> should have been read that way.
+    /// </para>
+    /// <para>
+    /// <b>WHAT IS BROKEN IS THAT THE OBJECTIVE IS VERY NEARLY NOISE, AND THE CEILING COLUMN
+    /// IS THE FIRST THING TO SAY SO.</b> A PERFECT predictor of the rarest-word objective
+    /// scores barely above a blind draw over the six rooms, because this corpus draws its
+    /// rooms at random over a template — nothing in <i>Mary went to the</i> carries where she
+    /// went, and no learner may be blamed for failing to find it.
+    /// </para>
+    /// <para>
+    /// <b>AND THE UNGATED ARM'S CEILING IS HALF AGAIN THE GATED ONES, WHICH EXPLAINS THE
+    /// FUNCTION WORDS RATHER THAN CONDEMNING THEM.</b> <i>to</i> and <i>the</i> are the only
+    /// predictable words in the corpus, so a masked objective spending its population on them
+    /// is not a pathology — <b>it is the arm finding the only signal on offer.</b>
+    /// </para>
+    /// <para>
+    /// <b>SO NO GATE CAN PAY HERE, WHICH IS A WALL AND NOT A DIAL.</b> Selecting informative
+    /// targets IS selecting unpredictable ones on this corpus, and the two cannot be had at
+    /// once. <b>A primer needs a text where reading is genuinely predictive</b>, which is a
+    /// property of the corpus rather than of the objective or the learner.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Which_word_is_worth_predicting()
+    {
+        foreach (var task in new[] { 1, 2 })
+        {
+            var (naming, company) = Counted(task);
+
+            var sorted = Grouped(new HashSet<Code>(company.Keys), company)
+                .Where(group => group.Count >= 2)
+                .SelectMany(group => group)
+                .ToHashSet();
+
+            var text = new Babi(new BabiSettings { Corpus = Tree.Babi(), Task = task, Stories = false });
+
+            var rarity = new Dictionary<string, int>(StringComparer.Ordinal);
+            foreach (var line in text.Lines)
+                foreach (var word in Babi.Words(line.Text ?? string.Empty))
+                    rarity[word] = rarity.GetValueOrDefault(word) + 1;
+
+            var ceiling = new Dictionary<string, double>(StringComparer.Ordinal);
+
+            foreach (var rule in new[] { "every word", "the rarest", "has alternatives" })
+            {
+                var picked = new Dictionary<string, int>(StringComparer.Ordinal);
+
+                var contexts = new Dictionary<string, Dictionary<string, int>>(StringComparer.Ordinal);
+
+                foreach (var line in text.Lines)
+                {
+                    if (line.Asking) continue;
+
+                    var words = Babi.Words(line.Text ?? string.Empty);
+                    if (words.Count < 2) continue;
+
+                    IEnumerable<string> targets = rule switch
+                    {
+                        "every word" => words,
+                        "the rarest" => [words
+                            .Select((word, at) => (word, at))
+                            .OrderBy(one => rarity.GetValueOrDefault(one.word, 0))
+                            .ThenBy(one => one.at)
+                            .First().word],
+
+                        // EVERY WORD THAT HAD AN ALTERNATIVE, and not one of them. The rule is
+                        // a filter rather than a rank, so it does not have to choose between
+                        // two words that were both real choices — which is the whole
+                        // difference from a frequency cut.
+                        _ => words.Where(one => sorted.Contains(Babi.Of(one))),
+                    };
+
+                    foreach (var word in targets)
+                    {
+                        picked[word] = picked.GetValueOrDefault(word) + 1;
+
+                        var context = string.Join(
+                            ",", words.Where((one, at) => one != word).Order(StringComparer.Ordinal));
+
+                        if (!contexts.TryGetValue(context, out var seen))
+                            contexts[context] = seen = new Dictionary<string, int>(StringComparer.Ordinal);
+
+                        seen[word] = seen.GetValueOrDefault(word) + 1;
+                    }
+                }
+
+                // AND WHETHER THE TARGET WAS PREDICTABLE AT ALL, which is the ceiling
+                // question asked of an OBJECTIVE rather than of a front end. Statements
+                // sharing a context are grouped and the commonest target in each is counted:
+                // that is what a perfect predictor of this objective would score, so a low
+                // number means the arm was set an unanswerable task and no gate can help it.
+                var best = 0;
+                var asked = 0;
+
+                foreach (var group in contexts)
+                {
+                    asked += group.Value.Values.Sum();
+                    best += group.Value.Values.Max();
+                }
+
+                var total = picked.Values.Sum();
+
+                var carrying = picked
+                    .Where(one => Key.Any(key => key.Value.Contains(one.Key)))
+                    .Sum(one => one.Value);
+
+                output.WriteLine(
+                    $"task {task} {rule,-16} | {total,6} targets, {carrying / (double)Math.Max(1, total):F3} "
+                    + $"of them a name, room or prop | a perfect predictor of this objective "
+                    + $"scores {best / (double)Math.Max(1, asked):F3} | commonest "
+                    + string.Join(" ", picked.OrderByDescending(one => one.Value).Take(6)
+                        .Select(one => $"{one.Key}:{one.Value}")));
+            }
+        }
+    }
+
+    /// <summary>
     /// Whether a SECOND hop puts the answer in the room, and which key rule gets it there.
     /// </summary>
     /// <remarks>

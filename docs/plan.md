@@ -207,6 +207,12 @@ exercise. One line a capability, and the status is the whole point of the row.
 - **AND A REFERENT IS A THIRD STORE RATHER THAN THE SAME ONE.** *Mary's bedroom* survives
   leaving the room and *Mary is in the bedroom* does not, so one store gets one lifetime
   wrong whichever lifetime it takes.
+- **A NAME OVER ALTERNATIVES** — NOT BUILT, and rung five is the wrong SHAPE for it. It
+  names what CO-FIRES; a category is a set of codes that never co-occur and share their
+  contexts. The general end of the gradient has no vocabulary without it.
+- **MUTUAL EXCLUSION, so a belief can be CONTRADICTED and not merely wrong** — NOT BUILT. A
+  miss says *I expected Y and got Z*; nothing anywhere says Y and Z cannot both hold, which
+  is the whole of what a conflict is.
 - **MINTING AN INDIVIDUAL** — NOT BUILT, AND ON NO LIST EITHER. Every operator here mints a
   RULE, and rung five mints a name for a SET. A referent is a constant introduced by one
   moment, which is neither — DRT's move, and what no rung covers.
@@ -1538,4 +1544,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **89** | John's: prime it on general English before setting it a text to be examined on. `Primer` exists for the walk and ports cheaply, but a settled-nothing round moves no counter here — so a primer needs something to predict while reading. Next word is rung three. Open |
 | **90** | John's: is there a standardised comprehension exam that separates understanding from regurgitation? bAbI already is one at this rung. What is unpriced is the tier above — school exams and the passages built so the wrong answer is the one present verbatim. Open, and blocked until the components pass |
 | **88** | The front end intersects the question with EACH statement. `Joining.Addressed` ANSWERS TASK ONE OUTRIGHT where the bag sits near the marginal, and falls to the base rate at two supporting facts — at its ceiling there too, so one hop is all it reaches and the learner never failed. Closed; fork 96 carries the reach |
+| **97** | John's: a category is a set of codes that are ALTERNATIVES, and rung five names only what co-fires — so a category is the COMPLEMENT of what it names, the slot varying across a family of otherwise-identical rules. The same operator the multiplexer's address bits have wanted for the life of the branch. Open |
+| **98** | John's: a concept can form BEFORE its label. Substitutability groups things by the relations they share and needs no word, so when the word arrives it labels a category that already existed. The probe comes first: does never-co-occurring-but-same-contexts recover people and places with nothing learnt? Open |
+| **99** | John's: a conflict is two beliefs asserting different members of ONE category for the same key, which is the only route to retraction under counters that only rise. And malleability is the counters rather than a property — a per-belief weight is where the human puts the answer in. Open |
 | **96** | A second hop: read at the key the FIRST reading supplied. Where the question names the apple, the apple's newest statement says who picked it up and never where. Chaining is already expressible, a commitment's identity being a code; what stands in the way is fork 32's depth cap. Open, and next |

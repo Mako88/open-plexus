@@ -56,6 +56,16 @@ a class in none is green forever because nothing ever asked it. Never chain the
 check into the commit — that has produced red commits more than once. Rebuild before running
 with `--no-build`, or the binary under test is the one from before the edit.
 
+**Put `kind!=sweep&` in front of every local filter, always.** CI does this and a hand-typed
+filter does not, so a filter naming a class runs that class's GRIDS as well — which is how
+`WideningTests` and `NarrowingTests` once ran past forty minutes and had to be killed. The
+same two suites take 17 seconds with the exclusion. Nothing warns you: the facts are tagged
+correctly, and it is the command that is wrong.
+
+```bash
+dotnet test --no-build --filter "kind!=sweep&FullyQualifiedName~Whatever" -v q --nologo
+```
+
 ## The measurements
 
 Sweeps are excluded from the suite by the `kind=sweep` trait and dispatched by hand:

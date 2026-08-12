@@ -921,6 +921,10 @@ condition is a superstition.
 - **A BUILD DURING A TEST RUN CAN ABORT IT WITH EVERY TEST PASSING.** The suite reported no
   failures and died on a crashed host, with a build replacing the assemblies under it. The
   mirror of the `--no-build` staleness rule.
+- **AND A HAND-TYPED FILTER RUNS THE GRIDS CI EXCLUDES.** Naming a class names its sweeps
+  too, so two suites ran past forty minutes and had to be killed where `kind!=sweep&` in
+  front takes them to seconds. The facts were tagged correctly; the command was not, and
+  nothing anywhere fails when it is.
 - **AND PUSHING FASTER THAN THE SUITE RUNS MEANS NOTHING IS EVER TESTED.** The concurrency
   group cancels whatever is waiting, so a session committing every few minutes cancels its own
   queue all day. Only a `[checkpoint]` escapes.

@@ -1025,6 +1025,9 @@ public sealed class RecalledTests(ITestOutputHelper output)
     public void What_reading_real_english_converts()
     {
         var scored = new Dictionary<Predicting, double>();
+        var saturated = new List<string>();
+
+        const int Capacity = 20_000;
 
         foreach (var predicting in new[] { Predicting.Masked, Predicting.Salient })
         {
@@ -1034,12 +1037,24 @@ public sealed class RecalledTests(ITestOutputHelper output)
             // population compares nothing however large it is. The grid says 2,855 words
             // settle at 18,267, so this is the same corpus at a cap known to clear it.
             // Chasing the vocabulary upwards was the mistake; matching it is the fix.
-            var (world, trial, brain) = Made(English(sentences: 2_000, predicting), capacity: 20_000);
+            var (world, trial, brain) = Made(English(sentences: 2_000, predicting), capacity: Capacity);
 
             var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
             var exam = tally.Unseen?.Accuracy ?? 0.0;
 
             scored[predicting] = exam - world.Commonest;
+
+            // THE CHECK THIS FAILURE CLASS EARNED, AFTER THREE SWEEPS SPENT ON IT. Twice the
+            // sizing chased the vocabulary and was caught by it; the third time the
+            // vocabulary MATCHED and both arms still pinned, because the two objectives do
+            // not read the same corpus the same number of times -- 15,312 questions against
+            // 1,800 from the same 2,855 words. A capacity sized on one arm cannot size the
+            // other, and a saturated population compares nothing however the sizing was
+            // reasoned about. Collected rather than thrown, so both rows still print.
+            if (brain.Held.Count >= Capacity)
+                saturated.Add(
+                    $"{predicting} held {brain.Held.Count} at a cap of {Capacity} after "
+                    + $"{world.Questions} questions");
 
             output.WriteLine(
                 $"english {predicting,-8} | exam {exam:F3} silent {tally.Unseen?.Silence ?? 0.0:F3} "
@@ -1058,6 +1073,13 @@ public sealed class RecalledTests(ITestOutputHelper output)
         // that with `held` on the cap -- Masked at -0.036 and Salient at +0.000, which
         // reads as the gate leading and means only that neither population was allowed to
         // finish growing. Read `held` before reading `exam`, every time.
+        // AND IT IS ASKED BEFORE THE COMPARISON RATHER THAN NOTED UNDER IT. The assertion
+        // below passed on a saturated grid twice and the pass meant nothing both times,
+        // which is precisely how a reading about a cap gets read as a reading about a gate.
+        // RAISING THE CAP IS NOT THE FIX AND HAS FAILED TWICE: what this demands is arms
+        // whose LOAD is matched, or a comparison that does not need them to be.
+        Assert.Empty(saturated);
+
         Assert.True(scored[Predicting.Salient] > scored[Predicting.Masked],
             $"the gate did not lead on real English either ({scored[Predicting.Salient]:+0.000;-0.000} "
             + $"against {scored[Predicting.Masked]:+0.000;-0.000} over the marginal), so the "

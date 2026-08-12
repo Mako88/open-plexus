@@ -242,6 +242,15 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["Holder"] = Composed,
         ["Fleet"] = Composed,
 
+        ["Unifying"] = "A PRICE AND NOT YET A MECHANISM, which is fork 33's own "
+            + "instruction: probe unification's cost BEFORE the ladder's escalation "
+            + "policy is designed, not after. Something in `src` calling it would mean "
+            + "rung four had been admitted -- and the admission is the decision the "
+            + "price exists to inform, so wiring it before that decision is taken would "
+            + "be answering the question by building the answer. `UnifyingCostTests` is "
+            + "what it is for; the day repair may propose a scope naming no argument is "
+            + "the day this entry comes off.",
+
         ["Probe"] = "A CONTROL ARM, SO THE LIBRARY NAMING IT WOULD BE THE FAULT. It "
             + "is the dullest learner there is, run over the same features the "
             + "commitment population reads, and what it measures is how much of a "

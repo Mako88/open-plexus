@@ -253,8 +253,8 @@ exercise. One line a capability, and the status is the whole point of the row.
   bought nothing on the one world that has asked.
 - **Order inside a scope** — NOT BUILT. Rung three. Handing recency over as a code helps
   and does not reach what choosing the sentence by hand reaches.
-- **A condition naming no argument** — NOT BUILT. Rung four, and it is a different matcher
-  rather than a rung. The one text task measured demands it.
+- **A condition naming no argument** — NOT BUILT. Rung four, a different matcher rather
+  than a rung. PRICED, and cheap: what blocks it is admission, not cost.
 - **A SITUATION MODEL, held apart from the rules** — NOT BUILT, AND NOT PREVIOUSLY ON ANY
   LIST. The population holds what is true in general; nothing holds what is true NOW.
 - **AND SPECIFICITY AS A GRADIENT ACROSS BOTH** — John's. *A person sleeps in a bedroom* and
@@ -634,9 +634,12 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   `csharp`'s `Kind.Role` is the part of its edge vocabulary worth keeping.
 - **And rung four is not a rung, it is a different matcher.** One to three keep
   matching a subset test; naming no argument requires UNIFICATION.
-- **Which breaks the indexing that makes matching cheap**, and is the distance between
-  a propositional learner and a relational one. Probe its cost before the escalation
-  policy is designed.
+- **AND THE INDEX IT WAS SAID TO BREAK IS ALREADY BARELY WORKING**, so the cost was never
+  where the argument put it. Fork 33 is priced and closed.
+- **WHAT IS UNBUILT IS THE ADMISSION, WHICH THE PRICE DID NOT TOUCH.** Nothing proposes a
+  scope naming no argument, and a scope handed in by an experimenter is architecture.
+- **AND A VARIABLE NEEDS TWO PLACES IN THE MOMENT THAT CAN DISAGREE**, which no front end
+  here emits — the question's words are unioned into the story's bag.
 - **Rung five, and it goes up.** When several commitments share a sub-scope, mint a
   code for the shared part and rewrite them in terms of it.
 - **AND WHAT IT CAN NAME IS A SET, NEVER A VARIABLE.** The multiplexer's real
@@ -1563,7 +1566,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **30** | A negative condition needs a settled occasion, so it fires one settlement late. Open |
 | **31** | The table spills without changing what fires, and reproducibly. Open |
 | **32** | Entailment depth capped at 1, horizon at K=1. Both come off when blame diffusion has a number — a cap with no trigger is a permanent decision nobody made. Open |
-| **33** | Unification's per-match cost against a subset test. Probed before the ladder's escalation policy, not after. Open |
+| **33** | Unification's per-match cost against a subset test. ANSWERED, and the premise refuted with it: a variable costs its candidate set, and the index it was said to break already visits most of the population every round on both worlds read. Closed; the block is admission |
 | **34** | Six bits is refused on POWER, not on having nothing to name; eleven names the wrong thing, with zero names in 258 grouping the address. Open on whether any world it reaches has a nameable concept |
 | **35** | More unsound commitments resident than sound ones, while the score holds. Is the vote robust to them, or are they why it stops short? Open |
 | **36** | Graded codes: does emitting several codes per reading make a POSITION nameable? BUILT, MEASURED AND DELETED: the code reaches the moment and no scope. What blocks it is where naming LOOKS, not the front end |
@@ -1623,7 +1626,8 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **95** | What makes a word a key. CORPUS FREQUENCY IS REFUTED, and arithmetically: the commonest motion verb outranks every name while the rarer ones fall below all of them, so no rank keeps names and drops verbs. The story's own intersection is better and leaks where a story mixes verbs. Open |
 | **92** | Banding a word by how many statements back it was makes *the latest one* sayable, and buys about half of what simply narrowing the view buys. Its gain reverses as capacity grows, so the alphabet it adds is spent memorising. Does a band the learner MINTS rather than one it is handed behave differently? Open |
 | **91** | A masked objective spends the population on function words. CLOSED AGAINST A GATE, and the premise was wrong: rarity already selects content words perfectly, and a perfect predictor of them barely beats a blind draw. The corpus is the wall — bAbI's, says fork 100 |
-| **89** | John's: prime it on general English before setting it a text to be examined on. `Primer` exists for the walk and ports cheaply, but a settled-nothing round moves no counter here — so a primer needs something to predict while reading. UNBLOCKED by fork 100. Open on what it scores |
+| **89** | John's: prime it on general English before setting it a text to be examined on. Wired and reading, and what it converts is the live question — it answers what it read and transfers next to none of it. Open on the gap, which is the learner rather than the corpus or the objective |
+| **101** | The two English objectives read one corpus 15,312 times and 1,800, so no single capacity sizes both and every converts grid pinned. Match the LOAD, or find a comparison not needing it. `RecalledTests` fails on a saturated arm now. Open |
 | **100** | Is reading real English predictive enough to teach this learner? Fork 91's *informative implies unpredictable* is bAbI's property and inverts on Tatoeba. bAbI is disqualified as a primer besides — its held-out half is all re-reading. Open on what the learner converts |
 | **90** | John's: is there a standardised comprehension exam that separates understanding from regurgitation? bAbI already is one at this rung. What is unpriced is the tier above — school exams and the passages built so the wrong answer is the one present verbatim. Open, and blocked until the components pass |
 | **88** | The front end intersects the question with EACH statement. `Joining.Addressed` ANSWERS TASK ONE OUTRIGHT where the bag sits near the marginal, and falls to the base rate at two supporting facts — at its ceiling there too, so one hop is all it reaches and the learner never failed. Closed; fork 96 carries the reach |

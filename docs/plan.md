@@ -162,6 +162,10 @@ FORBIDS things, and several of them are already measured.
 - **SO WHAT A PRIMER NEEDS IS SOMETHING TO BE WRONG ABOUT WHILE IT READS**, and the
   obvious candidate is the next word. That is rung three, so the curriculum and the
   comprehension failure ask for the same missing mechanism.
+- **AND A SITUATION MODEL IS DOWNSTREAM OF RUNG FOUR RATHER THAN A WAY AROUND IT.** Holding
+  one state per thing is no use to a matcher that can only ask whether a code is PRESENT:
+  two states in the room is the selection problem again, whole. The store must be read BY
+  KEY, which is unification.
 - **AND READING A STATEMENT MUST CHANGE SOMETHING, WHICH IS FORKS 89, 91 AND 93 AS ONE
   PROBLEM.** A primer moves no counter because nothing settles; a masked objective settles
   and learns function words; a situation is the thing a statement could change that a later
@@ -1519,7 +1523,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **86** | The ladder's admission rule reads near nothing on text while the transcript shows the ceiling plainly. It asks whether repair found a separating code, and on a wide alphabet memorising always does — so the trigger cannot summon the rungs that go UP. What signal separates *nothing separates* from *nothing GENERAL separates*. Open |
 | **87** | `Recalled` answers with a place and never a person. ANSWERED AGAINST for a coincidence code: naming the shared word, dropping its identity, and saying the absence out loud all sit inside the control's spread. A marker says when to trust the place in front of you, never where to find the right one |
 | **93** | John's: the brain must hold one knowledge at several grains — *a person sleeps in a bedroom*, and *this bedroom is Mary's*. SHARPENED: three stores rather than two, monotone counters forbid the retractable one, and the missing operator mints an INDIVIDUAL, which no rung covers. Fork 94 prices the cheap half |
-| **94** | Does overwriting dissolve the selection rather than help it? A statement is dropped when a newer one shares a key with it. HALF ANSWERED before any learning: keyed dropping beats a budget-matched blind control on both columns at once, so what goes is chosen rather than merely thinned. Open on the grid |
+| **94** | Does overwriting dissolve the selection rather than help it? REFUTED as a dissolution: across the dial the score falls as the ceiling rises, so the arm is at its ceiling only where it keeps ONE statement and every point it takes is bought by narrowing. Keyed dropping still beats a blind control. Open on `Distinguished` |
 | **95** | What makes a word a key. CORPUS FREQUENCY IS REFUTED, and arithmetically: the commonest motion verb outranks every name while the rarer ones fall below all of them, so no rank keeps names and drops verbs. The story's own intersection is better and leaks where a story mixes verbs. Open |
 | **92** | Banding a word by how many statements back it was makes *the latest one* sayable, and buys about half of what simply narrowing the view buys. Its gain reverses as capacity grows, so the alphabet it adds is spent memorising. Does a band the learner MINTS rather than one it is handed behave differently? Open |
 | **91** | A masked objective spends the population on function words, being what a bag predicts best, and transfers nothing. Gate what is worth predicting on surprise, the way genesis is already gated on it — the one repair that is not a stop list. Open, and it is what would make a primer teach |

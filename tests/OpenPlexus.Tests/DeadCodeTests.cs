@@ -254,6 +254,14 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "being pointed at, which is the fault `SeparationTests` guards from the "
             + "other side. `ReturningTests` is its caller.",
 
+        ["Handing"] = "A WORLD, ON `Roaming`'S FOOTING, and it has no `Trial` behind it "
+            + "yet for a reason of its own: what has been taken on it so far is the three "
+            + "CEILINGS, which need no learner at all. It is fork 105 isolated -- a "
+            + "sentence naming two people where a bag of words is provably at the marginal, "
+            + "a selector provably at one half, and the order provably at one. Running a "
+            + "population over it before those three were established would have produced a "
+            + "number nobody could attribute. `HandingTests` is its caller.",
+
         ["Alternating"] = "A DERIVATION MEASURED BEFORE IT IS ADMITTED, on the same "
             + "footing as `Unifying`. It finds the groups of codes that are alternatives, "
             + "which is what a category would be minted over -- and something in `src` "

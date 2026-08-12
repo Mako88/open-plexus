@@ -93,23 +93,41 @@ public sealed class Primer
         foreach (var line in lines)
         {
             if (read.Count == wanted) break;
-            if (string.IsNullOrWhiteSpace(line)) continue;
 
-            // id [tab] lang [tab] text. Anything else is a line this does not
-            // understand, and guessing at it would be a parser nobody asked for.
-            var parts = line.Split('\t');
-            if (parts.Length < 3) continue;
+            var said = Said(line);
+            if (said is null) continue;
 
-            if (!int.TryParse(
-                    parts[0], NumberStyles.None, CultureInfo.InvariantCulture, out _))
-                continue;
-
-            var words = Babi.Words(parts[2]).Select(Babi.Of).ToImmutableArray();
+            var words = Babi.Words(said).Select(Babi.Of).ToImmutableArray();
             if (words.Length < 2) continue;
 
             read.Add(new Sentence { Story = 0, Words = words });
         }
 
         return read;
+    }
+
+    /// <summary>
+    /// The sentence column of one export line, or null if the line is not one.
+    /// </summary>
+    /// <remarks>
+    /// <b>SEPARATE FROM <see cref="Read"/> BECAUSE A SECOND READER WANTS THE WORDS
+    /// RATHER THAN THE CODES.</b> The instrument that prices what English predicts
+    /// works in words, and a copy of this parse living beside it is exactly the
+    /// drift <c>DuplicationTests</c> exists to stop.
+    /// </remarks>
+    /// <param name="line">One line of the export.</param>
+    public static string? Said(string line)
+    {
+        if (string.IsNullOrWhiteSpace(line)) return null;
+
+        // id [tab] lang [tab] text. Anything else is a line this does not
+        // understand, and guessing at it would be a parser nobody asked for.
+        var parts = line.Split('\t');
+        if (parts.Length < 3) return null;
+
+        return int.TryParse(
+            parts[0], NumberStyles.None, CultureInfo.InvariantCulture, out _)
+            ? parts[2]
+            : null;
     }
 }

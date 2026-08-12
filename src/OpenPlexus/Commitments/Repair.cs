@@ -815,6 +815,9 @@ public sealed record CommittingSettings
 
     /// <inheritdoc cref="Commitments.Speaking"/>
     public Speaking Speaking { get; init; } = Speaking.Anyone;
+
+    /// <inheritdoc cref="Codes.Sequencing"/>
+    public Codes.Sequencing Sequencing { get; init; } = Codes.Sequencing.Never;
 }
 
 /// <summary>

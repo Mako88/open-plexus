@@ -190,6 +190,27 @@ public sealed class DialTests(ITestOutputHelper output)
             + "exactly where the failure is total, so it is not the cause there "
             + "either. Not a level; nothing to hunt",
 
+        ["Sequencing"] =
+            "RUNG THREE, and it is three arms rather than a level: whether a "
+            + "moment carries what came before what, and if so whether that is "
+            + "ADJACENCY or its transitive closure. NOT A LEVEL, so there is "
+            + "nothing for a controller to hunt -- which order relation a "
+            + "language has is not a quantity, and the two that exist entail "
+            + "different sets rather than more or less of one thing. IT SHIPS "
+            + "`Never`, so every number this repo has recorded is reproduced by "
+            + "it, and the derivation happens where the moment is FORMED rather "
+            + "than where it is matched because a fleet broadcasts a moment as "
+            + "codes and a precedence IS one. MEASURED ON `Handing`, the world "
+            + "built so a bag is provably at the marginal and a selector provably "
+            + "at a coin flip: both arms reach 1.000 on three seeds where "
+            + "choosing the sentence reaches 0.44 to 0.55, so ORDER is what "
+            + "carries roles and unification is not needed for it. ADJACENCY "
+            + "SHIPS AHEAD OF THE CLOSURE on cost alone -- 37 to 48 rules against "
+            + "98 to 139 for the same ceiling -- and the closure stays as the arm "
+            + "rather than going, because a world whose relation spans an "
+            + "intervening word would show as adjacency falling short and "
+            + "`Handing` has no such sentence to say so",
+
         ["Coarsening"] =
             "fork 85, and the half of it that survived. WHETHER subsumption may "
             + "read a member's entailment of its category. NOT A LEVEL: whether "
@@ -762,6 +783,19 @@ public sealed class DialTests(ITestOutputHelper output)
         // THE COUNT DID NOT FALL WITH THEM, AND THAT IS THE HONEST BOOKKEEPING. A dial that
         // arrives and loses most of itself in one session still leaves one behind, and this
         // file's own rule is that the budget is on dials that STAY.
-        Assert.Equal(28, HandSet.Count);
+        // AND TWENTY-NINE IS `Sequencing`, WHICH IS THE LADDER'S THIRD RUNG ARRIVING AS A
+        // DIAL RATHER THAN AS A MATCHER. A scope entry saying *this came after that* wants a
+        // scope that is no longer an array of codes, a `Fires` that is no longer a subset
+        // test, a tally keyed by pairs and a wire format that carries them -- all in the
+        // hottest path here. Derived into a CODE instead, it costs one file, two call sites
+        // and a gate in `Cover`, and nothing downstream knows it happened.
+        //
+        // IT SHIPS OFF, so the count going up buys the arm rather than a default. What would
+        // take it back down is `Preceding` going: the closure reached the same 1.000 as
+        // adjacency on `Handing` for two and a half times the population, so the day a world
+        // with a relation spanning an intervening word says adjacency is not enough, one of
+        // the two is deleted with a revival row. `Handing` cannot say it -- every sentence
+        // it draws puts the two people six words apart with the same four between them.
+        Assert.Equal(29, HandSet.Count);
     }
 }

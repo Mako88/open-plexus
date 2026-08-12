@@ -604,6 +604,44 @@ public sealed class Trial<TSeen>
     /// <summary>What a blind guess scores on this world.</summary>
     public double Chance => 1.0 / _world.Outcomes;
 
+    /// <summary>
+    /// One observation as the codes a machine broadcasts for it — <b>the front end's
+    /// reading, plus whatever rung three derives from the order it reported.</b>
+    /// </summary>
+    /// <param name="seen">What the world showed.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>WHERE THE MOMENT IS FORMED AND NOT WHERE IT IS MATCHED, WHICH IS A DECISION ABOUT
+    /// THE WIRE.</b> A fleet broadcasts a moment as a set of codes, and a precedence IS one
+    /// — so deriving it here means it travels with everything else and no holder needs the
+    /// order report beside the moment it already has. Doing it in
+    /// <see cref="Population.Moment"/> would have put the front end's order on the wire.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS THE MACHINE THAT DERIVES IT RATHER THAN THE FRONT END, WHICH IS THE
+    /// SEAM THAT MATTERS.</b> <see cref="IQuantizer{TObservation}.Order"/> reports word
+    /// order, which is a fact about the signal; turning it into <i>these two stood this way
+    /// round</i> is a derivation, and a front end doing it would be deciding which relations
+    /// exist. See <see cref="Sequencing"/>, whose default is <see cref="Sequencing.Never"/>
+    /// so that every number this repo has recorded is reproduced by this call.
+    /// </para>
+    /// </remarks>
+    private IReadOnlyCollection<Code> Sensed(TSeen seen)
+    {
+        var said = _sensing.Codify(seen);
+
+        if (_brain.Dials.Sequencing == Sequencing.Never) return said;
+
+        if (_sensing.Order(seen) is not { Count: > 1 } order) return said;
+
+        var carried = new HashSet<Code>(said);
+
+        foreach (var precedence in Sequenced.From(order, _brain.Dials.Sequencing))
+            carried.Add(precedence);
+
+        return carried;
+    }
+
     /// <summary>Runs the world through the translation into the brain.</summary>
     /// <param name="rounds">How many rounds.</param>
     /// <param name="sweep">How often to subsume, abstract and cull.</param>
@@ -713,7 +751,7 @@ public sealed class Trial<TSeen>
         {
             var turn = _world.Next();
 
-            var said = _sensing.Codify(turn.Seen);
+            var said = Sensed(turn.Seen);
             codes += said.Count;
 
             // TAKEN BEFORE THE STEP, BECAUSE THE STEP TEACHES. `Settle`, `Cover` and
@@ -972,7 +1010,7 @@ public sealed class Trial<TSeen>
 
         foreach (var turn in answerable)
         {
-            var said_ = _sensing.Codify(turn.Seen);
+            var said_ = Sensed(turn.Seen);
 
             var heard = holding
                 .Select(held =>

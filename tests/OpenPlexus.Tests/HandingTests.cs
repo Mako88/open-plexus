@@ -50,16 +50,32 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// </remarks>
     private sealed class Reciting(Reading reading) : IQuantizer<Recited>
     {
-        /// <summary>The modality a precedence fact rides on.</summary>
-        /// <remarks>
-        /// <b>ITS OWN, BESIDE <see cref="Unifying"/>'S AND <see cref="Commitment"/>'S</b>, and
-        /// for their reason: it is derived from two codes rather than emitted by a sense, so
-        /// a world able to produce one would be writing the learner's rules.
-        /// </remarks>
-        private const byte Before = 208;
-
         /// <inheritdoc/>
         public byte Modality => 47;
+
+        /// <summary>
+        /// Where each word of the chosen sentence stood — <b>a fact about the signal, and
+        /// the only thing this front end is allowed to say about order.</b>
+        /// </summary>
+        /// <param name="observation">One moment.</param>
+        /// <remarks>
+        /// <b>THE QUESTION'S WORDS GET NO POSITION, WHICH IS DELIBERATE.</b> A question and
+        /// a statement are two utterances, so a claim that one of their words came before
+        /// another would be inventing a sequencing nobody stated — the same reason
+        /// <see cref="Compound{TFrame}.Order"/> refuses to offset two front ends onto one
+        /// scale.
+        /// </remarks>
+        public IReadOnlyDictionary<Code, int>? Order(Recited observation)
+        {
+            if (reading == Reading.Bagged) return null;
+
+            var chosen = observation.Said[Selected(observation)];
+            var placed = new Dictionary<Code, int>();
+
+            for (var at = 0; at < chosen.Count; at++) placed[chosen[at]] = at;
+
+            return placed;
+        }
 
         /// <inheritdoc/>
         public IReadOnlyCollection<Code> Codify(Recited observation)
@@ -93,32 +109,13 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
                 {
                     if (chosen[first] == chosen[second]) continue;
 
-                    moment.Add(Pair(chosen[first], chosen[second]));
+                    moment.Add(Sequenced.Of(chosen[first], chosen[second]));
                 }
             }
 
             return moment;
         }
 
-        /// <summary>The code meaning <i>this one was said before that one</i>.</summary>
-        /// <param name="first">What came first.</param>
-        /// <param name="second">What came after it.</param>
-        /// <remarks>
-        /// <b>DERIVED FROM THE PAIR AND ORDERED, so two machines reach the same code with
-        /// nothing to ask</b> — the property every code here has, and
-        /// <see cref="Agreed"/> rather than <see cref="object.GetHashCode"/> because that
-        /// one is randomised per process.
-        /// </remarks>
-        private static Code Pair(Code first, Code second)
-        {
-            var hash = Agreed.Fold(Agreed.Basis, first.Modality);
-
-            hash = Agreed.Fold(hash, first.Value);
-            hash = Agreed.Fold(hash, second.Modality);
-            hash = Agreed.Fold(hash, second.Value);
-
-            return new Code(Before, Agreed.Mix(hash));
-        }
     }
 
     /// <summary>What the front end hands the learner, as three arms of one axis.</summary>
@@ -523,10 +520,17 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         var scores = new Dictionary<string, List<double>>();
         var populations = new Dictionary<string, List<int>>();
 
-        foreach (var reading in new[] { Reading.Bagged, Reading.Chosen, Reading.Ordered })
+        var arms = new (string Name, Reading Reading, Sequencing Sequencing)[]
         {
-            var name = reading.ToString().ToLowerInvariant();
+            ("bagged", Reading.Bagged, Sequencing.Never),
+            ("chosen", Reading.Chosen, Sequencing.Never),
+            ("adjacent", Reading.Chosen, Sequencing.Adjacent),
+            ("preceding", Reading.Chosen, Sequencing.Preceding),
+            ("handed", Reading.Ordered, Sequencing.Never),
+        };
 
+        foreach (var (name, reading, sequencing) in arms)
+        {
             scores[name] = [];
             populations[name] = [];
 
@@ -536,7 +540,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
                     new HandingSettings { People = People, Withheld = 300 }, seed);
 
                 var brain = new Machines.Brain(
-                    new CommittingSettings { Capacity = 4000 }, seed);
+                    new CommittingSettings { Capacity = 4000, Sequencing = sequencing }, seed);
 
                 var tally = new Machines.Trial<Recited>(world, new Reciting(reading), brain)
                     .Run(5_000, sweep: 1000, target: 0.9, window: 2000);
@@ -547,7 +551,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
                 populations[name].Add(brain.Held.Count);
 
                 output.WriteLine(
-                    $"{name,-8}| seed {seed} | exam {exam:F3} | own {tally.Recent:F3} "
+                    $"{name,-10}| seed {seed} | exam {exam:F3} | own {tally.Recent:F3} "
                     + $"| held {brain.Held.Count,4}");
             }
         }
@@ -580,25 +584,34 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
             + "owed a re-take");
 
         // THE KILL LINE, WRITTEN BEFORE THE RUN AND HELD DOWN WHERE IT CAME OUT. The line
-        // was 0.60; it reads 1.000 on all three seeds, so the bar sits at 0.90 rather than
-        // at the line -- if it ever falls back through this, order is not what carries roles
-        // and rung four is back on the list.
-        Assert.True(scores["ordered"].Min() > 0.90,
-            $"handing the order over reads {scores["ordered"].Min():F3} at its worst, so a "
-            + "sequence rung does not reach this world's ceiling and what fork 105 needs is "
-            + "unification after all");
+        // was 0.60; both sequence arms read 1.000 on all three seeds, so the bar sits at
+        // 0.90 -- if either falls back through it, order is not what carries roles here and
+        // rung four is back on the list.
+        foreach (var arm in new[] { "adjacent", "preceding" })
+            Assert.True(scores[arm].Min() > 0.90,
+                $"the {arm} rung reads {scores[arm].Min():F3} at its worst, so a sequence "
+                + "rung does not reach this world's ceiling and what fork 105 needs is "
+                + "unification after all");
 
-        // AND THE CEILING IS BOUGHT WITH POPULATION, WHICH IS WHY THIS ARM PRICES A BUILD
-        // RATHER THAN BEING ONE. Every ordered pair of the sentence is handed over, so the
-        // moment triples and genesis mints on all of it: a task four rules would answer is
-        // answered by two hundred. A rung in the scope language proposes a precedence only
-        // where no plain code separates, so it should reach the same ceiling far cheaper --
-        // and if this ratio ever collapses, the expansion was not what cost the population
-        // and that argument for moving the rung is gone.
-        Assert.True(populations["ordered"].Min() > 5 * populations["chosen"].Max(),
-            $"handing the order over holds {populations["ordered"].Min()} rules at fewest "
-            + $"against {populations["chosen"].Max()} at the coin flip's most, so the "
-            + "quadratic expansion is not what fills the population and moving the rung into "
-            + "the scope language would buy less than this reading claims");
+        // AND ADJACENCY IS STRICTLY CHEAPER FOR THE SAME CEILING, WHICH IS THE READING THAT
+        // DECIDES WHICH ARM SHIPS. The closure says nothing adjacency does not entail on
+        // this world, and it costs two and a half times the population to say it. A world
+        // needing a relation ACROSS an intervening word would show as the adjacent arm
+        // falling short -- and none of this world's sentences has one, which is exactly why
+        // it cannot decide the arm for any other world.
+        Assert.True(populations["adjacent"].Max() < populations["preceding"].Min(),
+            $"adjacency holds {populations["adjacent"].Max()} rules at most against "
+            + $"{populations["preceding"].Min()} at the closure's fewest, so the quadratic "
+            + "arm is not paying for its expansion and the two arms are one arm");
+
+        // AND THE MACHINE DERIVING IT IS THE SAME COMPUTATION AS THE FRONT END HANDING IT
+        // OVER, EXACTLY. `handed` folds the pairs in `Codify` and `preceding` folds the
+        // identical pairs in `Trial.Sensed`; the codes agree, so the runs agree seed for
+        // seed and rule for rule. That is the instrument check on the whole move: what
+        // changed when the derivation crossed the seam is WHERE IT LIVES and nothing else,
+        // which is what makes the front-end version legitimate as a price and illegitimate
+        // as a mechanism.
+        Assert.Equal(scores["preceding"], scores["handed"]);
+        Assert.Equal(populations["preceding"], populations["handed"]);
     }
 }

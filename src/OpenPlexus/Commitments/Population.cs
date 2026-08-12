@@ -629,10 +629,20 @@ public sealed class Population
     /// </summary>
     /// <param name="raw">What the front end said.</param>
     /// <remarks>
+    /// <para>
     /// <b>EVERYTHING DOWNSTREAM SEES THE FOLDED MOMENT.</b> Matching, covering and
     /// the tally all take it, so a name can be matched on, minted against, and chosen
     /// as a repair condition — which is what makes a second level of structure
     /// reachable rather than merely representable.
+    /// </para>
+    /// <para>
+    /// <b>AND A PRECEDENCE IS ALREADY IN <paramref name="raw"/> BY THE TIME IT GETS HERE,
+    /// WHICH IS A DECISION ABOUT THE WIRE AND NOT ABOUT THE FOLD.</b> Rung three is derived
+    /// where the moment is FORMED — see <see cref="Machines.InputMachine{TFrame}"/> and
+    /// <c>Trial</c> — because a fleet broadcasts the moment as a set of codes and a
+    /// precedence IS one. Deriving it here instead would mean every holder needed the
+    /// front end's order report on the wire beside the moment it already has.
+    /// </para>
     /// </remarks>
     public IReadOnlySet<Code> Moment(IReadOnlySet<Code> raw) => _names.Fold(raw);
 
@@ -941,6 +951,18 @@ public sealed class Population
             // nothing computed inside a run can say what it should be -- *has it ever
             // been absent* has one answer and needs nothing.
             if (!Varied(code)) continue;
+
+            // AND A PRECEDENCE IS A SPECIALISATION AND NEVER A ROOT, which is the same
+            // argument the line above makes about a code that has never been absent. `this
+            // stood before that` with no idea what either of them is about is a rule about
+            // grammar rather than about the world -- and with the order folded in, the
+            // moment holds a precedence for every pair, so rooting on them would fill the
+            // population with pairs the day the rung is switched on.
+            //
+            // REPAIR MAY STILL CHOOSE ONE, which is the whole point: a precedence enters a
+            // scope where a plain code does not separate the misses from the hits, which is
+            // what the ladder's admission asks and the only place this rung belongs.
+            if (Sequenced.Names(code)) continue;
 
             var proposed = new Commitment([code], arrived);
 

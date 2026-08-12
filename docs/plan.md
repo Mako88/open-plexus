@@ -255,8 +255,18 @@ exercise. One line a capability, and the status is the whole point of the row.
   and does not reach what choosing the sentence by hand reaches.
 - **A condition naming no argument** — NOT BUILT. Rung four, a different matcher rather
   than a rung. PRICED, and cheap: what blocks it is admission, not cost.
-- **A SITUATION MODEL, held apart from the rules** — NOT BUILT, AND NOT PREVIOUSLY ON ANY
-  LIST. The population holds what is true in general; nothing holds what is true NOW.
+- **A SITUATION MODEL, held apart from the rules** — BUILT IN THE FRONT END AND PRICED, and
+  the price is the first lift off `Roaming`'s marginal this branch has had.
+- **AND WHAT IT IS WORTH IS REACH THE TRANSCRIPT DOES NOT HOLD.** Every backward-reading arm
+  leaves the answer out of the moment on three questions in four, because the newest
+  statement about a thing names who moved it and never where.
+- **AND WHICH KEY THE FOLD FOLLOWS BEATS HOW FAR IT FOLLOWS IT.** Reach rises with depth and
+  the score peaks at one hop and falls back to the marginal, so what limits it is COMPANY.
+- **SO RECENCY OVER THE STORE ANSWERS WHAT FORK 95 COULD NOT STATE**, separating a verb from
+  a name without being told the distinction — the freshest entry is the one that moved.
+- **BUT NOTHING SCORES THE UPDATE, WHICH IS WHY IT IS THE FRONT END'S AND NOT THE BRAIN'S.**
+  A store the experimenter maintains is `Returning`'s handed index again: it works, and
+  what it measures is what such a store is WORTH. Fork 104.
 - **AND SPECIFICITY AS A GRADIENT ACROSS BOTH** — John's. *A person sleeps in a bedroom* and
   *this is Mary's* are the same knowledge at two grains, held loosely and at once. Rules
   have that gradient already; situations have nowhere to keep one.
@@ -869,6 +879,7 @@ condition is a superstition.
 | `Widening.Significant` — widen only where a clean record beats the base rate | Bit-identical on four cells: `Floor` demands twenty firings, and a perfect twenty clears every base rate under `n/(n+2.71)` | A world past that boundary. `WideningTests` fails the day one arrives |
 | `Joining.Situated` — displacement keyed on the commonest N words of the corpus | The motion verbs straddle the names, so no rank keeps names as keys and drops verbs | A corpus whose function words are separable by frequency. `Distinguished` takes its background from the story and needs no rank |
 | Displacement as a way AROUND unification | At every width it is at its ceiling only where it keeps one statement, and a better key rule bought a better ceiling and no more score | Never as a substitute. A store must be read BY KEY, and reading by key is rung four |
+| A forward store whose fold is transitive | It reaches every answer with nearly every room word still there, which is the bag by a longer road | Never uncapped. The depth's optimum is interior, so the reading that set the cap refuses a fold without one |
 | A front end emitting the POSITION beside the fused code | It reached every moment and no scope: genesis refuses a code never absent, repair one separating nothing | Never here; the coarser view belongs where pairs are COUNTED |
 
 ---
@@ -1631,12 +1642,12 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **87** | `Recalled` answers with a place and never a person. ANSWERED AGAINST for a coincidence code: naming the shared word, dropping its identity, and saying the absence out loud all sit inside the control's spread. A marker says when to trust the place in front of you, never where to find the right one |
 | **93** | John's: the brain must hold one knowledge at several grains — *a person sleeps in a bedroom*, and *this bedroom is Mary's*. SHARPENED: three stores rather than two, monotone counters forbid the retractable one, and the missing operator mints an INDIVIDUAL, which no rung covers. Fork 94 prices the cheap half |
 | **94** | Does overwriting dissolve the selection rather than help it? REFUTED as a dissolution: across the dial the score falls as the ceiling rises, so the arm is at its ceiling only where it keeps ONE statement and every point it takes is bought by narrowing. Keyed dropping still beats a blind control. Open on `Distinguished` |
-| **95** | What makes a word a key. CORPUS FREQUENCY IS REFUTED, and arithmetically: the commonest motion verb outranks every name while the rarer ones fall below all of them, so no rank keeps names and drops verbs. The story's own intersection is better and leaks where a story mixes verbs. Open |
+| **95** | What makes a word a key. CORPUS FREQUENCY IS REFUTED arithmetically — the motion verbs straddle the names, so no rank keeps one and drops the other. ANSWERED SIDEWAYS: the question was never which words are keys but which key is worth FOLLOWING, and recency over a forward store separates them knowing nothing about the text |
 | **92** | Banding a word by how many statements back it was makes *the latest one* sayable, and buys about half of what simply narrowing the view buys. Its gain reverses as capacity grows, so the alphabet it adds is spent memorising. Does a band the learner MINTS rather than one it is handed behave differently? Open |
 | **91** | A masked objective spends the population on function words. CLOSED AGAINST A GATE, and the premise was wrong: rarity already selects content words perfectly, and a perfect predictor of them barely beats a blind draw. The corpus is the wall — bAbI's, says fork 100 |
 | **89** | John's: prime it on general English before setting it a text to be examined on. Wired and reading, and what it converts is the live question — it answers what it read and transfers next to none of it. Open on the gap, which is the learner rather than the corpus or the objective |
 | **101** | The two English objectives read one corpus 15,312 times and 1,800, so no single capacity sizes both and every converts grid pinned. Match the LOAD, or find a comparison not needing it. `RecalledTests` fails on a saturated arm now. Open |
-| **103** | John's: TextWorld or Crafter as the world. Crafter is pixels and reward, so two unbuilt subsystems sit in front of the measurement. TextWorld's SHAPE is built here rather than ported, watched before acted in, and its shallow ceilings fall to the marginal on a long walk. Open on what a learner reads |
+| **103** | John's: TextWorld or Crafter as the world. Crafter is pixels and reward, so two unbuilt subsystems sit in front of the measurement. TextWorld's SHAPE is built here, watched before acted in. ANSWERED: every backward-reading arm sits on the marginal and a forward store is the first thing to lift off it. Open on twins |
 | **102** | Anti-unification as rung four's admission: where commitments differ in one scope position, propose the parent with a hole. TRIGGER IS ABUNDANT AND MOSTLY NOISE — a blind hole is worse than what it replaces nine times in ten, and group size does not separate the rest. Open on what gates it |
 | **100** | Is reading real English predictive enough to teach this learner? Fork 91's *informative implies unpredictable* is bAbI's property and inverts on Tatoeba. bAbI is disqualified as a primer besides — its held-out half is all re-reading. Open on what the learner converts |
 | **90** | John's: is there a standardised comprehension exam that separates understanding from regurgitation? bAbI already is one at this rung. What is unpriced is the tier above — school exams and the passages built so the wrong answer is the one present verbatim. Open, and blocked until the components pass |
@@ -1644,4 +1655,5 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **97** | John's: a category is the set of codes that are ALTERNATIVES, and the operator the multiplexer's address bits have always wanted. PRICED before it was built: handed over free they come back perfect, and pay five times more under the bag than under the front end that had done the selecting. Open on minting them |
 | **98** | John's: a concept forms BEFORE its label, so substitutability groups things with no word and the word later labels a category that already existed. THE PROBE PASSES on both categories and all three tasks, the category packed against one and the next thing out a third of the scale below. Closed, and fork 97 is unblocked |
 | **99** | John's: a conflict is two beliefs asserting different members of ONE category for the same key, which is the only route to retraction under counters that only rise. And malleability is the counters rather than a property — a per-belief weight is where the human puts the answer in. Open |
+| **104** | The store's update rule is the experimenter's, so nothing can be wrong about it — which the architecture forbids of anything the brain is TOLD. What must settle is *this statement changes what is known about that thing*, and the only signal is the question at the end. Open |
 | **96** | A second hop, keyed on what the FIRST reading supplied. Two hops nearly triple the ceiling; a unioned chain converts none of it and BANDING BY HOP converts it, best arm on the two-fact task and clear of its marginal. Open at three facts |

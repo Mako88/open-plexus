@@ -767,9 +767,20 @@ public sealed class Joined : IQuantizer<Asking>
 
     /// <inheritdoc/>
     /// <remarks>
-    /// <b>NOT THE ORDER OF THE WORDS, WHICH THIS WORLD HAS AND THIS ARM DELIBERATELY DOES
-    /// NOT USE.</b> Sequence is rung three and is not built; handing an order to a matcher
-    /// that cannot read one would be a number moving for a reason nobody could name.
+    /// <para>
+    /// <b>NOT THE ORDER OF THE WORDS, AND THE REASON CHANGED THE DAY RUNG THREE WAS
+    /// BUILT.</b> It used to be that a sequence had nowhere to go —
+    /// <see cref="Sequencing"/> now takes one and turns it into a code, so handing an order
+    /// over would be read rather than ignored.
+    /// </para>
+    /// <para>
+    /// <b>WHAT BLOCKS IT IS THAT <see cref="Worlds.Asking.Story"/> IS A LIST OF SETS.</b>
+    /// A statement's words arrive here already unordered, so this arm has nothing to report
+    /// — the order is destroyed by the shape of what the world hands over, one type before
+    /// the front end. <see cref="Worlds.Recited"/> is the same moment with the word order
+    /// still on it, and every text world here would need that shape before rung three could
+    /// be measured on one.
+    /// </para>
     /// </remarks>
     public IReadOnlyDictionary<Code, int>? Order(Asking observation) => null;
 

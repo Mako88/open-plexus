@@ -271,13 +271,11 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       machinery.
     - **SETTLED** — unification costs its candidate set rather than a subset test's price,
       and what blocks rung four is admission rather than cost. Fork **33**.
-    - **OPEN** — rung four, roles: a condition naming no argument is what buys transfer, and
-      it is a different MATCHER rather than a rung — one to three keep a subset test, naming
-      no argument requires unification.
+    - **SETTLED** — roles are carried by ORDER rather than unification, and rung three
+      reaches `Handing`'s ceiling. TRANSFER still needs the argument named on both sides,
+      and `Expects` is a constant. Fork **105**.
     - **OPEN** — anti-unification as rung four's admission, gated by a hole whose covered
       values never co-occur. Open on the build. Fork **102**, gated by fork **97**.
-    - **OPEN** — a category over the arguments retires most of a hole; what survives is
-      BINDING, which is roles rather than unification. Fork **105**.
     - **OPEN** — a second hop keyed on what the first reading supplied, banded by hop. Open
       at three facts. Fork **96**.
     - **OPEN** — a commitment ABOUT commitments is expressible and not built, an identity
@@ -358,9 +356,9 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       only more population. Fork **76**.
   - Which aspects are temporal
     - **NOW** — a forward store beside the population, retracting where the counters cannot.
-    - **OPEN** — rung three, sequence, *X then Y* rather than *X and Y*, is unbuilt.
-      `csharp`'s `Kind.After` is the shape, and handing recency over as a code helps without
-      reaching what choosing the sentence by hand reaches.
+    - **NOW** — rung three, sequence. A precedence is a CODE derived where the moment is
+      FORMED, so matching, the tally, repair and the wire are all untouched. Ships off;
+      `Adjacent` reaches `Preceding`'s ceiling far cheaper.
     - **OPEN** — a referent is a THIRD store rather than the same one: *Mary's bedroom*
       survives leaving the room and *Mary is in the bedroom* does not, so one store gets one
       lifetime wrong whichever it takes.
@@ -595,7 +593,7 @@ condition is a superstition.
 | `Joining.Situated` — displacement keyed on the commonest N words of the corpus | The motion verbs straddle the names, so no rank keeps names as keys and drops verbs | A corpus whose function words are separable by frequency. `Distinguished` takes its background from the story and needs no rank |
 | Displacement as a way AROUND unification | At every width it is at its ceiling only where it keeps one statement, and a better key rule bought a better ceiling and no more score | Never as a substitute. A store must be read BY KEY, and reading by key is rung four |
 | A forward store whose fold is transitive | It reaches every answer with nearly every room word still there, which is the bag by a longer road | Never uncapped. The depth's optimum is interior, so the reading that set the cap refuses a fold without one |
-| A front end emitting the POSITION beside the fused code | It reached every moment and no scope: genesis refuses a code never absent, repair one separating nothing | Never here; the coarser view belongs where pairs are COUNTED |
+| A front end putting a word's POSITION in the moment | Beside the code it is never absent, so it reached every moment and no scope; FUSED into it, it costs the identity — an input is an attribute, never the concept | Never. Order derives its own code beside the word: rung three |
 
 ---
 

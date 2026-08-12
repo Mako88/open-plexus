@@ -201,6 +201,45 @@ public enum Joining
     /// </para>
     /// </remarks>
     Chained,
+
+    /// <summary>
+    /// A store maintained FORWARDS through the story, read at the question's words — <b>what
+    /// is known about a thing now, rather than which sentence mentioned it last.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>EVERY ARM ABOVE READS THE TRANSCRIPT BACKWARDS AT QUESTION TIME, WHICH IS THE
+    /// PROPERTY THEY SHARE AND THE ONE THAT CAPS THEM.</b> <see cref="Distinguished"/> walks
+    /// back dropping superseded statements, <see cref="Addressed"/> walks back to the first
+    /// one the question names, <see cref="Chained"/> walks back again at the key that found.
+    /// All three are a LOOKUP over a fixed text, so nothing that was read ever changed
+    /// anything — and the plan's own statement of the problem is that reading a statement
+    /// must change something.
+    /// </para>
+    /// <para>
+    /// <b>SO THIS ONE IS MAINTAINED OLDEST FIRST AND HOLDS ONE VALUE PER KEY, WHICH IS
+    /// RETRACTION.</b> A newer statement naming a key REPLACES what was held about it rather
+    /// than sitting in front of it, so the store says what is true now and the transcript
+    /// says what was said. That is the store the monotone counters forbid, built where they
+    /// cannot reach it — beside the population rather than inside it.
+    /// </para>
+    /// <para>
+    /// <b>AND WHAT MAKES IT MORE THAN A RECORD IS THE RESOLUTION DEPTH, WHICH IS AN AXIS ON
+    /// <see cref="Joined"/> AND CARRIES ITS OWN CONTROL AT NOUGHT.</b> At depth nought an
+    /// entry is the statement and nothing else, which for <i>john dropped the apple</i> is
+    /// john and dropping and no room at all. Past that an entry also takes what was known
+    /// about the statement's OTHER keys, so the apple's entry absorbs wherever john was — an
+    /// inference performed while reading, which is forks 89, 91 and 93 as one question.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS JOHN'S ACCOUNT OF AN INDIVIDUAL RUN FORWARDS.</b> <see cref="Worlds.Returning"/>
+    /// found a thing is re-identifiable as the bundle of relations it stands in rather than as
+    /// a stored name, on a landmark that never moved. Here the landmark moves, and what holds
+    /// the bundle together across the movement is the entry — so the individual is what the
+    /// store accumulates rather than an index anybody handed over.
+    /// </para>
+    /// </remarks>
+    Resolved,
 }
 
 /// <summary>
@@ -278,6 +317,7 @@ public sealed class Joined : IQuantizer<Asking>
     private readonly IReadOnlyList<IReadOnlySet<Code>> _categories;
     private readonly int _hops;
     private readonly bool _banded;
+    private readonly int _resolution;
 
     /// <param name="joining">What to do with the two halves.</param>
     /// <param name="categories">
@@ -299,16 +339,26 @@ public sealed class Joined : IQuantizer<Asking>
     /// says whether the banding is what pays</b> — and the chain alone is already measured to
     /// raise what is in the room and not what is answered.
     /// </param>
+    /// <param name="resolution">
+    /// How many hops of the store <see cref="Joining.Resolved"/> folds into an entry as it
+    /// writes it. <b>An axis carrying its own control at nought</b>, where an entry is the
+    /// statement and nothing else — so whether resolving is what pays is read off the same
+    /// arm rather than against a differently-named one. <b>Capped rather than transitive on
+    /// purpose</b>, for the reason the entailment depth is capped: an unbounded fold reaches
+    /// everything the story ever said, which is the bag by a longer road.
+    /// </param>
     public Joined(
         Joining joining, IReadOnlyList<IReadOnlySet<Code>>? categories = null, int hops = 2,
-        bool banded = false)
+        bool banded = false, int resolution = 1)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(hops, 1);
+        ArgumentOutOfRangeException.ThrowIfNegative(resolution);
 
         _joining = joining;
         _categories = categories ?? [];
         _hops = hops;
         _banded = banded;
+        _resolution = resolution;
     }
 
     /// <inheritdoc/>
@@ -327,6 +377,8 @@ public sealed class Joined : IQuantizer<Asking>
         if (_joining == Joining.Addressed) return Sorting(Addressing(said, observation));
 
         if (_joining == Joining.Chained) return Sorting(Chaining(said, observation));
+
+        if (_joining == Joining.Resolved) return Sorting(Storing(said, observation));
 
         if (_joining == Joining.Bagged) return Sorting(said);
 
@@ -558,6 +610,102 @@ public sealed class Joined : IQuantizer<Asking>
         // NOTHING THE QUESTION NAMES WAS EVER SAID, so there is no store entry to read at all
         // and the bag is what is left -- the same fallback Addressing takes, and for the same
         // reason: going silent would score the abstention rather than the mechanism.
+        return read == 0 ? said : moment;
+    }
+
+    /// <summary>
+    /// The question, and what a forward store holds about the things the question names.
+    /// </summary>
+    /// <param name="said">The plain bag, which is what a store with nothing to say falls back to.</param>
+    /// <param name="observation">The story and the question.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>OLDEST FIRST, WHICH IS THE OPPOSITE OF EVERY OTHER ARM HERE AND IS THE POINT.</b>
+    /// <see cref="Asking.Story"/> arrives newest first because a distance from the question
+    /// means the same thing in every story; a store is maintained in the order the world
+    /// happened, so this walks it backwards to go forwards.
+    /// </para>
+    /// <para>
+    /// <b>EVERY NEW ENTRY IS COMPUTED FROM THE STORE AS IT STOOD BEFORE THE STATEMENT, so
+    /// the result does not depend on the order the keys of one statement are enumerated
+    /// in.</b> Writing as it goes would make a moment a fact about a hash set's iteration
+    /// order, which is fork 12's failure wearing a front end's clothes.
+    /// </para>
+    /// <para>
+    /// <b>THE READ IS AT THE QUESTION'S WORDS AND NOT AT ONE OF THEM</b>, which is the same
+    /// line <see cref="Addressing"/> stands on: the front end intersects two sets and never
+    /// decides which member of the question is the subject. A question naming nothing the
+    /// store has an entry for falls back to the bag, because an arm that went silent would
+    /// be scoring its own abstentions.
+    /// </para>
+    /// <para>
+    /// <b>ONE STORE PER DEPTH, WHICH IS WHAT MAKES THE FOLD CAPPED RATHER THAN TRANSITIVE.</b>
+    /// Level nought is the statement alone; level <i>i</i> is the statement plus the OTHER
+    /// keys' level <i>i-1</i> as it stood before this statement. Folding a key's own level
+    /// <i>i</i> back in would make an entry grow without bound over a story, and the first
+    /// version of this did exactly that — see the revival row.
+    /// </para>
+    /// <para>
+    /// <b>AND NEVER AGAINST ITS OWN OLD ENTRY AT ANY DEPTH, which is what makes this a store
+    /// rather than an accumulation.</b> Replacement IS the retraction; keeping the old value
+    /// means nothing is ever forgotten, and a moment that forgets nothing is the bag.
+    /// </para>
+    /// </remarks>
+    private HashSet<Code> Storing(HashSet<Code> said, Asking observation)
+    {
+        var levels = new Dictionary<Code, HashSet<Code>>[_resolution + 1];
+
+        for (var depth = 0; depth <= _resolution; depth++) levels[depth] = [];
+
+        var background = Shared(observation);
+        var keys = new List<Code>();
+
+        for (var back = observation.Story.Count - 1; back >= 0; back--)
+        {
+            var statement = observation.Story[back];
+
+            keys.Clear();
+
+            foreach (var one in statement) if (!background.Contains(one)) keys.Add(one);
+
+            // WRITTEN AFTER EVERY VALUE IS COMPUTED, never during. See the remarks: an entry
+            // that could see a sibling written by the same statement would make the moment
+            // depend on a hash set's enumeration order, which is fork 12's failure.
+            var written = new HashSet<Code>[_resolution + 1][];
+
+            for (var depth = 0; depth <= _resolution; depth++)
+            {
+                written[depth] = new HashSet<Code>[keys.Count];
+
+                for (var one = 0; one < keys.Count; one++)
+                {
+                    var value = new HashSet<Code>(statement);
+
+                    if (depth > 0)
+                        foreach (var other in keys)
+                            if (!other.Equals(keys[one])
+                                && levels[depth - 1].TryGetValue(other, out var held))
+                                value.UnionWith(held);
+
+                    written[depth][one] = value;
+                }
+            }
+
+            for (var depth = 0; depth <= _resolution; depth++)
+                for (var one = 0; one < keys.Count; one++)
+                    levels[depth][keys[one]] = written[depth][one];
+        }
+
+        var moment = new HashSet<Code>(observation.Question);
+        var read = 0;
+
+        foreach (var one in observation.Question)
+            if (levels[_resolution].TryGetValue(one, out var held))
+            {
+                moment.UnionWith(held);
+                read++;
+            }
+
         return read == 0 ? said : moment;
     }
 

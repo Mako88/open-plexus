@@ -145,6 +145,117 @@ public sealed class RoamingTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// What each translation leaves in the room, taken before any learner runs — <b>the
+    /// trap list's own rule, that a front-end arm's ceiling costs milliseconds against a
+    /// runner's hour.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>TWO COLUMNS AND THEY BRACKET THE LEARNER RATHER THAN PREDICTING IT.</b> PRESENT is
+    /// whether the answering room word survives the translation at all, which is an UPPER
+    /// bound: a moment the answer is missing from cannot be answered by anything. PINNED is
+    /// whether it is the ONLY room word left, which is a LOWER bound: a moment with one room
+    /// word in it is answerable by a rule as simple as <i>say the room you can see</i>. What
+    /// a learner has to work in is the gap between them.
+    /// </para>
+    /// <para>
+    /// <b>SO A HIGH PRESENT WITH A LOW PINNED IS THE SELECTION PROBLEM, WHICH IS WHERE EVERY
+    /// ARM ON THIS BRANCH HAS ALREADY BEEN.</b> The bag holds every room word in the house
+    /// after a long walk, so it is 1.000 present and near nought pinned — the answer is
+    /// there and nothing says which it is. An arm that raises PINNED is doing the thing a
+    /// situation model is for.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_each_translation_leaves_in_the_room()
+    {
+        var world = new Roaming(World(120), seed: 1);
+
+        var rooms = world.Named.ToHashSet();
+        var pinning = new Dictionary<string, double>();
+        var reaching = new Dictionary<string, double>();
+
+        // THE STORE WALKS ITS DEPTH AXIS AND EVERY OTHER ARM IS ONE CELL, so the grid is a
+        // cross rather than a list -- and depth nought is the store's own control, where an
+        // entry is the statement that wrote it and nothing else.
+        var arms = Enum.GetValues<Joining>()
+            .Where(one => one != Joining.Resolved)
+            .Select(one => (Name: one.ToString(), Joined: new Joined(one)))
+            .Concat(Enumerable.Range(0, 4).Select(depth =>
+                (Name: $"Resolved({depth})",
+                 Joined: new Joined(Joining.Resolved, resolution: depth))));
+
+        foreach (var (name, joined) in arms)
+        {
+            var asked = 0;
+            var present = 0;
+            var pinned = 0;
+            var seen = 0;
+
+            foreach (var turn in world.Withheld)
+            {
+                if (turn.Outcome is not { } answer) continue;
+
+                asked++;
+
+                var moment = joined.Codify(turn.Seen).ToHashSet();
+                var left = rooms.Where(moment.Contains).ToList();
+
+                seen += left.Count;
+
+                if (left.Contains(world.Named[answer]))
+                {
+                    present++;
+
+                    if (left.Count == 1) pinned++;
+                }
+            }
+
+            pinning[name] = pinned / (double)asked;
+            reaching[name] = present / (double)asked;
+
+            output.WriteLine(
+                $"{name,-14}| present {present / (double)asked:F3} "
+                + $"| pinned {pinned / (double)asked:F3} | rooms left {seen / (double)asked:F2}");
+        }
+
+        // THE BAG IS THE CONTROL AND IT HAS TO READ THIS WAY OR THE INSTRUMENT IS WRONG.
+        // Every room word of a six-room house is said during a hundred and twenty steps, so
+        // a translation that keeps all of them has the answer and cannot say which. If this
+        // ever pins anything the world has stopped being the one the ceiling grid measured.
+        Assert.True(pinning[nameof(Joining.Bagged)] < 0.05,
+            $"the plain bag pins the answer on {pinning[nameof(Joining.Bagged)]:F3} of questions, so "
+            + "the moment is not holding every room word and this column is measuring "
+            + "something other than what it says");
+
+        // AND THE FINDING, WHICH IS THAT RESOLVING AT UPDATE TIME IS WHAT PUTS THE ANSWER IN
+        // THE ROOM AND NOTHING ELSE ON THIS BRANCH DOES. Every backward-reading arm leaves it
+        // present on a quarter of questions or fewer, because the newest statement about a
+        // thing is *john dropped the apple* and there is no room in it -- the room is in a
+        // statement about JOHN, which is not about the apple at all and no lookup keyed on
+        // the apple can reach. One hop of the store reaches it, and the depth is a dial on
+        // how far.
+        //
+        // WHAT IT COSTS IS COMPANY, WHICH IS THE SELECTION PROBLEM ARRIVING AGAIN SMALLER.
+        // The fold goes through every key of a statement and the story's own background
+        // calls a VERB a key, so the room john was in comes in beside the room the last
+        // unrelated *went* mentioned. That is fork 95 unsolved, priced here rather than
+        // argued: the gap between `present` and `pinned` is what a better key rule is worth.
+        for (var depth = 1; depth < 4; depth++)
+            Assert.True(reaching[$"Resolved({depth})"] > reaching[$"Resolved({depth - 1})"],
+                $"a resolution depth of {depth} leaves the answer present on "
+                + $"{reaching[$"Resolved({depth})"]:F3} of questions against "
+                + $"{reaching[$"Resolved({depth - 1})"]:F3} one hop shallower, so folding "
+                + "further is not reaching further and the depth is not the axis this reports");
+
+        Assert.True(reaching["Resolved(1)"] > reaching[nameof(Joining.Distinguished)] + 0.2,
+            $"one hop of the store reaches {reaching["Resolved(1)"]:F3} against "
+            + $"{reaching[nameof(Joining.Distinguished)]:F3} for the best backward-reading arm, "
+            + "so maintaining a store forwards buys nothing a lookup does not and the whole "
+            + "mechanism is `Addressed` by a longer road");
+    }
+
+    /// <summary>
     /// What the learner reads where nothing shallow works — <b>the first score on a world
     /// whose held-out half is genuinely unseen.</b>
     /// </summary>
@@ -166,19 +277,29 @@ public sealed class RoamingTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_a_learner_reads_where_the_transcript_stops_answering_itself()
     {
-        foreach (var joining in new[]
-            { Joining.Bagged, Joining.Recent, Joining.Addressed, Joining.Chained })
+        var arms = new (string Name, Joined Joined)[]
+        {
+            (nameof(Joining.Bagged), new Joined(Joining.Bagged)),
+            (nameof(Joining.Recent), new Joined(Joining.Recent)),
+            (nameof(Joining.Addressed), new Joined(Joining.Addressed)),
+            (nameof(Joining.Chained), new Joined(Joining.Chained)),
+        }
+        .Concat(Enumerable.Range(0, 4).Select(depth =>
+            ($"Resolved({depth})", new Joined(Joining.Resolved, resolution: depth))))
+        .ToList();
+
+        foreach (var (name, joined) in arms)
         {
             var world = new Roaming(World(120), seed: 1);
             var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed: 1);
 
-            var tally = new Trial<Asking>(world, new Joined(joining), brain)
+            var tally = new Trial<Asking>(world, joined, brain)
                 .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
 
             var exam = tally.Unseen?.Accuracy ?? 0.0;
 
             output.WriteLine(
-                $"{joining,-12}| exam {exam:F3} | own {tally.Recent:F3} "
+                $"{name,-12}| exam {exam:F3} | own {tally.Recent:F3} "
                 + $"| held {brain.Held.Count}");
         }
 
@@ -193,9 +314,15 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // the front end deciding what the learner can possibly see, and both look like the
         // learner failing.
 
-        // NO BAR YET, AND SAYING SO IS THE POINT. This is the first reading any learner has
-        // taken on this world; a bar written beside it would be a level chosen from one run
-        // rather than a claim anything refutes. What the columns are FOR is the next
-        // session, and the ceiling grid above is what they are read against.
+        // AND THE STORE ARMS ARE READ AGAINST THE CEILING GRID ABOVE RATHER THAN AGAINST
+        // EACH OTHER. `Resolved(0)` cannot exceed 0.176 and `Resolved(3)` cannot exceed
+        // 0.921, because a moment the answering word is missing from is unanswerable -- so
+        // a depth that scores lower having reached higher is the learner failing to choose,
+        // and a depth that scores at its own ceiling is the learner doing all there is.
+        // Reading the two columns apart is what `What_each_translation_leaves_in_the_room`
+        // exists for.
+
+        // NO BAR YET, AND SAYING SO IS THE POINT. A bar written beside a first reading would
+        // be a level chosen from one run rather than a claim anything refutes.
     }
 }

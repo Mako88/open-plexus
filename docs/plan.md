@@ -653,9 +653,15 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   than the rules it replaces about nine times in ten. Fork 102.
 - **AND HOW MANY SIBLINGS A HOLE COVERS DOES NOT SEPARATE THEM**, so the first gate anybody
   would reach for is not one. What does is open.
-- **AND THE CANDIDATE IS FORK 97 ARRIVING WHERE NOBODY PUT IT.** A hole wants the values it
-  covers to be ALTERNATIVES, which is the category definition exactly — and almost no
-  sibling group on the world read is one, so it is a lead over a handful of cases.
+- **AND THE GATE IS FORK 97 ARRIVING WHERE NOBODY PUT IT.** A hole wants the values it
+  covers to be ALTERNATIVES, which is the category definition exactly — and pooled over
+  independent populations it separates the proposals that pay from the ones that do not
+  about as cleanly as anything here separates anything.
+- **AND IT IS A FACT ABOUT THE MOMENTS RATHER THAN ABOUT THE RULES, WHICH IS WHY NOTHING IN
+  THE POPULATION COULD HAVE SUPPLIED IT.** Two codes never co-occurring is what the world
+  did; two scopes differing in one position is what the learner did.
+- **SO WHAT IS LEFT OF FORK 102 IS THE BUILD**, the trigger being abundant, the gate being
+  measured and the matcher being priced and cheap.
 - **AND A VARIABLE NEEDS TWO PLACES IN THE MOMENT THAT CAN DISAGREE**, which no front end
   here emits — the question's words are unioned into the story's bag.
 - **Rung five, and it goes up.** When several commitments share a sub-scope, mint a
@@ -1648,7 +1654,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **89** | John's: prime it on general English before setting it a text to be examined on. Wired and reading, and what it converts is the live question — it answers what it read and transfers next to none of it. Open on the gap, which is the learner rather than the corpus or the objective |
 | **101** | The two English objectives read one corpus 15,312 times and 1,800, so no single capacity sizes both and every converts grid pinned. Match the LOAD, or find a comparison not needing it. `RecalledTests` fails on a saturated arm now. Open |
 | **103** | John's: TextWorld or Crafter as the world. Crafter is pixels and reward, so two unbuilt subsystems sit in front of the measurement. TextWorld's SHAPE is built here, watched before acted in. ANSWERED: every backward-reading arm sits on the marginal and a forward store is the first thing to lift off it. Open on twins |
-| **102** | Anti-unification as rung four's admission: where commitments differ in one scope position, propose the parent with a hole. TRIGGER IS ABUNDANT AND MOSTLY NOISE — a blind hole is worse than what it replaces nine times in ten, and group size does not separate the rest. Open on what gates it |
+| **102** | Anti-unification as rung four's admission. The trigger is abundant and mostly noise. GATED AT LAST BY FORK 97: a hole whose covered values never co-occur is no worse than what it replaces in every pooled case, where one over values that do is worse nine times in ten. Open on the build |
 | **100** | Is reading real English predictive enough to teach this learner? Fork 91's *informative implies unpredictable* is bAbI's property and inverts on Tatoeba. bAbI is disqualified as a primer besides — its held-out half is all re-reading. Open on what the learner converts |
 | **90** | John's: is there a standardised comprehension exam that separates understanding from regurgitation? bAbI already is one at this rung. What is unpriced is the tier above — school exams and the passages built so the wrong answer is the one present verbatim. Open, and blocked until the components pass |
 | **88** | The front end intersects the question with EACH statement. `Joining.Addressed` ANSWERS TASK ONE OUTRIGHT where the bag sits near the marginal, and falls to the base rate at two supporting facts — at its ceiling there too, so one hop is all it reaches and the learner never failed. Closed; fork 96 carries the reach |

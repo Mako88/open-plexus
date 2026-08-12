@@ -34,15 +34,36 @@ namespace OpenPlexus.Tests;
 /// a count, and this file takes it.
 /// </para>
 /// <para>
-/// <b>NO BAR, BECAUSE NOTHING IS BEING COMPARED YET.</b> The counts say whether the
-/// operator has a trigger. What it would then be WORTH is fork 88's number and already
-/// taken; what it would cost is fork 33's and already taken.
+/// <b>AND THE TRIGGER IS ABUNDANT AND MOSTLY NOISE, WHICH IS WHY THE SECOND TEST EXISTS.</b>
+/// A hole punched on every sibling group is WORSE than the rules it replaces about nine
+/// times in ten — it fires roughly twice as often and pays for it. So the operator needs a
+/// gate exactly as genesis does, and how many siblings a hole covers is not one.
+/// </para>
+/// <para>
+/// <b>WHAT IS, IS FORK 97 ARRIVING WHERE NOBODY PUT IT: the values a hole covers must be
+/// ALTERNATIVES.</b> A hole over codes that never co-occur is a variable; a hole over codes
+/// that do is a coincidence of position. That is a fact about the MOMENTS rather than about
+/// the rules, which is why nothing in the population could have supplied it — and it is the
+/// same definition of a category John proposed for a different operator entirely.
 /// </para>
 /// </remarks>
 public sealed class UnifyingYieldTests(ITestOutputHelper output)
 {
     /// <summary>How many rounds each population is learnt over.</summary>
     private const long Rounds = 4000;
+
+    /// <summary>
+    /// How many independent populations the proposals are pooled over.
+    /// </summary>
+    /// <remarks>
+    /// <b>SEEDS RATHER THAN ROUNDS, WHICH IS WHAT THE THIN COLUMN NEEDED.</b> The share of
+    /// sibling groups whose covered values are ALTERNATIVES is under one in a hundred, so
+    /// one population lands a handful of them and a rate over a handful carries nothing.
+    /// Running longer would multiply the cases and leave every one of them a fact about the
+    /// same learnt world; separate seeds multiply them and buy independence at the same
+    /// price.
+    /// </remarks>
+    private const int Populations = 8;
 
     /// <summary>
     /// Sibling groups, and how big they get — <b>commitments expecting one thing and
@@ -190,39 +211,52 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
     [Fact]
     public void What_the_parent_a_hole_proposes_is_worth_against_the_siblings_it_replaces()
     {
-        var brain = new Brain(new CommittingSettings { Capacity = 2000 }, seed: 1);
+        // POOLED OVER INDEPENDENT POPULATIONS, WHICH IS THE CHEAPEST WAY TO GET THE CASE
+        // COUNT UP AND ALSO THE RIGHT ONE. Running one population longer would grow the
+        // proposals and leave every one of them a fact about the same learnt world;
+        // separate seeds grow the count and buy independence with it. The alternatives
+        // column is the reason — at one seed it lands on a handful of cases, and this repo
+        // has already been caught reading a ratio over a few rounds.
+        //
+        // THE GROUPS ARE KEYED PER POPULATION AND NEVER ACROSS THEM. Two commitments from
+        // two brains are not siblings however alike their scopes look; a hole is a proposal
+        // to replace rules that one population actually holds at once.
+        var proposals = new List<(string Key, List<Commitment> Members)>();
 
-        new MultiplexerRun(new MultiplexerSettings { Address = 3 }, brain, seed: 1).Run(Rounds);
-
-        var all = brain.Held.All.ToList();
-
-        // THE GROUPS AGAIN, KEPT THIS TIME RATHER THAN COUNTED. Same key as `Siblings`, and
-        // anchored for the same reason — a hole with no context beside it is a rule about
-        // nothing and would drag the parent's score down for a reason that is this file's
-        // rather than the operator's.
-        var groups = new Dictionary<string, List<Commitment>>(StringComparer.Ordinal);
-
-        foreach (var one in all.Where(one => one.Scope.Length > 1))
+        foreach (var seed in Enumerable.Range(1, Populations))
         {
-            for (var hole = 0; hole < one.Scope.Length; hole++)
+            var brain = new Brain(new CommittingSettings { Capacity = 2000 }, seed);
+
+            new MultiplexerRun(new MultiplexerSettings { Address = 3 }, brain, seed).Run(Rounds);
+
+            // THE GROUPS AGAIN, KEPT THIS TIME RATHER THAN COUNTED. Same key as `Siblings`,
+            // and anchored for the same reason — a hole with no context beside it is a rule
+            // about nothing and would drag the parent's score down for a reason that is this
+            // file's rather than the operator's.
+            var groups = new Dictionary<string, List<Commitment>>(StringComparer.Ordinal);
+
+            foreach (var one in brain.Held.All.Where(one => one.Scope.Length > 1))
             {
-                var key = $"{one.Expects.Modality}:{one.Expects.Value}|{hole}|" + string.Join(
-                    ",",
-                    one.Scope.Select((code, at) => at == hole
-                        ? $"?{code.Modality}"
-                        : $"{code.Modality}:{code.Value}"));
+                for (var hole = 0; hole < one.Scope.Length; hole++)
+                {
+                    var key = $"{one.Expects.Modality}:{one.Expects.Value}|{hole}|" + string.Join(
+                        ",",
+                        one.Scope.Select((code, at) => at == hole
+                            ? $"?{code.Modality}"
+                            : $"{code.Modality}:{code.Value}"));
 
-                if (!groups.TryGetValue(key, out var members)) groups[key] = members = [];
+                    if (!groups.TryGetValue(key, out var members)) groups[key] = members = [];
 
-                members.Add(one);
+                    members.Add(one);
+                }
             }
-        }
 
-        var proposals = groups
-            .Where(one => one.Value.Count > 1)
-            .OrderByDescending(one => one.Value.Count)
-            .ThenBy(one => one.Key, StringComparer.Ordinal)
-            .ToList();
+            proposals.AddRange(groups
+                .Where(one => one.Value.Count > 1)
+                .OrderByDescending(one => one.Value.Count)
+                .ThenBy(one => one.Key, StringComparer.Ordinal)
+                .Select(one => (one.Key, one.Value)));
+        }
 
         IWorld<IReadOnlyList<int>> world =
             new Multiplexer(new MultiplexerSettings { Address = 3 }, seed: 99);
@@ -350,13 +384,12 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
                 $"  covering {size}{(size == 6 ? "+" : " ")} siblings | {tally.Better,3} of "
                 + $"{tally.Scored,3} no worse ({tally.Better / (double)tally.Scored:P0})");
 
-        // AND THIS COLUMN IS A LEAD RATHER THAN A FINDING, WHICH IS SAID HERE BECAUSE IT
-        // WILL READ AS A FINDING. Fork 97's definition of a category is exactly what a hole
-        // wants — the values it covers should be ALTERNATIVES — and on this world almost no
-        // sibling group is one, because repair adds a discriminating code rather than a
-        // pair. A rate over a handful of cases carries nothing whichever way it falls, and
-        // this repo has already been caught once reading a ratio over a few rounds.
-        output.WriteLine("and whether those values are alternatives — TOO FEW TO READ:");
+        // AND THIS COLUMN IS THE GATE, WHICH IT WAS TOO THIN TO BE UNTIL THE PROPOSALS WERE
+        // POOLED OVER INDEPENDENT POPULATIONS. Fork 97's definition of a category is exactly
+        // what a hole wants — the values it covers should be ALTERNATIVES — and it separates
+        // the proposals that pay from the ones that do not about as cleanly as anything in
+        // this repo separates anything.
+        output.WriteLine("and whether those values are alternatives — THE GATE:");
 
         foreach (var (exclusive, tally) in byKind.OrderByDescending(one => one.Key))
             output.WriteLine(
@@ -381,7 +414,32 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
 
         // AND NO BAR ON THE SIZE COLUMN, WHICH IS WHERE A BAR WOULD BE A GUESS. What it
         // says is that the share surviving is flat across groups of two, three and four
-        // and that the larger buckets are too thin to read — so a count is not the gate,
-        // and what is remains open.
+        // and that the larger buckets are too thin to read — so a count is not the gate.
+
+        // THE GATE, AND IT IS A COMPARISON RATHER THAN A LEVEL BECAUSE A LEVEL FROM ONE GRID
+        // IS NOT A CLAIM ANYTHING REFUTES. A hole whose covered values never co-occur is a
+        // variable; one whose values do is a coincidence of position, and the two are told
+        // apart by a fact about the MOMENTS rather than by anything about the rules — which
+        // is why nothing in the population could have supplied it.
+        //
+        // ITS PRICE IS SAID BESIDE IT: the gate admits a small fraction of proposals, so
+        // anti-unification under it fires rarely. That is the shape every gate here has —
+        // promiscuous proposal, and the gate doing the work — and it is the opposite of a
+        // gate that admits most of what it sees and hopes the vote sorts it out.
+        var alternating = byKind.GetValueOrDefault(true);
+        var overlapping = byKind.GetValueOrDefault(false);
+
+        Assert.True(alternating.Scored >= 30,
+            $"only {alternating.Scored} proposals covered values that never co-occur, which is "
+            + "too few to read a rate off -- raise `Populations` rather than reading it");
+
+        Assert.True(
+            alternating.Better / (double)alternating.Scored
+                > 3 * (overlapping.Better / (double)overlapping.Scored),
+            $"a hole over values that never co-occur is no worse in "
+            + $"{alternating.Better / (double)alternating.Scored:P0} of {alternating.Scored} cases "
+            + $"against {overlapping.Better / (double)overlapping.Scored:P0} where they do, so "
+            + "whether the covered values are alternatives is not the gate this file reports "
+            + "and fork 102 is open again");
     }
 }

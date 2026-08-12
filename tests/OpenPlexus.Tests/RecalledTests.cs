@@ -837,4 +837,228 @@ public sealed class RecalledTests(ITestOutputHelper output)
             }
         }
     }
+
+    /// <summary>
+    /// How alike the company two codes keep is, counted over statements they were never
+    /// both in.
+    /// </summary>
+    private static double Alike(IReadOnlyDictionary<Code, int> one, IReadOnlyDictionary<Code, int> other)
+    {
+        var dot = 0.0;
+        foreach (var (code, count) in one)
+            if (other.TryGetValue(code, out var had)) dot += count * (double)had;
+
+        var left = Math.Sqrt(one.Values.Sum(count => count * (double)count));
+        var right = Math.Sqrt(other.Values.Sum(count => count * (double)count));
+
+        return left == 0.0 || right == 0.0 ? 0.0 : dot / (left * right);
+    }
+
+    /// <summary>
+    /// Whether a category falls out of the text before anything has learnt anything.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE PROBE THAT DECIDES WHETHER THE MINTER IS BUILT AT ALL.</b> Rung five names
+    /// what CO-FIRES; a category is the complement of that — a set of codes that are
+    /// ALTERNATIVES, never both in one statement, standing in the same company when they
+    /// stand alone. If that statistic cannot separate people from places on a corpus
+    /// generated from a handful of templates over a cast of four, it will not separate
+    /// anything anywhere, and the operator dies here rather than after it is written.
+    /// </para>
+    /// <para>
+    /// <b>AND IT COSTS NO LEARNING, WHICH IS THE PATTERN THAT HAS ALREADY EARNED ITS
+    /// KEEP.</b> A front-end instrument taking milliseconds killed one key rule and bounded
+    /// the headline result before either grid returned — see
+    /// <see cref="Whether_a_second_supporting_fact_is_even_in_the_room"/>. The population is
+    /// never built here and no round is ever run.
+    /// </para>
+    /// <para>
+    /// <b>THE CAST IS AN ANSWER KEY AND NEVER AN INPUT.</b> Nothing below is told which
+    /// words are names; the two sets exist so the clusters the statistic returns can be
+    /// SCORED, exactly as the multiplexer's enumerated truth scores a rule without ever
+    /// reaching the learner.
+    /// </para>
+    /// <para>
+    /// <b>AND IT PASSES OUTRIGHT, ON BOTH CATEGORIES AND ALL THREE TASKS.</b> Every member's
+    /// nearest alternatives are the rest of its category and nothing else, and the margin is
+    /// not a threshold but a chasm — the far side of the boundary sits around a third of the
+    /// scale below the near side, with the category itself packed against one.
+    /// </para>
+    /// <para>
+    /// <b>THE FILTER ALONE IS NOT THE MECHANISM, WHICH ONE TASK WOULD HAVE HIDDEN.</b>
+    /// Never-in-one-statement offers a person exactly the three other people everywhere, and
+    /// offers a place exactly the five other places only where the task has nothing but
+    /// places to offer. Where a task adds objects and handling verbs the same filter offers
+    /// nineteen and is barely a quarter pure, and the company statistic is doing every bit of
+    /// the separating.
+    /// </para>
+    /// <para>
+    /// <b>AND THE RANKING IS PERFECT WHILE THE STOPPING HAS NO RULE, WHICH IS WHAT THE MINTER
+    /// INHERITS.</b> The two cuts below are exactly complementary — the largest fall is right
+    /// on every row where something has to be excluded and wrong on every row where nothing
+    /// does, and TAKE EVERYTHING is right in precisely the opposite rows. Neither is a rule,
+    /// and their being disjoint is the assertion rather than an observation.
+    /// </para>
+    /// <para>
+    /// <b>SO WHAT IS MISSING IS A BAR AND NOT A BETTER GAP</b>, which is the shape the repair
+    /// gate already has. Choosing the argmax is easy there too; what decides whether to take
+    /// it at all is a separation test corrected for how many candidates were considered, and
+    /// a category wants the same question asked the other way round — could these two have
+    /// been drawn from one distribution.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_alternatives_recover_the_cast_with_nothing_learnt()
+    {
+        var people = new HashSet<string>(StringComparer.Ordinal) { "mary", "john", "sandra", "daniel" };
+
+        var places = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "bathroom", "bedroom", "garden", "hallway", "kitchen", "office",
+        };
+
+        foreach (var task in new[] { 1, 2, 3 })
+        {
+            var text = new Babi(new BabiSettings
+            {
+                Corpus = Tree.Babi(), Task = task, Stories = false,
+            });
+
+            var naming = new Dictionary<Code, string>();
+            var seen = new Dictionary<Code, int>();
+            var company = new Dictionary<Code, Dictionary<Code, int>>();
+
+            // ONE ROW A STATEMENT AND NEVER A MOMENT, because a moment repeats every
+            // statement in front of it once per question after it — which would weight a
+            // sentence by how many questions happened to follow, and that is a fact about
+            // the corpus's punctuation rather than about the words.
+            foreach (var line in text.Lines)
+            {
+                if (line.Asking) continue;
+
+                foreach (var word in Babi.Words(line.Text ?? string.Empty)) naming[Babi.Of(word)] = word;
+
+                var statement = new HashSet<Code>(line.Words);
+
+                foreach (var one in statement)
+                {
+                    seen[one] = seen.GetValueOrDefault(one) + 1;
+
+                    if (!company.TryGetValue(one, out var row)) company[one] = row = [];
+                    foreach (var other in statement)
+                        if (other != one) row[other] = row.GetValueOrDefault(other) + 1;
+                }
+            }
+
+            foreach (var (key, wanted) in new[] { ("people", people), ("places", places) })
+            {
+                var offered = 0;
+                var kin = 0;
+                var ranked = 0;
+                var exact = 0;
+                var interior = 0;
+                var members = 0;
+
+                foreach (var word in wanted.Order(StringComparer.Ordinal))
+                {
+                    var code = Babi.Of(word);
+                    if (!company.TryGetValue(code, out var mine)) continue;
+
+                    members++;
+
+                    // AN ALTERNATIVE IS A CODE THIS ONE WAS NEVER IN A STATEMENT WITH, which
+                    // is the whole of the first half of the statistic. Ordered by a total
+                    // order under the score so two runs cannot disagree about a tie.
+                    var alternatives = company.Keys
+                        .Where(other => other != code && !mine.ContainsKey(other))
+                        .OrderByDescending(other => Alike(mine, company[other]))
+                        .ThenByDescending(other => seen[other])
+                        .ThenBy(other => other)
+                        .ToList();
+
+                    offered += alternatives.Count;
+                    kin += alternatives.Count(other => wanted.Contains(naming[other]));
+
+                    var top = alternatives.Take(wanted.Count - 1).ToList();
+                    ranked += top.Count(other => wanted.Contains(naming[other]));
+
+                    // WHERE THE LIST FALLS AWAY, WHICH IS THE ONLY CUT A MINTER COULD
+                    // ACTUALLY MAKE. Taking the answer's own size is the experimenter
+                    // holding the knife: nothing inside the machine knows a category has
+                    // four members. The biggest consecutive drop is size-free and dial-free,
+                    // and TAKE EVERYTHING is one of the cuts it is allowed to choose --
+                    // which is what the trailing fall to nothing stands for.
+                    var scored = alternatives
+                        .Select(other => Alike(mine, company[other]))
+                        .ToList();
+
+                    // AND BOTH RULES ARE READ, because the answer turns entirely on whether
+                    // TAKE EVERYTHING is one of the cuts on offer, and that was the
+                    // experimenter's choice rather than the data's.
+                    var cut = 0;
+                    var inner = 0;
+                    var fall = double.NegativeInfinity;
+                    var within = double.NegativeInfinity;
+
+                    for (var at = 0; at < scored.Count; at++)
+                    {
+                        var last = at + 1 == scored.Count;
+                        var drop = scored[at] - (last ? 0.0 : scored[at + 1]);
+
+                        if (drop > fall)
+                        {
+                            fall = drop;
+                            cut = at + 1;
+                        }
+
+                        if (last || drop <= within) continue;
+
+                        within = drop;
+                        inner = at + 1;
+                    }
+
+                    if (wanted.SetEquals(alternatives.Take(cut).Select(other => naming[other]).Append(word)))
+                        exact++;
+
+                    if (wanted.SetEquals(alternatives.Take(inner).Select(other => naming[other]).Append(word)))
+                        interior++;
+
+                    // THREE PAST THE CUT, so the transcript shows what the ranking REFUSED
+                    // and not only what it took. A list ending exactly at the answer's size
+                    // cannot be told from one that had nothing else to offer.
+                    output.WriteLine(
+                        $"task {task} {word,-8} | {alternatives.Count,3} alternatives, cut {cut,2} | "
+                        + string.Join(" ", alternatives
+                            .Select((other, at) =>
+                                (at == cut ? "|| " : string.Empty)
+                                + $"{naming[other]}:{scored[at]:F3}")));
+                }
+
+                var floor = Math.Max(1, members * (wanted.Count - 1));
+
+                // WHAT THE FILTER DID AND WHAT THE RANKING DID, KEPT APART. Every member is
+                // an alternative of every other by construction, so the recall of the filter
+                // is one whatever happens and says nothing; its PURITY is what falls as a
+                // task adds objects, and the difference between the two columns is exactly
+                // the work the company statistic is doing.
+                Assert.Equal(1.0, ranked / (double)floor);
+
+                // AND THE TWO CUTS NEVER BOTH WORK AND NEVER BOTH FAIL, which is the finding
+                // rather than a coincidence: one of them is right on every member of every
+                // row, and WHICH one is decided by whether the filter left anything to
+                // exclude. A minter reading only the fall would be perfect on people and
+                // take every object on places.
+                Assert.Equal(members, exact + interior);
+
+                output.WriteLine(
+                    $"task {task} {key,-6} | in the top {wanted.Count - 1,-2} "
+                    + $"{ranked / (double)floor:F3} | cut at the fall "
+                    + $"{exact / (double)Math.Max(1, members):F3} inside it "
+                    + $"{interior / (double)Math.Max(1, members):F3} | the filter alone offers "
+                    + $"{offered / (double)Math.Max(1, members):F1} a member at purity "
+                    + $"{kin / (double)Math.Max(1, offered):F3}");
+            }
+        }
+    }
 }

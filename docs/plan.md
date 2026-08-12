@@ -210,6 +210,17 @@ exercise. One line a capability, and the status is the whole point of the row.
 - **A NAME OVER ALTERNATIVES** — NOT BUILT, and rung five is the wrong SHAPE for it. It
   names what CO-FIRES; a category is a set of codes that never co-occur and share their
   contexts. The general end of the gradient has no vocabulary without it.
+- **AND WHAT IT NAMES IS THE SLOT THAT VARIES ACROSS A FAMILY OF OTHERWISE-IDENTICAL RULES**,
+  which is the operational form and the one a minter can be written against.
+- **AND THE STATISTIC IS MEASURED BEFORE THE OPERATOR IS BUILT, WHICH IS THE ONE THING THE
+  PROBE HAD TO SETTLE.** It recovers the cast and the rooms exactly, with nothing learnt, so
+  what is left to build is a minter rather than a question.
+- **AND THE FILTER IS NOT THE MECHANISM, WHICH A SINGLE TASK WOULD HAVE HIDDEN.** Never in
+  one statement offers a place five candidates where a task has only places and nineteen
+  where it has objects too, so the company statistic does all of the separating.
+- **AND WHAT IS MISSING IS A BAR RATHER THAN A BETTER GAP.** The ranking is perfect and the
+  STOPPING has no rule — the largest fall and take-everything are each right exactly where
+  the other is wrong, which is the repair gate's own shape read the other way round.
 - **MUTUAL EXCLUSION, so a belief can be CONTRADICTED and not merely wrong** — NOT BUILT. A
   miss says *I expected Y and got Z*; nothing anywhere says Y and Z cannot both hold, which
   is the whole of what a conflict is.
@@ -811,6 +822,9 @@ condition is a superstition.
 - **AND *THE ANSWER IS IN THE ROOM* IS NOT A BOUND ON THE SCORE.** An outcome is an index
   rather than a word, so the base rate is collected with nothing to read — and where the
   marginal is above that column a score sits above it with nothing wrong.
+- **AND A PRECISION TAKEN AT THE ANSWER'S OWN SIZE IS THE EXPERIMENTER HOLDING THE KNIFE.**
+  Nothing inside the machine knows a category has four members, so a top-k score can be
+  perfect while no rule the machine could run reproduces it. Report the size-free cut beside.
 
 Named so nobody reintroduces them. These are about MEASUREMENT, so they survive the
 change of architecture entirely.
@@ -1544,7 +1558,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **89** | John's: prime it on general English before setting it a text to be examined on. `Primer` exists for the walk and ports cheaply, but a settled-nothing round moves no counter here — so a primer needs something to predict while reading. Next word is rung three. Open |
 | **90** | John's: is there a standardised comprehension exam that separates understanding from regurgitation? bAbI already is one at this rung. What is unpriced is the tier above — school exams and the passages built so the wrong answer is the one present verbatim. Open, and blocked until the components pass |
 | **88** | The front end intersects the question with EACH statement. `Joining.Addressed` ANSWERS TASK ONE OUTRIGHT where the bag sits near the marginal, and falls to the base rate at two supporting facts — at its ceiling there too, so one hop is all it reaches and the learner never failed. Closed; fork 96 carries the reach |
-| **97** | John's: a category is a set of codes that are ALTERNATIVES, and rung five names only what co-fires — so a category is the COMPLEMENT of what it names, the slot varying across a family of otherwise-identical rules. The same operator the multiplexer's address bits have wanted for the life of the branch. Open |
-| **98** | John's: a concept can form BEFORE its label. Substitutability groups things by the relations they share and needs no word, so when the word arrives it labels a category that already existed. The probe comes first: does never-co-occurring-but-same-contexts recover people and places with nothing learnt? Open |
+| **97** | John's: a category is a set of codes that are ALTERNATIVES, and rung five names what CO-FIRES — so it is the complement, and the operator the multiplexer's address bits have wanted for the life of the branch. UNBLOCKED by fork 98; what it inherits is a stopping rule rather than a ranking. Open, and next |
+| **98** | John's: a concept forms BEFORE its label, so substitutability groups things with no word and the word later labels a category that already existed. THE PROBE PASSES on both categories and all three tasks, the category packed against one and the next thing out a third of the scale below. Closed, and fork 97 is unblocked |
 | **99** | John's: a conflict is two beliefs asserting different members of ONE category for the same key, which is the only route to retraction under counters that only rise. And malleability is the counters rather than a property — a per-belief weight is where the human puts the answer in. Open |
 | **96** | A second hop: read at the key the FIRST reading supplied. Where the question names the apple, the apple's newest statement says who picked it up and never where. Chaining is already expressible, a commitment's identity being a code; what stands in the way is fork 32's depth cap. Open, and next |

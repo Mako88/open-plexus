@@ -803,6 +803,9 @@ condition is a superstition.
   AGAINST A RUNNER'S HOUR.** Whether the answer survives the translation is decided before a
   commitment exists. Take it FIRST; a grid cannot tell a rule that dropped the wrong
   sentence from a learner that failed to use the right one.
+- **AND *THE ANSWER IS IN THE ROOM* IS NOT A BOUND ON THE SCORE.** An outcome is an index
+  rather than a word, so the base rate is collected with nothing to read — and where the
+  marginal is above that column a score sits above it with nothing wrong.
 
 Named so nobody reintroduces them. These are about MEASUREMENT, so they survive the
 change of architecture entirely.
@@ -1535,4 +1538,5 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **91** | A masked objective spends the population on function words, being what a bag predicts best, and transfers nothing. Gate what is worth predicting on surprise, the way genesis is already gated on it — the one repair that is not a stop list. Open, and it is what would make a primer teach |
 | **89** | John's: prime it on general English before setting it a text to be examined on. `Primer` exists for the walk and ports cheaply, but a settled-nothing round moves no counter here — so a primer needs something to predict while reading. Next word is rung three. Open |
 | **90** | John's: is there a standardised comprehension exam that separates understanding from regurgitation? bAbI already is one at this rung. What is unpriced is the tier above — school exams and the passages built so the wrong answer is the one present verbatim. Open, and blocked until the components pass |
-| **88** | The front end intersects the question with EACH statement rather than the whole story. `Joining.Addressed` ANSWERS TASK ONE OUTRIGHT on a handful of rules where the bag sits near the marginal. A probe rather than a mechanism: it prices rung four without being one. Open on whether it survives two supporting facts |
+| **88** | The front end intersects the question with EACH statement. `Joining.Addressed` ANSWERS TASK ONE OUTRIGHT where the bag sits near the marginal, and falls to the base rate at two supporting facts — at its ceiling there too, so one hop is all it reaches and the learner never failed. Closed; fork 96 carries the reach |
+| **96** | A second hop: read at the key the FIRST reading supplied. Where the question names the apple, the apple's newest statement says who picked it up and never where. Chaining is already expressible, a commitment's identity being a code; what stands in the way is fork 32's depth cap. Open, and next |

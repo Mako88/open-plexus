@@ -581,6 +581,54 @@ public sealed class RecalledTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// Whether a second supporting fact is out of REACH or merely unlearnt.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE DISTINCTION THE GRID CANNOT DRAW, AND IT COSTS NO LEARNING.</b> Reading at the
+    /// question's key answers task one outright and lands on the base rate at task two, and
+    /// a score alone cannot say whether the statement it retrieved HELD the answer. Where
+    /// the question names the apple and the apple's newest statement says who picked it up,
+    /// the answering word was never in the room and no learner could have found it.
+    /// </para>
+    /// <para>
+    /// <b>WHICH IS THE WHOLE SHAPE OF WHAT IS MISSING.</b> One hop of retrieval reaches the
+    /// statement the question names; a second hop would have to read at a key that FIRST
+    /// reading supplied. A ceiling near nought here says the arm is at its ceiling again and
+    /// the fault is the view, exactly as it was at every width on task one.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS NOT A BOUND ON THE SCORE, WHICH THIS READING IS THE FIRST TO SHOW.</b> An
+    /// outcome is an index rather than a word in the room, so a population collects the base
+    /// rate by expecting the commonest answer with nothing present to read — and where the
+    /// marginal is above this column, a score SITS ABOVE IT with no fault anywhere. Read the
+    /// two together or a working arm looks broken.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_a_second_supporting_fact_is_even_in_the_room()
+    {
+        foreach (var task in new[] { 1, 2, 3 })
+        {
+            var world = new Recalled(World(task: task, span: 0));
+            var asked = new Joined(Joining.Addressed);
+
+            var reachable = 0;
+
+            for (var one = 0; one < world.Withheld.Count; one++)
+            {
+                var moment = new HashSet<Code>(asked.Codify(world.Withheld[one].Seen));
+
+                if (moment.Contains(Babi.Of(world.Transcript[one].Answer))) reachable++;
+            }
+
+            output.WriteLine(
+                $"task {task} addressed | answer present "
+                + $"{reachable / (double)world.Withheld.Count:F3} of {world.Withheld.Count}");
+        }
+    }
+
+    /// <summary>
     /// Whether reading at the question's key survives needing more than one statement.
     /// </summary>
     /// <remarks>

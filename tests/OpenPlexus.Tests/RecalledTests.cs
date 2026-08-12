@@ -1028,10 +1028,11 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
         foreach (var predicting in new[] { Predicting.Masked, Predicting.Salient })
         {
-            // CAPACITY WELL ABOVE THE VOCABULARY, because the first reading was taken at
-            // two thousand against 2,855 words and came back with the population pinned
-            // at its cap in both arms. A saturated population compares nothing.
-            var (world, trial, brain) = Made(English(sentences: 5_000, predicting), capacity: 8_000);
+            // CAPACITY ABOVE WHERE THE POPULATION STOPS GROWING, and the number comes from
+            // `Whether_capacity_binds_on_english` rather than from taste: at 2,855 words it
+            // saturates a cap of 8,000 and settles under 20,000. A saturated population
+            // compares nothing, and the first sizing here compared two of them.
+            var (world, trial, brain) = Made(English(sentences: 5_000, predicting), capacity: 30_000);
 
             var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
             var exam = tally.Unseen?.Accuracy ?? 0.0;
@@ -1058,6 +1059,65 @@ public sealed class RecalledTests(ITestOutputHelper output)
             $"the gate did not lead on real English either ({scored[Predicting.Salient]:+0.000;-0.000} "
             + $"against {scored[Predicting.Masked]:+0.000;-0.000} over the marginal), so the "
             + "corpus was never what was wrong with it");
+    }
+
+    /// <summary>
+    /// Whether the population's cap is what holds the English arm down, or the learner is.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE CONTROL THAT SAYS HOW EVERY OTHER ENGLISH READING MAY BE READ.</b> The first
+    /// one came back under its marginal on both objectives with the population pinned at
+    /// its cap — and a saturated population cannot be evidence about a corpus, only about
+    /// the cap. bAbI never raised the question because thirty words fit anywhere.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS ONE AXIS: HOW MANY COMMITMENTS MAY BE HELD, nothing else moving.</b>
+    /// Same sentences, same objective, same rounds, same seed. Where the population stops
+    /// growing before it hits the cap is where the reading is the learner's rather than
+    /// the ceiling's, and that is the point every other English arm should be sized above.
+    /// </para>
+    /// <para>
+    /// <b>WHAT THE FIRST GRID SHOWED, AND THE REASON THE ASSERTION IS THE SHAPE IT IS:</b>
+    /// the exam rises with the cap, clears the marginal once the cap stops binding, and
+    /// sits an order below what the same text scores under a plain bag predictor. The
+    /// score to watch is not the exam but the DISTANCE from it to <c>own</c>: the learner
+    /// answers what it read far better than what it did not, which is the failure this
+    /// arm exists to make visible and is nothing the corpus can be blamed for.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_capacity_binds_on_english()
+    {
+        var cleared = new Dictionary<int, bool>();
+
+        foreach (var capacity in new[] { 2_000, 8_000, 20_000 })
+        {
+            var (world, trial, brain) = Made(
+                English(sentences: 2_000, Predicting.Salient), capacity: capacity);
+
+            var tally = trial.Run(rounds: 10_000, sweep: 1000, target: 0.9, window: 2000);
+            var exam = tally.Unseen?.Accuracy ?? 0.0;
+
+            cleared[capacity] = exam > world.Commonest;
+
+            output.WriteLine(
+                $"capacity {capacity,6} | exam {exam:F3} | own {tally.Recent:F3} "
+                + $"| marginal {world.Commonest:F3} | held {brain.Held.Count,6} "
+                + $"| {world.Questions} read, {world.Outcomes} words");
+        }
+
+        // THE CLAIM WORTH FAILING THE BUILD OVER, and it is about the CAP rather than about
+        // the score. Reading real English beats always saying the commonest answer once the
+        // population is allowed to be big enough, and does not when it is not. If the small
+        // cap ever clears too, the cap stopped binding and every arm here may be sized down.
+        Assert.False(cleared[2_000], "a cap of 2,000 now clears the marginal on English, so "
+            + "it stopped binding and the other English arms are sized larger than they need");
+
+        Assert.True(cleared[20_000], "reading real English no longer beats its marginal even "
+            + "with the cap off, so what blocks the primer route is the learner rather than "
+            + "the corpus — and fork 100's reading says the signal is there to be had");
     }
 
     /// <summary>Plain English, sized so it runs in the suite rather than in a sweep.</summary>

@@ -105,11 +105,15 @@ out why, repeat.** Enough turns of that and the problem is understood. There is 
 of this that skips the failing part.
 
 **And pushing back is part of the job rather than a risk to manage — John, and he asked for
-this in writing.** He is a senior engineer and says plainly that parts of this are outside
-his background, so an approach that will not work, a solution that is merely adequate, or a
-premise that is wrong is worth saying out loud the moment it is seen. Seeing that is
-described as what this collaboration is FOR. Do not soften it into a question, and do not
-wait to be asked.
+this in writing.** He is a senior engineer and owns the distributed and systems side; on
+AGI research, biology and the learning theory he is leaning on you deliberately. His words:
+he would be doing himself, the project and you a disservice by making you feel unable to
+offer suggestions or corrections, because on most of this you are the one with the
+knowledge and the one placed to find the cross-discipline answer.
+
+**So say it the moment you see it — an approach that will not work, a solution that is
+merely adequate, a premise that is wrong.** Do not soften it into a question and do not wait
+to be asked. Hedging is the failure mode here, not overstepping.
 
 **Say what would make you drop an arm before you run it, in one line — not what number you
 expect.** Predicting a value is a weaker form that invites anchoring and has already fired

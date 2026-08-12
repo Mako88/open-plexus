@@ -187,6 +187,9 @@ exercise. One line a capability, and the status is the whole point of the row.
   rather than a rung. The one text task measured demands it.
 - **A SITUATION MODEL, held apart from the rules** — NOT BUILT, AND NOT PREVIOUSLY ON ANY
   LIST. The population holds what is true in general; nothing holds what is true NOW.
+- **AND SPECIFICITY AS A GRADIENT ACROSS BOTH** — John's. *A person sleeps in a bedroom* and
+  *this is Mary's* are the same knowledge at two grains, held loosely and at once. Rules
+  have that gradient already; situations have nowhere to keep one.
 - **Action, and a consequence that can surprise** — NOT BUILT. The plan's own goal sentence
   is interventional and every world here is watched rather than acted in.
 - **A goal, as a commitment about a state that does not hold** — NOT BUILT.
@@ -1493,6 +1496,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **71** | A minted name is a code, so repair adds it for the price of one. Should the separation bar be charged by what a scope's codes STAND FOR rather than by how many there are? Open |
 | **86** | The ladder's admission rule reads near nothing on text while the transcript shows the ceiling plainly. It asks whether repair found a separating code, and on a wide alphabet memorising always does — so the trigger cannot summon the rungs that go UP. What signal separates *nothing separates* from *nothing GENERAL separates*. Open |
 | **87** | `Recalled` answers with a place and never a person. ANSWERED AGAINST for a coincidence code: naming the shared word, dropping its identity, and saying the absence out loud all sit inside the control's spread. A marker says when to trust the place in front of you, never where to find the right one |
+| **93** | John's: the brain must hold the same knowledge at several grains and loosely — *a person sleeps in a bedroom*, and *this bedroom is Mary's*. Subsumption and repair already give RULES that gradient. A situation has nowhere to keep one, so the two halves of this are one design. Open, and it is the architecture conversation |
 | **92** | Banding a word by how many statements back it was makes *the latest one* sayable, and buys about half of what simply narrowing the view buys. Its gain reverses as capacity grows, so the alphabet it adds is spent memorising. Does a band the learner MINTS rather than one it is handed behave differently? Open |
 | **91** | A masked objective spends the population on function words, being what a bag predicts best, and transfers nothing. Gate what is worth predicting on surprise, the way genesis is already gated on it — the one repair that is not a stop list. Open, and it is what would make a primer teach |
 | **89** | John's: prime it on general English before setting it a text to be examined on. `Primer` exists for the walk and ports cheaply, but a settled-nothing round moves no counter here — so a primer needs something to predict while reading. Next word is rung three. Open |

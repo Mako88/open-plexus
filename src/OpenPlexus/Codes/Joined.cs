@@ -101,6 +101,53 @@ public enum Joining
     /// </para>
     /// </remarks>
     Recent,
+
+    /// <summary>
+    /// Only the statements nothing newer has superseded — <b>a situation instead of a
+    /// transcript.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE SELECTION PROBLEM DOES NOT GET SOLVED HERE, IT GETS DISSOLVED.</b> Every arm
+    /// before this one hands the learner a bag with two places in it and some way of hinting
+    /// which is meant — a narrower view, a recency band, a coincidence marker. This asks a
+    /// different question: <i>Mary went to the kitchen</i> is not a fact to be found later,
+    /// it is an instruction to overwrite where Mary is. If the overwriting happens before the
+    /// bag is built there is only ever ONE place for Mary in it, and the near-perfect reader
+    /// this world has already measured reads it perfectly.
+    /// </para>
+    /// <para>
+    /// <b>SUPERSEDED MEANS SHARING A KEY WITH SOMETHING NEWER, AND A KEY IS ANY WORD THE
+    /// CORPUS DOES NOT USE CONSTANTLY.</b> Walking the story newest first, a statement is
+    /// dropped when a statement already kept used one of its words. <i>Mary went to the
+    /// garden</i> kills <i>Mary went to the kitchen</i> on <i>mary</i>, and leaves <i>John
+    /// moved to the garden</i> standing because the only words those two share are the ones
+    /// every sentence shares.
+    /// </para>
+    /// <para>
+    /// <b>WHICH IS WHY THE COMMONEST WORDS ARE EXCLUDED, AND WHY THAT EXCLUSION IS A DIAL
+    /// RATHER THAN A LIST.</b> No stop list, no parser and no notion that <i>mary</i> is a
+    /// person: the join is told how often each word is written and nothing else, which is
+    /// the same measured proxy for <i>informative</i> that <see cref="Worlds.Predicting.Salient"/>
+    /// already stands on.
+    /// </para>
+    /// <para>
+    /// <b>AND THE DIAL'S TWO ENDS ARE THE TWO CONTROLS, WHICH IS WHAT STOPS THIS BEING A
+    /// FREE WIN.</b> Exclude nothing and every sentence shares <i>the</i> with every other,
+    /// so only the newest survives and the arm IS a one-statement span. Exclude everything
+    /// and no statement has a key, so nothing is superseded and the arm IS
+    /// <see cref="Bagged"/>. Anything this buys has to be bought in the middle, against both
+    /// of its own ends.
+    /// </para>
+    /// <para>
+    /// <b>IT IS A FRONT END DOING A SITUATION MODEL'S WORK, WHICH IS AN UPPER BOUND AND NOT
+    /// THE MECHANISM.</b> A displacement rule computed once over a story that arrived whole
+    /// is not a store that survives a stream, cannot be wrong about anything, and earns no
+    /// blame — so what this can say is whether holding one state per thing is worth having
+    /// at all. If it is not, nothing built inside the learner would have been either.
+    /// </para>
+    /// </remarks>
+    Situated,
 }
 
 /// <summary>
@@ -156,9 +203,41 @@ public sealed class Joined : IQuantizer<Asking>
     public const int Bands = 3;
 
     private readonly Joining _joining;
+    private readonly HashSet<Code> _constant;
 
     /// <param name="joining">What to do with the two halves.</param>
-    public Joined(Joining joining) => _joining = joining;
+    /// <param name="frequency">
+    /// How often the corpus writes each word, which only <see cref="Joining.Situated"/>
+    /// reads. <b>A count and never a meaning</b> — see <see cref="Worlds.Recalled.Frequency"/>.
+    /// </param>
+    /// <param name="constant">
+    /// How many of the commonest words are too constant to key on.
+    /// </param>
+    /// <remarks>
+    /// <b>THE COMMONEST SET IS BUILT ONCE HERE RATHER THAN PER MOMENT.</b> It is a fact
+    /// about the corpus, so recomputing it per question would be the same answer at the
+    /// price of a sort a moment — and this runs on every round of every arm.
+    /// <b>Ties break on <see cref="Code"/> order</b>, because a set whose membership
+    /// depended on a dictionary's walk would make two runs of one seed disagree about
+    /// what the front end emitted.
+    /// </remarks>
+    public Joined(
+        Joining joining,
+        IReadOnlyDictionary<Code, int>? frequency = null,
+        int constant = 0)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(constant);
+
+        _joining = joining;
+
+        _constant = frequency is null
+            ? []
+            : [.. frequency
+                .OrderByDescending(one => one.Value)
+                .ThenBy(one => one.Key)
+                .Take(constant)
+                .Select(one => one.Key)];
+    }
 
     /// <inheritdoc/>
     public byte Modality => Both;
@@ -170,6 +249,8 @@ public sealed class Joined : IQuantizer<Asking>
         said.UnionWith(observation.Question);
 
         if (_joining == Joining.Recent) return Banding(said, observation);
+
+        if (_joining == Joining.Situated) return Situating(observation);
 
         if (_joining == Joining.Bagged) return said;
 
@@ -189,6 +270,59 @@ public sealed class Joined : IQuantizer<Asking>
 
         if (_joining == Joining.Named) foreach (var one in shared) said.Add(new Code(Both, one.Value));
         else said.Add(Coincided);
+
+        return said;
+    }
+
+    /// <summary>
+    /// The question, and every statement of the story nothing newer has superseded.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>NEWEST FIRST, WHICH IS THE ORDER THE WORLD ALREADY HANDS THEM OVER.</b> Walking
+    /// backwards from the question is what makes <i>superseded</i> decidable in one pass: a
+    /// statement is dead if something already kept claimed one of its keys, and everything
+    /// already kept is newer than it by construction.
+    /// </para>
+    /// <para>
+    /// <b>A DROPPED STATEMENT CLAIMS NOTHING, WHICH IS NOT A DETAIL.</b> If <i>Mary went to
+    /// the kitchen</i> dies on <i>mary</i>, its <i>kitchen</i> must stay free — an older
+    /// sentence about the kitchen was superseded by nothing, and letting a corpse claim keys
+    /// would kill it. Only survivors write.
+    /// </para>
+    /// <para>
+    /// <b>AND THE QUESTION'S WORDS GO IN UNCONDITIONALLY, because the question is not part
+    /// of the situation.</b> It supersedes nothing and is superseded by nothing; it is what
+    /// the situation is being asked about.
+    /// </para>
+    /// </remarks>
+    private HashSet<Code> Situating(Asking observation)
+    {
+        var said = new HashSet<Code>(observation.Question);
+        var claimed = new HashSet<Code>();
+        var keys = new List<Code>();
+
+        foreach (var statement in observation.Story)
+        {
+            keys.Clear();
+
+            var superseded = false;
+
+            foreach (var one in statement)
+            {
+                if (_constant.Contains(one)) continue;
+
+                if (claimed.Contains(one)) { superseded = true; break; }
+
+                keys.Add(one);
+            }
+
+            if (superseded) continue;
+
+            foreach (var key in keys) claimed.Add(key);
+
+            said.UnionWith(statement);
+        }
 
         return said;
     }

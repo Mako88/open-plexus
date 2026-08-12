@@ -38,12 +38,18 @@ public sealed class RecalledTests(ITestOutputHelper output)
         new Joined(Joining.Bagged).Codify(asking).Order();
 
     private static (Recalled World, Trial<Asking> Trial, Brain Brain) Made(
-        RecalledSettings settings, Joining joining = Joining.Bagged, int capacity = 2000)
+        RecalledSettings settings,
+        Joining joining = Joining.Bagged,
+        int capacity = 2000,
+        int constant = 0)
     {
         var brain = new Brain(new CommittingSettings { Capacity = capacity }, 1);
         var world = new Recalled(settings);
 
-        return (world, new Trial<Asking>(world, new Joined(joining), brain), brain);
+        return (
+            world,
+            new Trial<Asking>(world, new Joined(joining, world.Frequency, constant), brain),
+            brain);
     }
 
     [Fact]
@@ -277,6 +283,143 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
         output.WriteLine($"matched: {new Joined(Joining.Either).Codify(matching).Count} codes");
         output.WriteLine($"missed : {new Joined(Joining.Either).Codify(missing).Count} codes");
+    }
+
+    /// <summary>
+    /// A newer statement supersedes an older one about the same thing, and only that one.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE MECHANISM ASSERTED ON A MOMENT BUILT BY HAND, BECAUSE A GRID CANNOT TELL A
+    /// DISPLACEMENT RULE THAT DOES NOTHING FROM ONE THAT DOES THE WRONG THING.</b> Both come
+    /// back as a score, and this repo has read an unwired mechanism as a refutation before.
+    /// Three statements: Mary moves twice and John moves once.
+    /// </para>
+    /// <para>
+    /// <b>AND THE TWO ENDS OF THE DIAL ARE ASSERTED TO BE THE TWO CONTROLS</b>, which is the
+    /// property that stops the arm being a free win. Keying on every word collapses it to
+    /// the newest statement; keying on none collapses it to the bag.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_newer_statement_supersedes_an_older_one_about_the_same_thing()
+    {
+        var story = new Asking
+        {
+            // NEWEST FIRST, which is the order the world hands them over.
+            Story =
+            [
+                new HashSet<Code> { Babi.Of("mary"), Babi.Of("to"), Babi.Of("garden") },
+                new HashSet<Code> { Babi.Of("john"), Babi.Of("to"), Babi.Of("office") },
+                new HashSet<Code> { Babi.Of("mary"), Babi.Of("to"), Babi.Of("kitchen") },
+            ],
+            Question = new HashSet<Code> { Babi.Of("where"), Babi.Of("mary") },
+        };
+
+        // `to` IS THE ONLY CONSTANT, standing for the function words a real corpus writes
+        // into every sentence. Without excluding it every statement shares a key with every
+        // other and only the newest survives, which is the dial's own bottom end.
+        var frequency = new Dictionary<Code, int>
+        {
+            [Babi.Of("to")] = 100,
+            [Babi.Of("mary")] = 10,
+            [Babi.Of("john")] = 10,
+            [Babi.Of("garden")] = 5,
+            [Babi.Of("office")] = 5,
+            [Babi.Of("kitchen")] = 5,
+        };
+
+        var situated = new Joined(Joining.Situated, frequency, constant: 1).Codify(story);
+
+        // MARY'S OLD PLACE IS GONE AND HER NEW ONE IS THERE, which is the whole claim.
+        Assert.Contains(Babi.Of("garden"), situated);
+        Assert.DoesNotContain(Babi.Of("kitchen"), situated);
+
+        // AND JOHN IS UNTOUCHED, which is what separates displacement from a narrower view.
+        // A one-statement span would have taken his office as well.
+        Assert.Contains(Babi.Of("office"), situated);
+        Assert.Contains(Babi.Of("john"), situated);
+
+        // KEYING ON EVERY WORD IS THE NEWEST STATEMENT AND NOTHING ELSE, because `to` is
+        // then a key and every statement shares it.
+        var narrow = new Joined(Joining.Situated, frequency, constant: 0).Codify(story);
+
+        Assert.DoesNotContain(Babi.Of("office"), narrow);
+        Assert.DoesNotContain(Babi.Of("kitchen"), narrow);
+        Assert.Contains(Babi.Of("garden"), narrow);
+
+        // AND KEYING ON NOTHING IS THE BAG, code for code.
+        var wide = new Joined(Joining.Situated, frequency, constant: frequency.Count).Codify(story);
+
+        Assert.Equal(
+            new Joined(Joining.Bagged).Codify(story).Order(),
+            wide.Order());
+
+        output.WriteLine(
+            $"bag {wide.Count} | situated {situated.Count} | newest only {narrow.Count}");
+    }
+
+    /// <summary>
+    /// Whether holding one state per thing dissolves the selection this learner cannot do.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE MEASURED FAILURE IS A NEAR-PERFECT READER AND A HOPELESS SELECTOR, AND EVERY
+    /// ARM SO FAR HAS TRIED TO HELP IT SELECT.</b> A narrow view picks the sentence by hand
+    /// and reaches the ceiling; a recency band hands the position over in the alphabet and
+    /// buys about half of that. This arm does not help it select at all — it overwrites, so
+    /// that by the time the bag is built there is one place for Mary in it and selecting is
+    /// not required.
+    /// </para>
+    /// <para>
+    /// <b>THE KILL CONDITION, WRITTEN BEFORE THE ARM RAN: if no setting of the dial beats
+    /// <see cref="Joining.Recent"/> at the whole story, drop it.</b> Displacement would then
+    /// be buying nothing a position code does not already buy, and the situation model would
+    /// be answering a question this world does not ask. Beating the BAG is not enough — the
+    /// bottom of this dial is a one-statement span, so an arm that only beat the bag would
+    /// be reporting the span arm under a new name.
+    /// </para>
+    /// <para>
+    /// <b>AND THE CAPACITY IS AN AXIS FOR THE REASON THE RECENCY GRID FOUND.</b> That arm's
+    /// gain evaporated as the population was allowed to grow, which is what said the extra
+    /// alphabet was being spent memorising. This one REMOVES codes rather than adding them,
+    /// so if it is real its gain should go the other way — and a single capacity could not
+    /// tell.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_a_situation_dissolves_the_selection()
+    {
+        foreach (var capacity in new[] { 2000, 8000 })
+        {
+            // THE TWO CONTROLS FIRST, so the row they have to beat is printed in the same
+            // grid rather than cited from another one taken under other dials.
+            foreach (var joining in new[] { Joining.Bagged, Joining.Recent })
+                Row(capacity, joining, constant: 0);
+
+            // AND THE DIAL SWEPT ACROSS ITS OWN TWO ENDS. Nought is a one-statement span
+            // and the largest is the bag, so an interior row is the only place this can
+            // pay.
+            foreach (var constant in new[] { 0, 2, 4, 8, 16, 32 })
+                Row(capacity, Joining.Situated, constant);
+        }
+
+        void Row(int capacity, Joining joining, int constant)
+        {
+            var (world, trial, brain) = Made(
+                World(task: 1, span: 0), joining, capacity, constant);
+
+            var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
+            var unseen = tally.Unseen;
+
+            output.WriteLine(
+                $"cap {capacity,4} {joining,-9} constant {constant,2} | "
+                + $"exam {unseen?.Accuracy ?? 0.0:F3} silent {unseen?.Silence ?? 0.0:F3} | "
+                + $"own {tally.Recent:F3} | marginal {world.Commonest:F3} | "
+                + $"held {brain.Held.Count,5} names {brain.Held.Names.Count,4} "
+                + $"wanting {tally.Wanting:F3}");
+        }
     }
 
     /// <summary>

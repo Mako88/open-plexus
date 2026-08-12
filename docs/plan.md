@@ -235,6 +235,9 @@ Forks 1 through 25 are `csharp`'s, and when that code is stripped, point `DocsTe
       single capacity sizes both. Fork **101**.
     - **BLOCKED** — the exam tier above bAbI is unpriced, and blocked until the components
       pass. Fork **90**.
+    - **OPEN** — it is a near-perfect READER and a hopeless SELECTOR, which the two ends say
+      together: shown the right statement it is at the ceiling, shown the whole story it
+      takes a fraction of what is present to be answered.
   - Told, never architected
     - **NOW** — a front end may say what it is looking at, never what to conclude.
       `SeparationTests` fails the build.
@@ -251,6 +254,9 @@ Forks 1 through 25 are `csharp`'s, and when that code is stripped, point `DocsTe
     - **OPEN** — on a read corpus the OBJECTIVE is the wall and no gate reaches it: the
       informative words are the unpredictable ones and the predictable ones are `to` and
       `the`.
+    - **NOW** — OSTENSION is the signal rather than a shortcut around unsupervised reading.
+      Being told which word the question is about is information no amount of co-occurrence
+      contains, and it is the pointing-and-naming shape.
   - Original thought
     - **NOW** — nothing. Every world here is watched rather than acted in, and action, a
       consequence that can surprise, and a goal are all unbuilt.
@@ -280,6 +286,9 @@ Forks 1 through 25 are `csharp`'s, and when that code is stripped, point `DocsTe
     - **OPEN** — placement by the minimum code keeps a lineage together and costs balance
       past a dozen machines. Fork **61**.
   - Death is normal rather than an error
+    - **NOW** — the signal is a REFUSED CONNECTION and never a death notice, so an impolite
+      departure and a dropped message arrive by the same road. A machine never handed a
+      question cannot answer it, which is exact rather than a guess.
     - **SETTLED** — a death writes off routes into the dead cluster. Fork **5**.
     - **OPEN** — an ask watched failing to leave is written off exactly, so a fleet loses one
       and learns on. Open on the round a holder dies INSIDE. Fork **53**.
@@ -300,6 +309,12 @@ Forks 1 through 25 are `csharp`'s, and when that code is stripped, point `DocsTe
       the agreement. Whether shipping name frequencies recovers it exactly. Fork **81**.
     - **OPEN** — every node predicting its own output while the real wave verifies behind it.
       What it saves is a hop, so where it pays is deployment. Fork **57**.
+    - **NOW** — replicas DRIFT, because the completeness condition ends a round on one of
+      them and the other may take the next moment before the last settlement. Order rather
+      than content, so a failover replica is a similar population and not the same one.
+    - **NOW** — only IDENTICAL evidence converges on a name. Machines sharing most of a
+      stream agree as poorly as machines sharing none, so merging the counts is the only
+      thing that works rather than an optimisation.
 - **WHAT THE INSTRUMENTS MUST SAY** — an instrument that cannot fail says nothing, and every
   ground-truth one here needs a world that can be enumerated.
   - A run reproduces exactly
@@ -314,6 +329,13 @@ Forks 1 through 25 are `csharp`'s, and when that code is stripped, point `DocsTe
       to tell, the draw rejecting rather than picking. Fork **48**.
     - **OPEN** — the held-out gap as a function of RECURRENCE, which is the number saying how
       big a bag a world needs. Fork **41**.
+  - A score says how often and never which
+    - **NOW** — a transcript is an instrument and the cheapest one here. A population
+      answering everything with the commonest word and one that has learnt the task read
+      identically until the words are printed.
+    - **NOW** — a held-out question can be word for word one already asked, the corpus being
+      templated over a small cast. So an unseen score is read beside a count of its twins
+      rather than on its own.
   - What a rule learner is worth beside a probe
     - **OPEN** — given symbols worth having, how close a conjunctive rule learner comes to a
       linear probe on the same vectors. The grid is a sweep. Fork **43**.
@@ -325,146 +347,55 @@ FORBIDS things, and several of them are already measured.
 
 - **Twenty used phones on one wifi running the brain**, one stronger machine carrying the
   body — camera at a frame or two a second, audio, temperature, motion.
-- **AND THE PHONES ARE LAST RATHER THAN FIRST, WHICH IS JOHN'S ORDERING, 2026-08-11.** They
-  do not exist yet and will not be bought until this is worth showing somebody. So the
-  hardware is a conclusion of the prototype rather than a precondition for it.
+- **AND THE PHONES ARE LAST RATHER THAN FIRST, WHICH IS JOHN'S ORDERING.** They do not exist
+  yet and will not be bought until this is worth showing somebody, so the hardware is a
+  conclusion of the prototype rather than a precondition for it.
 - **FIRST IS DOCKER CONTAINERS ON ONE BOX, THE BODY A SEPARATE PROCESS, AND THE ONLY SENSE
   IS ENGLISH.** Talking to it is the first interactive test of the whole system, and it needs
   no camera, no phone and no wifi — the fleet is already the thing being exercised.
 - **THEN THE PHONE AS THE BODY AND THE CONTAINERS AS THE BRAIN**, video and sensors in, if
   one machine can hold enough containers to be a fleet. That is the arrangement that says
   whether twenty of anything is needed before twenty of anything is bought.
-- **SO WHAT THE FOOTPRINT READING IS ABOUT CHANGES WITH THE RUNG.** Containers share one
-  machine's memory, so the whole fleet's brain is the number that matters there; on phones it
-  is one holder's share. Both come off the same reading.
 - **And a text conversation as a second body**, so one brain is judged on symbols and on a
   stream of the world without being two brains.
 - **THE CONSTRAINTS WERE ALL WRITTEN FOR THIS, so it is a demonstration rather than a
   benchmark.** No shared memory, late messages, a cluster vanishing mid-thought.
+- **SO THE CONTAINERS ARE NOT THE THING THAT WAS UNPROVEN**, and the fleet was never the
+  risk. What text teaches this learner is answered in one process on one box, which is where
+  it should have been asked.
 - **AND TWENTY IS ALREADY THE MEASURED EDGE.** Placement by minimum code is capped by a
   world's distinct roots, so fleet size and the front end's vocabulary are one number.
-- **AND THE DEATH HANDLING IS PORTED, SO THE HARD BLOCKER IS OFF IT.** A fleet writes off the
-  ask it watched fail to leave and finishes on what is still owed — four machines lost one
-  mid-run and went on learning.
-- **THE SIGNAL IS A REFUSED CONNECTION AND NEVER A DEATH NOTICE**, so an impolite departure
-  and a dropped message arrive by the same road. A machine never handed a question cannot
-  answer it, which is exact rather than a guess.
-- **AND THE ROUND A PHONE DIES INSIDE IS PORTED TOO, WHICH WAS THE LAST HARD BLOCKER.** A slot
-  of two identical holders finishes on either one, so a machine that took the question and
-  went silent costs a fleet nothing at all.
-- **AND THE REPLICAS DRIFT APART, WHICH IS WHAT THE COMPLETENESS CONDITION COSTS.** A round
-  finishes on one of them, so the other is never waited on and can be handed the next moment
-  before the last settlement.
-- **SO IDENTICAL EVIDENCE CONVERGES AND EVIDENCE IN A DIFFERENT ORDER DOES NOT**, and nothing
-  was keeping the order but a fast machine. A failover replica is a similar population rather
-  than the same one.
-- **AND ONE INPUT MACHINE FEEDING TWENTY HOLDERS IS THE IDENTICAL CASE, NOT THE SHARED ONE.**
-  Every holder is told the same moment and the same settlement, so naming converges — the
-  divergence measured was between machines seeing DIFFERENT streams.
+- **SO WHAT THE FOOTPRINT READING IS ABOUT CHANGES WITH THE RUNG.** Containers share one
+  machine's memory, so the whole fleet's brain is the number that matters there; on phones
+  it is one holder's share. Both come off the same reading.
+- **AND WHAT PRICES A CAMERA IS THE FRONT END'S VOCABULARY**, at residents times codes times
+  a hundred bytes rather than anything about the population. That is the number to take
+  before a sensor is plumbed.
+- **AND ONE INPUT MACHINE FEEDING TWENTY HOLDERS IS THE IDENTICAL CASE, NOT THE SHARED
+  ONE.** Every holder is told the same moment and the same settlement, so naming converges —
+  the divergence measured was between machines seeing DIFFERENT streams.
 - **SO A CAMERA PER PHONE IS THE ARRANGEMENT TO AVOID**, and it is the arrangement nobody
   proposed. What breaks naming is many eyes, not many brains.
+- **A SENSOR IS A WORLD AND A WORLD IS A STREAM**, so nothing here is a new kind of input —
+  what is missing is the plumbing, not a mechanism.
+- **AND EVERY GROUND-TRUTH INSTRUMENT GOES DARK.** Soundness, overshoot and hard-round
+  coverage all need a world that can be enumerated, so the generated worlds never leave.
+- **SO THE PROBE IS THE ONE INSTRUMENT THAT CROSSES.** Ask what the codes carry against what
+  the raw reading carries, per sensor, BEFORE building anything on that sensor.
 - **AND A CURRICULUM IS ALLOWED AND C4 IS NOT ABOUT IT.** *No episode boundary* constrains
   the LEARNER; what an experimenter feeds and in what order is outside the machine.
 - **SO A PRIMER BEFORE A TEST IS EXPECTED RATHER THAN A CHEAT** — the language before the
   play, the room before the question. What is forbidden is the learner being able to tell
   that a boundary happened.
-- **AND THE MEMORY QUESTION IS ANSWERED AND IS NOT ABOUT THE POPULATION.** A trained holder
-  is 1.3MB, so twenty is 26MB of brain — and a table is bounded by the ALPHABET, growing
-  2.36x when the vocabulary grows 2.33x.
-- **SO WHAT PRICES A CAMERA IS THE FRONT END'S VOCABULARY**, at residents times codes times
-  a hundred bytes. A thousand codes over five hundred residents is a phone's whole share,
-  and that is the number to take before a sensor is plumbed.
-- **AND EVERY GROUND-TRUTH INSTRUMENT GOES DARK.** Soundness, overshoot and hard-round
-  coverage all need a world that can be enumerated, so the generated worlds never leave.
-- **SO THE PROBE IS THE ONE INSTRUMENT THAT CROSSES.** Ask what the codes carry against what
-  the raw reading carries, per sensor, BEFORE building anything on that sensor.
-- **A SENSOR IS A WORLD AND A WORLD IS A STREAM**, so nothing here is a new kind of input —
-  what is missing is the plumbing, not a mechanism.
-- **AND TEXT REACHES THE COMMITMENT LEARNER AT LAST, WHICH WAS AN ARGUMENT AND IS NOW A
-  MEASUREMENT.** `Recalled` puts a story and a question about it to a population, and it
-  answers questions from stories it was never told, well clear of the marginal.
-- **SO THE CONTAINERS ARE NOT THE THING THAT WAS UNPROVEN**, and the fleet was never the
-  risk. What text teaches this learner is answered in one process on one box, which is
-  where it should have been asked.
-- **AND WHAT IT LEARNT IS A PLACE AND NEVER A PERSON, WHICH THE TRANSCRIPT SAYS AND NO
-  SCORE COULD.** It answers with a location present in the moment, so it is right exactly
-  when the last statement is about whoever was asked.
-- **SO THE FIRST CONVERSATION DEMANDS UNIFICATION RATHER THAN SEQUENCE**, which inverts
-  what the ordering assumed. Binding the question's actor to a statement's actor is rung
-  four, and no dose of recency reaches it.
-- **AND THE TASK IS SELECT-THEN-READ, WHICH IS WHY ONE RUNG AT A TIME READS AS NOTHING.**
-  Finding the newest statement mentioning whoever was asked is sequence and unification at
-  once. Naming the coincidence alone is refuted — fork 87.
-- **A TRANSCRIPT IS AN INSTRUMENT AND THE CHEAPEST ONE HERE.** A score says how often and
-  never which, so a population answering everything with the commonest word and one that
-  has learnt the task read identically until the words are printed.
-- **AND A HELD-OUT QUESTION CAN BE WORD FOR WORD ONE ALREADY ASKED**, the corpus being
-  templated over a small cast — so the unseen score is read beside a count of its twins
-  rather than on its own.
-- **AND THE LEARNER IS AT THE CEILING THE VIEW ALLOWS, WHICH REFRAMES EVERY SCORE TAKEN
-  HERE.** Where the moment is one statement it answers all but a hair of what is present to
-  be answered, on a fifth of the population it is allowed to hold.
-- **SO IT IS A NEAR-PERFECT READER AND A HOPELESS SELECTOR**, which the two ends say
-  together. Shown only the right statement it is at the ceiling; shown the whole story,
-  where every answer is present, it takes under a third.
-- **AND RECENCY HANDED OVER AS A CODE HELPS AND DOES NOT RECOVER WHAT NARROWING THE VIEW
-  ALREADY GAVE.** Banding each word by how many statements back it was nearly doubles the
-  whole-story score and still trails the one-statement view.
-- **SO A CRUDE SELECTOR THE EXPERIMENTER CHOSE BEATS A LEARNABLE ONE SPELLED OUT IN THE
-  ALPHABET**, which is the opposite of the prediction written before the arm ran. The
-  learner can use a position code and cannot use it well.
-- **AND THE GAIN EVAPORATES AS THE POPULATION IS ALLOWED TO GROW, WHICH IS THE MECHANISM.**
-  Four times the capacity buys its own task and sells the examination, so the extra rules
-  memorise the stream — what banding costs is SEARCH, measured at last.
-- **AND WIDENING THE MOMENT BUYS THE DRAWN SCORE AND SELLS THE HELD-OUT ONE**, with the
-  population ballooning and silence appearing. The gap opens as the bag widens, which is
-  memorising caught by the one instrument a text world has.
-- **AND WHICH OBJECTIVE TO PREDICT IS MEASURED NOW, WHICH THE FIELD CANNOT ANSWER FOR A
-  LEARNER LIKE THIS.** Four arms predict a word from one alphabet and sit one examination
-  none was trained for, so an arm is judged on the population it grew.
-- **BEING TOLD WHAT MATTERS WINS AND NOTHING ELSE TRANSFERS AT ALL.** A masked arm and a
-  next-word arm learn their own task and score exactly nothing on the questions, while the
-  arm that was asked a question answers them.
-- **BECAUSE A MASKED OBJECTIVE SPENDS ITS POPULATION WHERE PREDICTION IS EASIEST, WHICH IS
-  WHERE THE INFORMATION IS LOWEST.** It answers with function words and never once reaches
-  for a place, which the transcript shows and the score only hints at.
-- **SO OSTENSION IS NOT A SHORTCUT AROUND UNSUPERVISED READING, IT IS THE SIGNAL** — being
-  told which word the question is about is information no amount of co-occurrence contains.
-  That is the pointing-and-naming shape, and it is what pays.
-- **AND MIXING THE TWO IS WORSE THAN EITHER TEACHING ALONE**, so a primer before an
-  examination costs rather than pays as built. The function-word rules crowd the population
-  the questions needed.
-- **AND DEMANDING THE RAREST WORD RESCUES THE KIND OF ANSWER AND NOT THE SCORE.** It answers
-  with places rather than prepositions and still lands under the marginal. A stop list is
-  refused; a frequency count is measured rather than declared.
-- **AND THAT ARM IS WHERE THE LADDER'S TRIGGER FINALLY FIRES, TWO ORDERS ABOVE ANY OTHER
-  READING HERE.** Predicting a rare word from a bag genuinely has nothing to separate on,
-  so the instrument works where the alphabet does not drown it.
-- **JOHN'S CURRICULUM PROPOSAL: TEACH IT ENGLISH, THEN SET IT A TEXT AND EXAMINE IT.** A
-  primer before a test is allowed and expected — C4 constrains the learner and not the
-  experimenter — and `Primer` already shows plain English to the walk.
-- **AND A PRIMER TEACHES THIS LEARNER EXACTLY NOTHING, WHICH IS A MECHANISM AND NOT A
-  GUESS.** A round the world cannot settle takes no score, no genesis and no repair, so
-  reading with nothing to predict moves not one counter.
-- **SO WHAT A PRIMER NEEDS IS SOMETHING TO BE WRONG ABOUT WHILE IT READS**, and the
-  obvious candidate is the next word. That is rung three, so the curriculum and the
-  comprehension failure ask for the same missing mechanism.
-- **AND SELECTION IS THE WHOLE OF THE FIRST TASK, WHICH IS NO LONGER AN INFERENCE.** Handed
-  the statement its own question names, the population answers everything on a handful of
-  rules where the bag sits near the marginal. Nothing about the learner needed fixing.
-- **SO WHAT RUNG FOUR IS WORTH ON TEXT IS PRICED, AND IT IS THE WHOLE TASK RATHER THAN A
-  MARGIN.** That is the number fork 33 wanted before anybody pays for a matcher — and the
-  caveat is that the task is NAMED for needing one statement.
-- **AND A SITUATION MODEL WAS CALLED DOWNSTREAM OF RUNG FOUR AND IS NOT.** A store read at
-  the question's own words by the front end is arithmetic, and it lifts a world where every
-  backward-reading arm sat on the marginal. What rung four would buy is the read, not the
-  store.
-- **AND READING A STATEMENT MUST CHANGE SOMETHING, WHICH IS FORKS 89, 91 AND 93 AS ONE
-  PROBLEM.** A primer moves no counter because nothing settles; a masked objective settles
-  and learns function words; a situation is the thing a statement could change that a later
-  question would then read.
-- **AND THE EXAM IS ALREADY THE RIGHT ONE.** Twenty tasks each isolating one prerequisite,
-  written elsewhere with published baselines, and built so surface matching fails. A school
+- **JOHN'S CURRICULUM PROPOSAL: TEACH IT ENGLISH, THEN SET IT A TEXT AND EXAMINE IT**, which
+  is the shape the first conversation takes.
+- **AND MIXING THE TWO IS WORSE THAN EITHER TEACHING ALONE**, so that curriculum costs rather
+  than pays as built. The function-word rules crowd out the population the questions needed.
+- **AND THE FIRST CONVERSATION DEMANDS UNIFICATION RATHER THAN SEQUENCE**, which inverts what
+  the ordering assumed. Binding the question's actor to a statement's actor is rung four, and
+  no dose of recency reaches it.
+- **AND THE EXAM IS ALREADY CHOSEN.** Twenty tasks each isolating one prerequisite, written
+  elsewhere with published baselines, and built so surface matching fails. A school
   comprehension test would read nothing until the components pass.
 
 ## The constraints

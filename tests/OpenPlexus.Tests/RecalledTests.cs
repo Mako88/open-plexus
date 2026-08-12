@@ -974,6 +974,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_a_category_handed_over_free_is_worth_anything()
     {
         foreach (var task in new[] { 1, 2, 3 })

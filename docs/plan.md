@@ -212,9 +212,6 @@ exercise. One line a capability, and the status is the whole point of the row.
   contexts. The general end of the gradient has no vocabulary without it.
 - **AND WHAT IT NAMES IS THE SLOT THAT VARIES ACROSS A FAMILY OF OTHERWISE-IDENTICAL RULES**,
   which is the operational form and the one a minter can be written against.
-- **AND THE STATISTIC IS MEASURED BEFORE THE OPERATOR IS BUILT, WHICH IS THE ONE THING THE
-  PROBE HAD TO SETTLE.** It recovers the cast and the rooms exactly, with nothing learnt, so
-  what is left to build is a minter rather than a question.
 - **AND THE FILTER IS NOT THE MECHANISM, WHICH A SINGLE TASK WOULD HAVE HIDDEN.** Never in
   one statement offers a place five candidates where a task has only places and nineteen
   where it has objects too, so the company statistic does all of the separating.
@@ -233,9 +230,9 @@ exercise. One line a capability, and the status is the whole point of the row.
 - **AND OFF THE RAW TEXT IT COMES BACK PERFECT, WHICH NEEDS NO POPULATION AT ALL.** The six
   rooms, the four names, the four motion verbs and the three props, and on the task holding
   both it separates the taking verbs from the dropping ones.
-- **AND HANDED OVER FREE IT PAYS, WHICH IS THE UPPER BOUND ON THE WHOLE OPERATOR AND WAS RUN
-  BEFORE IT.** Minting cannot beat being given, so a grid costing minutes prices a mechanism
-  costing a session.
+- **AND HANDED OVER FREE IT PAYS, WHICH IS THE UPPER BOUND ON THE OPERATOR AND WAS RUN BEFORE
+  IT.** Minting cannot beat being given, so a grid costing minutes priced a rung costing a
+  session — and that ordering is the reusable part.
 - **AND IT PAYS FIVE TIMES MORE UNDER THE BAG THAN UNDER THE ADDRESSED FRONT END**, which had
   already done the selecting and left a category nothing to generalise over. Under the bag it
   is bought for no extra population; under the addressed arm it costs a third more.

@@ -121,6 +121,7 @@ jobs:
             "RecalledTests.Whether_a_situation_dissolves",
             "RecalledTests.Whether_addressing_survives",
             "RecalledTests.What_a_bag_of_words_costs",
+            "RecalledTests.Whether_a_category_handed_over_free",
             "SeparableTests",
             "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",
             "WideningTests.Whether_shortening_a_scope",

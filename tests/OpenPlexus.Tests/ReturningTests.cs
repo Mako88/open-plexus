@@ -31,12 +31,13 @@ public sealed class ReturningTests(ITestOutputHelper output)
     private const long Rounds = 20_000;
 
     private static ReturningSettings World(
-        bool twinned, bool tagged, bool placed = false, double wandering = 0.0) =>
+        bool twinned, bool tagged, bool placed = false, double wandering = 0.0,
+        double drifting = 0.0) =>
         new()
         {
             Things = 8, Attributes = 3, CodesPerAttribute = 4, Hidden = 2,
             Twinned = twinned, Tagged = tagged, Placed = placed, Withheld = 300,
-            Wandering = wandering,
+            Wandering = wandering, Drifting = drifting,
         };
 
     /// <summary>What a front end watching this world would have seen, in order.</summary>
@@ -678,5 +679,103 @@ public sealed class ReturningTests(ITestOutputHelper output)
             $"per-thing categories hold {heldByThing} rules against a handed index's "
             + $"{byTag}, so a derived individual has stopped beating a given one and this "
             + "file's account of why is wrong");
+    }
+
+    /// <summary>
+    /// Whether what continuity recovers is a THING or a place a thing never leaves —
+    /// <b>the control this world's own doc asked for before any of it was measured.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A LANDMARK FIXED FOR THE LIFE OF THE WORLD IS PINNED BY A CONJUNCTION, WHICH IS
+    /// RUNG ONE AND ALREADY BUILT.</b> So <i>adhesion recovers the individual</i> is a claim
+    /// with an obvious cheaper explanation sitting under it: a thing's landmark codes adhere
+    /// because the thing has one landmark forever, and what is being recovered is the place.
+    /// Nothing in the reading above separates those two.
+    /// </para>
+    /// <para>
+    /// <b>SO THE THINGS MOVE AND EVERYTHING ELSE IS HELD.</b> Same looks, same twins, same
+    /// runs, same alphabet — a thing occasionally stands somewhere else, which is exactly
+    /// the fact that makes a place stop being a name for it.
+    /// </para>
+    /// <para>
+    /// <b>WHAT WOULD REFUTE THE IDENTITY READING, SAID BEFORE THIS RUNS: if the landmark
+    /// groups survive drift, adhesion is following the thing through its move and the
+    /// individual is real; if they collapse or scatter, what was recovered was the place and
+    /// the earlier reading is a conjunction wearing identity's clothes.</b> The score is the
+    /// second column — a place category can only predict a thing's hidden attribute while
+    /// nobody else has stood there.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_what_continuity_recovers_survives_the_thing_moving()
+    {
+        const double Adhesion = 1.5;
+
+        var fixedPlace = World(twinned: true, tagged: false, placed: true, wandering: 0.8);
+
+        var lift = new Dictionary<double, double>();
+        var shrunk = new Dictionary<double, double>();
+
+        foreach (var drifting in new[] { 0.0, 0.005, 0.02 })
+        {
+            var settings = World(
+                twinned: true, tagged: false, placed: true, wandering: 0.8, drifting: drifting);
+
+            var byTime = Alternating.Over(
+                Watched(settings, seed: 1), Adhesion, floor: 20, span: 1);
+
+            var places = On(byTime, 25);
+
+            var sorted = Cell(settings, "  folded and judged", new Sorting(byTime), Recasting.Judged);
+            var plain = Cell(settings, "  no categories", seed: 1);
+
+            lift[drifting] = sorted.Exam - plain.Exam;
+            shrunk[drifting] = plain.Held / (double)sorted.Held;
+
+            output.WriteLine(
+                $"drift {drifting:F3} | {places.Count,2} landmark groups of "
+                + $"{string.Join(",", places.Select(one => one.Count).Distinct().Order())} "
+                + $"| exam {sorted.Exam:F3} against {plain.Exam:F3} "
+                + $"| held {sorted.Held} against {plain.Held}");
+        }
+
+        // THE INSTRUMENT FIRST: at no drift this must reproduce the eight groups of four the
+        // arm above found, or a place that CAN move changed the world where it was set not
+        // to and every row here is about something else.
+        var control = On(Alternating.Over(
+            Watched(fixedPlace, seed: 1), Adhesion, floor: 20, span: 1), 25);
+
+        Assert.True(control.Count == 8 && control.All(one => one.Count == 4),
+            $"the no-drift control found {control.Count} landmark groups of sizes "
+            + $"{string.Join(",", control.Select(one => one.Count).Distinct().Order())}, so "
+            + "adding a place that can move changed the world where it was set not to move");
+
+        // AND THE FINDING, WHICH REFUTES THE READING THE ARM ABOVE INVITES. The groups
+        // SURVIVE drift at eight of four -- and they have to, because eight places hold four
+        // codes each whoever is standing in them. What the group count cannot say, the score
+        // does: the category stops predicting the moment its members stop belonging to one
+        // thing, and at the higher drift it is worse than holding no category at all.
+        //
+        // SO WHAT ADHESION RECOVERS IS A PERSISTENT SOURCE OF CODES AND NEVER AN INDIVIDUAL.
+        // Where a thing never moves the two are the same set and the reading above is what a
+        // thing is worth; where it moves they come apart, and the place is what was found.
+        // That is this world's own doc arriving on time: a fixed landmark is pinned by a
+        // conjunction, which is rung one and was built long ago.
+        // AND THE FIXED-PLACE ROW IS A CONTROL ON THE POPULATION RATHER THAN ON THE SCORE,
+        // because that cell answers everything with or without a category. Reading it as a
+        // lift is the mistake this line exists to have already made: the two are 1.000
+        // against 1.000, and what the category buys there is 40 rules against 180.
+        Assert.True(shrunk[0.0] > 3.0,
+            $"the fixed-place cell held a {shrunk[0.0]:F1}x smaller population with the "
+            + "category, so the control that makes the drifting rows readable is not there");
+
+        // THE TRIPWIRE. If a drifting cell ever lifts, adhesion has started following a thing
+        // THROUGH its move, an individual is reachable after all, and every sentence above
+        // about a persistent source is owed a re-take.
+        Assert.True(lift[0.02] < 0.05,
+            $"the drifting cell lifted {lift[0.02]:+0.000;-0.000} over no category, so "
+            + "continuity is tracking a thing through a move and what this file calls a "
+            + "place is an individual");
     }
 }

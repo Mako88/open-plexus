@@ -75,7 +75,7 @@ condition that would revive them.
 | what it must do | how, now | what stands in the way |
 |---|---|---|
 | Understand concepts | The commitment: a scope that predicts, and is wrong about something specific | Nothing yet answers what a concept IS here beyond a code that fires |
-| A concept a thing in its own right | `Code`. A commitment's identity is one, and adhesion over an ordered stream reaches one group a THING | The derivation is the experimenter's; no front end runs it on its own stream |
+| A concept a thing in its own right | `Code`. A commitment's identity is one, and adhesion reaches one group a persistent SOURCE | Nothing tracks a source through a CHANGE, so a thing that moves is a new one |
 | Every input an attribute of it | Nothing | Rung five names what co-fires and has never been run across two modalities |
 | Relations are concepts too | A commitment IS a relation and carries a code, so relations nest | A relation naming no ARGUMENT is rung four, a different matcher rather than a rung |
 | Concept and label independent | Concept-before-label is measured; alternation groups things with no word | Label-first is unbuilt — being told a word for a thing nothing else is known about |
@@ -296,16 +296,20 @@ exercise. One line a capability, and the status is the whole point of the row.
 - **AND CO-FIRING BINDS WHAT IS SIMULTANEOUS AND NEVER WHAT PERSISTS.** A ball at two moments
   does not co-occur with itself, so no amount of it reaches the same thing seen twice. That
   is minting an individual, by another road.
-- **AND AN INDIVIDUAL IS A CATEGORY OVER ITS APPEARANCES ONCE THE STREAM HAS AN ORDER.** A
-  bag of moments reaches the PAIR, since twins are substitutable in every moment. Sightings
-  in RUNS put a thing's own codes beside each other in time and no twin's — eight groups of
-  four where space finds four of eight, at three seeds.
-- **SO WHAT SEPARATES THEM IS IN THE INPUT AND NOT IN ANY MOMENT OF IT**, which retires the
-  gate this list called the only route. Exclusion stays in the moment; company becomes
-  ADHESION, a pair turning up near each other more than chance would.
-- **AND THE DERIVED INDIVIDUAL BEATS A HANDED ONE**, 123 rules to 179 over three seeds
-  against 604 with no category, every cell at a perfect score. A given index still needs
-  conjoining with a look; a derived one absorbs the rules that named its members.
+- **AND WHAT SEPARATES TWO SUBSTITUTABLE THINGS IS IN THE INPUT AND NOT IN ANY MOMENT OF
+  IT.** Sightings in RUNS put a thing's own codes beside each other in time and no twin's,
+  so ADHESION recovers eight groups of four where shared company finds four of eight, at
+  three seeds.
+- **AND IT PAYS AGAINST BEING TOLD**, 123 rules to a handed index's 179 over three seeds
+  against 604 with no category, every cell perfect. A given index still needs conjoining
+  with a look; this absorbs the rules that named its members.
+- **BUT WHAT IT RECOVERS IS A PERSISTENT SOURCE OF CODES AND NEVER AN INDIVIDUAL**, which
+  the same world says the moment things MOVE. The groups survive drift — eight places hold
+  four codes whoever stands in them — and the score does not, falling below holding no
+  category at all.
+- **SO A FIXED LANDMARK IS A CONJUNCTION, WHICH IS RUNG ONE AND WAS BUILT LONG AGO**, and
+  the identity reading was the cheaper explanation all along. Tracking a thing THROUGH a
+  change is what no derivation here reaches.
 - **SOMETHING TO BE WRONG ABOUT WHILE READING** — NOT BUILT, and it is why a primer moves no
   counter. A world that asks is one way and an action with a consequence is another; what is
   missing is any of them.
@@ -315,9 +319,9 @@ exercise. One line a capability, and the status is the whole point of the row.
 - **MUTUAL EXCLUSION, so a belief can be CONTRADICTED and not merely wrong** — NOT BUILT. A
   miss says *I expected Y and got Z*; nothing anywhere says Y and Z cannot both hold, which
   is the whole of what a conflict is.
-- **MINTING AN INDIVIDUAL** — DERIVED AND NOT ADMITTED. Adhesion over an ordered stream
-  reaches one group a THING, and a population folding it holds a third of what it held. What
-  is missing is a front end deriving its own, since the experimenter still runs it.
+- **MINTING AN INDIVIDUAL** — NOT BUILT, and adhesion reaches a persistent SOURCE rather
+  than a thing. Where a thing never moves the two are one set and it is worth a third of the
+  population; where it moves they come apart and the category costs.
 - **AND THE GRADIENT ALREADY COLLAPSED ONCE, IN THE STORE THAT HAS ONE.** The vote takes the
   narrowest every round and subsumption the general one every thousandth, so a second store
   needs an evidence rule the first lacked or it collapses the same way — repetition for a
@@ -1687,6 +1691,6 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **98** | John's: a concept forms BEFORE its label, so substitutability groups things with no word and the word later labels a category that already existed. THE PROBE PASSES on both categories and all three tasks, the category packed against one and the next thing out a third of the scale below. Closed, and fork 97 is unblocked |
 | **99** | John's: a conflict is two beliefs asserting different members of ONE category for the same key, which is the only route to retraction under counters that only rise. And malleability is the counters rather than a property — a per-belief weight is where the human puts the answer in. Open |
 | **105** | John's: a relation is a category too, so does building categories RETIRE two-hole anti-unification? Half yes — a category over the arguments says *people are in rooms* more narrowly than a hole does, and the never-co-occur gate is what a hole wanted anyway. What survives is BINDING, which is roles rather than unification. Open on roles |
-| **106** | John's: collapse categories over TIME as well as space. ANSWERED AND IT PAYS TWICE: ADHESION recovers one landmark group a THING where space finds one a PAIR, and a population folding those holds 123 rules to a handed index's 179 at three seeds. It replaces the gate. Open on a moving landmark |
+| **106** | John's: collapse categories over TIME as well as space. ANSWERED: ADHESION separates substitutable twins where shared company cannot, at 123 rules to a handed index's 179. LIMITED by the same world — it recovers a persistent SOURCE, so a thing that MOVES scores below no category. Open on tracking through a change |
 | **104** | The store's update rule is the experimenter's, so nothing can be wrong about it — which the architecture forbids of anything the brain is TOLD. What must settle is *this statement changes what is known about that thing*, and the only signal is the question at the end. Open |
 | **96** | A second hop, keyed on what the FIRST reading supplied. Two hops nearly triple the ceiling; a unioned chain converts none of it and BANDING BY HOP converts it, best arm on the two-fact task and clear of its marginal. Open at three facts |

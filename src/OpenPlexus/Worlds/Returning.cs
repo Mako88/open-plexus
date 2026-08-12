@@ -125,6 +125,30 @@ public sealed record ReturningSettings
     /// </remarks>
     public double Wandering { get; init; }
 
+    /// <summary>
+    /// How often a thing that is met has MOVED since it was last met — <b>the control that
+    /// says whether continuity recovers a thing or a place it happens to sit in.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THIS WORLD'S OWN DOC NAMES THE LIMIT AND THIS IS IT ARRIVING.</b> A landmark fixed
+    /// for the life of the world is pinned by a CONJUNCTION, which is rung one and built —
+    /// so recovering a thing from a fixed landmark is a claim about relations carrying
+    /// identity and not about anything tracking a thing through change.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS THE ONE ARM THAT COULD REFUTE WHAT ADHESION FOUND.</b> If a thing's
+    /// codes only adhere because the thing never moves, then what a derivation over an
+    /// ordered stream reaches is a PLACE — and a place is shared by whoever stands in it, so
+    /// it predicts a thing's hidden attribute exactly as long as nobody else has stood there.
+    /// </para>
+    /// <para>
+    /// <b>NOUGHT IS THE FIXED LANDMARK EVERY EARLIER READING WAS TAKEN UNDER</b>, and the
+    /// places are the things' own, so an alphabet's size never moves with this.
+    /// </para>
+    /// </remarks>
+    public double Drifting { get; init; }
+
     /// <summary>How many sightings are kept back and never drawn.</summary>
     public required int Withheld { get; init; }
 }
@@ -195,6 +219,10 @@ public sealed class Returning : IWorld<Coded>, IWithholds<Coded>
     /// <summary>Which appearance each thing wears, by thing — <b>twins share one.</b></summary>
     private readonly int[] _wearing;
 
+    /// <summary>Where each thing stands, by thing.</summary>
+    /// <inheritdoc cref="ReturningSettings.Drifting"/>
+    private readonly int[] _standing;
+
     private readonly List<Turn<Coded>> _kept = [];
 
     /// <summary>Which thing was met last, or -1 before anything has been.</summary>
@@ -213,6 +241,8 @@ public sealed class Returning : IWorld<Coded>, IWithholds<Coded>
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Withheld);
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Wandering);
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(settings.Wandering, 1.0);
+        ArgumentOutOfRangeException.ThrowIfNegative(settings.Drifting);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(settings.Drifting, 1.0);
 
         if (settings.Twinned && settings.Things % 2 != 0)
             throw new ArgumentException(
@@ -225,9 +255,14 @@ public sealed class Returning : IWorld<Coded>, IWithholds<Coded>
 
         _hidden = new int[settings.Things];
         _wearing = new int[settings.Things];
+        _standing = new int[settings.Things];
 
         for (var thing = 0; thing < settings.Things; thing++)
         {
+            // EACH THING IN ITS OWN PLACE TO BEGIN WITH, so a world that never drifts is
+            // bit-identical to the one that had no places to stand in at all.
+            _standing[thing] = thing;
+
             // TWINS WEAR ONE APPEARANCE AND CARRY DIFFERENT ANSWERS, which is the whole
             // construction. Untwinned, a thing's appearance is its own and the look is a
             // complete key -- so the two arms differ in exactly one fact about the world
@@ -298,8 +333,15 @@ public sealed class Returning : IWorld<Coded>, IWithholds<Coded>
         // every time would make the relation sharper than the appearance it is being
         // compared against, and the comparison would be about the noise rather than about
         // what the two channels can carry.
+        // AND IT MAY HAVE MOVED SINCE IT WAS LAST MET, which is drawn per SIGHTING rather
+        // than per round -- a thing nobody is looking at has no sightings to be inconsistent
+        // between, so moving it then would be a change the stream could never show.
+        if (_settings.Drifting > 0.0 && _sightings.NextDouble() < _settings.Drifting)
+            _standing[thing] = _sightings.Next(_settings.Things);
+
         if (_settings.Placed)
-            look.Add(Kinds.Pick(Beside, thing, _settings.CodesPerAttribute, _sightings));
+            look.Add(Kinds.Pick(
+                Beside, _standing[thing], _settings.CodesPerAttribute, _sightings));
 
         if (_settings.Tagged) look.Add(Kinds.Pick(Named, thing, 1, _sightings));
 

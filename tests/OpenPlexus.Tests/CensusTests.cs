@@ -231,6 +231,7 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Where_the_wrong_answers_come_from()
     {
         output.WriteLine("outvoted — a sound rule for the right answer fired and lost");
@@ -300,6 +301,7 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Where_the_wrong_answers_come_from_on_a_world_with_a_known_ceiling()
     {
         foreach (var puzzle in new[] { Puzzle.One, Puzzle.Two, Puzzle.Three })
@@ -342,6 +344,7 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void The_uncovered_bucket_empties_as_the_true_rules_arrive()
     {
         foreach (var (address, surprising) in new[]
@@ -399,6 +402,7 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_the_two_genesis_gates_do_to_the_uncovered_bucket()
     {
         foreach (var (address, skew) in new[] { (2, 0.0), (3, 0.0), (2, 0.8), (3, 0.8) })
@@ -456,6 +460,7 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void When_genesis_stops_minting()
     {
         foreach (var (address, skew) in new[] { (2, 0.0), (2, 0.8), (3, 0.8) })
@@ -503,6 +508,7 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Which_failures_the_vote_leaves_behind_on_the_skewed_world()
     {
         // ONE ARM NOW, WHERE THIS ONCE CROSSED THREE. Two of them lost and are deleted, so

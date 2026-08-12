@@ -592,6 +592,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_a_second_supporting_fact_is_even_in_the_room()
     {
         foreach (var task in new[] { 1, 2, 3 })
@@ -1251,6 +1252,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Which_word_is_worth_predicting()
     {
         foreach (var task in new[] { 1, 2 })

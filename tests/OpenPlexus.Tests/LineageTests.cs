@@ -153,6 +153,7 @@ public sealed class LineageTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_the_arms_that_pay_are_the_arms_that_redirect_blame()
     {
         var arms = new (string Name, CommittingSettings Dials)[]
@@ -239,6 +240,7 @@ public sealed class LineageTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void How_blame_and_coverage_fall_together_as_the_world_tilts()
     {
         output.WriteLine($"=== 6 bits, {Seeds} seeds, blame share is the minority's");

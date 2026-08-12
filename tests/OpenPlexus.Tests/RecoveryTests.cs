@@ -514,6 +514,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     }
 
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_the_operators_do_in_the_five_thousand_rounds_after_a_flip()
     {
         // TWO ACCOUNTS OF SLOW RECOVERY ARE DEAD AND THIS PARTITIONS WHAT IS LEFT. The old

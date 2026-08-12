@@ -111,6 +111,7 @@ public sealed class RefusalTests(ITestOutputHelper output)
     /// <b>THE READING: which gate is deciding the run.</b>
     /// </summary>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Where_repairs_die()
     {
         output.WriteLine("of every firing commitment that expected the wrong thing —");

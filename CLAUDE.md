@@ -50,9 +50,11 @@ Everything else keeps rolling.
 
 **Run the structural guards locally every commit, as their own command.** `DocsTests`,
 `DeadCodeTests`, `DuplicationTests`, `DialTests`, `SeparationTests`, `InertDialTests`,
-`SweepListTests` and `ShardTests` take seconds and go red for changes that look unrelated.
-`ShardTests` is the one that fails when a test class lands in two CI shards or in none, and
-a class in none is green forever because nothing ever asked it. Never chain the
+`SweepListTests`, `ShardTests` and `CheckingTests` take seconds and go red for changes that
+look unrelated. `ShardTests` is the one that fails when a test class lands in two CI shards
+or in none, and a class in none is green forever because nothing ever asked it.
+`CheckingTests` is the one that fails when a `[Fact]` prints a row and cannot fail — a
+measurement wearing a test's clothes, which runs on every push and checks nothing. Never chain the
 check into the commit — that has produced red commits more than once. Rebuild before running
 with `--no-build`, or the binary under test is the one from before the edit.
 

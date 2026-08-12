@@ -34,6 +34,7 @@ public sealed class SeedingTests(ITestOutputHelper output)
     /// <b>THE ONE-CODE POPULATION, SPLIT BY WHAT IT EXPECTS.</b>
     /// </summary>
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Which_outcome_the_seeds_genesis_never_mints_belong_to()
     {
         output.WriteLine("roots: resident commitments whose scope is a single code");

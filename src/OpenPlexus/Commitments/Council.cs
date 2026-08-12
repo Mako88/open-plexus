@@ -32,6 +32,10 @@ public readonly record struct Learnt
     /// has cost this project three sessions already.
     /// </remarks>
     public required long Widened { get; init; }
+
+    /// <summary>Coarser commitments proposed by the rewrite.</summary>
+    /// <inheritdoc cref="Widened"/>
+    public required long Recast { get; init; }
 }
 
 /// <summary>
@@ -225,7 +229,7 @@ public sealed class Alone : ICouncil
 
         at = Mark(ref _settling, at);
 
-        long subsumed = 0, widened = 0;
+        long subsumed = 0, widened = 0, recast = 0;
 
         // THE SWEEP IS NOT PART OF FAILING, and it sat inside the failure branch for the
         // whole of step one. Once the learner is right most of the time, the chance of a
@@ -244,6 +248,12 @@ public sealed class Alone : ICouncil
             // thousand rounds later, with its parent still deciding in the meantime.
             widened = _held.Widen();
 
+            // AND THE REWRITE BESIDE IT, FOR THE IDENTICAL REASON. A recast claim is judged
+            // by whether it absorbs the rule it came from, so proposing it after `Subsume`
+            // would leave it unjudged until the next sweep with its specific still deciding.
+            // Both propose and neither removes; subsumption is the one judge of both.
+            recast = _held.Recast();
+
             subsumed = _held.Subsume();
             _held.Abstract(heard);
             _held.Cull();
@@ -256,7 +266,7 @@ public sealed class Alone : ICouncil
         // something to have arrived; no repair, because blame needs a failure. A monotone
         // counter cannot retract a slur.
         if (arrived is not { } outcome)
-            return new Learnt { Minted = 0, Repaired = 0, Subsumed = subsumed, Widened = widened };
+            return new Learnt { Minted = 0, Repaired = 0, Subsumed = subsumed, Widened = widened, Recast = recast };
 
         long repaired = 0;
 
@@ -271,7 +281,7 @@ public sealed class Alone : ICouncil
         at = Mark(ref _mending, at);
 
         if (!wrong)
-            return new Learnt { Minted = 0, Repaired = repaired, Subsumed = subsumed, Widened = widened };
+            return new Learnt { Minted = 0, Repaired = repaired, Subsumed = subsumed, Widened = widened, Recast = recast };
 
         // COVERING RUNS ONLY ON A FAILURE AND IS NOT MOVED WITH REPAIR. Genesis mints per
         // live code, so running it every round walks the whole `code -> outcome` space --
@@ -288,7 +298,7 @@ public sealed class Alone : ICouncil
 
         Mark(ref _mending, at);
 
-        return new Learnt { Minted = minted, Repaired = repaired, Subsumed = subsumed, Widened = widened };
+        return new Learnt { Minted = minted, Repaired = repaired, Subsumed = subsumed, Widened = widened, Recast = recast };
     }
 
     private static double Milliseconds(long ticks) =>

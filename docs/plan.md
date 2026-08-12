@@ -280,9 +280,14 @@ exercise. One line a capability, and the status is the whole point of the row.
   wrong SHAPE: it names what CO-FIRES, and alternatives never do.
 - **AND EXCLUSION PLUS SHARED COMPANY RECOVERS THEM FROM THE MOMENTS ALONE**, with no world
   table, no vocabulary and no outcome read.
-- **BUT A CATEGORY IN THE MOMENT IS NOT A REWRITE OF THE RULES, WHICH IS WHERE THE
-  COMPRESSION WENT.** The plain code stays beside it, so genesis still roots on the plain one
-  — fork 85, arriving from a new direction.
+- **AND THE COMPRESSION IS THERE AND WAS BEHIND A JUDGE RATHER THAN A REWRITE.** Genesis
+  roots on a category code like any other, so the coarse rule already existed and nothing
+  could see that a member's rule is narrower. 606 rules folded, **196** once the entailment
+  is judged, over three seeds.
+- **SO PROPOSING THE COARSE CLAIM COSTS RULES INSTEAD OF SAVING THEM**, 256 from every
+  experienced rule and 207 from two agreeing. A recast needs a fresh record and must fire
+  before it can be judged, and the claim was already reachable — fork 85 answered against
+  the operator it asked for.
 - **AND IT IS LOAD-BEARING TWICE OVER NOW, WHICH RAISES WHAT IT IS WORTH.** The same
   never-co-occur test is rung four's admission gate, so building it once pays for two rungs.
 - **ONE CONCEPT REACHED BY SEVERAL SENSES** — NOT BUILT, and the mechanism already exists.
@@ -1614,7 +1619,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **82** | The answer key had to learn the coarse alphabet before the arm ran, or it would have scored its own subject unsound. Done: a code that pins nothing is passed over by both the enumeration and the checkability test. Closed |
 | **83** | Project each scope code to its COARSER form when counting pairs, so scopes pinning different address bits share the positions. Test the REWRITE first: a name no scope can be said in is a word with no referent |
 | **84** | A coarser view of a code is the front end's business, so `IQuantizer` must answer *what is the coarser form of this one*. Handed in once, and the first thing a world tells the brain about its alphabet |
-| **85** | A coarse name can only enter a scope as a NEW claim with a fresh record, since projecting a rewrite would change what a rule says. That is widening aimed by a name, which joins this rung to the reach operator |
+| **85** | A coarse name enters a scope as a NEW claim, since a rewrite would change what a rule says. ANSWERED SIDEWAYS: where the moment carries the category, genesis already mints that claim and the rewrite is redundant. What was missing was SUBSUMPTION reading the entailment — 606 rules to 196. Open where no moment carries it |
 | **37** | The repair budget's interior optimum was the ballot and does not survive a best-advocate vote. And `Mending.Uncovered` is two mechanisms — a gate plus every-round repair — where the gate alone is far worse than no gate at all. Open |
 | **38** | Spreading a reading over its range costs most of the score at both front ends. Is that fragmentation, or the search the extra codes buy? Open |
 | **39** | A reading under about ten dimensions has too few distinct wirings for a projection to expand into. Population coding has a floor, and it is not documented anywhere. Open |
@@ -1674,7 +1679,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **100** | Is reading real English predictive enough to teach this learner? Fork 91's *informative implies unpredictable* is bAbI's property and inverts on Tatoeba. bAbI is disqualified as a primer besides — its held-out half is all re-reading. Open on what the learner converts |
 | **90** | John's: is there a standardised comprehension exam that separates understanding from regurgitation? bAbI already is one at this rung. What is unpriced is the tier above — school exams and the passages built so the wrong answer is the one present verbatim. Open, and blocked until the components pass |
 | **88** | The front end intersects the question with EACH statement. `Joining.Addressed` ANSWERS TASK ONE OUTRIGHT where the bag sits near the marginal, and falls to the base rate at two supporting facts — at its ceiling there too, so one hop is all it reaches and the learner never failed. Closed; fork 96 carries the reach |
-| **97** | John's: a category is the set of codes that are ALTERNATIVES. PRICED, and now DERIVED — exclusion plus shared company recovers what a thing wears from the moments alone. Two limits came with it: substitutability reaches a kind and never an individual, and a category compresses nothing without a rewrite. Open on the rewrite |
+| **97** | John's: a category is the set of codes that are ALTERNATIVES. PRICED, and DERIVED — exclusion plus shared company recovers what a thing wears from the moments alone. Its second limit is lifted: a category cuts the population 3.1x once subsumption reads the entailment. Open on the individual, which substitutability reaches never |
 | **98** | John's: a concept forms BEFORE its label, so substitutability groups things with no word and the word later labels a category that already existed. THE PROBE PASSES on both categories and all three tasks, the category packed against one and the next thing out a third of the scale below. Closed, and fork 97 is unblocked |
 | **99** | John's: a conflict is two beliefs asserting different members of ONE category for the same key, which is the only route to retraction under counters that only rise. And malleability is the counters rather than a property — a per-belief weight is where the human puts the answer in. Open |
 | **105** | John's: a relation is a category too, so does building categories RETIRE two-hole anti-unification? Half yes — a category over the arguments says *people are in rooms* more narrowly than a hole does, and the never-co-occur gate is what a hole wanted anyway. What survives is BINDING, which is roles rather than unification. Open on roles |

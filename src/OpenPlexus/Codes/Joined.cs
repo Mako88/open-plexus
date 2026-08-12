@@ -314,7 +314,7 @@ public sealed class Joined : IQuantizer<Asking>
     public const byte Sorted = 43;
 
     private readonly Joining _joining;
-    private readonly IReadOnlyList<IReadOnlySet<Code>> _categories;
+    private readonly Sorting _categories;
     private readonly int _hops;
     private readonly bool _banded;
     private readonly int _resolution;
@@ -367,7 +367,7 @@ public sealed class Joined : IQuantizer<Asking>
         ArgumentOutOfRangeException.ThrowIfNegative(resolution);
 
         _joining = joining;
-        _categories = categories ?? [];
+        _categories = new Sorting(categories ?? []);
         _hops = hops;
         _banded = banded;
         _resolution = resolution;
@@ -383,17 +383,17 @@ public sealed class Joined : IQuantizer<Asking>
         var said = new HashSet<Code>(observation.Words);
         said.UnionWith(observation.Question);
 
-        if (_joining == Joining.Recent) return Sorting(Banding(said, observation));
+        if (_joining == Joining.Recent) return _categories.Folded(Banding(said, observation));
 
-        if (_joining == Joining.Distinguished) return Sorting(Situating(observation));
+        if (_joining == Joining.Distinguished) return _categories.Folded(Situating(observation));
 
-        if (_joining == Joining.Addressed) return Sorting(Addressing(said, observation));
+        if (_joining == Joining.Addressed) return _categories.Folded(Addressing(said, observation));
 
-        if (_joining == Joining.Chained) return Sorting(Chaining(said, observation));
+        if (_joining == Joining.Chained) return _categories.Folded(Chaining(said, observation));
 
-        if (_joining == Joining.Resolved) return Sorting(Storing(said, observation));
+        if (_joining == Joining.Resolved) return _categories.Folded(Storing(said, observation));
 
-        if (_joining == Joining.Bagged) return Sorting(said);
+        if (_joining == Joining.Bagged) return _categories.Folded(said);
 
         // THE INTERSECTION IS TAKEN OVER THE HALVES AND NEVER OVER THE UNION, which reads
         // as pedantry until the union has already lost the distinction. Every code in the
@@ -412,39 +412,7 @@ public sealed class Joined : IQuantizer<Asking>
         if (_joining == Joining.Named) foreach (var one in shared) said.Add(new Code(Both, one.Value));
         else said.Add(Coincided);
 
-        return Sorting(said);
-    }
-
-    /// <summary>
-    /// The moment with a code added for every category any of whose members is in it.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>ANY AND NEVER ALL, WHICH IS THE WHOLE DIFFERENCE FROM RUNG FIVE.</b> The members
-    /// are alternatives and by construction never co-occur, so a fold demanding all of them
-    /// would fire on nothing at all. <b>The plain code stays beside the category</b>, because
-    /// emitting only the category would make <i>mary</i> and <i>john</i> the same word — and
-    /// a general rule is worth having only while a particular one is still sayable, which is
-    /// the specificity gradient this repo has been circling.
-    /// </para>
-    /// <para>
-    /// <b>ONE PASS AND NOT A FIXED POINT, unlike <c>Naming.Fold</c>.</b> A category
-    /// over categories is expressible and nothing mints one yet, so iterating would be
-    /// machinery with no caller — and a loop that cannot turn twice is a loop written for a
-    /// mechanism that does not exist.
-    /// </para>
-    /// </remarks>
-    private HashSet<Code> Sorting(HashSet<Code> moment)
-    {
-        foreach (var category in _categories)
-            foreach (var member in category)
-                if (moment.Contains(member))
-                {
-                    moment.Add(Category(category));
-                    break;
-                }
-
-        return moment;
+        return _categories.Folded(said);
     }
 
     /// <summary>What a category of these members is called, on every machine, forever.</summary>

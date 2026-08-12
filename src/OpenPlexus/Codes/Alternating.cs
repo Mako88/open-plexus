@@ -155,36 +155,19 @@ public static class Alternating
 /// </remarks>
 /// <param name="inner">The front end this wraps.</param>
 /// <param name="categories">
-/// Sets of codes that are ALTERNATIVES. <b>Derived by <see cref="Alternating.From"/> or
-/// handed over as a ceiling</b>, and the difference between those two is the whole of what
-/// a grid using this is measuring.
+/// The vocabulary of alternatives. <b>The SAME object the population is handed</b>, since a
+/// category the front end folds and one the brain may rewrite over have to be the same code
+/// or the rewrite names something no moment ever holds.
 /// </param>
-public sealed class Sorted<TObservation>(
-    IQuantizer<TObservation> inner, IReadOnlyList<IReadOnlySet<Code>> categories)
+public sealed class Sorted<TObservation>(IQuantizer<TObservation> inner, Sorting categories)
     : IQuantizer<TObservation>
 {
     /// <inheritdoc/>
     public byte Modality => inner.Modality;
 
     /// <inheritdoc/>
-    public IReadOnlyCollection<Code> Codify(TObservation observation)
-    {
-        var moment = new HashSet<Code>(inner.Codify(observation));
-
-        // ANY AND NEVER ALL, AND THE PLAIN CODE STAYS BESIDE THE CATEGORY. Members are
-        // alternatives and by construction never co-occur, so a fold demanding all of them
-        // would fire on nothing -- and emitting only the category would make two members the
-        // same code, which is the specificity gradient collapsed at the front end.
-        foreach (var category in categories)
-            foreach (var member in category)
-                if (moment.Contains(member))
-                {
-                    moment.Add(Joined.Category(category));
-                    break;
-                }
-
-        return moment;
-    }
+    public IReadOnlyCollection<Code> Codify(TObservation observation) =>
+        categories.Folded(new HashSet<Code>(inner.Codify(observation)));
 
     /// <inheritdoc/>
     public IReadOnlyDictionary<Code, int>? Bind(TObservation observation) => inner.Bind(observation);

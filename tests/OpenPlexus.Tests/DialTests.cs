@@ -190,6 +190,17 @@ public sealed class DialTests(ITestOutputHelper output)
             + "exactly where the failure is total, so it is not the cause there "
             + "either. Not a level; nothing to hunt",
 
+        ["Recasting"] =
+            "fork 85. WHETHER a category may take a member's place in a scope, "
+            + "and on WHOSE evidence -- one experienced rule or two reaching the "
+            + "same coarse claim. NOT A LEVEL: whether a coarse name may enter a "
+            + "rule at all is not a quantity, and the pair is the same shape as "
+            + "`Widening`'s for the same reason. Measured ON from the baseline "
+            + "every earlier number was taken under. There is nothing for a "
+            + "controller to hunt until a run can say which grain a rule wanted, "
+            + "and the only thing that could say so is the subsumption bar that "
+            + "already judges both",
+
         ["Widening"] =
             "the ladder's other direction. It began as a mechanism against its own "
             + "absence and is two rules that do something now, because the failure "
@@ -741,6 +752,14 @@ public sealed class DialTests(ITestOutputHelper output)
         // deletion was pre-registered costs nothing to try, so the budget this file keeps is
         // a budget on dials that STAY -- which is the only version of it that does not make
         // measuring an idea more expensive than not measuring it.
-        Assert.Equal(27, HandSet.Count);
+        //
+        // AND TWENTY-EIGHT IS `Recasting`, WHICH IS FORK 85 ARRIVING AS AN ARM AND ALREADY
+        // CARRYING ITS OWN DELETION. It ships OFF, so every number recorded before it stands
+        // and it is measured on from a known baseline. Its three positions are not a
+        // gradient: one lets subsumption READ a category's entailment, and two propose the
+        // coarse claim on different evidence -- and the first reading says the judge is the
+        // whole of the mechanism, so the honest end of this row is the two proposing
+        // positions going and the count falling to twenty-seven with them.
+        Assert.Equal(28, HandSet.Count);
     }
 }

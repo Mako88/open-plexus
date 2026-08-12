@@ -146,6 +146,9 @@ public enum Birth
 
     /// <summary>The same claim said shorter, after a name was minted.</summary>
     Renamed,
+
+    /// <summary>A category took a member's place, as a new claim with no record.</summary>
+    Recast,
 }
 
 /// <summary>How a commitment stopped being held.</summary>
@@ -206,6 +209,9 @@ public readonly record struct Lifetime
     /// <inheritdoc cref="Birth.Renamed"/>
     public long Reborn { get; init; }
 
+    /// <inheritdoc cref="Birth.Recast"/>
+    public long Recast { get; init; }
+
     /// <inheritdoc cref="Loss.Subsumed"/>
     public long Subsumed { get; init; }
 
@@ -252,7 +258,7 @@ public readonly record struct Lifetime
     public long Searched { get; init; }
 
     /// <summary>Everything that ever entered at this shape.</summary>
-    public long Born => Covered + Repaired + Widened + Reborn;
+    public long Born => Covered + Repaired + Widened + Reborn + Recast;
 
     /// <summary>Everything that ever left it.</summary>
     public long Lost => Subsumed + Culled + Rewritten;
@@ -500,6 +506,31 @@ public sealed class Population
     /// </remarks>
     public Func<Commitment, bool>? Places { get; set; }
 
+    /// <summary>
+    /// Which codes are ALTERNATIVES, or nothing where the front end has not said.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE SAME OBJECT THE FRONT END FOLDS, AND THAT IS A REQUIREMENT RATHER THAN A
+    /// CONVENIENCE.</b> A category reaches a moment only because <see cref="Sorting.Folded"/>
+    /// put it there, so a population handed a different vocabulary would recast its rules
+    /// over codes no moment ever holds — rules that are never wrong because they never fire,
+    /// which is the shape every instrument here is worst at seeing.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS TOLD RATHER THAN DERIVED, WHICH IS FORK 84'S SEAM AND NOT A HOLE.</b>
+    /// What the coarser form of a code is is a fact about how a stream is being read; what
+    /// may be DONE with it is the brain's, and is <see cref="Recast"/> and
+    /// <see cref="Subsume"/>. A category the brain cannot be wrong about would be installed
+    /// in it — a recast claim carries its own record precisely so that it can be.
+    /// </para>
+    /// <para>
+    /// <b>NULL IS EVERY MEASUREMENT TAKEN BEFORE THIS EXISTED</b>, and it short-circuits
+    /// both readers, so a run without categories pays nothing for them.
+    /// </para>
+    /// </remarks>
+    public Sorting? Sorts { get; set; }
+
     /// <param name="dials">Every number the machinery is allowed to have.</param>
     /// <param name="seed">The control arm's generator, used only when it is running.</param>
     public Population(CommittingSettings dials, int seed)
@@ -568,6 +599,7 @@ public sealed class Population
             Birth.Covered => life with { Covered = life.Covered + 1 },
             Birth.Repaired => life with { Repaired = life.Repaired + 1 },
             Birth.Widened => life with { Widened = life.Widened + 1 },
+            Birth.Recast => life with { Recast = life.Recast + 1 },
             _ => life with { Reborn = life.Reborn + 1 },
         };
     }
@@ -1279,6 +1311,107 @@ public sealed class Population
         return widened;
     }
 
+    /// <summary>
+    /// Proposes each experienced commitment with one member swapped for its category —
+    /// <b>the rewrite, and the only thing here that makes a scope say MORE.</b>
+    /// </summary>
+    /// <returns>How many were new.</returns>
+    /// <remarks>
+    /// <para>
+    /// <b>A NEW CLAIM WITH A FRESH RECORD, WHICH IS FORK 85'S WHOLE CONTENT.</b>
+    /// <see cref="Abstract"/> may carry a record across its rewrite because a minted name is
+    /// entailed by its members and the claim is unchanged; a category is entailed by ANY
+    /// member, so the recast scope fires where the old one never did. Carrying the evidence
+    /// would keep a rule's record while changing what it says.
+    /// </para>
+    /// <para>
+    /// <b>AND IT ADDS WITHOUT REMOVING, exactly as <see cref="Widen"/> does.</b> The specific
+    /// keeps its counts and its place, and <see cref="Subsume"/> is what takes it once the
+    /// coarse claim is at least as accurate — which is also why the coarse one has to have
+    /// fired <see cref="CommittingSettings.Floor"/> times before it can absorb anything.
+    /// </para>
+    /// <para>
+    /// <b>THE FRONT END HAS TO BE FOLDING THE SAME VOCABULARY OR THIS MINTS RULES THAT NEVER
+    /// FIRE.</b> A category code reaches a moment only because <see cref="Sorting.Folded"/>
+    /// put it there, so <see cref="Sorts"/> and the front end's must be the one object. Null
+    /// is every measurement taken before this existed.
+    /// </para>
+    /// </remarks>
+    public int Recast()
+    {
+        if (_dials.Recasting is Recasting.Never or Recasting.Judged || Sorts is null) return 0;
+
+        // A COPY, BECAUSE `Add` WRITES TO WHAT THIS WALKS -- see `Widen`, which takes one
+        // for the same reason.
+        var eligible = All.Where(one => one.Seen >= _dials.Floor).ToList();
+
+        var counted = _dials.Recasting == Recasting.Agreed ? Reaching(eligible) : null;
+
+        var recast = 0;
+
+        foreach (var one in eligible)
+            foreach (var proposed in Coarsened(one))
+            {
+                if (counted is not null
+                    && (!counted.TryGetValue(proposed.Identity, out var from) || from < 2))
+                    continue;
+
+                // THE PLACEMENT GATE AGAIN, FOR `Widen`'S REASON. A recast scope has a
+                // different minimum code, so a fleet would otherwise mint the same
+                // generalisation on every holder that could see a member's rule.
+                if (Places is not null && !Places(proposed)) continue;
+
+                if (!Add(proposed)) continue;
+
+                Born(proposed, Birth.Recast);
+                recast++;
+            }
+
+        return recast;
+    }
+
+    /// <summary>The same claim, once with each member of a category swapped for it.</summary>
+    /// <param name="one">What to recast.</param>
+    /// <remarks>
+    /// <b>ONE MEMBER AT A TIME, AND A SCOPE ALREADY HOLDING THE CATEGORY IS PASSED OVER.</b>
+    /// Swapping both members of a two-member scope in one step proposes a claim two
+    /// generalisations away from anything with a record, and a scope holding <i>this look</i>
+    /// beside <i>that kind of look</i> already says both grains — recasting it would shorten
+    /// it, which is <see cref="Widen"/>'s business and not this one's.
+    /// </remarks>
+    private IEnumerable<Commitment> Coarsened(Commitment one)
+    {
+        foreach (var member in one.Scope)
+        {
+            if (Sorts!.Coarser(member) is not { } category) continue;
+
+            if (one.Scope.Contains(category)) continue;
+
+            yield return new Commitment(
+                [.. one.Scope.Select(code => code == member ? category : code)], one.Expects);
+        }
+    }
+
+    /// <summary>How many eligible commitments each recast would come from.</summary>
+    /// <param name="eligible">Everything that could be recast at all.</param>
+    /// <remarks>
+    /// <b>KEYED ON THE RECAST CLAIM'S IDENTITY, WHICH IS WHY IT NEEDS NO PAIRWISE WALK</b> —
+    /// see <see cref="Agreement"/>, which counts the same way for the same reason. Two rules
+    /// pinning different members of one category and expecting the same thing reach the same
+    /// recast scope, and a scope's identity is a hash of itself.
+    /// </remarks>
+    private Dictionary<Code, int> Reaching(IEnumerable<Commitment> eligible)
+    {
+        var counted = new Dictionary<Code, int>();
+
+        foreach (var one in eligible)
+            foreach (var proposed in Coarsened(one))
+                counted[proposed.Identity] =
+                    counted.TryGetValue(proposed.Identity, out var already) ? already + 1 : 1;
+
+        return counted;
+    }
+
     /// <summary>Whether anything could ever propose a shorter version of this.</summary>
     /// <param name="one">The commitment being considered.</param>
     /// <remarks>
@@ -1446,7 +1579,7 @@ public sealed class Population
 
         foreach (var specific in experienced)
             foreach (var general in experienced)
-                if (specific.Narrows(general) && Absorbs(general, specific))
+                if (Under(specific, general) && Absorbs(general, specific))
                 {
                     doomed.Add(specific);
                     break;
@@ -1455,6 +1588,66 @@ public sealed class Population
         foreach (var one in doomed) Remove(one, Loss.Subsumed);
 
         return doomed.Count;
+    }
+
+    /// <summary>
+    /// Whether one commitment's scope entails another's, categories included.
+    /// </summary>
+    /// <param name="specific">The commitment that would go.</param>
+    /// <param name="general">The commitment that would stay.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>WITHOUT THIS THE REWRITE PROPOSES AND NOTHING EVER JUDGES.</b>
+    /// <see cref="Commitment.Narrows"/> is a subset test and wants a strictly longer scope,
+    /// so a recast claim — the same length, one code swapped — stands in no relation at all
+    /// to the rule it came from and both are held forever. The compression fork 85 is after
+    /// is precisely the specific being taken, so the entailment has to be readable at the
+    /// same grain the front end folds at.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS ONE-DIRECTIONAL BY CONSTRUCTION, WHICH IS WHAT STOPS TWO CLAIMS ABSORBING
+    /// EACH OTHER.</b> A member entails its category and a category entails no member, so
+    /// nothing that pins <i>this look</i> and nothing that pins <i>that kind</i> can each be
+    /// the other's specific. A pair that could would be added to <c>doomed</c> twice and both
+    /// removed, which is the claim disappearing rather than being generalised.
+    /// </para>
+    /// <para>
+    /// <b>NULL <see cref="Sorts"/> OR <see cref="Recasting.Never"/> IS EXACTLY THE OLD
+    /// TEST</b>, so every reading taken before categories existed is reproduced by this line
+    /// rather than beside it — and a run that folds categories into the moment without
+    /// turning this on is the control that says what the FOLD alone was worth.
+    /// </para>
+    /// </remarks>
+    private bool Under(Commitment specific, Commitment general)
+    {
+        if (specific.Narrows(general)) return true;
+
+        if (Sorts is null
+            || _dials.Recasting == Recasting.Never
+            || specific.Expects != general.Expects
+            || specific.Scope.Length < general.Scope.Length)
+            return false;
+
+        var coarsely = false;
+
+        foreach (var code in general.Scope)
+        {
+            if (specific.Scope.Contains(code)) continue;
+
+            var pinned = false;
+
+            foreach (var mine in specific.Scope)
+                if (Sorts.Coarser(mine) == code) { pinned = true; break; }
+
+            if (!pinned) return false;
+
+            coarsely = true;
+        }
+
+        // AT LEAST ONE CODE MET COARSELY, OR THIS IS THE SUBSET TEST ABOVE ANSWERING TWICE.
+        // Equal-length scopes that are subsets are the same scope, so without this a
+        // commitment would be its own specific and every resident would be doomed.
+        return coarsely;
     }
 
     /// <summary>

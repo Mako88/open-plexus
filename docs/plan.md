@@ -674,6 +674,12 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   measured and the matcher being priced and cheap.
 - **AND A VARIABLE NEEDS TWO PLACES IN THE MOMENT THAT CAN DISAGREE**, which no front end
   here emits — the question's words are unioned into the story's bag.
+- **AND JOHN'S QUESTION RETIRES MOST OF THE RUNG: a category over the ARGUMENTS says what a
+  hole says, more narrowly and with the gate built in.** *These are the people* beats
+  *whichever code of this modality*, and the gate a hole needs is that test anyway.
+- **SO WHAT SURVIVES IS BINDING AND NEVER THE VARIABLE.** A scope is a subset test, so a
+  moment holding two people and two rooms cannot say which is in which however it is named.
+  That is roles — fork 105.
 - **Rung five, and it goes up.** When several commitments share a sub-scope, mint a
   code for the shared part and rewrite them in terms of it.
 - **AND WHAT IT CAN NAME IS A SET, NEVER A VARIABLE.** The multiplexer's real
@@ -1671,5 +1677,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **97** | John's: a category is the set of codes that are ALTERNATIVES. PRICED, and now DERIVED — exclusion plus shared company recovers what a thing wears from the moments alone. Two limits came with it: substitutability reaches a kind and never an individual, and a category compresses nothing without a rewrite. Open on the rewrite |
 | **98** | John's: a concept forms BEFORE its label, so substitutability groups things with no word and the word later labels a category that already existed. THE PROBE PASSES on both categories and all three tasks, the category packed against one and the next thing out a third of the scale below. Closed, and fork 97 is unblocked |
 | **99** | John's: a conflict is two beliefs asserting different members of ONE category for the same key, which is the only route to retraction under counters that only rise. And malleability is the counters rather than a property — a per-belief weight is where the human puts the answer in. Open |
+| **105** | John's: a relation is a category too, so does building categories RETIRE two-hole anti-unification? Half yes — a category over the arguments says *people are in rooms* more narrowly than a hole does, and the never-co-occur gate is what a hole wanted anyway. What survives is BINDING, which is roles rather than unification. Open on roles |
+| **106** | John's: collapse categories over TIME as well as space. The derivation sees a bag of moments and no order, which is why substitutable twins merge — correlated sightings would separate them by trajectory where statistics cannot, and `Returning` draws uniformly so it cannot show this yet. May replace the gate fork 97's limit asks for. Open |
 | **104** | The store's update rule is the experimenter's, so nothing can be wrong about it — which the architecture forbids of anything the brain is TOLD. What must settle is *this statement changes what is known about that thing*, and the only signal is the question at the end. Open |
 | **96** | A second hop, keyed on what the FIRST reading supplied. Two hops nearly triple the ceiling; a unioned chain converts none of it and BANDING BY HOP converts it, best arm on the two-fact task and clear of its marginal. Open at three facts |

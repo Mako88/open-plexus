@@ -770,8 +770,8 @@ public sealed class Joined : IQuantizer<Asking>
     /// <para>
     /// <b>NOT THE ORDER OF THE WORDS, AND THE REASON CHANGED THE DAY RUNG THREE WAS
     /// BUILT.</b> It used to be that a sequence had nowhere to go —
-    /// <see cref="Sequencing"/> now takes one and turns it into a code, so handing an order
-    /// over would be read rather than ignored.
+    /// <see cref="Sequenced"/> now takes one and turns it into a code, so an order reported
+    /// here would be read rather than ignored.
     /// </para>
     /// <para>
     /// <b>WHAT BLOCKS IT IS THAT <see cref="Worlds.Asking.Story"/> IS A LIST OF SETS.</b>

@@ -190,27 +190,6 @@ public sealed class DialTests(ITestOutputHelper output)
             + "exactly where the failure is total, so it is not the cause there "
             + "either. Not a level; nothing to hunt",
 
-        ["Sequencing"] =
-            "RUNG THREE, and it is three arms rather than a level: whether a "
-            + "moment carries what came before what, and if so whether that is "
-            + "ADJACENCY or its transitive closure. NOT A LEVEL, so there is "
-            + "nothing for a controller to hunt -- which order relation a "
-            + "language has is not a quantity, and the two that exist entail "
-            + "different sets rather than more or less of one thing. IT SHIPS "
-            + "`Never`, so every number this repo has recorded is reproduced by "
-            + "it, and the derivation happens where the moment is FORMED rather "
-            + "than where it is matched because a fleet broadcasts a moment as "
-            + "codes and a precedence IS one. MEASURED ON `Handing`, the world "
-            + "built so a bag is provably at the marginal and a selector provably "
-            + "at a coin flip: both arms reach 1.000 on three seeds where "
-            + "choosing the sentence reaches 0.44 to 0.55, so ORDER is what "
-            + "carries roles and unification is not needed for it. ADJACENCY "
-            + "SHIPS AHEAD OF THE CLOSURE on cost alone -- 37 to 48 rules against "
-            + "98 to 139 for the same ceiling -- and the closure stays as the arm "
-            + "rather than going, because a world whose relation spans an "
-            + "intervening word would show as adjacency falling short and "
-            + "`Handing` has no such sentence to say so",
-
         ["Coarsening"] =
             "fork 85, and the half of it that survived. WHETHER subsumption may "
             + "read a member's entailment of its category. NOT A LEVEL: whether "
@@ -783,19 +762,76 @@ public sealed class DialTests(ITestOutputHelper output)
         // THE COUNT DID NOT FALL WITH THEM, AND THAT IS THE HONEST BOOKKEEPING. A dial that
         // arrives and loses most of itself in one session still leaves one behind, and this
         // file's own rule is that the budget is on dials that STAY.
-        // AND TWENTY-NINE IS `Sequencing`, WHICH IS THE LADDER'S THIRD RUNG ARRIVING AS A
-        // DIAL RATHER THAN AS A MATCHER. A scope entry saying *this came after that* wants a
-        // scope that is no longer an array of codes, a `Fires` that is no longer a subset
-        // test, a tally keyed by pairs and a wire format that carries them -- all in the
-        // hottest path here. Derived into a CODE instead, it costs one file, two call sites
-        // and a gate in `Cover`, and nothing downstream knows it happened.
-        //
-        // IT SHIPS OFF, so the count going up buys the arm rather than a default. What would
-        // take it back down is `Preceding` going: the closure reached the same 1.000 as
-        // adjacency on `Handing` for two and a half times the population, so the day a world
-        // with a relation spanning an intervening word says adjacency is not enough, one of
-        // the two is deleted with a revival row. `Handing` cannot say it -- every sentence
-        // it draws puts the two people six words apart with the same four between them.
-        Assert.Equal(29, HandSet.Count);
+        // AND `Sequencing` ARRIVED AND WENT IN ONE SESSION WITHOUT THIS NUMBER STAYING UP,
+        // which is the second time that has happened and is what this file is for. Rung
+        // three shipped for one commit as a three-armed dial defaulting to OFF, justified
+        // by every recorded number being reproduced -- and John caught it. The closure lost
+        // its comparison on cost, so it is deleted with a revival row; with one arm left
+        // there is nothing to switch, and the mechanism is simply on. See
+        // `A_dial_that_ships_off_has_a_refutation_behind_it`, which is the check that stops
+        // the next one.
+        Assert.Equal(28, HandSet.Count);
+    }
+
+    /// <summary>
+    /// A dial shipping in its DO-NOTHING position is named in the plan's refutation table —
+    /// <b>the budget for building something better and leaving it switched off.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THERE ARE EXACTLY TWO HONEST REASONS TO SHIP `Never`, AND ONE OF THEM LEAVES A
+    /// TRACE.</b> Either the mechanism LOST its comparison — in which case this repo's own
+    /// rule says the loser is deleted and leaves a revival row — or it is the first thing of
+    /// its kind and must be on. What is forbidden is the third: built, better, and left off
+    /// so that the numbers already recorded do not have to be re-taken. <i>An arm only lives
+    /// while it is compared</i>, and <i>a better brain beats intact numbers</i>.
+    /// </para>
+    /// <para>
+    /// <b>SO THE CHECK IS THE TRACE RATHER THAN THE INTENT, WHICH IS THE ONLY PART A BUILD
+    /// CAN READ.</b> A refuted mechanism is named in DO NOT RE-TRY with what would revive it;
+    /// a mechanism switched off to protect a baseline is named nowhere, because there is
+    /// nothing to say. The second is what this fails on.
+    /// </para>
+    /// <para>
+    /// <b>IT IS WRITTEN AGAINST A CASE THAT ALREADY PASSES AND A CASE THAT ALREADY
+    /// FAILED.</b> `Widening` ships `Never` and is refuted twice over in the table, so it
+    /// passes. `Sequencing` shipped `Never` for one commit with no row anywhere, because
+    /// there was no refutation — it had WON — and this is the check that would have said so
+    /// before John had to.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_dial_that_ships_off_has_a_refutation_behind_it()
+    {
+        var plan = File.ReadAllText(Path.Combine(Tree.Repo(), "docs", "plan.md"));
+        var unexplained = new List<string>();
+
+        foreach (var dial in Census())
+        {
+            if (!dial.PropertyType.IsEnum) continue;
+
+            // THE DECLARING TYPE RATHER THAN A HAND-KEPT LIST, so a settings record nobody
+            // told this check about is still asked. `Activator` because a required member is
+            // a compile-time check and this never writes one.
+            var settings = Activator.CreateInstance(dial.DeclaringType!);
+            var shipped = dial.GetValue(settings)?.ToString();
+
+            // `Never` BY NAME, WHICH IS THIS REPO'S OWN WORD FOR THE POSITION WHERE NOTHING
+            // HAPPENS. A check inferring which arm is inert would be guessing at behaviour
+            // from a type; the naming convention is a decision somebody made on purpose and
+            // is what a reader goes by too.
+            if (shipped != "Never") continue;
+
+            if (!plan.Contains(dial.PropertyType.Name, StringComparison.Ordinal))
+                unexplained.Add(dial.PropertyType.Name);
+        }
+
+        Assert.True(unexplained.Count == 0,
+            $"dial(s) shipping in their do-nothing position with no refutation anywhere: "
+            + $"{string.Join(", ", unexplained)}. Either the mechanism lost, in which case "
+            + "delete the loser and leave a revival row in DO NOT RE-TRY, or it did not, in "
+            + "which case turn it on and re-take whatever goes red. Building something "
+            + "better and shipping it off to protect a baseline is the one option this repo "
+            + "does not have");
     }
 }

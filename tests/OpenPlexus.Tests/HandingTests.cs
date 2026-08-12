@@ -67,7 +67,11 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         /// </remarks>
         public IReadOnlyDictionary<Code, int>? Order(Recited observation)
         {
-            if (reading == Reading.Bagged) return null;
+            // ONLY THE ARM THAT CLAIMS TO SEE ORDER REPORTS ONE, WHICH IS WHERE THE AXIS
+            // LIVES NOW. There is no dial on the brain: a machine turns whatever order it
+            // is given into precedences, always. Whether a sense can tell word order is a
+            // fact about the sense, so the control is a front end that says nothing.
+            if (reading != Reading.Placed) return null;
 
             var chosen = observation.Said[Selected(observation)];
             var placed = new Dictionary<Code, int>();
@@ -96,7 +100,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
 
             moment.UnionWith(chosen);
 
-            if (reading == Reading.Chosen) return moment;
+            if (reading != Reading.Ordered) return moment;
 
             // EVERY ORDERED PAIR, WHICH IS WHY THIS IS A PRICE AND NOT A MECHANISM. Handing
             // the whole relation over exhaustively is the most a learner reading order could
@@ -126,6 +130,17 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
 
         /// <summary>The sentence sharing most with the question. <b>Provably a coin flip.</b></summary>
         Chosen,
+
+        /// <summary>
+        /// The same words, and the sentence's ORDER reported through
+        /// <see cref="IQuantizer{TObservation}.Order"/> — <b>the shipped mechanism.</b>
+        /// </summary>
+        /// <remarks>
+        /// <b>THE FRONT END SAYS WHERE THE WORDS STOOD AND THE MACHINE DERIVES WHAT THAT
+        /// ENTAILS</b>, which is the seam this whole file is about. It hands over the same
+        /// codes <see cref="Chosen"/> does, so the two differ in exactly one thing.
+        /// </remarks>
+        Placed,
 
         /// <summary>
         /// The same, plus every ORDERED PAIR of its words — <b>the ceiling on a sequence
@@ -520,16 +535,15 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         var scores = new Dictionary<string, List<double>>();
         var populations = new Dictionary<string, List<int>>();
 
-        var arms = new (string Name, Reading Reading, Sequencing Sequencing)[]
+        var arms = new (string Name, Reading Reading)[]
         {
-            ("bagged", Reading.Bagged, Sequencing.Never),
-            ("chosen", Reading.Chosen, Sequencing.Never),
-            ("adjacent", Reading.Chosen, Sequencing.Adjacent),
-            ("preceding", Reading.Chosen, Sequencing.Preceding),
-            ("handed", Reading.Ordered, Sequencing.Never),
+            ("bagged", Reading.Bagged),
+            ("chosen", Reading.Chosen),
+            ("placed", Reading.Placed),
+            ("handed", Reading.Ordered),
         };
 
-        foreach (var (name, reading, sequencing) in arms)
+        foreach (var (name, reading) in arms)
         {
             scores[name] = [];
             populations[name] = [];
@@ -540,7 +554,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
                     new HandingSettings { People = People, Withheld = 300 }, seed);
 
                 var brain = new Machines.Brain(
-                    new CommittingSettings { Capacity = 4000, Sequencing = sequencing }, seed);
+                    new CommittingSettings { Capacity = 4000 }, seed);
 
                 var tally = new Machines.Trial<Recited>(world, new Reciting(reading), brain)
                     .Run(5_000, sweep: 1000, target: 0.9, window: 2000);
@@ -587,11 +601,10 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         // was 0.60; both sequence arms read 1.000 on all three seeds, so the bar sits at
         // 0.90 -- if either falls back through it, order is not what carries roles here and
         // rung four is back on the list.
-        foreach (var arm in new[] { "adjacent", "preceding" })
-            Assert.True(scores[arm].Min() > 0.90,
-                $"the {arm} rung reads {scores[arm].Min():F3} at its worst, so a sequence "
-                + "rung does not reach this world's ceiling and what fork 105 needs is "
-                + "unification after all");
+        Assert.True(scores["placed"].Min() > 0.90,
+            $"the sequence rung reads {scores["placed"].Min():F3} at its worst, so it does "
+            + "not reach this world's ceiling and what fork 105 needs is unification after "
+            + "all");
 
         // AND ADJACENCY IS STRICTLY CHEAPER FOR THE SAME CEILING, WHICH IS THE READING THAT
         // DECIDES WHICH ARM SHIPS. The closure says nothing adjacency does not entail on
@@ -599,10 +612,11 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         // needing a relation ACROSS an intervening word would show as the adjacent arm
         // falling short -- and none of this world's sentences has one, which is exactly why
         // it cannot decide the arm for any other world.
-        Assert.True(populations["adjacent"].Max() < populations["preceding"].Min(),
-            $"adjacency holds {populations["adjacent"].Max()} rules at most against "
-            + $"{populations["preceding"].Min()} at the closure's fewest, so the quadratic "
-            + "arm is not paying for its expansion and the two arms are one arm");
+        Assert.True(populations["placed"].Max() < populations["handed"].Min(),
+            $"adjacency holds {populations["placed"].Max()} rules at most against "
+            + $"{populations["handed"].Min()} for the handed closure at its fewest, so the "
+            + "deleted arm was not paying for its expansion after all and its revival row is "
+            + "wrong about what would bring it back");
 
         // AND THE MACHINE DERIVING IT IS THE SAME COMPUTATION AS THE FRONT END HANDING IT
         // OVER, EXACTLY. `handed` folds the pairs in `Codify` and `preceding` folds the
@@ -611,7 +625,9 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         // changed when the derivation crossed the seam is WHERE IT LIVES and nothing else,
         // which is what makes the front-end version legitimate as a price and illegitimate
         // as a mechanism.
-        Assert.Equal(scores["preceding"], scores["handed"]);
-        Assert.Equal(populations["preceding"], populations["handed"]);
+        Assert.True(scores["handed"].Min() > 0.90,
+            $"the handed closure reads {scores["handed"].Min():F3} at its worst, so the "
+            + "ceiling this world was built to have is not reachable and the whole ladder "
+            + "here is measuring something else");
     }
 }

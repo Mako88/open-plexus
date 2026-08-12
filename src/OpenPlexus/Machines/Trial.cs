@@ -622,22 +622,19 @@ public sealed class Trial<TSeen>
     /// SEAM THAT MATTERS.</b> <see cref="IQuantizer{TObservation}.Order"/> reports word
     /// order, which is a fact about the signal; turning it into <i>these two stood this way
     /// round</i> is a derivation, and a front end doing it would be deciding which relations
-    /// exist. See <see cref="Sequencing"/>, whose default is <see cref="Sequencing.Never"/>
-    /// so that every number this repo has recorded is reproduced by this call.
+    /// exist. There is no dial: a front end reporting no order gets exactly the codes it
+    /// always did, which is a fact about the sense rather than a setting on the brain.
     /// </para>
     /// </remarks>
     private IReadOnlyCollection<Code> Sensed(TSeen seen)
     {
         var said = _sensing.Codify(seen);
 
-        if (_brain.Dials.Sequencing == Sequencing.Never) return said;
-
         if (_sensing.Order(seen) is not { Count: > 1 } order) return said;
 
         var carried = new HashSet<Code>(said);
 
-        foreach (var precedence in Sequenced.From(order, _brain.Dials.Sequencing))
-            carried.Add(precedence);
+        foreach (var precedence in Sequenced.From(order)) carried.Add(precedence);
 
         return carried;
     }

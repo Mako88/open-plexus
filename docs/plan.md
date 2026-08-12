@@ -271,9 +271,9 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       machinery.
     - **SETTLED** — unification costs its candidate set rather than a subset test's price,
       and what blocks rung four is admission rather than cost. Fork **33**.
-    - **SETTLED** — roles are carried by ORDER rather than unification, and rung three
-      reaches `Handing`'s ceiling. TRANSFER still needs the argument named on both sides,
-      and `Expects` is a constant. Fork **105**.
+    - **SETTLED** — roles are carried by ORDER rather than unification; rung three reaches
+      `Handing`'s ceiling. TRANSFER still needs the argument on both sides and `Expects` is
+      a constant. Fork **105**.
     - **OPEN** — anti-unification as rung four's admission, gated by a hole whose covered
       values never co-occur. Open on the build. Fork **102**, gated by fork **97**.
     - **OPEN** — a second hop keyed on what the first reading supplied, banded by hop. Open
@@ -357,8 +357,7 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
   - Which aspects are temporal
     - **NOW** — a forward store beside the population, retracting where the counters cannot.
     - **NOW** — rung three, sequence. A precedence is a CODE derived where the moment is
-      FORMED, so matching, the tally, repair and the wire are all untouched. Ships off;
-      `Adjacent` reaches `Preceding`'s ceiling far cheaper.
+      FORMED, so matching, the tally, repair and the wire are untouched. No dial, and inert where none is reported.
     - **OPEN** — a referent is a THIRD store rather than the same one: *Mary's bedroom*
       survives leaving the room and *Mary is in the bedroom* does not, so one store gets one
       lifetime wrong whichever it takes.
@@ -593,7 +592,8 @@ condition is a superstition.
 | `Joining.Situated` — displacement keyed on the commonest N words of the corpus | The motion verbs straddle the names, so no rank keeps names as keys and drops verbs | A corpus whose function words are separable by frequency. `Distinguished` takes its background from the story and needs no rank |
 | Displacement as a way AROUND unification | At every width it is at its ceiling only where it keeps one statement, and a better key rule bought a better ceiling and no more score | Never as a substitute. A store must be read BY KEY, and reading by key is rung four |
 | A forward store whose fold is transitive | It reaches every answer with nearly every room word still there, which is the bag by a longer road | Never uncapped. The depth's optimum is interior, so the reading that set the cap refuses a fold without one |
-| A front end putting a word's POSITION in the moment | Beside the code it is never absent, so it reached every moment and no scope; FUSED into it, it costs the identity — an input is an attribute, never the concept | Never. Order derives its own code beside the word: rung three |
+| A precedence's TRANSITIVE closure rather than the adjacent pairs | Identical ceiling on `Handing` for two and a half the population: a quadratic expansion to say what adjacency entails | A world whose relation spans an intervening position, where adjacency falls short |
+| A front end putting a word's POSITION in the moment | Beside the code it is never absent, reaching every moment and no scope; FUSED in, it costs the identity — an input is an attribute, never the concept | Never. Order derives its own code: rung three |
 
 ---
 

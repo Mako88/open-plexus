@@ -1,7 +1,7 @@
 namespace OpenPlexus.Codes;
 
 /// <summary>
-/// Whether a moment carries what came before what — <b>rung three, and it is a code rather
+/// What came immediately before what, as a code — <b>rung three, and it is a code rather
 /// than a matcher, which is the whole of why it is small.</b>
 /// </summary>
 /// <remarks>
@@ -9,79 +9,47 @@ namespace OpenPlexus.Codes;
 /// <b>THE LADDER'S THIRD RUNG IS <i>X THEN Y</i> RATHER THAN <i>X AND Y</i>, AND THE OBVIOUS
 /// WAY TO BUILD IT IS THE EXPENSIVE ONE.</b> A scope entry saying <i>this one came after
 /// that one</i> needs a scope that is no longer an array of codes, a
-/// <see cref="Commitments.Commitment.Fires"/> that is no longer a subset test, a tally
-/// keyed by pairs, a repair that proposes them, a subsumption that reads them and a wire
-/// format that carries them. Every one of those is in the hottest path in the project.
+/// <see cref="Commitments.Commitment.Fires"/> that is no longer a subset test, a tally keyed
+/// by pairs, a repair that proposes them, a subsumption that reads them and a wire format
+/// that carries them. Every one of those is in the hottest path in the project.
 /// </para>
 /// <para>
 /// <b>SO THE ORDER IS DERIVED INTO A CODE INSTEAD, AND NOTHING DOWNSTREAM CHANGES AT
-/// ALL.</b> <see cref="Commitments.Population.Moment"/> already folds minted names into what
-/// the front end said, and everything after it — matching, covering, the tally, repair,
-/// subsumption, naming — reads the folded moment. A precedence folded in there is matched
-/// by the same subset test, tallied by the same table, chosen by the same discriminative
-/// gate and named by the same hash. <b>It is the trick <see cref="Commitments.Unifying.Any"/> uses for a
-/// variable and <see cref="Joining.Either"/> uses for an absence</b>, which is John's own
-/// rung-two proposal moved to where it needs no new machinery.
+/// ALL.</b> Matching, the tally, the discriminative gate, naming, subsumption and the wire
+/// all read a set of codes, and a precedence IS one — so it is matched by the same subset
+/// test and chosen by the same repair. <b>It is the trick
+/// <see cref="Commitments.Unifying.Any"/> uses for a variable and
+/// <see cref="Joining.Either"/> uses for an absence</b>, which is John's own rung-two
+/// proposal moved to where it needs no new machinery.
 /// </para>
 /// <para>
 /// <b>AND IT IS THE LEARNER THAT DERIVES IT, WHICH IS THE SEAM THIS SITS THE RIGHT SIDE
-/// OF.</b> The front end reports word order through
+/// OF.</b> The front end reports order through
 /// <see cref="IQuantizer{TObservation}.Order"/>, which is a fact about the signal on the
 /// licence <see cref="Coded.Sequence"/> already carries. Turning that into <i>these two
 /// stood this way round</i> is a derivation, and a front end doing it would be deciding
-/// which relations exist. A handed-over version measured 1.000 on <see cref="Worlds.Handing"/>
-/// and is an instrument rather than a mechanism for exactly that reason.
+/// which relations exist.
 /// </para>
 /// <para>
-/// <b>WHAT IT COSTS IS THE THING TO WATCH, AND IT IS WHY THERE ARE TWO ARMS.</b> Every
-/// ordered pair of a moment is quadratic in it, which lands straight on the object the plan
-/// already says blows up — a tally entry per code seen while firing. Adjacency is linear and
-/// says less. Which of them a world needs is a reading rather than a preference.
+/// <b>THERE IS NO DIAL, AND THAT IS A CORRECTION RATHER THAN THE DESIGN.</b> This shipped
+/// for one commit as a three-armed setting defaulting to OFF, justified by every recorded
+/// number being reproduced — which is what this repo's own rules forbid twice over: an arm
+/// only lives while it is compared, and a better brain beats intact numbers. The transitive
+/// closure LOST its comparison on cost and is deleted with a revival row; with one arm left
+/// there is nothing to switch. <b>It is inert wherever a front end reports no order, which
+/// is a fact about the sense rather than a setting on the brain.</b>
 /// </para>
-/// </remarks>
-public enum Sequencing
-{
-    /// <summary>
-    /// No order reaches the learner. <b>The default, so every number this repo has ever
-    /// recorded is reproduced by it.</b>
-    /// </summary>
-    Never,
-
-    /// <summary>
-    /// One code for each pair that stood NEXT TO each other, in that order.
-    /// </summary>
-    /// <remarks>
-    /// <b>LINEAR IN THE MOMENT, AND IT IS THE LOCAL CLAIM RATHER THAN THE CHEAP ONE.</b>
-    /// <i>Immediately after</i> is what a sequence is made of; <see cref="Preceding"/> is
-    /// its transitive closure and says nothing adjacency does not entail. Where a world
-    /// needs the closure it will show as this arm falling short, which is a reading, and
-    /// where it does not the closure is a quadratic price for nothing.
-    /// </remarks>
-    Adjacent,
-
-    /// <summary>
-    /// One code for every pair where the first came anywhere before the second.
-    /// </summary>
-    /// <remarks>
-    /// <b>QUADRATIC IN THE MOMENT, WHICH IS THE COST THAT DECIDES WHETHER IT SHIPS.</b> It
-    /// reaches a relation between words with anything at all between them —
-    /// <i>whoever was asked about was mentioned before the answer</i> — which adjacency
-    /// cannot say at any distance. The tally is per code seen while firing, so squaring the
-    /// moment squares the object the plan already names as the one that blows up.
-    /// </remarks>
-    Preceding,
-}
-
-/// <summary>The code meaning <i>this one was said before that one</i>.</summary>
-/// <remarks>
-/// <b>ITS OWN MODALITY, BESIDE <see cref="Commitments.Commitment.Committed"/>,
-/// <see cref="Commitments.Naming.Meant"/> AND <see cref="Commitments.Unifying"/>'S.</b> A precedence is
-/// DERIVED from two codes rather than emitted by a sense, so a world able to produce one
-/// would be writing the learner's rules — the same reason a pattern may not be emitted.
 /// </remarks>
 public static class Sequenced
 {
     /// <summary>The modality a precedence rides on.</summary>
+    /// <remarks>
+    /// <b>ITS OWN, BESIDE <see cref="Commitments.Commitment.Committed"/>,
+    /// <see cref="Commitments.Naming.Meant"/> AND <see cref="Commitments.Unifying"/>'S.</b> A
+    /// precedence is DERIVED from two codes rather than emitted by a sense, so a world able
+    /// to produce one would be writing the learner's rules — the same reason a pattern may
+    /// not be emitted.
+    /// </remarks>
     public const byte Ordered = 208;
 
     /// <summary>What the precedence of one code over another is called, on every machine.</summary>
@@ -117,40 +85,55 @@ public static class Sequenced
     /// </remarks>
     public static bool Names(Code code) => code.Modality == Ordered;
 
-    /// <summary>Every precedence a moment's order entails, under one arm.</summary>
+    /// <summary>Every immediate precedence a moment's order entails.</summary>
     /// <param name="order">What position each code was at, from the front end.</param>
-    /// <param name="sequencing">Which arm.</param>
     /// <remarks>
-    /// <b>SORTED BY POSITION FIRST, BECAUSE A DICTIONARY'S ORDER DOES NOT SURVIVE A RUN.</b>
-    /// The codes come back in whatever order the map walks, and a moment whose contents
-    /// depended on that would be a difference nobody chose — which is what
-    /// <c>DeterminismTests</c> exists to refuse. Ties are broken by the code so that two
-    /// front ends reporting one position for two codes agree about what that means.
+    /// <para>
+    /// <b>BY DISTINCT POSITION AND NOT BY LIST INDEX, WHICH IS WHERE THE FIRST VERSION WAS
+    /// WRONG.</b> A front end may report several codes at ONE position —
+    /// <see cref="Worlds.SnakeSense"/> puts the action at nought and its whole view at one —
+    /// and walking a sorted list pairwise would emit <i>this view code came before that
+    /// one</i>, which the front end never said and which is false. Positions are grouped
+    /// first, and every pair across two CONSECUTIVE groups is emitted.
+    /// </para>
+    /// <para>
+    /// <b>IMMEDIATE AND NOT TRANSITIVE, AND THE CLOSURE IS DELETED RATHER THAN OPTIONAL.</b>
+    /// It reached the identical ceiling on <see cref="Worlds.Handing"/> for two and a half
+    /// times the population. The revival row in the plan says what would bring it back: a
+    /// world whose relation spans an intervening position, where this falls short.
+    /// </para>
+    /// <para>
+    /// <b>SORTED, BECAUSE A DICTIONARY'S ORDER DOES NOT SURVIVE A RUN.</b> A moment whose
+    /// contents depended on how a map happened to walk would be a difference nobody chose,
+    /// which is what <c>DeterminismTests</c> exists to refuse.
+    /// </para>
     /// </remarks>
-    public static IEnumerable<Code> From(
-        IReadOnlyDictionary<Code, int> order, Sequencing sequencing)
+    public static IEnumerable<Code> From(IReadOnlyDictionary<Code, int> order)
     {
         ArgumentNullException.ThrowIfNull(order);
 
-        if (sequencing == Sequencing.Never || order.Count < 2) yield break;
+        if (order.Count < 2) yield break;
 
-        var placed = order.OrderBy(one => one.Value).ThenBy(one => one.Key).ToList();
+        var groups = order
+            .GroupBy(one => one.Value)
+            .OrderBy(group => group.Key)
+            .Select(group => group.Select(one => one.Key).Order().ToList())
+            .ToList();
 
-        for (var first = 0; first < placed.Count - 1; first++)
+        for (var at = 0; at < groups.Count - 1; at++)
         {
-            var last = sequencing == Sequencing.Adjacent
-                ? Math.Min(first + 2, placed.Count)
-                : placed.Count;
-
-            for (var second = first + 1; second < last; second++)
+            foreach (var first in groups[at])
             {
-                // A CODE NEVER PRECEDES ITSELF, and a front end reporting one code at two
-                // positions is the case that makes that reachable -- a word said twice in
-                // one sentence. Folding it in would put a code in every moment the word
-                // appears twice in, which is a background code by a side door.
-                if (placed[first].Key == placed[second].Key) continue;
+                foreach (var second in groups[at + 1])
+                {
+                    // A CODE NEVER PRECEDES ITSELF, which is reachable where a front end
+                    // reports one code at two positions -- a word said twice. Folding it in
+                    // would put a code in every moment that word repeats in, which is a
+                    // background code by a side door.
+                    if (first == second) continue;
 
-                yield return Of(placed[first].Key, placed[second].Key);
+                    yield return Of(first, second);
+                }
             }
         }
     }

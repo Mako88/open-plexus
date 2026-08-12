@@ -534,7 +534,8 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
     - **BROKEN** — `BudgetTests` crosses two settings and pins neither timing nor budget, so
       it changed arms silently; being a sweep, CI never looked.
     - **BROKEN** — the catch-all shard runs past its forty-five minute cap, growing whenever
-      a suite is added without a home. `ShardTests` cannot catch this one.
+      a suite is added without a home. It reports as CANCELLED rather than failed, so the
+      whole run does too. `ShardTests` cannot catch this one.
   - Withholding is real and the gap is readable
     - **SETTLED** — a generated world holds assignments back without the learner being able
       to tell, the draw rejecting rather than picking. Fork **48**.
@@ -621,6 +622,10 @@ them. **A class earning a check moves out of here into the check.**
 - **A WORKFLOW IS THE ONE ARTIFACT WITH NO LOCAL CHECK**, and it is wrong until a push says
   otherwise. And SKIPPING WORK IS NOT SKIPPING A JOB: a matrix entry that exits immediately
   still took a runner slot.
+- **A TIMED-OUT JOB REPORTS AS CANCELLED AND NOT AS FAILED**, and one such job makes the
+  whole run read cancelled. On a branch where cancellation is the NORMAL outcome, an overrun
+  is perfectly disguised as the concurrency group working — which is how a `[checkpoint]`
+  can appear to have been cancelled by a later push it is immune to.
 
 ### A check that cannot fire reads exactly like a check that passes
 

@@ -254,6 +254,15 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "being pointed at, which is the fault `SeparationTests` guards from the "
             + "other side. `ReturningTests` is its caller.",
 
+        ["Alternating"] = "A DERIVATION MEASURED BEFORE IT IS ADMITTED, on the same "
+            + "footing as `Unifying`. It finds the groups of codes that are alternatives, "
+            + "which is what a category would be minted over -- and something in `src` "
+            + "calling it would mean the operator had been admitted, when what the "
+            + "measurement is FOR is deciding whether to admit it. `ReturningTests` reads "
+            + "it: the appearances come back exactly and the twins do not, so a category "
+            + "reaches a kind and never an individual. The day a category may enter a "
+            + "scope is the day this entry comes off.",
+
         ["Unifying"] = "A PRICE AND NOT YET A MECHANISM, which is fork 33's own "
             + "instruction: probe unification's cost BEFORE the ladder's escalation "
             + "policy is designed, not after. Something in `src` calling it would mean "

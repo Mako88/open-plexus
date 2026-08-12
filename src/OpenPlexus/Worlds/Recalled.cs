@@ -294,14 +294,6 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
 
         Vocabulary = [.. seen];
 
-        // A COUNT OVER THE CORPUS IS A FACT ABOUT THE SIGNAL, WHICH IS THE ONLY REASON THIS
-        // MAY LEAVE THE WORLD AT ALL. How often a word is written is the same kind of thing
-        // <see cref="Commonest"/> already is and the same statistic
-        // <see cref="Predicting.Salient"/> already picks on -- it says nothing about what a
-        // word MEANS, which is the line a world may not cross. What reads it is the join,
-        // where a translation is allowed to know something about the signal it is
-        // translating.
-        var counted = new Dictionary<Code, int>();
 
         var index = Vocabulary
             .Select((word, at) => (word, at))
@@ -316,10 +308,6 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
         foreach (var line in text.Lines)
             foreach (var word in Babi.Words(line.Text ?? string.Empty))
                 rarity[word] = rarity.GetValueOrDefault(word) + 1;
-
-        foreach (var (word, count) in rarity) counted[Babi.Of(word)] = count;
-
-        Frequency = counted;
 
         // WHICH STORIES ARE HELD BACK, DECIDED BEFORE A SINGLE TURN IS BUILT. Every line of
         // them is skipped by every arm, so no objective can train on a sentence another
@@ -464,26 +452,6 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
             });
         }
     }
-
-    /// <summary>
-    /// How often each word is written in the corpus, the held stories included.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>WHAT A JOIN NEEDS TO TELL A KEY FROM A FUNCTION WORD, AND THE ONLY THING IT IS
-    /// TOLD.</b> <see cref="Codes.Joining.Situated"/> has to decide which shared word means
-    /// two statements are about the same thing, and <i>to</i> is shared by every sentence in
-    /// the corpus while <i>mary</i> is not. Nothing here says which is which — it hands over
-    /// a count and the arm's own dial decides where to cut.
-    /// </para>
-    /// <para>
-    /// <b>OVER THE WHOLE FILE, FOR THE REASON THE RARITY BEHIND
-    /// <see cref="Predicting.Salient"/> IS.</b> Which words a language uses often is a fact
-    /// about the language rather than about this examination, so taking it from the drawn
-    /// half alone would make a front end's behaviour move with how much was withheld.
-    /// </para>
-    /// </remarks>
-    public IReadOnlyDictionary<Code, int> Frequency { get; }
 
     /// <summary>Every word the task uses, in the order the outcome index numbers them.</summary>
     /// <remarks>

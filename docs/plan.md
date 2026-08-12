@@ -780,6 +780,8 @@ condition is a superstition.
 | `Sharpness` — accuracy raised to a power before the vote | A workaround for a sum's shape: it cannot move the argmax of a maximum, and the sum is gone | Never under a maximum; only a summed vote returns it |
 | `Stepping.Pair` — winner and runner-up in one repair | Coverage falls 2 to 4 standard errors on three worlds, accuracy with it, and the carriers overshoot the minimum sound depth | A machine knowing when a scope is deep enough — fork 75 |
 | `Widening.Significant` — widen only where a clean record beats the base rate | Bit-identical on four cells: `Floor` demands twenty firings, and a perfect twenty clears every base rate under `n/(n+2.71)` | A world past that boundary. `WideningTests` fails the day one arrives |
+| `Joining.Situated` — displacement keyed on the commonest N words of the corpus | The motion verbs straddle the names, so no rank keeps names as keys and drops verbs | A corpus whose function words are separable by frequency. `Distinguished` takes its background from the story and needs no rank |
+| Displacement as a way AROUND unification | At every width it is at its ceiling only where it keeps one statement, and a better key rule bought a better ceiling and no more score | Never as a substitute. A store must be read BY KEY, and reading by key is rung four |
 | A front end emitting the POSITION beside the fused code | It reached every moment and no scope: genesis refuses a code never absent, repair one separating nothing | Never here; the coarser view belongs where pairs are COUNTED |
 
 ---

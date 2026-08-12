@@ -102,52 +102,6 @@ public enum Joining
     /// </remarks>
     Recent,
 
-    /// <summary>
-    /// Only the statements nothing newer has superseded — <b>a situation instead of a
-    /// transcript.</b>
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>THE SELECTION PROBLEM DOES NOT GET SOLVED HERE, IT GETS DISSOLVED.</b> Every arm
-    /// before this one hands the learner a bag with two places in it and some way of hinting
-    /// which is meant — a narrower view, a recency band, a coincidence marker. This asks a
-    /// different question: <i>Mary went to the kitchen</i> is not a fact to be found later,
-    /// it is an instruction to overwrite where Mary is. If the overwriting happens before the
-    /// bag is built there is only ever ONE place for Mary in it, and the near-perfect reader
-    /// this world has already measured reads it perfectly.
-    /// </para>
-    /// <para>
-    /// <b>SUPERSEDED MEANS SHARING A KEY WITH SOMETHING NEWER, AND A KEY IS ANY WORD THE
-    /// CORPUS DOES NOT USE CONSTANTLY.</b> Walking the story newest first, a statement is
-    /// dropped when a statement already kept used one of its words. <i>Mary went to the
-    /// garden</i> kills <i>Mary went to the kitchen</i> on <i>mary</i>, and leaves <i>John
-    /// moved to the garden</i> standing because the only words those two share are the ones
-    /// every sentence shares.
-    /// </para>
-    /// <para>
-    /// <b>WHICH IS WHY THE COMMONEST WORDS ARE EXCLUDED, AND WHY THAT EXCLUSION IS A DIAL
-    /// RATHER THAN A LIST.</b> No stop list, no parser and no notion that <i>mary</i> is a
-    /// person: the join is told how often each word is written and nothing else, which is
-    /// the same measured proxy for <i>informative</i> that <see cref="Worlds.Predicting.Salient"/>
-    /// already stands on.
-    /// </para>
-    /// <para>
-    /// <b>AND THE DIAL'S TWO ENDS ARE THE TWO CONTROLS, WHICH IS WHAT STOPS THIS BEING A
-    /// FREE WIN.</b> Exclude nothing and every sentence shares <i>the</i> with every other,
-    /// so only the newest survives and the arm IS a one-statement span. Exclude everything
-    /// and no statement has a key, so nothing is superseded and the arm IS
-    /// <see cref="Bagged"/>. Anything this buys has to be bought in the middle, against both
-    /// of its own ends.
-    /// </para>
-    /// <para>
-    /// <b>IT IS A FRONT END DOING A SITUATION MODEL'S WORK, WHICH IS AN UPPER BOUND AND NOT
-    /// THE MECHANISM.</b> A displacement rule computed once over a story that arrived whole
-    /// is not a store that survives a stream, cannot be wrong about anything, and earns no
-    /// blame — so what this can say is whether holding one state per thing is worth having
-    /// at all. If it is not, nothing built inside the learner would have been either.
-    /// </para>
-    /// </remarks>
-    Situated,
 
     /// <summary>
     /// The same displacement, keyed on what this story does not share — <b>no corpus
@@ -156,12 +110,12 @@ public enum Joining
     /// <remarks>
     /// <para>
     /// <b>BECAUSE FREQUENCY CANNOT SEPARATE A VERB FROM A NAME HERE, AND THAT IS
-    /// ARITHMETIC RATHER THAN BAD LUCK.</b> <see cref="Situated"/> cuts the vocabulary at a
-    /// rank, and on this corpus <i>went</i> is written more often than any of the four
-    /// people while <i>journeyed</i>, <i>travelled</i> and <i>moved</i> are written less
-    /// than all of them. The verbs straddle the names, so no rank keeps the names as keys
-    /// and drops the verbs — and a shared <i>went</i> supersedes statements about different
-    /// people.
+    /// ARITHMETIC RATHER THAN BAD LUCK.</b> Cutting the vocabulary at a rank was the first
+    /// version and it is deleted: on this corpus <i>went</i> is written more often than any
+    /// of the four people while <i>journeyed</i>, <i>travelled</i> and <i>moved</i> are
+    /// written less than all of them. The verbs straddle the names, so no rank keeps the
+    /// names as keys and drops the verbs — and a shared <i>went</i> supersedes statements
+    /// about different people.
     /// </para>
     /// <para>
     /// <b>SO THE BACKGROUND IS TAKEN FROM THE STORY INSTEAD: a key is any word not in every
@@ -173,9 +127,9 @@ public enum Joining
     /// <para>
     /// <b>AND ITS FAILURE MODE IS NAMED BEFORE IT RUNS, BECAUSE IT IS THE SAME ONE.</b> One
     /// sentence saying <i>journeyed</i> drops <i>went</i> out of the intersection and makes
-    /// it a key again, so a story mixing its verbs supersedes across people exactly as
-    /// <see cref="Situated"/> does. The ceiling column says how often that happens without
-    /// anything having to learn.
+    /// it a key again, so a story mixing its verbs supersedes across people exactly as the
+    /// deleted rank did. The ceiling column says how often that happens without anything
+    /// having to learn.
     /// </para>
     /// </remarks>
     Distinguished,
@@ -194,7 +148,7 @@ public enum Joining
     /// </para>
     /// <para>
     /// <b>IT IS SELECTION AND NOT DISPLACEMENT, WHICH IS WHY IT IS A DIFFERENT ARM RATHER
-    /// THAN A SETTING.</b> <see cref="Situated"/> asks what a newer statement made false and
+    /// THAN A SETTING.</b> <see cref="Distinguished"/> asks what a newer statement made false and
     /// throws that away for good; this asks what the question is about and reads only that.
     /// One is a store maintained forwards, the other a lookup done backwards, and the grid
     /// says the first pays only by accident.
@@ -267,41 +221,9 @@ public sealed class Joined : IQuantizer<Asking>
     public const int Bands = 3;
 
     private readonly Joining _joining;
-    private readonly HashSet<Code> _constant;
 
     /// <param name="joining">What to do with the two halves.</param>
-    /// <param name="frequency">
-    /// How often the corpus writes each word, which only <see cref="Joining.Situated"/>
-    /// reads. <b>A count and never a meaning</b> — see <see cref="Worlds.Recalled.Frequency"/>.
-    /// </param>
-    /// <param name="constant">
-    /// How many of the commonest words are too constant to key on.
-    /// </param>
-    /// <remarks>
-    /// <b>THE COMMONEST SET IS BUILT ONCE HERE RATHER THAN PER MOMENT.</b> It is a fact
-    /// about the corpus, so recomputing it per question would be the same answer at the
-    /// price of a sort a moment — and this runs on every round of every arm.
-    /// <b>Ties break on <see cref="Code"/> order</b>, because a set whose membership
-    /// depended on a dictionary's walk would make two runs of one seed disagree about
-    /// what the front end emitted.
-    /// </remarks>
-    public Joined(
-        Joining joining,
-        IReadOnlyDictionary<Code, int>? frequency = null,
-        int constant = 0)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegative(constant);
-
-        _joining = joining;
-
-        _constant = frequency is null
-            ? []
-            : [.. frequency
-                .OrderByDescending(one => one.Value)
-                .ThenBy(one => one.Key)
-                .Take(constant)
-                .Select(one => one.Key)];
-    }
+    public Joined(Joining joining) => _joining = joining;
 
     /// <inheritdoc/>
     public byte Modality => Both;
@@ -314,8 +236,7 @@ public sealed class Joined : IQuantizer<Asking>
 
         if (_joining == Joining.Recent) return Banding(said, observation);
 
-        if (_joining is Joining.Situated or Joining.Distinguished)
-            return Situating(observation);
+        if (_joining == Joining.Distinguished) return Situating(observation);
 
         if (_joining == Joining.Addressed) return Addressing(said, observation);
 
@@ -369,11 +290,10 @@ public sealed class Joined : IQuantizer<Asking>
         var claimed = new HashSet<Code>();
         var keys = new List<Code>();
 
-        // WHERE THE BACKGROUND COMES FROM IS THE WHOLE DIFFERENCE BETWEEN THE TWO ARMS, and
-        // it is one line because the displacement below is identical. One is handed a rank
-        // over the corpus; the other works out, from this story alone, which words every
-        // sentence in it uses.
-        var constant = _joining == Joining.Distinguished ? Shared(observation) : _constant;
+        // THE BACKGROUND IS THE STORY'S OWN, and there is no other kind here any more. A
+        // rank over the corpus was the first version and it is deleted -- see the revival
+        // row: the motion verbs straddle the names, so no rank separates them.
+        var constant = Shared(observation);
 
         foreach (var statement in observation.Story)
         {

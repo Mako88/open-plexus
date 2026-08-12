@@ -38,18 +38,12 @@ public sealed class RecalledTests(ITestOutputHelper output)
         new Joined(Joining.Bagged).Codify(asking).Order();
 
     private static (Recalled World, Trial<Asking> Trial, Brain Brain) Made(
-        RecalledSettings settings,
-        Joining joining = Joining.Bagged,
-        int capacity = 2000,
-        int constant = 0)
+        RecalledSettings settings, Joining joining = Joining.Bagged, int capacity = 2000)
     {
         var brain = new Brain(new CommittingSettings { Capacity = capacity }, 1);
         var world = new Recalled(settings);
 
-        return (
-            world,
-            new Trial<Asking>(world, new Joined(joining, world.Frequency, constant), brain),
-            brain);
+        return (world, new Trial<Asking>(world, new Joined(joining), brain), brain);
     }
 
     [Fact]
@@ -316,20 +310,9 @@ public sealed class RecalledTests(ITestOutputHelper output)
             Question = new HashSet<Code> { Babi.Of("where"), Babi.Of("mary") },
         };
 
-        // `to` IS THE ONLY CONSTANT, standing for the function words a real corpus writes
-        // into every sentence. Without excluding it every statement shares a key with every
-        // other and only the newest survives, which is the dial's own bottom end.
-        var frequency = new Dictionary<Code, int>
-        {
-            [Babi.Of("to")] = 100,
-            [Babi.Of("mary")] = 10,
-            [Babi.Of("john")] = 10,
-            [Babi.Of("garden")] = 5,
-            [Babi.Of("office")] = 5,
-            [Babi.Of("kitchen")] = 5,
-        };
-
-        var situated = new Joined(Joining.Situated, frequency, constant: 1).Codify(story);
+        // `went` AND `to` ARE IN EVERY STATEMENT, so the story's own intersection makes
+        // them background and `mary` a key with nothing told to the front end at all.
+        var situated = new Joined(Joining.Distinguished).Codify(story);
 
         // MARY'S OLD PLACE IS GONE AND HER NEW ONE IS THERE, which is the whole claim.
         Assert.Contains(Babi.Of("garden"), situated);
@@ -339,21 +322,6 @@ public sealed class RecalledTests(ITestOutputHelper output)
         // A one-statement span would have taken his office as well.
         Assert.Contains(Babi.Of("office"), situated);
         Assert.Contains(Babi.Of("john"), situated);
-
-        // KEYING ON EVERY WORD IS THE NEWEST STATEMENT AND NOTHING ELSE, because `to` is
-        // then a key and every statement shares it.
-        var narrow = new Joined(Joining.Situated, frequency, constant: 0).Codify(story);
-
-        Assert.DoesNotContain(Babi.Of("office"), narrow);
-        Assert.DoesNotContain(Babi.Of("kitchen"), narrow);
-        Assert.Contains(Babi.Of("garden"), narrow);
-
-        // AND KEYING ON NOTHING IS THE BAG, code for code.
-        var wide = new Joined(Joining.Situated, frequency, constant: frequency.Count).Codify(story);
-
-        Assert.Equal(
-            new Joined(Joining.Bagged).Codify(story).Order(),
-            wide.Order());
 
         // AND READING AT THE QUESTION'S KEY TAKES MARY'S NEWEST AND NOTHING ELSE, which is a
         // different statement from the newest overall wherever somebody else spoke last.
@@ -365,8 +333,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
         Assert.DoesNotContain(Babi.Of("john"), addressed);
 
         output.WriteLine(
-            $"bag {wide.Count} | situated {situated.Count} | newest only {narrow.Count} "
-            + $"| addressed {addressed.Count}");
+            $"bag {new Joined(Joining.Bagged).Codify(story).Count} "
+            + $"| distinguished {situated.Count} | addressed {addressed.Count}");
     }
 
     /// <summary>
@@ -406,36 +374,29 @@ public sealed class RecalledTests(ITestOutputHelper output)
             // THE TWO CONTROLS FIRST, so the row they have to beat is printed in the same
             // grid rather than cited from another one taken under other dials.
             foreach (var joining in new[] { Joining.Bagged, Joining.Recent })
-                Row(capacity, joining, constant: 0);
+                Row(capacity, joining);
 
-            // AND THE DIAL SWEPT ACROSS ITS OWN TWO ENDS. Nought is a one-statement span
-            // and the largest is the bag, so an interior row is the only place this can
-            // pay.
-            foreach (var constant in new[] { 0, 2, 4, 8, 16, 32 })
-                Row(capacity, Joining.Situated, constant);
-
-            // AND THE ARM THAT IS TOLD NOTHING, WHICH THE CEILING SAYS IS THE BETTER KEY.
-            // It has no dial because the story supplies its own background.
-            Row(capacity, Joining.Distinguished, constant: 0);
+            // THE DISPLACEMENT ARM, WHICH KEYS ON RECENCY AND HAS NO DIAL because the
+            // story supplies its own background.
+            Row(capacity, Joining.Distinguished);
 
             // AND THE ONE THE CEILING SAYS SHOULD WIN OUTRIGHT. PRE-REGISTERED: it hands
             // over one statement with a ceiling of one, and this learner is measured at
             // ninety-nine per cent of its ceiling wherever it is handed one statement — so
             // anything short of the nineties says the reader finding was conditional on
             // something nobody has named.
-            Row(capacity, Joining.Addressed, constant: 0);
+            Row(capacity, Joining.Addressed);
         }
 
-        void Row(int capacity, Joining joining, int constant)
+        void Row(int capacity, Joining joining)
         {
-            var (world, trial, brain) = Made(
-                World(task: 1, span: 0), joining, capacity, constant);
+            var (world, trial, brain) = Made(World(task: 1, span: 0), joining, capacity);
 
             var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
             var unseen = tally.Unseen;
 
             output.WriteLine(
-                $"cap {capacity,4} {joining,-9} constant {constant,2} | "
+                $"cap {capacity,4} {joining,-13} | "
                 + $"exam {unseen?.Accuracy ?? 0.0:F3} silent {unseen?.Silence ?? 0.0:F3} | "
                 + $"own {tally.Recent:F3} | marginal {world.Commonest:F3} | "
                 + $"held {brain.Held.Count,5} names {brain.Held.Names.Count,4} "
@@ -689,11 +650,11 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// keep more than one sentence.
     /// </para>
     /// <para>
-    /// <b>AND BOTH COLUMNS MUST RISE WITH THE DIAL, WHICH IS AN INVARIANT RATHER THAN A
-    /// HOPE.</b> A larger constant set means fewer words are keys, so fewer statements are
-    /// superseded and the survivors are a superset of the survivors before it. A reading
-    /// that fell anywhere would be a wiring fault, and this repo has read one of those as a
-    /// refutation before.
+    /// <b>AND THE THREE ROWS ARE ONE COMPARISON RATHER THAN THREE READINGS.</b> Displacement
+    /// keyed on recency, retrieval keyed on the question, and a blind draw matched on
+    /// budget — so an arm that keeps less AND answers more than the blind one has a key
+    /// doing real work, and an arm that beats displacement on both columns at a smaller
+    /// budget is reaching something recency cannot.
     /// </para>
     /// </remarks>
     [Fact]
@@ -707,62 +668,6 @@ public sealed class RecalledTests(ITestOutputHelper output)
         for (var one = 0; one < world.Withheld.Count; one++)
             whole += bagged.Codify(world.Withheld[one].Seen).Count;
 
-        // THE ORDERING THE DIAL CUTS, PRINTED, BECAUSE THE CURVE BELOW IS UNREADABLE
-        // WITHOUT IT. Whether corpus frequency separates a key from a function word is the
-        // whole assumption this arm rests on, and it is a fact about the corpus rather than
-        // about the rule.
-        output.WriteLine(string.Join(" ", world.Vocabulary
-            .OrderByDescending(word => world.Frequency.GetValueOrDefault(Babi.Of(word)))
-            .ThenBy(word => word, StringComparer.Ordinal)
-            .Take(20)
-            .Select(word => $"{word}:{world.Frequency.GetValueOrDefault(Babi.Of(word))}")));
-
-        var wasCeiling = -1.0;
-        var wasWords = -1.0;
-        var narrowest = int.MaxValue;
-
-        foreach (var constant in new[] { 0, 1, 2, 4, 8, 16, 32, 64 })
-        {
-            var front = new Joined(Joining.Situated, world.Frequency, constant);
-
-            var reachable = 0;
-            var kept = 0;
-
-            for (var one = 0; one < world.Withheld.Count; one++)
-            {
-                var moment = new HashSet<Code>(front.Codify(world.Withheld[one].Seen));
-
-                kept += moment.Count;
-
-                if (moment.Contains(Babi.Of(world.Transcript[one].Answer))) reachable++;
-            }
-
-            var ceiling = reachable / (double)world.Withheld.Count;
-            var words = kept / (double)whole;
-
-            // MONOTONE IN THE DIAL, BOTH OF THEM. See the remark: a larger constant set
-            // supersedes strictly less, so neither column may ever fall.
-            Assert.True(ceiling >= wasCeiling, $"ceiling fell at constant {constant}");
-            Assert.True(words >= wasWords, $"bag shrank at constant {constant}");
-
-            wasCeiling = ceiling;
-            wasWords = words;
-            narrowest = Math.Min(narrowest, kept);
-
-            output.WriteLine(
-                $"constant {constant,2} | answer present {ceiling:F3} | "
-                + $"kept {words:F3} of the bag");
-        }
-
-        // THE TOP OF THE DIAL IS THE BAG, WHICH THE MECHANISM TEST ASSERTS CODE FOR CODE AND
-        // THIS ASSERTS ON THE CORPUS. A ceiling under one there would mean the arm was
-        // dropping statements with no key to drop them on.
-        Assert.Equal(1.0, wasCeiling);
-
-        // AND THE ARM THAT IS TOLD NOTHING, READ IN THE SAME COLUMNS. It has no dial, so it
-        // is one row — and the pair of numbers is the whole comparison: a rule that throws
-        // more away for the same ceiling is a better rule, and the corpus arm above never
-        // manages both at once.
         var told = new Joined(Joining.Distinguished);
 
         var found = 0;
@@ -809,7 +714,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         // any budget. A recency rule is at its ceiling only where it keeps one statement,
         // and this keeps one statement AND has no ceiling to be short of.
         Assert.Equal(world.Withheld.Count, aimed);
-        Assert.True(cost < narrowest, $"addressed kept {cost} against the narrow arm's {narrowest}");
+        Assert.True(cost < held, $"addressed kept {cost} against displacement's {held}");
 
         // AND THE CONTROL THAT SAYS WHETHER THE KEY IS DOING ANYTHING AT ALL, matched
         // question by question on how many words survived. Both columns moving together is

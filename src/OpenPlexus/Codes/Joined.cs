@@ -166,6 +166,41 @@ public enum Joining
     /// </para>
     /// </remarks>
     Addressed,
+
+    /// <summary>
+    /// The same lookup, taken again at the key the LAST reading supplied — <b>a chain of
+    /// statements rather than one.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>FORK 96, AND WHAT HELD IT TO ONE HOP WAS NEVER THE LEARNER.</b>
+    /// <see cref="Addressed"/> returns the first statement naming anything the question
+    /// names, and stops. Where the question names the apple, the apple's newest statement
+    /// says who picked it up and never where he went — so the answering word was not in the
+    /// room, and no learner could have found it. Reading again at <i>john</i> is the hop.
+    /// </para>
+    /// <para>
+    /// <b>AND THE CEILING SAYS THE ROOM WAS THE WHOLE SHORTFALL.</b> One hop leaves the answer
+    /// present on a quarter of two-fact questions and a twelfth of three-fact ones; two hops
+    /// reach near a half and a quarter, three reach four in seven and two in five.
+    /// </para>
+    /// <para>
+    /// <b>ITS CONTROL IS A SPAN-MATCHED BAG AND NEVER ONE HOP, WHICH IS THE READING THAT COST
+    /// THE MOST TO GET.</b> Every statement of this corpus says <i>to</i> and <i>the</i>, so a
+    /// chain keyed on everything walks back a sentence at a time and never follows a referent
+    /// — and about half of what the hops buy is exactly that. Scored against one hop this arm
+    /// reads twice as good as it is.
+    /// </para>
+    /// <para>
+    /// <b>THE KEY IS WHAT THE READING ADDED AND IS NOT THE STORY'S BACKGROUND</b>, which is
+    /// <see cref="Distinguished"/>'s own answer to fork 95 reused rather than a second rule. A
+    /// key already used is the hop just taken, so carrying one forward returns the same
+    /// statement for ever; and a key every sentence contains is recency wearing a chain's
+    /// name. <b>The two rules beaten are naive-everything and members-of-a-category</b>, both
+    /// inside a standard error of this one and neither leading twice — see the revival row.
+    /// </para>
+    /// </remarks>
+    Chained,
 }
 
 /// <summary>
@@ -241,6 +276,7 @@ public sealed class Joined : IQuantizer<Asking>
 
     private readonly Joining _joining;
     private readonly IReadOnlyList<IReadOnlySet<Code>> _categories;
+    private readonly int _hops;
 
     /// <param name="joining">What to do with the two halves.</param>
     /// <param name="categories">
@@ -250,10 +286,20 @@ public sealed class Joined : IQuantizer<Asking>
     /// being named for one is a trap this repo has already paid for — every arm below is a
     /// cell of a grid rather than a point on a line.
     /// </param>
-    public Joined(Joining joining, IReadOnlyList<IReadOnlySet<Code>>? categories = null)
+    /// <param name="hops">
+    /// How many statements <see cref="Joining.Chained"/> may read, each at the key the last
+    /// one supplied. <b>An independent axis, and read beside a span-matched control</b> — a
+    /// deeper chain is also a wider moment, and widening is already known here to buy the
+    /// drawn score and sell the held-out one.
+    /// </param>
+    public Joined(
+        Joining joining, IReadOnlyList<IReadOnlySet<Code>>? categories = null, int hops = 2)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThan(hops, 1);
+
         _joining = joining;
         _categories = categories ?? [];
+        _hops = hops;
     }
 
     /// <inheritdoc/>
@@ -270,6 +316,8 @@ public sealed class Joined : IQuantizer<Asking>
         if (_joining == Joining.Distinguished) return Sorting(Situating(observation));
 
         if (_joining == Joining.Addressed) return Sorting(Addressing(said, observation));
+
+        if (_joining == Joining.Chained) return Sorting(Chaining(said, observation));
 
         if (_joining == Joining.Bagged) return Sorting(said);
 
@@ -442,6 +490,56 @@ public sealed class Joined : IQuantizer<Asking>
         // the bag is what is left. See the arm's remarks: going silent would score the
         // abstention rather than the mechanism.
         return said;
+    }
+
+    /// <summary>
+    /// The question, and a chain of statements each found at the key the last one supplied.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>OLDER ONLY, BECAUSE THE CHAIN RUNS BACKWARDS IN TIME.</b> Whatever a statement
+    /// mentions was established before it, so the search resumes past the statement just
+    /// taken — and searching the whole story again would let anything later answer, which is
+    /// the recency this arm exists to beat.
+    /// </para>
+    /// <para>
+    /// <b>AND A CHAIN THAT RUNS OUT STOPS RATHER THAN FALLING BACK.</b> A hop with no key left
+    /// and a hop whose key names nothing older are both <i>the store has no more to say</i>,
+    /// and widening to the bag there would quietly turn the deepest arm into the control on
+    /// exactly the questions it found hardest.
+    /// </para>
+    /// </remarks>
+    private HashSet<Code> Chaining(HashSet<Code> said, Asking observation)
+    {
+        var background = Shared(observation);
+        var moment = new HashSet<Code>(observation.Question);
+        var key = observation.Question;
+        var from = 0;
+        var read = 0;
+
+        for (var hop = 0; hop < _hops; hop++)
+        {
+            var at = -1;
+
+            for (var one = from; one < observation.Story.Count && at < 0; one++)
+                foreach (var code in observation.Story[one])
+                    if (key.Contains(code)) { at = one; break; }
+
+            if (at < 0) break;
+
+            moment.UnionWith(observation.Story[at]);
+            read++;
+
+            key = new HashSet<Code>(observation.Story[at]
+                .Where(code => !key.Contains(code) && !background.Contains(code)));
+
+            from = at + 1;
+        }
+
+        // NOTHING THE QUESTION NAMES WAS EVER SAID, so there is no store entry to read at all
+        // and the bag is what is left -- the same fallback Addressing takes, and for the same
+        // reason: going silent would score the abstention rather than the mechanism.
+        return read == 0 ? said : moment;
     }
 
     /// <summary>

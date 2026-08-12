@@ -251,6 +251,19 @@ exercise. One line a capability, and the status is the whole point of the row.
   arm must be scored against a SPAN-MATCHED control rather than against one hop.
 - **AND NO KEY RULE WINS TWICE, so none is shipped.** Naive-everything leads at three hops,
   not-background at two, in-a-category on task three — every gap inside a standard error.
+- **AND THE CEILING ROSE AND THE SCORE DID NOT FOLLOW, WHICH IS THE ARM'S VERDICT.** The chain
+  beats its span-matched control on one cell of six, and the plain bag at span three is the
+  best arm on both tasks needing more than one fact. Retrieval was necessary and is not
+  enough.
+- **AND A HOP NOT NEEDED IS DAMAGE — A QUARTER OF A PERFECT SCORE.** Task one falls from
+  answering everything to three in four the moment a second statement enters the room.
+- **BECAUSE THE BOTTLENECK MOVED FROM THE ROOM TO THE BAG.** Every arm reading more than one
+  statement pins the population at capacity, the drawn score climbs, the held-out one does
+  not, and silence appears — this doc's own widening finding, reproduced by a mechanism built
+  for another reason.
+- **SO THE CHAIN WANTS RUNG THREE RATHER THAN A DEEPER HOP**, a scope being a set: two
+  statements in the room is the selection problem again, whole. The next arm is chaining with
+  the statements BANDED rather than unioned.
 - **MUTUAL EXCLUSION, so a belief can be CONTRADICTED and not merely wrong** — NOT BUILT. A
   miss says *I expected Y and got Z*; nothing anywhere says Y and Z cannot both hold, which
   is the whole of what a conflict is.
@@ -1594,4 +1607,4 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **97** | John's: a category is the set of codes that are ALTERNATIVES, and the operator the multiplexer's address bits have always wanted. PRICED before it was built: handed over free they come back perfect, and pay five times more under the bag than under the front end that had done the selecting. Open on minting them |
 | **98** | John's: a concept forms BEFORE its label, so substitutability groups things with no word and the word later labels a category that already existed. THE PROBE PASSES on both categories and all three tasks, the category packed against one and the next thing out a third of the scale below. Closed, and fork 97 is unblocked |
 | **99** | John's: a conflict is two beliefs asserting different members of ONE category for the same key, which is the only route to retraction under counters that only rise. And malleability is the counters rather than a property — a per-belief weight is where the human puts the answer in. Open |
-| **96** | A second hop: read at the key the FIRST reading supplied. FORK 32 WAS THE WRONG BLOCKER — that cap is entailment's and this is retrieval, one `return` in `Addressing`. Two hops nearly doubles the answer-present ceiling and three nearly triples it, but half is recency and chaining's margin shrinks with depth. Open on the score |
+| **96** | A second hop, read at the key the FIRST reading supplied. FORK 32 WAS THE WRONG BLOCKER — that cap is entailment's and this is retrieval. BUILT: two hops nearly triple the answer-present ceiling and the score does not follow, the bag at that width beating it almost everywhere. Open on banding the chain |

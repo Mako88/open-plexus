@@ -59,12 +59,12 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
     private static (Recalled World, Trial<Asking> Trial, Brain Brain) Made(
         RecalledSettings settings, Joining joining = Joining.Bagged, int capacity = 2000,
-        IReadOnlyList<IReadOnlySet<Code>>? categories = null, int seed = 1)
+        IReadOnlyList<IReadOnlySet<Code>>? categories = null, int seed = 1, int hops = 2)
     {
         var brain = new Brain(new CommittingSettings { Capacity = capacity }, seed);
         var world = new Recalled(settings);
 
-        return (world, new Trial<Asking>(world, new Joined(joining, categories), brain), brain);
+        return (world, new Trial<Asking>(world, new Joined(joining, categories, hops), brain), brain);
     }
 
     [Fact]
@@ -855,6 +855,96 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     + $"commonest {world.Commonest:F3} chance {1.0 / world.Outcomes:F3} | "
                     + $"held {brain.Held.Count,5} names {brain.Held.Names.Count,4} "
                     + $"wanting {tally.Wanting:F3}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// What the chain SCORES, against the span-matched bag rather than against one hop.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE CONTROL IS THE WHOLE DESIGN OF THIS GRID.</b> A chain of N statements is also a
+    /// moment of N statements, and widening a moment is already known here to buy the drawn
+    /// score and sell the held-out one. The ceiling probe says about half of what the hops
+    /// reach is recency, so an arm read against one hop reports twice what it is worth — the
+    /// bag at the same span is what says which mechanism paid.
+    /// </para>
+    /// <para>
+    /// <b>AND THE CEILING IS NOT A BOUND ON THE SCORE, which this exam has already caught
+    /// once.</b> An outcome is an index rather than a word in the room, so a population
+    /// collects the base rate expecting the commonest answer with nothing present to read —
+    /// and task three scores above its own one-hop ceiling for exactly that reason. Read the
+    /// marginal beside every cell or a working arm looks broken and a dead one looks fine.
+    /// </para>
+    /// <para>
+    /// <b>THE CEILING ROSE TWO TO THREE TIMES AND THE SCORE DID NOT FOLLOW, WHICH IS THE
+    /// RESULT.</b> The chain wins its span-matched control on exactly one cell of six and
+    /// loses or ties everywhere else, and the plain bag at span three is the best arm on both
+    /// tasks that need more than one fact. Retrieval was necessary and is not sufficient.
+    /// </para>
+    /// <para>
+    /// <b>AND WHERE ONE STATEMENT IS ENOUGH, A SECOND ONE IS DAMAGE — A QUARTER OF A PERFECT
+    /// SCORE.</b> Task one falls from answering everything to answering three in four the
+    /// moment a hop it does not need is taken. That is the sharpest reading here and it is
+    /// what the assertion below holds.
+    /// </para>
+    /// <para>
+    /// <b>BECAUSE THE BOTTLENECK MOVED FROM THE ROOM TO THE BAG, WHICH THIS DOC ALREADY
+    /// PREDICTED IN ANOTHER PLACE.</b> Every arm reading more than one statement pins the
+    /// population at its capacity, the drawn score climbs while the held-out one does not, and
+    /// silence appears from nowhere — <i>widening the moment buys the drawn score and sells
+    /// the held-out one</i>, reproduced exactly by a mechanism built for a different reason.
+    /// </para>
+    /// <para>
+    /// <b>AND THE CAUSE IS THAT A SCOPE IS A SET, so two statements in the room is the
+    /// SELECTION problem again, whole.</b> Nothing in a bag says which statement a word came
+    /// from, so a chain that fetched the right sentence hands the matcher no way to use it —
+    /// the same sentence this doc writes about a situation model. <b>The chain therefore wants
+    /// rung three rather than a deeper hop</b>, and the next arm is chaining with the
+    /// statements BANDED rather than unioned.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_a_chain_scores_against_a_bag_of_the_same_width()
+    {
+        foreach (var task in new[] { 1, 2, 3 })
+        {
+            var scored = new Dictionary<string, double>(StringComparer.Ordinal);
+
+            foreach (var (label, settings, joining, hops) in new (string, RecalledSettings, Joining, int)[]
+            {
+                ("bag span 1  ", World(task, span: 1), Joining.Bagged, 1),
+                ("bag span 2  ", World(task, span: 2), Joining.Bagged, 1),
+                ("bag span 3  ", World(task, span: 3), Joining.Bagged, 1),
+                ("addressed   ", World(task, span: 0), Joining.Addressed, 1),
+                ("chained x2  ", World(task, span: 0), Joining.Chained, 2),
+                ("chained x3  ", World(task, span: 0), Joining.Chained, 3),
+            })
+            {
+                var (world, trial, brain) = Made(settings, joining, hops: hops);
+                var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
+
+                scored[label.Trim()] = tally.Unseen?.Accuracy ?? 0.0;
+
+                output.WriteLine(
+                    $"task {task} {label} | exam {tally.Unseen?.Accuracy ?? 0.0:F3} "
+                    + $"silent {tally.Unseen?.Silence ?? 0.0:F3} | own {tally.Recent:F3} | "
+                    + $"marginal {world.Commonest:F3} | held {brain.Held.Count,5} "
+                    + $"wanting {tally.Wanting:F3}");
+            }
+
+            // A HOP NOT NEEDED IS DAMAGE, and task one is where that is unmistakable: the
+            // addressed arm answers everything and every deeper arm answers less. This is
+            // asserted rather than printed because it is the finding that stops a future
+            // session shipping the chain as a default on a ceiling reading alone.
+            if (task == 1)
+            {
+                Assert.Equal(1.0, scored["addressed"]);
+                Assert.True(
+                    scored["chained x2"] < scored["addressed"],
+                    $"a second hop cost nothing on task 1: {scored["chained x2"]:F3}");
             }
         }
     }

@@ -122,6 +122,7 @@ jobs:
             "RecalledTests.Whether_addressing_survives",
             "RecalledTests.What_a_bag_of_words_costs",
             "RecalledTests.Whether_a_category_handed_over_free",
+            "RecalledTests.What_a_chain_scores_against_a_bag",
             "SeparableTests",
             "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",
             "WideningTests.Whether_shortening_a_scope",

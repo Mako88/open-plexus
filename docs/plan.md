@@ -28,6 +28,65 @@ refutes it — read its refutation table before repeating anything.
 - **The representation is the residue of repaired failures**, not a thing designed up
   front. Distinctions get minted to tell two conflated cases apart.
 
+## THE ARCHITECTURE
+
+John's, and the one section written to STAY. It says what the brain must DO and never how —
+a mechanism written here is a decision wearing a requirement's clothes. No finding enters.
+
+- **A BRAIN THAT UNDERSTANDS CONCEPTS.** It holds a model of the world and answers from it,
+  never by matching the surface of a question to the surface of a text.
+- **A CONCEPT IS A THING IN ITS OWN RIGHT** — distinct from every other and interrelated
+  with every other. That pairing IS the understanding: what a thing is, and how it stands to
+  everything else.
+- **AND EVERY INPUT IS AN ATTRIBUTE OF A CONCEPT, NEVER THE CONCEPT.** The look of a thing,
+  the sound of it, its temperature, its name: each is one way it shows through one sense. The
+  thing is what they are all attributes OF.
+- **AND RELATIONS ARE CONCEPTS TOO** — association, containment, ownership, movement. If the
+  meta level is not representable then the model is a list rather than an understanding.
+- **AND A CONCEPT AND ITS LABEL ARE INDEPENDENT.** Either may arrive first: a slot with no
+  word for it yet, or a word for a thing nothing else is known about. Both must be reachable.
+- **AND WHAT IS UNDERSTOOD OF A THING DEEPENS AND BROADENS WITHOUT LIMIT**, thousands of
+  truths about one individual, each sharpening what it is.
+- **AND PART OF WHAT IS UNDERSTOOD IS WHICH ASPECTS ARE TEMPORAL** — which properties come
+  and go, what those aspects are in themselves, and how they stand to everything else.
+- **AND KNOWLEDGE IS HELD AT SEVERAL GRAINS AT ONCE** — *a person sleeps in a bedroom* and
+  *this bedroom is Mary's*, both live, neither replacing the other.
+- **AND HOW HARD A BELIEF IS TO SHIFT IS ITS OWN RECORD, NEVER A WEIGHT.** Gravity is
+  immovable because that belief has vast evidence and has never missed; Mary's room moves
+  because that one misses constantly.
+- **AND IT LEARNS BY BEING WRONG AND FINDING OUT.** It predicts, is scored, and refines.
+  What supplies the scoring is left open — a question asked, an action taken, a consequence
+  observed.
+- **AND IT MAY BE TOLD AND MUST NEVER BE ARCHITECTED.** A primer may teach it that a room is
+  a space people enter. What is forbidden is an ontology built in by hand: the representation
+  is what learning left behind.
+- **AND WHAT IT IS TOLD MUST BE SOMETHING IT CAN BE WRONG ABOUT.** Told and configured are
+  indistinguishable from the inside, so a fact it cannot fail on was not taught to it — it
+  was installed in it.
+- **AND FROM THAT UNDERSTANDING IT PRODUCES ORIGINAL THOUGHT** — conclusions it was never
+  told and could not have reached by matching.
+
+## THE ROUTE
+
+One row per line of THE ARCHITECTURE, in that order. **What carries it now, and what stands
+in the way.** Refuted alternatives are not repeated here — they are in DO NOT RE-TRY with the
+condition that would revive them.
+
+| what it must do | how, now | what stands in the way |
+|---|---|---|
+| Understand concepts | The commitment: a scope that predicts, and is wrong about something specific | Nothing yet answers what a concept IS here beyond a code that fires |
+| A concept a thing in its own right | `Code`. A commitment's identity is one, so concepts nest inside scopes with no new machinery | Nothing mints a code for an INDIVIDUAL; every operator mints a rule or names a set |
+| Every input an attribute of it | Nothing | Rung five names what co-fires and has never been run across two modalities |
+| Relations are concepts too | A commitment IS a relation and carries a code, so relations nest | A relation naming no ARGUMENT is rung four, a different matcher rather than a rung |
+| Concept and label independent | Concept-before-label is measured; alternation groups things with no word | Label-first is unbuilt — being told a word for a thing nothing else is known about |
+| Understanding deepens without limit | Repair. Specialisation on failure, gated, adding a narrower rule and never editing the old | It only ever NARROWS. Nothing broadens except rung five, whose trigger is redundancy |
+| Which aspects are temporal | Nothing | Counters only rise. Needs an individual, a role and a category at once — fork 99 |
+| Several grains at once | Subsumption keeps the general rule where both are equally accurate | The gradient collapsed once already: the vote takes the narrowest every round |
+| Malleability is the record | Accuracy-weighted vote, plus a recency-weighted local estimate that never merges | Nothing. This one works |
+| Learns by being wrong | Commitment, settlement, blame, repair. Measured on every world here | What supplies the settlement on a stream of text — a primer moves no counter |
+| Told, never architected | A front end may say what it is looking at, never what to conclude. `SeparationTests` fails the build | Nothing enforces that what is TOLD is settleable rather than installed |
+| Original thought | Nothing | Every world here is watched rather than acted in; action and goals are both unbuilt |
+
 ## The first north star
 
 John's, and it is a stepping stone rather than the goal above. Written down because it
@@ -210,67 +269,17 @@ exercise. One line a capability, and the status is the whole point of the row.
 - **A NAME OVER ALTERNATIVES** — NOT BUILT, and rung five is the wrong SHAPE for it. It
   names what CO-FIRES; a category is a set of codes that never co-occur and share their
   contexts. The general end of the gradient has no vocabulary without it.
-- **AND WHAT IT NAMES IS THE SLOT THAT VARIES ACROSS A FAMILY OF OTHERWISE-IDENTICAL RULES**,
-  which is the operational form and the one a minter can be written against.
-- **AND THE FILTER IS NOT THE MECHANISM, WHICH A SINGLE TASK WOULD HAVE HIDDEN.** Never in
-  one statement offers a place five candidates where a task has only places and nineteen
-  where it has objects too, so the company statistic does all of the separating.
-- **AND WHAT IS MISSING IS A BAR RATHER THAN A BETTER GAP.** The ranking is perfect and the
-  STOPPING has no rule — the largest fall and take-everything are each right exactly where
-  the other is wrong, which is the repair gate's own shape read the other way round.
-- **AND THE POPULATION ALONE CANNOT SUPPLY ONE, WHICH IS MEASURED RATHER THAN ARGUED.** Every
-  slot a family of otherwise-identical rules offers is a bag of names, verbs, rooms, props and
-  function words at once, being *everything that predicted this answer*.
-- **SO THE TWO HALVES ARE ONE MECHANISM: THE POPULATION SAYS WHERE A SLOT IS AND THE TEXT
-  SAYS WHAT BELONGS IN IT.** Cutting the bag by the company statistic never once straddles two
-  categories, over seventy-one groups on three tasks.
-- **AND THE CATEGORY COMES BACK WHOLE ONLY WHERE THE LEARNER IS FAILING**, which inverts the
-  order this was planned in. The task answered outright returns half the cast off twenty-seven
-  rules; the task below its own marginal returns all of it off twelve hundred.
-- **AND OFF THE RAW TEXT IT COMES BACK PERFECT, WHICH NEEDS NO POPULATION AT ALL.** The six
-  rooms, the four names, the four motion verbs and the three props, and on the task holding
-  both it separates the taking verbs from the dropping ones.
-- **AND HANDED OVER FREE IT PAYS, WHICH IS THE UPPER BOUND ON THE OPERATOR AND WAS RUN BEFORE
-  IT.** Minting cannot beat being given, so a grid costing minutes priced a rung costing a
-  session — and that ordering is the reusable part.
-- **AND IT PAYS FIVE TIMES MORE UNDER THE BAG THAN UNDER THE ADDRESSED FRONT END**, which had
-  already done the selecting and left a category nothing to generalise over. Under the bag it
-  is bought for no extra population; under the addressed arm it costs a third more.
-- **AND NO ARM CLEARS ITS MARGINAL WHERE TWO FACTS ARE NEEDED, WHICH IS THE LIMIT.** A
-  category generalises across one slot and adds no hop, so it prices this rung and leaves fork
-  96 exactly where it was.
-- **AND THE ROOM IS WHERE THE ANSWERS WERE MISSING, WHICH THE ONE-HOP CEILING SAYS OUTRIGHT.**
-  Reading at the question's key leaves the answer present on a quarter of task two and a
-  twelfth of task three, so those scores were never about the learner.
-- **AND A SECOND HOP NEARLY DOUBLES IT AND A THIRD NEARLY TRIPLES IT**, to four questions in
-  seven and two in five. The retrieval was the whole of what was short.
-- **AND ABOUT HALF OF THAT IS RECENCY, WHICH ONLY A CONTROL SAYS.** Every statement here says
-  *to* and *the*, so a chain keyed on everything walks back a sentence at a time and never
-  follows a referent — `span` under a longer name.
-- **SO THE MARGIN THAT IS CHAINING'S IS A TENTH AT TWO HOPS AND SHRINKS WITH DEPTH**, and the
-  arm must be scored against a SPAN-MATCHED control rather than against one hop.
-- **AND NO KEY RULE WINS TWICE, so none is shipped.** Naive-everything leads at three hops,
-  not-background at two, in-a-category on task three — every gap inside a standard error.
-- **AND THE CEILING ROSE AND THE SCORE DID NOT FOLLOW, WHICH IS THE ARM'S VERDICT.** The chain
-  beats its span-matched control on one cell of six, and the plain bag at span three is the
-  best arm on both tasks needing more than one fact. Retrieval was necessary and is not
-  enough.
-- **AND A HOP NOT NEEDED IS DAMAGE — A QUARTER OF A PERFECT SCORE.** Task one falls from
-  answering everything to three in four the moment a second statement enters the room.
-- **BECAUSE THE BOTTLENECK MOVED FROM THE ROOM TO THE BAG.** Every arm reading more than one
-  statement pins the population at capacity, the drawn score climbs, the held-out one does
-  not, and silence appears — this doc's own widening finding, reproduced by a mechanism built
-  for another reason.
-- **SO THE CHAIN WANTED RUNG THREE RATHER THAN A DEEPER HOP**, a scope being a set: two
-  statements in the room is the selection problem again, whole.
-- **AND BANDING BY HOP PAYS IT OUT, WHICH IS A DIAGNOSIS CASHED RATHER THAN ARGUED.** Tagging
-  each word with which hop found it takes the two-fact task from a fifth to a third — the best
-  arm on it, half again the chain alone, and clear of a marginal nothing else cleared.
-- **AND SILENCE COLLAPSES WITH IT**, from a sixth of the exam to a two-hundredth: an arm that
-  can tell its statements apart stops abstaining on the rounds holding two.
-- **AND IT REACHES TWO FACTS AND NOT THREE.** The three-fact task sits level with the plain bag
-  and under its own marginal at every depth, and the band is capped at three so a longer chain
-  cannot say where its tail came from.
+- **ONE CONCEPT REACHED BY SEVERAL SENSES** — NOT BUILT, and the mechanism already exists.
+  Rung five names what CO-FIRES, which is exactly what a seen ball and a heard *ball* do;
+  nothing has ever run it across two modalities.
+- **AND CO-FIRING BINDS WHAT IS SIMULTANEOUS AND NEVER WHAT PERSISTS.** A ball at two moments
+  does not co-occur with itself, so no amount of it reaches the same thing seen twice. That
+  is minting an individual, by another road.
+- **AND IT BINDS WHAT IS SIMULTANEOUS AND NOT WHAT PERSISTS.** The ball at two moments never
+  co-occurs with itself, so co-firing cannot reach it. That is the individual again.
+- **SOMETHING TO BE WRONG ABOUT WHILE READING** — NOT BUILT, and it is why a primer moves no
+  counter. A world that asks is one way and an action with a consequence is another; what is
+  missing is any of them.
 - **MUTUAL EXCLUSION, so a belief can be CONTRADICTED and not merely wrong** — NOT BUILT. A
   miss says *I expected Y and got Z*; nothing anywhere says Y and Z cannot both hold, which
   is the whole of what a conflict is.

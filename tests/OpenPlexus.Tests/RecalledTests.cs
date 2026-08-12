@@ -923,8 +923,13 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// <b>AND IT REACHES TWO FACTS AND NOT THREE, WHICH IS THE HONEST EDGE.</b> The three-fact
     /// task sits level with the plain bag and under its own marginal at every depth, so what
     /// is measured here is a mechanism that scales to the task it was aimed at and stops.
-    /// <b>The band is capped at three</b>, so a fourth hop shares the oldest code and a longer
-    /// chain cannot say where its tail came from.
+    /// </para>
+    /// <para>
+    /// <b>AND THE BAND CAP IS NOT WHAT STOPS IT, WHICH IS WORTH SAYING BECAUSE IT IS THE
+    /// OBVIOUS SUSPECT.</b> <see cref="Joined.Bands"/> is three and three hops use bands nought, one
+    /// and two, all distinct — the cap first bites at a FOURTH hop. What separates the two
+    /// tasks is CONVERSION: the two-fact task turns near three quarters of its answer-present
+    /// ceiling into score and the three-fact task under half.
     /// </para>
     /// </remarks>
     [Fact]

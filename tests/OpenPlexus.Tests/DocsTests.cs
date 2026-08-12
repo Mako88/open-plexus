@@ -73,6 +73,19 @@ public sealed class DocsTests
     private static readonly string[] Sections =
     [
         "The goal",
+
+        // JOHN'S, AND IT IS THE SECTION WRITTEN TO STAY STILL. `The goal` holds the BET --
+        // a commitment rather than a count -- and the capability list holds what is missing.
+        // Neither said what the thing is missing FROM, so a session arriving cold read the
+        // capability list as a menu and optimised whatever the handoff named. It sits above
+        // the north star because architecture outranks what it will run on.
+        "THE ARCHITECTURE",
+
+        // AND THE HOW SITS DIRECTLY UNDER THE WHAT, one row per architecture line and in that
+        // order. Without it the architecture is a wish and the capability list is a menu, and
+        // neither says which of the two a given mechanism is serving.
+        "THE ROUTE",
+
         "The first north star",
 
         // JOHN'S, AND IT EARNS A SECTION BECAUSE IT ANSWERS A QUESTION NOTHING ELSE HERE

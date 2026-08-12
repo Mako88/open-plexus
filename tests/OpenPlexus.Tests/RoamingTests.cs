@@ -300,11 +300,12 @@ public sealed class RoamingTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_a_learner_reads_where_the_transcript_stops_answering_itself()
     {
+        // THE BACKWARD-READING ARM THAT LEADS, AND THE STORE'S TWO AXES CROSSED. `Bagged`,
+        // `Recent` and `Addressed` are not here because they are compared in the ceiling
+        // grid and all three sit at the marginal; `Chained` is the one worth beating, being
+        // the best any lookup over the transcript reached on this world.
         var arms = new (string Name, Joined Joined)[]
         {
-            (nameof(Joining.Bagged), new Joined(Joining.Bagged)),
-            (nameof(Joining.Recent), new Joined(Joining.Recent)),
-            (nameof(Joining.Addressed), new Joined(Joining.Addressed)),
             (nameof(Joining.Chained), new Joined(Joining.Chained)),
         }
         .Concat(new[] { 1, 3 }.SelectMany(depth => new[]
@@ -315,20 +316,56 @@ public sealed class RoamingTests(ITestOutputHelper output)
         }))
         .ToList();
 
+        var scores = new Dictionary<string, List<double>>();
+
         foreach (var (name, joined) in arms)
         {
-            var world = new Roaming(World(120), seed: 1);
-            var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed: 1);
+            scores[name] = [];
 
-            var tally = new Trial<Asking>(world, joined, brain)
-                .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
+            // SEEDS, BECAUSE THE CLAIM IS A COMPARISON AND A COMPARISON ON ONE RUN IS AN
+            // ANECDOTE. The world and the brain take the same seed, so an arm's whole run
+            // moves together rather than the house being redrawn under a fixed population.
+            foreach (var seed in new[] { 1, 2, 3 })
+            {
+                var world = new Roaming(World(120), seed);
+                var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed);
 
-            var exam = tally.Unseen?.Accuracy ?? 0.0;
+                var tally = new Trial<Asking>(world, joined, brain)
+                    .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
 
-            output.WriteLine(
-                $"{name,-12}| exam {exam:F3} | own {tally.Recent:F3} "
-                + $"| held {brain.Held.Count}");
+                var exam = tally.Unseen?.Accuracy ?? 0.0;
+
+                scores[name].Add(exam);
+
+                output.WriteLine(
+                    $"{name,-12}| seed {seed} | exam {exam:F3} | own {tally.Recent:F3} "
+                    + $"| held {brain.Held.Count}");
+            }
         }
+
+        foreach (var (name, taken) in scores)
+            output.WriteLine($"{name,-12}| worst {taken.Min():F3} | best {taken.Max():F3}");
+
+        // THE BAR IS TWO COMPARISONS AND NEITHER IS A LEVEL. First, that following the
+        // freshest key beats folding through all of them AT THE SAME DEPTH -- which isolates
+        // the key rule, the two arms differing in nothing else. Second, that it beats the
+        // best lookup over the transcript, which is what says a forward store is worth
+        // building at all.
+        //
+        // WORST AGAINST BEST, so a lead has to survive the seed that suited it least meeting
+        // the seed that suited its rival most. That is a cruder test than a standard error
+        // and it cannot be gamed by a run that happened to land well.
+        Assert.True(scores["Freshest(3)"].Min() > scores["Resolved(3)"].Max(),
+            $"following the freshest key reads {scores["Freshest(3)"].Min():F3} at its worst "
+            + $"against {scores["Resolved(3)"].Max():F3} at the all-keys fold's best, so which "
+            + "key the fold follows is inside the seed spread and the ceiling grid's account "
+            + "of what limits this learner is wrong");
+
+        Assert.True(scores["Freshest(3)"].Min() > scores[nameof(Joining.Chained)].Max(),
+            $"the store reads {scores["Freshest(3)"].Min():F3} at its worst against "
+            + $"{scores[nameof(Joining.Chained)].Max():F3} for the best backward-reading arm at "
+            + "its best, so maintaining a store forwards buys no score over a lookup and this "
+            + "whole mechanism is `Chained` by a longer road");
 
         // AND THE BAGGED ARM COMES BACK WITH AN EMPTY POPULATION, WHICH IS A FINDING ABOUT
         // THE FRONT END RATHER THAN A SCORE. Six rooms, four things and a few function
@@ -341,15 +378,11 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // the front end deciding what the learner can possibly see, and both look like the
         // learner failing.
 
-        // AND THE STORE ARMS ARE READ AGAINST THE CEILING GRID ABOVE RATHER THAN AGAINST
-        // EACH OTHER. `Resolved(0)` cannot exceed 0.176 and `Resolved(3)` cannot exceed
-        // 0.921, because a moment the answering word is missing from is unanswerable -- so
-        // a depth that scores lower having reached higher is the learner failing to choose,
-        // and a depth that scores at its own ceiling is the learner doing all there is.
-        // Reading the two columns apart is what `What_each_translation_leaves_in_the_room`
-        // exists for.
-
-        // NO BAR YET, AND SAYING SO IS THE POINT. A bar written beside a first reading would
-        // be a level chosen from one run rather than a claim anything refutes.
+        // AND EVERY ARM IS READ AGAINST ITS OWN CEILING RATHER THAN AGAINST THE OTHERS'
+        // SCORES, which is what makes the two tests in this file one instrument. A moment
+        // the answering word is missing from is unanswerable, so `present` in the grid above
+        // caps each arm exactly -- and what an arm CONVERTS of its own cap is where the
+        // learner's part of this shows. An arm reaching further and scoring lower is failing
+        // to choose, which is the selection problem and not a failure to read.
     }
 }

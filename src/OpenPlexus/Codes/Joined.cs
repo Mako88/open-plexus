@@ -179,6 +179,39 @@ public enum Joining
     /// </para>
     /// </remarks>
     Distinguished,
+
+    /// <summary>
+    /// The newest statement the question names something in — <b>the store read at the key
+    /// the question supplies, rather than at whichever key moved last.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>FORK 88, AND THE ARM THE DISPLACEMENT GRID POINTS AT.</b> Every situation arm
+    /// before this keys on recency and is at its ceiling only where it keeps ONE statement,
+    /// because a matcher that can ask only whether a code is present cannot choose between
+    /// two states in the room. So the choosing is done where the key is: <i>where is
+    /// mary</i> names <i>mary</i>, and the statement wanted is the newest one about her.
+    /// </para>
+    /// <para>
+    /// <b>IT IS SELECTION AND NOT DISPLACEMENT, WHICH IS WHY IT IS A DIFFERENT ARM RATHER
+    /// THAN A SETTING.</b> <see cref="Situated"/> asks what a newer statement made false and
+    /// throws that away for good; this asks what the question is about and reads only that.
+    /// One is a store maintained forwards, the other a lookup done backwards, and the grid
+    /// says the first pays only by accident.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS STILL NOT UNIFICATION, WHICH IS THE HONEST LIMIT.</b> A front end
+    /// intersecting two sets is arithmetic; a scope naming no argument is a matcher this
+    /// repo does not have. What this can say is what such a matcher would be WORTH, which
+    /// is the number fork 33 wants before anybody pays for one.
+    /// </para>
+    /// <para>
+    /// <b>Falls back to the whole bag where the question names nothing said</b>, because a
+    /// moment with no statement in it can answer nothing at all, and an arm that went silent
+    /// would be scoring its own abstentions.
+    /// </para>
+    /// </remarks>
+    Addressed,
 }
 
 /// <summary>
@@ -284,6 +317,8 @@ public sealed class Joined : IQuantizer<Asking>
         if (_joining is Joining.Situated or Joining.Distinguished)
             return Situating(observation);
 
+        if (_joining == Joining.Addressed) return Addressing(said, observation);
+
         if (_joining == Joining.Bagged) return said;
 
         // THE INTERSECTION IS TAKEN OVER THE HALVES AND NEVER OVER THE UNION, which reads
@@ -362,6 +397,40 @@ public sealed class Joined : IQuantizer<Asking>
             said.UnionWith(statement);
         }
 
+        return said;
+    }
+
+    /// <summary>
+    /// The question, and the newest statement that names something the question names.
+    /// </summary>
+    /// <remarks>
+    /// <b>NEWEST FIRST MAKES THIS ONE PASS AND ONE STATEMENT.</b> The story arrives newest
+    /// first, so the first statement intersecting the question IS the newest one about
+    /// whatever was asked — no scoring, no comparison, and nothing to tie-break.
+    /// <b>The intersection is against the question's words and never against the bag</b>,
+    /// which is the same line <see cref="Joining.Named"/> stands on: every word of the story
+    /// is in the story, so only the two halves know which are in both.
+    /// </remarks>
+    private static HashSet<Code> Addressing(HashSet<Code> said, Asking observation)
+    {
+        foreach (var statement in observation.Story)
+        {
+            var names = false;
+
+            foreach (var one in statement)
+                if (observation.Question.Contains(one)) { names = true; break; }
+
+            if (!names) continue;
+
+            var found = new HashSet<Code>(observation.Question);
+            found.UnionWith(statement);
+
+            return found;
+        }
+
+        // NOTHING THE QUESTION NAMES WAS EVER SAID, so there is no store entry to read and
+        // the bag is what is left. See the arm's remarks: going silent would score the
+        // abstention rather than the mechanism.
         return said;
     }
 

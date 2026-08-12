@@ -355,8 +355,18 @@ public sealed class RecalledTests(ITestOutputHelper output)
             new Joined(Joining.Bagged).Codify(story).Order(),
             wide.Order());
 
+        // AND READING AT THE QUESTION'S KEY TAKES MARY'S NEWEST AND NOTHING ELSE, which is a
+        // different statement from the newest overall wherever somebody else spoke last.
+        var addressed = new Joined(Joining.Addressed).Codify(story);
+
+        Assert.Contains(Babi.Of("garden"), addressed);
+        Assert.DoesNotContain(Babi.Of("kitchen"), addressed);
+        Assert.DoesNotContain(Babi.Of("office"), addressed);
+        Assert.DoesNotContain(Babi.Of("john"), addressed);
+
         output.WriteLine(
-            $"bag {wide.Count} | situated {situated.Count} | newest only {narrow.Count}");
+            $"bag {wide.Count} | situated {situated.Count} | newest only {narrow.Count} "
+            + $"| addressed {addressed.Count}");
     }
 
     /// <summary>
@@ -407,6 +417,13 @@ public sealed class RecalledTests(ITestOutputHelper output)
             // AND THE ARM THAT IS TOLD NOTHING, WHICH THE CEILING SAYS IS THE BETTER KEY.
             // It has no dial because the story supplies its own background.
             Row(capacity, Joining.Distinguished, constant: 0);
+
+            // AND THE ONE THE CEILING SAYS SHOULD WIN OUTRIGHT. PRE-REGISTERED: it hands
+            // over one statement with a ceiling of one, and this learner is measured at
+            // ninety-nine per cent of its ceiling wherever it is handed one statement — so
+            // anything short of the nineties says the reader finding was conditional on
+            // something nobody has named.
+            Row(capacity, Joining.Addressed, constant: 0);
         }
 
         void Row(int capacity, Joining joining, int constant)
@@ -612,6 +629,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
         var wasCeiling = -1.0;
         var wasWords = -1.0;
+        var narrowest = int.MaxValue;
 
         foreach (var constant in new[] { 0, 1, 2, 4, 8, 16, 32, 64 })
         {
@@ -639,6 +657,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
             wasCeiling = ceiling;
             wasWords = words;
+            narrowest = Math.Min(narrowest, kept);
 
             output.WriteLine(
                 $"constant {constant,2} | answer present {ceiling:F3} | "
@@ -671,6 +690,36 @@ public sealed class RecalledTests(ITestOutputHelper output)
         output.WriteLine(
             $"distinguished | answer present {found / (double)world.Withheld.Count:F3} | "
             + $"kept {held / (double)whole:F3} of the bag");
+
+        // AND THE ARM THAT READS THE STORE AT THE KEY THE QUESTION SUPPLIES, in the same
+        // two columns. It keeps ONE statement, so its budget is the narrowest here — and if
+        // its ceiling is high while its budget is small, that is the pair no recency rule
+        // has managed and the whole reason fork 88 is worth taking.
+        var asked = new Joined(Joining.Addressed);
+
+        var aimed = 0;
+        var cost = 0;
+
+        for (var one = 0; one < world.Withheld.Count; one++)
+        {
+            var moment = new HashSet<Code>(asked.Codify(world.Withheld[one].Seen));
+
+            cost += moment.Count;
+
+            if (moment.Contains(Babi.Of(world.Transcript[one].Answer))) aimed++;
+        }
+
+        output.WriteLine(
+            $"addressed     | answer present {aimed / (double)world.Withheld.Count:F3} | "
+            + $"kept {cost / (double)whole:F3} of the bag");
+
+        // THE DOMINANCE PUT IN THE TEST, because it is the reading the whole arc turns on.
+        // Reading the store at the key the question supplies keeps LESS than the narrowest
+        // recency rule and loses no answer at all, which no displacement setting managed at
+        // any budget. A recency rule is at its ceiling only where it keeps one statement,
+        // and this keeps one statement AND has no ceiling to be short of.
+        Assert.Equal(world.Withheld.Count, aimed);
+        Assert.True(cost < narrowest, $"addressed kept {cost} against the narrow arm's {narrowest}");
 
         // AND THE CONTROL THAT SAYS WHETHER THE KEY IS DOING ANYTHING AT ALL, matched
         // question by question on how many words survived. Both columns moving together is

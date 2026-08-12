@@ -475,7 +475,7 @@ public sealed class DocsTests
         var plan = Plan();
 
         var listed = Regex
-            .Matches(plan, @"\*\*(\d{1,2})\*\*")
+            .Matches(plan, @"\*\*(\d{1,3})\*\*")
             .Select(match => match.Groups[1].Value)
             .ToHashSet(StringComparer.Ordinal);
 
@@ -484,7 +484,12 @@ public sealed class DocsTests
         var cited = new SortedSet<string>(StringComparer.Ordinal);
 
         foreach (var path in Tree.Sources("src"))
-            foreach (Match match in Regex.Matches(File.ReadAllText(path), @"[Ff]ork (\d{1,2})"))
+            // THREE DIGITS AND ANCHORED, BECAUSE TWO SILENTLY TRUNCATED THE FIRST FORK PAST
+            // NINETY-NINE. `fork 106` matched as `10`, so the check reported a dangling
+            // citation of a fork nobody had written about while the one actually cited went
+            // unchecked -- a guard describing a repo that is not there, which is the fault
+            // this file exists to catch in other people's work.
+            foreach (Match match in Regex.Matches(File.ReadAllText(path), @"[Ff]ork (\d{1,3})\b"))
                 cited.Add(match.Groups[1].Value);
 
         Assert.NotEmpty(cited);

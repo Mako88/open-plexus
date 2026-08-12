@@ -30,12 +30,40 @@ public sealed class ReturningTests(ITestOutputHelper output)
 {
     private const long Rounds = 20_000;
 
-    private static ReturningSettings World(bool twinned, bool tagged, bool placed = false) =>
+    private static ReturningSettings World(
+        bool twinned, bool tagged, bool placed = false, double wandering = 0.0) =>
         new()
         {
             Things = 8, Attributes = 3, CodesPerAttribute = 4, Hidden = 2,
             Twinned = twinned, Tagged = tagged, Placed = placed, Withheld = 300,
+            Wandering = wandering,
         };
+
+    /// <summary>What a front end watching this world would have seen, in order.</summary>
+    /// <param name="settings">Which world.</param>
+    /// <param name="seed">Which stream.</param>
+    /// <param name="sightings">How many moments to watch.</param>
+    /// <remarks>
+    /// <b>A SEPARATE INSTANCE AT THE SAME SEED, so the groups are found in what a front end
+    /// would have seen rather than in the examination.</b> It sees the same distribution and
+    /// none of the withheld sightings.
+    /// </remarks>
+    private static List<IReadOnlySet<Code>> Watched(
+        ReturningSettings settings, int seed, int sightings = 4000)
+    {
+        var watching = new Returning(settings, seed);
+
+        return Enumerable.Range(0, sightings)
+            .Select(_ => (IReadOnlySet<Code>)new HashSet<Code>(watching.Next().Seen.Codes))
+            .ToList();
+    }
+
+    /// <summary>How many groups of each size a derivation found on one modality.</summary>
+    /// <param name="found">What came back.</param>
+    /// <param name="modality">Which channel to read.</param>
+    private static List<IReadOnlySet<Code>> On(
+        IReadOnlyList<IReadOnlySet<Code>> found, byte modality) =>
+        found.Where(one => one.All(code => code.Modality == modality)).ToList();
 
     /// <summary>One cell of the grid, run and printed.</summary>
     /// <param name="settings">Which cell.</param>
@@ -453,5 +481,202 @@ public sealed class ReturningTests(ITestOutputHelper output)
                 $"{arms[arm].Item1.Trim()} scored {scored[arm]:F3} against {scored[0]:F3} "
                 + "with no categories, so it did not compress a population -- it changed what "
                 + "the population claims, and the rule count is measuring two things at once");
+    }
+
+    /// <summary>
+    /// Whether continuity separates two things every statistic over the moments says are the
+    /// same — <b>fork 106, John's, and the limit of <see cref="Alternating.From"/> attacked
+    /// where it was found.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE DERIVATION SEES A BAG OF MOMENTS AND NO ORDER, WHICH IS WHY THE TWINS MERGED.</b>
+    /// Substitutability is a fact about moments, and twins are substitutable by construction —
+    /// so eight things came back as four groups of eight landmarks, each holding both twins'.
+    /// Nothing about looking harder at moments can fix that.
+    /// </para>
+    /// <para>
+    /// <b>SO WHAT IS ADDED IS THE STREAM'S ORDER AND NOTHING ELSE.</b> The world draws
+    /// sightings in RUNS rather than uniformly, which changes which thing is met and changes
+    /// nothing whatever about how a met thing is shown. A learner seeing one moment at a time
+    /// is handed exactly what it was handed before.
+    /// </para>
+    /// <para>
+    /// <b>WHAT WOULD KILL IT, SAID BEFORE IT RUNS AND CARRIED FROM THE HANDOFF THAT NAMED
+    /// IT: if the landmarks still come back four-of-eight, continuity does not separate
+    /// substitutable things and the route back is a GATE reading what a proposal predicts.</b>
+    /// That is the honest alternative and it is a different kind of mechanism — a derivation
+    /// over what arrived against a judge of what a claim earns.
+    /// </para>
+    /// <para>
+    /// <b>AND THE UNIFORM STREAM IS THE CONTROL THAT SAYS ADHESION READS TIME.</b> Run on a
+    /// world drawing independently, the same clause must not recover a thing — otherwise it
+    /// is reading some other regularity and the runs were never what paid.
+    /// </para>
+    /// <para>
+    /// <b>IT DOES NOT COME BACK EMPTY, AND THAT IS A PROPERTY OF THE BAR RATHER THAN OF THE
+    /// WORLD.</b> A ratio against chance corrects for nothing, so out of every pair in the
+    /// alphabet one clears it by luck — the same failure rung five's gate exists against and
+    /// pays for with a correction by the count of candidates. What the control can say is
+    /// that noise reaches a PAIR and structure reaches the thing, and the distance between
+    /// those two is the finding rather than the emptiness.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_continuity_separates_things_that_statistics_cannot()
+    {
+        const double Adhesion = 1.5;
+        const int Seeds = 3;
+
+        var running = World(twinned: true, tagged: false, placed: true, wandering: 0.8);
+        var uniform = World(twinned: true, tagged: false, placed: true);
+
+        var stream = Watched(running, seed: 1);
+
+        // CONTROL ONE: THE SPACE DERIVATION ON THE SAME RUNS. It reads an unordered bag, so
+        // making the stream continuous must leave it exactly where it was -- and if it does
+        // not, the runs changed the moments and the arm below is measuring two things.
+        var blind = Alternating.From(stream, company: 0.5, floor: 20);
+
+        // CONTROL TWO: THE TIME DERIVATION ON A UNIFORM STREAM. Every pair adheres at chance
+        // there, so this must find nothing.
+        var chance = Alternating.Over(
+            Watched(uniform, seed: 1), Adhesion, floor: 20, span: 1);
+
+        var found = Alternating.Over(stream, Adhesion, floor: 20, span: 1);
+
+        foreach (var (label, groups) in new (string, IReadOnlyList<IReadOnlySet<Code>>)[]
+            { ("space, on runs", blind), ("time, on uniform", chance), ("time, on runs", found) })
+            output.WriteLine(
+                $"{label,-18}| {groups.Count,2} groups | looks "
+                + $"{string.Join(",", On(groups, 23).Select(one => one.Count).OrderDescending())} "
+                + $"| places "
+                + $"{string.Join(",", On(groups, 25).Select(one => one.Count).OrderDescending())}");
+
+        Assert.True(On(blind, 25).Count == 4 && On(blind, 25).All(one => one.Count == 8),
+            $"the space derivation found {On(blind, 25).Count} landmark groups on a continuous "
+            + "stream where it found four of eight on a uniform one, so the runs changed what "
+            + "a moment holds and this file's account of them is wrong");
+
+        // AND WHAT THE CONTROL CAN SAY IS THAT NOTHING IS RECOVERED, NOT THAT NOTHING IS
+        // FOUND. An uncorrected ratio lets one pair through on luck; a thing is four codes,
+        // so a group that reaches four is the world and a group of two is the tail.
+        Assert.DoesNotContain(On(chance, 25), one => one.Count >= 4);
+
+        // THE FINDING. Eight groups of four is one per THING, which is what four of eight
+        // could not reach: the twins' landmarks are drawn from different alphabets and only
+        // ever turn up beside their own.
+        var places = On(found, 25);
+
+        Assert.True(places.Count == 8 && places.All(one => one.Count == 4),
+            $"the landmark groups came back as {places.Count} of sizes "
+            + $"{string.Join(",", places.Select(one => one.Count).Distinct().Order())}. Four of "
+            + "eight means continuity does not separate substitutable things, the twins are "
+            + "beyond a derivation over what arrived, and the route back is a gate reading "
+            + "what a proposal predicts");
+
+        // AND THE APPEARANCES ARE STILL RECOVERED, WHICH IS WHAT SAYS THE TIME CLAUSE IS AN
+        // ADDITION RATHER THAN A REPLACEMENT. Twins wear one look, so the look groups are the
+        // same twelve of four the space derivation finds -- an arm that separated the twins
+        // and lost the appearances would have traded one recovery for another.
+        var looks = On(found, 23);
+
+        Assert.True(looks.Count == 12 && looks.All(one => one.Count == 4),
+            $"the appearance groups came back as {looks.Count} of sizes "
+            + $"{string.Join(",", looks.Select(one => one.Count).Distinct().Order())} against "
+            + "twelve of four from the space derivation, so reading time cost what reading "
+            + "space already had");
+
+        Assert.DoesNotContain(found, one => one.Select(code => code.Modality).Distinct().Count() > 1);
+
+        // AND WHAT IT IS WORTH, WHICH IS A SECOND QUESTION AND NOT A COROLLARY. Separating
+        // the twins in a derivation is one thing; a population getting smaller because of it
+        // is another, and the two have come apart here before -- the fold recovered the
+        // appearances exactly and moved the rule count by nothing until the judge arrived.
+        //
+        // THE SPACE CATEGORIES ARE THE CONTROL AND NOT THE PLAIN CELL. Both arms fold a
+        // vocabulary in and both let subsumption read it, so the ONLY difference between
+        // them is whether the landmark groups are per thing or per pair. A plain cell alone
+        // would be measuring the categories and the twins at once.
+        int byNothing = 0, heldByPair = 0, heldByThing = 0, byTag = 0;
+        double loose = 0.0, byPair = 0.0, byThing = 0.0;
+
+        foreach (var seed in Enumerable.Range(1, Seeds))
+        {
+            // DERIVED FROM ITS OWN SEED'S STREAM, both ways. A vocabulary derived once and
+            // reused would make the later seeds a test of how well the first one's
+            // categories travel, which is an easier question than the one being asked.
+            var watched = seed == 1 ? stream : Watched(running, seed);
+
+            var bySpace = Alternating.From(watched, company: 0.5, floor: 20);
+            var byTime = Alternating.Over(watched, Adhesion, floor: 20, span: 1);
+
+            // THE DERIVATION CHECKED AT EVERY SEED AND NOT ONLY THE FIRST, because the two
+            // vocabularies below are the arm and a seed where they came back the same shape
+            // would be a cell comparing one thing with itself.
+            Assert.True(
+                On(bySpace, 25).Count == 4 && On(byTime, 25).Count == 8,
+                $"at seed {seed} space found {On(bySpace, 25).Count} landmark groups and time "
+                + $"{On(byTime, 25).Count}, against four and eight -- so the separation this "
+                + "arm is built on is a fact about seed one");
+
+            var perPair = new Sorting(bySpace);
+            var perThing = new Sorting(byTime);
+
+            var none = Cell(running, $"seed {seed}, no categories", seed: seed);
+
+            var space = Cell(
+                running, "  categories from space", perPair, Recasting.Judged, seed);
+
+            var time = Cell(
+                running, "  categories from time", perThing, Recasting.Judged, seed);
+
+            var tagged = Cell(
+                World(twinned: true, tagged: true, wandering: 0.8),
+                "  tagged, the floor", seed: seed);
+
+            byNothing += none.Held;
+            heldByPair += space.Held;
+            heldByThing += time.Held;
+            byTag += tagged.Held;
+
+            loose += none.Exam / Seeds;
+            byPair += space.Exam / Seeds;
+            byThing += time.Exam / Seeds;
+        }
+
+        output.WriteLine(
+            $"over {Seeds} seeds, per-thing categories hold {heldByThing} rules against "
+            + $"{heldByPair} per-pair, {byNothing} with none and a handed index's {byTag}");
+
+        // THE SCORE GUARD FIRST. This cell already answers everything, so no arm here can buy
+        // accuracy and any of them can sell it.
+        foreach (var (name, score) in new[] { ("space", byPair), ("time", byThing) })
+            Assert.True(Math.Abs(score - loose) < 0.15,
+                $"the {name} categories scored {score:F3} against {loose:F3} with none, so "
+                + "what moved the rule count was what the population CLAIMS rather than how "
+                + "much of it there is");
+
+        // AND THE FINDING, WHICH IS THE ONE THIS ARM EXISTS FOR: A CATEGORY THAT REACHES THE
+        // INDIVIDUAL COMPRESSES WHERE ONE THAT REACHES THE PAIR CANNOT. A per-pair landmark
+        // group says *one of these two things* and still needs the look to say which, so the
+        // conjunction survives; a per-thing group says the thing, and the rule collapses onto
+        // it. That is what minting an individual is worth, derived rather than handed.
+        Assert.True(heldByThing < heldByPair,
+            $"per-thing categories hold {heldByThing} rules against {heldByPair} per-pair, so "
+            + "separating the twins bought nothing a population can spend -- the derivation "
+            + "is better and the machine is not, which is the gap this assertion exists to "
+            + "catch");
+
+        // AND IT GOES PAST THE CEILING THE GRID ABOVE CALLED ONE, WHICH IS THE CLAIM MOST
+        // WORTH REFUTING HERE. A handed index is one contentless code standing for the thing
+        // and it still needs conjoining with what the thing looks like; a derived category
+        // over a thing's own landmarks is the same code AND it absorbs the look rules that
+        // named its members. If this ever flips, the individual this recovers is worth less
+        // than being told, and the whole route is a longer way to a smaller answer.
+        Assert.True(heldByThing < byTag,
+            $"per-thing categories hold {heldByThing} rules against a handed index's "
+            + $"{byTag}, so a derived individual has stopped beating a given one and this "
+            + "file's account of why is wrong");
     }
 }

@@ -96,6 +96,35 @@ public sealed record ReturningSettings
     /// </remarks>
     public bool Placed { get; init; }
 
+    /// <summary>
+    /// How often the next sighting is the SAME thing as the last — <b>fork 106, and the one
+    /// thing this world withheld that a category could have used.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>JOHN'S: COLLAPSE CATEGORIES OVER TIME AS WELL AS SPACE.</b> A derivation over a bag
+    /// of moments sees no order, which is exactly why twins merge — every statistic over the
+    /// moments is the same for both by construction. Sightings that come in RUNS put a
+    /// thing's own codes next to each other in time and nobody else's, which is a fact about
+    /// the stream rather than about any moment in it.
+    /// </para>
+    /// <para>
+    /// <b>AND NOUGHT IS THE UNIFORM DRAW EVERY READING BEFORE THIS WAS TAKEN UNDER</b>, so
+    /// the world is unchanged where this is not set and the two are one axis rather than two
+    /// worlds. What it does NOT do is make a thing easier to answer about: the hidden
+    /// attribute, the looks and the landmarks are drawn exactly as they were, and a learner
+    /// seeing one moment at a time is handed nothing at all.
+    /// </para>
+    /// <para>
+    /// <b>SO IT IS CONTINUITY WITHOUT MOTION, WHICH IS THE HONEST LIMIT.</b> A thing's
+    /// landmark is still fixed for the life of the world, so what runs give is repeated
+    /// sightings of one thing rather than a thing moving between places. Whether a MOVING
+    /// landmark is what an individual needs is the arm after this one, and it is the arm
+    /// this world's own doc already names.
+    /// </para>
+    /// </remarks>
+    public double Wandering { get; init; }
+
     /// <summary>How many sightings are kept back and never drawn.</summary>
     public required int Withheld { get; init; }
 }
@@ -168,6 +197,10 @@ public sealed class Returning : IWorld<Coded>, IWithholds<Coded>
 
     private readonly List<Turn<Coded>> _kept = [];
 
+    /// <summary>Which thing was met last, or -1 before anything has been.</summary>
+    /// <inheritdoc cref="ReturningSettings.Wandering"/>
+    private int _last = -1;
+
     /// <param name="settings">How the world is set up.</param>
     /// <param name="seed">What draws the sightings.</param>
     public Returning(ReturningSettings settings, int seed)
@@ -178,6 +211,8 @@ public sealed class Returning : IWorld<Coded>, IWithholds<Coded>
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.CodesPerAttribute);
         ArgumentOutOfRangeException.ThrowIfLessThan(settings.Hidden, 2);
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Withheld);
+        ArgumentOutOfRangeException.ThrowIfNegative(settings.Wandering);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(settings.Wandering, 1.0);
 
         if (settings.Twinned && settings.Things % 2 != 0)
             throw new ArgumentException(
@@ -228,10 +263,20 @@ public sealed class Returning : IWorld<Coded>, IWithholds<Coded>
     /// <inheritdoc/>
     public Turn<Coded> Next() => Draw();
 
-    /// <summary>One sighting of one thing, chosen uniformly.</summary>
+    /// <summary>One sighting of one thing, uniformly or in a run.</summary>
+    /// <remarks>
+    /// <b>THE RUN IS DRAWN BEFORE ANYTHING ELSE IS, so a sighting's look and landmark are
+    /// exactly what they would have been.</b> Continuity decides WHICH thing is met and
+    /// changes nothing about how a met thing is shown — otherwise the arm would be handing
+    /// over a second channel and reading it as order.
+    /// </remarks>
     private Turn<Coded> Draw()
     {
-        var thing = _sightings.Next(_settings.Things);
+        var thing = _last >= 0 && _sightings.NextDouble() < _settings.Wandering
+            ? _last
+            : _sightings.Next(_settings.Things);
+
+        _last = thing;
 
         var look = new HashSet<Code>();
 

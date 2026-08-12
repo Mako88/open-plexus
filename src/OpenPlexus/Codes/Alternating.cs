@@ -83,6 +83,142 @@ public static class Alternating
                 foreach (var other in moment) if (!other.Equals(one)) kept.Add(other);
             }
 
+        return Grouped(
+            seen, floor, withs,
+            (mine, theirs, group) => Shared(withs[mine], withs[theirs], group) >= company);
+    }
+
+    /// <summary>
+    /// The same question asked of a stream that has an ORDER — <b>fork 106, John's, and the
+    /// one clause a bag of moments cannot carry.</b>
+    /// </summary>
+    /// <param name="moments">What was seen, in the order it was seen.</param>
+    /// <param name="adhesion">
+    /// How many times more often than chance two codes must turn up near each other in TIME.
+    /// <b>A ratio against what independent codes would have done, so it is not a level about
+    /// this world</b> — the same shape rung five's independence bar has, and the reason a
+    /// share of shared company would not do here.
+    /// </param>
+    /// <param name="floor">
+    /// <inheritdoc cref="From" path="/param[@name='floor']"/>
+    /// </param>
+    /// <param name="span">
+    /// How many moments either side count as near. <b>The window is what makes time
+    /// readable at all</b>, and one is the smallest thing that is not the moment itself.
+    /// </param>
+    /// <remarks>
+    /// <para>
+    /// <b>EXCLUSION STAYS IN THE MOMENT AND COMPANY MOVES TO THE WINDOW, WHICH IS THE WHOLE
+    /// CONSTRUCTION.</b> Widening the exclusion would refuse exactly the codes this is for —
+    /// a thing seen twice running shows two of its own looks in adjacent moments, so they
+    /// co-occur in any window and would fail the clause that makes them alternatives.
+    /// </para>
+    /// <para>
+    /// <b>AND THE TEST IS ADHESION RATHER THAN SHARED COMPANY, BECAUSE SHARED COMPANY IS
+    /// EXACTLY WHAT TWINS HAVE.</b> Two twins wear one look, so their landmarks keep the same
+    /// company however wide the window is — that is <see cref="From"/>'s measured limit. What
+    /// runs give is that a thing's OWN codes turn up beside each other far more often than
+    /// chance and a twin's never do, which is a statement about a pair rather than about the
+    /// company either keeps.
+    /// </para>
+    /// <para>
+    /// <b>SO A UNIFORM STREAM MUST RETURN NOTHING, AND THAT IS THE CONTROL RATHER THAN A
+    /// FAILURE.</b> Where sightings are drawn independently, every pair adheres at chance, so
+    /// this refuses everything <see cref="From"/> would have found. The two are not
+    /// substitutes: one reads space and one reads time.
+    /// </para>
+    /// </remarks>
+    public static IReadOnlyList<IReadOnlySet<Code>> Over(
+        IEnumerable<IReadOnlySet<Code>> moments, double adhesion, int floor, int span)
+    {
+        ArgumentNullException.ThrowIfNull(moments);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(span);
+
+        var stream = moments.ToList();
+
+        var seen = new Dictionary<Code, int>();
+        var withs = new Dictionary<Code, HashSet<Code>>();
+        var near = new Dictionary<(Code Mine, Code Theirs), int>();
+
+        for (var at = 0; at < stream.Count; at++)
+            foreach (var one in stream[at])
+            {
+                seen[one] = seen.GetValueOrDefault(one) + 1;
+
+                if (!withs.TryGetValue(one, out var kept)) withs[one] = kept = [];
+
+                foreach (var other in stream[at]) if (!other.Equals(one)) kept.Add(other);
+
+                // COUNTED ONCE A MOMENT AN OTHER, NOT ONCE A NEIGHBOUR. A code appearing in
+                // both moments either side of this one is one piece of evidence about
+                // adjacency, and counting it twice would let a long run of one thing
+                // manufacture its own significance.
+                var window = new HashSet<Code>();
+
+                for (var step = Math.Max(0, at - span);
+                    step <= Math.Min(stream.Count - 1, at + span);
+                    step++)
+                    if (step != at) window.UnionWith(stream[step]);
+
+                foreach (var other in window)
+                    if (!other.Equals(one))
+                    {
+                        near.TryGetValue((one, other), out var already);
+                        near[(one, other)] = already + 1;
+                    }
+            }
+
+        // CHANCE IS THE PRODUCT OF THE TWO MARGINALS OVER THE WINDOW'S OWN WIDTH, so what is
+        // being asked is whether the pair turns up beside each other more than two codes of
+        // those frequencies would have. Without the width the bar would be a claim about how
+        // wide the window is rather than about the stream.
+        var total = (double)stream.Count;
+        var width = (2 * span) + 1.0;
+
+        return Grouped(
+            seen, floor, withs,
+            (mine, theirs, _) =>
+            {
+                near.TryGetValue((mine, theirs), out var beside);
+
+                var expected = seen[mine] / total * (seen[theirs] / total) * width * total;
+
+                return expected > 0.0 && beside / expected >= adhesion;
+            });
+    }
+
+    /// <summary>The greedy grouping both derivations share.</summary>
+    /// <param name="seen">How often each code turned up.</param>
+    /// <param name="floor">How often before a code may join a group.</param>
+    /// <param name="withs">What each code shared a MOMENT with — the exclusion clause.</param>
+    /// <param name="keeps">Whether two codes keep close enough company to be alternatives.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>GREEDY, AND ITS ORDER IS THE CODES' OWN RATHER THAN THE STREAM'S.</b> Two machines
+    /// seeing the same moments in different orders must reach the same groups or a category
+    /// means one thing here and another there — the rule <c>Agreed</c> stands on, and the
+    /// reason a fitted quantiser is refused.
+    /// </para>
+    /// <para>
+    /// <b>A MEMBER MUST CLEAR BOTH CLAUSES AGAINST EVERY MEMBER ALREADY IN, never against
+    /// the first alone.</b> A chain of pairwise-similar codes reaches arbitrarily far, which
+    /// is single-link clustering's own failure and would return one group holding the whole
+    /// alphabet.
+    /// </para>
+    /// <para>
+    /// <b>AND THE EXCLUSION CLAUSE IS HERE RATHER THAN IN EITHER CALLER, because it is the
+    /// half of John's account that is not negotiable.</b> What the two derivations differ in
+    /// is what counts as keeping the same company; that alternatives never co-occur is the
+    /// same claim in both.
+    /// </para>
+    /// </remarks>
+    private static IReadOnlyList<IReadOnlySet<Code>> Grouped(
+        Dictionary<Code, int> seen,
+        int floor,
+        Dictionary<Code, HashSet<Code>> withs,
+        Func<Code, Code, IReadOnlySet<Code>, bool> keeps)
+    {
         var codes = seen.Where(one => one.Value >= floor).Select(one => one.Key).Order().ToList();
 
         var taken = new HashSet<Code>();
@@ -98,8 +234,8 @@ public static class Alternating
             {
                 if (taken.Contains(other) || group.Contains(other)) continue;
 
-                if (group.All(member => !withs[member].Contains(other)
-                        && Shared(withs[member], withs[other], group) >= company))
+                if (group.All(member =>
+                    !withs[member].Contains(other) && keeps(member, other, group)))
                     group.Add(other);
             }
 

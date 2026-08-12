@@ -75,7 +75,7 @@ condition that would revive them.
 | what it must do | how, now | what stands in the way |
 |---|---|---|
 | Understand concepts | The commitment: a scope that predicts, and is wrong about something specific | Nothing yet answers what a concept IS here beyond a code that fires |
-| A concept a thing in its own right | `Code`. A commitment's identity is one, so concepts nest inside scopes with no new machinery | Nothing mints a code for an INDIVIDUAL; every operator mints a rule or names a set |
+| A concept a thing in its own right | `Code`. A commitment's identity is one, and adhesion over an ordered stream reaches one group a THING | The derivation is the experimenter's; no front end runs it on its own stream |
 | Every input an attribute of it | Nothing | Rung five names what co-fires and has never been run across two modalities |
 | Relations are concepts too | A commitment IS a relation and carries a code, so relations nest | A relation naming no ARGUMENT is rung four, a different matcher rather than a rung |
 | Concept and label independent | Concept-before-label is measured; alternation groups things with no word | Label-first is unbuilt — being told a word for a thing nothing else is known about |
@@ -296,12 +296,16 @@ exercise. One line a capability, and the status is the whole point of the row.
 - **AND CO-FIRING BINDS WHAT IS SIMULTANEOUS AND NEVER WHAT PERSISTS.** A ball at two moments
   does not co-occur with itself, so no amount of it reaches the same thing seen twice. That
   is minting an individual, by another road.
-- **SO AN INDIVIDUAL LOOKED LIKE A CATEGORY OVER ITS APPEARANCES AND IS HALF THAT.** The
-  derivation reaches the PAIR: twins are substitutable by construction, so every statistic
-  over the moments is the same for both.
-- **AND WHAT SEPARATES THEM IS WHAT THEIR CODES PREDICT, WHICH IS NOWHERE IN THE INPUT.** So
-  the last step to an individual is a GATE reading a proposal's record, never a derivation
-  over what arrived.
+- **AND AN INDIVIDUAL IS A CATEGORY OVER ITS APPEARANCES ONCE THE STREAM HAS AN ORDER.** A
+  bag of moments reaches the PAIR, since twins are substitutable in every moment. Sightings
+  in RUNS put a thing's own codes beside each other in time and no twin's — eight groups of
+  four where space finds four of eight, at three seeds.
+- **SO WHAT SEPARATES THEM IS IN THE INPUT AND NOT IN ANY MOMENT OF IT**, which retires the
+  gate this list called the only route. Exclusion stays in the moment; company becomes
+  ADHESION, a pair turning up near each other more than chance would.
+- **AND THE DERIVED INDIVIDUAL BEATS A HANDED ONE**, 123 rules to 179 over three seeds
+  against 604 with no category, every cell at a perfect score. A given index still needs
+  conjoining with a look; a derived one absorbs the rules that named its members.
 - **SOMETHING TO BE WRONG ABOUT WHILE READING** — NOT BUILT, and it is why a primer moves no
   counter. A world that asks is one way and an action with a consequence is another; what is
   missing is any of them.
@@ -311,9 +315,9 @@ exercise. One line a capability, and the status is the whole point of the row.
 - **MUTUAL EXCLUSION, so a belief can be CONTRADICTED and not merely wrong** — NOT BUILT. A
   miss says *I expected Y and got Z*; nothing anywhere says Y and Z cannot both hold, which
   is the whole of what a conflict is.
-- **MINTING AN INDIVIDUAL** — NOT BUILT, AND ON NO LIST EITHER. Every operator here mints a
-  RULE, and rung five mints a name for a SET. A referent is a constant introduced by one
-  moment, which is neither — DRT's move, and what no rung covers.
+- **MINTING AN INDIVIDUAL** — DERIVED AND NOT ADMITTED. Adhesion over an ordered stream
+  reaches one group a THING, and a population folding it holds a third of what it held. What
+  is missing is a front end deriving its own, since the experimenter still runs it.
 - **AND THE GRADIENT ALREADY COLLAPSED ONCE, IN THE STORE THAT HAS ONE.** The vote takes the
   narrowest every round and subsumption the general one every thousandth, so a second store
   needs an evidence rule the first lacked or it collapses the same way — repetition for a
@@ -1683,6 +1687,6 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **98** | John's: a concept forms BEFORE its label, so substitutability groups things with no word and the word later labels a category that already existed. THE PROBE PASSES on both categories and all three tasks, the category packed against one and the next thing out a third of the scale below. Closed, and fork 97 is unblocked |
 | **99** | John's: a conflict is two beliefs asserting different members of ONE category for the same key, which is the only route to retraction under counters that only rise. And malleability is the counters rather than a property — a per-belief weight is where the human puts the answer in. Open |
 | **105** | John's: a relation is a category too, so does building categories RETIRE two-hole anti-unification? Half yes — a category over the arguments says *people are in rooms* more narrowly than a hole does, and the never-co-occur gate is what a hole wanted anyway. What survives is BINDING, which is roles rather than unification. Open on roles |
-| **106** | John's: collapse categories over TIME as well as space. The derivation sees a bag of moments and no order, which is why substitutable twins merge — correlated sightings would separate them by trajectory where statistics cannot, and `Returning` draws uniformly so it cannot show this yet. May replace the gate fork 97's limit asks for. Open |
+| **106** | John's: collapse categories over TIME as well as space. ANSWERED AND IT PAYS TWICE: ADHESION recovers one landmark group a THING where space finds one a PAIR, and a population folding those holds 123 rules to a handed index's 179 at three seeds. It replaces the gate. Open on a moving landmark |
 | **104** | The store's update rule is the experimenter's, so nothing can be wrong about it — which the architecture forbids of anything the brain is TOLD. What must settle is *this statement changes what is known about that thing*, and the only signal is the question at the end. Open |
 | **96** | A second hop, keyed on what the FIRST reading supplied. Two hops nearly triple the ceiling; a unioned chain converts none of it and BANDING BY HOP converts it, best arm on the two-fact task and clear of its marginal. Open at three facts |

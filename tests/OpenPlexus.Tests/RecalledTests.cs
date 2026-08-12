@@ -33,6 +33,26 @@ public sealed class RecalledTests(ITestOutputHelper output)
             Withheld = withheld, Predicting = predicting,
         };
 
+    /// <summary>
+    /// The cast, the rooms and the props, <b>as an answer key and never as an input.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>NOTHING IS EVER TOLD WHICH WORDS ARE NAMES.</b> These exist so that what a
+    /// statistic returns can be SCORED, exactly as the multiplexer's enumerated truth scores
+    /// a rule without ever reaching the learner. <b>Verbs are deliberately absent</b>: a verb
+    /// group is a real finding and writing a verb key after seeing one would be the
+    /// experimenter deciding what counts as a category once the answer was on the screen.
+    /// </remarks>
+    private static readonly IReadOnlyList<KeyValuePair<string, IReadOnlySet<string>>> Key =
+    [
+        new("people", new HashSet<string>(StringComparer.Ordinal)
+            { "mary", "john", "sandra", "daniel" }),
+        new("places", new HashSet<string>(StringComparer.Ordinal)
+            { "bathroom", "bedroom", "garden", "hallway", "kitchen", "office" }),
+        new("props", new HashSet<string>(StringComparer.Ordinal)
+            { "football", "apple", "milk" }),
+    ];
+
     /// <summary>The moment as the bagged control sees it, which is every word once.</summary>
     private static IEnumerable<Code> Codify(Asking asking) =>
         new Joined(Joining.Bagged).Codify(asking).Order();
@@ -839,6 +859,240 @@ public sealed class RecalledTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// Whether the population holds a FAMILY for the category minter to read.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE CONTROL BEFORE THE OPERATOR, AND IT COSTS ONE RUN.</b> Fork 98 says the
+    /// statistic is there in the TEXT; fork 97 mints the category from the POPULATION, which
+    /// is a different store and may not contain the same thing at all. The operator is the
+    /// slot that varies across a family of otherwise-identical rules, so if no two resident
+    /// commitments differ in exactly one scope position there is nothing for it to see and it
+    /// dies before it is written.
+    /// </para>
+    /// <para>
+    /// <b>AND THE TRANSCRIPT IS THE INSTRUMENT RATHER THAN THE COUNT.</b> A family count says
+    /// how many and never of what, and a population that families up on <i>to</i> and
+    /// <i>the</i> reads identically to one that families up on the cast — which is the
+    /// function-word failure that has already cost this branch a whole objective.
+    /// </para>
+    /// <para>
+    /// <b>AND THE POPULATION ALONE CANNOT SUPPLY A CATEGORY, WHICH IS THE FIRST HALF OF THE
+    /// ANSWER.</b> Every slot it offers is a bag holding names, motion verbs, rooms, props,
+    /// function words and minted names at once, because a slot is only ever <i>everything
+    /// that predicted this answer</i>. Read off the population and nothing else, the operator
+    /// would mint that bag.
+    /// </para>
+    /// <para>
+    /// <b>AND FORK 98's STATISTIC CUTS IT AND NEVER ONCE MISCUTS IT, WHICH IS THE SECOND.</b>
+    /// Every group holding any word of the key holds words of ONE category — seventy-one of
+    /// them over the three tasks, and not one straddles two. So the two halves are one
+    /// mechanism: the population says WHERE a slot is and the text says WHAT belongs in it,
+    /// and neither says both.
+    /// </para>
+    /// <para>
+    /// <b>AND THE CATEGORY COMES BACK WHOLE ONLY WHERE THE LEARNER IS FAILING, WHICH INVERTS
+    /// THE ORDER THIS WAS PLANNED IN.</b> The task the arm answers outright holds twenty-seven
+    /// rules and returns half the cast; the task it scores below its own marginal on holds
+    /// twelve hundred and returns all four names and all three props. A solved task needs no
+    /// family, so it has none to read — <b>the operator has most to see exactly where it is
+    /// most wanted</b>, and a first measurement taken on task one alone would have read as a
+    /// weak result.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_the_population_holds_a_family_for_a_category_to_be_read_off()
+    {
+        foreach (var task in new[] { 1, 2, 3 })
+        {
+            var (world, trial, brain) = Made(World(task, span: 0), Joining.Addressed);
+            var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
+
+            var (naming, company) = Counted(task);
+
+            string Spell(Code code) =>
+                naming.TryGetValue(code, out var word) ? word
+                : brain.Held.Names.Knows(code) ? $"name#{code.Value % 1000}"
+                : $"?{code.Value % 1000}";
+
+            string Answering(Commitment one) => (int)one.Expects.Value is var at
+                && at < world.Vocabulary.Length ? world.Vocabulary[at] : $"#{one.Expects.Value}";
+
+            // THE FRAME IS THE SCOPE WITH ONE POSITION TAKEN OUT, AND THE EXPECTATION STAYS
+            // IN. Two rules agreeing on everything but the answer are not a family varying in
+            // a slot, they are a contradiction — and grouping those would mint a category out
+            // of exactly the disagreement the design wants kept.
+            //
+            // AND A ONE-CODE SCOPE LEAVES AN EMPTY FRAME, WHICH IS ADMITTED RATHER THAN
+            // SKIPPED. Covering mints one code and nothing longer, so a run whose population
+            // is mostly one-code rules would report no family at all under a length bar — and
+            // the family it would have missed is every code that predicts one answer.
+            var families = new Dictionary<string, List<Commitment>>(StringComparer.Ordinal);
+            var slots = new Dictionary<string, HashSet<Code>>(StringComparer.Ordinal);
+
+            foreach (var one in brain.Held.All)
+                for (var at = 0; at < one.Scope.Length; at++)
+                {
+                    var rest = one.Scope.Where((_, other) => other != at).Order();
+                    var frame = $"{one.Expects.Value}<{string.Join(",", rest)}";
+
+                    if (!families.TryGetValue(frame, out var had)) families[frame] = had = [];
+                    if (!slots.TryGetValue(frame, out var filling)) slots[frame] = filling = [];
+
+                    had.Add(one);
+                    filling.Add(one.Scope[at]);
+                }
+
+            var varying = families.Keys
+                .Where(frame => slots[frame].Count >= 2)
+                .OrderByDescending(frame => slots[frame].Count)
+                .ToList();
+
+            var recovered = new HashSet<string>(StringComparer.Ordinal);
+
+            foreach (var frame in varying.Take(8))
+            {
+                var one = families[frame][0];
+
+                output.WriteLine(
+                    $"task {task} | {{{string.Join(" ", one.Scope.Where(code => !slots[frame].Contains(code)).Select(Spell))}}}"
+                    + $" + [{string.Join(" ", slots[frame].Order().Select(Spell))}] -> {Answering(one)}");
+            }
+
+            // AND THE SLOT IS THEN PARTITIONED BY FORK 98's STATISTIC, WHICH IS THE WHOLE
+            // PROPOSAL. The population says WHERE a slot is and never what belongs in it; the
+            // text says which codes are alternatives and never that any rule wanted them. A
+            // group is what survives both — never in one statement, and keeping company alike
+            // enough that fork 98's measured chasm cannot be straddled.
+            foreach (var frame in varying)
+                foreach (var group in Grouped(slots[frame], company))
+                    if (group.Count >= 2)
+                        recovered.Add(string.Join(" ", group.Select(Spell).Order(StringComparer.Ordinal)));
+
+            // PURE MEANS NO GROUP STRADDLES TWO OF THE KEY'S CATEGORIES, and a group of verbs
+            // is not scored either way — there is no verb key and inventing one would be the
+            // experimenter deciding what a category is after seeing the groups.
+            var judged = 0;
+            var pure = 0;
+            var largest = new Dictionary<string, int>(StringComparer.Ordinal);
+
+            foreach (var group in recovered.Order(StringComparer.Ordinal))
+            {
+                var members = group.Split(' ');
+                var touched = Key.Where(one => members.Any(one.Value.Contains)).ToList();
+
+                if (touched.Count > 0)
+                {
+                    judged++;
+                    if (touched.Count == 1 && members.All(touched[0].Value.Contains))
+                    {
+                        pure++;
+                        largest[touched[0].Key] = Math.Max(largest.GetValueOrDefault(touched[0].Key), members.Length);
+                    }
+                }
+
+                output.WriteLine($"task {task} | group [{group}]");
+            }
+
+            // NEVER MIXED, WHICH IS THE ASSERTION. The population's slot is a bag of names,
+            // verbs, rooms and objects at once, so a statistic that could not tell them apart
+            // would show up here as one group holding two of the key's categories.
+            Assert.Equal(judged, pure);
+
+            output.WriteLine(
+                $"task {task} | held {brain.Held.Count} of them {brain.Held.All.Count(one => one.Scope.Length >= 2)} "
+                + $"longer than one | frames {families.Count} varying {varying.Count} "
+                + $"widest {(varying.Count == 0 ? 0 : slots[varying[0]].Count)} | "
+                + $"groups {recovered.Count} judged {judged} pure {pure} | biggest "
+                + string.Join(" ", Key.Select(one =>
+                    $"{one.Key} {largest.GetValueOrDefault(one.Key)}/{one.Value.Count}"))
+                + $" | exam {tally.Unseen?.Accuracy ?? 0.0:F3} marginal {world.Commonest:F3}");
+        }
+    }
+
+    /// <summary>
+    /// A slot cut into the groups whose members are ALTERNATIVES, by fork 98's statistic.
+    /// </summary>
+    /// <param name="slot">The codes that filled one position across a family of rules.</param>
+    /// <param name="company">What company each code keeps, from <see cref="Counted"/>.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>A STATED BAR, AND IT IS ONLY SAFE BECAUSE FORK 98 MEASURED THE GAP IT SITS IN.</b>
+    /// A category's members keep company alike to within a thousandth and the nearest
+    /// non-member is a third of the scale away, so anything between the two reads the same —
+    /// and a constant chosen inside a measured chasm is a different object from one tuned
+    /// until a number came out. <b>A world with a narrower gap would need a test rather than
+    /// a constant, and this is where that would be found out.</b>
+    /// </para>
+    /// <para>
+    /// <b>COMPONENTS RATHER THAN CLIQUES, WHICH IS THE LOOSER READING ON PURPOSE.</b> Demanding
+    /// every pair agree would hide a category behind one leaky member; joining through any
+    /// link cannot, so what this returns is the most generous grouping the statistic allows
+    /// and a mixed group is a real refutation rather than a strictness artefact.
+    /// </para>
+    /// </remarks>
+    private static List<List<Code>> Grouped(
+        IReadOnlySet<Code> slot, IReadOnlyDictionary<Code, Dictionary<Code, int>> company)
+    {
+        const double Alike = 0.9;
+
+        var ours = slot.Where(company.ContainsKey).Order().ToList();
+        var home = new Dictionary<Code, int>();
+
+        foreach (var one in ours) home[one] = home.Count;
+
+        foreach (var one in ours)
+            foreach (var other in ours)
+            {
+                if (one.CompareTo(other) >= 0 || company[one].ContainsKey(other)) continue;
+                if (RecalledTests.Alike(company[one], company[other]) < Alike) continue;
+
+                var (from, to) = (home[other], home[one]);
+                if (from == to) continue;
+
+                foreach (var member in ours) if (home[member] == from) home[member] = to;
+            }
+
+        return [.. ours.GroupBy(one => home[one]).Select(group => group.ToList())];
+    }
+
+    /// <summary>
+    /// What word each code is, and what company each code kept, over one task's statements.
+    /// </summary>
+    /// <remarks>
+    /// <b>ONE ROW A STATEMENT AND NEVER A MOMENT</b>, because a moment repeats every
+    /// statement in front of it once per question after it — which would weight a sentence by
+    /// how many questions happened to follow, and that is a fact about the corpus's
+    /// punctuation rather than about the words.
+    /// </remarks>
+    private static (Dictionary<Code, string> Naming, Dictionary<Code, Dictionary<Code, int>> Company)
+        Counted(int task)
+    {
+        var text = new Babi(new BabiSettings { Corpus = Tree.Babi(), Task = task, Stories = false });
+
+        var naming = new Dictionary<Code, string>();
+        var company = new Dictionary<Code, Dictionary<Code, int>>();
+
+        foreach (var line in text.Lines)
+        {
+            if (line.Asking) continue;
+
+            foreach (var word in Babi.Words(line.Text ?? string.Empty)) naming[Babi.Of(word)] = word;
+
+            var statement = new HashSet<Code>(line.Words);
+
+            foreach (var one in statement)
+            {
+                if (!company.TryGetValue(one, out var row)) company[one] = row = [];
+                foreach (var other in statement)
+                    if (other != one) row[other] = row.GetValueOrDefault(other) + 1;
+            }
+        }
+
+        return (naming, company);
+    }
+
+    /// <summary>
     /// How alike the company two codes keep is, counted over statements they were never
     /// both in.
     /// </summary>
@@ -911,47 +1165,11 @@ public sealed class RecalledTests(ITestOutputHelper output)
     [Fact]
     public void Whether_alternatives_recover_the_cast_with_nothing_learnt()
     {
-        var people = new HashSet<string>(StringComparer.Ordinal) { "mary", "john", "sandra", "daniel" };
-
-        var places = new HashSet<string>(StringComparer.Ordinal)
-        {
-            "bathroom", "bedroom", "garden", "hallway", "kitchen", "office",
-        };
-
         foreach (var task in new[] { 1, 2, 3 })
         {
-            var text = new Babi(new BabiSettings
-            {
-                Corpus = Tree.Babi(), Task = task, Stories = false,
-            });
+            var (naming, company) = Counted(task);
 
-            var naming = new Dictionary<Code, string>();
-            var seen = new Dictionary<Code, int>();
-            var company = new Dictionary<Code, Dictionary<Code, int>>();
-
-            // ONE ROW A STATEMENT AND NEVER A MOMENT, because a moment repeats every
-            // statement in front of it once per question after it — which would weight a
-            // sentence by how many questions happened to follow, and that is a fact about
-            // the corpus's punctuation rather than about the words.
-            foreach (var line in text.Lines)
-            {
-                if (line.Asking) continue;
-
-                foreach (var word in Babi.Words(line.Text ?? string.Empty)) naming[Babi.Of(word)] = word;
-
-                var statement = new HashSet<Code>(line.Words);
-
-                foreach (var one in statement)
-                {
-                    seen[one] = seen.GetValueOrDefault(one) + 1;
-
-                    if (!company.TryGetValue(one, out var row)) company[one] = row = [];
-                    foreach (var other in statement)
-                        if (other != one) row[other] = row.GetValueOrDefault(other) + 1;
-                }
-            }
-
-            foreach (var (key, wanted) in new[] { ("people", people), ("places", places) })
+            foreach (var (key, wanted) in Key.Where(one => one.Key != "props"))
             {
                 var offered = 0;
                 var kin = 0;
@@ -973,7 +1191,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     var alternatives = company.Keys
                         .Where(other => other != code && !mine.ContainsKey(other))
                         .OrderByDescending(other => Alike(mine, company[other]))
-                        .ThenByDescending(other => seen[other])
+                        .ThenByDescending(other => company[other].Values.Sum())
                         .ThenBy(other => other)
                         .ToList();
 

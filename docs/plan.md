@@ -221,6 +221,15 @@ exercise. One line a capability, and the status is the whole point of the row.
 - **AND WHAT IS MISSING IS A BAR RATHER THAN A BETTER GAP.** The ranking is perfect and the
   STOPPING has no rule — the largest fall and take-everything are each right exactly where
   the other is wrong, which is the repair gate's own shape read the other way round.
+- **AND THE POPULATION ALONE CANNOT SUPPLY ONE, WHICH IS MEASURED RATHER THAN ARGUED.** Every
+  slot a family of otherwise-identical rules offers is a bag of names, verbs, rooms, props and
+  function words at once, being *everything that predicted this answer*.
+- **SO THE TWO HALVES ARE ONE MECHANISM: THE POPULATION SAYS WHERE A SLOT IS AND THE TEXT
+  SAYS WHAT BELONGS IN IT.** Cutting the bag by the company statistic never once straddles two
+  categories, over seventy-one groups on three tasks.
+- **AND THE CATEGORY COMES BACK WHOLE ONLY WHERE THE LEARNER IS FAILING**, which inverts the
+  order this was planned in. The task answered outright returns half the cast off twenty-seven
+  rules; the task below its own marginal returns all of it off twelve hundred.
 - **MUTUAL EXCLUSION, so a belief can be CONTRADICTED and not merely wrong** — NOT BUILT. A
   miss says *I expected Y and got Z*; nothing anywhere says Y and Z cannot both hold, which
   is the whole of what a conflict is.
@@ -1558,7 +1567,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **89** | John's: prime it on general English before setting it a text to be examined on. `Primer` exists for the walk and ports cheaply, but a settled-nothing round moves no counter here — so a primer needs something to predict while reading. Next word is rung three. Open |
 | **90** | John's: is there a standardised comprehension exam that separates understanding from regurgitation? bAbI already is one at this rung. What is unpriced is the tier above — school exams and the passages built so the wrong answer is the one present verbatim. Open, and blocked until the components pass |
 | **88** | The front end intersects the question with EACH statement. `Joining.Addressed` ANSWERS TASK ONE OUTRIGHT where the bag sits near the marginal, and falls to the base rate at two supporting facts — at its ceiling there too, so one hop is all it reaches and the learner never failed. Closed; fork 96 carries the reach |
-| **97** | John's: a category is a set of codes that are ALTERNATIVES, and rung five names what CO-FIRES — so it is the complement, and the operator the multiplexer's address bits have wanted for the life of the branch. UNBLOCKED by fork 98; what it inherits is a stopping rule rather than a ranking. Open, and next |
+| **97** | John's: a category is the set of codes that are ALTERNATIVES, and the operator the multiplexer's address bits have always wanted. HALF ANSWERED before a line of it was written: the population's slot is a mixed bag and the text statistic cuts it without ever straddling two categories. Open on the operator itself |
 | **98** | John's: a concept forms BEFORE its label, so substitutability groups things with no word and the word later labels a category that already existed. THE PROBE PASSES on both categories and all three tasks, the category packed against one and the next thing out a third of the scale below. Closed, and fork 97 is unblocked |
 | **99** | John's: a conflict is two beliefs asserting different members of ONE category for the same key, which is the only route to retraction under counters that only rise. And malleability is the counters rather than a property — a per-belief weight is where the human puts the answer in. Open |
 | **96** | A second hop: read at the key the FIRST reading supplied. Where the question names the apple, the apple's newest statement says who picked it up and never where. Chaining is already expressible, a commitment's identity being a code; what stands in the way is fork 32's depth cap. Open, and next |

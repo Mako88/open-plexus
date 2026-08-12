@@ -1028,11 +1028,13 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
         foreach (var predicting in new[] { Predicting.Masked, Predicting.Salient })
         {
-            // CAPACITY ABOVE WHERE THE POPULATION STOPS GROWING, and the number comes from
-            // `Whether_capacity_binds_on_english` rather than from taste: at 2,855 words it
-            // saturates a cap of 8,000 and settles under 20,000. A saturated population
-            // compares nothing, and the first sizing here compared two of them.
-            var (world, trial, brain) = Made(English(sentences: 5_000, predicting), capacity: 30_000);
+            // THE SIZING `Whether_capacity_binds_on_english` PROVED UNSATURATED, RATHER THAN
+            // A BIGGER ONE. Two arms have now been compared at a cap they both sat ON --
+            // 8,000 against 2,855 words, then 30,000 against 4,648 -- and a saturated
+            // population compares nothing however large it is. The grid says 2,855 words
+            // settle at 18,267, so this is the same corpus at a cap known to clear it.
+            // Chasing the vocabulary upwards was the mistake; matching it is the fix.
+            var (world, trial, brain) = Made(English(sentences: 2_000, predicting), capacity: 20_000);
 
             var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
             var exam = tally.Unseen?.Accuracy ?? 0.0;
@@ -1051,10 +1053,11 @@ public sealed class RecalledTests(ITestOutputHelper output)
         // this is the text where the words it picks are the ones carrying something. If
         // it still does not lead, the reason is the gate and `Salient` should go.
         //
-        // AND A PASS HERE IS NOT A WIN WHILE BOTH ARE NEGATIVE, which is why the margins
-        // are printed either way. What would settle the route is one of them CLEARING
-        // its marginal; at the first sizing neither did, and the population was pinned
-        // at its cap, so that reading priced the capacity rather than the corpus.
+        // AND A PASS HERE IS NOT A WIN WHILE BOTH SIT AT OR UNDER THEIR MARGINAL, which is
+        // why the margins are printed either way. TWICE NOW a sizing has produced exactly
+        // that with `held` on the cap -- Masked at -0.036 and Salient at +0.000, which
+        // reads as the gate leading and means only that neither population was allowed to
+        // finish growing. Read `held` before reading `exam`, every time.
         Assert.True(scored[Predicting.Salient] > scored[Predicting.Masked],
             $"the gate did not lead on real English either ({scored[Predicting.Salient]:+0.000;-0.000} "
             + $"against {scored[Predicting.Masked]:+0.000;-0.000} over the marginal), so the "

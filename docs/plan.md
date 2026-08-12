@@ -276,9 +276,13 @@ exercise. One line a capability, and the status is the whole point of the row.
 - **AND A REFERENT IS A THIRD STORE RATHER THAN THE SAME ONE.** *Mary's bedroom* survives
   leaving the room and *Mary is in the bedroom* does not, so one store gets one lifetime
   wrong whichever lifetime it takes.
-- **A NAME OVER ALTERNATIVES** — NOT BUILT, and rung five is the wrong SHAPE for it. It
-  names what CO-FIRES; a category is a set of codes that never co-occur and share their
-  contexts. The general end of the gradient has no vocabulary without it.
+- **A NAME OVER ALTERNATIVES** — DERIVABLE, MEASURED, AND NOT ADMITTED. Rung five is the
+  wrong SHAPE: it names what CO-FIRES, and alternatives never do.
+- **AND EXCLUSION PLUS SHARED COMPANY RECOVERS THEM FROM THE MOMENTS ALONE**, with no world
+  table, no vocabulary and no outcome read.
+- **BUT A CATEGORY IN THE MOMENT IS NOT A REWRITE OF THE RULES, WHICH IS WHERE THE
+  COMPRESSION WENT.** The plain code stays beside it, so genesis still roots on the plain one
+  — fork 85, arriving from a new direction.
 - **AND IT IS LOAD-BEARING TWICE OVER NOW, WHICH RAISES WHAT IT IS WORTH.** The same
   never-co-occur test is rung four's admission gate, so building it once pays for two rungs.
 - **ONE CONCEPT REACHED BY SEVERAL SENSES** — NOT BUILT, and the mechanism already exists.
@@ -287,6 +291,12 @@ exercise. One line a capability, and the status is the whole point of the row.
 - **AND CO-FIRING BINDS WHAT IS SIMULTANEOUS AND NEVER WHAT PERSISTS.** A ball at two moments
   does not co-occur with itself, so no amount of it reaches the same thing seen twice. That
   is minting an individual, by another road.
+- **SO AN INDIVIDUAL LOOKED LIKE A CATEGORY OVER ITS APPEARANCES AND IS HALF THAT.** The
+  derivation reaches the PAIR: twins are substitutable by construction, so every statistic
+  over the moments is the same for both.
+- **AND WHAT SEPARATES THEM IS WHAT THEIR CODES PREDICT, WHICH IS NOWHERE IN THE INPUT.** So
+  the last step to an individual is a GATE reading a proposal's record, never a derivation
+  over what arrived.
 - **SOMETHING TO BE WRONG ABOUT WHILE READING** — NOT BUILT, and it is why a primer moves no
   counter. A world that asks is one way and an action with a consequence is another; what is
   missing is any of them.
@@ -1658,7 +1668,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **100** | Is reading real English predictive enough to teach this learner? Fork 91's *informative implies unpredictable* is bAbI's property and inverts on Tatoeba. bAbI is disqualified as a primer besides — its held-out half is all re-reading. Open on what the learner converts |
 | **90** | John's: is there a standardised comprehension exam that separates understanding from regurgitation? bAbI already is one at this rung. What is unpriced is the tier above — school exams and the passages built so the wrong answer is the one present verbatim. Open, and blocked until the components pass |
 | **88** | The front end intersects the question with EACH statement. `Joining.Addressed` ANSWERS TASK ONE OUTRIGHT where the bag sits near the marginal, and falls to the base rate at two supporting facts — at its ceiling there too, so one hop is all it reaches and the learner never failed. Closed; fork 96 carries the reach |
-| **97** | John's: a category is the set of codes that are ALTERNATIVES, and the operator the multiplexer's address bits have always wanted. PRICED before it was built: handed over free they come back perfect, and pay five times more under the bag than under the front end that had done the selecting. Open on minting them |
+| **97** | John's: a category is the set of codes that are ALTERNATIVES. PRICED, and now DERIVED — exclusion plus shared company recovers what a thing wears from the moments alone. Two limits came with it: substitutability reaches a kind and never an individual, and a category compresses nothing without a rewrite. Open on the rewrite |
 | **98** | John's: a concept forms BEFORE its label, so substitutability groups things with no word and the word later labels a category that already existed. THE PROBE PASSES on both categories and all three tasks, the category packed against one and the next thing out a third of the scale below. Closed, and fork 97 is unblocked |
 | **99** | John's: a conflict is two beliefs asserting different members of ONE category for the same key, which is the only route to retraction under counters that only rise. And malleability is the counters rather than a property — a per-belief weight is where the human puts the answer in. Open |
 | **104** | The store's update rule is the experimenter's, so nothing can be wrong about it — which the architecture forbids of anything the brain is TOLD. What must settle is *this statement changes what is known about that thing*, and the only signal is the question at the end. Open |

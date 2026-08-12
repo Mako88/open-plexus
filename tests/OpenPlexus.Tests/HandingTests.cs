@@ -1,4 +1,6 @@
+using System.Collections.Immutable;
 using OpenPlexus.Codes;
+using OpenPlexus.Commitments;
 using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Tests;
@@ -158,6 +160,49 @@ public sealed class HandingTests
     }
 
     /// <summary>
+    /// <b>And a selector that takes the first sentence sharing ANY word with the question
+    /// is worth nothing at all here</b>, which is a fact about <see cref="Joining.Addressed"/>
+    /// rather than about this world.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>EVERY SENTENCE SAYS <i>the</i> AND SO DOES THE QUESTION, so first-any-overlap
+    /// returns the newest sentence every time and the middle rung is not reached by the arm
+    /// that looks like it should reach it.</b> The refutation table already says this in
+    /// <see cref="Joining.Chained"/>'s words — a chain keyed on everything walks back a
+    /// sentence at a time and never follows a referent — and this is the same sentence
+    /// arriving as a number on a world built to hold it still.
+    /// </para>
+    /// <para>
+    /// <b>SO THE MIDDLE RUNG NEEDS THE BACKGROUND SUBTRACTED, WHICH IS
+    /// <see cref="Joining.Distinguished"/>'S RULE AND IS ALREADY BUILT.</b> Taken here
+    /// rather than found in a grid, this costs a millisecond and saves attributing a
+    /// selector's failure to a learner's — which is exactly what a ceiling is for.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_first_sentence_sharing_any_word_with_the_question_is_the_newest_one()
+    {
+        var world = World();
+        var right = 0;
+
+        for (var draw = 0; draw < Draws; draw++)
+        {
+            var turn = world.Next();
+            var asked = new HashSet<Code>(turn.Seen.Asked);
+
+            var first = turn.Seen.Said.First(one => one.Any(asked.Contains));
+
+            if (first.Contains(turn.Seen.Asked[^1])) right++;
+        }
+
+        // AT THE MARGINAL, BECAUSE IT IS THE NEWEST SENTENCE AND THE QUESTION IS DRAWN
+        // INDEPENDENTLY OF WHICH THAT IS. So the arm reaches the right sentence exactly as
+        // often as guessing would, and a run using it measures recency.
+        Assert.InRange(right / (double)Draws, 0.20, 0.30);
+    }
+
+    /// <summary>
     /// <b>And reading the sentence's ORDER answers it outright.</b> The third ceiling, one,
     /// so anything above a half on this world is binding and nothing else.
     /// </summary>
@@ -212,5 +257,125 @@ public sealed class HandingTests
 
         Assert.Equal(People, gave.Count);
         Assert.Equal(gave, took);
+    }
+
+    /// <summary>
+    /// <b>ONE COMMITMENT FIRES ON TWO MOMENTS THAT WANT DIFFERENT ANSWERS, so whatever it
+    /// expects it is wrong about one of them.</b> Fork 105's blocker, said as a fact about
+    /// the learner rather than about the world.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>AND IT IS UNIVERSAL RATHER THAN A PROPERTY OF THIS SCOPE, WHICH IS WHY IT IS
+    /// WORTH A CHECK.</b> <see cref="Commitment.Fires"/> takes an
+    /// <see cref="IReadOnlySet{T}"/>, so two moments that are the same SET are the same
+    /// moment to every commitment there could ever be — no scope, no repair, no rung of the
+    /// ladder and no matcher over sets separates them. Finding one such pair refutes the
+    /// whole language at once.
+    /// </para>
+    /// <para>
+    /// <b>SO THE BLOCKER IS THE SCOPE LANGUAGE AND NOT THE FRONT END, WHICH IS THE CORRECTION
+    /// THIS FILE EXISTS TO MAKE.</b> The world hands the order over —
+    /// <see cref="Recited.Said"/> is a list and not a bag, on the licence
+    /// <see cref="IQuantizer{TFrame}.Order"/> already carries — and it is dropped at
+    /// <c>Trial</c>'s <c>new HashSet&lt;Code&gt;(said)</c>, one call before anything could
+    /// use it. Fork 33 priced the MATCHER, and the matcher was never what was in the way.
+    /// </para>
+    /// <para>
+    /// <b>AND FUSING THE POSITION INTO THE WORD IS NOT THE ESCAPE, WHICH IS SAID HERE
+    /// BECAUSE IT IS THE FIRST THING ANYBODY WOULD REACH FOR.</b> A code meaning
+    /// <i>john-in-last-place</i> makes the moment separable and costs the identity: nothing
+    /// downstream could then see that it is the same john who stood first in another
+    /// sentence. That is the architecture's own line — every input is an ATTRIBUTE of a
+    /// concept, never the concept — broken by the front end, which is the same fault as a
+    /// fused pair from the other side.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void One_scope_covers_two_moments_that_want_different_answers()
+    {
+        var world = World();
+        var cast = world.Called;
+        var seen = new Dictionary<string, (IReadOnlySet<Code> Moment, int Outcome)>();
+
+        for (var draw = 0; draw < Draws; draw++)
+        {
+            var turn = world.Next();
+
+            // THE WHOLE MOMENT AND NOT THE CHOSEN SENTENCE, so the claim is about what the
+            // learner is handed rather than about what some front end selected out of it.
+            // A pair found here is a pair no arm on this world can ever separate.
+            var moment = Bag(turn.Seen);
+            moment.UnionWith(turn.Seen.Asked);
+
+            var key = string.Join(
+                ",", moment.Select(one => $"{one.Modality}:{one.Value}").Order(StringComparer.Ordinal));
+
+            if (seen.TryGetValue(key, out var before) && before.Outcome != turn.Outcome!.Value)
+            {
+                var scope = ImmutableArray.CreateRange(moment);
+
+                var held = new Commitment(scope, cast[before.Outcome]);
+
+                // IT FIRES ON BOTH, and a settlement is `Expects == arrived` -- so one of
+                // the two is a hit and the other is a miss, for a commitment that had no
+                // way to tell them apart and no repair that could find one.
+                Assert.True(held.Fires(before.Moment));
+                Assert.True(held.Fires(moment));
+                Assert.NotEqual(before.Outcome, turn.Outcome!.Value);
+
+                return;
+            }
+
+            seen[key] = (moment, turn.Outcome!.Value);
+        }
+
+        Assert.Fail(
+            $"no two of {Draws} moments were the same set with different answers, so this "
+            + "world no longer isolates binding and every number taken on it is owed a "
+            + "re-take");
+    }
+
+    /// <summary>
+    /// <b>And a variable put where the ANSWER goes is refuted by every settlement there
+    /// is</b>, which is the half of rung four that naming a condition does not buy.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE TYPE DOES NOT STOP IT AND THE SETTLEMENT DOES, WHICH IS WHY THIS IS A CHECK
+    /// AND NOT A COMMENT.</b> <see cref="Commitment.Expects"/> is a <see cref="Code"/> and
+    /// <see cref="Unifying.Any"/> returns one, so a commitment expecting <i>whoever filled
+    /// the slot</i> CONSTRUCTS. What refutes it is <c>Population</c>'s settlement, which is
+    /// an equality against what arrived — and no world may emit
+    /// <see cref="Unifying"/>'s modality, by that type's own design, because a moment
+    /// holding a pattern would make a scope match itself.
+    /// </para>
+    /// <para>
+    /// <b>SO THE PLAN'S LEAF ON RUNG FOUR IS HALF A SENTENCE SHORT.</b> <i>A condition
+    /// naming no argument is what buys transfer</i> — but a condition naming no argument
+    /// with a CONSTANT consequent says <i>whoever stood last, the answer is john</i>, which
+    /// is right exactly when the filler was john and is therefore the one-rule-per-person
+    /// version wearing a variable's clothes. Transfer needs the argument named on BOTH
+    /// sides, and only one side exists.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_variable_where_the_answer_goes_can_never_equal_what_arrived()
+    {
+        var world = World();
+        var cast = world.Called;
+
+        var whoever = Unifying.Any(cast[0].Modality, name: 0);
+
+        // IT CONSTRUCTS, which is the half worth demonstrating -- nothing in the primitive
+        // refuses this and a reader of the types alone would conclude rung four is
+        // expressible.
+        var held = new Commitment([whoever, .. world.Handed], whoever);
+
+        Assert.True(Unifying.Names(held.Expects));
+
+        // AND IT LOSES EVERY SETTLEMENT, because a settlement is `Expects == arrived` and
+        // what arrives is a person. There is no answer this commitment can be right about.
+        foreach (var person in cast) Assert.NotEqual(held.Expects, person);
     }
 }

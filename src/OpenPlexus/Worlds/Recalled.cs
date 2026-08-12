@@ -6,11 +6,35 @@ namespace OpenPlexus.Worlds;
 /// <summary>Which text, how much of it is visible at once, and how much is held back.</summary>
 public sealed record RecalledSettings
 {
-    /// <summary>The bAbI task directory, the same one <see cref="BabiSettings.Corpus"/> names.</summary>
+    /// <summary>
+    /// Where the text is — the bAbI task directory, or the Tatoeba export.
+    /// </summary>
     public required string Corpus { get; init; }
 
-    /// <summary>Which of the twenty tasks.</summary>
+    /// <summary>
+    /// Which of the twenty tasks, or <b>nought to read <see cref="Corpus"/> as plain
+    /// English</b>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>ONE SETTING BECAUSE IT IS ONE QUESTION — WHICH TEXT.</b> Two paths and a flag
+    /// would let a run name a bAbI directory and a sentence count at once and mean
+    /// nothing by it; the tasks are numbered one to twenty, so nought was free.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS NOT A CHOICE OF CORPUS SO MUCH AS THE ONLY ONE LEFT.</b> bAbI's
+    /// held-out half is 1.000 recalled — some two thousand distinct contexts exist and
+    /// no more — so reading it twice is re-reading it, whatever any arm scores. See
+    /// <c>PrimerTests.Is_reading_real_english_predictive_at_all</c>.
+    /// </para>
+    /// </remarks>
     public required int Task { get; init; }
+
+    /// <summary>
+    /// How many sentences of plain English to read. <b>Ignored unless <see cref="Task"/>
+    /// is nought.</b>
+    /// </summary>
+    public int Sentences { get; init; }
 
     /// <summary>
     /// How many statements before the question are in the moment — <b>nought for every
@@ -266,17 +290,25 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Span);
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Withheld);
 
-        var text = new Babi(new BabiSettings
-        {
-            Task = settings.Task,
-            Corpus = settings.Corpus,
+        var lines = settings.Task == 0
+            ? Primer.Numbered(settings.Corpus, settings.Sentences)
+            : new Babi(new BabiSettings
+            {
+                Task = settings.Task,
+                Corpus = settings.Corpus,
 
-            // OFF, BECAUSE A CODE NAMING ONE STORY IS PRESENT ONCE AND NEVER AGAIN. Genesis
-            // roots on a code that was live when the outcome started, so a per-story code
-            // mints a commitment that can never fire a second time -- one resident a story,
-            // for a population that is bounded.
-            Stories = false,
-        });
+                // OFF, BECAUSE A CODE NAMING ONE STORY IS PRESENT ONCE AND NEVER AGAIN.
+                // Genesis roots on a code that was live when the outcome started, so a
+                // per-story code mints a commitment that can never fire a second time --
+                // one resident a story, for a population that is bounded.
+                Stories = false,
+            }).Lines;
+
+        // WHETHER THE TEXT ASKS ANYTHING, WHICH DECIDES WHAT THE EXAMINATION CAN BE AND
+        // IS NOT A DIAL. bAbI writes questions, so the exam is the withheld questions.
+        // Plain English writes none, so the only thing a withheld sentence can be
+        // examined on is the objective itself -- the word that was hidden from it.
+        var nothingAsks = !lines.Any(line => line.Asking);
 
         // ONE ALPHABET FOR EVERY ARM, AND IT IS THE VOCABULARY RATHER THAN THE ANSWER SET.
         // A masked arm predicts any word of a statement and an asked arm predicts an answer,
@@ -286,7 +318,7 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
         // would make two runs of one seed disagree about what the machine said.
         var seen = new SortedSet<string>(StringComparer.Ordinal);
 
-        foreach (var line in text.Lines)
+        foreach (var line in lines)
         {
             foreach (var word in Babi.Words(line.Text ?? string.Empty)) seen.Add(word);
             if (line.Answer is { } answer) foreach (var word in Babi.Words(answer)) seen.Add(word);
@@ -305,14 +337,14 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
         // the arm's choice move with how much was withheld.
         var rarity = new Dictionary<string, int>(StringComparer.Ordinal);
 
-        foreach (var line in text.Lines)
+        foreach (var line in lines)
             foreach (var word in Babi.Words(line.Text ?? string.Empty))
                 rarity[word] = rarity.GetValueOrDefault(word) + 1;
 
         // WHICH STORIES ARE HELD BACK, DECIDED BEFORE A SINGLE TURN IS BUILT. Every line of
         // them is skipped by every arm, so no objective can train on a sentence another
         // objective's examination is about.
-        var stories = text.Lines.Count == 0 ? 0 : text.Lines[^1].Story + 1;
+        var stories = lines.Count == 0 ? 0 : lines[^1].Story + 1;
         var keeping = Math.Max(0, stories - settings.Withheld);
 
         var told = new List<Turn<Asking>>();
@@ -322,7 +354,7 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
         var said = new List<ImmutableArray<Code>>();
         var wording = new List<string>();
 
-        foreach (var line in text.Lines)
+        foreach (var line in lines)
         {
             // A NEW STORY FORGETS THE LAST ONE, which is the corpus's own boundary and not
             // an episode the learner can see. Nothing about the machine changes here; what
@@ -341,7 +373,15 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
                 said.Add(line.Words);
                 wording.Add(line.Text ?? string.Empty);
 
+                // A WITHHELD SENTENCE OF A TEXT THAT ASKS NOTHING IS THE EXAMINATION, and
+                // this is the one place the two corpora part. On bAbI a held statement is
+                // dropped, because its story's QUESTIONS are what the exam is made of and
+                // training on the statement would be training on the answer. Plain English
+                // writes no questions, so dropping the held statements would leave nothing
+                // to sit -- the exam is the same objective on sentences never read.
                 if (!held) Reading(told, settings.Predicting, line, index, rarity);
+                else if (nothingAsks) Reading(quizzed, settings.Predicting, line, index, rarity);
+
                 continue;
             }
 

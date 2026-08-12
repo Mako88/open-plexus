@@ -107,6 +107,59 @@ public sealed class Primer
     }
 
     /// <summary>
+    /// The same export, but each sentence its own story and its words kept as written.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>SEPARATE FROM <see cref="Read"/> BECAUSE THE STORY NUMBER IS LOAD-BEARING IN
+    /// OPPOSITE DIRECTIONS.</b> The walk needs every sentence at story nought so no
+    /// per-story code is minted and the fleeting code stays null. A text world needs
+    /// the opposite: Tatoeba lines are unrelated, so a span reaching back past a full
+    /// stop reaches into somebody else's sentence, and a held-back sentence is only
+    /// held back if it is a story of its own.
+    /// </para>
+    /// <para>
+    /// <b>And <see cref="Sentence.Text"/> is kept</b>, because a masked objective picks
+    /// which word to hide by how often the corpus writes it, and that is a question
+    /// about words rather than about codes.
+    /// </para>
+    /// </remarks>
+    /// <param name="corpus">The Tatoeba English export.</param>
+    /// <param name="sentences">How many usable sentences to stop at.</param>
+    /// <exception cref="FileNotFoundException">The export is not there.</exception>
+    public static IReadOnlyList<Sentence> Numbered(string corpus, int sentences)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(sentences);
+
+        if (!File.Exists(corpus))
+            throw new FileNotFoundException(
+                "the Tatoeba English export is not there. Fetch it with: "
+                + "bash corpora/fetch.sh", corpus);
+
+        var read = new List<Sentence>(sentences);
+
+        foreach (var line in File.ReadLines(corpus))
+        {
+            if (read.Count == sentences) break;
+
+            var said = Said(line);
+            if (said is null) continue;
+
+            var words = Babi.Words(said);
+            if (words.Count < 2) continue;
+
+            read.Add(new Sentence
+            {
+                Story = read.Count,
+                Words = [.. words.Select(Babi.Of)],
+                Text = said,
+            });
+        }
+
+        return read;
+    }
+
+    /// <summary>
     /// The sentence column of one export line, or null if the line is not one.
     /// </summary>
     /// <remarks>

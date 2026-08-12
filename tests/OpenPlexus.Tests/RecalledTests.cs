@@ -993,6 +993,128 @@ public sealed class RecalledTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// What the learner converts of the signal real English has and bAbI has not.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE FIRST READING ON A CORPUS THAT IS NOT TEMPLATED, AND IT IS ONLY POSSIBLE
+    /// BECAUSE OF WHAT <c>PrimerTests.Is_reading_real_english_predictive_at_all</c>
+    /// FOUND.</b> On bAbI, selecting the informative words IS selecting the
+    /// unpredictable ones — a held-out predictor reaching 89% of that corpus's ceiling
+    /// elsewhere scores 0.170 on its rooms against a blind draw of 0.173. On Tatoeba
+    /// the implication inverts: informative words 59x their blind draw, function words
+    /// 1.2x. So a gate can pay here and could never have paid there.
+    /// </para>
+    /// <para>
+    /// <b>WHICH MAKES <see cref="Predicting.Salient"/> AGAINST <see cref="Predicting.Masked"/>
+    /// A REAL COMPARISON FOR THE FIRST TIME.</b> The two were compared on bAbI and the
+    /// gate could only ever have lost there, because the words it selects were drawn at
+    /// random over a template. This is the same pair on a text where the gate is
+    /// selecting the words that carry something.
+    /// </para>
+    /// <para>
+    /// <b>AND THE EXAMINATION IS THE OBJECTIVE ON SENTENCES NEVER READ, which is forced
+    /// rather than chosen.</b> Plain English writes no questions, so there is nothing
+    /// else a withheld sentence could be asked. That makes this arm's accuracy NOT
+    /// comparable with any bAbI reading in this file — a different exam is a different
+    /// number, and only the two English arms may be read against each other.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_reading_real_english_converts()
+    {
+        var scored = new Dictionary<Predicting, double>();
+
+        foreach (var predicting in new[] { Predicting.Masked, Predicting.Salient })
+        {
+            // CAPACITY WELL ABOVE THE VOCABULARY, because the first reading was taken at
+            // two thousand against 2,855 words and came back with the population pinned
+            // at its cap in both arms. A saturated population compares nothing.
+            var (world, trial, brain) = Made(English(sentences: 5_000, predicting), capacity: 8_000);
+
+            var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
+            var exam = tally.Unseen?.Accuracy ?? 0.0;
+
+            scored[predicting] = exam - world.Commonest;
+
+            output.WriteLine(
+                $"english {predicting,-8} | exam {exam:F3} silent {tally.Unseen?.Silence ?? 0.0:F3} "
+                + $"| own {tally.Recent:F3} | marginal {world.Commonest:F3} "
+                + $"| over {exam - world.Commonest:+0.000;-0.000} "
+                + $"| {world.Questions} read, {world.Outcomes} words | held {brain.Held.Count}");
+        }
+
+        // THE GATE HAS TO PAY HERE OR IT PAYS NOWHERE. It lost on bAbI for a reason that
+        // has since been measured and is about the corpus rather than about gating, and
+        // this is the text where the words it picks are the ones carrying something. If
+        // it still does not lead, the reason is the gate and `Salient` should go.
+        //
+        // AND A PASS HERE IS NOT A WIN WHILE BOTH ARE NEGATIVE, which is why the margins
+        // are printed either way. What would settle the route is one of them CLEARING
+        // its marginal; at the first sizing neither did, and the population was pinned
+        // at its cap, so that reading priced the capacity rather than the corpus.
+        Assert.True(scored[Predicting.Salient] > scored[Predicting.Masked],
+            $"the gate did not lead on real English either ({scored[Predicting.Salient]:+0.000;-0.000} "
+            + $"against {scored[Predicting.Masked]:+0.000;-0.000} over the marginal), so the "
+            + "corpus was never what was wrong with it");
+    }
+
+    /// <summary>Plain English, sized so it runs in the suite rather than in a sweep.</summary>
+    /// <param name="sentences">How many sentences of the export to read.</param>
+    /// <param name="predicting">What the learner is asked to be wrong about.</param>
+    private static RecalledSettings English(int sentences, Predicting predicting) =>
+        new()
+        {
+            Corpus = Path.Combine(Tree.Repo(), "corpora", "tatoeba_eng.tsv"),
+            Task = 0,
+            Sentences = sentences,
+            Withheld = sentences / 10,
+            Span = 0,
+            Predicting = predicting,
+        };
+
+    /// <summary>
+    /// The English world is one sentence a story, and its exam is sentences never read.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE STRUCTURE RATHER THAN THE SCORE, because the score is a sweep and this has
+    /// to fail the build.</b> Two things could quietly go wrong and read as a result:
+    /// sentences sharing a story would let a span reach into somebody else's full stop,
+    /// and an exam drawn from sentences that were also read would be recall wearing
+    /// comprehension's clothes. Both are asserted here and neither costs a second.
+    /// </remarks>
+    [Fact]
+    public void Plain_english_is_one_sentence_a_story_and_examined_on_sentences_never_read()
+    {
+        var world = new Recalled(English(sentences: 400, Predicting.Salient));
+
+        // ONE TARGET A SENTENCE UNDER `Salient`, AND THE HELD TENTH IS NOT AMONG THEM.
+        // 400 sentences less the 40 withheld is what may be read, and the withheld ones
+        // are the whole of the examination.
+        Assert.Equal(360, world.Questions);
+        Assert.True(world.Outcomes > 400, $"only {world.Outcomes} distinct words in 400 sentences");
+
+        // AND NOTHING READ IS ANYTHING EXAMINED. A sentence is its own story here, so
+        // withholding the last forty stories withholds forty whole sentences -- which is
+        // the property the bAbI world gets from withholding whole stories.
+        var read = new HashSet<int>();
+        for (var one = 0; one < world.Questions; one++)
+            if (world.Next().Outcome is { } outcome) read.Add(outcome);
+
+        output.WriteLine(
+            $"400 sentences: {world.Questions} read over {world.Outcomes} words, "
+            + $"{read.Count} distinct answers, marginal {world.Commonest:F3}");
+
+        // THE MARGINAL IS THE FLOOR EVERY ENGLISH READING IS AGAINST, and on the rarest
+        // word of a sentence it is nearly nothing -- which is the whole reason this
+        // corpus can show a lift where bAbI's six rooms could not.
+        Assert.True(world.Commonest < 0.1,
+            $"the commonest rarest-word answer now takes {world.Commonest:F3} of the exam, "
+            + "so plain English acquired a modal answer and the floor moved");
+    }
+
+    /// <summary>
     /// Which word is worth predicting, decided by ALTERNATIVES rather than by rarity.
     /// </summary>
     /// <remarks>

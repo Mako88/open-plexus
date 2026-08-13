@@ -339,7 +339,7 @@ public static class Fixture
     /// </remarks>
     public static Thinking.Message Origin(Code code) => new()
     {
-        Broadcast = Thinking.BroadcastId.New(),
+        Broadcast = Bus.BroadcastId.New(),
         ReturnTo = new MachineAddress("test"),
         To = code,
         Held = 10.0,

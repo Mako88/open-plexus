@@ -4,26 +4,6 @@ using OpenPlexus.Codes;
 
 namespace OpenPlexus.Thinking;
 
-/// <summary>Which thought a message belongs to.</summary>
-/// <remarks>
-/// <b>Without this, two thoughts in flight mix their chains and their death
-/// counts.</b> The Python has no equivalent and records that as a known gap.
-/// Under continuous input there are always many thoughts in flight, so this is
-/// not optional.
-/// </remarks>
-public readonly record struct BroadcastId(Guid Value)
-{
-    /// <summary>
-    /// A fresh id, minted without asking anyone.
-    /// </summary>
-    /// <remarks>
-    /// <b>C1 forbids a counter.</b> Any shared sequence would need every
-    /// machine to agree on what comes next, so this is a value large enough
-    /// that independent machines do not collide by accident.
-    /// </remarks>
-    public static BroadcastId New() => new(Guid.NewGuid());
-}
-
 /// <summary>
 /// What travels on the thinking path.
 /// </summary>

@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Graph;
 using OpenPlexus.Thinking;

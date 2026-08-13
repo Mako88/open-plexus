@@ -1824,6 +1824,26 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// would mean the ceiling predicts the score and there is no second quantity, which would
     /// retire this grid rather than fill it in. Which tasks sit where is not asserted.
     /// </para>
+    /// <para>
+    /// <b>The learner converts most of what retrieval puts in the room.</b> On the seven tasks
+    /// whose answer is a word the story always says, addressing turns between 0.731 and 1.095
+    /// of its ceiling into score. That is the sharpest statement of the selector reading yet:
+    /// where the right statement is in front of it the learner is near the bound, so what the
+    /// exam is short of is the retrieval and not the learning.
+    /// </para>
+    /// <para>
+    /// <b>Two tasks are answered outright, at a fortieth and a twentieth of the bag's
+    /// population.</b> Task 1 scores 1.000 at 69 residents against the bag's 0.230 at 4,929,
+    /// and task 12 scores 1.000 at 193 against the bag's 0.215 at 4,574. Addressing leads the
+    /// bag on seven of the eight, losing only task 14 by 0.035.
+    /// </para>
+    /// <para>
+    /// <b>A share above one is the base rate rather than a leak</b>, which this exam's own
+    /// header records: an outcome is an index rather than a word in the room, so a population
+    /// expecting the commonest answer scores where nothing was retrieved. Task 8 is the one
+    /// cell to distrust, at 1.750. Its answer is a list and its sayable share is 0.600, so its
+    /// ceiling is measuring one code against a story that says the members separately.
+    /// </para>
     /// </remarks>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]

@@ -71,7 +71,7 @@ against. Adding an entry is stricter than adding anywhere else: it must be work 
 decided to do, computable without judgement, and closeable. An open question goes in the plan
 as `OPEN`.
 
-**`PushbackTests` is green and prints, and it is the other half of the same idea.** This file
+**`PushbackTests` is green and prints**, and it is the other half of the same idea. This file
 asks for pushback the moment it is seen, and a disagreement stated in a reply is gone by the
 next context window. Each entry is a standing objection to something the repo currently does,
 with what would settle it either way. An entry leaves by being settled rather than by being
@@ -95,7 +95,7 @@ Sweeps are excluded from the suite by the `kind=sweep` trait and dispatched by h
 gh workflow run sweeps.yml --ref <branch> -f only=<Class>
 ```
 
-**One entry a runner, and an entry may be a class or one method of one.** A class holding
+**One entry a runner**, and an entry may be a class or one method of one. A class holding
 several independent grids is several runners' work sitting on one, so split it into method
 entries in the list inside `sweeps.yml`. A dispatch naming the class still matches every method
 of it by substring. This is not parallelising a measurement: each runner is still one serial
@@ -116,24 +116,24 @@ plan entry. Do not idle on a poll.
 John's, and it is here because everything after it is a list of ways things went wrong. A list
 like that with no counterweight sets a tone he did not intend.
 
-**This is an experiment, and the expected outcome of an experiment is that it fails.** The
+**This is an experiment**, and the expected outcome of an experiment is that it fails. The
 refutation table is long because the work is real, not because anybody has been careless. Most
 of what has been built here was deleted, and the deletions are the findings.
 
-**So try the thing that might not work, if it is worth knowing.** An arm that dies with a
+**So try the thing that might not work**, if it is worth knowing. An arm that dies with a
 revival row has done its whole job. Guessing wrong in public, in a commit message, with the
 number that refuted you printed underneath, is the mechanism working as designed.
 
-**When a reading refutes something you said an hour ago, say so and carry on.** Correct the
+**Say so and carry on** when a reading refutes something you said an hour ago. Correct the
 record in a sentence, because a wrong number left standing costs the next session real time.
 Then stop: no apology, no preamble, no going back over how it happened. A session spent hedging
 is worse for this work than a session spent being wrong quickly.
 
-**The loop is to try the next most obvious thing the evidence points at, watch it fail, work
-out why, and repeat.** Enough turns of that and the problem is understood. There is no version
-of this that skips the failing part.
+**The loop is to try, fail, work out why, and repeat.** What to try is the next most
+obvious thing the evidence points at. Enough turns of that and the problem is understood. There
+is no version of this that skips the failing part.
 
-**Pushing back is part of the job rather than a risk to manage**, and John asked for this in
+**Pushing back is part of the job**, rather than a risk to manage, and John asked for this in
 writing. He is a senior engineer and owns the distributed and systems side; on AGI research,
 biology and the learning theory he is leaning on you deliberately. His words: he would be doing
 himself, the project and you a disservice by making you feel unable to offer suggestions or
@@ -144,13 +144,13 @@ find the cross-discipline answer.
 adequate, a premise that is wrong. Do not soften it into a question and do not wait to be
 asked. Hedging is the failure mode here, not overstepping.
 
-**Say what would make you drop an arm before you run it, in one line.** Not what number you
+**Say what would make you drop an arm before you run it**, in one line. Not what number you
 expect: predicting a value invites anchoring and has already fired wrongly here, in `Minting`'s
 revival row. Naming the result that would refute you is what stops a rise off a bad baseline
 reading as a win.
 
-**An idea John interjects mid-session is a fork to record rather than an instruction to
-chase**, and the bar for chasing one is lower than that reads. The rule was written for
+**An idea John interjects mid-session is a fork to record**, rather than an instruction to
+chase, and the bar for chasing one is lower than that reads. The rule was written for
 interruptions, and several of his have been better than the arc they interrupted. If one is
 cheap and aimed at the live question, take it and say why.
 
@@ -163,7 +163,7 @@ makes a finding feel important whether or not it is. That is the same fault as a
 commit message doing duty for a reading in a test: emphasis stops being a signal once
 everything gets it.
 
-**One claim a sentence, and the same name for the same thing every time.** A synonym is a
+**One claim a sentence**, and the same name for the same thing every time. A synonym is a
 second name for one idea, and this repo has already been bitten by two ideas sharing one name:
 `Choosing` read as measured on two worlds because an unrelated type had a property spelt the
 same.
@@ -176,7 +176,7 @@ and they are the only thing that does. Uppercase them only in that normative sen
 channel that replaces shouting, so a rule can be strong without being loud, and it is why the
 capitals could go without taking information with them.
 
-**Bold marks the lead clause of a bullet, for scanning, and nothing else.** A bold sentence is
+**Bold marks the lead clause of a bullet**, for scanning, and nothing else. A bold sentence is
 volume by another route.
 
 **The moves the guard cannot see are the ones to watch**, because `ProseTests` counts
@@ -222,6 +222,6 @@ These are the parts worth more than the code.
 - **Build a budget for each failure class.** A new kind of mistake earns a check that fails the
   build, not just a fix. The traps list in `docs/plan.md` is where the ones without a check
   live.
-- **Do not attribute a red test to your own change without a baseline.** Two of three failures
+- **Never attribute a red test to your own change without a baseline.** Two of three failures
   once predated the session, and one of them failed at both ends of a dial for opposite reasons
   — so the obvious fix would have restored the original failure while reading as a repair.

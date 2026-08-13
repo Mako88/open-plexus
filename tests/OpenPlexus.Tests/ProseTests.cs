@@ -84,7 +84,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// This is the half that stayed a ratchet, because it is the half a script cannot do. A
     /// shouted sentence has one correct rewrite and a bold sentence does not: where the lead
     /// clause ends is a judgement about which part of the claim a reader scans for, and there
-    /// are 1,209 of those judgements left.
+    /// are 1,164 of those judgements left.
     /// </para>
     /// <para>
     /// Every pass lowers this to what that pass achieved.
@@ -92,7 +92,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// it sitting here, since a ratchet nobody turns is a budget rather than a target.
     /// </para>
     /// </remarks>
-    private const int Shouted = 1_209;
+    private const int Shouted = 1_164;
 
     /// <summary>
     /// Every file whose prose this repo is responsible for.

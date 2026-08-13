@@ -8,12 +8,11 @@ namespace OpenPlexus.Bus;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>NOTHING IN THIS PROJECT HAS EVER PRODUCED A BYTE, WHICH IS WHY THE DISTRIBUTED
-/// CLAIM IS STILL A CLAIM.</b> <see cref="HybridBus"/> holds a dictionary of clusters and
-/// calls them, injecting lateness and jitter and loss so that C2 and C3 are exercised —
-/// but the delivery is a method call, so every constraint about a NETWORK is currently
-/// being honoured by a simulation of one. Twenty phones cannot run a dictionary lookup
-/// between them.
+/// <b>WHAT MAKES THE DISTRIBUTED CLAIM MORE THAN A CLAIM.</b> <see cref="HybridBus"/>
+/// holds a dictionary of holders and calls them, injecting lateness and jitter and loss so
+/// that C2 and C3 are exercised — but the delivery is a method call, so every constraint
+/// about a NETWORK would be honoured by a simulation of one. Twenty phones cannot run a
+/// dictionary lookup between them, and this is the file that says what crosses instead.
 /// </para>
 /// <para>
 /// <b>THE ONE THING THIS HAS TO GET EXACTLY RIGHT IS DOUBLES, AND FORK 12 IS WHY.</b> A
@@ -32,9 +31,9 @@ namespace OpenPlexus.Bus;
 /// </para>
 /// <para>
 /// <b>AND IT IS JSON RATHER THAN ANYTHING FASTER ON PURPOSE, FOR NOW.</b> The bytes on
-/// this wire are a thought's routes, not a corpus; the profile that matters is
-/// `Separations` and the search, and neither is here. A binary format is a change to make
-/// when something measures the wire, which nothing yet does.
+/// this wire are a moment and what a holder makes of it, not a corpus; the profile that
+/// matters is `Separations` and the search, and neither is here. A binary format is a
+/// change to make when something measures the wire, which nothing yet does.
 /// </para>
 /// </remarks>
 public static class Wire

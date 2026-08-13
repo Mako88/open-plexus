@@ -1,9 +1,6 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Bus;
-using OpenPlexus.Graph;
-using OpenPlexus.Thinking;
 using OpenPlexus.Worlds;
-using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
 
@@ -34,21 +31,17 @@ namespace OpenPlexus.Tests;
 /// the internal signal first", which is what step 2 is really for.
 /// </para>
 /// </remarks>
-public sealed class DialTests(ITestOutputHelper output)
+public sealed class DialTests
 {
     /// <summary>Dials something already sets from what the run is doing.</summary>
     private static readonly Dictionary<string, string> Driven = new(StringComparer.Ordinal)
     {
-        ["Stamina"] =
-            "fork 24 — `Budget` hunts it from whether the walk reached what it "
-            + "was narrowing to. Off by default, which is its own open question",
 
     };
 
     /// <summary>Every dial in the tree, wherever its settings record lives.</summary>
     private static IEnumerable<System.Reflection.PropertyInfo> Census() =>
-        typeof(WalkSettings).GetProperties()
-            .Concat(typeof(CommittingSettings).GetProperties());
+        typeof(CommittingSettings).GetProperties();
 
     /// <summary>
     /// Dials nothing drives, each with the reason. <b>A reason, not an excuse</b>
@@ -260,52 +253,6 @@ public sealed class DialTests(ITestOutputHelper output)
             + "construction -- promiscuous while the population accounts for nothing "
             + "and quiet once it does -- so there is no level here to aim at",
 
-        ["Fanout"] =
-            "a choice between sending to every partner and sending above the row's "
-            + "own shoulder. The quantity that could be hunted is the WIDTH, and "
-            + "the row already sets that from its widest gap — what is left is "
-            + "which of two rules applies, which is not a level",
-
-        ["Pricing"] =
-            "a choice between two C1-legal weightings rather than a continuum. "
-            + "Which end weighs an edge is not a quantity that can be hunted",
-
-        ["Horizon"] =
-            "a backstop, and it has not fired since the cost became inverse. A "
-            + "bound that never binds has nothing to tune against",
-
-        ["Reflect"] =
-            "OPEN, AND FORK 23 IS WHY. Two candidate signals for the threshold "
-            + "were tried: `Hunger` inverted, `Thwarted` had the right shape and "
-            + "swung too little. Needs the internal error signal of step 2",
-
-        ["Doubt"] =
-            "OPEN, AND THE MOST TRACTABLE OF THE SIX. Shrinkage strength is "
-            + "estimated from data everywhere else it is used, and a node has the "
-            + "data: every message arriving carries the sender's marginal, so a "
-            + "node could shrink relative to how much evidence it typically sees. "
-            + "Its own inbox, so C1-legal, and world-independent by construction",
-
-        ["Toll"] =
-            "a choice between two statistics to charge from rather than a "
-            + "continuum, exactly as `Pricing` is. WHAT it prices in is not a "
-            + "quantity that can be hunted; how deep to go already has a "
-            + "controller, and that is `Stamina`",
-
-        ["Row"] =
-            "OPEN, AND IT IS A CAPACITY RATHER THAN A LEVEL. Cashed in at 32; "
-            + "what a node can "
-            + "AFFORD to hold is a fact about the machine, not about the run, so "
-            + "there is nothing in the walk for it to be hunted from — the honest "
-            + "driver is available memory. What a run CAN say is whether the cap "
-            + "is biting, and `Widest` already reports that",
-
-        ["Foresight"] =
-            "OPEN, AND THE MOST TRACTABLE ONE LEFT. The prediction budget is "
-            + "hand-set, yet its feedback is already computed every single step — "
-            + "the graph's guess is scored against what actually arrived. That is "
-            + "the signal fork 24 needed and it is sitting there unused",
-
         // ---- ARRIVED FROM THE WORLDS, 2026-08-04 ---------------------------
         //
         // NONE OF THESE IS NEW. Every one was already a dial, passed to a `*Run`
@@ -315,37 +262,6 @@ public sealed class DialTests(ITestOutputHelper output)
         // which is the sharpest form of the fault: `Ranking` was `Sum` on bAbI
         // and `Agreement` on CLEVR, so a world decided how the brain thought.
 
-        ["Span"] =
-            "a capacity rather than a level, like `Row`. How far back to carry is "
-            + "a claim about the STREAM, and the refutation row says it costs its "
-            + "row without paying — so what it needs is a reason to exist, not a "
-            + "controller. It is ON everywhere since 2026-08-04 and known to hurt "
-            + "bAbI, which is the pressure that makes the reason worth finding",
-
-        ["Ranking"] =
-            "a choice between accumulation rules rather than a continuum, exactly "
-            + "as `Pricing` and `Toll` are. WHICH rule is not a quantity",
-
-
-
-
-
-        ["Carried"] =
-            "OPEN. What a carried occasion is worth against a simultaneous one is "
-            + "a genuine continuum and nothing hunts it — but the refuted "
-            + "carried-edge discount row says a weight was not what the window "
-            + "needed, so this waits on that being answered rather than tuned",
-
-
-        ["Depth"] =
-            "OPEN, AND THE PLAN CALLS IT OUT. Every rollout step is a whole walk, "
-            + "so depth currently borrows `Stamina`'s budget. It wants its own "
-            + "control, and that is an item rather than an excuse",
-
-
-        ["Names"] =
-            "CASHED IN AT ONE CODE. Coarse ranking informs and fine does not, so "
-            + "the number is a finding rather than a level anybody should hunt",
     };
 
     /// <summary>
@@ -366,170 +282,6 @@ public sealed class DialTests(ITestOutputHelper output)
     /// what it found. Anything else is the two jobs bleeding into each other.
     /// </para>
     /// </remarks>
-    private static readonly Dictionary<string, bool> Ranking = new(StringComparer.Ordinal)
-    {
-        ["Doubt"] = true,
-    };
-
-    [Theory]
-    [InlineData("Doubt")]
-    public async Task A_ranking_dial_does_not_touch_the_price(string dial)
-    {
-        Assert.True(Ranking[dial], $"{dial} is not claimed to be ranking-only");
-
-        var plain = Fixture.Dials(stamina: 8.0);
-
-        var moved = dial switch
-        {
-            // MOVED OFF THE DEFAULT RATHER THAN ON FROM ZERO. Doubt was cashed in
-            // at 8.0 on 2026-08-04, so `with { Doubt = 8.0 }` is now the SAME
-            // record and this assertion compared a run against itself.
-            "Doubt" => plain with { Doubt = 32.0 },
-            _ => throw new ArgumentOutOfRangeException(nameof(dial)),
-        };
-
-        Assert.NotEqual(plain, moved);
-
-        Assert.Equal(await MessagesAsync(plain), await MessagesAsync(moved));
-    }
-
-    /// <summary>
-    /// The companion, and without it the check above passes for a harness that
-    /// cannot see a price change at all.
-    /// </summary>
-    [Fact]
-    public async Task And_a_price_dial_does()
-    {
-        var shallow = await MessagesAsync(Fixture.Dials(stamina: 4.0));
-        var deep = await MessagesAsync(Fixture.Dials(stamina: 8.0));
-
-        Assert.NotEqual(shallow, deep);
-    }
-
-    /// <summary>
-    /// <b><see cref="Toll"/> IS THE FIRST DIAL CLAIMED TO MOVE THE PRICE AND
-    /// NOTHING ELSE</b>, and this is the same fingerprint read the other way
-    /// round.
-    /// </summary>
-    /// <remarks>
-    /// <b>A price dial must move the traffic, or it is connected to nothing</b> —
-    /// which is the failure `ThinkAsync`'s stamina survived three measurements as.
-    /// The ranking half is asserted where it can be seen directly: the weight a
-    /// partner is believed at is untouched by this dial, so a walk under either
-    /// toll ranks the same partners in the same order and only gets a different
-    /// distance for its money.
-    /// </remarks>
-    [Fact]
-    public async Task The_traffic_toll_moves_the_price()
-    {
-        var evidence = Fixture.Dials(stamina: 8.0);
-        var traffic = evidence with { Toll = Toll.Traffic };
-
-        Assert.NotEqual(evidence, traffic);
-
-        Assert.NotEqual(await MessagesAsync(evidence), await MessagesAsync(traffic));
-    }
-
-    /// <summary>
-    /// And the walk is still bounded under it — <b>the one failure that takes the
-    /// process with it.</b>
-    /// </summary>
-    /// <remarks>
-    /// <b>THE REFUTED <c>StepCost</c> ARMS DIED OF EXACTLY THIS</b>, at five
-    /// million messages on a twelve-clique where inverse cost took 1,111. A clique
-    /// of equal weights is the shape that kills a cost which can reach zero: every
-    /// edge is perfect, so under anything proportional to the weight a route pays
-    /// nothing and the fan-out is factorial. Here the cheapest hop still costs the
-    /// one that is added to the log.
-    /// </remarks>
-    [Fact]
-    public void And_the_walk_is_still_bounded_where_the_evidence_toll_degenerates()
-    {
-        var evidence = Sweep(Toll.Evidence);
-        var traffic = Sweep(Toll.Traffic);
-
-        output.WriteLine($"12-clique, stamina 8: evidence={evidence} traffic={traffic}");
-
-        // WHAT THE CLIQUE ACTUALLY MEASURES, AND IT IS NOT WHAT IT WAS BUILT FOR.
-        // Every node here noted once and met eleven partners once, so every weight
-        // is EXACTLY 1.0 -- and `1 / weight` at weight one is the constant cost
-        // that `StepCost.Constant` was refuted as. So the control is not merely
-        // dearer here, it is the refuted arm in disguise: a budget of 8 buys 8
-        // free hops out of a fan-out of 11 and the growth is factorial.
-        //
-        // THAT IS THE REFUTATION ROW'S REVIVAL CONDITION READ OUT LOUD -- "a bound
-        // not relying on positive cost at weight 1.0". Inverse cost relies on it,
-        // and this is the shape where it is not there to rely on.
-        Assert.True(evidence > 1_000_000,
-            $"the control was expected to run away on an equal-weight clique and "
-            + $"passed only {evidence} messages — if this has been fixed, the "
-            + "argument for a traffic toll is weaker than it was written up as");
-
-        // AND THE TRAFFIC TOLL HOLDS EXACTLY WHERE THE OTHER LETS GO, because a
-        // row of eleven costs `1 + log2(11)` whatever the counts in it say.
-        Assert.True(traffic < 1_000,
-            $"the traffic toll was not bounded: {traffic} messages");
-    }
-
-    /// <summary>
-    /// One walk over a 12-clique of equal weights, driven by hand.
-    /// </summary>
-    /// <remarks>
-    /// <b>BY HAND RATHER THAN OVER A BUS</b>, because what is counted is what the
-    /// NODES produce. A bus would put delivery, ordering and settling into a
-    /// number that is meant to be arithmetic.
-    /// </remarks>
-    private static long Sweep(Toll toll)
-    {
-        var dials = Fixture.Dials(stamina: 8.0) with { Toll = toll };
-
-        var clique = Enumerable.Range(1, 12).Select(one => Fixture.C((ulong)one)).ToList();
-        var nodes = clique.ToDictionary(code => code, code => new Node(code, dials));
-
-        foreach (var code in clique)
-        {
-            nodes[code].Note();
-            foreach (var other in clique.Where(other => other != code)) nodes[code].Observe(other);
-        }
-
-        var queue = new Queue<Message>();
-
-        queue.Enqueue(new Message
-        {
-            Broadcast = BroadcastId.New(),
-            ReturnTo = new MachineAddress("in"),
-            To = clique[0],
-            Held = dials.Stamina,
-            Chain = [clique[0]],
-            Carried = 1.0,
-        });
-
-        var sent = 0L;
-
-        // A CEILING SO A RUNAWAY IS A FAILING NUMBER RATHER THAN A HUNG SUITE.
-        // The chain's cycle check bounds this shape at 11!/3! either way, so
-        // nothing here can actually reach it — it is the backstop for a change
-        // that has lost the cycle check as well.
-        while (queue.Count > 0 && sent < 5_000_000)
-        {
-            var message = queue.Dequeue();
-
-            foreach (var outgoing in nodes[message.To].Fire(message).Outgoing)
-            {
-                sent++;
-                queue.Enqueue(outgoing);
-            }
-        }
-
-        return sent;
-    }
-
-    /// <summary>One fixed run, so the only thing that differs is the dial.</summary>
-    private static async Task<long> MessagesAsync(WalkSettings dials)
-    {
-        using var run = new SensesRun(Fixture.Senses(concepts: 12), dials, seed: 3);
-        return (await run.RunAsync(300, every: 10).ConfigureAwait(false)).Messages;
-    }
 
     [Fact]
     public void Every_dial_is_either_driven_or_has_a_written_reason_it_is_not()
@@ -770,7 +522,13 @@ public sealed class DialTests(ITestOutputHelper output)
         // there is nothing to switch, and the mechanism is simply on. See
         // `A_dial_that_ships_off_has_a_refutation_behind_it`, which is the check that stops
         // the next one.
-        Assert.Equal(28, HandSet.Count);
+        // AND FIFTEEN IS THE WALK GOING, WHICH IS THE BIGGEST FALL THIS NUMBER HAS EVER
+        // TAKEN AND THE LEAST INTERESTING. Thirteen of the twenty-eight were the walk's --
+        // `Pricing`, `Toll`, `Doubt`, `Row`, `Span`, `Ranking`, `Carried`, `Depth`, `Names`,
+        // `Fanout`, `Horizon`, `Reflect`, `Foresight` -- and they left with the code rather
+        // than by being driven or refused. NOTHING WAS SOLVED BY THIS DROP, which is worth
+        // saying because a budget falling usually means work was done.
+        Assert.Equal(15, HandSet.Count);
     }
 
     /// <summary>
@@ -918,6 +676,16 @@ public sealed class DialTests(ITestOutputHelper output)
             + "second world whose front end derives its own categories -- which is "
             + "`Alternating`'s wiring, and blocked on when a front end re-derives",
 
+        ["Choosing"] =
+            "`Multiplexer` ONLY, AND IT ALWAYS WAS -- this entry is a check that was passing "
+            + "for a wrong reason, found by the walk going. Its second world was "
+            + "`HomeostatTests`, which named `Choosing` as a field of the walk's run result "
+            + "holding an `Attending`, and the attribution matches on the WORD. So a dial "
+            + "measured on one world read as measured on two because an unrelated type had "
+            + "a property spelt the same. What it is waiting for is `Arranged` or `Roaming`, "
+            + "which nothing stops beyond nobody having done it -- and the sharper lesson is "
+            + "that a name-matching census cannot tell a dial from its homonym",
+
         ["Speaking"] =
             "`Multiplexer` ONLY, and this one IS owed. Whether an untested commitment may "
             + "vote is not a question about any world's vocabulary, so nothing stops it "
@@ -925,13 +693,6 @@ public sealed class DialTests(ITestOutputHelper output)
             + "reason already says the finding is that excluding them moves no metric -- a "
             + "null result on one world, which is the weakest thing a grid can say",
 
-        ["Fanout"] =
-            "NO WORLD AT ALL, and it is on the walk learner, which is being deleted. This "
-            + "entry goes with it rather than being satisfied",
-
-        ["Accumulate"] =
-            "the walk learner again, and `InertDialTests` already records the sharper "
-            + "version: it is wired and measurably does nothing. It goes with the walk",
     };
 
     /// <summary>

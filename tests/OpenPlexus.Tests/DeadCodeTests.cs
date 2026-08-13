@@ -69,8 +69,57 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     /// included. What is not allowed is silence, and what this file buys is that
     /// the next unwired mechanism arrives ALONE rather than among sixteen.
     /// </remarks>
-    private static readonly Dictionary<string, string> Unused =
-        new(StringComparer.Ordinal);
+    private static readonly Dictionary<string, string> Unused = new(StringComparer.Ordinal)
+    {
+        // ---- MEMBERS OF THE ELEVEN STRANDED WORLDS -------------------------
+        //
+        // THIS LIST WAS AT NOUGHT AND THE WALK'S DELETION PUT FIFTEEN ON IT, WHICH IS THE
+        // ONLY HONEST WAY TO RECORD WHAT THE DELETION COST. The type list below says
+        // eleven worlds have no runner; this says how much of each one is unreachable
+        // rather than merely undriven. Every entry here was called by a `*Run` in
+        // `Worlds/`, and every one of those runs was the walk's.
+        //
+        // EACH LEAVES BY ITS WORLD GETTING A `Trial`, NOT BY ANYBODY EDITING THIS. And the
+        // budget below is back off nought for the first time since it reached it, which
+        // should read as a debt rather than as a threshold being relaxed.
+        ["Composed.Third"] = Stranded,
+        ["Homeostat.Act"] = Stranded,
+        ["Homeostat.Attended"] = Stranded,
+        ["Homeostat.Attending"] = Stranded,
+        ["Homeostat.Idling"] = Stranded,
+        ["Homeostat.Lowest"] = Stranded,
+        ["Homeostat.Viable"] = Stranded,
+        ["Rhythm.Beat"] = Stranded,
+        ["Rhythm.Turned"] = Stranded,
+        ["Snake.Absolute"] = Stranded,
+        ["Snake.Heading"] = Stranded,
+        ["SnakeSense.Encode"] = Stranded,
+        ["SnakeSense.Turned"] = Stranded,
+
+        // ---- AND THE ONE THAT IS NOT A WORLD, WHICH IS THE ONE TO READ ------
+        //
+        // C2 IS THE CONSTRAINT THE WHOLE DESIGN RESTS ON AND ITS ONLY INJECTOR IS NOW
+        // UNCALLED. `Lateness` delays a share of deliveries on purpose and this counts how
+        // many were actually held back -- because a jitter arm that delayed nothing is a
+        // control wearing the arm's name. Its one caller was the walk's latency sweep,
+        // which measured per-hop delay against a thought's DEPTH; a fleet round is two
+        // round trips and not a depth, so that measurement did not carry over.
+        //
+        // WHAT IT IS OWED IS FORK 52'S OPEN HALF IN ONE SENTENCE: run a fleet over
+        // `HybridBus` with lateness on and assert it still learns. Every distributed number
+        // here is over `Posted`, and TCP does not reorder within a connection -- so a green
+        // distributed run says nothing about C2, which this repo's trap list already says.
+        ["HybridBus.Delayed"] =
+            "THE C2 INJECTOR'S REPORT, LEFT UNCALLED BY THE WALK GOING. It is kept rather "
+            + "than deleted because deleting it deletes the only way to make C2 real, and "
+            + "what it wants is a fleet over `HybridBus` with lateness -- fork 52 on C2 "
+            + "alone, which is the half `Posted` structurally cannot answer.",
+
+        ["Multiplexer.Widest"] =
+            "THE SOUNDNESS INSTRUMENT'S OWN BOUND, and it reads as uncalled because its one "
+            + "caller shares its file -- the own-file rule cannot see a caller sitting "
+            + "beside it, which is the exemption `Felt` carries on the type list.",
+    };
 
     /// <summary>What a record or a runtime generates and nobody writes.</summary>
     private static readonly HashSet<string> Generated = new(StringComparer.Ordinal)
@@ -146,11 +195,19 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // stops the next unwired mechanism arriving unnoticed beside these. IT
         // SHOULD ONLY EVER FALL — every entry is something to wire or delete.
         //
-        // AT NOUGHT, AND THAT MAKES THIS THE STRICTEST THE CHECK CAN BE: the next
-        // public member to lose its last caller fails the test above outright, with
-        // nowhere to sit quietly. Raising this is a deliberate edit and should read
-        // as one.
-        Assert.Empty(Unused);
+        // IT WAS AT NOUGHT AND THE WALK'S DELETION PUT IT AT FIFTEEN, WHICH IS THE
+        // DELIBERATE EDIT THAT COMMENT ASKED TO READ AS ONE. Nought made this the
+        // strictest the check can be: the next member to lose its last caller failed
+        // outright with nowhere to sit quietly. That is given up here, and what is bought
+        // for it is a countable record of what deleting the walk stranded.
+        //
+        // FOURTEEN OF THE FIFTEEN ARE ONE FACT REPEATED — a world whose only runner was the
+        // walk's — and they come off together when that world gets a `Trial`. The
+        // fifteenth, `HybridBus.Delayed`, is the one that is not bookkeeping.
+        //
+        // AND IT ONLY EVER FALLS FROM HERE. Nought is the destination and this is a
+        // detour with a map, not a new resting place.
+        Assert.Equal(15, Unused.Count);
     }
 
     [Fact]
@@ -242,6 +299,46 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["Holder"] = Composed,
         ["Fleet"] = Composed,
 
+        // ---- THE WALK'S DELETION LEFT ELEVEN WORLDS WITH NO RUNNER ----------
+        //
+        // AND THIS IS THE ONE PLACE THE WHOLE DELETION IS VISIBLE AS A COST. Each of these
+        // had a `*Run` in `Worlds/` that drove it, and every one of those was the walk's --
+        // so the world data survived and the thing that turned it into a measurement did
+        // not. They are NOT on `Roaming`'s footing: that one is driven by `Trial` through
+        // `IWorld` and has a caller, and these have none at all.
+        //
+        // WHAT EACH IS OWED IS THE SAME AND IT IS SMALL: a `Trial` over it, which is the
+        // generic runner the commitment side already has. What decides the ORDER is which
+        // question is live -- `Senses` is the cross-modal pairing nothing has ever run,
+        // `Motif` is rung five's, `Rhythm` is rung three's, `Latent` is fork 39's.
+        //
+        // AND THE LIST BEING LONG IS THE ARGUMENT FOR IT RATHER THAN AGAINST. Deleting
+        // eleven worlds to make a guard green would delete the questions with them; leaving
+        // them silent would be eleven mechanisms nobody could see were unreachable. This
+        // entry is what makes the debt countable.
+        ["Clevr"] = Stranded,
+        ["Composed"] = Stranded,
+        ["Homeostat"] = Stranded,
+        ["Latent"] = Stranded,
+        ["Motif"] = Stranded,
+        ["Recalled"] = Stranded,
+        ["Rhythm"] = Stranded,
+        ["Senses"] = Stranded,
+        ["Snake"] = Stranded,
+        ["SnakeSense"] = Stranded,
+
+        ["HybridBus"] = Composed,
+
+        // ---- A FRONT END IS CHOSEN AT THE JOIN ------------------------------
+        //
+        // THE THIRD THING, AND THE PLAN SAYS SO IN THOSE WORDS. Whether a reading is banded
+        // or winnowed is neither a fact about the problem nor a setting on the brain, so it
+        // is picked where the two meet -- `ShapeTests` admits `fronting` and `through` on a
+        // world's runner for exactly this reason. A library that named one would be
+        // deciding how everything it is ever shown gets perceived.
+        ["Marked"] = Join,
+        ["Passthrough"] = Join,
+
         ["Roaming"] = "A WORLD, ON THE SAME FOOTING AS `Returning`: `Trial` drives it "
             + "through `IWorld`, so there is no run for `src` to name and naming the world "
             + "itself would be the library knowing which problem it is pointed at. "
@@ -296,6 +393,20 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     };
 
     /// <summary>Why a world's run is not named by the library.</summary>
+    /// <summary>Why a world whose only runner was the walk's is named by nothing.</summary>
+    private const string Stranded =
+        "A WORLD WHOSE RUNNER WENT WITH THE WALK. The data is intact and nothing drives it "
+        + "-- unlike `Roaming`, which `Trial` drives through `IWorld`. What it is owed is a "
+        + "`Trial` over it, and until then its tests assert what the WORLD is and nothing "
+        + "about what is learnt from it.";
+
+    /// <summary>Why a front end is not named by the library that reads through it.</summary>
+    private const string Join =
+        "A TRANSLATION IS A THIRD THING AND BELONGS AT THE JOIN. Which front end a stream is "
+        + "read through is neither a fact about the problem nor a setting on the brain, so a "
+        + "library naming one would decide how everything it is ever shown is perceived. "
+        + "`ShapeTests` admits `fronting` on a runner for the same reason.";
+
     private const string Harness =
         "a world's run is the HARNESS's entry point, so a test is its rightful "
         + "caller and the library naming it would be the surprise.";

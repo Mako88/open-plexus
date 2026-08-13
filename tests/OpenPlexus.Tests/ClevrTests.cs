@@ -1,5 +1,4 @@
-using OpenPlexus.Graph;
-using OpenPlexus.Worlds;
+﻿using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
@@ -44,8 +43,6 @@ public sealed class ClevrTests(ITestOutputHelper output)
     {
         Corpus = Corpus, Scenes = scenes, Segmented = segmented, Tagged = tagged, Fleeting = fleeting,
     };
-
-    private static WalkSettings Dials => Fixture.Dials(stamina: 8.0);
 
     // ---- what the corpus is, asserted rather than described -----------------
 
@@ -111,22 +108,6 @@ public sealed class ClevrTests(ITestOutputHelper output)
             }
     }
 
-    [Fact]
-    public void Turning_segmentation_off_changes_the_grouping_and_nothing_else()
-    {
-        // THE CEILING ARM HAS TO DIFFER IN ONE THING. If the flat world emitted
-        // different codes as well, a drop would have two explanations.
-        var segmented = new Clevr(World(scenes: 20));
-        var flat = new Clevr(World(scenes: 20, segmented: false));
-
-        Assert.Equal(
-            segmented.Scenes.Select(scene => scene.Codes.AsEnumerable()),
-            flat.Scenes.Select(scene => scene.Codes.AsEnumerable()));
-
-        Assert.All(segmented.Scenes, scene => Assert.NotNull(scene.Groups));
-        Assert.All(flat.Scenes, scene => Assert.Null(scene.Groups));
-    }
-
     // ---- what the graph does with it ---------------------------------------
 
     /// <summary>Enough scenes to put a few hundred questions behind an arm.</summary>
@@ -136,165 +117,4 @@ public sealed class ClevrTests(ITestOutputHelper output)
     /// </remarks>
     private const int Scenes = 700;
 
-    /// <param name="refer">How a question names what it is about.</param>
-    /// <param name="pricing">How a scene is priced.</param>
-    /// <param name="scenes">How many scenes are drawn.</param>
-    /// <param name="row">
-    /// The row cap. <b>Lift it for anything reading <c>ClevrResult.Widest</c></b>
-    /// — entries are clipped at the cap, so a saturated row reports the bound and
-    /// not the graph. See the row-growth test below.
-    /// </param>
-    private async Task<ClevrResult> RunAsync(
-        Refer refer, Pricing pricing, int scenes = Scenes, int row = 32)
-    {
-        using var run = new ClevrRun(
-            World(scenes),
-            Dials with { Pricing = pricing, Row = row },
-            seed: 1);
-
-        var result = await run.RunAsync(refer);
-        output.WriteLine($"pricing={pricing,-8} {result}");
-        return result;
-    }
-
-    [Fact]
-    public async Task Weighing_from_both_ends_serves_both_hops()
-    {
-        // ALL THREE AT THE SAME, GENEROUS BUDGET — which is the comparison that
-        // should have been made first. At stamina 8 the receiver arm looked beaten
-        // on the answer and the two arms read as a per-hop conflict no default
-        // could fix. That was the budget: an index is seen once and an attribute
-        // in most scenes, so index-to-attribute is receiver pricing's dearest hop,
-        // and it simply could not be afforded. Given enough, it can.
-        var arms = new List<(double Reference, double Accuracy, long Messages)>();
-
-        foreach (var pricing in new[] { Pricing.Receiver, Pricing.Sender })
-        {
-            using var probe = new ClevrRun(
-                World(180), Fixture.Dials(stamina: 32.0) with { Pricing = pricing }, seed: 1);
-
-            var seen = await probe.RunAsync(Refer.Conjunction);
-            arms.Add((seen.Reference, seen.Accuracy, seen.Messages));
-
-            output.WriteLine(
-                $"{pricing,-8} ref={seen.Reference:F4} acc={seen.Accuracy:F4} "
-                + $"silent={seen.Silent} msgs={seen.Messages}");
-        }
-
-        var receiver = arms[0];
-        var sender = arms[1];
-
-        // THE CORRECTION, HELD AS A TEST. Receiver takes both halves once it can
-        // pay, so there is no conflict to split a dial over -- and a regression
-        // that reintroduced the apparent conflict would land here.
-        Assert.True(receiver.Reference > sender.Reference,
-            $"receiver did not win the reference at budget: "
-            + $"{receiver.Reference} against {sender.Reference}");
-
-        Assert.True(receiver.Accuracy > sender.Accuracy * 0.8,
-            $"receiver did not come near sender on the answer at budget: "
-            + $"{receiver.Accuracy} against {sender.Accuracy}");
-
-        // AND SENDER IS NOT THE CHEAP ARM EITHER, which was the other half of the
-        // story and also wrong. At a matched budget it costs several times more:
-        // what it actually does is reach a good ANSWER at a low budget, where
-        // receiver needs a high one and pays for the reference as well.
-        Assert.True(sender.Messages > receiver.Messages,
-            $"sender was cheaper at a matched budget after all: "
-            + $"{sender.Messages} against {receiver.Messages}");
-    }
-
-    [Fact]
-    public async Task Finding_the_object_and_reading_it_want_opposite_pricing()
-    {
-        // THE BEST-OF-BOTH-WORLDS CASE, AND IT IS SHARPER THAN THE USUAL ONE.
-        // The recurring fault in this design is a dial two WORLDS want different
-        // values of. This is one QUESTION whose two hops want different values,
-        // which no per-world default can fix.
-        //
-        // The arithmetic says why, and it is not subtle. An object index is seen
-        // exactly once, an attribute is seen in most scenes. Receiver pricing
-        // charges `seen(receiver)`, so attribute-to-index is the cheapest hop in
-        // the graph and index-to-attribute is among the dearest; sender pricing
-        // charges `seen(sender)` and inverts precisely that pair. The reference
-        // half of the task is the first hop and the answer half is the second.
-        var finding = await RunAsync(Refer.Conjunction, Pricing.Receiver);
-        var reading = await RunAsync(Refer.Conjunction, Pricing.Sender);
-
-        Assert.True(finding.Reference > reading.Reference,
-            $"receiver did not win the reference: {finding.Reference} against {reading.Reference}");
-
-        Assert.True(reading.Accuracy > finding.Accuracy,
-            $"sender did not win the answer: {reading.Accuracy} against {finding.Accuracy}");
-
-        // AND NEITHER WINS BOTH, which is the whole point. Stated as a crossover
-        // rather than two separate wins, because two arms each winning something
-        // is only interesting if no arm wins everything.
-        Assert.True(finding.Accuracy < reading.Accuracy && reading.Reference < finding.Reference,
-            "one pricing won both halves, so there is nothing to split");
-    }
-
-    [Fact]
-    public async Task The_ceiling_arm_shows_the_second_hop_is_the_one_that_starves()
-    {
-        // HANDED THE OBJECT ITSELF, so the reference is perfect by construction
-        // and the only thing left is reading an attribute off it. Receiver pricing
-        // still cannot, and that is the second hop being unaffordable rather than
-        // the walk failing to refer.
-        var dear = await RunAsync(Refer.Index, Pricing.Receiver);
-        var cheap = await RunAsync(Refer.Index, Pricing.Sender);
-
-        Assert.Equal(1.0, dear.Reference, 6);
-        Assert.Equal(1.0, cheap.Reference, 6);
-
-        Assert.True(cheap.Accuracy > dear.Accuracy * 2,
-            $"the second hop was not the difference: {cheap.Accuracy} against {dear.Accuracy}");
-
-        // THE STARVATION IS VISIBLE AS SILENCE, not as a wrong answer. A walk that
-        // cannot afford the hop reaches nothing in the modality it was narrowing
-        // to, which is a different failure from reaching the wrong thing.
-        Assert.True(dear.Silent > cheap.Silent,
-            $"the dear arm was not the silent one: {dear.Silent} against {cheap.Silent}");
-    }
-
-    [Fact]
-    public async Task An_index_the_walk_must_arrive_at_cannot_be_fleeting_so_the_rows_grow()
-    {
-        // THE COST THIS WORLD CANNOT AVOID, AND IT IS THE ROW-GROWTH TRAP FROM
-        // OUTSIDE. Everywhere else an index is declared fleeting, which keeps it
-        // out of every lasting node's row. Here the question does NOT know which
-        // object it means -- it knows two attributes of one -- so the walk has to
-        // be able to ARRIVE at an index, and a fleeting index cannot be arrived
-        // at. The row therefore grows by one entry per object forever.
-        //
-        // Read `Widest` and never the mean: the growth mints a great many tiny
-        // index nodes, and they hold `Edges / Nodes` flat while the handful of
-        // attribute nodes the walk actually passes through grow without bound.
-        // AND THE CAP COMES OFF TO READ IT, because `Widest` is clipped at
-        // `WalkSettings.Row` — a row that grows "without bound" saturates at the
-        // bound, and both corpus sizes then report the SAME number and this
-        // assertion fails while the growth it describes is really happening. That is
-        // exactly how the companion test on `Tending` came to report the opposite of
-        // the truth for as long as it existed.
-        var few = await RunAsync(
-            Refer.Conjunction, Pricing.Receiver, scenes: 100, row: Fixture.Unbounded);
-        var many = await RunAsync(
-            Refer.Conjunction, Pricing.Receiver, scenes: 400, row: Fixture.Unbounded);
-
-        // THE GUARD FIRST. A saturated row is the bound, reported.
-        Assert.True(few.Widest < Fixture.Unbounded && many.Widest < Fixture.Unbounded,
-            $"a row reached the lifted cap ({few.Widest}, {many.Widest}), so these "
-            + "numbers are the bound rather than the growth");
-
-        Assert.True(many.Widest > few.Widest * 3,
-            $"the widest row did not grow with the corpus: {many.Widest} against {few.Widest}");
-
-        // AND THE MEAN CANNOT SEE IT, which is why the trap is written down.
-        var thin = few.Edges / (double)few.Nodes;
-        var thick = many.Edges / (double)many.Nodes;
-
-        Assert.True(thick < thin * 3,
-            $"the mean fan-out grew as fast as the widest row, so this world no "
-            + $"longer demonstrates the trap: {thick} against {thin}");
-    }
 }

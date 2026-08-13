@@ -1,5 +1,4 @@
-using OpenPlexus.Commitments;
-using OpenPlexus.Graph;
+﻿using OpenPlexus.Commitments;
 using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
@@ -17,9 +16,9 @@ namespace OpenPlexus.Tests;
 /// </para>
 /// <para>
 /// <b>A TOGGLE BETWEEN TWO NAMED ALTERNATIVES IS FINE. AN ON/OFF FLAG IS NOT.</b>
-/// <see cref="Pricing"/> chooses which end of an edge weighs it; <see cref="Toll"/>
-/// chooses what a hop is charged from. Both ends do something, and the comparison
-/// is between two real behaviours. A <c>bool</c> compares a behaviour against its
+/// <see cref="Mending"/> chooses which failures a repair may run on;
+/// <see cref="Repairing"/> chooses when it runs. Both ends do something, and the
+/// comparison is between two real behaviours. A <c>bool</c> compares a behaviour against its
 /// own absence, which means the absence is a permanent resident of the code.
 /// </para>
 /// <para>
@@ -33,9 +32,9 @@ namespace OpenPlexus.Tests;
 /// <para>
 /// <b>AND THE DISGUISED ONES COUNT.</b> A nullable dial whose null means "off", or
 /// a number whose zero means "off", is the same flag wearing a different type —
-/// <see cref="WalkSettings.Row"/>, <see cref="WalkSettings.Reflect"/> and
-/// <see cref="WalkSettings.Span"/> are all switches. They are listed by hand
-/// because no reflection can tell "null is off" from "null is a sensible absence".
+/// a nullable cap whose null means <i>unbounded</i> is the sharpest case, and the walk
+/// carried three of them. They are listed by hand because no reflection can tell
+/// "null is off" from "null is a sensible absence".
 /// </para>
 /// </remarks>
 public sealed class FlagTests(ITestOutputHelper output)
@@ -74,11 +73,11 @@ public sealed class FlagTests(ITestOutputHelper output)
     [Fact]
     public void No_dial_is_an_on_off_switch()
     {
-        // BOTH SETTINGS TYPES. A second brain's control arm arrived as a `bool` and
-        // this file could not see it, which is the same blind spot the dial census
-        // has already been caught in once.
-        var flags = typeof(WalkSettings).GetProperties()
-            .Concat(typeof(CommittingSettings).GetProperties())
+        // THE BRAIN'S SETTINGS, WHICH ARE NOW ALL OF THEM. A second settings record
+        // arrived once with a control arm as a `bool` that this file could not see --
+        // the same blind spot the dial census has already been caught in. One record
+        // is not a reason to stop looking; it is a reason this line is worth reading.
+        var flags = typeof(CommittingSettings).GetProperties()
             .Where(one => one.PropertyType == typeof(bool))
             .Select(one => one.Name)
             .ToList();

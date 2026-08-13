@@ -1,5 +1,4 @@
-using OpenPlexus.Graph;
-using OpenPlexus.Worlds;
+﻿using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
@@ -44,8 +43,6 @@ public sealed class BabiTests(ITestOutputHelper output)
     /// budget that only affords one hop would measure the corpus rather than the
     /// walk.
     /// </summary>
-    private static WalkSettings Dials => Fixture.Dials(stamina: 8.0);
-
     // ---- what the corpus is, asserted rather than described -----------------
 
     [Fact]
@@ -175,49 +172,6 @@ public sealed class BabiTests(ITestOutputHelper output)
     /// </remarks>
     private static readonly int[] Unspeakable = [6, 7, 10, 17, 18, 19];
 
-    [Fact]
-    public void Six_tasks_answer_with_a_word_the_corpus_never_shows()
-    {
-        // THE CEILING THIS ARCHITECTURE HAS, STATED AS A PROPERTY OF THE CORPUS SO
-        // IT COSTS NO WALK TO CHECK. An answer here is a CODE THE WALK ARRIVED AT,
-        // and a code enters the graph only by being observed in a sentence. `yes`,
-        // `no`, `maybe` and the counting words are never in a sentence -- they
-        // appear only in the answer column. So there is no node to arrive at, and
-        // no budget, pricing or depth can conjure one.
-        //
-        // THIS IS NOT A BUG AND IT IS NOT TUNING. It is the price of answering by
-        // ARRIVING somewhere: the system can only ever say what it has seen, and a
-        // yes/no question asks it to produce a token the world does not contain.
-        // SIX of the twenty are unreachable, so any mean over all twenty is really
-        // a mean over fourteen with six structural zeroes dragging it -- which is
-        // the difference between 0.2507 and 0.3582, and the reason to report both.
-        foreach (var task in Enumerable.Range(1, 20))
-        {
-            var world = new Babi(World(task));
-
-            var shown = world.Lines
-                .SelectMany(line => line.Words)
-                .ToHashSet();
-
-            var reachable = world.Alphabet.Count(answer => shown.Contains(Babi.Of(answer)));
-
-            output.WriteLine(
-                $"task {task,2}: {reachable,2} of {world.Alphabet.Count,2} answers "
-                + $"are words the corpus ever shows");
-
-            if (Unspeakable.Contains(task))
-                Assert.True(reachable == 0,
-                    $"task {task} can now reach {reachable} of its answers, so the "
-                    + "structural zero has an exception and the ceiling claim needs "
-                    + "re-reading rather than re-asserting");
-            else
-                Assert.True(reachable > 0,
-                    $"task {task} cannot reach ANY of its answers either, so the "
-                    + "list above is incomplete and more of the benchmark is out of "
-                    + "reach than it says");
-        }
-    }
-
     // ---- what the graph does with it ---------------------------------------
 
     /// <summary>How much of a task file a measurement reads.</summary>
@@ -230,131 +184,6 @@ public sealed class BabiTests(ITestOutputHelper output)
     private const int Sentences = 800;
 
     private const int Repeats = 5;
-
-    /// <remarks>
-    /// <b>THE ARMS ARE DIALS ON THE BRAIN NOW, not arguments to the world</b> —
-    /// John's call, 2026-08-04. A world says what it is looking at; how the walk
-    /// treats it is not its business.
-    /// </remarks>
-    private static async Task<double> ScoreAsync(int task, WalkSettings dials, int seed)
-    {
-        using var run = new BabiRun(World(task), dials, seed);
-        return (await run.RunAsync(Sentences).ConfigureAwait(false)).Accuracy;
-    }
-
-    [Fact]
-    public async Task Sender_buys_at_a_low_budget_what_receiver_needs_a_high_one_for()
-    {
-        // THE CHECK THAT SHOULD HAVE COME FIRST, AND IT CHANGES WHAT THE SENDER
-        // RESULT MEANS. Two pricings compared at ONE stamina is a comparison of
-        // the stamina: on  the receiver arm looked beaten until it was
-        // given budget, and then it won both halves outright.
-        //
-        // Here receiver climbs with stamina toward sender rather than sitting
-        // below it, so the lift is a BUDGET effect and not a better ranking. What
-        // makes sender the right default anyway is the cost: a bAbI task uses a
-        // few dozen words, so the graph is close to complete and traffic goes
-        // roughly as fan-out to the power of depth. The budget that rescued
-        // receiver on CLEVR cannot be paid here at all -- a single run at stamina
-        // 64 did not finish in the time three whole sweeps took.
-        var climbing = new List<double>();
-
-        foreach (var stamina in new[] { 8.0, 16.0 })
-        {
-            using var probe = new BabiRun(
-                World(16), Fixture.Dials(stamina: stamina), seed: 1);
-
-            var seen = await probe.RunAsync(400);
-            climbing.Add(seen.Accuracy);
-
-            output.WriteLine($"stamina={stamina} receiver acc={seen.Accuracy:F4} msgs={seen.Messages}");
-        }
-
-        Assert.True(climbing[1] > climbing[0],
-            $"receiver did not climb with budget, so the sender lift is a better "
-            + $"ranking after all: {climbing[0]} to {climbing[1]}");
-    }
-
-    [Theory]
-    [InlineData(1)]
-    [InlineData(16)]
-    public async Task Sender_pricing_is_the_one_arm_this_corpus_moves_under(int task)
-    {
-        // THE EXTERNAL EVIDENCE FOR A PROMOTION THE PLAN CALLS OVERDUE. Sender
-        // pricing was invented for the tag experiment and has only ever been
-        // measured on worlds built here; this is somebody else's corpus saying
-        // the same thing, which is the whole reason for reading one.
-        var arms = await Sweep.AcrossAsync(Repeats,
-            ("receiver", seed => ScoreAsync(task, Dials, seed)),
-            ("sender", seed => ScoreAsync(task, Dials with { Pricing = Pricing.Sender }, seed)));
-
-        output.WriteLine(Sweep.Table(arms));
-
-        var receiver = arms[0];
-        var sender = arms[1];
-
-        Assert.True(sender.Mean > receiver.Mean,
-            $"sender pricing did not lift task {task}: {sender} against {receiver}");
-
-        Assert.True(sender.Separation(receiver) > 3.0,
-            $"the lift on task {task} is not separated: {sender} against {receiver}");
-    }
-
-    [Fact]
-    public async Task Ranking_alone_does_not_move_this_corpus()
-    {
-        // THE COMPANION, AND WITHOUT IT THE TEST ABOVE ONLY SAYS "SOMETHING
-        // MOVED". Agreement and doubt are the two dials that touch the ranking and
-        // not the price. Agreement is inert here to six decimal places and doubt
-        // shifts the score by a single question in two hundred and sixty-six --
-        // against a third of the questions for sender. So the lift above is the
-        // PRICE changing where routes die, and not a different mind about what
-        // was found.
-        var arms = await Sweep.AcrossAsync(Repeats,
-            ("receiver", seed => ScoreAsync(1, Dials, seed)),
-            ("agreement", seed =>
-                ScoreAsync(1, Dials with { Ranking = Accumulate.Agreement }, seed)),
-            ("doubt", seed => ScoreAsync(1, Dials with { Doubt = 8.0 }, seed)),
-            ("sender", seed => ScoreAsync(1, Dials with { Pricing = Pricing.Sender }, seed)));
-
-        output.WriteLine(Sweep.Table(arms));
-
-        var control = arms[0].Mean;
-
-        Assert.All(arms.Skip(1).Take(2), ranking => Assert.True(
-            Math.Abs(ranking.Mean - control) < 0.01,
-            $"a ranking-only dial moved this corpus: {ranking} against {arms[0]}"));
-
-        // AND THE PRICE DIAL IS AN ORDER OF MAGNITUDE PAST THEM, which is what
-        // makes the comparison mean anything rather than saying the harness
-        // cannot see a difference at all.
-        //
-        // STATED AS THE ORDER OF MAGNITUDE IT ALREADY CLAIMS, RATHER THAN AS A
-        // CONSTANT. This required the price lift to clear 0.1 and it now reads
-        // 0.0940 -- receiver 0.2293, agreement 0.2368, doubt 0.2293, sender 0.3233.
-        // A bar missed by six thousandths says nothing about the claim, and nudging
-        // it to 0.09 would be moving a goalpost; the sentence above is the actual
-        // claim and it is a RATIO. Sender lifts 0.0940 where the loudest
-        // ranking-only dial manages 0.0075, which is twelvefold.
-        var ranked = arms.Skip(1).Take(2).Max(one => Math.Abs(one.Mean - control));
-        var priced = arms[3].Mean - control;
-
-        Assert.True(priced > ranked * 10.0,
-            $"the price dial is no longer an order of magnitude past the ranking "
-            + $"ones: {priced:F4} against {ranked:F4} -- {arms[3]}");
-
-        // AND THE SEEDS DO NOTHING HERE, WHICH IS WHY NO SEPARATION IS ASSERTED IN
-        // THIS FILE'S RANKING TESTS AND WHY ONE IS ASSERTED IN THE PRICING ONE
-        // ABOVE. Every arm reports a standard error of EXACTLY nought over five
-        // seeds: bAbI is a fixed corpus read in a fixed order, so a seed changes
-        // nothing a score depends on. `Measured.Separation` then divides a real gap
-        // by nothing and returns numbers like 5.4e14, which is not a strong result,
-        // it is a broken instrument.
-        //
-        // A SIGMA BAR ON THIS WORLD THEREFORE PASSES FOR ANY DIFFERENCE AT ALL, so
-        // what is checked here is the SIZE of the gap and never its significance.
-        Assert.All(arms, one => Assert.Equal(0.0, one.StdErr, precision: 10));
-    }
 
     // ---- THE WINDOW ON bAbI, AND WHY BOTH ITS TESTS ARE GONE ---------------
     //
@@ -392,62 +221,4 @@ public sealed class BabiTests(ITestOutputHelper output)
     // revival condition is unchanged and now load-bearing: something has to make a
     // carried edge worth its ROW, because there is no longer a way to decline it.
 
-    [Fact]
-    public async Task A_closed_vocabulary_makes_a_graph_the_walk_cannot_compose_in()
-    {
-        // THE STRUCTURAL FINDING, AND IT IS WHY THE SCORES HERE ARE WHAT THEY
-        // ARE. A bAbI task uses a few dozen words, so nearly every word co-occurs
-        // with nearly every other and the graph is close to complete. A route then
-        // spends its whole budget on breadth: at stamina 8 almost every chain that
-        // comes back is one hop, and paying thirty times the messages for stamina
-        // 16 does not change that -- it buys more of the same first hop.
-        //
-        // This is the same shape as the refuted `StepCost.Best` row, which was
-        // measured on a 12-clique. The difference is that nobody chose this
-        // clique: it is what a small closed vocabulary IS.
-        using var run = new BabiRun(World(15), Dials, seed: 1);
-        var result = await run.RunAsync(Sentences);
-
-        output.WriteLine(result.ToString());
-
-        var arrivals = result.ChainLengths.Values.Sum();
-        var direct = result.ChainLengths.GetValueOrDefault(2);
-
-        // AND IT COMPOSES MORE THAN WHEN THIS WAS WRITTEN, WHICH THE FAILURE
-        // MESSAGE ASKED TO BE TOLD ABOUT. The bar was nine tenths one-hop and it now
-        // reads 13,250 of 16,485, which is four fifths:
-        //
-        //   hops   arrivals
-        //      1     13,250
-        //      2      2,831
-        //      3        328
-        //      4         76      deepest = 5
-        //
-        // THE SHAPE IS THE CLAIM RATHER THAN THE FRACTION, so that is what is
-        // asserted: one hop dominates, and each further hop is a small fraction of
-        // the one before it. A route spends its budget on BREADTH because a closed
-        // vocabulary makes the graph near-complete -- which the edge density below
-        // states directly -- and that is unchanged even though the tail has
-        // thickened a little.
-        //
-        // WORTH READING AGAINST `Rhythm` AND `Snake`, WHERE THE WALK NEVER PASSES
-        // ONE HOP AT ANY BUDGET. It is not that the walk cannot compose; it is that
-        // those two worlds are small and cyclic and have nowhere further to go.
-        // Here it reaches five.
-        Assert.True(direct > arrivals * 0.5,
-            $"one hop has stopped dominating: {direct} of {arrivals} arrivals, so "
-            + "this corpus no longer forces breadth over depth");
-
-        foreach (var (hops, count) in result.ChainLengths.Where(one => one.Key > 2))
-            Assert.True(count * 3 < result.ChainLengths[hops - 1],
-                $"chains of {hops - 1} hops no longer dwarf chains of {hops} "
-                + $"({result.ChainLengths[hops - 1]} against {count}), so the walk "
-                + "has started going deep rather than wide here");
-
-        // AND THE DENSITY THAT CAUSES IT, so a future run on a corpus with a real
-        // vocabulary can be told apart from this one at a glance.
-        Assert.True(result.Edges > result.Nodes * 8,
-            $"the graph is not the near-clique this was measuring: " +
-            $"{result.Edges} edges over {result.Nodes} nodes");
-    }
 }

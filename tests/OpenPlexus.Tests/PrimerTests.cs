@@ -1,5 +1,4 @@
-using OpenPlexus.Codes;
-using OpenPlexus.Graph;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
@@ -23,14 +22,14 @@ namespace OpenPlexus.Tests;
 /// <see cref="SensesSettings.Skew"/> was pushed to — the commonest word is in half
 /// of all sentences — so ingesting it is ruinous. And the words the tasks need are
 /// RARE: the largest slice affordable holds <i>yes</i> a handful of times, which is
-/// the single-accident population <see cref="WalkSettings.Doubt"/> exists to
+/// the single-accident population the repair gate's twenty-miss floor exists to
 /// disbelieve. Affordable is far below useful, and the gap is orders of magnitude.
 /// </para>
 /// <para>
 /// <b>So this file asserts the WALL rather than a lift.</b> That is the honest
 /// artifact: the experiment is blocked by throughput on heavy-tailed data, which
-/// is the same wall <see cref="TailTests"/> found and what the plan's hierarchy and
-/// Space-Saving items are for.
+/// is the same wall the walk's tail measurements found and what the plan's hierarchy
+/// and Space-Saving items are for.
 /// </para>
 /// </remarks>
 public sealed class PrimerTests(ITestOutputHelper output)
@@ -100,28 +99,6 @@ public sealed class PrimerTests(ITestOutputHelper output)
             $"`yes` now appears {counts["yes"]} times in the affordable slice, so "
             + "it is no longer a single-accident node and the experiment that "
             + "found no lift needs re-running");
-    }
-
-    [Fact]
-    public async Task Swallowing_english_is_priced_by_the_row_cap_and_nothing_else()
-    {
-        // THE WALL, AND IT IS THE SAME ONE `TailTests` FOUND ON A SYNTHETIC SKEW.
-        // Real English is the heavy tail arriving for free: the commonest word is
-        // in half of all sentences, so its row holds nearly the whole vocabulary
-        // and `Node.Fire` emits one message per partner.
-        //
-        // MEASURED: twenty-five sentences of English cost an order of magnitude
-        // more at a cap of 32 than at 8, and four hundred at 32 does not finish
-        // inside the bus's thirty-second patience at all. The cap is not a saving
-        // here, it is the difference between possible and not.
-        var dear = await CostAsync(cap: 32);
-        var cheap = await CostAsync(cap: 8);
-
-        output.WriteLine($"cap=32 {dear} messages, cap=8 {cheap} messages");
-
-        Assert.True(dear > cheap * 5,
-            $"the row cap stopped pricing the English ({dear} against {cheap}), so "
-            + "ingesting a heavy tail is no longer what this file says it is");
     }
 
     /// <summary>
@@ -483,25 +460,4 @@ public sealed class PrimerTests(ITestOutputHelper output)
             .ToList();
     }
 
-    /// <summary>What a small slice of English costs to swallow, in messages.</summary>
-    /// <remarks>
-    /// <b>Twenty-five sentences and two of the task, because the English is the
-    /// measurement.</b> Anything slower here is the corpus rather than the
-    /// questions, and a bigger slice at the dearer cap does not finish.
-    /// </remarks>
-    private static async Task<long> CostAsync(int cap)
-    {
-        using var run = new BabiRun(
-            new BabiSettings
-            {
-                Task = 6,
-                Corpus = Path.Combine(Tree.Repo(), "corpora", "tasks_1-20_v1-2", "en-10k"),
-                Stories = true,
-            },
-            Fixture.Dials(stamina: 8.0) with { Pricing = Pricing.Sender, Row = cap },
-            seed: 1,
-            primer: Priming(25));
-
-        return (await run.RunAsync(2).ConfigureAwait(false)).Messages;
-    }
 }

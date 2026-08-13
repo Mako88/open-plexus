@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Tests;
@@ -102,35 +102,6 @@ public sealed class DuplicationTests
             $"{clones.Count} block(s) of {Window}+ statements appear more than once. "
             + "Extract rather than raising the window:\n"
             + string.Join("\n\n", clones.Take(5)));
-    }
-
-    [Fact]
-    public void Only_the_shared_base_decides_what_a_result_complains_about()
-    {
-        // THE GUARD ON THE THING THAT WAS ACTUALLY DUPLICATED. Every world's
-        // result carried its own `Complaints`, which is how a check could be
-        // added to one world and silently missed on the other two. A fourth
-        // world inherits the list or it does not have one.
-        var owners = typeof(Measurement).Assembly
-            .GetExportedTypes()
-            .Where(type => type.GetProperty("Complaints")?.DeclaringType == type)
-            .ToList();
-
-        Assert.Equal([typeof(Measurement)], owners);
-
-        // And every result really does inherit it, rather than the base sitting
-        // there unused while the worlds go their own way.
-        var results = typeof(Measurement).Assembly
-            .GetExportedTypes()
-            .Where(type => type.Name.EndsWith("Result", StringComparison.Ordinal)
-                || type.Name.EndsWith("Report", StringComparison.Ordinal))
-            .Where(type => type != typeof(Thinking.Report) && type != typeof(RunResult))
-            .ToList();
-
-        Assert.NotEmpty(results);
-        Assert.All(results, type => Assert.True(
-            typeof(Measurement).IsAssignableFrom(type),
-            $"{type.Name} is a world's result and does not inherit its range checks"));
     }
 
     /// <summary>

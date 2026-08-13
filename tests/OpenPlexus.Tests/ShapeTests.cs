@@ -1,5 +1,5 @@
-using System.Reflection;
-using OpenPlexus.Graph;
+﻿using System.Reflection;
+using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using Xunit.Abstractions;
 
@@ -23,7 +23,7 @@ namespace OpenPlexus.Tests;
 /// words, dial count. None of them guarded the SHAPE. So a dial could be added to a
 /// world's constructor forever and no check could see it, including
 /// <see cref="DialTests"/>, whose entire job is noticing dials arrive: it
-/// enumerates <see cref="WalkSettings"/>, and these were never there.
+/// enumerates the brain's settings record, and these were never in it.
 /// </para>
 /// <para>
 /// <b>THE LIST REACHED NOUGHT ON THE DAY IT WAS WRITTEN.</b> It began as fifteen
@@ -134,9 +134,9 @@ public sealed class ShapeTests(ITestOutputHelper output)
 
         Assert.True(fresh.Count == 0,
             $"new dial(s) on a world: {string.Join(", ", fresh)}. A world says what "
-            + "it is looking at; put this on `WalkSettings` where the dial census "
+            + "it is looking at; put this on `CommittingSettings` where the dial census "
             + "can see it, or add it to `Allowed` with an argument for why it is "
-            + "about the data rather than the walk.");
+            + "about the data rather than the brain.");
 
         // AND THE OTHER DIRECTION, so the list cannot rot into a record of dials
         // that have already moved -- the same failure the doc's ticked boxes and
@@ -168,7 +168,7 @@ public sealed class ShapeTests(ITestOutputHelper output)
     /// A new world joins this check by existing.
     /// </remarks>
     private static IEnumerable<Type> Worlds() =>
-        typeof(WalkSettings).Assembly
+        typeof(CommittingSettings).Assembly
             .GetTypes()
             .Where(one => one.IsClass && one.IsPublic && one.Name.EndsWith("Run", StringComparison.Ordinal))
             .OrderBy(one => one.Name, StringComparer.Ordinal);

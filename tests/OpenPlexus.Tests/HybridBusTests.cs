@@ -1,71 +1,79 @@
-using OpenPlexus.Bus;
-using OpenPlexus.Thinking;
+﻿using OpenPlexus.Bus;
+using OpenPlexus.Codes;
+using OpenPlexus.Commitments;
 
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// The transport. What matters is that a sender never waits on a receiver, that
-/// leaving is not silent, and that a failure surfaces.
+/// The transport. What matters is that a sender never waits on a receiver, that an ask
+/// which never left is written off, and that a failure surfaces.
 /// </summary>
+/// <remarks>
+/// <b>WHAT THE WALK'S DELETION TOOK OUT OF THIS FILE WAS THE ADDRESSED SEND.</b> An
+/// envelope named one cluster, so half of these tests were about the bus picking the right
+/// entry out of a dictionary. An ask is a BROADCAST — every holder gets it — so the routing
+/// question is gone and what is left is the concurrency, which was always the part worth
+/// asserting.
+/// </remarks>
 public sealed class HybridBusTests
 {
-
-    private static Envelope To(string cluster) => new()
+    private static Ask Asking() => new()
     {
-        To = new ClusterAddress(cluster),
-        Messages = [],
+        Broadcast = BroadcastId.New(),
+        ReturnTo = new MachineAddress("asker"),
+        Wants = Wanted.Vote,
+        Moment = [new Code(1, 2)],
     };
 
-    private static Report Reporting() => new()
+    private static Answer Answering() => new()
     {
-        From = new ClusterAddress("somewhere"),
-        Handled = 1,
-        SentInto = [],
-        Arrivals = [],
-        Accounting = new Accounting(new BroadcastId(Guid.Empty), 0, 1),
+        Broadcast = BroadcastId.New(),
+        From = new MachineAddress("holder"),
+        Said = new Testimony { Advocates = [] },
     };
 
     /// <summary>Records what it was handed, and can be made to wait.</summary>
-    private sealed class Cluster(string name) : IReceiveEnvelopes
+    private sealed class Held(string name) : IReceiveAsks
     {
-        private readonly List<Envelope> _got = [];
-
-        public ClusterAddress Address { get; } = new(name);
-
-        public TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
-
-        public Task Held { get; set; } = Task.CompletedTask;
-
-        public Exception? Throws { get; set; }
-
-        public IReadOnlyList<Envelope> Got
-        {
-            get { lock (_got) return [.. _got]; }
-        }
-
-        public async Task DeliverAsync(Envelope envelope, CancellationToken ct = default)
-        {
-            Entered.TrySetResult();
-            await Held.WaitAsync(Fixture.Patience, ct);
-            if (Throws is { } failure) throw failure;
-            lock (_got) _got.Add(envelope);
-        }
-    }
-
-    private sealed class Machine(string name) : IReceiveReports
-    {
-        private readonly List<Report> _got = [];
+        private readonly List<Ask> _got = [];
 
         public MachineAddress Address { get; } = new(name);
 
-        public IReadOnlyList<Report> Got
+        public TaskCompletionSource Entered { get; } =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public Task Waits { get; set; } = Task.CompletedTask;
+
+        public Exception? Throws { get; set; }
+
+        public IReadOnlyList<Ask> Got
         {
             get { lock (_got) return [.. _got]; }
         }
 
-        public Task DeliverAsync(Report report, CancellationToken ct = default)
+        public async Task DeliverAsync(Ask ask, CancellationToken ct = default)
         {
-            lock (_got) _got.Add(report);
+            Entered.TrySetResult();
+            await Waits.WaitAsync(Fixture.Patience, ct);
+            if (Throws is { } failure) throw failure;
+            lock (_got) _got.Add(ask);
+        }
+    }
+
+    private sealed class Asking_(string name) : IReceiveAnswers
+    {
+        private readonly List<Answer> _got = [];
+
+        public MachineAddress Address { get; } = new(name);
+
+        public IReadOnlyList<Answer> Got
+        {
+            get { lock (_got) return [.. _got]; }
+        }
+
+        public Task DeliverAsync(Answer answer, CancellationToken ct = default)
+        {
+            lock (_got) _got.Add(answer);
             return Task.CompletedTask;
         }
     }
@@ -73,82 +81,95 @@ public sealed class HybridBusTests
     // ---- delivery ---------------------------------------------------------
 
     [Fact]
-    public async Task An_envelope_reaches_the_cluster_it_is_addressed_to()
+    public async Task An_ask_reaches_every_holder_and_the_asker_is_told_who()
     {
         var bus = new HybridBus();
-        var alpha = new Cluster("alpha");
-        var beta = new Cluster("beta");
+        var alpha = new Held("alpha");
+        var beta = new Held("beta");
         using var _ = bus.Subscribe(alpha);
         using var __ = bus.Subscribe(beta);
 
-        // ADDRESSED TO THE SECOND SUBSCRIBER ON PURPOSE. Sending to the first
-        // let a mutation that ignores the address entirely and always picks
-        // `_clusters.Values.First()` survive every assertion here.
-        await bus.SendAsync(beta.Address, To("beta"));
+        var asked = await bus.AskAsync(Asking());
         await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
-        Assert.Single(beta.Got);
-
-        // The companion. Without it this passes for a bus that hands every
-        // envelope to everybody.
-        Assert.Empty(alpha.Got);
-
-        await bus.SendAsync(alpha.Address, To("alpha"));
-        await bus.WhenIdle().WaitAsync(Fixture.Patience);
+        // THE DENOMINATOR IS RETURNED AND THE ANSWERS ARE NOT, which is the whole shape of
+        // this bus: an asker learns who it asked now and what they said later.
+        Assert.Equal([alpha.Address, beta.Address], [.. asked]);
 
         Assert.Single(alpha.Got);
         Assert.Single(beta.Got);
     }
 
     [Fact]
-    public async Task A_report_reaches_the_machine_that_started_the_thought()
+    public async Task An_answer_reaches_the_asker_that_asked_and_no_other()
     {
         var bus = new HybridBus();
-        var machine = new Machine("origin");
-        using var _ = bus.Subscribe(machine);
+        var mine = new Asking_("mine");
+        var theirs = new Asking_("theirs");
+        using var _ = bus.Subscribe(mine);
+        using var __ = bus.Subscribe(theirs);
 
-        await bus.SendAsync(machine.Address, Reporting());
+        // ADDRESSED TO THE SECOND SUBSCRIBER ON PURPOSE. Sending to the first would let a
+        // mutation that ignores the address entirely and always takes the first entry
+        // survive every assertion here.
+        await bus.SendAsync(theirs.Address, Answering());
         await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
-        Assert.Single(machine.Got);
+        Assert.Single(theirs.Got);
+
+        // The companion. Without it this passes for a bus that hands every answer to
+        // everybody.
+        Assert.Empty(mine.Got);
+    }
+
+    [Fact]
+    public async Task An_answer_to_an_asker_that_has_gone_is_dropped_rather_than_thrown()
+    {
+        var bus = new HybridBus();
+
+        // C3: AN ASKER THAT DIED BETWEEN ASKING AND BEING ANSWERED IS ORDINARY. Throwing
+        // would make one machine's departure another machine's error, which is the whole
+        // thing this constraint refuses.
+        await bus.SendAsync(new MachineAddress("gone"), Answering());
+
+        await bus.WhenIdle().WaitAsync(Fixture.Patience);
     }
 
     // ---- a sender never waits on a receiver -------------------------------
 
     [Fact]
-    public async Task Sending_returns_before_the_receiver_has_finished()
+    public async Task Asking_returns_before_the_holder_has_finished()
     {
         var bus = new HybridBus();
-        var slow = new Cluster("slow") { Held = new TaskCompletionSource().Task };
+        var slow = new Held("slow") { Waits = new TaskCompletionSource().Task };
         using var _ = bus.Subscribe(slow);
 
-        await bus.SendAsync(slow.Address, To("slow"));
+        await bus.AskAsync(Asking());
 
-        // The receiver is still inside DeliverAsync and the send has already
-        // returned. That is the whole of "unawaited": a fan-out to many
-        // clusters is parallel rather than a queue.
+        // The holder is still inside DeliverAsync and the ask has already returned. That is
+        // the whole of "unawaited": a fan-out to many holders is parallel rather than a
+        // queue, and a queue would put the slowest machine's latency into every round.
         await slow.Entered.Task.WaitAsync(Fixture.Patience);
         Assert.Empty(slow.Got);
         Assert.Equal(1, bus.InFlight);
     }
 
     [Fact]
-    public async Task Two_clusters_are_delivered_to_at_the_same_time()
+    public async Task Two_holders_are_delivered_to_at_the_same_time()
     {
         var bus = new HybridBus();
-        var alpha = new Cluster("alpha");
-        var beta = new Cluster("beta");
+        var alpha = new Held("alpha");
+        var beta = new Held("beta");
 
-        // Each waits for the other to have started. Serial delivery cannot
-        // satisfy both, so this finishes only if they really overlap.
-        alpha.Held = beta.Entered.Task;
-        beta.Held = alpha.Entered.Task;
+        // Each waits for the other to have started. Serial delivery cannot satisfy both, so
+        // this finishes only if they really overlap.
+        alpha.Waits = beta.Entered.Task;
+        beta.Waits = alpha.Entered.Task;
 
         using var _ = bus.Subscribe(alpha);
         using var __ = bus.Subscribe(beta);
 
-        await bus.SendAsync(alpha.Address, To("alpha"));
-        await bus.SendAsync(beta.Address, To("beta"));
+        await bus.AskAsync(Asking());
 
         await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
@@ -161,10 +182,10 @@ public sealed class HybridBusTests
     {
         var bus = new HybridBus();
         var gate = new TaskCompletionSource();
-        var slow = new Cluster("slow") { Held = gate.Task };
+        var slow = new Held("slow") { Waits = gate.Task };
         using var _ = bus.Subscribe(slow);
 
-        await bus.SendAsync(slow.Address, To("slow"));
+        await bus.AskAsync(Asking());
         await slow.Entered.Task.WaitAsync(Fixture.Patience);
 
         var quiet = bus.WhenIdle();
@@ -176,78 +197,49 @@ public sealed class HybridBusTests
         Assert.Equal(0, bus.InFlight);
     }
 
-    // ---- leaving is not silent --------------------------------------------
+    // ---- who is about to be asked, before anyone is asked -----------------
 
     [Fact]
-    public async Task Leaving_the_bus_fires_a_death_carrying_the_address()
+    public async Task The_asker_is_told_the_denominator_before_any_holder_is_reached()
     {
         var bus = new HybridBus();
-        var departures = new List<ClusterAddress>();
-        bus.Deaths += departures.Add;
+        var one = new Held("one");
+        using var _ = bus.Subscribe(one);
 
-        var alpha = new Cluster("alpha");
-        var handle = bus.Subscribe(alpha);
+        var ready = new List<MachineAddress>();
 
-        // The companion, first: while it is subscribed, nothing has died and a
-        // send lands. Without this the assertions below pass for a bus that
-        // never delivered anything at all.
-        await bus.SendAsync(alpha.Address, To("alpha"));
-        await bus.WhenIdle().WaitAsync(Fixture.Patience);
-        Assert.Single(alpha.Got);
-        Assert.Empty(departures);
+        // AN ANSWER TO AN ASK NOBODY REMEMBERS IS DROPPED, so the asker has to record its
+        // gathering inside this window. Dispatch is `Task.Run`, so a holder can answer
+        // before `AskAsync` returns -- asserting the callback ran before delivery is
+        // asserting that the window is real rather than documented.
+        await bus.AskAsync(Asking(), ready: everyone => ready.AddRange(everyone));
 
-        handle.Dispose();
-
-        Assert.Equal([alpha.Address], departures);
+        Assert.Equal([one.Address], ready);
     }
 
-    [Fact]
-    public void Disposing_twice_reports_one_death()
-    {
-        var bus = new HybridBus();
-        var departures = new List<ClusterAddress>();
-        bus.Deaths += departures.Add;
-
-        var handle = bus.Subscribe(new Cluster("alpha"));
-        handle.Dispose();
-        handle.Dispose();
-
-        Assert.Single(departures);
-    }
+    // ---- a holder that never took the question ----------------------------
 
     [Fact]
-    public async Task A_stale_handle_does_not_evict_the_cluster_that_replaced_it()
+    public async Task A_holder_that_threw_taking_the_question_is_written_off_by_name()
     {
-        // C3 says a cluster vanishing is normal, so one coming back under the
-        // same address is normal too. A handle from the previous life must not
-        // be able to unsubscribe its successor — which is what makes the
-        // guard inside the handle load-bearing rather than a second copy of
-        // the check `Leave` already does.
         var bus = new HybridBus();
-        var gone = bus.Subscribe(new Cluster("alpha"));
-        gone.Dispose();
+        bus.Faults += _ => { };
 
-        var returned = new Cluster("alpha");
-        using var _ = bus.Subscribe(returned);
+        var written = new List<(BroadcastId Broadcast, MachineAddress Who)>();
+        bus.Unreached += (broadcast, who) => written.Add((broadcast, who));
 
-        gone.Dispose();
+        var broken = new Held("broken") { Throws = new InvalidOperationException("no") };
+        using var _ = bus.Subscribe(broken);
 
-        await bus.SendAsync(returned.Address, To("alpha"));
+        var ask = Asking();
+
+        await bus.AskAsync(ask);
         await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
-        Assert.Single(returned.Got);
-    }
-
-    [Fact]
-    public void An_address_with_nothing_local_and_no_wire_is_a_bug_not_a_drop()
-    {
-        var bus = new HybridBus();
-
-        // With no remote half, an unknown address can only be a routing error.
-        // Dropping it would be indistinguishable from ordinary C2 message loss,
-        // which is exactly the confusion that hides a wiring failure.
-        Assert.Throws<InvalidOperationException>(
-            () => bus.SendAsync(new ClusterAddress("nowhere"), To("nowhere")));
+        // FORK 53, IN THE ONE FORM ONE PROCESS CAN SHOW IT. A holder that took the ask and
+        // threw is the local spelling of a refused connection: no answer to THAT ask is
+        // owed from it, which is a smaller and exacter claim than saying it is dead.
+        Assert.Equal([(ask.Broadcast, broken.Address)], written);
     }
 
     // ---- failures surface -------------------------------------------------
@@ -259,15 +251,14 @@ public sealed class HybridBusTests
         var faults = new List<Exception>();
         bus.Faults += faults.Add;
 
-        var broken = new Cluster("broken") { Throws = new InvalidOperationException("no") };
+        var broken = new Held("broken") { Throws = new InvalidOperationException("no") };
         using var _ = bus.Subscribe(broken);
 
-        await bus.SendAsync(broken.Address, To("broken"));
+        await bus.AskAsync(Asking());
         await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
-        // A send that returns before delivery has no other way to report
-        // failure, and swallowing is how a thing turns out never to have been
-        // wired up.
+        // A send that returns before delivery has no other way to report failure, and
+        // swallowing is how a thing turns out never to have been wired up.
         Assert.Single(faults);
         Assert.Equal(0, bus.InFlight);
     }
@@ -278,25 +269,48 @@ public sealed class HybridBusTests
         var bus = new HybridBus();
         bus.Faults += _ => { };
 
-        var broken = new Cluster("broken") { Throws = new InvalidOperationException("no") };
+        var broken = new Held("broken") { Throws = new InvalidOperationException("no") };
         using var _ = bus.Subscribe(broken);
 
-        await bus.SendAsync(broken.Address, To("broken"));
+        await bus.AskAsync(Asking());
 
         await bus.WhenIdle().WaitAsync(Fixture.Patience);
     }
 
     [Fact]
-    public async Task Many_sends_all_arrive()
+    public async Task Many_asks_all_arrive_and_all_of_them_are_counted()
     {
         var bus = new HybridBus();
-        var alpha = new Cluster("alpha");
+        var alpha = new Held("alpha");
         using var _ = bus.Subscribe(alpha);
 
-        for (var i = 0; i < 200; i++) await bus.SendAsync(alpha.Address, To("alpha"));
+        for (var i = 0; i < 200; i++) await bus.AskAsync(Asking());
         await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         Assert.Equal(200, alpha.Got.Count);
         Assert.Equal(0, bus.InFlight);
+
+        // THE COUNT IS THE INSTRUMENT AND THE ARRIVALS ARE THE BEHAVIOUR, and a bus that
+        // delivered everything while counting nothing would pass the line above alone.
+        Assert.Equal(200, bus.Messages);
+    }
+
+    [Fact]
+    public async Task A_holder_that_has_left_is_not_asked()
+    {
+        var bus = new HybridBus();
+        var going = new Held("going");
+        var handle = bus.Subscribe(going);
+
+        // LEAVING IS SILENT HERE, WHICH IS THE OPPOSITE OF THE WALK'S CLUSTER. A holder
+        // that has unsubscribed is not in the roster, so it is never in the denominator and
+        // never owed anything -- there is nothing to announce and nobody to announce it.
+        handle.Dispose();
+
+        var asked = await bus.AskAsync(Asking());
+        await bus.WhenIdle().WaitAsync(Fixture.Patience);
+
+        Assert.Empty(asked);
+        Assert.Empty(going.Got);
     }
 }

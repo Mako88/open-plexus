@@ -97,7 +97,7 @@ jobs:
             "EncodedTests.The_population_reaches_most",
             "ForkingTests.What_a_parents_attempts_buy",
             "ForkingTests.What_the_budget_caps",
-            "GateCostTests","LatencyTests","MendingTests",
+            "GateCostTests","MendingTests",
             "MonkTests","NarrowingTests","OverlapTests","PlacingTests",
             "NamingYieldTests.Which_bar_takes",
             "NamingYieldTests.Whether_a_run_past",

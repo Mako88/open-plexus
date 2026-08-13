@@ -1,4 +1,4 @@
-using OpenPlexus.Worlds;
+﻿using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Tests;
 
@@ -12,7 +12,15 @@ public sealed class SnakeTests
     // than defaulted: these tests are about absolute movement and an unrotated
     // view, so they say what they are riding on.
     private static SnakeSettings Board(int? sight = 1, double energy = 100.0, double perFood = 50.0) =>
-        Fixture.Snake(sight, energy, perFood, size: 21);
+        new()
+        {
+            Width = 21,
+            Height = 21,
+            Sight = sight,
+            StartingEnergy = energy,
+            EnergyPerStep = 1.0,
+            EnergyPerFood = perFood,
+        };
 
     private static Cell SeenAt(SnakeView view, int dx, int dy) =>
         view.Cells.Single(c => c.Dx == dx && c.Dy == dy).Content;

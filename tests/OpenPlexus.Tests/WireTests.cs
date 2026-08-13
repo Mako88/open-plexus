@@ -1,8 +1,7 @@
 ﻿using System.Collections.Immutable;
 using OpenPlexus.Bus;
 using OpenPlexus.Codes;
-using OpenPlexus.Graph;
-using OpenPlexus.Thinking;
+using OpenPlexus.Commitments;
 using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
@@ -107,6 +106,23 @@ public sealed class WireTests(ITestOutputHelper output)
         Assert.NotEqual(backBelow, backAbove);
     }
 
+    /// <summary>A code is two numbers and both of them are exact.</summary>
+    /// <remarks>
+    /// <b>The value is a <see cref="ulong"/> and JSON numbers are doubles in a lot of
+    /// readers</b>, which silently loses precision above 2^53 — and a code's value is a
+    /// hash, so the high bits are the ones carrying the identity.
+    /// </remarks>
+    [Fact]
+    public void A_code_survives_including_the_high_bits_of_its_value()
+    {
+        foreach (var value in new[] { 0UL, 1UL, ulong.MaxValue, (1UL << 53) + 1, 0xDEADBEEFCAFEF00D })
+        {
+            var code = new Code(Modality: 200, value);
+
+            Assert.Equal(code, Wire.Read<Code>(Wire.Write(code)));
+        }
+    }
+
     /// <summary>
     /// <b>EVERY PROPERTY OF EVERY MESSAGE REACHES THE WIRE, AND THIS IS THE CHECK THAT
     /// DOES NOT ROT.</b>
@@ -115,9 +131,11 @@ public sealed class WireTests(ITestOutputHelper output)
     /// <para>
     /// <b>A ROUND TRIP THAT COMPARES BYTES TO BYTES PROVES STABILITY AND NOT
     /// LOSSLESSNESS.</b> A field the serialiser cannot see is missing from BOTH sides and
-    /// the two agree perfectly — which is precisely how <see cref="Kind"/> behaved: a
-    /// struct whose whole state is private, written as <c>{}</c>, read back as a relation
-    /// no machine ever named, with nothing thrown and nothing unequal.
+    /// the two agree perfectly — which is precisely how the walk's edge kind behaved: a
+    /// struct whose whole state was private, written as <c>{}</c>, read back as a relation
+    /// no machine ever named, with nothing thrown and nothing unequal. <b>That type is gone
+    /// and the trap is not</b>, which is why this theory outlived the messages it was
+    /// written for.
     /// </para>
     /// <para>
     /// <b>SO THE PROPERTY IS ASKED OF THE TYPE RATHER THAN OF ONE VALUE.</b> Every public
@@ -125,14 +143,22 @@ public sealed class WireTests(ITestOutputHelper output)
     /// covered without this test being edited, which is the difference between a budget
     /// and a list somebody has to remember to update.
     /// </para>
+    /// <para>
+    /// <b>AND THE LIST IS THE WHOLE ASK AND ANSWER TREE RATHER THAN THE TWO TOP TYPES.</b>
+    /// A nested payload is where a private table or a tuple key hides — <see cref="Counts"/>
+    /// is what rung five reads off another machine, and a holder that shipped it as
+    /// <c>{}</c> would name nothing and report no error.
+    /// </para>
     /// </remarks>
     [Theory]
-    [InlineData(typeof(Message))]
-    [InlineData(typeof(Envelope))]
-    [InlineData(typeof(Report))]
-    [InlineData(typeof(Settled))]
-    [InlineData(typeof(Arrival))]
-    [InlineData(typeof(Accounting))]
+    [InlineData(typeof(Ask))]
+    [InlineData(typeof(Answer))]
+    [InlineData(typeof(Tabled))]
+    [InlineData(typeof(Testimony))]
+    [InlineData(typeof(Advocacy))]
+    [InlineData(typeof(Counts))]
+    [InlineData(typeof(Tallied))]
+    [InlineData(typeof(Learnt))]
     public void No_property_of_a_message_is_missing_from_the_wire(Type message)
     {
         ArgumentNullException.ThrowIfNull(message);
@@ -157,212 +183,171 @@ public sealed class WireTests(ITestOutputHelper output)
     /// <remarks>
     /// <b>DEFAULTS ARE THE PROBLEM AND SO THEY ARE AVOIDED.</b> A property left at zero
     /// would be indistinguishable from one the serialiser dropped, so the check would pass
-    /// for the fault it exists to find.
+    /// for the fault it exists to find. Every optional member of <see cref="Answer"/> is
+    /// filled here for that reason, even though no single answer ever carries all three.
     /// </remarks>
     private static object Populated(Type message) =>
-        message == typeof(Message) ? Filled
-        : message == typeof(Envelope)
-            ? new Envelope { To = new ClusterAddress("c"), Messages = [Filled], Everywhere = true }
-        : message == typeof(Report)
-            ? new Report
-            {
-                From = new ClusterAddress("c"),
-                Arrivals = [Reached],
-                Handled = 3,
-                SentInto = [],
-                Accounting = new Accounting { Broadcast = BroadcastId.New() },
-            }
-        : message == typeof(Settled)
-            ? new Settled
-            {
-                Broadcast = BroadcastId.New(),
-                From = new MachineAddress("m"),
-                Arrivals = [Reached],
-            }
-        : message == typeof(Arrival) ? Reached
-        : message == typeof(Accounting) ? new Accounting { Broadcast = BroadcastId.New() }
+        message == typeof(Ask) ? FilledAsk
+        : message == typeof(Answer) ? FilledAnswer
+        : message == typeof(Tabled) ? FilledTabled
+        : message == typeof(Testimony) ? FilledTestimony
+        : message == typeof(Advocacy) ? FilledAdvocacy
+        : message == typeof(Counts) ? FilledCounts
+        : message == typeof(Tallied) ? FilledTallied
+        : message == typeof(Learnt) ? (object)FilledLearnt
         : throw new ArgumentOutOfRangeException(nameof(message), $"no sample for {message.Name}");
 
-    private static Message Filled => new()
+    private static Advocacy FilledAdvocacy => new()
+    {
+        Expects = new Code(5, 12345678901234567),
+        Weight = 1.0 / 3.0,
+        By = new Code(6, 77),
+    };
+
+    private static Testimony FilledTestimony => new() { Advocates = [FilledAdvocacy] };
+
+    private static Tallied FilledTallied => new()
+    {
+        Left = new Code(1, 2),
+        Right = new Code(3, 4),
+        Seen = 9,
+    };
+
+    private static Counts FilledCounts => new() { Scopes = 11, Rows = [FilledTallied] };
+
+    private static Tabled FilledTabled => new()
+    {
+        From = new MachineAddress("holder-1"),
+        Slot = "slot-a",
+        Counted = FilledCounts,
+    };
+
+    private static Learnt FilledLearnt => new()
+    {
+        Minted = 1,
+        Repaired = 2,
+        Subsumed = 3,
+        Widened = 4,
+    };
+
+    private static Ask FilledAsk => new()
     {
         Broadcast = BroadcastId.New(),
-        ReturnTo = new MachineAddress("m"),
-        To = new Code(7, 11),
-        Held = 4.0,
-        Together = 0.25,
-        Seen = 0.5,
-        Kind = Kind.After,
-        Through = Kind.Before,
-        Recent = true,
-        Fresh = 0.75,
-        Chain = [new Code(1, 2)],
-        Carried = 1.0,
+        ReturnTo = new MachineAddress("asker-1"),
+        Wants = Wanted.Settle,
+        Moment = [new Code(1, 2), new Code(3, 4)],
+        Arrived = new Code(7, 8),
+        Wrong = true,
+        Sweeping = true,
+        Counted = [FilledTabled],
     };
 
-    private static Arrival Reached => new()
+    private static Answer FilledAnswer => new()
     {
-        Endpoint = new Code(9, 3),
-        Score = 0.5,
-        Chain = [new Code(1, 1)],
-        Best = 0.25,
-        Routes = 2,
+        Broadcast = BroadcastId.New(),
+        From = new MachineAddress("holder-1"),
+        Said = FilledTestimony,
+        Counted = FilledCounts,
+        Did = FilledLearnt,
     };
-
-    /// <summary>A code is two numbers and both of them are exact.</summary>
-    /// <remarks>
-    /// <b>The value is a <see cref="ulong"/> and JSON numbers are doubles in a lot of
-    /// readers</b>, which silently loses precision above 2^53 — and a code's value is a
-    /// hash, so the high bits are the ones carrying the identity.
-    /// </remarks>
-    [Fact]
-    public void A_code_survives_including_the_high_bits_of_its_value()
-    {
-        foreach (var value in new[] { 0UL, 1UL, ulong.MaxValue, (1UL << 53) + 1, 0xDEADBEEFCAFEF00D })
-        {
-            var code = new Code(Modality: 200, value);
-
-            Assert.Equal(code, Wire.Read<Code>(Wire.Write(code)));
-        }
-    }
 
     /// <summary>
-    /// <b>A WHOLE ENVELOPE, WHICH IS WHAT ACTUALLY GOES DOWN THE WIRE.</b>
+    /// <b>A WHOLE ASK, WHICH IS WHAT ACTUALLY GOES DOWN THE WIRE.</b>
     /// </summary>
     /// <remarks>
     /// The pieces above are the parts that go wrong; this is the thing that has to arrive.
-    /// Records compare by value, so one assertion covers every field including the nested
-    /// arrays — and a field added later is covered by it without this test being touched,
-    /// which is the opposite of the hand-listed comparison that would rot.
+    /// A settlement ask is the fullest one there is — it carries the moment, what actually
+    /// arrived, whether the vote was wrong, and on a sweep round the whole fleet's tables.
     /// </remarks>
     [Fact]
-    public void An_envelope_arrives_as_the_envelope_that_was_sent()
+    public void An_ask_arrives_as_the_ask_that_was_sent()
     {
-        var envelope = new Envelope
-        {
-            To = new ClusterAddress("cluster-3"),
-            Messages =
-            [
-                new Message
-                {
-                    Broadcast = BroadcastId.New(),
-                    ReturnTo = new MachineAddress("machine-1"),
-                    To = new Code(7, 12345678901234567),
-                    Held = Math.BitDecrement(4.0),
-                    Together = 1.0 / 3.0,
-                    Seen = double.Epsilon,
-                    Kind = Kind.After,
-                    Recent = true,
-                    Fresh = 0.1 + 0.2,
-                    Chain = [new Code(1, 2), new Code(3, 4)],
-                    Carried = 0.9999999999999999,
-                },
-            ],
-            Everywhere = true,
-        };
+        var ask = FilledAsk;
 
-        var back = Wire.Read<Envelope>(Wire.Write(envelope));
+        var back = Wire.Read<Ask>(Wire.Write(ask));
 
-        output.WriteLine(Wire.Write(envelope));
+        output.WriteLine(Wire.Write(ask));
 
-        // NOT `Assert.Equal(envelope, back)`, AND THE REASON IS A TRAP THIS REPO HAS
-        // ALREADY PAID FOR ONCE. A synthesised record equality compares
-        // `ImmutableArray<T>` by the identity of the array behind it, so two envelopes
-        // holding identical messages are never equal and the assertion could only ever
-        // fail. `Multiplexer.Round` carries a hand-written `Equals` with the same note.
-        Assert.Equal(Wire.Write(envelope), Wire.Write(back));
-
-        var sent = envelope.Messages[0];
-        var got = back.Messages[0];
+        // NOT `Assert.Equal(ask, back)`, AND THE REASON IS A TRAP THIS REPO HAS ALREADY
+        // PAID FOR ONCE. A synthesised record equality compares `ImmutableArray<T>` by the
+        // identity of the array behind it, so two asks holding identical moments are never
+        // equal and the assertion could only ever fail. `Multiplexer.Round` carries a
+        // hand-written `Equals` with the same note.
+        Assert.Equal(Wire.Write(ask), Wire.Write(back));
 
         // AND THE LEAVES BY HAND, because writing the same bytes twice proves the trip is
         // STABLE and not that it is LOSSLESS -- a field dropped by the serialiser is
-        // dropped identically on both sides and compares equal. That is exactly how
-        // `Kind` behaved before it had a converter.
-        Assert.Equal(sent.Kind, got.Kind);
-        Assert.Equal(sent.To, got.To);
-        Assert.Equal(sent.Broadcast, got.Broadcast);
-        Assert.Equal(sent.ReturnTo, got.ReturnTo);
-        Assert.Equal(sent.Recent, got.Recent);
-        Assert.Equal(sent.Chain.ToArray(), got.Chain.ToArray());
+        // dropped identically on both sides and compares equal. That is exactly how the
+        // walk's edge kind behaved before it had a converter.
+        Assert.Equal(ask.Broadcast, back.Broadcast);
+        Assert.Equal(ask.ReturnTo, back.ReturnTo);
+        Assert.Equal(ask.Wants, back.Wants);
+        Assert.Equal(ask.Arrived, back.Arrived);
+        Assert.Equal(ask.Wrong, back.Wrong);
+        Assert.Equal(ask.Sweeping, back.Sweeping);
+        Assert.Equal(ask.Moment.ToArray(), back.Moment.ToArray());
 
-        foreach (var (was, is_) in new[]
-        {
-            (sent.Held, got.Held), (sent.Together, got.Together),
-            (sent.Seen, got.Seen), (sent.Fresh, got.Fresh), (sent.Carried, got.Carried),
-        })
-            Assert.Equal(BitConverter.DoubleToInt64Bits(was), BitConverter.DoubleToInt64Bits(is_));
-    }
-
-    /// <summary>A report is the accounting, and it comes back whole.</summary>
-    [Fact]
-    public void A_report_arrives_as_the_report_that_was_sent()
-    {
-        var report = new Report
-        {
-            From = new ClusterAddress("cluster-1"),
-            Arrivals =
-            [
-                new Arrival
-                {
-                    Endpoint = new Code(9, ulong.MaxValue),
-                    Score = 1.0 / 3.0,
-                    Chain = [new Code(1, 1)],
-                    Best = Math.BitIncrement(0.5),
-                    Routes = 3,
-                },
-            ],
-            Handled = 2,
-            SentInto = [],
-            Accounting = new Accounting { Broadcast = BroadcastId.New() },
-        };
-
-        var back = Wire.Read<Report>(Wire.Write(report));
-
-        Assert.Equal(Wire.Write(report), Wire.Write(back));
-
-        Assert.Equal(report.From, back.From);
-        Assert.Equal(report.Handled, back.Handled);
-        Assert.Equal(report.Accounting, back.Accounting);
-        Assert.Equal(report.Arrivals[0].Endpoint, back.Arrivals[0].Endpoint);
-        Assert.Equal(report.Arrivals[0].Chain.ToArray(), back.Arrivals[0].Chain.ToArray());
+        Assert.Equal(ask.Counted[0].From, back.Counted[0].From);
+        Assert.Equal(ask.Counted[0].Slot, back.Counted[0].Slot);
+        Assert.Equal(ask.Counted[0].Counted.Scopes, back.Counted[0].Counted.Scopes);
         Assert.Equal(
-            BitConverter.DoubleToInt64Bits(report.Arrivals[0].Best),
-            BitConverter.DoubleToInt64Bits(back.Arrivals[0].Best));
+            ask.Counted[0].Counted.Rows.ToArray(), back.Counted[0].Counted.Rows.ToArray());
     }
 
-    /// <summary>A finished thought is the thing an actuator acts on.</summary>
+    /// <summary>An answer is what a holder makes of a moment, and it comes back whole.</summary>
     /// <remarks>
-    /// Fork 11 routes this by CODE rather than by address, so it is the one message whose
-    /// recipients are not known to the sender — which makes it the one whose shape cannot
-    /// be checked by whoever receives it complaining.
+    /// <b>THE WEIGHT IS THE FIELD THIS TEST IS REALLY ABOUT.</b> An advocate's weight is a
+    /// recency-weighted accuracy, so it is a double that decides an argmax — and a vote
+    /// merged from a weight that lost its last bit on the wire would pick a different rule
+    /// on some rounds and agree on the rest, which is the hardest kind of wrong to see.
     /// </remarks>
     [Fact]
-    public void A_finished_thought_arrives_as_the_thought_that_finished()
+    public void An_answer_arrives_as_the_answer_that_was_sent()
     {
-        var settled = new Settled
+        var answer = FilledAnswer;
+
+        var back = Wire.Read<Answer>(Wire.Write(answer));
+
+        Assert.Equal(Wire.Write(answer), Wire.Write(back));
+
+        Assert.Equal(answer.Broadcast, back.Broadcast);
+        Assert.Equal(answer.From, back.From);
+        Assert.Equal(answer.Did, back.Did);
+        Assert.Equal(answer.Counted!.Scopes, back.Counted!.Scopes);
+        Assert.Equal(answer.Counted.Rows.ToArray(), back.Counted.Rows.ToArray());
+
+        var said = answer.Said!.Value.Advocates[0];
+        var got = back.Said!.Value.Advocates[0];
+
+        Assert.Equal(said.Expects, got.Expects);
+        Assert.Equal(said.By, got.By);
+        Assert.Equal(
+            BitConverter.DoubleToInt64Bits(said.Weight),
+            BitConverter.DoubleToInt64Bits(got.Weight));
+    }
+
+    /// <summary>
+    /// <b>SILENCE IS A THING A HOLDER SAYS, AND IT HAS TO SURVIVE THE TRIP.</b>
+    /// </summary>
+    /// <remarks>
+    /// A holder that fired nothing has been HEARD FROM; a holder that died has not, and the
+    /// merge may not treat them alike — see <see cref="Testimony.Silent"/>. An empty array
+    /// that came back null would turn every silence into a death and quietly lower the
+    /// denominator C3 is read off.
+    /// </remarks>
+    [Fact]
+    public void A_holder_that_fired_nothing_still_arrives_as_having_spoken()
+    {
+        var quiet = new Answer
         {
             Broadcast = BroadcastId.New(),
-            From = new MachineAddress("machine-2"),
-            Arrivals =
-            [
-                new Arrival
-                {
-                    Endpoint = new Code(3, 77),
-                    Score = 0.30000000000000004,
-                    Chain = [new Code(3, 77), new Code(4, 88)],
-                    Best = 0.1,
-                    Routes = 1,
-                },
-            ],
+            From = new MachineAddress("holder-2"),
+            Said = new Testimony { Advocates = [] },
         };
 
-        var back = Wire.Read<Settled>(Wire.Write(settled));
+        var back = Wire.Read<Answer>(Wire.Write(quiet));
 
-        Assert.Equal(Wire.Write(settled), Wire.Write(back));
-
-        Assert.Equal(settled.Broadcast, back.Broadcast);
-        Assert.Equal(settled.From, back.From);
-        Assert.Equal(settled.Arrivals[0].Endpoint, back.Arrivals[0].Endpoint);
-        Assert.Equal(settled.Arrivals[0].Chain.ToArray(), back.Arrivals[0].Chain.ToArray());
+        Assert.NotNull(back.Said);
+        Assert.True(back.Said!.Value.Silent);
     }
 }

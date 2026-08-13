@@ -39,7 +39,8 @@ public sealed class ScalingTests(ITestOutputHelper output)
                 + $"reached={learned.Reached} recent={learned.Recent:F3} "
                 + $"resident={learned.Resident} sound={learned.Sound} "
                 + $"unsound={learned.Unsound} unchecked={learned.Unchecked} "
-                + $"named={learned.Named} exhausted={learned.Exhausted}");
+                + $"named={learned.Named}/{learned.Eligible} "
+                + $"spoke={learned.Speaking:F2} exhausted={learned.Exhausted}");
         }
 
         // What is asserted is that the curve exists to be read, not where it goes.

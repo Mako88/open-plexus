@@ -294,6 +294,38 @@ public sealed record Tally
     /// </remarks>
     public double Wanting => Blamed == 0 ? 0.0 : Unseparated / (double)Blamed;
 
+    /// <summary>
+    /// The share of naming asks that produced a name — <b>what every absolute
+    /// <see cref="Named"/> on this branch has been read as.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>An absolute name count is bounded by the sweep calendar</b> rather than by the
+    /// gate. <see cref="Asked"/> rises once a sweep and <c>Abstracting.Propose</c> returns
+    /// one pair an ask, so a run of twenty thousand rounds at a sweep of a thousand cannot
+    /// mint more than twenty names however much redundancy the population holds. A cell
+    /// reporting seventeen is reporting seventeen of twenty asks, and a cell reporting
+    /// seventeen against a different dial is reporting the same ceiling.
+    /// </para>
+    /// <para>
+    /// <b>So this is the number that can differ between two cells</b>, where the count
+    /// cannot. Read beside <see cref="PerEligible"/> it separates the two ways a reading can
+    /// move: the gate answering more often, or more scopes being there to answer over.
+    /// </para>
+    /// </remarks>
+    public double Speaking => Asked == 0 ? 0.0 : Spoke / (double)Asked;
+
+    /// <summary>
+    /// Names held per eligible scope — <b>the denominator <see cref="Named"/> wants.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>The repair budget moves <see cref="Eligible"/> directly</b>, so a cell that
+    /// repaired more is offered more to name and reports more names without the gate having
+    /// behaved differently once. This is names against what was there to be named, which is
+    /// the comparison every naming grid here has printed a numerator for.
+    /// </remarks>
+    public double PerEligible => Eligible == 0 ? 0.0 : Named / (double)Eligible;
+
     /// <summary>How many codes one round produced, on average.</summary>
     /// <remarks>
     /// <b>The cost side of a front end.</b> One allowed to say four times as much has

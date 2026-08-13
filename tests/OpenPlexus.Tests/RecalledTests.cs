@@ -225,7 +225,9 @@ public sealed class RecalledTests(ITestOutputHelper output)
         output.WriteLine($"never asked: {unseen.Accuracy:F3} over {unseen.Asked}, "
             + $"{unseen.Silence:F3} silent");
         output.WriteLine($"marginal   : {world.Commonest:F3}, blind draw {1.0 / world.Outcomes:F3}");
-        output.WriteLine($"held       : {brain.Held.Count} commitments, {brain.Held.Names.Count} names");
+        output.WriteLine($"held       : {brain.Held.Count} commitments, {tally.Named} names "
+            + $"over {tally.Eligible} eligible scopes, the gate spoke {tally.Spoke} of "
+            + $"{tally.Asked} asks");
         output.WriteLine($"wanting    : {tally.Wanting:F3} of blamed rounds nothing separated");
         output.WriteLine($"twins      : {twinned} of {unseen.Asked} exam moments appear "
             + $"word for word among the {drawn.Count} distinct moments drawn");
@@ -368,7 +370,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                             + $"silent {unseen?.Silence ?? 0.0:F3} | "
                             + $"drawn {tally.Recent:F3} | "
                             + $"held {brain.Held.Count,6} of {capacity} "
-                            + $"names {brain.Held.Names.Count,3} "
+                            + $"names {tally.Named,3} of {tally.Eligible,5} eligible, spoke {tally.Speaking:F2} "
                             + $"wanting {tally.Wanting:F3}");
                     }
                 }
@@ -599,7 +601,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                 $"cap {capacity,4} {joining,-13} | "
                 + $"exam {unseen?.Accuracy ?? 0.0:F3} silent {unseen?.Silence ?? 0.0:F3} | "
                 + $"own {tally.Recent:F3} | marginal {world.Commonest:F3} | "
-                + $"held {brain.Held.Count,5} names {brain.Held.Names.Count,4} "
+                + $"held {brain.Held.Count,5} names {tally.Named,4} of {tally.Eligible,5} eligible, spoke {tally.Speaking:F2} "
                 + $"wanting {tally.Wanting:F3}");
         }
     }
@@ -638,7 +640,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     $"task {task} {joining,-9} | "
                     + $"drawn {tally.Recent:F3} unseen {unseen?.Accuracy ?? 0.0:F3} "
                     + $"silent {unseen?.Silence ?? 0.0:F3} | commonest {world.Commonest:F3} | "
-                    + $"held {brain.Held.Count,5} names {brain.Held.Names.Count,4} "
+                    + $"held {brain.Held.Count,5} names {tally.Named,4} of {tally.Eligible,5} eligible, spoke {tally.Speaking:F2} "
                     + $"wanting {tally.Wanting:F3}");
             }
         }
@@ -686,7 +688,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     $"cap {capacity,4} span {span} {joining,-7} | exam {unseen?.Accuracy ?? 0.0:F3} "
                     + $"silent {unseen?.Silence ?? 0.0:F3} | own {tally.Recent:F3} | "
                     + $"marginal {world.Commonest:F3} | held {brain.Held.Count,5} "
-                    + $"names {brain.Held.Names.Count,4} wanting {tally.Wanting:F3}");
+                    + $"names {tally.Named,4} of {tally.Eligible,5} eligible, spoke {tally.Speaking:F2} wanting {tally.Wanting:F3}");
             }
         }
     }
@@ -827,7 +829,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                 $"task {task} {joining,-9} | exam {unseen?.Accuracy ?? 0.0:F3} "
                 + $"silent {unseen?.Silence ?? 0.0:F3} | own {tally.Recent:F3} | "
                 + $"marginal {world.Commonest:F3} | held {brain.Held.Count,5} "
-                + $"names {brain.Held.Names.Count,4} wanting {tally.Wanting:F3}");
+                + $"names {tally.Named,4} of {tally.Eligible,5} eligible, spoke {tally.Speaking:F2} wanting {tally.Wanting:F3}");
         }
     }
 
@@ -1002,7 +1004,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                 + $"silent {unseen?.Silence ?? 0.0:F3} over {unseen?.Asked ?? 0} | "
                 + $"own task {tally.Recent:F3} over {world.Questions} moments | "
                 + $"marginal {world.Commonest:F3} draw {1.0 / world.Outcomes:F3} | "
-                + $"held {brain.Held.Count,5} names {brain.Held.Names.Count,4} "
+                + $"held {brain.Held.Count,5} names {tally.Named,4} of {tally.Eligible,5} eligible, spoke {tally.Speaking:F2} "
                 + $"wanting {tally.Wanting:F3}");
         }
     }
@@ -1032,7 +1034,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     + $"drawn {tally.Recent:F3} unseen {unseen?.Accuracy ?? 0.0:F3} "
                     + $"silent {unseen?.Silence ?? 0.0:F3} | "
                     + $"commonest {world.Commonest:F3} chance {1.0 / world.Outcomes:F3} | "
-                    + $"held {brain.Held.Count,5} names {brain.Held.Names.Count,4} "
+                    + $"held {brain.Held.Count,5} names {tally.Named,4} of {tally.Eligible,5} eligible, spoke {tally.Speaking:F2} "
                     + $"wanting {tally.Wanting:F3}");
             }
         }
@@ -1842,7 +1844,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                         $"task {task} {joining,-9} categories {(sorted ? "on " : "off")} | "
                         + $"exam {tally.Unseen?.Accuracy ?? 0.0:F3} | own {tally.Recent:F3} | "
                         + $"marginal {world.Commonest:F3} | held {brain.Held.Count,5} "
-                        + $"names {brain.Held.Names.Count,4} wanting {tally.Wanting:F3}");
+                        + $"names {tally.Named,4} of {tally.Eligible,5} eligible, spoke {tally.Speaking:F2} wanting {tally.Wanting:F3}");
                 }
 
                 // NEVER WORSE, IN EVERY CELL, which is the claim worth asserting rather than

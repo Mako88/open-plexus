@@ -67,7 +67,8 @@ public sealed class GradedTests(ITestOutputHelper output)
                 output.WriteLine(
                     $"crowding={crowding} {fronting} recent={sensed.Recent:F3} "
                     + $"reached={sensed.Reached} resident={sensed.Resident} "
-                    + $"codes={sensed.Codes:F1} named={sensed.Named} silent={sensed.Silent}");
+                    + $"codes={sensed.Codes:F1} named={sensed.Named}/{sensed.Eligible} "
+                    + $"spoke={sensed.Speaking:F2} silent={sensed.Silent}");
 
                 Assert.True(sensed.Codes > 0, "the front end said nothing");
             }

@@ -209,7 +209,8 @@ public sealed class SensesTests(ITestOutputHelper output)
             + $"{unseen.Silence:F3} silent");
         output.WriteLine($"bars       : ceiling {world.Ceiling:F3}, blind draw {world.Chance:F3}");
         output.WriteLine($"held       : {brain.Held.Count} commitments, "
-            + $"{brain.Held.Names.Count} names, {crossed} of them cross-modal");
+            + $"{tally.Named} names over {tally.Eligible} eligible scopes, the gate spoke "
+            + $"{tally.Spoke} of {tally.Asked} asks, {crossed} names cross-modal");
         output.WriteLine($"wanting    : {tally.Wanting:F3} of blamed rounds nothing separated");
     }
 
@@ -258,7 +259,7 @@ public sealed class SensesTests(ITestOutputHelper output)
                         + $"silent {tally.Unseen?.Silence ?? 0.0:F3} | "
                         + $"drawn {tally.Recent:F3} | "
                         + $"ceiling {world.Ceiling:F3} chance {world.Chance:F3} | "
-                        + $"held {brain.Held.Count,5} names {brain.Held.Names.Count,3} "
+                        + $"held {brain.Held.Count,5} names {tally.Named,3} of {tally.Eligible,5} eligible, spoke {tally.Speaking:F2} "
                         + $"crossed {crossed,3}");
                 }
             }

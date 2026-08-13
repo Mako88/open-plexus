@@ -301,7 +301,8 @@ public sealed class AbstractingTests(ITestOutputHelper output)
 
         foreach (var learned in (Learned[])[six, eleven])
             output.WriteLine(
-                $"named={learned.Named} stacked={learned.Stacked} sound={learned.Sound} "
+                $"named={learned.Named}/{learned.Eligible} spoke={learned.Speaking:F2} "
+                + $"stacked={learned.Stacked} sound={learned.Sound} "
                 + $"unsound={learned.Unsound} resident={learned.Resident} "
                 + $"recent={learned.Recent:F3} found={learned.Found}/{learned.Truths}");
 

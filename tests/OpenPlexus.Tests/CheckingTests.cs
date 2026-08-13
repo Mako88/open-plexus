@@ -110,6 +110,100 @@ public sealed class CheckingTests
             + "when it is asked for:\n  " + string.Join("\n  ", silent.Take(10)));
     }
 
+    /// <summary>
+    /// How a naming count is printed — <b>the numerator, in the two spellings this repo
+    /// has.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>The terminators are what keep this off three unrelated ideas called `Named`.</b>
+    /// <c>Joining.Named</c> is a front-end arm, <c>Cifar.Named</c> and <c>Encoded.Named</c>
+    /// are label lookups, and <c>Roaming.Named</c> is a list of rooms — the repo's own trap
+    /// about two ideas sharing one word, live in the check that would otherwise trip on it.
+    /// A count reaches output through an interpolation hole, so it is followed by a brace, a
+    /// comma or a format specifier; a method call is followed by <c>(</c> and an indexer by
+    /// <c>[</c>.
+    /// </remarks>
+    private static readonly string[] Counts = ["Names.Count", ".Named}", ".Named,", ".Named:"];
+
+    /// <summary>What makes a naming count readable.</summary>
+    /// <remarks>
+    /// <b>Any one of them, because they answer the same question three ways.</b>
+    /// <c>Eligible</c> is how many scopes were there to name, <c>Asked</c> is how many
+    /// chances the gate got, and <c>Speaking</c> and <c>PerEligible</c> are those two as
+    /// shares. The check does not care which a grid prints, only that the numerator is not
+    /// alone.
+    /// </remarks>
+    private static readonly string[] Denominators =
+        ["Eligible", "Asked", "Speaking", "PerEligible", "Stackable"];
+
+    /// <summary>
+    /// A printed naming count carries what it is a count OF.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The budget for a rate cap that was read as a finding.</b> Rung five is asked once
+    /// a sweep and answers with one pair, so twenty thousand rounds at a sweep of a thousand
+    /// cannot mint more than twenty names. Eight cells of a grid came back at exactly
+    /// seventeen across two tasks, two spans and two capacities, and that constant was
+    /// written up as a result — it was seventeen of twenty asks, and no dial in the grid
+    /// could have moved it.
+    /// </para>
+    /// <para>
+    /// <b>And the trap it belongs to is already written down</b>: an exact partition of what
+    /// arrived says nothing about what never did. <c>Tally.Eligible</c> and
+    /// <c>Tally.Asked</c> existed the whole time and no grid printed either, so every naming
+    /// reading on this branch was a numerator.
+    /// </para>
+    /// <para>
+    /// <b>It reads the whole method rather than the one statement</b>, which is deliberately
+    /// loose. Where a denominator goes in a row is a layout choice and a grid printing it in
+    /// a second line is not the fault being guarded; printing no denominator anywhere in the
+    /// measurement is.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Every_printed_naming_count_has_a_denominator()
+    {
+        var bare = new List<string>();
+
+        foreach (var path in Tree.Sources("tests"))
+        {
+            if (Path.GetFileName(path) == Specimens) continue;
+
+            var text = File.ReadAllText(path);
+
+            foreach (var fact in Facts(text))
+            {
+                // Inside an interpolation and nowhere else, which is what separates a
+                // reading from an invariant. `CensusTests` asserts two arms mint the same
+                // number and `WithheldTests` asserts an examination moves it not at all --
+                // neither is a magnitude anybody reads, so neither wants a denominator, and
+                // the first version of this check flagged both.
+                var printed = fact.Body
+                    .Split('\n')
+                    .Where(line => line.Contains("$\"", StringComparison.Ordinal))
+                    .Where(line => Counts.Any(count =>
+                        line.Contains(count, StringComparison.Ordinal)))
+                    .ToList();
+
+                if (printed.Count == 0) continue;
+
+                if (Denominators.Any(against =>
+                        fact.Body.Contains(against, StringComparison.Ordinal)))
+                    continue;
+
+                bare.Add($"{Path.GetFileName(path)}: {fact.Name}");
+            }
+        }
+
+        Assert.True(bare.Count == 0,
+            $"{bare.Count} measurement(s) print a naming count with nothing to read it "
+            + "against. An absolute name count is capped by the sweep calendar rather than "
+            + "by the gate, so two cells can report the same number for opposite reasons. "
+            + "Print `Tally.Eligible`, `Tally.Asked`, `Tally.Speaking` or "
+            + $"`Tally.PerEligible` beside it:\n  " + string.Join("\n  ", bare.Take(10)));
+    }
+
     /// <summary>The private methods of a file that assert, by name.</summary>
     private static IEnumerable<string> Helpers(string text)
     {

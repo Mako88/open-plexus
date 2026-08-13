@@ -199,6 +199,78 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>
+    /// <b>A name count is capped by the sweep calendar</b>, so it is not a yield.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The reading behind a constant that was written up as a finding.</b> Eight cells of
+    /// a bAbI grid came back at exactly seventeen names across two tasks, two spans and two
+    /// capacities — a number no dial in the grid could have moved, because rung five is asked
+    /// once a sweep and answers with at most one pair. Twenty thousand rounds at a sweep of a
+    /// thousand admits twenty names and no more.
+    /// </para>
+    /// <para>
+    /// <b>So the cap is shown causally rather than argued.</b> The same world over the same
+    /// rounds at two sweep periods differs in what it may mint by the ratio of the periods,
+    /// and the tighter calendar is the one that mints more. An arithmetic account of a
+    /// constant is not the same as a demonstration of it, which is this repo's own point
+    /// about an explanation that is true and still not the cause.
+    /// </para>
+    /// <para>
+    /// <b>What this does not say is that asking more often is better.</b>
+    /// <c>Minting.UntilRefused</c> was measured and refuted — every count rose while
+    /// hard-round coverage fell — so the cap is recorded here as a property of the
+    /// instrument and not as a dial anybody should turn.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_name_count_is_bounded_by_how_often_the_rung_was_asked()
+    {
+        const long rounds = 4_000;
+
+        var readings = new List<(int Sweep, Learned Learned)>();
+
+        foreach (var sweep in new[] { 1_000, 250 })
+            readings.Add((sweep, new MultiplexerRun(
+                    new MultiplexerSettings { Address = Address },
+                    new Brain(new CommittingSettings(), seed: 1),
+                    seed: 1)
+                .Run(rounds, sweep)));
+
+        foreach (var (sweep, learned) in readings)
+            output.WriteLine(
+                $"sweep {sweep,5} | asked {learned.Tally.Asked,3} "
+                + $"named {learned.Named,3} of {learned.Eligible,4} eligible | "
+                + $"spoke {learned.Speaking:F2} per eligible {learned.PerEligible:F3}");
+
+        // THE CALENDAR EXACTLY, which is the half that makes the cap a cap. `Asked` is not
+        // a function of the population, the world or any dial on the brain -- it is the
+        // number of sweeps that happened, so two cells run over the same rounds got the
+        // same number of chances however differently they learnt.
+        Assert.All(readings, one =>
+            Assert.Equal(rounds / one.Sweep, one.Learned.Tally.Asked));
+
+        // And no cell can hold more names than it had asks. This is what makes an absolute
+        // count unreadable between two grids: a cell at its ceiling and a cell that found
+        // nothing worth naming are distinguishable only by the denominator.
+        Assert.All(readings, one =>
+            Assert.True(one.Learned.Named <= one.Learned.Tally.Asked,
+                $"sweep {one.Sweep} minted {one.Learned.Named} names off "
+                + $"{one.Learned.Tally.Asked} asks, so a name arrived from somewhere this "
+                + "file does not know about"));
+
+        // And the tighter calendar mints more, which is the causal half. Arithmetic says
+        // the ceiling moved; this says the run actually walked into it, so the cap is what
+        // was limiting the count rather than the population running out of redundancy.
+        var (loose, tight) = (readings[0].Learned, readings[1].Learned);
+
+        Assert.True(tight.Named > loose.Named,
+            $"a sweep of {readings[1].Sweep} minted {tight.Named} names against "
+            + $"{loose.Named} at {readings[0].Sweep}, so the count was not calendar-bound "
+            + "here and the cap reading needs taking again");
+    }
+
     [Fact]
     public void Every_ask_is_charged_to_exactly_one_bar()
     {
@@ -869,7 +941,9 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         }
 
         output.WriteLine($"vocabularies {vocabularies.Distinct().Count()} | names "
-            + $"{holders.Sum(held => held.Names.Count)} | {vocabularies[0]}");
+            + $"{holders.Sum(held => held.Names.Count)} over "
+            + $"{holders.Sum(held => held.All.Count(one => Recurrence.Eligible(one, dials)))} "
+            + $"eligible scopes | {vocabularies[0]}");
 
         Assert.Single(vocabularies.Distinct());
 

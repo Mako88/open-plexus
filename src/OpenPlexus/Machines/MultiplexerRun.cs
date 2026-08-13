@@ -141,6 +141,12 @@ public sealed record Learned
     /// <inheritdoc cref="Tally.Stackable"/>
     public int Stackable => Tally.Stackable;
 
+    /// <inheritdoc cref="Tally.Speaking"/>
+    public double Speaking => Tally.Speaking;
+
+    /// <inheritdoc cref="Tally.PerEligible"/>
+    public double PerEligible => Tally.PerEligible;
+
     /// <summary>Commitments that have spent their whole repair budget.</summary>
     public int Exhausted => Tally.Exhausted;
 

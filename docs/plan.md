@@ -371,12 +371,12 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       lifetime wrong whichever it takes.
     - **OPEN** — nothing SCORES the update, so what retracts is the experimenter's rule. Fork
       **104** carries it, under *what it is told must be settleable*.
-    - **OPEN** — banding a word by how many statements back it was buys about half of what
-      narrowing the view buys. Does a band the learner MINTS differ. Fork **92**.
+    - **OPEN** — banding a word by how many statements back it was buys half what narrowing
+      the view buys. Does a band the learner MINTS differ. Fork **92**.
     - **OPEN** — does overwriting dissolve the selection rather than help it. Open on
       `Distinguished`. Fork **94**.
-    - **OPEN** — recency over a forward store separates a verb from a name knowing nothing
-      about the text, so the question is which key is worth FOLLOWING. Fork **95**.
+    - **OPEN** — the key that moved last is not worth following: it leads where one walker
+      makes it the only candidate, and loses to all of them at four. Fork **95**.
   - Several grains at once
     - **NOW** — subsumption keeps the general rule where both are equally accurate, and it
       reads a category's entailment.

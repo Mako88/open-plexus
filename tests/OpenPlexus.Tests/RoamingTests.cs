@@ -335,6 +335,14 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// and it costs milliseconds.
     /// </para>
     /// <para>
+    /// <b>And it caps in one direction only</b>, which the four-person learner settled and is
+    /// recorded here because the column is read here. A high figure is a proof of a ceiling; a
+    /// low one is not a floor. <see cref="Joining.Distinguished"/> conflates 0.004 of moments at
+    /// four walkers and reads the marginal, against 0.002 and two and a half times the marginal
+    /// for one hop of the store — because a moment that is nobody's twin may never recur, and a
+    /// rule with one observation is a lookup table entry.
+    /// </para>
+    /// <para>
     /// <b>The precedences are derived here exactly as the machine derives them</b>, through
     /// <see cref="Sequenced.From"/> off the front end's own report — so this is the moment a
     /// holder would broadcast rather than a model of it. What the column says is how much of
@@ -1013,5 +1021,30 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + $"against {scores["Freshest(1)"].Max():F3} for the freshest key at its best, so the "
             + "key rule's advantage does survive a second walker after all and fork 95's answer "
             + "is what it looked like at one person");
+
+        // And the reading that refutes the cap as a ranking outright, which is why these two arms
+        // were added. `Distinguished` conflates 0.004 of moments at four people and `Resolved(1)`
+        // conflates 0.002 -- the same cap, to within a seed -- and they read 0.167 and 0.497. One
+        // is the marginal and the other is two and a half times it.
+        //
+        // So a LOW conflation says nothing, and this is the direction the column cannot be read
+        // in. A moment that is nobody's twin may be unlearnable for the opposite reason: nothing
+        // recurs, so no rule ever gets a second observation. `Distinguished` holds 133 rules where
+        // `Resolved(1)` holds 934, which is what a population of snowflakes looks like from
+        // outside. High conflation is a proof of a ceiling; low conflation is not a floor.
+        Assert.True(scores["Resolved(1)"].Min() > scores[nameof(Joining.Distinguished)].Max() * 2,
+            $"the background rule reads {scores[nameof(Joining.Distinguished)].Max():F3} at its "
+            + $"best against {scores["Resolved(1)"].Min():F3} for the store at its worst, so two "
+            + "arms whose conflation is equally near nought are no longer far apart -- and the "
+            + "column can be read as a floor after all");
+
+        // Both backward-reading arms sit at the marginal here, which is a fact about a second
+        // walker rather than about either rule. A lookup over the transcript answers *which
+        // statement mentioned this* and the answer is in a statement about somebody else.
+        foreach (var name in new[] { nameof(Joining.Distinguished), nameof(Joining.Chained) })
+            Assert.True(scores[name].Max() < 0.25,
+                $"{name} reads {scores[name].Max():F3} at its best with four walkers, off the "
+                + "marginal of about 0.19 -- so reading the transcript backwards is tracking "
+                + "something after all and the forward store is not what pays here");
     }
 }

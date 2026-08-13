@@ -408,10 +408,24 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// bitten by a kill line pre-registered on a column.
     /// </para>
     /// <para>
-    /// <b>Capacity is pinned at the unbound arm and span at one.</b> The earlier grid measured
-    /// both: the cap was half the story on one cell of eight and none of it elsewhere, and
-    /// span two moved the sign nowhere. Carrying either as an arm here would be four times the
-    /// runners for a reading already taken, and this grid is about the joining.
+    /// <b>Capacity is pinned at the unbound arm and the span is NOUGHT.</b> The cap was half
+    /// the story on one cell of eight of the earlier grid and none of it elsewhere, so
+    /// carrying it would be twice the runners for a reading already taken. The span is the
+    /// opposite case and it has to be nought, which is the whole story.
+    /// </para>
+    /// <para>
+    /// <b>The first dispatch ran at span one and measured nothing</b>, and the
+    /// tell was that <see cref="Joining.Distinguished"/> came back bit-identical to
+    /// <see cref="Joining.Bagged"/> in all four of its cells — same accuracy, same residents,
+    /// same names, same codes per round. A span of one puts ONE statement in the moment, so a
+    /// joining that chooses among statements has nothing to choose between and is inert.
+    /// Selection cannot be the bottleneck in a room holding one thing.
+    /// </para>
+    /// <para>
+    /// <b>Which is this repo's trap about a default short-circuiting the mechanism</b>, and it
+    /// has fired before: a sweep on defaults once returned three identical arms for a gate
+    /// that was never running. The rows are in the commit, because an identical arm is the
+    /// reading that says a grid asked nothing.
     /// </para>
     /// <para>
     /// <b>Seeds are gone for the reason they went from the other grid.</b> This world draws
@@ -430,7 +444,11 @@ public sealed class RecalledTests(ITestOutputHelper output)
                 foreach (var ordered in new[] { false, true })
                 {
                     var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, 1);
-                    var world = new Recalled(World(task, span: 1));
+
+                    // THE WHOLE STORY, which is what makes the selecting arms arms at all.
+                    // At a span of one they were bit-identical to `Bagged`, because a
+                    // joining that chooses among statements is inert where there is one.
+                    var world = new Recalled(World(task, span: 0));
 
                     var trial = ordered
                         ? new Trial<Recited>(world, new Joined(joining), brain)
@@ -442,7 +460,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     var unseen = tally.Unseen;
 
                     output.WriteLine(
-                        $"task {task} {joining,-13} {(ordered ? "ordered" : "bagged ")} | "
+                        $"task {task} span 0 {joining,-13} "
+                        + $"{(ordered ? "ordered" : "bagged ")} | "
                         + $"unseen {unseen?.Accuracy ?? 0.0:F3} "
                         + $"silent {unseen?.Silence ?? 0.0:F3} | "
                         + $"drawn {tally.Recent:F3} | "

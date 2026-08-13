@@ -55,7 +55,8 @@ public sealed class DocsTests
     private const int Item = 60;
 
     /// <summary>
-    /// The most words the WHOLE doc may spend. <b>A ratchet: it only ever goes down.</b>
+    /// The most words the WHOLE doc may spend. <b>A ratchet with one exception, and John
+    /// wrote the exception.</b>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -83,11 +84,29 @@ public sealed class DocsTests
     /// <para>
     /// <b>THE TARGET IS SIX THOUSAND</b>, roughly eight thousand tokens, which is loadable
     /// without thinking about it. Every pass lowers this constant to what it achieved, so the
-    /// doc can never grow back past its own best. Raising it is not a refactor and wants
-    /// John.
+    /// doc can never grow back past its own best by ACCIDENT.
+    /// </para>
+    /// <para>
+    /// <b>AND IT MAY BE RAISED FOR SOMETHING GENUINELY NEW — JOHN, 2026-08-13, IN THOSE
+    /// WORDS.</b> A ratchet that only ever falls says a new idea can only be afforded by
+    /// deleting an old one, which is a doc-wide cap deciding what the project may think
+    /// about. That is not what it is for. The three conditions are his: <b>the existing
+    /// items are reasonable, the new one duplicates nothing, and the doc is still in a
+    /// state you would load whole.</b>
+    /// </para>
+    /// <para>
+    /// <b>THE THIRD CONDITION IS THE ONLY ONE THAT IS NOT A JUDGEMENT CALL, AND IT IS ALSO
+    /// THE ONE THIS CHECK CANNOT MAKE.</b> So a raise is a deliberate edit to this constant
+    /// and reads as one in a diff — the escape hatch is a NUMBER somebody had to type,
+    /// rather than prose. Compaction still lowers it every pass; what is refused is a raise
+    /// that pays for a rewording.
     /// </para>
     /// </remarks>
-    private const int Whole = 9_761;
+    // AND 9,809 IS THE FIRST DELIBERATE RAISE, WHICH IS THE RULE ABOVE BEING USED RATHER
+    // THAN AN EXCEPTION TO IT. It buys the rule itself: two lines saying the budget may
+    // rise for something genuinely new. A cap that could only fall would have had to be
+    // paid for by deleting an item, which is the failure the paragraph describes.
+    private const int Whole = 9_809;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -398,6 +398,23 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     };
 
     /// <summary>Why a world's run is not named by the library.</summary>
+    /// <summary>
+    /// Everything still on this file's lists for the STRANDED reason — <b>the outstanding
+    /// item, in one place, so `OutstandingTests` and this file cannot disagree about it.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>DERIVED RATHER THAN LISTED, WHICH IS THE WHOLE VALUE.</b> An entry leaves by being
+    /// deleted from the dictionaries above — because its world got a `Trial`, or because its
+    /// world was deleted — and the red test that demands it closes on the same edit. A second
+    /// hand-kept list would be a second thing to forget.
+    /// </remarks>
+    internal static IReadOnlyCollection<string> StillStranded =>
+    [
+        .. Unwired.Where(one => one.Value == Stranded).Select(one => one.Key)
+            .Concat(Unused.Where(one => one.Value == Stranded).Select(one => one.Key))
+            .Order(StringComparer.Ordinal),
+    ];
+
     /// <summary>Why a world whose only runner was the walk's is named by nothing.</summary>
     private const string Stranded =
         "A WORLD WHOSE RUNNER WENT WITH THE WALK. The data is intact and nothing drives it "

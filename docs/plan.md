@@ -13,8 +13,11 @@ refutes it — read its refutation table before repeating anything.
 - **JOHN'S TEST, AND IT IS THE ONE THAT DECIDES: if it is long enough that you would
   hesitate to load all of it, it is too long.** This doc exists to be read whole at the
   start of every session. A doc read in pages is the pile of docs it replaced.
-- **So the budget only ever goes DOWN**, and `DocsTests` fails the build the moment the
-  doc grows. What will not fit belongs in a commit, a test, or an XML comment.
+- **So the budget falls by default** and `DocsTests` fails the build the moment the doc
+  grows. What will not fit belongs in a commit, a test, or an XML comment.
+- **AND IT MAY BE RAISED FOR SOMETHING GENUINELY NEW — John's, and the conditions are his:
+  the existing items are reasonable, the new one duplicates nothing, and this is still a
+  doc you would load whole.** A cap that only ever falls decides what may be thought about.
 - **Built and decided means GONE FROM HERE, and no arm either.** A winner becomes the
   code; losers are deleted, leaving a revival row.
 

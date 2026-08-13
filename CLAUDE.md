@@ -49,14 +49,26 @@ nothing cancels it. Use it before shipping a default, or on a state worth return
 Everything else keeps rolling.
 
 **Run the structural guards locally every commit, as their own command.** `DocsTests`,
-`DeadCodeTests`, `DuplicationTests`, `DialTests`, `SeparationTests`, `InertDialTests`,
-`SweepListTests`, `ShardTests` and `CheckingTests` take seconds and go red for changes that
-look unrelated. `ShardTests` is the one that fails when a test class lands in two CI shards
+`DeadCodeTests`, `DuplicationTests`, `DialTests`, `SeparationTests`, `ShapeTests`,
+`FlagTests`, `SweepListTests`, `ShardTests`, `CheckingTests` and `RemindingTests` take
+seconds and go red for changes that look unrelated. `ShardTests` is the one that fails when a test class lands in two CI shards
 or in none, and a class in none is green forever because nothing ever asked it.
 `CheckingTests` is the one that fails when a `[Fact]` prints a row and cannot fail — a
 measurement wearing a test's clothes, which runs on every push and checks nothing. Never chain the
 check into the commit — that has produced red commits more than once. Rebuild before running
 with `--no-build`, or the binary under test is the one from before the edit.
+
+**`OutstandingTests` IS RED ON PURPOSE AND IT IS THE TOP PRIORITY — John's, 2026-08-13.**
+The outstanding work is written as tests that FAIL until it is done, so a session cannot get
+to green without doing it. **Do not delete them, do not weaken them, and do not read them as
+a regression.** Each computes the state rather than asserting a constant, so none can be
+satisfied by editing that file — an entry closes when the work closes.
+
+**SO THE RED SET IS NAMED, AND ANYTHING ELSE RED IS YOURS.** Check the failures are exactly
+those before assuming a run is clean, because a stable red set is the only kind you can read
+a new failure against. Adding an entry is stricter than adding anywhere else: it must be work
+somebody has DECIDED to do, computable without judgement, and closeable. An open question
+goes in the plan as `OPEN`.
 
 **Put `kind!=sweep&` in front of every local filter, always.** CI does this and a hand-typed
 filter does not, so a filter naming a class runs that class's GRIDS as well — which is how

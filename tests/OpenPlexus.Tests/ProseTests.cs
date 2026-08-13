@@ -230,6 +230,61 @@ public sealed class ProseTests(ITestOutputHelper output)
             + $"capitals are:\n  {Worst(Bolds)}");
     }
 
+    /// <summary>
+    /// What UTF-8 looks like after being read as Windows-1252 and written back out.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Written as escapes rather than as the characters themselves, which is not a style
+    /// choice. A literal here would put the damage in this file, and the check would fail on
+    /// the one file that defines it.
+    /// </para>
+    /// <para>
+    /// An em-dash is three bytes in UTF-8 and this repo's prose is full of them, so the
+    /// round-trip turns every one into a visible pair. None of these sequences occurs in
+    /// English, which is what makes the test exact rather than a heuristic.
+    /// </para>
+    /// </remarks>
+    private static readonly string[] Mangled = ["\u00e2\u20ac", "\u00c2", "\u00c3"];
+
+    [Fact]
+    public void No_file_has_been_round_tripped_through_the_wrong_encoding()
+    {
+        // A real failure, and it happened while writing this file. `Get-Content` and
+        // `Set-Content` in Windows PowerShell 5.1 default to the system ANSI codepage for a
+        // file with no byte-order mark, so reading a UTF-8 source and writing it straight back
+        // rewrites every em-dash as mojibake -- and the edit that does it reports success.
+        //
+        // IT IS A WHOLE-FILE READ RATHER THAN A PROSE ONE, unlike everything else here. The
+        // damage lands wherever the non-ASCII characters are, and a string literal is as good
+        // a home for one as a comment.
+        var damaged = Written()
+            .Where(path => Mangled.Any(bad =>
+                File.ReadAllText(path).Contains(bad, StringComparison.Ordinal)))
+            .Select(path => Path.GetRelativePath(Tree.Repo(), path))
+            .ToList();
+
+        Assert.True(damaged.Count == 0,
+            $"{damaged.Count} file(s) have been read as ANSI and written back as UTF-8, so "
+            + "their em-dashes are mojibake. Restore them from git rather than repairing by "
+            + "hand, and use `[System.IO.File]::ReadAllText`/`WriteAllText` with an explicit "
+            + $"UTF-8 encoding:\n  {string.Join("\n  ", damaged)}");
+    }
+
+    [Fact]
+    public void The_encoding_check_can_still_fire()
+    {
+        // THE COMPANION, and this one earns it twice over: the signatures are escapes, so a
+        // typo in one would produce a check that matches nothing and passes forever while
+        // reading exactly like a tree with no damage in it.
+        var wrecked = "the plan\u00e2\u20ac\u2122s own rule";
+
+        Assert.Contains(Mangled, bad => wrecked.Contains(bad, StringComparison.Ordinal));
+
+        Assert.DoesNotContain(Mangled, bad =>
+            "the plan's own rule — said once".Contains(bad, StringComparison.Ordinal));
+    }
+
     [Fact]
     public void The_check_can_tell_a_shouted_sentence_from_a_label()
     {

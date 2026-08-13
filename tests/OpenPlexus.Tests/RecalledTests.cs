@@ -1796,6 +1796,89 @@ public sealed class RecalledTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// How much of the retrieval ceiling becomes score, on every task that has one.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The exam has been read on three tasks and it is twenty.</b>
+    /// <see cref="Whether_addressing_picks_anything_a_span_of_one_would_not"/> says one
+    /// selected statement carries the answer above the marginal on eight of them, which is
+    /// the list run here. The other twelve are not skipped for being hard: six answer in an
+    /// alphabet no statement holds and six leave the answer out of the statement addressing
+    /// picks, so a score on either would be measuring something other than conversion.
+    /// </para>
+    /// <para>
+    /// <b>Conversion is the quantity, and it is not the accuracy.</b> Two tasks with the same
+    /// ceiling and different scores differ in the learner; two with the same score and
+    /// different ceilings do not. The chain grid already found the two-fact task turning near
+    /// three quarters of its ceiling into score and the three-fact task under half, on two
+    /// points and no explanation.
+    /// </para>
+    /// <para>
+    /// <b>The bag at the same span is the control</b>, for the reason every selection arm here
+    /// is read against one: a narrower moment is a different moment as well as a chosen one,
+    /// and this branch already knows widening buys the drawn score and sells the held-out one.
+    /// </para>
+    /// <para>
+    /// <b>What is asserted is that conversion varies across the eight.</b> A constant share
+    /// would mean the ceiling predicts the score and there is no second quantity, which would
+    /// retire this grid rather than fill it in. Which tasks sit where is not asserted.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_one_selected_statement_converts_across_the_exam()
+    {
+        var converted = new List<double>();
+
+        foreach (var task in new[] { 1, 2, 4, 5, 8, 12, 14, 16 })
+        {
+            var world = new Recalled(World(task, span: 0));
+            var reached = 0;
+
+            for (var one = 0; one < world.Withheld.Count; one++)
+            {
+                var asking = world.Withheld[one].Seen.Bagged;
+                var at = Reading(asking, asking.Question, 0);
+
+                if (at >= 0 && asking.Story[at].Contains(Babi.Of(world.Transcript[one].Answer)))
+                    reached++;
+            }
+
+            var ceiling = reached / (double)world.Withheld.Count;
+
+            foreach (var joining in new[] { Joining.Addressed, Joining.Bagged })
+            {
+                var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, 1);
+                var trial = new Trial<Recited>(
+                    new Recalled(World(task, span: 0)), new Joined(joining), brain);
+
+                var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
+                var unseen = tally.Unseen?.Accuracy ?? 0.0;
+
+                if (joining == Joining.Addressed && ceiling > 0.0)
+                    converted.Add(unseen / ceiling);
+
+                output.WriteLine(
+                    $"task {task,-2} {joining,-10} | exam {unseen:F3} "
+                    + $"silent {tally.Unseen?.Silence ?? 0.0:F3} | ceiling {ceiling:F3} "
+                    + $"converted {(ceiling > 0.0 ? unseen / ceiling : 0.0):F3} | "
+                    + $"marginal {world.Commonest:F3} | drawn {tally.Recent:F3} | "
+                    + $"held {brain.Held.Count,6} | names {tally.Named,3} of "
+                    + $"{tally.Eligible,5} eligible");
+            }
+        }
+
+        // Conversion is a second quantity or it is not. A constant share across eight tasks
+        // would mean the ceiling already predicts the score, and this grid would be a longer
+        // way of printing the ceiling.
+        Assert.True(
+            converted.Max() - converted.Min() > 0.05,
+            $"every task converted its ceiling alike, from {converted.Min():F3} to "
+            + $"{converted.Max():F3}, so the ceiling is the whole of the score");
+    }
+
+    /// <summary>
     /// Whether addressing picks a different statement from taking the newest one.
     /// </summary>
     /// <remarks>

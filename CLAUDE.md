@@ -1,28 +1,26 @@
 # Working in this repo
 
-Read `docs/plan.md` first. It is the only doc, it holds nothing finished, and findings live
-in the commit that produced them and in the test that asserts them — never here and never
-there.
+Read `docs/plan.md` first. It is the only doc and it holds nothing finished; findings live in
+the commit that produced them and in the test that asserts them, never here and never there.
 
-## How a session runs, which you do not need to be told again
+## How a session runs
 
 John's standing instruction, written down so a new session starts itself. Orient, read the
-handoff if there is one, then **do all of the following without asking.**
+handoff if there is one, then do all of the following without asking.
 
 **Arm a five-minute `Monitor` and keep it armed.** Not `/loop`, not `schedule`, not a cron —
 those have misfired here and the Monitor tick has not. It is a heartbeat rather than a
-watcher: each tick is permission to carry on, so `while true; do echo ...; sleep 300; done`
-with `persistent: true` is exactly the shape wanted. Something like:
+watcher: each tick is permission to carry on, so `persistent: true` around a sleep loop is the
+shape wanted.
 
 ```bash
 i=0; while true; do i=$((i+1)); echo "tick $i — next step or stop"; sleep 300; done
 ```
 
 **Then work, and take forks yourself.** Where two routes are open, take the one likelier to
-pay, and if it does not, revert it and take the other. Do not stop to ask which. An idea John
-interjects mid-session is a fork to record rather than an instruction to chase.
+pay; if it does not pay, revert it and take the other. Do not stop to ask which.
 
-**Stop the monitor — do not let it tick on — when any of these is true:**
+**Stop the monitor when any of these is true** — do not let it tick on:
 
 - there is no obvious next step, or the next one genuinely needs John;
 - you are truly blocked;
@@ -31,56 +29,59 @@ interjects mid-session is a fork to record rather than an instruction to chase.
 Stopping is a normal ending rather than a failure. Compact `docs/plan.md` on the way out, and
 leave the handoff in the last commit message and in the final reply.
 
-**Everything below this line still applies while the monitor runs** — the guards every
-commit, an arm only living while it is compared, and no dead code left behind.
+Everything below still applies while the monitor runs: the guards every commit, an arm only
+living while it is compared, and no dead code left behind.
 
 ## The suite, and why pushing is free
 
-**Push whenever. Do not hold a commit back waiting for CI.** `tests.yml` runs on every push
-and its concurrency group is deliberate: a run in flight is never killed, a newly queued run
-waits behind it, and a third arrival cancels the one still *waiting* rather than the one
-working. So intermediate commits are skipped without any finished work being thrown away,
-and whatever is newest when the queue clears is what gets tested. Waiting to push buys
-nothing that already gives.
+**Push whenever, and do not hold a commit back waiting for CI.** `tests.yml` runs on every
+push and its concurrency group is deliberate. A run in flight is never killed, a newly queued
+run waits behind it, and a third arrival cancels the one still *waiting* rather than the one
+working. Intermediate commits are skipped without finished work being thrown away, and
+whatever is newest when the queue clears is what gets tested.
 
-**Put `[checkpoint]` in the commit message when a specific commit must clear.** That makes
-the concurrency group unique to the SHA, so it queues behind nothing, cancels nothing and
-nothing cancels it. Use it before shipping a default, or on a state worth returning to.
-Everything else keeps rolling.
+**Put `[checkpoint]` in the commit message when a specific commit must clear.** That makes the
+concurrency group unique to the SHA, so it queues behind nothing, cancels nothing, and nothing
+cancels it. Use it before shipping a default, or on a state worth returning to.
 
 **Run the structural guards locally every commit, as their own command.** `DocsTests`,
-`DeadCodeTests`, `DuplicationTests`, `DialTests`, `SeparationTests`, `ShapeTests`,
-`FlagTests`, `SweepListTests`, `ShardTests`, `CheckingTests` and `RemindingTests` take
-seconds and go red for changes that look unrelated. `ShardTests` is the one that fails when a test class lands in two CI shards
-or in none, and a class in none is green forever because nothing ever asked it.
-`CheckingTests` is the one that fails when a `[Fact]` prints a row and cannot fail — a
-measurement wearing a test's clothes, which runs on every push and checks nothing. Never chain the
-check into the commit — that has produced red commits more than once. Rebuild before running
-with `--no-build`, or the binary under test is the one from before the edit.
+`DeadCodeTests`, `DuplicationTests`, `DialTests`, `SeparationTests`, `ShapeTests`, `FlagTests`,
+`SweepListTests`, `ShardTests`, `CheckingTests`, `RemindingTests` and `ProseTests` take seconds
+and go red for changes that look unrelated. Never chain the check into the commit — that has
+produced red commits more than once. Rebuild before running with `--no-build`, or the binary
+under test is the one from before the edit.
 
-**`OutstandingTests` IS RED ON PURPOSE AND IT IS THE TOP PRIORITY — John's, 2026-08-13.**
-The outstanding work is written as tests that FAIL until it is done, so a session cannot get
-to green without doing it. **Do not delete them, do not weaken them, and do not read them as
-a regression.** Each computes the state rather than asserting a constant, so none can be
-satisfied by editing that file — an entry closes when the work closes.
+Three of them are worth knowing by what they catch:
 
-**SO THE RED SET IS NAMED, AND ANYTHING ELSE RED IS YOURS.** Check the failures are exactly
-those before assuming a run is clean, because a stable red set is the only kind you can read
-a new failure against. Adding an entry is stricter than adding anywhere else: it must be work
-somebody has DECIDED to do, computable without judgement, and closeable. An open question
-goes in the plan as `OPEN`.
+- `ShardTests` fails when a test class lands in two CI shards or in none. A class in none is
+  green forever, because nothing ever asked it.
+- `CheckingTests` fails when a `[Fact]` prints a row and cannot fail — a measurement wearing a
+  test's clothes, which runs on every push and checks nothing.
+- `ProseTests` ratchets how much of the prose here is shouted. See *How to write here*.
 
-**`PushbackTests` IS GREEN AND PRINTS — read it, it is the other half of the same idea.**
-CLAUDE.md asks for pushback the moment it is seen, and a disagreement stated in a reply is
-gone by the next context window. These are standing objections to things the repo currently
-does, each with what would settle it either way. **An entry leaves by being settled, never by
-being dropped**, which is why the count is asserted.
+**`OutstandingTests` is red on purpose and it is the top priority** — John's, 2026-08-13. The
+outstanding work is written as tests that fail until it is done, so a session cannot reach
+green without doing it. Do not delete them, do not weaken them, and do not read them as a
+regression. Each computes the state rather than asserting a constant, so none can be satisfied
+by editing that file; an entry closes when the work closes.
+
+**The red set is named, so anything else red is yours.** Check the failures are exactly those
+before assuming a run is clean — a stable red set is the only kind you can read a new failure
+against. Adding an entry is stricter than adding anywhere else: it must be work somebody has
+decided to do, computable without judgement, and closeable. An open question goes in the plan
+as `OPEN`.
+
+**`PushbackTests` is green and prints, and it is the other half of the same idea.** This file
+asks for pushback the moment it is seen, and a disagreement stated in a reply is gone by the
+next context window. Each entry is a standing objection to something the repo currently does,
+with what would settle it either way. An entry leaves by being settled rather than by being
+dropped, which is why the count is asserted.
 
 **Put `kind!=sweep&` in front of every local filter, always.** CI does this and a hand-typed
-filter does not, so a filter naming a class runs that class's GRIDS as well — which is how
-`WideningTests` and `NarrowingTests` once ran past forty minutes and had to be killed. The
-same two suites take 17 seconds with the exclusion. Nothing warns you: the facts are tagged
-correctly, and it is the command that is wrong.
+filter does not, so a filter naming a class runs that class's grids as well. That is how
+`WideningTests` and `NarrowingTests` once ran past forty minutes and had to be killed; the same
+two suites take 17 seconds with the exclusion. Nothing warns you, because the facts are tagged
+correctly and it is the command that is wrong.
 
 ```bash
 dotnet test --no-build --filter "kind!=sweep&FullyQualifiedName~Whatever" -v q --nologo
@@ -95,89 +96,107 @@ gh workflow run sweeps.yml --ref <branch> -f only=<Class>
 ```
 
 **One entry a runner, and an entry may be a class or one method of one.** A class holding
-several independent grids is several runners' work sitting on one — split it into method
-entries in the list inside `sweeps.yml`. A dispatch naming the class still matches every
-method of it by substring. This is not parallelising a measurement: each runner is still one
-serial run at a serial run's load, which is the thing `Parallelism.cs` protects.
+several independent grids is several runners' work sitting on one, so split it into method
+entries in the list inside `sweeps.yml`. A dispatch naming the class still matches every method
+of it by substring. This is not parallelising a measurement: each runner is still one serial
+run at a serial run's load, which is what `Parallelism.cs` protects.
 
 **Dispatch several sweeps at once.** The concurrency group carries the input, so different
 measurements on one ref run side by side rather than queueing.
 
 **Adding a sweep is a line in `sweeps.yml`.** The list is named rather than discovered, on
-purpose. A dispatch matching nothing now fails loudly; it used to conclude `success` with the
-job skipped.
+purpose. A dispatch matching nothing fails loudly; it used to conclude `success` with the job
+skipped.
 
-**While a grid runs, keep working.** Build the next instrument, take a local reading, write
-the plan entry. Do not idle on a poll.
+**While a grid runs, keep working.** Build the next instrument, take a local reading, write the
+plan entry. Do not idle on a poll.
 
-## What this project is, so nothing below reads as a rebuke
+## What this project is
 
-John's, and it is written here because everything after it is a list of ways things went
-wrong, and a list like that with no counterweight sets a tone he did not intend.
+John's, and it is here because everything after it is a list of ways things went wrong. A list
+like that with no counterweight sets a tone he did not intend.
 
 **This is an experiment, and the expected outcome of an experiment is that it fails.** The
-refutation table is long because the work is real, not because anybody has been careless.
-Most of what has been built here was deleted, and the deletions are the findings — a repo
-where nothing had been refuted would be a repo where nothing had been learnt.
+refutation table is long because the work is real, not because anybody has been careless. Most
+of what has been built here was deleted, and the deletions are the findings.
 
 **So try the thing that might not work, if it is worth knowing.** An arm that dies with a
 revival row has done its whole job. Guessing wrong in public, in a commit message, with the
-number that refuted you printed underneath, is the mechanism working exactly as designed.
+number that refuted you printed underneath, is the mechanism working as designed.
 
-**And when a reading refutes something you said an hour ago, just say so and carry on.**
-Correct the record in a sentence, because a wrong number left standing costs the next
-session real time. Then stop. No apology, no preamble, no going back over how it happened —
-that is noise where a correction was enough, and a session spent hedging is worse for this
-work than a session spent being wrong quickly.
+**When a reading refutes something you said an hour ago, say so and carry on.** Correct the
+record in a sentence, because a wrong number left standing costs the next session real time.
+Then stop: no apology, no preamble, no going back over how it happened. A session spent hedging
+is worse for this work than a session spent being wrong quickly.
 
-**The loop is: try the next most obvious thing the evidence points at, watch it fail, work
-out why, repeat.** Enough turns of that and the problem is understood. There is no version
+**The loop is to try the next most obvious thing the evidence points at, watch it fail, work
+out why, and repeat.** Enough turns of that and the problem is understood. There is no version
 of this that skips the failing part.
 
-**And pushing back is part of the job rather than a risk to manage — John, and he asked for
-this in writing.** He is a senior engineer and owns the distributed and systems side; on
-AGI research, biology and the learning theory he is leaning on you deliberately. His words:
-he would be doing himself, the project and you a disservice by making you feel unable to
-offer suggestions or corrections, because on most of this you are the one with the
-knowledge and the one placed to find the cross-discipline answer.
+**Pushing back is part of the job rather than a risk to manage**, and John asked for this in
+writing. He is a senior engineer and owns the distributed and systems side; on AGI research,
+biology and the learning theory he is leaning on you deliberately. His words: he would be doing
+himself, the project and you a disservice by making you feel unable to offer suggestions or
+corrections, because on most of this you are the one with the knowledge and the one placed to
+find the cross-discipline answer.
 
-**So say it the moment you see it — an approach that will not work, a solution that is
-merely adequate, a premise that is wrong.** Do not soften it into a question and do not wait
-to be asked. Hedging is the failure mode here, not overstepping.
+**Say it the moment you see it** — an approach that will not work, a solution that is merely
+adequate, a premise that is wrong. Do not soften it into a question and do not wait to be
+asked. Hedging is the failure mode here, not overstepping.
 
-**Say what would make you drop an arm before you run it, in one line — not what number you
-expect.** Predicting a value is a weaker form that invites anchoring and has already fired
-wrongly once here; see `Minting`'s revival row. Naming the result that would refute you is
-what actually stops a rise off a bad baseline reading as a win.
+**Say what would make you drop an arm before you run it, in one line.** Not what number you
+expect: predicting a value invites anchoring and has already fired wrongly here, in `Minting`'s
+revival row. Naming the result that would refute you is what stops a rise off a bad baseline
+reading as a win.
 
-**An idea John interjects mid-session is still a fork to record, and the bar for chasing one
-is lower than it reads.** The rule was written for interruptions. Several of his have been
-better than the arc they interrupted — if one is cheap and aimed at the live question, take
-it and say why.
+**An idea John interjects mid-session is a fork to record rather than an instruction to
+chase**, and the bar for chasing one is lower than that reads. The rule was written for
+interruptions, and several of his have been better than the arc they interrupted. If one is
+cheap and aimed at the live question, take it and say why.
 
 ## How to write here
 
-John's, 2026-08-13, and it is a correction to the existing prose as much as an instruction
-for new prose.
+John's, 2026-08-13, and it corrects the existing prose as much as it instructs the next commit.
 
-**Say the thing. Do not build up to it.** The reveal structure — *and here is what actually
-happened* — is a way of making a finding feel important, and it works whether or not the
-finding is. That is the same fault as a number in a commit message doing duty for a reading
-in a test: the emphasis stops being a signal once everything gets it.
+**Say the thing. Do not build up to it.** The reveal — *and here is what actually happened* —
+makes a finding feel important whether or not it is. That is the same fault as a number in a
+commit message doing duty for a reading in a test: emphasis stops being a signal once
+everything gets it.
 
 **One claim a sentence, and the same name for the same thing every time.** A synonym is a
-second name for one idea and this repo has already been bitten by two ideas sharing one name
-— `Choosing` read as measured on two worlds because an unrelated type had a property spelt
-the same.
+second name for one idea, and this repo has already been bitten by two ideas sharing one name:
+`Choosing` read as measured on two worlds because an unrelated type had a property spelt the
+same.
 
 **Let the number carry the weight.** If a result matters, the evidence says so. If it needs
 capitals to seem to matter, ask whether it does.
 
-**AND THE EXISTING PROSE IS THE PROBLEM, NOT JUST THE NEXT COMMIT.** This file, `docs/plan.md`
-and most XML comments are written in the register above and a session matching its
-surroundings will reproduce it. Rewriting them is a real task and is on the handoff. Do not
-do it in the same commit as anything else, and do not lose content to it — a guard must not
-cost information.
+**`MUST`, `MUST NOT`, `SHOULD` and `MAY` carry how binding a rule is**, in the RFC 2119 sense,
+and they are the only thing that does. Uppercase them only in that normative sense. This is the
+channel that replaces shouting, so a rule can be strong without being loud, and it is why the
+capitals could go without taking information with them.
+
+**Bold marks the lead clause of a bullet, for scanning, and nothing else.** A bold sentence is
+volume by another route.
+
+**The moves the guard cannot see are the ones to watch**, because `ProseTests` counts
+typography and none of this survives it:
+
+- the reveal, withholding a point so that arriving at it feels like a result;
+- singling one item out of a list to hook a reader — *and the third one is the real problem*;
+- the stinger, a short final sentence restating a point with more force;
+- the corrective turn, *not X but Y*, where nobody claimed X;
+- precision as drama, an exact figure doing impact work rather than information work.
+
+John's name for the register they add up to is the tone the internet took on when engagement
+started to matter: content treated as insufficient until enhanced. Kindness, humour and
+friendliness are not the problem and are wanted. What is not wanted is a sales pitch.
+
+**The existing prose is the problem as much as the next commit.** This file, `docs/plan.md` and
+most XML comments were written in the register above, and a session matching its surroundings
+reproduces it. `ProseTests` ratchets the count down and its target is nought. Rewriting is a
+real task: do not do it in the same commit as anything else, and do not lose content to it,
+because a guard must not cost information.
 
 ## The epistemics
 
@@ -189,21 +208,20 @@ These are the parts worth more than the code.
 - **An arm only lives while it is compared.** A winner becomes the code; the loser is deleted
   and leaves a revival row saying what would bring it back. A row without one is a
   superstition.
-- **Nothing ships switched off, and preserving recorded numbers is never a reason to keep
-  anything or to not change it.** A dial is a new ability — turn it on, that is why it was
-  built — or a replacement, so both arms run until one wins and the loser goes. Neither road
-  ends at a default that does nothing. The baseline is safe in the commit and the test.
-- **And ADJUSTING a losing arm is allowed** — one more shape before it goes, where what lost
-  was the build rather than the idea. What is forbidden is leaving it off while nobody
-  decides. `DialTests` holds both halves.
-- **Run the guards and READ what they print.** `RemindingTests` lists the rules that could
-  not be made into checks and prints them into that same output. An entry there leaves by
-  becoming a guard.
+- **Nothing ships switched off**, and preserving recorded numbers is never a reason to keep
+  anything or to not change it. A dial is a new ability — turn it on, that is why it was built
+  — or a replacement, so both arms run until one wins and the loser goes. Neither road ends at
+  a default that does nothing. The baseline is safe in the commit and the test.
+- **Adjusting a losing arm is allowed**, one more shape before it goes, where what lost was the
+  build rather than the idea. What is forbidden is leaving it off while nobody decides.
+  `DialTests` holds both halves.
+- **Run the guards and read what they print.** `RemindingTests` lists the rules that could not
+  be made into checks and prints them into that same output. An entry there leaves by becoming
+  a guard.
 - **A number in a commit message is a claim, not a record.** Put the reading in the test.
-- **Build a budget for each failure class.** A new kind of mistake earns a check that fails
-  the build, not just a fix. The traps list in `docs/plan.md` is where the ones without a
-  check live.
-- **Do not attribute a red test to your own change without a baseline.** Two of three
-  failures once predated the session, and one of them failed at both ends of a dial for
-  opposite reasons — so the obvious fix would have restored the original failure while
-  reading as a repair.
+- **Build a budget for each failure class.** A new kind of mistake earns a check that fails the
+  build, not just a fix. The traps list in `docs/plan.md` is where the ones without a check
+  live.
+- **Do not attribute a red test to your own change without a baseline.** Two of three failures
+  once predated the session, and one of them failed at both ends of a dial for opposite reasons
+  — so the obvious fix would have restored the original failure while reading as a repair.

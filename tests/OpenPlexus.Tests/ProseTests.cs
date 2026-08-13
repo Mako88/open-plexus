@@ -64,7 +64,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// really is one-way.
     /// </para>
     /// </remarks>
-    private const int Shouting = 2_489;
+    private const int Shouting = 2_486;
 
     /// <summary>
     /// The most words a bold span may hold before it is a sentence rather than a lead.
@@ -77,7 +77,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     private const int Lead = 12;
 
     /// <summary>The most bold sentences the tree may hold. <b>A ratchet, like the one above.</b></summary>
-    private const int Shouted = 1_216;
+    private const int Shouted = 1_212;
 
     /// <summary>
     /// Every file whose prose this repo is responsible for.

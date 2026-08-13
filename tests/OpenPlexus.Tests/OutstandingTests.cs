@@ -156,6 +156,13 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// would block a one-line fix on a tone debt it has nothing to do with.
     /// </para>
     /// <para>
+    /// <b>Most have an obvious cut point.</b> Taking it by script is not safe. 833
+    /// of the 1,209 would fall under the cap by closing the bold at the first comma, and 373
+    /// need the claim rewritten. A shouted sentence has one correct rewrite and that is why a
+    /// script did 2,489 of them; a comma is only usually where a lead ends, so a scripted pass
+    /// would trade one mechanical register for another. That is the thing being fixed.
+    /// </para>
+    /// <para>
     /// <b>Closes by the count reaching nought.</b> It reads
     /// <see cref="ProseTests.BoldSentences"/> rather than a list of its own. The typography is
     /// all any check here can see; the reveal, the stinger and the corrective turn are written

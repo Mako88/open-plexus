@@ -34,7 +34,7 @@ namespace OpenPlexus.Tests;
 public sealed class OutstandingTests(ITestOutputHelper output)
 {
     /// <summary>
-    /// <b>Nine worlds have no runner</b> — 22 entries, because members count too.
+    /// <b>Eight worlds have no runner</b> — 21 entries, because members count too.
     /// </summary>
     /// <remarks>
     /// <para>

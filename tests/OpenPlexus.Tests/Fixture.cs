@@ -60,7 +60,9 @@ public static class Fixture
         double noise = 0.0,
         int clutter = 0,
         int pool = 0,
-        double skew = 0.0) => new()
+        double skew = 0.0,
+        bool scrambled = false,
+        int withheld = 0) => new()
     {
         Concepts = concepts,
         CodesPerSense = codes,
@@ -68,6 +70,8 @@ public static class Fixture
         Clutter = clutter,
         Pool = pool,
         Skew = skew,
+        Scrambled = scrambled,
+        Withheld = withheld,
     };
 
     /// <summary>The binding world.</summary>

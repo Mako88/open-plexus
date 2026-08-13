@@ -297,7 +297,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["Holder"] = Composed,
         ["Fleet"] = Composed,
 
-        // ---- The walk's deletion left nine worlds with no runner ------------
+        // ---- The walk's deletion left eight worlds with no runner -----------
         //
         // and this is the one place the whole deletion is visible as a cost. Each of these
         // had a `*Run` in `Worlds/` that drove it, and every one of those was the walk's --
@@ -336,7 +336,11 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "coincidence, and so can a debt.",
 
         ["Rhythm"] = Stranded,
-        ["Senses"] = Stranded,
+        ["Senses"] = "A WORLD, ON `Roaming`'S FOOTING, AND IT CAME OFF THIS LIST BY "
+            + "GETTING A RUNNER. `Trial` drives it through `IWorld` now: an occasion shows "
+            + "two senses and asks about one of them, and the examination shows a sight and "
+            + "a sound and asks what the thing FEELS like -- a combination the stream draws "
+            + "nought times. `SensesTests` is its caller.",
         ["Snake"] = Stranded,
         ["SnakeSense"] = Stranded,
 

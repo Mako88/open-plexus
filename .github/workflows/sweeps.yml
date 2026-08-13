@@ -146,6 +146,7 @@ jobs:
             "RecalledTests.What_reading_real_english_converts",
             "RecalledTests.Whether_capacity_binds_on_english",
             "RecalledTests.Whether_word_order_pays_on_real_english",
+            "SensesTests.Whether_the_cross_modal_question",
             "SeparableTests",
             "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",
             "WideningTests.Whether_shortening_a_scope",

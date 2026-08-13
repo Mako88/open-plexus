@@ -111,6 +111,18 @@ public sealed record SensesSettings
     /// </para>
     /// </remarks>
     public double Skew { get; init; }
+
+    /// <summary>
+    /// How many cross-modal questions this world keeps back and never draws.
+    /// </summary>
+    /// <remarks>
+    /// <b>A COMBINATION rather than a sample</b>, which is what makes the number mean
+    /// something here. Every held turn shows a sight and a sound and asks what the thing
+    /// feels like, and that combination is drawn nought times however long the run goes on —
+    /// so a population that answers it is answering across an occasion type it was never
+    /// scored on, rather than one it happened not to meet.
+    /// </remarks>
+    public int Withheld { get; init; }
 }
 
 /// <summary>
@@ -136,7 +148,7 @@ public sealed record SensesSettings
 /// database with extra steps or not.
 /// </para>
 /// </remarks>
-public sealed class Senses
+public sealed class Senses : IWorld<Coded>, IWithholds<Coded>
 {
     /// <summary>What a thing looks like.</summary>
     public const byte Sight = 10;
@@ -146,6 +158,26 @@ public sealed class Senses
 
     /// <summary>What a thing feels like.</summary>
     public const byte Touch = 12;
+
+    /// <summary>
+    /// The modality the question rides on — <b>which sense is being asked about.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Ostension, and the plan calls it the signal rather than a shortcut.</b> Being told
+    /// which sense the question is about is information no amount of co-occurrence contains,
+    /// and it is the pointing-and-naming shape. Without it the world asks nothing: a moment
+    /// of a sight and a sound has three things it could be asked and no way to say which, so
+    /// every arm would be scored on a question nobody put.
+    /// </para>
+    /// <para>
+    /// <b>It says what is being looked at and never what to conclude</b>, which is the line a
+    /// world's report has to stay on. <i>You are being asked about touch</i> is the same
+    /// standing as <see cref="Coded.Groups"/>'s <i>these codes were one object</i>; what
+    /// nothing here says is which code answers it.
+    /// </para>
+    /// </remarks>
+    public const byte Asks = 14;
 
     /// <summary>
     /// Something present and irrelevant. <b>A modality of its own, so it can
@@ -170,6 +202,11 @@ public sealed class Senses
     /// </remarks>
     private readonly double[]? _ranks;
 
+    /// <summary>Draws the held-out questions, and <b>nothing else</b>.</summary>
+    private readonly Random _quizzing;
+
+    private readonly List<Turn<Coded>> _kept = [];
+
     public Senses(SensesSettings settings, int seed)
     {
         ArgumentNullException.ThrowIfNull(settings);
@@ -180,6 +217,7 @@ public sealed class Senses
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Clutter);
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Pool);
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Skew);
+        ArgumentOutOfRangeException.ThrowIfNegative(settings.Withheld);
 
         // An arm that looks distinct and is not is how this project has fooled
         // itself before: clutter drawn from an empty pool is no clutter at all.
@@ -203,7 +241,14 @@ public sealed class Senses
         // has two explanations instead of one -- see Seeds.Apart.
         _aside = new Random(Seeds.Apart(seed, 0xA51D_E001));
 
+        // And the examination gets a third stream, for the same reason. Building the held
+        // turns off `_rng` would make how many were held decide which concepts the run then
+        // saw, so two arms differing only in `Withheld` would be two different worlds.
+        _quizzing = new Random(Seeds.Apart(seed, 0xA51D_E002));
+
         _ranks = settings.Skew > 0.0 ? Ranks(settings.Pool, settings.Skew) : null;
+
+        for (var back = 0; back < settings.Withheld; back++) _kept.Add(Quiz());
     }
 
     /// <summary>
@@ -236,8 +281,139 @@ public sealed class Senses
     /// <summary>How many things there are to know about.</summary>
     public int Concepts => _settings.Concepts;
 
-    /// <summary>What a blind guess at one touch code is worth.</summary>
-    public double Chance => 1.0 / _settings.Concepts;
+    /// <summary>Every code any sense can produce, which is the answer alphabet.</summary>
+    /// <remarks>
+    /// <b>One alphabet over all three senses</b>, so the sense a question asks about is
+    /// something the machine says rather than something the scoring assumes. An outcome
+    /// space per sense would make an answer in the wrong modality unexpressible, and
+    /// answering in the wrong modality is the failure this world is most likely to have.
+    /// </remarks>
+    public int Outcomes => 3 * _settings.Concepts * _settings.CodesPerSense;
+
+    /// <summary>What a blind guess is worth.</summary>
+    public double Chance => 1.0 / Outcomes;
+
+    /// <summary>
+    /// What a perfect reader is worth — <b>a ceiling by construction and not a
+    /// measurement.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>The answer is drawn uniformly</b> among the asked sense's codes for that concept,
+    /// so knowing the concept and the sense exactly still leaves a draw of one in
+    /// <see cref="SensesSettings.CodesPerSense"/>. Nothing in the moment says which of them
+    /// is coming, and a score read against one rather than against this would call a perfect
+    /// population half wrong.
+    /// </remarks>
+    public double Ceiling => 1.0 / _settings.CodesPerSense;
+
+    /// <inheritdoc/>
+    public IReadOnlyList<Turn<Coded>> Withheld => _kept;
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <b>A pair, a question, and the answer</b> — one of the two senses shown is named and
+    /// the answer is in it. The question is what makes the world askable at all — see
+    /// <see cref="Asks"/> — and the asked sense is always one that is present, so a drawn
+    /// round never rehearses the examination.
+    /// </remarks>
+    public Turn<Coded> Next()
+    {
+        var concept = _rng.Next(_settings.Concepts);
+        var pairing = _rng.Next(2);
+        var (first, second) = pairing == 0 ? (Sight, Sound) : (Sound, Touch);
+
+        var those = _settings.Scrambled ? _rng.Next(_settings.Concepts) : concept;
+
+        var shown = new List<Code> { Pick(first, concept, _rng), Pick(second, those, _rng) };
+
+        // Which of the two is being asked about, and never the third. Asking about the sense
+        // that is absent is the examination, and a drawn round that did it would be training
+        // on the exam.
+        var asked = _rng.Next(2) == 0 ? first : second;
+
+        return Asking(shown, asked, asked == first ? concept : those, _rng);
+    }
+
+    /// <summary>
+    /// One held-out question: a sight, a sound, and <b>what does it feel like.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The combination the stream never draws</b>, and a memoriser scores nought on it by
+    /// construction. Touch is only ever shown beside sound, and touch is only ever asked
+    /// about in an occasion holding one — so a moment holding a sight and asking about touch
+    /// is a shape the population has been scored on nought times.
+    /// </para>
+    /// <para>
+    /// <b>The sound is the only route and the sight is the distractor</b>, which is what
+    /// this measures rather than a limit on it. A subset test cannot walk, so composition
+    /// here is a rule keyed on the code the two occasion types share, winning a vote against
+    /// everything the sight code has ever advocated. Whether it does is the reading.
+    /// </para>
+    /// </remarks>
+    private Turn<Coded> Quiz()
+    {
+        var concept = _quizzing.Next(_settings.Concepts);
+        var those = _settings.Scrambled ? _quizzing.Next(_settings.Concepts) : concept;
+
+        var shown = new List<Code>
+        {
+            Pick(Sight, concept, _quizzing),
+            Pick(Sound, those, _quizzing),
+        };
+
+        // Answered through the SOUND's concept, because the sound is the only code the
+        // learner could have met beside a touch. Scoring it against the sight's concept
+        // would make the control arm's world unanswerable for a second reason and the two
+        // would be inseparable.
+        return Asking(shown, Touch, those, _quizzing);
+    }
+
+    /// <summary>One moment, with the noise, the clutter and the question on it.</summary>
+    /// <param name="shown">The senses that are present.</param>
+    /// <param name="asked">Which sense the question is about.</param>
+    /// <param name="about">Which concept the answer belongs to.</param>
+    /// <param name="rng">Which stream this turn draws from.</param>
+    private Turn<Coded> Asking(List<Code> shown, byte asked, int about, Random rng)
+    {
+        if (rng.NextDouble() < _settings.Noise)
+            shown.Add(Pick(
+                rng.Next(2) == 0 ? shown[0].Modality : shown[1].Modality,
+                rng.Next(_settings.Concepts),
+                rng));
+
+        // Present and irrelevant. Distinct within the moment, or a repeat would be one code
+        // counted twice rather than two things being here.
+        for (var i = 0; i < _settings.Clutter; i++)
+        {
+            var aside = new Code(Aside, (ulong)Irrelevant());
+            if (!shown.Contains(aside)) shown.Add(aside);
+        }
+
+        shown.Add(new Code(Asks, asked));
+
+        return new Turn<Coded>
+        {
+            Seen = Coded.Of(shown),
+            Outcome = Answer(Pick(asked, about, rng)),
+        };
+    }
+
+    /// <summary>Where a code sits in the answer alphabet.</summary>
+    /// <param name="code">A code some sense produced.</param>
+    /// <remarks>
+    /// <b>Derived from the code and never from a counter</b>, so the same code is the same
+    /// answer on every machine and in every run. A table numbered by order of first
+    /// appearance would make two runs of one seed disagree about what the machine said.
+    /// </remarks>
+    private int Answer(Code code)
+    {
+        var sense = code.Modality == Sight ? 0 : code.Modality == Sound ? 1 : 2;
+        var concept = Kinds.Of(code);
+        var slot = (int)(code.Value % 1000);
+
+        return (((sense * _settings.Concepts) + concept) * _settings.CodesPerSense) + slot;
+    }
 
     /// <summary>Every code one sense produces for one concept.</summary>
     public IReadOnlyList<Code> Of(byte sense, int concept)
@@ -268,12 +444,13 @@ public sealed class Senses
         // sight -> sound -> touch leads somewhere unrelated.
         var codes = new List<Code>
         {
-            Pick(first, concept),
-            Pick(second, _settings.Scrambled ? _rng.Next(_settings.Concepts) : concept),
+            Pick(first, concept, _rng),
+            Pick(second, _settings.Scrambled ? _rng.Next(_settings.Concepts) : concept, _rng),
         };
 
         if (_rng.NextDouble() < _settings.Noise)
-            codes.Add(Pick(_rng.Next(2) == 0 ? first : second, _rng.Next(_settings.Concepts)));
+            codes.Add(Pick(
+                _rng.Next(2) == 0 ? first : second, _rng.Next(_settings.Concepts), _rng));
 
         // PRESENT AND IRRELEVANT. Distinct within the moment, or a repeat would
         // be one code counted twice rather than two things being here.
@@ -309,6 +486,6 @@ public sealed class Senses
         return Math.Min(rank, _settings.Pool - 1);
     }
 
-    private Code Pick(byte sense, int concept) =>
-        Kinds.Pick(sense, concept, _settings.CodesPerSense, _rng);
+    private Code Pick(byte sense, int concept, Random rng) =>
+        Kinds.Pick(sense, concept, _settings.CodesPerSense, rng);
 }

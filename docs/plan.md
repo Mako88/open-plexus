@@ -252,8 +252,8 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
     - **SETTLED** — the binding world was built to fail, failed as predicted, and has since
       lifted. Fork **25**.
     - **OPEN** — text as an IMAGE is the one perceptual world whose ground truth stays
-      enumerable, so soundness survives where a camera kills it. Gated on `Senses` running at
-      all, two stable symbolic channels being cheaper than pixels. Fork **107**.
+      enumerable, so soundness survives where a camera kills it. `Senses` runs and its gate is
+      open: a name IS minted over two modalities. Fork **107**.
     - **OPEN** — spreading a reading over its range costs most of the score at both front
       ends: fragmentation, or the search the extra codes buy. Fork **38**.
     - **OPEN** — a reading under about ten dimensions has too few distinct wirings for a
@@ -501,7 +501,7 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       18, 20, 21, 22 and 24 went with it; `csharp` keeps their code and their numbers.
     - **OPEN** — `Drives` is the one idea still owed off it: a third factor from the body's
       own variables.
-    - **BROKEN** — nine worlds have no runner, their `*Run` files being the walk's. Each
+    - **BROKEN** — eight worlds have no runner, their `*Run` files being the walk's. Each
       wants a `Trial` OR A DELETION, a world going when its question closes, and nothing
       says which. `DeadCodeTests` counts the debt.
     - **NOW** — the vote's arithmetic composes and a whole learner runs over it. Fork **52**.

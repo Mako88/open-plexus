@@ -34,7 +34,7 @@ namespace OpenPlexus.Tests;
 public sealed class OutstandingTests(ITestOutputHelper output)
 {
     /// <summary>
-    /// <b>Eleven worlds have no runner — 23 entries, because members count too.</b>
+    /// <b>Nine worlds have no runner</b> — 22 entries, because members count too.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -71,7 +71,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
                 : $"{stranded.Count} stranded: {string.Join(", ", stranded)}");
 
         Assert.True(stranded.Count == 0,
-            $"{stranded.Count} entries across eleven worlds nothing can run: "
+            $"{stranded.Count} entries across the worlds nothing can run: "
             + $"{string.Join(", ", stranded)}. Give the world a `Trial`, or DELETE it "
             + "because its question closed — then take its entry off `DeadCodeTests`. "
             + "This test is red on purpose and closes on that edit, not on this file.");

@@ -501,7 +501,7 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       18, 20, 21, 22 and 24 went with it; `csharp` keeps their code and their numbers.
     - **OPEN** — `Drives` is the one idea still owed off it: a third factor from the body's
       own variables.
-    - **BROKEN** — eleven worlds have no runner, their `*Run` files being the walk's. Each
+    - **BROKEN** — nine worlds have no runner, their `*Run` files being the walk's. Each
       wants a `Trial` OR A DELETION, a world going when its question closes, and nothing
       says which. `DeadCodeTests` counts the debt.
     - **NOW** — the vote's arithmetic composes and a whole learner runs over it. Fork **52**.

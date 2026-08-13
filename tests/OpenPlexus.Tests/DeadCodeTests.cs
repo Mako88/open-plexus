@@ -71,11 +71,11 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     /// </remarks>
     private static readonly Dictionary<string, string> Unused = new(StringComparer.Ordinal)
     {
-        // ---- Members of the eleven stranded worlds -------------------------
+        // ---- Members of the stranded worlds --------------------------------
         //
         // this list was at nought and the walk's deletion put fifteen on it, which is the
-        // only honest way to record what the deletion cost. The type list below says
-        // eleven worlds have no runner; this says how much of each one is unreachable
+        // only honest way to record what the deletion cost. The type list below says which
+        // worlds have no runner; this says how much of each one is unreachable
         // rather than merely undriven. Every entry here was called by a `*Run` in
         // `Worlds/`, and every one of those runs was the walk's.
         //
@@ -297,7 +297,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["Holder"] = Composed,
         ["Fleet"] = Composed,
 
-        // ---- The walk's deletion left eleven worlds with no runner ----------
+        // ---- The walk's deletion left nine worlds with no runner ------------
         //
         // and this is the one place the whole deletion is visible as a cost. Each of these
         // had a `*Run` in `Worlds/` that drove it, and every one of those was the walk's --
@@ -319,14 +319,22 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // SETTLED and both deleted with the walk.
         //
         // What is forbidden is leaving them here while nobody decides, which is the same
-        // sentence the dial rule uses. Deleting all eleven to make a guard green would
-        // delete live questions; keeping all eleven is a world budget nobody is paying.
+        // sentence the dial rule uses. Deleting them all to make a guard green would delete
+        // live questions; keeping them all is a world budget nobody is paying.
         ["Clevr"] = Stranded,
         ["Composed"] = Stranded,
         ["Homeostat"] = Stranded,
         ["Latent"] = Stranded,
         ["Motif"] = Stranded,
-        ["Recalled"] = Stranded,
+        ["Recalled"] = "A WORLD, ON `Roaming`'S FOOTING, and it was on the stranded list "
+            + "by mistake. Both halves of that reason are false of it: `Trial` drives it "
+            + "through `IWorld` -- `RecalledTests.Made` builds a `Trial<Recited>` over it -- "
+            + "and its tests assert what is LEARNT rather than what the world is, every "
+            + "text reading on this branch having come off them. It went on the list when "
+            + "the walk's deletion enumerated the worlds, and nothing checked which of them "
+            + "the walk had actually been driving. A budget can be satisfied by a "
+            + "coincidence, and so can a debt.",
+
         ["Rhythm"] = Stranded,
         ["Senses"] = Stranded,
         ["Snake"] = Stranded,

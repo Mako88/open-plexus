@@ -48,42 +48,7 @@ public static class Wire
     {
         IncludeFields = false,
         NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
-        Converters = { new Relation() },
     };
-
-    /// <summary>
-    /// <see cref="Graph.Kind"/>, whose entire state is private and would otherwise be
-    /// written as nothing at all.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>WITHOUT THIS EVERY EDGE KIND ARRIVES AS <see langword="default"/>, SILENTLY.</b>
-    /// A relation is a <see langword="readonly"/> <see langword="record"/>
-    /// <see langword="struct"/> around one private number, so a serialiser looking for
-    /// public members finds none, writes <c>{}</c>, and reads back a relation that
-    /// matches nothing any machine has ever named. Nothing throws. The walk simply starts
-    /// receiving messages whose kind is a relation that does not exist.
-    /// </para>
-    /// <para>
-    /// <b>AND IT WAS FOUND BY THE TEST RATHER THAN BY THE FAULT</b>, which is the whole
-    /// argument for writing the round trip down before writing the transport that needs
-    /// it. Over a wire this is fork 12 with the two halves on different machines, where
-    /// neither end can see that they disagree.
-    /// </para>
-    /// </remarks>
-    private sealed class Relation : JsonConverter<Graph.Kind>
-    {
-        public override Graph.Kind Read(
-            ref Utf8JsonReader reader, Type type, JsonSerializerOptions options) =>
-            Graph.Kind.From(reader.GetUInt64());
-
-        public override void Write(
-            Utf8JsonWriter writer, Graph.Kind value, JsonSerializerOptions options)
-        {
-            ArgumentNullException.ThrowIfNull(writer);
-            writer.WriteNumberValue(value.Name);
-        }
-    }
 
     /// <summary>One message, as the bytes that carry it.</summary>
     /// <typeparam name="T">What is being sent.</typeparam>

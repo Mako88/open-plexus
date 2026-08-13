@@ -47,12 +47,6 @@ public readonly record struct Coded
     /// <inheritdoc cref="IQuantizer{TObservation}.Fleeting"/>
     public IReadOnlySet<Code>? Passing { get; init; }
 
-    /// <inheritdoc cref="IQuantizer{TObservation}.Relating"/>
-    public Graph.Kind? Relating { get; init; }
-
-    /// <inheritdoc cref="IQuantizer{TObservation}.Filling"/>
-    public IReadOnlyDictionary<Code, int>? Filling { get; init; }
-
     /// <inheritdoc cref="IQuantizer{TObservation}.Forced"/>
     public IReadOnlySet<Code>? Assigned { get; init; }
 

@@ -1,8 +1,7 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Net;
 using System.Text;
 using OpenPlexus.Codes;
-using OpenPlexus.Thinking;
 using SimpleHttpClient;
 using SimpleHttpClient.Models;
 
@@ -59,10 +58,6 @@ public readonly record struct Peer(string Host);
 /// </remarks>
 public sealed class Posted : IBus, IAsyncDisposable
 {
-    private readonly Dictionary<ClusterAddress, IReceiveEnvelopes> _clusters = [];
-    private readonly Dictionary<MachineAddress, IReceiveReports> _machines = [];
-    private readonly List<(IReceiveArrivals Machine, HashSet<Code> Codes)> _listeners = [];
-
     private readonly Dictionary<MachineAddress, IReceiveAsks> _holders = [];
     private readonly Dictionary<MachineAddress, IReceiveAnswers> _askers = [];
 
@@ -267,37 +262,6 @@ public sealed class Posted : IBus, IAsyncDisposable
     }
 
     /// <inheritdoc/>
-    public IDisposable Subscribe(IReceiveEnvelopes cluster)
-    {
-        ArgumentNullException.ThrowIfNull(cluster);
-
-        lock (_gate) _clusters.Add(cluster.Address, cluster);
-
-        return new Leaves(() =>
-        {
-            lock (_gate) _clusters.Remove(cluster.Address);
-
-            // LEAVING IS NOT SILENT, which is the whole reason this is a bus. Every peer
-            // is told, because a route heading into a cluster that has gone is stranded
-            // and the origin can only write it off if somebody says so.
-            foreach (var peer in _peers)
-                _ = PostAsync(peer, $"died/{Uri.EscapeDataString(cluster.Address.Value)}", "", default);
-
-            Deaths?.Invoke(cluster.Address);
-        });
-    }
-
-    /// <inheritdoc/>
-    public IDisposable Subscribe(IReceiveReports machine)
-    {
-        ArgumentNullException.ThrowIfNull(machine);
-
-        lock (_gate) _machines.Add(machine.Address, machine);
-
-        return new Leaves(() => { lock (_gate) _machines.Remove(machine.Address); });
-    }
-
-    /// <inheritdoc/>
     public IDisposable Subscribe(IReceiveAsks holder)
     {
         ArgumentNullException.ThrowIfNull(holder);
@@ -321,100 +285,6 @@ public sealed class Posted : IBus, IAsyncDisposable
 
         return Joins.At(_gate, _askers, asker.Address, asker);
     }
-
-    /// <inheritdoc/>
-    public IDisposable Listen(IReceiveArrivals machine, IReadOnlyCollection<Code> codes)
-    {
-        ArgumentNullException.ThrowIfNull(machine);
-        ArgumentNullException.ThrowIfNull(codes);
-
-        var entry = (machine, new HashSet<Code>(codes));
-
-        lock (_gate) _listeners.Add(entry);
-
-        return new Leaves(() => { lock (_gate) _listeners.Remove(entry); });
-    }
-
-    /// <inheritdoc/>
-    public async ValueTask SendAsync(
-        ClusterAddress to, Envelope envelope, CancellationToken ct = default)
-    {
-        IReceiveEnvelopes? here;
-        string? there;
-
-        lock (_gate)
-        {
-            _clusters.TryGetValue(to, out here);
-            _elsewhere.TryGetValue(to, out there);
-        }
-
-        if (here is not null)
-        {
-            await here.DeliverAsync(envelope, ct).ConfigureAwait(false);
-            return;
-        }
-
-        if (there is null) throw Unreachable(to.Value);
-
-        await PostAsync(there, $"envelope/{Uri.EscapeDataString(to.Value)}", envelope, ct)
-            .ConfigureAwait(false);
-    }
-
-    /// <inheritdoc/>
-    /// <remarks>
-    /// <para>
-    /// <b>FIRE AND FORGET, AND IT AWAITED EACH POST IN TURN UNTIL SOMETHING TIMED IT.</b>
-    /// The class remark two hundred lines up has always said a fan-out to twelve clusters
-    /// is twelve posts in flight rather than twelve round trips end to end. It was twelve
-    /// round trips: every send awaited its peer's acknowledgement before the next one left,
-    /// so a broadcast cost the SUM of the hops and the origin was paced by the slowest
-    /// machine in the fleet.
-    /// </para>
-    /// <para>
-    /// <b>WHICH PUT THE NETWORK'S LATENCY INTO THE SEARCH ONCE PER CLUSTER, exactly as that
-    /// remark warned.</b> Nothing measured it because nothing on the thinking path has ever
-    /// been timed across a real socket — the depth-of-a-thought number was taken on a wire
-    /// whose fan-out was a queue.
-    /// </para>
-    /// <para>
-    /// <b>AND A LOCAL CLUSTER IS DISPATCHED TOO, WHICH IS WHAT MAKES IT ACTUALLY FIRE AND
-    /// FORGET.</b> Delivering to a cluster that happens to live here by direct call inside
-    /// the loop would leave one machine in the fleet still able to pace a broadcast, and
-    /// which one would depend on where the ring put things. <see cref="HybridBus"/> has
-    /// always dispatched both alike.
-    /// </para>
-    /// </remarks>
-    public ValueTask<IReadOnlyCollection<ClusterAddress>> BroadcastAsync(
-        Envelope envelope,
-        CancellationToken ct = default,
-        Action<IReadOnlyCollection<ClusterAddress>>? ready = null)
-    {
-        var everyone = Known;
-
-        // THE ORIGIN RECORDS ITS THOUGHT INSIDE THIS WINDOW, before anything is asked. A
-        // cluster can report back before this method returns, and a report for a broadcast
-        // nobody has heard of is dropped.
-        ready?.Invoke(everyone);
-
-        foreach (var cluster in everyone) Fire(cluster, envelope with { To = cluster }, ct);
-
-        return ValueTask.FromResult(everyone);
-    }
-
-    /// <summary>Sends without waiting, and without a fault nobody will ever read.</summary>
-    /// <param name="to">Which cluster.</param>
-    /// <param name="envelope">What it gets.</param>
-    /// <param name="ct">Cancellation.</param>
-    /// <remarks>
-    /// <b>THE THROW HAS TO GO SOMEWHERE, AND ON THIS PATH THERE IS NOWHERE.</b>
-    /// <see cref="SendAsync(ClusterAddress, Envelope, CancellationToken)"/> refuses a
-    /// cluster no machine has announced, and a broadcast only ever addresses what
-    /// <see cref="Known"/> held a moment ago — so the one way to reach that throw is a
-    /// cluster departing inside the window, which is C3 happening rather than a routing
-    /// bug. An unobserved faulted task would be the alternative, and it reports to nobody.
-    /// </remarks>
-    private void Fire(ClusterAddress to, Envelope envelope, CancellationToken ct) =>
-        Away(() => SendAsync(to, envelope, ct).AsTask(), ct);
 
     /// <summary>Asks one holder without waiting for it.</summary>
     /// <param name="who">Which holder.</param>
@@ -506,33 +376,6 @@ public sealed class Posted : IBus, IAsyncDisposable
             CancellationToken.None);
 
     /// <inheritdoc/>
-    public async ValueTask SendAsync(
-        MachineAddress to, Report report, CancellationToken ct = default)
-    {
-        IReceiveReports? here;
-        string? there;
-
-        lock (_gate)
-        {
-            _machines.TryGetValue(to, out here);
-            _reporting.TryGetValue(to, out there);
-        }
-
-        if (here is not null)
-        {
-            await here.DeliverAsync(report, ct).ConfigureAwait(false);
-            return;
-        }
-
-        // A REPORT WITH NOWHERE TO GO IS DROPPED RATHER THAN THROWN. The machine that
-        // asked may have died mid-thought, which C3 says is normal; a route that cannot
-        // report is exactly the stranded route the accounting already knows how to lose.
-        if (there is not null)
-            await PostAsync(there, $"report/{Uri.EscapeDataString(to.Value)}", report, ct)
-                .ConfigureAwait(false);
-    }
-
-    /// <inheritdoc/>
     public ValueTask<IReadOnlyCollection<MachineAddress>> AskAsync(
         Ask ask,
         CancellationToken ct = default,
@@ -596,41 +439,6 @@ public sealed class Posted : IBus, IAsyncDisposable
         if (there is not null)
             await PostAsync(there, $"answer/{Uri.EscapeDataString(to.Value)}", answer, ct)
                 .ConfigureAwait(false);
-    }
-
-    /// <inheritdoc/>
-    public async ValueTask PublishAsync(Settled settled, CancellationToken ct = default)
-    {
-        ArgumentNullException.ThrowIfNull(settled);
-
-        await DeliverLocallyAsync(settled, ct).ConfigureAwait(false);
-
-        // AND TO EVERY PEER, BECAUSE THE SENDER DOES NOT KNOW WHO LISTENS. Fork 11 routes
-        // a finished thought by the CODES it reached rather than by an address, so the
-        // only way to honour that across machines is for each to decide for itself.
-        //
-        // ALL AT ONCE, FOR THE REASON `AnnounceAsync` GIVES. This is the widest fan-out on
-        // the bus -- every machine, not every machine holding something -- and it awaited
-        // each peer in turn, so publishing a finished thought was paced by the whole fleet
-        // in series while the class remark above promised otherwise.
-        await Task.WhenAll(_peers.Select(peer => PostAsync(peer, "settled", settled, ct)))
-            .ConfigureAwait(false);
-    }
-
-    private async Task DeliverLocallyAsync(Settled settled, CancellationToken ct)
-    {
-        List<IReceiveArrivals> wanting;
-
-        lock (_gate)
-            wanting =
-            [
-                .. _listeners
-                    .Where(one => settled.Arrivals.Any(reached => one.Codes.Contains(reached.Endpoint)))
-                    .Select(one => one.Machine),
-            ];
-
-        foreach (var machine in wanting)
-            await machine.DeliverAsync(settled, ct).ConfigureAwait(false);
     }
 
     /// <summary>What arrived, and who it is for.</summary>

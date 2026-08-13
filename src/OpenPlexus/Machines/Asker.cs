@@ -2,7 +2,6 @@ using System.Collections.Immutable;
 using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
-using OpenPlexus.Thinking;
 
 namespace OpenPlexus.Machines;
 

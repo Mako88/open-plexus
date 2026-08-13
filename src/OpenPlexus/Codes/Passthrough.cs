@@ -53,10 +53,8 @@ public sealed class Passthrough : IQuantizer<Coded>
     public IReadOnlySet<Code>? Fleeting(Coded observation) => observation.Passing;
 
     /// <inheritdoc/>
-    public Graph.Kind? Relating(Coded observation) => observation.Relating;
 
     /// <inheritdoc/>
-    public IReadOnlyDictionary<Code, int>? Filling(Coded observation) => observation.Filling;
 
     /// <inheritdoc/>
     public IReadOnlySet<Code>? Forced(Coded observation) => observation.Assigned;

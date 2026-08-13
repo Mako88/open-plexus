@@ -315,10 +315,8 @@ public sealed class Sorted<TObservation>(IQuantizer<TObservation> inner, Sorting
     public IReadOnlySet<Code>? Fleeting(TObservation observation) => inner.Fleeting(observation);
 
     /// <inheritdoc/>
-    public Graph.Kind? Relating(TObservation observation) => inner.Relating(observation);
 
     /// <inheritdoc/>
-    public IReadOnlyDictionary<Code, int>? Filling(TObservation observation) => inner.Filling(observation);
 
     /// <inheritdoc/>
     public IReadOnlySet<Code>? Forced(TObservation observation) => inner.Forced(observation);

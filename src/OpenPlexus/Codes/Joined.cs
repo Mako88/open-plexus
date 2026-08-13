@@ -788,10 +788,8 @@ public sealed class Joined : IQuantizer<Asking>
     public IReadOnlySet<Code>? Fleeting(Asking observation) => null;
 
     /// <inheritdoc/>
-    public Graph.Kind? Relating(Asking observation) => null;
 
     /// <inheritdoc/>
-    public IReadOnlyDictionary<Code, int>? Filling(Asking observation) => null;
 
     /// <inheritdoc/>
     public IReadOnlySet<Code>? Forced(Asking observation) => null;

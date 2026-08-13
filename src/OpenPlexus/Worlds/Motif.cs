@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
@@ -32,11 +32,11 @@ public sealed record MotifSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE WORLD FOR STEP 3, BUILT BEFORE STEP 3.</b> Fork 21 mints edges; it
-/// should mint <i>nodes</i>. When a set of codes recurs, a code standing for the
-/// whole set should come into existence — which is what would let the alphabet
-/// GROW, where today the quantiser fixes it forever. `Chunk` does not exist yet,
-/// so what this measures is the baseline that mechanism has to beat.
+/// <b>THE WORLD FOR MINTING A NAME, AND IT WAS BUILT BEFORE ANYTHING COULD.</b>
+/// When a set of codes recurs, a code standing for the WHOLE set should come into
+/// existence — which is what lets the alphabet GROW, where a quantiser alone fixes
+/// it forever. That is rung five, and this world is where the redundancy it needs
+/// is manufactured on purpose.
 /// </para>
 /// <para>
 /// <b>THE INTERESTING NUMBER HERE IS COST, NOT ACCURACY.</b> A graph with no

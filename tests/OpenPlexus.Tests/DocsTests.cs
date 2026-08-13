@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 
 namespace OpenPlexus.Tests;
@@ -87,7 +87,7 @@ public sealed class DocsTests
     /// John.
     /// </para>
     /// </remarks>
-    private const int Whole = 9_771;
+    private const int Whole = 9_766;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

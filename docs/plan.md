@@ -253,7 +253,9 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
     - **OPEN** — a reading under about ten dimensions has too few distinct wirings for a
       projection to expand into, and population coding's floor is undocumented. Fork **39**.
     - **OPEN** — the tiled patch is the arranged world's cell, so it is told where the parts
-      are. Does the advantage survive a grid that does not divide the world's. Fork **44**.
+      are. Does the advantage survive a grid that does not divide the world's. `csharp`
+      refuted BANDED POSITION codes for both — row width bought with noise. Fork **44**,
+      with **38**.
     - **OPEN** — THE INTERFACE COSTS MOST OF THE SCORE, and the front end's resolution is a
       hard floor: a fixed projection can split what is separable at some resolution and can
       never invent a direction. How the projection is AIMED beat both, rung five uninvolved.
@@ -277,7 +279,8 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
     - **OPEN** — anti-unification as rung four's admission, gated by a hole whose covered
       values never co-occur. Open on the build. Fork **102**, gated by fork **97**.
     - **OPEN** — a second hop keyed on what the first reading supplied, banded by hop. Open
-      at three facts. Fork **96**.
+      at three facts. `csharp` refuted the cheap version: a second pass where a task merely
+      LOOKS deep buys nothing, so the hop has to be real. Fork **96**.
     - **OPEN** — a commitment ABOUT commitments is expressible and not built, an identity
       being a code. Metacognition, and where a self-model starts.
   - Concept and label independent
@@ -303,7 +306,9 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
     - **OPEN** — should the separation bar be charged by what a scope's codes STAND FOR
       rather than by how many there are. Fork **71**.
     - **OPEN** — a category is the set of codes that are ALTERNATIVES, derived from moments
-      alone. Open on the individual, which substitutability never reaches. Fork **97**.
+      alone. Open on the individual, which substitutability never reaches. `csharp` refuted
+      a SIMILARITY code as the coarse form — a hub at one end, an index at the other, nothing
+      between — so **83**, **84** and **85** want a told alphabet. Fork **97**.
     - **OPEN** — a name over ALTERNATIVES is derivable and not admitted, rung five being the
       wrong SHAPE: it names what CO-FIRES, and alternatives never do.
   - Understanding deepens without limit
@@ -378,8 +383,6 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
     - **OPEN** — specificity as a gradient across the SITUATION stores too. Rules have that
       gradient; situations have nowhere to keep one — repetition for a general rule,
       assertion for a particular.
-    - **DEAD** — compression as an edge, off as a trade. Revives where a link costs more than
-      the compute to shrink what crosses it. Fork **21**.
     - **OPEN** — whether compression is self-regulating. On no signal found yet. Fork **23**.
     - **OPEN** — project each scope code to its COARSER form when counting pairs. Test the
       rewrite first: a name no scope can be said in is a word with no referent. Fork **83**.
@@ -394,8 +397,6 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       merges. This one works.
     - **SETTLED** — the local decaying estimate earns its keep: level with a lifetime average
       where the world holds still, ahead where the target moves. Fork **27**.
-    - **DEAD** — a budget controller aiming at a moving target. Revives if fuel that returns
-      beats a fixed count. Fork **24**.
     - **OPEN** — more unsound commitments resident than sound ones while the score holds: is
       the vote robust to them, or are they why it stops short. Fork **35**.
     - **OPEN** — THE LIVE PROBLEM IS WHICH RULE GETS THE SEAT, and two arms at it have
@@ -451,20 +452,15 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
   - Original thought
     - **NOW** — nothing. Every world here is watched rather than acted in, and action, a
       consequence that can surprise, and a goal are all unbuilt.
-    - **SETTLED** — prediction conditional on the next action, answered by edge kinds.
-      Fork **18**.
-    - **SETTLED** — split budgets, deep to act and shallow to predict. Fork **20**.
     - **OPEN** — TextWorld's shape is built here and watched before acted in; Crafter puts
-      two unbuilt subsystems in front of the measurement. Open on twins. Fork **103**.
+      two unbuilt subsystems in front of the measurement. Open on twins. `csharp` disqualified
+      SURVIVAL as a score and refuted absolute actions under an unrotated view, so an acting
+      world owes both. Fork **103**.
 - **WHAT THE MACHINE MUST SURVIVE** — C1 to C4 are under THE DESTINATION and do not move;
   these are the questions they leave open.
   - The constraints hold under lateness and loss
     - **NOW** — merge monotone, decide local. Hits, misses and abstains are the only thing
       another node is ever told.
-    - **SETTLED** — broadcast the origin, route the hops. Fork **6**.
-    - **SETTLED** — a finished thought is published and routed by code, so N actuators act on
-      one broadcast. Fork **11**.
-    - **SETTLED** — a transiently-zero live count dropped later reports. Fork **22**.
   - Placement, so two machines reach one rule and not two
     - **NOW** — placement by the minimum code of a sorted scope, capped by a world's distinct
       roots, so fleet size and the front end's vocabulary are one number.
@@ -480,19 +476,19 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
     - **NOW** — the signal is a REFUSED CONNECTION and never a death notice, so an impolite
       departure and a dropped message arrive by the same road. A machine never handed a
       question cannot answer it, which is exact rather than a guess.
-    - **SETTLED** — a death writes off routes into the dead cluster. Fork **5**.
     - **OPEN** — an ask watched failing to leave is written off exactly, so a fleet loses one
       and learns on. Open on the round a holder dies INSIDE. Fork **53**.
     - **OPEN** — slots of R identical holders let a round finish on either one. Open on what
       R buys and what it costs. Fork **62**.
   - A fleet learns what one machine learns
-    - **NOW** — `Posted` and `Cycle`: envelopes, reports, deaths, questions and settlements
-      over real sockets, with the learning loop still existing exactly once.
-    - **DEAD** — fork **1**: the walk learnt only at home, and goes with it. Revives if a
-      second learner is ever built that writes locally.
-    - **OPEN** — `Graph`, `Thinking`, the twelve `Worlds/*Run` files and every bus member
-      typed on them. The ideas are out bar `Drives`: a third factor from the body's own
-      variables, never handed in.
+    - **NOW** — `Posted` and `Cycle`: asks, answers and settlements over real sockets, with
+      the learning loop still existing exactly once. THE WALK IS GONE and forks 1, 5, 6, 11,
+      18, 20, 21, 22 and 24 went with it; `csharp` keeps their code and their numbers.
+    - **OPEN** — `Drives` is the one idea still owed off it: a third factor from the body's
+      own variables, never handed in.
+    - **BROKEN** — eleven worlds have no runner, every one having been driven by a `*Run`
+      that was the walk's. `Trial` is the generic replacement and none is wired to it;
+      `DeadCodeTests` counts the debt.
     - **OPEN** — the vote's arithmetic composes and a whole learner runs over it. Open on C2
       alone, which TCP cannot show. Fork **52**.
     - **OPEN** — what the repair gate's query costs on a wire, priced on loopback. Open on a
@@ -502,7 +498,8 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
     - **OPEN** — rung five's evidence is the population, so splitting the population splits
       the agreement. Whether shipping name frequencies recovers it exactly. Fork **81**.
     - **OPEN** — every node predicting its own output while the real wave verifies behind it.
-      What it saves is a hop, so where it pays is deployment. Fork **57**.
+      What it saves is a hop, so where it pays is deployment. `csharp`'s adaptive version
+      wrote most where it helped least, so WHAT to spend on is the open half. Fork **57**.
     - **NOW** — replicas DRIFT, because the completeness condition ends a round on one of
       them and the other may take the next moment before the last settlement. Order rather
       than content, so a failover replica is a similar population and not the same one.

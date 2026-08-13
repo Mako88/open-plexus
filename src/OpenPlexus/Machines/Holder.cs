@@ -1,4 +1,4 @@
-using OpenPlexus.Bus;
+﻿using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 
@@ -9,9 +9,9 @@ namespace OpenPlexus.Machines;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE FIRST THING IN THIS PROJECT THAT PUTS LEARNING ON A WIRE.</b> Fork 1 is open
-/// because <c>LocalRendezvous</c> writes edges straight into locally-held clusters, so a
-/// machine could think across a socket and not learn across one. What crosses here is what
+/// <b>THE FIRST THING IN THIS PROJECT THAT PUT LEARNING ON A WIRE.</b> The walk wrote its
+/// edges straight into locally-held clusters, so a machine could think across a socket and
+/// not learn across one — it was deleted with that still true. What crosses here is what
 /// the plan always said could: a count, and an expectation with a weight already computed.
 /// </para>
 /// <para>

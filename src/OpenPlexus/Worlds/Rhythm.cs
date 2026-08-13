@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
 
@@ -60,18 +60,18 @@ public sealed record RhythmSettings
 /// <remarks>
 /// <para>
 /// <b>JOHN'S SPECIFICATION, AND IT EXISTS BECAUSE SNAKE DIES AT SEVENTY-SEVEN
-/// STEPS.</b> Snake is the only predictive world here, and a run that short gives
-/// the prediction-budget hunt of fork 24 almost no samples to hunt with — the
-/// controller was measured never moving, and nobody could tell whether that was
-/// the controller or the sample size. This stream never ends and never changes
-/// its statistics, so a dial can be swept against it at two run lengths, which
-/// the traps section asks for and no world here could previously offer.
+/// STEPS.</b> Snake was the only predictive world here, and a run that short gave
+/// the walk's prediction-budget controller almost no samples to hunt with — it was
+/// measured never moving, and nobody could tell whether that was the controller or
+/// the sample size. This stream never ends and never changes its statistics, so a
+/// dial can be swept against it at two run lengths, which the traps section asks
+/// for and no world here could previously offer.
 /// </para>
 /// <para>
-/// <b>It is built BEFORE the mechanism it is for, deliberately.</b> Step 2 is
-/// predictive coding, and the type <c>Surprise</c> does not exist yet; this world
-/// is the baseline that mechanism will have to beat, measured first so that the
-/// comparison cannot be assembled after the fact.
+/// <b>It is built BEFORE the mechanism it is for, deliberately.</b> The baseline
+/// is measured first so that the comparison cannot be assembled after the fact —
+/// and the mechanism it was built for lost, which is the version of this that
+/// costs something to have written down.
 /// </para>
 /// <para>
 /// <b>ONE SYMBOL PER MOMENT, WHICH MAKES CARRYING THE PAST THE WHOLE TASK.</b>

@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
 
@@ -93,8 +93,8 @@ public sealed class SnakeSense : IQuantizer<SnakeFrame>
     /// world after it, so they are not simultaneous and never were. Written as
     /// one occasion with no order they became a <c>With</c> pair, which says the
     /// view ACCOMPANIED the action — indistinguishable from the view having been
-    /// there when the action was chosen, and that is precisely why fork 18 was
-    /// blocked on temporal edges.
+    /// there when the action was chosen — which is why prediction conditional on an
+    /// action was blocked until something could say what FOLLOWED what.
     /// </para>
     /// <para>
     /// <b>One way, action to view.</b> The past records the future and the reverse

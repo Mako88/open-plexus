@@ -379,6 +379,83 @@ public sealed class RecalledTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// Whether word order pays where the front end SELECTS statements rather than reading
+    /// them all.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Fork 109, and it needs no new mechanism.</b>
+    /// <see cref="Whether_word_order_pays_on_real_english"/> found order costing on bAbI task
+    /// one and paying on task two, and left why unread. The reading to test is that
+    /// precedences pay where SELECTION is the bottleneck: task one is answered by one
+    /// statement a span-one bag nearly always already holds, and task two needs two, where a
+    /// bag is known to conflate them.
+    /// </para>
+    /// <para>
+    /// <b>So the arms are the two joinings that choose what to read.</b>
+    /// <see cref="Joining.Distinguished"/> asks what a newer statement made false and
+    /// <see cref="Joining.Chained"/> walks back at the key the last hop found, so both hand
+    /// the population a chosen subset where <see cref="Joining.Bagged"/> hands it everything
+    /// inside the span. If the split is about selection, relieving it should move what order
+    /// is worth.
+    /// </para>
+    /// <para>
+    /// <b>What would refute the selection reading</b> is the sign following the TASK under
+    /// all three joinings — order still costing on task one and paying on task two once the
+    /// front end is choosing statements. Then the split is about how many facts an answer
+    /// needs and selection is not what order was buying. Naming the value order should take
+    /// is refused on purpose: a predicted number anchors, and this branch has already been
+    /// bitten by a kill line pre-registered on a column.
+    /// </para>
+    /// <para>
+    /// <b>Capacity is pinned at the unbound arm and span at one.</b> The earlier grid measured
+    /// both: the cap was half the story on one cell of eight and none of it elsewhere, and
+    /// span two moved the sign nowhere. Carrying either as an arm here would be four times the
+    /// runners for a reading already taken, and this grid is about the joining.
+    /// </para>
+    /// <para>
+    /// <b>Seeds are gone for the reason they went from the other grid.</b> This world draws
+    /// nothing, so five of them returned min equal to max in every cell.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_word_order_pays_where_the_front_end_selects()
+    {
+        foreach (var task in new[] { 1, 2 })
+        {
+            foreach (var joining in new[]
+                { Joining.Bagged, Joining.Distinguished, Joining.Chained })
+            {
+                foreach (var ordered in new[] { false, true })
+                {
+                    var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, 1);
+                    var world = new Recalled(World(task, span: 1));
+
+                    var trial = ordered
+                        ? new Trial<Recited>(world, new Joined(joining), brain)
+                        : new Trial<Recited>(world, new Unordered(joining), brain);
+
+                    var tally = trial.Run(
+                        rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
+
+                    var unseen = tally.Unseen;
+
+                    output.WriteLine(
+                        $"task {task} {joining,-13} {(ordered ? "ordered" : "bagged ")} | "
+                        + $"unseen {unseen?.Accuracy ?? 0.0:F3} "
+                        + $"silent {unseen?.Silence ?? 0.0:F3} | "
+                        + $"drawn {tally.Recent:F3} | "
+                        + $"held {brain.Held.Count,6} "
+                        + $"names {tally.Named,3} of {tally.Eligible,5} eligible, "
+                        + $"spoke {tally.Speaking:F2} | codes {tally.Codes:F1} "
+                        + $"wanting {tally.Wanting:F3}");
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// It answers in English, which is the thing a number cannot show.
     /// </summary>
     /// <remarks>

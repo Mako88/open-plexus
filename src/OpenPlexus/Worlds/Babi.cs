@@ -25,7 +25,7 @@ public sealed record BabiSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>OFF IS THE CONTROL, AND IT IS A HARSHER WORLD THAN IT LOOKS.</b> The
+    /// <b>Off is the control, and it is a harsher world than it looks.</b> The
     /// corpus resets its sentence ids to mark a new story, and C4 forbids
     /// treating that as an episode boundary — nothing here may stop, retrain or
     /// clear. So with this off, <i>Lily is a frog</i> in one story and <i>Lily is
@@ -78,7 +78,7 @@ public sealed record Sentence
     /// The line as the corpus wrote it, without its number or its answer column.
     /// </summary>
     /// <remarks>
-    /// <b>KEPT SO AN ANSWER CAN BE READ BACK IN ENGLISH, WHICH NOTHING COULD DO BEFORE.</b>
+    /// <b>Kept so an answer can be read back in English, which nothing could do before.</b>
     /// A word becomes <see cref="Babi.Of"/>'s hash and a hash goes nowhere back, so a run
     /// that answered a question correctly could report a number and never the question. It
     /// is shown to nobody and to nothing that learns — see <see cref="Recalled"/>, which
@@ -95,7 +95,7 @@ public sealed record Sentence
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE POINT OF THIS WORLD IS THAT NOBODY HERE DESIGNED IT.</b> Every other
+/// <b>The point of this world is that nobody here designed it.</b> Every other
 /// world in this project was built by the same hands that built the mechanism it
 /// measures, so a result on one of them can only ever say the mechanism does what
 /// its author expected. Twenty tasks written by somebody else, with published
@@ -177,7 +177,7 @@ public sealed class Babi
     /// Questions whose answer is more than one word.
     /// </summary>
     /// <remarks>
-    /// <b>STRUCTURALLY UNANSWERABLE HERE, AND COUNTED RATHER THAN EXCLUDED.</b> A
+    /// <b>Structurally unanswerable here, and counted rather than excluded.</b> A
     /// walk returns the one endpoint it ranked first, so <i>lists and sets</i> and
     /// <i>path finding</i> — whose answers are comma-joined pairs — cannot be got
     /// right however good the graph is. Dropping them from the denominator would
@@ -191,7 +191,7 @@ public sealed class Babi
     /// What always answering the single most common answer would score.
     /// </summary>
     /// <remarks>
-    /// <b>THE BASELINE THAT MATTERS, AND IT IS WELL ABOVE UNIFORM CHANCE.</b>
+    /// <b>The baseline that matters, and it is well above uniform chance.</b>
     /// Uniform over the answer alphabet is what <see cref="Chance"/> reports and
     /// it is too easy to beat — the answers are not uniformly distributed, so a
     /// system that has learnt nothing but the marginal already clears it. This is

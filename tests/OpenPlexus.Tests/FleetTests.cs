@@ -13,7 +13,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>WHAT CROSSED BEFORE THIS WAS A DEMONSTRATION AND NOT A RUN.</b> <c>AskedTests</c>
+/// <b>What crossed before this was a demonstration and not a run.</b> <c>AskedTests</c>
 /// puts one vote and one counts merge on real sockets between machines that share no
 /// object, and both are asked of a population somebody else had already trained. Nothing
 /// had ever LEARNT across a wire: fork 1 is open because an occasion writes its edges into
@@ -22,7 +22,7 @@ namespace OpenPlexus.Tests;
 /// <c>Abstract</c> with no argument.
 /// </para>
 /// <para>
-/// <b>AND IT IS NOT A TEST OF C2, WHICH IS WHAT WILL BE ASSUMED.</b> TCP does not reorder
+/// <b>And it is not a test of C2, which is what will be assumed.</b> TCP does not reorder
 /// within a connection, so this exercises less adversity than <see cref="Bus.HybridBus"/>
 /// does. Green here says the bytes, the routing and the arithmetic are right, and says
 /// nothing whatever about lateness.
@@ -67,7 +67,7 @@ public sealed class FleetTests(ITestOutputHelper output)
     /// <param name="seed">The world's generator and every holder's.</param>
     /// <param name="holders">How many machines.</param>
     /// <remarks>
-    /// <b>SAME WORLD, SAME SEED, SAME FRONT END, SAME DIALS.</b> The holders are the only
+    /// <b>Same world, same seed, same front end, same dials.</b> The holders are the only
     /// difference, which is what makes the two curves comparable at all — this repo's own
     /// rule is to measure one mechanism on from a known baseline rather than a sharded
     /// world against a whole one, where four things move and the score cannot say which.
@@ -86,7 +86,7 @@ public sealed class FleetTests(ITestOutputHelper output)
 
         var running = trial.RunAsync(council, fleet.Held, rounds);
 
-        // THE EXPERIMENTER'S PATIENCE AND NEVER THE MACHINE'S. A fleet waits on its
+        // The experimenter's patience and never the machine's. A fleet waits on its
         // gathering forever by design, so a single lost message is a run that never ends --
         // correct behaviour, and a suite that inherited it would hang instead of failing.
         // See `Ported.Patience`.
@@ -102,14 +102,14 @@ public sealed class FleetTests(ITestOutputHelper output)
 
         var tally = await running;
 
-        // THE DENOMINATOR, ASSERTED WHERE THE RUN ENDS RATHER THAN REPORTED. Nothing here
+        // The denominator, asserted where the run ends rather than reported. Nothing here
         // decides a missing holder by a clock, so a fleet that quietly stopped asking one
         // machine would learn from the rest and score perfectly well -- and the only thing
         // that could say so is how many it asked against how many answered.
         Assert.Equal(holders, council.Asked);
         Assert.Equal(holders, council.Heard);
 
-        // AND NOTHING WAS LOST WHILE IT RAN, which is a claim about the WIRE rather than
+        // And nothing was lost while it ran, which is a claim about the WIRE rather than
         // about the learner and could not be made before the bus counted. A dropped ask is
         // indistinguishable from a slow one to everything else here, and the difference is
         // whether the run has an answer or is merely still waiting for one.
@@ -119,7 +119,7 @@ public sealed class FleetTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A FLEET LEARNS THE MULTIPLEXER, AND NO ONE MACHINE HOLDS THE RULES.</b>
+    /// <b>A fleet learns the multiplexer, and no one machine holds the rules.</b>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -128,7 +128,7 @@ public sealed class FleetTests(ITestOutputHelper output)
     /// and that the fleet's vote is good enough to be a learner at all.
     /// </para>
     /// <para>
-    /// <b>THE DISJOINTNESS IS THE HALF THAT COULD SILENTLY NOT HAPPEN.</b> Every holder
+    /// <b>The disjointness is the half that could silently not happen.</b> Every holder
     /// sees every observation and runs the identical round, so without
     /// <see cref="Population.Places"/> each would mint the same rules and the fleet would
     /// be N copies of one population — which learns perfectly well and is not a
@@ -147,7 +147,7 @@ public sealed class FleetTests(ITestOutputHelper output)
 
         await using var _ = fleet;
 
-        // AND THE MERGE WAS ASKED TO COMBINE SOMETHING, WHICH THE SCORE CANNOT SAY. A run
+        // And the merge was asked to combine something, which the score cannot say. A run
         // where one holder speaks and the rest are silent is merged identically by every
         // rule there is, so it would agree with one process while combining nothing.
         Assert.True(council.Contested > Rounds / 10,
@@ -160,12 +160,12 @@ public sealed class FleetTests(ITestOutputHelper output)
             $"a fleet of {Holders} scored {tally.Recent:F3} over the last tenth, which is "
             + "not far enough above four-way chance to be learning");
 
-        // AND IT IS SPLIT RATHER THAN COPIED, which no score could say. Every holder holds
+        // And it is split rather than copied, which no score could say. Every holder holds
         // something, and every ROOT sits on the machine its identity hashes to.
         foreach (var held in fleet.Held)
             Assert.True(held.Count > 0, "a holder learnt nothing, so the fleet is not spread");
 
-        // GENESIS PLACED THEM, WHICH IS THE MECHANISM AND NOT THE OUTCOME. Without
+        // Genesis placed them, which is the mechanism and not the outcome. Without
         // `Population.Places` every holder would mint the same rules and the fleet would be
         // N copies of one population -- which learns perfectly well and is not a
         // distribution. Only the roots are checked, because a child belongs with its parent.
@@ -173,8 +173,8 @@ public sealed class FleetTests(ITestOutputHelper output)
             foreach (var one in fleet.Held[at].All.Where(one => one.Scope.Length == 1))
                 Assert.Equal((ulong)at, one.Identity.Value % Holders);
 
-        // AND THE ROOTS ARE THE ONLY THING THAT IS DISJOINT, WHICH IS FORK 29 ARRIVING
-        // SHARPER THAN IT WAS WRITTEN. Two nodes repairing one parent were predicted to
+        // And the roots are the only thing that is disjoint, which is fork 29 arriving
+        // sharper than it was written. Two nodes repairing one parent were predicted to
         // mint SIBLINGS; what actually happens is that two DIFFERENT parents on different
         // machines reach the identical child -- `{x}` repaired with `z` and `{z}` repaired
         // with `x` are one scope and one name. Nothing here can prevent it: placing a child
@@ -190,14 +190,14 @@ public sealed class FleetTests(ITestOutputHelper output)
 
         Assert.Equal(tally.Resident, everywhere.Count);
 
-        // AND EVERY ONE OF THEM IS A CHILD, WHICH IS THE CLAIM ABOVE RATHER THAN A
-        // SUMMARY OF IT. A duplicated ROOT would mean the placement is not working at all
+        // And every one of them is a child, which is the claim above rather than a
+        // summary of it. A duplicated ROOT would mean the placement is not working at all
         // -- and would fail the loop above too -- so this says the only thing crossing
         // machines is a scope repair reached from two directions.
         Assert.All(twice, one => Assert.True(one.First().Scope.Length > 1,
             "a one-code commitment is held twice, so genesis is not placed"));
 
-        // NO BAR ON HOW MANY, BECAUSE THIS IS THE FIRST READING OF IT. What it costs is a
+        // No bar on how many, because this is the first reading of it. What it costs is a
         // fact about the weighing rather than about the count, and the weighing that would
         // have charged for it is deleted: an expectation is worth its best advocate, so a
         // rule held twice is worth exactly what it was. A summed vote counted its evidence
@@ -216,7 +216,7 @@ public sealed class FleetTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHAT DISTRIBUTION COSTS A LEARNING CURVE — a grid, and no bar.</b>
+    /// <b>What distribution costs a learning curve — a grid, and no bar.</b>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -228,13 +228,13 @@ public sealed class FleetTests(ITestOutputHelper output)
     /// repair gate can only refuse a repair another commitment on THIS machine covers.
     /// </para>
     /// <para>
-    /// <b>SO A GAP IS NOT A DEFECT AND NEITHER IS A LEAD, AND THAT IS WHY THERE IS NO
-    /// BAR.</b> A threshold written before the first reading is a prediction dressed as a
+    /// <b>So a gap is not a defect and neither is a lead, and that is why there is no
+    /// bar.</b> A threshold written before the first reading is a prediction dressed as a
     /// requirement. The grid is the finding, and the number to read is the last tenth's
     /// accuracy against the same brain in one process.
     /// </para>
     /// <para>
-    /// <b>THE CLOCK IS PRINTED AND ASSERTED ON BY NOTHING.</b> Two socket round trips a
+    /// <b>The clock is printed and asserted on by nothing.</b> Two socket round trips a
     /// round is what the shape costs, and on loopback that is a floor rather than an
     /// answer — a LAN adds its own delay and the internet a great deal more. See fork 56.
     /// </para>
@@ -252,8 +252,8 @@ public sealed class FleetTests(ITestOutputHelper output)
 
         var dials = new CommittingSettings();
 
-        // ONE CASE PER ARRANGEMENT RATHER THAN ONE GRID, AND THE REASON IS THAT A FLEET
-        // COSTS A FLEET. Bringing one up and taking it down is most of this test's clock,
+        // One case per arrangement rather than one grid, and the reason is that a fleet
+        // costs a fleet. Bringing one up and taking it down is most of this test's clock,
         // and a single method holding every cell reports nothing at all until the last one
         // finishes -- so one slow arrangement hides every reading before it.
         output.WriteLine(
@@ -277,26 +277,26 @@ public sealed class FleetTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHETHER THE FLEET'S ADVANTAGE IS THE REPAIR GATE TURNED DOWN, AND NOT THE WIRE
-    /// AT ALL.</b>
+    /// <b>Whether the fleet's advantage is the repair gate turned down, and not the wire
+    /// at all.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE CONTROL WAS ALREADY IN THE CODEBASE AND WAS BUILT FOR EXACTLY THIS.</b>
+    /// <b>The control was already in the codebase and was built for exactly this.</b>
     /// <see cref="Population.Placing"/> tells the repair gate which of the commitments it
     /// can see are notionally elsewhere, so a run with it set has a fleet's GATE and one
     /// process's POPULATION. That splits the two things distribution does at once, and
     /// nothing else can: a sharded run moves both and a whole run moves neither.
     /// </para>
     /// <para>
-    /// <b>SO THE THREE ARMS ANSWER THE QUESTION BETWEEN THEM.</b> If placed-alone lands on
+    /// <b>So the three arms answer the question between them.</b> If placed-alone lands on
     /// the fleet, the advantage is the gate and the wire contributes nothing; if it lands
     /// on alone, the advantage is the population being split and the gate is innocent. Both
     /// readings are useful and only one of them is the story the eleven-bit row was written
     /// up as, which is why this exists rather than a paragraph asserting it.
     /// </para>
     /// <para>
-    /// <b>ELEVEN BITS, BECAUSE SIX HAS NOTHING TO SEPARATE.</b> The fleet is level with one
+    /// <b>Eleven bits, because six has nothing to separate.</b> The fleet is level with one
     /// process at the narrow width and ahead at the wide one, so the wide one is where an
     /// explanation has something to explain.
     /// </para>
@@ -318,7 +318,7 @@ public sealed class FleetTests(ITestOutputHelper output)
         {
             var (here, held) = Alone_(dials, Address, Rounds, seed);
 
-            // THE GATE OF A FLEET AND THE POPULATION OF ONE MACHINE. `Placing` is read by
+            // The gate of a fleet and the population of one machine. `Placing` is read by
             // `Mend` alone -- firing, voting and settling never see it -- so this run
             // differs from the one above in the repair gate and in nothing else.
             var placed = new Brain(dials, seed);
@@ -342,17 +342,17 @@ public sealed class FleetTests(ITestOutputHelper output)
                 + $"| {here.Repaired}/{apart.Repaired}/{there.Repaired}");
         }
 
-        // NO BAR, BECAUSE THE POINT IS WHICH TWO OF THREE ARMS LAND TOGETHER AND THAT HAS
-        // NEVER BEEN READ. A threshold written before the first reading would be a
+        // No bar, because the point is which two of three arms land together and that has
+        // never been read. A threshold written before the first reading would be a
         // prediction dressed as a requirement, and this file already has one prediction in
         // it that the grid refuted.
     }
 
     /// <summary>
-    /// <b>AND A FLEET RUN REPRODUCES ITSELF, WHICH A WIRE COULD EASILY HAVE COST.</b>
+    /// <b>And a fleet run reproduces itself, which a wire could easily have cost.</b>
     /// </summary>
     /// <remarks>
-    /// <b>FORK 12, WITH THE TWO HALVES ON DIFFERENT MACHINES.</b> Every merge here is
+    /// <b>Fork 12, with the two halves on different machines.</b> Every merge here is
     /// ordered before it is combined and every placement is a fact about a commitment
     /// rather than about who asked, so nothing should move with delivery order — but that
     /// is an argument, and this project has reopened that fork twice on arguments.
@@ -360,7 +360,7 @@ public sealed class FleetTests(ITestOutputHelper output)
     [Fact]
     public async Task The_same_seed_produces_the_same_fleet_run()
     {
-        // SHORT, BECAUSE WHAT IS BEING ASSERTED IS AN EQUALITY RATHER THAN A SCORE. Three
+        // Short, because what is being asserted is an equality rather than a score. Three
         // fleets on four ports each is most of this test's clock; a longer run would buy
         // nothing but a slower suite, and the backstop below is what says the report has
         // enough in it to differ at all.

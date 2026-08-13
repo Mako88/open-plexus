@@ -8,7 +8,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE FAILURE THIS EXISTS FOR IS NOT NOT-KNOWING, IT IS NOT-CONSULTING.</b> Every
+/// <b>The failure this exists for is not not-knowing, it is not-consulting.</b> Every
 /// foundational mistake on this branch has the same shape: a decision that is locally
 /// sensible and globally wrong, where the governing rule was written down somewhere and
 /// nothing surfaced it at the moment of choosing. Arms that reached into worlds; a season
@@ -16,21 +16,21 @@ namespace OpenPlexus.Tests;
 /// off. The knowledge was present each time and was not cued.
 /// </para>
 /// <para>
-/// <b>SO A GUARD'S REAL JOB IS TO MAKE A GLOBAL CONSTRAINT LOCAL</b> — present at the
+/// <b>So a guard's real job is to make a global constraint local</b> — present at the
 /// decision rather than three files away. Where a rule can be evaluated, that is a check and
 /// it belongs beside the others. Where it cannot, the next best thing is to put it in front
 /// of whoever is already looking, which is what this does: the guards are run as their own
 /// command every commit, so these print into that same output.
 /// </para>
 /// <para>
-/// <b>AND IT ASSERTS RATHER THAN ONLY PRINTING, WHICH <c>CheckingTests</c> REQUIRES AND
-/// WHICH IS ALSO THE RIGHT SHAPE.</b> A list nobody maintains is worse than none: it goes
+/// <b>And it asserts rather than only printing, which <c>CheckingTests</c> requires and
+/// which is also the right shape.</b> A list nobody maintains is worse than none: it goes
 /// stale, gets skimmed, and becomes furniture. The bars below keep it a list somebody has
 /// to keep — short enough to read, every entry saying what to DO rather than what to
 /// believe, and none of them a rule that could have been a check.
 /// </para>
 /// <para>
-/// <b>AN ENTRY LEAVES BY BECOMING A GUARD.</b> That is the only exit, and it is the same
+/// <b>An entry leaves by becoming a guard.</b> That is the only exit, and it is the same
 /// rule <c>TRAPS</c> has in the plan: a class earning a check moves out of here into the
 /// check.
 /// </para>
@@ -39,7 +39,7 @@ public sealed class RemindingTests(ITestOutputHelper output)
 {
     /// <summary>How many reminders a session can be expected to actually read.</summary>
     /// <remarks>
-    /// <b>A RATCHET, AND IT ONLY GOES DOWN.</b> Twelve is about a screen. Past that this
+    /// <b>A ratchet, and it only goes down.</b> Twelve is about a screen. Past that this
     /// stops being a reminder and becomes a second doc, which is the thing it was written
     /// instead of. Raising it wants John and a reason in the commit message; the ordinary
     /// way to make room is to turn one into a guard.
@@ -121,7 +121,7 @@ public sealed class RemindingTests(ITestOutputHelper output)
     /// Prints the reminders, and fails if the list has stopped being one.
     /// </summary>
     /// <remarks>
-    /// <b>THE BARS ARE WHAT KEEP IT ALIVE.</b> A list that may grow without limit is a doc;
+    /// <b>The bars are what keep it alive.</b> A list that may grow without limit is a doc;
     /// an entry that says what to believe rather than what to do is a slogan; an entry with
     /// no reason it is not a check is one somebody has not tried to write. Each of those is
     /// a way this decays into furniture, and each fails here.
@@ -149,7 +149,7 @@ public sealed class RemindingTests(ITestOutputHelper output)
                 $"a reminder with no reason it is not a check: {doing}. If nobody has tried "
                 + "to write one, it may well be checkable -- which is the better outcome");
 
-            // WHAT TO DO RATHER THAN WHAT TO BELIEVE, which is the difference between a
+            // What to do rather than what to believe, which is the difference between a
             // reminder and a slogan. An imperative opening is the cheapest thing that tells
             // the two apart, and a slogan cannot pass it without being rewritten into one.
             Assert.True(char.IsUpper(doing[0]) && doing.Split(' ')[0].All(char.IsUpper),

@@ -8,15 +8,15 @@ namespace OpenPlexus.Machines;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE ONLY WORLD HERE WHOSE CEILING IS KNOWN BEFORE THE RUN.</b> Elsewhere a
+/// <b>The only world here whose ceiling is known before the run.</b> Elsewhere a
 /// disappointing score leaves two explanations standing — the learner, or the language
 /// it has to say its answer in — and no measurement separates them. <see cref="Monk"/>
 /// enumerates both: the concept is 432 instances and the scope language is 2,880
 /// conjunctions, so what a conjunction CAN say is decided rather than discovered.
 /// </para>
 /// <para>
-/// <b>SO <see cref="Learned.Found"/> IS READ AGAINST A BASIS THAT IS ITSELF THE
-/// FINDING.</b> On <see cref="Puzzle.Two"/> the minimal basis is 254 rules of which 142
+/// <b>SO <see cref="Learned.Found"/> is read against a basis that is itself the
+/// finding.</b> On <see cref="Puzzle.Two"/> the minimal basis is 254 rules of which 142
 /// are whole six-attribute instances, because nothing shorter can soundly say yes — so a
 /// learner that finds all of them has MEMORISED the concept and a learner that finds few
 /// has not generalised, and for once those are not the same number.
@@ -37,8 +37,8 @@ public sealed class MonkRun
     /// the one whose language ceiling is known in advance.</b>
     /// </param>
     /// <remarks>
-    /// <b>WHICH MAKES THIS THE ONLY PLACE THE CENSUS CAN BE READ AGAINST A KNOWN
-    /// CEILING.</b> On <see cref="Puzzle.Two"/> a conjunction cannot soundly say yes
+    /// <b>Which makes this the only place the census can be read against a known
+    /// ceiling.</b> On <see cref="Puzzle.Two"/> a conjunction cannot soundly say yes
     /// short of a whole instance, so an uncovered bucket there is the SCOPE LANGUAGE
     /// failing rather than covering failing — and on the multiplexer the same number
     /// means the opposite, because every rule it needs is expressible. Two worlds
@@ -53,7 +53,7 @@ public sealed class MonkRun
         _puzzle = world.Puzzle;
         _brain = brain;
 
-        // ONE CODE PER ATTRIBUTE AND VALUE, AGAINST A DECLARED STRIDE. The jacket has
+        // One code per attribute and value, against a declared stride. The jacket has
         // four colours and the tie has two, so a stride taken from the widest attribute
         // is the only one that cannot alias -- which is the fault `Bits` already carried
         // once, when its only caller happened to be binary.
@@ -79,7 +79,7 @@ public sealed class MonkRun
     {
         var tally = _trial.Run(rounds, sweep, target, window);
 
-        // EVERYTHING IS CHECKABLE HERE AND THAT IS WHY THIS WORLD WAS CHOSEN. There are
+        // Everything is checkable here and that is why this world was chosen. There are
         // 432 instances however little a scope pins, so `Unchecked` is nought by
         // construction rather than by luck -- and a soundness count quietly covering
         // only the small rules would be the sampled-instrument fault this project keeps

@@ -8,27 +8,27 @@ namespace OpenPlexus.Commitments;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>RUNG FIVE, AND IT IS THE ONLY PART OF THE LADDER THAT GOES UP.</b> Rungs one to
+/// <b>Rung five, and it is the only part of the ladder that goes up.</b> Rungs one to
 /// four make a commitment narrower; nothing else anywhere makes anything more
 /// general, and a machine built only from them can be arbitrarily accurate and hold
 /// no concept at all — every multiplexer rule learnt and no representation of *the
 /// address*.
 /// </para>
 /// <para>
-/// <b>ITS TRIGGER IS REDUNDANCY RATHER THAN FAILURE</b>, so it is the one rung a
+/// <b>Its trigger is redundancy rather than failure</b>, so it is the one rung a
 /// failure does not summon. What proposes a name is the same sub-scope turning up in
 /// commitment after commitment, which is a fact about what has already been learnt
 /// rather than about what has just gone wrong.
 /// </para>
 /// <para>
-/// <b>A NAME IS REACHED BY INFERENCE AND NEVER WRITTEN AS A PARTNER.</b> Nothing
+/// <b>A name is reached by inference and never written as a partner.</b> Nothing
 /// emits a minted code, so <see cref="Fold"/> adds it to a moment whose members are
 /// all present. `csharp` broke two controls learning that the other arrangement —
 /// letting a name join the occasion it completes — makes a name's only partner its
 /// own last member.
 /// </para>
 /// <para>
-/// <b>AND IT IS WHAT MAKES A FIXED FRONT END SURVIVABLE.</b> The red-ball property
+/// <b>And it is what makes a fixed front end survivable.</b> The red-ball property
 /// forbids fitting the quantiser, so no learned feature can live inside it. A name
 /// over co-firing codes is a learned feature that lives ABOVE the codes, identical on
 /// every machine because its identity derives from its members.

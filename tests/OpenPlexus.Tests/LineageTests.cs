@@ -13,7 +13,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>SIX EXPLANATIONS DIED TO CONTROLS AND EVERY ONE OF THEM CHANGED SELECTION.</b> The
+/// <b>Six explanations died to controls and every one of them changed selection.</b> The
 /// minority seeds are present, repair's choice of condition beats a random draw by the
 /// whole distance between sixteen sound rules and none, repair runs hundreds of times, and
 /// true rules come out at perfect accuracy — while not one of them fires on a round the
@@ -21,7 +21,7 @@ namespace OpenPlexus.Tests;
 /// behaviour and answers where in the ladder a minority lineage stops.
 /// </para>
 /// <para>
-/// <b>A SEED IS ONE CODE AND A TRUE RULE IS <c>Address + 1</c>, so something has to survive
+/// <b>A seed is one code and a true rule is <c>Address + 1</c>, so something has to survive
 /// two specialisations at six bits and three at eleven.</b> Whether anything ever reaches
 /// the last rung, and what removes it if it does, is what
 /// <see cref="Population.Lineages"/> was built to say — see <see cref="Lifetime"/> for why
@@ -34,7 +34,7 @@ public sealed class LineageTests(ITestOutputHelper output)
     private const int Seeds = 4;
 
     /// <summary>
-    /// <b>THE LADDER, RUNG BY RUNG, SPLIT BY THE OUTCOME THE LINEAGE EXPECTS.</b>
+    /// <b>The ladder, rung by rung, split by the outcome the lineage expects.</b>
     /// </summary>
     [Fact]
     public void Where_a_minority_lineage_stops_between_its_seed_and_a_true_rule()
@@ -65,7 +65,7 @@ public sealed class LineageTests(ITestOutputHelper output)
                 var minority = Minority(settings);
                 var held = brain.Held;
 
-                // THE BALANCE, AND IT IS THE LEDGER'S OWN CHECK. Births minus losses at
+                // The balance, and it is the ledger's own check. Births minus losses at
                 // one expectation and length is how many of that shape are resident,
                 // walked from a completely different table -- so a call site this ledger
                 // has missed says so here rather than under-reporting a death forever.
@@ -80,8 +80,8 @@ public sealed class LineageTests(ITestOutputHelper output)
                         (int)(life.Born - life.Lost));
                 }
 
-                // AND THE SECOND CHECK IS AGAINST A COUNTER WRITTEN FOR A DIFFERENT
-                // QUESTION. `Wrong` and `Searched` partition the same walk by GATE where
+                // And the second check is against a counter written for a different
+                // question. `Wrong` and `Searched` partition the same walk by GATE where
                 // this partitions it by LINEAGE, so the two totals agree exactly or one of
                 // them is describing a machine that is not running.
                 Assert.Equal(held.Wrong, held.Lineages.Values.Sum(one => one.Blamed));
@@ -130,20 +130,20 @@ public sealed class LineageTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHETHER WHAT REDIRECTS BLAME IS WHAT PAYS, WHICH IS THE READING'S OWN KILL
-    /// CONDITION.</b>
+    /// <b>Whether what redirects blame is what pays, which is the reading's own kill
+    /// condition.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE LADDER SAYS A MINORITY LINEAGE IS NEVER OFFERED TO REPAIR, AND THAT IS AN
-    /// OBSERVATION RATHER THAN A MECHANISM.</b> <see cref="Repairing.AfterFailure"/> runs
+    /// <b>The ladder says a minority lineage is never offered to repair, and that is an
+    /// observation rather than a mechanism.</b> <see cref="Repairing.AfterFailure"/> runs
     /// <see cref="Population.Mend"/> only on a round the VOTE got wrong; under skew nearly
     /// every such round is a minority-outcome round, and on one of those a
     /// minority-expecting commitment expected CORRECTLY and cannot be a culprit. So the
     /// only rounds repair may run on are the rounds where minority rules are right.
     /// </para>
     /// <para>
-    /// <b>TWO ARMS REACHED THAT COUPLING FROM OPPOSITE ENDS AND NEITHER WAS BUILT FOR IT.</b>
+    /// <b>Two arms reached that coupling from opposite ends and neither was built for it.</b>
     /// A vote arm that divided by the answer's base rate made the vote say the rare answer,
     /// so it started being wrong on MAJORITY rounds and the blame landed on minority
     /// lineages; <see cref="Repairing.EveryRound"/> removes the coupling outright. Both
@@ -221,19 +221,19 @@ public sealed class LineageTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE MECHANISM AS A CURVE RATHER THAN AS TWO POINTS.</b>
+    /// <b>The mechanism as a curve rather than as two points.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE READING SO FAR IS AN EVEN WORLD AND A SKEWED ONE, WHICH IS TWO POINTS AND A
-    /// STORY JOINING THEM.</b> If blame starvation is really what stops the lineages, then
+    /// <b>The reading so far is an even world and a skewed one, which is two points and a
+    /// story joining them.</b> If blame starvation is really what stops the lineages, then
     /// the minority's share of blame should fall smoothly as the world tilts, hard-round
     /// coverage should fall with it, and the arm that does not consult the vote should be
     /// flat across the whole range. Three curves with one shape is a mechanism; a step
     /// between two cells is a pair of measurements.
     /// </para>
     /// <para>
-    /// <b>AND IT CAN COME OUT WRONG IN A WAY THE TWO POINTS COULD NOT.</b> A threshold — the
+    /// <b>And it can come out wrong in a way the two points could not.</b> A threshold — the
     /// shipped arm holding up to some tilt and then collapsing — would say something is
     /// switching rather than starving, and the explanation would need the switch. What is
     /// predicted is monotone and gradual in both.
@@ -279,7 +279,7 @@ public sealed class LineageTests(ITestOutputHelper output)
                     paying += learnt.Census!.Paying;
                     recent += learnt.Recent;
 
-                    // HOW OFTEN THE RARE OUTCOME ACTUALLY ARRIVED, taken from the census
+                    // How often the rare outcome actually arrived, taken from the census
                     // rather than from the setting -- `Skew` is a property of the BITS and
                     // the outcome's rate is what the multiplexer makes of them, which is
                     // not the same number and would misread the whole x axis.

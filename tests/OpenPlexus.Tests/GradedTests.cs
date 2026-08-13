@@ -10,7 +10,7 @@ namespace OpenPlexus.Tests;
 /// The only measurement here that touches what the project actually claims.
 /// </summary>
 /// <remarks>
-/// <b>EVERY OTHER WORLD HANDS THE LEARNER ITS SYMBOLS.</b> This one makes it earn
+/// <b>Every other world hands the learner its symbols.</b> This one makes it earn
 /// them, and which front end earns them is the arm — one code per band against a
 /// sparse set of winners read across dimensions together.
 /// </remarks>
@@ -26,7 +26,7 @@ public sealed class GradedTests(ITestOutputHelper output)
     [Fact]
     public void Crowding_moves_a_reading_toward_the_line_and_never_across_it()
     {
-        // A WORLD WHERE THIS CHANGED THE ANSWER would be measuring difficulty and
+        // A world where this changed the answer would be measuring difficulty and
         // calling it interface risk, so the function has to be untouched by it.
         foreach (var crowding in new[] { 0.0, 0.9, 1.0 })
         {
@@ -52,11 +52,11 @@ public sealed class GradedTests(ITestOutputHelper output)
     [Fact]
     public void The_front_end_is_an_arm_and_both_ends_do_something()
     {
-        // THE COMPARISON THE PLAN HAS CALLED ITS DEFENCE AND NEVER RUN. `Winnow` has
+        // The comparison the plan has called its defence and never run. `Winnow` has
         // been built, documented and mounted on no world for the whole life of the
         // repo -- this is the first time anything consumes it.
         //
-        // AND THE CODE COUNT GOES BESIDE THE SCORE, because a front end allowed to
+        // And the code count goes beside the score, because a front end allowed to
         // say four times as much has four times as much to search, and a comparison
         // that ignored that would be rewarding whoever talks more.
         foreach (var crowding in new[] { 0.0, 0.9 })
@@ -76,7 +76,7 @@ public sealed class GradedTests(ITestOutputHelper output)
     [Fact]
     public void The_world_is_learnable_once_the_coding_is_nearly_a_bit()
     {
-        // THE END-TO-END CLAIM, AT THE EASY END OF THE INTERFACE. Readings crowded
+        // The end-to-end claim, at the easy end of the interface. Readings crowded
         // against the line fall in two bands, so what reaches the learner is almost
         // the symbolic world -- and it scores like it. If this failed, the pipeline
         // would be broken rather than the interface being expensive.
@@ -90,11 +90,11 @@ public sealed class GradedTests(ITestOutputHelper output)
     [Fact]
     public void And_spreading_the_readings_is_what_the_interface_costs()
     {
-        // THE NUMBER THIS WHOLE WORLD EXISTS TO PRODUCE, AND IT CARRIES NO BAR. The
+        // The number this whole world exists to produce, and it carries no bar. The
         // same function, the same learner, and the only difference is that one
         // dimension now speaks in many codes instead of nearly one.
         //
-        // BOTH FRONT ENDS ARE FAR BELOW WHAT THE SYMBOLIC WORLD REACHED. That is the
+        // Both front ends are far below what the symbolic world reached. That is the
         // interface cost measured for the first time in this repo, and it is the
         // thing the project claims to be good at.
         var spread = new[] { Fronting.Banded, Fronting.Winnowed }
@@ -114,7 +114,7 @@ public sealed class GradedTests(ITestOutputHelper output)
     [Fact]
     public void The_sheet_is_capped_by_how_many_distinct_wirings_exist()
     {
-        // SIX NUMBERS SAMPLED SIX AT A TIME HAVE EXACTLY ONE WIRING, so every cell
+        // Six numbers sampled six at a time have exactly one wiring, so every cell
         // would fire identically on every reading and the tag would separate nothing.
         // `Winnow` refuses that outright, which is how this was found -- the fixed
         // geometry that works for a fly is degenerate on a narrow reading.
@@ -124,7 +124,7 @@ public sealed class GradedTests(ITestOutputHelper output)
         Assert.True(narrow <= 15, $"{narrow} cells from only fifteen distinct wirings");
         Assert.True(winners >= 2, "a tag of fewer than two winners is not a population");
 
-        // AND A WIDER READING GETS THE SHEET IT ASKED FOR, so the cap is a floor
+        // And a wider reading gets the sheet it asked for, so the cap is a floor
         // effect rather than a ceiling on everything.
         var (wide, _, _) = Winnowing.Sheet(20);
 
@@ -135,13 +135,13 @@ public sealed class GradedTests(ITestOutputHelper output)
     [Fact]
     public void The_winnowed_arm_cannot_be_stressed_by_crowding_at_all()
     {
-        // A FINDING RATHER THAN A CHECK, and it is why this world does not yet test
+        // A finding rather than a check, and it is why this world does not yet test
         // what it was built to test. `Winnow` reads dimensions TOGETHER through a
         // projection, and crowding contracts every dimension toward the same point --
         // which leaves the relative pattern untouched. The tag does not move, so the
         // arm is invariant to the one dial this world has.
         //
-        // WHAT WOULD STRESS IT IS A WORLD WHOSE DIMENSIONS MOVE INDEPENDENTLY, which
+        // What would stress it is a world whose dimensions move independently, which
         // this one does not have. Said here so the flat numbers are read as a
         // property of the pairing rather than as a result about population coding.
         var arms = Fixture.Abreast(
@@ -159,7 +159,7 @@ public sealed class GradedTests(ITestOutputHelper output)
         // FORK 12 AGAIN, and a front end is a new place for it to break: `Winnow`
         // takes no seed on purpose, so two runs differing here would mean the
         // projection was not a constant of the design after all.
-        // AND THE TWO COPIES RUN AT THE SAME TIME NOW, WHICH ASKS MORE RATHER THAN LESS.
+        // And the two copies run at the same time now, which asks more rather than less.
         // A learner that reached its numbers through anything ambient — a static, a
         // shared buffer, a clock — would have been free to agree with itself while the
         // two runs were consecutive. Side by side it is not.

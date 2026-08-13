@@ -1,19 +1,19 @@
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// <b>A FACT THAT CHECKS NOTHING IS A MEASUREMENT, AND A MEASUREMENT BELONGS TO
+/// <b>A fact that checks nothing is a measurement, and a measurement belongs to
 /// <c>sweeps.yml</c> RATHER THAN TO EVERY PUSH.</b>
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE BUDGET FOR THE FAILURE CLASS THAT COST FORTY-FIVE MINUTES A PUSH.</b>
+/// <b>The budget for the failure class that cost forty-five minutes a push.</b>
 /// <c>RepairingTests</c> held six facts and not one assertion — eight seeds at twenty
 /// thousand rounds an arm, writing rows to a test output nobody reads on CI, seventeen
 /// minutes of every run. It was a sweep in everything but the trait, and
 /// <c>WideningTests</c> beside it carries that trait for grids of identical shape.
 /// </para>
 /// <para>
-/// <b>AND NOTHING COULD SEE IT, WHICH IS WHY THIS IS A CHECK RATHER THAN A FIX.</b> A fact
+/// <b>And nothing could see it, which is why this is a check rather than a fix.</b> A fact
 /// with no assertion is GREEN — greener than a real test, since it cannot fail. It reads as
 /// coverage, it runs forever, and the only symptom is a clock. <c>SweepListTests</c> guards
 /// the sweeps that declare themselves and <c>ShardTests</c> guards where a class runs;
@@ -29,7 +29,7 @@ public sealed class CheckingTests
 {
     /// <summary>What counts as a test being able to fail.</summary>
     /// <remarks>
-    /// <b>`Assert` COVERS XUNIT, AND THE OTHERS ARE THE WAYS THIS REPO ALREADY WRITES ONE.</b>
+    /// <b>`Assert` covers xunit, and the others are the ways this repo already writes one.</b>
     /// A helper that asserts on the caller's behalf still names one of these inside itself,
     /// and the check reads the helper's own body as well — so a fact delegating its whole
     /// verification to a private method is not flagged.
@@ -39,15 +39,15 @@ public sealed class CheckingTests
     /// <summary>How a measurement announces itself: it PRINTS.</summary>
     /// <remarks>
     /// <para>
-    /// <b>THE FIRST VERSION OF THIS FLAGGED EVERY FACT WITH NO ASSERTION AND WAS WRONG ON
-    /// ITS FIRST RUN.</b> <c>ClusterTests.Two_nodes_that_are_partners_can_fire_at_once</c>
+    /// <b>The first version of this flagged every fact with no assertion and was wrong on
+    /// its first run.</b> <c>ClusterTests.Two_nodes_that_are_partners_can_fire_at_once</c>
     /// asserts nothing and is a perfectly good test: it fires sixty-four deliveries at a
     /// mutual pair and fails by DEADLOCKING, which its <c>WaitAsync</c> turns into a thrown
     /// timeout. A test whose failure mode is an exception can fail, so the rule <i>no
     /// assertion means no test</i> is simply false.
     /// </para>
     /// <para>
-    /// <b>SO THE RULE READS THE TELL INSTEAD OF THE ABSENCE.</b> What a measurement does that
+    /// <b>So the rule reads the tell instead of the absence.</b> What a measurement does that
     /// a test never does is WRITE A ROW: a grid exists to print arms against columns for a
     /// human to read later. A fact that prints and cannot fail is a sweep, and that pair is
     /// exactly what <c>RepairingTests</c> was for seventeen minutes of every push.
@@ -59,7 +59,7 @@ public sealed class CheckingTests
     /// The file holding this check's own specimens, which are deliberately faulty.
     /// </summary>
     /// <remarks>
-    /// <b>A CHECK THAT READS SOURCE MUST EXEMPT ITS OWN COMPANION</b>, or the fixture proving
+    /// <b>A check that reads source must exempt its own companion</b>, or the fixture proving
     /// it can fail becomes the thing it fails on. The exemption is one file by name rather
     /// than a pattern, so nothing else can drift under it.
     /// </remarks>
@@ -126,7 +126,7 @@ public sealed class CheckingTests
     /// Every method of a file: its name, its body, and whether it is a declared sweep.
     /// </summary>
     /// <remarks>
-    /// <b>BRACE-MATCHED RATHER THAN SPLIT ON THE NEXT ATTRIBUTE.</b> Taking the text between
+    /// <b>Brace-matched rather than split on the next attribute.</b> Taking the text between
     /// one fact and the next would fold any helper sitting between them into the first
     /// fact's body, and a helper that asserts would then excuse a fact that does not — which
     /// is the exact case this check exists to catch, forgiven by its own reader.
@@ -194,7 +194,7 @@ public sealed class CheckingTests
                 else if (character == '}') depth--;
             }
 
-            // AN EXPRESSION BODY NEVER OPENS A BRACE, so a `=> Something();` method would
+            // An expression body never opens a brace, so a `=> Something();` method would
             // otherwise swallow the rest of the file.
             if (!started && lines[at].Contains(';', StringComparison.Ordinal)) break;
 
@@ -236,7 +236,7 @@ public sealed class CheckingTests
         Assert.Contains(facts, fact => fact.Name == "It_measures" && !fact.Sweep);
         Assert.Contains(facts, fact => fact.Name == "It_is_a_declared_grid" && fact.Sweep);
 
-        // AND THE TELL IS THE PRINTING RATHER THAN THE MISSING ASSERTION, which is the
+        // And the tell is the printing rather than the missing assertion, which is the
         // correction the first run forced: a fact that neither prints nor asserts may still
         // fail by throwing, and one of those is a real deadlock test in this suite.
         Assert.Contains(

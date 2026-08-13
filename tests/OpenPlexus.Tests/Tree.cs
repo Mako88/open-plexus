@@ -51,7 +51,7 @@ public static class Tree
     /// The bAbI task files, which two worlds now read and once said so twice.
     /// </summary>
     /// <remarks>
-    /// <b>ONE PLACE BECAUSE THERE ARE TWO READERS OF IT.</b> <see cref="OpenPlexus.Worlds.Babi"/>
+    /// <b>One place because there are two readers of it.</b> <see cref="OpenPlexus.Worlds.Babi"/>
     /// feeds the walk and <see cref="OpenPlexus.Worlds.Recalled"/> feeds the commitment
     /// learner, and the corpus is the same eleven megabytes on disk either way.
     /// </remarks>

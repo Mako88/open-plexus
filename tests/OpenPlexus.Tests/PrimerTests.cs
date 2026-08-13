@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Codes;
+using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
@@ -16,7 +16,7 @@ namespace OpenPlexus.Tests;
 /// English and the node exists.
 /// </para>
 /// <para>
-/// <b>THE NODE DOES START EXISTING AND THE SCORE DOES NOT MOVE, which is a
+/// <b>The node does start existing and the score does not move, which is a
 /// finding about COST rather than about the idea.</b> Two facts collide. Real
 /// English is a heavier-tailed distribution than anything
 /// <see cref="SensesSettings.Skew"/> was pushed to — the commonest word is in half
@@ -57,16 +57,16 @@ public sealed class PrimerTests(ITestOutputHelper output)
     [Fact]
     public void The_english_is_read_as_the_same_codes_the_tasks_ask_about()
     {
-        // THE PROPERTY THE WHOLE EXPERIMENT RESTS ON. A primer with its own
+        // The property the whole experiment rests on. A primer with its own
         // tokenizer would mint a different code for `yes` and demonstrate nothing:
-        // the word has to land on the NODE THE TASK WILL ASK ABOUT.
+        // the word has to land on the node the task will ask about.
         var read = Primer.Read(["1\teng\tYes, I do.", "2\teng\tNo."], wanted: 2);
 
         Assert.Single(read);
         Assert.Contains(Babi.Of("yes"), read[0].Words);
         Assert.Equal([Babi.Of("yes"), Babi.Of("i"), Babi.Of("do")], read[0].Words.AsEnumerable());
 
-        // AND A ONE-WORD LINE IS DROPPED, because a sentence joins its codes to
+        // and a one-word line is dropped, because a sentence joins its codes to
         // each other and a single code joins to nothing. `No.` is that line.
         Assert.DoesNotContain(read, line => line.Words.Length < 2);
     }
@@ -74,7 +74,7 @@ public sealed class PrimerTests(ITestOutputHelper output)
     [Fact]
     public void The_affordable_slice_holds_the_words_it_needs_only_a_handful_of_times()
     {
-        // THE MEASUREMENT THAT EXPLAINS THE NULL RESULT, and it needs no walk at
+        // The measurement that explains the null result, and it needs no walk at
         // all. A thousand sentences is about the most that can be swallowed at a
         // cap the questions still work under -- and it holds `yes` a handful of
         // times. Four accidental sentences is not a word the graph knows; it is
@@ -92,7 +92,7 @@ public sealed class PrimerTests(ITestOutputHelper output)
         // right. Every one of these was absent from bAbI entirely.
         Assert.All(Wanted, word => Assert.Contains(Babi.Of(word), seen));
 
-        // AND IT IS FAR TOO THIN TO BE REACHED, which is the half that makes the
+        // And it is far too thin to be reached, which is the half that makes the
         // score sit still. If this ever stops holding, the primer got big enough
         // to matter and the null result above must be re-run rather than cited.
         Assert.True(counts["yes"] < 20,
@@ -106,8 +106,8 @@ public sealed class PrimerTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>FORK 91 CLOSED AGAINST bAbI, AND THIS ASKS THE SAME QUESTION OF A CORPUS
-    /// THAT IS NOT TEMPLATED.</b> <c>Which_word_is_worth_predicting</c> found the
+    /// <b>FORK 91 CLOSED AGAINST bAbI, and this asks the same question of a corpus
+    /// that is not templated.</b> <c>Which_word_is_worth_predicting</c> found the
     /// wall: a PERFECT predictor of the informative words in bAbI scores 0.215
     /// against a blind draw over six rooms of 0.167, because the rooms are drawn at
     /// random over a template and nothing in <i>Mary went to the</i> carries where
@@ -115,8 +115,8 @@ public sealed class PrimerTests(ITestOutputHelper output)
     /// any corpus does better — and Tatoeba is real English, already fetched.
     /// </para>
     /// <para>
-    /// <b>THE OLD CEILING CANNOT CROSS OVER, AND SAYING WHY IS HALF THE
-    /// INSTRUMENT.</b> It groups statements sharing an IDENTICAL bag of company and
+    /// <b>The old ceiling cannot cross over, and saying why is half the
+    /// instrument.</b> It groups statements sharing an IDENTICAL bag of company and
     /// takes the commonest target in each group. bAbI repeats its templates so the
     /// groups are large and the number means something. Real sentences are very
     /// nearly unique, so nearly every group holds ONE member and the ceiling goes to
@@ -125,7 +125,7 @@ public sealed class PrimerTests(ITestOutputHelper output)
     /// show that happening rather than to be believed.
     /// </para>
     /// <para>
-    /// <b>SO THE COLUMN THAT COUNTS IS HELD OUT AND HAS TO GENERALISE.</b> Half the
+    /// <b>So the column that counts is held out and has to generalise.</b> Half the
     /// lines train and the other half are scored, and the predictor is the cheapest
     /// thing that could possibly learn: for every word, the target it most often
     /// keeps company with, and for every masked slot, the answer of whichever
@@ -134,13 +134,13 @@ public sealed class PrimerTests(ITestOutputHelper output)
     /// proof there is signal, which is the whole question.
     /// </para>
     /// <para>
-    /// <b>AND THE bAbI ROWS RUN IN THE SAME CALL, because the English number alone
+    /// <b>AND THE bAbI rows run in the same call, because the English number alone
     /// says nothing.</b> Two corpora through one instrument is the comparison; one
     /// corpus through a new instrument is a number with no scale.
     /// </para>
     /// <para>
-    /// <b>THE PRE-REGISTERED KILL FIRED AND WAS NOT ACCEPTED, WHICH IS SAID HERE
-    /// RATHER THAN LEFT OUT.</b> What was written before the run was <i>English's
+    /// <b>The pre-registered kill fired and was not accepted, which is said here
+    /// rather than left out.</b> What was written before the run was <i>English's
     /// UNGATED row must double its blind draw or the primer route is dead</i>. It
     /// scores 1.2x and does not. The bar named the wrong row and the reason is
     /// checkable: fork 91's finding was that on bAbI <b>selecting informative targets
@@ -151,7 +151,7 @@ public sealed class PrimerTests(ITestOutputHelper output)
     /// stated with its own kill: had the gated row come back near 1x, the route died.
     /// </para>
     /// <para>
-    /// <b>SO THE WALL WAS bAbI'S AND NOT READING'S — AND THAT IS THE WHOLE CLAIM.</b>
+    /// <b>SO THE WALL WAS bAbI'S and not reading's — and that is the whole claim.</b>
     /// 0.042 is thin, and this instrument caps it further by shortlisting five
     /// nominees per companion out of a vocabulary of tens of thousands. Whether the
     /// signal is ENOUGH to teach this learner is settled by running the learner, not
@@ -159,7 +159,7 @@ public sealed class PrimerTests(ITestOutputHelper output)
     /// wrong about, where on bAbI there was provably nothing.
     /// </para>
     /// <para>
-    /// <b>AND THE SECOND FINDING WAS NOT LOOKED FOR: bAbI's held-out half holds
+    /// <b>And the second finding was not looked for: bAbI's held-out half holds
     /// almost no company its training half did not.</b> Every scored context on task
     /// one was already met — the corpus has some two thousand distinct contexts and
     /// no more. Reading it twice is re-reading it. That is a disqualification from
@@ -185,7 +185,7 @@ public sealed class PrimerTests(ITestOutputHelper output)
             }
         }
 
-        // FIRST, THAT THE PREDICTOR IS NOT THE WEAK LINK, because every reading below
+        // First, that the predictor is not the weak link, because every reading below
         // is a LOW number and a low number means nothing from a poor instrument. On
         // bAbI's ungated rule it reaches most of the memorised ceiling: whatever the
         // company of a word carries there, this gets nearly all of it.
@@ -194,7 +194,7 @@ public sealed class PrimerTests(ITestOutputHelper output)
             $"the predictor now reaches only {strong.Cued:F3} of a {strong.Memorised:F3} "
             + "ceiling, so it is too weak for a low score to be evidence about a corpus");
 
-        // AND THE CONTROL THAT GIVES THE ENGLISH ROW A SCALE. That same predictor gets
+        // And the control that gives the English row a scale. That same predictor gets
         // NOTHING on bAbI's informative words -- it does not beat answering `hallway`
         // every time -- because the room was drawn at random over the template.
         var control = scored["babi 1 the rarest"];
@@ -203,7 +203,7 @@ public sealed class PrimerTests(ITestOutputHelper output)
             + $"blind draw of {control.Blind:F3}), so the corpus stopped being random "
             + "over its template and fork 91's wall needs re-measuring");
 
-        // AND THE READING THAT KEEPS THE PRIMER ROUTE ALIVE: on real English the same
+        // And the reading that keeps the primer route alive: on real English the same
         // predictor is far clear of its blind draw on exactly the words bAbI gave it
         // nothing on -- scored only where the company was never met in training, so
         // it is prediction rather than the recall of a duplicate sentence.
@@ -213,7 +213,7 @@ public sealed class PrimerTests(ITestOutputHelper output)
             + $"against a blind draw of {english.Flat:F3}) — the wall is reading itself "
             + "rather than bAbI, and minting an individual is what is left");
 
-        // AND THE ASYMMETRY THAT MAKES bAbI UNUSABLE AS A PRIMER WHATEVER IT SCORES:
+        // AND THE ASYMMETRY THAT MAKES bAbI unusable as a primer whatever it scores:
         // its held-out half holds almost no company the training half did not already
         // hold, so reading it twice is re-reading. Real English is the other way up.
         Assert.True(scored["babi 1 every word"].Fresh < 0.05 && scored["english every word"].Fresh > 0.9,
@@ -239,17 +239,17 @@ public sealed class PrimerTests(ITestOutputHelper output)
             foreach (var word in line)
                 rarity[word] = rarity.GetValueOrDefault(word) + 1;
 
-        // WHAT ONE WORD PREDICTS, LEARNT ON HALF THE LINES. `keeping[word]` is the
+        // What one word predicts, learnt on half the lines. `keeping[word]` is the
         // tally of targets that word has been company to; the cue it becomes is
         // whichever of those it keeps company with most often, and how often.
         var keeping = new Dictionary<string, Dictionary<string, int>>(StringComparer.Ordinal);
         var drawn = new Dictionary<string, int>(StringComparer.Ordinal);
 
-        // AND WHAT AN IDENTICAL CONTEXT PREDICTS, over every line rather than half.
+        // And what an identical context predicts, over every line rather than half.
         // This is the old ceiling, kept only so the row shows it degenerating.
         var repeating = new Dictionary<string, Dictionary<string, int>>(StringComparer.Ordinal);
 
-        // AND WHICH CONTEXTS THE TRAINING HALF ALREADY HELD. Tatoeba is full of near
+        // And which contexts the training half already held. Tatoeba is full of near
         // and exact duplicates, and alternate lines put both copies of one on
         // opposite sides of the split — so a slot whose company was already met is
         // recall rather than prediction, and the honest score excludes it.
@@ -270,7 +270,7 @@ public sealed class PrimerTests(ITestOutputHelper output)
             }
         }
 
-        // A COMPANION MET FEWER THAN FIVE TIMES IS DROPPED. A word seen once is
+        // A companion met fewer than five times is dropped. A word seen once is
         // certain of whatever it was seen beside, and that certainty is memory
         // wearing confidence — it would outrank every well-attested cue.
         var cue = keeping
@@ -280,7 +280,7 @@ public sealed class PrimerTests(ITestOutputHelper output)
         var met = cue.ToDictionary(
             one => one.Key, one => (double)one.Value.Values.Sum(), StringComparer.Ordinal);
 
-        // WHO EACH COMPANION WOULD PUT FORWARD, kept to five so the slot has a short
+        // Who each companion would put forward, kept to five so the slot has a short
         // list to score rather than the whole vocabulary. A target no companion has
         // ever been beside is one no bag learner could have reached either.
         var nominating = cue.ToDictionary(
@@ -291,7 +291,7 @@ public sealed class PrimerTests(ITestOutputHelper output)
 
         var seen = (double)Math.Max(1, drawn.Values.Sum());
 
-        // A BLIND DRAW IS THE COMMONEST TARGET AND NOTHING ELSE, which is the number
+        // A blind draw is the commonest target and nothing else, which is the number
         // any lift has to clear before it is a lift at all.
         var blindly = drawn.Count == 0 ? string.Empty : drawn.MaxBy(one => one.Value).Key;
 

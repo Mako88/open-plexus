@@ -11,21 +11,21 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>EVERY INSTRUMENT HERE WATCHES TIME OR COUNTS ROWS, AND THE TRAPS LIST ALREADY NAMES
-/// THAT SHAPE.</b> A cost can sit in memory while every reading watches the clock; a run
+/// <b>Every instrument here watches time or counts rows, and the traps list already names
+/// that shape.</b> A cost can sit in memory while every reading watches the clock; a run
 /// that gets slower is noticed within a session and a run that gets fatter is noticed when
 /// it will not start. Residents, tables, scopes and names have all been counted since the
 /// branch began, and not one of them is in bytes.
 /// </para>
 /// <para>
-/// <b>AND IT IS THE NORTH STAR'S OWN QUESTION.</b> Twenty used phones running the brain is a
+/// <b>And it is the north star's own question.</b> Twenty used phones running the brain is a
 /// claim about memory before it is a claim about anything else — no score, no curve and no
 /// latency reading says whether a holder's share fits on a machine somebody already owns.
 /// This is the one that can come back and say no.
 /// </para>
 /// <para>
-/// <b>THE SLOPE IS THE READING AND THE INTERCEPT IS NOISE, WHICH IS WHY IT IS MEASURED AT
-/// THREE SIZES.</b> A managed heap in a test host holds the runner, the world, the
+/// <b>The slope is the reading and the intercept is noise, which is why it is measured at
+/// three sizes.</b> A managed heap in a test host holds the runner, the world, the
 /// framework and whatever the last test left behind, so one delta is a number about this
 /// process. What a population costs is how the delta GROWS with what it holds, and that
 /// subtracts the process it was measured in.
@@ -44,22 +44,22 @@ public sealed class FootprintTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A BAR WRITTEN BEFORE THE FIRST READING IS USUALLY A PREDICTION DRESSED AS A
-    /// REQUIREMENT, AND THIS ONE IS NOT MINE TO PREDICT.</b> It comes from outside the
+    /// <b>A bar written before the first reading is usually a prediction dressed as a
+    /// requirement, and this one is not mine to predict.</b> It comes from outside the
     /// measurement entirely — <b>John's number, 2026-08-11</b>, and he is the one who knows
     /// what the hardware is: used Android handsets with one to two gigabytes total, of which
     /// the operating system and everything else take their share, leaving something between
     /// half a gigabyte and a gigabyte a process can actually have.
     /// </para>
     /// <para>
-    /// <b>AND THE FIRST GUESS HERE WAS 64MB, WHICH WAS WRONG IN THE DIRECTION THAT MATTERS.</b>
+    /// <b>And the first guess here was 64MB, which was wrong in the direction that matters.</b>
     /// A bar eight times too tight fails a population that would have run perfectly well on
     /// the machine it was written about, and the failure would have read as the learner
     /// being too fat rather than as the bar being invented. A number about somebody else's
     /// hardware should come from whoever has the hardware.
     /// </para>
     /// <para>
-    /// <b>SO A RED HERE IS A FINDING RATHER THAN A REGRESSION.</b> If a trained population
+    /// <b>So a red here is a finding rather than a regression.</b> If a trained population
     /// outgrows this the answer is that the north star needs fewer commitments a machine,
     /// more machines, or a smaller table per commitment — and that would be worth knowing
     /// long before twenty phones are in a room.
@@ -70,8 +70,8 @@ public sealed class FootprintTests(ITestOutputHelper output)
     /// <summary>What a trained population costs, and what it holds to cost it.</summary>
     /// <param name="rounds">How long it ran.</param>
     /// <remarks>
-    /// <b>THE SCAFFOLDING IS DROPPED BEFORE THE SECOND READING AND THE POPULATION IS NOT,
-    /// WHICH IS THE WHOLE TRICK.</b> A brain holds its population, a run holds its world and
+    /// <b>The scaffolding is dropped before the second reading and the population is not,
+    /// which is the whole trick.</b> A brain holds its population, a run holds its world and
     /// a trial holds both, so measuring with any of them alive would weigh the harness. What
     /// is kept alive across the collection is the population and nothing else, which is
     /// exactly what a holder keeps between rounds.
@@ -87,7 +87,7 @@ public sealed class FootprintTests(ITestOutputHelper output)
         var entries = held.All.Sum(one => (long)one.Separations.Count);
         var resident = held.Count;
 
-        // AND THE POPULATION IS ALIVE AT THE MOMENT THE SECOND READING IS TAKEN, which is
+        // And the population is alive at the moment the second reading is taken, which is
         // not something the compiler owes anybody. A local whose last use is above the
         // collection is collectable AT that collection, and the reading would then be of a
         // heap that had just dropped its subject.
@@ -100,7 +100,7 @@ public sealed class FootprintTests(ITestOutputHelper output)
     /// <param name="rounds">How long it ran.</param>
     /// <param name="address">Address bits, which is what sets the alphabet's size.</param>
     /// <remarks>
-    /// <b>IN ITS OWN FRAME SO THE BRAIN AND THE RUN GO OUT OF SCOPE, and the population
+    /// <b>In its own frame so the brain and the run go out of scope, and the population
     /// comes back by itself.</b> Everything else this builds is garbage by the time the
     /// caller collects, which is what makes the delta a reading about commitments.
     /// </remarks>
@@ -116,7 +116,7 @@ public sealed class FootprintTests(ITestOutputHelper output)
 
     /// <summary>The managed heap with everything collectable collected.</summary>
     /// <remarks>
-    /// <b>TWICE, BECAUSE ONE PASS LEAVES WHAT FINALISERS FREED.</b> A collection queues
+    /// <b>Twice, because one pass leaves what finalisers freed.</b> A collection queues
     /// finalisable objects rather than freeing them, so the first reading counts memory that
     /// is already unreachable — and the sockets and streams these runs leave behind are
     /// exactly the finalisable kind.
@@ -130,8 +130,8 @@ public sealed class FootprintTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHAT A COMMITMENT COSTS IN BYTES, AND WHETHER A PHONE COULD HOLD A HOLDER'S
-    /// SHARE.</b>
+    /// <b>What a commitment costs in bytes, and whether a phone could hold a holder's
+    /// share.</b>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -140,8 +140,8 @@ public sealed class FootprintTests(ITestOutputHelper output)
     /// holder's share fits on the machine the north star names.
     /// </para>
     /// <para>
-    /// <b>AND THE TABLE IS EXPECTED TO DOMINATE, WHICH IS FORK 51 IN BYTES FOR THE FIRST
-    /// TIME.</b> A commitment is a scope, an expectation and three counters; its
+    /// <b>And the table is expected to dominate, which is fork 51 in bytes for the first
+    /// time.</b> A commitment is a scope, an expectation and three counters; its
     /// <c>Separations</c> is one entry per code it has ever been asked about, and an
     /// always-present code is an entry in every table forever. So the ratio worth reading is
     /// bytes per ENTRY, and bytes per commitment is that times however many entries a
@@ -169,7 +169,7 @@ public sealed class FootprintTests(ITestOutputHelper output)
 
         var biggest = readings[^1];
 
-        // THE INSTRUMENT HAD SOMETHING TO MEASURE, asserted before anything is read off it.
+        // The instrument had something to measure, asserted before anything is read off it.
         // A collection that happened to free more than the population cost would report a
         // negative delta and every ratio below would be a number about the harness.
         Assert.True(biggest.Bytes > 0,
@@ -180,7 +180,7 @@ public sealed class FootprintTests(ITestOutputHelper output)
             $"{biggest.Resident} residents holding {biggest.Entries} entries between them, "
             + "so there is no table here to weigh");
 
-        // AND THE NORTH STAR'S OWN QUESTION, WHICH IS THE ONLY BAR. See `Share`: this is
+        // And the north star's own question, which is the only bar. See `Share`: this is
         // what a phone can give a process, not what the learner deserves.
         Assert.True(biggest.Bytes < Share,
             $"one holder's share is {biggest.Bytes / 1024 / 1024}MB after "
@@ -196,7 +196,7 @@ public sealed class FootprintTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHAT A COMMITMENT COSTS DOES NOT GROW WITH HOW LONG THE RUN WAS — the table does,
+    /// <b>What a commitment costs does not grow with how long the run was — the table does,
     /// and that is where the memory is.</b>
     /// </summary>
     /// <remarks>
@@ -209,7 +209,7 @@ public sealed class FootprintTests(ITestOutputHelper output)
     /// ever weighed.
     /// </para>
     /// <para>
-    /// <b>NO BAR ON THE DIRECTION, BECAUSE THIS IS THE FIRST READING OF IT.</b> What is
+    /// <b>No bar on the direction, because this is the first reading of it.</b> What is
     /// asserted is that the two run lengths are comparable at all — the same world, the same
     /// seed, the same dials — and the ratio is printed. A threshold here would be deciding
     /// the answer in the file that asks the question.
@@ -242,26 +242,26 @@ public sealed class FootprintTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A COMMITMENT'S TABLE IS BOUNDED BY THE FRONT END'S VOCABULARY, WHICH IS THE NUMBER
-    /// THE NORTH STAR ACTUALLY TURNS ON.</b>
+    /// <b>A commitment's table is bounded by the front end's vocabulary, which is the number
+    /// the north star actually turns on.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE CONTROL THE READING ABOVE NEEDED, AND WITHOUT IT THE PROJECTION IS AN
-    /// ARGUMENT.</b> Bytes per entry is flat and entries a commitment climbs with the run,
+    /// <b>The control the reading above needed, and without it the projection is an
+    /// argument.</b> Bytes per entry is flat and entries a commitment climbs with the run,
     /// so a holder's footprint is residents times entries times a constant. What decides
     /// whether twenty phones carry a CAMERA rather than a multiplexer is what the middle
     /// term is bounded by — and a table with one entry per code it has been asked about can
     /// only be bounded by how many codes there are.
     /// </para>
     /// <para>
-    /// <b>SO IT IS MEASURED AT TWO VOCABULARIES RATHER THAN REASONED ABOUT.</b> Six bits and
+    /// <b>So it is measured at two vocabularies rather than reasoned about.</b> Six bits and
     /// eleven, same dials, same seed, same rounds. If entries a commitment moves with the
     /// alphabet then a front end that emits a thousand codes is the thing to price before
     /// any sensor is plumbed, and the ratio here is the first estimate of what it costs.
     /// </para>
     /// <para>
-    /// <b>AND THE BAR IS THAT IT IS BOUNDED AT ALL.</b> A table cannot hold more entries
+    /// <b>And the bar is that it is bounded at all.</b> A table cannot hold more entries
     /// than the world has codes — asserted, because the alternative is an entry per
     /// OCCASION, which is the shape that turns a phone's memory into a run length. What the
     /// ratio between the two widths is, is the finding and carries no threshold.
@@ -296,7 +296,7 @@ public sealed class FootprintTests(ITestOutputHelper output)
                 $"{bits,4} | {seen,5} | {held.Count,8} | {each,20:F1} | "
                 + $"{(after - before) / (double)Math.Max(held.Count, 1),12:F0}");
 
-            // NO TABLE MAY HOLD MORE THAN THE WORLD HAS CODES, which is the whole claim. An
+            // No table may hold more than the world has codes, which is the whole claim. An
             // entry per occasion would pass every other assertion in this file and would
             // make a phone's memory a function of how long it had been switched on.
             Assert.All(held.All, one => Assert.True(one.Separations.Count <= seen,

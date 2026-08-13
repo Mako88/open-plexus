@@ -6,7 +6,7 @@ namespace OpenPlexus.Worlds;
 /// How much of CIFAR-10 to read, and how coarsely.
 /// </summary>
 /// <remarks>
-/// <b>RESOLUTION IS A WORLD DIAL AND NOT A BRAIN ONE.</b> How finely a world shows
+/// <b>Resolution is a world dial and not a brain one.</b> How finely a world shows
 /// itself is a fact about what is being looked at; how that reading becomes symbols is
 /// the translation's business, and neither is the brain's. The plan says it in one
 /// line — the demand for resolution may change how finely the front end cuts, and
@@ -19,7 +19,7 @@ public sealed record CifarSettings
 
     /// <summary>How many images to hold, from the start of the test batch.</summary>
     /// <remarks>
-    /// <b>THE SPLIT MEANS NOTHING TO A SYSTEM WITH NO TRAINING PHASE</b>, exactly as
+    /// <b>The split means nothing to a system with no training phase</b>, exactly as
     /// it means nothing on CLEVR and CLUTRR. The test batch is taken first because it
     /// is one file of ten thousand with every class equally represented; the five
     /// training batches follow it in order when more than that is asked for.
@@ -29,7 +29,7 @@ public sealed record CifarSettings
     /// <summary>How many further images to load and never draw.</summary>
     /// <remarks>
     /// <para>
-    /// <b>THE ONLY THING ON THIS WORLD THAT CAN TELL LEARNING FROM MEMORISING.</b> The
+    /// <b>The only thing on this world that can tell learning from memorising.</b> The
     /// bag is finite and the draw is with replacement, so at forty thousand rounds over
     /// ten thousand images each has recurred four times — and a score over the drawn bag
     /// cannot distinguish a learner that generalises from one holding a lookup table
@@ -37,7 +37,7 @@ public sealed record CifarSettings
     /// ones are, and <see cref="Cifar.Next"/> never reaches them.
     /// </para>
     /// <para>
-    /// <b>TAKEN AFTER THE DRAWN ONES IN THE FIXED FILE ORDER, so the split is a
+    /// <b>Taken after the drawn ones in the fixed file order, so the split is a
     /// position and not a sample.</b> A withheld set chosen by the world's own generator
     /// would move with the seed, and two seeds would then be scored against two
     /// different questions — which is the shape of thing <see cref="Seeds"/> exists
@@ -49,7 +49,7 @@ public sealed record CifarSettings
     /// <summary>How many pixels across, after box-averaging. Must divide 32.</summary>
     /// <remarks>
     /// <para>
-    /// <b>EIGHT BY DEFAULT, AND THE REASON IS ARITHMETIC RATHER THAN TASTE.</b>
+    /// <b>Eight by default, and the reason is arithmetic rather than taste.</b>
     /// <see cref="Codes.Winnowing"/> derives its sheet from the reading's width and
     /// takes one winner per twenty cells, so the number of codes a moment contains is
     /// LINEAR in how wide the reading is. Full 32x32 colour is 3,072 numbers, which is
@@ -57,7 +57,7 @@ public sealed record CifarSettings
     /// every surprise.
     /// </para>
     /// <para>
-    /// <b>SO THE FULL-RESOLUTION ARM IS NOT EXPENSIVE, IT IS UNRUNNABLE</b>, and that
+    /// <b>So the full-resolution arm is not expensive, it is unrunnable</b>, and that
     /// is a finding about the front end rather than a limit of the machine. At eight
     /// by eight in grey the reading is 64 numbers and the sheet is 2,560 cells with
     /// 128 winners — which is the scale the fly actually operates at, fifty receptors
@@ -68,8 +68,8 @@ public sealed record CifarSettings
 
     /// <summary>Whether the three channels are averaged into one.</summary>
     /// <remarks>
-    /// <b>ON BY DEFAULT BECAUSE COLOUR TRIPLES THE WIDTH FOR THIS WORLD'S HARDEST
-    /// CLASSES.</b> It is a real part of the problem and it is the first thing to turn
+    /// <b>On by default because colour triples the width for this world's hardest
+    /// classes.</b> It is a real part of the problem and it is the first thing to turn
     /// off when the code count can afford it — which is exactly what makes it a dial
     /// on the world rather than a decision baked into the reader.
     /// </remarks>
@@ -81,8 +81,8 @@ public sealed record CifarSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE FIRST WORLD HERE THAT WAS NOT ALREADY SYMBOLS, AND THAT IS THE WHOLE
-/// POINT.</b> bAbI ships words, CLEVR ships a scene graph with every object's colour
+/// <b>The first world here that was not already symbols, and that is the whole
+/// point.</b> bAbI ships words, CLEVR ships a scene graph with every object's colour
 /// and shape already separated, CLUTRR ships the relation as a column. Each of those
 /// hands over the front end this architecture claims to replace, so nothing measured
 /// on them has said anything about the interface. This ships photons.
@@ -95,7 +95,7 @@ public sealed record CifarSettings
 /// anybody — including whoever wrote the world.
 /// </para>
 /// <para>
-/// <b>IT DRAWS WITH REPLACEMENT RATHER THAN WALKING THE FILE.</b> A stream with no
+/// <b>It draws with replacement rather than walking the file.</b> A stream with no
 /// episode boundary is what the rest of the design assumes — a lifetime accuracy over
 /// a fixed pass would be measuring the end of the corpus — so the world is an infinite
 /// draw from a finite bag, as <see cref="Graded"/> and <see cref="Multiplexer"/> are.
@@ -180,7 +180,7 @@ public sealed class Cifar : IWorld<IReadOnlyList<double>>, IWithholds<IReadOnlyL
 
         Width = settings.Side * settings.Side * (settings.Grey ? 1 : 3);
 
-        // THE WITHHELD ARE LOADED BY THE SAME READER AND CODED THE SAME WAY. A
+        // The withheld are loaded by the same reader and coded the same way. A
         // held-out set that arrived down a second path could differ from the drawn one
         // by a bug rather than by learning, and the gap between the two scores is the
         // whole product here.
@@ -216,7 +216,7 @@ public sealed class Cifar : IWorld<IReadOnlyList<double>>, IWithholds<IReadOnlyL
                 $"asked for {settings.Images} images and {settings.Withheld} held back, "
                 + $"and the corpus held {labels.Count}.");
 
-        // THE SPLIT IS A POSITION IN A FIXED FILE ORDER AND NOT A DRAW, so every seed
+        // The split is a position in a fixed file order and not a draw, so every seed
         // is scored against the same held-out question. Splitting with the world's own
         // generator would give each seed a different exam.
         _readings = [.. readings.Take(settings.Images)];
@@ -277,7 +277,7 @@ public sealed class Cifar : IWorld<IReadOnlyList<double>>, IWithholds<IReadOnlyL
         for (var down = 0; down < settings.Side; down++)
         for (var across = 0; across < settings.Side; across++)
         {
-            // THE THREE PLANES ARE READ TOGETHER SO GREY COSTS ONE PASS. A separate
+            // The three planes are read together so grey costs one pass. A separate
             // averaging step per channel would read the record three times to produce
             // one number.
             Span<double> sum = [0.0, 0.0, 0.0];
@@ -320,8 +320,8 @@ internal static class Records
     /// <returns>Whether a whole record was read.</returns>
     /// <exception cref="InvalidDataException">The file ended mid-record.</exception>
     /// <remarks>
-    /// <b><see cref="Stream.Read(byte[], int, int)"/> IS ALLOWED TO RETURN SHORT AND
-    /// USUALLY DOES NOT</b>, which is how a reader passes every test on a local disk
+    /// <b><see cref="Stream.Read(byte[], int, int)"/> Is allowed to return short and
+    /// usually does not</b>, which is how a reader passes every test on a local disk
     /// and truncates one image in ten thousand somewhere else. A partial record is a
     /// corrupt corpus and says so rather than being padded with zeroes into a
     /// plausible grey square.

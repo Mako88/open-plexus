@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Worlds;
+using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
@@ -8,7 +8,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S ASK, 2026-08-03: STOP COMPARING ONLY AGAINST OUR OWN NUMBERS.</b>
+/// <b>John's ask, 2026-08-03: stop comparing only against our own numbers.</b>
 /// Four worlds were built here by the same hands that built the mechanisms they
 /// measure, so a good result on one of them can only say the mechanism does what
 /// its author expected. The bAbI tasks were written by other people to isolate
@@ -59,7 +59,7 @@ public sealed class BabiTests(ITestOutputHelper output)
 
         Assert.Null(read[0].Answer);
         Assert.False(read[0].Asking);
-        // COMPARED AS SEQUENCES AND NOT AS ImmutableArray, which compares the
+        // Compared as sequences and not as ImmutableArray, which compares the
         // underlying array by reference and passes for nothing.
         Assert.Equal(
             new[] { "mary", "moved", "to", "the", "bathroom" }.Select(Babi.Of),
@@ -69,7 +69,7 @@ public sealed class BabiTests(ITestOutputHelper output)
         Assert.Equal("bathroom", read[2].Answer);
         Assert.Equal([Babi.Of("bathroom")], read[2].Answers.AsEnumerable());
 
-        // THE SUPPORTING FACT IDS ARE DROPPED, and that is the whole ethic of
+        // The supporting fact IDS are dropped, and that is the whole ethic of
         // this world. They are the strong supervision the corpus authors ask
         // people to do without, and a route told which sentence to look at is
         // not doing the task.
@@ -89,7 +89,7 @@ public sealed class BabiTests(ITestOutputHelper output)
 
         Assert.Equal([0, 0, 1, 1], read.Select(line => line.Story));
 
-        // AND THE STORY CODE IS IN THE SENTENCE, which is what makes it an
+        // And the story code is in the sentence, which is what makes it an
         // observed thing rather than an episode boundary. C4 forbids the second.
         Assert.Contains(Babi.Telling(0), read[0].Words);
         Assert.Contains(Babi.Telling(1), read[2].Words);
@@ -138,7 +138,7 @@ public sealed class BabiTests(ITestOutputHelper output)
             Assert.Contains(world.Lines, line => line.Asking);
             Assert.NotEmpty(world.Alphabet);
 
-            // THE MAJORITY-CLASS BASELINE IS THE ONE THAT MATTERS, and it is
+            // The majority-class baseline is the one that matters, and it is
             // well above uniform on every task -- which is why a score is
             // reported against it and not against 1/alphabet.
             Assert.True(world.Commonest >= world.Chance,
@@ -157,12 +157,12 @@ public sealed class BabiTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>FOUND BY RUNNING ALL TWENTY AND ASKING WHY SIX WERE EXACTLY NOUGHT.</b>
+    /// <b>Found by running all twenty and asking why six were exactly nought.</b>
     /// Not nearly nought — <i>exactly</i>, on every question, which is the shape of
     /// a thing that cannot happen rather than a thing done badly.
     /// </para>
     /// <para>
-    /// <b>19 IS HERE BECAUSE THE CHECK PUT IT HERE.</b> The list was written from
+    /// <b>19 is here because the check put it here.</b> The list was written from
     /// the five tasks whose score was nought with nothing compound about them, and
     /// 19 was set aside as the compound case. It reaches none of its twelve answers
     /// either — a path like <c>n,w</c> is neither a word nor one answer — so it
@@ -185,24 +185,24 @@ public sealed class BabiTests(ITestOutputHelper output)
 
     private const int Repeats = 5;
 
-    // ---- THE WINDOW ON bAbI, AND WHY BOTH ITS TESTS ARE GONE ---------------
+    // ---- THE WINDOW ON bAbI, and why both its tests are gone ---------------
     //
-    // TWO TESTS STOOD HERE. `The_window_costs_an_order_of_magnitude_and_scores_worse`
+    // two tests stood here. `The_window_costs_an_order_of_magnitude_and_scores_worse`
     // compared a span of nought against two, and
     // `Edge_kinds_are_the_windows_revival_condition_and_this_is_where_it_is_run`
     // compared the fused cell against the split one at three budgets. Both arms
     // are gone: `Span` has a floor of one since 2026-08-05 and the kinds are
     // unconditional, so neither comparison can be built.
     //
-    // WHAT THEY ESTABLISHED, AND IT IS A COST THIS WORLD IS NOW PAYING KNOWINGLY:
+    // What they established, and it is a cost this world is now paying knowingly:
     //
-    //   * THE WINDOW IS A LOSS HERE. It exists to give the graph temporal edges
+    //   * the window is a loss here. It exists to give the graph temporal edges
     //     and measured null on snake, where what matters is what is visible now.
     //     A corpus of sentences in the order somebody wrote them is the opposite
     //     of that, and it was WORSE here rather than null — for something over
     //     five times the traffic.
     //
-    //   * EDGE KINDS RECOVER MUCH OF IT AND DO NOT PAY FOR IT. Splitting the cell
+    //   * Edge kinds recover much of it and do not pay for it. Splitting the cell
     //     ranked better AND cost fewer messages at every budget swept, which is
     //     the opposite of what a wider row predicts — but carrying words across
     //     sentences stayed worse than not carrying them at all. The revival
@@ -216,7 +216,7 @@ public sealed class BabiTests(ITestOutputHelper output)
     //     simply be a walk on a smaller budget. Sweeping against stamina is what
     //     separated the two.
     //
-    // SO bAbI IS EXPECTED TO SCORE BELOW ITS OLD BASELINE and the scoreboard floor
+    // SO bAbI is expected to score below its old baseline and the scoreboard floor
     // records that as a decision rather than absorbing it. The refutation row's
     // revival condition is unchanged and now load-bearing: something has to make a
     // carried edge worth its ROW, because there is no longer a way to decline it.

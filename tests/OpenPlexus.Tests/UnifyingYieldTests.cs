@@ -13,34 +13,34 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A SCOPE HANDED IN BY AN EXPERIMENTER IS ARCHITECTURE, WHICH IS THE ONE THING THIS
-/// DESIGN MAY NOT DO.</b> The matcher is priced and cheap; what nothing here can do is
+/// <b>A scope handed in by an experimenter is architecture, which is the one thing this
+/// design may not do.</b> The matcher is priced and cheap; what nothing here can do is
 /// arrive at <i>whichever word</i> on its own. So the operator has to be summoned by
 /// something the population already contains, and the obvious candidate is the one rung
 /// five is already summoned by: REDUNDANCY.
 /// </para>
 /// <para>
-/// <b>AND IT IS ANTI-UNIFICATION, WHICH IS THE DUAL OF REPAIR AND NOT A NEW IDEA.</b>
+/// <b>And it is anti-unification, which is the dual of repair and not a new idea.</b>
 /// Where several commitments expect the same thing and differ in exactly one position of
 /// their scope, the thing they share is a rule with a hole in it — <i>whoever was asked
 /// about</i> rather than <i>mary</i>, <i>john</i>, <i>sandra</i> and <i>daniel</i>
 /// separately. Repair walks specific-to-general nowhere; this is the step that would.
 /// </para>
 /// <para>
-/// <b>SO THE QUESTION BEFORE THE BUILD IS WHETHER THERE IS ANYTHING TO FIRE ON.</b> A
+/// <b>So the question before the build is whether there is anything to fire on.</b> A
 /// population holding no two commitments that differ in one position gives the operator
 /// nothing, and rung four would then be blocked by the SHAPE of what is learnt rather
 /// than by the operator being unbuilt — a different problem with a different fix. That is
 /// a count, and this file takes it.
 /// </para>
 /// <para>
-/// <b>AND THE TRIGGER IS ABUNDANT AND MOSTLY NOISE, WHICH IS WHY THE SECOND TEST EXISTS.</b>
+/// <b>And the trigger is abundant and mostly noise, which is why the second test exists.</b>
 /// A hole punched on every sibling group is WORSE than the rules it replaces about nine
 /// times in ten — it fires roughly twice as often and pays for it. So the operator needs a
 /// gate exactly as genesis does, and how many siblings a hole covers is not one.
 /// </para>
 /// <para>
-/// <b>WHAT IS, IS FORK 97 ARRIVING WHERE NOBODY PUT IT: the values a hole covers must be
+/// <b>What is, is fork 97 arriving where nobody put it: the values a hole covers must be
 /// ALTERNATIVES.</b> A hole over codes that never co-occur is a variable; a hole over codes
 /// that do is a coincidence of position. That is a fact about the MOMENTS rather than about
 /// the rules, which is why nothing in the population could have supplied it — and it is the
@@ -56,7 +56,7 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
     /// How many independent populations the proposals are pooled over.
     /// </summary>
     /// <remarks>
-    /// <b>SEEDS RATHER THAN ROUNDS, WHICH IS WHAT THE THIN COLUMN NEEDED.</b> The share of
+    /// <b>Seeds rather than rounds, which is what the thin column needed.</b> The share of
     /// sibling groups whose covered values are ALTERNATIVES is under one in a hundred, so
     /// one population lands a handful of them and a rate over a handful carries nothing.
     /// Running longer would multiply the cases and leave every one of them a fact about the
@@ -71,7 +71,7 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
     /// </summary>
     /// <param name="all">The population to read.</param>
     /// <remarks>
-    /// <b>KEYED ON THE SCOPE WITH ONE POSITION BLANKED, WHICH IS THE HOLE ITSELF.</b> Two
+    /// <b>Keyed on the scope with one position blanked, which is the hole itself.</b> Two
     /// commitments land in the same group exactly when one variable would cover both, so
     /// a group of size N is a proposal to replace N rules with one — and the size is what
     /// says whether the replacement is worth making rather than a rename.
@@ -94,7 +94,7 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
 
             for (var hole = 0; hole < one.Scope.Length; hole++)
             {
-                // THE HOLE'S MODALITY IS PART OF THE KEY AND THE VALUE IS NOT. A variable
+                // The hole's modality is part of the key and the value is not. A variable
                 // is *whichever code of this kind*, so two commitments differing in a word
                 // are siblings and two differing in a word against a place are not — the
                 // second pair shares no rule with a hole in it, it just happens to have
@@ -159,7 +159,7 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
 
         var onText = Report("babi 1", text.Held.All.ToList());
 
-        // THE MULTIPLEXER BESIDE IT, AND IT IS THE WORLD THE ARGUMENT WAS ALWAYS ABOUT.
+        // The multiplexer beside it, and it is the world the argument was always about.
         // *These positions are the address, whatever they say* is the concept rung five
         // provably cannot name — zero of 258 minted names grouped the address — and it is
         // a hole in a scope rather than a set of codes. If sibling groups exist anywhere
@@ -170,7 +170,7 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
 
         var onBits = Report("multiplexer", bits.Held.All.ToList());
 
-        // THE ONE THING HELD DOWN, AND IT IS THE TRIGGER'S EXISTENCE RATHER THAN ITS SIZE.
+        // The one thing held down, and it is the trigger's existence rather than its size.
         // If no anchored group survives on either world then anti-unification has nothing
         // to fire on, rung four is blocked by the SHAPE of what is learnt rather than by an
         // unbuilt operator, and the fix is a different one entirely. The counts are the
@@ -187,7 +187,7 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A VARIABLE IS A GENERALISATION AND EVERY OPERATOR HERE NARROWS, so the risk is
+    /// <b>A variable is a generalisation and every operator here narrows, so the risk is
     /// named before the number: a scope with a hole in it fires far more often than any
     /// sibling it covers, and firing more can only cost accuracy.</b> If the parent is
     /// worse than the siblings it replaces then repair would refuse it exactly as it
@@ -195,14 +195,14 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
     /// nothing that survives however cheap the matcher is.
     /// </para>
     /// <para>
-    /// <b>ON THE MULTIPLEXER, BECAUSE THE CONCEPT IS KNOWN AND RUNG FIVE PROVABLY MISSED
-    /// IT.</b> <i>These positions are the address, whatever they say</i> is a hole in a
+    /// <b>On the multiplexer, because the concept is known and rung five provably missed
+    /// it.</b> <i>These positions are the address, whatever they say</i> is a hole in a
     /// scope and not a set of codes, and not one minted name in 258 grouped the address.
     /// So this is the same target approached by the operator whose shape actually fits it,
     /// which is what makes the comparison worth taking rather than a repeat.
     /// </para>
     /// <para>
-    /// <b>AND IT IS SCORED ON MOMENTS THE POPULATION NEVER LEARNT ON</b>, from a world at a
+    /// <b>And it is scored on moments the population never learnt on</b>, from a world at a
     /// different seed. A parent scored on what its siblings were fitted to would be asking
     /// whether a generalisation reproduces its own training set, which it does by
     /// construction.
@@ -211,14 +211,14 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
     [Fact]
     public void What_the_parent_a_hole_proposes_is_worth_against_the_siblings_it_replaces()
     {
-        // POOLED OVER INDEPENDENT POPULATIONS, WHICH IS THE CHEAPEST WAY TO GET THE CASE
-        // COUNT UP AND ALSO THE RIGHT ONE. Running one population longer would grow the
+        // Pooled over independent populations, which is the cheapest way to get the case
+        // count up and also the right one. Running one population longer would grow the
         // proposals and leave every one of them a fact about the same learnt world;
         // separate seeds grow the count and buy independence with it. The alternatives
         // column is the reason — at one seed it lands on a handful of cases, and this repo
         // has already been caught reading a ratio over a few rounds.
         //
-        // THE GROUPS ARE KEYED PER POPULATION AND NEVER ACROSS THEM. Two commitments from
+        // The groups are keyed per population and never across them. Two commitments from
         // two brains are not siblings however alike their scopes look; a hole is a proposal
         // to replace rules that one population actually holds at once.
         var proposals = new List<(string Key, List<Commitment> Members)>();
@@ -229,7 +229,7 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
 
             new MultiplexerRun(new MultiplexerSettings { Address = 3 }, brain, seed).Run(Rounds);
 
-            // THE GROUPS AGAIN, KEPT THIS TIME RATHER THAN COUNTED. Same key as `Siblings`,
+            // The groups again, kept this time rather than counted. Same key as `Siblings`,
             // and anchored for the same reason — a hole with no context beside it is a rule
             // about nothing and would drag the parent's score down for a reason that is this
             // file's rather than the operator's.
@@ -307,7 +307,7 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
                 if (moments[at].Arrived == expects) right++;
             }
 
-            // THE SIBLINGS ON THE SAME MOMENTS, POOLED. What the parent replaces is the
+            // The siblings on the same moments, pooled. What the parent replaces is the
             // whole group, so what it is compared against is the group's own record on
             // exactly these moments and never its lifetime counters — those were kept on
             // moments it was fitted to.
@@ -337,14 +337,14 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
 
             if (parent >= kids) better++;
 
-            // AND BY HOW MANY SIBLINGS THE HOLE COVERS, WHICH IS THE FIRST GATE ANYBODY
-            // WOULD REACH FOR. A hole over two rules is two rules that happen to differ; a
+            // And by how many siblings the hole covers, which is the first gate anybody
+            // would reach for. A hole over two rules is two rules that happen to differ; a
             // hole over six is the same rule written six times, which is what a variable
             // IS. If the share that survives rises with the group then the gate is a count
             // and costs nothing; if it is flat, the operator needs a real bar and the count
             // is a distraction.
-            // AND WHETHER THE VALUES THE HOLE COVERS ARE ALTERNATIVES, WHICH IS FORK 97'S
-            // DEFINITION OF A CATEGORY ARRIVING WHERE NOBODY PUT IT. *Bit three is nought*
+            // And whether the values the hole covers are alternatives, which is fork 97'S
+            // Definition of a category arriving where nobody put it. *Bit three is nought*
             // and *bit three is one* never co-occur; *bit three is nought* and *bit five is
             // one* do. A hole over the first pair is a variable and over the second is a
             // coincidence of position, and the two are told apart by a fact about the
@@ -384,8 +384,8 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
                 $"  covering {size}{(size == 6 ? "+" : " ")} siblings | {tally.Better,3} of "
                 + $"{tally.Scored,3} no worse ({tally.Better / (double)tally.Scored:P0})");
 
-        // AND THIS COLUMN IS THE GATE, WHICH IT WAS TOO THIN TO BE UNTIL THE PROPOSALS WERE
-        // POOLED OVER INDEPENDENT POPULATIONS. Fork 97's definition of a category is exactly
+        // And this column is the gate, which it was too thin to be until the proposals were
+        // pooled over independent populations. Fork 97's definition of a category is exactly
         // what a hole wants — the values it covers should be ALTERNATIVES — and it separates
         // the proposals that pay from the ones that do not about as cleanly as anything in
         // this repo separates anything.
@@ -398,13 +398,13 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
 
         Assert.True(scored > 0, "no proposal ever fired, so nothing was scored");
 
-        // THE FINDING, HELD DOWN IN THE DIRECTION IT CAME OUT. A hole proposed blindly is
+        // The finding, held down in the direction it came out. A hole proposed blindly is
         // WORSE than the siblings it replaces: it fires about twice as often and pays for
         // it, and it is no worse in about one case in ten. So anti-unification firing on
         // every sibling group is refuted, and rung four's admission needs a gate exactly
         // as genesis does — promiscuous proposal is fine, unbarred admission is not.
         //
-        // IF THIS FLIPS THE CONCLUSION IS OWED A RE-TAKE RATHER THAN A DELETION, because a
+        // If this flips the conclusion is owed a re-take rather than a deletion, because a
         // population learnt under different search dials could hold sibling groups that
         // are real generalisations rather than coincidences of one position.
         Assert.True(better < scored / 2,
@@ -412,17 +412,17 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
             + "every sibling group is no longer refuted and the gate this file asks for "
             + "may not be needed");
 
-        // AND NO BAR ON THE SIZE COLUMN, WHICH IS WHERE A BAR WOULD BE A GUESS. What it
+        // And no bar on the size column, which is where a bar would be a guess. What it
         // says is that the share surviving is flat across groups of two, three and four
         // and that the larger buckets are too thin to read — so a count is not the gate.
 
-        // THE GATE, AND IT IS A COMPARISON RATHER THAN A LEVEL BECAUSE A LEVEL FROM ONE GRID
-        // IS NOT A CLAIM ANYTHING REFUTES. A hole whose covered values never co-occur is a
+        // The gate, and it is a comparison rather than a level because a level from one grid
+        // is not a claim anything refutes. A hole whose covered values never co-occur is a
         // variable; one whose values do is a coincidence of position, and the two are told
         // apart by a fact about the MOMENTS rather than by anything about the rules — which
         // is why nothing in the population could have supplied it.
         //
-        // ITS PRICE IS SAID BESIDE IT: the gate admits a small fraction of proposals, so
+        // Its price is said beside it: the gate admits a small fraction of proposals, so
         // anti-unification under it fires rarely. That is the shape every gate here has —
         // promiscuous proposal, and the gate doing the work — and it is the opposite of a
         // gate that admits most of what it sees and hopes the vote sorts it out.

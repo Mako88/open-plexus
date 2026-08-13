@@ -11,15 +11,15 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE CENSUS SAYS THE MISSING RULES ARE CONJUNCTIONS AND REPAIR IS THE ONLY THING
-/// THAT MAKES THEM.</b> Genesis is one code wide, so its whole reachable space is the
+/// <b>The census says the missing rules are conjunctions and repair is the only thing
+/// that makes them.</b> Genesis is one code wide, so its whole reachable space is the
 /// vocabulary times the outcomes and it saturates in the opening few hundred rounds.
 /// Everything after that is repair, and on the worlds where coverage is worst repair runs
 /// at a fifth the rate it does where coverage is fine. Nothing said why.
 /// </para>
 /// <para>
-/// <b>FIVE GATES STAND BETWEEN A WRONG COMMITMENT AND A CHILD, AND ONLY THE LAST WAS EVER
-/// COUNTED.</b> <c>Blamed</c> and <c>Unseparated</c> are per-ROUND and speak only for
+/// <b>Five gates stand between a wrong commitment and a child, and only the last was ever
+/// counted.</b> <c>Blamed</c> and <c>Unseparated</c> are per-ROUND and speak only for
 /// candidates that survived everything else — so a run whose gates refuse almost
 /// everything reports the same <c>Wanting</c> as a run whose language is too weak, and
 /// those are opposite diagnoses. The ladder's own trigger has been reading a number
@@ -41,11 +41,11 @@ public sealed class RefusalTests(ITestOutputHelper output)
             census: true).Run(Rounds);
 
     /// <summary>
-    /// <b>THE FIVE REFUSALS ADD UP TO EVERY CANDIDATE, which is what makes the shares
+    /// <b>The five refusals add up to every candidate, which is what makes the shares
     /// readable.</b>
     /// </summary>
     /// <remarks>
-    /// <b>A PARTITION THAT DOES NOT PARTITION IS A PIE CHART OF A DIFFERENT PIE.</b> Each
+    /// <b>A partition that does not partition is a pie chart of a different pie.</b> Each
     /// wrong commitment is charged to the FIRST gate that refused it, so the five counts
     /// and the search must total the candidates exactly — and if a sixth gate is ever
     /// added to <c>Mend</c> without being counted here, this is what goes red.
@@ -69,11 +69,11 @@ public sealed class RefusalTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE SAME READING WITH SEEDS UNDER IT, because one seed will happily invert.</b>
+    /// <b>The same reading with seeds under it, because one seed will happily invert.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THE SHARES ARE LARGE ENOUGH THAT THE SINGLE-SEED ROW WOULD PROBABLY HOLD, WHICH
-    /// IS NOT A REASON NOT TO COUNT.</b> This repo has a trap saying error bars come
+    /// <b>The shares are large enough that the single-seed row would probably hold, which
+    /// is not a reason not to count.</b> This repo has a trap saying error bars come
     /// before ordering every time, and a budget refusing nine candidates in ten is exactly
     /// the sort of number that gets quoted for months.
     /// </remarks>

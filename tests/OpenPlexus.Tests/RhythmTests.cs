@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Worlds;
+using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Tests;
 
@@ -25,7 +25,7 @@ public sealed class RhythmTests
     [Fact]
     public void The_cycle_repeats_and_the_statistics_never_move()
     {
-        // STATIONARY IS THE WHOLE POINT. A dial swept over a long run against a
+        // Stationary is the whole point. A dial swept over a long run against a
         // world that drifts is measuring the drift.
         var world = new Rhythm(World(violations: 0.0), seed: 1);
 
@@ -38,7 +38,7 @@ public sealed class RhythmTests
     [Fact]
     public void A_violation_is_never_the_symbol_the_cycle_called_for()
     {
-        // A "VIOLATION" THAT DREW THE EXPECTED SYMBOL IS NOT ONE, and counting it
+        // A "violation" that drew the expected symbol is not one, and counting it
         // as one would put predictable moments into the unpredictable column and
         // quietly raise the ceiling.
         var world = new Rhythm(World(violations: 1.0), seed: 3);
@@ -60,7 +60,7 @@ public sealed class RhythmTests
 
         Assert.Equal(0.8, world.Ceiling, 6);
 
-        // AND THE MARGINAL BASELINE IS BELOW IT, which is what makes it a control:
+        // And the marginal baseline is below it, which is what makes it a control:
         // a system that learnt only which symbols are frequent, and nothing about
         // order, lands there.
         Assert.True(world.Marginal < world.Ceiling);

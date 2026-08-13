@@ -6,27 +6,27 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S, AND IT IS TWO CLAUSES RATHER THAN ONE.</b> His account is a set of things
+/// <b>John's, and it is two clauses rather than one.</b> His account is a set of things
 /// standing in the same relations to everything else; the clause that has to go with it is
 /// that they NEVER CO-OCCUR. Without it the same rule groups a wheel and a door — both
 /// stand in relations to a car — and that is a co-firing bundle, which is rung five and
 /// folds the opposite way.
 /// </para>
 /// <para>
-/// <b>SO THE TEST IS EXCLUSION AND SHARED COMPANY, AND BOTH ARE FACTS ABOUT THE MOMENTS.</b>
+/// <b>So the test is exclusion and shared company, and both are facts about the moments.</b>
 /// Nothing here reads a world's tables, a vocabulary or an outcome. Two codes that have
 /// never been seen together and that keep the same company are alternatives, and that is
 /// arithmetic over what arrived.
 /// </para>
 /// <para>
-/// <b>AND IT IS WHY THE INDIVIDUAL AND THE CATEGORY ARE ONE MECHANISM RATHER THAN TWO.</b>
+/// <b>And it is why the individual and the category are one mechanism rather than two.</b>
 /// The looks a thing wears across sightings never co-occur — a basket at two moments does
 /// not co-occur with itself, which is what makes rung five structurally unable to reach it —
 /// and they keep the same company by construction. So a thing's appearances ARE a category,
 /// and minting one is what collapses a rule per appearance into a rule.
 /// </para>
 /// <para>
-/// <b>WHAT IT CANNOT DO, SAID BEFORE ANYTHING READS IT: it cannot separate two things that
+/// <b>What it cannot do, said before anything reads it: it cannot separate two things that
 /// are substitutable.</b> Twins wear one look by construction, so every statistic over the
 /// moments is the same for both and a proposal covering both is what this returns. That is
 /// not a fault to repair here — it is exactly what a PAYING gate is for, and the proposal
@@ -52,13 +52,13 @@ public static class Alternating
     /// </param>
     /// <remarks>
     /// <para>
-    /// <b>GREEDY, AND ITS ORDER IS THE CODES' OWN RATHER THAN THE STREAM'S.</b> Two machines
+    /// <b>Greedy, and its order is the codes' own rather than the stream's.</b> Two machines
     /// seeing the same moments in different orders must reach the same groups or a category
     /// means one thing here and another there — the rule <c>Agreed</c> stands on, and the
     /// reason a fitted quantiser is refused.
     /// </para>
     /// <para>
-    /// <b>A MEMBER MUST CLEAR BOTH CLAUSES AGAINST EVERY MEMBER ALREADY IN, never against
+    /// <b>A member must clear both clauses against every member already in, never against
     /// the first alone.</b> A chain of pairwise-similar codes reaches arbitrarily far, which
     /// is single-link clustering's own failure and would return one group holding the whole
     /// alphabet.
@@ -108,22 +108,22 @@ public static class Alternating
     /// </param>
     /// <remarks>
     /// <para>
-    /// <b>EXCLUSION STAYS IN THE MOMENT AND COMPANY MOVES TO THE WINDOW, WHICH IS THE WHOLE
-    /// CONSTRUCTION.</b> Widening the exclusion would refuse exactly the codes this is for —
+    /// <b>Exclusion stays in the moment and company moves to the window, which is the whole
+    /// construction.</b> Widening the exclusion would refuse exactly the codes this is for —
     /// a thing seen twice running shows two of its own looks in adjacent moments, so they
     /// co-occur in any window and would fail the clause that makes them alternatives.
     /// </para>
     /// <para>
-    /// <b>AND THE TEST IS ADHESION RATHER THAN SHARED COMPANY, BECAUSE SHARED COMPANY IS
-    /// EXACTLY WHAT TWINS HAVE.</b> Two twins wear one look, so their landmarks keep the same
+    /// <b>And the test is adhesion rather than shared company, because shared company is
+    /// exactly what twins have.</b> Two twins wear one look, so their landmarks keep the same
     /// company however wide the window is — that is <see cref="From"/>'s measured limit. What
     /// runs give is that a thing's OWN codes turn up beside each other far more often than
     /// chance and a twin's never do, which is a statement about a pair rather than about the
     /// company either keeps.
     /// </para>
     /// <para>
-    /// <b>SO A UNIFORM STREAM MUST RETURN NOTHING, AND THAT IS THE CONTROL RATHER THAN A
-    /// FAILURE.</b> Where sightings are drawn independently, every pair adheres at chance, so
+    /// <b>So a uniform stream must return nothing, and that is the control rather than a
+    /// failure.</b> Where sightings are drawn independently, every pair adheres at chance, so
     /// this refuses everything <see cref="From"/> would have found. The two are not
     /// substitutes: one reads space and one reads time.
     /// </para>
@@ -150,7 +150,7 @@ public static class Alternating
 
                 foreach (var other in stream[at]) if (!other.Equals(one)) kept.Add(other);
 
-                // COUNTED ONCE A MOMENT AN OTHER, NOT ONCE A NEIGHBOUR. A code appearing in
+                // Counted once a moment an other, not once a neighbour. A code appearing in
                 // both moments either side of this one is one piece of evidence about
                 // adjacency, and counting it twice would let a long run of one thing
                 // manufacture its own significance.
@@ -169,7 +169,7 @@ public static class Alternating
                     }
             }
 
-        // CHANCE IS THE PRODUCT OF THE TWO MARGINALS OVER THE WINDOW'S OWN WIDTH, so what is
+        // Chance is the product of the two marginals over the window's own width, so what is
         // being asked is whether the pair turns up beside each other more than two codes of
         // those frequencies would have. Without the width the bar would be a claim about how
         // wide the window is rather than about the stream.
@@ -195,19 +195,19 @@ public static class Alternating
     /// <param name="keeps">Whether two codes keep close enough company to be alternatives.</param>
     /// <remarks>
     /// <para>
-    /// <b>GREEDY, AND ITS ORDER IS THE CODES' OWN RATHER THAN THE STREAM'S.</b> Two machines
+    /// <b>Greedy, and its order is the codes' own rather than the stream's.</b> Two machines
     /// seeing the same moments in different orders must reach the same groups or a category
     /// means one thing here and another there — the rule <c>Agreed</c> stands on, and the
     /// reason a fitted quantiser is refused.
     /// </para>
     /// <para>
-    /// <b>A MEMBER MUST CLEAR BOTH CLAUSES AGAINST EVERY MEMBER ALREADY IN, never against
+    /// <b>A member must clear both clauses against every member already in, never against
     /// the first alone.</b> A chain of pairwise-similar codes reaches arbitrarily far, which
     /// is single-link clustering's own failure and would return one group holding the whole
     /// alphabet.
     /// </para>
     /// <para>
-    /// <b>AND THE EXCLUSION CLAUSE IS HERE RATHER THAN IN EITHER CALLER, because it is the
+    /// <b>And the exclusion clause is here rather than in either caller, because it is the
     /// half of John's account that is not negotiable.</b> What the two derivations differ in
     /// is what counts as keeping the same company; that alternatives never co-occur is the
     /// same claim in both.
@@ -284,8 +284,8 @@ public static class Alternating
 /// </summary>
 /// <typeparam name="TObservation">What the world hands over.</typeparam>
 /// <remarks>
-/// <b>A DECORATOR, SO THE CATEGORIES ARE AN AXIS ON EVERY WORLD RATHER THAN A FEATURE OF
-/// ONE.</b> <see cref="Joined"/> carries its own because it was built before this existed
+/// <b>A decorator, so the categories are an axis on every world rather than a feature of
+/// one.</b> <see cref="Joined"/> carries its own because it was built before this existed
 /// and its arms cross with the categories; anything reaching a world that is already coded
 /// needs the fold without the text machinery around it.
 /// </remarks>

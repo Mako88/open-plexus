@@ -6,8 +6,8 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE TWO VOCABULARIES ARE THE SAME SHAPE AND THE OPPOSITE ENTAILMENT, WHICH IS WHY
-/// THIS IS A TYPE AND NOT A LIST.</b> A minted name means every member is present, so it
+/// <b>The two vocabularies are the same shape and the opposite entailment, which is why
+/// this is a type and not a list.</b> A minted name means every member is present, so it
 /// enters a moment when they all are and a scope may be rewritten over it with the record
 /// carried. A category means ANY member is present, so it enters a moment when one is — and
 /// a scope rewritten over it CLAIMS MORE THAN IT DID. Everything fork 85 says follows from
@@ -15,8 +15,8 @@ namespace OpenPlexus.Codes;
 /// reached for.
 /// </para>
 /// <para>
-/// <b>SO IT IS HELD BY THE FRONT END AND READ BY THE POPULATION, WHICH IS THE SEAM FORK 84
-/// ALREADY DREW.</b> What the coarser form of a code is is a fact about how a stream is
+/// <b>So it is held by the front end and read by the population, which is the seam fork 84
+/// already drew.</b> What the coarser form of a code is is a fact about how a stream is
 /// being read, and the brain is told it in the same way it is told an alphabet. What the
 /// brain does with it — whether a coarse code may enter a scope, and on what evidence — is
 /// the brain's, and is <c>Population.Recast</c>.
@@ -39,8 +39,8 @@ public sealed class Sorting
     /// what a grid using this is measuring.
     /// </param>
     /// <remarks>
-    /// <b>A CODE BELONGS TO AT MOST ONE CATEGORY, AND THE FIRST GROUP TO CLAIM IT KEEPS
-    /// IT.</b> <see cref="Alternating.From"/> returns disjoint groups by construction, so
+    /// <b>A code belongs to at most one category, and the first group to claim it keeps
+    /// it.</b> <see cref="Alternating.From"/> returns disjoint groups by construction, so
     /// this only fires on a hand-written table — and a code with two coarser forms would
     /// make <see cref="Coarser"/> a choice rather than a lookup, which is a decision hiding
     /// in what was meant to be an alphabet.
@@ -70,7 +70,7 @@ public sealed class Sorting
     /// <summary>The category this code is a member of, or nothing.</summary>
     /// <param name="code">The code to ask about.</param>
     /// <remarks>
-    /// <b>A CATEGORY'S OWN CODE HAS NO COARSER FORM, and that is load-bearing rather than an
+    /// <b>A category's own code has no coarser form, and that is load-bearing rather than an
     /// omission.</b> It is what makes the entailment one-directional, so nothing here can
     /// come to say that a category is a member of itself — and a rewrite that could would
     /// walk a scope up until it said nothing at all.
@@ -84,14 +84,14 @@ public sealed class Sorting
     /// that call this have just built it.</param>
     /// <remarks>
     /// <para>
-    /// <b>ANY AND NEVER ALL, WHICH IS THE WHOLE DIFFERENCE FROM RUNG FIVE.</b> The members
+    /// <b>Any and never all, which is the whole difference from rung five.</b> The members
     /// are alternatives and by construction never co-occur, so a fold demanding all of them
     /// would fire on nothing at all. <b>The plain code stays beside the category</b>, because
     /// emitting only the category would make <i>mary</i> and <i>john</i> the same word — and
     /// a general rule is worth having only while a particular one is still sayable.
     /// </para>
     /// <para>
-    /// <b>ONE PASS AND NOT A FIXED POINT, unlike <c>Naming.Fold</c>.</b> A category over
+    /// <b>One pass and not a fixed point, unlike <c>Naming.Fold</c>.</b> A category over
     /// categories is expressible and nothing mints one yet, so iterating would be machinery
     /// with no caller — and a loop that cannot turn twice is a loop written for a mechanism
     /// that does not exist.

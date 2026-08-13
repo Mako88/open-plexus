@@ -11,14 +11,14 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>REPAIR CHOOSES WELL AND BUILDS TRUE RULES THAT PAY NOTHING, so what it is handed is
+/// <b>Repair chooses well and builds true rules that pay nothing, so what it is handed is
 /// the suspect.</b> Covering mints <c>{c} → arrived</c> and its whole reachable space is
 /// the vocabulary times the outcomes — twenty-four rules at six bits, of which it mints
 /// seventeen and then stops for the rest of the run. Repair can only specialise what is
 /// there, so a seed never minted is a rule never reachable, forever.
 /// </para>
 /// <para>
-/// <b>AND THE PREDICTION IS SPECIFIC ENOUGH TO BE WRONG.</b> On a world whose answer is
+/// <b>And the prediction is specific enough to be wrong.</b> On a world whose answer is
 /// the commoner outcome four times in five, a minority round is rare and the gate closes
 /// as soon as ANYTHING proposes that outcome — so the seeds that go missing should be the
 /// minority ones, which are exactly the seeds a rule covering the hard rounds would have
@@ -31,7 +31,7 @@ public sealed class SeedingTests(ITestOutputHelper output)
     private const long Rounds = 20_000;
 
     /// <summary>
-    /// <b>THE ONE-CODE POPULATION, SPLIT BY WHAT IT EXPECTS.</b>
+    /// <b>The one-code population, split by what it expects.</b>
     /// </summary>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
@@ -67,7 +67,7 @@ public sealed class SeedingTests(ITestOutputHelper output)
                 .GroupBy(one => one.Expects)
                 .ToDictionary(one => one.Key, one => one.Count());
 
-            // THE WHOLE SPACE ONE-CODE GENESIS CAN EVER REACH, per outcome: one rule for
+            // The whole space one-code genesis can ever reach, per outcome: one rule for
             // each (position, value) pair the world emits.
             var reachable = 2 * (address + (1 << address));
 

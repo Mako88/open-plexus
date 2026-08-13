@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Worlds;
+using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Tests;
 
@@ -24,7 +24,7 @@ public sealed class MotifTests
     [Fact]
     public void The_sets_are_disjoint_and_a_noise_moment_is_the_same_size()
     {
-        // OVERLAPPING SETS WOULD MAKE A COMPLETION AMBIGUOUS for a reason that has
+        // Overlapping sets would make a completion ambiguous for a reason that has
         // nothing to do with chunking, and a noise moment of a different size
         // would make the task counting rather than recognising.
         var world = new Motif(World(), seed: 1);
@@ -51,7 +51,7 @@ public sealed class MotifTests
         Assert.Equal(2, wanted.Count);
         Assert.Empty(asked.Where(wanted.Contains));
 
-        // AND THE WHOLE SET IS THE TWO TOGETHER, so nothing was dropped.
+        // And the whole set is the two together, so nothing was dropped.
         Assert.Equal(world.Motifs[0].Order(), asked.Concat(wanted).Order());
     }
 
@@ -71,9 +71,9 @@ public sealed class MotifTests
 
     // ---- step 3, built ------------------------------------------------------
 
-    // ---- WHAT CHUNKING BOUGHT, AND WHY THE MEASUREMENT IS GONE ------------
+    // ---- What chunking bought, and why the measurement is gone ------------
     //
-    // TWO TESTS STOOD HERE AND BOTH COMPARED CHUNKING AGAINST ITS OWN ABSENCE:
+    // two tests stood here and both compared chunking against its own absence:
     // `Minting_a_node_buys_the_traffic_it_was_supposed_to` and
     // `What_the_minting_costs_and_what_it_buys_over_seeds`. Step 3 became
     // unconditional on 2026-08-04 -- John's rule, you build it and it is ON -- so

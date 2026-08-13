@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -13,23 +13,23 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>EVERY HOLDER SEES EVERY MOMENT, WHICH IS WHAT THE BUS ALREADY DOES.</b> An input
+/// <b>Every holder sees every moment, which is what the bus already does.</b> An input
 /// machine broadcasts, so the observations are not what differs between two holders — the
 /// COMMITMENTS are, because a ring places a code and a holder keeps what lands on it. That
 /// makes <c>FoldingTests</c>' two rows the wrong pair for a deployment: one gave two
 /// machines different observations and the other gave them identical everything.
 /// </para>
 /// <para>
-/// <b>AND ABSTRACTION'S EVIDENCE IS THE POPULATION, WHICH IS PRECISELY WHAT GETS
-/// SPLIT.</b> <see cref="Abstracting.Shared(Recurrence, CommittingSettings)"/> reads every resident scope, counts which
+/// <b>And abstraction's evidence is the population, which is precisely what gets
+/// split.</b> <see cref="Abstracting.Shared(Recurrence, CommittingSettings)"/> reads every resident scope, counts which
 /// pairs recur across them, and names the pair that beats what independent scopes would
 /// have produced. Sharding cuts the scopes each holder can see, so it moves all three
 /// terms at once: the count a pair must reach, the marginal frequencies it is tested
 /// against, and the number of candidates the bar is corrected for.
 /// </para>
 /// <para>
-/// <b>SO THE QUESTION IS NOT WHETHER TWO HOLDERS AGREE, IT IS WHETHER EITHER ONE STILL
-/// SPEAKS.</b> The description-length bar wants a pair in three scopes and the gate wants
+/// <b>So the question is not whether two holders agree, it is whether either one still
+/// speaks.</b> The description-length bar wants a pair in three scopes and the gate wants
 /// three scopes to exist at all. A twelfth of a population may hold neither, and rung five
 /// would then not diverge across machines — it would go silent on all of them, which reads
 /// from any score exactly like a mechanism that was never load-bearing.
@@ -41,7 +41,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     /// Rounds, <b>and the five hundred past the last sweep are the point of the number.</b>
     /// </summary>
     /// <remarks>
-    /// <b>A RUN ENDING ON A SWEEP ROUND IS READ AT ITS MOST EXHAUSTED, and this file's whole
+    /// <b>A run ending on a sweep round is read at its most exhausted, and this file's whole
     /// subject is what a trained population would name NEXT.</b> At twenty thousand exactly,
     /// three seeds in eight have nothing left to say — so the assertions here stood on seed
     /// one happening to be one of the five that did, which is the single-seed ordering this
@@ -60,21 +60,21 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THIS FILE'S PRECONDITION IS THAT A SHARD ALONE NAMES NOTHING, AND A SEARCH DIAL
-    /// BUYS PAST IT.</b> Every reading here is about what SPLITTING costs rung five, so it
+    /// <b>This file's precondition is that a shard alone names nothing, and a search dial
+    /// buys past it.</b> Every reading here is about what SPLITTING costs rung five, so it
     /// needs a population a third of which cannot certify a redundancy by itself. Raise the
     /// repair budget and each third holds enough eligible scopes to clear the gate unaided —
     /// three holders naming three things where the fixture requires three naming none.
     /// </para>
     /// <para>
-    /// <b>SO THE CLAIM IS CONDITIONAL ON SHARD SIZE AND WAS NEVER WRITTEN THAT WAY.</b>
+    /// <b>So the claim is conditional on shard size and was never written that way.</b>
     /// <i>Splitting a population does not remove a redundancy, it removes the ability to
     /// certify one</i> is true of shards too small to reach the gate's counts, which is what
     /// this world was. It is not a fact about splitting as such, and the plan says so now.
     /// </para>
     /// <para>
-    /// <b>AND THE TIMING IS PINNED BESIDE IT, BECAUSE THE TWO FAILURES ARE OPPOSITE AND ONE
-    /// NUMBER CANNOT DODGE BOTH.</b> Under <see cref="Repairing.EveryRound"/> a budget of 64
+    /// <b>And the timing is pinned beside it, because the two failures are opposite and one
+    /// number cannot dodge both.</b> Under <see cref="Repairing.EveryRound"/> a budget of 64
     /// leaves the WHOLE population naming nothing, so the baseline assertion goes red; 256
     /// gives every third enough to name alone, so the precondition goes red instead. What
     /// this file needs is a population rich enough to name and shards too poor to — and that
@@ -82,8 +82,8 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     /// it was the only one of the three still green.
     /// </para>
     /// <para>
-    /// <b>SO THE TWO FILES PIN THE SAME PAIR, AND THEY MEASURE ONE MECHANISM ON TWO SIDES OF
-    /// A SOCKET.</b> A window that differed between them would make the in-process reading
+    /// <b>So the two files pin the same pair, and they measure one mechanism on two sides of
+    /// a socket.</b> A window that differed between them would make the in-process reading
     /// and the wire reading incomparable, which is the whole point of having both.
     /// </para>
     /// </remarks>
@@ -98,14 +98,14 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE PRECONDITION IS A PROPERTY OF ONE RUN AND EVERY SEARCH DIAL MOVES IT.</b>
+    /// <b>The precondition is a property of one run and every search dial moves it.</b>
     /// Seed one satisfied <i>whole names, no third names alone</i> until the vote rule
     /// changed — and under <see cref="Repairing.AfterFailure"/> the vote decides what repair
     /// may run on, so a readout change is a search change and the window moved with it. That
     /// is the row this file already carried, arriving from a direction nobody watched.
     /// </para>
     /// <para>
-    /// <b>AND IT IS NOT A THIN WINDOW, WHICH IS WORTH KNOWING BEFORE THE NEXT HUNT.</b> Four
+    /// <b>And it is not a thin window, which is worth knowing before the next hunt.</b> Four
     /// seeds in twelve satisfy the precondition at this budget and timing — 4, 8, 9 and 10 —
     /// so a red here means finding another rather than re-tuning the pair. The assertions
     /// below say which half failed.
@@ -115,7 +115,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
 
     /// <summary>A trained population, its dials, and the name it proposes whole.</summary>
     /// <remarks>
-    /// <b>WRITTEN ONCE BECAUSE THE CLONE BUDGET REFUSED THE THIRD COPY.</b> Three tests
+    /// <b>Written once because the clone budget refused the third copy.</b> Three tests
     /// here each need a population and the whole-population baseline it is measured
     /// against, and three copies of that setup is three places for the dials to drift —
     /// which would make three grids that look comparable and are not.
@@ -128,7 +128,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
             Budget = Sparse,
             Repairing = Waiting,
 
-            // AND THE FORKING RULE, FOR THE REASON THE OTHER TWO ARE PINNED. This file's
+            // And the forking rule, for the reason the other two are pinned. This file's
             // precondition is a population with something left to name, and every dial
             // deciding what repair builds moves it.
             Forking = Forking.Repeated,
@@ -155,14 +155,14 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     {
         var (dials, all, _) = Trained();
 
-        // THE WHOLE POPULATION'S ANSWER IS THE BASELINE, and every split is measured
+        // The whole population's answer is the baseline, and every split is measured
         // against it rather than against nothing. `Abstracting.Shared` proposes one pair,
         // so what a shard can do is agree with that, propose something else, or say
         // nothing -- and the three are completely different failures.
         var whole = Abstracting.Shared(all, dials);
 
-        // WHAT `Shared` ACTUALLY READS, WHICH IS NOT THE RESIDENT COUNT AND IS THE NUMBER
-        // THE CLIFF BELOW IS ABOUT. It proposes only from commitments past the experience
+        // WHAT `Shared` actually reads, which is not the resident count and is the number
+        // the cliff below is about. It proposes only from commitments past the experience
         // floor with a scope of two or more, and then wants three such scopes to exist and
         // a pair recurring across three of them. So the pool that gets split is this one,
         // and a resident count in the hundreds can sit on top of a pool in the tens.
@@ -175,7 +175,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
         Assert.True(all.Count > 20,
             $"only {all.Count} commitments resident — there is nothing here to shard");
 
-        // AND THE BASELINE HAS TO SPEAK OR THE GRID BELOW IS UNREADABLE. A population that
+        // And the baseline has to speak or the grid below is unreadable. A population that
         // names nothing whole cannot show sharding taking anything away, and every row
         // would read `silent` for a reason that has nothing to do with splitting.
         Assert.NotNull(whole);
@@ -209,18 +209,18 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
 
         // ---- which of the two explanations it is --------------------------------
         //
-        // THE OBVIOUS READING IS STARVATION AND THE COLUMN ABOVE REFUTES IT. `Shared`
+        // The obvious reading is starvation and the column above refutes it. `Shared`
         // wants three eligible scopes and a pair recurring across three of them; a shard
         // holding thirty-six clears both by a wide margin and still says nothing. So the
         // evidence is present and something else is refusing it.
         //
-        // THE OTHER READING IS POWER, AND LOOSENING THE ONE BAR IS HOW TO TELL. `Shared`
+        // The other reading is power, and loosening the one bar is how to tell. `Shared`
         // ends on `Normal.Tail(z) * candidates <= Alpha`, and z carries a factor of the
         // square root of the scope count -- so splitting a population does not remove a
         // redundancy, it removes the ability to CERTIFY one. If a looser alpha revives the
         // shards, the pattern was in every one of them all along.
         //
-        // AND THIS IS AN ARM RATHER THAN A PROPOSAL. A bar loosened until something passes
+        // And this is an arm rather than a proposal. A bar loosened until something passes
         // is the oldest way to manufacture a finding; nothing here suggests changing
         // `Alpha`, and the number below is diagnostic only.
         output.WriteLine("holders | proposing at alpha 0.05 | proposing at alpha 0.5");
@@ -237,8 +237,8 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
             output.WriteLine($"{holders,7} | {strict,22} | {loose,21}");
         }
 
-        // NO BAR ON ANY OF IT, BECAUSE WHAT SHARDING SHOULD COST RUNG FIVE HAS NEVER BEEN
-        // MEASURED and a threshold written before the first reading would be a prediction
+        // No bar on any of it, because what sharding should cost rung five has never been
+        // measured and a threshold written before the first reading would be a prediction
         // dressed as a requirement. The grids are the finding.
     }
 
@@ -246,12 +246,12 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_a_dead_holder_costs_a_merged_name()
     {
-        // C3 SAYS A CLUSTER VANISHING MID-THOUGHT IS NORMAL, AND EVERY FILE IN THIS ARC
-        // HAS CARRIED A NOTE THAT NOTHING DIES IN IT. This is the smallest honest version
+        // C3 says a cluster vanishing mid-thought is normal, and every file in this arc
+        // has carried a note that nothing dies in it. This is the smallest honest version
         // of that: a merge is only ever over the holders that answered, so a death is
         // counts that never arrive.
         //
-        // AND IT SHOULD DEGRADE RATHER THAN BREAK, WHICH IS THE PREDICTION UNDER TEST.
+        // And it should degrade rather than break, which is the prediction under test.
         // Losing counts is losing scopes, and losing scopes is the power problem this file
         // already measured -- so a merge missing a holder should sit somewhere between the
         // whole population and a single shard, and the question is how many deaths it
@@ -272,7 +272,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
             var kept = 0;
             var silent = 0;
 
-            // EVERY WAY OF LOSING THAT MANY, UP TO A BOUND, because which holders die is
+            // Every way of losing that many, up to a bound, because which holders die is
             // not something a deployment gets to choose and one arrangement would be one
             // sample of a distribution. Bounded by walking a stride through the
             // combinations rather than all of them, which is stated because a truncation
@@ -309,7 +309,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     [Fact]
     public void Holders_told_each_others_counts_mint_one_name_where_alone_they_mint_none()
     {
-        // THE PAYOFF OF THE WHOLE NAMING ARC, ASKED OF `Population` RATHER THAN OF
+        // The payoff of the whole naming arc, asked of `Population` RATHER THAN OF
         // `Abstracting`. Every measurement so far has been of the gate in isolation; this
         // is the operator the learner actually calls, on populations that hold a shard
         // each, and it asks the two questions that matter together -- does a holder speak
@@ -339,7 +339,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
 
         for (var holder = 0; holder < Holders; holder++)
         {
-            // ALONE FIRST, AND IT HAS TO COME BACK NOUGHT. If a shard can name something
+            // Alone first, and it has to come back nought. If a shard can name something
             // by itself then this world does not show the problem being fixed, and the
             // line below would be crediting the exchange with something free.
             Assert.Equal(0, holders[holder].Abstract());
@@ -354,12 +354,12 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
             minted.AddRange(holders[holder].Names.Means.Select(one => one.Key));
         }
 
-        // ONE NAME BETWEEN THEM, WHICH IS THE CLAIM. Three holders minting three names is
+        // One name between them, which is the claim. Three holders minting three names is
         // three vocabularies and is the failure this arc has been about; three holders
         // minting one is the mechanism working.
         Assert.Single(minted.Distinct());
 
-        // AND IT IS THE NAME THE WHOLE POPULATION WOULD HAVE MINTED, so the exchange
+        // And it is the name the whole population would have minted, so the exchange
         // recovers the undistributed answer rather than merely agreeing on something.
         Assert.Equal(Naming.Name(whole.Value), minted[0]);
 
@@ -371,7 +371,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     [Fact]
     public void The_counts_survive_being_written_as_bytes_and_read_back()
     {
-        // THE TYPE BUILT TO CROSS A WIRE COULD NOT CROSS ONE, AND NOTHING SAID SO.
+        // The type built to cross a wire could not cross one, and nothing said so.
         // `Recurrence` keys its pairs on a tuple and keeps both tables private, so a
         // serialiser writes the scope count and drops the tables -- `{"Scopes":110}`,
         // printed below. That is worse than an empty object, because it LOOKS like a
@@ -379,7 +379,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
         // that adds nothing to anything. Exactly how `Graph.Kind` arrived as `default` on
         // every edge until `Wire` grew a converter for it.
         //
-        // SO THE ROUND TRIP IS ASSERTED ON THE ANSWER AND NOT ON THE BYTES. Two tables
+        // So the round trip is asserted on the answer and not on the bytes. Two tables
         // comparing equal says the fields survived; the same NAME coming out the far side
         // says the statistic did, and that is the thing anything downstream depends on.
         var (dials, all, whole) = Trained();
@@ -395,19 +395,19 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
 
         Assert.Equal(whole, Abstracting.Shared(there, dials));
 
-        // AND THE BYTES ARE THE SAME BYTES, because two machines writing one table must
+        // And the bytes are the same bytes, because two machines writing one table must
         // write one string or nothing downstream can compare what crossed. A dictionary's
         // walk is not stable across processes, which is why `Written` orders.
         Assert.Equal(
             OpenPlexus.Bus.Wire.Write(here.Written()),
             OpenPlexus.Bus.Wire.Write(there.Written()));
 
-        // THE CHECK THAT THE ROUND TRIP CARRIED ANYTHING AT ALL. An empty table writes,
+        // The check that the round trip carried anything at all. An empty table writes,
         // reads and compares equal perfectly, and would pass every line above.
         Assert.True(here.Written().Rows.Length > 0,
             "nothing was counted, so the round trip above moved an empty table");
 
-        // AND THE REASON THE PROJECTION EXISTS, ASSERTED RATHER THAN CLAIMED. Handing
+        // And the reason the projection exists, asserted rather than claimed. Handing
         // `Recurrence` straight to the serialiser is the obvious thing to write and it
         // loses both tables in silence -- so this pins the failure the projection avoids.
         // If a future runtime makes the direct form work, this line fails, somebody reads
@@ -422,13 +422,13 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     [Fact]
     public void Merging_the_counts_gets_the_whole_populations_name_back()
     {
-        // WHAT THE GRID ABOVE POINTS AT, BUILT. `Recurrence` is the two frequency tables
+        // What the grid above points at, built. `Recurrence` is the two frequency tables
         // the gate reads and nothing else -- how often each code appeared across scopes
         // and how often each pair appeared together. A holder counts its own and the
         // merge adds them, which is what a G-Counter is and why this design already
         // trusts the shape.
         //
-        // AND EXACTLY RATHER THAN NEARLY, WHICH IS THE WHOLE POINT OF IT BEING COUNTS.
+        // And exactly rather than nearly, which is the whole point of it being counts.
         // A sharded SUM was never bit-identical, because floating-point addition is not
         // associative -- that arm is deleted and integers have no such caveat either way,
         // so this is an equality and must never become a tolerance.
@@ -440,7 +440,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
         {
             var shards = Sharded(all, holders);
 
-            // COUNTED WHERE THE COMMITMENTS ARE AND MERGED WHERE NOTHING IS, so no holder
+            // Counted where the commitments are and merged where nothing is, so no holder
             // ever sees another's scopes -- which is the C1 claim this whole arrangement
             // exists to keep, and it is kept by what the type can carry rather than by
             // anybody being careful.
@@ -455,12 +455,12 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     [Fact]
     public void And_the_merge_does_not_care_what_order_the_holders_answered_in()
     {
-        // C2 SAYS THE ORDER IS THE NETWORK'S CHOICE, and a result that moved with a choice
+        // C2 says the order is the network's choice, and a result that moved with a choice
         // nobody made is fork 12 -- reopened twice already, and this is a third door.
         // Integer addition is commutative, so the assertion is that the code actually uses
         // it that way rather than that arithmetic works.
         //
-        // AND THE TIE-BREAK IS THE HALF THAT WAS ACTUALLY BROKEN. `Shared` walked its pair
+        // And the tie-break is the half that was actually broken. `Shared` walked its pair
         // table with a strict improvement test, so two pairs at the same z resolved by
         // whichever the dictionary reached first -- stable in one process and nothing at
         // all across two tables merged in different orders. Ordering the walk is what

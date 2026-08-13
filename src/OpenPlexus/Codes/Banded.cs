@@ -8,8 +8,8 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THIS IS NOT A STEPPING STONE TO <see cref="Winnow"/> AND MUST NOT BE
-/// WRITTEN UP AS ONE.</b> Grains take a reading that has already been banded and
+/// <b>This is not a stepping stone to <see cref="Winnow"/> and must not be
+/// written up as one.</b> Grains take a reading that has already been banded and
 /// say it again more coarsely, so the hierarchy IS the similarity — but it is a
 /// hierarchy per DIMENSION, and two readings differing a little in every
 /// dimension share no band at any grain. <see cref="Winnow"/> reads the
@@ -17,13 +17,13 @@ namespace OpenPlexus.Codes;
 /// other's arm</b>, so a body wanting both mounts both.
 /// </para>
 /// <para>
-/// <b>IT TAKES THE PART OF THE FRAME IT READS, WHICH IS WHY THERE IS NO
-/// SPLITTER.</b> A body hands over everything it sensed and each front end
+/// <b>It takes the part of the frame it reads, which is why there is no
+/// splitter.</b> A body hands over everything it sensed and each front end
 /// selects its own stream — see <see cref="Compound{TFrame}"/>. The selector is
 /// the whole of what a router would have been.
 /// </para>
 /// <para>
-/// <b>AND IT LIVES HERE RATHER THAN IN THE WORLD.</b> The walk's tending world
+/// <b>And it lives here rather than in the world.</b> The walk's tending world
 /// banded its own moisture and called <see cref="Grains"/> itself, which is a
 /// world deciding how it is coded — John's line, 2026-08-05: what the world IS
 /// stays, how the brain THINKS goes. The bands and the grain are adapter
@@ -55,8 +55,8 @@ public sealed class Banded<TFrame> : IQuantizer<TFrame>
     /// </exception>
     /// <remarks>
     /// <para>
-    /// <b>THE WIDTH IS TAKEN SO THE BLOCK CAN BE CHECKED, AND THAT CHECK WAS THE
-    /// WHOLE REASON FOR ADDING IT.</b> A modality is ONE BYTE and a dimension owns
+    /// <b>The width is taken so the block can be checked, and that check was the
+    /// whole reason for adding it.</b> A modality is ONE BYTE and a dimension owns
     /// <see cref="Spans"/> of them, so a reading of 128 dimensions at two spans runs
     /// out — and the arithmetic that assigns them is an unchecked cast, so it WRAPPED
     /// rather than failed. Dimension 0 and dimension 128 came out with identical
@@ -64,7 +64,7 @@ public sealed class Banded<TFrame> : IQuantizer<TFrame>
     /// anywhere said so.
     /// </para>
     /// <para>
-    /// <b>IT WAS ALREADY KNOWN AND GUARDED IN EXACTLY ONE WORLD.</b> The walk's tending
+    /// <b>It was already known and guarded in exactly one world.</b> The walk's tending
     /// world refused more plants than its block held, and that guard sat there while
     /// <see cref="Machines.GradedRun"/> built the same type with no check at all. A
     /// defence mounted on one caller is the failure this repo keeps re-finding, so it
@@ -72,7 +72,7 @@ public sealed class Banded<TFrame> : IQuantizer<TFrame>
     /// since been deleted, which is exactly why it had to move.
     /// </para>
     /// <para>
-    /// <b>AND IT IS THE CEILING ON THIS FRONT END REACHING PERCEPTION.</b> Roughly
+    /// <b>And it is the ceiling on this front end reaching perception.</b> Roughly
     /// fifty dimensions at two spans is all a byte affords beside the modalities
     /// already spoken for — an eight-by-eight thumbnail and nothing wider.
     /// <see cref="Winnow"/> has no such ceiling because every code it emits rides on
@@ -126,7 +126,7 @@ public sealed class Banded<TFrame> : IQuantizer<TFrame>
     {
         var reading = _reading(observation);
 
-        // OR THE DECLARED WIDTH IS A PROMISE NOBODY KEPT. The block was sized against
+        // Or the declared width is a promise nobody kept. The block was sized against
         // it at construction, so a reading that outgrows it wraps exactly as before
         // and the guard above would be decoration.
         if (reading.Count != _width)

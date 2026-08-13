@@ -12,8 +12,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>`SplitTests` FOLDED THE MOMENT ONCE AND HANDED THE SAME SET TO EVERY HOLDER, WHICH
-/// IS NOT WHAT A DEPLOYMENT DOES.</b> That file split a population's COMMITMENTS and left
+/// <b>`SplitTests` folded the moment once and handed the same set to every holder, which
+/// is not what a deployment does.</b> That file split a population's COMMITMENTS and left
 /// its <see cref="Naming"/> whole, so every shard fired against an identical moment by
 /// construction. The bit-identical result it reports is therefore a fact about the
 /// arithmetic and not about two machines — and reading it as the latter would be a
@@ -21,7 +21,7 @@ namespace OpenPlexus.Tests;
 /// list already carries, running in the other direction.
 /// </para>
 /// <para>
-/// <b>BECAUSE A MOMENT IS FOLDED BEFORE ANYTHING FIRES, AND FOLDING NEEDS THE NAMES.</b>
+/// <b>Because a moment is folded before anything fires, and folding needs the names.</b>
 /// <see cref="Naming.Fold"/> adds every minted name whose members are all present, and
 /// runs to a fixed point because a name may stand for a set containing names. A holder
 /// folds with the names IT has minted. Two holders that abstracted on different evidence
@@ -29,8 +29,8 @@ namespace OpenPlexus.Tests;
 /// different questions.
 /// </para>
 /// <para>
-/// <b>AND THE DESIGN SAYS THIS SHOULD BE FINE, WHICH IS EXACTLY WHY IT IS WORTH
-/// CHECKING.</b> A name's identity is a hash of its members, so two machines that notice
+/// <b>And the design says this should be fine, which is exactly why it is worth
+/// checking.</b> A name's identity is a hash of its members, so two machines that notice
 /// the same redundancy mint the same code without speaking. That is the claim. What it
 /// does not say is whether they notice the same redundancies at all — fork 29's divergent
 /// siblings, arriving at rung five instead of at repair.
@@ -46,7 +46,7 @@ public sealed class FoldingTests(ITestOutputHelper output)
     /// Eleven bits, <b>because six mints no names at all and would pass for free.</b>
     /// </summary>
     /// <remarks>
-    /// <b>FORK 34 IS WHY THIS NUMBER IS NOT TWO.</b> Rung five names nothing at six bits
+    /// <b>Fork 34 is why this number is not two.</b> Rung five names nothing at six bits
     /// and both names and STACKS at eleven — so a version of this file run on the world
     /// step one is judged on would compare two empty naming tables, find them identical,
     /// and report agreement it had never tested.
@@ -56,7 +56,7 @@ public sealed class FoldingTests(ITestOutputHelper output)
     /// <param name="world">The world's generator — which observations are seen.</param>
     /// <param name="brain">The brain's own generator, used by the control arm.</param>
     /// <remarks>
-    /// <b>TWO SEEDS AND NOT ONE, BECAUSE OTHERWISE THE ARM BELOW CANNOT BE BUILT.</b>
+    /// <b>Two seeds and not one, because otherwise the arm below cannot be built.</b>
     /// Holding the world fixed and moving the brain asks whether the SAME evidence mints
     /// the same names; moving both asks whether two machines that saw different things
     /// end up anywhere near each other. One number without the other is unreadable —
@@ -120,7 +120,7 @@ public sealed class FoldingTests(ITestOutputHelper output)
 
         output.WriteLine($"names: {ours.Count} and {theirs.Count}, {shared} in common");
 
-        // THE CHECK THAT THIS FILE IS ASKING ANYTHING AT ALL. Two empty tables fold every
+        // The check that this file is asking anything at all. Two empty tables fold every
         // moment identically and would report perfect agreement for the one reason that
         // makes the number worthless.
         Assert.True(ours.Count > 0 && theirs.Count > 0,
@@ -133,7 +133,7 @@ public sealed class FoldingTests(ITestOutputHelper output)
             $"different streams | {folded_at_all} folded by at least one | {apart} folded apart "
             + $"({apart / (double)Asked:P1})");
 
-        // THE ARM, AND WITHOUT IT THE NUMBER ABOVE IS UNREADABLE. Same world, same
+        // The arm, and without it the number above is unreadable. Same world, same
         // stream, different brain generator: if the same evidence still mints different
         // names then abstraction is not convergent and the wire cannot fix it. If it
         // mints the SAME names, then everything above is a fact about seeing different
@@ -149,7 +149,7 @@ public sealed class FoldingTests(ITestOutputHelper output)
             + $"{ours.Intersect(also).Count()} in common | {folded_alike} folded "
             + $"| {apart_alike} folded apart ({apart_alike / (double)Asked:P1})");
 
-        // AND THE SECOND CHECK THAT THIS FILE CAN FAIL. A naming table that never
+        // And the second check that this file can fail. A naming table that never
         // completes on any live moment is a table that exists and does nothing, and the
         // disagreement count below it would then be nought for that reason instead of
         // because two machines agreed.
@@ -157,7 +157,7 @@ public sealed class FoldingTests(ITestOutputHelper output)
             "no moment was folded by either machine, so the comparison below is between "
             + "two unchanged sets and says nothing about naming");
 
-        // NO BAR ON THE DISAGREEMENT ITSELF, because what it should be has never been
+        // No bar on the disagreement itself, because what it should be has never been
         // measured and a threshold written first would be a prediction dressed as a
         // requirement. The number is the finding.
     }

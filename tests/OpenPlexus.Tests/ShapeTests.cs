@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using Xunit.Abstractions;
@@ -10,7 +10,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S RULE, 2026-08-04, AND THIS IS THE CHECK THAT WAS MISSING.</b> The
+/// <b>John's rule, 2026-08-04, and this is the check that was missing.</b> The
 /// point of this project is one brain that several worlds are shown to. A dial
 /// that lives on a world's constructor breaks that twice over: the world decides
 /// how the walk behaves, and the SAME dial ends up with different defaults in
@@ -18,15 +18,15 @@ namespace OpenPlexus.Tests;
 /// CLEVR, so two measurements that looked comparable were not.
 /// </para>
 /// <para>
-/// <b>WHY IT WENT UNNOTICED FOR SO LONG, WHICH IS THE LESSON RATHER THAN THE
-/// BUG.</b> Every budget in this suite guards the CODE — dead members, clones, doc
+/// <b>Why it went unnoticed for so long, which is the lesson rather than the
+/// bug.</b> Every budget in this suite guards the CODE — dead members, clones, doc
 /// words, dial count. None of them guarded the SHAPE. So a dial could be added to a
 /// world's constructor forever and no check could see it, including
 /// <see cref="DialTests"/>, whose entire job is noticing dials arrive: it
 /// enumerates the brain's settings record, and these were never in it.
 /// </para>
 /// <para>
-/// <b>THE LIST REACHED NOUGHT ON THE DAY IT WAS WRITTEN.</b> It began as fifteen
+/// <b>The list reached nought on the day it was written.</b> It began as fifteen
 /// dials across seven worlds and was a to-do list that failed the build, which is
 /// the only kind that gets done. It is kept at nought rather than deleted, because
 /// what it guards is not the migration — it is the next world somebody adds.
@@ -45,15 +45,15 @@ public sealed class ShapeTests(ITestOutputHelper output)
     /// read. A new name here needs an argument, which is the point.
     /// </para>
     /// <para>
-    /// <b><c>brain</c> IS THE HANDING-IN THIS CHECK EXISTS TO ENFORCE, ARRIVING AS
-    /// SOMETHING IT DID NOT RECOGNISE.</b> <i>Brain dials are built once and handed in;
+    /// <b><c>brain</c> is the handing-in this check exists to enforce, arriving as
+    /// something it did not recognise.</b> <i>Brain dials are built once and handed in;
     /// a world turns only its own.</i> A runner taking the whole brain as ONE object is
     /// that rule kept — the dials are assembled outside and the world cannot reach a
     /// single one of them. Taking a settings record instead would be the fault, so the
     /// name is admitted with a TYPE beside it rather than on its own.
     /// </para>
     /// <para>
-    /// <b>AND THE TRANSLATION IS A THIRD THING THAT BELONGS AT THE JOIN.</b> Whether a
+    /// <b>And the translation is a third thing that belongs at the join.</b> Whether a
     /// picture is read whole or in patches, whether a reading is banded or winnowed, and
     /// which frozen encoder it passes through are none of them facts about the problem
     /// and none of them settings on the brain — so <c>looking</c>, <c>fronting</c> and
@@ -67,13 +67,13 @@ public sealed class ShapeTests(ITestOutputHelper output)
         "world", "settings", "dials", "seed", "clusters", "replicas", "late", "primer",
         "brain", "looking", "fronting", "through",
 
-        // AN INSTRUMENT SWITCH RATHER THAN A DIAL, AND THE DIFFERENCE IS DECIDABLE: a
+        // An instrument switch rather than a dial, and the difference is decidable: a
         // dial changes what the run DOES and this changes only whether a reading is
         // taken. It is on a world rather than on the brain because the census needs the
         // world's own soundness check, which no brain may ever see -- so it could not
         // live anywhere else without handing the learner an answer key.
         //
-        // AND A NAME IS NOT AN ARGUMENT, WHICH IS WHAT THIS FILE'S OWN `brain` CLAUSE
+        // And a name is not an argument, which is what this file's own `brain` CLAUSE
         // SAYS. `CensusTests` asserts that a run with it on and a run with it off learn
         // identically, so the exemption is paid for by a check rather than by this
         // comment -- and the day the census starts changing the run, that goes red here
@@ -105,7 +105,7 @@ public sealed class ShapeTests(ITestOutputHelper output)
                 {
                     var name = taken.Name!;
 
-                    // AN EXEMPTION ON A NAME ALONE IS A HOLE IN THE GUARD, and this is
+                    // An exemption on a name alone is a hole in the guard, and this is
                     // the one where it would matter: `brain` is admitted because it
                     // hands over the whole brain at once, so a parameter called `brain`
                     // that is a settings record -- or anything else a world could reach
@@ -128,7 +128,7 @@ public sealed class ShapeTests(ITestOutputHelper output)
                 ? "every world takes only what it is showing"
                 : string.Join("\n", outstanding.Order(StringComparer.Ordinal)));
 
-        // A DIAL THAT ARRIVED ON A WORLD SINCE THE LIST WAS WRITTEN.
+        // A dial that arrived on a world since the list was written.
         var fresh = outstanding.Except(NotYetMoved, StringComparer.Ordinal)
             .Order(StringComparer.Ordinal).ToList();
 
@@ -138,7 +138,7 @@ public sealed class ShapeTests(ITestOutputHelper output)
             + "can see it, or add it to `Allowed` with an argument for why it is "
             + "about the data rather than the brain.");
 
-        // AND THE OTHER DIRECTION, so the list cannot rot into a record of dials
+        // and the other direction, so the list cannot rot into a record of dials
         // that have already moved -- the same failure the doc's ticked boxes and
         // the dead-code list are both checked for.
         var done = NotYetMoved.Except(outstanding, StringComparer.Ordinal)
@@ -152,7 +152,7 @@ public sealed class ShapeTests(ITestOutputHelper output)
     [Fact]
     public void The_list_of_worlds_still_holding_dials_only_ever_shrinks()
     {
-        // THE BUDGET, AND IT SITS AT THE CURRENT COUNT RATHER THAN ABOVE IT. There
+        // The budget, and it sits at the current count rather than above it. There
         // is no ordinary edit that should raise this: every entry is a world
         // deciding something the brain should decide, and the whole direction of
         // travel is towards nought.

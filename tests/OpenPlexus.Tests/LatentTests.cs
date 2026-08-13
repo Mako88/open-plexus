@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Worlds;
+using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Tests;
 
@@ -7,7 +7,7 @@ namespace OpenPlexus.Tests;
 /// minted over.</b>
 /// </summary>
 /// <remarks>
-/// <b>EVERY CHANNEL REPORTS ONE HIDDEN STATE, so they co-occur constantly and none
+/// <b>Every channel reports one hidden state, so they co-occur constantly and none
 /// of them causes any other.</b> The thing that would explain them has no code and
 /// no walk can reach it. That is the shape `Thought.Grouped` was built for and
 /// which no other world here has.
@@ -22,7 +22,7 @@ public sealed class LatentTests
     [Fact]
     public void A_channel_never_shows_another_channels_code()
     {
-        // THE WORLD, ASSERTED RATHER THAN DESCRIBED. If two channels could emit one
+        // The world, asserted rather than described. If two channels could emit one
         // code the group would be an artefact of the coding rather than of the
         // hidden cause.
         var codes = Enumerable.Range(0, 6)

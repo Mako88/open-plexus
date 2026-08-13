@@ -10,8 +10,8 @@ namespace OpenPlexus.Tests;
 /// The first world here whose readings were never symbols.
 /// </summary>
 /// <remarks>
-/// <b>bAbI SHIPS WORDS, CLEVR SHIPS A SCENE GRAPH, CLUTRR SHIPS THE RELATION AS A
-/// COLUMN.</b> Each hands over the front end this architecture claims to replace, so
+/// <b>bAbI ships words, CLEVR ships a scene graph, clutrr ships the relation as a
+/// column.</b> Each hands over the front end this architecture claims to replace, so
 /// no score on any of them has said anything about the interface. This ships photons,
 /// and what a front end can do with them is the whole question.
 /// </remarks>
@@ -50,7 +50,7 @@ public sealed class CifarTests(ITestOutputHelper output)
     [Fact]
     public void Box_averaging_keeps_the_photons_a_subsample_would_throw_away()
     {
-        // THE COARSE READING IS THE MEAN OF THE FINE ONE, which is what says the dial
+        // The coarse reading is the mean of the fine one, which is what says the dial
         // is a loss of RESOLUTION rather than a differently-aliased picture. A
         // subsampling reader would pass every other test in this file and fail this.
         var fine = new Cifar(World(side: 32), seed: 4).Next();
@@ -89,7 +89,7 @@ public sealed class CifarTests(ITestOutputHelper output)
     [Fact]
     public void Every_class_is_drawn_and_none_dominates()
     {
-        // THE TEST BATCH IS BALANCED BY CONSTRUCTION and the draw is uniform, so a
+        // The test batch is balanced by construction and the draw is uniform, so a
         // reader that mangled the record stride would show up here as a class that
         // never appears -- which is cheaper to find than as a score nobody can explain.
         var world = new Cifar(World(images: 10_000), seed: 2);
@@ -104,7 +104,7 @@ public sealed class CifarTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE CEILING, AND IT IS STRUCTURAL RATHER THAN A MATTER OF DEGREE.</b>
+    /// <b>The ceiling, and it is structural rather than a matter of degree.</b>
     /// </summary>
     /// <remarks>
     /// <see cref="Banded{TFrame}"/> gives every dimension its own block of modalities
@@ -137,7 +137,7 @@ public sealed class CifarTests(ITestOutputHelper output)
 
         Assert.All(said, code => Assert.Equal(CifarRun.Pixel, code.Modality));
 
-        // THE COST SIDE, SAID OUT LOUD. One winner per twenty cells over forty cells
+        // The cost side, said out loud. One winner per twenty cells over forty cells
         // per dimension is 128 codes for a 64-number reading -- and genesis mints a
         // candidate per live code on every surprise, so this is the number that
         // decides whether the front end is affordable and not the accuracy.

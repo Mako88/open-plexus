@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Tests;
@@ -8,7 +8,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S ASK, 2026-08-03: MAKE THE HAND PASS UNNECESSARY.</b> Three worlds
+/// <b>John's ask, 2026-08-03: make the hand pass unnecessary.</b> Three worlds
 /// each grew their own copy of the settle loop, the complaint list, the vote
 /// tally and the concept-code scheme, and every one of those was found by
 /// somebody reading all three files side by side. That is not a thing anyone
@@ -67,7 +67,7 @@ public sealed class DuplicationTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>ADDED 2026-08-04, AND THE REASON MATTERS MORE THAN THE PATTERN.</b> The
+    /// <b>Added 2026-08-04, and the reason matters more than the pattern.</b> The
     /// dials moved out of the worlds and into <c>WalkSettings</c>, so every
     /// world runner's constructor now reads <c>(settings, dials, seed, clusters,
     /// replicas)</c> — IDENTICALLY, ON PURPOSE. That uniformity is the whole point
@@ -127,7 +127,7 @@ public sealed class DuplicationTests
             }
         }
 
-        // OVERLAPPING WINDOWS ARE ONE CLONE. A twelve-statement copy contains
+        // Overlapping Windows are one clone. A twelve-statement copy contains
         // seven duplicated windows, and reporting all seven buries every other
         // finding underneath it. So a window whose start is already inside a
         // reported clone is that clone continuing, not a new one.

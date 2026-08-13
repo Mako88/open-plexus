@@ -16,43 +16,43 @@ public readonly record struct Peer(string Host);
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THIS IS THE FIRST THING IN THE PROJECT THAT CAN ACTUALLY BE DISTRIBUTED.</b>
+/// <b>This is the first thing in the project that can actually be distributed.</b>
 /// <see cref="HybridBus"/> is a dictionary of holders called through
 /// <see cref="Task.Run(Action)"/> with delays sprinkled in, so C2 and C3 have been
 /// honoured by a SIMULATION of a network for the life of the repo. Twenty phones cannot
 /// run a dictionary lookup between them.
 /// </para>
 /// <para>
-/// <b>AND `HybridBus` STAYS THE HARSHER TEST, WHICH IS THE PART THAT WILL BE ASSUMED THE
-/// OTHER WAY ROUND.</b> It reorders deliveries on purpose because C2 says messages arrive
+/// <b>AND `HybridBus` stays the harsher test, which is the part that will be assumed the
+/// other way round.</b> It reorders deliveries on purpose because C2 says messages arrive
 /// out of order; HTTP over TCP does not reorder within a connection, so a run over this
 /// exercises LESS adversity than a run in one process. A green distributed run is
 /// therefore not evidence that C2 is satisfied — the simulator is where that is measured,
 /// and this is where it is measured that the bytes are right.
 /// </para>
 /// <para>
-/// <b>WHERE A HOLDER LIVES IS LEARNED AND NOT CONFIGURED.</b> A machine announces the
+/// <b>Where a holder lives is learned and not configured.</b> A machine announces the
 /// addresses it holds when they subscribe, so a roster of hosts is all any of them is
 /// told — which is what lets a machine arrive late, and is the only shape that survives
 /// C3, since a machine that dies and returns announces itself again.
 /// </para>
 /// <para>
-/// <b>SENDS DO NOT WAIT ON RECEIVERS, exactly as the interface promises.</b> A fan-out to
+/// <b>Sends do not wait on receivers, exactly as the interface promises.</b> A fan-out to
 /// twelve holders is twelve posts in flight rather than twelve round trips end to end;
 /// awaiting each would turn a broadcast into a queue and put the network's latency into
 /// the search once per hop.
 /// </para>
 /// <para>
-/// <b>AND THAT PARAGRAPH WAS FALSE FROM THE DAY IT WAS WRITTEN, WHICH IS WHY IT IS STILL
-/// HERE.</b> Both fan-outs awaited each post in turn, so a broadcast cost the SUM of the
+/// <b>And that paragraph was false from the day it was written, which is why it is still
+/// here.</b> Both fan-outs awaited each post in turn, so a broadcast cost the SUM of the
 /// hops and the origin was paced by the slowest machine in the fleet — the exact failure
 /// the sentence above describes, sitting underneath it. Nothing caught it because nothing
 /// on the thinking path had ever been timed across a socket; it turned up when the LEARNING
 /// path was, because that one is measured in milliseconds and a queue shows.
 /// </para>
 /// <para>
-/// <b>SO A DOCUMENTED PROMISE IS NOT A CHECK, AND THE ONLY REASON THIS ONE IS TRUE NOW IS
-/// THAT SOMETHING PUT A CLOCK ON IT.</b> The cost of a fan-out is in
+/// <b>So a documented promise is not a check, and the only reason this one is true now is
+/// that something put a clock on it.</b> The cost of a fan-out is in
 /// <c>AskedTests</c>: nine holders at two and a half times one, rather than at nine.
 /// </para>
 /// </remarks>
@@ -65,8 +65,8 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// Where an asker that is not here can be reached.
     /// </summary>
     /// <remarks>
-    /// <b>SEPARATE FROM <see cref="_holding"/> BECAUSE AN ASK IS A BROADCAST AND AN ANSWER
-    /// IS NOT.</b> An answer goes to the one machine that asked, so this table only has to
+    /// <b>SEPARATE FROM <see cref="_holding"/> because an ask is a broadcast and an answer
+    /// is not.</b> An answer goes to the one machine that asked, so this table only has to
     /// say where that one is; an ask goes to every holder, so the other one decides the
     /// denominator of a gathering. Folding them together would put every asker into the
     /// vote's population count, and each would then be a holder that never answers.
@@ -81,7 +81,7 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// One client per peer, made once.
     /// </summary>
     /// <remarks>
-    /// <b>NOT ONE PER SEND, WHICH IS THE PITFALL `SimpleHttpClient` EXISTS TO AVOID.</b>
+    /// <b>Not one per send, which is the pitfall `SimpleHttpClient` EXISTS TO AVOID.</b>
     /// A client made per request leaks sockets into TIME_WAIT and eventually cannot open
     /// another; one held per host pools its connections, which is also what keeps a
     /// fan-out from paying a handshake per cluster.
@@ -101,8 +101,8 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A BUS THAT DROPS SILENTLY NEEDS A COUNT, OR THE LOSS IS A FACT NOTHING CAN
-    /// SEE.</b> Every failed post here is swallowed on purpose — a machine that is not
+    /// <b>A bus that drops silently needs a count, or the loss is a fact nothing can
+    /// see.</b> Every failed post here is swallowed on purpose — a machine that is not
     /// there is C3 rather than an error — and that reasoning is right for a DEATH and
     /// wrong for a hiccup. The two are the same event to <see cref="PostAsync"/> and they
     /// are completely different to whoever was waiting, because a fleet gathers from a
@@ -110,7 +110,7 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// machine that is alive and idle.
     /// </para>
     /// <para>
-    /// <b>AND THIS REPO'S OWN TRAP LIST IS ABOUT EXACTLY THIS SHAPE.</b> A cost can be in
+    /// <b>And this repo's own trap list is about exactly this shape.</b> A cost can be in
     /// memory while every instrument watches time; here a loss was on the wire while every
     /// instrument watched arrivals. What could be seen was how many answers came back, and
     /// what could not was whether an ask ever left.
@@ -120,7 +120,7 @@ public sealed class Posted : IBus, IAsyncDisposable
 
     /// <summary>Messages this machine took delivery of and then could not act on.</summary>
     /// <remarks>
-    /// <b>THE OTHER END OF THE SAME SILENCE, AND IT IS A DIFFERENT FAULT.</b> A drop is
+    /// <b>The other end of the same silence, and it is a different fault.</b> A drop is
     /// the sender failing to hand it over; this is the receiver accepting the bytes and
     /// throwing while reading or dispatching them. From the waiting asker they are one
     /// event — no answer — and only one of them is about the network.
@@ -150,7 +150,7 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// alive and reachable when it subscribed and no others.
     /// </para>
     /// <para>
-    /// <b>AND IT IS THE DENOMINATOR OF A GATHERING, which is why the partial picture has to
+    /// <b>And it is the denominator of a gathering, which is why the partial picture has to
     /// be reportable.</b> How many HOLDERS exist decides how much of a population a vote was
     /// taken over, and a run that quietly asked eleven of twelve would score like one that
     /// asked all twelve and be wrong about something nothing reports.
@@ -190,20 +190,20 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// <param name="ct">Cancellation.</param>
     /// <remarks>
     /// <para>
-    /// <b>A PEER THAT CANNOT BE REACHED IS NOT AN ERROR, WHICH IS C3 AT STARTUP.</b> A
+    /// <b>A peer that cannot be reached is not an error, which is C3 AT STARTUP.</b> A
     /// machine that is not up yet, or never will be, must not stop this one from running —
     /// so a failed announcement is dropped and the peer simply does not know about these
     /// holders until the next one.
     /// </para>
     /// <para>
-    /// <b>AND IT IS A FAN-OUT LIKE EVERY OTHER ONE HERE, WHICH IT WAS NOT UNTIL SOMETHING
-    /// TIMED A FLEET COMING UP.</b> This awaited each peer in turn, so a machine opening paid
+    /// <b>And it is a fan-out like every other one here, which it was not until something
+    /// timed a fleet coming up.</b> This awaited each peer in turn, so a machine opening paid
     /// the SUM of its peers rather than the slowest of them — the identical defect the class
     /// remark describes at length for a broadcast, in the method underneath it, surviving the
     /// commit that fixed the other two.
     /// </para>
     /// <para>
-    /// <b>AND WHAT IT COSTS IS PAID EXACTLY WHERE IT HURTS MOST.</b> A peer that is not there
+    /// <b>And what it costs is paid exactly where it hurts most.</b> A peer that is not there
     /// costs a connect giving up — four seconds on a Windows loopback, and a real timeout on
     /// a wifi — so a fleet coming up is the one moment when most posts fail, and serialising
     /// it multiplied that by the number of machines. Twenty phones where two are off is the
@@ -246,11 +246,11 @@ public sealed class Posted : IBus, IAsyncDisposable
     {
         ArgumentNullException.ThrowIfNull(holder);
 
-        // AND LEAVING IS SILENT HERE, WHICH IS THE OPPOSITE OF A CLUSTER. See `IBus`: an
+        // And leaving is silent here, which is the opposite of a cluster. See `IBus`: an
         // ask that reaches nobody is an answer that never arrives, and the asker counts
         // that for itself. A death notice would only ever cover the polite departures.
         //
-        // AND `Unreached` IS NOT ONE, WHICH IS WHY THIS IS STILL SILENT WITH FORK 53 BUILT.
+        // AND `Unreached` is not one, which is why this is still silent with fork 53 built.
         // That event fires where an ask fails to leave rather than where a holder goes, so
         // it says nothing about departures and everything about deliveries -- the impolite
         // death and the dropped message reach it by the same road, which is the road that
@@ -273,8 +273,8 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// <param name="ask">The question.</param>
     /// <param name="ct">Cancellation.</param>
     /// <remarks>
-    /// <b>THE ONE DELIVERY ON THIS BUS WHOSE FAILURE SOMEBODY IS WAITING ON, WHICH IS WHY
-    /// IT IS THE ONE NOT SIMPLY SWALLOWED.</b> Every other path here loses a message and
+    /// <b>The one delivery on this bus whose failure somebody is waiting on, which is why
+    /// it is the one not simply swallowed.</b> Every other path here loses a message and
     /// costs whoever needed it a fact; this one loses a message and costs an asker its
     /// denominator, so the gathering never completes and a fleet that is alive and idle
     /// stops for good. See <see cref="IBus.Unreached"/>.
@@ -299,13 +299,13 @@ public sealed class Posted : IBus, IAsyncDisposable
                 }
                 catch (Exception) when (!ct.IsCancellationRequested)
                 {
-                    // A HOLDER ON THIS MACHINE THAT THREW WHILE TAKING THE QUESTION, which
+                    // A holder on this machine that threw while taking the question, which
                     // is `Refused` rather than `Dropped` and is the same event to whoever
                     // asked: no answer to this ask is coming from there.
                 }
 
-                // AND IT COMES OFF THE ROSTER, WHICH IS THE WALK'S `died` PATH REACHED BY
-                // OBSERVATION RATHER THAN BY ANNOUNCEMENT. Measured before this line
+                // And it comes off the roster, which is the walk's `died` path reached by
+                // observation rather than by announcement. Measured before this line
                 // existed: a post to a machine that has closed its door costs a flat four
                 // seconds on loopback -- the transport's own give-up, not a wait anybody
                 // here chose -- so a fleet that kept asking a dead holder paid that every
@@ -317,7 +317,7 @@ public sealed class Posted : IBus, IAsyncDisposable
                 // still subscribed; unsubscribing it here would delete a machine over a
                 // fault in one answer.
                 //
-                // AND IT COMES BACK BY ANNOUNCING, WHICH IS THE ONLY WAY IN AND IS A PUSH.
+                // And it comes back by announcing, which is the only way in and is a push.
                 // `Absorb` re-enters a holder the moment its machine opens, so a phone out
                 // of a tunnel rejoins by saying so. What this cannot recover is a machine
                 // that stayed up while one message to it was lost -- it is out until it
@@ -335,8 +335,8 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// <param name="delivery">What to do.</param>
     /// <param name="ct">Cancellation.</param>
     /// <remarks>
-    /// <b>A FAULT ON THIS PATH HAS NOWHERE TO GO, AND AN UNOBSERVED TASK IS WORSE THAN A
-    /// SWALLOWED ONE.</b> The caller has already been handed its answer — who was asked, or
+    /// <b>A fault on this path has nowhere to go, and an unobserved task is worse than a
+    /// swallowed one.</b> The caller has already been handed its answer — who was asked, or
     /// who is about to be sent to — so there is no return value left to carry a failure on.
     /// What reaches here is a holder departing inside the window between being listed and
     /// being sent to, which is C3 happening rather than a routing bug.
@@ -377,12 +377,12 @@ public sealed class Posted : IBus, IAsyncDisposable
 
         IReadOnlyCollection<MachineAddress> everyone = [.. going.Select(one => one.Who)];
 
-        // THE ASKER RECORDS ITS GATHERING INSIDE THIS WINDOW, before anything is asked. A
+        // The asker records its gathering inside this window, before anything is asked. A
         // local holder answers by direct call and can be back before this method returns,
         // and an answer to an ask nobody remembers is dropped.
         ready?.Invoke(everyone);
 
-        // EVERY HOLDER ASKED AT ONCE AND NONE OF THEM WAITED ON, WHICH IS FORK 56'S PRICE.
+        // Every holder asked at once and none of them waited on, which is fork 56'S PRICE.
         // The gate's query is about nine asks a round, all askable at once, so ONE round
         // trip -- and a fan-out that awaited each peer's acknowledgement would cost nine
         // however concurrent the answers were.
@@ -413,7 +413,7 @@ public sealed class Posted : IBus, IAsyncDisposable
             return;
         }
 
-        // AN ANSWER WITH NOWHERE TO GO IS DROPPED, exactly as a report is. The asker may
+        // An answer with nowhere to go is dropped, exactly as a report is. The asker may
         // have died between asking and being answered, which C3 says is ordinary — and
         // throwing here would make one machine's departure another machine's error.
         if (there is not null)
@@ -451,8 +451,8 @@ public sealed class Posted : IBus, IAsyncDisposable
         }
         catch (Exception) when (!ct.IsCancellationRequested)
         {
-            // A MALFORMED OR UNDELIVERABLE MESSAGE IS DROPPED AND NOT RETURNED AS AN
-            // ERROR. C2 makes a lost message indistinguishable from a late one, and the
+            // A malformed or undeliverable message is dropped and not returned as an
+            // error. C2 makes a lost message indistinguishable from a late one, and the
             // sender is not waiting on this answer anyway -- so failing loudly here would
             // only produce noise nobody reads.
             //
@@ -492,14 +492,14 @@ public sealed class Posted : IBus, IAsyncDisposable
                     await asker.DeliverAsync(Wire.Read<Answer>(sent), ct).ConfigureAwait(false);
                 break;
 
-            // AN ANNOUNCEMENT IS ANSWERED BY ONE, AND WITHOUT THAT THE CLASS'S OWN CLAIM
-            // ABOUT LATE ARRIVAL WAS HALF TRUE. A machine announces when it opens, and a
+            // An announcement is answered by one, and without that the class's own claim
+            // about late arrival was half true. A machine announces when it opens, and a
             // peer that is not up yet drops it -- so the machine that opened FIRST tells
             // nobody and is told by everybody. Its own routes work and nothing can route
             // back to it, which for the thinking path is a lost report and for this one is
             // every answer undeliverable.
             //
-            // ONE REPLY AND NEVER A SECOND, WHICH IS WHAT THE SEPARATE PATH BUYS. A reply
+            // One reply and never a second, which is what the separate path buys. A reply
             // that was itself answered would be two machines announcing at each other for
             // the life of the run; `announced` is the same message with no reply owed, so
             // the exchange closes in one round trip whoever opened first.
@@ -515,8 +515,8 @@ public sealed class Posted : IBus, IAsyncDisposable
                 Absorb(Wire.Read<Roster>(sent));
                 break;
 
-            // AND THERE IS NO `died` PATH, WHICH IS C3 REACHED BY OBSERVATION RATHER THAN BY
-            // ANNOUNCEMENT. The walk had one because a route in flight toward a departed
+            // AND THERE IS NO `died` PATH, WHICH IS C3 reached by observation rather than by
+            // announcement. The walk had one because a route in flight toward a departed
             // cluster is stranded and the origin cannot write it off without being told; an
             // ask is written off by the sender watching it fail to leave -- see `Fire` --
             // which needs nothing of the dying machine and so covers the impolite departure
@@ -549,12 +549,12 @@ public sealed class Posted : IBus, IAsyncDisposable
         }
         catch (Exception) when (!ct.IsCancellationRequested)
         {
-            // C3: A MACHINE THAT IS NOT THERE IS NORMAL AND NOT AN ERROR. The design says
+            // C3: A machine that is not there is normal and not an error. The design says
             // a holder vanishing mid-round is expected, so a refused connection is the
             // same event arriving by a faster road than a timeout.
             //
-            // AND IT IS COUNTED NOW, BECAUSE THE SENTENCE ABOVE IS TRUE OF A DEATH AND
-            // FALSE OF A HICCUP. See `Dropped`.
+            // And it is counted now, because the sentence above is true of a death and
+            // false of a hiccup. See `Dropped`.
             Interlocked.Increment(ref _dropped);
 
             return false;
@@ -582,8 +582,8 @@ public sealed class Posted : IBus, IAsyncDisposable
         /// The holders of commitments it has, which can be asked.
         /// </summary>
         /// <remarks>
-        /// <b>ANNOUNCED SEPARATELY FROM <see cref="Askers"/> BECAUSE AN ASK IS A BROADCAST
-        /// AND AN ANSWER IS NOT.</b> An answer goes to the one machine that asked, so the
+        /// <b>ANNOUNCED SEPARATELY FROM <see cref="Askers"/> because an ask is a broadcast
+        /// and an answer is not.</b> An answer goes to the one machine that asked, so the
         /// roster only has to say where that one is; an ask goes to EVERY holder, so the
         /// roster is what decides the denominator of a gathering. Folding them together
         /// would put every asker into the vote's population count, and each of them would
@@ -596,7 +596,7 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// Shuts the door. <b>Twice is the same as once.</b>
     /// </summary>
     /// <remarks>
-    /// <b>AND IT THREW THE SECOND TIME UNTIL SOMETHING KILLED A MACHINE ON PURPOSE.</b>
+    /// <b>And it threw the second time until something killed a machine on purpose.</b>
     /// <see cref="CancellationTokenSource.CancelAsync"/> on a disposed source is an
     /// <see cref="ObjectDisposedException"/>, so a harness that took a machine down mid-run
     /// and then tore the fleet down could not do both — which reads as the C3 test failing
@@ -613,7 +613,7 @@ public sealed class Posted : IBus, IAsyncDisposable
 
         await _closing.CancelAsync().ConfigureAwait(false);
 
-        // ABORTED RATHER THAN CLOSED, AND THE DIFFERENCE WAS MINUTES A MACHINE.
+        // Aborted rather than closed, and the difference was minutes a machine.
         //
         // `Close` is the polite shutdown: it waits for the request queue to drain, and
         // every peer holds a keep-alive connection to this listener that nothing on this
@@ -622,14 +622,14 @@ public sealed class Posted : IBus, IAsyncDisposable
         // a second and the teardown around it took minutes, which is what made a grid of
         // twelve fleets look exactly like a deadlock.
         //
-        // AND ABORT IS THE HONEST SEMANTICS HERE ANYWAY, WHICH IS WHY THIS IS NOT A
-        // WORKAROUND. C3 says a machine vanishing mid-thought is normal; a phone going into
+        // And abort is the honest semantics here anyway, which is why this is not a
+        // workaround. C3 says a machine vanishing mid-thought is normal; a phone going into
         // a tunnel does not drain its request queue first. What this discards is exactly
         // what a death discards.
         _door.Abort();
         _closing.Dispose();
 
-        // AND THE CLIENTS ARE NOT DISPOSED, BECAUSE THEY CANNOT BE. `ISimpleClient` has no
+        // And the clients are not disposed, because they cannot be. `ISimpleClient` has no
         // `Dispose`, so the line that used to sit here -- `(client as IDisposable)?.Dispose()`
         // -- read as cleanup and did nothing at all, which is this repo's oldest shape of
         // defect wearing a tidy face. One client per host is what keeps a fan-out from

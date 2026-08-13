@@ -7,7 +7,7 @@ public sealed record ReturningSettings
 {
     /// <summary>How many individuals the room holds.</summary>
     /// <remarks>
-    /// <b>INDIVIDUALS AND NOT KINDS, WHICH IS THE WHOLE OF WHAT THIS WORLD IS FOR.</b> Every
+    /// <b>Individuals and not kinds, which is the whole of what this world is for.</b> Every
     /// other world here shows a fresh draw from a distribution; this one shows THE SAME
     /// THINGS AGAIN, so a moment can be about something that was already met.
     /// </remarks>
@@ -33,14 +33,14 @@ public sealed record ReturningSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE CELL THE WHOLE WORLD EXISTS FOR, AND WITHOUT IT EVERY SCORE HERE IS A KIND'S
-    /// RATHER THAN AN INDIVIDUAL'S.</b> A thing that looks unlike everything else can be
+    /// <b>The cell the whole world exists for, and without it every score here is a kind's
+    /// rather than an individual's.</b> A thing that looks unlike everything else can be
     /// re-found by its appearance, and a rule keyed on appearance is a narrow CATEGORY that
     /// this design already builds. Two things that look the same and are not is where a
     /// category runs out and a referent is the only thing left.
     /// </para>
     /// <para>
-    /// <b>SO THE UNTAGGED ARM MUST FALL TO THE PAIR'S BASE RATE HERE, BY CONSTRUCTION.</b>
+    /// <b>So the untagged arm must fall to the pair's base rate here, by construction.</b>
     /// That is not a failure to be repaired — it is the measurement. What an individual is
     /// WORTH is the distance from it to the arm that is handed one.
     /// </para>
@@ -52,14 +52,14 @@ public sealed record ReturningSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE CEILING ARM, AND IT IS A THING NO CAMERA CAN DO.</b> A front end may say
+    /// <b>The ceiling arm, and it is a thing no camera can do.</b> A front end may say
     /// <i>these codes were one object</i> and this design grants it that; saying <i>and it
     /// is the one you saw on Tuesday</i> is the answer rather than the signal. John's
     /// ordering, 2026-08-12: point a phone at a basket, look away, look back, and nothing
     /// outside the learner may say it is the same basket.
     /// </para>
     /// <para>
-    /// <b>IT IS HERE ANYWAY BECAUSE A GAP NEEDS TWO ENDS.</b> Fork 88's number is what it is
+    /// <b>It is here anyway because a gap needs two ends.</b> Fork 88's number is what it is
     /// because the selection was handed over and the score compared; this is the same
     /// instrument aimed at identity. An arm nobody may ship is still the arm that says what
     /// shipping one would be worth.
@@ -72,7 +72,7 @@ public sealed record ReturningSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>JOHN'S OWN ACCOUNT OF WHAT AN INDIVIDUAL IS, MADE MEASURABLE.</b> A concept here
+    /// <b>John's own account of what an individual is, made measurable.</b> A concept here
     /// is not a thing stored somewhere — it is codes and an awareness of how they stand to
     /// each other. If an individual works the same way then what makes two identical
     /// baskets two baskets is not how they look, which is by construction the same, but
@@ -80,14 +80,14 @@ public sealed record ReturningSettings
     /// appearance cannot.
     /// </para>
     /// <para>
-    /// <b>AND IT IS AN AXIS RATHER THAN A THIRD ARM, BECAUSE IT HAS TO BE READ AGAINST
-    /// BOTH.</b> Against the anonymous twinned cell it says whether a relation recovers
+    /// <b>And it is an axis rather than a third arm, because it has to be read against
+    /// both.</b> Against the anonymous twinned cell it says whether a relation recovers
     /// what appearance lost; against the tagged one it says how much of a handed index it
     /// recovers. One number without the other two is a score with nothing to mean.
     /// </para>
     /// <para>
-    /// <b>THE LANDMARK IS FIXED FOR THE LIFE OF THE WORLD, WHICH IS THE HONEST LIMIT AND IS
-    /// SAID HERE RATHER THAN DISCOVERED LATER.</b> A basket that never moves is pinned by a
+    /// <b>The landmark is fixed for the life of the world, which is the honest limit and is
+    /// said here rather than discovered later.</b> A basket that never moves is pinned by a
     /// conjunction, and a conjunction is rung one and already built — so a win in this cell
     /// is a claim about RELATIONS carrying identity and not about anything tracking a thing
     /// through change. A landmark that moved would break the conjunction and is the next
@@ -102,21 +102,21 @@ public sealed record ReturningSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>JOHN'S: COLLAPSE CATEGORIES OVER TIME AS WELL AS SPACE.</b> A derivation over a bag
+    /// <b>John's: collapse categories over time as well as space.</b> A derivation over a bag
     /// of moments sees no order, which is exactly why twins merge — every statistic over the
     /// moments is the same for both by construction. Sightings that come in RUNS put a
     /// thing's own codes next to each other in time and nobody else's, which is a fact about
     /// the stream rather than about any moment in it.
     /// </para>
     /// <para>
-    /// <b>AND NOUGHT IS THE UNIFORM DRAW EVERY READING BEFORE THIS WAS TAKEN UNDER</b>, so
+    /// <b>And nought is the uniform draw every reading before this was taken under</b>, so
     /// the world is unchanged where this is not set and the two are one axis rather than two
     /// worlds. What it does NOT do is make a thing easier to answer about: the hidden
     /// attribute, the looks and the landmarks are drawn exactly as they were, and a learner
     /// seeing one moment at a time is handed nothing at all.
     /// </para>
     /// <para>
-    /// <b>SO IT IS CONTINUITY WITHOUT MOTION, WHICH IS THE HONEST LIMIT.</b> A thing's
+    /// <b>So it is continuity without motion, which is the honest limit.</b> A thing's
     /// landmark is still fixed for the life of the world, so what runs give is repeated
     /// sightings of one thing rather than a thing moving between places. Whether a MOVING
     /// landmark is what an individual needs is the arm after this one, and it is the arm
@@ -131,19 +131,19 @@ public sealed record ReturningSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THIS WORLD'S OWN DOC NAMES THE LIMIT AND THIS IS IT ARRIVING.</b> A landmark fixed
+    /// <b>This world's own doc names the limit and this is it arriving.</b> A landmark fixed
     /// for the life of the world is pinned by a CONJUNCTION, which is rung one and built —
     /// so recovering a thing from a fixed landmark is a claim about relations carrying
     /// identity and not about anything tracking a thing through change.
     /// </para>
     /// <para>
-    /// <b>AND IT IS THE ONE ARM THAT COULD REFUTE WHAT ADHESION FOUND.</b> If a thing's
+    /// <b>And it is the one arm that could refute what adhesion found.</b> If a thing's
     /// codes only adhere because the thing never moves, then what a derivation over an
     /// ordered stream reaches is a PLACE — and a place is shared by whoever stands in it, so
     /// it predicts a thing's hidden attribute exactly as long as nobody else has stood there.
     /// </para>
     /// <para>
-    /// <b>NOUGHT IS THE FIXED LANDMARK EVERY EARLIER READING WAS TAKEN UNDER</b>, and the
+    /// <b>Nought is the fixed landmark every earlier reading was taken under</b>, and the
     /// places are the things' own, so an alphabet's size never moves with this.
     /// </para>
     /// </remarks>
@@ -159,13 +159,13 @@ public sealed record ReturningSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S, 2026-08-12, AND IT IS THE BASKET.</b> Point a phone at a white basket, point
+/// <b>John's, 2026-08-12, and it is the basket.</b> Point a phone at a white basket, point
 /// it somewhere else, point it back. Knowing it is the same basket is not recognising a
 /// KIND — the room may hold two white baskets — and nothing in this design reaches it.
 /// Rung five names what CO-FIRES, and a basket at two moments never co-occurs with itself.
 /// </para>
 /// <para>
-/// <b>SO THE PROBLEM IS POSED AS A PREDICTION AND NEVER AS A JUDGEMENT OF IDENTITY.</b>
+/// <b>So the problem is posed as a prediction and never as a judgement of identity.</b>
 /// Asking the learner <i>is this the same one</i> would need an answer channel about
 /// identity, which is the conclusion being handed over in a different envelope. Instead a
 /// thing has an attribute that is never shown, and predicting it is possible exactly to the
@@ -173,15 +173,15 @@ public sealed record ReturningSettings
 /// evidence of, rather than what the question asks about.
 /// </para>
 /// <para>
-/// <b>AND THE TWINS ARE WHAT MAKE THAT EVIDENCE MEAN ANYTHING.</b> Untwinned, appearance
+/// <b>And the twins are what make that evidence mean anything.</b> Untwinned, appearance
 /// decides and a conjunctive scope over the look is a complete answer — the world would be
 /// scoring category formation and reading as identity. Twinned, appearance is exhausted by
 /// construction and the pair's base rate is the ceiling on anything that has only ever seen
 /// a moment at a time.
 /// </para>
 /// <para>
-/// <b>WHAT IS NOT BUILT HERE, DELIBERATELY, IS THE CONTINUITY THAT WOULD LET A LEARNER
-/// RECOVER THE GAP.</b> Company, trajectory, a room that changes slowly — each is a way an
+/// <b>What is not built here, deliberately, is the continuity that would let a learner
+/// recover the gap.</b> Company, trajectory, a room that changes slowly — each is a way an
 /// individual could be pinned by its relations rather than its looks, and each is an arm to
 /// run once the gap is measured. Measuring the gap first is what stops the first mechanism
 /// tried from being scored against no baseline at all.
@@ -259,11 +259,11 @@ public sealed class Returning : IWorld<Coded>, IWithholds<Coded>
 
         for (var thing = 0; thing < settings.Things; thing++)
         {
-            // EACH THING IN ITS OWN PLACE TO BEGIN WITH, so a world that never drifts is
+            // Each thing in its own place to begin with, so a world that never drifts is
             // bit-identical to the one that had no places to stand in at all.
             _standing[thing] = thing;
 
-            // TWINS WEAR ONE APPEARANCE AND CARRY DIFFERENT ANSWERS, which is the whole
+            // Twins wear one appearance and carry different answers, which is the whole
             // construction. Untwinned, a thing's appearance is its own and the look is a
             // complete key -- so the two arms differ in exactly one fact about the world
             // and in nothing the world shows.
@@ -287,7 +287,7 @@ public sealed class Returning : IWorld<Coded>, IWithholds<Coded>
     /// What a blind draw would score, and what appearance ALONE can reach.
     /// </summary>
     /// <remarks>
-    /// <b>TWO BARS RATHER THAN ONE, BECAUSE THE INTERESTING ARM SITS BETWEEN THEM.</b>
+    /// <b>Two bars rather than one, because the interesting arm sits between them.</b>
     /// Untwinned, a perfect reader of appearance answers everything and the bar is one.
     /// Twinned, appearance narrows the answer to a PAIR and no further, so the ceiling on
     /// anything without a referent is the better of the two hidden values within a pair —
@@ -300,14 +300,14 @@ public sealed class Returning : IWorld<Coded>, IWithholds<Coded>
 
     /// <summary>One sighting of one thing, uniformly or in a run.</summary>
     /// <remarks>
-    /// <b>THE RUN IS DRAWN BEFORE ANYTHING ELSE IS, so a sighting's look and landmark are
+    /// <b>The run is drawn before anything else is, so a sighting's look and landmark are
     /// exactly what they would have been.</b> Continuity decides WHICH thing is met and
     /// changes nothing about how a met thing is shown — otherwise the arm would be handing
     /// over a second channel and reading it as order.
     /// </remarks>
     private Turn<Coded> Draw()
     {
-        // THE SETTING IS TESTED BEFORE THE GENERATOR IS, WHICH IS NOT A MICRO-OPTIMISATION.
+        // The setting is tested before the generator is, which is not a micro-optimisation.
         // A `NextDouble` drawn and thrown away shifts the whole stream, so a world at nought
         // would be uniform and NOT the world every earlier reading was taken on -- and the
         // rule counts here moved by five per cent before this line was written that way.
@@ -321,7 +321,7 @@ public sealed class Returning : IWorld<Coded>, IWithholds<Coded>
 
         var look = new HashSet<Code>();
 
-        // ONE CODE DRAWN PER ATTRIBUTE PER SIGHTING, so the same thing looks slightly
+        // One code drawn per attribute per sighting, so the same thing looks slightly
         // different every time it is met. Without that, re-finding a thing is comparing two
         // identical sets and the world would be asking nothing.
         for (var attribute = 0; attribute < _settings.Attributes; attribute++)
@@ -331,15 +331,15 @@ public sealed class Returning : IWorld<Coded>, IWithholds<Coded>
                 _settings.CodesPerAttribute,
                 _sightings));
 
-        // ONE CODE AND ONLY ONE, DRAWN FROM AN ALPHABET OF ONE, so the index is exactly
+        // One code and only one, drawn from an alphabet of one, so the index is exactly
         // as contentless as it claims to be -- a thing's index never varies and says
         // nothing about the thing, which is what makes this arm a ceiling rather than a
         // second appearance channel.
-        // WHERE IT STANDS, DRAWN THE SAME WAY ITS LOOK IS. A landmark that showed one code
+        // Where it stands, drawn the same way its look is. A landmark that showed one code
         // every time would make the relation sharper than the appearance it is being
         // compared against, and the comparison would be about the noise rather than about
         // what the two channels can carry.
-        // AND IT MAY HAVE MOVED SINCE IT WAS LAST MET, which is drawn per SIGHTING rather
+        // And it may have moved since it was last met, which is drawn per SIGHTING rather
         // than per round -- a thing nobody is looking at has no sightings to be inconsistent
         // between, so moving it then would be a change the stream could never show.
         if (_settings.Drifting > 0.0 && _sightings.NextDouble() < _settings.Drifting)

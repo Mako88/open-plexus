@@ -4,7 +4,7 @@ namespace OpenPlexus.Worlds;
 
 /// <summary>Which of the three MONK's problems a world is posing.</summary>
 /// <remarks>
-/// <b>ALL THREE, BECAUSE ONE OF THEM ALONE ANSWERS NOTHING.</b> The second is the
+/// <b>All three, because one of them alone answers nothing.</b> The second is the
 /// language probe and the other two are its controls: a learner that falls short on
 /// <see cref="Two"/> has either hit the ceiling of what a conjunction can say or is
 /// merely a poor learner, and those look identical from one number. <see cref="One"/>
@@ -44,8 +44,8 @@ public sealed record MonkSettings
     /// How many of the 432 to load, score and never draw.
     /// </summary>
     /// <remarks>
-    /// <b>TAKEN FROM THE END OF A FIXED ENUMERATION, SO THE SPLIT IS A POSITION AND NOT
-    /// A SAMPLE</b> — the same reason <see cref="Cifar"/> does it that way. A withheld
+    /// <b>Taken from the end of a fixed enumeration, so the split is a position and not
+    /// a sample</b> — the same reason <see cref="Cifar"/> does it that way. A withheld
     /// set chosen by the world's own generator would move with the seed, and two seeds
     /// would then be scored against two different questions.
     /// </remarks>
@@ -58,22 +58,22 @@ public sealed record MonkSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE CHEAPEST LANGUAGE-CEILING PROBE THERE IS, AND THE PLAN HAS CALLED IT A DAY'S
-/// WORK SINCE THE LADDER WAS WRITTEN.</b> Step eight is <i>the rung the failures
+/// <b>The cheapest language-ceiling probe there is, and the plan has called it a day's
+/// work since the ladder was written.</b> Step eight is <i>the rung the failures
 /// demand, and never the rung that sounds next</i> — and no failure has asked yet,
 /// because on the one world that can say, twelve one-code rules cover everything held
 /// out. This is a world built so a failure can ask.
 /// </para>
 /// <para>
-/// <b>THE BAG IS 432 AND THAT IS THE WHOLE ATTRACTION.</b> Every instrument this project
+/// <b>The bag is 432 and that is the whole attraction.</b> Every instrument this project
 /// wants is exact here rather than estimated: the concept can be enumerated, so soundness
 /// is decidable; the bag is finite, so <see cref="IWithholds{TSeen}"/> gives a real
 /// held-out set; and the majority class is countable, so the bar a silent arm drifts
 /// toward is a number rather than a guess.
 /// </para>
 /// <para>
-/// <b>AND THE BAR IS NOT A HALF, WHICH IS THE TRAP THIS WORLD SETS FOR ANYBODY READING
-/// ITS SCORE.</b> <see cref="Puzzle.Two"/> is 142 positive of 432, so ALWAYS SAYING NO
+/// <b>And the bar is not a half, which is the trap this world sets for anybody reading
+/// its score.</b> <see cref="Puzzle.Two"/> is 142 positive of 432, so ALWAYS SAYING NO
 /// SCORES 0.6713. A run reporting 0.68 on it has learnt approximately nothing and looks
 /// like it has learnt a great deal — the fallback-as-control-arm trap, with the
 /// arithmetic already done for it. <see cref="Chance"/> is that number, reported beside
@@ -109,7 +109,7 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
 
     /// <summary>The modality the answer rides on.</summary>
     /// <remarks>
-    /// <b>101, WHICH IS THE BRAIN'S OWN, AND THIS FILE MAY NOT SAY SO OUT LOUD.</b> The
+    /// <b>101, which is the brain's own, and this file may not say so out loud.</b> The
     /// outcome alphabet is shared across every world — a brain that learnt a different
     /// one per world would not be one brain — and <c>SeparationTests</c> fails the build
     /// if a world names a brain type, so the number is written here and that same test
@@ -151,7 +151,7 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
 
     /// <summary>What always naming the commoner answer scores on the whole bag.</summary>
     /// <remarks>
-    /// <b>THE MAJORITY CLASS AND NOT A HALF.</b> See the note on the type: 0.6713 on
+    /// <b>The majority class and not a half.</b> See the note on the type: 0.6713 on
     /// <see cref="Puzzle.Two"/>, and a score read against 0.5 there would call a learner
     /// that has done nothing a success.
     /// </remarks>
@@ -162,7 +162,7 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
 
     /// <summary>Every one of the 432 instances, in a fixed order.</summary>
     /// <remarks>
-    /// <b>THE ANSWER KEY, AND IT IS WHY THIS WORLD IS WORTH BUILDING.</b> A soundness
+    /// <b>The answer key, and it is why this world is worth building.</b> A soundness
     /// check needs to enumerate every instance a scope covers and ask whether the
     /// outcome is constant across them. On a world of photographs that is impossible and
     /// on this one it is six nested loops.
@@ -225,8 +225,8 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
     /// </summary>
     /// <param name="scope">The codes that must be present.</param>
     /// <remarks>
-    /// <b><see cref="Multiplexer"/> HAS TO REFUSE SCOPES WITH TOO MANY FREE BITS AND
-    /// THIS ONE NEVER DOES.</b> There are 432 instances however few attributes a scope
+    /// <b><see cref="Multiplexer"/> Has to refuse scopes with too many free bits and
+    /// this one never does.</b> There are 432 instances however few attributes a scope
     /// pins, so enumeration is a walk of the whole bag rather than an exponential in
     /// what was left open. Every rule a run holds is checkable here, so
     /// <c>Learned.Unchecked</c> is nought by construction and a soundness count on this
@@ -241,7 +241,7 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
     /// <param name="scope">The codes that must be present.</param>
     /// <param name="expects">What is claimed to follow.</param>
     /// <remarks>
-    /// <b>A SCOPE PINNING ONE ATTRIBUTE TO TWO VALUES IS SATISFIED BY NOTHING</b>, so it
+    /// <b>A scope pinning one attribute to two values is satisfied by nothing</b>, so it
     /// entails everything vacuously — and calling that sound would let a learner score by
     /// minting contradictions. It covers no instance, so the empty-coverage test below
     /// refuses it without needing to know why it was empty.
@@ -270,7 +270,7 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
     /// <param name="puzzle">Which of the three.</param>
     /// <remarks>
     /// <para>
-    /// <b>MINIMAL RATHER THAN ALL, BECAUSE SUBSUMPTION IS AIMED AT EXACTLY THIS SET.</b>
+    /// <b>Minimal rather than all, because subsumption is aimed at exactly this set.</b>
     /// A sound rule with a sound sub-scope says nothing the shorter one does not and
     /// covers less, which is the one case the design lets a general commitment replace a
     /// narrow one. So this is what a population that had finished compressing would
@@ -278,7 +278,7 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
     /// conjunctions on <see cref="Puzzle.One"/> is not.
     /// </para>
     /// <para>
-    /// <b>AND THE SIZE OF THIS SET IS THE WHOLE FINDING.</b> 22 rules on
+    /// <b>And the size of this set is the whole finding.</b> 22 rules on
     /// <see cref="Puzzle.One"/> and 12 on <see cref="Puzzle.Three"/>, against 254 on
     /// <see cref="Puzzle.Two"/> — of which 142 are complete six-attribute instances,
     /// because the concept has no sound conjunction saying YES at any shorter depth.
@@ -326,8 +326,8 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
 
     /// <summary>Every conjunction the scope language can express, as pinned-or-free.</summary>
     /// <remarks>
-    /// <b>2,880 OF THEM, WHICH IS WHY THE ANSWER KEY HERE IS COMPLETE RATHER THAN
-    /// SAMPLED.</b> An attribute is pinned to one of its values or left free, and it can
+    /// <b>2,880 of them, which is why the answer key here is complete rather than
+    /// sampled.</b> An attribute is pinned to one of its values or left free, and it can
     /// never be pinned twice — two values of one attribute never co-occur, so such a
     /// scope fires on nothing and is not part of the language in any useful sense.
     /// </remarks>

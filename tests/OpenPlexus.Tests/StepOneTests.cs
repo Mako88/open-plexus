@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Machines;
+using OpenPlexus.Machines;
 using OpenPlexus.Commitments;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -9,7 +9,7 @@ namespace OpenPlexus.Tests;
 /// Step one, end to end, on the world it is judged on.
 /// </summary>
 /// <remarks>
-/// <b>THE ARM IS THE POINT OF THIS FILE.</b> A learner that specialises will get
+/// <b>The arm is the point of this file.</b> A learner that specialises will get
 /// better at almost anything, so a score on its own says nothing about whether
 /// CHOOSING the condition did any work. Every claim here is made against the arm that
 /// adds a condition drawn at random from the ones present in the failures.
@@ -35,15 +35,15 @@ public sealed class StepOneTests(ITestOutputHelper output)
 
         Assert.True(learned.Recent > 0.97, $"only {learned.Recent:F3} over the last tenth");
 
-        // AN ACCURACY CAN BE REACHED BY MEMORISING, so the count goes beside it. The
+        // An accuracy can be reached by memorising, so the count goes beside it. The
         // world's own basis holds eight rules; a learner at ten thousand commitments
         // has not found the structure whatever it scores.
         Assert.True(learned.Resident < 100, $"{learned.Resident} commitments resident");
 
-        // AND SOUNDNESS IS THE NUMBER THIS IS ACTUALLY JUDGED ON -- rules that are
+        // And soundness is the number this is actually judged on -- rules that are
         // TRUE of the world, checked by enumeration rather than against one basis.
         //
-        // A RAW COUNT IS THE WRONG BAR AND WAS SET AT ONE FOR A WHILE. Subsumption
+        // A raw count is the wrong bar and was set at one for a while. Subsumption
         // compresses, so a population that got BETTER holds fewer sound rules than
         // one that never dropped a redundant specific -- and the bar then punishes
         // exactly the mechanism it was meant to reward. The share is what survives
@@ -54,17 +54,17 @@ public sealed class StepOneTests(ITestOutputHelper output)
             learned.Sound / (double)(learned.Sound + learned.Unsound) > 0.3,
             $"{learned.Sound} sound against {learned.Unsound} not");
 
-        // SILENCE IS A CONTROL ARM NOBODY MEANT TO RUN, and it is a handful of rounds at
+        // Silence is a control arm nobody meant to run, and it is a handful of rounds at
         // the very start rather than one.
         //
-        // IT WAS ONE UNTIL GENESIS STOPPED ROOTING ON CODES THAT HAVE NEVER VARIED, and
+        // It was one until genesis stopped rooting on codes that have never varied, and
         // the extra rounds are that gate's warm-up arriving where it was predicted to.
         // A code is only eligible once it has been ABSENT, and in the first moment nothing
         // has, so the earliest rounds mint less and there is briefly nothing to fire. Every
         // code here is present about half the time, so it resolves within a handful of
         // draws and never recurs.
         //
-        // THE BAR IS ON THE WARM-UP AND NOT ON THE RATE, which is why it stays this tight.
+        // The bar is on the warm-up and not on the rate, which is why it stays this tight.
         // Twenty is still nothing against thirty thousand, and a run that went quiet LATER
         // would be a population being destroyed rather than a table filling up — that is
         // the failure this assertion is for, and it can still fire.
@@ -74,12 +74,12 @@ public sealed class StepOneTests(ITestOutputHelper output)
     [Fact]
     public void Choosing_the_condition_beats_choosing_any_condition_present()
     {
-        // THE SINGLE MOST IMPORTANT NUMBER IN STEP ONE. If discriminative-Z does not
+        // The single most important number in step one. If discriminative-Z does not
         // beat random-Z, repair is doing nothing and the bet is dead -- every other
         // assertion in this file would be measuring the narrowing that ANY added
         // condition buys.
         //
-        // FIVE SEEDS AND COUNTED IN BOTH DIRECTIONS, because a small sample can look
+        // Five seeds and counted in both directions, because a small sample can look
         // like a mechanism and can hide a real effect just as easily.
         var beaten = 0;
 
@@ -106,7 +106,7 @@ public sealed class StepOneTests(ITestOutputHelper output)
     [Fact]
     public void The_arm_that_cannot_choose_overfits_instead()
     {
-        // WHAT AN UNGATED REPAIR ACTUALLY DOES, rather than what it fails to do. It
+        // What an ungated repair actually does, rather than what it fails to do. It
         // specialises without limit: more children, more residents, and nothing true
         // to show for either. This is ILP's cause of death reproduced on purpose.
         var gated = Run(address: 3, choosing: Choosing.Separating, seed: 1);
@@ -117,8 +117,8 @@ public sealed class StepOneTests(ITestOutputHelper output)
         output.WriteLine(
             $"blind resident={blind.Resident} repaired={blind.Repaired} sound={blind.Sound}");
 
-        // THE MULTIPLE WAS FIVE AND IS THREE, AND THE FALL IS THE GATED ARM IMPROVING
-        // RATHER THAN THE BLIND ONE CALMING DOWN. Under `Forking.Repeated` a parent
+        // The multiple was five and is three, and the fall is the gated arm improving
+        // rather than the blind one calming down. Under `Forking.Repeated` a parent
         // re-proposed the same child until its table drifted, so the gated arm minted a
         // few hundred children and the blind one -- drawing a DIFFERENT code each time
         // by construction -- minted ten times as many for free. The ratio was measuring
@@ -127,13 +127,13 @@ public sealed class StepOneTests(ITestOutputHelper output)
         Assert.True(blind.Repaired > gated.Repaired * 3,
             $"the blind arm minted {blind.Repaired} against {gated.Repaired}");
 
-        // AND THE RESIDENTS SAY THE SAME THING WITHOUT A MULTIPLE IN IT, which is why
+        // And the residents say the same thing without a multiple in it, which is why
         // this is added rather than the line above being loosened on its own. More rules
         // held, none of them true.
         Assert.True(blind.Resident > gated.Resident,
             $"the blind arm held {blind.Resident} against {gated.Resident}");
 
-        // AND THE SHARP ONE, WHICH GOT SHARPER RATHER THAN WEAKER. Nothing sound at all
+        // And the sharp one, which got sharper rather than weaker. Nothing sound at all
         // against 378, where the bar below was written when the gated arm held about
         // thirty. Repair's choice of condition passes its own kill condition by more
         // under a search than it did under a re-derivation.
@@ -160,11 +160,11 @@ public sealed class StepOneTests(ITestOutputHelper output)
     [Fact]
     public void A_fixed_seed_reproduces_a_run_exactly()
     {
-        // FORK 12, WHICH THIS PROJECT HAS ALREADY REOPENED TWICE. Repair decides from
+        // Fork 12, which this project has already reopened twice. Repair decides from
         // a dictionary of tallies and the population is walked every round, so an
         // unstable iteration order would move the learned structure without anything
         // failing.
-        // SIDE BY SIDE RATHER THAN ONE AFTER THE OTHER, WHICH IS THE HARDER QUESTION.
+        // Side by side rather than one after the other, which is the harder question.
         // Consecutive runs are free to agree through anything ambient they happen to
         // share; concurrent ones are not, and a learner with a static in it fails here
         // and passes there.

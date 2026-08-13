@@ -20,8 +20,8 @@ public sealed record PrimerSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S ASK, 2026-08-04, AND IT TESTS A CEILING RATHER THAN CHASING A
-/// SCORE.</b> Six bAbI tasks come back at exactly nought because their answers —
+/// <b>John's ask, 2026-08-04, and it tests a ceiling rather than chasing a
+/// score.</b> Six bAbI tasks come back at exactly nought because their answers —
 /// <i>yes</i>, <i>no</i>, <i>maybe</i>, the counting words — never appear as words
 /// anywhere in the corpus, only in the answer column. An answer here is a code the
 /// walk ARRIVED at, and a code enters the graph only by being observed, so there
@@ -111,8 +111,8 @@ public sealed class Primer
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>SEPARATE FROM <see cref="Read"/> BECAUSE THE STORY NUMBER IS LOAD-BEARING IN
-    /// OPPOSITE DIRECTIONS.</b> The walk needs every sentence at story nought so no
+    /// <b>SEPARATE FROM <see cref="Read"/> because the story number is load-bearing in
+    /// opposite directions.</b> The walk needs every sentence at story nought so no
     /// per-story code is minted and the fleeting code stays null. A text world needs
     /// the opposite: Tatoeba lines are unrelated, so a span reaching back past a full
     /// stop reaches into somebody else's sentence, and a held-back sentence is only
@@ -163,8 +163,8 @@ public sealed class Primer
     /// The sentence column of one export line, or null if the line is not one.
     /// </summary>
     /// <remarks>
-    /// <b>SEPARATE FROM <see cref="Read"/> BECAUSE A SECOND READER WANTS THE WORDS
-    /// RATHER THAN THE CODES.</b> The instrument that prices what English predicts
+    /// <b>SEPARATE FROM <see cref="Read"/> because a second reader wants the words
+    /// rather than the codes.</b> The instrument that prices what English predicts
     /// works in words, and a copy of this parse living beside it is exactly the
     /// drift <c>DuplicationTests</c> exists to stop.
     /// </remarks>

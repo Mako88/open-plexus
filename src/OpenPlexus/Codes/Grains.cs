@@ -6,22 +6,22 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE PROBLEM, MEASURED THREE WAYS.</b> A credit cell keyed on the state that
+/// <b>The problem, measured three ways.</b> A credit cell keyed on the state that
 /// earned it cannot cover a state count that keeps growing — and on `Tending`,
 /// quadrupling a run grows the distinct states more than three times over while
 /// the credit cells grow less than half again. <b>Coverage does not stall, it
 /// falls.</b> Experience never accumulates while every state is its own island.
 /// </para>
 /// <para>
-/// <b>AND STEP 9 RULED OUT FIXING IT INSIDE THE GRAPH.</b> Every likeness the
+/// <b>And step 9 ruled out fixing it inside the graph.</b> Every likeness the
 /// graph can derive is made of co-occurrence, and in a body co-occurrence records
 /// the policy that produced it — so a walk wide enough to stop being silent
 /// converges on whatever was done most. <b>A likeness has to come from OUTSIDE the
 /// counting, which means the front end.</b>
 /// </para>
 /// <para>
-/// <b>THE MOVE: SAY THE SAME OBSERVATION COARSELY AS WELL AS FINELY, AND PUT BOTH
-/// IN THE OCCASION.</b> Two states that differ finely still share their coarse
+/// <b>The move: say the same observation coarsely as well as finely, and put both
+/// in the occasion.</b> Two states that differ finely still share their coarse
 /// code, so they meet in the graph without anything having to decide they are
 /// similar. <b>The hierarchy IS the similarity</b>, and no metric, no distance and
 /// no comparison is needed anywhere.
@@ -35,7 +35,7 @@ namespace OpenPlexus.Codes;
 /// front end can do to its own output without knowing anything.
 /// </para>
 /// <para>
-/// <b>WHY THIS IS NOT A FITTED CODEBOOK.</b> Nothing is learnt, nothing is
+/// <b>Why this is not a fitted codebook.</b> Nothing is learnt, nothing is
 /// sampled, and two machines handed the same observation drop the same bits — so
 /// the red-ball property holds exactly as it does for a hash. <b>What a fitted
 /// quantiser buys is spending codes where the data is; what this buys is spending
@@ -59,7 +59,7 @@ public static class Grains
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A MODALITY PER GRAIN, OR A COARSE CODE AND A FINE ONE COLLIDE.</b> Band
+    /// <b>A modality per grain, or a coarse code and a fine one collide.</b> Band
     /// 1 of 2 and band 1 of 8 are different claims about the world, and one code
     /// meaning two things is this design's recurring fault at its most literal.
     /// </para>
@@ -90,7 +90,7 @@ public static class Grains
 
         for (var grain = 0; grain < grains; grain++)
         {
-            // EACH GRAIN IS THE ONE BEFORE IT WITH A BIT DROPPED. Integer division
+            // Each grain is the one before it with a bit dropped. Integer division
             // rather than a shift so the arithmetic reads as what it is: the same
             // reading, coarser.
             var coarse = value >> grain;

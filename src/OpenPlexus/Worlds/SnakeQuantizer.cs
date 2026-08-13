@@ -25,7 +25,7 @@ public sealed class SnakeQuantizer : IQuantizer<SnakeView>
     public const byte Vision = 1;
 
     /// <remarks>
-    /// <b>AN EMPTY CELL EMITS A CODE, AND THERE IS NO ARM THAT DOES NOT — John's
+    /// <b>An empty cell emits a code, and there is no arm that does not — John's
     /// call, 2026-08-04.</b> Withholding them was worth four orders of magnitude
     /// when `Best` pricing let the flood enumerate every simple path; inverse cost
     /// bounds the walk by construction, so that reason is gone. What withholding

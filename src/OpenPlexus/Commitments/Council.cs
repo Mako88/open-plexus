@@ -6,8 +6,8 @@ namespace OpenPlexus.Commitments;
 
 /// <summary>What one round of learning added, from whoever did it.</summary>
 /// <remarks>
-/// <b>THREE COUNTS RATHER THAN THREE RETURN VALUES, BECAUSE ON A FLEET THEY COME BACK
-/// TOGETHER.</b> A holder settles, sweeps, covers and repairs on one telling — that is the
+/// <b>Three counts rather than three return values, because on a fleet they come back
+/// together.</b> A holder settles, sweeps, covers and repairs on one telling — that is the
 /// whole point of pushing the settlement rather than driving each phase from the asker — so
 /// what it did arrives as one answer. In one process the same record is filled in by four
 /// consecutive calls, which is what keeps the two arrangements comparable.
@@ -25,7 +25,7 @@ public readonly record struct Learnt
 
     /// <summary>Shorter commitments proposed by generalisation.</summary>
     /// <remarks>
-    /// <b>COUNTED FROM THE DAY IT WAS WRITTEN, because this repo keeps finding mechanisms
+    /// <b>Counted from the day it was written, because this repo keeps finding mechanisms
     /// that were running and invisible.</b> <see cref="Widening"/> is off by default, so
     /// without a count the only way to tell a proposal that was refused from one that was
     /// never made is to read the source — and <i>a gate that reads as running and is not</i>
@@ -40,7 +40,7 @@ public readonly record struct Learnt
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE SEAM IS TWO CALLS WIDE, AND WHICH TWO IS THE FINDING RATHER THAN A CHOICE.</b>
+/// <b>The seam is two calls wide, and which two is the finding rather than a choice.</b>
 /// Every operator on <see cref="Population"/> decides local except two: the vote reads what
 /// everything that fired advocates, and <see cref="Population.Abstract"/> reads how often
 /// scopes recur across the whole population. Settling, covering and repairing are each a
@@ -48,13 +48,13 @@ public readonly record struct Learnt
 /// machine that holds the commitment.
 /// </para>
 /// <para>
-/// <b>SO ASKING IS A SCATTER-GATHER AND TELLING IS A PUSH.</b> A vote has to come back
+/// <b>So asking is a scatter-gather and telling is a push.</b> A vote has to come back
 /// before the round can be scored; a settlement has to reach every holder and has no answer
 /// worth waiting for beyond what it did. That asymmetry is why this is two methods and not
 /// one round-shaped call.
 /// </para>
 /// <para>
-/// <b>AND IT IS ASYNCHRONOUS ON PURPOSE, INCLUDING WHERE IT NEVER YIELDS.</b>
+/// <b>And it is asynchronous on purpose, including where it never yields.</b>
 /// <see cref="Alone"/> completes every task synchronously and allocates nothing to do it,
 /// so a one-process run pays for this seam in exactly nothing — see
 /// <c>Machines.Trial.Run</c>, which refuses a council that would have made it wait. What the
@@ -67,7 +67,7 @@ public interface ICouncil
 {
     /// <summary>Where the wall clock went, by phase.</summary>
     /// <remarks>
-    /// <b>AND NO DIALS BESIDE IT, WHICH IS A DELIBERATE ABSENCE.</b> <c>Cycle</c> read
+    /// <b>And no dials beside it, which is a deliberate absence.</b> <c>Cycle</c> read
     /// <c>Repairing</c> off the population to decide where a call sat, so one setting was
     /// consulted in two places and a cell that moved the gate also moved the timing.
     /// Every dial that decides something is now read where it decides, and a loop that
@@ -81,7 +81,7 @@ public interface ICouncil
     /// <param name="raw">What the front end said, before any minted name is folded in.</param>
     /// <param name="ct">Cancellation.</param>
     /// <remarks>
-    /// <b>RAW, BECAUSE A NAME IS FOLDED BY WHOEVER HOLDS IT.</b> A minted code is reached by
+    /// <b>Raw, because a name is folded by whoever holds it.</b> A minted code is reached by
     /// inference from the codes it stands for, so a moment folded by the loop would carry one
     /// machine's vocabulary onto machines that may not share it — and whether they share it
     /// is exactly what the counts merge exists to establish.
@@ -110,8 +110,8 @@ public interface ICouncil
 /// The council of one — <b>everything this project has ever measured, behind the seam.</b>
 /// </summary>
 /// <remarks>
-/// <b>IT MUST REPRODUCE EVERY RECORDED NUMBER EXACTLY, WHICH IS WHY THE ORDER HERE LOOKS
-/// FUSSY.</b> Settle, then sweep, then repair every round, then cover, then repair after a
+/// <b>It must reproduce every recorded number exactly, which is why the order here looks
+/// fussy.</b> Settle, then sweep, then repair every round, then cover, then repair after a
 /// failure: the sweep sits between the settlement and the repair because it always has, and
 /// a sweep round that culls before a child is minted is not the same run as one that culls
 /// after. <c>DeterminismTests</c> is what says so.
@@ -151,8 +151,8 @@ public sealed class Alone : ICouncil
     /// What the last ask's firing has to say, with nothing of the commitments in it.
     /// </summary>
     /// <remarks>
-    /// <b>THE HALF OF A VOTE A MACHINE MAY COMPUTE ALONE, AND THE REASON A HOLDER IS A
-    /// THIN THING.</b> <c>Machines.Holder</c> answers a vote with this and a settlement
+    /// <b>The half of a vote a machine may compute alone, and the reason a holder is a
+    /// thin thing.</b> <c>Machines.Holder</c> answers a vote with this and a settlement
     /// with <see cref="Tell"/>, so every phase of a round lives here and exactly here
     /// whether there is one machine or twenty — which is what stops a fleet growing a
     /// second copy of the learning loop.
@@ -168,7 +168,7 @@ public sealed class Alone : ICouncil
     /// </summary>
     /// <param name="raw">What the front end said, before any minted name is folded in.</param>
     /// <remarks>
-    /// <b>SYNCHRONOUS BECAUSE IT IS, RATHER THAN WRAPPED BECAUSE THE INTERFACE IS.</b> A
+    /// <b>Synchronous because it is, rather than wrapped because the interface is.</b> A
     /// council of one never waits for anything, and a holder answering an ask over a wire
     /// wants the answer on the thread the transport handed it. Writing the task first and
     /// unwrapping it at every call site would put a sync-over-async at each of them; this
@@ -211,7 +211,7 @@ public sealed class Alone : ICouncil
     /// What the OTHER holders counted, or nothing where this machine is alone.
     /// </param>
     /// <remarks>
-    /// <b>ONE EXTRA ARGUMENT AND NOT AN EXTRA METHOD BODY, WHICH IS THE WHOLE POINT.</b>
+    /// <b>One extra argument and not an extra method body, which is the whole point.</b>
     /// Abstraction is the only operator here whose statistic is the whole population's, so
     /// it is the only thing a holder cannot decide by itself — and it is one parameter deep
     /// rather than a second arrangement of the round. The interface does not carry it
@@ -228,17 +228,17 @@ public sealed class Alone : ICouncil
 
         long subsumed = 0, widened = 0;
 
-        // THE SWEEP IS NOT PART OF FAILING, and it sat inside the failure branch for the
+        // The sweep is not part of failing, and it sat inside the failure branch for the
         // whole of step one. Once the learner is right most of the time, the chance of a
         // wrong round landing on a sweep round is the miss rate itself -- so subsumption
         // and culling ran a handful of times in thirty thousand rounds and read as
         // mechanisms that bought nothing.
         //
-        // AND A ROUND THE WORLD COULD NOT SETTLE STILL SWEEPS, or the calendar becomes
+        // And a round the world could not settle still sweeps, or the calendar becomes
         // conditional on how often the world was quiet -- the same trap by a new door.
         if (sweeping)
         {
-            // WIDENING BEFORE SUBSUMPTION, BECAUSE SUBSUMPTION IS ITS JUDGE. A proposed
+            // Widening before subsumption, because subsumption is its judge. A proposed
             // generalisation is worth keeping exactly when it absorbs the parent it came
             // from, and that is the comparison `Subsume` already makes -- running it
             // first would leave every fresh proposal unjudged until the next sweep, a
@@ -252,7 +252,7 @@ public sealed class Alone : ICouncil
             at = Mark(ref _sweeping, at);
         }
 
-        // NOTHING ELSE IN THE ROUND HAPPENS WHERE THE WORLD COULD NOT SAY, which is the
+        // Nothing else in the round happens where the world could not say, which is the
         // whole content of the third verdict. No genesis, because a surprise needs
         // something to have arrived; no repair, because blame needs a failure. A monotone
         // counter cannot retract a slur.
@@ -261,7 +261,7 @@ public sealed class Alone : ICouncil
 
         long repaired = 0;
 
-        // REPAIR NEED NOT WAIT FOR THE VOTE, AND WHETHER IT SHOULD IS AN ARM. An outvoted
+        // Repair need not wait for the vote, and whether it should is an arm. An outvoted
         // commitment still accrues its own hits and misses -- and returning early on a
         // right answer meant it could never spend them, so how hard the machine searched
         // was a function of how good its answers already were.
@@ -274,10 +274,10 @@ public sealed class Alone : ICouncil
         if (!wrong)
             return new Learnt { Minted = 0, Repaired = repaired, Subsumed = subsumed, Widened = widened };
 
-        // COVERING RUNS ONLY ON A FAILURE AND IS NOT MOVED WITH REPAIR. Genesis mints per
+        // Covering runs only on a failure and is not moved with repair. Genesis mints per
         // live code, so running it every round walks the whole `code -> outcome` space --
         // which is the refutation that put `Surprising` back, and it would arrive again by
-        // this door. AND IT IS GATED AGAIN INSIDE, on whether anything that fired proposed
+        // this door. And it is gated again inside, on whether anything that fired proposed
         // what arrived.
         long minted = _held.Cover(_moment, outcome, _firing);
 
@@ -299,7 +299,7 @@ public sealed class Alone : ICouncil
     /// <param name="phase">The running total to add to.</param>
     /// <param name="since">When the phase started.</param>
     /// <remarks>
-    /// <b>ONE CALL A PHASE RATHER THAN A <c>Stopwatch</c> EACH.</b> Five allocations a round
+    /// <b>One call a phase rather than a <c>Stopwatch</c> EACH.</b> Five allocations a round
     /// over thirty thousand rounds is a cost the instrument would be adding to the thing it
     /// measures; a timestamp is a single counter read.
     /// </remarks>

@@ -18,22 +18,22 @@ public sealed record Probed
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THIS IS A CONTROL ARM AND NOT A COMPETITOR, AND WITHOUT IT THE ENCODER
-/// MEASUREMENT CANNOT BE READ.</b> The open defect asks whether the ceiling is the
+/// <b>This is a control arm and not a competitor, and without it the encoder
+/// measurement cannot be read.</b> The open defect asks whether the ceiling is the
 /// front end or the learner behind it. A commitment population scoring 0.6 on CLIP
 /// features answers neither question on its own: 0.6 could be an excellent front end
 /// under a weak learner or the reverse, and the two are indistinguishable from one
 /// number. Running the simplest possible learner over the SAME features separates them.
 /// </para>
 /// <para>
-/// <b>THE PUBLISHED NUMBER IS NOT A SUBSTITUTE FOR IT.</b> A linear probe on frozen
+/// <b>The published number is not a substitute for it.</b> A linear probe on frozen
 /// CLIP scores about 95% on CIFAR-10 — through a different preprocessing pipeline, at
 /// full resolution, over the full training set, with a solver nobody here is running.
 /// Holding this project's score against somebody else's setup measures the difference
 /// between two setups. The bar has to be measured on the same bench or it is decoration.
 /// </para>
 /// <para>
-/// <b>AND IT IS ALLOWED TO TRAIN, BECAUSE IT IS NOT THE ARCHITECTURE.</b> C4 forbids
+/// <b>And it is allowed to train, because it is not the architecture.</b> C4 forbids
 /// the MACHINE depending on a train-then-test boundary. A yardstick is not the machine
 /// — it is a thing the experimenter runs to find out how hard the problem is, and if
 /// it were held to the architecture's constraints it would stop being a yardstick and
@@ -58,7 +58,7 @@ public static class Probe
     /// <param name="seed">The shuffle's generator.</param>
     /// <exception cref="ArgumentException">A set is empty or the widths disagree.</exception>
     /// <remarks>
-    /// <b>THE SHUFFLE IS SEEDED AND THE WALK IS ORDERED, so two runs of this agree
+    /// <b>The shuffle is seeded and the walk is ordered, so two runs of this agree
     /// exactly.</b> A yardstick that moved between readings of it would put its own
     /// spread into every comparison it was used for, and fork 12 is what that costs.
     /// </remarks>
@@ -155,16 +155,16 @@ public static class Probe
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE INTERFACE WAS THE COST, AND IT WAS TWO THIRDS OF THE SLOWEST TEST IN THE
-    /// SUITE.</b> The fit is 30 passes over every reading against every outcome, so a
+    /// <b>The interface was the cost, and it was two thirds of the slowest test in the
+    /// suite.</b> The fit is 30 passes over every reading against every outcome, so a
     /// 3,072-wide raw CIFAR probe indexes a reading about two billion times — and every
     /// one of those went through <see cref="IReadOnlyList{T}"/>, which is a virtual call
     /// the JIT cannot inline, cannot elide a bounds check on, and cannot hoist anything
     /// out of. Copied once into <see cref="double"/>[] it is ordinary array indexing.
     /// </para>
     /// <para>
-    /// <b>AND IT IS A COPY RATHER THAN A CLEVERER LOOP BECAUSE THE ARITHMETIC MUST NOT
-    /// MOVE.</b> The same values are added in the same order, so every score this probe
+    /// <b>And it is a copy rather than a cleverer loop because the arithmetic must not
+    /// move.</b> The same values are added in the same order, so every score this probe
     /// has ever reported is reproduced to the last bit — which is the only kind of
     /// speed-up a yardstick is allowed to have. Vectorising the dot product would be
     /// faster still and would re-associate the sum, and a probe that changed its answer

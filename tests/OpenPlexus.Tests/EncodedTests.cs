@@ -11,14 +11,14 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE OPEN DEFECT THIS EXISTS FOR: IS THE CEILING THE FRONT END OR THE LEARNER
-/// BEHIND IT.</b> A fixed random projection is the project's bet and a frozen trained
+/// <b>The open defect this exists for: is the ceiling the front end or the learner
+/// behind it.</b> A fixed random projection is the project's bet and a frozen trained
 /// encoder is what it has to lose to before the bet means anything. Both are legal
 /// under the red-ball property — one derives its wiring from arithmetic and the other
 /// from a published file of constants, and neither is fitted to the data in front of it.
 /// </para>
 /// <para>
-/// <b>AND A SCORE ON THE ENCODER ARM ALONE ANSWERS NEITHER QUESTION.</b> It is two
+/// <b>And a score on the encoder arm alone answers neither question.</b> It is two
 /// unknowns multiplied, so <see cref="Probe"/> runs the dullest possible learner over
 /// the SAME embeddings and the pair of numbers separates them.
 /// </para>
@@ -48,7 +48,7 @@ public sealed class EncodedTests(ITestOutputHelper output)
     /// Readings paired with the outcomes that followed them.
     /// </summary>
     /// <remarks>
-    /// <b>THE READINGS AND THE OUTCOMES TRAVEL TOGETHER AND THE ORDER IS THE JOIN</b>, so a
+    /// <b>The readings and the outcomes travel together and the order is the join</b>, so a
     /// front end that returned its answers in a different order than it was asked would
     /// mislabel every one of them rather than fail.
     /// </remarks>
@@ -96,8 +96,8 @@ public sealed class EncodedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE SAME PICTURE ENCODES TO THE SAME NUMBERS, OR NONE OF THIS IS A FRONT
-    /// END.</b>
+    /// <b>The same picture encodes to the same numbers, or none of this is a front
+    /// end.</b>
     /// </summary>
     /// <remarks>
     /// The red-ball property is the whole reason a frozen encoder is admissible here.
@@ -135,7 +135,7 @@ public sealed class EncodedTests(ITestOutputHelper output)
                 .Distinct(StringComparer.Ordinal)
                 .Count();
 
-            // AND DIFFERENT PICTURES DO NOT COLLAPSE TO ONE, which a badly normalised
+            // And different pictures do not collapse to one, which a badly normalised
             // input would produce silently: every image saturating the same way emits
             // the same winners and the run reads as a learner that cannot learn.
             Assert.Equal(pictures.Count, distinct);
@@ -143,8 +143,8 @@ public sealed class EncodedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE BANDED CEILING APPLIES TO AN EMBEDDING TOO, AND IT IS THE SAME
-    /// CEILING.</b>
+    /// <b>The banded ceiling applies to an embedding too, and it is the same
+    /// ceiling.</b>
     /// </summary>
     /// <remarks>
     /// A modality is one byte and a dimension owns a block of them, so 512 numbers is
@@ -175,7 +175,7 @@ public sealed class EncodedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE CONTROL ARM, AND WITHOUT IT THE ENCODER'S SCORE IS UNANCHORED.</b>
+    /// <b>The control arm, and without it the encoder's score is unanchored.</b>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -219,7 +219,7 @@ public sealed class EncodedTests(ITestOutputHelper output)
 
         output.WriteLine($"chance                        : {Cifar.Chance:F3}");
 
-        // THE ORDERING, NOT A NUMBER. A trained encoder that did not beat raw pixels
+        // The ordering, not a number. A trained encoder that did not beat raw pixels
         // under the same probe would mean the preprocessing is wrong, not that trained
         // features are worthless -- and that failure would otherwise show up as a
         // disappointing score on the arm and be believed.
@@ -230,33 +230,33 @@ public sealed class EncodedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE POPULATION AND THE PROBE ON THE IDENTICAL VECTORS — fork 43, whose number has
+    /// <b>The population and the probe on the identical vectors — fork 43, whose number has
     /// only ever been a commit message.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE MOST LOAD-BEARING READING IN THIS PROJECT WAS A CLAIM RATHER THAN A
-    /// RECORD.</b> <i>Given symbols worth having, the commitment machinery is competitive</i>
+    /// <b>The most load-bearing reading in this project was a claim rather than a
+    /// record.</b> <i>Given symbols worth having, the commitment machinery is competitive</i>
     /// is what separates <i>a fixed projection cannot manufacture the symbols</i> from
     /// <i>a conjunctive rule learner cannot do perception</i> — and no test has ever run a
     /// population on encoder vectors at all. <c>CifarRun</c> has taken an encoder since the
     /// day the arm was built and nothing passed it one.
     /// </para>
     /// <para>
-    /// <b>THE ARMS SHARE A WORLD, A SEED AND A FRONT END, so the only difference is what
+    /// <b>The arms share a world, a seed and a front end, so the only difference is what
     /// reads the codes.</b> Both are scored on the same withheld images, which the world
     /// never draws — and the probe is fit on the distinct pictures the run was drawing from
     /// rather than on its draws, so it is if anything the easier side of the comparison.
     /// </para>
     /// <para>
-    /// <b>AND IT ASSERTS NOTHING, BECAUSE THE FIRST ATTEMPT TO MAKE IT A CHECK WAS A
-    /// PREDICTION IN A CHECK'S CLOTHES.</b> Written as a suite test with a bar at six tenths
+    /// <b>And it asserts nothing, because the first attempt to make it a check was a
+    /// prediction in a check's clothes.</b> Written as a suite test with a bar at six tenths
     /// it read 0.32 — and the run behind that was five hundred rounds holding eleven and a
     /// half thousand commitments, which is a population that has not finished being born.
     /// A grid decides what the bar is, and the bar comes afterwards.
     /// </para>
     /// <para>
-    /// <b>AND IT IS A SWEEP FOR THE COST RATHER THAN FOR THE SIZE OF THE ANSWER.</b> Five
+    /// <b>And it is a sweep for the cost rather than for the size of the answer.</b> Five
     /// hundred rounds took ten minutes and the encoding was a minute of it — an embedding is
     /// an order more codes a moment and matching is what this machine's clock is made of, so
     /// the arm that answers fork 43 is a runner's work and cannot sit in the suite.
@@ -282,7 +282,7 @@ public sealed class EncodedTests(ITestOutputHelper output)
 
             Assert.NotNull(tally.Unseen);
 
-            // THE SAME WORLD AGAIN RATHER THAN THE RUN'S, because the run's has been drawn
+            // The same world again rather than the run's, because the run's has been drawn
             // from and a probe needs the draws in order. Same settings and same seed is the
             // same world, which is fork 12 being relied on rather than restated.
             var world = new Cifar(settings, seed: 1);

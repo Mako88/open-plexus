@@ -1,7 +1,7 @@
 using Xunit;
 
-// TESTS RUN ONE AT A TIME, AND IT IS A MEASUREMENT DECISION RATHER THAN A
-// CONVENIENCE.
+// Tests run one at a time, and it is a measurement decision rather than a
+// convenience.
 //
 // Most of this suite does not assert on code paths, it asserts on NUMBERS the
 // system produced, and those numbers move with how busy the machine is.

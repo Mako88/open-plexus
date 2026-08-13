@@ -8,7 +8,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE BUDGET FOR A FAILURE CLASS THAT HAD ALREADY HAPPENED AND SAID NOTHING.</b>
+/// <b>The budget for a failure class that had already happened and said nothing.</b>
 /// <see cref="Banded{TFrame}"/> gives each dimension a block of modalities and assigns
 /// them with <c>(byte)(first + which * spans)</c> — an unchecked cast. Past 256 it
 /// WRAPPED, so on a reading of 192 dimensions the codes for dimension 0 and dimension
@@ -16,13 +16,13 @@ namespace OpenPlexus.Tests;
 /// moment. No exception, no warning, no failing test.
 /// </para>
 /// <para>
-/// <b>IT HAD NEVER FIRED BECAUSE NOTHING WAS WIDE ENOUGH.</b> <c>Graded</c> tops out
+/// <b>It had never fired because nothing was wide enough.</b> <c>Graded</c> tops out
 /// at twenty dimensions and <c>Tending</c> guarded the block itself — in that ONE
 /// world, while the type everybody else built had no check at all. The first world
 /// here to read a picture would have walked straight into it.
 /// </para>
 /// <para>
-/// <b>SO THE GUARD LIVES ON THE TYPE AND THIS IS WHAT KEEPS IT THERE.</b> A silent
+/// <b>So the guard lives on the type and this is what keeps it there.</b> A silent
 /// collision is the worst shape a bug can have in this design: every downstream number
 /// stays plausible, and the learner is simply wrong about what it saw.
 /// </para>
@@ -75,7 +75,7 @@ public sealed class AliasingTests(ITestOutputHelper output)
     [Fact]
     public void A_reading_too_wide_for_its_modality_block_is_refused_at_construction()
     {
-        // 129 DIMENSIONS AT TWO SPANS FROM ZERO NEEDS 258 MODALITIES. Before the
+        // 129 dimensions at two spans from zero needs 258 modalities. Before the
         // guard this constructed happily and aliased dimension 0 with dimension 128.
         var thrown = Assert.Throws<ArgumentOutOfRangeException>(() =>
             new Banded<IReadOnlyList<double>>(
@@ -91,7 +91,7 @@ public sealed class AliasingTests(ITestOutputHelper output)
     [Fact]
     public void A_reading_that_is_not_the_declared_width_is_refused_when_it_arrives()
     {
-        // OR THE DECLARED WIDTH IS A PROMISE NOBODY KEEPS, and the construction-time
+        // Or the declared width is a promise nobody keeps, and the construction-time
         // guard is decoration -- a sense built for 8 and handed 400 wraps exactly as
         // it did before.
         var sense = new Banded<IReadOnlyList<double>>(
@@ -107,7 +107,7 @@ public sealed class AliasingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b><see cref="Winnow"/> HAS NO SUCH CEILING, AND IT IS STRUCTURAL.</b>
+    /// <b><see cref="Winnow"/> Has no such ceiling, and it is structural.</b>
     /// </summary>
     /// <remarks>
     /// Every code it emits rides on ONE modality and the sheet is addressed by the
@@ -138,19 +138,19 @@ public sealed class AliasingTests(ITestOutputHelper output)
     [Fact]
     public void A_row_of_whole_numbers_cannot_pack_two_positions_onto_one_code()
     {
-        // THE SAME FAULT AS `Banded`'S WRAP, IN THE SIMPLEST TRANSLATION THERE IS.
+        // THE SAME FAULT AS `Banded`'S wrap, in the simplest translation there is.
         // `Bits` documented itself as reading whole numbers and packed
         // `(position << 1) | value`, so position one holding nought and position nought
         // holding two were THE SAME CODE. Two attributes conflated, silently, and every
         // downstream number still plausible.
         //
-        // IT HAD NEVER FIRED BECAUSE ITS ONLY CALLER WAS BITS. Which is this repo's own
+        // It had never fired because its only caller was bits. Which is this repo's own
         // trap about a guard mounted on one caller, arriving in a packing instead --
         // and the first world with a three-valued attribute would have walked into it.
         Assert.Throws<ArgumentOutOfRangeException>(
             () => Bits.Of(modality: 1, position: 0, value: 2));
 
-        // AND THE WIDE PACKING IS INJECTIVE, WHICH IS WHAT THE GUARD IS PROTECTING.
+        // And the wide packing is injective, which is what the guard is protecting.
         // Six positions of four values apiece is `Monk`'s widest attribute, and every
         // one of the twenty-four must be its own code.
         var seen = new HashSet<Code>();
@@ -162,7 +162,7 @@ public sealed class AliasingTests(ITestOutputHelper output)
 
         Assert.Equal(24, seen.Count);
 
-        // AND THE DEFAULT IS BYTE-FOR-BYTE WHAT WAS THERE, so no measurement taken on a
+        // And the default is byte-for-byte what was there, so no measurement taken on a
         // binary world moves. Asserted rather than believed, because "this changes
         // nothing" is the claim that most needs a check behind it.
         for (var position = 0; position < 8; position++)

@@ -11,14 +11,14 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE PLAN NAMES THIS INSTRUMENT AND THE REPO HAS ONLY THE WORLD.</b>
+/// <b>The plan names this instrument and the repo has only the world.</b>
 /// <c>MultiplexerSettings.Switch</c> moves the target mid-run and <c>MultiplexerTests</c>
 /// asserts that it moves it correctly — the key travels with it, the first mapping is the
 /// identity so a switching run and a standard one are one world until the first flip. What
 /// nobody built is the reading: <i>flip the target mid-run, report steps to recover</i>.
 /// </para>
 /// <para>
-/// <b>AND IT IS THE ONLY THING THAT CAN SETTLE FORK 27.</b> Hits, misses and abstains are
+/// <b>And it is the only thing that can settle fork 27.</b> Hits, misses and abstains are
 /// G-Counters and give a LIFETIME average for free; beside them each node keeps a
 /// recency-weighted estimate of what IT saw, which never merges and is what decides. The
 /// second estimate is justified by C4 — no episode boundary, so a lifetime average cannot
@@ -27,7 +27,7 @@ namespace OpenPlexus.Tests;
 /// into the lifetime one is <see cref="CommittingSettings.Recency"/> at near zero.
 /// </para>
 /// <para>
-/// <b>SO THE GRID IS TWO WORLDS BY TWO ARMS, AND THE STATIONARY HALF IS NOT DECORATION.</b>
+/// <b>So the grid is two worlds by two arms, and the stationary half is not decoration.</b>
 /// A difference on the switching world alone is the finding; the same difference on both is
 /// the dial doing something else entirely, and this repo has paid for reading one cell of a
 /// two-by-two as though it were the whole of it. Measure one mechanism ON from a known
@@ -38,7 +38,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
 {
     /// <summary>How long the world holds still before it moves.</summary>
     /// <remarks>
-    /// <b>LONG ENOUGH THAT THE TARGET IS HELD BEFORE THE FLIP, or this measures learning
+    /// <b>Long enough that the target is held before the flip, or this measures learning
     /// rather than recovery.</b> Six bits reaches the target well inside this on every seed
     /// the scaling grid reads, so what happens after the flip is a fall from a height the
     /// run had actually reached.
@@ -50,7 +50,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
 
     /// <summary>How often the target moves where it keeps moving.</summary>
     /// <remarks>
-    /// <b>LONGER THAN THE TRAILING WINDOW AND SHORTER THAN A RECOVERY.</b> Two thousand
+    /// <b>Longer than the trailing window and shorter than a recovery.</b> Two thousand
     /// rounds is what accuracy is read over, so a shorter interval would report a window
     /// straddling two targets and nothing else; five thousand is where the one-flip curves
     /// are furthest apart — a free budget has turned the corner and started climbing while a
@@ -61,7 +61,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
 
     /// <summary>The local estimate turned off, as near as a rate can be turned off.</summary>
     /// <remarks>
-    /// <b>NOT ZERO, BECAUSE ZERO IS A DIFFERENT MECHANISM AND NOT A SLOWER ONE.</b> At
+    /// <b>Not zero, because zero is a different mechanism and not a slower one.</b> At
     /// exactly nought the estimate never moves off whatever it was initialised to, which is
     /// an arm about initialisation. Near zero it is the lifetime average the G-Counters
     /// already carry, which is the arm fork 27 actually names.
@@ -105,17 +105,17 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_a_moving_target_costs_and_whether_the_local_estimate_pays_for_it()
     {
-        // READ AS A CURVE PAST THE FLIP RATHER THAN AS A CROSSING, because there is no
+        // Read as a curve past the flip rather than as a crossing, because there is no
         // machinery for a second crossing and inventing one would be a mechanism built to
         // serve a measurement. `Tally.Reached` reports the FIRST time the trailing window
         // held the target and nothing re-arms it, so a run that flips at twenty thousand
         // reports the same crossing it would have reported without flipping at all.
         //
-        // SO THE READING IS THE TRAILING ACCURACY AT A KNOWN DISTANCE PAST THE FLIP, taken
+        // So the reading is the trailing accuracy at a known distance past the flip, taken
         // over separate runs of the same seed. Same world, same brain, same draw order up to
         // the flip -- only how long the run continues afterwards differs, which is what makes
         // the row a recovery curve rather than four unrelated numbers.
-        // AND WITH A SPREAD ON EVERY CELL, WHICH THE FIRST TAKE OF THIS GRID DID NOT HAVE.
+        // And with a spread on every cell, which the first take of this grid did not have.
         // It printed four rows of bare means and they ordered cleanly, which is exactly the
         // shape this repo's traps list warns about -- one seed is not a comparison and six
         // means are not one either unless something says how far apart they are. The
@@ -157,20 +157,20 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_what_recovery_waits_for_is_genesis()
     {
-        // THE CANDIDATE LEFT STANDING AFTER THE WRECKAGE STORY DIED, and it follows from what
+        // The candidate left standing after the wreckage story died, and it follows from what
         // repair CANNOT do. A flip changes which answer a scope entails, and repair only ever
         // adds a condition -- it cannot change what a commitment EXPECTS. So every rule the
         // new target needs has to be minted, and minting is the one operator with a gate in
         // front of it.
         //
-        // AND THE GATE IS EXACTLY WRONG-SHAPED FOR THIS. `Surprising.Unaccounted` mints only
+        // And the gate is exactly wrong-shaped for this. `Surprising.Unaccounted` mints only
         // where nothing that fired proposed what arrived -- and after a flip the population is
         // dense, so with two outcomes something proposes the right answer about half the time
         // by chance alone. Genesis goes quiet precisely when the population most needs new
         // claims, and that is a self-limiting rule doing what fork 40 already caught it doing
         // on `Arranged`.
         //
-        // `AnyFailure` IS A CONTROL AND NOT A PROPOSAL. It walks the whole `code -> outcome`
+        // `AnyFailure` is a control and not a proposal. It walks the whole `code -> outcome`
         // space and this repo's revival table says so; what it is for here is isolating
         // whether the gate is what recovery waits on. If the two arms recover alike, genesis
         // is not the bottleneck and the question is open again.
@@ -201,14 +201,14 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_an_earned_budget_keeps_free_s_recovery_without_free_s_standing_cost()
     {
-        // THE CELL THAT DECIDES `Earned`, AND IT IS ON THE WORLD THAT HOLDS STILL. A moving
+        // THE CELL THAT DECIDES `Earned`, and it is on the world that holds still. A moving
         // world rewards forking as hard as possible, so the arm that refuses least wins there
         // and nothing about a budget's WORTH is visible. `BudgetCurveTests` says free is worse
         // than the interior optimum on a stationary world -- and says it on hard-round
         // coverage and sound rules, not on a score, because a score is what a population that
         // has over-specialised still holds up.
         //
-        // SO THE QUESTION IS WHETHER ONE ARM CAN HAVE BOTH. Free recovers and costs; 256 does
+        // So the question is whether one arm can have both. Free recovers and costs; 256 does
         // not recover and does not cost. `Earned` recovers, refuses a seventh of free's
         // repairs, and if its stationary columns sit with 256 rather than with free then a
         // budget earned from evidence is strictly better than a total -- which is the whole
@@ -263,20 +263,20 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_a_world_that_keeps_moving_costs_a_budget_that_never_returns()
     {
-        // ONE FLIP IS THE EASY CASE AND C4 DESCRIBES THE HARD ONE. *No episode boundary* does
+        // One flip is the easy case and C4 DESCRIBES THE HARD ONE. *No episode boundary* does
         // not mean the target moves once and settles; it means there is no round at which the
         // world can be assumed to have stopped. Every recovery reading in this file so far
         // moves the target a single time and then lets the run finish in peace, which is a
         // world with an episode boundary in all but name.
         //
-        // AND A LIFETIME BUDGET SHOULD DEGRADE WITH THE NUMBER OF MOVES rather than with any
+        // And a lifetime budget should degrade with the number of moves rather than with any
         // one of them. Each flip asks the parents that now expect the right answer to spend
         // from a total that was never topped up, so the second move has less to spend than
         // the first and the fourth may have nothing. That is a prediction about the SHAPE of
         // the curve and not about a gap: `Attempts` should fall away move by move while a
         // bound on what a parent HOLDS should not.
         //
-        // READ AT THE END RATHER THAN PAST A FLIP, because with the target moving every five
+        // Read at the end rather than past a flip, because with the target moving every five
         // thousand rounds there is no *past the flip* -- the run is always between two of
         // them. The trailing window is two thousand rounds, so a reading taken at the end is
         // taken well inside the last interval and is comparable across arms.
@@ -288,7 +288,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
             ("attempts 64", new CommittingSettings { Budget = 64 }),
             ("attempts 256", new CommittingSettings()),
             ("attempts free", new CommittingSettings { Budget = int.MaxValue }),
-            // KNOWN TO BE FREE AND KEPT AS THE CHECK THAT IT STILL IS. Distinct children
+            // Known to be free and kept as the check that it still is. Distinct children
             // are capped by the vocabulary far below sixty-four, so this cannot bind -- and
             // a row that stopped matching the free one would mean the vocabulary had grown
             // past the budget, which is the day `DialTests` has been waiting for.
@@ -311,7 +311,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
             var repaired = new List<double>();
             var resident = new List<double>();
 
-            // NOUGHT MOVES IS THE CONTROL AND IT IS THE SAME LENGTH OF RUN, so the row reads
+            // Nought moves is the control and it is the same length of run, so the row reads
             // across rather than down: what changes between the cells is how many times the
             // target moved and nothing else whatever.
             foreach (var moves in new[] { 0, 1, 2, 4 })
@@ -331,8 +331,8 @@ public sealed class RecoveryTests(ITestOutputHelper output)
 
                     recent.Add(learned.Recent);
 
-                    // AT THE LAST CELL ONLY, WHICH IS WHERE A BUDGET HAS HAD THE MOST CHANCE
-                    // TO BIND.
+                    // At the last cell only, which is where a budget has had the most chance
+                    // to bind.
                     if (moves == 4)
                     {
                         repaired.Add(learned.Tally.Repaired);
@@ -343,8 +343,8 @@ public sealed class RecoveryTests(ITestOutputHelper output)
                 read.Add($"{Sweep.Spread(recent),18}");
             }
 
-            // AND THE TWO COLUMNS THAT SAY WHETHER A BUDGET BINDS AT ALL, WHICH ACCURACY
-            // CANNOT. Two rules that both recover are indistinguishable on a score and are
+            // and the two columns that say whether a budget binds at all, which accuracy
+            // cannot. Two rules that both recover are indistinguishable on a score and are
             // not the same mechanism: one may be refusing repairs and the other refusing
             // nothing, and only a count of what was BUILT separates them. This grid ranked
             // `earned` against `free` on accuracy alone and could not say whether it was a
@@ -364,7 +364,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_a_budget_on_children_rather_than_attempts_is_what_C4_wanted()
     {
-        // THE ANSWER TO FORK 72 NAMES A MECHANISM THAT IS ALREADY BUILT, and this is the
+        // The answer to fork 72 names a mechanism that is already built, and this is the
         // reading that says whether it is the one. A per-parent budget in ATTEMPTS is a
         // lifetime cap on EFFORT: spend it being wrong for twenty thousand rounds and there is
         // none left when the target moves. `Budgeting.Children` charges only for a child the
@@ -376,7 +376,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
         // train-then-test* -- and a total spent over a life is a bet that the life is one
         // episode. This is the one arm in the census that is not such a bet.
         //
-        // AND IT HAS READ AS INERT FOR THE LIFE OF THE BRANCH, WHICH IS THE POINT. Distinct
+        // And it has read as inert for the life of the branch, which is the point. Distinct
         // children are capped by the vocabulary far below the budget -- twelve at six bits,
         // twenty-two at eleven, against sixty-four -- so `Children` has never bound on any
         // world here and is indistinguishable from a free budget. On a world that holds still
@@ -406,7 +406,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
                         $"{address + (1 << address),4} | {world,-11} | {counting,-9} | "
                         + Curve(
                             flip,
-                            // SIXTY-FOUR RATHER THAN THE SHIPPED LEVEL, because the question is
+                            // Sixty-four rather than the shipped level, because the question is
                             // what the budget COUNTS and not how big it is. At the shipped 256
                             // the attempts arm is already close to free at six bits, which
                             // would leave the two arms with nothing to differ about.
@@ -425,27 +425,27 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_the_parents_that_must_relearn_have_spent_their_budget()
     {
-        // THE FOURTH ACCOUNT, AND IT IS A STRUCTURAL ASYMMETRY RATHER THAN AN OPERATOR MISBE-
-        // HAVING. Repair adds a CONDITION and never changes what a commitment expects, so
+        // The fourth account, and it is a structural asymmetry rather than an operator misbe-
+        // having. Repair adds a CONDITION and never changes what a commitment expects, so
         // every rule a moved target needs has to descend from a parent that ALREADY expects
         // the new answer -- and those are precisely the parents that spent twenty thousand
         // rounds being wrong. `Budget` is per parent and counts attempts, and this doc's own
         // row says most of it goes on re-derivation, so the lineages that must now do the
         // work arrive at the flip with theirs largely gone.
         //
-        // WHICH IS THE ONE THING THAT DIFFERS BETWEEN RELEARNING AND LEARNING FROM NOTHING.
+        // Which is the one thing that differs between relearning and learning from nothing.
         // From scratch every parent has a full budget; after a flip the ones that matter do
         // not. If that is the bottleneck, a free budget recovers faster and a smaller one is
         // worse; if the three arms come back level, the budget is not what the window is
         // short of and the asymmetry is somewhere else.
         //
-        // AND THE STATIONARY CONTROL IS NOT OPTIONAL HERE, because `BudgetCurveTests` already
+        // And the stationary control is not optional here, because `BudgetCurveTests` already
         // says the budget has an interior optimum on a world that holds still. A grid that
         // moved on both worlds would be re-reading that curve rather than measuring recovery.
         output.WriteLine($"{Seeds} seeds, target moves once at {Settled} rounds");
         output.WriteLine("bits | world       | budget | rounds past the flip: 250 | 1000 | 5000");
 
-        // BOTH WIDTHS, BECAUSE A FINDING ON ONE IS A FINDING ABOUT ONE. Six bits was where
+        // Both widths, because a finding on one is a finding about one. Six bits was where
         // this was first read; eleven is where the repair budget is known to have an interior
         // optimum on a world that holds still, so it is also where a budget effect could most
         // easily be that curve arriving in disguise. The stationary rows are what separate
@@ -477,12 +477,12 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_a_subsumption_that_demands_significance_recovers_faster()
     {
-        // THE THIRD ACCOUNT, AND ITS PREDICTION IS IN THE COMMIT THAT SHIPPED THE READING
-        // BELOW RATHER THAN IN THIS COMMENT. Repair makes about nineteen children in the five
+        // The third account, and its prediction is in the commit that shipped the reading
+        // below rather than in this comment. Repair makes about nineteen children in the five
         // thousand rounds after a flip and subsumption removes about twenty-five, so the
         // population shrinks across the window it is meant to be rebuilding in.
         //
-        // AND THE MECHANISM IS ALREADY NAMED. A fresh child inherits no table, so it must
+        // And the mechanism is already named. A fresh child inherits no table, so it must
         // re-earn its statistics -- and under `Subsuming.Weaker` a rule that is merely NOT
         // BETTER than its parent loses, which a child with almost no firings usually is.
         // `Insignificant` demands the narrower rule be significantly better before the
@@ -509,7 +509,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
             }
         }
 
-        // NO BAR, AND THE PREDICTION IS ELSEWHERE ON PURPOSE. A threshold here would be the
+        // No bar, and the prediction is elsewhere on purpose. A threshold here would be the
         // answer rather than the reading; a prediction in a commit can be wrong in public.
     }
 
@@ -517,13 +517,13 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_the_operators_do_in_the_five_thousand_rounds_after_a_flip()
     {
-        // TWO ACCOUNTS OF SLOW RECOVERY ARE DEAD AND THIS PARTITIONS WHAT IS LEFT. The old
+        // Two accounts of slow recovery are dead and this partitions what is left. The old
         // rules are not squatting and genesis is not gated shut; what remains is that the
         // rules the new target needs are CONJUNCTIONS, and the only thing that builds a
         // conjunction is repair -- which wants a floor of misses on a parent, a condition
         // past a separation bar, and a budget.
         //
-        // SO THE READING IS WHAT EACH OPERATOR DID IN THE WINDOW, and it is a subtraction
+        // So the reading is what each operator did in the window, and it is a subtraction
         // rather than a new counter. The same seed run to twenty thousand and to twenty-five
         // thousand differ only in the five thousand rounds after the flip, so the difference
         // between their tallies is what those rounds cost -- and the same subtraction on a
@@ -575,20 +575,20 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     [Fact]
     public void The_wreckage_of_a_flip_is_not_what_is_resident_afterwards()
     {
-        // THE OBVIOUS EXPLANATION FOR SLOW RECOVERY, AND THIS IS THE CONTROL THAT REFUSES
-        // IT. Relearning after the target moves is slower than learning the same world from
+        // The obvious explanation for slow recovery, and this is the control that refuses
+        // it. Relearning after the target moves is slower than learning the same world from
         // nothing, and the reading that suggests itself is that the population is full of
         // confidently wrong rules holding seats -- `Cull` returns early below `Capacity` and
         // this world holds a few dozen commitments against two thousand, so nothing is ever
         // culled at all.
         //
-        // AND THE MACHINE ALREADY KEEPS BOTH STATISTICS NEEDED TO LOOK. `Reliability` is the
+        // And the machine already keeps both statistics needed to look. `Reliability` is the
         // G-Counter ratio over a commitment's whole life; `Accuracy` is the local decaying
         // estimate. A rule that was right and is now wrong is one where the first is high and
         // the second is not, and the gap between two numbers the design already carries needs
         // no threshold anyone had to choose.
         //
-        // WHAT IT SAYS IS THAT THE WRECKAGE IS NOT THERE. A handful of residents past a flip,
+        // What it says is that the wreckage is not there. A handful of residents past a flip,
         // almost none of them believed-over-a-life and refuted-lately, and subsumption
         // removing a hundred and more over the run -- so the population turns over even where
         // culling never runs, and slow recovery is NOT the old rules squatting. Whatever
@@ -604,7 +604,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
             .Where(one => one.Seen >= brain.Dials.Floor)
             .ToList();
 
-        // BELIEVED OVER A LIFETIME AND REFUTED LATELY. Both bars are the same number and it
+        // Believed over a lifetime and refuted lately. Both bars are the same number and it
         // is one the design already uses for a coin toss, so neither is tuned.
         var stale = experienced.Count(one => one.Reliability > 0.5 && one.Accuracy < 0.5);
 
@@ -623,7 +623,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
             $"mean reliability {experienced.Average(one => one.Reliability):F3}, "
             + $"mean accuracy {experienced.Average(one => one.Accuracy):F3}");
 
-        // THE POPULATION IS NOWHERE NEAR THE CAPACITY, SO CULLING NEVER RUNS. Asserted rather
+        // The population is nowhere near the capacity, so culling never runs. Asserted rather
         // than remarked, because it is the half of the story that IS true: nothing here
         // deletes on a rule going bad, and the population turns over anyway.
         Assert.True(
@@ -633,7 +633,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
 
         Assert.Equal(0, culled);
 
-        // AND SUBSUMPTION IS WHAT MOVES INSTEAD, which is what makes the stale count small
+        // And subsumption is what moves instead, which is what makes the stale count small
         // rather than an accident of one seed. If this ever reads nought the population is
         // static and the paragraph above stops being the explanation.
         Assert.True(subsumed > 0,
@@ -647,13 +647,13 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     [Fact]
     public void The_flip_is_reached_by_the_learner_and_not_only_by_the_world()
     {
-        // A WORLD CAN MOVE AND THE LEARNER NEVER NOTICE, WHICH READS EXACTLY LIKE A LEARNER
-        // THAT RECOVERED INSTANTLY. `MultiplexerTests` asserts the target moves and the key
+        // A world can move and the learner never notice, which reads exactly like a learner
+        // that recovered instantly. `MultiplexerTests` asserts the target moves and the key
         // moves with it; that is a fact about the world and says nothing about whether any
         // run was disturbed. So the grid above is unreadable until something shows the flip
         // costs accuracy at all.
         //
-        // AND IT IS ASSERTED AS A DIFFERENCE RATHER THAN AS A DEPTH. How far a run falls is
+        // And it is asserted as a difference rather than as a depth. How far a run falls is
         // the grid's question; that it falls is this one's, and a bar on the size of the fall
         // would be a number chosen to sit just under what was measured.
         var settings = new MultiplexerSettings { Address = 2 };
@@ -674,7 +674,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
             + "still, so moving the target cost it nothing and the recovery grid beside "
             + "this is measuring two identical worlds");
 
-        // AND THE TWO ARE ONE WORLD UNTIL THE FLIP, so the difference above is the flip and
+        // And the two are one world until the flip, so the difference above is the flip and
         // not two runs that diverged from the first round. `Switch` leaves the first mapping
         // as the identity for exactly this reason.
         var before = new MultiplexerRun(

@@ -10,21 +10,21 @@ namespace OpenPlexus.Machines;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THERE IS NO CLOCK IN HERE AND THAT IS THE DESIGN RATHER THAN AN OMISSION.</b> The
+/// <b>There is no clock in here and that is the design rather than an omission.</b> The
 /// obvious build waits a while and decides; the plan's revival table refuses it outright —
 /// <i>a miss decided by a deadline</i>, because C2 makes late indistinguishable from absent
 /// and a monotone counter cannot retract. So this accumulates and reports, and WHEN to
 /// read it is the caller's decision, made from something other than a timer.
 /// </para>
 /// <para>
-/// <b>AND THE DENOMINATOR IS CARRIED BESIDE THE NUMERATOR, WHICH IS THE WHOLE C3
+/// <b>And the denominator is carried beside the numerator, which is the whole C3
 /// INSTRUMENT.</b> <see cref="Population.Decide"/> cannot tell a silent holder from a dead
 /// one and is not supposed to; <see cref="Asked"/> against <see cref="Heard"/> is where
 /// that difference lives, and without it a vote over eight survivors of twelve reads
 /// exactly like a vote over twelve.
 /// </para>
 /// <para>
-/// <b>KEYED BY WHO SPOKE RATHER THAN BY WHAT ARRIVED.</b> C2 permits a message to arrive
+/// <b>Keyed by who spoke rather than by what arrived.</b> C2 permits a message to arrive
 /// twice, and a merge that absorbed one holder's counts twice would weigh one machine's
 /// scopes double — silently, plausibly, and in the direction that makes a redundancy look
 /// better certified than it is.
@@ -42,14 +42,14 @@ public sealed class Gathering : IDisposable
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE ROSTER RATHER THAN THE COUNT, WHICH IS THE WHOLE OF WHAT FORK 53 NEEDED
-    /// HERE.</b> A count can only be compared with another count, so a gathering holding one
+    /// <b>The roster rather than the count, which is the whole of what fork 53 needed
+    /// here.</b> A count can only be compared with another count, so a gathering holding one
     /// could tell that somebody was missing and never which somebody — and a write-off has
     /// to name a machine or it is a decrement, which is a deadline with the clock hidden.
     /// </para>
     /// <para>
-    /// <b>AND GROUPED BY SLOT, WHICH IS FORK 62 AND IS THE OTHER HALF OF THE SAME
-    /// SENTENCE.</b> A write-off ends the wait for a holder the question never reached; a
+    /// <b>And grouped by slot, which is fork 62 and is the other half of the same
+    /// sentence.</b> A write-off ends the wait for a holder the question never reached; a
     /// slot ends the wait for a holder that TOOK the question and went, because somebody
     /// else holding the identical population can answer in its place. Neither is a clock,
     /// and the second is the only thing that reaches the round a machine dies inside.
@@ -78,13 +78,13 @@ public sealed class Gathering : IDisposable
     /// </param>
     /// <remarks>
     /// <para>
-    /// <b>IT DOES NOT CARRY WHICH ASK IT IS, BECAUSE NOTHING OUTSIDE THE ASKER NEEDS TO
-    /// KNOW.</b> The correlation is the <see cref="Asker"/>'s bookkeeping and holding it
+    /// <b>It does not carry which ask it is, because nothing outside the asker needs to
+    /// know.</b> The correlation is the <see cref="Asker"/>'s bookkeeping and holding it
     /// here as well would be a second copy of one fact — and this repo's dead-code budget
     /// is the check that asks whether a public member has a caller at all.
     /// </para>
     /// <para>
-    /// <b>A HOLDER ALONE IS A SLOT OF ONE NAMED AFTER ITSELF, so no partition is not a
+    /// <b>A holder alone is a slot of one named after itself, so no partition is not a
     /// special case.</b> With nothing handed in, every holder is its own slot and every
     /// condition below reduces to counting holders — which is what makes R=1 bit-identical
     /// to the machine before fork 62 rather than merely close to it.
@@ -122,7 +122,7 @@ public sealed class Gathering : IDisposable
 
     /// <summary>How many distinct holders have answered and been counted.</summary>
     /// <remarks>
-    /// <b>ONE A SLOT, WHICH IS WHY THIS IS NOT SIMPLY HOW MANY MESSAGES CAME BACK.</b>
+    /// <b>One a slot, which is why this is not simply how many messages came back.</b>
     /// Replicas in a slot hold the identical population, so adding two of them up would
     /// weigh one shard's scopes double — which is the fault this class's own header warns
     /// about, arriving from the deployment rather than from a duplicate message. The second
@@ -138,8 +138,8 @@ public sealed class Gathering : IDisposable
     /// the replicas are there rather than merely configured.</b>
     /// </summary>
     /// <remarks>
-    /// <b>A CHECK CAN BE WIRED AND UNABLE TO FIRE, WHICH IS WHY THE DROPPED ANSWERS ARE
-    /// COUNTED RATHER THAN DROPPED SILENTLY.</b> A fleet declared with two machines a slot
+    /// <b>A check can be wired and unable to fire, which is why the dropped answers are
+    /// counted rather than dropped silently.</b> A fleet declared with two machines a slot
     /// where one of them never answers is a fleet of one wearing redundancy's name, and it
     /// survives every death test by being lucky about which machine died. This reads nought
     /// in exactly that case and never in the healthy one.
@@ -151,8 +151,8 @@ public sealed class Gathering : IDisposable
 
     /// <summary>How many answering holders had anything to advocate.</summary>
     /// <remarks>
-    /// <b>SILENCE REPORTED BESIDE THE SCORE, WHICH IS A TRAP THIS PROJECT ALREADY HAS A
-    /// LINE FOR.</b> A gathering where every holder answered and none of them fired
+    /// <b>Silence reported beside the score, which is a trap this project already has a
+    /// line for.</b> A gathering where every holder answered and none of them fired
     /// decides identically to one that was never asked, so a run comparing a whole vote
     /// with a split one can agree perfectly while combining nothing — and read as the
     /// merge working.
@@ -164,7 +164,7 @@ public sealed class Gathering : IDisposable
 
     /// <summary>How many holders were never handed the question at all.</summary>
     /// <remarks>
-    /// <b>THE TERM THAT SEPARATES A SILENCE FROM A LOSS, AND IT IS NOT THE SAME AS
+    /// <b>The term that separates a silence from a loss, and it is not the same as
     /// <see cref="Asked"/> MINUS <see cref="Heard"/>.</b> That difference is every holder
     /// yet to speak, of which some are thinking and some are gone; this is the share the
     /// sender watched fail to leave. A run reading only the first cannot tell a fleet that
@@ -177,14 +177,14 @@ public sealed class Gathering : IDisposable
 
     /// <summary>Whether everyone asked has answered.</summary>
     /// <remarks>
-    /// <b>NOT A CONDITION ANYTHING MAY BLOCK ON FOREVER, AND DELIBERATELY NOT WHAT
+    /// <b>Not a condition anything may block on forever, and deliberately not what
     /// <see cref="Everyone"/> WAITS FOR SINCE FORK 53.</b> A round finished by a write-off
     /// completes without being whole, and keeping the two apart is what stops a fleet of
     /// twelve that heard eight reading like a fleet of eight — which is the C3 instrument
     /// and the reason the denominator is carried at all.
     /// </remarks>
     /// <remarks>
-    /// <b>AND AN ECHO COUNTS TOWARDS IT, BECAUSE A REPLICA THAT SPOKE WAS HEARD FROM.</b>
+    /// <b>And an echo counts towards it, because a replica that spoke was heard from.</b>
     /// What this asks is whether every machine put to answered, which is a question about the
     /// fleet's health; what <see cref="Heard"/> asks is how much distinct evidence arrived,
     /// which is a question about the vote. Under R=1 they are the same number and this is the
@@ -200,21 +200,21 @@ public sealed class Gathering : IDisposable
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>SO A CALLER CAN WAIT ON THE EVENT RATHER THAN LOOK FOR IT.</b> Polling
+    /// <b>So a caller can wait on the event rather than look for it.</b> Polling
     /// <see cref="Whole"/> works and puts the poll's granularity into anything timing the
     /// exchange — which would make a measurement of what distance costs a measurement of
     /// how often somebody looked.
     /// </para>
     /// <para>
-    /// <b>AND WHAT IS OWED COMES DOWN AS WELL AS UP, WHICH IS FORK 53 AND WAS THE WHOLE
-    /// DIFFERENCE FROM THE WALK.</b> A holder the ask never reached is written off, exactly
+    /// <b>And what is owed comes down as well as up, which is fork 53 and was the whole
+    /// difference from the walk.</b> A holder the ask never reached is written off, exactly
     /// as a departing cluster takes the routes heading into it, so a fleet that has lost a
     /// machine finishes its round on the arrivals it can still expect. Nothing here is
     /// decided by elapsed time and nothing is retracted: the write-off removes a claim on
     /// the future, never a count.
     /// </para>
     /// <para>
-    /// <b>IT IS STILL NOT A PROMISE THAT IT COMPLETES, AND WHAT IT WAITS ON IS A SLOT.</b> A
+    /// <b>It is still not a promise that it completes, and what it waits on is a slot.</b> A
     /// holder that took the question and died is owed forever because late and absent are
     /// one thing under C2 — so what finishes that round is another machine holding the same
     /// population answering in its place. A slot every one of whose replicas is silent still
@@ -236,7 +236,7 @@ public sealed class Gathering : IDisposable
         {
             if (_slotOf.TryGetValue(answer.From, out var slot))
             {
-                // A SLOT SPEAKS ONCE, AND THE SECOND VOICE IS DROPPED RATHER THAN ADDED.
+                // A slot speaks once, and the second voice is dropped rather than added.
                 // Replicas in a slot are fed one stream and mint the same children
                 // independently, so their answers are the same answer -- and `Merged`,
                 // `Added` and `Tables` all ADD what they are given. Two of them is one
@@ -244,8 +244,8 @@ public sealed class Gathering : IDisposable
                 // describes for a duplicate message and is the same failure by deployment.
                 if (!_spoken.Add(slot))
                 {
-                    // A DIFFERENT MACHINE IS A REPLICA; THE SAME ONE TWICE IS A DUPLICATE
-                    // MESSAGE, and only the first says anything about the fleet's shape.
+                    // A different machine is a replica; the same one twice is a duplicate
+                    // message, and only the first says anything about the fleet's shape.
                     if (!_heard.ContainsKey(answer.From)) _echoed++;
 
                     return;
@@ -266,14 +266,14 @@ public sealed class Gathering : IDisposable
     /// <param name="who">The holder that was not handed the question.</param>
     /// <remarks>
     /// <para>
-    /// <b>THE LOSS IS EXACT RATHER THAN ESTIMATED, WHICH IS THE PROPERTY BORROWED FROM THE
-    /// WALK.</b> A departure there writes off the routes heading into one cluster because a
+    /// <b>The loss is exact rather than estimated, which is the property borrowed from the
+    /// walk.</b> A departure there writes off the routes heading into one cluster because a
     /// report said how many there were; here it writes off one answer because the sender
     /// watched the question fail to leave. Neither is a guess about what a silent machine
     /// might be doing, and that is the only kind of write-off this design permits.
     /// </para>
     /// <para>
-    /// <b>AND AN ANSWER THAT ARRIVES ANYWAY IS STILL FOLDED IN.</b> C2 allows the question
+    /// <b>And an answer that arrives anyway is still folded in.</b> C2 allows the question
     /// to have got through while the acknowledgement did not, so this removes a claim on an
     /// answer rather than a right to one — the count is monotone in both directions it
     /// matters, and the only thing given up is the waiting.
@@ -290,7 +290,7 @@ public sealed class Gathering : IDisposable
 
             _unreached++;
 
-            // AND A SLOT IS ONLY LOST WHEN EVERY REPLICA IN IT IS, which is fork 62's whole
+            // And a slot is only lost when every replica in it is, which is fork 62's whole
             // arithmetic: with R=1 this fires on the first write-off and is exactly what
             // fork 53 shipped, and with R=2 a fleet writes off one machine and waits on the
             // one that can still answer for the same population.
@@ -302,8 +302,8 @@ public sealed class Gathering : IDisposable
 
     /// <summary>The vote over whoever answered.</summary>
     /// <remarks>
-    /// <b>A VOTE WITH NOTHING IN IT COMES BACK WITH NO EXPECTATION, AND THAT IS THE THIRD
-    /// OUTCOME ARRIVING.</b> The plan records <c>Abstain</c> as unarmed in any run because
+    /// <b>A vote with nothing in it comes back with no expectation, and that is the third
+    /// outcome arriving.</b> The plan records <c>Abstain</c> as unarmed in any run because
     /// nothing in one process can die; a gathering whose every advocate was on a machine
     /// that has gone is the case it was written for, and it is reachable here for the first
     /// time.
@@ -325,8 +325,8 @@ public sealed class Gathering : IDisposable
 
     /// <summary>What every answering holder added, added up.</summary>
     /// <remarks>
-    /// <b>THREE COUNTS AND NOT A POPULATION, WHICH IS WHAT C1 LEAVES A FLEET ABLE TO
-    /// REPORT.</b> How many rules a machine minted is a number; which rules they are is the
+    /// <b>Three counts and not a population, which is what C1 leaves a fleet able to
+    /// report.</b> How many rules a machine minted is a number; which rules they are is the
     /// thing that may never leave. So a distributed run can say how hard it searched and
     /// cannot say what it holds, and the second of those is a fact an experimenter outside
     /// the machine assembles rather than one the machine reports about itself.
@@ -357,8 +357,8 @@ public sealed class Gathering : IDisposable
 
     /// <summary>Every answering holder's table, with the holder it came from.</summary>
     /// <remarks>
-    /// <b>KEPT APART RATHER THAN MERGED, BECAUSE THE MERGE EACH HOLDER NEEDS EXCLUDES
-    /// ITSELF.</b> <see cref="Merged"/> is the asker's own view and is what a name is
+    /// <b>Kept apart rather than merged, because the merge each holder needs excludes
+    /// itself.</b> <see cref="Merged"/> is the asker's own view and is what a name is
     /// certified against; this is what goes back out, so that every holder can add up the
     /// others and leave its own row alone — see <see cref="Tabled"/>.
     /// </remarks>
@@ -374,7 +374,7 @@ public sealed class Gathering : IDisposable
                     {
                         From = one.From,
 
-                        // THE SLOT TRAVELS AND THE PARTITION DOES NOT, which is the one
+                        // The slot travels and the partition does not, which is the one
                         // thing that had to cross for a replicated sweep to be right. A
                         // holder drops the row belonging to its OWN slot, and under
                         // replication that row carries somebody else's name — so filtering
@@ -391,8 +391,8 @@ public sealed class Gathering : IDisposable
 
     /// <summary>Every answering holder's counts, added up.</summary>
     /// <remarks>
-    /// <b>INTEGER ADDITION, SO NO ORDERING CAVEAT APPLIES AND THE ORDER IS FIXED
-    /// ANYWAY.</b> <see cref="Recurrence.Absorb"/> is commutative and exact — unlike the
+    /// <b>Integer addition, so no ordering caveat applies and the order is fixed
+    /// anyway.</b> <see cref="Recurrence.Absorb"/> is commutative and exact — unlike the
     /// summed vote, which is not associative in its last bits — but the walk is ordered
     /// regardless, because anything that hashes or logs what crossed would otherwise move
     /// with delivery order.
@@ -425,13 +425,13 @@ public sealed class Gathering : IDisposable
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>SCATTER AND GATHER, WITH NOTHING BLOCKING BETWEEN THEM.</b>
+/// <b>Scatter and gather, with nothing blocking between them.</b>
 /// <see cref="IBus.AskAsync"/> returns who was asked and never what they said, so the two
 /// halves are separate messages and a holder that has died costs an answer rather than a
 /// timeout. See <see cref="Ask"/> for why the request-and-wait shape was refused.
 /// </para>
 /// <para>
-/// <b>THE ASKER NEED HOLD NO COMMITMENTS, WHICH IS WHY THIS IS NOT A METHOD ON
+/// <b>The asker need hold no commitments, which is why this is not a method on
 /// <see cref="Population"/>.</b> An input machine putting a question to a fleet is the
 /// ordinary case, and a merger that reached into a population to finish a vote would make
 /// itself an extra voter without saying so.
@@ -451,15 +451,15 @@ public sealed class Asker : IReceiveAnswers
     /// </param>
     /// <remarks>
     /// <para>
-    /// <b>THE PARTITION IS THE EXPERIMENTER'S DEPLOYMENT FACT AND NOT SOMETHING ON THE
-    /// WIRE.</b> Putting it in <c>Posted.Roster</c> is the obvious build and it would teach
+    /// <b>The partition is the experimenter's deployment fact and not something on the
+    /// wire.</b> Putting it in <c>Posted.Roster</c> is the obvious build and it would teach
     /// the transport what a holder HOLDS — <see cref="IBus"/> does not know what a cluster
     /// is, and it has no business knowing that two machines hold the same population either.
     /// This arrives the way <see cref="Population.Places"/> does: from whoever composed the
     /// fleet, once, in the process that composed it.
     /// </para>
     /// <para>
-    /// <b>AND NOTHING IS A SPECIAL CASE, BECAUSE A HOLDER ALONE IS A SLOT OF ONE.</b> Left
+    /// <b>And nothing is a special case, because a holder alone is a slot of one.</b> Left
     /// null, every gathering below partitions into one slot per holder and behaves exactly
     /// as it did before this existed.
     /// </para>
@@ -473,8 +473,8 @@ public sealed class Asker : IReceiveAnswers
         _bus = bus;
         _slots = slots;
 
-        // SUBSCRIBED AND NEVER UNSUBSCRIBED, WHICH IS `InputMachine`'S SHAPE FOR THE SAME
-        // EVENT AND FOR THE SAME REASON. An asker outlives every gathering it opens and dies
+        // Subscribed and never unsubscribed, which is `InputMachine`'S shape for the same
+        // event and for the same reason. An asker outlives every gathering it opens and dies
         // with its bus, so there is no moment where dropping this would be right and one
         // where it would silently stop writing off.
         _bus.Unreached += OnUnreached;
@@ -488,7 +488,7 @@ public sealed class Asker : IReceiveAnswers
     /// <param name="moment">What is live, for a vote.</param>
     /// <param name="ct">Cancellation.</param>
     /// <remarks>
-    /// <b>THE GATHERING IS REGISTERED BEFORE THE FIRST HOLDER IS ASKED.</b> A local holder
+    /// <b>The gathering is registered before the first holder is asked.</b> A local holder
     /// answers by direct call, so an answer can arrive before this method returns — which
     /// is the same measured race <c>BroadcastAsync</c> opens its <c>ready</c> window for,
     /// and it lost reports the first time nobody accounted for it.
@@ -514,7 +514,7 @@ public sealed class Asker : IReceiveAnswers
     /// <param name="counted">Every holder's table, for a sweep. Empty otherwise.</param>
     /// <param name="ct">Cancellation.</param>
     /// <remarks>
-    /// <b>THE SAME SCATTER AS A QUESTION, WHICH IS WHY IT IS AN <see cref="Ask"/>.</b> A
+    /// <b>The same scatter as a question, which is why it is an <see cref="Ask"/>.</b> A
     /// settlement goes to every holder at once and each says what it added, so the
     /// accounting — how many did I tell, how many answered — is one mechanism rather than
     /// two. What makes it a telling rather than a question is only which fields are filled.
@@ -559,7 +559,7 @@ public sealed class Asker : IReceiveAnswers
             lock (_gate) _open[ask.Broadcast] = gathering;
         }).ConfigureAwait(false);
 
-        // A BUS THAT NEVER OPENED THE WINDOW ASKED NOBODY, and an empty gathering is the
+        // A bus that never opened the window asked nobody, and an empty gathering is the
         // honest answer rather than a null: nought heard of nought asked, which decides to
         // silence and merges to an empty table.
         return gathering ?? new Gathering([], static () => { });
@@ -573,7 +573,7 @@ public sealed class Asker : IReceiveAnswers
         Gathering? at;
         lock (_gate) _open.TryGetValue(answer.Broadcast, out at);
 
-        // AN ANSWER TO AN ASK NOBODY REMEMBERS IS DROPPED, exactly as a report for an
+        // An answer to an ask nobody remembers is dropped, exactly as a report for an
         // unknown broadcast is. C2 says an answer can arrive after the asker has moved on,
         // and there is nothing for it to be folded into.
         at?.Fold(answer);
@@ -585,8 +585,8 @@ public sealed class Asker : IReceiveAnswers
     /// <param name="broadcast">Which ask never left.</param>
     /// <param name="who">Which holder it was going to.</param>
     /// <remarks>
-    /// <b>ONE GATHERING RATHER THAN ALL OF THEM, WHICH IS SHARPER THAN THE WALK'S EVENT AND
-    /// NOT MERELY DIFFERENT.</b> <c>InputMachine.OnDeath</c> walks every thought it holds
+    /// <b>One gathering rather than all of them, which is sharper than the walk's event and
+    /// not merely different.</b> <c>InputMachine.OnDeath</c> walks every thought it holds
     /// because a departed cluster strands routes in all of them; a question that failed to
     /// leave failed for one question, and a holder unreachable for this ask may take the
     /// next one. Writing off the others would be inferring a death from a dropped message,

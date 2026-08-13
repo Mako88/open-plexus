@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Commitments;
+using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -10,21 +10,21 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A CODE LIVE IN EVERY MOMENT SEPARATES NOTHING, AND REPAIR ALREADY KNOWS THAT.</b>
+/// <b>A code live in every moment separates nothing, and repair already knows that.</b>
 /// <see cref="Repair.Divergence"/> asks how often a code was present in hits against in
 /// misses; present in all of both gives one and one, so its separation is nought and it
 /// can never be chosen as a condition. The mechanism John asked after is, for repair,
 /// already there.
 /// </para>
 /// <para>
-/// <b>GENESIS HAD NO SUCH GUARD AND NOW DOES, WHICH IS WHAT THE GRID BELOW IS AGAINST.</b>
+/// <b>Genesis had no such guard and now does, which is what the grid below is against.</b>
 /// It used to mint one commitment per live code on a surprise, so background became a
 /// ROOT and every child hanging off it inherited a code that could never earn its place —
 /// half the resident population, on eight bits of it. <see cref="Population.Cover"/>
 /// refuses to root on a code that has never once been absent.
 /// </para>
 /// <para>
-/// <b>AND THE TALLY STILL HAS NO GUARD, WHICH IS THE HALF OF FORK 51 LEFT OPEN.</b>
+/// <b>And the tally still has no guard, which is the half of fork 51 left open.</b>
 /// <see cref="Commitment.Settle"/> stores an entry per non-scope code in every moment a
 /// commitment fires on, so an always-on code is an entry in EVERY commitment's table with
 /// a divergence pinned at nought for the life of the run. The grid still shows the table
@@ -40,7 +40,7 @@ public sealed class ClutterCostTests(ITestOutputHelper output)
             seed: 1).Run(20_000);
 
     /// <summary>
-    /// <b>THE COST OF BACKGROUND, IN THE THREE PLACES IT COULD BE.</b>
+    /// <b>The cost of background, in the three places it could be.</b>
     /// </summary>
     /// <remarks>
     /// No bar. What the numbers say is which of minting, the table, or the score moves
@@ -59,7 +59,7 @@ public sealed class ClutterCostTests(ITestOutputHelper output)
                 + $"· resident {got.Resident,4} · separations {got.Tally.Separations,7} "
                 + $"· repaired {got.Repaired,5} · sound {got.Sound,3}");
 
-        // THE ONE THING THAT MUST HOLD WHATEVER THE COST IS: background carries no
+        // The one thing that must hold whatever the cost is: background carries no
         // information, so it cannot make a rule true that was not, nor false that was.
         // A soundness count moving with clutter would mean the answer key had started
         // reading the noise, which is a bug in the instrument rather than a finding.
@@ -67,12 +67,12 @@ public sealed class ClutterCostTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>NOTHING IS EVER ROOTED ON BACKGROUND, WHICH IS THE INVARIANT AND NOT A
-    /// SCORE.</b>
+    /// <b>Nothing is ever rooted on background, which is the invariant and not a
+    /// score.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THIS IS WHAT THE GATE IS NAMED FOR, ASKED DIRECTLY.</b> Before it, half the
+    /// <b>This is what the gate is named for, asked directly.</b> Before it, half the
     /// resident population at eight bits of background carried an always-present code, and
     /// three quarters of those were otherwise perfectly good rules dragging one they had
     /// inherited from a parent that should never have existed. A mechanism that improved
@@ -80,7 +80,7 @@ public sealed class ClutterCostTests(ITestOutputHelper output)
     /// and the number would be believed anyway.
     /// </para>
     /// <para>
-    /// <b>AND THE COUNT IS NOUGHT RATHER THAN SMALL.</b> A code that has never been absent
+    /// <b>And the count is nought rather than small.</b> A code that has never been absent
     /// cannot be a root, and a scope only grows by conditions repair chooses — which can
     /// never be background, since its separation is nought by construction. So there is no
     /// road by which one gets in, and anything above nought means a road exists that this
@@ -112,7 +112,7 @@ public sealed class ClutterCostTests(ITestOutputHelper output)
             $"{tainted} of {resident.Count} resident commitments carry a code that is "
             + "always present");
 
-        // AND THE POPULATION IS NOT EMPTY, so a nought above is the gate working rather
+        // And the population is not empty, so a nought above is the gate working rather
         // than the run having learnt nothing at all -- which would satisfy the assertion
         // for the wrong reason and is exactly the shape of a check that cannot fire.
         Assert.NotEmpty(resident);
@@ -121,8 +121,8 @@ public sealed class ClutterCostTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>AND THE WORLD IS UNCHANGED UNDERNEATH IT, WHICH IS WHAT MAKES THE GRID
-    /// READABLE.</b>
+    /// <b>And the world is unchanged underneath it, which is what makes the grid
+    /// readable.</b>
     /// </summary>
     /// <remarks>
     /// Clutter takes nothing from the generator and the answer function ignores it, so
@@ -146,7 +146,7 @@ public sealed class ClutterCostTests(ITestOutputHelper output)
             Assert.Equal(bare.Answer, noisy.Answer);
             Assert.Equal(bare.Outcome, noisy.Outcome);
 
-            // AND THE INFORMATIVE CUES ARE THE SAME CUES, so the extra codes are purely
+            // And the informative cues are the same cues, so the extra codes are purely
             // additional rather than a different reading of the same world.
             Assert.All(bare.Cues, code => Assert.Contains(code, noisy.Cues));
         }

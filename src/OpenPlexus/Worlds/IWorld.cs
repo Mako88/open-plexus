@@ -3,7 +3,7 @@ namespace OpenPlexus.Worlds;
 /// <summary>One step of a world: what it showed, and what followed.</summary>
 /// <typeparam name="TSeen">Whatever this world natively produces.</typeparam>
 /// <remarks>
-/// <b>NOT CODES, AND THAT IS THE WHOLE POINT.</b> A world says what happened in its
+/// <b>Not codes, and that is the whole point.</b> A world says what happened in its
 /// own terms — numbers, bits, whatever it has. Turning that into codes is the
 /// TRANSLATION's job, and which translation is used is not a fact about the world.
 /// </remarks>
@@ -23,13 +23,13 @@ public readonly record struct Turn<TSeen>
     /// different alphabet per world would not be one brain.
     /// </para>
     /// <para>
-    /// <b>AND NULLABLE, BECAUSE A WORLD THAT DOES NOT KNOW HAD NO WAY TO SAY SO.</b> Most
+    /// <b>And nullable, because a world that does not know had no way to say so.</b> Most
     /// moments in any real stream are followed by nothing anybody observes, and this type
     /// could only express a stream where every one of them is. What was missing was a
     /// world's ability to say <i>nothing followed that I saw</i>.
     /// </para>
     /// <para>
-    /// <b>IT SAYS WHAT IS BEING LOOKED AT AND NEVER WHAT TO CONCLUDE</b>, which is the line
+    /// <b>It says what is being looked at and never what to conclude</b>, which is the line
     /// every other thing a world is allowed to report stays on. What anything downstream
     /// does about an unobserved outcome is not the world's business, and nothing here names
     /// it.
@@ -48,13 +48,13 @@ public readonly record struct Turn<TSeen>
 /// <typeparam name="TSeen">Whatever this world natively produces.</typeparam>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S RULE, AND IT IS ABOUT WHAT WENT WRONG LAST TIME.</b> On `csharp` the
+/// <b>John's rule, and it is about what went wrong last time.</b> On `csharp` the
 /// worlds grew dials that reached into the brain — `Ranking` was one thing on bAbI
 /// and another on CLEVR, so a WORLD decided how the brain thought, and every score
 /// was a comparison between two brains as much as between two problems.
 /// </para>
 /// <para>
-/// <b>SO A WORLD MAY TURN ITS OWN DIALS AND NEVER THE BRAIN'S.</b> What a world
+/// <b>So a world may turn its own dials and never the brain's.</b> What a world
 /// outputs is its business; what a brain does with it is not, and `SeparationTests`
 /// fails the build if anything in here names a brain type.
 /// </para>
@@ -78,8 +78,8 @@ public interface IWorld<TSeen>
 /// <typeparam name="TSeen">Whatever this world natively produces.</typeparam>
 /// <remarks>
 /// <para>
-/// <b>C4 CONSTRAINS THE LEARNER AND NOT THE EXPERIMENTER, AND CONFLATING THE TWO IS
-/// WHY THIS WAS MISSING.</b> <i>No episode boundary, so nothing may depend on
+/// <b>C4 constrains the learner and not the experimenter, and conflating the two is
+/// why this was missing.</b> <i>No episode boundary, so nothing may depend on
 /// train-then-test</i> forbids the MACHINE knowing about a boundary — it may not wait
 /// for one, switch behaviour at one, or be scored on a lifetime average that assumes
 /// one. Nothing in it forbids the person running the experiment from keeping some
@@ -87,7 +87,7 @@ public interface IWorld<TSeen>
 /// The learner is never told and cannot tell.
 /// </para>
 /// <para>
-/// <b>WITHOUT IT A WORLD THAT DRAWS WITH REPLACEMENT SCORES ITS OWN RECURRENCE.</b>
+/// <b>Without it a world that draws with replacement scores its own recurrence.</b>
 /// <see cref="Cifar"/> draws ten thousand images forever, so at forty thousand rounds
 /// each has been seen four times and memorising a moment's winner set is entirely
 /// affordable. That already happened here — an unbounded population's score tracked how
@@ -95,7 +95,7 @@ public interface IWorld<TSeen>
 /// than measured. This measures it.
 /// </para>
 /// <para>
-/// <b>AND IT IS THE ONLY ANTI-MEMORISATION INSTRUMENT A PERCEPTUAL WORLD CAN HAVE.</b>
+/// <b>And it is the only anti-memorisation instrument a perceptual world can have.</b>
 /// The sharp one is soundness by enumeration, which needs a rule set to enumerate;
 /// <see cref="Multiplexer"/> has one and no world made of photographs ever will. On
 /// <see cref="Cifar"/> the choice is this or nothing but a score that cannot be

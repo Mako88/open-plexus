@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Worlds;
+using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
@@ -55,14 +55,14 @@ public sealed class ClevrTests(ITestOutputHelper output)
 
         foreach (var scene in world.Scenes)
         {
-            // FOUR ATTRIBUTES AND AN INDEX PER OBJECT, PLUS ONE FOR THE SCENE, so
+            // Four attributes and an index per object, plus one for the scene, so
             // the code count is one more than a multiple of five.
             Assert.Equal(1, scene.Codes.Length % 5);
 
             Assert.NotNull(scene.Groups);
             Assert.Single(scene.Codes.Where(code => code.Modality == Clevr.Where));
 
-            // AND THE SCENE INDEX IS ALWAYS FLEETING, whatever the object arm
+            // And the scene index is always fleeting, whatever the object arm
             // says, or every attribute grows a row entry per scene forever.
             Assert.Contains(Clevr.Seen(scene.Scene), scene.Fleeting!);
         }
@@ -102,7 +102,7 @@ public sealed class ClevrTests(ITestOutputHelper output)
                 // corpus rather than the binding.
                 Assert.True(question.Origins.Length >= 2);
 
-                // AND THE FILTERS NAME A DIFFERENT ATTRIBUTE FROM THE ANSWER, or
+                // And the filters name a different attribute from the answer, or
                 // the question would contain its own answer.
                 Assert.DoesNotContain(question.Origins, code => code.Modality == question.Asking);
             }

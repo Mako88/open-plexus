@@ -13,14 +13,14 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE WORTH IS ALREADY PRICED AND THE COST IS NOT.</b> <c>Joining.Addressed</c> did
+/// <b>The worth is already priced and the cost is not.</b> <c>Joining.Addressed</c> did
 /// the selection in the front end and answered bAbI's first task outright where the bag
 /// sits at its marginal, so what a unifying matcher would BUY is a number this repo
 /// already has. What it would cost has been an argument — <i>it breaks the indexing that
 /// makes matching cheap</i> — and an argument is what this file replaces.
 /// </para>
 /// <para>
-/// <b>AND THE FIRST FINDING IS ABOUT THE FRONT END RATHER THAN THE MATCHER.</b>
+/// <b>And the first finding is about the front end rather than the matcher.</b>
 /// <c>Joined</c> unions the question's words into the story's bag under one modality, so
 /// <i>the word asked about</i> and <i>the word told</i> are the same code and a repeated
 /// variable binds against nothing at all. A variable needs two places to stand in; on
@@ -30,7 +30,7 @@ namespace OpenPlexus.Tests;
 /// is a cost of zero and means nothing.
 /// </para>
 /// <para>
-/// <b>AND THE ARGUMENT IS REFUTED BY THE SECOND READING RATHER THAN BY THE FIRST.</b> The
+/// <b>And the argument is refuted by the second reading rather than by the first.</b> The
 /// per-match cost is small — a variable costs its candidate set, which is the moment
 /// restricted to one modality, and a refusal costs all of it where a binding stops at the
 /// first that fits. What was supposed to be expensive is the INDEX, and the index turns
@@ -40,7 +40,7 @@ namespace OpenPlexus.Tests;
 /// is the remainder.
 /// </para>
 /// <para>
-/// <b>NO BAR ON THE COSTS THEMSELVES.</b> What a deployment can afford is not decided
+/// <b>No bar on the costs themselves.</b> What a deployment can afford is not decided
 /// here, and the point of pricing a rung before designing its escalation policy is that
 /// the policy reads the number rather than the number being chosen to fit a policy. The
 /// one bar is on the finding above, so that a world where the index DOES earn its keep
@@ -61,15 +61,15 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>AND THE QUESTION'S WORDS ARE NOT ALSO PUT IN THE STORY'S BAG, WHICH THE FIRST
-    /// VERSION OF THIS FILE DID AND IT COST THE READING.</b> <c>Joined</c> unions them, so
+    /// <b>And the question's words are not also put in the story's bag, which the first
+    /// version of this file did and it cost the reading.</b> <c>Joined</c> unions them, so
     /// every asked word is a told word by construction — and under that moment <i>the word
     /// asked about was told</i> is true of every question ever asked. It fired 400 times
     /// out of 400 at one candidate tried, which reads as unification being free and is
     /// only the union being tautological.
     /// </para>
     /// <para>
-    /// <b>SO A VARIABLE NEEDS TWO PLACES THAT CAN DISAGREE</b>, and keeping the halves
+    /// <b>So a variable needs two places that can disagree</b>, and keeping the halves
     /// apart is the whole of what the front end has to supply. The world has kept them
     /// apart since it was written; nothing has to be inferred to emit this.
     /// </para>
@@ -81,7 +81,7 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
     /// variable can stand, and the one that can DISAGREE.</b>
     /// </summary>
     /// <remarks>
-    /// <b>BECAUSE ON THIS TASK THE QUESTION ALWAYS NAMES SOMEBODY THE STORY MENTIONS.</b>
+    /// <b>Because on this task the question always names somebody the story mentions.</b>
     /// <i>The word asked about was told</i> is therefore true of every question ever asked
     /// here — 400 of 400, measured — so it prices a binding and can never price a refusal,
     /// and half the cost of this rung is what a refusal costs. <i>The word asked about is
@@ -115,24 +115,24 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
             Predicting = Predicting.Asked,
         });
 
-        // THE MODALITY WORDS ARRIVE ON, READ OFF THE SIGNAL RATHER THAN NAMED. `Babi` keeps
+        // The modality words arrive on, read off the signal rather than named. `Babi` keeps
         // it private and a test is not a reason to publish it — a probe that had to widen
         // the library to take a reading would be changing what it measures.
         var told = world.Withheld[0].Seen.Words.First().Modality;
 
-        // THE FOUR SHAPES, AND THE CONSTANT ONE IS THE CONTROL RATHER THAN A FIFTH ARM. A
+        // The four shapes, and the constant one is the control rather than a fifth arm. A
         // subset test tries exactly one membership per scope code, so a two-code constant
         // scope costs two — and every number below is against that.
         //
-        // A JOIN IS THE SHAPE THAT MATTERS. One variable standing in two places is *the
+        // A join is the shape that matters. One variable standing in two places is *the
         // word asked about was told*, which is `Joining.Anonymous` with the identity kept
         // rather than thrown away, and it is the cheapest thing rung four can say that
         // rungs one to three cannot say at all.
         var join = ImmutableArray.Create(
             Unifying.Any(Wondered, 0), Unifying.Any(told, 0));
 
-        // THE SAME JOIN WRITTEN THE OTHER WAY ROUND, AND IT IS AN ARM RATHER THAN A
-        // DUPLICATE. `Fill` draws its candidates from the FIRST entry naming a variable, so
+        // The same join written the other way round, and it is an arm rather than a
+        // duplicate. `Fill` draws its candidates from the FIRST entry naming a variable, so
         // asking from the question's side enumerates the three words asked about and asking
         // from the story's side enumerates every word in the story. Same scope, same
         // answers, and the distance between the two columns is exactly the saving a matcher
@@ -140,7 +140,7 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
         var wide = ImmutableArray.Create(
             Unifying.Any(told, 0), Unifying.Any(Wondered, 0));
 
-        // AND THE ONE THAT CAN SAY NO. Everything above binds on every question this world
+        // And the one that can say no. Everything above binds on every question this world
         // asks, so between them they price a hit and never a refusal — and a population is
         // mostly refusals. This is the same join against the newest statement instead of
         // the whole story, which is contingent.
@@ -192,8 +192,8 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
             $"{moments} moments | {words / (double)moments:F1} codes a moment, "
             + $"{asked / (double)moments:F1} of them asked about");
 
-        // BOUND AND REFUSED ARE REPORTED APART BECAUSE THEY ARE NOT THE SAME COST AND THE
-        // POPULATION IS MOSTLY THE SECOND. A binding is found and the search stops; a
+        // Bound and refused are reported apart because they are not the same cost and the
+        // population is mostly the second. A binding is found and the search stops; a
         // refusal is the whole candidate set enumerated and every partner checked, and
         // almost every resident refuses almost every round. An average over both would be
         // an average weighted by this file's choice of scopes rather than by a population.
@@ -210,7 +210,7 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
 
         output.WriteLine("subset   | 1 tried a code, bound or refused, by construction");
 
-        // THE INSTRUMENT CHECK, AND IT IS THE ONE THAT CAUGHT TWO READINGS. A join that can
+        // The instrument check, and it is the one that caught two readings. A join that can
         // never fail costs nothing to decide and a join that can never fire costs nothing
         // to refuse; either way the number would be about the moment rather than about
         // unification. The contingent shape is the one both columns are demanded of, and
@@ -242,7 +242,7 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
 
         Assert.True(all.Count > 0, "nothing was learnt, so there is no population to price");
 
-        // WHAT VARIABILISING ONE CODE WOULD COST THE INDEX. `Population.Firing` reaches a
+        // What variabilising one code would cost the index. `Population.Firing` reaches a
         // commitment through any real code in its scope, so a scope keeps its index while
         // it keeps one — and a scope of length one that gives up its only code is reached
         // by nothing and has to be scanned every round.
@@ -257,8 +257,8 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
         output.WriteLine(
             $"{all.Count - singles} would keep at least one constant and stay indexable");
 
-        // AND WHAT THE INDEX IS WORTH TODAY, WHICH IS THE DENOMINATOR THE SHARE ABOVE IS
-        // MEANINGLESS WITHOUT. `Population.Firing` reaches a commitment only through a code
+        // And what the index is worth today, which is the denominator the share above is
+        // meaningless without. `Population.Firing` reaches a commitment only through a code
         // its scope holds, so what it visits a round is the residents sharing a code with
         // the moment — and a scope naming only variables shares none, so it would be
         // visited EVERY round on top of that. The cost of the rung is therefore the scan
@@ -280,7 +280,7 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
             $"matching visits {visited / (double)rounds:F1} of {all.Count} residents a round, "
             + $"so an all-variable scope costs a visit no index can save");
 
-        // AND THE SAME READING ON A WORLD WHERE THE INDEX SHOULD WIN, because a share taken
+        // And the same reading on a world where the index should win, because a share taken
         // on one world is a fact about that world. The multiplexer's moments are narrow and
         // its alphabet is tiny, which is the arrangement an index is FOR — so if the share
         // is low there and high on text, what the index buys is a property of the signal
@@ -311,7 +311,7 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
             + $"moment | matching visits {narrowVisited / (double)Asked:F1} "
             + $"({narrowVisited / (double)Asked / bits.Count:P1})");
 
-        // THE ONE BAR IN THIS FILE, AND IT HOLDS THE FINDING RATHER THAN A LEVEL. What
+        // The one bar in this file, and it holds the finding rather than a level. What
         // gated rung four for the whole branch is the sentence *unification breaks the
         // indexing that makes matching cheap*, and both readings say the indexing is
         // already not making matching cheap: four residents in five are visited a round on
@@ -319,7 +319,7 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
         // moment holds much of the alphabet. So what a scan list adds is the remainder, and
         // the remainder is small.
         //
-        // IF THIS GOES RED THE CONCLUSION IS OWED A RE-TAKE RATHER THAN A REPAIR. A
+        // If this goes red the conclusion is owed a re-take rather than a repair. A
         // population of long scopes over a wide alphabet would make the index earn its
         // keep, and rung four's price would be a different number on that world.
         Assert.True(visited / (double)rounds > all.Count / 2.0,

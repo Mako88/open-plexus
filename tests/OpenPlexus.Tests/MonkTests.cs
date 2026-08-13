@@ -12,8 +12,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>STEP EIGHT IS <i>THE RUNG THE FAILURES DEMAND, AND NEVER THE RUNG THAT SOUNDS
-/// NEXT</i>, AND NO FAILURE HAD ASKED.</b> On the multiplexer twelve one-code rules
+/// <b>STEP EIGHT IS <i>the rung the failures demand, and never the rung that sounds
+/// next</i>, AND NO FAILURE HAD ASKED.</b> On the multiplexer twelve one-code rules
 /// cover everything held out, so the scope language is nowhere near binding there. This
 /// world is built so a failure can ask, and it asks BEFORE a learner is run: the concept
 /// and the language are both finite, so what a conjunction can and cannot say about the
@@ -21,7 +21,7 @@ namespace OpenPlexus.Tests;
 /// a disappointing score.
 /// </para>
 /// <para>
-/// <b>AND THE TWO CONTROLS ARE THE POINT OF HAVING THREE PUZZLES.</b> A learner falling
+/// <b>And the two controls are the point of having three puzzles.</b> A learner falling
 /// short on <see cref="Puzzle.Two"/> alone says nothing — a ceiling on the language and
 /// a poor learner look identical from one number, which is this project's oldest
 /// complaint about its own measurements. <see cref="Puzzle.One"/> and
@@ -45,7 +45,7 @@ public sealed class MonkTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE BAR IS NOT A HALF ON THE ONE PUZZLE THAT MATTERS.</b>
+    /// <b>The bar is not a half on the one puzzle that matters.</b>
     /// </summary>
     /// <remarks>
     /// <see cref="Puzzle.Two"/> is 142 positive of 432, so an arm that never says yes
@@ -66,7 +66,7 @@ public sealed class MonkTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE CONCEPTS ARE THE PUBLISHED ONES, CHECKED AGAINST THEIR OWN SHORT RULES.</b>
+    /// <b>The concepts are the published ones, checked against their own short rules.</b>
     /// </summary>
     /// <remarks>
     /// An encoding slip here would be invisible everywhere else — the counts above would
@@ -88,8 +88,8 @@ public sealed class MonkTests(ITestOutputHelper output)
         Assert.Single(yes, truth => truth.Scope.Length == 1);
         Assert.Contains(yes, truth => truth.Scope.SequenceEqual(new[] { Monk.Of(4, 0) }));
 
-        // AND `head = body`, WHICH A CONJUNCTION SAYS THREE TIMES BECAUSE IT CANNOT SAY
-        // IT ONCE. Equality between two attributes is not a thing a scope can express;
+        // AND `head = body`, which a conjunction says three times because it cannot say
+        // it once. Equality between two attributes is not a thing a scope can express;
         // what it can express is each of the three ways of satisfying it.
         Assert.Equal(3, yes.Count(truth => truth.Scope.Length == 2));
 
@@ -99,8 +99,8 @@ public sealed class MonkTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE FINDING: ON THE SECOND PUZZLE THE ONLY SOUND WAY TO SAY YES IS TO NAME AN
-    /// INSTANCE.</b>
+    /// <b>The finding: on the second puzzle the only sound way to say yes is to name an
+    /// instance.</b>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -111,8 +111,8 @@ public sealed class MonkTests(ITestOutputHelper output)
     /// it can only memorise, one robot at a time.</b>
     /// </para>
     /// <para>
-    /// <b>AND THE SHORTEST SOUND RULE OF ANY KIND IS DEPTH THREE, WHICH IS CHECKABLE BY
-    /// HAND.</b> The twenty of them are the twenty ways to choose three of six attributes
+    /// <b>And the shortest sound rule of any kind is depth three, which is checkable by
+    /// hand.</b> The twenty of them are the twenty ways to choose three of six attributes
     /// and pin all three to their first value: that forces the count to at least three,
     /// so the answer is NO whatever the other three do. Twenty is <c>C(6,3)</c>, and a
     /// count that came out as anything else would mean the concept had been mis-encoded.
@@ -137,13 +137,13 @@ public sealed class MonkTests(ITestOutputHelper output)
         Assert.Equal(142, yes.Count);
         Assert.All(yes, truth => Assert.Equal(Monk.Widths.Length, truth.Scope.Length));
 
-        // AND THE SHORTEST SOUND RULE AT ALL IS THREE, WHICH IS C(6,3) OF THEM.
+        // And the shortest sound rule at all is three, which is C(6,3) OF THEM.
         Assert.Equal(3, no.Min(one => one.Scope.Length));
         Assert.Equal(20, no.Count(one => one.Scope.Length == 3));
     }
 
     /// <summary>
-    /// <b>THE CONTROLS, AND THEY RUN THE OTHER WAY.</b>
+    /// <b>The controls, and they run the other way.</b>
     /// </summary>
     /// <remarks>
     /// A basis of 22 rules and one of 12 against one of 254, of which 142 are whole
@@ -177,7 +177,7 @@ public sealed class MonkTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>EVERY RULE THE KEY CALLS TRUE IS TRUE, AND A CONTRADICTION IS NOT.</b>
+    /// <b>Every rule the key calls true is true, and a contradiction is not.</b>
     /// </summary>
     /// <remarks>
     /// The second half is the one that matters: a scope pinning one attribute to two
@@ -196,13 +196,13 @@ public sealed class MonkTests(ITestOutputHelper output)
         Assert.False(Monk.Sound(Puzzle.Two, impossible, Monk.Says(holds: true)));
         Assert.False(Monk.Sound(Puzzle.Two, impossible, Monk.Says(holds: false)));
 
-        // AND A CODE FROM ANOTHER WORLD IS NOT CHECKABLE HERE, so a minted name reaching
+        // And a code from another world is not checkable here, so a minted name reaching
         // this key is refused rather than silently called unsound.
         Assert.False(Monk.Checkable([new Code(Modality: 9, 1)]));
     }
 
     /// <summary>
-    /// <b>WHAT IS WITHHELD IS NEVER DRAWN, AND THE SPLIT IS A POSITION.</b>
+    /// <b>What is withheld is never drawn, and the split is a position.</b>
     /// </summary>
     /// <remarks>
     /// The same rule <see cref="Cifar"/> follows and for the same reason: a held-out set
@@ -228,13 +228,13 @@ public sealed class MonkTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE LEARNER AGAINST THE CEILING, ON ALL THREE, WITH THE BAR BESIDE EVERY
-    /// SCORE.</b>
+    /// <b>The learner against the ceiling, on all three, with the bar beside every
+    /// score.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>NO THRESHOLD, BECAUSE A BAR WRITTEN BEFORE THE FIRST RUN IS A PREDICTION
-    /// DRESSED AS A CHECK.</b> What this asserts is only what the enumeration above has
+    /// <b>No threshold, because a bar written before the first run is a prediction
+    /// dressed as a check.</b> What this asserts is only what the enumeration above has
     /// already decided — that the basis differs — and what it PRINTS is the grid the
     /// finding gets read off.
     /// </para>
@@ -264,11 +264,11 @@ public sealed class MonkTests(ITestOutputHelper output)
                 + $"· sound {got.Sound} unsound {got.Unsound} unchecked {got.Unchecked} "
                 + $"· found {got.Found} of {got.Truths}");
 
-            // THE ONE THING THIS WORLD GUARANTEES: every rule is decidable here, so a
+            // The one thing this world guarantees: every rule is decidable here, so a
             // soundness count that quietly skipped some would be a silent instrument.
             Assert.Equal(0, got.Unchecked);
 
-            // AND THE INSTRUMENT IS ARMED, WHICH IT WAS NOT WHEN THIS FILE WAS WRITTEN.
+            // And the instrument is armed, which it was not when this file was written.
             // The answer key was first built in the world's own outcome alphabet rather
             // than the shared one, so every rule it called true expected a code the
             // population can never hold: `sound` and `found` read NOUGHT on all three
@@ -281,11 +281,11 @@ public sealed class MonkTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHETHER THE FAILURES ARE ASKING FOR A RUNG — fork 50, as a number.</b>
+    /// <b>Whether the failures are asking for a rung — fork 50, as a number.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE LADDER'S RULE IS DECIDABLE AND WAS BEING READ BY NOTHING.</b> The plan says
+    /// <b>The ladder's rule is decidable and was being read by nothing.</b> The plan says
     /// a rung is admitted when and only when no expression in the current language
     /// separates the failures from the hits, and that choosing one before a failure asks is
     /// hand-specified bias by a side door — the fault that killed ILP. That condition is
@@ -293,7 +293,7 @@ public sealed class MonkTests(ITestOutputHelper output)
     /// since the branch began and has never been counted. <c>Tally.Wanting</c> is the count.
     /// </para>
     /// <para>
-    /// <b>THE PREDICTION, WRITTEN BEFORE THE FIRST READING AND NOT IN AN ASSERTION.</b>
+    /// <b>The prediction, written before the first reading and not in an assertion.</b>
     /// <see cref="Puzzle.Two"/> is a counting concept: EXACTLY TWO of six attributes hold
     /// their first value, which a conjunction cannot say at any depth. So its failures
     /// should be the ones nothing separates, and <see cref="Puzzle.One"/> and
@@ -302,7 +302,7 @@ public sealed class MonkTests(ITestOutputHelper output)
     /// entirely, where the true rules ARE conjunctions and this should be near nought.
     /// </para>
     /// <para>
-    /// <b>AND IF THE NUMBER IS FLAT ACROSS ALL FOUR, THE RUNG IS NOT WHAT IS MISSING.</b>
+    /// <b>And if the number is flat across all four, the rung is not what is missing.</b>
     /// That is the outcome worth most: it would say `Monk-2`'s ceiling is the floor, the
     /// budget or the gates refusing to repair rather than the language failing to describe,
     /// and every argument for rung two so far has been an argument.
@@ -329,7 +329,7 @@ public sealed class MonkTests(ITestOutputHelper output)
 
         foreach (var (world, run) in worlds)
         {
-            // CACHED, SO BOTH SHARES ARE READ OFF THE SAME RUNS ON THE SAME SEEDS. `Sweep`
+            // Cached, so both shares are read off the same runs on the same seeds. `Sweep`
             // mixes the seed counter before handing it over, because near-neighbour seeds
             // agree more than chance allows and that agreement comes straight off the
             // standard error -- so the sequence has to come from there rather than from a
@@ -345,7 +345,7 @@ public sealed class MonkTests(ITestOutputHelper output)
             var wanting = await Sweep.ArmAsync(
                 world, Seeds, seed => Task.FromResult(At(seed).Wanting));
 
-            // AND THE SECOND SHARE IS OVER THE FIRST'S NUMERATOR, so a seed that separated
+            // And the second share is over the first's numerator, so a seed that separated
             // everything contributes no opinion about absence rather than a nought. A
             // nought there would say an absence did not help on a seed where nothing needed
             // helping, which is reading a silence as a refusal.
@@ -366,7 +366,7 @@ public sealed class MonkTests(ITestOutputHelper output)
                 + $"over {absence.Seeds} of {Seeds} seeds");
         }
 
-        // THE INSTRUMENT CHECK, AND IT IS THE ONE THIS FILE ALREADY HAS A PARAGRAPH ABOUT.
+        // The instrument check, and it is the one this file already has a paragraph about.
         // `Wanting` is a ratio over `Blamed`, so a run where nothing was ever repairable
         // reports nought and reads exactly like a language that described everything.
         Assert.True(Monked(Puzzle.Two, 1).Blamed > 0,

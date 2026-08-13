@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Commitments;
+using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -11,16 +11,16 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>TWO ARMS CAN PEAK AT DIFFERENT BUDGETS, AND THIS REPO'S OWN TRAPS LIST SAYS COMPARE
-/// PEAK TO PEAK.</b> <see cref="BudgetingTests"/> measured sixty-four against a budget that
+/// <b>Two arms can peak at different budgets, and this repo's own traps list says compare
+/// peak to peak.</b> <see cref="BudgetingTests"/> measured sixty-four against a budget that
 /// cannot bind, and the ordering inverted: the free end holds 125.8 sound rules to 68.7,
 /// mints the most names, carries 0.92 of the hard rounds to 0.79 — and its trailing accuracy
 /// on an even world falls. Both readings are ENDS. Nothing between them has ever been run,
 /// so a trade recorded as a choice may only be a dial read at two points.
 /// </para>
 /// <para>
-/// <b>AND THE FREE END IS REACHED BY A NUMBER RATHER THAN BY THE OTHER ENUM, WHICH IS WHAT
-/// MAKES THIS ONE AXIS.</b> <see cref="Budgeting.Children"/> is a free budget on every world
+/// <b>And the free end is reached by a number rather than by the other enum, which is what
+/// makes this one axis.</b> <see cref="Budgeting.Children"/> is a free budget on every world
 /// here — a child adds one code, so distinct children are capped by the vocabulary at
 /// twenty-two against sixty-four — so it never refuses, and neither does
 /// <see cref="Budgeting.Attempts"/> at <see cref="Unlimited"/>. Sweeping the COUNT keeps
@@ -28,14 +28,14 @@ namespace OpenPlexus.Tests;
 /// at once.
 /// </para>
 /// <para>
-/// <b>THE PREDICTION IS WRITTEN DOWN FIRST AND IT IS SPECIFIC ENOUGH TO BE WRONG.</b> If
+/// <b>The prediction is written down first and it is specific enough to be wrong.</b> If
 /// hard-round coverage and sound rules rise monotonically in the budget while trailing
 /// accuracy on the even world falls monotonically, the trade is real, no number ranks it, and
 /// the choice is John's. If instead there is an interior budget carrying the free end's
 /// coverage at the shipped end's accuracy, the trade dissolves and that budget ships.
 /// </para>
 /// <para>
-/// <b>BOTH WORLDS, BECAUSE THE TWO HALVES OF THE TRADE LIVE ON DIFFERENT ONES.</b> The
+/// <b>Both worlds, because the two halves of the trade live on different ones.</b> The
 /// coverage and the sound rules are bought on the skewed world where the base rate pays
 /// nothing; the accuracy is sold on the even world where it pays. A curve on one of them
 /// would read as a clean win in whichever direction it was taken.
@@ -56,7 +56,7 @@ public sealed class BudgetCurveTests(ITestOutputHelper output)
     /// <param name="budget">How many separation attempts one parent may ever spend.</param>
     /// <param name="seed">The world's generator and the brain's.</param>
     /// <remarks>
-    /// <b><see cref="Repairing.EveryRound"/> IS THE SHIPPED TIMING AND IS NOT SWEPT HERE.</b>
+    /// <b><see cref="Repairing.EveryRound"/> Is the shipped timing and is not swept here.</b>
     /// The budget read as inert under the old timing because the lineages that would have
     /// spent it were never blamed, so a grid over both timings would be re-running a question
     /// already answered rather than asking this one.
@@ -76,8 +76,8 @@ public sealed class BudgetCurveTests(ITestOutputHelper output)
                     Budget = budget,
                     Budgeting = counting,
 
-                // AND `Forking` IS PINNED, WHICH IT WAS NOT WHEN THIS DIAL SHIPPED ITS NEW
-                // VALUE. A fixture inherits every dial it does not pin, and this grid sweeps
+                // AND `Forking` is pinned, which it was not when this dial shipped its new
+                // value. A fixture inherits every dial it does not pin, and this grid sweeps
                 // the one number whose meaning `Forking` decides -- under `Repeated` a parent
                 // re-proposed the same child and the budget capped RE-DERIVATION; under
                 // `Distinct` it caps the search. Left unpinned, the same rows would have
@@ -90,7 +90,7 @@ public sealed class BudgetCurveTests(ITestOutputHelper output)
             census: true).Run(Rounds);
 
     /// <summary>
-    /// <b>SEVEN BUDGETS ACROSS THE TWO ENDS ALREADY MEASURED.</b>
+    /// <b>Seven budgets across the two ends already measured.</b>
     /// </summary>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
@@ -98,15 +98,15 @@ public sealed class BudgetCurveTests(ITestOutputHelper output)
     {
         var budgets = Fixture.Budgets;
 
-        // THE GRID MUST BRACKET WHAT SHIPS, OR IT IS A CURVE ABOUT SOMEBODY ELSE'S BRAIN.
+        // The grid must bracket what ships, or it is a curve about somebody else's brain.
         // A default moved out from under this list would leave every row still printing and
         // none of them standing on the running configuration -- the pass-shaped failure this
         // repo keeps finding, wearing a sweep. Cheaper as an assert than as a reading nobody
         // re-takes.
         Assert.Contains(new CommittingSettings().Budget, budgets);
 
-        // BOTH WIDTHS, BECAUSE THE PLAN ALREADY CARRIES THIS OPTIMUM AS ONE THAT MOVES WITH
-        // THE RELEVANT BITS -- and a budget in ATTEMPTS is spent mostly on re-derivation,
+        // Both widths, because the plan already carries this optimum as one that moves with
+        // the relevant bits -- and a budget in ATTEMPTS is spent mostly on re-derivation,
         // whose rate is a function of the vocabulary. So a peak at one width is not a
         // number this brain gets to keep unless the other width agrees: a dial whose best
         // value moves with the world is a world reaching into the brain, which is the one
@@ -116,8 +116,8 @@ public sealed class BudgetCurveTests(ITestOutputHelper output)
             output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}, "
                 + $"{Seeds} seeds, {Rounds} rounds, every-round repair ===");
 
-            // AND ONE CELL THAT IS NOT A LEVEL AT ALL, WHICH IS WHY IT IS APPENDED RATHER
-            // THAN INSERTED. `Budgeting.Earned` pays one attempt per `Floor` misses and does
+            // And one cell that is not a level at all, which is why it is appended rather
+            // than inserted. `Budgeting.Earned` pays one attempt per `Floor` misses and does
             // not read `Budget`, so it belongs on this curve as a row and nowhere on its
             // x-axis. It sits with a free budget where a parent is often wrong and with a cap
             // where it is not, measured on `Arranged` -- and this is where the columns skew
@@ -129,7 +129,7 @@ public sealed class BudgetCurveTests(ITestOutputHelper output)
                     Budgeting.Attempts))
                     .Append(("earned", Unlimited, Budgeting.Earned)))
             {
-                // ONE RUN PER SEED, SHARED BY EVERY READING BELOW -- the same discipline
+                // One run per seed, shared by every reading below -- the same discipline
                 // `BudgetTests` records. Seven readings asked independently would run one
                 // configuration seven times and print one measurement as seven.
                 var once = new Dictionary<int, Learned>();
@@ -144,11 +144,11 @@ public sealed class BudgetCurveTests(ITestOutputHelper output)
 
                 foreach (var reading in new (string What, Func<Learned, double> Of)[]
                 {
-                    // FIRST, BECAUSE IT IS THE ONE READING SKEW CANNOT GAME. A true rule
+                    // First, because it is the one reading skew cannot game. A true rule
                     // firing on a round the base rate gets wrong is what `found` and
                     // `recent` both fail to separate on a tilted world.
                     ("paying", one => one.Census!.Paying),
-                    // AND THE ROUNDS THE COVERAGE IS THE COMPLEMENT OF, because a rise in
+                    // And the rounds the coverage is the complement of, because a rise in
                     // `paying` is consistent with the quantity story and does not test it. A
                     // child fires only where its added code is present, so it covers a SUBSET
                     // of what its parent was right about -- if that is why two thirds of wrong
@@ -160,14 +160,14 @@ public sealed class BudgetCurveTests(ITestOutputHelper output)
                     ("sound", one => one.Sound),
                     ("named", one => one.Named),
                     ("stacked", one => one.Stacked),
-                    // THE TWO DENOMINATORS, BECAUSE A NAMING COUNT WITHOUT THEM IS A REPAIR
-                    // RESULT WEARING AN ABSTRACTION'S NAME. Rung five is offered only scopes
+                    // The two denominators, because a naming count without them is a repair
+                    // result wearing an abstraction's name. Rung five is offered only scopes
                     // of two codes or more past the floor, and covering mints one code and
                     // nothing longer -- so its whole input is repair's surviving output, and
                     // the budget moves that directly.
                     ("eligible", one => one.Eligible),
                     ("stackable", one => one.Stackable),
-                    // BESIDE EVERY SCORE, BECAUSE AN ACCURACY CAN BE HIT BY MEMORISING.
+                    // Beside every score, because an accuracy can be hit by memorising.
                     ("residents", one => one.Resident),
                     ("exhausted", one => one.Exhausted),
                     ("repaired", one => one.Repaired),

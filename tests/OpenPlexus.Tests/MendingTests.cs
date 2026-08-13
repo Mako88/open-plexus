@@ -11,7 +11,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE SETTING DECIDES TWO INDEPENDENT THINGS AND IS NAMED FOR ONE.</b> Whether repair
+/// <b>The setting decides two independent things and is named for one.</b> Whether repair
 /// runs every round or only after the vote was wrong is decided in <c>Cycle</c>;
 /// whether a commitment something else already narrows may be repaired at all is decided
 /// in <c>Population.Mend</c>. <c>Mending.Outvoted</c> is after-failure with no
@@ -19,8 +19,8 @@ namespace OpenPlexus.Tests;
 /// in both, and no measurement of them can say which half did anything.
 /// </para>
 /// <para>
-/// <b><c>Mending.Neglected</c> IS THE CELL THAT SEPARATES THEM AND HAS NEVER BEEN
-/// READ AS ONE.</b> It waits for the failure like <c>Outvoted</c> and takes the gate like
+/// <b><c>Mending.Neglected</c> is the cell that separates them and has never been
+/// read as one.</b> It waits for the failure like <c>Outvoted</c> and takes the gate like
 /// <c>Uncovered</c>, so <c>Outvoted</c> against it isolates the GATE and it against
 /// <c>Uncovered</c> isolates WHEN. The fourth cell — every round with no gate — is not a
 /// setting today and WAS one: <c>Mending.Earned</c> sat exactly there, before the failure
@@ -30,8 +30,8 @@ namespace OpenPlexus.Tests;
 /// a mechanism depends on the budget beside it.
 /// </para>
 /// <para>
-/// <b>AND THE REASON TO ASK NOW IS THAT THE GATE TURNED OUT TO BE NEARLY INERT
-/// SOMEWHERE.</b> <c>GateCostTests</c> blinds the gate on <c>Arranged</c> and moves repair
+/// <b>And the reason to ask now is that the gate turned out to be nearly inert
+/// somewhere.</b> <c>GateCostTests</c> blinds the gate on <c>Arranged</c> and moves repair
 /// by four tenths of a percent, against thirty on the multiplexer — so whatever makes
 /// <c>Uncovered</c> behave differently on that world, it is not mostly the thing it is
 /// named after. That is a documented finding resting on a conflation, which is worth more
@@ -67,14 +67,14 @@ public sealed class MendingTests(ITestOutputHelper output)
     /// <param name="seeds">How many seeds each arm is run over.</param>
     /// <param name="of">What one arm on one seed is worth — the run and the metric together.</param>
     /// <remarks>
-    /// <b>ORDERED SO EACH ROW DIFFERS FROM THE ONE ABOVE IT IN EXACTLY ONE THING.</b>
+    /// <b>Ordered so each row differs from the one above it in exactly one thing.</b>
     /// Row one to row two adds the gate; row two to row three moves repair off the failure
     /// branch; row three to row four adds the did-forking-ever-pay test. Every separation
     /// printed is against the first row, so the reading is cumulative and the differences
     /// between adjacent rows are what the axes cost.
     /// </remarks>
     /// <remarks>
-    /// <b>THIS FILE IS WHY THE SETTING IS TWO SETTINGS NOW.</b> The four rows were four
+    /// <b>This file is why the setting is two settings now.</b> The four rows were four
     /// values of one enum, and reading them as a list is what produced <i>a dial whose best
     /// value moves with the world</i>; ordered so each row differs in one thing, they are a
     /// two-by-two grid with a cell missing. <see cref="Fixture.Repairs"/> holds the same
@@ -104,7 +104,7 @@ public sealed class MendingTests(ITestOutputHelper output)
             output.WriteLine(Sweep.Table(await Across(Seeds, (gate, when, seed) => metric(Run(gate, when, seed)))));
         }
 
-        // THE ONE ASSERTION, AND IT IS THAT THE TWO AXES ARE NOT THE SAME AXIS. If adding
+        // The one assertion, and it is that the two axes are not the same axis. If adding
         // the gate and moving repair off the failure branch produced the same population,
         // then `Mending` really is a list and this file is measuring one thing twice --
         // which would be worth knowing and is the only outcome that makes the decomposition
@@ -149,13 +149,13 @@ public sealed class MendingTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public async Task And_which_half_makes_the_setting_ruinous_on_the_other_world()
     {
-        // A HYPOTHESIS UNDER TEST RATHER THAN A SWEEP FOR ITS OWN SAKE. `Mending.Uncovered`
+        // A hypothesis under test rather than a sweep for its own sake. `Mending.Uncovered`
         // is recorded as ruinous on `Arranged`, and `GateCostTests` shows the gate nearly
         // inert there -- so if that verdict is real it has to be the every-round half doing
         // it, and the two after-failure rows should land together while the two every-round
         // rows land together somewhere else.
         //
-        // AND THE PREDICTION IS NOT IN AN ASSERTION, for the reason this suite has already
+        // And the prediction is not in an assertion, for the reason this suite has already
         // paid for once: a check that encodes a guess fails identically whether the wiring
         // is broken or the guess is backwards.
         foreach (var (name, metric) in new (string, Func<Grounded, double>)[]
@@ -170,7 +170,7 @@ public sealed class MendingTests(ITestOutputHelper output)
                 await Across(SceneSeeds, (gate, when, seed) => metric(OnArranged(gate, when, seed)))));
         }
 
-        // THE INSTRUMENT CHECK, AND IT IS ABOUT THE WITHHELD SET EXISTING. Every row above
+        // The instrument check, and it is about the withheld set existing. Every row above
         // reads a nullable, so a world that withheld nothing would print four zeroes and
         // agree with itself perfectly.
         var withheld = await Across(
@@ -179,17 +179,17 @@ public sealed class MendingTests(ITestOutputHelper output)
         Assert.True(withheld[0].Mean > 0.0,
             "no withheld score came back, so every arm is a default and the grid is empty");
 
-        // FOUR SEEDS RESOLVES A DIRECTION AND NOT A SEPARATION, so nothing here may be
+        // Four seeds resolves a direction and not a separation, so nothing here may be
         // reported as a cost -- only as which rows landed together.
     }
 
     /// <summary>
-    /// <b>THE TWO CELLS NOTHING HAS EVER RUN — the whole grid, at last.</b>
+    /// <b>The two cells nothing has ever run — the whole grid, at last.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>UNREACHABLE RATHER THAN REFUSED, WHICH IS THE DIFFERENCE THAT MAKES THIS WORTH
-    /// DOING.</b> One enum decided both axes and no value of it landed on <i>ungated,
+    /// <b>Unreachable rather than refused, which is the difference that makes this worth
+    /// doing.</b> One enum decided both axes and no value of it landed on <i>ungated,
     /// every round</i> or <i>improving, after a failure</i> — so those two are not arms
     /// somebody tried and dropped, they are corners of a two-by-two that could not be
     /// spelled. <see cref="Fixture.Reachable"/> holds them apart from
@@ -197,7 +197,7 @@ public sealed class MendingTests(ITestOutputHelper output)
     /// same four rows.
     /// </para>
     /// <para>
-    /// <b>THE PREDICTION, WRITTEN BEFORE THE FIRST READING AND NOT IN AN ASSERTION.</b>
+    /// <b>The prediction, written before the first reading and not in an assertion.</b>
     /// The timing is the load-bearing axis — every-round repair leads on both worlds
     /// measured — and the gate's sign flips with it: every round <c>Uncovered</c> beat
     /// <c>Earned</c>, and after a failure the gate is six and a half standard errors
@@ -206,8 +206,8 @@ public sealed class MendingTests(ITestOutputHelper output)
     /// and nothing has ever looked at it.
     /// </para>
     /// <para>
-    /// <b>AND THE OTHER NEW CELL IS THE ONE THAT SHOULD BE WORST, WHICH IS WHAT MAKES IT
-    /// A CONTROL RATHER THAN A SIXTH GUESS.</b> <i>Improving, after a failure</i> stacks
+    /// <b>And the other new cell is the one that should be worst, which is what makes it
+    /// a control rather than a sixth guess.</b> <i>Improving, after a failure</i> stacks
     /// the two brakes that were each measured as costly on their own — waiting for the
     /// vote to be wrong, and then also asking whether forking has ever paid. A grid where
     /// it is not last would say the two brakes are not additive, which is a fact about
@@ -238,7 +238,7 @@ public sealed class MendingTests(ITestOutputHelper output)
                         metric(Run(one.Gate, one.When, seed)))))])));
         }
 
-        // THE ONE ASSERTION IS THAT THE NEW CELLS ARE REACHABLE AT ALL, which is not
+        // The one assertion is that the new cells are reachable at all, which is not
         // trivial and is exactly the shape of failure this repo keeps finding: a
         // combination that compiles, runs, and quietly behaves as one of the cells beside
         // it would print six rows and mean four. If ungated-every-round mints the same

@@ -8,7 +8,7 @@ namespace OpenPlexus.Machines;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THIS MEASURES THE FRONT END AND IT DOES NOT MEASURE THE BET.</b> Every other
+/// <b>This measures the front end and it does not measure the bet.</b> Every other
 /// world hands the learner symbols somebody else separated — words, a scene graph, a
 /// relation column, or bits with noise poured over them. This hands it photons, and
 /// which front end turns them into symbols is the arm. That is worth having, because
@@ -16,15 +16,15 @@ namespace OpenPlexus.Machines;
 /// is also only half of what this design claims.
 /// </para>
 /// <para>
-/// <b>AND THE HALF IT LEAVES OUT IS THE HALF THE GOAL IS WRITTEN IN.</b> <i>Understand
+/// <b>And the half it leaves out is the half the goal is written in.</b> <i>Understand
 /// rather than perform — what would the world look like if I did X.</i> A draw from
 /// CIFAR is single-shot and independent: no action, no intervention, no sequence, no
 /// counterfactual. Settlement is trivial at K=1, <c>Abstain</c> cannot fire,
 /// entailment depth is always one, and rungs three and four have nothing to bite on.
 /// </para>
 /// <para>
-/// <b>SO A MEDIOCRE SCORE HERE IS A FACT ABOUT A FIXED PROJECTION ON THUMBNAILS AND
-/// NOT A VERDICT ON THE ARCHITECTURE</b> — and saying so before the number arrives is
+/// <b>So a mediocre score here is a fact about a fixed projection on thumbnails and
+/// not a verdict on the architecture</b> — and saying so before the number arrives is
 /// the only time saying it is worth anything. A ten-way label per image has no parts
 /// and no arrangement, so it cannot tell a front end that manufactures REUSABLE
 /// symbols from one that emits a holistic blob per picture; both separate ten classes
@@ -33,7 +33,7 @@ namespace OpenPlexus.Machines;
 /// on the arrangement.
 /// </para>
 /// <para>
-/// <b>AND THE TWO ARMS ARE NOT INTERCHANGEABLE HERE, WHICH IS ITSELF THE FINDING.</b>
+/// <b>And the two arms are not interchangeable here, which is itself the finding.</b>
 /// <see cref="Banded{TFrame}"/> gives every dimension its own block of modalities, and
 /// a modality is one byte — so a reading wider than about fifty dimensions cannot be
 /// addressed at all, once what the other worlds already claim is set aside. An
@@ -41,8 +41,8 @@ namespace OpenPlexus.Machines;
 /// <see cref="Winnowing"/> rides every code on ONE modality and has no such ceiling.
 /// </para>
 /// <para>
-/// <b>SO "WINNOW BEATS BANDS ON IMAGES" IS THE WRONG SHAPE OF CLAIM TO GO LOOKING
-/// FOR.</b> At the widths where both fit, the score is a fair comparison. Above them
+/// <b>So "winnow beats bands on images" is the wrong shape of claim to go looking
+/// for.</b> At the widths where both fit, the score is a fair comparison. Above them
 /// there is no contest to run, because one of the two front ends cannot be pointed at
 /// the problem. That is a structural difference and worth more than a number.
 /// </para>
@@ -64,7 +64,7 @@ public sealed class CifarRun : IDisposable
     /// The modality the banded arm's first pixel rides on.
     /// </summary>
     /// <remarks>
-    /// <b>148 BECAUSE THAT IS WHERE THE FREE RUN IS, AND THE RUN IS SHORT.</b> The
+    /// <b>148 because that is where the free run is, and the run is short.</b> The
     /// worlds below it have claimed 20-22, 40-41, 50-55, 70, 100-101 and a block from
     /// 140 for moisture; the learner has 200-203 and 210-211, and relations sit at
     /// 255. What is left contiguous is 148 to 199 — fifty-two modalities, which at two
@@ -97,7 +97,7 @@ public sealed class CifarRun : IDisposable
     /// or an encoder was handed a world with no colour to read.
     /// </exception>
     /// <remarks>
-    /// <b>THE ENCODER COMPOSES WITH THE FRONT END RATHER THAN REPLACING IT</b>, so the
+    /// <b>The encoder composes with the front end rather than replacing it</b>, so the
     /// raw arm and the encoded arm differ in exactly one place. An embedding is still a
     /// reading and something still has to turn numbers into codes — which also means
     /// the banded ceiling applies to it unchanged, and 512 numbers is ten times past

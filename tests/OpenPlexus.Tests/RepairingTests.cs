@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Commitments;
+using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -11,16 +11,16 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b><c>LineageTests</c> SAYS THE DEFECT IS A COUPLING AND <see cref="Repairing"/> IS
-/// THE DIAL THAT REMOVES IT.</b> Under <see cref="Repairing.AfterFailure"/> repair runs
+/// <b><c>LineageTests</c> says the defect is a coupling and <see cref="Repairing"/> is
+/// the dial that removes it.</b> Under <see cref="Repairing.AfterFailure"/> repair runs
 /// only on a round the vote got wrong, so under skew almost all blame lands on the
 /// majority lineages and the rules that would carry the hard rounds are never offered.
 /// <see cref="Repairing.EveryRound"/> touches the vote in no way and takes hard-round
 /// coverage from 4% to 97% at six bits.
 /// </para>
 /// <para>
-/// <b>THE KILL CONDITION IS WRITTEN DOWN BEFORE THE RUN, BECAUSE THE PLAN ALREADY HOLDS
-/// EVIDENCE AGAINST IT.</b> Fork 58 says the gate's sign flips with the timing and that
+/// <b>The kill condition is written down before the run, because the plan already holds
+/// evidence against it.</b> Fork 58 says the gate's sign flips with the timing and that
 /// on <see cref="Worlds.Arranged"/> repairing without waiting for the vote minted 1,349
 /// children where the waiting arm minted nine, taking a perfect withheld score to 0.752.
 /// So this is a default candidate only if it costs nothing on the worlds where the vote
@@ -46,7 +46,7 @@ public sealed class RepairingTests(ITestOutputHelper output)
     ];
 
     /// <summary>
-    /// <b>WHAT THE COUPLING COSTS AND WHAT REMOVING IT COSTS, ON EVERY WIDTH AND SKEW.</b>
+    /// <b>What the coupling costs and what removing it costs, on every width and skew.</b>
     /// </summary>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
@@ -81,10 +81,10 @@ public sealed class RepairingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE WORLD THE PLAN SAYS THIS RUINS, ASKED DIRECTLY.</b>
+    /// <b>The world the plan says this ruins, asked directly.</b>
     /// </summary>
     /// <remarks>
-    /// <b>SEPARATE FROM THE GRID BECAUSE IT IS THE EXPENSIVE HALF</b>, and because a
+    /// <b>Separate from the grid because it is the expensive half</b>, and because a
     /// refutation arriving here says something different from a null on the multiplexer:
     /// the multiplexer says whether the arm PAYS and this says whether it may ship.
     /// </remarks>
@@ -137,11 +137,11 @@ public sealed class RepairingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>PEAK TO PEAK, WHICH THE GRID ABOVE DOES NOT DO AND A TRAP NAMES BY NAME.</b>
+    /// <b>Peak to peak, which the grid above does not do and a trap names by name.</b>
     /// </summary>
     /// <remarks>
-    /// <b>TWO ARMS CAN PEAK AT DIFFERENT BUDGETS, AND THESE TWO SPEND ONE AT DIFFERENT
-    /// RATES BY CONSTRUCTION.</b> <see cref="Repairing.EveryRound"/> walks the culprits on
+    /// <b>Two arms can peak at different budgets, and these two spend one at different
+    /// rates by construction.</b> <see cref="Repairing.EveryRound"/> walks the culprits on
     /// every round and <see cref="Repairing.AfterFailure"/> on the wrong seventh of them,
     /// so at one fixed <see cref="CommittingSettings.Budget"/> the arms are not offered the
     /// same search — which makes the grid above a comparison at ONE point of a curve whose
@@ -193,11 +193,11 @@ public sealed class RepairingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHETHER THE TWO THINGS THAT REDIRECT BLAME ARE ONE THING, WHICH DECIDES WHAT
-    /// SHIPS.</b>
+    /// <b>Whether the two things that redirect blame are one thing, which decides what
+    /// ships.</b>
     /// </summary>
     /// <remarks>
-    /// <b>BOTH ACTED ON THE SAME COUPLING AND SO DID NOT ADD, WHICH WAS THE PREDICTION.</b>
+    /// <b>Both acted on the same coupling and so did not add, which was the prediction.</b>
     /// A vote arm dividing by the answer's base rate reached the blame by making the vote say
     /// the rare answer, and <see cref="Repairing.EveryRound"/> reaches it by not consulting
     /// the vote at all — so under the second the first had nothing left to redirect. That is
@@ -243,20 +243,20 @@ public sealed class RepairingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHETHER THE NEW TIMING STARVES RUNG FIVE, WHICH A PRECONDITION FOUND BY
-    /// FAILING.</b>
+    /// <b>Whether the new timing starves rung five, which a precondition found by
+    /// failing.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>`AskedTests` ASSERTS THAT A TRAINED POPULATION HAS SOMETHING WORTH NAMING BEFORE
-    /// IT TESTS THE WIRE, AND UNDER <see cref="Repairing.EveryRound"/> IT HAS NOT.</b>
+    /// <b>`AskedTests` asserts that a trained population has something worth naming before
+    /// it tests the wire, and under <see cref="Repairing.EveryRound"/> IT HAS NOT.</b>
     /// <see cref="Abstracting.Shared(Recurrence, CommittingSettings)"/> came back empty at eleven bits, which is a fact
     /// about the population rather than about the socket — and it is the one cost of this
     /// timing that no grid here would have shown, because every reading taken so far is
     /// about rules and none is about NAMES.
     /// </para>
     /// <para>
-    /// <b>AND THE PLAN PUTS ABSTRACTION SECOND IN THE WHOLE ORDER OF WORK</b> — <i>if
+    /// <b>And the plan puts abstraction second in the whole order of work</b> — <i>if
     /// abstraction fails nothing downstream matters</i> — so a default that buys coverage
     /// and costs naming is not obviously a win, whatever the score does. This measures it
     /// rather than reasoning from the one seed the precondition happened to use.
@@ -284,8 +284,8 @@ public sealed class RepairingTests(ITestOutputHelper output)
                     new CommittingSettings { Repairing = repairing },
                     Curve);
 
-                // SEEDS RATHER THAN A MEAN, BECAUSE A MEAN OF NINE NAMES IS COMPATIBLE
-                // WITH FIVE SEEDS NAMING NOTHING. The precondition that found this had one
+                // Seeds rather than a mean, because a mean of nine names is compatible
+                // with five seeds naming nothing. The precondition that found this had one
                 // seed and read its silence as the rung being dead; what says otherwise is
                 // how many seeds name at all, and it is a different question from how many
                 // names they mint.
@@ -302,16 +302,16 @@ public sealed class RepairingTests(ITestOutputHelper output)
 
     /// <summary>Every reading one arm produces on one world, across the seeds.</summary>
     /// <remarks>
-    /// <b>THE SEEDS ARE MIXED AND THE ARMS SHARE THEM</b>, which is what makes the second
+    /// <b>The seeds are mixed and the arms share them</b>, which is what makes the second
     /// column a control rather than a second experiment — see <c>Sweep.ArmAsync</c>, whose
     /// discipline this borrows and whose purpose word it deliberately does not reuse.
     /// </remarks>
     /// <summary>
-    /// <b>WHETHER THE NAMES COME BACK WITH THE RULES ONCE THE BUDGET STOPS BINDING.</b>
+    /// <b>Whether the names come back with the rules once the budget stops binding.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THE NAMING COST AND THE SMALLER POPULATION ARE THE SAME OBSERVATION, AND ONE OF
-    /// THEM IS ALREADY KNOWN TO BE THE BUDGET'S.</b> <see cref="Repairing.EveryRound"/>
+    /// <b>The naming cost and the smaller population are the same observation, and one of
+    /// them is already known to be the budget's.</b> <see cref="Repairing.EveryRound"/>
     /// walks the culprits every round rather than on the wrong seventh, so a parent spends
     /// its ATTEMPTS about seven times faster — and `BudgetingTests` shows that with the
     /// budget counting distinct children instead, the same timing holds 126.6 sound rules

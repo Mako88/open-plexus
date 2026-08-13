@@ -31,7 +31,7 @@ public sealed record MultiplexerSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>NO WORLD HERE HAS EVER HAD SKEWED OUTCOMES, AND NOTHING MEASURED THAT.</b> Every
+    /// <b>No world here has ever had skewed outcomes, and nothing measured that.</b> Every
     /// world on the bench draws two outcomes about evenly — the multiplexer to within three
     /// parts in a thousand — so any mechanism whose behaviour depends on how COMMON an
     /// answer is has been untestable for the life of the branch while reading as tested.
@@ -40,15 +40,15 @@ public sealed record MultiplexerSettings
     /// number cannot move an argmax.
     /// </para>
     /// <para>
-    /// <b>THE ADDRESS BITS STAY EVEN, WHICH IS WHAT MAKES THIS A CONTROL RATHER THAN A NEW
-    /// WORLD.</b> Skewing them would make some address values rare and quietly change how
+    /// <b>The address bits stay even, which is what makes this a control rather than a new
+    /// world.</b> Skewing them would make some address values rare and quietly change how
     /// often each true rule can be exercised, so two arms would differ in the outcome
     /// distribution AND in how much evidence each rule got. Only the data bits move here,
     /// so <see cref="Multiplexer.Truths"/> is unchanged, soundness still enumerates, and
     /// the single thing that differs from the shipped world is how often the answer is one.
     /// </para>
     /// <para>
-    /// <b>AND ZERO CONSUMES THE GENERATOR EXACTLY AS IT DID BEFORE THIS EXISTED</b>, which
+    /// <b>And zero consumes the generator exactly as it did before this existed</b>, which
     /// is the same promise <c>Clutter</c> makes and for the same reason: a dial that shifts
     /// the stream at its default retires every number the world has ever produced.
     /// </para>
@@ -71,14 +71,14 @@ public sealed record MultiplexerSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>FORK 48: THE ONE WORLD WHERE DEPTH IS GENUINELY NEEDED WITHHELD NOTHING, so
+    /// <b>Fork 48: the one world where depth is genuinely needed withheld nothing, so
     /// every instrument that wants a held-out set was blind exactly where it was most
     /// wanted.</b> A generated world can hold assignments back and the learner cannot
     /// tell, because there is no boundary to notice — the world simply never emits them,
     /// which is what C4 asks and what a train-then-test split is not.
     /// </para>
     /// <para>
-    /// <b>TAKEN FROM THE END OF THE ASSIGNMENT ORDER, so the split is a position rather
+    /// <b>Taken from the end of the assignment order, so the split is a position rather
     /// than a sample</b> — <see cref="Cifar"/> and <see cref="Monk"/> both do this, and
     /// for the reason those give: a held-out set chosen by the world's own generator
     /// moves with the seed, and two seeds are then scored against two different
@@ -92,14 +92,14 @@ public sealed record MultiplexerSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>FORK 51: A CODE LIVE IN EVERY MOMENT SEPARATES NOTHING, AND NO WORLD HERE HAD
-    /// ONE.</b> Every multiplexer code is a (position, value) pair present about half the
+    /// <b>Fork 51: a code live in every moment separates nothing, and no world here had
+    /// one.</b> Every multiplexer code is a (position, value) pair present about half the
     /// time, so background — the thing that is simply always there — could not be studied
     /// on the world where everything else is exactly known.
     /// </para>
     /// <para>
-    /// <b>WHAT THE LEARNER DOES WITH IT IS NOT THIS FILE'S BUSINESS, AND THE WORLD'S JOB
-    /// IS ONLY TO POSE IT.</b> A code present in every moment is present in every hit and
+    /// <b>What the learner does with it is not this file's business, and the world's job
+    /// is only to pose it.</b> A code present in every moment is present in every hit and
     /// every miss alike, so any statistic asking what SEPARATES the two has nothing to
     /// find in it — and whether anything downstream exploits that, or pays for the code
     /// anyway in candidates and in stored counts, is exactly what this dial is for
@@ -119,13 +119,13 @@ public sealed record MultiplexerSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>ZERO IS EVERY MEASUREMENT EVER TAKEN HERE, AND THE DRAW IS SHORT-CIRCUITED SO
-    /// THE GENERATOR IS UNTOUCHED AT ZERO.</b> A dial that consumed one number a round
+    /// <b>Zero is every measurement ever taken here, and the draw is short-circuited so
+    /// the generator is untouched at zero.</b> A dial that consumed one number a round
     /// even when off would move every existing figure on this world by shifting the
     /// stream, which is fork 12 arriving as a feature.
     /// </para>
     /// <para>
-    /// <b>AND IT IS NOT A SIMULATION OF A NETWORK, WHICH IS WHY IT IS A WORLD DIAL.</b>
+    /// <b>And it is not a simulation of a network, which is why it is a world dial.</b>
     /// Most moments in any real stream are followed by nothing anybody observes; a
     /// generated world can say so exactly and cheaply, and what anything downstream does
     /// about it is not this world's business.
@@ -227,7 +227,7 @@ public readonly record struct Truth
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE WORLD THE PLAN ASKS FOR, AND NOT AN ANALOGY FOR IT.</b> Address bits
+/// <b>The world the plan asks for, and not an analogy for it.</b> Address bits
 /// select which data bit is the answer, so every bit is present in every round,
 /// most of them are irrelevant, and WHICH ones are irrelevant changes from round to
 /// round. `csharp`'s plan lists that world under the ones it is missing; this is it,
@@ -235,12 +235,12 @@ public readonly record struct Truth
 /// costs nothing.
 /// </para>
 /// <para>
-/// <b>IT IS GENERATED, WHICH IS HALF OF WHY IT IS FIRST.</b> A corpus can contain
+/// <b>It is generated, which is half of why it is first.</b> A corpus can contain
 /// its own answer and then a score measures the leak — the trap has already cost
 /// this project once. Nothing drawn from a generator can.
 /// </para>
 /// <para>
-/// <b>AND ITS GROUND TRUTH IS A KNOWN RULE SET, WHICH IS THE OTHER HALF.</b> An
+/// <b>And its ground truth is a known rule set, which is the other half.</b> An
 /// accuracy can be reached by memorising, so accuracy alone cannot tell a learner
 /// that found the structure from one that stored the instances. <see cref="Truths"/>
 /// is the answer key: how many of those were found EXACTLY is the number step one is
@@ -248,7 +248,7 @@ public readonly record struct Truth
 /// learner that scored well by holding ten thousand rules.
 /// </para>
 /// <para>
-/// <b>WHAT IT DOES NOT TEST IS THE BET.</b> Its cues are already symbols, so nothing
+/// <b>What it does not test is the bet.</b> Its cues are already symbols, so nothing
 /// here reaches a quantiser and nothing here says whether a substrate that
 /// manufactures symbols repairs the interface that killed this family of systems.
 /// This measures the LEARNER. Step one passing is not evidence for the thesis and
@@ -264,7 +264,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// The same round, said in the world's own terms rather than in codes.
     /// </summary>
     /// <remarks>
-    /// <b>EXPLICIT, BECAUSE A WORLD KEEPS ITS OWN VOICE.</b> <see cref="Next"/> says
+    /// <b>Explicit, because a world keeps its own voice.</b> <see cref="Next"/> says
     /// what this world has always said and is what its own tests read; this says the
     /// same thing in the shape every world shares, so that one brain can be handed
     /// any of them without a world knowing a brain exists.
@@ -275,14 +275,14 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
 
         return new Turn<IReadOnlyList<int>>
         {
-            // WRITTEN AS LAMBDAS BECAUSE THE PACKING NOW DECLARES ITS WIDTH. A method
+            // Written as lambdas because the packing now declares its width. A method
             // group cannot be converted where the method has an optional argument, and
             // that is the compiler asking the right question: this world is bits, so it
             // takes the default stride and says so.
             Seen = [.. shown.Cues
                 .OrderBy(code => Codes.Bits.Position(code))
                 .Select(code => Codes.Bits.Value(code))],
-            // THE ONE PLACE A WORLD MAY SAY IT DOES NOT KNOW. Short-circuited so a run
+            // The one place a world may say it does not know. Short-circuited so a run
             // with the dial off draws no random number and reproduces every figure this
             // world has ever reported.
             Outcome = _settings.Unsettled > 0 && _rng.NextDouble() < _settings.Unsettled
@@ -306,14 +306,14 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// <summary>The modality for one POSITION, whatever it says.</summary>
     /// <remarks>
     /// <para>
-    /// <b>THE CODE <see cref="Bit"/>'S OWN REMARK SAYS SEPARATES NOTHING, AND THAT IS
-    /// PRECISELY WHY IT IS WORTH EMITTING.</b> A code true in every round cannot win a
+    /// <b>THE CODE <see cref="Bit"/>'S own remark says separates nothing, and that is
+    /// precisely why it is worth emitting.</b> A code true in every round cannot win a
     /// repair and can never be the condition that tells a failure from a hit. But rung five
     /// does not name what separates — it names what is SHARED, and what the address bits
     /// share is exactly their positions with the values thrown away.
     /// </para>
     /// <para>
-    /// <b>AND THE THING IT MAKES NAMEABLE IS DECIDABLY UNREACHABLE WITHOUT IT.</b>
+    /// <b>And the thing it makes nameable is decidably unreachable without it.</b>
     /// <i>Position p, whatever it says</i> would otherwise need both values of one bit
     /// inside one name, and a scope pinning a bit both ways is satisfied by nothing — so no
     /// scope holds that pair and no name counted from scopes could ever be it. Fork 36 is
@@ -347,7 +347,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentOutOfRangeException.ThrowIfLessThan(settings.Address, 1);
 
-        // FIVE ADDRESS BITS IS THE THIRTY-SEVEN-BIT MULTIPLEXER, which is the
+        // Five address bits is the thirty-seven-bit multiplexer, which is the
         // largest size the literature reports. Beyond it there is nothing to
         // compare against, so the guard is a reminder rather than a limitation.
         ArgumentOutOfRangeException.ThrowIfGreaterThan(settings.Address, 5);
@@ -365,14 +365,14 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
         _settings = settings;
         _rng = new Random(seed);
 
-        // NULL RATHER THAN A FULL SET WHEN NOTHING IS HELD BACK, so the draw's rejection
+        // Null rather than a full set when nothing is held back, so the draw's rejection
         // test is skipped entirely rather than merely always passing. That is what keeps
         // the generator consumed identically to before this existed.
         _kept = settings.Withheld == 0
             ? null
             : [.. Enumerable.Range(0, assignments - settings.Withheld)];
 
-        // THE FIRST MAPPING IS THE IDENTITY WHATEVER `Switch` SAYS, so a run that
+        // The first mapping is the identity whatever `Switch` SAYS, so a run that
         // never switches is exactly the published world and its numbers stay
         // comparable. A switching run differs from it only after the first flip.
         _selects = [.. Enumerable.Range(0, Data)];
@@ -385,8 +385,8 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// How many bits actually carry the function, which is what an assignment is.
     /// </summary>
     /// <remarks>
-    /// <b>SEPARATE FROM <see cref="Bits"/> SO CLUTTER AND WITHHOLDING STAY
-    /// ORTHOGONAL.</b> A withheld assignment is a setting of the bits that MATTER;
+    /// <b>SEPARATE FROM <see cref="Bits"/> so clutter and withholding stay
+    /// orthogonal.</b> A withheld assignment is a setting of the bits that MATTER;
     /// counting the always-one ones into it would make almost every assignment
     /// unreachable and the held-out set mostly fiction.
     /// </remarks>
@@ -408,8 +408,8 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE INSTRUMENT FORK 48 WAS ABOUT, AND THE MULTIPLEXER IS THE WORLD THAT NEEDED
-    /// IT MOST.</b> Depth is genuinely required here — a rule shorter than the address
+    /// <b>The instrument fork 48 was about, and the multiplexer is the world that needed
+    /// it most.</b> Depth is genuinely required here — a rule shorter than the address
     /// plus one is unsound — so this is where a held-out score can say something no other
     /// generated world can, and it was the one world that held nothing back.
     /// </para>
@@ -419,7 +419,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// scoring against the answer it had at the start would measure the switch.
     /// </para>
     /// <para>
-    /// <b>AND IT CARRIES <see cref="Round.Answer"/> RATHER THAN THE EMITTED OUTCOME.</b>
+    /// <b>And it carries <see cref="Round.Answer"/> rather than the emitted outcome.</b>
     /// Noise flips what a learner is TOLD, and nothing here is ever told to anyone — an
     /// examination asks what the population would say about a case the world kept, so the
     /// thing to mark it against is what the function says rather than what a lie would
@@ -487,7 +487,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// <summary>One round of the world.</summary>
     public Round Next()
     {
-        // THE MAPPING MOVES BEFORE THE ROUND IT AFFECTS, so a run that switches
+        // The mapping moves before the round it affects, so a run that switches
         // every N rounds has the old target for exactly N of them. Moving it after
         // would put one round of the new target under the old count.
         if (_settings.Switch > 0 && _rounds > 0 && _rounds % _settings.Switch == 0)
@@ -497,19 +497,19 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
 
         var bits = new int[Bits];
 
-        // DRAWN AND REDRAWN RATHER THAN PICKED FROM WHAT IS LEFT, AND THAT IS THE ONLY
-        // SHAPE THAT KEEPS EVERY NUMBER THIS WORLD HAS EVER PRODUCED. Picking an index
+        // Drawn and redrawn rather than picked from what is left, and that is the only
+        // shape that keeps every number this world has ever produced. Picking an index
         // out of the allowed assignments would take ONE draw from the generator where
         // this takes `Bits` of them, so the whole stream shifts and no measurement taken
         // before today stays comparable. With nothing withheld the loop below never
         // rejects, so the generator is consumed exactly as it always was.
         do
         {
-            // THE INFORMATIVE BITS ARE DRAWN AND THE CLUTTER IS NOT, so a clutter dial
+            // The informative bits are drawn and the clutter is not, so a clutter dial
             // takes nothing from the generator and a run with none is bit-for-bit the run
             // that existed before the dial did.
             //
-            // AND A SKEW TOUCHES THE DATA BITS ONLY, which is what leaves `Truths` true
+            // And a skew touches the data bits only, which is what leaves `Truths` true
             // and every address equally exercised. At zero this is `_rng.Next(2)` for
             // every bit, so the stream is the one every earlier measurement was taken on.
             for (var which = 0; which < Informative; which++)
@@ -527,7 +527,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
 
         var answer = bits[_settings.Address + _selects[address]];
 
-        // NOISE FLIPS WHAT IS EMITTED AND NEVER WHAT IS TRUE. `Answer` is what the
+        // Noise flips what is emitted and never what is true. `Answer` is what the
         // function says and `Outcome` is what the learner sees, so a run can report
         // how much of its own failure was the world lying to it.
         var outcome = _settings.Noise > 0 && _rng.NextDouble() < _settings.Noise
@@ -573,7 +573,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
 
                 scope.Add(Of(_settings.Address + _selects[address], value));
 
-                // SORTED BECAUSE A SCOPE IS A SET. The order is already ascending by
+                // Sorted because a scope is a set. The order is already ascending by
                 // construction, so this changes nothing today -- it is here so that
                 // it still changes nothing when the construction moves.
                 scope.Sort();
@@ -596,13 +596,13 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// <summary>Whether a scope pins enough that its soundness can be settled exactly.</summary>
     /// <param name="scope">The codes that must be present.</param>
     /// <remarks>
-    /// <b>A COUNT OF SOUND RULES IS A LIE IF THE UNCHECKABLE ONES ARE COUNTED AS
-    /// UNSOUND.</b> A one-code scope in a twenty-bit world leaves nineteen free, so
+    /// <b>A count of sound rules is a lie if the uncheckable ones are counted as
+    /// unsound.</b> A one-code scope in a twenty-bit world leaves nineteen free, so
     /// what cannot be settled is reported as its own number rather than folded into
     /// the bad news.
     /// </remarks>
     /// <remarks>
-    /// <b>AND IT COUNTS THE FINE CODES ALONE, because a <see cref="Place"/> code pins
+    /// <b>And it counts the fine codes alone, because a <see cref="Place"/> code pins
     /// nothing.</b> Counting one as though it constrained a position would call a scope
     /// checkable that leaves that bit free, and the enumeration below would then be over the
     /// wrong space — a scope reading sound on an assignment it never actually forbade.
@@ -622,7 +622,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// <param name="expects">What is claimed to follow.</param>
     /// <remarks>
     /// <para>
-    /// <b>THE ANSWER KEY IS ONE BASIS AND THE WORLD ADMITS SEVERAL, WHICH
+    /// <b>The answer key is one basis and the world admits several, which
     /// <see cref="Truths"/> ALONE CANNOT SAY.</b> Pinning both data bits an address
     /// pair could select — *this address bit is zero, and the two bits it might
     /// choose between are both zero* — is a TRUE rule, and it is not in the key. A
@@ -639,7 +639,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     {
         if (scope.IsDefaultOrEmpty) return false;
 
-        // ENUMERATION IS EXPONENTIAL IN THE FREE BITS, so this is honest about where
+        // Enumeration is exponential in the free bits, so this is honest about where
         // it stops rather than quietly sampling.
         if (!Checkable(scope))
             throw new InvalidOperationException("too many free bits to enumerate exactly");
@@ -648,7 +648,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
 
         foreach (var code in scope)
         {
-            // A POSITION WITH ITS VALUE THROWN AWAY CONSTRAINS NOTHING AND IS NOT AN ERROR.
+            // A position with its value thrown away constrains nothing and is not an error.
             // It is true in every round, so a rule carrying one claims exactly what the same
             // rule without it claims -- and skipping it here is what keeps the answer key in
             // the same alphabet as the population. Scoring it unsound would mark the
@@ -662,7 +662,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
 
             if (position >= Bits) return false;
 
-            // A SCOPE PINNING A BIT BOTH WAYS IS SATISFIED BY NOTHING, so it entails
+            // A scope pinning a bit both ways is satisfied by nothing, so it entails
             // everything vacuously -- and calling that sound would let a learner
             // score by minting contradictions.
             if (pinned[position] is { } already && already != value) return false;

@@ -11,7 +11,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE PLAN CARRIED THIS AS AN OPEN DEFECT AND BLAMED THE WRONG THING.</b> <i>`Abstain`
+/// <b>The plan carried this as an open defect and blamed the wrong thing.</b> <i>`Abstain`
 /// is unarmed in any run — nothing in one process can die, so C3's third outcome is
 /// exercised only by unit tests.</i> Distribution was never the wall.
 /// <see cref="Commitment.Settle"/> has always handled the verdict correctly and
@@ -20,12 +20,12 @@ namespace OpenPlexus.Tests;
 /// machines with any number of deaths.
 /// </para>
 /// <para>
-/// <b>SO A CHECK THAT COULD NOT FIRE WAS READING AS A MECHANISM NOBODY HAD NEEDED YET</b>,
+/// <b>So a check that could not fire was reading as a mechanism nobody had needed yet</b>,
 /// which is the oldest line on this repo's trap list wearing the plan's own words.
 /// </para>
 /// <para>
-/// <b>AND THE SOURCE IS A WORLD RATHER THAN A NETWORK, WHICH IS THE HONEST PLACE FOR
-/// IT.</b> A world that sometimes does not say what followed is not a simulation of a dead
+/// <b>And the source is a world rather than a network, which is the honest place for
+/// it.</b> A world that sometimes does not say what followed is not a simulation of a dead
 /// machine — most moments in any real stream are followed by nothing anybody observes, and
 /// a world saying so is a world saying what it is looking at. The distributed case arrives
 /// on top of this rather than instead of it.
@@ -42,7 +42,7 @@ public sealed class AbstainTests(ITestOutputHelper output)
             seed).Run(Rounds);
 
     /// <summary>
-    /// <b>A ROUND THE WORLD CANNOT SETTLE COSTS A COMMITMENT EXACTLY NOTHING.</b>
+    /// <b>A round the world cannot settle costs a commitment exactly nothing.</b>
     /// </summary>
     /// <remarks>
     /// The design's claim, asserted on the primitive rather than inferred from a score. A
@@ -79,7 +79,7 @@ public sealed class AbstainTests(ITestOutputHelper output)
         Assert.Equal(1, cycle.Abstained);
         Assert.Equal(1, mind.Abstains);
 
-        // NOT ONE OF THESE MOVES, AND THE TABLE IS THE ONE THAT WOULD BE MISSED. Hits and
+        // Not one of these moves, and the table is the one that would be missed. Hits and
         // misses are the obvious pair; `Separations` is what repair reads, and letting an
         // unsettled round into it would make which condition wins a fact about the
         // world's silence.
@@ -100,10 +100,10 @@ public sealed class AbstainTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE VERDICT FIRES IN A RUN, AT ABOUT THE RATE THE WORLD WAS TOLD TO WITHHOLD.</b>
+    /// <b>The verdict fires in a run, at about the rate the world was told to withhold.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THE RATE IS THE CHECK RATHER THAN THE MERE PRESENCE OF A COUNT.</b> A single
+    /// <b>The rate is the check rather than the mere presence of a count.</b> A single
     /// abstain anywhere would satisfy <i>it can fire</i> and would not say the dial was
     /// connected to the thing it names — this repo has a line about a dial declared,
     /// documented, passed everywhere and connected to nothing.
@@ -121,17 +121,17 @@ public sealed class AbstainTests(ITestOutputHelper output)
             $"{quiet.Abstained} of {quiet.Rounds} rounds unsettled ({share:F3}) | "
             + $"recent {quiet.Recent:F3} | sound {quiet.Sound} | resident {quiet.Resident}");
 
-        // GENEROUS ON PURPOSE, BECAUSE IT IS A DRAW AND NOT A QUOTA. What is being asserted
+        // Generous on purpose, because it is a draw and not a quota. What is being asserted
         // is that the dial reaches the loop, not that a binomial landed on its mean.
         Assert.InRange(share, 0.07, 0.13);
     }
 
     /// <summary>
-    /// <b>AND THE CONTROL: WITH THE DIAL OFF, NOTHING ABSTAINS AND THE RUN IS THE OLD
-    /// RUN.</b>
+    /// <b>And the control: with the dial off, nothing abstains and the run is the old
+    /// run.</b>
     /// </summary>
     /// <remarks>
-    /// <b>BIT-IDENTICAL AND NOT MERELY SIMILAR, WHICH IS WHAT THE SHORT-CIRCUIT BUYS.</b>
+    /// <b>Bit-identical and not merely similar, which is what the short-circuit buys.</b>
     /// The draw is skipped entirely at zero, so the world's generator is never touched and
     /// every figure this world has ever reported is reproduced. A dial that consumed one
     /// number a round even when off would shift the stream and move every existing
@@ -160,14 +160,14 @@ public sealed class AbstainTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE DESIGN CLAIMS AN UNSETTLED ROUND IS FREE, WHICH IS NOT THE SAME AS
-    /// HARMLESS.</b> It costs a commitment nothing, and it costs the RUN an observation —
+    /// <b>The design claims an unsettled round is free, which is not the same as
+    /// harmless.</b> It costs a commitment nothing, and it costs the RUN an observation —
     /// so a world quiet a third of the time should look like a shorter run rather than a
     /// worse one, and anything beyond that would be the verdict doing damage the primitive
     /// says it cannot.
     /// </para>
     /// <para>
-    /// <b>NO BAR, BECAUSE WHAT SILENCE SHOULD COST HAS NEVER BEEN MEASURED</b> and a
+    /// <b>No bar, because what silence should cost has never been measured</b> and a
     /// threshold written before the first reading is a prediction dressed as a
     /// requirement. The grid is the finding.
     /// </para>

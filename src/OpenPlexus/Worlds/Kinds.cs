@@ -8,7 +8,7 @@ namespace OpenPlexus.Worlds;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>SEVERAL CODES PER CONCEPT, OR THE TASK IS A LOOKUP TABLE.</b> A concept
+/// <b>Several codes per concept, or the task is a lookup table.</b> A concept
 /// that showed the same single code every time would make identity trivial;
 /// several is what forces <i>a concept is what you reach by walking</i> to do any
 /// work. That is the whole reason the scheme is not simply the concept number.

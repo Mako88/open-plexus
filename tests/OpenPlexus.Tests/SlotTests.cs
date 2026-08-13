@@ -13,31 +13,31 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE TWO DEATHS ARE NOT ONE DEATH, WHICH IS THE WHOLE REASON THIS FILE EXISTS BESIDE
-/// THAT ONE.</b> A machine whose door is shut refuses the connection, so the sender watches
+/// <b>The two deaths are not one death, which is the whole reason this file exists beside
+/// that one.</b> A machine whose door is shut refuses the connection, so the sender watches
 /// the question fail to leave and writes it off exactly — no clock, no politeness, no guess.
 /// A machine that accepted the question and went is silent in a way nothing can observe:
 /// late and absent are one thing under C2, and the only mechanism that separates them is a
 /// deadline, which this project carries a revival row against saying never.
 /// </para>
 /// <para>
-/// <b>SO THE ANSWER IS NOT TO OBSERVE HARDER, IT IS TO NOT NEED THAT MACHINE.</b> Partition
+/// <b>So the answer is not to observe harder, it is to not need that machine.</b> Partition
 /// the population into slots and give each slot R machines holding the identical shard. A
 /// round is complete when every SLOT has spoken or been written off entirely, rather than
 /// every holder — so a slot survives its own member dying mid-question and the round
 /// finishes on evidence that is complete rather than on evidence that is timely.
 /// </para>
 /// <para>
-/// <b>AND THE REPLICAS COST NOTHING TO KEEP IN SYNC, WHICH IS WHY THIS IS AFFORDABLE AT
-/// ALL.</b> Every machine is told the same moment and the same settlement, and where a
+/// <b>And the replicas cost nothing to keep in sync, which is why this is affordable at
+/// all.</b> Every machine is told the same moment and the same settlement, and where a
 /// commitment is placed is a fact about the commitment — so two machines in one slot mint
 /// the same children independently and stay identical with no message between them. That
 /// they do is asserted below rather than assumed, because it is also a free check on fork
 /// 12 across a wire.
 /// </para>
 /// <para>
-/// <b>THE DEATH IS A MUTED HOLDER RATHER THAN A RACED KILL, AND THAT IS A MEASUREMENT
-/// DECISION.</b> See <see cref="Ported.Mute"/>: killing a machine mid-round means winning a
+/// <b>The death is a muted holder rather than a raced kill, and that is a measurement
+/// decision.</b> See <see cref="Ported.Mute"/>: killing a machine mid-round means winning a
 /// race against a socket, so which round it landed in would vary and a green suite would be
 /// evidence about scheduling. A holder that accepts every question and answers none is the
 /// same condition with the timing removed and made permanent, which is strictly harsher.
@@ -49,19 +49,19 @@ public sealed class SlotTests(ITestOutputHelper output)
     private const int Narrow = 2;
 
     /// <summary>
-    /// <b>A HOLDER THAT TOOK THE QUESTION AND WENT QUIET STOPS THE ROUND FOR GOOD.</b>
+    /// <b>A holder that took the question and went quiet stops the round for good.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE CONTROL, AND WITHOUT IT EVERY TEST BELOW IS A CLAIM THAT SOMETHING WAS FIXED
-    /// WITH NO EVIDENCE THAT IT WAS EVER BROKEN.</b> This is the same fleet with one machine
+    /// <b>The control, and without it every test below is a claim that something was fixed
+    /// with no evidence that it was ever broken.</b> This is the same fleet with one machine
     /// a slot, which is what fork 53 shipped — and the write-off it ships cannot reach this
     /// at all, because there is nothing to write off: the ask was handed over, acknowledged,
     /// and nobody is coming back.
     /// </para>
     /// <para>
-    /// <b>AND <see cref="Gathering.Unreached"/> READING NOUGHT IS THE ASSERTION THAT SAYS
-    /// SO.</b> A run that stopped because the post failed would be fork 53 not working; this
+    /// <b>AND <see cref="Gathering.Unreached"/> reading nought is the assertion that says
+    /// so.</b> A run that stopped because the post failed would be fork 53 not working; this
     /// stops with every message delivered, which is the case only a slot reaches.
     /// </para>
     /// </remarks>
@@ -95,8 +95,8 @@ public sealed class SlotTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A SLOT WHOSE OTHER MACHINE ANSWERS FINISHES THE ROUND, AND THE DEATH COSTS
-    /// NOTHING.</b>
+    /// <b>A slot whose other machine answers finishes the round, and the death costs
+    /// nothing.</b>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -106,8 +106,8 @@ public sealed class SlotTests(ITestOutputHelper output)
     /// present.
     /// </para>
     /// <para>
-    /// <b>AND THE SECOND REPLICA'S ANSWER IS DROPPED RATHER THAN ADDED, WHICH IS THE HALF A
-    /// COMPLETION COULD SILENTLY DESTROY.</b> <see cref="Gathering.Merged"/> and
+    /// <b>And the second replica's answer is dropped rather than added, which is the half a
+    /// completion could silently destroy.</b> <see cref="Gathering.Merged"/> and
     /// <see cref="Gathering.Added"/> both ADD what they are handed, so two identical shards
     /// counted twice is one machine's scopes weighed double — the exact fault
     /// <see cref="Gathering"/>'s own header describes for a duplicated message, arriving by
@@ -133,8 +133,8 @@ public sealed class SlotTests(ITestOutputHelper output)
 
         Assert.Equal(4, gathering.Asked);
 
-        // ONE VOICE A SLOT COUNTED, AND THE OTHER SLOT'S SECOND MACHINE ECHOING IS WHAT
-        // SAYS THE REPLICAS ARE REAL. A fleet declared with two machines a slot where one
+        // One voice a slot counted, and the other slot's second machine echoing is what
+        // says the replicas are real. A fleet declared with two machines a slot where one
         // never speaks passes every death test by being lucky about which machine died.
         Assert.Equal(2, gathering.Heard);
         Assert.Equal(1, gathering.Echoed);
@@ -150,11 +150,11 @@ public sealed class SlotTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>AND NOTHING IS DROPPED WHERE THERE IS NOTHING TO DROP, WHICH IS R=1 BEING THE OLD
+    /// <b>And nothing is dropped where there is nothing to drop, which is R=1 BEING THE OLD
     /// MACHINE EXACTLY.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THE BUDGET AGAINST THE WAY THIS CHANGE COULD BE WRONG AND STILL LOOK RIGHT.</b> A
+    /// <b>The budget against the way this change could be wrong and still look right.</b> A
     /// slot condition that quietly deduplicated on an unpartitioned fleet would silence
     /// holders on every measurement this project has ever taken over a wire, and every one of
     /// them would still finish and still score. What says it did not is that a fleet of slots
@@ -178,7 +178,7 @@ public sealed class SlotTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A FLEET GOES ON LEARNING WHILE A MACHINE IT IS STILL ASKING NEVER ANSWERS — the
+    /// <b>A fleet goes on learning while a machine it is still asking never answers — the
     /// round a phone dies inside, and the last hard blocker on the north star.</b>
     /// </summary>
     /// <remarks>
@@ -190,13 +190,13 @@ public sealed class SlotTests(ITestOutputHelper output)
     /// observed, arriving four thousand times instead of once.
     /// </para>
     /// <para>
-    /// <b>AND THE DENOMINATOR DOES NOT COME DOWN HERE, WHICH IS THE DIFFERENCE FROM FORK 53
-    /// SAID IN A NUMBER.</b> A refused connection takes a holder off the roster; a holder
+    /// <b>And the denominator does not come down here, which is the difference from fork 53
+    /// said in a number.</b> A refused connection takes a holder off the roster; a holder
     /// that accepts and is quiet stays on it forever, correctly, because nothing has been
     /// observed about it. The fleet asks four and hears two and finishes anyway.
     /// </para>
     /// <para>
-    /// <b>THE SCORE IS PRINTED AND BARRED LOW, for the reason its neighbour gives.</b> What
+    /// <b>The score is printed and barred low, for the reason its neighbour gives.</b> What
     /// is being asserted is that the run happened at all — it could not have before this, on
     /// a fleet where every surviving machine was alive and idle. Four-way chance is a
     /// quarter.
@@ -224,7 +224,7 @@ public sealed class SlotTests(ITestOutputHelper output)
 
         var after = await Ran(trial.RunAsync(council, fleet.Held, Half), "after the silence");
 
-        // STILL ASKED AND STILL NOT HEARD FROM, every round to the end of the run. A fleet
+        // Still asked and still not heard from, every round to the end of the run. A fleet
         // that had quietly stopped asking it would read as three machines and would be
         // fork 53's mechanism doing this rather than fork 62's.
         Assert.Equal(Slots * Replicas, council.Asked);
@@ -242,29 +242,29 @@ public sealed class SlotTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>TWO MACHINES IN ONE SLOT DO NOT HOLD THE SAME POPULATION, AND WHAT SEPARATES THEM
-    /// IS THE COMPLETENESS CONDITION ITSELF.</b>
+    /// <b>Two machines in one slot do not hold the same population, and what separates them
+    /// is the completeness condition itself.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THIS WAS WRITTEN TO ASSERT IDENTITY AND IT FAILED ON THE FIRST MACHINE THAT WAS NOT
-    /// MINE.</b> The plan's claim is that replicas fed one stream mint the same children
+    /// <b>This was written to assert identity and it failed on the first machine that was not
+    /// mine.</b> The plan's claim is that replicas fed one stream mint the same children
     /// independently and stay identical, so redundancy costs coordination nothing — 88
     /// commitments against 89 with twenty held by only one of them, on a runner, where the
     /// same code is bit-identical here. A green local run said the claim held; it said the
     /// machine was fast.
     /// </para>
     /// <para>
-    /// <b>AND THE MECHANISM IS THE SLOT, WHICH MAKES THIS A COST OF FORK 62 RATHER THAN A BUG
-    /// IN IT.</b> A round finishes when ONE replica answers, so the other is never waited on
+    /// <b>And the mechanism is the slot, which makes this a cost of fork 62 rather than a bug
+    /// in it.</b> A round finishes when ONE replica answers, so the other is never waited on
     /// — and asks are dispatched per arrival rather than in order, so a replica running
     /// behind can be handed the next moment before the last settlement. Identical evidence
     /// converges; evidence in a different ORDER does not, and nothing was making the order
     /// the same except this machine being quick enough that it never came up.
     /// </para>
     /// <para>
-    /// <b>SO WHAT IS ASSERTED IS WHAT SURVIVES: BOTH REPLICAS LEARN, AND THE SLOTS ARE
-    /// DIFFERENT FROM EACH OTHER.</b> The divergence is printed rather than barred, because a
+    /// <b>So what is asserted is what survives: both replicas learn, and the slots are
+    /// different from each other.</b> The divergence is printed rather than barred, because a
     /// threshold on how far two populations drift is a prediction and this has been measured
     /// exactly once. What it costs is fork 62's open half — a failover replica is a similar
     /// population and not the same one.
@@ -306,7 +306,7 @@ public sealed class SlotTests(ITestOutputHelper output)
             }
         }
 
-        // AND THE SLOTS ARE NOT ALL HOLDING ONE THING, or every reading above is taken on a
+        // And the slots are not all holding one thing, or every reading above is taken on a
         // fleet whose placement never split anything.
         Assert.NotEqual(Identities(fleet.Held[0]), Identities(fleet.Held[Replicas]));
     }
@@ -316,7 +316,7 @@ public sealed class SlotTests(ITestOutputHelper output)
     /// <param name="replicas">How many machines hold each one.</param>
     /// <returns>The trial, the fleet the caller must dispose, and the council over it.</returns>
     /// <remarks>
-    /// <b>THE FLEET IS HANDED BACK RATHER THAN DISPOSED HERE, which is what the duplication
+    /// <b>The fleet is handed back rather than disposed here, which is what the duplication
     /// budget costs and it is worth it.</b> Two tests wrote these six lines identically and
     /// the check refused the second copy — rightly, because a difference between them would
     /// read as a difference the replication caused.
@@ -343,8 +343,8 @@ public sealed class SlotTests(ITestOutputHelper output)
     /// <param name="running">The run.</param>
     /// <param name="when">Which half, for the message.</param>
     /// <remarks>
-    /// <b>THE EXPERIMENTER'S PATIENCE AND NEVER THE MACHINE'S, WHICH IS <c>FleetTests</c>'
-    /// RULE AND IS UNCHANGED BY ANY OF THIS.</b> A slot every one of whose machines went
+    /// <b>The experimenter's patience and never the machine's, which is <c>FleetTests</c>'
+    /// Rule and is unchanged by any of this.</b> A slot every one of whose machines went
     /// quiet still owes an answer forever, so a suite that inherited the wait would hang
     /// rather than fail.
     /// </remarks>

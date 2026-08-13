@@ -11,7 +11,7 @@ public sealed record ComposedSettings
     /// How many values each attribute can take.
     /// </summary>
     /// <remarks>
-    /// <b>THE NUMBER THAT DECIDES WHETHER THE CONJUNCTION IS A CONJUNCTION.</b>
+    /// <b>The number that decides whether the conjunction is a conjunction.</b>
     /// The question names one value of <see cref="Composed.First"/> and one of
     /// <see cref="Composed.Second"/>, and it works because only the asked-about
     /// object had both. Some other scene will have had both by coincidence, and
@@ -35,7 +35,7 @@ public sealed record ComposedSettings
     /// Whether the front end can say which codes belong to which object.
     /// </summary>
     /// <remarks>
-    /// <b>A CONTROL, AND IT MUST FAIL.</b> Ungrouped, the first attribute of one
+    /// <b>A control, and it must fail.</b> Ungrouped, the first attribute of one
     /// object pairs with the index of the other as readily as with its own, so
     /// the conjunction selects nothing.
     /// </remarks>
@@ -45,7 +45,7 @@ public sealed record ComposedSettings
     /// Whether each object gets a contentless index, fresh every scene.
     /// </summary>
     /// <remarks>
-    /// <b>A CONTROL, AND IT MUST FAIL.</b> The three moments share no code but
+    /// <b>A control, and it must fail.</b> The three moments share no code but
     /// the index, so without one there is nothing whatsoever linking what was
     /// shown first to what was shown last, and no walk can compose them.
     /// </remarks>
@@ -100,8 +100,8 @@ public sealed record Episode
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE HONEST TEST OF THE BINDING RESULT, AND IT EXISTS BECAUSE THAT WORLD IS
-/// MEMORISABLE.</b> There, the index is grouped with the shape being asked
+/// <b>The honest test of the binding result, and it exists because that world is
+/// memorisable.</b> There, the index is grouped with the shape being asked
 /// about, so the occasion under question wrote the answer down directly and a
 /// lookup table scores perfectly. What it showed is that the binding can be
 /// <i>represented</i>. This asks whether it can be <i>composed</i>.
@@ -126,7 +126,7 @@ public sealed record Episode
 /// kind for a memoriser to fall back on either.
 /// </para>
 /// <para>
-/// <b>THE ANSWER IS OPEN RATHER THAN A FORCED CHOICE, and that is not the
+/// <b>The answer is open rather than a forced choice, and that is not the
 /// binding world's shape.</b> There the question was which of the two shapes
 /// present belonged to the colour, because a forced choice isolates binding from
 /// recognition. Here a forced choice would break the sharpest control: grouping
@@ -178,7 +178,7 @@ public sealed class Composed
         ArgumentOutOfRangeException.ThrowIfLessThan(settings.Values, PerScene);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.CodesPerValue);
 
-        // AN UNGROUPED INDEX IS ALLOWED HERE, AND THE BINDING WORLD REFUSES IT.
+        // An ungrouped index is allowed here, and the binding world refuses it.
         // There it could only be a mistake: an index that pairs with the whole
         // scene indexes nothing, so the pair was rejected rather than measured.
         // Here that IS one of the controls the design asks for -- an index
@@ -235,7 +235,7 @@ public sealed class Composed
                     Attributes[i], values[i][obj], _settings.CodesPerValue, _scenes))];
         }
 
-        // THE INDEXES ARE IN EVERY MOMENT AND EACH ATTRIBUTE IN ONE. So an index
+        // The indexes are in every moment and each attribute in one. So an index
         // persists and the attributes flicker past it, which is what leaves A, B
         // and C pairwise unobserved while all three meet the index.
         var moments = new List<IReadOnlyCollection<Code>>(Attributes.Count);

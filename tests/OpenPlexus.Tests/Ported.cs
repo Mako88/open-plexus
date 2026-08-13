@@ -9,20 +9,20 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>SEPARATE BUSES AND SEPARATE PORTS IS WHAT MAKES A TEST DISTRIBUTED AT ALL.</b> Two
+/// <b>Separate buses and separate ports is what makes a test distributed at all.</b> Two
 /// holders on one bus would share a dictionary, which is the arrangement every measurement
 /// in this project has been taken under and the one <see cref="Posted"/> exists to stop
 /// being the only one.
 /// </para>
 /// <para>
-/// <b>THE ASKER OPENS FIRST AND THE ANNOUNCE-BACK IS WHY THAT IS SAFE.</b> A machine
+/// <b>The asker opens first and the announce-back is why that is safe.</b> A machine
 /// announces when it opens and a peer that is not up yet drops it, so whoever opens first
 /// would otherwise tell nobody where it is — and every answer to it would have nowhere to
 /// go. <see cref="Posted"/> answers an announcement with one, so the roster converges
 /// whatever order the fleet came up in.
 /// </para>
 /// <para>
-/// <b>SHARED BECAUSE TWO FILES NOW BRING A FLEET UP AND THE COPIES WOULD DRIFT.</b>
+/// <b>Shared because two files now bring a fleet up and the copies would drift.</b>
 /// <c>AskedTests</c> puts one exchange on a socket and <c>FleetTests</c> runs a whole
 /// learner over one; a difference in how the fleet is composed would show up as a
 /// difference the wire appeared to cause, which is exactly what <c>Fixture.Sharded</c>
@@ -50,14 +50,14 @@ public sealed class Ported : IAsyncDisposable
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE ONE NUMBER THAT SEPARATES A RUN WHOSE ANSWER IS WRONG FROM A RUN WHOSE
-    /// EVIDENCE NEVER ARRIVED.</b> A gathering waits for a denominator and nothing here
+    /// <b>The one number that separates a run whose answer is wrong from a run whose
+    /// evidence never arrived.</b> A gathering waits for a denominator and nothing here
     /// decides a missing holder by a clock, so a lost message can stop a run forever on a
     /// fleet where every machine is alive and idle — and the only reading that says so is
     /// this one.
     /// </para>
     /// <para>
-    /// <b>AND IT IS THE LOST ANSWER THAT DOES IT NOW, RATHER THAN ANY LOST MESSAGE.</b> Fork
+    /// <b>And it is the lost answer that does it now, rather than any lost message.</b> Fork
     /// 53 writes off an ask that failed to leave, so the outbound half no longer strands a
     /// round; what is left is an answer that was sent and did not arrive, which is
     /// indistinguishable from a slow one and is the case nothing may decide. The two are one
@@ -69,8 +69,8 @@ public sealed class Ported : IAsyncDisposable
 
     /// <summary>What has been lost since the fleet finished coming up.</summary>
     /// <remarks>
-    /// <b>THE COMING-UP LOSSES ARE REAL AND ARE NOT A FAULT, WHICH IS WHY THEY ARE
-    /// SUBTRACTED RATHER THAN FIXED.</b> A machine announces itself to every peer as it
+    /// <b>The coming-up losses are real and are not a fault, which is why they are
+    /// subtracted rather than fixed.</b> A machine announces itself to every peer as it
     /// opens, and a peer that is not listening yet cannot take it — so a fleet of N always
     /// loses exactly N(N-1)/2 announcements, deterministically, and the announce-back is
     /// what makes the roster converge anyway. What matters is whether anything is lost
@@ -86,7 +86,7 @@ public sealed class Ported : IAsyncDisposable
     /// machine's.</b>
     /// </summary>
     /// <remarks>
-    /// <b>A DEADLOCK DETECTOR IN EXACTLY THE SENSE <see cref="Wired.ArrivedAsync"/> IS.</b>
+    /// <b>A deadlock detector in exactly the sense <see cref="Wired.ArrivedAsync"/> IS.</b>
     /// Nothing in the library may decide a missing holder by a clock — <i>a miss decided by
     /// a deadline</i> carries a revival row saying never — so a fleet that loses an ANSWER
     /// waits forever, correctly, and a suite that inherited that would hang rather than
@@ -111,7 +111,7 @@ public sealed class Ported : IAsyncDisposable
         var hosts = Enumerable.Range(0, holding.Count + 1).Select(_ => Wired.Free()).ToList();
         var peers = hosts.Select(one => new Peer(one)).ToList();
 
-        // THE MAP IS BUILT BEFORE THE ASKER BECAUSE THE ASKER IS HANDED IT, and the
+        // The map is built before the asker because the asker is handed it, and the
         // addresses are known before anything opens a port — which is the whole reason a
         // partition can be a deployment fact rather than something announced.
         var slots = new Dictionary<MachineAddress, string>();
@@ -152,7 +152,7 @@ public sealed class Ported : IAsyncDisposable
             throw new InvalidOperationException(
                 $"only {fleet._asking.Holding.Count} of {holding.Count} holders announced");
 
-        // AND ONE ASK THROWN AWAY, WHICH IS THE BARRIER THE ROSTER ALONE CANNOT BE. Knowing
+        // And one ask thrown away, which is the barrier the roster alone cannot be. Knowing
         // where the holders are says the outbound half converged; nothing observable says
         // the holders know where to send an answer, and that is the direction the
         // announce-back exists for. A round trip completing is the only honest check of it,
@@ -193,21 +193,21 @@ public sealed class Ported : IAsyncDisposable
     /// <param name="seed">The control arm's generator, the same on every machine.</param>
     /// <remarks>
     /// <para>
-    /// <b>THE PLACEMENT IS THE ONLY THING THAT MAKES THESE MACHINES DIFFERENT.</b> Every
+    /// <b>The placement is the only thing that makes these machines different.</b> Every
     /// holder sees every observation and runs the identical round, so without
     /// <see cref="Population.Places"/> a fleet of twelve would hold twelve copies of one
     /// population — the same rules minted by every machine that was surprised, which is
     /// not a shard and is not a distribution.
     /// </para>
     /// <para>
-    /// <b>AND IT IS <c>Fixture.Sharded</c>'S RULE RATHER THAN A NEW ONE</b>, so a fleet
+    /// <b>AND IT IS <c>Fixture.Sharded</c>'S rule rather than a new one</b>, so a fleet
     /// that learnt its population and a fleet handed one already trained are split the
     /// same way — otherwise a difference between the two arrangements would be a
     /// difference in how the ring was drawn.
     /// </para>
     /// <para>
-    /// <b>AND <see cref="Population.Placing"/> IS LEFT NULL, WHICH IS NOT AN
-    /// OVERSIGHT.</b> That predicate exists to SIMULATE sharding inside one process, by
+    /// <b>AND <see cref="Population.Placing"/> is left null, which is not an
+    /// oversight.</b> That predicate exists to SIMULATE sharding inside one process, by
     /// telling the repair gate which of the commitments it can see are notionally
     /// elsewhere. Here what a holder can see is genuinely only what it holds, so the
     /// simulation would be a second, disagreeing account of the same fact.
@@ -242,15 +242,15 @@ public sealed class Ported : IAsyncDisposable
     /// <param name="seed">The control arm's generator, the same on every machine.</param>
     /// <remarks>
     /// <para>
-    /// <b>THE REPLICAS COST NOTHING TO KEEP IN SYNC AND THAT IS WHY THIS IS ONLY A
-    /// PLACEMENT.</b> Every machine is told the same moment and the same settlement, and
+    /// <b>The replicas cost nothing to keep in sync and that is why this is only a
+    /// placement.</b> Every machine is told the same moment and the same settlement, and
     /// <see cref="Population.Places"/> is a fact about a commitment rather than about who
     /// asked — so two machines given one <c>slot</c> mint the same children from the same
     /// stream and stay identical with no message between them. There is nothing here that
     /// copies anything.
     /// </para>
     /// <para>
-    /// <b>AND <c>replicas: 1</c> IS THE FLEET THIS FILE ALREADY BUILT</b>, one slot a holder
+    /// <b>AND <c>replicas: 1</c> is the fleet this file already built</b>, one slot a holder
     /// and the slot named after nothing else — so a difference between the two arrangements
     /// is the replication and never the composition.
     /// </para>
@@ -284,7 +284,7 @@ public sealed class Ported : IAsyncDisposable
     /// <param name="which">Which holder goes quiet.</param>
     /// <remarks>
     /// <para>
-    /// <b>THE OTHER KIND OF DEATH, AND IT IS THE ONE NO WRITE-OFF CAN REACH.</b>
+    /// <b>The other kind of death, and it is the one no write-off can reach.</b>
     /// <see cref="KillAsync"/> closes the door, so a post is refused and the sender WATCHES
     /// the question fail to leave — which is fork 53 and is exact. This drops the
     /// subscription and leaves the listener up: the ask is accepted, acknowledged, routed
@@ -293,7 +293,7 @@ public sealed class Ported : IAsyncDisposable
     /// a deadline could separate and only a slot can survive.
     /// </para>
     /// <para>
-    /// <b>AND IT IS DETERMINISTIC, WHICH IS WHY IT IS THIS AND NOT A RACED KILL.</b> Killing
+    /// <b>And it is deterministic, which is why it is this and not a raced kill.</b> Killing
     /// a machine mid-round means winning a race against a socket to make the test say
     /// anything at all — so the round it lands in would vary run to run and a green suite
     /// would be evidence about scheduling. A holder that never answers is that same
@@ -310,8 +310,8 @@ public sealed class Ported : IAsyncDisposable
     /// </summary>
     /// <param name="which">Which holder dies.</param>
     /// <remarks>
-    /// <b>THE WHOLE MACHINE RATHER THAN THE SUBSCRIPTION, BECAUSE THOSE ARE DIFFERENT
-    /// DEATHS.</b> Dropping a subscription leaves a listener that accepts the ask and
+    /// <b>The whole machine rather than the subscription, because those are different
+    /// deaths.</b> Dropping a subscription leaves a listener that accepts the ask and
     /// routes it nowhere; closing the door refuses the connection, which is what a phone
     /// going into a tunnel does. The second is the one the design claims to survive, and it
     /// is the harsher of the two.

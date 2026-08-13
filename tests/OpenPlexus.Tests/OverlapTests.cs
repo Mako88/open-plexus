@@ -12,7 +12,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THAT FILE MEASURED THE TWO ENDS AND CALLED THE MIDDLE THE DEPLOYMENT CASE.</b>
+/// <b>That file measured the two ends and called the middle the deployment case.</b>
 /// Identical streams converge exactly and disjoint ones share almost nothing, which
 /// between them establish that naming is deterministic in the EVIDENCE — and say nothing
 /// about how much evidence two machines need in common. Twenty phones on one wifi share
@@ -20,13 +20,13 @@ namespace OpenPlexus.Tests;
 /// whole question is where between those the mechanism stops agreeing with itself.
 /// </para>
 /// <para>
-/// <b>SO THE OVERLAP IS THE DIAL AND IT IS THE WORLD'S, NOT THE BRAIN'S.</b> Each machine
+/// <b>So the overlap is the dial and it is the world's, not the brain's.</b> Each machine
 /// draws each round either from a stream both can see or from one only it can, and the
 /// share decides which. Nothing about the learner changes across the sweep, which is what
 /// makes the column readable.
 /// </para>
 /// <para>
-/// <b>AND THE ENDS ARE RUN AS PART OF THE SWEEP RATHER THAN CITED FROM ELSEWHERE.</b> An
+/// <b>And the ends are run as part of the sweep rather than cited from elsewhere.</b> An
 /// overlap of one has to reproduce <c>FoldingTests</c>' converged row and an overlap of
 /// nought its diverged one — if they do not, this world is not the one that file measured
 /// and the middle of the curve means nothing.
@@ -42,8 +42,8 @@ public sealed class OverlapTests(ITestOutputHelper output)
     /// A world that draws from a stream two machines share, or from one they do not.
     /// </summary>
     /// <remarks>
-    /// <b>INDEXED BY ROUND AND NEVER BY A COUNTER, WHICH IS THE ONLY WAY THE SHARED HALF
-    /// IS ACTUALLY SHARED.</b> Two machines advancing their own pointer into a common
+    /// <b>Indexed by round and never by a counter, which is the only way the shared half
+    /// is actually shared.</b> Two machines advancing their own pointer into a common
     /// stream take DIFFERENT elements of it the moment their coins disagree once, so a
     /// shared stream consumed that way is two private streams with extra steps. Reading
     /// position <c>t</c> at round <c>t</c> means a round either of them takes from the
@@ -88,7 +88,7 @@ public sealed class OverlapTests(ITestOutputHelper output)
             overlap,
             seed);
 
-        // THROUGH `Trial` RATHER THAN A LOOP WRITTEN HERE. A second copy of predict,
+        // THROUGH `Trial` rather than a loop written here. A second copy of predict,
         // score, settle, sweep, cover and repair is the one duplication that could
         // silently start learning something else, and the clone budget exists for it.
         new Trial<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit), brain).Run(Rounds);
@@ -127,7 +127,7 @@ public sealed class OverlapTests(ITestOutputHelper output)
                 + $"({(union == 0 ? 0.0 : shared / (double)union),5:P0}) | {apart,5}");
         }
 
-        // THE ONE ASSERTION, AND IT IS THAT THE SWEEP HAS ENDS. At an overlap of one both
+        // The one assertion, and it is that the sweep has ends. At an overlap of one both
         // machines see the identical stream, so a private draw never happens and the two
         // must land on the same names -- if that row disagrees, `Blended` is not sharing
         // what it claims to and every row above it is measuring the wrong thing.
@@ -138,7 +138,7 @@ public sealed class OverlapTests(ITestOutputHelper output)
             same.Names.Means.Select(one => one.Key).ToHashSet(),
             also.Names.Means.Select(one => one.Key).ToHashSet());
 
-        // NO BAR ON THE CURVE ITSELF, because where naming stops converging has never been
+        // No bar on the curve itself, because where naming stops converging has never been
         // measured and a threshold written before the first reading would be a prediction
         // dressed as a requirement. The grid is the finding.
     }

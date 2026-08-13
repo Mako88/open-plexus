@@ -11,7 +11,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE BUDGET FOR THE ONE INSTRUMENT A PERCEPTUAL WORLD CAN HAVE.</b> Soundness by
+/// <b>The budget for the one instrument a perceptual world can have.</b> Soundness by
 /// enumeration is the sharp measurement and no world made of photographs will ever
 /// support it, so on <see cref="Cifar"/> the held-out score is the whole of the
 /// difference between a learner and a lookup table. An examination that moved a single
@@ -19,7 +19,7 @@ namespace OpenPlexus.Tests;
 /// would read as a PASS — better numbers, no error, nothing to see.
 /// </para>
 /// <para>
-/// <b>AND IT IS EXACTLY THE FAILURE CLASS THIS REPO KEEPS FINDING.</b> A check that
+/// <b>And it is exactly the failure class this repo keeps finding.</b> A check that
 /// cannot fire reads as passing; a leak into a measurement reads as a result. Both are
 /// silent, so both get a budget rather than a fix.
 /// </para>
@@ -50,7 +50,7 @@ public sealed class WithheldTests(ITestOutputHelper output)
         Assert.Equal(500, world.Withheld.Count);
         Assert.Equal(1000, world.Held);
 
-        // COMPARED BY READING AND NOT BY INDEX, because the world hands out readings
+        // Compared by reading and not by index, because the world hands out readings
         // and an index would only prove the bookkeeping agrees with itself.
         var kept = world.Withheld
             .Select(one => string.Join(",", one.Seen.Select(x => x.ToString("R"))))
@@ -88,7 +88,7 @@ public sealed class WithheldTests(ITestOutputHelper output)
         Assert.Equal(names, brain.Held.Names.Count);
         Assert.Equal(count, brain.Held.Count);
 
-        // AND THE ANSWER IS THE SAME EVERY TIME, which is the same claim read from the
+        // And the answer is the same every time, which is the same claim read from the
         // other side: a population that did not move cannot say two different things.
         Assert.All(said, one => Assert.Equal(said[0], one));
 
@@ -118,7 +118,7 @@ public sealed class WithheldTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>NOTHING RATHER THAN ZERO WHERE A WORLD WITHHOLDS NOTHING.</b>
+    /// <b>Nothing rather than zero where a world withholds nothing.</b>
     /// </summary>
     /// <remarks>
     /// A generated world cannot contain its own answer and has nothing to hold back, so
@@ -139,7 +139,7 @@ public sealed class WithheldTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>AND A WORLD THAT CAN WITHHOLD WHILE WITHHOLDING NOTHING REPORTS THE SAME.</b>
+    /// <b>And a world that can withhold while withholding nothing reports the same.</b>
     /// </summary>
     /// <remarks>
     /// The distinction above used to be carried by the interface alone — a world either
@@ -161,7 +161,7 @@ public sealed class WithheldTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>FORK 48: THE ONE WORLD WHERE DEPTH IS NEEDED CAN HOLD SOMETHING BACK NOW.</b>
+    /// <b>Fork 48: the one world where depth is needed can hold something back now.</b>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -193,14 +193,14 @@ public sealed class WithheldTests(ITestOutputHelper output)
 
         Assert.Equal(16, unseen.Asked);
 
-        // THE INSTRUMENT IS ARMED RATHER THAN MERELY PRESENT. An examination that answers
+        // The instrument is armed rather than merely present. An examination that answers
         // nothing reports nought and looks exactly like a learner that generalises to
         // nothing, which is the trap the test above is about.
         Assert.True(unseen.Answered > 0, "the examination answered nothing at all");
     }
 
     /// <summary>
-    /// <b>AND WHAT IS WITHHELD IS GENUINELY NEVER DRAWN.</b>
+    /// <b>And what is withheld is genuinely never drawn.</b>
     /// </summary>
     /// <remarks>
     /// The draw rejects and redraws rather than picking out of what is left, because

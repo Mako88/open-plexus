@@ -85,7 +85,7 @@ public sealed class SnakeQuantizerTests
         var view = snake.View();
         var codes = new SnakeQuantizer().Codify(view);
 
-        // EVERY CELL EMITS, EMPTY ONES INCLUDED -- John's call, 2026-08-04; the
+        // Every cell emits, empty ones included -- John's call, 2026-08-04; the
         // audit that settled it is on `SnakeQuantizer.Modality`. This asserted
         // the opposite until then, and what it is worth asserting NOW is the
         // encoder's own claim: distinct cells cannot collide into one code,
@@ -105,7 +105,7 @@ public sealed class SnakeQuantizerTests
 
         var codes = new SnakeQuantizer().Codify(view);
 
-        // THIS ASSERTED THE WITHHOLDING UNTIL JOHN OVERRULED IT, 2026-08-04. An
+        // This asserted the withholding until John overruled it, 2026-08-04. An
         // occasion is a clique, so codes per frame set how dense the graph is --
         // 46,536 routes halted with empty cells against 6 without. That was
         // measured under `Best` pricing, where the flood could enumerate every
@@ -116,7 +116,7 @@ public sealed class SnakeQuantizerTests
         Assert.Equal(3, codes.Count);
         Assert.Equal(3, codes.Distinct().Count());
 
-        // AND THE COMPANION THAT USED TO SIT HERE COULD NOT FIRE. It read
+        // And the companion that used to sit here could not fire. It read
         // `view.Cells.Take(0)`, so it asked whether an EMPTY sequence contained
         // an empty cell and was true however the quantiser behaved -- a check
         // wired and unable to fire, which is a named trap in the plan and reads

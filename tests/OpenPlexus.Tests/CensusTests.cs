@@ -11,14 +11,14 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>EVERY GATE, WEIGHING RULE AND SUBSUMPTION BAR TRIED HERE ATTACKS ONE BUCKET.</b>
+/// <b>Every gate, weighing rule and subsumption bar tried here attacks one bucket.</b>
 /// They change which resident rule gets the seat, so they can only reach a round where a
 /// correct rule was HELD and lost. If most failures are rounds where no correct rule was
 /// in the room, every one of those arms was inert by construction — which fits a table of
 /// level results better than any of the mechanisms did.
 /// </para>
 /// <para>
-/// <b>AND THE PARTITION IS ONLY AVAILABLE ON A WORLD THAT CAN SAY WHAT IS TRUE.</b> A
+/// <b>And the partition is only available on a world that can say what is true.</b> A
 /// sound commitment that fires is right by definition, so the split is exact rather than
 /// estimated — which is why this file is the multiplexer's and cannot be `Arranged`'s.
 /// </para>
@@ -47,18 +47,18 @@ public sealed class CensusTests(ITestOutputHelper output)
             census: true).Run(Rounds);
 
     /// <summary>
-    /// <b>WHETHER A PARENT'S TABLE ALREADY KNOWS WHAT ITS CHILD WILL WANT — fork 74's
+    /// <b>Whether a parent's table already knows what its child will want — fork 74's
     /// precondition, and it changes nothing.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A FOUR-CODE TRUTH COSTS THREE MISS FLOORS</b>, because a fresh child inherits no
+    /// <b>A four-code truth costs three miss floors</b>, because a fresh child inherits no
     /// table and must re-earn one before it may add the next code. That is what makes the
     /// chain the cost it is: the repairs that pay sit at the world's minimum sound depth and
     /// every shorter step pays nothing by construction.
     /// </para>
     /// <para>
-    /// <b>SO THE QUESTION IS WHETHER ONE TABLE COULD HAVE PICKED BOTH.</b> When a child is
+    /// <b>So the question is whether one table could have picked both.</b> When a child is
     /// born its parent's table has a runner-up; when that child later repairs it picks from
     /// its OWN table, re-earned over its own firings and therefore conditioned on the code
     /// the parent added. If the two agree, the second floor bought nothing that the first
@@ -66,7 +66,7 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// conditioning is the whole point and no single pass can replace it.
     /// </para>
     /// <para>
-    /// <b>AND THE ANSWER MEANS SOMETHING EITHER WAY, which is why it is worth a run before a
+    /// <b>And the answer means something either way, which is why it is worth a run before a
     /// mechanism.</b> Agreement makes fork 74 buildable; disagreement kills it and says why —
     /// the same reason a minted name overshoots, arriving through the search rather than
     /// through the vocabulary.
@@ -108,25 +108,25 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHETHER THE CHAIN IS CAPPED BY ITS OWN INTERMEDIATE RUNGS DYING.</b>
+    /// <b>Whether the chain is capped by its own intermediate rungs dying.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE REPAIRS THAT PAY SIT AT THE WORLD'S MINIMUM SOUND DEPTH</b> — three codes at six
+    /// <b>The repairs that pay sit at the world's minimum sound depth</b> — three codes at six
     /// bits, four at eleven — and repair adds one code at a time, so reaching one takes two or
     /// three separations. Every rung below the last is UNSOUND by construction: it pins some
     /// of what the truth needs and not all of it, so it is wrong on a share of its firings and
     /// its accuracy says so.
     /// </para>
     /// <para>
-    /// <b>AND AN UNSOUND CHILD THAT IS NO BETTER THAN ITS PARENT IS EXACTLY WHAT SUBSUMPTION
-    /// REMOVES.</b> Under <see cref="Subsuming.Weaker"/> the general rule survives wherever it
+    /// <b>And an unsound child that is no better than its parent is exactly what subsumption
+    /// removes.</b> Under <see cref="Subsuming.Weaker"/> the general rule survives wherever it
     /// is at least as accurate, and a child that has pinned one of three needed codes usually
     /// is not better yet. So the chain may be capped not by the search but by the ladder being
     /// kicked away halfway up.
     /// </para>
     /// <para>
-    /// <b>WHICH IS TESTABLE WITH AN ARM THAT ALREADY EXISTS.</b>
+    /// <b>Which is testable with an arm that already exists.</b>
     /// <see cref="Subsuming.Insignificant"/> demands the narrower rule be significantly better
     /// before the general one may take its place, and holds roughly twice the residents where
     /// it has been measured. If intermediate rungs dying is the cap, the share of repairs that
@@ -175,12 +175,12 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE CENSUS COUNTS THE RUN'S OWN FAILURES AND NOT A SECOND OPINION ABOUT
-    /// THEM.</b>
+    /// <b>The census counts the run's own failures and not a second opinion about
+    /// them.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THE VOTE IS RE-DERIVED BEFORE THE STEP, SO THIS IS THE CHECK THAT IT IS THE SAME
-    /// VOTE.</b> Reading the population a second time is only sound if the reading agrees
+    /// <b>The vote is re-derived before the step, so this is the check that it is the same
+    /// vote.</b> Reading the population a second time is only sound if the reading agrees
     /// with what the loop did — a census that partitioned a DIFFERENT set of wrong rounds
     /// would look exactly as informative and mean nothing, which is this repo's oldest
     /// trap wearing an instrument. Rounds where nothing fired are wrong in neither count.
@@ -209,22 +209,22 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>ONE WALK OVER FOUR WORLDS RATHER THAN TWO, WHICH IS WHAT THE VOTE ARMS COST.</b>
+    /// <b>One walk over four worlds rather than two, which is what the vote arms cost.</b>
     /// These were two readings because each crossed the four worlds with its own list of
     /// weighing arms; the arms are deleted, and what was left was the same four runs taken
     /// twice for two sets of columns. `DuplicationTests` refused it, correctly.
     /// </para>
     /// <para>
-    /// <b>A DOZEN PERFECTLY ACCURATE TRUE RULES AND AN ANSWER KEY SCORING NOUGHT ARE THE
-    /// SAME RUN.</b> On the skewed multiplexer every data bit is one four times in five,
+    /// <b>A dozen perfectly accurate true rules and an answer key scoring nought are the
+    /// same run.</b> On the skewed multiplexer every data bit is one four times in five,
     /// so <i>all four data bits are one</i> holds on about two rounds in five and entails
     /// the answer whatever the address selects. That rule is sound, never misses, and is
     /// not in the key — this repo's own trap about a single answer key marking the basis
     /// rather than the learner, walked into again.
     /// </para>
     /// <para>
-    /// <b>AND IT STILL HAS NOT LEARNT THE WORLD, WHICH IS WHAT THE SECOND ROW
-    /// SEPARATES.</b> That rule fires exactly when guessing the commoner answer already
+    /// <b>And it still has not learnt the world, which is what the second row
+    /// separates.</b> That rule fires exactly when guessing the commoner answer already
     /// works, so it buys nothing. <see cref="Census.Paying"/> asks the question no
     /// alternative rule set can game: of the rounds where the base rate is WRONG, how many
     /// had a true rule present and firing.
@@ -260,7 +260,7 @@ public sealed class CensusTests(ITestOutputHelper output)
                 + $"| carried {census.Carried,6} | paying {census.Paying,7:P1} "
                 + $"| sound {learned.Sound,3}");
 
-            // AND WHICH HALF OF GENERATE-AND-TEST THE UNCOVERED ROUNDS BELONG TO. A round
+            // And which half of generate-and-test the uncovered rounds belong to. A round
             // where nothing expecting the right answer fired cannot be reached by narrowing
             // anything resident -- repair keeps the parent's expectation and a child fires
             // only where its parent does -- so it is a ceiling rather than a search problem,
@@ -281,12 +281,12 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE SAME PARTITION ON THE WORLD WHOSE CEILING IS KNOWN IN ADVANCE — where an
+    /// <b>The same partition on the world whose ceiling is known in advance — where an
     /// uncovered round means the opposite of what it means on the multiplexer.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>ONE NUMBER, TWO DIAGNOSES, AND ONLY A SECOND WORLD SEPARATES THEM.</b> Every
+    /// <b>One number, two diagnoses, and only a second world separates them.</b> Every
     /// rule the multiplexer needs is a conjunction the scope language can say, so an
     /// uncovered round there is covering or repair failing to BUILD something that was
     /// available. On <see cref="Puzzle.Two"/> nothing shorter than a whole instance can
@@ -294,7 +294,7 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// vote could ever have fixed it.
     /// </para>
     /// <para>
-    /// <b>WHICH MAKES THE PAIR THE CHECK RATHER THAN EITHER ROW.</b> A mechanism that
+    /// <b>Which makes the pair the check rather than either row.</b> A mechanism that
     /// lowers uncovered on the multiplexer and leaves it alone on the second puzzle is
     /// doing what it claims; one that lowers both is finding rules that cannot be true,
     /// and the soundness count beside it should say so.
@@ -324,19 +324,19 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHETHER THE UNCOVERED BUCKET EMPTIES ONCE THE TRUE RULES ARE ALL HELD — the
+    /// <b>Whether the uncovered bucket empties once the true rules are all held — the
     /// internal claim two instruments can check and neither can alone.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>AT SIX BITS UNGATED THE RUN ENDS HOLDING ALL EIGHT TRUE RULES AND STILL REPORTS
-    /// THREE HUNDRED UNCOVERED ROUNDS.</b> Those eight partition the input space, so once
+    /// <b>At six bits ungated the run ends holding all eight true rules and still reports
+    /// three hundred uncovered rounds.</b> Those eight partition the input space, so once
     /// they are resident every round must have a correct advocate — which means the
     /// uncovered rounds have to be EARLY ones, before the rules existed. That is the
     /// parsimonious reading and it was a guess until this counted.
     /// </para>
     /// <para>
-    /// <b>AND IF IT IS WRONG THE FAULT IS IN MATCHING RATHER THAN IN LEARNING</b>, which
+    /// <b>And if it is wrong the fault is in matching rather than in learning</b>, which
     /// no score could distinguish. A correct rule that is resident and does not fire on a
     /// moment it covers is a defect; a correct rule that did not exist yet is a run
     /// getting on with it. `Found` and `Uncovered` are computed by different code from
@@ -366,7 +366,7 @@ public sealed class CensusTests(ITestOutputHelper output)
 
             foreach (var upto in new long[] { 2_000, 5_000, 10_000, 15_000, 20_000 })
             {
-                // EACH CALL REPORTS ITS OWN SEGMENT, because the census accumulates per
+                // Each call reports its own segment, because the census accumulates per
                 // run rather than per population -- the same property that made the
                 // genesis reading possible without touching the loop.
                 var learned = run.Run(upto - ran);
@@ -382,18 +382,18 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHAT THE TWO KNOWN GATES COST AND BUY, read on the bucket that decides it.</b>
+    /// <b>What the two known gates cost and buy, read on the bucket that decides it.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>BOTH ARMS HAVE BEEN COMPARED ON ACCURACY AND NEITHER HAS EVER BEEN READ ON
-    /// COVERAGE.</b> <see cref="Surprising.Unaccounted"/> won on score and the reason
+    /// <b>Both arms have been compared on accuracy and neither has ever been read on
+    /// coverage.</b> <see cref="Surprising.Unaccounted"/> won on score and the reason
     /// given was that ungated genesis walks the whole <c>code → outcome</c> space — which
     /// is a statement about its COST. What it buys is rounds moved out of
     /// <see cref="Census.Uncovered"/>, and nothing has ever counted those.
     /// </para>
     /// <para>
-    /// <b>AND THE GATE'S QUESTION IS ANSWERED BY ANY RULE AT ALL, WHICH IS THE SUSPECT.</b>
+    /// <b>And the gate's question is answered by any rule at all, which is the suspect.</b>
     /// <c>firing.Any(one =&gt; one.Expects == arrived)</c> is satisfied by a commitment that
     /// is unsound, inaccurate and outvoted — so one worthless rule proposing an outcome
     /// blocks covering on every round that outcome arrives, forever. This says whether
@@ -418,7 +418,7 @@ public sealed class CensusTests(ITestOutputHelper output)
 
                 var census = learned.Census!;
 
-                // THE WHOLE SPACE GENESIS CAN EVER REACH IS ONE CODE WIDE, so counting the
+                // The whole space genesis can ever reach is one code wide, so counting the
                 // one-code residents against it says whether covering stopped because a
                 // gate refused or because there was nothing left to mint. Those are
                 // opposite diagnoses and the mint total cannot tell them apart.
@@ -445,14 +445,14 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>SEVENTEEN MINTS IN TWENTY THOUSAND ROUNDS IS NOT A RATE, IT IS AN EVENT.</b> The
+    /// <b>Seventeen mints in twenty thousand rounds is not a rate, it is an event.</b> The
     /// same total under three different vote rules says the vote does not touch genesis at
     /// all, and a total that small on a world wanting eight rules says covering is not
     /// running for most of the run. Whether it tails off or stops is the difference
     /// between a gate that is strict and a gate that is closed.
     /// </para>
     /// <para>
-    /// <b>AND THE SUSPECT IS THE GATE'S OWN QUESTION.</b> <c>Surprising.Unaccounted</c>
+    /// <b>And the suspect is the gate's own question.</b> <c>Surprising.Unaccounted</c>
     /// asks whether ANYTHING that fired proposed what arrived — not whether the vote was
     /// right. With two outcomes and promiscuous one-code minting, some rule proposes each
     /// of them within a few hundred rounds, after which nothing is ever unaccounted for
@@ -489,19 +489,19 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHICH BUCKET A VOTE RULE ACTUALLY MOVES — and the census says it should be able
+    /// <b>Which bucket a vote rule actually moves — and the census says it should be able
     /// to move only one of them.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A VOTE DECIDES WHO GETS THE SEAT, SO IT CAN ONLY REACH THE OUTVOTED BUCKET —
-    /// EXCEPT THAT IT ALSO STEERS REPAIR.</b> This repo already records that no change to
+    /// <b>A vote decides who gets the seat, so it can only reach the outvoted bucket —
+    /// except that it also steers repair.</b> This repo already records that no change to
     /// the vote is only a readout, because covering and repair run on the rounds the
     /// WINNER got wrong. So a vote rule can move the uncovered bucket too, by changing
     /// what gets minted rather than by changing what gets read.
     /// </para>
     /// <para>
-    /// <b>WHICH IS THE DIFFERENCE BETWEEN A BETTER READOUT AND A BETTER SEARCH, and no
+    /// <b>Which is the difference between a better readout and a better search, and no
     /// score can tell them apart.</b> If a rule that wins on the skewed world wins by
     /// lowering <see cref="Census.Uncovered"/>, then what it improved was coverage and
     /// calling it a vote rule describes where it is implemented rather than what it does.
@@ -511,7 +511,7 @@ public sealed class CensusTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Which_failures_the_vote_leaves_behind_on_the_skewed_world()
     {
-        // ONE ARM NOW, WHERE THIS ONCE CROSSED THREE. Two of them lost and are deleted, so
+        // One arm now, where this once crossed three. Two of them lost and are deleted, so
         // what is left is the partition itself -- and the partition is what the reading was
         // ever for: a wrong round is outvoted, uncovered, or deeper than the language
         // reaches, and those three want completely different work.
@@ -531,20 +531,20 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>TAKING THE CENSUS DOES NOT CHANGE THE RUN, which is what buys its exemption
+    /// <b>Taking the census does not change the run, which is what buys its exemption
     /// from `ShapeTests`.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>`census` IS A CONSTRUCTOR PARAMETER ON A WORLD RUN AND THE DIAL GUARD IS RIGHT
-    /// TO ASK ABOUT IT.</b> A world may say what it is looking at and never what to
+    /// <b>`census` is a constructor parameter on a world run and the dial guard is right
+    /// to ask about it.</b> A world may say what it is looking at and never what to
     /// conclude, and this one hands over the world's own soundness check — an answer key,
     /// which is exactly the thing that may not reach a learner. What makes it admissible
     /// is that the key goes to the HARNESS and not to the brain, and that is a claim about
     /// wiring which a name in an allow-list cannot carry.
     /// </para>
     /// <para>
-    /// <b>SO IT IS ASSERTED ON THE ANSWER RATHER THAN ON THE ROUTING.</b> Two runs from
+    /// <b>So it is asserted on the answer rather than on the routing.</b> Two runs from
     /// one seed, one censused and one not, and every number the learner produced has to
     /// match exactly — a single leak into the population shows up as a different rule
     /// count long before it shows up as a better score. This is also the check that would

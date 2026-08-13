@@ -8,14 +8,14 @@ namespace OpenPlexus.Bus;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>WHAT MAKES THE DISTRIBUTED CLAIM MORE THAN A CLAIM.</b> <see cref="HybridBus"/>
+/// <b>What makes the distributed claim more than a claim.</b> <see cref="HybridBus"/>
 /// holds a dictionary of holders and calls them, injecting lateness and jitter and loss so
 /// that C2 and C3 are exercised — but the delivery is a method call, so every constraint
 /// about a NETWORK would be honoured by a simulation of one. Twenty phones cannot run a
 /// dictionary lookup between them, and this is the file that says what crosses instead.
 /// </para>
 /// <para>
-/// <b>THE ONE THING THIS HAS TO GET EXACTLY RIGHT IS DOUBLES, AND FORK 12 IS WHY.</b> A
+/// <b>The one thing this has to get exactly right is doubles, and fork 12 is why.</b> A
 /// reading is a QUANTISED number, so a value that comes back differing in its last bit
 /// codes differently at a band boundary and becomes a different observation. That fault
 /// has cost this project twice already — once from a graph's intra-op parallelism, once
@@ -23,14 +23,14 @@ namespace OpenPlexus.Bus;
 /// the damage spread across machines where no single one could see it.
 /// </para>
 /// <para>
-/// <b>System.Text.Json WRITES THE SHORTEST STRING THAT ROUND-TRIPS</b>, so a double
+/// <b>System.Text.Json writes the shortest string that round-trips</b>, so a double
 /// survives exactly rather than to fifteen places. That is a guarantee of the runtime
 /// rather than of this file, so <c>WireTests</c> asserts it against the awkward values
 /// instead of trusting it — infinities, subnormals, negative zero, and the epsilon
 /// either side of a band edge.
 /// </para>
 /// <para>
-/// <b>AND IT IS JSON RATHER THAN ANYTHING FASTER ON PURPOSE, FOR NOW.</b> The bytes on
+/// <b>And it is JSON rather than anything faster on purpose, for now.</b> The bytes on
 /// this wire are a moment and what a holder makes of it, not a corpus; the profile that
 /// matters is `Separations` and the search, and neither is here. A binary format is a
 /// change to make when something measures the wire, which nothing yet does.
@@ -40,7 +40,7 @@ public static class Wire
 {
     /// <summary>How everything on the wire is written and read.</summary>
     /// <remarks>
-    /// <b>NO INDENTING AND NO CAMEL CASE, BECAUSE BOTH ENDS ARE THIS CODE.</b> A wire
+    /// <b>No indenting and no camel case, because both ends are this code.</b> A wire
     /// format that reads nicely is a wire format shaped for a human who is not there.
     /// </remarks>
     private static readonly JsonSerializerOptions Shape = new()

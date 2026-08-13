@@ -14,7 +14,7 @@ public sealed record HomeostatSettings
     /// <c>Drain × (i+1)</c></b>.
     /// </summary>
     /// <remarks>
-    /// <b>UNEVEN ON PURPOSE, AND IT IS WHAT MAKES THE WORLD DISCRIMINATE.</b> If
+    /// <b>Uneven on purpose, and it is what makes the world discriminate.</b> If
     /// every variable fell at the same rate, attending to whichever is lowest and
     /// attending at random would differ only in variance, and a policy that did
     /// not look at its own state would score nearly as well as one that did. With
@@ -26,7 +26,7 @@ public sealed record HomeostatSettings
 
     /// <summary>How much one act of attention restores.</summary>
     /// <remarks>
-    /// <b>BOUNDED ON BOTH SIDES BY THE WORLD'S OWN ARITHMETIC.</b> Above the sum
+    /// <b>Bounded on both sides by the world's own arithmetic.</b> Above the sum
     /// of every drain, or nothing can hold the system and the ceiling is not
     /// reachable; below <c>Needs × the fastest drain</c>, or attending at random
     /// suffices and the world measures nothing.
@@ -46,8 +46,8 @@ public sealed record HomeostatSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>TWO MEASUREMENTS SAID THE FRONT END WAS THE PROBLEM, FROM OPPOSITE
-    /// DIRECTIONS.</b> A band is an ABSOLUTE fact about one variable, and
+    /// <b>Two measurements said the front end was the problem, from opposite
+    /// directions.</b> A band is an ABSOLUTE fact about one variable, and
     /// <i>attend to whichever is lowest</i> is a RELATIONAL fact about all of
     /// them — the same limit as <c>A is north of B</c>. And the ceiling policy
     /// holds the body so steady that every banded code sits still: it visits
@@ -55,15 +55,15 @@ public sealed record HomeostatSettings
     /// no state variation for a state-conditional association to attach to.
     /// </para>
     /// <para>
-    /// <b>A RANK FIXES BOTH AT ONCE, AND THE SECOND IS THE SURPRISING HALF.</b>
+    /// <b>A rank fixes both at once, and the second is the surprising half.</b>
     /// Drains are uneven, so attending to the lowest makes which-variable-is-worst
     /// ROTATE while the values themselves barely move. The ordering varies exactly
     /// where the magnitudes do not, which is what gives a well-behaved run
     /// something to be conditional on.
     /// </para>
     /// <para>
-    /// <b>IT IS THE <see cref="Codes.IQuantizer{TObservation}.Bind"/> SPLIT AGAIN,
-    /// AND THE SAME CAVEAT APPLIES WORD FOR WORD.</b> Comparison is pre-attentive
+    /// <b>IT IS THE <see cref="Codes.IQuantizer{TObservation}.Bind"/> split again,
+    /// and the same caveat applies word for word.</b> Comparison is pre-attentive
     /// here exactly as segmentation is there — Ashby's units deviate against each
     /// other by their physics, not by deliberation. So the front end supplies the
     /// ORDERING and the learner must still work out what an ordering MEANS: nothing
@@ -88,7 +88,7 @@ public sealed record HomeostatSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE WORLD FOR STEP 4, AND IT EXISTS BECAUSE SURVIVAL WAS GAMEABLE.</b>
+/// <b>The world for step 4, and it exists because survival was gameable.</b>
 /// Snake scored by staying alive, and circling wins that: it lives longest and
 /// eats least, which is the refuted row. Keeping variables in bounds cannot be
 /// gamed the same way, because <b>standing still stops paying</b> — every
@@ -141,7 +141,7 @@ public sealed class Homeostat
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Drain);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Restore);
 
-        // ONE MODALITY BLOCK MUST NOT RUN INTO THE NEXT. See Rank.
+        // One modality block must not run into the next. See Rank.
         if (Need + settings.Needs > Rank || Rank + settings.Needs > byte.MaxValue + 1)
             throw new ArgumentOutOfRangeException(nameof(settings),
                 $"{settings.Needs} variables do not fit between the need block at "
@@ -216,8 +216,8 @@ public sealed class Homeostat
     /// not read as a float.
     /// </para>
     /// <para>
-    /// <b>AND, WHERE THE BODY CAN SAY SO, WHERE EACH ONE STANDS AGAINST THE
-    /// OTHERS.</b> A band cannot express <i>lowest</i>, which is the one fact this
+    /// <b>And, where the body can say so, where each one stands against the
+    /// others.</b> A band cannot express <i>lowest</i>, which is the one fact this
     /// world turns on — see <see cref="HomeostatSettings.Ranked"/>. The ranks are
     /// EXTRA codes rather than replacements, so the arm is additive and the graph
     /// holds the absolute fact and the relational one at once.

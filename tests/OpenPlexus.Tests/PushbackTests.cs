@@ -15,20 +15,20 @@ namespace OpenPlexus.Tests;
 /// written down instead.
 /// </para>
 /// <para>
-/// <b>IT IS NOT A LIST OF WORK AND THAT IS THE WHOLE DISTINCTION.</b>
+/// <b>It is not a list of work and that is the whole distinction.</b>
 /// <see cref="OutstandingTests"/> is work somebody has decided to do, so it is RED. This is
 /// work nobody has decided to do, because there is a disagreement about whether it should be
 /// done at all — so it is GREEN and it PRINTS. An entry here is a claim that something
 /// currently in the repo is wrong or unjustified, plus what would settle it.
 /// </para>
 /// <para>
-/// <b>AND AN ENTRY LEAVES BY BEING SETTLED, NEVER BY BEING WITHDRAWN QUIETLY.</b> Either the
+/// <b>And an entry leaves by being settled, never by being withdrawn quietly.</b> Either the
 /// thing changes, or a measurement says the objection was wrong and the row moves to the
 /// plan's refutation table. What is forbidden is deleting a row because nobody got round to
 /// it — which is the failure this exists to prevent, and is why the count is asserted.
 /// </para>
 /// <para>
-/// <b>THE ENTRIES BELOW ARE MINE AND SEVERAL MAY BE WRONG.</b> That is the intended state:
+/// <b>The entries below are mine and several may be wrong.</b> That is the intended state:
 /// a disagreement nobody has tested is exactly what this is for, and a list where every
 /// entry turned out to be right would mean the bar for adding was far too high.
 /// </para>
@@ -85,7 +85,7 @@ public sealed class PushbackTests(ITestOutputHelper output)
     ];
 
     /// <summary>
-    /// <b>THE LIST IS PRINTED EVERY RUN, WHICH IS THE ONLY THING THAT MAKES IT WORK.</b>
+    /// <b>The list is printed every run, which is the only thing that makes it work.</b>
     /// </summary>
     /// <remarks>
     /// The failure this addresses is not not-knowing, it is not-consulting — the same one
@@ -103,7 +103,7 @@ public sealed class PushbackTests(ITestOutputHelper output)
             output.WriteLine(string.Empty);
         }
 
-        // AN OBJECTION WITH NO WAY TO END IT IS A COMPLAINT, and a complaint in a list that
+        // An objection with no way to end it is a complaint, and a complaint in a list that
         // only shrinks by agreement is a thing nobody can ever remove. Every row has to name
         // the measurement or the decision that closes it in EITHER direction.
         Assert.All(Open, one =>
@@ -113,7 +113,7 @@ public sealed class PushbackTests(ITestOutputHelper output)
             Assert.True(one.Settles.Length > 40, $"{one.With}: no way to settle it");
         });
 
-        // AND IT MUST NOT BECOME A BACKLOG. The point is that a live disagreement gets
+        // And it must not become a backlog. The point is that a live disagreement gets
         // settled, not that it gets catalogued -- so the cap is low on purpose and a full
         // list means settling one before adding another.
         Assert.True(Open.Length <= 6,
@@ -122,7 +122,7 @@ public sealed class PushbackTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>AND THE COUNT IS ASSERTED, SO A ROW CANNOT LEAVE QUIETLY.</b>
+    /// <b>And the count is asserted, so a row cannot leave quietly.</b>
     /// </summary>
     /// <remarks>
     /// Lowering this is the deliberate edit that says a disagreement was settled, and the

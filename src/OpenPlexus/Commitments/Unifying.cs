@@ -9,7 +9,7 @@ namespace OpenPlexus.Commitments;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>RUNGS ONE TO THREE KEEP A SUBSET TEST AND THIS ONE DOES NOT.</b>
+/// <b>Rungs one to three keep a subset test and this one does not.</b>
 /// <see cref="Commitment.Fires"/> asks whether every code of a scope is in the moment,
 /// which is a membership test per code and nothing else. An entry saying <i>whichever
 /// code of this modality, and the SAME one wherever this entry repeats</i> cannot be
@@ -18,20 +18,20 @@ namespace OpenPlexus.Commitments;
 /// distance between a propositional learner and a relational one.
 /// </para>
 /// <para>
-/// <b>AND AN ENTRY IS STILL A <see cref="Code"/>, WHICH IS THE ONE THING WORTH KEEPING
-/// FROM THE CHEAP MATCHER.</b> A scope stays an array of codes, so identity, ordering,
+/// <b>And an entry is still a <see cref="Code"/>, which is the one thing worth keeping
+/// from the cheap matcher.</b> A scope stays an array of codes, so identity, ordering,
 /// subsumption and everything that reads a scope carry over unchanged. What varies is
 /// carried in the modality, exactly as <see cref="Naming.Meant"/> carries a name.
 /// </para>
 /// <para>
-/// <b>ONE ENTRY NAMING A VARIABLE CONSTRAINS NOTHING, WHICH IS WHY THE COST IS NOT
-/// OBVIOUS.</b> <i>Whichever word</i> alone is satisfied by any moment holding a word at
+/// <b>One entry naming a variable constrains nothing, which is why the cost is not
+/// obvious.</b> <i>Whichever word</i> alone is satisfied by any moment holding a word at
 /// all. It is the REPETITION that says something — <i>whichever word was asked about,
 /// and that same word was told</i> — so the shape whose cost matters is a join, and a
 /// join is what has no index.
 /// </para>
 /// <para>
-/// <b>WHICH IS THE HALF THE FRONT END HAS TO SUPPLY AND ON TEXT DOES NOT.</b>
+/// <b>Which is the half the front end has to supply and on text does not.</b>
 /// <see cref="Codes.Joined"/> unions the question's words into the story's bag under one
 /// modality, so <i>asked</i> and <i>told</i> are the same code and a repeated entry
 /// binds against nothing. <see cref="Joining.Anonymous"/> is that join computed in the
@@ -81,8 +81,8 @@ public static class Unifying
     /// </summary>
     /// <param name="moment">What is live.</param>
     /// <remarks>
-    /// <b>BUILT ONCE A ROUND AND NOT ONCE A COMMITMENT, WHICH IS WHERE THE HONEST
-    /// ACCOUNTING OF THIS RUNG STARTS.</b> The cheap matcher reads the moment as a set and
+    /// <b>Built once a round and not once a commitment, which is where the honest
+    /// accounting of this rung starts.</b> The cheap matcher reads the moment as a set and
     /// pays nothing to prepare it; a variable has to enumerate what could fill it, and
     /// enumerating means grouping. So the rung costs one pass over the moment before any
     /// commitment is looked at, and the probe reports it separately for that reason.
@@ -101,8 +101,8 @@ public static class Unifying
             values.Add(code.Value);
         }
 
-        // SORTED, BECAUSE THE FIRST BINDING FOUND DECIDES AND A DICTIONARY'S ORDER DOES
-        // NOT SURVIVE A RUN. A matcher whose answer moved with the iteration order would
+        // Sorted, because the first binding found decides and a dictionary's order does
+        // not survive a run. A matcher whose answer moved with the iteration order would
         // be a difference nobody chose, which is what `DeterminismTests` exists to refuse.
         foreach (var values in index.Values) values.Sort();
 
@@ -127,14 +127,14 @@ public static class Unifying
     /// <param name="index">The moment's values by modality, from <see cref="Index"/>.</param>
     /// <remarks>
     /// <para>
-    /// <b>THE CONSTANTS ARE TESTED FIRST AND THAT IS NOT AN OPTIMISATION.</b> A scope
+    /// <b>The constants are tested first and that is not an optimisation.</b> A scope
     /// mixing constants with variables is indexable by its constants exactly as it is now,
     /// so the population's <c>_byCode</c> still reaches it — and a scope of variables
     /// ALONE is reached by nothing and has to be scanned. Which scopes are all-variable is
     /// therefore the fact that decides whether this rung keeps the index or loses it.
     /// </para>
     /// <para>
-    /// <b>THE FIRST CONSISTENT FILLING WINS, WHICH IS A DECISION AND NOT A DETAIL.</b> A
+    /// <b>The first consistent filling wins, which is a decision and not a detail.</b> A
     /// variable scope can be satisfied several ways in one moment, and each way is a
     /// different grounded expectation. Taking the first in code order keeps the matcher
     /// decidable and order-independent; what a vote should do with the others is the
@@ -184,8 +184,8 @@ public static class Unifying
     /// <param name="name">Which variable this call is filling.</param>
     /// <param name="tried">Candidate values considered, accumulated across the search.</param>
     /// <remarks>
-    /// <b>IN NAME ORDER RATHER THAN BY SMALLEST CANDIDATE SET, AND SAID OUT LOUD BECAUSE
-    /// IT IS A CEILING ON THE READING.</b> Choosing the most constrained variable first is
+    /// <b>In name order rather than by smallest candidate set, and said out loud because
+    /// it is a ceiling on the reading.</b> Choosing the most constrained variable first is
     /// the standard saving and it would make this cheaper than it is measured to be. The
     /// probe wants the cost of the rung rather than the cost of one implementation of it,
     /// so the number reported is an upper bound, and a real matcher may beat it.
@@ -201,7 +201,7 @@ public static class Unifying
     {
         if (name == filling.Length) return true;
 
-        // WHERE THIS VARIABLE MAY BE DRAWN FROM. Any entry naming it will do -- they all
+        // Where this variable may be drawn from. Any entry naming it will do -- they all
         // have to agree in the end, so starting from the first is a choice about order and
         // never about which answers exist.
         byte modality = 0;
@@ -217,7 +217,7 @@ public static class Unifying
             break;
         }
 
-        // A NAME NOTHING MENTIONS IS SATISFIED BY ANYTHING, which can only happen where a
+        // A name nothing mentions is satisfied by anything, which can only happen where a
         // scope skips a number, and is answered rather than refused so that the search
         // never depends on how the names were counted out.
         if (!found)

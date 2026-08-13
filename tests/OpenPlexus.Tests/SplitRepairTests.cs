@@ -12,27 +12,27 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>REPAIR'S EVIDENCE IS PER-COMMITMENT AND SURVIVES SPLITTING BY CONSTRUCTION.</b>
+/// <b>Repair's evidence is per-commitment and survives splitting by construction.</b>
 /// <c>Repair.Discriminator</c> is handed ONE commitment and reads the table that
 /// commitment kept of its own hits and misses. A ring places a commitment whole, so
 /// nothing about sharding touches that table — which is <i>decide local</i> working
 /// exactly as the plan says it should.
 /// </para>
 /// <para>
-/// <b>BUT THE GATE IN FRONT OF IT IS NOT PER-COMMITMENT, AND THAT IS THE CRACK.</b>
+/// <b>But the gate in front of it is not per-commitment, and that is the crack.</b>
 /// <c>Mending.Uncovered</c> refuses to repair a commitment when any OTHER firing
 /// commitment already narrows it, and asks that of <c>firing</c> — which under sharding is
 /// only what this holder happens to hold. A holder cannot see that somebody else already
 /// covers the case, so it mints a child the whole population would have refused.
 /// </para>
 /// <para>
-/// <b>SO THE TWO MECHANISMS FAIL IN OPPOSITE DIRECTIONS FROM ONE CAUSE.</b> Rung five
+/// <b>So the two mechanisms fail in opposite directions from one cause.</b> Rung five
 /// loses the power to CERTIFY a redundancy and goes silent; this gate loses the evidence
 /// to REFUSE a repair and over-fires. Both are a population-level statistic computed on a
 /// shard, and reading either as the general shape of the problem would miss the other.
 /// </para>
 /// <para>
-/// <b>AND THIS ONE CANNOT BE FIXED THE WAY RUNG FIVE WAS.</b> <see cref="Recurrence"/>
+/// <b>And this one cannot be fixed the way rung five was.</b> <see cref="Recurrence"/>
 /// works because a frequency is monotone and adds; <c>Narrows</c> is a structural test
 /// between two scopes and there is nothing to add up. What a holder needs is an ANSWER —
 /// <i>does anybody hold a strict specialisation of this scope</i> — which is a round trip
@@ -65,7 +65,7 @@ public sealed class SplitRepairTests(ITestOutputHelper output)
     /// <param name="dials">The gate's numbers, for the miss floor.</param>
     /// <param name="place">Which holder a commitment sits on.</param>
     /// <remarks>
-    /// <b>THE WHOLE POPULATION IS THIS SAME FUNCTION WITH EVERY COMMITMENT ON ONE HOLDER,
+    /// <b>The whole population is this same function with every commitment on one holder,
     /// which is why there is no separate baseline path.</b> Two loops differing only in a
     /// placement rule is two places for the filters to drift, and the clone budget refused
     /// the second copy the moment it was written — which is what that budget is for.
@@ -135,7 +135,7 @@ public sealed class SplitRepairTests(ITestOutputHelper output)
             });
         }
 
-        // EVERY COMMITMENT ON ONE HOLDER IS THE WHOLE POPULATION, which is what one
+        // Every commitment on one holder is the whole population, which is what one
         // process computes today and what every row below is measured against.
         var (candidates, whole) = Counted(held, asks, dials, _ => 0UL);
 
@@ -154,14 +154,14 @@ public sealed class SplitRepairTests(ITestOutputHelper output)
             var (_, by_identity) =
                 Counted(held, asks, dials, one => one.Identity.Value % (ulong)holders);
 
-            // A CHILD AND ITS PARENT ARE PLACED INDEPENDENTLY, AND THAT IS WHY COVERAGE
-            // GOES. A commitment's identity derives from its SCOPE, and a child's scope is
+            // A child and its parent are placed independently, and that is why coverage
+            // goes. A commitment's identity derives from its SCOPE, and a child's scope is
             // its parent's plus one code, so the two hash to unrelated places -- the ring
             // actively separates exactly the pairs this gate exists to compare.
             //
-            // SO PLACE BY THE FIRST CODE IN THE SCOPE INSTEAD, which is fork 3's prefix
-            // locality asked of the one mechanism now known to need it. AN ARM AND NOT A
-            // PROPOSAL: prefix placement trades a uniform load for a clustered one, and
+            // So place by the first code in the scope instead, which is fork 3's prefix
+            // locality asked of the one mechanism now known to need it. An arm and not a
+            // proposal: prefix placement trades a uniform load for a clustered one, and
             // nothing here measures what that costs -- a family sharing a root piles onto
             // one holder, which is why a uniform hash was chosen in the first place.
             var (_, by_prefix) =
@@ -171,7 +171,7 @@ public sealed class SplitRepairTests(ITestOutputHelper output)
                 $"{holders,7} | {by_identity,19} | {whole - by_identity,6} "
                 + $"({(whole - by_identity) / (double)candidates,6:P1}) | {by_prefix,23}");
 
-            // AT ONE HOLDER THERE IS NOTHING TO MISS, and a row that disagreed would mean
+            // At one holder there is nothing to miss, and a row that disagreed would mean
             // the placement rule was reaching something other than placement.
             if (holders == 1) Assert.Equal(whole, by_identity);
         }

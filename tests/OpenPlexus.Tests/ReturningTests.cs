@@ -12,14 +12,14 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE TWO AXES ARE INDEPENDENT AND THAT IS THE WHOLE DESIGN.</b> <c>Twinned</c> is a
+/// <b>The two axes are independent and that is the whole design.</b> <c>Twinned</c> is a
 /// fact about the world — whether two things look alike — and <c>Tagged</c> is a fact
 /// about what the front end hands over. Crossing them gives four cells where an arm would
 /// give one number and no way to read it: the untwinned row says the harness can score at
 /// all, and the twinned row says what identity is worth once appearance has run out.
 /// </para>
 /// <para>
-/// <b>AND THE CELL NOBODY MAY SHIP IS THE ONE THAT MAKES THE OTHERS LEGIBLE.</b> A handed
+/// <b>And the cell nobody may ship is the one that makes the others legible.</b> A handed
 /// index is exactly what John's ordering forbids — point a phone at a basket, look away,
 /// look back, and nothing outside the learner may say it is the same basket. It is here
 /// because a gap needs two ends, in the same way fork 88 priced rung four by handing the
@@ -45,7 +45,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// <param name="seed">Which stream.</param>
     /// <param name="sightings">How many moments to watch.</param>
     /// <remarks>
-    /// <b>A SEPARATE INSTANCE AT THE SAME SEED, so the groups are found in what a front end
+    /// <b>A separate instance at the same seed, so the groups are found in what a front end
     /// would have seen rather than in the examination.</b> It sees the same distribution and
     /// none of the withheld sightings.
     /// </remarks>
@@ -85,7 +85,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// seed is a run rather than two independent draws that could be varied apart.
     /// </param>
     /// <remarks>
-    /// <b>ONE <see cref="Sorting"/> FOR THE FRONT END AND THE POPULATION BOTH.</b> A
+    /// <b>ONE <see cref="Sorting"/> for the front end and the population both.</b> A
     /// category's code is derived from its members, so two vocabularies built from the same
     /// groups would agree — but a rewrite reading a vocabulary the front end is not folding
     /// mints rules that can never fire, and nothing downstream would report it.
@@ -129,7 +129,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
                     World(twinned, tagged),
                     $"{(twinned ? "twinned" : "distinct")} {(tagged ? "tagged" : "anonymous")}").Exam;
 
-        // AND THE CELL JOHN'S ACCOUNT PREDICTS, WHICH IS THE ONE WORTH THE FILE. Twins are
+        // And the cell John's account predicts, which is the one worth the file. Twins are
         // identical in appearance and stand in different places, and nothing is handed
         // over. If a relation recovers what appearance lost, then an individual is reachable
         // as a bundle of relations rather than as a stored name — which is concept-before-
@@ -139,7 +139,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
 
         var byTag = Cell(World(twinned: true, tagged: true), "twinned tagged, re-read").Held;
 
-        // THE HARNESS CHECK FIRST, AND IT IS NOT A FORMALITY. Where every thing looks
+        // The harness check first, and it is not a formality. Where every thing looks
         // different, appearance is a complete answer and the learner should find it with no
         // index at all. A world that scored badly HERE would be one where the codes are too
         // noisy to carry anything, and every number in the twinned row would then be about
@@ -148,7 +148,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
             $"appearance alone reached {scored[(false, false)]:F3} where every thing looks "
             + "different, so the signal is too weak to read anything else off this world");
 
-        // AND THE FINDING THE WORLD EXISTS FOR. Twinned, appearance is exhausted by
+        // And the finding the world exists for. Twinned, appearance is exhausted by
         // construction: two things wear one look and carry different answers, so nothing
         // that sees a moment at a time can beat the pair's base rate. The index is the only
         // thing separating them, and the distance is what minting an individual would buy.
@@ -169,7 +169,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
             + $"({(gap == 0 ? 0.0 : (placed - scored[(true, false)]) / gap):P0} of the way "
             + "to a handed index)");
 
-        // AND THE CONTROL THAT SAYS THE LANDMARK IS NOT JUST MORE SIGNAL. A place is another
+        // And the control that says the landmark is not just more signal. A place is another
         // channel of codes, so a cell that improved could be improving because the moment
         // got wider rather than because a RELATION separated the twins. What rules that out
         // is that the twins share every appearance code by construction: the only thing a
@@ -179,7 +179,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
             + "no landmark, so adding a channel that uniquely separates the twins made the "
             + "world harder — which is a fault in the harness rather than a finding");
 
-        // AND WHAT IT COST TO GET THERE, WHICH IS THE FINDING RATHER THAN THE SCORE. Both
+        // And what it cost to get there, which is the finding rather than the score. Both
         // cells answer everything, and one does it with an order of magnitude more rules —
         // because a handed index is ONE code standing for the thing while a relation has to
         // be conjoined with every appearance the thing ever wears. So what minting an
@@ -194,7 +194,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
             + "is not buying compression here and the case for minting one is the score "
             + "alone — which the landmark already matches");
 
-        // NO BAR ON THE ANONYMOUS TWINNED CELL ITSELF. That it sits near the pair's base
+        // No bar on the anonymous twinned cell itself. That it sits near the pair's base
         // rate is the point rather than a result, and pinning a level would turn the
         // world's own arithmetic into a claim about the learner.
     }
@@ -206,21 +206,21 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>RUNG FIVE CANNOT REACH THIS AND THE PLAN ALREADY SAID SO.</b> It names what
+    /// <b>Rung five cannot reach this and the plan already said so.</b> It names what
     /// CO-FIRES, and a basket at two moments does not co-occur with itself. The looks one
     /// thing wears are the opposite shape: they never co-occur and they keep the same
     /// company, which is a category. So what would collapse a rule-per-appearance into a
     /// rule is <see cref="Alternating"/> and never abstraction.
     /// </para>
     /// <para>
-    /// <b>AND NOTHING IS HANDED OVER, WHICH IS THE DIFFERENCE FROM EVERY CEILING IN THE
-    /// GRID ABOVE.</b> The groups are derived from drawn moments by exclusion and shared
+    /// <b>And nothing is handed over, which is the difference from every ceiling in the
+    /// grid above.</b> The groups are derived from drawn moments by exclusion and shared
     /// company. The world's own tables are never read — which matters especially here,
     /// because a landmark's codes are drawn per THING, so handing that grouping over would
     /// be the index of the forbidden cell wearing a different hat.
     /// </para>
     /// <para>
-    /// <b>WHAT WOULD REFUTE THE ROUTE, SAID BEFORE IT RUNS: if the derived categories do not
+    /// <b>What would refute the route, said before it runs: if the derived categories do not
     /// cut the rule count, then a name over alternatives does not compress and the
     /// individual-as-category account is wrong however tidy it sounds.</b> The score is the
     /// second column and not the first — the placed cell already answers everything, so what
@@ -243,7 +243,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
 
         var found = Alternating.From(moments, company: 0.5, floor: 20);
 
-        // THE MODALITY IS THE READOUT AND THE WORLD'S TABLES ARE NOT. A look rides on one
+        // The modality is the readout and the world's tables are not. A look rides on one
         // modality and a landmark on another, so how many groups of each kind were found,
         // and whether any group MIXED them, says what the derivation recovered without
         // anything having to be told which code is which thing.
@@ -271,7 +271,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
             + $"{byCategory - byLook:+#;-#;0} ({byCategory / (double)byLook:F2}x), against a "
             + $"handed index's {byTag}");
 
-        // THE INSTRUMENT CHECK, AND IT IS THE ONE THAT WOULD OTHERWISE PASS UNNOTICED. A
+        // The instrument check, and it is the one that would otherwise pass unnoticed. A
         // derivation returning nothing, or returning one group holding the alphabet, would
         // make the cell below identical to the cell above and the whole reading would be a
         // no-op reported as a result.
@@ -284,7 +284,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
             + "share of the alphabet and is single-link clustering running away rather than "
             + "a category");
 
-        // FINDING ONE: THE APPEARANCES ARE RECOVERED EXACTLY AND NOTHING WAS HANDED OVER.
+        // Finding one: the appearances are recovered exactly and nothing was handed over.
         // Every group is a modality's own, so exclusion and shared company never once
         // confused where a thing stands with what it looks like -- and the look groups come
         // back one per attribute per appearance, at the size the world draws them from. That
@@ -299,15 +299,15 @@ public sealed class ReturningTests(ITestOutputHelper output)
 
         Assert.DoesNotContain(found, one => one.Select(code => code.Modality).Distinct().Count() > 1);
 
-        // FINDING TWO, AND IT IS THE LIMIT RATHER THAN THE RESULT: SUBSTITUTABILITY FINDS A
-        // KIND AND NEVER AN INDIVIDUAL. A landmark is drawn per THING, so eight things means
+        // Finding two, and it is the limit rather than the result: substitutability finds a
+        // kind and never an individual. A landmark is drawn per THING, so eight things means
         // eight groups of four -- and what comes back is four groups of eight, each holding
         // both twins' landmarks. That is not a bug in the derivation. Twins are substitutable
         // by construction, so every statistic over the moments is the same for both, and the
         // only thing separating them is that their landmarks predict different answers, which
         // is not in the input at all.
         //
-        // SO *THE INDIVIDUAL IS A CATEGORY OVER ITS APPEARANCES* IS HALF RIGHT. The category
+        // So *the individual is a category over its appearances* is half right. The category
         // reaches the PAIR. Getting from the pair to the individual needs something that
         // reads what a code predicts, which is a gate rather than a derivation.
         var places = found.Where(one => one.All(code => code.Modality == 25)).ToList();
@@ -318,13 +318,13 @@ public sealed class ReturningTests(ITestOutputHelper output)
             + "four would mean substitutability separated the twins, which it cannot -- and if "
             + "it now does, this file's account of what a category reaches is wrong");
 
-        // FINDING THREE: A CATEGORY IN THE MOMENT IS NOT A REWRITE OF THE RULES, WHICH IS
-        // WHERE THE COMPRESSION WENT. The plain code stays beside the category on purpose, so
+        // Finding three: a category in the moment is not a rewrite of the rules, which is
+        // where the compression went. The plain code stays beside the category on purpose, so
         // genesis still roots on it and repair still specialises on it -- the category is one
         // more thing available rather than a shorter way to say what is already held. The
         // population barely moves, and the 9.3x this was aimed at is untouched.
         //
-        // SO WHAT IS MISSING IS THE REWRITE AND NOT THE NAME, which is fork 85 arriving from a
+        // So what is missing is the rewrite and not the name, which is fork 85 arriving from a
         // new direction: a coarse name can only enter a scope as a NEW claim with a fresh
         // record, and nothing here mints that claim.
         Assert.True(Math.Abs(sorted - plain) < 0.05,
@@ -344,13 +344,13 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE FOLD IS THE CONTROL AND THE JUDGE IS THE ARM.</b> The test above establishes
+    /// <b>The fold is the control and the judge is the arm.</b> The test above establishes
     /// that a category in the moment moves the population by nearly nothing; this asks what
     /// happens when subsumption is allowed to see that a rule pinning a MEMBER is narrower
     /// than one pinning its category.
     /// </para>
     /// <para>
-    /// <b>AND THE OPERATOR FORK 85 ACTUALLY ASKED FOR WAS BUILT HERE AND DELETED.</b> It
+    /// <b>And the operator fork 85 actually asked for was built here and deleted.</b> It
     /// proposed the coarse claim as a new commitment with a fresh record — which is not
     /// optional, since carrying the parent's would keep a rule's evidence while widening what
     /// it claims — and it cost 60 rules over three seeds where the judge cost none. A
@@ -364,7 +364,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// derived and kept inside the population would have nothing minting its rules.
     /// </para>
     /// <para>
-    /// <b>AND THE SCORE IS A GUARD RATHER THAN THE COLUMN.</b> The landmark cell already
+    /// <b>And the score is a guard rather than the column.</b> The landmark cell already
     /// answers nearly everything, so nothing here can buy accuracy and anything can sell it
     /// — a population that compressed by generalising past what is true would show up as
     /// rules falling and the exam falling with them.
@@ -375,8 +375,8 @@ public sealed class ReturningTests(ITestOutputHelper output)
     {
         var settings = World(twinned: true, tagged: false, placed: true);
 
-        // THREE SEEDS, BECAUSE A POPULATION COUNT IS THE COLUMN AND ONE OF THEM WOULD BE A
-        // COINCIDENCE. This repo has already had a lift live at one seed and vanish at two
+        // Three seeds, because a population count is the column and one of them would be a
+        // coincidence. This repo has already had a lift live at one seed and vanish at two
         // others -- see the plan's caution about `Resolved(1)`. Each seed redraws the world
         // AND the derivation, so a category found on one stream is never carried onto
         // another's.
@@ -392,7 +392,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
 
         foreach (var seed in new[] { 1, 2, 3 })
         {
-            // DERIVED FROM ITS OWN SEED'S WORLD, so the groups are found in what a front end
+            // Derived from its own seed's world, so the groups are found in what a front end
             // watching THIS run would have seen. A vocabulary derived once and reused would
             // make seeds two and three a test of how well seed one's categories travel,
             // which is a different question and a much easier one.
@@ -417,14 +417,14 @@ public sealed class ReturningTests(ITestOutputHelper output)
             $"over three seeds: {held[0]} rules plain, {held[1]} folded and {held[2]} judged, "
             + $"against a handed index's {byTag} a seed");
 
-        // THE FINDING, AND IT IS A CORRECTION RATHER THAN A RESULT: WHAT WAS MISSING WAS THE
-        // JUDGE AND NOT A REWRITE. Genesis already roots on a category code, because it is in
+        // The finding, and it is a correction rather than a result: what was missing was the
+        // judge and not a rewrite. Genesis already roots on a category code, because it is in
         // the moment like any other -- so the population already held coarse rules, and held
         // every member's rule beside them because nothing could see that one entails the
         // other. Teaching subsumption the entailment is the whole of the compression fork 85
         // was after, and it proposes not one new claim to get it.
         //
-        // AND THE OPERATOR FORK 85 ASKED FOR IS DELETED, MEASURED. Proposing the coarse claim
+        // And the operator fork 85 asked for is deleted, measured. Proposing the coarse claim
         // with a fresh record cost 60 rules over these three seeds where the judge costs
         // none: a proposal must fire `Floor` times before anything may judge it, and the
         // claim it makes was already reachable. The plan carries the revival row -- what
@@ -434,7 +434,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
             + "the coarse rules genesis mints are not absorbing their members and this "
             + "file's account of where the compression comes from is wrong");
 
-        // AND THE FOLD ALONE IS THE CONTROL THAT SAYS SO. A category in the moment moves the
+        // And the fold alone is the control that says so. A category in the moment moves the
         // population by nearly nothing, which is what made the judge look like a missing
         // rewrite in the first place.
         Assert.True(held[1] > held[0] * 0.8,
@@ -442,7 +442,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
             + $"{held[1]}, so the fold compresses on its own now and the judge below is not "
             + "the mechanism this file credits");
 
-        // THE SCORE GUARD, ON EVERY ARM. A population that compressed by generalising past
+        // The score guard, on every arm. A population that compressed by generalising past
         // what is true is the failure a rule count cannot tell from a success.
         for (var arm = 1; arm < arms.Length; arm++)
             Assert.True(Math.Abs(scored[arm] - scored[0]) < 0.15,
@@ -458,32 +458,32 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE DERIVATION SEES A BAG OF MOMENTS AND NO ORDER, WHICH IS WHY THE TWINS MERGED.</b>
+    /// <b>The derivation sees a bag of moments and no order, which is why the twins merged.</b>
     /// Substitutability is a fact about moments, and twins are substitutable by construction —
     /// so eight things came back as four groups of eight landmarks, each holding both twins'.
     /// Nothing about looking harder at moments can fix that.
     /// </para>
     /// <para>
-    /// <b>SO WHAT IS ADDED IS THE STREAM'S ORDER AND NOTHING ELSE.</b> The world draws
+    /// <b>So what is added is the stream's order and nothing else.</b> The world draws
     /// sightings in RUNS rather than uniformly, which changes which thing is met and changes
     /// nothing whatever about how a met thing is shown. A learner seeing one moment at a time
     /// is handed exactly what it was handed before.
     /// </para>
     /// <para>
-    /// <b>WHAT WOULD KILL IT, SAID BEFORE IT RUNS AND CARRIED FROM THE HANDOFF THAT NAMED
-    /// IT: if the landmarks still come back four-of-eight, continuity does not separate
+    /// <b>What would kill it, said before it runs and carried from the handoff that named
+    /// it: if the landmarks still come back four-of-eight, continuity does not separate
     /// substitutable things and the route back is a GATE reading what a proposal predicts.</b>
     /// That is the honest alternative and it is a different kind of mechanism — a derivation
     /// over what arrived against a judge of what a claim earns.
     /// </para>
     /// <para>
-    /// <b>AND THE UNIFORM STREAM IS THE CONTROL THAT SAYS ADHESION READS TIME.</b> Run on a
+    /// <b>And the uniform stream is the control that says adhesion reads time.</b> Run on a
     /// world drawing independently, the same clause must not recover a thing — otherwise it
     /// is reading some other regularity and the runs were never what paid.
     /// </para>
     /// <para>
-    /// <b>IT DOES NOT COME BACK EMPTY, AND THAT IS A PROPERTY OF THE BAR RATHER THAN OF THE
-    /// WORLD.</b> A ratio against chance corrects for nothing, so out of every pair in the
+    /// <b>It does not come back empty, and that is a property of the bar rather than of the
+    /// world.</b> A ratio against chance corrects for nothing, so out of every pair in the
     /// alphabet one clears it by luck — the same failure rung five's gate exists against and
     /// pays for with a correction by the count of candidates. What the control can say is
     /// that noise reaches a PAIR and structure reaches the thing, and the distance between
@@ -501,12 +501,12 @@ public sealed class ReturningTests(ITestOutputHelper output)
 
         var stream = Watched(running, seed: 1);
 
-        // CONTROL ONE: THE SPACE DERIVATION ON THE SAME RUNS. It reads an unordered bag, so
+        // Control one: the space derivation on the same runs. It reads an unordered bag, so
         // making the stream continuous must leave it exactly where it was -- and if it does
         // not, the runs changed the moments and the arm below is measuring two things.
         var blind = Alternating.From(stream, company: 0.5, floor: 20);
 
-        // CONTROL TWO: THE TIME DERIVATION ON A UNIFORM STREAM. Every pair adheres at chance
+        // Control two: the time derivation on a uniform stream. Every pair adheres at chance
         // there, so this must find nothing.
         var chance = Alternating.Over(
             Watched(uniform, seed: 1), Adhesion, floor: 20, span: 1);
@@ -526,8 +526,8 @@ public sealed class ReturningTests(ITestOutputHelper output)
             + "stream where it found four of eight on a uniform one, so the runs changed what "
             + "a moment holds and this file's account of them is wrong");
 
-        // AND WHAT THE CONTROL CAN SAY IS THAT NOTHING IS RECOVERED, NOT THAT NOTHING IS
-        // FOUND. An uncorrected ratio lets one pair through on luck; a thing is four codes,
+        // And what the control can say is that nothing is recovered, not that nothing is
+        // found. An uncorrected ratio lets one pair through on luck; a thing is four codes,
         // so a group that reaches four is the world and a group of two is the tail.
         Assert.DoesNotContain(On(chance, 25), one => one.Count >= 4);
 
@@ -543,8 +543,8 @@ public sealed class ReturningTests(ITestOutputHelper output)
             + "beyond a derivation over what arrived, and the route back is a gate reading "
             + "what a proposal predicts");
 
-        // AND THE APPEARANCES ARE STILL RECOVERED, WHICH IS WHAT SAYS THE TIME CLAUSE IS AN
-        // ADDITION RATHER THAN A REPLACEMENT. Twins wear one look, so the look groups are the
+        // And the appearances are still recovered, which is what says the time clause is an
+        // addition rather than a replacement. Twins wear one look, so the look groups are the
         // same twelve of four the space derivation finds -- an arm that separated the twins
         // and lost the appearances would have traded one recovery for another.
         var looks = On(found, 23);
@@ -557,12 +557,12 @@ public sealed class ReturningTests(ITestOutputHelper output)
 
         Assert.DoesNotContain(found, one => one.Select(code => code.Modality).Distinct().Count() > 1);
 
-        // AND WHAT IT IS WORTH, WHICH IS A SECOND QUESTION AND NOT A COROLLARY. Separating
+        // And what it is worth, which is a second question and not a corollary. Separating
         // the twins in a derivation is one thing; a population getting smaller because of it
         // is another, and the two have come apart here before -- the fold recovered the
         // appearances exactly and moved the rule count by nothing until the judge arrived.
         //
-        // THE SPACE CATEGORIES ARE THE CONTROL AND NOT THE PLAIN CELL. Both arms fold a
+        // The space categories are the control and not the plain cell. Both arms fold a
         // vocabulary in and both let subsumption read it, so the ONLY difference between
         // them is whether the landmark groups are per thing or per pair. A plain cell alone
         // would be measuring the categories and the twins at once.
@@ -571,7 +571,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
 
         foreach (var seed in Enumerable.Range(1, Seeds))
         {
-            // DERIVED FROM ITS OWN SEED'S STREAM, both ways. A vocabulary derived once and
+            // Derived from its own seed's stream, both ways. A vocabulary derived once and
             // reused would make the later seeds a test of how well the first one's
             // categories travel, which is an easier question than the one being asked.
             var watched = seed == 1 ? stream : Watched(running, seed);
@@ -579,7 +579,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
             var bySpace = Alternating.From(watched, company: 0.5, floor: 20);
             var byTime = Alternating.Over(watched, Adhesion, floor: 20, span: 1);
 
-            // THE DERIVATION CHECKED AT EVERY SEED AND NOT ONLY THE FIRST, because the two
+            // The derivation checked at every seed and not only the first, because the two
             // vocabularies below are the arm and a seed where they came back the same shape
             // would be a cell comparing one thing with itself.
             Assert.True(
@@ -625,8 +625,8 @@ public sealed class ReturningTests(ITestOutputHelper output)
                 + "what moved the rule count was what the population CLAIMS rather than how "
                 + "much of it there is");
 
-        // AND THE FINDING, WHICH IS THE ONE THIS ARM EXISTS FOR: A CATEGORY THAT REACHES THE
-        // INDIVIDUAL COMPRESSES WHERE ONE THAT REACHES THE PAIR CANNOT. A per-pair landmark
+        // And the finding, which is the one this arm exists for: a category that reaches the
+        // individual compresses where one that reaches the pair cannot. A per-pair landmark
         // group says *one of these two things* and still needs the look to say which, so the
         // conjunction survives; a per-thing group says the thing, and the rule collapses onto
         // it. That is what minting an individual is worth, derived rather than handed.
@@ -636,8 +636,8 @@ public sealed class ReturningTests(ITestOutputHelper output)
             + "is better and the machine is not, which is the gap this assertion exists to "
             + "catch");
 
-        // AND IT GOES PAST THE CEILING THE GRID ABOVE CALLED ONE, WHICH IS THE CLAIM MOST
-        // WORTH REFUTING HERE. A handed index is one contentless code standing for the thing
+        // And it goes past the ceiling the grid above called one, which is the claim most
+        // worth refuting here. A handed index is one contentless code standing for the thing
         // and it still needs conjoining with what the thing looks like; a derived category
         // over a thing's own landmarks is the same code AND it absorbs the look rules that
         // named its members. If this ever flips, the individual this recovers is worth less
@@ -654,19 +654,19 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A LANDMARK FIXED FOR THE LIFE OF THE WORLD IS PINNED BY A CONJUNCTION, WHICH IS
-    /// RUNG ONE AND ALREADY BUILT.</b> So <i>adhesion recovers the individual</i> is a claim
+    /// <b>A landmark fixed for the life of the world is pinned by a conjunction, which is
+    /// rung one and already built.</b> So <i>adhesion recovers the individual</i> is a claim
     /// with an obvious cheaper explanation sitting under it: a thing's landmark codes adhere
     /// because the thing has one landmark forever, and what is being recovered is the place.
     /// Nothing in the reading above separates those two.
     /// </para>
     /// <para>
-    /// <b>SO THE THINGS MOVE AND EVERYTHING ELSE IS HELD.</b> Same looks, same twins, same
+    /// <b>So the things move and everything else is held.</b> Same looks, same twins, same
     /// runs, same alphabet — a thing occasionally stands somewhere else, which is exactly
     /// the fact that makes a place stop being a name for it.
     /// </para>
     /// <para>
-    /// <b>WHAT WOULD REFUTE THE IDENTITY READING, SAID BEFORE THIS RUNS: if the landmark
+    /// <b>What would refute the identity reading, said before this runs: if the landmark
     /// groups survive drift, adhesion is following the thing through its move and the
     /// individual is real; if they collapse or scatter, what was recovered was the place and
     /// the earlier reading is a conjunction wearing identity's clothes.</b> The score is the
@@ -718,18 +718,18 @@ public sealed class ReturningTests(ITestOutputHelper output)
             + $"{string.Join(",", control.Select(one => one.Count).Distinct().Order())}, so "
             + "adding a place that can move changed the world where it was set not to move");
 
-        // AND THE FINDING, WHICH REFUTES THE READING THE ARM ABOVE INVITES. The groups
+        // And the finding, which refutes the reading the arm above invites. The groups
         // SURVIVE drift at eight of four -- and they have to, because eight places hold four
         // codes each whoever is standing in them. What the group count cannot say, the score
         // does: the category stops predicting the moment its members stop belonging to one
         // thing, and at the higher drift it is worse than holding no category at all.
         //
-        // SO WHAT ADHESION RECOVERS IS A PERSISTENT SOURCE OF CODES AND NEVER AN INDIVIDUAL.
+        // So what adhesion recovers is a persistent source of codes and never an individual.
         // Where a thing never moves the two are the same set and the reading above is what a
         // thing is worth; where it moves they come apart, and the place is what was found.
         // That is this world's own doc arriving on time: a fixed landmark is pinned by a
         // conjunction, which is rung one and was built long ago.
-        // AND THE FIXED-PLACE ROW IS A CONTROL ON THE POPULATION RATHER THAN ON THE SCORE,
+        // And the fixed-place row is a control on the population rather than on the score,
         // because that cell answers everything with or without a category. Reading it as a
         // lift is the mistake this line exists to have already made: the two are 1.000
         // against 1.000, and what the category buys there is 40 rules against 180.

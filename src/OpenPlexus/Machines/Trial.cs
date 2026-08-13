@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Worlds;
@@ -10,15 +10,15 @@ namespace OpenPlexus.Machines;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE ONLY NUMBER ON A PERCEPTUAL WORLD THAT SEPARATES LEARNING FROM
-/// MEMORISING.</b> Where a world's true rule set can be enumerated, soundness answers
+/// <b>The only number on a perceptual world that separates learning from
+/// memorising.</b> Where a world's true rule set can be enumerated, soundness answers
 /// that question exactly and this is redundant. Where it cannot — which is every world
 /// made of photographs, forever — a trailing accuracy over a bag drawn with
 /// replacement is indistinguishable from a lookup table, and this is the whole of the
 /// difference.
 /// </para>
 /// <para>
-/// <b>AND THE SILENCE IS REPORTED BESIDE THE SCORE RATHER THAN FOLDED INTO IT.</b> A
+/// <b>And the silence is reported beside the score rather than folded into it.</b> A
 /// population that fires on nothing it has not seen scores an excellent
 /// <see cref="Accuracy"/> over the handful it does answer, which is a fallback arm
 /// nobody meant to run. Both halves or neither.
@@ -39,15 +39,14 @@ public sealed record Examined
     /// How many DISTINCT commitments were the best advocate for an answer given here.
     /// </summary>
     /// <remarks>
-    /// <b>FORK 46, AND IT IS THE ONE READING THAT COULD MAKE FOUR SESSIONS OF ARMS MAKE
-    /// SENSE.</b> Every gate, weighing and subsumption rule tried so far changes the
+    /// <b>The one reading that could make four sessions of arms make sense.</b> Every gate, weighing and subsumption rule tried so far changes the
     /// POPULATION, and the answer is its best advocate and no more. Small against <see cref="Answered"/> means a
     /// handful of rules are deciding the world and the rest are furniture — which would
     /// say the remaining gap is about which rule WINS rather than about which are held.
     /// </remarks>
     /// <remarks>
-    /// <b>AND IT COULD ONLY EVER BE READ ON A WORLD THAT WITHHOLDS, WHICH WAS A LIMIT ON
-    /// THE FINDING AND NOT A DETAIL.</b> A generated world held nothing back, so this was
+    /// <b>And it could only ever be read on a world that withholds, which was a limit on
+    /// the finding and not a detail.</b> A generated world held nothing back, so this was
     /// unmeasurable on the multiplexer — the one world where depth is genuinely needed,
     /// and therefore the one where a handful of deciders would mean something different.
     /// <b>Fork 48 closed that: <see cref="Worlds.MultiplexerSettings.Withheld"/> keeps
@@ -86,7 +85,7 @@ public sealed record Tally
 
     /// <summary>Rounds the world could not say the outcome of.</summary>
     /// <remarks>
-    /// <b>REPORTED BECAUSE A VERDICT NOBODY COUNTS IS A VERDICT NOBODY KNOWS FIRED.</b>
+    /// <b>Reported because a verdict nobody counts is a verdict nobody knows fired.</b>
     /// `Abstain` was unreachable for the life of the branch and read exactly like a
     /// mechanism that was working and never needed — which is this repo's oldest trap, a
     /// check that is wired and unable to fire. Beside <see cref="Silent"/> it separates the
@@ -101,7 +100,7 @@ public sealed record Tally
     /// How much of the winner's weight its lead over the runner-up accounted for.
     /// </summary>
     /// <remarks>
-    /// <b>ARMED HERE FOR THE FIRST TIME, AND THE PLAN SAID IT ALREADY WAS.</b> The
+    /// <b>Armed here for the first time, and the plan said it already was.</b> The
     /// margin has been computed every round for the life of the branch and read by
     /// nothing — see <see cref="Commitments.Cycle.Confidence"/>. Near nought it says the
     /// answer is being settled by how many advocates each side had rather than by how
@@ -118,7 +117,7 @@ public sealed record Tally
 
     /// <summary>Narrower commitments a general one took the place of.</summary>
     /// <remarks>
-    /// <b>BESIDE <see cref="Repaired"/> BECAUSE THEY ARE THE TWO DIRECTIONS.</b> Repair
+    /// <b>BESIDE <see cref="Repaired"/> because they are the two directions.</b> Repair
     /// is the only thing here that makes a scope longer and subsumption is the only one
     /// that prefers it shorter, so a population's drift toward one rule per instance is
     /// the difference between these two numbers and was visible in neither.
@@ -146,22 +145,22 @@ public sealed record Tally
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE OBJECT THE PLAN PREDICTED WOULD BLOW UP, COUNTED RATHER THAN FEARED.</b>
+    /// <b>The object the plan predicted would blow up, counted rather than feared.</b>
     /// <i>The table is what blows up, not the commitments</i> — commitments times distinct
     /// codes, both large under population coding. A CIFAR run was memory-bound and every
     /// instrument on it watched time, so what actually ended the run was invisible to all
     /// of them.
     /// </para>
     /// <para>
-    /// <b>ENTRIES AND NOT BYTES, BECAUSE A COUNT IS EXACT AND REPRODUCIBLE AND A BYTE
-    /// FIGURE IS NEITHER.</b> Asking the runtime for its heap gives a number that moves
+    /// <b>Entries and not bytes, because a count is exact and reproducible and a byte
+    /// figure is neither.</b> Asking the runtime for its heap gives a number that moves
     /// with collection timing and with everything else in the process — so it could not be
     /// barred, and a fixed seed would not reproduce it. Each entry is two longs behind a
     /// dictionary slot; multiply if a byte figure is wanted, and the multiplier is a fact
     /// about the runtime rather than about the run.
     /// </para>
     /// <para>
-    /// <b>AND IT IS THE HALF OF THE COST THAT CAN BE BARRED.</b> <see cref="Spent"/> is a
+    /// <b>And it is the half of the cost that can be barred.</b> <see cref="Spent"/> is a
     /// wall clock and must never be asserted on; this cannot drift with the machine, so a
     /// budget on it would hold.
     /// </para>
@@ -176,8 +175,8 @@ public sealed record Tally
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>REPORTED RATHER THAN ACTED ON, WHICH IS <see cref="Confidence"/>'S POSITION AND
-    /// FOR A BETTER REASON.</b> Weighing a subsumption against this instead of against
+    /// <b>Reported rather than acted on, which is <see cref="Confidence"/>'S position and
+    /// for a better reason.</b> Weighing a subsumption against this instead of against
     /// firings was measured and refuted — see the plan's revival row — so nothing decides
     /// on it. What it answers is whether a population's evidence is WIDE or merely LONG,
     /// and no other number here can: a run that has settled a million times over four
@@ -185,7 +184,7 @@ public sealed record Tally
     /// same everything else.
     /// </para>
     /// <para>
-    /// <b>AND THE FIRST THING IT SAID WAS THAT THE OBVIOUS STORY WAS WRONG.</b> The
+    /// <b>And the first thing it said was that the obvious story was wrong.</b> The
     /// children that cost <see cref="Worlds.Arranged"/> a quarter of its score stand on
     /// many distinct scenes, not on one drawn repeatedly — so they are true of what was
     /// shown and false of what was not, which is a fault no statistic over drawn data can
@@ -202,8 +201,8 @@ public sealed record Tally
 
     /// <inheritdoc cref="Commitments.Recurrence.Eligible"/>
     /// <remarks>
-    /// <b>THE DENOMINATOR <see cref="Named"/> HAS NEVER BEEN READ AGAINST, WHICH IS THIS
-    /// REPO'S OWN TRAP ABOUT A COUNT THAT PARTITIONS WHAT REACHED A MECHANISM.</b> Every
+    /// <b>THE DENOMINATOR <see cref="Named"/> has never been read against, which is this
+    /// repo's own trap about a count that partitions what reached a mechanism.</b> Every
     /// naming reading here has been an absolute count, so a cell minting more names and a
     /// cell offered more scopes to name are one number — and the repair budget moves the
     /// second directly. What separates them is names per eligible scope.
@@ -215,7 +214,7 @@ public sealed record Tally
     /// the reason <see cref="Stacked"/> is not simply a smaller <see cref="Named"/>.</b>
     /// </summary>
     /// <remarks>
-    /// <b>NAMING A PAIR THAT IS THE WHOLE SCOPE REMOVES THAT COMMITMENT FROM
+    /// <b>Naming a pair that is the whole scope removes that commitment from
     /// <see cref="Eligible"/> FOREVER.</b> The rewrite replaces both members with one name,
     /// so a two-code scope becomes a one-code scope and stops contributing a pair — rung
     /// five consuming its own trigger. Only a scope of three or more leaves something
@@ -226,8 +225,8 @@ public sealed record Tally
 
     /// <inheritdoc cref="Commitments.Population.Asked"/>
     /// <remarks>
-    /// <b>AND IT IS THE SWEEP CALENDAR RATHER THAN THE SEARCH, WHICH IS WHY THE SIX BELOW
-    /// COMPARE ACROSS DIALS AT ALL.</b> Rung five is asked once a sweep round whatever the
+    /// <b>And it is the sweep calendar rather than the search, which is why the six below
+    /// compare across dials at all.</b> Rung five is asked once a sweep round whatever the
     /// population is doing, so two cells run over the same rounds are asked the same number
     /// of times — and a difference in what came back is then about the counts and not about
     /// how often anybody looked.
@@ -286,7 +285,7 @@ public sealed record Tally
     /// The share of repairable rounds the current language could not separate.
     /// </summary>
     /// <remarks>
-    /// <b>THE LADDER'S TRIGGER, AS A NUMBER RATHER THAN AN ARGUMENT.</b> The plan says a
+    /// <b>The ladder's trigger, as a number rather than an argument.</b> The plan says a
     /// rung is admitted when and only when no expression in the current language separates
     /// the failures from the hits, and that choosing one before a failure asks is
     /// hand-specified bias by a side door. This is what asking looks like: near nought the
@@ -307,7 +306,7 @@ public sealed record Tally
     /// everything.
     /// </summary>
     /// <remarks>
-    /// <b>NOTHING RATHER THAN ZERO WHERE A WORLD WITHHOLDS NOTHING.</b> A generated
+    /// <b>Nothing rather than zero where a world withholds nothing.</b> A generated
     /// world cannot contain its own answer and has nothing to hold back, so a zero here
     /// would read as a learner that generalises to nothing at all — which is a check
     /// that cannot fire reading as a failure instead of as absent.
@@ -332,21 +331,21 @@ public sealed record Tally
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>EVERY FAILURE IN THIS REPO HAS BEEN ONE INCREMENT OF ONE NUMBER, AND FOUR SESSIONS
-/// OF ARMS WERE AIMED WITHOUT IT.</b> Gates, weighing rules and subsumption bars all
+/// <b>Every failure in this repo has been one increment of one number, and four sessions
+/// of arms were aimed without it.</b> Gates, weighing rules and subsumption bars all
 /// attack the case where the right rule is HELD and loses. Nothing measured whether that
 /// is where the failures are, so every one of those arms may have been aimed at a bucket
 /// with almost nothing in it — which would explain a table of level results better than
 /// any of the mechanisms did.
 /// </para>
 /// <para>
-/// <b>THE PARTITION IS EXACT RATHER THAN HEURISTIC, AND ONLY A WORLD WITH ENUMERABLE
-/// TRUTH CAN GIVE IT.</b> A sound commitment that fires is right by definition, so on a
+/// <b>The partition is exact rather than heuristic, and only a world with enumerable
+/// truth can give it.</b> A sound commitment that fires is right by definition, so on a
 /// world that never lies a wrong answer means an UNSOUND rule won. What separates the two
 /// diagnoses is whether a sound advocate for the right answer was in the room at all.
 /// </para>
 /// <para>
-/// <b>AND THE SPLIT DECIDES WHERE WORK GOES.</b> <see cref="Outvoted"/> is a readout
+/// <b>And the split decides where work goes.</b> <see cref="Outvoted"/> is a readout
 /// failure and the vote or subsumption owns it; <see cref="Uncovered"/> is a coverage
 /// failure and genesis or repair owns it. They have opposite fixes, and a rule that helps
 /// one can cost the other.
@@ -356,7 +355,7 @@ public sealed record Census
 {
     /// <summary>Wrong rounds where a SOUND advocate for the right answer fired and lost.</summary>
     /// <remarks>
-    /// <b>THE RULE WAS PRESENT, CORRECT, AND MATCHED THE MOMENT.</b> Nothing was missing
+    /// <b>The rule was present, correct, and matched the moment.</b> Nothing was missing
     /// and nothing needed minting — the population knew and did not say so, which is the
     /// failure every arm tried so far was built for.
     /// </remarks>
@@ -364,7 +363,7 @@ public sealed record Census
 
     /// <summary>Wrong rounds where nothing sound advocating the right answer fired at all.</summary>
     /// <remarks>
-    /// <b>NO VOTE RULE CAN REACH THESE, WHICH IS WHY THEY ARE COUNTED APART.</b> A merge
+    /// <b>No vote rule can reach these, which is why they are counted apart.</b> A merge
     /// cannot promote an advocate that was never in the room, so a change to how weights
     /// combine is inert on every round in this bucket however good it is.
     /// </remarks>
@@ -374,7 +373,7 @@ public sealed record Census
     /// Of the <see cref="Outvoted"/>, how many were lost to a winner with a LONGER scope.
     /// </summary>
     /// <remarks>
-    /// <b>THE OVER-SPECIALISATION HYPOTHESIS AS A NUMBER RATHER THAN A STORY.</b> The plan
+    /// <b>The over-specialisation hypothesis as a number rather than a story.</b> The plan
     /// says the vote prefers the narrower rule every round while subsumption prefers the
     /// general one every thousandth, so a child displaces its parent as decider and then
     /// answers what it has never seen. If that is what is happening this is most of
@@ -389,20 +388,20 @@ public sealed record Census
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE PARTITION THAT SAYS WHICH HALF OF GENERATE-AND-TEST IS SHORT.</b> Two thirds to
+    /// <b>The partition that says which half of generate-and-test is short.</b> Two thirds to
     /// all of every wrong answer is a round no sound rule advocated, and this doc's own trap
     /// says a rule about who WINS cannot reach those. What it does not say is whether they
     /// are reachable at all — and that is decidable rather than arguable.
     /// </para>
     /// <para>
-    /// <b>REPAIR ADDS A CONDITION AND NEVER CHANGES WHAT A COMMITMENT EXPECTS, AND A CHILD
-    /// FIRES ONLY WHERE ITS PARENT DOES.</b> So a round where nothing expecting the right
+    /// <b>Repair adds a condition and never changes what a commitment expects, and a child
+    /// fires only where its parent does.</b> So a round where nothing expecting the right
     /// answer fired cannot be covered by narrowing anything resident, this round or ever.
     /// Covering it needs a new claim about a new outcome — which is GENESIS, and genesis
     /// saturates its one-code space in the opening hundred rounds and never mints again.
     /// </para>
     /// <para>
-    /// <b>SO A HIGH SHARE HERE IS A CEILING AND A LOW ONE IS A SEARCH PROBLEM</b>, and every
+    /// <b>So a high share here is a ceiling and a low one is a search problem</b>, and every
     /// gate, budget and timing arm ever measured on this bench is aimed at the second. That
     /// is worth knowing before another one is built.
     /// </para>
@@ -415,8 +414,8 @@ public sealed record Census
     /// barred from touching.</b>
     /// </summary>
     /// <remarks>
-    /// <b>A COMMITMENT THAT FIRES EXPECTING WHAT ARRIVED IS RIGHT ON THAT ROUND AND TAKES A
-    /// HIT FOR IT.</b> Its misses come from other rounds entirely, and
+    /// <b>A commitment that fires expecting what arrived is right on that round and takes a
+    /// hit for it.</b> Its misses come from other rounds entirely, and
     /// <see cref="Commitments.Population.Mend"/> refuses anything under
     /// <see cref="Commitments.CommittingSettings.Floor"/> of them. So the rule that most
     /// needs narrowing is never the culprit where it is needed, and may never accrue the
@@ -436,7 +435,7 @@ public sealed record Census
     /// a hard round, against the thousands that were made.</b>
     /// </summary>
     /// <remarks>
-    /// <b>FORK 73, AND IT IS THE ONE JOIN NOTHING HERE HAD.</b> Every budget arm counts
+    /// <b>Fork 73, and it is the one join nothing here had.</b> Every budget arm counts
     /// repairs and every coverage column counts rounds, so a child that buys hard rounds and
     /// a child that buys none are the same line in every grid this bench prints. Covering
     /// mints one code and nothing longer, so a scope past one came from repair — and this is
@@ -449,7 +448,7 @@ public sealed record Census
     /// shallow narrowing or from deep chains.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THE CHEAPEST DISCRIMINATOR FORK 73 HAS, AND IT NEEDS NOTHING NEW.</b> Repair adds
+    /// <b>The cheapest discriminator fork 73 has, and it needs nothing new.</b> Repair adds
     /// one code at a time, so a scope of four took three separations and a scope of two took
     /// one. If the rules that buy hard rounds are the deep ones, the four in five repairs
     /// that never pay are the price of reaching them and the budget is buying depth. If they
@@ -460,14 +459,14 @@ public sealed record Census
     /// <summary>Wrong rounds decided by a commitment that had not yet been tested.</summary>
     /// <remarks>
     /// <para>
-    /// <b>WHETHER THE PROVISIONAL WEIGHT IS ACTUALLY STEALING DECISIONS, rather than
+    /// <b>Whether the provisional weight is actually stealing decisions, rather than
     /// merely being able to.</b> A commitment below the floor carries an accuracy averaged
     /// over a handful of firings, so one that has been right once weighs a perfect one and
     /// takes the maximum outright. That it CAN outvote an established rule is
     /// arithmetic; that it DOES is a measurement, and nothing had taken it.
     /// </para>
     /// <para>
-    /// <b>AND IT SEPARATES A FIX FROM ITS EXPLANATION.</b> Refusing the young a vote may
+    /// <b>And it separates a fix from its explanation.</b> Refusing the young a vote may
     /// improve a run for reasons that have nothing to do with this — fewer voters is a
     /// different population, and a different population scores differently. If this number
     /// is small, then the gate helping is not the gate helping for the stated reason, and
@@ -479,13 +478,13 @@ public sealed record Census
     /// <summary>Rounds whose outcome was NOT the commonest one the world has produced.</summary>
     /// <remarks>
     /// <para>
-    /// <b>THE ONLY ROUNDS THAT CAN DISTINGUISH KNOWING FROM GUESSING.</b> A machine
+    /// <b>The only rounds that can distinguish knowing from guessing.</b> A machine
     /// holding nothing answers the commonest outcome and is right on every other round,
     /// so a score over all rounds pays it for the base rate. On a world drawn four to one
     /// that is eighty percent for free.
     /// </para>
     /// <para>
-    /// <b>THE COMMONEST IS TAKEN FROM WHAT HAS ARRIVED RATHER THAN DECLARED</b>, because
+    /// <b>The commonest is taken from what has arrived rather than declared</b>, because
     /// a world does not tell anyone its base rate and a harness that knew it would be
     /// scoring against a fact the learner cannot see.
     /// </para>
@@ -495,13 +494,13 @@ public sealed record Census
     /// <summary>The outcome the world produced most often, as the run last saw it.</summary>
     /// <remarks>
     /// <para>
-    /// <b>THE ONE THING NEEDED TO ASK WHETHER A TRUE RULE COULD EVER PAY, and it was
+    /// <b>The one thing needed to ask whether a true rule could ever pay, and it was
     /// computed every round and thrown away.</b> <see cref="Hard"/> counts rounds this is not
     /// the answer to; nothing anywhere says WHICH outcome it is, so no reading can separate
     /// the world's rules that expect it from the ones that do not.
     /// </para>
     /// <para>
-    /// <b>WHICH IS THE DIFFERENCE BETWEEN A RULE THAT CANNOT PAY AND ONE THAT DID NOT.</b> A
+    /// <b>Which is the difference between a rule that cannot pay and one that did not.</b> A
     /// true rule expecting the commonest outcome fires only where guessing already works,
     /// however accurate it is — so counting the world's rules a run has found says nothing
     /// about coverage until the count is split this way. Two levers have now moved
@@ -509,7 +508,7 @@ public sealed record Census
     /// the rules arriving were the useless kind.
     /// </para>
     /// <para>
-    /// <b>TAKEN FROM WHAT ARRIVED RATHER THAN DECLARED, exactly as <see cref="Hard"/> is.</b>
+    /// <b>Taken from what arrived rather than declared, exactly as <see cref="Hard"/> is.</b>
     /// A world does not tell anyone its base rate, and a harness reading one off the world
     /// would be scoring against a fact the learner cannot see.
     /// </para>
@@ -518,7 +517,7 @@ public sealed record Census
 
     /// <summary>Of those, how many had a SOUND rule fire and advocate the right answer.</summary>
     /// <remarks>
-    /// <b>THE INSTRUMENT `Found` SHOULD HAVE BEEN ALL ALONG.</b> A world admits several
+    /// <b>THE INSTRUMENT `Found` should have been all along.</b> A world admits several
     /// correct rule sets and this repo has a trap saying so — scoring against one answer
     /// key marks the basis rather than the learner, and a run holding a dozen perfectly
     /// accurate true rules can read as having learnt nothing. What cannot be gamed is
@@ -544,13 +543,13 @@ public sealed record Census
 /// <typeparam name="TSeen">Whatever the world natively produces.</typeparam>
 /// <remarks>
 /// <para>
-/// <b>THE SEAM IS ONE CALL WIDE IN EACH DIRECTION.</b> A world says what happened in
+/// <b>The seam is one call wide in each direction.</b> A world says what happened in
 /// its own terms; a quantiser turns that into codes; the brain learns from codes. No
 /// world knows a brain exists, and the brain knows nothing about where its codes came
 /// from — which is what lets the SAME brain, configured once, run every world.
 /// </para>
 /// <para>
-/// <b>THE TRANSLATION IS CHOSEN HERE, WHICH IS NEITHER SIDE'S BUSINESS TO DECIDE.</b>
+/// <b>The translation is chosen here, which is neither side's business to decide.</b>
 /// Whether a reading is banded or winnowed is a fact about the pipe. Putting that
 /// choice inside a world is how a world starts deciding what the brain perceives, and
 /// putting it inside the brain is how the brain starts knowing about worlds.
@@ -572,14 +571,14 @@ public sealed class Trial<TSeen>
     /// </param>
     /// <remarks>
     /// <para>
-    /// <b>A DELEGATE RATHER THAN A WORLD, BECAUSE A TRIAL MAY NOT KNOW WHICH WORLD IT IS
-    /// RUNNING.</b> Naming <c>Multiplexer</c> here would put one world's vocabulary in
+    /// <b>A delegate rather than a world, because a trial may not know which world it is
+    /// running.</b> Naming <c>Multiplexer</c> here would put one world's vocabulary in
     /// front of every other one and would fail <c>SeparationTests</c> from the other
     /// direction — a question only some worlds can answer arrives as a function some
     /// callers pass.
     /// </para>
     /// <para>
-    /// <b>AND IT IS OFF UNLESS ASKED FOR, BECAUSE IT COSTS A SECOND MATCH EVERY ROUND.</b>
+    /// <b>And it is off unless asked for, because it costs a second match every round.</b>
     /// Matching is nine tenths of the clock on a narrow world, so a census left on by
     /// default would roughly double every run this repo has ever timed — and it says
     /// nothing on a world whose truth cannot be enumerated anyway.
@@ -611,15 +610,15 @@ public sealed class Trial<TSeen>
     /// <param name="seen">What the world showed.</param>
     /// <remarks>
     /// <para>
-    /// <b>WHERE THE MOMENT IS FORMED AND NOT WHERE IT IS MATCHED, WHICH IS A DECISION ABOUT
-    /// THE WIRE.</b> A fleet broadcasts a moment as a set of codes, and a precedence IS one
+    /// <b>Where the moment is formed and not where it is matched, which is a decision about
+    /// the wire.</b> A fleet broadcasts a moment as a set of codes, and a precedence IS one
     /// — so deriving it here means it travels with everything else and no holder needs the
     /// order report beside the moment it already has. Doing it in
     /// <see cref="Population.Moment"/> would have put the front end's order on the wire.
     /// </para>
     /// <para>
-    /// <b>AND IT IS THE MACHINE THAT DERIVES IT RATHER THAN THE FRONT END, WHICH IS THE
-    /// SEAM THAT MATTERS.</b> <see cref="IQuantizer{TObservation}.Order"/> reports word
+    /// <b>And it is the machine that derives it rather than the front end, which is the
+    /// seam that matters.</b> <see cref="IQuantizer{TObservation}.Order"/> reports word
     /// order, which is a fact about the signal; turning it into <i>these two stood this way
     /// round</i> is a derivation, and a front end doing it would be deciding which relations
     /// exist. There is no dial: a front end reporting no order gets exactly the codes it
@@ -655,7 +654,7 @@ public sealed class Trial<TSeen>
         var running = RunAsync(
             new Alone(_brain.Held), [_brain.Held], rounds, sweep, target, window);
 
-        // A COUNCIL THAT WOULD HAVE MADE THIS WAIT IS REFUSED RATHER THAN WAITED FOR, and
+        // A council that would have made this wait is refused rather than waited for, and
         // that is what keeps sync-over-async to one line that cannot fire. `Alone`
         // completes every task before returning it, so this is a completed task being
         // unwrapped; a fleet reaches `RunAsync` directly and never comes through here. If
@@ -681,8 +680,8 @@ public sealed class Trial<TSeen>
     /// <param name="ct">Cancellation.</param>
     /// <remarks>
     /// <para>
-    /// <b>THE WORLD STILL PULLS AND THE ROUNDS STILL COME FROM THIS LOOP, WHICH IS THE
-    /// HARNESS'S SHAPE AND WAS NEVER FORK 53'S.</b> <see cref="IWorld{TSeen}.Next"/> is
+    /// <b>The world still pulls and the rounds still come from this loop, which is the
+    /// harness's shape and was never fork 53'S.</b> <see cref="IWorld{TSeen}.Next"/> is
     /// asked for the next observation the moment the last one is settled, so a fleet's round
     /// is as long as its slowest holder and never longer. What a learner whose rounds
     /// arrived on the world's schedule would do differently is a different harness, and this
@@ -690,7 +689,7 @@ public sealed class Trial<TSeen>
     /// two frames a second is that other harness, and the north star will want it.
     /// </para>
     /// <para>
-    /// <b>THE POPULATIONS ARE HANDED IN RATHER THAN READ OFF THE COUNCIL, AND C1 IS
+    /// <b>The populations are handed in rather than read off the council, and C1 IS
     /// WHY.</b> An asker cannot report what a fleet holds because it may not know:
     /// residents, tables and names are facts about machines it is only allowed to ask
     /// questions of. Whoever composed the fleet holds those references, which is the
@@ -698,7 +697,7 @@ public sealed class Trial<TSeen>
     /// always been read from.
     /// </para>
     /// <para>
-    /// <b>AND EVERY POPULATION FIGURE IS AN AGGREGATE, WHICH FOR ONE MACHINE IS ITSELF.</b>
+    /// <b>And every population figure is an aggregate, which for one machine is itself.</b>
     /// Residents, tables and exhausted rules add up; occasions is the mean over every
     /// resident anywhere; names are counted DISTINCT across holders, because two machines
     /// minting the same name is the mechanism working and counting it twice would read as
@@ -726,19 +725,19 @@ public sealed class Trial<TSeen>
         var carriers = new HashSet<Code>();
         var narrowed = new Dictionary<Code, int>();
 
-        // WHAT THE WORLD PRODUCES MOST, LEARNT AS IT GOES. Taking the base rate from the
+        // What the world produces most, learnt as it goes. Taking the base rate from the
         // world would score the machine against a number it is not allowed to see, and
         // declaring it up front would make every skewed world need a hand-written
         // constant. Two outcomes is the common case and this is a walk over a table with
         // two entries in it.
         var arrivals = new Dictionary<Code, long>();
 
-        // NOTHING UNTIL A ROUND HAS BEEN JUDGED, which is why it is nullable rather than a
+        // Nothing until a round has been judged, which is why it is nullable rather than a
         // default code. A run whose census saw no settled round has no commonest outcome, and
         // a zero code there would be a claim about the world rather than an absence.
         Code? seenMost = null;
 
-        // ONE POPULATION OR NONE, BECAUSE THE CENSUS ASKS WHAT A MACHINE HELD. On a fleet
+        // One population or none, because the census asks what a machine held. On a fleet
         // no single population is the one that voted, and reaching into all of them to
         // find out would be the experimenter answering a question C1 says a machine may
         // not ask. Left null, every count below stays nought and the report says so.
@@ -751,7 +750,7 @@ public sealed class Trial<TSeen>
             var said = Sensed(turn.Seen);
             codes += said.Count;
 
-            // TAKEN BEFORE THE STEP, BECAUSE THE STEP TEACHES. `Settle`, `Cover` and
+            // Taken before the step, because the step teaches. `Settle`, `Cover` and
             // `Mend` all move the population, so the same three read-only calls after it
             // would be asking a different machine what it thought a moment ago. These are
             // the same calls `Examine` is built out of and they change nothing.
@@ -761,8 +760,8 @@ public sealed class Trial<TSeen>
                 var firing = censusing.Firing(censusing.Moment(new HashSet<Code>(said)));
                 var vote = censusing.Predict(firing);
 
-                // WHETHER A TRUE RULE WAS THERE, ASKED ON EVERY ROUND AND NOT ONLY ON THE
-                // WRONG ONES. The wrong rounds say what went astray; this says whether
+                // Whether a true rule was there, asked on every round and not only on the
+                // wrong ones. The wrong rounds say what went astray; this says whether
                 // anything the machine holds is EARNING its keep where the base rate
                 // cannot -- and a rule can be perfectly true, perfectly accurate and
                 // still never fire on a round that guessing would have missed.
@@ -773,7 +772,7 @@ public sealed class Trial<TSeen>
                     : arrivals.OrderByDescending(one => one.Value).ThenBy(one => one.Key)
                         .First().Key;
 
-                // KEPT AS THE RUN'S LAST WORD ON IT rather than recomputed at the end, so
+                // Kept as the run's last word on it rather than recomputed at the end, so
                 // the answer reported is exactly the one the last round was judged against.
                 seenMost = commonest;
 
@@ -781,7 +780,7 @@ public sealed class Trial<TSeen>
                 {
                     hard++;
 
-                    // AND WHICH COMMITMENTS DID IT, NOT ONLY WHETHER ANY DID. Every budget
+                    // And which commitments did it, not only whether any did. Every budget
                     // arm counts repairs and every coverage column counts rounds, and nothing
                     // in this repo joins the two -- so a rule that buys hard rounds and a rule
                     // that buys none are the same line in every grid. Fork 73.
@@ -798,7 +797,7 @@ public sealed class Trial<TSeen>
                         {
                             carriers.Add(one.Identity);
 
-                            // A SCOPE LONGER THAN ONE CODE CAME FROM REPAIR, because covering
+                            // A scope longer than one code came from repair, because covering
                             // mints one code and nothing longer. So this is the count of
                             // repairs that ever bought a hard round, against the thousands
                             // that were made.
@@ -809,14 +808,14 @@ public sealed class Trial<TSeen>
 
                 if (!firing.IsDefaultOrEmpty && vote.Expects != arrived)
                 {
-                    // WHO ACTUALLY DECIDED IT, AND WHETHER THEY HAD EARNED THE RIGHT.
+                    // Who actually decided it, and whether they had earned the right.
                     // `Vote.By` names the best advocate for the side that won, so this
                     // costs one lookup rather than a second pass.
                     if (firing.FirstOrDefault(one => one.Identity == vote.By) is { } winner
                         && winner.Seen < _brain.Dials.Floor)
                         untested++;
 
-                    // A SOUND COMMITMENT THAT FIRES IS RIGHT BY DEFINITION, so the only
+                    // A sound commitment that fires is right by definition, so the only
                     // question a wrong round raises is whether one of them was in the room
                     // and lost. Everything else is a round no vote rule could have saved.
                     var advocate = firing.FirstOrDefault(one =>
@@ -826,7 +825,7 @@ public sealed class Trial<TSeen>
                     {
                         uncovered++;
 
-                        // AND WHETHER ANYTHING COULD EVER HAVE COVERED IT, which is a
+                        // And whether anything could ever have covered it, which is a
                         // different question from whether anything did. Repair adds a
                         // CONDITION and never changes what a commitment expects, and a child
                         // fires only where its parent fires -- so if nothing expecting the
@@ -838,7 +837,7 @@ public sealed class Trial<TSeen>
 
                         if (present.Count == 0) unreachable++;
 
-                        // AND WHETHER REPAIR WAS EVER ALLOWED TO TOUCH WHAT WAS PRESENT.
+                        // And whether repair was ever allowed to touch what was present.
                         // A commitment that fires expecting what arrived is RIGHT this round
                         // and takes a hit for it, so its misses come from other rounds
                         // entirely -- and `Mend` refuses anything under `Floor` of them. Where
@@ -851,8 +850,8 @@ public sealed class Trial<TSeen>
                     {
                         outvoted++;
 
-                        // THE WINNER'S OWN SCOPE, FOUND BY THE IDENTITY THE VOTE ALREADY
-                        // REPORTS. `Vote.By` names the best advocate for the side that
+                        // The winner's own scope, found by the identity the vote already
+                        // reports. `Vote.By` names the best advocate for the side that
                         // won, so no second search is needed to ask whether a child beat
                         // a parent.
                         var won = firing.FirstOrDefault(one => one.Identity == vote.By);
@@ -863,7 +862,7 @@ public sealed class Trial<TSeen>
                 }
             }
 
-            // A ROUND THE WORLD COULD NOT SETTLE PASSES NOTHING RATHER THAN A NUMBER, and
+            // A round the world could not settle passes nothing rather than a number, and
             // that is the whole of what arms `Abstain`. Every world that always knows its
             // outcome reaches the same call it always did.
             await cycle.StepAsync(
@@ -951,8 +950,8 @@ public sealed class Trial<TSeen>
     /// <returns>What it said, or nothing where the world withholds nothing.</returns>
     /// <remarks>
     /// <para>
-    /// <b>EVERY CALL HERE IS READ-ONLY AND THAT IS LOAD-BEARING RATHER THAN
-    /// INCIDENTAL.</b> <see cref="Population.Moment"/> folds names without minting one,
+    /// <b>Every call here is read-only and that is load-bearing rather than
+    /// incidental.</b> <see cref="Population.Moment"/> folds names without minting one,
     /// <see cref="Population.Firing"/> gathers candidates without touching them, and
     /// <c>Population.Predict</c> reads accuracies it does not write.
     /// <c>Settle</c>, <c>Cover</c> and <c>Mend</c> are the three that teach and none of
@@ -961,7 +960,7 @@ public sealed class Trial<TSeen>
     /// less than no number.
     /// </para>
     /// <para>
-    /// <b>AND C4 IS UNTOUCHED, WHICH IS THE POINT THAT WAS BEING MISSED.</b> The
+    /// <b>AND C4 is untouched, which is the point that was being missed.</b> The
     /// constraint is that the MACHINE may not depend on an episode boundary. It does
     /// not: nothing here is fed back, the run does not pause, and the population cannot
     /// tell this happened. The person reading the number is outside the machine, and
@@ -973,8 +972,8 @@ public sealed class Trial<TSeen>
     /// <summary>The same examination, put to however many machines hold the population.</summary>
     /// <param name="holding">Whose commitments to ask.</param>
     /// <remarks>
-    /// <b>EACH FOLDS THE MOMENT THROUGH ITS OWN NAMES AND SPEAKS FOR ITSELF, AND THE MERGE
-    /// IS THE SAME ARITHMETIC THE WIRE USES.</b> <c>Population.Predict</c> is
+    /// <b>Each folds the moment through its own names and speaks for itself, and the merge
+    /// is the same arithmetic the wire uses.</b> <c>Population.Predict</c> is
     /// <c>Decide</c> over one testimony, so a fleet of one reaches the identical vote by
     /// the identical route — which is what makes a distributed examination comparable with
     /// every one taken before there was a wire, rather than a second instrument.
@@ -983,8 +982,8 @@ public sealed class Trial<TSeen>
     {
         if (_world is not IWithholds<TSeen> withholding) return null;
 
-        // AND A WORLD THAT CAN WITHHOLD BUT IS NOT WITHHOLDING REPORTS ABSENT RATHER THAN
-        // NOUGHT, WHICH IS THE SAME DISTINCTION ONE LAYER IN. It used to be carried by the
+        // And a world that can withhold but is not withholding reports absent rather than
+        // nought, which is the same distinction one layer in. It used to be carried by the
         // interface alone — a world either held things back or did not implement this —
         // and that stopped being true the moment `Multiplexer` gained a dial for it. An
         // empty examination answers nothing, so every count is nought and the accuracy
@@ -997,7 +996,7 @@ public sealed class Trial<TSeen>
         var right = 0;
         var deciders = new HashSet<Code>();
 
-        // AND A WITHHELD OBSERVATION WITH NO OUTCOME IS NOT ASKED AT ALL, because there is
+        // And a withheld observation with no outcome is not asked at all, because there is
         // nothing to score it against. Counting it would report as SILENCE -- a population
         // that declined to answer -- when what happened is that the examiner had no answer
         // key for that row, which is a completely different fact.

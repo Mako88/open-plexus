@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Commitments;
+using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -11,21 +11,21 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE PLAN HAS SAID FOR THE LIFE OF THE BRANCH THAT A SPECIALISE-ONLY MACHINE IS
-/// CONCEPTLESS, AND THE COST IS MEASURED NOW.</b> On the skewed multiplexer the machine
+/// <b>The plan has said for the life of the branch that a specialise-only machine is
+/// conceptless, and the cost is measured now.</b> On the skewed multiplexer the machine
 /// holds sound rules at perfect accuracy that fire on not one of nearly four thousand
 /// rounds the base rate gets wrong. True, never mistaken, and too narrow to pay — which
 /// is precisely what a population with no way back up the ladder looks like from outside.
 /// </para>
 /// <para>
-/// <b>AND `Paying` IS WHAT THIS IS JUDGED ON, NOT `Found` OR ACCURACY.</b> Generalisation
+/// <b>AND `Paying` is what this is judged on, not `Found` OR ACCURACY.</b> Generalisation
 /// makes rules fire MORE, so it will move a resident count and a repair count whatever it
 /// is worth; and it could raise accuracy by covering the easy rounds more thoroughly
 /// while buying nothing where guessing already fails. The only reading that cannot be had
 /// that way is whether a true rule turns up on a round the base rate misses.
 /// </para>
 /// <para>
-/// <b>AND THE COST IS SAID BEFORE THE RUN.</b> A scope of length k proposes k shortened
+/// <b>And the cost is said before the run.</b> A scope of length k proposes k shortened
 /// rules, so a population of narrow commitments can propose a great many at once — and a
 /// generalisation that is WRONG fires on more moments than the rule it came from, which
 /// is a bad rule with a wider reach. If the unsound count climbs faster than
@@ -53,15 +53,15 @@ public sealed class WideningTests(ITestOutputHelper output)
                 {
                     Widening = widening,
 
-                    // PINNED AT WHAT SHIPS RATHER THAN LEFT TO INHERIT IT, because this grid
+                    // Pinned at what ships rather than left to inherit it, because this grid
                     // is being re-taken precisely BECAUSE those two moved. A fixture that
                     // inherits the dial whose change prompted the re-take cannot say which
                     // machine its rows are about the next time one of them moves again.
                     Forking = Forking.Distinct,
                     Budget = 8,
 
-                    // AND THE DEFAULT IS SPELT OUT RATHER THAN INHERITED FOR THE SAME REASON
-                    // ONE LINE UP, since the grid below is entirely about this number.
+                    // And the default is spelt out rather than inherited for the same reason
+                    // one line up, since the grid below is entirely about this number.
                     Capacity = capacity ?? new CommittingSettings().Capacity,
                 },
                 seed),
@@ -69,7 +69,7 @@ public sealed class WideningTests(ITestOutputHelper output)
             census: true).Run(Rounds);
 
     /// <summary>
-    /// <b>WHETHER GENERALISATION REACHES THE ROUNDS GUESSING MISSES.</b>
+    /// <b>Whether generalisation reaches the rounds guessing misses.</b>
     /// </summary>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
@@ -89,7 +89,7 @@ public sealed class WideningTests(ITestOutputHelper output)
     /// <param name="cell">What to print the rows under.</param>
     /// <param name="run">How to build the population for a seed.</param>
     /// <remarks>
-    /// <b>THE CACHE IS THE POINT AND NOT A TIDINESS.</b> A grid asking `Sweep` for its runs
+    /// <b>The cache is the point and not a tidiness.</b> A grid asking `Sweep` for its runs
     /// per COLUMN builds every population once a column, so one measurement is paid for
     /// seven times and the column that would rank the arms looks too expensive to add. That
     /// is a line on this repo's trap list, and it is written once here so a second grid in
@@ -113,7 +113,7 @@ public sealed class WideningTests(ITestOutputHelper output)
             ("recent", one => one.Recent),
             ("sound", one => one.Sound),
 
-            // WHAT THIS OPERATOR EXISTS TO REMOVE, AND THE FIRST GRID THAT COULD SAY SO. A
+            // What this operator exists to remove, and the first grid that could say so. A
             // sound rule containing a shorter sound rule fires on fewer moments than a truth
             // it already holds, which is the reach problem stated as a property of the
             // population rather than as a score. If shortening scopes is worth anything at
@@ -142,8 +142,8 @@ public sealed class WideningTests(ITestOutputHelper output)
     /// <b>THE ARM IS CONNECTED, asserted as a difference and never as a direction.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THE TRAP THIS GUARDS COST THIS SESSION A FOURTEEN-MINUTE GRID AND A WRONG
-    /// WRITE-UP.</b> A mechanism that is off and one that is on but inert report the same
+    /// <b>The trap this guards cost this session a fourteen-minute grid and a wrong
+    /// write-up.</b> A mechanism that is off and one that is on but inert report the same
     /// everything, so a new operator is asserted to FIRE before any grid it appears in is
     /// worth reading. Whether firing is an improvement is the test above's question.
     /// </remarks>
@@ -165,7 +165,7 @@ public sealed class WideningTests(ITestOutputHelper output)
             "generalisation is switched on and proposed nothing, so either no commitment "
             + "ever reaches a scope of two with no misses, or the operator is not wired");
 
-        // AND THE AIMED ARM FIRES AND IS NOT THE OTHER ONE, which are two failures reading as
+        // And the aimed arm fires and is not the other one, which are two failures reading as
         // one number. An arm proposing nothing is `Never` under another name and drifts to the
         // baseline for free, and an arm proposing everything is `Unmissed` under another name
         // -- so the grid is unreadable unless it sits strictly between them. No direction is
@@ -179,39 +179,39 @@ public sealed class WideningTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHETHER WIDENING'S ACCURACY COST IS THE SHORTENED RULES OR THE CEILING THEY
-    /// PUSH THE POPULATION INTO.</b>
+    /// <b>Whether widening's accuracy cost is the shortened rules or the ceiling they
+    /// push the population into.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE GRID ABOVE HOLDS 2001 RESIDENTS OF A CAPACITY OF 2000 AT BOTH ELEVEN-BIT
-    /// WIDTHS, AND 302 AT SIX.</b> So the arm is pinned at the ceiling exactly where it
+    /// <b>The grid above holds 2001 residents of a capacity of 2000 at both eleven-bit
+    /// widths, and 302 at six.</b> So the arm is pinned at the ceiling exactly where it
     /// costs a tenth of the trailing accuracy and free of it where it costs least — which
     /// is a confound rather than a finding, because this repo has already measured that
     /// what is damage is REACHING a capacity rather than holding more.
     /// </para>
     /// <para>
-    /// <b>AND THE TWO STORIES PREDICT OPPOSITE THINGS OF ONE CONTROL.</b> If the cost is
+    /// <b>And the two stories predict opposite things of one control.</b> If the cost is
     /// the shortened rules being wrong, raising the ceiling changes nothing about accuracy
     /// and merely lets more wrong rules sit resident. If the cost is eviction, the
     /// shortened rules were never the problem: a flood of blind proposals sorts at the
     /// median of the judged and pushes earned rules out from below, and room removes it.
     /// </para>
     /// <para>
-    /// <b>CROSSED RATHER THAN MEASURED OFF THE ARM, because raising a ceiling moves the
+    /// <b>Crossed rather than measured off the arm, because raising a ceiling moves the
     /// baseline too.</b> A bigger population without widening is a different machine, and
     /// comparing a widened arm at one capacity against an unwidened one at another would
     /// move both axes — the trap this repo has now paid for four times.
     /// </para>
     /// <para>
-    /// <b>AND <c>residents</c> AGAINST THE CAPACITY IS WHAT SAYS THE MECHANISM RAN, WHICH
-    /// NO SCORE CAN.</b> A ceiling that is never reached and one that evicts constantly
+    /// <b>AND <c>residents</c> against the capacity is what says the mechanism ran, which
+    /// no score can.</b> A ceiling that is never reached and one that evicts constantly
     /// read the same in every other column, and this grid is unreadable unless the raised
     /// arm comes back UNDER its own ceiling — otherwise 8000 is another pinned machine and
     /// the control never happened.
     /// </para>
     /// <para>
-    /// <b>AND THE ANSWER IS THE FIRST STORY AND NOT THE SECOND.</b> The control held — the
+    /// <b>And the answer is the first story and not the second.</b> The control held — the
     /// raised arm comes back well under its ceiling and the unwidened one is bit-identical
     /// at both capacities, so the crossing is clean. Room leaves hard-round coverage flat
     /// and trailing accuracy no better, a little worse on the even world; what it buys is
@@ -219,7 +219,7 @@ public sealed class WideningTests(ITestOutputHelper output)
     /// what no widening at all already held.
     /// </para>
     /// <para>
-    /// <b>WHICH IS THE REACH CLAIM CONFIRMED FROM A DIRECTION NOTHING ELSE COULD REACH.</b>
+    /// <b>Which is the reach claim confirmed from a direction nothing else could reach.</b>
     /// The same truths held and far more hard rounds carried is exactly <i>the rules that
     /// could pay are held and do not fire</i>, answered — so what widening is for is real
     /// and what it costs is the rules it mints beside them. That is the flood, and
@@ -245,21 +245,21 @@ public sealed class WideningTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE OVERSHOOT READING FIRES, AND IT IS NOT THE SAME NUMBER AT BOTH WIDTHS.</b>
+    /// <b>The overshoot reading fires, and it is not the same number at both widths.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A COLUMN THAT IS ALWAYS NOUGHT IS A CHECK THAT CANNOT FIRE</b>, which this repo
+    /// <b>A column that is always nought is a check that cannot fire</b>, which this repo
     /// has now found twice by arming something that had always read zero. So the instrument
     /// is asserted to have a subject before any row above is read as a comparison.
     /// </para>
     /// <para>
-    /// <b>AND IT IS ONE SEED A WIDTH ON PURPOSE, because this asks whether the number
+    /// <b>And it is one seed a width on purpose, because this asks whether the number
     /// EXISTS and not how big it is.</b> How much a population overshoots, and whether
     /// shortening scopes reduces it, is the grid's question and carries error bars there.
     /// </para>
     /// <para>
-    /// <b>WHAT IT WOULD MEAN FOR THE TWO TO BE EQUAL IS WORTH SAYING FIRST.</b> Repair
+    /// <b>What it would mean for the two to be equal is worth saying first.</b> Repair
     /// refuses a parent under <c>Floor</c> misses and a sound rule on a clean world never
     /// misses, so a chain that only ever narrows what is still wrong cannot pass a sound
     /// depth by that route — it can only arrive at one along a lineage that was never sound.
@@ -286,29 +286,29 @@ public sealed class WideningTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE GATE THIS OPERATOR'S OWN ROW HAS ALWAYS NAMED IS PAID BY
+    /// <b>The gate this operator's own row has always named is paid by
     /// <see cref="CommittingSettings.Floor"/> BEFORE IT IS ASKED.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE PROPOSAL WAS TO REFUSE A CLEAN RECORD THAT IS NOT SIGNIFICANT AGAINST THE
-    /// BASE RATE</b>, by the pooled two-proportion z repair already owns and at the same
+    /// <b>The proposal was to refuse a clean record that is not significant against the
+    /// base rate</b>, by the pooled two-proportion z repair already owns and at the same
     /// <see cref="CommittingSettings.Alpha"/> — <i>zero misses over twenty firings is not
     /// the same claim as zero over four hundred</i>. It was built, and it is bit-identical
     /// to the ungated arm on all four cells of the grid above: 861 and 6058 and 12813
     /// proposals, the same residents, the same <c>Paying</c>, the same trailing accuracy.
     /// </para>
     /// <para>
-    /// <b>AND THE REASON IS ARITHMETIC RATHER THAN A WORLD, WHICH IS WHY THIS IS A CHECK
-    /// AND NOT A ROW.</b> <see cref="Population.Widen"/> already refuses anything under
+    /// <b>And the reason is arithmetic rather than a world, which is why this is a check
+    /// and not a row.</b> <see cref="Population.Widen"/> already refuses anything under
     /// <see cref="CommittingSettings.Floor"/> settlements, and a perfect record over n
     /// firings clears a one-sided bar at <c>alpha</c> for every base rate below roughly
     /// <c>n / (n + 2.71)</c>. At the shipped floor of twenty that is 0.88, and the most
     /// skewed world on this bench draws four in five.
     /// </para>
     /// <para>
-    /// <b>SO THE REVIVAL CONDITION IS A NUMBER RATHER THAN A HOPE, AND THIS IS WHAT WOULD
-    /// SPOT IT.</b> The day a world's commonest outcome passes the boundary below, or the
+    /// <b>So the revival condition is a number rather than a hope, and this is what would
+    /// spot it.</b> The day a world's commonest outcome passes the boundary below, or the
     /// day the floor drops far enough to move the boundary under a world already here, the
     /// gate stops being inert and is worth building again. Until then it is a second name
     /// for <see cref="Widening.Unmissed"/>, and a grid of identical rows is this repo's own
@@ -320,8 +320,8 @@ public sealed class WideningTests(ITestOutputHelper output)
     {
         var dials = new CommittingSettings();
 
-        // A CLEAN RECORD AT EXACTLY THE FLOOR, WHICH IS THE THINNEST ONE THE OPERATOR CAN
-        // EVER SEE. Anything it would refuse it would refuse here first.
+        // A clean record at exactly the floor, which is the thinnest one the operator can
+        // ever see. Anything it would refuse it would refuse here first.
         var thinnest = dials.Floor;
 
         double Refused(double rate)
@@ -335,7 +335,7 @@ public sealed class WideningTests(ITestOutputHelper output)
         foreach (var rate in new[] { 0.5, 0.8, 0.85, 0.9, 0.95 })
             output.WriteLine($"  base rate {rate:F2} -> p={Refused(rate):F4}");
 
-        // THE WORLDS THIS BENCH HAS, NAMED RATHER THAN ASSUMED. `Multiplexer`'s answer is a
+        // The worlds this bench has, named rather than assumed. `Multiplexer`'s answer is a
         // data bit, so its commonest outcome IS the skew, and 0.8 is the steepest tilt any
         // grid here runs.
         Assert.True(Refused(0.5) <= dials.Alpha);
@@ -349,7 +349,7 @@ public sealed class WideningTests(ITestOutputHelper output)
         // free if `Ahead` ever returned a constant.
         Assert.True(Refused(0.95) > dials.Alpha);
 
-        // THE BOUNDARY ITSELF, WHICH IS THE NUMBER THE REVIVAL ROW CITES. Below it the
+        // The boundary itself, which is the number the revival row cites. Below it the
         // floor has already paid for the significance; above it the gate has something to
         // say. It moves with the floor and with nothing else.
         var boundary = thinnest / (thinnest + 2.71);

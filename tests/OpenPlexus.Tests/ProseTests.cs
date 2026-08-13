@@ -49,22 +49,22 @@ public sealed class ProseTests(ITestOutputHelper output)
     private const int Words = 6;
 
     /// <summary>
-    /// The most shouted sentences the tree may hold. <b>A ratchet, and the target is nought.</b>
+    /// The most shouted sentences the tree may hold. <b>It is at nought and stays there.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// It cannot start at nought because it began at 2,489 across 158 files, which is most of
-    /// the repo. So it takes the shape <see cref="DocsTests"/> already uses for the doc budget:
-    /// every pass lowers this constant to what that pass achieved, and the register can never
-    /// grow back by accident.
+    /// It began at 2,489 across 158 files, which was most of the repo, and it was written as a
+    /// ratchet in the shape <see cref="DocsTests"/> uses for the doc budget. That turned out to
+    /// be unnecessary: the transformation is mechanical, so one pass took it to nought rather
+    /// than the many that shape assumes.
     /// </para>
     /// <para>
-    /// <b>Lowering it is the whole point and raising it needs a reason in the commit.</b> There
-    /// is no condition under which a repo wants more of this, so unlike the doc budget this one
-    /// really is one-way.
+    /// So this is no longer a budget being worked down. It is a rule, and it is one-way — there
+    /// is no condition under which this repo wants a sentence written in capitals, so raising
+    /// this constant is not a thing a commit may do.
     /// </para>
     /// </remarks>
-    private const int Shouting = 2_404;
+    private const int Shouting = 0;
 
     /// <summary>
     /// The most words a bold span may hold before it is a sentence rather than a lead.
@@ -76,8 +76,22 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// </remarks>
     private const int Lead = 12;
 
-    /// <summary>The most bold sentences the tree may hold. <b>A ratchet, like the one above.</b></summary>
-    private const int Shouted = 1_212;
+    /// <summary>
+    /// The most bold sentences the tree may hold. <b>A ratchet, and the target is nought.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is the half that stayed a ratchet, because it is the half a script cannot do. A
+    /// shouted sentence has one correct rewrite and a bold sentence does not: where the lead
+    /// clause ends is a judgement about which part of the claim a reader scans for, and there
+    /// are 1,210 of those judgements left.
+    /// </para>
+    /// <para>
+    /// Every pass lowers this to what that pass achieved. A ratchet nobody turns is a budget
+    /// rather than a target, so something has to stop it sitting here.
+    /// </para>
+    /// </remarks>
+    private const int Shouted = 1_210;
 
     /// <summary>
     /// Every file whose prose this repo is responsible for.
@@ -208,14 +222,14 @@ public sealed class ProseTests(ITestOutputHelper output)
     [Fact]
     public void The_check_can_tell_a_shouted_sentence_from_a_label()
     {
-        // THE COMPANION EVERY GUARD IN THIS SUITE HAS, and it is the reason the two above are
+        // The companion every guard in this suite has, and it is the reason the two above are
         // worth anything: a detector that matches nothing passes forever and reads exactly like
         // prose that is in order. This comment is left shouting on purpose -- it is inside the
         // one file that would notice, and the assertions below are what notices it.
         Assert.Single(Shouts("**THESE ARE SUPPOSED TO BE FAILING AND THAT IS THE POINT.**"));
         Assert.Single(Shouts("/// <b>JOHN'S CALL, 2026-08-04: CAP THE ITEM, NOT THE DOC.</b>"));
 
-        // A LABEL IS SHORTER THAN A SENTENCE, which is the whole basis of the threshold. Every
+        // A label is shorter than a sentence, which is the whole basis of the threshold. Every
         // one of these is real: two are route branches, one is a section heading, one is a leaf
         // status. None may ever trip this check.
         Assert.Empty(Shouts("- **WHAT IT MUST DO** — one entry a line of THE ARCHITECTURE"));
@@ -223,14 +237,14 @@ public sealed class ProseTests(ITestOutputHelper output)
         Assert.Empty(Shouts("## DO NOT RE-TRY"));
         Assert.Empty(Shouts("**NOW** — a commitment fires when its scope is a subset"));
 
-        // AND AN ACRONYM CLUSTER IS NOT A SHOUT, at any length this repo writes.
+        // And an acronym cluster is not a shout, at any length this repo writes.
         Assert.Empty(Shouts("held under TCP, and ILP, MDL and LSH say the same"));
     }
 
     [Fact]
     public void The_bold_check_can_tell_a_lead_from_a_sentence()
     {
-        // THE SAME COMPANION FOR THE SAME REASON. A lead clause is what bold is for and a bold
+        // The same companion for the same reason. A lead clause is what bold is for and a bold
         // sentence is what it is not, so both directions are pinned.
         Assert.Empty(Bolds("**A control beats an argument.**"));
         Assert.Empty(Bolds("<b>Throws rather than skipping.</b>"));
@@ -243,7 +257,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     [Fact]
     public void Only_comments_are_read_out_of_a_source_file()
     {
-        // THE THIRD COMPANION, AND IT PINS THE ONE THING THAT WOULD MAKE THIS CHECK ABSURD.
+        // The third companion, and it pins the one thing that would make this check absurd.
         // Reading a whole `.cs` file would count `SearchOption.AllDirectories` and every
         // `SCREAMING_CASE` constant as prose, and the ratchet would then be measuring the
         // codebase rather than the writing.

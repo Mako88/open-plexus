@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Worlds;
+using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Tests;
 
@@ -44,7 +44,7 @@ public sealed class BindingTests
     [Fact]
     public void The_two_arms_see_the_identical_input()
     {
-        // THE PROOF, AND EVERYTHING ELSE HERE IS A DEMONSTRATION OF IT. The bound
+        // The proof, and everything else here is a demonstration of it. The bound
         // world and the unbound world at the same seed emit the same codes in the
         // same order, scene after scene. Only which shape is answerable for which
         // colour differs -- and that lives nowhere in what the machine receives.
@@ -74,7 +74,7 @@ public sealed class BindingTests
     [Fact]
     public void The_binding_coin_is_fair_and_its_spread_is_honest()
     {
-        // THE TRAP THAT COST A FALSE FIVE-SIGMA RESULT, 2026-08-03, kept as a
+        // The trap that cost a false five-sigma result, 2026-08-03, kept as a
         // check so it cannot come back. A seeded Random in .NET normalises by
         // magnitude, so consecutive seeds produce nearly the same stream: over
         // seeds 1..8 the swap count landed in 19..23 of 39, a spread of about 1.3
@@ -178,7 +178,7 @@ public sealed class BindingTests
     [Fact]
     public void A_tag_without_its_group_is_refused_rather_than_accepted()
     {
-        // AN ARM THAT LOOKS DISTINCT AND IS NOT is how this project has fooled
+        // An arm that looks distinct and is not is how this project has fooled
         // itself before. An ungrouped tag pairs with every code in the scene, so
         // it indexes nothing and the arm would quietly measure the untagged one.
         Assert.Throws<ArgumentException>(() =>

@@ -6,7 +6,7 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>WHICH TILE THE BODY STANDS ON IS NOT A MAGNITUDE.</b> Banding it would
+/// <b>Which tile the body stands on is not a magnitude.</b> Banding it would
 /// claim tile 3 is nearer tile 4 than tile 40, and hashing it would claim the
 /// same by another road — but a position index is a NAME, and the graph is what
 /// learns which names go together. <b>A quantiser transports similarity and never

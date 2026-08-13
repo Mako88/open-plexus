@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Codes;
+using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Tests;
@@ -30,8 +30,8 @@ public sealed class ComposedTests
     [Fact]
     public void No_moment_ever_shows_two_attributes_of_one_object()
     {
-        // THE WHOLE EXPERIMENT, AND IT IS ENFORCED HERE RATHER THAN LEFT TO A
-        // CALLER TO RESPECT. If A and C were ever shown together the pair would
+        // The whole experiment, and it is enforced here rather than left to a
+        // caller to respect. If A and C were ever shown together the pair would
         // be observed, the task would be a lookup, and every number would be
         // measuring memorisation.
         var world = new Composed(World(), seed: 1);

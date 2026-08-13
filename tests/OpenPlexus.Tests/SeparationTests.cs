@@ -12,14 +12,14 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S RULE, AND IT IS ABOUT WHAT WENT WRONG LAST TIME.</b> On `csharp` the
+/// <b>John's rule, and it is about what went wrong last time.</b> On `csharp` the
 /// worlds grew dials that reached into the brain — `Ranking` was `Sum` on bAbI and
 /// `Agreement` on CLEVR, so a WORLD decided how the brain thought. Every score was
 /// then a comparison between two brains as much as between two problems, and nobody
 /// could say which.
 /// </para>
 /// <para>
-/// <b>A RULE NOBODY CHECKS IS A RULE THAT LASTS UNTIL THE NEXT WORLD.</b> This one
+/// <b>A rule nobody checks is a rule that lasts until the next world.</b> This one
 /// arrived in the code within an hour of being agreed and had already been broken:
 /// the graded world's runner owned the choice of front end, the band count and the
 /// projection geometry — three brain-side decisions living inside a world.
@@ -61,7 +61,7 @@ public sealed class SeparationTests
 
         foreach (var (path, text) in Worlds())
         {
-            // THE WALK-ERA WORLDS ARE EXEMPT AND SAY SO. They name `csharp`'s brain
+            // The walk-era worlds are exempt and say so. They name `csharp`'s brain
             // everywhere and go when it goes -- this guards what is being built now.
             if (!Path.GetFileName(path).StartsWith("Multiplexer", StringComparison.Ordinal)
                 && !Path.GetFileName(path).StartsWith("Graded", StringComparison.Ordinal)
@@ -84,8 +84,8 @@ public sealed class SeparationTests
     [Fact]
     public void And_the_check_can_still_fail()
     {
-        // THE COMPANION, AND WITHOUT IT THIS PASSES FOR A TYPE LIST THAT CAME BACK
-        // EMPTY -- which is exactly how a separation rule rots into a comment.
+        // The companion, and without it this passes for a type list that came back
+        // empty -- which is exactly how a separation rule rots into a comment.
         var brainish = Brainish().ToList();
 
         Assert.Contains("Population", brainish);
@@ -100,7 +100,7 @@ public sealed class SeparationTests
     [Fact]
     public void Every_world_says_its_outcome_in_the_same_alphabet()
     {
-        // A BRAIN THAT LEARNT A DIFFERENT ALPHABET PER WORLD WOULD NOT BE ONE BRAIN,
+        // A brain that learnt a different alphabet per world would not be one brain,
         // and a commitment about an outcome would mean different things depending on
         // who was asking. The multiplexer keeps its own name for this because its
         // answer key is written in it; the two must agree or they will drift.
@@ -109,8 +109,8 @@ public sealed class SeparationTests
 
         Assert.Equal(Brain.Followed, Multiplexer.Said);
 
-        // AND `Monk`, WHOSE KEY WAS WRITTEN IN ITS OWN ALPHABET FIRST AND READ ZERO FOR
-        // IT. Every rule the enumeration called true expected a code on a modality the
+        // AND `Monk`, whose key was written in its own alphabet first and read zero for
+        // it. Every rule the enumeration called true expected a code on a modality the
         // population can never hold, so the soundness count was nought on all three
         // puzzles and the `Found` count with it -- a blind instrument reporting a
         // flawless-looking absence. This is the check that could have caught it.
@@ -123,7 +123,7 @@ public sealed class SeparationTests
     [Fact]
     public void One_brain_can_be_handed_two_different_worlds()
     {
-        // THE POINT OF THE WHOLE ARRANGEMENT, ASSERTED RATHER THAN DESCRIBED. The
+        // The point of the whole arrangement, asserted rather than described. The
         // same brain object, configured once, learns a symbolic world and a graded
         // one -- so switching world cannot switch brain, because there is only one.
         var brain = new Brain(new CommittingSettings(), seed: 1);
@@ -143,7 +143,7 @@ public sealed class SeparationTests
 
         Assert.True(first.Rounds == 4000 && second.Rounds == 4000);
 
-        // AND IT CARRIES WHAT IT LEARNT ACROSS, because the population is the brain's
+        // And it carries what it learnt across, because the population is the brain's
         // and not the trial's. Whether that HELPS is a separate question nobody has
         // measured; that it is possible at all is what the seam buys.
         Assert.True(second.Resident > first.Resident);

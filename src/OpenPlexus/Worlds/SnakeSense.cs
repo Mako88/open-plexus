@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Codes;
+using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
 
@@ -88,7 +88,7 @@ public sealed class SnakeSense : IQuantizer<SnakeFrame>
     /// <inheritdoc/>
     /// <remarks>
     /// <para>
-    /// <b>THE ACTION CAME FIRST, AND THE VIEW IS WHAT FOLLOWED IT — FORK 18.</b>
+    /// <b>The action came first, and the view is what followed it.</b>
     /// <see cref="SnakeFrame.Did"/> is the move already taken and the view is the
     /// world after it, so they are not simultaneous and never were. Written as
     /// one occasion with no order they became a <c>With</c> pair, which says the

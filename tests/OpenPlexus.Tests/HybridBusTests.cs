@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Bus;
+using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 
@@ -9,7 +9,7 @@ namespace OpenPlexus.Tests;
 /// which never left is written off, and that a failure surfaces.
 /// </summary>
 /// <remarks>
-/// <b>WHAT THE WALK'S DELETION TOOK OUT OF THIS FILE WAS THE ADDRESSED SEND.</b> An
+/// <b>What the walk's deletion took out of this file was the addressed send.</b> An
 /// envelope named one cluster, so half of these tests were about the bus picking the right
 /// entry out of a dictionary. An ask is a BROADCAST — every holder gets it — so the routing
 /// question is gone and what is left is the concurrency, which was always the part worth
@@ -92,7 +92,7 @@ public sealed class HybridBusTests
         var asked = await bus.AskAsync(Asking());
         await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
-        // THE DENOMINATOR IS RETURNED AND THE ANSWERS ARE NOT, which is the whole shape of
+        // The denominator is returned and the answers are not, which is the whole shape of
         // this bus: an asker learns who it asked now and what they said later.
         Assert.Equal([alpha.Address, beta.Address], [.. asked]);
 
@@ -109,7 +109,7 @@ public sealed class HybridBusTests
         using var _ = bus.Subscribe(mine);
         using var __ = bus.Subscribe(theirs);
 
-        // ADDRESSED TO THE SECOND SUBSCRIBER ON PURPOSE. Sending to the first would let a
+        // Addressed to the second subscriber on purpose. Sending to the first would let a
         // mutation that ignores the address entirely and always takes the first entry
         // survive every assertion here.
         await bus.SendAsync(theirs.Address, Answering());
@@ -127,7 +127,7 @@ public sealed class HybridBusTests
     {
         var bus = new HybridBus();
 
-        // C3: AN ASKER THAT DIED BETWEEN ASKING AND BEING ANSWERED IS ORDINARY. Throwing
+        // C3: An asker that died between asking and being answered is ordinary. Throwing
         // would make one machine's departure another machine's error, which is the whole
         // thing this constraint refuses.
         await bus.SendAsync(new MachineAddress("gone"), Answering());
@@ -208,7 +208,7 @@ public sealed class HybridBusTests
 
         var ready = new List<MachineAddress>();
 
-        // AN ANSWER TO AN ASK NOBODY REMEMBERS IS DROPPED, so the asker has to record its
+        // An answer to an ask nobody remembers is dropped, so the asker has to record its
         // gathering inside this window. Dispatch is `Task.Run`, so a holder can answer
         // before `AskAsync` returns -- asserting the callback ran before delivery is
         // asserting that the window is real rather than documented.
@@ -236,7 +236,7 @@ public sealed class HybridBusTests
         await bus.AskAsync(ask);
         await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
-        // FORK 53, IN THE ONE FORM ONE PROCESS CAN SHOW IT. A holder that took the ask and
+        // Fork 53, in the one form one process can show it. A holder that took the ask and
         // threw is the local spelling of a refused connection: no answer to THAT ask is
         // owed from it, which is a smaller and exacter claim than saying it is dead.
         Assert.Equal([(ask.Broadcast, broken.Address)], written);
@@ -290,7 +290,7 @@ public sealed class HybridBusTests
         Assert.Equal(200, alpha.Got.Count);
         Assert.Equal(0, bus.InFlight);
 
-        // THE COUNT IS THE INSTRUMENT AND THE ARRIVALS ARE THE BEHAVIOUR, and a bus that
+        // The count is the instrument and the arrivals are the behaviour, and a bus that
         // delivered everything while counting nothing would pass the line above alone.
         Assert.Equal(200, bus.Messages);
     }
@@ -302,7 +302,7 @@ public sealed class HybridBusTests
         var going = new Held("going");
         var handle = bus.Subscribe(going);
 
-        // LEAVING IS SILENT HERE, WHICH IS THE OPPOSITE OF THE WALK'S CLUSTER. A holder
+        // Leaving is silent here, which is the opposite of the walk's cluster. A holder
         // that has unsubscribed is not in the roster, so it is never in the denominator and
         // never owed anything -- there is nothing to announce and nobody to announce it.
         handle.Dispose();

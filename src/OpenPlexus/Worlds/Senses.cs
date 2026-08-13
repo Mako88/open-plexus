@@ -47,7 +47,7 @@ public sealed record SensesSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE SIZE DIAL, AND IT IS DELIBERATELY NOT A NEW WORLD.</b> Scale is a
+    /// <b>The size dial, and it is deliberately not a new world.</b> Scale is a
     /// change to a world rather than a task of its own, and the standing rule
     /// here is to run the world that exists instead of building one to flatter a
     /// change. The task, the question and the chance level are all untouched —
@@ -67,8 +67,8 @@ public sealed record SensesSettings
     /// How many distinct irrelevant codes there are to draw from.
     /// </summary>
     /// <remarks>
-    /// <b>THE SHARP END OF THE DIAL, BECAUSE THE TWO EXTREMES TEST OPPOSITE
-    /// CLAIMS.</b> A large pool makes each irrelevant code RARE, so the graph
+    /// <b>The sharp end of the dial, because the two extremes test opposite
+    /// claims.</b> A large pool makes each irrelevant code RARE, so the graph
     /// grows wide and every clutter partner is thin — that tests whether cost
     /// stays affordable. A small pool makes them UBIQUITOUS, which manufactures
     /// exactly the ever-present background the forward weighting exists to
@@ -84,7 +84,7 @@ public sealed record SensesSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE SHAPE NO WORLD HERE HAD, AND THE SCALING MEASUREMENT IS WHY.</b>
+    /// <b>The shape no world here had, and the scaling measurement is why.</b>
     /// Sixty-four times the alphabet gave sixty-four times the nodes and left the
     /// widest row exactly where it started, so cost per thought never moved. A row
     /// grows without bound only where ONE code accompanies NEARLY EVERYTHING, and
@@ -92,7 +92,7 @@ public sealed record SensesSettings
     /// than more. More nodes was the wrong axis.
     /// </para>
     /// <para>
-    /// <b>AND <see cref="Pool"/> ALONE CANNOT MAKE THAT SHAPE, because its two
+    /// <b>And <see cref="Pool"/> alone cannot make that shape, because its two
     /// extremes are opposite and both UNIFORM.</b> A small pool makes every
     /// irrelevant code ubiquitous; a large one makes every one rare. Zipf is the
     /// distribution that holds BOTH AT ONCE — a handful of codes at nearly every
@@ -118,13 +118,13 @@ public sealed record SensesSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE SECOND WORLD, AND IT SHARES NO CODE WITH SNAKE.</b> No space, no
+/// <b>The second world, and it shares no code with Snake.</b> No space, no
 /// movement, no actions, no energy, nothing to lose, no time pressure. If a
 /// finding holds here as well, it was about the architecture; if it does not, it
 /// was about snake — and every number in this project so far is one world wide.
 /// </para>
 /// <para>
-/// <b>THE TASK IS WHAT THE DESIGN EXISTS FOR.</b> An occasion shows either
+/// <b>The task is what the design exists for.</b> An occasion shows either
 /// SIGHT with SOUND, or SOUND with TOUCH. <b>Sight and touch are never shown
 /// together, not once.</b> Then the question is: given a sight, what does it
 /// feel like?
@@ -187,7 +187,7 @@ public sealed class Senses
             throw new ArgumentException(
                 "clutter needs a pool to draw from", nameof(settings));
 
-        // AND A SKEW OVER NOTHING IS THE SAME FAULT ONE STEP ALONG. A pool of one
+        // And a skew over nothing is the same fault one step along. A pool of one
         // is uniform whatever the exponent says, so a run configured that way
         // would report a heavy tail it does not have.
         if (settings.Skew > 0.0 && settings.Pool < 2)
@@ -300,7 +300,7 @@ public sealed class Senses
 
         var drawn = _aside.NextDouble();
 
-        // THE FIRST RANK WHOSE CUMULATIVE WEIGHT COVERS THE DRAW. `BinarySearch`
+        // The first rank whose cumulative weight covers the draw. `BinarySearch`
         // returns the complement of the insertion point when there is no exact
         // hit, which is that rank; an exact hit is that rank too.
         var found = Array.BinarySearch(_ranks, drawn);

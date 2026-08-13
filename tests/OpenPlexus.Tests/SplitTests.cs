@@ -13,7 +13,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE COMMITMENT LEARNER RUNS IN ONE PROCESS, SO C1 IS KEPT BY CONVENTION.</b> No
+/// <b>The commitment learner runs in one process, so C1 IS KEPT BY CONVENTION.</b> No
 /// node has ever had the OPPORTUNITY to read another's data, which is not the same as a
 /// design that forbids it — and a constraint nothing has ever been able to break is a
 /// check that cannot fire. <see cref="Population.Speak"/> is the narrow seam that makes
@@ -21,14 +21,14 @@ namespace OpenPlexus.Tests;
 /// only ever sees those cannot cheat.
 /// </para>
 /// <para>
-/// <b>AND THE FIRST QUESTION IS AGREEMENT-WITH-ITSELF, WHICH HAS A KNOWN ANSWER.</b>
+/// <b>And the first question is agreement-with-itself, which has a known answer.</b>
 /// Splitting a population changes no commitment, no accuracy and no dial — only who does
 /// the arithmetic. So a split vote that differs from a whole one is a DEFECT rather than a
 /// finding, and this file asserts that before it measures anything. The measurements below are only worth
 /// reading because that assertion holds.
 /// </para>
 /// <para>
-/// <b>NO SOCKET HERE ON PURPOSE, AND THE LIMIT IS STATED RATHER THAN DISCOVERED.</b> What
+/// <b>No socket here on purpose, and the limit is stated rather than discovered.</b> What
 /// this file exercises is the ARITHMETIC of a distributed vote and none of its transport.
 /// A green run says the fold composes; it says nothing whatever about C2, because nothing
 /// here is late, and nothing about C3, because nothing here dies. Reading it as <i>the
@@ -40,7 +40,7 @@ public sealed class SplitTests(ITestOutputHelper output)
 {
     /// <summary>How long the population trains before it is asked anything.</summary>
     /// <remarks>
-    /// <b>ENOUGH FOR THE WEIGHTS TO BE REAL AND NO LONGER.</b> This file measures whether
+    /// <b>Enough for the weights to be real and no longer.</b> This file measures whether
     /// an arithmetic composes, and that question does not get a better answer from a
     /// population that has learnt more — but it gets a WORSE one from a population where
     /// every accuracy is still nought, since every weight would then be nought too and
@@ -59,7 +59,7 @@ public sealed class SplitTests(ITestOutputHelper output)
     /// </summary>
     /// <param name="seed">The world's generator and the brain's.</param>
     /// <remarks>
-    /// <b>THE MOMENTS ARE DRAWN AFTER TRAINING AND NOTHING IS TAUGHT ON THEM.</b> Every
+    /// <b>The moments are drawn after training and nothing is taught on them.</b> Every
     /// call below is one of the three read-only ones — <c>Moment</c>, <c>Firing</c>,
     /// <c>Predict</c> — so asking four thousand questions leaves the population exactly as
     /// the run left it. A comparison that moved a counter would be comparing two
@@ -75,7 +75,7 @@ public sealed class SplitTests(ITestOutputHelper output)
 
         var held = brain.Held;
 
-        // A FRESH GENERATOR, SO THESE ARE NOT THE ROUNDS IT JUST SAW. Whether the
+        // A fresh generator, so these are not the rounds it just saw. Whether the
         // population has met a moment before changes what fires, and a comparison drawn
         // only from familiar moments would be measuring the merge on the easy half.
         //
@@ -106,8 +106,8 @@ public sealed class SplitTests(ITestOutputHelper output)
     /// <param name="holders">How many machines to spread it over.</param>
     /// <param name="missing">A holder that says nothing at all, or -1 for none.</param>
     /// <remarks>
-    /// <b>A MISSING HOLDER IS NOT A SILENT ONE AND THE PARAMETER IS NAMED FOR THE
-    /// DIFFERENCE.</b> A holder that fires nothing returns an empty <see cref="Testimony"/> and
+    /// <b>A missing holder is not a silent one and the parameter is named for the
+    /// difference.</b> A holder that fires nothing returns an empty <see cref="Testimony"/> and
     /// has been heard from; this one is never asked, which is what a death looks like from
     /// the outside. <see cref="Population.Decide"/> cannot tell them apart and is not
     /// supposed to — the count of who was asked lives with the asker.
@@ -137,10 +137,10 @@ public sealed class SplitTests(ITestOutputHelper output)
     // ---- the check that can fire -------------------------------------------
 
     /// <summary>
-    /// <b>SCALE-FREE, BECAUSE THE PROPERTY IS THE AGGREGATE AND NOT THE WEIGHT.</b>
+    /// <b>Scale-free, because the property is the aggregate and not the weight.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THIS ONCE RAN OVER TWO MAXIMUM-SHAPED RULES AND THE SECOND IS DELETED.</b> The
+    /// <b>This once ran over two maximum-shaped rules and the second is deleted.</b> The
     /// base-rate divisor divided before the maximum and the merge never saw it, so this
     /// check was the claim that every holder held the same divisor table. What survives is
     /// the simpler and stronger half: a maximum of maxima is a maximum, at any number of
@@ -149,7 +149,7 @@ public sealed class SplitTests(ITestOutputHelper output)
     [Fact]
     public void A_vote_split_between_holders_is_the_same_vote()
     {
-        // THE AGGREGATE IS A MAXIMUM UNDER BOTH, AND A MAXIMUM COMPOSES EXACTLY.
+        // The aggregate is a maximum under both, and a maximum composes exactly.
         // So this is not a tolerance and must never become one: every field of the vote
         // is bit-identical, including the margin, which is a subtraction of two doubles
         // that were each chosen rather than accumulated.
@@ -177,8 +177,8 @@ public sealed class SplitTests(ITestOutputHelper output)
                 compared++;
             }
 
-            // WHETHER THE SPLIT WAS EVER LOAD-BEARING, WHICH THE EQUALITIES ABOVE CANNOT
-            // SAY. A moment where one commitment fires is split by every rule alike, so a
+            // Whether the split was ever load-bearing, which the equalities above cannot
+            // say. A moment where one commitment fires is split by every rule alike, so a
             // file full of those would assert nothing and pass. This counts the moments
             // where at least two holders had something to say.
             if (Spread(firing, held, 12).Count(one => !one.Silent) > 1) contested++;
@@ -196,13 +196,13 @@ public sealed class SplitTests(ITestOutputHelper output)
     [Fact]
     public void What_a_holder_says_survives_being_written_as_bytes_and_read_back()
     {
-        // ASKED BECAUSE THE OTHER PAYLOAD BUILT THIS SESSION COULD NOT CROSS. `Recurrence`
+        // Asked because the other payload built this session could not cross. `Recurrence`
         // was committed as the thing that travels and had never been near a serialiser; it
         // wrote its scope count and dropped both tables, silently and plausibly. Assuming
         // `Testimony` is fine because it looks fine is the same reasoning that shipped
         // that one.
         //
-        // AND THE WEIGHTS ARE DOUBLES, WHICH IS WHY THIS IS NOT A FORMALITY. `Wire` exists
+        // And the weights are doubles, which is why this is not a formality. `Wire` exists
         // in the shape it does because a value that comes back differing in its last bit
         // codes differently at a band boundary -- and here a weight differing in its last
         // bit reorders a vote whose margin was thin. Fork 12 with the two halves on
@@ -222,7 +222,7 @@ public sealed class SplitTests(ITestOutputHelper output)
                 .Select(one => OpenPlexus.Bus.Wire.Read<Testimony>(OpenPlexus.Bus.Wire.Write(one)))
                 .ToList();
 
-            // ON THE DECISION AND NOT ONLY ON THE FIELDS. Two testimonies comparing equal
+            // On the decision and not only on the fields. Two testimonies comparing equal
             // says the members survived; the same VOTE coming out says the arithmetic did,
             // and that is the thing a machine on the far side actually acts on.
             Assert.Equal(
@@ -234,7 +234,7 @@ public sealed class SplitTests(ITestOutputHelper output)
 
         Assert.True(compared > 500, $"only {compared} testimonies crossed");
 
-        // THE CHECK THAT ANYTHING WAS CARRIED. An empty testimony round-trips perfectly and
+        // The check that anything was carried. An empty testimony round-trips perfectly and
         // decides identically, so a population too quiet to advocate would pass every line
         // above without the format having been asked anything.
         var spoke = moments
@@ -252,19 +252,19 @@ public sealed class SplitTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_a_lost_holder_costs_the_vote_against_what_the_margin_predicted()
     {
-        // C3 SAYS A CLUSTER VANISHING MID-THOUGHT IS NORMAL, AND NOTHING HAS EVER
-        // MEASURED WHAT THAT DOES TO AN ANSWER. In one process nothing can die, so the
+        // C3 says a cluster vanishing mid-thought is normal, and nothing has ever
+        // measured what that does to an answer. In one process nothing can die, so the
         // third outcome has only ever been exercised by unit tests -- an open defect in
         // the plan, and the reason this sweep exists.
         //
-        // AND THE GRID IS BUCKETED BY THE MARGIN BECAUSE THAT IS THE PREDICTION UNDER
-        // TEST. `Vote.Margin` has been computed every round for the life of the branch and
+        // And the grid is bucketed by the margin because that is the prediction under
+        // test. `Vote.Margin` has been computed every round for the life of the branch and
         // called a confidence; if it is one, a wide-margin round should survive a lost
         // holder and a thin-margin round should not. A flat grid would mean the margin is
         // not measuring what its own documentation says.
         //
-        // NO BAR, BECAUSE A THRESHOLD WRITTEN BEFORE THE FIRST READING IS A PREDICTION
-        // DRESSED AS A REQUIREMENT. It prints a grid and the grid is the finding.
+        // No bar, because a threshold written before the first reading is a prediction
+        // dressed as a requirement. It prints a grid and the grid is the finding.
         var (held, moments) = Trained(seed: 1);
 
         const int Holders = 12;
@@ -317,7 +317,7 @@ public sealed class SplitTests(ITestOutputHelper output)
                 + $"| {silenced[bucket] / (double)asked[bucket],8:F4}");
         }
 
-        // THE ONE ASSERTION, AND IT IS ABOUT THE INSTRUMENT RATHER THAN THE RESULT. A
+        // The one assertion, and it is about the instrument rather than the result. A
         // sweep whose every bucket is empty prints five dashes and passes, which is the
         // failure mode this suite exists to refuse.
         Assert.True(asked.Sum() > 1000, $"only {asked.Sum()} holder-losses examined");

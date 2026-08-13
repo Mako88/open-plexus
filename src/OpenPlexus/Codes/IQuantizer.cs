@@ -40,8 +40,8 @@ public interface IQuantizer<in TObservation>
     /// quantiser and changes no existing measurement.
     /// </para>
     /// <para>
-    /// <b>AND NOTHING READS IT SINCE THE WALK WENT, WHICH MAKES IT A CHANNEL WITH NO
-    /// FAR END.</b> The walk's occasion was the only consumer; a commitment's scope is a
+    /// <b>And nothing reads it since the walk went, which makes it a channel with no
+    /// far end.</b> The walk's occasion was the only consumer; a commitment's scope is a
     /// SET of codes and has nowhere to put a group. It stays only until something
     /// decides between wiring it to rung four's binding and deleting it — and a front-end
     /// ability nothing can act on is the shape this repo keeps finding read as built.
@@ -54,12 +54,12 @@ public interface IQuantizer<in TObservation>
     /// default, which is every front end for which nothing came first.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THE ORDER IS A FRONT-END JOB FOR THE SAME REASON SEGMENTATION IS.</b>
+    /// <b>The order is a front-end job for the same reason segmentation is.</b>
     /// A phase cannot survive C2 — late, jittered, out-of-order messages are
     /// exactly what destroys an oscillator relationship — so the order has to
     /// travel INSIDE the moment, where lateness cannot reach it. Only the front end
-    /// knows it: by the time codes reach a population they are a set. <b>THE ONE OF
-    /// THESE FOUR WITH A READER</b> — <see cref="Machines.Trial{TSeen}"/> turns it into
+    /// knows it: by the time codes reach a population they are a set. <b>The one of
+    /// these four with a reader</b> — <see cref="Machines.Trial{TSeen}"/> turns it into
     /// the precedence codes rung three is made of. Defaulted so that adding it breaks
     /// no existing quantiser and changes no existing measurement.
     /// </remarks>
@@ -76,7 +76,7 @@ public interface IQuantizer<in TObservation>
     /// is a fact about how it was minted. Defaulted so that adding it breaks no
     /// existing quantiser and changes no existing measurement.
     /// <para>
-    /// <b>AND IT HAS NO READER EITHER — see <see cref="Bind"/>.</b> The walk's
+    /// <b>And it has no reader either — see <see cref="Bind"/>.</b> The walk's
     /// rendezvous refused to write an edge onto a code that would never recur;
     /// nothing on this side has the equivalent, and a commitment that never fires
     /// twice is disposed of by its own statistics rather than by being marked.
@@ -89,13 +89,13 @@ public interface IQuantizer<in TObservation>
     /// is every occasion this design has ever written.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THE CHANNEL THAT OWES AN ARGUMENT AGAINST THE OTHERS.</b> None of them can
+    /// <b>The channel that owes an argument against the others.</b> None of them can
     /// carry it: grouping is about objects, fleetingness about recurrence, and order
     /// about time. This is about how the moment came to happen at all, which is a fact
     /// nothing in the moment records — the difference between <c>P(y | x)</c> and
     /// <c>P(y | do(x))</c>, and no amount of counting the first yields the second.
     /// <para>
-    /// <b>AND ITS READER WAS THE WALK'S INTERVENED EDGE KIND, SO IT HAS NONE — see
+    /// <b>And its reader was the walk's intervened edge kind, so it has none — see
     /// <see cref="Bind"/>.</b> <i>I picked this without looking at the state</i> is
     /// something a body knows about what it did; nothing here can be told it, which is
     /// the same hole the plan records under <i>original thought</i>: every world is

@@ -8,8 +8,8 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE PLAN ASKS FOR "A HASH SPENDING ITS BITS WHERE THE DATA IS WITHOUT
-/// BEING FITTED", AND THAT READS AS A CONTRADICTION UNTIL THE ADAPTIVITY MOVES.</b>
+/// <b>The plan asks for "a hash spending its bits where the data is without
+/// being fitted", and that reads as a contradiction until the adaptivity moves.</b>
 /// A projection chosen to suit the data is a fitted codebook, which the red-ball
 /// property forbids outright — two machines fitted on different samples agree
 /// about under 0.12 of items. So the projection cannot adapt. <b>What CAN adapt
@@ -18,7 +18,7 @@ namespace OpenPlexus.Codes;
 /// nothing to fit.
 /// </para>
 /// <para>
-/// <b>THIS IS THE FRUIT FLY'S OLFACTORY CIRCUIT, AND IT IS AN LSH SCHEME —
+/// <b>This is the fruit fly's olfactory circuit, and it is an LSH scheme —
 /// Dasgupta, Stevens and Navlakha, <i>Science</i> 2017.</b> Fifty receptor types
 /// project to two thousand Kenyon cells over sparse random connections, and one
 /// inhibitory neuron then silences all but the strongest few per cent. The tag is
@@ -27,7 +27,7 @@ namespace OpenPlexus.Codes;
 /// of the randomness rather than out of any training.
 /// </para>
 /// <para>
-/// <b>IT EXPANDS WHERE TEXTBOOK LSH CONTRACTS, and that is the part worth
+/// <b>It expands where textbook LSH contracts, and that is the part worth
 /// copying.</b> Classical LSH projects down into a short dense code; this
 /// projects UP and then throws most of it away. The expansion is what preserves
 /// similarity on little data — and a sparse set of fired codes is exactly what
@@ -35,7 +35,7 @@ namespace OpenPlexus.Codes;
 /// all. <b>A dense code would have to be unpacked into codes; this IS codes.</b>
 /// </para>
 /// <para>
-/// <b>WHAT IT IS FOR, AND WHY <see cref="Grains"/> IS NOT ENOUGH.</b> Grains take
+/// <b>What it is for, and why <see cref="Grains"/> IS NOT ENOUGH.</b> Grains take
 /// a reading that has ALREADY been banded and say it again more coarsely, so the
 /// hierarchy is the similarity — but it is a hierarchy per DIMENSION, and two
 /// readings that differ a little in every dimension share no band at any grain.
@@ -45,14 +45,14 @@ namespace OpenPlexus.Codes;
 /// along one axis at a time, this generalises across them.
 /// </para>
 /// <para>
-/// <b>THE PROJECTION IS A CONSTANT OF THE DESIGN AND NOT OF A RUN, WHICH IS WHY
-/// NO SEED IS TAKEN.</b> A seed parameter would let two machines be handed
+/// <b>The projection is a constant of the design and not of a run, which is why
+/// no seed is taken.</b> A seed parameter would let two machines be handed
 /// different ones, and the red-ball property would be gone without anything
 /// failing — the codes would simply mean different things in two places. Making
 /// it impossible to pass is stronger than documenting that nobody should.
 /// </para>
 /// <para>
-/// <b>AND IT IS DERIVED BY ARITHMETIC RATHER THAN FROM <see cref="Random"/>.</b>
+/// <b>And it is derived by arithmetic rather than from <see cref="Random"/>.</b>
 /// <see cref="Worlds.Seeds"/> already records that a seeded generator normalises
 /// its seed by magnitude, and <see cref="Worlds.Kinds.Named"/> already refuses
 /// <see cref="string.GetHashCode()"/> for being randomised per process. A
@@ -76,7 +76,7 @@ public sealed class Winnow
     /// settled.
     /// </summary>
     /// <remarks>
-    /// <b>A BOUND ON THE WATCHING AND NOT ON THE FRONT END.</b> The question this
+    /// <b>A bound on the watching and not on the front end.</b> The question this
     /// answers is <i>did the sheet collapse</i>, and a front end that has emitted
     /// this many distinct tags has answered it — counting further would grow
     /// without limit for no more information. Saturating for the same reason
@@ -140,19 +140,19 @@ public sealed class Winnow
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(samples);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(winners);
 
-        // A CELL CANNOT LISTEN TO AN INPUT TWICE, so it cannot want more distinct
+        // A cell cannot listen to an input twice, so it cannot want more distinct
         // inputs than exist. Sampling with replacement would quietly weight one
         // input double in that cell, which is a claim nobody made.
         ArgumentOutOfRangeException.ThrowIfGreaterThan(samples, inputs);
 
-        // AND WINNOWING TO EVERYTHING IS NOT WINNOWING. With every cell surviving
+        // And winnowing to everything is not winnowing. With every cell surviving
         // there is no competition, the tag is the same set for every reading, and
         // the one adaptive step in the design has been switched off by arithmetic.
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(winners, cells);
 
-        // AND A NARROW READING CANNOT FILL A WIDE SHEET -- BUT THIS READS THE
-        // DECLARED WIDTH AND NOT THE REAL ONE, SO IT IS NECESSARY AND NOT
-        // SUFFICIENT. Fifty inputs whose variation is really three-dimensional pass
+        // And a narrow reading cannot fill a wide sheet -- but this reads the
+        // declared width and not the real one, so it is necessary and not
+        // sufficient. Fifty inputs whose variation is really three-dimensional pass
         // it comfortably and still collapse onto a handful of tags, which is the
         // CLEVR failure wearing a disguise this arithmetic cannot see. `Distinct`
         // is the empirical half and the only one that can catch that.
@@ -164,7 +164,7 @@ public sealed class Winnow
         // three distinct tags at 128 cells and ONE at 2,000, against four thousand
         // for the same front end on a fifty-number reading.
         //
-        // IT IS NOT A CAP ON CELLS, IT IS A STATEMENT ABOUT THE READING. The fly
+        // It is not a cap on cells, it is a statement about the reading. The fly
         // expands fifty receptors onto two thousand cells because C(50, 6) is
         // astronomical; expansion buys similarity only where there is room to
         // expand INTO, and asking for more cells than that is claiming a resolution
@@ -202,7 +202,7 @@ public sealed class Winnow
         {
             total = total * (inputs - step) / (step + 1);
 
-            // NOTHING ABOVE THIS CAN CHANGE AN ANSWER, since `cells` is an `int`.
+            // Nothing above this can change an answer, since `cells` is an `int`.
             if (total > int.MaxValue) return int.MaxValue;
         }
 
@@ -287,8 +287,8 @@ public sealed class Winnow
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE HONEST VERSION OF THE CONSTRUCTOR'S GUARD, AND THE ONLY ONE THAT CAN
-    /// SEE A COLLAPSE.</b> That check compares the sheet against C(inputs,
+    /// <b>The honest version of the constructor's guard, and the only one that can
+    /// see a collapse.</b> That check compares the sheet against C(inputs,
     /// samples) — the width the caller DECLARED — and real data routinely varies in
     /// far fewer dimensions than it has numbers. Fifty inputs whose variation is
     /// really three-dimensional pass the arithmetic and still emit a handful of
@@ -296,7 +296,7 @@ public sealed class Winnow
     /// and exactly the case it cannot detect.
     /// </para>
     /// <para>
-    /// <b>A COUNT AND NOT A VERDICT.</b> Nothing here decides what "too few" is —
+    /// <b>A count and not a verdict.</b> Nothing here decides what "too few" is —
     /// that depends on how many things the world contains, which a front end has no
     /// business knowing. It is reported beside <see cref="Emitted"/> so a caller
     /// can say; see <c>WinnowTests</c>.
@@ -323,15 +323,15 @@ public sealed class Winnow
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE READING IS CENTRED FIRST, WHICH IS THE FLY'S DIVISIVE
-    /// NORMALISATION.</b> A tag should say what SHAPE the reading has and not how
+    /// <b>The reading is centred first, which is the fly's divisive
+    /// normalisation.</b> A tag should say what SHAPE the reading has and not how
     /// loud it was — a smell twice as strong is the same smell, and a garden
     /// uniformly damper is the same arrangement of plants. Without centring, the
     /// cells reading the most inputs win every time whatever arrives, and the tag
     /// stops varying at all.
     /// </para>
     /// <para>
-    /// <b>TIES BREAK ON THE CELL NUMBER, and that is not a detail.</b> A reading
+    /// <b>Ties break on the cell number, and that is not a detail.</b> A reading
     /// where several cells sum equal is exactly what a coarse or repetitive world
     /// produces, and leaving those to the sort's own order would make the tag
     /// depend on something nobody chose — which is the fault this session found
@@ -346,7 +346,7 @@ public sealed class Winnow
     {
         ArgumentNullException.ThrowIfNull(reading);
 
-        // A READING OF THE WRONG LENGTH IS A DIFFERENT SENSE, and quietly reading
+        // A reading of the wrong length is a different sense, and quietly reading
         // the first few numbers of it would emit codes that look exactly like this
         // front end's and mean something else.
         if (reading.Count != _inputs)
@@ -368,7 +368,7 @@ public sealed class Winnow
             fired[cell] = sum;
         }
 
-        // THE INHIBITION, AND IT IS THE ONLY ADAPTIVE STEP IN THE DESIGN. Every
+        // The inhibition, and it is the only adaptive step in the design. Every
         // cell competes with every other and the strongest few survive, so which
         // bits get spent is decided by THIS reading -- which is what the plan
         // asked for, without a codebook having been fitted to anything.
@@ -383,13 +383,13 @@ public sealed class Winnow
 
         var codes = ImmutableArray.CreateBuilder<Code>(_winners);
 
-        // EMITTED IN CELL ORDER RATHER THAN IN STRENGTH ORDER. The graph is handed
+        // Emitted in cell order rather than in strength order. The graph is handed
         // a SET, and how strongly each winner fired is not something a count can
         // hold -- so a stable order is worth more than a meaningless one.
         var winners = order.Take(_winners).Order().ToArray();
         foreach (var cell in winners) codes.Add(new Code(_modality, (ulong)cell));
 
-        // WHAT THE SHEET IS ACTUALLY RESOLVING, COUNTED RATHER THAN ASSUMED. See
+        // What the sheet is actually resolving, counted rather than assumed. See
         // `Distinct` -- the constructor's guard reads the declared width, and this
         // is the half of it that can see a reading whose real dimension is lower.
         var tag = 17;

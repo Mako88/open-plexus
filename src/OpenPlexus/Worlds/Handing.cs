@@ -7,14 +7,14 @@ public sealed record HandingSettings
 {
     /// <summary>How many people are in the room.</summary>
     /// <remarks>
-    /// <b>THE ANSWER ALPHABET, SO IT IS THE MARGINAL'S DENOMINATOR AND THE FIRST CEILING'S
-    /// VALUE.</b> Two people would make a coin-flip and the whole ladder one step high;
+    /// <b>The answer alphabet, so it is the marginal's denominator and the first ceiling's
+    /// value.</b> Two people would make a coin-flip and the whole ladder one step high;
     /// what the world is for is the DISTANCE between guessing at the marginal, guessing
     /// inside the right sentence, and reading it, so there has to be room between them.
     /// </remarks>
     /// <remarks>
-    /// <b>AND IT IS THE NUMBER OF THINGS TOO, WHICH IS A CONSTRAINT RATHER THAN A
-    /// SHORTHAND.</b> One sentence a thing, one person giving in each and one receiving,
+    /// <b>And it is the number of things too, which is a constraint rather than a
+    /// shorthand.</b> One sentence a thing, one person giving in each and one receiving,
     /// means the sentences use every person exactly twice — and THAT is what makes the
     /// story's word set identical in every draw. Fewer things than people would leave
     /// somebody out of some stories and not others, and how often a word appears is exactly
@@ -34,23 +34,23 @@ public sealed record HandingSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A SENTENCE IS A SEQUENCE AND EVERY TEXT ARM HERE READS IT AS A SET, WHICH IS WHERE
-/// THE BINDING DIES.</b> <i>mary gave the book to john</i> and <i>john gave the book to
+/// <b>A sentence is a sequence and every text arm here reads it as a set, which is where
+/// the binding dies.</b> <i>mary gave the book to john</i> and <i>john gave the book to
 /// mary</i> hold the same words, so no scope over a bag can tell them apart however the
 /// bag is coded — and that is not a limitation of the learner, it is the front end
 /// destroying the answer one call before anything could use it.
 /// </para>
 /// <para>
-/// <b>ORDER IS A FACT ABOUT THE SIGNAL AND NOT A CONCLUSION, WHICH IS THE LINE THIS STAYS
-/// THE RIGHT SIDE OF.</b> <see cref="Codes.Coded.Sequence"/> and
+/// <b>Order is a fact about the signal and not a conclusion, which is the line this stays
+/// the right side of.</b> <see cref="Codes.Coded.Sequence"/> and
 /// <see cref="IQuantizer{TFrame}.Order"/> already carry exactly this licence for every
 /// other sense; <see cref="Asking"/> carries it ACROSS sentences and not WITHIN one, which
 /// is an omission rather than a principle. What no world here may say is which word is the
 /// giver — that is a role, and a role is what has to be learnt.
 /// </para>
 /// <para>
-/// <b>AND <see cref="Bagged"/> IS ONE PROPERTY CALL, SO THE ARM THAT LOSES IT IS THE
-/// CONTROL RATHER THAN A DIFFERENT WORLD.</b> Every <see cref="Joining"/> arm, every
+/// <b>AND <see cref="Bagged"/> is one property call, so the arm that loses it is the
+/// control rather than a different world.</b> Every <see cref="Joining"/> arm, every
 /// ceiling and the withheld exam apply unchanged through it, so a reading here stands
 /// beside <see cref="Roaming"/>'s rather than starting a second scale.
 /// </para>
@@ -65,8 +65,8 @@ public readonly record struct Recited
 
     /// <summary>The same moment with the order thrown away.</summary>
     /// <remarks>
-    /// <b>WHAT EVERY EXISTING TEXT ARM READS, AND THE CEILING IT IMPOSES IS THE MARGINAL
-    /// EXACTLY.</b> <see cref="Handing"/> draws its givers and its takers as permutations,
+    /// <b>What every existing text arm reads, and the ceiling it imposes is the marginal
+    /// exactly.</b> <see cref="Handing"/> draws its givers and its takers as permutations,
     /// so the set of words in a story is the SAME SET in every draw — which makes the first
     /// rung of the ladder provable by construction rather than measured and argued over.
     /// </remarks>
@@ -91,8 +91,8 @@ public readonly record struct Recited
 /// thing, however either of them is named. This world is that sentence and nothing else.
 /// </para>
 /// <para>
-/// <b>THE LADDER HAS THREE RUNGS AND ALL THREE CEILINGS ARE EXACT BY CONSTRUCTION, WHICH IS
-/// THE WHOLE REASON TO GENERATE A WORLD RATHER THAN READ ONE.</b>
+/// <b>The ladder has three rungs and all three ceilings are exact by construction, which is
+/// the whole reason to generate a world rather than read one.</b>
 /// </para>
 /// <list type="number">
 /// <item><b>A bag of the story's words reaches 1/<see cref="HandingSettings.People"/></b>,
@@ -106,22 +106,22 @@ public readonly record struct Recited
 /// ordered sentence, so anything above a half is binding and nothing else.</item>
 /// </list>
 /// <para>
-/// <b>SO THE MIDDLE RUNG IS FORK 88 ARRIVING WITH SOMETHING LEFT OVER, AND THAT IS THE
-/// POINT OF THE DESIGN.</b> Intersecting the question with each statement is settled: it
+/// <b>So the middle rung is fork 88 arriving with something left over, and that is the
+/// point of the design.</b> Intersecting the question with each statement is settled: it
 /// answers bAbI's first task where the bag sits near the marginal. Here it is worth exactly
 /// one half and not one, so the two mechanisms are separated by a world instead of by an
 /// argument — a run that lands on 0.5 has selected and not bound, and a run that lands on
 /// 1.0 has done both.
 /// </para>
 /// <para>
-/// <b>AND THE TEMPLATE IS DELIBERATELY THE DULLEST ENGLISH THAT CARRIES A ROLE.</b> The
+/// <b>And the template is deliberately the dullest English that carries a role.</b> The
 /// role is carried by word order and by <i>to</i>, which is how English carries it, so a
 /// rule that finds it is a rule about the signal. Handing over a role LABEL would be the
 /// forbidden index in a different hat — the same standing as <c>ReturningTests</c>' tagged
 /// cell, which exists to be the far end of a gap and may never ship.
 /// </para>
 /// <para>
-/// <b>WATCHED RATHER THAN ACTED IN, AND SPEAKING TEXT ON PURPOSE</b>, for
+/// <b>Watched rather than acted in, and speaking text on purpose</b>, for
 /// <see cref="Roaming"/>'s reasons exactly: action and goals are both unbuilt, and a
 /// reading that cannot be put beside the other text worlds is a second scale nobody can
 /// compare across.
@@ -176,7 +176,7 @@ public sealed class Handing : IWorld<Recited>, IWithholds<Recited>
     /// from the transcript rather than from the state.</b>
     /// </summary>
     /// <remarks>
-    /// <b>WHAT IT SAID AND NEVER WHAT TO CONCLUDE</b>, which is
+    /// <b>What it said and never what to conclude</b>, which is
     /// <see cref="Roaming.Named"/>'s standing exactly. A probe asking <i>which people does
     /// this sentence mention</i> has to know which codes are people, and that is a fact
     /// about the vocabulary this world emitted. Nothing that learns is ever shown it.
@@ -218,15 +218,15 @@ public sealed class Handing : IWorld<Recited>, IWithholds<Recited>
     /// <summary>One room, one round of handing over, and one question about who has what.</summary>
     private Turn<Recited> Draw()
     {
-        // GIVERS AND TAKERS ARE BOTH PERMUTATIONS, WHICH IS WHAT MAKES THE FIRST CEILING A
-        // FACT RATHER THAN A MEASUREMENT. Drawing each pair independently would let a
+        // Givers and takers are both permutations, which is what makes the first ceiling a
+        // fact rather than a measurement. Drawing each pair independently would let a
         // person turn up more often than another, and how often a word appears is exactly
         // what a bag CAN read -- so the marginal would stop being the bag's ceiling and
         // every number off this world would be arguable.
         var givers = Shuffled(_settings.People);
         var takers = Shuffled(_settings.People);
 
-        // AND NOBODY HANDS A THING TO THEMSELF, so the two permutations are redrawn until
+        // And nobody hands a thing to themself, so the two permutations are redrawn until
         // they disagree everywhere it matters. A sentence naming one person twice would
         // hold ONE candidate rather than two, and the middle rung's one half would be an
         // average over sentences of two different shapes.
@@ -236,7 +236,7 @@ public sealed class Handing : IWorld<Recited>, IWithholds<Recited>
         var order = Shuffled(_settings.People);
         var told = new List<IReadOnlyList<Code>>();
 
-        // SHUFFLED, SO THAT WHICH SENTENCE ANSWERS THE QUESTION IS NOT ITS POSITION. A
+        // Shuffled, so that which sentence answers the question is not its position. A
         // fixed order would be answerable by counting from the end, which is recency and
         // has been measured elsewhere -- it would put a second mechanism in a world built
         // to hold exactly one.

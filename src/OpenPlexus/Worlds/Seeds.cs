@@ -6,7 +6,7 @@ namespace OpenPlexus.Worlds;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>MEASURED 2026-08-03, AND IT HAD ALREADY PRODUCED ONE FALSE RESULT.</b> A
+/// <b>Measured 2026-08-03, and it had already produced one false result.</b> A
 /// seeded <see cref="Random"/> in .NET normalises its seed by magnitude, so
 /// <c>new Random(~s)</c> <i>is</i> <c>new Random(s + 1)</c> — a "separate"
 /// generator built that way is the next seed's. Worse and more general,

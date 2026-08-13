@@ -6,15 +6,15 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S CALL, 2026-08-05: THE TEST WORLDS ARE NOT GOING AWAY.</b> A world
+/// <b>John's call, 2026-08-05: the test worlds are not going away.</b> A world
 /// built to isolate one mechanism should be allowed to feed the graph directly —
 /// what it is testing is not the front end, and making it invent a signal first
 /// would put a second thing between the mechanism and the measurement. So the
 /// no-op is a first-class member of the family rather than a gap in it.
 /// </para>
 /// <para>
-/// <b>AND IT IS BRAIN-SIDE LIKE EVERY OTHER QUANTISER, WHICH IS THE WHOLE POINT
-/// OF WRITING IT DOWN ONCE.</b> While each world owned a private nested copy,
+/// <b>And it is brain-side like every other quantiser, which is the whole point
+/// of writing it down once.</b> While each world owned a private nested copy,
 /// "this world does not quantise" was indistinguishable from "nobody has got to
 /// this world yet" — and <see cref="Winnow"/> could be built, documented and
 /// measured without ever reaching a world, because there was no shared place a

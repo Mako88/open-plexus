@@ -12,14 +12,14 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A WORLD SCOREABLE BY A BAG OF PARTS IS CIFAR WITH BETTER PICTURES.</b> The whole
+/// <b>A world scoreable by a bag of parts is CIFAR with better pictures.</b> The whole
 /// reason this world exists is that a ten-way label has no arrangement, so no score on
 /// one can tell a front end that manufactures reusable symbols from one that emits a
 /// holistic blob. If the parts alone carry the answer here, the exercise repeats and
 /// nobody finds out until a number has already been written up.
 /// </para>
 /// <para>
-/// <b>SO IT IS CHECKED THE ONLY WAY THAT SETTLES IT: OVER THE WHOLE SPACE.</b> A
+/// <b>So it is checked the only way that settles it: over the whole space.</b> A
 /// sampled version of this test would pass on a world that leaked a little, and a
 /// little is all it takes — the leak becomes the score, and the score becomes the
 /// finding.
@@ -36,7 +36,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
     [Fact]
     public void Knowing_every_part_that_is_present_says_nothing_about_the_answer()
     {
-        // THE CONSTRAINT, AS A COUNT RATHER THAN AS AN ARGUMENT. Group the entire
+        // The constraint, as a count rather than as an argument. Group the entire
         // space by what it CONTAINS and throw away where everything is: if any group
         // leans, a front end that names the parts and forgets their places can beat
         // chance, and this world is not the instrument it claims to be.
@@ -61,7 +61,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
     [Fact]
     public void And_the_swap_is_why_that_is_true_rather_than_a_coincidence()
     {
-        // THE MAP THAT MAKES THE COUNT INEVITABLE. Every layout has a partner holding
+        // The map that makes the count inevitable. Every layout has a partner holding
         // the identical parts and the opposite answer, and the partner is in the
         // space -- so the pairing above cannot be broken by a change to the clutter,
         // the grid or the resolution. A count that happens to come out even is a
@@ -80,13 +80,13 @@ public sealed class ArrangedTests(ITestOutputHelper output)
             Assert.Equal(1 - layout.Outcome, swapped.Outcome);
             Assert.Equal(Parts(layout), Parts(swapped));
 
-            // AND IT STAYS ON ITS OWN SIDE OF THE HELD-OUT LINE, which is what makes
+            // And it stays on its own side of the held-out line, which is what makes
             // the exam balanced without anything balancing it. Withholding one half of
             // a swapped pair would hand the withheld set a majority class, and a
             // constant answer would then beat chance on it.
             Assert.Equal(layout.Shown, swapped.Shown);
 
-            // AND THE LIGHT IS THE SAME, which closes the other way a bag of parts
+            // And the light is the same, which closes the other way a bag of parts
             // could leak. `Winnow` centres a reading before it projects it, so a
             // scene brighter on one answer than the other would be separable by
             // total intensity alone -- parts, again, wearing a different hat.
@@ -99,7 +99,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
     {
         var world = new Arranged(Small, seed: 7);
 
-        // A HELD-OUT SET WITH A MAJORITY CLASS IS AN EXAM A CONSTANT ANSWER PASSES,
+        // A held-out set with a majority class is an exam a constant answer passes,
         // and this world holds arrangements back in swapped PAIRS precisely so that
         // cannot happen. Asserted rather than argued.
         Assert.NotEmpty(world.Withheld);
@@ -107,7 +107,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
             world.Withheld.Count(one => one.Outcome == 0),
             world.Withheld.Count(one => one.Outcome == 1));
 
-        // AND THE WORLD MUST NEVER WANDER INTO IT. A withheld set the generator can
+        // And the world must never wander into it. A withheld set the generator can
         // reach measures the same thing a trailing accuracy does, more slowly.
         var kept = world.Withheld
             .Select(one => string.Join(",", one.Seen.Select(pixel => pixel > 0.5 ? '1' : '0')))
@@ -128,7 +128,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
     [Fact]
     public void The_drawn_stream_is_even_and_reproducible()
     {
-        // TWO WORLDS ON ONE SEED SEE THE SAME THING. Fork 12 has been reopened three
+        // Two worlds on one seed see the same thing. Fork 12 has been reopened three
         // times, and every time it was something outside this file -- which is why
         // the check belongs in every world rather than in one.
         var first = new Arranged(Small, seed: 3);
@@ -147,7 +147,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
             if (one.Outcome == 0) left++;
         }
 
-        // EVEN, BECAUSE THE DRAW IS UNIFORM OVER A SPACE CLOSED UNDER THE SWAP. A
+        // Even, because the draw is uniform over a space closed under the swap. A
         // world whose chance bar was not really a half would make every score above
         // it a comparison against the wrong number.
         Assert.InRange(left / 5_000.0, 0.47, 0.53);
@@ -156,7 +156,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
     [Fact]
     public void A_shape_looks_the_same_wherever_it_goes_and_different_from_the_others()
     {
-        // THE RECURRENCE THE WORLD IS FOR. A part must be the same part in every cell,
+        // The recurrence the world is for. A part must be the same part in every cell,
         // or there is nothing for a reusable symbol to be reused ON -- and the shapes
         // must differ from each other, or the clutter is indistinguishable from a
         // marker and the answer stops being about arrangement.
@@ -176,7 +176,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
 
             var reading = world.Render(only);
 
-            // READ BACK OUT OF THE CELL IT WAS DRAWN IN, so what is compared is the
+            // Read back out of the cell it was drawn in, so what is compared is the
             // GLYPH and not where it sat.
             var top = cell / 3 * 3;
             var mleft = cell % 3 * 3;
@@ -201,7 +201,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
     [Fact]
     public void No_shape_is_a_solid_block_at_any_resolution()
     {
-        // THE BUDGET FOR A FAILURE CLASS, AND THE CLASS IS "A PART NO SENSE CAN SEE".
+        // The budget for a failure class, and the class is "a part no sense can see".
         // `Winnow` centres a reading before it projects it, so a uniformly filled patch
         // and an empty one are the SAME reading -- and the first shape here was a solid
         // block. The whole-image arm never noticed, because a whole picture is never
@@ -209,7 +209,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
         // cell as an empty one, silently, and the score would have been read as a
         // learner that could not learn.
         //
-        // SO IT IS CHECKED AT EVERY RESOLUTION AND NOT JUST THE DEFAULT ONE, because
+        // So it is checked at every resolution and not just the default one, because
         // the shapes are predicates over the patch and a predicate can go uniform at a
         // size nobody tried.
         foreach (var cell in new[] { 3, 4, 5, 6, 8 })
@@ -239,13 +239,13 @@ public sealed class ArrangedTests(ITestOutputHelper output)
     [Fact]
     public void The_front_end_can_tell_the_two_answers_apart_at_all()
     {
-        // THE CEILING, COMPUTED RATHER THAN DISCOVERED AFTERWARDS. A learner cannot
+        // The ceiling, computed rather than discovered afterwards. A learner cannot
         // beat the front end it is fed, so before any score is read it is worth
         // knowing how often two scenes with OPPOSITE answers arrive as the same set
         // of codes. That is an exact upper bound on this world, and it is the number
         // `Cifar` could never have.
         //
-        // AND IT IS A COLLAPSE DETECTOR TOO. On CLEVR a projection over three numbers
+        // And it is a collapse detector too. On CLEVR a projection over three numbers
         // emitted one tag for four thousand objects and nothing said so.
         var world = new Arranged(Small, seed: 1);
         var sensing = new Winnowing(ArrangedRun.Patch, world.Width);
@@ -272,7 +272,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
             $"{layouts} scenes -> {said.Count} distinct tags, {sensing.Distinct} watched "
             + $"over {sensing.Emitted} readings; {confused} tags carry both answers");
 
-        // NOT A BAR ON QUALITY, A BAR ON THE FRONT END BEING THERE AT ALL. A
+        // Not a bar on quality, a bar on the front end being there at all. A
         // projection that mushed most of the world into tags carrying both answers
         // would make every downstream number a measurement of nothing, and it would
         // read exactly like a learner that could not learn.
@@ -284,8 +284,8 @@ public sealed class ArrangedTests(ITestOutputHelper output)
     [Fact]
     public void A_tiled_front_end_says_the_part_and_says_where_it_is()
     {
-        // THE TWO CLAIMS THE ARM RESTS ON, ASSERTED SEPARATELY BECAUSE EITHER COULD
-        // HOLD WITHOUT THE OTHER. A front end saying only what is present makes the
+        // The two claims the arm rests on, asserted separately because either could
+        // hold without the other. A front end saying only what is present makes the
         // world unscoreable; one saying only where things are makes nothing
         // transferable. It has to do both, and the bare code has to be literally the
         // shared part of the placed ones or rung five has nothing to reach for.
@@ -297,7 +297,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
         ImmutableHashSet<Code> Said(int shape, int cell) => [.. sensing.Codify(world.Render(
             new Layout { Places = [new Placed { Shape = shape, Cell = cell }], Outcome = 0, Shown = true }))];
 
-        // THE SAME PART IN TWO PLACES SHARES CODES, which is the recurrence. A whole
+        // The same part in two places shares codes, which is the recurrence. A whole
         // picture projection shares none, because every winner reads pixels from
         // everywhere at once.
         var here = Said(shape: 0, cell: 0);
@@ -305,19 +305,19 @@ public sealed class ArrangedTests(ITestOutputHelper output)
 
         Assert.NotEmpty(here.Intersect(there));
 
-        // AND IT IS STILL NOT THE SAME MOMENT, which is the arrangement. A front end
+        // And it is still not the same moment, which is the arrangement. A front end
         // whose two readings were identical would have thrown the position away and
         // the world would be unscoreable through it.
         Assert.NotEqual(here, there);
 
-        // AND TWO DIFFERENT PARTS IN ONE PLACE DIFFER, or the clutter is
+        // And two different parts in one place differ, or the clutter is
         // indistinguishable from a marker and nothing about arrangement survives.
         var wedge = Said(shape: 0, cell: 4);
 
         foreach (var other in Enumerable.Range(1, Arranged.Shapes - 1))
             Assert.NotEqual(wedge, Said(other, cell: 4));
 
-        // AND AN EMPTY CELL IS NOT A FILLED ONE. `Winnow` centres before it projects,
+        // And an empty cell is not a filled one. `Winnow` centres before it projects,
         // so a uniformly filled patch and an empty one are the same reading -- which
         // is why no shape here is a solid block, and this is the check that keeps it
         // that way from the front end's side rather than the world's.
@@ -335,12 +335,12 @@ public sealed class ArrangedTests(ITestOutputHelper output)
     [Fact]
     public void Both_front_ends_are_measured_against_the_dullest_learner_there_is()
     {
-        // THE BAR, AND IT COSTS NOTHING BECAUSE IT NEEDS NO LEARNING. A probe reads the
+        // The bar, and it costs nothing because it needs no learning. A probe reads the
         // world and the front end and never the population, so this is a fact about how
         // much of the problem each arm CARRIES -- available before any run, and the only
         // thing that makes a run's number readable afterwards.
         //
-        // AND THE PIXEL BAR IS THE SAME FOR BOTH ARMS BY CONSTRUCTION, which is what
+        // And the pixel bar is the same for both arms by construction, which is what
         // makes it the world's difficulty rather than a front end's.
         var pixels = new List<double>();
 
@@ -367,8 +367,8 @@ public sealed class ArrangedTests(ITestOutputHelper output)
     [Fact]
     public void What_the_scope_language_could_hold_if_the_learner_were_perfect()
     {
-        // THE PLAN'S RULE FOR EXTENDING THE LANGUAGE IS DECIDABLE AND NOTHING HAD
-        // DECIDED IT. Until this number exists, "the learner needs rung four" and "the
+        // The plan's rule for extending the language is decidable and nothing had
+        // decided it. Until this number exists, "the learner needs rung four" and "the
         // learner is leaving something on the table" are the same observation, and
         // picking a rung between them is the hand-specified bias the refutation table
         // calls ILP's cause of death.
@@ -397,12 +397,12 @@ public sealed class ArrangedTests(ITestOutputHelper output)
     [Fact]
     public void Whether_the_learner_ever_holds_the_rules_its_own_genesis_can_mint()
     {
-        // THE DIAGNOSIS, AND IT SPLITS THE GAP IN TWO. Genesis mints one-code
+        // The diagnosis, and it splits the gap in two. Genesis mints one-code
         // commitments and nothing else, so a code that is SOUND ON ITS OWN is reachable
         // by the very first thing the machine does. Whether the twelve are resident at
         // the end separates a learner that never found them from one that found them and
         // was outvoted -- and those two want completely different repairs.
-        // AND THE ARM IS THE GATE, BECAUSE IT DECIDES WHETHER THEY ARE EVER MINTED.
+        // And the arm is the gate, because it decides whether they are ever minted.
         // `Unaccounted` is self-limiting by construction -- once anything proposes the
         // outcome there is no surprise and genesis stops -- which is fork 40 exactly,
         // and it is also how a mechanism quietly stops. On CIFAR the gate was
@@ -413,8 +413,8 @@ public sealed class ArrangedTests(ITestOutputHelper output)
              from gate in new[] { Surprising.Unaccounted, Surprising.AnyFailure }
              select (looking, gate)).ToArray();
 
-        // FOUR WHOLE RUNS THAT SHARE NOTHING, AND THIS WAS THE SLOWEST TEST IN THE SUITE
-        // AT 184 SECONDS OF THEM WAITING FOR EACH OTHER. `ArrangedRun` holds no bus and
+        // Four whole runs that share nothing, and this was the slowest test in the suite
+        // at 184 seconds of them waiting for each other. `ArrangedRun` holds no bus and
         // is synchronous end to end, so a fixed seed fixes every number it reports
         // whatever else the machine is doing -- see `Fixture.Abreast` for why that is the
         // condition and why no bus world may go through it.
@@ -431,7 +431,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
                     var could = run.Reachable(depth: 1);
                     var got = run.Run(20_000);
 
-                    // WHAT IT HOLDS, SPELLED BACK OUT, so a minted name cannot hide a
+                    // What it holds, spelled back out, so a minted name cannot hide a
                     // scope that is really one code wearing a hat.
                     return (could, got, Fixture.Alone(run.Held));
                 })]);
@@ -453,7 +453,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
                 + $"believed {got.Rules.Trusted:F3} sound vs {got.Rules.Doubted:F3} "
                 + $"unsound · mean scope {got.Rules.Scope:F2}");
 
-            // THE TWO WAYS AN UNSOUND RULE SURVIVES, AND THEY PARTITION. Either
+            // The two ways an unsound rule survives, and they partition. Either
             // subsumption had a general parent to absorb it into and declined, or there
             // was no parent and nothing in the mechanism set could have removed it --
             // `Cull` returns early below capacity, and this world never reaches it.
@@ -466,7 +466,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
     [Fact]
     public void A_run_finishes_and_every_commitment_it_holds_is_graded()
     {
-        // END TO END, AND SHORT ON PURPOSE. What this asserts is that the world, the
+        // End to end, and short on purpose. What this asserts is that the world, the
         // front end, the learner and the soundness check compose -- the numbers are a
         // separate question and belong in a commit message, not in a bar here.
         var run = new ArrangedRun(Small, new Brain(new CommittingSettings(), seed: 1), Looking.Whole, seed: 1);
@@ -476,7 +476,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
         Assert.Equal(4_000, got.Tally.Rounds);
         Assert.Equal(0.5, run.Chance);
 
-        // THE THREE BUCKETS ARE A PARTITION. A commitment is contradicted, or it is
+        // The three buckets are a partition. A commitment is contradicted, or it is
         // not and fires somewhere, or it fires nowhere -- and `Inert` existing at all
         // is what stops a vacuous rule being counted as a true one.
         Assert.Equal(

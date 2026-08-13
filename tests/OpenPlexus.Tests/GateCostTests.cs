@@ -11,28 +11,28 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>`SplitRepairTests` REPORTED A RATE AND A RATE IS NOT A SCORE.</b> It measured how
+/// <b>`SplitRepairTests` reported a rate and a rate is not a score.</b> It measured how
 /// often a sharded holder repairs where the whole population would have refused, and said
 /// in its own commit that nothing there measures what that does to accuracy. A gate that
 /// is wrong harmlessly and a gate that is wrong expensively look identical from a
 /// disagreement count, and only one of them is a reason to build the query in fork 56.
 /// </para>
 /// <para>
-/// <b>AND IT UNDER-REPAIRS RATHER THAN OVER-REPAIRING, WHICH IS WHY THE TITLE OF THIS FILE
-/// IS NOT THE QUESTION IT WAS OPENED WITH.</b> <c>Mend</c> mints once a round, so the gate
+/// <b>And it under-repairs rather than over-repairing, which is why the title of this file
+/// is not the question it was opened with.</b> <c>Mend</c> mints once a round, so the gate
 /// never controlled how MANY repairs happen — only which commitment gets the one attempt.
 /// Admitting covered commitments puts low-accuracy generals at the front of a list ordered
 /// by accuracy ascending and they consume it. The gate aims repair; it does not limit it.
 /// </para>
 /// <para>
-/// <b>ONE MECHANISM ON FROM A KNOWN BASELINE, WHICH IS WHY <see cref="Population.Placing"/>
+/// <b>One mechanism on from a known baseline, which is why <see cref="Population.Placing"/>
 /// REACHES ONLY THE GATE.</b> Firing, voting and settling are untouched, so a run with a
 /// placement differs from one without in the repair gate ALONE. Sharding a world properly
 /// and comparing it against a whole one would move four things at once and the score could
 /// not say which of them did it.
 /// </para>
 /// <para>
-/// <b>AND THE ARMS ARE PAIRED SEED FOR SEED.</b> One seed is not a comparison and will
+/// <b>And the arms are paired seed for seed.</b> One seed is not a comparison and will
 /// happily invert — winnowing beat bands on seed one and lost to them over five, which is
 /// the finding this suite writes on every sweep it runs.
 /// </para>
@@ -47,7 +47,7 @@ public sealed class GateCostTests(ITestOutputHelper output)
     /// Twelve, <b>because five separated nothing and every arm moved the same way.</b>
     /// </summary>
     /// <remarks>
-    /// <b>RAISED AFTER READING, WHICH IS WORTH SAYING OUT LOUD.</b> Five seeds put every
+    /// <b>Raised after reading, which is worth saying out loud.</b> Five seeds put every
     /// metric between one and two standard errors of the whole-population arm — all in the
     /// same direction and none of it separated. Adding seeds to resolve a consistent
     /// direction is not the same as adding them until something passes, and the difference
@@ -60,7 +60,7 @@ public sealed class GateCostTests(ITestOutputHelper output)
     /// <summary>Runs the world with the repair gate seeing one holder's worth.</summary>
     /// <remarks>
     /// <para>
-    /// <b>`Mending.Uncovered` EXPLICITLY, BECAUSE THE DEFAULT HAS NO GATE TO BLIND.</b>
+    /// <b>`Mending.Uncovered` explicitly, because the default has no gate to blind.</b>
     /// <c>Mending.Outvoted</c> ships as the default and short-circuits the narrows
     /// check outright, so a sweep run on defaults returns three identical arms — which is
     /// what the first version of this file did, and the wiring assertion below is what
@@ -68,7 +68,7 @@ public sealed class GateCostTests(ITestOutputHelper output)
     /// and ruinous on `Arranged`, so this measures an arm and not the machine.
     /// </para>
     /// <para>
-    /// <b>AND EACH CONFIGURATION IS RUN ONCE.</b> Four metrics off one sweep is four
+    /// <b>And each configuration is run once.</b> Four metrics off one sweep is four
     /// twenty-thousand-round runs of the same thing unless something remembers, and an
     /// instrument that costs four times what it needs to is an instrument nobody runs.
     /// </para>
@@ -77,7 +77,7 @@ public sealed class GateCostTests(ITestOutputHelper output)
     /// The gate, on the timing it was measured with.
     /// </summary>
     /// <remarks>
-    /// <b>BOTH SETTINGS NAMED, BECAUSE ONE OF THEM USED TO BE IMPLIED.</b>
+    /// <b>Both settings named, because one of them used to be implied.</b>
     /// <c>Mending.Uncovered</c> meant the gate AND every-round repair while it was one
     /// enum; naming only the gate now would silently move every reading in this file onto
     /// the after-failure timing, where the same gate is six and a half standard errors
@@ -95,7 +95,7 @@ public sealed class GateCostTests(ITestOutputHelper output)
 
         var brain = new Brain(Gated, seed);
 
-        // SET BEFORE THE RUN AND NEVER DURING IT. A placement that changed mid-run would
+        // Set before the run and never during it. A placement that changed mid-run would
         // be a different machine either side of the change, and the score would be an
         // average over two of them.
         if (holders > 1)
@@ -113,7 +113,7 @@ public sealed class GateCostTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public async Task What_the_repair_gate_going_blind_costs_the_score()
     {
-        // ACCURACY IS THE HEADLINE AND IS NOT THE ONLY THING ASKED, because an accuracy
+        // Accuracy is the headline and is not the only thing asked, because an accuracy
         // can be reached by memorising and the gate's whole job is to stop the population
         // growing rules it does not need. If blinding it costs nothing on the score and
         // adds hundreds of residents, that is a cost this suite already knows how to read.
@@ -149,13 +149,13 @@ public sealed class GateCostTests(ITestOutputHelper output)
         output.WriteLine("children minted by repair");
         output.WriteLine(Sweep.Table(repaired));
 
-        // THE WIRING CHECK, AND IT IS THE ONLY ASSERTION HERE. `Placing` connected to
+        // The wiring check, and it is the only assertion here. `Placing` connected to
         // nothing would leave every arm identical and every table reading no cost -- a dial
         // declared, documented, passed everywhere and wired to nought, which this project
         // has lost a stamina dial to for the life of three measurements.
         //
-        // AND IT ASSERTS A DIFFERENCE RATHER THAN A DIRECTION, BECAUSE THE FIRST VERSION
-        // ASSERTED A DIRECTION AND GOT IT BACKWARDS. Blinding the gate admits MORE
+        // And it asserts a difference rather than a direction, because the first version
+        // asserted a direction and got it backwards. Blinding the gate admits MORE
         // candidates and mints FEWER children -- `Mend` returns after one successful mint,
         // so the gate never controlled how many repairs happen, only which commitment gets
         // the attempt. A prediction written into a wiring check fails for two completely
@@ -174,7 +174,7 @@ public sealed class GateCostTests(ITestOutputHelper output)
     /// order more.</b>
     /// </summary>
     /// <remarks>
-    /// <b>WRITTEN DOWN BECAUSE THE FIRST VERSION REUSED TWELVE AND WAS NOT COSTED.</b>
+    /// <b>Written down because the first version reused twelve and was not costed.</b>
     /// Thirty-six runs of <c>Arranged</c> is not a sweep anybody runs twice, and an
     /// instrument nobody runs is worth nothing however careful it is. Four resolves a
     /// DIRECTION and not a separation — so nothing here may be reported as a cost, only as
@@ -211,19 +211,19 @@ public sealed class GateCostTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public async Task And_the_same_blinding_on_the_world_where_the_gate_is_the_problem()
     {
-        // FORK 55 WAS ANSWERED ON ONE WORLD AND SAID SO. On the multiplexer, blinding the
+        // Fork 55 was answered on one world and said so. On the multiplexer, blinding the
         // gate is worse on every metric -- and this project's standing finding is that
         // `Mending.Uncovered` wins the clean multiplexer and RUINS `Arranged`. A mechanism
         // that helps in one place and hurts in another cannot have one answer to *what
         // does losing it cost*, and reporting the multiplexer's number as the cost would
         // be a dial cashed in citing a finding from one world in ten.
         //
-        // SO THE PREDICTION IS AN INVERSION, WHICH IS WHY THIS IS WORTH THE RUN. If the
+        // So the prediction is an inversion, which is why this is worth the run. If the
         // gate is what sinks this world, a holder that cannot see far enough to apply it
         // should do BETTER blind -- and a grid that came back flat would say the gate is
         // not what sinks it after all, which is worth as much.
         //
-        // AND THE WITHHELD SET IS THE SCORE HERE AND NOT THE TRAILING ONE. `Arranged` is
+        // And the withheld set is the score here and not the trailing one. `Arranged` is
         // where this repo learnt that a drawn score can be perfect while the withheld one
         // is not, so the trained number would agree with itself and say nothing.
         var withheld = await Sweep.AcrossAsync(SceneSeeds,
@@ -250,13 +250,13 @@ public sealed class GateCostTests(ITestOutputHelper output)
         output.WriteLine("children minted by repair");
         output.WriteLine(Sweep.Table(repaired));
 
-        // THE WIRING CHECK AGAIN, AND A DIFFERENCE RATHER THAN A DIRECTION. The whole
+        // The wiring check again, and a difference rather than a direction. The whole
         // point of running a second world is that the direction is what might invert.
         Assert.True(Math.Abs(repaired[2].Mean - repaired[0].Mean) > 0.0,
             $"blinding minted {repaired[2].Mean:F1} against {repaired[0].Mean:F1} whole — "
             + "`Placing` is not reaching `Mend` on this world");
 
-        // AND THE WITHHELD SET HAS TO EXIST, or every row above is a nullable defaulting to
+        // And the withheld set has to exist, or every row above is a nullable defaulting to
         // nought and three arms of zero agree perfectly.
         Assert.True(withheld[0].Mean > 0.0,
             "no withheld score came back, so every arm is a default and the grid is empty");

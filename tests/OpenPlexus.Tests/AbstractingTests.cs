@@ -40,8 +40,8 @@ public sealed class AbstractingTests(ITestOutputHelper output)
     [Fact]
     public void A_name_comes_from_its_members_and_from_nothing_else()
     {
-        // TWO NODES THAT NOTICE THE SAME REDUNDANCY MUST MINT THE SAME CODE WITHOUT
-        // SPEAKING, or a name means two things in two places and the whole point of
+        // Two nodes that notice the same redundancy must mint the same code without
+        // speaking, or a name means two things in two places and the whole point of
         // having one is gone.
         Assert.Equal(
             Naming.Name([Of(1), Of(2)]),
@@ -50,7 +50,7 @@ public sealed class AbstractingTests(ITestOutputHelper output)
         Assert.NotEqual(Naming.Name([Of(1), Of(2)]), Naming.Name([Of(1), Of(3)]));
         Assert.Equal(Naming.Meant, Naming.Name([Of(1), Of(2)]).Modality);
 
-        // A NAME FOR FEWER THAN TWO CODES SAYS NOTHING, and minting one would be a
+        // A name for fewer than two codes says nothing, and minting one would be a
         // rename dressed as an abstraction.
         Assert.Throws<ArgumentException>(() => Naming.Name([Of(1)]));
         Assert.Throws<ArgumentException>(() => Naming.Name([Of(1), Of(1)]));
@@ -68,7 +68,7 @@ public sealed class AbstractingTests(ITestOutputHelper output)
         Assert.Contains(name, names.Fold(Moment(1, 2, 3)));
         Assert.DoesNotContain(name, names.Fold(Moment(1, 3)));
 
-        // AND THE FOLD RUNS TO A FIXED POINT, which is the whole of the
+        // And the fold runs to a fixed point, which is the whole of the
         // bootstrapping: a name reached this round can complete a larger one in the
         // same moment, so a second level exists rather than being declared.
         var above = names.Mint([name, Of(3)]);
@@ -80,7 +80,7 @@ public sealed class AbstractingTests(ITestOutputHelper output)
     [Fact]
     public void Unfolding_spells_a_name_back_out_however_deep_it_goes()
     {
-        // WHAT A SOUNDNESS CHECK HAS TO BE ASKED IN. A world knows nothing about
+        // What a soundness check has to be asked in. A world knows nothing about
         // minted codes, so a rewrite that changed what a commitment CLAIMS shows up
         // here as a rule that stopped being true.
         var names = new Naming();
@@ -92,7 +92,7 @@ public sealed class AbstractingTests(ITestOutputHelper output)
         Assert.Equal<IEnumerable<Code>>([Of(1), Of(2), Of(3)], names.Unfold([above]));
         Assert.Equal<IEnumerable<Code>>([Of(1), Of(2), Of(4)], names.Unfold([pair, Of(4)]));
 
-        // A CODE NOBODY NAMED IS ITSELF.
+        // A code nobody named is itself.
         Assert.Equal<IEnumerable<Code>>([Of(7)], names.Unfold([Of(7)]));
         Assert.True(names.Knows(pair));
         Assert.False(names.Knows(Of(7)));
@@ -159,7 +159,7 @@ public sealed class AbstractingTests(ITestOutputHelper output)
     [Fact]
     public void Only_experienced_commitments_get_to_propose()
     {
-        // A SCOPE MINTED THIS ROUND IS NOT EVIDENCE THAT ANYTHING RECURS -- it is
+        // A scope minted this round is not evidence that anything recurs -- it is
         // evidence that covering ran.
         var dials = new CommittingSettings();
 
@@ -191,7 +191,7 @@ public sealed class AbstractingTests(ITestOutputHelper output)
 
         var after = held.All.Single(one => one.Expects == Says(0));
 
-        // SHORTER, AND SAYING THE SAME THING -- which `Unfold` is what checks.
+        // Shorter, and saying the same thing -- which `Unfold` is what checks.
         Assert.Equal(2, after.Scope.Length);
         Assert.Equal<IEnumerable<Code>>(before.Scope, held.Names.Unfold(after.Scope));
 
@@ -201,7 +201,7 @@ public sealed class AbstractingTests(ITestOutputHelper output)
         Assert.Equal(before.Seen, after.Seen);
         Assert.Equal(before.Accuracy, after.Accuracy);
 
-        // IT STILL FIRES ON EXACTLY THE MOMENTS IT DID, once the moment is folded.
+        // It still fires on exactly the moments it did, once the moment is folded.
         Assert.Single(held.Firing(held.Moment(Moment(1, 2, 7))));
         Assert.Empty(held.Firing(held.Moment(Moment(1, 7))));
     }
@@ -209,8 +209,8 @@ public sealed class AbstractingTests(ITestOutputHelper output)
     [Fact]
     public void A_scope_still_speaking_the_members_stands_in_no_relation_to_one_that_took_the_name()
     {
-        // WHAT REFUTED `Chunk`'S RULE WHEN IT WAS PORTED HERE, AND A LIVE DEFECT
-        // UNDERNEATH IT. On the walk, a name covering the whole MOMENT destroyed the
+        // WHAT REFUTED `Chunk`'S rule when it was ported here, and a live defect
+        // underneath it. On the walk, a name covering the whole MOMENT destroyed the
         // pairing it was meant to compress and `Senses` fell 0.8621 to 0.4138, so the
         // rule there was that a fold must leave something standing. The scope version
         // of that rule -- refuse the rewrite where the name would cover the whole
@@ -219,7 +219,7 @@ public sealed class AbstractingTests(ITestOutputHelper output)
         // first, `Unfold` recovers the claim, and the commitment fires on exactly the
         // moments it did.
         //
-        // WHAT IT DOES INSTEAD IS SPLIT THE POPULATION INTO TWO VOCABULARIES.
+        // What it does instead is split the population into two vocabularies.
         // `Commitment.Narrows` is a subset test over codes and does not unfold, so a
         // commitment left holding `{A,B}` and its own children holding `{name,C}` have
         // no code in common and stand in NO relation -- subsumption never looks at
@@ -229,7 +229,7 @@ public sealed class AbstractingTests(ITestOutputHelper output)
         // all, +1 to +41, with `resident` up on five of six. More rules held and no
         // more of them true.
         //
-        // AND THE REWRITE ALREADY HAS ONE PATH THAT LEAVES A SCOPE BEHIND -- the
+        // And the rewrite already has one path that leaves a scope behind -- the
         // identity collision in `Population.Abstract`, which is rare and is this same
         // split. That is why this is pinned here rather than left with the arm.
         var names = new Naming();
@@ -241,7 +241,7 @@ public sealed class AbstractingTests(ITestOutputHelper output)
         Assert.False(took.Narrows(members),
             "these are comparable after all, so the split this pins has been closed");
 
-        // AND UNFOLDING IS WHAT WOULD RESTORE IT — the revival condition, and the same
+        // And unfolding is what would restore it — the revival condition, and the same
         // grain `Population.Under` already reaches for to read a category's entailment.
         var spelled = names.Unfold(took.Scope);
 
@@ -260,7 +260,7 @@ public sealed class AbstractingTests(ITestOutputHelper output)
 
         Assert.Equal(3, held.Abstract());
 
-        // THE PAIR IS GONE FROM EVERY SCOPE, so there is nothing left to propose and
+        // The pair is gone from every scope, so there is nothing left to propose and
         // the second pass has to find nothing rather than mint a synonym.
         Assert.Equal(0, held.Abstract());
         Assert.Equal(1, held.Names.Count);
@@ -271,23 +271,23 @@ public sealed class AbstractingTests(ITestOutputHelper output)
     [Fact]
     public void Six_bits_has_nothing_this_rung_can_name_and_eleven_does()
     {
-        // THE PLAN SAID THIS WORLD HAD AN ANSWER KEY FOR ABSTRACTION -- that the
+        // The plan said this world had an answer key for abstraction -- that the
         // address bits recur across the rules, so an address is the thing to notice.
         // IT IS WRONG, and building the rung is what showed it.
         //
-        // A CODE HERE CARRIES A POSITION AND A VALUE TOGETHER, so the only thing a
+        // A code here carries a position and a value together, so the only thing a
         // pair can name is one address VALUE: *the address is zero-zero*. That
         // appears in exactly two rules, because each address selects one data bit
         // and that bit has two values. Two is below the description-length bar, and
         // rightly: a name costing two entries to define cannot repay itself across
         // two uses.
         //
-        // AND THE STRUCTURE THE WORLD ACTUALLY HAS IS OVER POSITIONS RATHER THAN
-        // VALUES -- *these bits are the address, whatever they say* -- which is a
+        // And the structure the world actually has is over positions rather than
+        // values -- *these bits are the address, whatever they say* -- which is a
         // variable, and a variable is rung FOUR. Naming sets of codes cannot reach
         // it at all.
         //
-        // ELEVEN BITS NAMES ANYWAY, AND NOT THE THING THE PLAN EXPECTED. Its scopes
+        // Eleven bits names anyway, and not the thing the plan expected. Its scopes
         // are wider and its correct rules more numerous, so sub-scopes DO recur
         // across three and more of them -- what repays is whatever the population
         // happens to share, which is a fact about what was learnt rather than about
@@ -308,7 +308,7 @@ public sealed class AbstractingTests(ITestOutputHelper output)
         Assert.Equal(0, six.Named);
         Assert.True(eleven.Named > 0, "eleven bits found nothing worth a name either");
 
-        // AND NAMING COSTS NOTHING ITS TRUTH. Every rewritten scope is checked
+        // And naming costs nothing its truth. Every rewritten scope is checked
         // against the world spelled back out, so a rewrite that changed what a
         // commitment claims would land here.
         Assert.True(six.Sound > 0, "the world stopped being learnable at all");
@@ -318,7 +318,7 @@ public sealed class AbstractingTests(ITestOutputHelper output)
     [Fact]
     public void And_it_names_the_moment_a_sub_scope_actually_repays()
     {
-        // THE MECHANISM IS NOT WHAT IS MISSING, which is worth asserting beside the
+        // The mechanism is not what is missing, which is worth asserting beside the
         // refusal above so the two are not confused. Given a population whose scopes
         // really do share a pair, the name arrives, the scopes shorten, and what each
         // one claims is unchanged.
@@ -335,10 +335,10 @@ public sealed class AbstractingTests(ITestOutputHelper output)
 
         output.WriteLine($"scope entries {before} -> {after} plus a name of two");
 
-        // SHORTER BY MORE THAN THE NAME COSTS TO DEFINE, which is the bar it cleared.
+        // Shorter by more than the name costs to define, which is the bar it cleared.
         Assert.True(after + 2 < before, $"{after} plus two is no better than {before}");
 
-        // AND EVERY ONE STILL CLAIMS WHAT IT CLAIMED: two codes now, three when
+        // And every one still claims what it claimed: two codes now, three when
         // spelled back out.
         Assert.All(held.All, one => Assert.Equal(2, one.Scope.Length));
         Assert.All(held.All, one => Assert.Equal(3, held.Names.Unfold(one.Scope).Length));

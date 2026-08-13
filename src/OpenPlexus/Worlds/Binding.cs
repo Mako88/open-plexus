@@ -30,7 +30,7 @@ public sealed record BindingSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE CONTROL, AND IT RUNS THE OTHER WAY ROUND FROM
+    /// <b>The control, and it runs the other way round from
     /// <see cref="SensesSettings.Scrambled"/>.</b> There the control destroys
     /// structure and is expected to fail; here the control ADDS structure the
     /// counts can see, and is expected to succeed. It exists so that "scored at
@@ -155,7 +155,7 @@ public sealed record Scene
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE WORLD BUILT TO FAIL, WITH THE FAILURE PREDICTED IN ADVANCE.</b> An
+/// <b>The world built to fail, with the failure predicted in advance.</b> An
 /// occasion in this architecture is a SET of co-occurring codes. So a scene of a
 /// red ball beside a blue box and a scene of a blue ball beside a red box produce
 /// the <i>identical</i> set — <c>{red, blue, ball, box}</c> — and no amount of
@@ -239,7 +239,7 @@ public sealed class Binding
 
         _settings = settings;
 
-        // TWO PURPOSES, SO THE TWO STREAMS SHARE NOTHING. See Seeds.Apart for
+        // Two purposes, so the two streams share nothing. See Seeds.Apart for
         // what happens when they are merely offset from each other.
         _scenes = new Random(Seeds.Apart(seed, 0x9E37_79B9));
         _binding = new Random(Seeds.Apart(seed, 0x85EB_CA6B));
@@ -307,7 +307,7 @@ public sealed class Binding
         IReadOnlyCollection<Code> codes =
             [colourLow, colourHigh, shapeLow, shapeHigh, .. tags];
 
-        // DRAWN EITHER WAY AND USED ONLY WHEN UNBOUND, so the binding generator
+        // Drawn either way and used only when unbound, so the binding generator
         // advances identically in both arms and a future arm added between them
         // cannot silently shift one.
         var swapped = _binding.Next(2) == 1 && !_settings.Bound;

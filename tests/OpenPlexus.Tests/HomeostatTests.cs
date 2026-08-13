@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Codes;
+using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
@@ -25,7 +25,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     [Fact]
     public void The_world_is_arithmetically_capable_and_not_trivially_so()
     {
-        // BOTH BOUNDS, OR THE WORLD MEASURES NOTHING. Restoring less than
+        // Both bounds, or the world measures nothing. Restoring less than
         // everything falls means nothing could hold it and the ceiling is
         // unreachable; restoring more than the fastest drain times the number of
         // needs means attending at random suffices and the ceiling is free.
@@ -43,7 +43,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     [Fact]
     public void Everything_falls_whether_or_not_anything_is_done()
     {
-        // THE PROPERTY THAT MAKES IDLING COST. Under survival, doing nothing was
+        // The property that makes idling cost. Under survival, doing nothing was
         // the strategy; here it is the failure.
         var world = new Homeostat(World());
         var before = world.At.ToList();
@@ -53,7 +53,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         Assert.All(Enumerable.Range(0, world.Needs),
             which => Assert.True(world.At[which] < before[which]));
 
-        // AND THE FASTEST-FALLING ONE FALLS FASTEST, which is what makes spreading
+        // And the fastest-falling one falls fastest, which is what makes spreading
         // attention evenly the wrong thing to do.
         Assert.True(
             before[world.Needs - 1] - world.At[world.Needs - 1] > before[0] - world.At[0]);
@@ -89,7 +89,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     [Fact]
     public void A_band_cannot_say_which_is_lowest_and_a_rank_can()
     {
-        // THE CEILING, ASSERTED RATHER THAN ARGUED, AND IT IS FORK 25's SHAPE IN A
+        // The ceiling, asserted rather than argued, and it is fork 25's SHAPE IN A
         // SECOND WORLD. Two states of one body whose variables sit in the SAME
         // bands and in a DIFFERENT order. A front end that emits bands alone emits
         // the identical code set for both, so no amount of counting can separate
@@ -122,7 +122,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         Assert.Equal(plain.Length * 2, before.Length);
         Assert.All(plain, code => Assert.Contains(code, before));
 
-        // AND THE ORDERING IS A PERMUTATION, never a near-miss: every position is
+        // And the ordering is a permutation, never a near-miss: every position is
         // held by exactly one variable, so the front end cannot emit a rank no
         // variable holds -- a state the graph would learn about and the body can
         // never be in again.

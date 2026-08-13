@@ -11,29 +11,29 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>REPAIR TESTS WHETHER THE ADDED CODE SEPARATES AND NEVER WHETHER IT WAS WORTH
-/// ADDING.</b> The gate runs a two-proportion test on Z's rate in the misses against its
+/// <b>Repair tests whether the added code separates and never whether it was worth
+/// adding.</b> The gate runs a two-proportion test on Z's rate in the misses against its
 /// rate in the hits, corrected for the candidates considered — so <i>is this a real
 /// discriminator</i> is answered and <i>did the rule pay too much for it</i> is not asked
 /// anywhere. Every condition roughly halves where a commitment can fire, and nothing reads
 /// that half.
 /// </para>
 /// <para>
-/// <b>SO THIS REPORTS THE TWO NUMBERS TOGETHER AND ASSERTS NOTHING.</b> Accuracy by rung is
+/// <b>So this reports the two numbers together and asserts nothing.</b> Accuracy by rung is
 /// the gain and firings by rung is the price, and a criterion weighing one against the other
 /// would need no per-world constant — which is what <see cref="CommittingSettings.Budget"/>
 /// is at every value, including the one that ships. A grid first, because this repo's own
 /// rule is that the instrument comes before the seventh story.
 /// </para>
 /// <para>
-/// <b>AND THE PREDICTION IS WRITTEN DOWN BEFORE THE RUN.</b> If each rung costs about half
+/// <b>And the prediction is written down before the run.</b> If each rung costs about half
 /// the reach for a small accuracy gain, deep children are poor value and a gain-against-reach
 /// rule would prune them — which is the same conclusion subsumption reaches by a different
 /// road and would explain why it is the population's main exit. If accuracy climbs steeply
 /// with depth, the narrowing is earned and fork 68 is answered no.
 /// </para>
 /// <para>
-/// <b>THE MEAN IS OVER COMMITMENTS AND NOT OVER FIRINGS, WHICH MATTERS AT DEPTH.</b> A rung
+/// <b>The mean is over commitments and not over firings, which matters at depth.</b> A rung
 /// holding many rules that each fire twice would otherwise read as a rung nobody uses, when
 /// what it is is a rung spread thin — and those want opposite conclusions.
 /// </para>
@@ -49,7 +49,7 @@ public sealed class NarrowingTests(ITestOutputHelper output)
     private const uint Purpose = 0x5EED_0068;
 
     /// <summary>
-    /// <b>WHAT EACH RUNG GAINS IN ACCURACY AND SPENDS IN REACH.</b>
+    /// <b>What each rung gains in accuracy and spends in reach.</b>
     /// </summary>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
@@ -62,7 +62,7 @@ public sealed class NarrowingTests(ITestOutputHelper output)
             output.WriteLine(
                 $"{"rung",4} {"rules",8} {"accuracy",10} {"firings",12} {"reach kept",12}");
 
-            // ONE RUN A SEED, AND EVERY RUNG READ OFF THE SAME POPULATION. Asking per rung
+            // One run a seed, and every rung read off the same population. Asking per rung
             // would run the identical configuration once a rung and report one measurement
             // as several -- the discipline `BudgetTests` records.
             var byRung = new Dictionary<int, (List<double> Accuracy, List<double> Firings, List<int> Rules)>();
@@ -102,7 +102,7 @@ public sealed class NarrowingTests(ITestOutputHelper output)
 
                 var reach = firings.Average();
 
-                // WHAT THE RUNG BELOW STILL REACHES, WHICH IS THE PRICE IN ITS OWN TERMS. A
+                // What the rung below still reaches, which is the price in its own terms. A
                 // firing count falls with depth for two unrelated reasons -- a longer scope
                 // matches less, and a younger rule has had less time -- and this separates
                 // neither. It is the ratio the fork is about; the confound is named here so

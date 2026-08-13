@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 
@@ -6,7 +6,7 @@ namespace OpenPlexus.Machines;
 
 /// <summary>A trial on the multiplexer, plus what only that world can say.</summary>
 /// <remarks>
-/// <b>SOUNDNESS AND THE ANSWER KEY ARE WORLD FACTS, so they are asked for here rather
+/// <b>Soundness and the answer key are world facts, so they are asked for here rather
 /// than carried in <see cref="Tally"/>.</b> A shared report that grew a field per
 /// world would put every world's vocabulary in front of every other one.
 /// </remarks>
@@ -30,20 +30,20 @@ public sealed record Learned
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>NOTHING IN THE MACHINE KNOWS WHEN A SCOPE IS DEEP ENOUGH, AND UNTIL THIS THERE
-    /// WAS NO NUMBER FOR IT.</b> The mean scope of the carriers says how deep the rules
+    /// <b>Nothing in the machine knows when a scope is deep enough, and until this there
+    /// was no number for it.</b> The mean scope of the carriers says how deep the rules
     /// that pay are; it cannot say whether that depth was NEEDED. This asks the world
     /// directly: drop one code, is the remainder still true? A rule where some drop leaves
     /// a truth is a rule that fires on fewer moments than a rule it already contains.
     /// </para>
     /// <para>
-    /// <b>AND IT IS A PROPERTY OF THE POPULATION RATHER THAN OF A LINEAGE, WHICH IS WHY IT
-    /// NEEDS NO NEW PLUMBING.</b> Whether the parent it descended from was itself sound is
+    /// <b>And it is a property of the population rather than of a lineage, which is why it
+    /// needs no new plumbing.</b> Whether the parent it descended from was itself sound is
     /// a question about a history the brain does not keep; whether what it holds NOW is
     /// longer than it had to be is decidable from the scope and the world's enumeration.
     /// </para>
     /// <para>
-    /// <b>AND THE FLOOR ON MISSES IS THE REASON THIS COULD BE NOUGHT.</b> Repair refuses a
+    /// <b>And the floor on misses is the reason this could be nought.</b> Repair refuses a
     /// parent under <c>Floor</c> misses, and a sound rule on a clean world never misses at
     /// all — so on such a world the chain may already stop by construction, and the depth
     /// the carriers sit at would be the route rather than the overshoot. That is a
@@ -51,15 +51,15 @@ public sealed record Learned
     /// number tells them apart.
     /// </para>
     /// <para>
-    /// <b>NOTHING WHERE IT WAS NOT ASKED FOR, BECAUSE IT IS THE MOST EXPENSIVE READING HERE
-    /// AND IT TIMED A CI SHARD OUT.</b> One soundness check enumerates every assignment the
+    /// <b>Nothing where it was not asked for, because it is the most expensive reading here
+    /// and it timed a CI shard out.</b> One soundness check enumerates every assignment the
     /// scope leaves open — up to <c>2^Widest</c> — and this asks one per code of every sound
     /// rule, each with one MORE bit free than the check it came from. On a wide world that is
     /// hundreds of millions of assignments per graded run, and it is charged once per run
     /// rather than once per round, which is why nothing else noticed.
     /// </para>
     /// <para>
-    /// <b>SO IT IS NULL RATHER THAN NOUGHT WHERE THE CENSUS IS OFF</b>, which is the same
+    /// <b>So it is null rather than nought where the census is off</b>, which is the same
     /// shape <c>Census</c> itself uses and the only one that cannot be misread. A zero here
     /// would say <i>nothing is over-specialised</i>, which is a finding, and the absence of a
     /// reading is not one.
@@ -76,27 +76,27 @@ public sealed record Learned
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A TRUE RULE EXPECTING THE COMMONEST OUTCOME FIRES ONLY WHERE GUESSING ALREADY
-    /// WORKS</b>, however accurate it is and however sound. So <see cref="Found"/> counts two
+    /// <b>A true rule expecting the commonest outcome fires only where guessing already
+    /// works</b>, however accurate it is and however sound. So <see cref="Found"/> counts two
     /// unlike things at once, and two levers have now moved it a long way with
     /// <c>Census.Paying</c> flat — thirteen of sixteen against six under skew, and no more
     /// hard rounds carried. Neither reading could say whether the rules arriving were the
     /// useless kind.
     /// </para>
     /// <para>
-    /// <b>NAMED FOR WHAT IT BOUNDS RATHER THAN FOR WHAT IT COUNTS, so it cannot be read as
+    /// <b>Named for what it bounds rather than for what it counts, so it cannot be read as
     /// <c>Census.Paying</c>.</b> That one is a SHARE of the hard rounds actually carried;
     /// this is a COUNT of the world's rules that could in principle carry one, and a grid
     /// carrying both under one word would be two different questions in one column.
     /// </para>
     /// <para>
-    /// <b>IT IS AN UPPER BOUND ON WHAT COULD PAY AND NEVER A COUNT OF WHAT DID</b>, which is
+    /// <b>It is an upper bound on what could pay and never a count of what did</b>, which is
     /// the whole reason it sits beside <c>Census.Carried</c> rather than replacing it. A rule
     /// expecting the rare outcome still has to FIRE on a round the rare outcome arrives on,
     /// and a deep enough scope may never do so.
     /// </para>
     /// <para>
-    /// <b>AND IT IS NOUGHT WHERE THE CENSUS DID NOT RUN, which is not the same as no such
+    /// <b>And it is nought where the census did not run, which is not the same as no such
     /// rule being held.</b> The commonest outcome is read off what arrived, so a run that was
     /// never censused has nothing to split by — this repo's own trap about a check that is
     /// wired and unable to fire, avoided by saying so here rather than by a number that looks
@@ -161,7 +161,7 @@ public sealed record Learned
     /// <param name="sound">Whether a scope really does entail an expectation.</param>
     /// <remarks>
     /// <para>
-    /// <b>WRITTEN ONCE BECAUSE THE CLONE BUDGET REFUSED THE SECOND COPY</b>, on the day
+    /// <b>Written once because the clone budget refused the second copy</b>, on the day
     /// the second enumerable world arrived — the same thing that happened to
     /// <see cref="Commitments.Cycle"/>, and for a better reason than tidiness. Two copies
     /// of a grading pass are two places for <i>experienced</i>, <i>checkable</i> and
@@ -170,7 +170,7 @@ public sealed record Learned
     /// the point of having more than one world.
     /// </para>
     /// <para>
-    /// <b>THE SCOPES ARE SPELLED BACK OUT BEFORE THE WORLD IS ASKED.</b> A world knows
+    /// <b>The scopes are spelled back out before the world is asked.</b> A world knows
     /// nothing about minted codes, so a rule written in them can only be checked once its
     /// names are expanded — and a rewrite that changed what a commitment CLAIMS would
     /// show up right here as a rule that had stopped being true.
@@ -197,8 +197,8 @@ public sealed record Learned
         var decidable = experienced.Where(one => checkable(one.Scope)).ToList();
         var true_ = decidable.Count(one => sound(one.Scope, one.Expects));
 
-        // ONE DROP AT A TIME AND NOT EVERY SUBSET, WHICH IS THE CHEAP HALF AND THE ONLY HALF
-        // THAT MATTERS. If any shorter sound rule is contained at all then some single drop
+        // One drop at a time and not every subset, which is the cheap half and the only half
+        // that matters. If any shorter sound rule is contained at all then some single drop
         // reaches a sound scope on the way down, because soundness here is a property of the
         // pinned bits and dropping an irrelevant one cannot make a true rule false. So the
         // one-code question answers the general one at a k-th of the cost.
@@ -226,7 +226,7 @@ public sealed record Learned
             Truths = truths.Length,
             Found = truths.Count(truth => Holds(held, truth)),
 
-            // AND THE SAME WALK SPLIT BY WHETHER THE RULE COULD EVER HAVE PAID. Written as a
+            // And the same walk split by whether the rule could ever have paid. Written as a
             // second `Count` over the same predicate rather than folded into one pass,
             // because the grading here is read far more often than it is run and a pair of
             // obvious walks is worth more than one clever one.
@@ -239,7 +239,7 @@ public sealed record Learned
 
     /// <summary>Whether the population holds one of the world's rules exactly.</summary>
     /// <remarks>
-    /// <b>PULLED OUT BECAUSE IT IS ASKED TWICE NOW</b> — once over every truth and once over
+    /// <b>Pulled out because it is asked twice now</b> — once over every truth and once over
     /// the truths expecting something other than the commonest outcome. Two copies of a scope
     /// comparison is two chances for one of them to unfold a minted name and the other not
     /// to, which is a fault that would read as a finding about which rules were found.

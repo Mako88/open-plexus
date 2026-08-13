@@ -11,13 +11,13 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S PROTOTYPE ORDERING PUTS TEXT FIRST AND THE CONTAINERS AFTER IT</b>, and
+/// <b>John's prototype ordering puts text first and the containers after it</b>, and
 /// this is the measurement that says whether the containers are worth building. The
 /// fleet is already proven to learn across sockets; what is unproven is that words
 /// teach this learner anything at all, and no arrangement of processes changes that.
 /// </para>
 /// <para>
-/// <b>A SCOPE IS A SET AND A SENTENCE IS A SEQUENCE, WHICH IS THE WHOLE QUESTION.</b>
+/// <b>A scope is a set and a sentence is a sequence, which is the whole question.</b>
 /// Rung three is not built, so a moment holding a story is a bag of words — and the two
 /// span arms below are the cheapest possible reading of what that costs, taken before
 /// anything is built to fix it.
@@ -37,7 +37,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// The cast, the rooms and the props, <b>as an answer key and never as an input.</b>
     /// </summary>
     /// <remarks>
-    /// <b>NOTHING IS EVER TOLD WHICH WORDS ARE NAMES.</b> These exist so that what a
+    /// <b>Nothing is ever told which words are names.</b> These exist so that what a
     /// statistic returns can be SCORED, exactly as the multiplexer's enumerated truth scores
     /// a rule without ever reaching the learner. <b>Verbs are deliberately absent</b>: a verb
     /// group is a real finding and writing a verb key after seeing one would be the
@@ -80,7 +80,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         Assert.Equal(whole.Questions, last.Questions);
         Assert.Equal(whole.Outcomes, last.Outcomes);
 
-        // THE SAME QUESTIONS IN THE SAME ORDER EXPECTING THE SAME ANSWERS, so the only
+        // The same questions in the same order expecting the same answers, so the only
         // thing the arm changes is how many words are in the room. An arm that also moved
         // the answer key would be two changes read as one.
         for (var one = 0; one < whole.Questions; one++)
@@ -102,14 +102,14 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE WITHHELD TURNS ARE NEVER DRAWN AND THEIR MOMENTS ARE, WHICH IS A CAVEAT ON
-    /// THE UNSEEN NUMBER RATHER THAN A FAULT IN THE WITHHOLDING.</b> bAbI is generated
+    /// <b>The withheld turns are never drawn and their moments are, which is a caveat on
+    /// the unseen number rather than a fault in the withholding.</b> bAbI is generated
     /// from templates over a small cast, so two stories reach the same bag of words often
     /// — and where they do, a held-out question is one the population has answered before
     /// under a different name.
     /// </para>
     /// <para>
-    /// <b>SO THIS COUNTS IT INSTEAD OF FORBIDDING IT.</b> Forbidding it would mean
+    /// <b>So this counts it instead of forbidding it.</b> Forbidding it would mean
     /// dropping the collisions from the examination, which is the experimenter deciding
     /// which questions count after seeing which ones repeat. The number goes beside the
     /// score, and a reading of the unseen accuracy has to be read next to it.
@@ -132,7 +132,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
         var twinned = kept.Count(one => drawn.Contains(one));
 
-        // ASSERTED AS A RANGE RATHER THAN A VALUE, because what this guards is that the
+        // Asserted as a range rather than a value, because what this guards is that the
         // number is READ. A silent nought would mean the examination is clean and a silent
         // hundred would mean it measures nothing, and both have to be visible.
         Assert.InRange(twinned, 0, kept.Count);
@@ -147,13 +147,13 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE BAR IS THE MARGINAL AND NOT THE BLIND DRAW, because the blind draw is too
+    /// <b>The bar is the marginal and not the blind draw, because the blind draw is too
     /// easy to clear.</b> Six answers make chance a sixth and the commonest answer is a
     /// fifth, so a population that has learnt nothing but which word comes up most is
     /// already at the second number — and a check against the first would pass on it.
     /// </para>
     /// <para>
-    /// <b>AND THE HELD-OUT NUMBER CARRIES THE BAR RATHER THAN THE DRAWN ONE.</b> A
+    /// <b>And the held-out number carries the bar rather than the drawn one.</b> A
     /// question drawn twenty times over is one a population may have memorised, and the
     /// twin count beside it says a chunk of the examination is word for word something
     /// already asked. What survives both is that it answers questions from stories it was
@@ -168,7 +168,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
         var unseen = Assert.IsType<Examined>(tally.Unseen);
 
-        // TWICE THE MARGINAL, WHICH THE READING CLEARS BY HALF AGAIN. Written under the
+        // Twice the marginal, which the reading clears by half again. Written under the
         // grid rather than over it: the drawn and unseen numbers came back near three
         // times `Commonest` and this is the room a default change is allowed to cost
         // before somebody has to look at it.
@@ -179,7 +179,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         Assert.True(tally.Recent > 2.0 * world.Commonest,
             $"the drawn stream scored {tally.Recent:F3} against {world.Commonest:F3}");
 
-        // THE CAVEAT PRINTED BESIDE THE SCORE AND IN THE SAME TEST, because they were once
+        // The caveat printed beside the score and in the same test, because they were once
         // taken under different settings and quoted together -- a twin count read at one
         // span next to an accuracy read at another, which flatters the accuracy by exactly
         // the amount nobody could see. Two numbers that must be read together belong in one
@@ -205,7 +205,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// It answers in English, which is the thing a number cannot show.
     /// </summary>
     /// <remarks>
-    /// <b>THE POINT OF THIS IS THAT IT CAN BE READ AND THEREFORE DISBELIEVED.</b> A score
+    /// <b>The point of this is that it can be read and therefore disbelieved.</b> A score
     /// says four in five and never which four, so a population answering every question
     /// with the commonest word and a population that has learnt the task produce the same
     /// line of output. The transcript is where that stops being true.
@@ -228,8 +228,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
             var moment = brain.Held.Moment(new HashSet<Code>(Codify(world.Withheld[one].Seen)));
             var vote = brain.Held.Predict(brain.Held.Firing(moment));
 
-            // THE OUTCOME CODE BACK INTO A WORD, WHICH IS THE ONLY PLACE THE MAPPING RUNS
-            // BACKWARDS. `Brain.Says` is a code per index and the world's alphabet is that
+            // The outcome code back into a word, which is the only place the mapping runs
+            // backwards. `Brain.Says` is a code per index and the world's alphabet is that
             // index, so a search over the alphabet is exact rather than a lookup that could
             // drift out of step with the thing it names.
             var answer = vote.Expects is not { } expects
@@ -245,8 +245,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
         // printing below to mean anything. What it answered is scored by the fact above.
         Assert.DoesNotContain(said, one => one.Contains("(unknown)", StringComparison.Ordinal));
 
-        // WHAT IT REACHES FOR, COUNTED, BECAUSE A SCORE OF EXACTLY NOUGHT IS A DIAGNOSIS
-        // WAITING TO BE READ. An arm answering every question wrongly and never abstaining
+        // What it reaches for, counted, because a score of exactly nought is a diagnosis
+        // waiting to be read. An arm answering every question wrongly and never abstaining
         // is not guessing badly -- it is answering something else consistently, and which
         // something is the finding.
         var reached = said
@@ -264,7 +264,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// The coincidence code says what it claims, on a moment built by hand.
     /// </summary>
     /// <remarks>
-    /// <b>THE ARM IS WORTH NOTHING IF THE MARKER IS NOT WHERE IT SAYS IT IS</b>, and a
+    /// <b>The arm is worth nothing if the marker is not where it says it is</b>, and a
     /// front end that silently marked nothing would read as <i>the coincidence does not
     /// pay</i> — the same conclusion from a wire that was never connected. Two moments,
     /// one sharing a word and one not.
@@ -287,14 +287,14 @@ public sealed class RecalledTests(ITestOutputHelper output)
         Assert.Contains(Joined.Coincided, new Joined(Joining.Anonymous).Codify(matching));
         Assert.DoesNotContain(Joined.Coincided, new Joined(Joining.Anonymous).Codify(missing));
 
-        // NAMED CARRIES WHICH WORD IT WAS, so it is not the anonymous code under another
+        // Named carries which word it was, so it is not the anonymous code under another
         // name — the whole difference between the two arms is this one assertion.
         Assert.DoesNotContain(Joined.Coincided, new Joined(Joining.Named).Codify(matching));
         Assert.Contains(
             new Code(Joined.Both, Babi.Of("mary").Value),
             new Joined(Joining.Named).Codify(matching));
 
-        // AND THE ABSENCE IS SAID OUT LOUD, which is the only arm that speaks when nothing
+        // And the absence is said out loud, which is the only arm that speaks when nothing
         // coincided. `Sundered` and `Coincided` are exclusive by construction.
         Assert.Contains(Joined.Sundered, new Joined(Joining.Either).Codify(missing));
         Assert.DoesNotContain(Joined.Sundered, new Joined(Joining.Either).Codify(matching));
@@ -309,13 +309,13 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE MECHANISM ASSERTED ON A MOMENT BUILT BY HAND, BECAUSE A GRID CANNOT TELL A
-    /// DISPLACEMENT RULE THAT DOES NOTHING FROM ONE THAT DOES THE WRONG THING.</b> Both come
+    /// <b>The mechanism asserted on a moment built by hand, because a grid cannot tell a
+    /// displacement rule that does nothing from one that does the wrong thing.</b> Both come
     /// back as a score, and this repo has read an unwired mechanism as a refutation before.
     /// Three statements: Mary moves twice and John moves once.
     /// </para>
     /// <para>
-    /// <b>AND THE TWO ENDS OF THE DIAL ARE ASSERTED TO BE THE TWO CONTROLS</b>, which is the
+    /// <b>And the two ends of the dial are asserted to be the two controls</b>, which is the
     /// property that stops the arm being a free win. Keying on every word collapses it to
     /// the newest statement; keying on none collapses it to the bag.
     /// </para>
@@ -339,7 +339,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         // them background and `mary` a key with nothing told to the front end at all.
         var situated = new Joined(Joining.Distinguished).Codify(story);
 
-        // MARY'S OLD PLACE IS GONE AND HER NEW ONE IS THERE, which is the whole claim.
+        // Mary's old place is gone and her new one is there, which is the whole claim.
         Assert.Contains(Babi.Of("garden"), situated);
         Assert.DoesNotContain(Babi.Of("kitchen"), situated);
 
@@ -348,7 +348,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         Assert.Contains(Babi.Of("office"), situated);
         Assert.Contains(Babi.Of("john"), situated);
 
-        // AND READING AT THE QUESTION'S KEY TAKES MARY'S NEWEST AND NOTHING ELSE, which is a
+        // And reading at the question's key takes Mary's newest and nothing else, which is a
         // different statement from the newest overall wherever somebody else spoke last.
         var addressed = new Joined(Joining.Addressed).Codify(story);
 
@@ -367,15 +367,15 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE MEASURED FAILURE IS A NEAR-PERFECT READER AND A HOPELESS SELECTOR, AND EVERY
-    /// ARM SO FAR HAS TRIED TO HELP IT SELECT.</b> A narrow view picks the sentence by hand
+    /// <b>The measured failure is a near-perfect reader and a hopeless selector, and every
+    /// arm so far has tried to help it select.</b> A narrow view picks the sentence by hand
     /// and reaches the ceiling; a recency band hands the position over in the alphabet and
     /// buys about half of that. This arm does not help it select at all — it overwrites, so
     /// that by the time the bag is built there is one place for Mary in it and selecting is
     /// not required.
     /// </para>
     /// <para>
-    /// <b>THE KILL CONDITION, WRITTEN BEFORE THE ARM RAN: if no setting of the dial beats
+    /// <b>The kill condition, written before the arm ran: if no setting of the dial beats
     /// <see cref="Joining.Recent"/> at the whole story, drop it.</b> Displacement would then
     /// be buying nothing a position code does not already buy, and the situation model would
     /// be answering a question this world does not ask. Beating the BAG is not enough — the
@@ -383,7 +383,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// be reporting the span arm under a new name.
     /// </para>
     /// <para>
-    /// <b>AND THE CAPACITY IS AN AXIS FOR THE REASON THE RECENCY GRID FOUND.</b> That arm's
+    /// <b>And the capacity is an axis for the reason the recency grid found.</b> That arm's
     /// gain evaporated as the population was allowed to grow, which is what said the extra
     /// alphabet was being spent memorising. This one REMOVES codes rather than adding them,
     /// so if it is real its gain should go the other way — and a single capacity could not
@@ -401,11 +401,11 @@ public sealed class RecalledTests(ITestOutputHelper output)
             foreach (var joining in new[] { Joining.Bagged, Joining.Recent })
                 Row(capacity, joining);
 
-            // THE DISPLACEMENT ARM, WHICH KEYS ON RECENCY AND HAS NO DIAL because the
+            // The displacement arm, which keys on recency and has no dial because the
             // story supplies its own background.
             Row(capacity, Joining.Distinguished);
 
-            // AND THE ONE THE CEILING SAYS SHOULD WIN OUTRIGHT. PRE-REGISTERED: it hands
+            // And the one the ceiling says should win outright. Pre-registered: it hands
             // over one statement with a ceiling of one, and this learner is measured at
             // ninety-nine per cent of its ceiling wherever it is handed one statement — so
             // anything short of the nineties says the reader finding was conditional on
@@ -434,13 +434,13 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE CONTROL IS IN THE FILE, WHICH IS THE ONLY REASON THE OTHER TWO MEAN
-    /// ANYTHING.</b> <see cref="Joining.Bagged"/> is every reading taken before this
+    /// <b>The control is in the file, which is the only reason the other two mean
+    /// anything.</b> <see cref="Joining.Bagged"/> is every reading taken before this
     /// existed, so the three run the same world, the same seed and the same brain and
     /// differ in one call.
     /// </para>
     /// <para>
-    /// <b>AND THE TWO ARMS SEPARATE A LOOKUP FROM A VARIABLE.</b>
+    /// <b>And the two arms separate a lookup from a variable.</b>
     /// <see cref="Joining.Named"/> keeps which word was shared and reaches one rule per
     /// person per place; <see cref="Joining.Anonymous"/> throws the identity away and
     /// reaches one rule per place, which is what a variable buys. If they come back level
@@ -474,14 +474,14 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE CEILING SAYS THIS LEARNER IS A NEAR-PERFECT READER AND A HOPELESS SELECTOR,
-    /// AND THIS IS THE FIRST MECHANISM AIMED AT THE SECOND HALF.</b> Shown one statement it
+    /// <b>The ceiling says this learner is a near-perfect reader and a hopeless selector,
+    /// and this is the first mechanism aimed at the second half.</b> Shown one statement it
     /// answers all but a hair of what is present; shown the whole story, where everything
     /// is present, it takes under a third. What it cannot do is say WHICH sentence, because
     /// a scope is a subset test over a set and a set has no positions.
     /// </para>
     /// <para>
-    /// <b>THE PREDICTION, WRITTEN BEFORE THE ARM RAN: banded at the whole story it should
+    /// <b>The prediction, written before the arm ran: banded at the whole story it should
     /// reach at least what the one-statement view reached.</b> The narrow view wins by
     /// throwing information away, and a band hands the same information over while keeping
     /// the rest — so anything short of that says the learner cannot use recency even when
@@ -493,8 +493,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_recency_as_a_code_recovers_the_selection()
     {
-        // AND THE CAPACITY IS AN AXIS RATHER THAN A CONSTANT, BECAUSE THE FIRST READING OF
-        // THIS ARM CAME BACK PINNED AT THE CAP. Banding multiplies the alphabet, so the
+        // And the capacity is an axis rather than a constant, because the first reading of
+        // this arm came back pinned at the cap. Banding multiplies the alphabet, so the
         // banded population saturated where the control sat at a twentieth of the limit --
         // and a comparison where one arm is against a wall and the other is not measures
         // the wall. Both arms get both caps, which is the only way to tell which it was.
@@ -522,14 +522,14 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A SCORE WITH NO CEILING BESIDE IT CANNOT SEPARATE A POOR LEARNER FROM A POOR
-    /// VIEW.</b> At one statement of span the moment is the last thing said and the
+    /// <b>A score with no ceiling beside it cannot separate a poor learner from a poor
+    /// view.</b> At one statement of span the moment is the last thing said and the
     /// question, so where the last statement is about somebody else the answering word is
     /// not present — and nothing the population could ever hold would put it there. That
     /// share is a fact about the WORLD and the span, decided before any learning happens.
     /// </para>
     /// <para>
-    /// <b>IT IS A CEILING RATHER THAN A TARGET, AND IT IS GENEROUS.</b> Being present is
+    /// <b>It is a ceiling rather than a target, and it is generous.</b> Being present is
     /// necessary and nowhere near sufficient — two places in the room and no way to choose
     /// clears this bar and answers wrongly half the time. So a learner AT the ceiling is
     /// doing everything the view allows, and a learner far under it is leaving something on
@@ -554,7 +554,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
             var ceiling = reachable / (double)world.Withheld.Count;
 
-            // NEVER NOUGHT, WHICH WOULD MEAN NOBODY COULD ANSWER THIS EXAM AT ALL. One is
+            // Never nought, which would mean nobody could answer this exam at all. One is
             // a legitimate reading and the important one: the whole story always contains
             // its own answer, so a span that shows everything has no information ceiling
             // whatever -- and the score there is entirely about the learner and the bag.
@@ -571,20 +571,20 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE DISTINCTION THE GRID CANNOT DRAW, AND IT COSTS NO LEARNING.</b> Reading at the
+    /// <b>The distinction the grid cannot draw, and it costs no learning.</b> Reading at the
     /// question's key answers task one outright and lands on the base rate at task two, and
     /// a score alone cannot say whether the statement it retrieved HELD the answer. Where
     /// the question names the apple and the apple's newest statement says who picked it up,
     /// the answering word was never in the room and no learner could have found it.
     /// </para>
     /// <para>
-    /// <b>WHICH IS THE WHOLE SHAPE OF WHAT IS MISSING.</b> One hop of retrieval reaches the
+    /// <b>Which is the whole shape of what is missing.</b> One hop of retrieval reaches the
     /// statement the question names; a second hop would have to read at a key that FIRST
     /// reading supplied. A ceiling near nought here says the arm is at its ceiling again and
     /// the fault is the view, exactly as it was at every width on task one.
     /// </para>
     /// <para>
-    /// <b>AND IT IS NOT A BOUND ON THE SCORE, WHICH THIS READING IS THE FIRST TO SHOW.</b> An
+    /// <b>And it is not a bound on the score, which this reading is the first to show.</b> An
     /// outcome is an index rather than a word in the room, so a population collects the base
     /// rate by expecting the commonest answer with nothing present to read — and where the
     /// marginal is above this column, a score SITS ABOVE IT with no fault anywhere. Read the
@@ -620,20 +620,20 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE CAVEAT ON THE PERFECT SCORE, MADE INTO A MEASUREMENT.</b> Task one is named
+    /// <b>The caveat on the perfect score, made into a measurement.</b> Task one is named
     /// <i>single supporting fact</i>, so a front end that retrieves one statement by the
     /// question's key is close to that task's own definition — and a grid that only ever ran
     /// there would be reporting the corpus's structure as the arm's result. Tasks two and
     /// three need two statements and three.
     /// </para>
     /// <para>
-    /// <b>PRE-REGISTERED, AND THE FAILURE IS THE INFORMATIVE OUTCOME.</b> One statement
+    /// <b>Pre-registered, and the failure is the informative outcome.</b> One statement
     /// cannot carry two supporting facts, so this should fall hard at task two — and where
     /// it falls to is the number worth having: down to the bag says retrieval buys nothing
     /// without chaining, and part of the way says one hop of it is already worth something.
     /// </para>
     /// <para>
-    /// <b>AND THE BAG RUNS BESIDE IT AT EVERY TASK</b>, because the tasks are not equally
+    /// <b>And the bag runs beside it at every task</b>, because the tasks are not equally
     /// hard and a score that fell because the corpus got harder would read exactly like an
     /// arm that stopped working.
     /// </para>
@@ -662,21 +662,21 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE SHARPER INSTRUMENT, AND IT COSTS NO LEARNING AT ALL.</b> A grid can only say
+    /// <b>The sharper instrument, and it costs no learning at all.</b> A grid can only say
     /// that an arm scored badly; it cannot say whether the rule dropped the wrong statement
     /// or the learner failed to use the right one. This asks the question directly — after
     /// displacement, is the answering word still in the room? — and it is decided by the
     /// front end alone, on the withheld set, before a single commitment exists.
     /// </para>
     /// <para>
-    /// <b>SO THE TWO COLUMNS TOGETHER ARE THE WHOLE VERDICT ON THE RULE.</b> The bag always
+    /// <b>So the two columns together are the whole verdict on the rule.</b> The bag always
     /// contains its own answer, so a ceiling under one is displacement destroying something
     /// it should have kept. What makes a rule GOOD is throwing a great deal away while that
     /// ceiling holds — the same reading `Span` gets, from a mechanism that is allowed to
     /// keep more than one sentence.
     /// </para>
     /// <para>
-    /// <b>AND THE THREE ROWS ARE ONE COMPARISON RATHER THAN THREE READINGS.</b> Displacement
+    /// <b>And the three rows are one comparison rather than three readings.</b> Displacement
     /// keyed on recency, retrieval keyed on the question, and a blind draw matched on
     /// budget — so an arm that keeps less AND answers more than the blind one has a key
     /// doing real work, and an arm that beats displacement on both columns at a smaller
@@ -712,7 +712,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
             $"distinguished | answer present {found / (double)world.Withheld.Count:F3} | "
             + $"kept {held / (double)whole:F3} of the bag");
 
-        // AND THE ARM THAT READS THE STORE AT THE KEY THE QUESTION SUPPLIES, in the same
+        // And the arm that reads the store at the key the question supplies, in the same
         // two columns. It keeps ONE statement, so its budget is the narrowest here — and if
         // its ceiling is high while its budget is small, that is the pair no recency rule
         // has managed and the whole reason fork 88 is worth taking.
@@ -734,7 +734,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
             $"addressed     | answer present {aimed / (double)world.Withheld.Count:F3} | "
             + $"kept {cost / (double)whole:F3} of the bag");
 
-        // THE DOMINANCE PUT IN THE TEST, because it is the reading the whole arc turns on.
+        // The dominance put in the test, because it is the reading the whole arc turns on.
         // Reading the store at the key the question supplies keeps LESS than the narrowest
         // recency rule and loses no answer at all, which no displacement setting managed at
         // any budget. A recency rule is at its ceiling only where it keeps one statement,
@@ -742,12 +742,12 @@ public sealed class RecalledTests(ITestOutputHelper output)
         Assert.Equal(world.Withheld.Count, aimed);
         Assert.True(cost < held, $"addressed kept {cost} against displacement's {held}");
 
-        // AND THE CONTROL THAT SAYS WHETHER THE KEY IS DOING ANYTHING AT ALL, matched
+        // And the control that says whether the key is doing anything at all, matched
         // question by question on how many words survived. Both columns moving together is
         // what removal AT A RATE looks like, and a rate is what dropping statements blindly
         // gives — so without this the two rules above cannot be told from a coin.
         //
-        // IT LIVES HERE RATHER THAN IN `Joining` ON PURPOSE. A control arm shipped in the
+        // It lives here rather than in `Joining` ON PURPOSE. A control arm shipped in the
         // front end would be an arm to delete later; a control computed in the test that
         // reads it costs nothing and cannot be mistaken for a mechanism.
         var draw = new Random(1);
@@ -780,7 +780,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
             $"blind         | answer present {guessing:F3} | "
             + $"kept {spent / (double)whole:F3} of the bag");
 
-        // THE READING PUT IN THE TEST RATHER THAN IN A COMMIT MESSAGE. A key that beat the
+        // The reading put in the test rather than in a commit message. A key that beat the
         // control on the ceiling while keeping MORE would be buying its advantage with
         // budget; this keeps strictly less and answers strictly more, which is the only
         // shape that says the choice of what to drop is doing the work.
@@ -794,19 +794,19 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE EXAMINATION DOES NOT MOVE WHEN THE OBJECTIVE DOES, WHICH IS THE WHOLE OF THE
-    /// DESIGN.</b> An objective scored on its own target is unfalsifiable — a next-word arm
+    /// <b>The examination does not move when the objective does, which is the whole of the
+    /// design.</b> An objective scored on its own target is unfalsifiable — a next-word arm
     /// hits next words and says nothing about understanding. So every arm predicts a word
     /// from one vocabulary, whole stories are held back from all four alike, and the same
     /// withheld questions are put to whatever each one grew.
     /// </para>
     /// <para>
-    /// <b>SO THREE OF THE FOUR SIT AN EXAM THEY WERE NEVER TRAINED FOR</b>, which is
+    /// <b>So three of the four sit an exam they were never trained for</b>, which is
     /// precisely the transfer question: did it learn the language, or this examination? A
     /// masked arm has never seen a question in its life.
     /// </para>
     /// <para>
-    /// <b>AND THE DRAWN COLUMN IS NOT COMPARABLE ACROSS ARMS AND IS PRINTED ANYWAY.</b>
+    /// <b>And the drawn column is not comparable across arms and is printed anyway.</b>
     /// Each one draws a different stream, so its trailing accuracy is against its own
     /// skew — it says whether an arm learnt ITS OWN task, which is what separates <i>the
     /// objective is hopeless</i> from <i>the objective works and does not transfer</i>.
@@ -837,7 +837,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// What a bag of words costs, over two tasks and three doses of recency.
     /// </summary>
     /// <remarks>
-    /// <b>A GRID RATHER THAN A CHECK, so it prints and asserts nothing.</b> <c>Span</c> is
+    /// <b>A grid rather than a check, so it prints and asserts nothing.</b> <c>Span</c> is
     /// the crudest possible dose of sequence and rung three is not built, so this is the
     /// reading that says what building it would be worth.
     /// </remarks>
@@ -869,65 +869,65 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE CONTROL IS THE WHOLE DESIGN OF THIS GRID.</b> A chain of N statements is also a
+    /// <b>The control is the whole design of this grid.</b> A chain of N statements is also a
     /// moment of N statements, and widening a moment is already known here to buy the drawn
     /// score and sell the held-out one. The ceiling probe says about half of what the hops
     /// reach is recency, so an arm read against one hop reports twice what it is worth — the
     /// bag at the same span is what says which mechanism paid.
     /// </para>
     /// <para>
-    /// <b>AND THE CEILING IS NOT A BOUND ON THE SCORE, which this exam has already caught
+    /// <b>And the ceiling is not a bound on the score, which this exam has already caught
     /// once.</b> An outcome is an index rather than a word in the room, so a population
     /// collects the base rate expecting the commonest answer with nothing present to read —
     /// and task three scores above its own one-hop ceiling for exactly that reason. Read the
     /// marginal beside every cell or a working arm looks broken and a dead one looks fine.
     /// </para>
     /// <para>
-    /// <b>THE CEILING ROSE TWO TO THREE TIMES AND THE SCORE DID NOT FOLLOW, WHICH IS THE
-    /// RESULT.</b> The chain wins its span-matched control on exactly one cell of six and
+    /// <b>The ceiling rose two to three times and the score did not follow, which is the
+    /// result.</b> The chain wins its span-matched control on exactly one cell of six and
     /// loses or ties everywhere else, and the plain bag at span three is the best arm on both
     /// tasks that need more than one fact. Retrieval was necessary and is not sufficient.
     /// </para>
     /// <para>
-    /// <b>AND WHERE ONE STATEMENT IS ENOUGH, A SECOND ONE IS DAMAGE — A QUARTER OF A PERFECT
-    /// SCORE.</b> Task one falls from answering everything to answering three in four the
+    /// <b>And where one statement is enough, a second one is damage — a quarter of a perfect
+    /// score.</b> Task one falls from answering everything to answering three in four the
     /// moment a hop it does not need is taken. That is the sharpest reading here and it is
     /// what the assertion below holds.
     /// </para>
     /// <para>
-    /// <b>BECAUSE THE BOTTLENECK MOVED FROM THE ROOM TO THE BAG, WHICH THIS DOC ALREADY
-    /// PREDICTED IN ANOTHER PLACE.</b> Every arm reading more than one statement pins the
+    /// <b>Because the bottleneck moved from the room to the bag, which this doc already
+    /// predicted in another place.</b> Every arm reading more than one statement pins the
     /// population at its capacity, the drawn score climbs while the held-out one does not, and
     /// silence appears from nowhere — <i>widening the moment buys the drawn score and sells
     /// the held-out one</i>, reproduced exactly by a mechanism built for a different reason.
     /// </para>
     /// <para>
-    /// <b>AND THE CAUSE IS THAT A SCOPE IS A SET, so two statements in the room is the
+    /// <b>And the cause is that a scope is a set, so two statements in the room is the
     /// SELECTION problem again, whole.</b> Nothing in a bag says which statement a word came
     /// from, so a chain that fetched the right sentence hands the matcher no way to use it —
     /// the same sentence this doc writes about a situation model.
     /// </para>
     /// <para>
-    /// <b>AND BANDING BY HOP CONFIRMS IT, WHICH IS THE ONE PLACE A DIAGNOSIS HERE HAS BEEN
-    /// PAID OUT RATHER THAN ARGUED.</b> Tagging each word with which hop found it makes
+    /// <b>And banding by hop confirms it, which is the one place a diagnosis here has been
+    /// paid out rather than argued.</b> Tagging each word with which hop found it makes
     /// <i>the statement the question named</i> and <i>the one that named</i> different codes,
     /// and the two-fact task goes from a fifth to a third — the best arm on it, half again
     /// what the chain alone reached and clear of its marginal, where nothing else was.
     /// </para>
     /// <para>
-    /// <b>SO THE CHAIN WANTED RUNG THREE AND NOT A DEEPER HOP, and the retrieval was only ever
+    /// <b>So the chain wanted rung three and not a deeper hop, and the retrieval was only ever
     /// half a mechanism.</b> Silence collapses with it, from a sixth of the exam to a
     /// two-hundredth, because an arm that can tell its statements apart stops abstaining on
     /// the rounds that held two.
     /// </para>
     /// <para>
-    /// <b>AND IT REACHES TWO FACTS AND NOT THREE, WHICH IS THE HONEST EDGE.</b> The three-fact
+    /// <b>And it reaches two facts and not three, which is the honest edge.</b> The three-fact
     /// task sits level with the plain bag and under its own marginal at every depth, so what
     /// is measured here is a mechanism that scales to the task it was aimed at and stops.
     /// </para>
     /// <para>
-    /// <b>AND THE BAND CAP IS NOT WHAT STOPS IT, WHICH IS WORTH SAYING BECAUSE IT IS THE
-    /// OBVIOUS SUSPECT.</b> <see cref="Joined.Bands"/> is three and three hops use bands nought, one
+    /// <b>And the band cap is not what stops it, which is worth saying because it is the
+    /// obvious suspect.</b> <see cref="Joined.Bands"/> is three and three hops use bands nought, one
     /// and two, all distinct — the cap first bites at a FOURTH hop. What separates the two
     /// tasks is CONVERSION: the two-fact task turns near three quarters of its answer-present
     /// ceiling into score and the three-fact task under half.
@@ -966,7 +966,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     + $"wanting {tally.Wanting:F3}");
             }
 
-            // A HOP NOT NEEDED IS DAMAGE, and task one is where that is unmistakable: the
+            // A hop not needed is damage, and task one is where that is unmistakable: the
             // addressed arm answers everything and every deeper arm answers less. This is
             // asserted rather than printed because it is the finding that stops a future
             // session shipping the chain as a default on a ceiling reading alone.
@@ -982,7 +982,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     "banding did not recover what the unioned chain gave away");
             }
 
-            // AND ON THE TWO-FACT TASK THE BANDED CHAIN IS THE BEST ARM THERE IS, which is the
+            // And on the two-fact task the banded chain is the best arm there is, which is the
             // claim worth failing the build over. Every other arm here is a bag of some width
             // or a chain the matcher cannot read, and one of those leading would mean the
             // mechanism is width and never the hop.
@@ -998,8 +998,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE FIRST READING ON A CORPUS THAT IS NOT TEMPLATED, AND IT IS ONLY POSSIBLE
-    /// BECAUSE OF WHAT <c>PrimerTests.Is_reading_real_english_predictive_at_all</c>
+    /// <b>The first reading on a corpus that is not templated, and it is only possible
+    /// because of what <c>PrimerTests.Is_reading_real_english_predictive_at_all</c>
     /// FOUND.</b> On bAbI, selecting the informative words IS selecting the
     /// unpredictable ones — a held-out predictor reaching 89% of that corpus's ceiling
     /// elsewhere scores 0.170 on its rooms against a blind draw of 0.173. On Tatoeba
@@ -1008,13 +1008,13 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </para>
     /// <para>
     /// <b>WHICH MAKES <see cref="Predicting.Salient"/> AGAINST <see cref="Predicting.Masked"/>
-    /// A REAL COMPARISON FOR THE FIRST TIME.</b> The two were compared on bAbI and the
+    /// A real comparison for the first time.</b> The two were compared on bAbI and the
     /// gate could only ever have lost there, because the words it selects were drawn at
     /// random over a template. This is the same pair on a text where the gate is
     /// selecting the words that carry something.
     /// </para>
     /// <para>
-    /// <b>AND THE EXAMINATION IS THE OBJECTIVE ON SENTENCES NEVER READ, which is forced
+    /// <b>And the examination is the objective on sentences never read, which is forced
     /// rather than chosen.</b> Plain English writes no questions, so there is nothing
     /// else a withheld sentence could be asked. That makes this arm's accuracy NOT
     /// comparable with any bAbI reading in this file — a different exam is a different
@@ -1032,8 +1032,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
         foreach (var predicting in new[] { Predicting.Masked, Predicting.Salient })
         {
-            // THE SIZING `Whether_capacity_binds_on_english` PROVED UNSATURATED, RATHER THAN
-            // A BIGGER ONE. Two arms have now been compared at a cap they both sat ON --
+            // THE SIZING `Whether_capacity_binds_on_english` proved unsaturated, rather than
+            // a bigger one. Two arms have now been compared at a cap they both sat ON --
             // 8,000 against 2,855 words, then 30,000 against 4,648 -- and a saturated
             // population compares nothing however large it is. The grid says 2,855 words
             // settle at 18,267, so this is the same corpus at a cap known to clear it.
@@ -1045,7 +1045,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
             scored[predicting] = exam - world.Commonest;
 
-            // THE CHECK THIS FAILURE CLASS EARNED, AFTER THREE SWEEPS SPENT ON IT. Twice the
+            // The check this failure class earned, after three sweeps spent on it. Twice the
             // sizing chased the vocabulary and was caught by it; the third time the
             // vocabulary MATCHED and both arms still pinned, because the two objectives do
             // not read the same corpus the same number of times -- 15,312 questions against
@@ -1064,20 +1064,20 @@ public sealed class RecalledTests(ITestOutputHelper output)
                 + $"| {world.Questions} read, {world.Outcomes} words | held {brain.Held.Count}");
         }
 
-        // THE GATE HAS TO PAY HERE OR IT PAYS NOWHERE. It lost on bAbI for a reason that
+        // The gate has to pay here or it pays nowhere. It lost on bAbI for a reason that
         // has since been measured and is about the corpus rather than about gating, and
         // this is the text where the words it picks are the ones carrying something. If
         // it still does not lead, the reason is the gate and `Salient` should go.
         //
-        // AND A PASS HERE IS NOT A WIN WHILE BOTH SIT AT OR UNDER THEIR MARGINAL, which is
+        // And a pass here is not a win while both sit at or under their marginal, which is
         // why the margins are printed either way. TWICE NOW a sizing has produced exactly
         // that with `held` on the cap -- Masked at -0.036 and Salient at +0.000, which
         // reads as the gate leading and means only that neither population was allowed to
         // finish growing. Read `held` before reading `exam`, every time.
-        // AND IT IS ASKED BEFORE THE COMPARISON RATHER THAN NOTED UNDER IT. The assertion
+        // And it is asked before the comparison rather than noted under it. The assertion
         // below passed on a saturated grid twice and the pass meant nothing both times,
         // which is precisely how a reading about a cap gets read as a reading about a gate.
-        // RAISING THE CAP IS NOT THE FIX AND HAS FAILED TWICE: what this demands is arms
+        // Raising the cap is not the fix and has failed twice: what this demands is arms
         // whose LOAD is matched, or a comparison that does not need them to be.
         Assert.Empty(saturated);
 
@@ -1092,19 +1092,19 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE CONTROL THAT SAYS HOW EVERY OTHER ENGLISH READING MAY BE READ.</b> The first
+    /// <b>The control that says how every other English reading may be read.</b> The first
     /// one came back under its marginal on both objectives with the population pinned at
     /// its cap — and a saturated population cannot be evidence about a corpus, only about
     /// the cap. bAbI never raised the question because thirty words fit anywhere.
     /// </para>
     /// <para>
-    /// <b>AND IT IS ONE AXIS: HOW MANY COMMITMENTS MAY BE HELD, nothing else moving.</b>
+    /// <b>And it is one axis: how many commitments may be held, nothing else moving.</b>
     /// Same sentences, same objective, same rounds, same seed. Where the population stops
     /// growing before it hits the cap is where the reading is the learner's rather than
     /// the ceiling's, and that is the point every other English arm should be sized above.
     /// </para>
     /// <para>
-    /// <b>WHAT THE FIRST GRID SHOWED, AND THE REASON THE ASSERTION IS THE SHAPE IT IS:</b>
+    /// <b>What the first grid showed, and the reason the assertion is the shape it is:</b>
     /// the exam rises with the cap, clears the marginal once the cap stops binding, and
     /// sits an order below what the same text scores under a plain bag predictor. The
     /// score to watch is not the exam but the DISTANCE from it to <c>own</c>: the learner
@@ -1134,7 +1134,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                 + $"| {world.Questions} read, {world.Outcomes} words");
         }
 
-        // THE CLAIM WORTH FAILING THE BUILD OVER, and it is about the CAP rather than about
+        // The claim worth failing the build over, and it is about the CAP rather than about
         // the score. Reading real English beats always saying the commonest answer once the
         // population is allowed to be big enough, and does not when it is not. If the small
         // cap ever clears too, the cap stopped binding and every arm here may be sized down.
@@ -1164,7 +1164,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// The English world is one sentence a story, and its exam is sentences never read.
     /// </summary>
     /// <remarks>
-    /// <b>THE STRUCTURE RATHER THAN THE SCORE, because the score is a sweep and this has
+    /// <b>The structure rather than the score, because the score is a sweep and this has
     /// to fail the build.</b> Two things could quietly go wrong and read as a result:
     /// sentences sharing a story would let a span reach into somebody else's full stop,
     /// and an exam drawn from sentences that were also read would be recall wearing
@@ -1175,13 +1175,13 @@ public sealed class RecalledTests(ITestOutputHelper output)
     {
         var world = new Recalled(English(sentences: 400, Predicting.Salient));
 
-        // ONE TARGET A SENTENCE UNDER `Salient`, AND THE HELD TENTH IS NOT AMONG THEM.
+        // ONE TARGET A SENTENCE UNDER `Salient`, and the held tenth is not among them.
         // 400 sentences less the 40 withheld is what may be read, and the withheld ones
         // are the whole of the examination.
         Assert.Equal(360, world.Questions);
         Assert.True(world.Outcomes > 400, $"only {world.Outcomes} distinct words in 400 sentences");
 
-        // AND NOTHING READ IS ANYTHING EXAMINED. A sentence is its own story here, so
+        // And nothing read is anything examined. A sentence is its own story here, so
         // withholding the last forty stories withholds forty whole sentences -- which is
         // the property the bAbI world gets from withholding whole stories.
         var read = new HashSet<int>();
@@ -1192,7 +1192,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
             $"400 sentences: {world.Questions} read over {world.Outcomes} words, "
             + $"{read.Count} distinct answers, marginal {world.Commonest:F3}");
 
-        // THE MARGINAL IS THE FLOOR EVERY ENGLISH READING IS AGAINST, and on the rarest
+        // The marginal is the floor every English reading is against, and on the rarest
         // word of a sentence it is nearly nothing -- which is the whole reason this
         // corpus can show a lift where bAbI's six rooms could not.
         Assert.True(world.Commonest < 0.1,
@@ -1205,14 +1205,14 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>FORK 91, AND THE FRONT-END INSTRUMENT FOR IT.</b> A masked objective spends its
+    /// <b>Fork 91, and the front-end instrument for it.</b> A masked objective spends its
     /// population on function words because a bag predicts those best, and demanding the
     /// RAREST word instead rescues the kind of answer and not the score. Fork 95 says why
     /// arithmetically: on this corpus the commonest motion verb outranks every name while the
     /// rarer verbs fall below all of them, so no rank keeps the names and drops the verbs.
     /// </para>
     /// <para>
-    /// <b>SO THE RULE PROPOSED HERE IS NOT A RANK AT ALL: a word is worth predicting if
+    /// <b>So the rule proposed here is not a rank at all: a word is worth predicting if
     /// something ELSE could have been there instead.</b> That is the alternation statistic
     /// already measured — <i>the</i> and <i>to</i> belong to no category because they stand
     /// with everything, and a word with no alternative was never a choice, so predicting it
@@ -1220,32 +1220,32 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// needed to answer it.
     /// </para>
     /// <para>
-    /// <b>AND WHAT WOULD DROP IT IS WRITTEN BEFORE IT RAN:</b> picking the same targets as
+    /// <b>And what would drop it is written before it ran:</b> picking the same targets as
     /// rarity already picks. A gate that changes no target changes no population, whatever
     /// story is told about why it should.
     /// </para>
     /// <para>
-    /// <b>IT DID NOT PICK THE SAME TARGETS AND THE ARM DIES ANYWAY, FOR A BETTER REASON THAN
-    /// THE ONE PRE-REGISTERED.</b> Rarity already selects content words perfectly on the
+    /// <b>It did not pick the same targets and the arm dies anyway, for a better reason than
+    /// the one pre-registered.</b> Rarity already selects content words perfectly on the
     /// one-fact task — every target a room, not a preposition among them — so target
     /// selection was never what was broken, and the plan's own note that it <i>rescues the
     /// kind of answer and not the score</i> should have been read that way.
     /// </para>
     /// <para>
-    /// <b>WHAT IS BROKEN IS THAT THE OBJECTIVE IS VERY NEARLY NOISE, AND THE CEILING COLUMN
-    /// IS THE FIRST THING TO SAY SO.</b> A PERFECT predictor of the rarest-word objective
+    /// <b>What is broken is that the objective is very nearly noise, and the ceiling column
+    /// is the first thing to say so.</b> A PERFECT predictor of the rarest-word objective
     /// scores barely above a blind draw over the six rooms, because this corpus draws its
     /// rooms at random over a template — nothing in <i>Mary went to the</i> carries where she
     /// went, and no learner may be blamed for failing to find it.
     /// </para>
     /// <para>
-    /// <b>AND THE UNGATED ARM'S CEILING IS HALF AGAIN THE GATED ONES, WHICH EXPLAINS THE
-    /// FUNCTION WORDS RATHER THAN CONDEMNING THEM.</b> <i>to</i> and <i>the</i> are the only
+    /// <b>And the ungated arm's ceiling is half again the gated ones, which explains the
+    /// function words rather than condemning them.</b> <i>to</i> and <i>the</i> are the only
     /// predictable words in the corpus, so a masked objective spending its population on them
     /// is not a pathology — <b>it is the arm finding the only signal on offer.</b>
     /// </para>
     /// <para>
-    /// <b>SO NO GATE CAN PAY HERE, WHICH IS A WALL AND NOT A DIAL.</b> Selecting informative
+    /// <b>So no gate can pay here, which is a wall and not a dial.</b> Selecting informative
     /// targets IS selecting unpredictable ones on this corpus, and the two cannot be had at
     /// once. <b>A primer needs a text where reading is genuinely predictive</b>, which is a
     /// property of the corpus rather than of the objective or the learner.
@@ -1295,7 +1295,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                             .ThenBy(one => one.at)
                             .First().word],
 
-                        // EVERY WORD THAT HAD AN ALTERNATIVE, and not one of them. The rule is
+                        // Every word that had an alternative, and not one of them. The rule is
                         // a filter rather than a rank, so it does not have to choose between
                         // two words that were both real choices — which is the whole
                         // difference from a frequency cut.
@@ -1316,7 +1316,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     }
                 }
 
-                // AND WHETHER THE TARGET WAS PREDICTABLE AT ALL, which is the ceiling
+                // And whether the target was predictable at all, which is the ceiling
                 // question asked of an OBJECTIVE rather than of a front end. Statements
                 // sharing a context are grouped and the commonest target in each is counted:
                 // that is what a perfect predictor of this objective would score, so a low
@@ -1351,21 +1351,21 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE CEILING BEFORE THE MECHANISM, WHICH IS THE THIRD TIME THAT ORDER HAS PAID
-    /// TODAY.</b> One hop leaves the answer in the room on a quarter of task two and a
+    /// <b>The ceiling before the mechanism, which is the third time that order has paid
+    /// today.</b> One hop leaves the answer in the room on a quarter of task two and a
     /// twelfth of task three, so the retrieval and not the learner is what those tasks are
     /// short of. What no grid can say is whether a second hop would FIND it, and that is
     /// decided with nothing learnt and in milliseconds.
     /// </para>
     /// <para>
-    /// <b>AND THE KEY RULE IS THE WHOLE ARM RATHER THAN A DETAIL, WHICH FORK 95 ALREADY PAID
-    /// TO DISCOVER.</b> Every statement of this corpus says <i>to</i> and <i>the</i>, so a
+    /// <b>And the key rule is the whole arm rather than a detail, which fork 95 already paid
+    /// to discover.</b> Every statement of this corpus says <i>to</i> and <i>the</i>, so a
     /// second hop keyed on whatever the first statement contained walks to the statement
     /// before it and calls recency a chain. The rules below differ only in which words of
     /// the first reading are allowed to be the next key.
     /// </para>
     /// <para>
-    /// <b>AND WHAT WOULD DROP IT IS WRITTEN BEFORE IT RAN:</b> no rule raising the
+    /// <b>And what would drop it is written before it ran:</b> no rule raising the
     /// answer-present column above what one hop already reaches. A learner cannot find what
     /// is not in the room, so a flat ceiling kills the arm whatever a score would have said.
     /// </para>
@@ -1376,21 +1376,21 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// said.
     /// </para>
     /// <para>
-    /// <b>AND ABOUT HALF OF THAT IS RECENCY RATHER THAN CHAINING, WHICH THE CONTROL SAYS AND
-    /// THE HEADLINE WOULD NOT HAVE.</b> Every statement here says <i>to</i> and <i>the</i>, so
+    /// <b>And about half of that is recency rather than chaining, which the control says and
+    /// the headline would not have.</b> Every statement here says <i>to</i> and <i>the</i>, so
     /// a chain keyed on everything can walk back a sentence at a time and never follow a
     /// referent — which is <c>span</c> under a longer name. Taking the newest three outright
     /// already carries half of task two and two fifths of task three.
     /// </para>
     /// <para>
-    /// <b>SO THE MARGIN THAT IS ACTUALLY CHAINING'S IS A TENTH AT TWO HOPS ON TASK TWO AND
-    /// SHRINKS WITH DEPTH</b>, to under three points by three hops on task three. It is real
+    /// <b>So the margin that is actually chaining's is a tenth at two hops on task two and
+    /// shrinks with depth</b>, to under three points by three hops on task three. It is real
     /// and it is far smaller than the ceiling rise, <b>and the arm must therefore be scored
     /// against a SPAN-MATCHED control rather than against one hop</b> — widening the moment is
     /// already known here to buy the drawn score and sell the held-out one.
     /// </para>
     /// <para>
-    /// <b>AND NO KEY RULE WINS TWICE, WHICH IS WHY NONE IS SHIPPED ON THIS EVIDENCE.</b>
+    /// <b>And no key rule wins twice, which is why none is shipped on this evidence.</b>
     /// Naive-everything leads at three hops, not-background at two, and in-a-category on task
     /// three at two — every gap inside about one standard error on two hundred questions. The
     /// hop is what pays; which word carries it is not yet decided by anything.
@@ -1431,7 +1431,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
                     for (var hop = 0; hop < hops; hop++)
                     {
-                        // THE CONTROL, AND IT HAD TO BE NAMED TO BE ONE. Every statement of
+                        // The control, and it had to be named to be one. Every statement of
                         // this corpus says *to* and *the*, so a chain keyed on everything the
                         // last one held can walk back a sentence at a time and never once
                         // follow a referent — which is `span` under a longer name, already
@@ -1446,8 +1446,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
                         moment.UnionWith(asking.Story[at]);
                         read++;
 
-                        // THE NEXT KEY IS WHAT THIS READING SUPPLIED AND NEVER WHAT THE LAST
-                        // ONE ALREADY HELD — a key already used is the hop just taken, so
+                        // The next key is what this reading supplied and never what the last
+                        // one already held — a key already used is the hop just taken, so
                         // carrying it forward returns the same statement for ever.
                         var next = asking.Story[at].Where(code => !key.Contains(code));
 
@@ -1476,8 +1476,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     + $"statements read {read / (double)world.Withheld.Count:F2}");
             }
 
-            // FOLLOWING A KEY BEATS TAKING THE NEWEST, AT EVERY DEPTH PAST THE FIRST AND ON
-            // EVERY TASK — but only the best rule does, and reading three statements by
+            // Following a key beats taking the newest, at every depth past the first and on
+            // every task — but only the best rule does, and reading three statements by
             // recency alone already carries most of what three hops carry. So the claim
             // asserted is the ordering and never the size of the gap.
             foreach (var hops in new[] { 2, 3 })
@@ -1492,7 +1492,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// Which statement, at or after <paramref name="from"/>, names anything in the key.
     /// </summary>
     /// <remarks>
-    /// <b>NEWEST FIRST IS THE ORDER THE WORLD HANDS THEM OVER</b>, so the first match IS the
+    /// <b>Newest first is the order the world hands them over</b>, so the first match IS the
     /// newest one about whatever was asked, with no scoring and nothing to tie-break. Returns
     /// a negative where nothing matches, which is a real case rather than an error: a
     /// question naming something never said has no store entry to read.
@@ -1511,16 +1511,16 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE ONE PROPERTY THAT SEPARATES THIS FROM RUNG FIVE, AND NOTHING ELSE ASSERTS
-    /// IT.</b> A minted name stands for a set that CO-FIRES and appears when all of it does;
+    /// <b>The one property that separates this from rung five, and nothing else asserts
+    /// it.</b> A minted name stands for a set that CO-FIRES and appears when all of it does;
     /// a category stands for a set of ALTERNATIVES, which by construction never co-occur — so
     /// an all-members fold would fire on nothing at all and the arm would read as inert
     /// rather than as broken. <b>A mechanism that cannot fire looks exactly like one that
     /// does not help</b>, which is a trap this repo has already paid for twice.
     /// </para>
     /// <para>
-    /// <b>AND THE CODE IS DERIVED FROM THE MEMBERS, WHICH IS THE CONSTRAINT AND NOT A
-    /// STYLE.</b> Two front ends counting the same statements in a different order must reach
+    /// <b>And the code is derived from the members, which is the constraint and not a
+    /// style.</b> Two front ends counting the same statements in a different order must reach
     /// the same code without speaking, or a category means one thing on one machine and
     /// another on the next.
     /// </para>
@@ -1534,7 +1534,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         Assert.Equal(Joined.Category(people), Joined.Category(shuffled));
         Assert.Equal(Joined.Sorted, Joined.Category(people).Modality);
 
-        // A DIFFERENT SET IS A DIFFERENT CATEGORY, so dropping a member cannot silently
+        // A different set is a different category, so dropping a member cannot silently
         // rewrite what every scope holding the old name was claiming.
         Assert.NotEqual(
             Joined.Category(people),
@@ -1542,7 +1542,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
         Assert.Throws<ArgumentException>(() => Joined.Category(new HashSet<Code> { Babi.Of("mary") }));
 
-        // ONE STATEMENT BUILT BY HAND RATHER THAN DRAWN, because a drawn moment is a whole
+        // One statement built by hand rather than drawn, because a drawn moment is a whole
         // story and holds several names at once — which is a fine moment and a useless
         // instrument, since a fold demanding all members might fire on it by luck.
         var said = new Asking
@@ -1555,14 +1555,14 @@ public sealed class RecalledTests(ITestOutputHelper output)
         var sorted = new HashSet<Code>(
             new Joined(Joining.Bagged, new List<IReadOnlySet<Code>> { people }).Codify(said));
 
-        // ONE MEMBER IS ENOUGH AND THE OTHERS ARE NOT THERE, which is the whole assertion. A
+        // One member is enough and the others are not there, which is the whole assertion. A
         // fold demanding all three would leave this moment untouched and the two sets would
         // come back equal.
         Assert.Single(bare, people.Contains);
         Assert.Contains(Joined.Category(people), sorted);
         Assert.DoesNotContain(Joined.Category(people), bare);
 
-        // AND THE PLAIN WORD SURVIVES BESIDE IT. Replacing a name with its category would
+        // And the plain word survives beside it. Replacing a name with its category would
         // make mary and john the same word, which is the general end of the gradient eating
         // the particular one — the collapse this repo has already measured in the one store
         // that has a gradient.
@@ -1575,47 +1575,47 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE KILL TEST, AND IT IS RUN BEFORE THE MINTER RATHER THAN AFTER IT.</b> Minting a
+    /// <b>The kill test, and it is run before the minter rather than after it.</b> Minting a
     /// category cannot beat being given one, so the arm that hands the learner every category
     /// the statistic finds is an upper bound on the whole of fork 97. If the score does not
     /// move here, no operator that computes these sets more cleverly can make it move, and
     /// the design dies for the price of one grid instead of a mechanism.
     /// </para>
     /// <para>
-    /// <b>AND THE CATEGORIES ARE THE ONES THE STATISTIC PROPOSES AND NEVER THE ANSWER
-    /// KEY.</b> <see cref="Key"/> scores what comes back and is not consulted here — an arm
+    /// <b>And the categories are the ones the statistic proposes and never the answer
+    /// key.</b> <see cref="Key"/> scores what comes back and is not consulted here — an arm
     /// handed <i>person</i> and <i>place</i> by an experimenter would price a category nobody
     /// can compute, which is a ceiling for a mechanism that does not exist.
     /// </para>
     /// <para>
-    /// <b>AND WHAT WOULD DROP IT WAS WRITTEN BEFORE IT RAN, AND WAS A BAD LINE:</b> clearing
+    /// <b>And what would drop it was written before it ran, and was a bad line:</b> clearing
     /// the control by more than the seed spread. <b>The seed spread here is nought</b> — three
     /// seeds returned the identical exam score in every cell — so the rule admits any gain at
     /// all, and the verdict has to be read against the MARGINAL instead. Written down rather
     /// than quietly replaced, because a kill line rewritten after the numbers is not one.
     /// </para>
     /// <para>
-    /// <b>THE KILL DID NOT FIRE, AND THE CATEGORIES COME BACK PERFECT.</b> The statistic
+    /// <b>The kill did not fire, and the categories come back perfect.</b> The statistic
     /// proposes the six rooms, the four names, the four motion verbs and the three props, and
     /// on the task that has both it separates the taking verbs from the dropping ones — all
     /// of it off the raw text with no learner and no key.
     /// </para>
     /// <para>
-    /// <b>AND IT PAYS FIVE TIMES MORE UNDER THE BAG THAN UNDER THE ADDRESSED FRONT END, WHICH
-    /// IS THE READING THE SECOND ARM EXISTS FOR.</b> Addressed hands the learner one statement
+    /// <b>And it pays five times more under the bag than under the addressed front end, which
+    /// is the reading the second arm exists for.</b> Addressed hands the learner one statement
     /// and has already done the selecting, so a category has almost nothing left to
     /// generalise over and buys a point or two; the bag hands over the whole story and the
     /// category buys five, on both tasks that need more than one fact.
     /// </para>
     /// <para>
-    /// <b>AND UNDER THE BAG IT IS BOUGHT FOR NOTHING</b>, where under the addressed arm it
+    /// <b>And under the bag it is bought for nothing</b>, where under the addressed arm it
     /// costs a third more population. The task that sits at its capacity keeps the identical
     /// budget and scores better with it, so what the category buys there is not more rules —
     /// it is the same rules saying more.
     /// </para>
     /// <para>
-    /// <b>AND NO ARM CLEARS ITS MARGINAL ON THE TWO TASKS THAT NEED TWO FACTS, WHICH IS THE
-    /// LIMIT AND NOT A FOOTNOTE.</b> A category generalises across the members of one slot; it
+    /// <b>And no arm clears its marginal on the two tasks that need two facts, which is the
+    /// limit and not a footnote.</b> A category generalises across the members of one slot; it
     /// does not add a hop, and a hop is what those tasks are missing. So this prices fork 97
     /// and leaves fork 96 exactly where it was.
     /// </para>
@@ -1628,7 +1628,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         {
             var (naming, company) = Counted(task);
 
-            // EVERY CODE THE CORPUS EVER WROTE, cut by the same statistic and with nothing
+            // Every code the corpus ever wrote, cut by the same statistic and with nothing
             // told to it. Restricting the candidates to the words that fill a population's
             // slot would make the front end depend on a learner that has not run yet, and
             // the point of this arm is to price the ceiling rather than the route to it.
@@ -1641,13 +1641,13 @@ public sealed class RecalledTests(ITestOutputHelper output)
                 output.WriteLine(
                     $"task {task} | category [{string.Join(" ", category.Order().Select(one => naming[one]))}]");
 
-            // ONE SEED, AND THAT IS A MEASUREMENT RATHER THAN A SHORTCUT. Three seeds were
+            // One seed, and that is a measurement rather than a shortcut. Three seeds were
             // run first and every cell returned the identical exam score to three places, so
             // the seed reaches nothing this world exercises — which means a seed spread
             // cannot be the yardstick here and the reading has to be taken against the
             // marginal instead.
             //
-            // AND BOTH FRONT ENDS, BECAUSE THE ADDRESSED ONE HAS ALREADY DONE THE NARROWING.
+            // And both front ends, because the addressed one has already done the narrowing.
             // It hands the learner one statement, where a category has almost nothing left to
             // generalise over; the bag hands it the whole story. An arm measured only under
             // the front end that solved the problem would be reporting the front end.
@@ -1688,7 +1688,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE CONTROL BEFORE THE OPERATOR, AND IT COSTS ONE RUN.</b> Fork 98 says the
+    /// <b>The control before the operator, and it costs one run.</b> Fork 98 says the
     /// statistic is there in the TEXT; fork 97 mints the category from the POPULATION, which
     /// is a different store and may not contain the same thing at all. The operator is the
     /// slot that varies across a family of otherwise-identical rules, so if no two resident
@@ -1696,28 +1696,28 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// dies before it is written.
     /// </para>
     /// <para>
-    /// <b>AND THE TRANSCRIPT IS THE INSTRUMENT RATHER THAN THE COUNT.</b> A family count says
+    /// <b>And the transcript is the instrument rather than the count.</b> A family count says
     /// how many and never of what, and a population that families up on <i>to</i> and
     /// <i>the</i> reads identically to one that families up on the cast — which is the
     /// function-word failure that has already cost this branch a whole objective.
     /// </para>
     /// <para>
-    /// <b>AND THE POPULATION ALONE CANNOT SUPPLY A CATEGORY, WHICH IS THE FIRST HALF OF THE
-    /// ANSWER.</b> Every slot it offers is a bag holding names, motion verbs, rooms, props,
+    /// <b>And the population alone cannot supply a category, which is the first half of the
+    /// answer.</b> Every slot it offers is a bag holding names, motion verbs, rooms, props,
     /// function words and minted names at once, because a slot is only ever <i>everything
     /// that predicted this answer</i>. Read off the population and nothing else, the operator
     /// would mint that bag.
     /// </para>
     /// <para>
-    /// <b>AND FORK 98's STATISTIC CUTS IT AND NEVER ONCE MISCUTS IT, WHICH IS THE SECOND.</b>
+    /// <b>AND FORK 98's statistic cuts it and never once miscuts it, which is the second.</b>
     /// Every group holding any word of the key holds words of ONE category — seventy-one of
     /// them over the three tasks, and not one straddles two. So the two halves are one
     /// mechanism: the population says WHERE a slot is and the text says WHAT belongs in it,
     /// and neither says both.
     /// </para>
     /// <para>
-    /// <b>AND THE CATEGORY COMES BACK WHOLE ONLY WHERE THE LEARNER IS FAILING, WHICH INVERTS
-    /// THE ORDER THIS WAS PLANNED IN.</b> The task the arm answers outright holds twenty-seven
+    /// <b>And the category comes back whole only where the learner is failing, which inverts
+    /// the order this was planned in.</b> The task the arm answers outright holds twenty-seven
     /// rules and returns half the cast; the task it scores below its own marginal on holds
     /// twelve hundred and returns all four names and all three props. A solved task needs no
     /// family, so it has none to read — <b>the operator has most to see exactly where it is
@@ -1743,13 +1743,13 @@ public sealed class RecalledTests(ITestOutputHelper output)
             string Answering(Commitment one) => (int)one.Expects.Value is var at
                 && at < world.Vocabulary.Length ? world.Vocabulary[at] : $"#{one.Expects.Value}";
 
-            // THE FRAME IS THE SCOPE WITH ONE POSITION TAKEN OUT, AND THE EXPECTATION STAYS
-            // IN. Two rules agreeing on everything but the answer are not a family varying in
+            // The frame is the scope with one position taken out, and the expectation stays
+            // in. Two rules agreeing on everything but the answer are not a family varying in
             // a slot, they are a contradiction — and grouping those would mint a category out
             // of exactly the disagreement the design wants kept.
             //
-            // AND A ONE-CODE SCOPE LEAVES AN EMPTY FRAME, WHICH IS ADMITTED RATHER THAN
-            // SKIPPED. Covering mints one code and nothing longer, so a run whose population
+            // And a one-code scope leaves an empty frame, which is admitted rather than
+            // skipped. Covering mints one code and nothing longer, so a run whose population
             // is mostly one-code rules would report no family at all under a length bar — and
             // the family it would have missed is every code that predicts one answer.
             var families = new Dictionary<string, List<Commitment>>(StringComparer.Ordinal);
@@ -1784,8 +1784,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     + $" + [{string.Join(" ", slots[frame].Order().Select(Spell))}] -> {Answering(one)}");
             }
 
-            // AND THE SLOT IS THEN PARTITIONED BY FORK 98's STATISTIC, WHICH IS THE WHOLE
-            // PROPOSAL. The population says WHERE a slot is and never what belongs in it; the
+            // And the slot is then partitioned by fork 98's statistic, which is the whole
+            // proposal. The population says WHERE a slot is and never what belongs in it; the
             // text says which codes are alternatives and never that any rule wanted them. A
             // group is what survives both — never in one statement, and keeping company alike
             // enough that fork 98's measured chasm cannot be straddled.
@@ -1794,7 +1794,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     if (group.Count >= 2)
                         recovered.Add(string.Join(" ", group.Select(Spell).Order(StringComparer.Ordinal)));
 
-            // PURE MEANS NO GROUP STRADDLES TWO OF THE KEY'S CATEGORIES, and a group of verbs
+            // Pure means no group straddles two of the key's categories, and a group of verbs
             // is not scored either way — there is no verb key and inventing one would be the
             // experimenter deciding what a category is after seeing the groups.
             var judged = 0;
@@ -1819,7 +1819,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                 output.WriteLine($"task {task} | group [{group}]");
             }
 
-            // NEVER MIXED, WHICH IS THE ASSERTION. The population's slot is a bag of names,
+            // Never mixed, which is the assertion. The population's slot is a bag of names,
             // verbs, rooms and objects at once, so a statistic that could not tell them apart
             // would show up here as one group holding two of the key's categories.
             Assert.Equal(judged, pure);
@@ -1842,7 +1842,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// <param name="company">What company each code keeps, from <see cref="Counted"/>.</param>
     /// <remarks>
     /// <para>
-    /// <b>A STATED BAR, AND IT IS ONLY SAFE BECAUSE FORK 98 MEASURED THE GAP IT SITS IN.</b>
+    /// <b>A stated bar, and it is only safe because fork 98 measured the gap it sits in.</b>
     /// A category's members keep company alike to within a thousandth and the nearest
     /// non-member is a third of the scale away, so anything between the two reads the same —
     /// and a constant chosen inside a measured chasm is a different object from one tuned
@@ -1850,7 +1850,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// a constant, and this is where that would be found out.</b>
     /// </para>
     /// <para>
-    /// <b>COMPONENTS RATHER THAN CLIQUES, WHICH IS THE LOOSER READING ON PURPOSE.</b> Demanding
+    /// <b>Components rather than cliques, which is the looser reading on purpose.</b> Demanding
     /// every pair agree would hide a category behind one leaky member; joining through any
     /// link cannot, so what this returns is the most generous grouping the statistic allows
     /// and a mixed group is a real refutation rather than a strictness artefact.
@@ -1885,7 +1885,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// What word each code is, and what company each code kept, over one task's statements.
     /// </summary>
     /// <remarks>
-    /// <b>ONE ROW A STATEMENT AND NEVER A MOMENT</b>, because a moment repeats every
+    /// <b>One row a statement and never a moment</b>, because a moment repeats every
     /// statement in front of it once per question after it — which would weight a sentence by
     /// how many questions happened to follow, and that is a fact about the corpus's
     /// punctuation rather than about the words.
@@ -1938,7 +1938,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE PROBE THAT DECIDES WHETHER THE MINTER IS BUILT AT ALL.</b> Rung five names
+    /// <b>The probe that decides whether the minter is built at all.</b> Rung five names
     /// what CO-FIRES; a category is the complement of that — a set of codes that are
     /// ALTERNATIVES, never both in one statement, standing in the same company when they
     /// stand alone. If that statistic cannot separate people from places on a corpus
@@ -1946,26 +1946,26 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// anything anywhere, and the operator dies here rather than after it is written.
     /// </para>
     /// <para>
-    /// <b>AND IT COSTS NO LEARNING, WHICH IS THE PATTERN THAT HAS ALREADY EARNED ITS
-    /// KEEP.</b> A front-end instrument taking milliseconds killed one key rule and bounded
+    /// <b>And it costs no learning, which is the pattern that has already earned its
+    /// keep.</b> A front-end instrument taking milliseconds killed one key rule and bounded
     /// the headline result before either grid returned — see
     /// <see cref="Whether_a_second_supporting_fact_is_even_in_the_room"/>. The population is
     /// never built here and no round is ever run.
     /// </para>
     /// <para>
-    /// <b>THE CAST IS AN ANSWER KEY AND NEVER AN INPUT.</b> Nothing below is told which
+    /// <b>The cast is an answer key and never an input.</b> Nothing below is told which
     /// words are names; the two sets exist so the clusters the statistic returns can be
     /// SCORED, exactly as the multiplexer's enumerated truth scores a rule without ever
     /// reaching the learner.
     /// </para>
     /// <para>
-    /// <b>AND IT PASSES OUTRIGHT, ON BOTH CATEGORIES AND ALL THREE TASKS.</b> Every member's
+    /// <b>And it passes outright, on both categories and all three tasks.</b> Every member's
     /// nearest alternatives are the rest of its category and nothing else, and the margin is
     /// not a threshold but a chasm — the far side of the boundary sits around a third of the
     /// scale below the near side, with the category itself packed against one.
     /// </para>
     /// <para>
-    /// <b>THE FILTER ALONE IS NOT THE MECHANISM, WHICH ONE TASK WOULD HAVE HIDDEN.</b>
+    /// <b>The filter alone is not the mechanism, which one task would have hidden.</b>
     /// Never-in-one-statement offers a person exactly the three other people everywhere, and
     /// offers a place exactly the five other places only where the task has nothing but
     /// places to offer. Where a task adds objects and handling verbs the same filter offers
@@ -1973,14 +1973,14 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// the separating.
     /// </para>
     /// <para>
-    /// <b>AND THE RANKING IS PERFECT WHILE THE STOPPING HAS NO RULE, WHICH IS WHAT THE MINTER
-    /// INHERITS.</b> The two cuts below are exactly complementary — the largest fall is right
+    /// <b>And the ranking is perfect while the stopping has no rule, which is what the minter
+    /// inherits.</b> The two cuts below are exactly complementary — the largest fall is right
     /// on every row where something has to be excluded and wrong on every row where nothing
     /// does, and TAKE EVERYTHING is right in precisely the opposite rows. Neither is a rule,
     /// and their being disjoint is the assertion rather than an observation.
     /// </para>
     /// <para>
-    /// <b>SO WHAT IS MISSING IS A BAR AND NOT A BETTER GAP</b>, which is the shape the repair
+    /// <b>So what is missing is a bar and not a better gap</b>, which is the shape the repair
     /// gate already has. Choosing the argmax is easy there too; what decides whether to take
     /// it at all is a separation test corrected for how many candidates were considered, and
     /// a category wants the same question asked the other way round — could these two have
@@ -2010,7 +2010,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
                     members++;
 
-                    // AN ALTERNATIVE IS A CODE THIS ONE WAS NEVER IN A STATEMENT WITH, which
+                    // An alternative is a code this one was never in a statement with, which
                     // is the whole of the first half of the statistic. Ordered by a total
                     // order under the score so two runs cannot disagree about a tie.
                     var alternatives = company.Keys
@@ -2026,8 +2026,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     var top = alternatives.Take(wanted.Count - 1).ToList();
                     ranked += top.Count(other => wanted.Contains(naming[other]));
 
-                    // WHERE THE LIST FALLS AWAY, WHICH IS THE ONLY CUT A MINTER COULD
-                    // ACTUALLY MAKE. Taking the answer's own size is the experimenter
+                    // Where the list falls away, which is the only cut a minter could
+                    // actually make. Taking the answer's own size is the experimenter
                     // holding the knife: nothing inside the machine knows a category has
                     // four members. The biggest consecutive drop is size-free and dial-free,
                     // and TAKE EVERYTHING is one of the cuts it is allowed to choose --
@@ -2080,14 +2080,14 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
                 var floor = Math.Max(1, members * (wanted.Count - 1));
 
-                // WHAT THE FILTER DID AND WHAT THE RANKING DID, KEPT APART. Every member is
+                // What the filter did and what the ranking did, kept apart. Every member is
                 // an alternative of every other by construction, so the recall of the filter
                 // is one whatever happens and says nothing; its PURITY is what falls as a
                 // task adds objects, and the difference between the two columns is exactly
                 // the work the company statistic is doing.
                 Assert.Equal(1.0, ranked / (double)floor);
 
-                // AND THE TWO CUTS NEVER BOTH WORK AND NEVER BOTH FAIL, which is the finding
+                // And the two cuts never both work and never both fail, which is the finding
                 // rather than a coincidence: one of them is right on every member of every
                 // row, and WHICH one is decided by whether the filter left anything to
                 // exclude. A minter reading only the fall would be perfect on people and

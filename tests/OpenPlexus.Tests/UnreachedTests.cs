@@ -13,15 +13,15 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE WALK HAS SOLVED THIS SINCE THE DAY THE EVENT BUS WAS BUILT.</b> A thought knows
+/// <b>The walk has solved this since the day the event bus was built.</b> A thought knows
 /// how many of its routes are heading into each cluster, so a departure writes off exactly
 /// those and the thought settles by its own accounting. What the commitment fleet had
 /// instead was a denominator it could only watch: an asker knew it had asked twelve and
 /// heard eight, and had nothing whatever to do about the four.
 /// </para>
 /// <para>
-/// <b>AND THE MISSING TERM WAS NOT A DEATH NOTICE, WHICH IS WHY THE ASYMMETRY IN
-/// <see cref="Bus.IBus"/> WAS RIGHT AND STILL LEFT A FLEET STOPPED.</b> A holder that
+/// <b>And the missing term was not a death notice, which is why the asymmetry in
+/// <see cref="Bus.IBus"/> Was right and still left a fleet stopped.</b> A holder that
 /// crashed sends nothing, so a design waiting to be told would work for the polite
 /// departures alone. What is observable without anybody's cooperation is the sender's own
 /// failure to hand the question over — a refused connection, which is a fact rather than an
@@ -29,15 +29,15 @@ namespace OpenPlexus.Tests;
 /// given a question cannot answer it.
 /// </para>
 /// <para>
-/// <b>SO WHAT IS CLOSED HERE IS EVERY ROUND AFTER THE ONE A HOLDER DIED IN, AND NOT THE
-/// ROUND IT DIED IN.</b> A holder that took the question and went before answering is owed
+/// <b>So what is closed here is every round after the one a holder died in, and not the
+/// round it died in.</b> A holder that took the question and went before answering is owed
 /// for the rest of the run, correctly — late and absent are one thing under C2, and only a
 /// deadline separates them. That half is fork 62's and its condition is completeness rather
 /// than a clock. The distinction matters because a fleet that recovers on the NEXT round is
 /// a fleet that keeps learning through deaths, which is what twenty phones on one wifi need.
 /// </para>
 /// <para>
-/// <b>AND NOTHING HERE IS A TEST OF C2.</b> TCP does not reorder within a connection, so
+/// <b>And nothing here is a test of C2.</b> TCP does not reorder within a connection, so
 /// what these say is that the write-off is exact and that a run survives it — and nothing
 /// about lateness, which <see cref="Bus.HybridBus"/> is where to ask.
 /// </para>
@@ -49,7 +49,7 @@ public sealed class UnreachedTests(ITestOutputHelper output)
 
     /// <summary>A population trained on the multiplexer, and the dials it ran under.</summary>
     /// <remarks>
-    /// <b>THE DEFAULTS, BECAUSE NOTHING HERE ASKS ANYTHING ABOUT THE SEARCH.</b>
+    /// <b>The defaults, because nothing here asks anything about the search.</b>
     /// <c>AskedTests</c> pins three repair dials so that a shard reliably has a nameable
     /// sub-scope left over, which is a precondition about what was LEARNT; these tests need
     /// only a population that fires, and pinning dials they do not read would be inheriting
@@ -67,7 +67,7 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A HOLDER THE ASK NEVER REACHED IS WRITTEN OFF, AND THE ROUND FINISHES.</b>
+    /// <b>A holder the ask never reached is written off, and the round finishes.</b>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -78,8 +78,8 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     /// that never completes at all.
     /// </para>
     /// <para>
-    /// <b>AND THE DENOMINATOR IS UNCHANGED, WHICH IS THE HALF A WRITE-OFF COULD SILENTLY
-    /// DESTROY.</b> The obvious build subtracts the departed from what was asked, and then a
+    /// <b>And the denominator is unchanged, which is the half a write-off could silently
+    /// destroy.</b> The obvious build subtracts the departed from what was asked, and then a
     /// fleet of four that lost one reads exactly like a fleet of three — the C3 instrument
     /// erased by the mechanism that was supposed to use it. <see cref="Gathering.Asked"/> is
     /// what was tried, <see cref="Gathering.Unreached"/> is what the sender watched fail to
@@ -108,7 +108,7 @@ public sealed class UnreachedTests(ITestOutputHelper output)
         Assert.Equal(Holders - 1, gathering.Heard);
         Assert.Equal(1, gathering.Unreached);
 
-        // AND IT IS NOT WHOLE, WHICH IS THE DIFFERENCE A FINISHED ROUND MUST STILL CARRY. A
+        // And it is not whole, which is the difference a finished round must still carry. A
         // vote over three survivors of four decided as though four had spoken is the failure
         // this instrument exists to make visible, and finishing the round is not permitted
         // to cost it.
@@ -120,11 +120,11 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>ONE DEPARTURE WRITES OFF ONE HOLDER AND LEAVES THE REST OWED.</b>
+    /// <b>One departure writes off one holder and leaves the rest owed.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THE COMPANION, AND WITHOUT IT EVERY ASSERTION IN THIS FILE PASSES FOR A MACHINE
-    /// THAT ABANDONS THE WHOLE FLEET THE MOMENT ANYTHING FAILS.</b> <c>DepartureTests</c>
+    /// <b>The companion, and without it every assertion in this file passes for a machine
+    /// that abandons the whole fleet the moment anything fails.</b> <c>DepartureTests</c>
     /// carries the identical pair for the same reason. What makes it real here is that the
     /// survivors' answers are what completed the gathering — the write-off removed one claim
     /// and the other three were waited for, in full, exactly as they always were.
@@ -151,7 +151,7 @@ public sealed class UnreachedTests(ITestOutputHelper output)
 
         Assert.Equal(1, gathering.Unreached);
 
-        // THE SILENCE IS AT THE DEAD END RATHER THAN ON THE RETURN PATH, and every other
+        // The silence is at the dead end rather than on the return path, and every other
         // holder took the question and answered it. A machine writing off whatever it felt
         // like would be indistinguishable from this one by any count on the asker.
         Assert.Equal(before[2], fleet.Holders[2].Answered);
@@ -160,13 +160,13 @@ public sealed class UnreachedTests(ITestOutputHelper output)
             if (at != 2)
                 Assert.Equal(before[at] + 1, fleet.Holders[at].Answered);
 
-        // AND THE MERGE STILL CARRIES SOMETHING, so what finished is a round with evidence
+        // And the merge still carries something, so what finished is a round with evidence
         // in it rather than an empty one that completed by giving up on everybody.
         Assert.True(gathering.Merged().Scopes > 0, "the survivors merged an empty table");
     }
 
     /// <summary>
-    /// <b>LOSING EVERY HOLDER FINISHES THE ROUND, AND THE VOTE COMES BACK WITH NO ANSWER.</b>
+    /// <b>Losing every holder finishes the round, and the vote comes back with no answer.</b>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -176,7 +176,7 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     /// by a deadline, and a deadline is a constant nobody measured.
     /// </para>
     /// <para>
-    /// <b>AND IT IS THE THIRD OUTCOME BY A SECOND ROAD.</b> <c>AskedTests</c> arms
+    /// <b>And it is the third outcome by a second road.</b> <c>AskedTests</c> arms
     /// <c>Abstain</c> by killing every advocate and leaving a crowd answering, which is the
     /// harder and more interesting arrangement; this reaches it by having nobody left to ask
     /// at all. Both are C3, and only one of them used to terminate.
@@ -225,7 +225,7 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A FLEET GOES ON LEARNING AFTER A HOLDER DIES MID-RUN — the north star's blocker,
+    /// <b>A fleet goes on learning after a holder dies mid-run — the north star's blocker,
     /// and the reading that says it is gone.</b>
     /// </summary>
     /// <remarks>
@@ -236,16 +236,16 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     /// otherwise alive and idle.
     /// </para>
     /// <para>
-    /// <b>THE SECOND HALF'S ACCURACY IS PRINTED AND BARRED LOW, BECAUSE WHAT IS BEING
-    /// ASSERTED IS THAT IT RAN.</b> A quarter of the population went with the machine that
+    /// <b>The second half's accuracy is printed and barred low, because what is being
+    /// asserted is that it ran.</b> A quarter of the population went with the machine that
     /// held it, and what that costs a curve is a measurement rather than a check — the fleet
     /// re-mints what it lost, from a placement that now has a hole in it, and how quickly is
     /// exactly the kind of number this file must not invent a threshold for. Four-way chance
     /// is a quarter; the bar says the survivors are learning and nothing more.
     /// </para>
     /// <para>
-    /// <b>AND THE ROUND THE DEATH LANDS IN IS STILL OWED, WHICH IS WHY THE KILL IS BETWEEN
-    /// RUNS RATHER THAN INSIDE ONE.</b> A holder that took a question and died before
+    /// <b>And the round the death lands in is still owed, which is why the kill is between
+    /// runs rather than inside one.</b> A holder that took a question and died before
     /// answering it stops that round for good, and no amount of write-off reaches it — see
     /// this file's header, and fork 62. Killing between two runs asks the question this
     /// mechanism actually answers: whether a fleet that has LOST a machine can go on.
@@ -276,7 +276,7 @@ public sealed class UnreachedTests(ITestOutputHelper output)
 
         var after = await Ran(trial.RunAsync(council, fleet.Held, Half), Holders, "after the death");
 
-        // AND THE DENOMINATOR CAME DOWN ONCE, BY OBSERVATION. The first round after the
+        // And the denominator came down once, by observation. The first round after the
         // death asked four and heard three; every round after that asked the three that are
         // there, because a holder whose post failed comes off the roster. A fleet that had
         // quietly stopped asking somebody would read exactly like this -- which is why the
@@ -295,42 +295,42 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A HOLDER THAT COULD NOT BE REACHED IS NOT ASKED AGAIN, AND THAT IS WHAT MAKES A
-    /// RUN POSSIBLE RATHER THAN MERELY CORRECT.</b>
+    /// <b>A holder that could not be reached is not asked again, and that is what makes a
+    /// run possible rather than merely correct.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE NUMBER THAT PUT THIS LINE IN THE CODE, AND IT IS THE TRANSPORT'S RATHER THAN
-    /// THE DESIGN'S.</b> A post to a machine that has closed its door costs a flat four
+    /// <b>The number that put this line in the code, and it is the transport's rather than
+    /// the design's.</b> A post to a machine that has closed its door costs a flat four
     /// seconds on loopback — a connect giving up, measured at 4.09s an ask over ten asks
     /// against 2.6ms with everybody alive. The write-off ends the round; it cannot end it
     /// before the transport admits the question did not go, so a fleet still asking a dead
     /// holder pays four seconds every round forever.
     /// </para>
     /// <para>
-    /// <b>SO THE ROSTER LOSES IT, WHICH IS THE WALK'S OTHER HALF AND WAS ALWAYS PART OF THE
-    /// PORT.</b> A cluster death removes it from where routes are addressed; this removes a
+    /// <b>So the roster loses it, which is the walk's other half and was always part of the
+    /// port.</b> A cluster death removes it from where routes are addressed; this removes a
     /// holder from where asks are addressed, reached by watching a post fail rather than by
     /// being told. What it costs is written down beside it: a machine that stayed up while
     /// one message to it was lost is out until it announces again.
     /// </para>
     /// <para>
-    /// <b>AND THE COST IS ASSERTED AS A SHAPE RATHER THAN A DURATION.</b> A threshold in
+    /// <b>And the cost is asserted as a shape rather than a duration.</b> A threshold in
     /// milliseconds fails the build on a busy machine, which this repo has a line about. The
     /// claim is that the second ask is not paying what the first one did, which is a
     /// comparison rather than a clock.
     /// </para>
     /// <para>
-    /// <b>AND THAT COMPARISON IS THE PLATFORM'S RATHER THAN THE MECHANISM'S, WHICH IT TOOK A
-    /// RED SHARD TO FIND OUT.</b> Four seconds is what a Windows loopback connect spends
+    /// <b>And that comparison is the platform's rather than the mechanism's, which it took a
+    /// red shard to find out.</b> Four seconds is what a Windows loopback connect spends
     /// giving up; a Linux runner answers a closed port with a reset immediately, so the FIRST
     /// ask costs a millisecond and there is nothing left for the second to be half of. The
     /// check then fails on a machine where the fault it guards against cannot happen — which
     /// is the mirror of a check that cannot fire, and worse, because it reads as a defect.
     /// </para>
     /// <para>
-    /// <b>SO THE COUNTS ARE THE ASSERTION AND THE CLOCK IS A REPORT WHEREVER THERE IS A CLOCK
-    /// TO READ.</b> <see cref="Gathering.Asked"/> coming down and
+    /// <b>So the counts are the assertion and the clock is a report wherever there is a clock
+    /// to read.</b> <see cref="Gathering.Asked"/> coming down and
     /// <see cref="Gathering.Unreached"/> reading nought already say the dead holder was not
     /// asked again, exactly, on every platform — <i>anything asserting a COST must assert a
     /// count</i>, and the count was here all along.
@@ -353,7 +353,7 @@ public sealed class UnreachedTests(ITestOutputHelper output)
         {
             Assert.True(await Wired.ArrivedAsync(first.Everyone), "the first ask never finished");
 
-            // THE DEAD HOLDER IS ASKED EXACTLY ONCE, which is the only way anybody could
+            // The dead holder is asked exactly once, which is the only way anybody could
             // find out. A roster dropping it without trying would be a machine deciding who
             // is alive from something other than an observation.
             Assert.Equal(Holders, first.Asked);
@@ -376,7 +376,7 @@ public sealed class UnreachedTests(ITestOutputHelper output)
 
         var after = clock.Elapsed.TotalMilliseconds;
 
-        // AND THE CLOCK IS ONLY ASKED WHERE THE FIRST ASK PAID SOMETHING. A platform whose
+        // And the clock is only asked where the first ask paid something. A platform whose
         // refused connect is instant leaves nothing for the second ask to be half of, and
         // demanding it there fails the build over a cost that does not exist. Which case
         // this run was is printed rather than swallowed, because a comparison that quietly
@@ -402,8 +402,8 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     /// <param name="holders">How many machines, for the message.</param>
     /// <param name="when">Which half, for the message.</param>
     /// <remarks>
-    /// <b>THE EXPERIMENTER'S PATIENCE AND NEVER THE MACHINE'S, WHICH IS <c>FleetTests</c>'
-    /// RULE AND IS UNCHANGED BY ANY OF THIS.</b> A holder that took a question and died
+    /// <b>The experimenter's patience and never the machine's, which is <c>FleetTests</c>'
+    /// Rule and is unchanged by any of this.</b> A holder that took a question and died
     /// still owes an answer forever, so a suite that inherited the wait would hang rather
     /// than fail. What the write-off removes is the case where a fleet stops with every
     /// surviving machine idle — not the general promise, which was never one.

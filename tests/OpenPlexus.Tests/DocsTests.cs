@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace OpenPlexus.Tests;
@@ -23,7 +23,7 @@ namespace OpenPlexus.Tests;
 /// types deleted weeks earlier on the day it was switched on.
 /// </para>
 /// <para>
-/// <b>AND IT WAS ON FOR THE LIBRARY ONLY, WHICH MEANT THE TESTS ROTTED FREELY.</b> The
+/// <b>And it was on for the library only, which meant the tests rotted freely.</b> The
 /// sentence above was written about one project and read as being about the tree, so a test
 /// citing a deleted type compiled quietly — five files went on explaining themselves in
 /// terms of two vote arms that had been removed. It is on for this project now, with
@@ -43,7 +43,7 @@ public sealed class DocsTests
     /// one</b> — see the test that reads it.
     /// </summary>
     /// <remarks>
-    /// <b>RAISED FROM 45 ON 2026-08-11, AND BY WHAT IT COST RATHER THAN BY FEEL.</b> John's
+    /// <b>Raised from 45 on 2026-08-11, and by what it cost rather than by feel.</b> John's
     /// rule for this budget is that it must stop a doc growing without ever stopping
     /// information getting written down, and that day it did the second thing: a fork row
     /// carrying a closed finding and a new design decision would not fit, so <i>R scales
@@ -60,22 +60,22 @@ public sealed class DocsTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>JOHN'S TEST, 2026-08-12, AND IT IS THE ONE THAT DECIDES: if it is long enough that
+    /// <b>John's test, 2026-08-12, and it is the one that decides: if it is long enough that
     /// you would hesitate to load all of it, it is too long.</b> The whole point of collapsing
     /// several docs into one was that a session could read the plan WHOLE before starting. A
     /// doc read in pages is the pile of docs it replaced, wearing one filename.
     /// </para>
     /// <para>
-    /// <b>AND THE PER-ITEM CAP IS WHY THIS WAS NEEDED, WHICH IS A CORRECTION TO THE COMMENT
-    /// ABOVE IT.</b> Capping the item and not the doc fixed the right fault — an item becoming
+    /// <b>And the per-item cap is why this was needed, which is a correction to the comment
+    /// above it.</b> Capping the item and not the doc fixed the right fault — an item becoming
     /// an essay — and gave up the only thing that bounded the total. Both budgets were green
     /// at nearly twenty-five thousand words, because twelve new ideas cost twelve lines and
     /// nothing ever said stop. The session that measured this had read the doc in pages all
     /// day without once noticing it was the failure.
     /// </para>
     /// <para>
-    /// <b>AND IT COSTS NO INFORMATION, WHICH IS THE OBJECTION THAT RETIRED THE OLD DOC-WIDE
-    /// CAP.</b> That objection was written when there was nowhere else to put things. There is
+    /// <b>And it costs no information, which is the objection that retired the old doc-wide
+    /// cap.</b> That objection was written when there was nowhere else to put things. There is
     /// now: a finding belongs to the commit that produced it and the test that asserts it, a
     /// mechanism to the XML comment the compiler enforces, a trap with a check to the check.
     /// A doc-wide cap does not delete information — it evicts it to the home that keeps it
@@ -87,23 +87,23 @@ public sealed class DocsTests
     /// doc can never grow back past its own best by ACCIDENT.
     /// </para>
     /// <para>
-    /// <b>AND IT MAY BE RAISED FOR SOMETHING GENUINELY NEW — JOHN, 2026-08-13, IN THOSE
-    /// WORDS.</b> A ratchet that only ever falls says a new idea can only be afforded by
+    /// <b>And it may be raised for something genuinely new — John, 2026-08-13, in those
+    /// words.</b> A ratchet that only ever falls says a new idea can only be afforded by
     /// deleting an old one, which is a doc-wide cap deciding what the project may think
     /// about. That is not what it is for. The three conditions are his: <b>the existing
     /// items are reasonable, the new one duplicates nothing, and the doc is still in a
     /// state you would load whole.</b>
     /// </para>
     /// <para>
-    /// <b>THE THIRD CONDITION IS THE ONLY ONE THAT IS NOT A JUDGEMENT CALL, AND IT IS ALSO
-    /// THE ONE THIS CHECK CANNOT MAKE.</b> So a raise is a deliberate edit to this constant
+    /// <b>The third condition is the only one that is not a judgement call, and it is also
+    /// the one this check cannot make.</b> So a raise is a deliberate edit to this constant
     /// and reads as one in a diff — the escape hatch is a NUMBER somebody had to type,
     /// rather than prose. Compaction still lowers it every pass; what is refused is a raise
     /// that pays for a rewording.
     /// </para>
     /// </remarks>
-    // AND 9,809 IS THE FIRST DELIBERATE RAISE, WHICH IS THE RULE ABOVE BEING USED RATHER
-    // THAN AN EXCEPTION TO IT. It buys the rule itself: two lines saying the budget may
+    // And 9,809 is the first deliberate raise, which is the rule above being used rather
+    // than an exception to it. It buys the rule itself: two lines saying the budget may
     // rise for something genuinely new. A cap that could only fall would have had to be
     // paid for by deleting an item, which is the failure the paragraph describes.
     private const int Whole = 9_809;
@@ -114,20 +114,20 @@ public sealed class DocsTests
     /// <remarks>
     /// <b>Anything built and decided is not on this list</b>, because it is in the code.
     /// <para>
-    /// <b>JOHN'S SHAPE, 2026-08-12, AND IT WENT FROM NINE SECTIONS TO FOUR.</b> The goal, the
+    /// <b>John's shape, 2026-08-12, and it went from nine sections to four.</b> The goal, the
     /// architecture, the constraints and the first north star were four headings saying one
     /// thing — here is what must be true when this is finished — and `TO BUILD` was a fifth
     /// listing what is not built yet, which is what a route leaf already says. So the doc
     /// splits on the only line that matters to a reader: what is FIXED against what MOVES.
     /// </para>
     /// <para>
-    /// <b>AND `OPEN DEFECTS` WENT WITH THEM.</b> It was added when whole areas were being
+    /// <b>And `open defects` went with them.</b> It was added when whole areas were being
     /// deferred mid-rabbit-hole and a defect could sit unowned for weeks. Handoffs and a CI
     /// that goes green every session carry that now, and a defect that outlives a session is
     /// a `BROKEN` leaf against the requirement it blocks.
     /// </para>
     /// <para>
-    /// <b>AND THE FORK INDEX WENT EARLIER, WHICH IS WHAT THE ROUTE BECOMING A TREE BOUGHT.</b>
+    /// <b>And the fork index went earlier, which is what the route becoming a tree bought.</b>
     /// Ninety-four flat rows that had to be read whole to find the one bearing on your work.
     /// The numbers still resolve, because
     /// <see cref="Every_fork_the_code_cites_is_in_the_index"/> reads the whole doc rather
@@ -136,7 +136,7 @@ public sealed class DocsTests
     /// </remarks>
     private static readonly string[] Sections =
     [
-        // FOUR, AND THE SPLIT IS THE FIXED AGAINST THE MOVING. `THE DESTINATION` holds what
+        // Four, and the split is the fixed against the moving. `The destination` holds what
         // must be true when this is finished -- the bet, the requirements, the machine's
         // invariants, the first target, and what the field already knows. None of it moves.
         // `THE ROUTE` is where everything moves, and it is the only section a normal session
@@ -144,7 +144,7 @@ public sealed class DocsTests
         "THE DESTINATION",
         "THE ROUTE",
 
-        // AND THE TWO THAT ARE CROSS-CUTTING BY NATURE. A refutation belongs to the ARM it
+        // And the two that are cross-cutting by nature. A refutation belongs to the ARM it
         // killed and a trap to the failure CLASS, neither of which is a requirement -- so
         // folding them into the route would scatter them past finding.
         "DO NOT RE-TRY",
@@ -156,7 +156,7 @@ public sealed class DocsTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>JOHN'S RULE, 2026-08-04: PREFER CUTTING PROSE OVER CUTTING LISTS.</b> A
+    /// <b>John's rule, 2026-08-04: prefer cutting prose over cutting lists.</b> A
     /// total word budget is indifferent to what gets retired, so when the doc goes
     /// over, whatever is easiest to delete goes — and that is usually a table row
     /// or a bullet, because a paragraph reads as though it is holding an argument
@@ -190,7 +190,7 @@ public sealed class DocsTests
 
         if ("-|#>".Contains(trimmed[0], StringComparison.Ordinal)) return true;
 
-        // AN ASTERISK IS A BULLET ONLY WITH A SPACE AFTER IT. `**` opens bold,
+        // An asterisk is a bullet only with a space after it. `**` opens bold,
         // and this doc leads nearly every sentence with it — counting those as
         // structure would let prose pass the budget by shouting, which is the
         // one way this check could be worth nothing.
@@ -201,7 +201,7 @@ public sealed class DocsTests
         if (char.IsAsciiDigit(trimmed[0]) && trimmed.Contains('.', StringComparison.Ordinal))
             return true;
 
-        // A WRAPPED BULLET IS STILL A BULLET. Markdown continues a list item on an
+        // A wrapped bullet is still a bullet. Markdown continues a list item on an
         // indented line, and counting those as prose would make the rule punish
         // line wrapping rather than paragraphs.
         return line.StartsWith("  ", StringComparison.Ordinal);
@@ -248,7 +248,7 @@ public sealed class DocsTests
     /// leaf. The route's shape is load-bearing rather than cosmetic, which is why three
     /// checks read it this way instead of matching prose.
     /// <para>
-    /// <b>AND A WRAPPED BULLET IS ONE BULLET, WHICH IS NOT A DETAIL.</b> The first version of
+    /// <b>And a wrapped bullet is one bullet, which is not a detail.</b> The first version of
     /// this read single lines, so a leaf's revival clause was invisible whenever it fell past
     /// the line break — and two dead leaves passed the revival check purely because of where
     /// their text happened to wrap. A guard whose verdict moves with line width is worse than
@@ -304,7 +304,7 @@ public sealed class DocsTests
     /// token is that a reader can sort by it without reading the clause.</b>
     /// </summary>
     /// <remarks>
-    /// <b>`BROKEN` ARRIVED WHEN `OPEN DEFECTS` WENT.</b> That section was retired because
+    /// <b>`Broken` arrived when `open defects` went.</b> That section was retired because
     /// handoffs and a green CI carry what it used to, but a defect and an open question are
     /// different urgencies and `OPEN` flattens them — one wants investigating and the other
     /// wants fixing. The distinction cost one token rather than a section.
@@ -333,13 +333,13 @@ public sealed class DocsTests
     [Fact]
     public void The_route_tracks_the_architecture_one_for_one()
     {
-        // THE CHECK THAT MAKES KEEPING THE TWO SECTIONS APART SAFE RATHER THAN MERELY TIDY.
-        // `THE ARCHITECTURE` is the one section that forbids mechanisms, so the route may
+        // The check that makes keeping the two sections apart safe rather than merely tidy.
+        // `The architecture` is the one section that forbids mechanisms, so the route may
         // not be nested inside it -- an edit to a child would drag an edit into the parent
         // and the property would die quietly. Holding them one for one is what buys the
         // separation, and nothing but this says so.
         //
-        // IT ALREADY HAD SOMETHING TO CATCH. The route claimed a row per architecture line
+        // It already had something to catch. The route claimed a row per architecture line
         // in its own opening sentence and had twelve against thirteen: *what it is told
         // must be something it can be wrong about* had no row, its obstacle folded into the
         // line above instead. The prose rule had been there for weeks and read as true.
@@ -371,7 +371,7 @@ public sealed class DocsTests
             + "order -- an architecture line with no entry is a requirement nothing is "
             + "carrying, and that is the state this check was written to end.");
 
-        // AND ORDER, BY A WORD THE TWO SHARE. Matching prose against prose would make the
+        // And order, by a word the two share. Matching prose against prose would make the
         // check a style rule; requiring one significant word in common says the entry is
         // about that line without dictating how it is worded.
         //
@@ -393,7 +393,7 @@ public sealed class DocsTests
     [Fact]
     public void Every_leaf_carries_exactly_one_status()
     {
-        // A LEAF IS A LINE A READER SHOULD BE ABLE TO SORT WITHOUT READING. That only works
+        // A leaf is a line a reader should be able to sort without reading. That only works
         // if the token is at the front and there is exactly one of it -- a leaf saying both
         // OPEN and SETTLED is a row that has been half-updated, which is the failure this
         // doc's fork table had in a dozen places and no check could see.
@@ -418,7 +418,7 @@ public sealed class DocsTests
     [Fact]
     public void Every_dead_leaf_carries_a_revival_condition()
     {
-        // THE SAME RULE `DO NOT RE-TRY` IS HELD TO, THROUGH THE DOOR THE TREE OPENS. A
+        // The same rule `do not re-try` is held to, through the door the tree opens. A
         // refutation is conditional on its configuration, and a leaf saying only that
         // something failed is a superstition -- this repo has already had to revive two
         // arms whose reason for being dead had quietly expired.
@@ -436,15 +436,15 @@ public sealed class DocsTests
     [Fact]
     public void The_route_checks_can_still_fail()
     {
-        // THE COMPANION THE THREE ABOVE NEED, and for the reason every other companion in
+        // The companion the three above need, and for the reason every other companion in
         // this file exists: a predicate that accepts everything passes in silence and reads
         // exactly like a doc that is in order.
         Assert.Equal(
             [(0, "a branch"), (1, "an entry"), (2, "a leaf")],
             Nested(["- a branch", "  - an entry", "    - a leaf", "not a bullet"]));
 
-        // THE ONE THAT WAS MISSING, AND ITS ABSENCE LET TWO DEAD LEAVES PASS THE REVIVAL
-        // CHECK ON WHERE THEIR TEXT WRAPPED. A leaf is a bullet, not a line.
+        // The one that was missing, and its absence let two dead leaves pass the revival
+        // check on where their text wrapped. A leaf is a bullet, not a line.
         Assert.Equal(
             [(2, "a leaf that revives when the wrapped half is read")],
             Nested(["    - a leaf that revives when", "      the wrapped half is read"]));
@@ -455,7 +455,7 @@ public sealed class DocsTests
         Assert.True(Significant("Malleability is the record").Overlaps(
             Significant("AND HOW HARD A BELIEF IS TO SHIFT IS ITS OWN RECORD")));
 
-        // AND THE STOPWORDS MUST STILL BITE, or the overlap test above passes on any two
+        // And the stopwords must still bite, or the overlap test above passes on any two
         // English sentences and the order half of the correspondence check is worth nothing.
         Assert.False(Significant("What it must never do").Overlaps(
             Significant("EVERY INPUT IS AN ATTRIBUTE, WHICH MUST NEVER BE THE THING")));
@@ -488,7 +488,7 @@ public sealed class DocsTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE RULE WAS WRITTEN AND THEN BROKEN THREE TIMES IN ONE FILE.</b> The plan already
+    /// <b>The rule was written and then broken three times in one file.</b> The plan already
     /// says never to cite a time, because <i>one session ago</i> is true when written and
     /// false forever after. What it did not say is that a DEFAULT is a time: <i>the shipped
     /// timing</i> names whatever ships at the moment of reading, so a row comparing
@@ -496,7 +496,7 @@ public sealed class DocsTests
     /// such row ended up asserting the opposite of the mechanism it described.
     /// </para>
     /// <para>
-    /// <b>SO A ROW NAMES THE ARM AND NEVER THE SEAT.</b> <c>AfterFailure</c> means the same
+    /// <b>So a row names the arm and never the seat.</b> <c>AfterFailure</c> means the same
     /// thing forever; <i>the shipped timing</i> does not. Introducing this rule turned up
     /// three rows already rotted — two comparing a default against the arm that had since
     /// become it, and one calling a check unarmed that has been armed and load-bearing since.
@@ -512,16 +512,16 @@ public sealed class DocsTests
     [Fact]
     public void No_single_item_outgrows_a_line()
     {
-        // JOHN'S CALL, 2026-08-04: CAP THE ITEM, NOT THE DOC. A doc-wide ceiling
+        // John's call, 2026-08-04: cap the item, not the doc. A doc-wide ceiling
         // punishes having twelve ideas, which is the wrong thing to discourage. It
         // made several sessions trim good sentences to afford new ones, and the
         // trimming produced worse prose than one pass would have.
         //
-        // WHAT ACTUALLY GOES WRONG IS AN ITEM BECOMING AN ESSAY. Eleven had, and
+        // What actually goes wrong is an item becoming an essay. Eleven had, and
         // between them they were 38% of the doc while saying what the XML comments
         // beside the code already said better. So the rule is per item: name the
-        // thing, say enough to recognise it on return, stop. TWELVE NEW IDEAS NOW
-        // COST TWELVE LINES and nothing has to be retired to make room.
+        // thing, say enough to recognise it on return, stop. Twelve new ideas now
+        // cost twelve lines and nothing has to be retired to make room.
         var swollen = new List<string>();
 
         foreach (var path in Directory.EnumerateFiles(Docs(), "*.md"))
@@ -604,12 +604,12 @@ public sealed class DocsTests
     [Fact]
     public void The_doc_holds_these_sections_and_no_others()
     {
-        // THE OTHER HALF OF CAPPING THE ITEM RATHER THAN THE DOC. Nothing else stops
+        // The other half of capping the item rather than the doc. Nothing else stops
         // a new prose section appearing beside the lists — which is exactly how
-        // "WHAT A WHOLE SESSION OF THIS SAYS" arrived, 289 words of findings in the
+        // "What a whole session of this says" arrived, 289 words of findings in the
         // one doc whose own first rule is that findings live in the commit.
         //
-        // ADDING A SECTION IS A DECISION and should cost a deliberate edit here.
+        // Adding a section is a decision and should cost a deliberate edit here.
         var found = File.ReadLines(Path.Combine(Docs(), "plan.md"))
             .Where(line => line.StartsWith("## ", StringComparison.Ordinal))
             .Select(line => line[3..].Trim())
@@ -621,8 +621,8 @@ public sealed class DocsTests
     [Fact]
     public void The_whole_doc_still_fits_in_one_reading()
     {
-        // THE BUDGET THAT WAS MISSING, AND ITS ABSENCE IS WHY THIS DOC REACHED TWENTY-FIVE
-        // THOUSAND WORDS WITH EVERY OTHER CHECK GREEN. Read the constant's remarks: the rule
+        // The budget that was missing, and its absence is why this doc reached twenty-five
+        // thousand words with every other check green. Read the constant's remarks: the rule
         // is John's and it is about whether a session LOADS the thing, not about tidiness.
         var words = Directory
             .EnumerateFiles(Docs(), "*.md")
@@ -677,7 +677,7 @@ public sealed class DocsTests
     [Fact]
     public void There_is_still_only_one_doc()
     {
-        // THE COMPANION, AND WITHOUT IT THE BUDGET IS TRIVIAL TO DEFEAT: split the
+        // The companion, and without it the budget is trivial to defeat: split the
         // doc in two and every file is comfortably under the cap while the total
         // is unchanged. A second doc is a decision, not an accident, so it should
         // cost a deliberate edit here.
@@ -689,8 +689,8 @@ public sealed class DocsTests
     [Fact]
     public void The_plan_looks_forward_and_records_no_findings()
     {
-        // JOHN'S CALL, 2026-08-03: THE PLAN IS WHERE THE PROJECT IS GOING, AND A
-        // RESULT IS SOMETHING THAT ALREADY HAPPENED. The two were mixed, and the
+        // John's call, 2026-08-03: the plan is where the project is going, and a
+        // result is something that already happened. The two were mixed, and the
         // findings won -- roughly half the doc was scores, and the sections
         // saying what to build next were the ones getting compacted to make room
         // under the word budget.
@@ -700,7 +700,7 @@ public sealed class DocsTests
         // mechanism is where anyone touching that mechanism will actually see it,
         // and the test that asserts it is the only copy that cannot drift.
         //
-        // THE GUARDS ARE NOT FINDINGS. `DO NOT RE-TRY` and `TRAPS` say what not
+        // The guards are not findings. `Do not re-try` and `TRAPS` say what not
         // to do, which is a forward-facing instruction -- so they stay, and this
         // is what keeps their evidence column a reason rather than a readout.
         var plan = Plan();
@@ -723,8 +723,8 @@ public sealed class DocsTests
     [Fact]
     public void No_row_is_dated_rather_than_stated()
     {
-        // A ROW THAT NAMES A SEAT INSTEAD OF AN ARM REVERSES ITSELF WHEN THE SEAT CHANGES
-        // HANDS, and it does so silently -- nothing goes red, the sentence still parses, and
+        // A row that names a seat instead of an arm reverses itself when the seat changes
+        // hands, and it does so silently -- nothing goes red, the sentence still parses, and
         // it now says the opposite of what it was written to say. That is worse than a stale
         // number, which at least looks like a number nobody has re-taken.
         var lines = Plan().Split('\n');
@@ -745,7 +745,7 @@ public sealed class DocsTests
     [Fact]
     public void The_dating_check_can_still_fail()
     {
-        // THE COMPANION, FOR THE SAME REASON THE ONE BELOW HAS ONE. A pattern set that
+        // The companion, for the same reason the one below has one. A pattern set that
         // matches nothing passes forever and reads exactly like a doc with no dated claims
         // in it.
         var dated = new[]
@@ -759,7 +759,7 @@ public sealed class DocsTests
             Dated.Any(rule => Regex.IsMatch(line, rule.Pattern)),
             $"nothing in the rule set notices this is dated: {line}"));
 
-        // AND A ROW THAT MERELY MENTIONS A DAY IS NOT DATED, which is what the lookahead is
+        // And a row that merely mentions a day is not dated, which is what the lookahead is
         // for. Asserted, because a rule that reddens on ordinary prose gets deleted rather
         // than obeyed.
         Assert.DoesNotContain(Dated, rule =>
@@ -769,8 +769,8 @@ public sealed class DocsTests
     [Fact]
     public void The_forward_facing_check_can_still_fail()
     {
-        // THE COMPANION, AND WITHOUT IT THE CHECK ABOVE PASSES FOR A PATTERN SET
-        // THAT MATCHES NOTHING. Every rule is asserted against a line that must
+        // The companion, and without it the check above passes for a pattern set
+        // that matches nothing. Every rule is asserted against a line that must
         // trip it, so a regex quietly broken by an edit is caught here rather
         // than by the doc slowly refilling with results.
         var findings = new[]
@@ -790,7 +790,7 @@ public sealed class DocsTests
     [Fact]
     public void Every_fork_the_code_cites_is_in_the_index()
     {
-        // THE GHOST-REFERENCE PROBLEM THAT HAS BITTEN THIS PROJECT BEFORE, which
+        // The ghost-reference problem that has bitten this project before, which
         // is why forks are deliberately never renumbered. The code cites fork
         // numbers in a dozen places; this asserts each one still resolves.
         var plan = Plan();
@@ -805,8 +805,8 @@ public sealed class DocsTests
         var cited = new SortedSet<string>(StringComparer.Ordinal);
 
         foreach (var path in Tree.Sources("src"))
-            // THREE DIGITS AND ANCHORED, BECAUSE TWO SILENTLY TRUNCATED THE FIRST FORK PAST
-            // NINETY-NINE. `fork 106` matched as `10`, so the check reported a dangling
+            // Three digits and anchored, because two silently truncated the first fork past
+            // ninety-nine. `fork 106` matched as `10`, so the check reported a dangling
             // citation of a fork nobody had written about while the one actually cited went
             // unchecked -- a guard describing a repo that is not there, which is the fault
             // this file exists to catch in other people's work.
@@ -832,14 +832,14 @@ public sealed class DocsTests
     [Fact]
     public void Every_suite_the_library_names_in_a_comment_still_exists()
     {
-        // THE SAME GHOST REFERENCE AS THE FORK CHECK, THROUGH THE ONE DOOR IT LEAVES OPEN.
+        // The same ghost reference as the fork check, through the one door it leaves open.
         // A `<see cref="..."/>` is enforced by the compiler and a fork number by the check
         // above; a suite named in PROSE is enforced by nothing at all. So a library comment
         // saying *measured in `SomeTests`* keeps compiling forever after that file is
         // renamed, and the reader who goes looking finds nothing and cannot tell whether
         // the measurement moved or never existed.
         //
-        // AND IT IS A REAL PATH RATHER THAN A HYPOTHETICAL ONE. Comments in this library
+        // And it is a real path rather than a hypothetical one. Comments in this library
         // now cite suites for their numbers -- that is deliberate, since the plan forbids
         // findings living in the doc, so the citation is how a mechanism points at its own
         // evidence. Which makes the citation load-bearing and therefore worth a budget.
@@ -867,7 +867,7 @@ public sealed class DocsTests
     [Fact]
     public void The_suite_check_can_still_fail()
     {
-        // THE COMPANION, BECAUSE A LOOKUP OVER AN EMPTY SET PASSES EVERYTHING. If `Suites`
+        // The companion, because a lookup over an empty set passes everything. If `Suites`
         // returned nothing the check above would find every citation dangling and fail
         // loudly, which is the safe direction -- but if its matching were loose enough to
         // accept anything, it would pass in silence. This pins both ends.
@@ -880,7 +880,7 @@ public sealed class DocsTests
     [Fact]
     public void Every_refuted_row_says_what_would_revive_it()
     {
-        // A REFUTATION IS CONDITIONAL ON ITS CONFIGURATION, and this project has
+        // A refutation is conditional on its configuration, and this project has
         // already had to revive two arms whose reason for being dead had quietly
         // expired -- the empty-cell workaround and the temporal window. A row
         // without a revival condition is a superstition rather than a finding,
@@ -915,7 +915,7 @@ public sealed class DocsTests
     [Fact]
     public void The_library_is_built_with_the_doc_contract_switched_on()
     {
-        // THE CHECK THAT PROTECTS THE OTHER CHECK. Everything above assumes the
+        // The check that protects the other check. Everything above assumes the
         // compiler is enforcing the XML comments; someone removing
         // GenerateDocumentationFile to quiet a warning would silently take the
         // real doc check with it, and nothing else would notice.

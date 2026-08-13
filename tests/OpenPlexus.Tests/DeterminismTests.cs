@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Commitments;
+using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 
@@ -9,14 +9,14 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE RUN HALF OF THIS FILE WENT WITH THE WALK, AND THE PROPERTY DID NOT.</b> Fork 12
+/// <b>The run half of this file went with the walk, and the property did not.</b> Fork 12
 /// asked whether a fixed seed reproduces a run exactly, and it is answered on this side by
 /// <c>GradedTests.A_fixed_seed_reproduces_a_graded_run_exactly</c> — which asks MORE than
 /// the deleted version did, running its two copies side by side so a learner that agreed
 /// with itself through anything ambient could not pass.
 /// </para>
 /// <para>
-/// <b>WHAT IS LEFT HERE IS THE EQUALITY ITSELF, AND IT IS A DIFFERENT QUESTION.</b> Every
+/// <b>What is left here is the equality itself, and it is a different question.</b> Every
 /// one of those reproducibility tests compares two reports with <c>Assert.Equal</c>, so
 /// what a report counts as part of itself decides what they are asserting. A wall clock in
 /// there turns every one of them red on a correct machine; a field MISSING from there makes
@@ -38,11 +38,11 @@ public sealed class DeterminismTests
             seed: 1).Run(rounds: 200).Tally;
 
     /// <summary>
-    /// <b>A WALL CLOCK IS NOT PART OF A RUN'S IDENTITY, AND FOR TWO DAYS IT WAS.</b>
+    /// <b>A wall clock is not part of a run's identity, and for two days it was.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THE THREE <i>a fixed seed reproduces a run exactly</i> TESTS WENT RED ON A
-    /// CORRECT MACHINE</b> the moment <see cref="Spent"/> joined <see cref="Tally"/>,
+    /// <b>THE THREE <i>a fixed seed reproduces a run exactly</i> tests went red on a
+    /// correct machine</b> the moment <see cref="Spent"/> joined <see cref="Tally"/>,
     /// because a record compares every field it has and milliseconds do not repeat.
     /// Every other number in those reports was identical to the digit. See
     /// <see cref="Spent.Equals(Spent)"/> for why the fix is there rather than here.
@@ -58,7 +58,7 @@ public sealed class DeterminismTests
     }
 
     /// <summary>
-    /// <b>THE COMPANION, AND IT IS THE HALF THAT WAS ACTUALLY DANGEROUS.</b>
+    /// <b>The companion, and it is the half that was actually dangerous.</b>
     /// </summary>
     /// <remarks>
     /// A clock inside the report did not merely turn three tests red. It made every

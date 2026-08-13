@@ -5,13 +5,13 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>WRITTEN ONCE BECAUSE TWO FILES NOW OPEN PORTS AND THE COPIES WOULD DRIFT.</b>
+/// <b>Written once because two files now open ports and the copies would drift.</b>
 /// <c>PostedTests</c> put the thinking path on a wire and <c>AskedTests</c> puts the
 /// learning path on one; a port picker and a hang detector in both is two places for the
 /// bound to differ, and a flake blamed on the bus is the outcome.
 /// </para>
 /// <para>
-/// <b>AND NEITHER OF THESE IS A CLAIM ABOUT SPEED.</b> The bound below is a deadlock
+/// <b>And neither of these is a claim about speed.</b> The bound below is a deadlock
 /// detector in exactly the sense <see cref="Fixture.Patience"/> is: what is being asserted
 /// is that a message ARRIVES, and a bound generous enough to be uninteresting is what keeps
 /// a slow machine from being reported as a broken one. Anything asserting a COST must
@@ -33,14 +33,14 @@ public static class Wired
     /// </exception>
     /// <remarks>
     /// <para>
-    /// <b>TAKEN FROM THE OPERATING SYSTEM RATHER THAN COUNTED UP FROM A CONSTANT.</b> A
+    /// <b>Taken from the operating system rather than counted up from a constant.</b> A
     /// fixed port makes a test that passes alone and fails beside anything else holding
     /// it — including a previous run of itself that has not finished releasing it, which
     /// is the flake that would get blamed on the bus.
     /// </para>
     /// <para>
-    /// <b>AND ASKING THE OPERATING SYSTEM TWICE CAN GET THE SAME ANSWER TWICE, WHICH IS THE
-    /// FAULT THIS SET EXISTS FOR.</b> The port is RELEASED before it is used — it has to be,
+    /// <b>And asking the operating system twice can get the same answer twice, which is the
+    /// fault this set exists for.</b> The port is RELEASED before it is used — it has to be,
     /// or the <c>HttpListener</c> that wants it could not bind — so between one call and the
     /// next it is free and the kernel is entitled to offer it again. A fleet asks for five in
     /// a row, and two of them being one port is a machine that fails to open with a message
@@ -48,7 +48,7 @@ public static class Wired
     /// fleet.
     /// </para>
     /// <para>
-    /// <b>THE SET IS NEVER EMPTIED, WHICH IS DELIBERATE AND IS THE OTHER HALF.</b> A fleet
+    /// <b>The set is never emptied, which is deliberate and is the other half.</b> A fleet
     /// that has been torn down may still hold its prefix for a moment, so a port coming free
     /// is not the same event as a port becoming bindable — and remembering it for the life of
     /// the process costs a few dozen integers.
@@ -82,7 +82,7 @@ public static class Wired
     /// <param name="done">The signal — <c>Gathering.Everyone</c>, in practice.</param>
     /// <returns>Whether it completed inside the hang detector's bound.</returns>
     /// <remarks>
-    /// <b>USE THIS WHERE THE WAIT IS BEING TIMED, AND <see cref="UntilAsync"/> ANYWHERE
+    /// <b>Use this where the wait is being timed, and <see cref="UntilAsync"/> ANYWHERE
     /// ELSE.</b> Polling every ten milliseconds is fine for asserting that a message
     /// arrived and useless for measuring how long it took — the reading would be the poll's
     /// granularity, and a clock that reports how often somebody looked is exactly the trap

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using OpenPlexus.Codes;
@@ -12,7 +12,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S CALL, 2026-08-04: DEAD CODE IS THE WORST.</b> Nothing in this build
+/// <b>John's call, 2026-08-04: dead code is the worst.</b> Nothing in this build
 /// fails when a public member loses its last caller, so a mechanism can be
 /// written, documented, cited in the plan, and never once run — and it reads
 /// exactly like a mechanism that works. <b>Two were found by hand the day this
@@ -28,7 +28,7 @@ namespace OpenPlexus.Tests;
 /// is not allowed is silence.
 /// </para>
 /// <para>
-/// <b>USE IS TEXTUAL AND COMMENTS DO NOT COUNT.</b> A <c>cref</c> naming a type
+/// <b>Use is textual and comments do not count.</b> A <c>cref</c> naming a type
 /// keeps its documentation honest and is exactly how a dead mechanism stays
 /// looking alive, so the scan strips comments before it looks. <b>That is the
 /// whole trick</b>: `Code.Prefix` is cited by fork 3 in prose and called by
@@ -46,7 +46,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     /// point of writing it down rather than the failure of it.
     /// </remarks>
     /// <remarks>
-    /// <b>EMPTY, AND THE THREE WAYS IT GOT THERE ARE WORTH KEEPING.</b> Sixteen
+    /// <b>Empty, and the three ways it got there are worth keeping.</b> Sixteen
     /// entries were resolved rather than re-explained, and none of the three moves
     /// was "write a better reason":
     /// <list type="bullet">
@@ -64,22 +64,22 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     /// shown to whoever reads the output and free to be wrong forever. Each now has
     /// a test comparing it to something.</item>
     /// </list>
-    /// <b>THE LIST BEING EMPTY IS NOT THE POINT AND SHOULD NOT BECOME ONE.</b> A
+    /// <b>The list being empty is not the point and should not become one.</b> A
     /// written reason is a perfectly good outcome — "nobody has got to it yet"
     /// included. What is not allowed is silence, and what this file buys is that
     /// the next unwired mechanism arrives ALONE rather than among sixteen.
     /// </remarks>
     private static readonly Dictionary<string, string> Unused = new(StringComparer.Ordinal)
     {
-        // ---- MEMBERS OF THE ELEVEN STRANDED WORLDS -------------------------
+        // ---- Members of the eleven stranded worlds -------------------------
         //
-        // THIS LIST WAS AT NOUGHT AND THE WALK'S DELETION PUT FIFTEEN ON IT, WHICH IS THE
-        // ONLY HONEST WAY TO RECORD WHAT THE DELETION COST. The type list below says
+        // this list was at nought and the walk's deletion put fifteen on it, which is the
+        // only honest way to record what the deletion cost. The type list below says
         // eleven worlds have no runner; this says how much of each one is unreachable
         // rather than merely undriven. Every entry here was called by a `*Run` in
         // `Worlds/`, and every one of those runs was the walk's.
         //
-        // EACH LEAVES BY ITS WORLD GETTING A `Trial`, NOT BY ANYBODY EDITING THIS. And the
+        // Each leaves by its world getting a `Trial`, NOT BY ANYBODY EDITING THIS. And the
         // budget below is back off nought for the first time since it reached it, which
         // should read as a debt rather than as a threshold being relaxed.
         ["Composed.Third"] = Stranded,
@@ -96,9 +96,9 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["SnakeSense.Encode"] = Stranded,
         ["SnakeSense.Turned"] = Stranded,
 
-        // ---- AND THE ONE THAT CAME STRAIGHT BACK OFF, WHICH IS THE CHECK WORKING -----
+        // ---- And the one that came straight back off, which is the check working -----
         //
-        // `HybridBus.Delayed` SPENT ONE COMMIT ON THIS LIST. C2 is the constraint the whole
+        // `HybridBus.Delayed` spent one commit on this list. C2 is the constraint the whole
         // design rests on and its only injector was left uncalled by the walk going --
         // `Lateness` delays a share of deliveries on purpose and `Delayed` counts how many
         // were actually held back, because a jitter arm that delayed nothing is a control
@@ -106,8 +106,8 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // measured per-hop delay against a thought's DEPTH; a fleet round is two round trips
         // and not a depth, so that measurement did not carry over.
         //
-        // I WROTE THE REASON AND THEN WROTE THE CALLER, AND THIS FILE CAUGHT THE STALE
-        // ENTRY. `LatenessTests` runs a fleet over `HybridBus` with a fifth of its traffic
+        // I wrote the reason and then wrote the caller, and this file caught the stale
+        // entry. `LatenessTests` runs a fleet over `HybridBus` with a fifth of its traffic
         // delayed, which is fork 52's open half -- every distributed number here is over
         // `Posted`, and TCP does not reorder within a connection. The entry is gone rather
         // than reworded, which is the only way it is allowed to leave.
@@ -138,7 +138,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             {
                 var name = $"{type.Name}.{member}";
 
-                // ITS OWN DECLARATION IS NOT A USE. Every other file counts, which
+                // Its own declaration is not a use. Every other file counts, which
                 // includes the tests -- a member exercised only by a test is doing
                 // something, even if only holding a claim in place.
                 var used = source
@@ -192,18 +192,18 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // stops the next unwired mechanism arriving unnoticed beside these. IT
         // SHOULD ONLY EVER FALL — every entry is something to wire or delete.
         //
-        // IT WAS AT NOUGHT AND THE WALK'S DELETION PUT IT AT FIFTEEN, WHICH IS THE
-        // DELIBERATE EDIT THAT COMMENT ASKED TO READ AS ONE. Nought made this the
+        // It was at nought and the walk's deletion put it at fifteen, which is the
+        // deliberate edit that comment asked to read as one. Nought made this the
         // strictest the check can be: the next member to lose its last caller failed
         // outright with nowhere to sit quietly. That is given up here, and what is bought
         // for it is a countable record of what deleting the walk stranded.
         //
-        // IT WAS FIFTEEN FOR ONE COMMIT. THIRTEEN ARE ONE FACT REPEATED — a world whose only
+        // It was fifteen for one commit. Thirteen are one fact repeated — a world whose only
         // runner was the walk's — and they come off as those worlds are decided. The
         // fifteenth was `HybridBus.Delayed` and it is already gone, which is what the
         // entries above and below are each supposed to do.
         //
-        // AND IT ONLY EVER FALLS FROM HERE. Nought is the destination and this is a
+        // And it only ever falls from here. Nought is the destination and this is a
         // detour with a map, not a new resting place.
         Assert.Equal(14, Unused.Count);
     }
@@ -211,13 +211,13 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     [Fact]
     public void And_a_public_type_the_library_itself_never_names_is_not_wired()
     {
-        // THE HOLE THE MEMBER SCAN CANNOT SEE, and `Winnow` fell straight through
+        // The hole the member scan cannot see, and `Winnow` fell straight through
         // it: built, documented, measured, and reaching NO WORLD -- while every
         // member read as used because `WinnowTests` names them. A member scan asks
         // whether anything calls a method; it never asks whether the library
-        // itself has heard of the TYPE.
+        // itself has heard of the type.
         //
-        // AND TESTS DO NOT COUNT HERE, WHICH THEY DELIBERATELY DO ABOVE. That
+        // And tests do not count here, which they deliberately do above. That
         // asymmetry is the point rather than an inconsistency: a world's
         // `RunAsync` exists for the harness to call, so a test IS its caller and
         // counting it is right. Nothing exists for a test to CONSTRUCT -- a type
@@ -250,8 +250,8 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
 
     /// <summary>Public types the library never names, each with its reason.</summary>
     /// <remarks>
-    /// <b>TEN ENTRY POINTS AND ONE ORPHAN, WHICH IS THE WHOLE VALUE OF THE
-    /// CHECK.</b> A world's run exists for a harness to call, so a test IS its
+    /// <b>Ten entry points and one orphan, which is the whole value of the
+    /// check.</b> A world's run exists for a harness to call, so a test IS its
     /// caller and the library never naming it is correct. `Winnow` is not that: it
     /// is a mechanism, and a mechanism the library has never heard of is wired to
     /// nothing however thoroughly its own tests exercise it.
@@ -284,30 +284,30 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["Felt"] = "used by `Sensing`, which shares its file — the own-file rule "
             + "cannot see a caller sitting beside it.",
 
-        // AND BOTH ENTRIES CHANGED THEIR REASON RATHER THAN THEIR STATUS, WHICH IS THE
-        // MORE INTERESTING OUTCOME. `Asker` came off this list because `Fleet` names it,
+        // And both entries changed their reason rather than their status, which is the
+        // more interesting outcome. `Asker` came off this list because `Fleet` names it,
         // and the two that remain are not unmounted any more -- they are the deployment,
         // and a library that named its own deployment would be deciding it.
         //
-        // `Holder` READ AS WIRED FOR EXACTLY AS LONG AS A TUPLE FIELD WAS SPELT LIKE
-        // IT. `HybridBus.AskAsync` named its second element `Holder`, and a scan for
+        // `Holder` read as wired for exactly as long as a tuple field was spelt like
+        // it. `HybridBus.AskAsync` named its second element `Holder`, and a scan for
         // whether the library NAMES a type answers yes to that for free. Renaming the
         // field is what put it on this list, and it is the sharper half of the finding: a
         // budget can be satisfied by a coincidence.
         ["Holder"] = Composed,
         ["Fleet"] = Composed,
 
-        // ---- THE WALK'S DELETION LEFT ELEVEN WORLDS WITH NO RUNNER ----------
+        // ---- The walk's deletion left eleven worlds with no runner ----------
         //
-        // AND THIS IS THE ONE PLACE THE WHOLE DELETION IS VISIBLE AS A COST. Each of these
+        // and this is the one place the whole deletion is visible as a cost. Each of these
         // had a `*Run` in `Worlds/` that drove it, and every one of those was the walk's --
         // so the world data survived and the thing that turned it into a measurement did
         // not. They are NOT on `Roaming`'s footing: that one is driven by `Trial` through
         // `IWorld` and has a caller, and these have none at all.
         //
-        // AND THE QUESTION IS NOT ONLY *WHICH GETS A `Trial` FIRST*, WHICH IS HOW THIS WAS
-        // FIRST WRITTEN AND IS HALF THE RULE. `RemindingTests` carries the other half: AN
-        // ISOLATING WORLD IS DELETED WHEN ITS QUESTION CLOSES, and worlds accumulate exactly
+        // And the question is not only *which gets a `Trial` first*, which is how this was
+        // first written and is half the rule. `RemindingTests` carries the other half: An
+        // isolating world is deleted when its question closes, and worlds accumulate exactly
         // as dials do. So each of these is one of two things and the list does not yet say
         // which -- a world whose question is LIVE and wants a runner, or a world whose
         // question closed with the walk and wants deleting.
@@ -318,7 +318,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // were built for prediction-conditional-on-action, which is forks 18 and 20, both
         // SETTLED and both deleted with the walk.
         //
-        // WHAT IS FORBIDDEN IS LEAVING THEM HERE WHILE NOBODY DECIDES, which is the same
+        // What is forbidden is leaving them here while nobody decides, which is the same
         // sentence the dial rule uses. Deleting all eleven to make a guard green would
         // delete live questions; keeping all eleven is a world budget nobody is paying.
         ["Clevr"] = Stranded,
@@ -334,9 +334,9 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
 
         ["HybridBus"] = Composed,
 
-        // ---- A FRONT END IS CHOSEN AT THE JOIN ------------------------------
+        // ---- A front end is chosen at the join ------------------------------
         //
-        // THE THIRD THING, AND THE PLAN SAYS SO IN THOSE WORDS. Whether a reading is banded
+        // the third thing, and the plan says so in those words. Whether a reading is banded
         // or winnowed is neither a fact about the problem nor a setting on the brain, so it
         // is picked where the two meet -- `ShapeTests` admits `fronting` and `through` on a
         // world's runner for exactly this reason. A library that named one would be
@@ -391,7 +391,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "inside `src` calling it would mean the architecture had started "
             + "consulting its own yardstick, which is the one thing it must never do.",
 
-        // `Winnow` WAS THE ENTRY THIS CHECK WAS WRITTEN FOR, and it is gone because
+        // `Winnow` was the entry this check was written for, and it is gone because
         // it is now mounted rather than because the reason was reworded. `GradedRun`
         // consumes it as one of two front-end arms, so the library has finally heard
         // of the type its own plan called its defence.
@@ -403,7 +403,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     /// item, in one place, so `OutstandingTests` and this file cannot disagree about it.</b>
     /// </summary>
     /// <remarks>
-    /// <b>DERIVED RATHER THAN LISTED, WHICH IS THE WHOLE VALUE.</b> An entry leaves by being
+    /// <b>Derived rather than listed, which is the whole value.</b> An entry leaves by being
     /// deleted from the dictionaries above — because its world got a `Trial`, or because its
     /// world was deleted — and the red test that demands it closes on the same edit. A second
     /// hand-kept list would be a second thing to forget.
@@ -437,8 +437,8 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     /// Why a role in a deployment is not named by the library it is deployed from.
     /// </summary>
     /// <remarks>
-    /// <b>THE SAME REASON `Posted` CARRIES, ONE LAYER UP, AND IT REPLACED A BETTER-KNOWN
-    /// ONE.</b> These two used to say <i>fork 52's transport is built and the learner is
+    /// <b>THE SAME REASON `Posted` carries, one layer up, and it replaced a better-known
+    /// one.</b> These two used to say <i>fork 52's transport is built and the learner is
     /// not on it</i>, which was the honest state and is exactly what this list is for.
     /// The learner is on it now, and what is left is not a gap: a library that constructed
     /// its own holders would be a library that had decided how many machines there are.
@@ -455,8 +455,8 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     /// What using a member actually looks like, as against merely spelling it.
     /// </summary>
     /// <remarks>
-    /// <b>A BARE WORD IS NOT A USE, AND THE COMPANION CHECK CAUGHT ME ASSUMING IT
-    /// WAS.</b> <c>Better</c>, <c>Same</c>, <c>Symbol</c> and <c>Thing</c> are
+    /// <b>A bare word is not a use, and the companion check caught me assuming it
+    /// was.</b> <c>Better</c>, <c>Same</c>, <c>Symbol</c> and <c>Thing</c> are
     /// ordinary words appearing as unrelated identifiers all over the tree, so
     /// matching the name alone reports a dead member as live — <b>a check that
     /// produces false PASSES</b>, which is the one failure this file exists to
@@ -507,11 +507,11 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             if (one.Name.StartsWith('<') || one.Name.StartsWith("op_", StringComparison.Ordinal))
                 continue;
 
-            // CONSTRUCTORS ARE NAMED BY THEIR TYPE, and the type's own use is a
+            // Constructors are named by their type, and the type's own use is a
             // different question from a member's.
             if (one is ConstructorInfo) continue;
 
-            // AN ENUM MEMBER IS A VALUE RATHER THAN A CALL, and a refuted arm being
+            // An enum member is a value rather than a call, and a refuted arm being
             // deleted is what `Attending` and `Gardening` are already policed by.
             if (type.IsEnum) continue;
 

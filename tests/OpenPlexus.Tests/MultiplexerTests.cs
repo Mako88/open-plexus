@@ -34,7 +34,7 @@ public sealed class MultiplexerTests(Xunit.Abstractions.ITestOutputHelper output
     [Fact]
     public void One_code_per_bit_and_it_carries_the_value()
     {
-        // A CODE STANDING FOR A POSITION ALONE WOULD BE TRUE IN EVERY ROUND and
+        // A code standing for a position alone would be true in every round and
         // would separate nothing, so the value has to be in the identity.
         var world = new Multiplexer(World(), seed: 1);
 
@@ -54,8 +54,8 @@ public sealed class MultiplexerTests(Xunit.Abstractions.ITestOutputHelper output
     [Fact]
     public void A_round_and_a_rule_compare_by_what_they_say()
     {
-        // THE COMPANION, AND WITHOUT IT HALF THIS FILE PASSES BY BEING UNABLE TO
-        // FAIL. A synthesised record equality compares the array behind an
+        // The companion, and without it half this file passes by being unable to
+        // fail. A synthesised record equality compares the array behind an
         // ImmutableArray by IDENTITY, so two rounds from the same draw read as
         // different and two different rules read as different for the wrong reason.
         // Every determinism and switching assertion below rests on this.
@@ -71,12 +71,12 @@ public sealed class MultiplexerTests(Xunit.Abstractions.ITestOutputHelper output
         Assert.Equal(truths[0], new Multiplexer(World(), seed: 99).Truths()[0]);
         Assert.NotEqual(truths[0], truths[1]);
 
-        // AND A SCOPE IS A SET, so the same codes in any order are the same rule.
+        // And a scope is a set, so the same codes in any order are the same rule.
         Assert.Equal(
             truths[0],
             truths[0] with { Scope = [.. truths[0].Scope.Reverse().Order()] });
 
-        // THE TRAP ALSO LIVES ONE LEVEL UP, and it bit this file before it was
+        // The trap also lives one level up, and it bit this file before it was
         // written down: an ImmutableArray OF rules compares by the identity of the
         // array too, so `Assert.Equal` on two keys fails whatever they hold and
         // `Assert.NotEqual` passes whatever they hold. Every key comparison below
@@ -90,7 +90,7 @@ public sealed class MultiplexerTests(Xunit.Abstractions.ITestOutputHelper output
     [Fact]
     public void The_key_holds_two_rules_per_address_and_pins_only_what_matters()
     {
-        // THE COUNT IS DERIVED, NOT QUOTED: one rule per (address value, value of
+        // The count is derived, not quoted: one rule per (address value, value of
         // the bit that address selects). Eight at six bits, sixteen at eleven.
         foreach (var address in new[] { 2, 3 })
         {
@@ -99,7 +99,7 @@ public sealed class MultiplexerTests(Xunit.Abstractions.ITestOutputHelper output
 
             Assert.Equal(world.Data * 2, truths.Length);
 
-            // EVERY SCOPE IS THE ADDRESS BITS PLUS ONE DATA BIT. A scope that pinned
+            // Every scope is the address bits plus one data bit. A scope that pinned
             // a second data bit would still be correct and would no longer be the
             // rule the learner has to find, so the key would be scoring the wrong
             // target.
@@ -113,7 +113,7 @@ public sealed class MultiplexerTests(Xunit.Abstractions.ITestOutputHelper output
     [Fact]
     public void Exactly_one_rule_in_the_key_fires_and_it_says_what_the_world_said()
     {
-        // THE LOAD-BEARING TEST IN THIS FILE. It asserts the world against the key
+        // The load-bearing test in this file. It asserts the world against the key
         // and the key against the world in one statement, so neither can drift into
         // agreeing with itself. If more than one rule fired, the key would be
         // ambiguous; if none did, it would be incomplete; if the one that fired
@@ -138,7 +138,7 @@ public sealed class MultiplexerTests(Xunit.Abstractions.ITestOutputHelper output
     [Fact]
     public void Both_answers_come_up_and_a_blind_guess_scores_a_half()
     {
-        // A WORLD THAT SAID ONE THING NINE TIMES IN TEN would let a learner that
+        // A world that said one thing nine times in ten would let a learner that
         // never fires beat chance, and the bar would be measuring the imbalance.
         var world = new Multiplexer(World(), seed: 3);
 
@@ -155,7 +155,7 @@ public sealed class MultiplexerTests(Xunit.Abstractions.ITestOutputHelper output
     [Fact]
     public void Noise_flips_what_is_emitted_and_never_what_is_true()
     {
-        // THE REPAIR GATE CANNOT BE TESTED ON A CLEAN WORLD, because there every
+        // The repair gate cannot be tested on a clean world, because there every
         // failure really is explained by some absent condition. So the world has to
         // be able to lie -- and it has to keep saying what the truth was, or a run
         // cannot report how much of its own failure it was handed.
@@ -214,7 +214,7 @@ public sealed class MultiplexerTests(Xunit.Abstractions.ITestOutputHelper output
     [Fact]
     public void A_run_that_never_switches_is_the_published_world()
     {
-        // THE FIRST MAPPING IS THE IDENTITY WHATEVER `Switch` SAYS, so a switching
+        // The first mapping is the identity whatever `Switch` SAYS, so a switching
         // run and a standard one are the same world until the first flip -- which is
         // what keeps the numbers comparable to anything published.
         var standard = new Multiplexer(World(), seed: 11);
@@ -229,7 +229,7 @@ public sealed class MultiplexerTests(Xunit.Abstractions.ITestOutputHelper output
     [Fact]
     public void A_fixed_seed_reproduces_a_run_exactly()
     {
-        // FORK 12, WHICH THIS PROJECT HAS ALREADY REOPENED ONCE. A world that did
+        // Fork 12, which this project has already reopened once. A world that did
         // not reproduce would make every arm incomparable with every other, and the
         // failure would look like a mechanism.
         var one = new Multiplexer(World(noise: 0.1, flip: 50), seed: 13);
@@ -244,18 +244,18 @@ public sealed class MultiplexerTests(Xunit.Abstractions.ITestOutputHelper output
     }
 
     /// <summary>
-    /// <b>THE SKEWED WORLD SKEWS ITS OUTCOMES AND CHANGES NOTHING ELSE.</b>
+    /// <b>The skewed world skews its outcomes and changes nothing else.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE TRUE RULE SET IS ASSERTED IDENTICAL, WHICH IS THE HALF THAT MAKES IT A
-    /// CONTROL.</b> A world that skewed its outcomes by changing what is true of it would
+    /// <b>The true rule set is asserted identical, which is the half that makes it a
+    /// control.</b> A world that skewed its outcomes by changing what is true of it would
     /// move two things at once, and every comparison against it would be unreadable — this
     /// repo's own trap about a setting that decides two independent things while being named
     /// for one. Only how often the answer is one may differ.
     /// </para>
     /// <para>
-    /// <b>IT ARRIVED HERE WITH THE VOTE ARM IT WAS BUILT FOR, AND OUTLIVED IT.</b> The
+    /// <b>It arrived here with the vote arm it was built for, and outlived it.</b> The
     /// base-rate divisor is deleted; the world property it needed is a fact about the world
     /// and every skewed grid on this bench still rests on it.
     /// </para>
@@ -271,7 +271,7 @@ public sealed class MultiplexerTests(Xunit.Abstractions.ITestOutputHelper output
 
         var world = new Multiplexer(slanted, seed: 1);
 
-        // COUNTED PER DISTINCT ANSWER RATHER THAN AGAINST A NOMINATED ONE, so this says
+        // Counted per distinct answer rather than against a nominated one, so this says
         // nothing about which code means one and cannot be wrong about it.
         var seen = new Dictionary<Code, int>();
         const int Draws = 20_000;
@@ -292,11 +292,11 @@ public sealed class MultiplexerTests(Xunit.Abstractions.ITestOutputHelper output
             $"a skew of {skew:F2} produced an outcome ratio of {ratio:F2}x, under the "
             + $"{least:F2}x this setting exists to reach");
 
-        // THE RULES ARE THE SAME RULES, WHICH IS WHAT KEEPS SOUNDNESS COMPARABLE ACROSS THE
-        // TWO ARMS. `Truths` reads the mapping and the mapping is drawn from the seed, so two
+        // The rules are the same rules, which is what keeps soundness comparable across the
+        // two arms. `Truths` reads the mapping and the mapping is drawn from the seed, so two
         // worlds on one seed must agree exactly whatever their bits do.
         //
-        // COMPARED BY CONTENT AND NOT BY THE RECORD, because `Truth` holds an
+        // Compared by content and not by the record, because `Truth` holds an
         // `ImmutableArray` and that type's equality is the identity of the underlying array
         // -- so two separately built keys with identical scopes are never equal and the
         // assertion would fail on a world it had no complaint about.

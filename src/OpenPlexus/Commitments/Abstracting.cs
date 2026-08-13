@@ -8,14 +8,14 @@ namespace OpenPlexus.Commitments;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>TWO BARS AND NEVER ONE, WHICH IS `Paying`'S FINDING CARRIED OVER RATHER THAN
-/// ITS CODE.</b> Description length alone minted 715 names on a pure-noise control
+/// <b>Two bars and never one, which is `Paying`'S finding carried over rather than
+/// its code.</b> Description length alone minted 715 names on a pure-noise control
 /// against 245 on structured data — because a shorter description of noise is still
 /// a shorter description. So a name has to pay for itself AND beat what independent
 /// scopes would have produced anyway.
 /// </para>
 /// <para>
-/// <b>PAIRS, AND BIGGER SETS BY RECURSION RATHER THAN BY SEARCH.</b> A named pair is
+/// <b>Pairs, and bigger sets by recursion rather than by search.</b> A named pair is
 /// a code, so it can be half of the next pair — which reaches a set of four in two
 /// steps and costs nothing to look for. Searching all subsets directly is
 /// exponential, and the recursion is also the thing worth having: it is what makes
@@ -30,7 +30,7 @@ public readonly record struct Tallied
 
     /// <summary>The second of the pair, or nothing where this row is one code alone.</summary>
     /// <remarks>
-    /// <b>ONE ROW TYPE AND NOT TWO, so a reader cannot receive half a table.</b> The two
+    /// <b>One row type and not two, so a reader cannot receive half a table.</b> The two
     /// counts are meaningless apart — a pair's frequency is tested against what its members
     /// do separately — and two arrays are two chances for one to arrive without the other.
     /// </remarks>
@@ -62,22 +62,22 @@ public sealed record Counts
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>RUNG FIVE'S STATISTIC IS POPULATION-WIDE AND NOTHING ABOUT HOLDING MORE PER MACHINE
-/// FIXES THAT.</b> Measured in <c>SplitNamingTests</c>: sharding one population three ways
+/// <b>Rung five's statistic is population-wide and nothing about holding more per machine
+/// fixes that.</b> Measured in <c>SplitNamingTests</c>: sharding one population three ways
 /// leaves each holder thirty-six eligible scopes — far past every count the gate asks for
 /// — and all three go silent, because the z it computes carries a factor of the square
 /// root of the scope count. Splitting a population does not remove a redundancy; it
 /// removes the ability to certify one.
 /// </para>
 /// <para>
-/// <b>AND COUNTS ARE THE ONE THING THIS DESIGN ALREADY MERGES WITHOUT A COORDINATOR.</b>
+/// <b>And counts are the one thing this design already merges without a coordinator.</b>
 /// Hits, misses and abstains are G-Counters for exactly this reason. These two tables are
 /// the same shape, so <see cref="Absorb"/> is addition and the merged answer is EXACTLY
 /// the whole population's — integers, so none of the floating-point caveat that
 /// <see cref="Population.Decide"/> carries applies here.
 /// </para>
 /// <para>
-/// <b>C1 IS KEPT BECAUSE A COUNT IS NOT A COMMITMENT.</b> What crosses is how often a pair
+/// <b>C1 is kept because a count is not a commitment.</b> What crosses is how often a pair
 /// of codes co-occurred in the sender's scopes. A reader learns nothing about which
 /// commitments those were, what they expect, or how accurate they are — it is told a
 /// frequency, which is what the constraint has always permitted.
@@ -109,8 +109,8 @@ public sealed class Recurrence
     /// evidence that anything recurs — it is evidence that covering ran.
     /// </para>
     /// <para>
-    /// <b>AND A ONE-CODE SCOPE HAS NO PAIR TO CONTRIBUTE, WHICH MAKES THIS RUNG'S INPUT
-    /// EXACTLY REPAIR'S SURVIVING OUTPUT.</b> Covering mints one code and nothing longer, so
+    /// <b>And a one-code scope has no pair to contribute, which makes this rung's input
+    /// exactly repair's surviving output.</b> Covering mints one code and nothing longer, so
     /// every scope this admits was reached by a specialisation — and how many there are is a
     /// fact about the repair budget and the repair timing rather than about redundancy.
     /// <b>A naming count read without this beside it is a repair result wearing an
@@ -168,7 +168,7 @@ public sealed class Recurrence
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE WORKING TYPE CANNOT CROSS AND THAT WAS NOT NOTICED WHEN IT WAS BUILT.</b>
+    /// <b>The working type cannot cross and that was not noticed when it was built.</b>
     /// <see cref="Recurrence"/> keys its pairs on a tuple and keeps both tables private, so
     /// a serialiser writes <c>Scopes</c> and drops everything else — which is worse than
     /// writing nothing, because a plausible number and no error is indistinguishable from a
@@ -177,7 +177,7 @@ public sealed class Recurrence
     /// was found by a round-trip test rather than by a failure.
     /// </para>
     /// <para>
-    /// <b>AND ORDERED RATHER THAN WHATEVER THE DICTIONARY HELD.</b> Two machines writing
+    /// <b>And ordered rather than whatever the dictionary held.</b> Two machines writing
     /// the same counts must write the same bytes, or nothing downstream can compare them —
     /// and a dictionary's walk is not stable across processes. Fork 12 does not reach the
     /// merge, which is integer addition, but it reaches anything that hashes or logs what
@@ -222,7 +222,7 @@ public sealed class Recurrence
     /// <summary>Folds another holder's counts into these.</summary>
     /// <param name="other">What the other holder counted.</param>
     /// <remarks>
-    /// <b>MONOTONE AND COMMUTATIVE, SO ARRIVAL ORDER CANNOT BE READ OFF THE RESULT.</b>
+    /// <b>Monotone and commutative, so arrival order cannot be read off the result.</b>
     /// Integer addition composes exactly in any order, which is what makes this safe under
     /// C2 where <see cref="Population.Decide"/>'s sum is not. Fork 12 has cost this
     /// project twice and does not reach here.
@@ -252,15 +252,15 @@ public sealed class Recurrence
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE PARTITION <see cref="Abstracting.Shared(Recurrence, CommittingSettings)"/> NEVER HAD, AND THE REASON A YIELD
-/// COULD FALL WITH NO ACCOUNT OF WHY.</b> The gate answers a pair or nothing, so every
+/// <b>THE PARTITION <see cref="Abstracting.Shared(Recurrence, CommittingSettings)"/> never had, and the reason a yield
+/// could fall with no account of why.</b> The gate answers a pair or nothing, so every
 /// reading of it in this repo has been a count of the times it spoke — and a count of
 /// silences says nothing whatever about which of four completely different things
 /// happened. <c>Tally.Eligible</c> put a denominator under the successes; this puts one
 /// under the failures.
 /// </para>
 /// <para>
-/// <b>AND THE FOUR REFUSALS ARE NOT DEGREES OF ONE THING.</b> <see cref="Scarce"/> and
+/// <b>And the four refusals are not degrees of one thing.</b> <see cref="Scarce"/> and
 /// <see cref="Rare"/> are the population being too small or too varied to hold a
 /// redundancy; <see cref="Independent"/> is a redundancy the counts say is not there;
 /// <see cref="Uncertain"/> is one that is there and cannot be certified. Only the last
@@ -301,7 +301,7 @@ public enum Refused
 /// which is the only place its refusals can be told apart.</b>
 /// </summary>
 /// <remarks>
-/// <b>A READING RATHER THAN A LOG, so it can be counted rather than eyeballed.</b> This
+/// <b>A reading rather than a log, so it can be counted rather than eyeballed.</b> This
 /// is what <see cref="Abstracting.Propose"/> returns on every ask, and
 /// <see cref="Abstracting.Shared(Recurrence, CommittingSettings)"/> is the one field of it
 /// the learner needs. Nothing here
@@ -326,8 +326,8 @@ public readonly record struct Proposed
     /// the pairs that WON, which is what the selection loop reports.</b>
     /// </summary>
     /// <remarks>
-    /// <b>SIGNED, BECAUSE THE INTERESTING FAILURE IS BELOW NOUGHT AND THE GATE CANNOT SAY
-    /// SO.</b> Selection starts at zero and takes strict improvements, so a population
+    /// <b>Signed, because the interesting failure is below nought and the gate cannot say
+    /// so.</b> Selection starts at zero and takes strict improvements, so a population
     /// whose every repaying pair is RARER than chance reads identically to one that had no
     /// repaying pair at all. Those are opposite findings.
     /// <see cref="double.NegativeInfinity"/> where nothing repaid.
@@ -364,7 +364,7 @@ public static class Abstracting
     /// <param name="counted">What recurred, from one holder or from all of them merged.</param>
     /// <param name="dials">The gate's numbers.</param>
     /// <remarks>
-    /// <b>ONE FIELD OF <see cref="Propose"/> AND NOT A SECOND IMPLEMENTATION.</b> Two copies of
+    /// <b>One field of <see cref="Propose"/> and not a second implementation.</b> Two copies of
     /// a gate is two chances for an instrument to describe a machine that is not running,
     /// which is the fault this repo has already paid for twice.
     /// </remarks>
@@ -382,14 +382,14 @@ public static class Abstracting
     /// </param>
     /// <remarks>
     /// <para>
-    /// <b>A PAIR ALREADY NAMED IS NOT A CANDIDATE, AND THE ARM THAT ALLOWED ONE IS DELETED.</b>
+    /// <b>A pair already named is not a candidate, and the arm that allowed one is deleted.</b>
     /// Proposing a pair twice mints nothing — a name's identity is its members — and this
     /// mints at most once an ask, so an ask spent on a known pair cannot add vocabulary. The
     /// old arm did that on a third of its asks at the shipped cadence. See the plan's
     /// revival row.
     /// </para>
     /// <para>
-    /// <b>AND DROPPING THEM BEFORE THE CANDIDATE COUNT IS PRINCIPLE RATHER THAN GAIN.</b> The
+    /// <b>And dropping them before the candidate count is principle rather than gain.</b> The
     /// correction multiplies by what was searched, and a pair that could never be accepted
     /// was not searched — but the refusal counts did not move between the arms, so the whole
     /// of the measured effect was the ask being spent where it could still buy a name.
@@ -419,14 +419,14 @@ public static class Abstracting
         var repaying = 0;
         var candidates = 0;
 
-        // ORDERED, BECAUSE THE WINNER WAS OTHERWISE WHICHEVER TIE THE DICTIONARY REACHED
-        // FIRST. Two pairs with the same z resolved by hash order, which is stable within
+        // Ordered, because the winner was otherwise whichever tie the dictionary reached
+        // first. Two pairs with the same z resolved by hash order, which is stable within
         // a process and nothing at all across two -- and merging counts from several
         // holders is exactly what makes a dictionary's walk differ. Fork 12 by a door
         // nobody had opened yet, since before this there was only ever one table.
         foreach (var (pair, seen) in together.OrderBy(one => one.Key.Left).ThenBy(one => one.Key.Right))
         {
-            // A CODE CANNOT CO-OCCUR WITH ITSELF, AND SUCH A ROW WOULD WIN EVERY TIME.
+            // A code cannot co-occur with itself, and such a row would win every time.
             // `Recurrence.Of` cannot make one -- a scope is `Distinct().Order()` -- but
             // `From` takes whatever arrived, and a self-pair reads as a share of p against
             // an expectation of p squared, so its z is enormous and it takes the argmax.
@@ -435,7 +435,7 @@ public static class Abstracting
             // cross a wire.
             if (pair.Left == pair.Right) continue;
 
-            // A PAIR ALREADY NAMED CANNOT ADD VOCABULARY, so under `Fresh` it is not a
+            // A pair already named cannot add vocabulary, so under `Fresh` it is not a
             // candidate -- and it is dropped BEFORE the count that the correction divides
             // among, because a candidate the gate would never accept is not one it searched.
             if (named is not null && named.Knows(Naming.Name([pair.Left, pair.Right]))) continue;
@@ -453,7 +453,7 @@ public static class Abstracting
             var expected = alone[pair.Left] / (double)scopes
                 * (alone[pair.Right] / (double)scopes);
 
-            // A PAIR IN EVERY SCOPE HAS NO VARIANCE TO TEST AGAINST, and refusing it
+            // A pair in every scope has no variance to test against, and refusing it
             // for that would be perverse -- it is the strongest redundancy the
             // population can hold, and it is only reachable when repair chose BOTH
             // codes every single time. Nothing noise-like has that shape, so the
@@ -463,7 +463,7 @@ public static class Abstracting
                 : ((seen / (double)scopes) - expected)
                     / Math.Sqrt(expected * (1.0 - expected) / scopes);
 
-            // STRICT, SO A TIE GOES TO THE PAIR THE ORDERING REACHED FIRST rather than to
+            // Strict, so a tie goes to the pair the ordering reached first rather than to
             // the last one written. Starting below nought rather than at it is what lets
             // the reading carry a negative peak; the choice below still needs a positive
             // one, so what the learner sees is unchanged.
@@ -473,14 +473,14 @@ public static class Abstracting
             best = pair;
         }
 
-        // AND `Unpaired` IS REACHABLE FROM `Fresh` AS WELL AS FROM A HAND-WRITTEN TABLE:
+        // AND `Unpaired` IS REACHABLE FROM `Fresh` as well as from a hand-written table:
         // a population that has named every pair it holds has no candidate left, which is a
         // completely different state from holding no pair.
         if (candidates == 0) return Nothing(scopes, 0, Refused.Unpaired);
 
         if (repaying == 0) return Nothing(scopes, candidates, Refused.Rare);
 
-        // A PAIR NO COMMONER THAN CHANCE IS NOT A REDUNDANCY, and the old loop could not
+        // A pair no commoner than chance is not a redundancy, and the old loop could not
         // say that it had found one. Selection began at nought, so this case and the one
         // above both came back as no candidate at all.
         if (best is not { } chosen || strongest <= 0.0)
@@ -490,7 +490,7 @@ public static class Abstracting
                 Strongest = strongest,
             };
 
-        // CORRECTED FOR THE PAIRS LOOKED AT, exactly as repair's bar is. Taking the
+        // Corrected for the pairs looked at, exactly as repair's bar is. Taking the
         // best of thousands of candidates clears any fixed bar on chance alone, and
         // that is the failure this whole gate exists against.
         var corrected = Normal.Tail(strongest) * candidates;

@@ -9,7 +9,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE CLAIM THAT MATTERS IS LOCALITY SENSITIVITY AND IT IS ONE TEST.</b>
+/// <b>The claim that matters is locality sensitivity and it is one test.</b>
 /// Everything else in this file is wiring: the tag is the right size, the same
 /// reading gives the same tag, a different reading gives a different one. Those
 /// would all pass for an ordinary hash, which is precisely what would be useless
@@ -18,7 +18,7 @@ namespace OpenPlexus.Tests;
 /// to come from outside the counting.
 /// </para>
 /// <para>
-/// <b>SO THE MEASUREMENT IS THE GRADIENT, not a threshold.</b> Overlap has to
+/// <b>So the measurement is the gradient, not a threshold.</b> Overlap has to
 /// FALL as readings move apart, and it has to fall smoothly rather than off a
 /// cliff — a front end that returned the same tag for everything within a radius
 /// and nothing beyond it would be a quantiser with the fitting hidden in the
@@ -66,7 +66,7 @@ public sealed class WinnowTests(ITestOutputHelper output)
     [Fact]
     public void The_same_reading_gives_the_same_tag_from_a_front_end_built_twice()
     {
-        // THE RED-BALL PROPERTY, AND IT IS THE ONE THIS DESIGN CANNOT TRADE. Two
+        // The red-ball property, and it is the one this design cannot trade. Two
         // machines build their own front end from the shape numbers alone -- there
         // is no seed to agree on and nothing is sent -- so this standing in for
         // "another machine" is the whole of what it means.
@@ -82,15 +82,15 @@ public sealed class WinnowTests(ITestOutputHelper output)
     [Fact]
     public void A_reading_of_the_wrong_length_is_refused_rather_than_truncated()
     {
-        // A DIFFERENT SENSE, AND QUIETLY READING THE FIRST FEW NUMBERS WOULD EMIT
-        // CODES THAT LOOK LIKE THIS ONE'S AND MEAN SOMETHING ELSE.
+        // A different sense, and quietly reading the first few numbers would emit
+        // codes that look like this one's and mean something else.
         Assert.Throws<ArgumentException>(() => Front().Of(new double[Inputs + 1]));
     }
 
     [Fact]
     public void Winnowing_to_everything_is_refused_because_it_is_not_winnowing()
     {
-        // THE ONE ADAPTIVE STEP CAN BE SWITCHED OFF BY ARITHMETIC, which is what a
+        // the one adaptive step can be switched off by arithmetic, which is what a
         // named trap here calls a check that is wired and unable to fire: with
         // every cell surviving, every reading gets the same tag.
         Assert.Throws<ArgumentOutOfRangeException>(
@@ -100,14 +100,14 @@ public sealed class WinnowTests(ITestOutputHelper output)
     [Fact]
     public void A_sheet_wider_than_the_reading_can_fill_is_refused()
     {
-        // THE BUDGET FOR THE FAILURE CLASS THAT COST THIS SESSION A PLAN ITEM. The
+        // The budget for the failure class that cost this session a plan item. The
         // plan named CLEVR's `3d_coords` as the real-valued signal to point this
         // front end at; three inputs over four thousand objects produced three
         // distinct tags, and one at two thousand cells. There are only
         // C(inputs, samples) distinct wirings and every cell beyond that repeats
         // one, so it fires identically on every reading and separates nothing.
         //
-        // A NARROW SENSE FAILS SILENTLY OTHERWISE -- it emits codes, the graph
+        // A narrow sense fails silently otherwise -- it emits codes, the graph
         // counts them, and every object in the corpus carries the same tag. That
         // reads as the architecture failing to generalise.
         Assert.Throws<ArgumentOutOfRangeException>(
@@ -118,7 +118,7 @@ public sealed class WinnowTests(ITestOutputHelper output)
         // reading rather than a preference about the sheet.
         Assert.Equal(3, new Winnow(Modality, 3, 3, 2, 2).Cells);
 
-        // AND THE FRONT END AS IT IS ACTUALLY MOUNTED IS UNAFFECTED. C(20, 3) is
+        // And the front end as it is actually mounted is unaffected. C(20, 3) is
         // 1,140 against 800 cells, so this check cannot be the reason a real sense
         // stops working.
         Assert.Equal(Cells, Front().Cells);
@@ -127,8 +127,8 @@ public sealed class WinnowTests(ITestOutputHelper output)
     [Fact]
     public void And_the_declared_width_is_NOT_what_decides_whether_it_collapses()
     {
-        // THE GUARD ABOVE READS THE WIDTH THE CALLER DECLARED, AND REAL DATA
-        // ROUTINELY VARIES IN FAR FEWER DIMENSIONS THAN IT HAS NUMBERS. Twenty
+        // The guard above reads the width the caller declared, and real data
+        // routinely varies in far fewer dimensions than it has numbers. Twenty
         // inputs sampled three at a time give 1,140 wirings against 800 cells, so
         // the arithmetic is satisfied -- and a signal whose variation is really
         // two-dimensional still collapses onto a handful of tags. That is the
@@ -168,13 +168,13 @@ public sealed class WinnowTests(ITestOutputHelper output)
         output.WriteLine($"full={full.Distinct}/{full.Emitted} "
             + $"flat={flat.Distinct}/{flat.Emitted}");
 
-        // THE FULL-RANK SIGNAL RESOLVES NEARLY EVERY READING APART.
+        // The full-rank signal resolves nearly every reading apart.
         Assert.True(full.Distinct > Readings * 0.9,
             $"a twenty-dimensional signal gave only {full.Distinct} tags over "
             + $"{full.Emitted} readings, so this front end is not working at all "
             + "and the comparison below means nothing");
 
-        // AND THE FLAT ONE DOES NOT, HAVING PASSED EXACTLY THE SAME GUARD.
+        // and the flat one does not, having passed exactly the same guard.
         Assert.True(flat.Distinct * 2 < full.Distinct,
             $"the two-dimensional signal gave {flat.Distinct} tags against "
             + $"{full.Distinct} for the full-rank one -- if these are close, "
@@ -185,7 +185,7 @@ public sealed class WinnowTests(ITestOutputHelper output)
     [Fact]
     public void A_front_end_nobody_has_shown_anything_to_reports_no_collapse()
     {
-        // NOUGHT DISTINCT OVER NOUGHT READINGS IS NOT A COLLAPSE, and a caller
+        // nought distinct over nought readings is not a collapse, and a caller
         // dividing one by the other has to be able to tell. The named trap: a
         // check that cannot fire reads as one that passed.
         var front = Front();
@@ -197,7 +197,7 @@ public sealed class WinnowTests(ITestOutputHelper output)
     [Fact]
     public void Every_cell_listens_to_a_few_inputs_and_never_to_one_twice()
     {
-        // SPARSE IS THE HALF THE FLY CONTRIBUTES. A cell reading everything fires
+        // Sparse is the half the fly contributes. A cell reading everything fires
         // on the total and says nothing about shape, so the tag would stop varying
         // with the arrangement and start varying only with the sum.
         var front = Front();
@@ -217,7 +217,7 @@ public sealed class WinnowTests(ITestOutputHelper output)
         // end silently discards, which is a sense that is wired and dead.
         Assert.All(listeners, heard => Assert.NotEmpty(heard));
 
-        // AND NO TWO INPUTS ARE THE SAME INPUT. If two produced identical winners
+        // And no two inputs are the same input. If two produced identical winners
         // the projection would be collapsing dimensions it was meant to spread.
         for (var one = 0; one < Inputs; one++)
             for (var other = one + 1; other < Inputs; other++)
@@ -260,7 +260,7 @@ public sealed class WinnowTests(ITestOutputHelper output)
 
         var mean = shared / pairs;
 
-        // A TAG IS A TWENTIETH OF THE CELLS, so two tags drawn independently would
+        // A tag is a twentieth of the cells, so two tags drawn independently would
         // share about a twentieth by chance alone. Well under a quarter is the bar
         // that says unrelated readings land apart.
         output.WriteLine($"unrelated readings share {mean:P1} of a tag");
@@ -277,10 +277,10 @@ public sealed class WinnowTests(ITestOutputHelper output)
         // is locality-sensitive hashing -- near inputs get overlapping tags -- and
         // it is the ONLY property that makes this a front end rather than a hash.
         //
-        // IT IS WHAT THE REFUTATION TABLE ASKED FOR AND NOTHING SHORT OF IT. Every
+        // It is what the refutation table asked for and nothing short of it. Every
         // likeness the graph can derive is built out of co-occurrence and carries
         // the behaviour policy with it, which is why `Kindred`, `Foreseeing` and
-        // `Backing` all died. THIS LIKENESS THE GRAPH DID NOT COMPUTE: it is a
+        // `Backing` all died. This likeness the graph did not compute: it is a
         // fact about the reading, decided before anything was counted.
         var front = Front();
         var rng = new Random(5);
@@ -316,10 +316,10 @@ public sealed class WinnowTests(ITestOutputHelper output)
         for (var step = 0; step < steps.Length; step++)
             output.WriteLine($"{steps[step],8:F2} {overlap[step],9:P1}");
 
-        // A READING THAT DID NOT MOVE IS THE SAME READING.
+        // A reading that did not move is the same reading.
         Assert.Equal(1.0, overlap[0]);
 
-        // AND EVERY STEP AWAY SHARES STRICTLY LESS THAN THE ONE BEFORE IT. This is
+        // and every step away shares strictly less than the one before it. This is
         // the gradient rather than a threshold: a front end that held one tag
         // across a radius and scattered beyond it would be a quantiser with the
         // fitting hidden in the radius, and it would pass a bar on the endpoints.
@@ -329,7 +329,7 @@ public sealed class WinnowTests(ITestOutputHelper output)
                 + $"{overlap[step - 1]:P1} at {steps[step - 1]:F2}, so overlap is "
                 + "not falling with distance");
 
-        // AND A SMALL MOVE KEEPS MOST OF THE TAG, which is the half that makes two
+        // And a small move keeps most of the tag, which is the half that makes two
         // states MEET in the graph. If a nudge scattered the tag there would be no
         // generalisation to have, whatever the ordering said.
         Assert.True(overlap[1] > 0.5,

@@ -5,13 +5,13 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A SWEEP ASSERTS NOTHING AND THAT IS THE POINT OF IT.</b> A threshold written
+/// <b>A sweep asserts nothing and that is the point of it.</b> A threshold written
 /// before the first run is a prediction dressed as a check, so the grids in
 /// `ArrangingTests` and `SharpeningTests` print their numbers and pass unconditionally.
 /// The findings then live in the commit that produced them, which is this repo's rule.
 /// </para>
 /// <para>
-/// <b>AND THEY TOOK THE SUITE PAST ITS FORTY-FIVE MINUTE CEILING IN ONE SESSION.</b>
+/// <b>And they took the suite past its forty-five minute ceiling in one session.</b>
 /// Between them they are several hundred runs of twenty and thirty thousand rounds, all
 /// serial because `Parallelism` requires it — so leaving them in the default filter
 /// spends most of an hour of somebody else's machine producing output nobody reads, and
@@ -19,7 +19,7 @@ namespace OpenPlexus.Tests;
 /// shape the workflow's own comment about cancelled runs warns about.
 /// </para>
 /// <para>
-/// <b>THEY ARE EXCLUDED RATHER THAN DELETED, AND THEY STILL COMPILE.</b> A measurement
+/// <b>They are excluded rather than deleted, and they still compile.</b> A measurement
 /// nobody can re-run is a number nobody can check, so the harness stays and the build
 /// keeps it honest — a `cref` that rots or a call site that stops existing still fails.
 /// What it does not do is run unasked. `dotnet test --filter "kind=sweep"` is how to

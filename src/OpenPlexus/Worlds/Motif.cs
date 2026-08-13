@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
@@ -32,14 +32,14 @@ public sealed record MotifSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE WORLD FOR MINTING A NAME, AND IT WAS BUILT BEFORE ANYTHING COULD.</b>
+/// <b>The world for minting a name, and it was built before anything could.</b>
 /// When a set of codes recurs, a code standing for the WHOLE set should come into
 /// existence — which is what lets the alphabet GROW, where a quantiser alone fixes
 /// it forever. That is rung five, and this world is where the redundancy it needs
 /// is manufactured on purpose.
 /// </para>
 /// <para>
-/// <b>THE INTERESTING NUMBER HERE IS COST, NOT ACCURACY.</b> A graph with no
+/// <b>The interesting number here is cost, not accuracy.</b> A graph with no
 /// chunking can already complete a familiar set perfectly well — the codes
 /// co-occur, so the counts are exactly what they should be. What it cannot do is
 /// stop paying for it: a set of size S written as pairwise co-occurrence is
@@ -77,7 +77,7 @@ public sealed class Motif
         _settings = settings;
         _rng = new Random(seed);
 
-        // THE SETS ARE DRAWN ONCE AND DISJOINT. Overlapping sets would make a
+        // The sets are drawn once and disjoint. Overlapping sets would make a
         // completion ambiguous for a reason that has nothing to do with chunking,
         // and the score would be measuring the overlap.
         var pool = Enumerable.Range(0, settings.Symbols).OrderBy(_ => _rng.Next()).ToList();
@@ -158,7 +158,7 @@ public sealed class Motif
     /// What the graph would hold if every set were minted as one node.
     /// </summary>
     /// <remarks>
-    /// <b>THE MDL TARGET, COMPUTED RATHER THAN MEASURED.</b> A set of size S seen
+    /// <b>The MDL target, computed rather than measured.</b> A set of size S seen
     /// as co-occurrence writes S(S-1) directed entries; a node standing for the
     /// set writes S, one to each member. This is what the graph's own edge count
     /// is compared against, and the gap is what step 3 would be buying.

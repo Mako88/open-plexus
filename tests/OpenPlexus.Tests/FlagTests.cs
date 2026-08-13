@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Commitments;
+using OpenPlexus.Commitments;
 using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
@@ -8,29 +8,29 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S RULE, 2026-08-04, AND IT IS STRICTER THAN THE DEAD-CODE BUDGET.</b>
+/// <b>John's rule, 2026-08-04, and it is stricter than the dead-code budget.</b>
 /// Dead code is code nothing calls. This is about code everything calls and
 /// nothing RUNS — built, tested, referenced, and switched off, so it passes every
 /// check here while doing nothing for anybody. <c>Surprise</c> was in that state
 /// for weeks: unit-tested, measured as an arm, and wired into exactly one world.
 /// </para>
 /// <para>
-/// <b>A TOGGLE BETWEEN TWO NAMED ALTERNATIVES IS FINE. AN ON/OFF FLAG IS NOT.</b>
+/// <b>A toggle between two named alternatives is fine. An on/off flag is not.</b>
 /// <see cref="Mending"/> chooses which failures a repair may run on;
 /// <see cref="Repairing"/> chooses when it runs. Both ends do something, and the
 /// comparison is between two real behaviours. A <c>bool</c> compares a behaviour against its
 /// own absence, which means the absence is a permanent resident of the code.
 /// </para>
 /// <para>
-/// <b>SO THE LIFECYCLE IS: BUILD IT, MEASURE IT AGAINST ITS NEIGHBOUR, DELETE THE
-/// LOSER.</b> That is the rule this project already applies to arms — see the
+/// <b>So the lifecycle is: build it, measure it against its neighbour, delete the
+/// loser.</b> That is the rule this project already applies to arms — see the
 /// revival table, and <c>Attending.Marked</c>, which was collapsed the same day
 /// this was written. What changes here is that a flag no longer gets to sit in the
 /// middle of that lifecycle indefinitely, which is where all six of the ones below
 /// were living.
 /// </para>
 /// <para>
-/// <b>AND THE DISGUISED ONES COUNT.</b> A nullable dial whose null means "off", or
+/// <b>And the disguised ones count.</b> A nullable dial whose null means "off", or
 /// a number whose zero means "off", is the same flag wearing a different type —
 /// a nullable cap whose null means <i>unbounded</i> is the sharpest case, and the walk
 /// carried three of them. They are listed by hand because no reflection can tell
@@ -50,7 +50,7 @@ public sealed class FlagTests(ITestOutputHelper output)
     /// revival row. Nothing leaves this list by being renamed.
     /// </remarks>
     /// <remarks>
-    /// <b>SORTED BY WHAT THE EVIDENCE ALREADY SAYS, because "turn everything on"
+    /// <b>Sorted by what the evidence already says, because "turn everything on"
     /// is three different jobs and only one of them is easy.</b> Checked against
     /// the refutation table on 2026-08-04: NONE of these is a refuted loser. Every
     /// arm the table refuted was already deleted from the code, and what is left
@@ -58,13 +58,13 @@ public sealed class FlagTests(ITestOutputHelper output)
     /// </remarks>
     private static readonly HashSet<string> Switches = new(StringComparer.Ordinal)
     {
-        // ---- THE ONE THAT IS A TRADE AND NOT A WINNER OR A LOSER ------------
+        // ---- The one that is a trade and not a winner or a loser ------------
         //
-        // JOHN'S CALL, 2026-08-04: everything else went ON and the way to switch it
+        // John's call, 2026-08-04: everything else went ON and the way to switch it
         // off went with it. `Reflect` stays a toggle because fork 21's own note
         // says why -- the risk is that the system learns its own hallucinations,
         // confirmation bias literally, and null is the control that says whether it
-        // is doing that. THE THRESHOLD HAS NO SIGNAL YET (fork 23: `Hunger`
+        // is doing that. The threshold has no signal yet (fork 23: `Hunger`
         // inverted, `Thwarted` swung too little), so this is a mechanism that
         // cannot yet be told when to stop, which is not the same as one that lost.
         "Reflect",
@@ -73,7 +73,7 @@ public sealed class FlagTests(ITestOutputHelper output)
     [Fact]
     public void No_dial_is_an_on_off_switch()
     {
-        // THE BRAIN'S SETTINGS, WHICH ARE NOW ALL OF THEM. A second settings record
+        // The brain's settings, which are now all of them. A second settings record
         // arrived once with a control arm as a `bool` that this file could not see --
         // the same blind spot the dial census has already been caught in. One record
         // is not a reason to stop looking; it is a reason this line is worth reading.
@@ -85,7 +85,7 @@ public sealed class FlagTests(ITestOutputHelper output)
         output.WriteLine(
             $"{flags.Count} raw boolean dial(s): {string.Join(", ", flags.Order(StringComparer.Ordinal))}");
 
-        // A BOOLEAN DIAL IS DETECTABLE AND THEREFORE ENFORCEABLE, which is why it
+        // A boolean dial is detectable and therefore enforceable, which is why it
         // is asserted separately from the hand-kept list below. Anything new fails
         // here the moment it is added.
         var fresh = flags.Except(Switches, StringComparer.Ordinal)
@@ -101,7 +101,7 @@ public sealed class FlagTests(ITestOutputHelper output)
     [Fact]
     public void The_number_of_switches_only_ever_falls()
     {
-        // THE BUDGET, AT THE COUNT ON THE DAY THE RULE WAS MADE. Every exit is a
+        // The budget, at the count on the day the rule was made. Every exit is a
         // decision: won and became unconditional, or lost and was deleted. There
         // is no edit that should raise this, because raising it means somebody
         // built something and left a way to not run it.

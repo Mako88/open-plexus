@@ -17,12 +17,12 @@ public sealed record RecalledSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>ONE SETTING BECAUSE IT IS ONE QUESTION — WHICH TEXT.</b> Two paths and a flag
+    /// <b>One setting because it is one question — which text.</b> Two paths and a flag
     /// would let a run name a bAbI directory and a sentence count at once and mean
     /// nothing by it; the tasks are numbered one to twenty, so nought was free.
     /// </para>
     /// <para>
-    /// <b>AND IT IS NOT A CHOICE OF CORPUS SO MUCH AS THE ONLY ONE LEFT.</b> bAbI's
+    /// <b>And it is not a choice of corpus so much as the only one left.</b> bAbI's
     /// held-out half is 1.000 recalled — some two thousand distinct contexts exist and
     /// no more — so reading it twice is re-reading it, whatever any arm scores. See
     /// <c>PrimerTests.Is_reading_real_english_predictive_at_all</c>.
@@ -42,7 +42,7 @@ public sealed record RecalledSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THIS IS THE ONE DIAL WORTH HAVING AND IT IS AN ARM RATHER THAN A SETTING.</b> A
+    /// <b>This is the one dial worth having and it is an arm rather than a setting.</b> A
     /// scope is a set of co-present codes, so a moment holding a whole story is a bag of
     /// words and <i>Mary went to the kitchen, Mary went to the garden, where is Mary</i>
     /// puts both places in it with nothing to tell them apart. A bounded span is the
@@ -51,7 +51,7 @@ public sealed record RecalledSettings
     /// measure it properly.
     /// </para>
     /// <para>
-    /// <b>AND IT IS A FACT ABOUT WHAT WAS SHOWN RATHER THAN ABOUT HOW TO THINK</b>, which
+    /// <b>And it is a fact about what was shown rather than about how to think</b>, which
     /// is the line a world's own dials have to stay on. How much of a page a reader is
     /// allowed to see is the experiment's business; what a reader does with it is not, and
     /// nothing here names a brain type.
@@ -61,8 +61,8 @@ public sealed record RecalledSettings
 
     /// <summary>Stories from the end of the file that this world will never draw.</summary>
     /// <remarks>
-    /// <b>WHOLE STORIES AND NOT WHOLE QUESTIONS, WHICH IS WHAT MAKES THE ARMS
-    /// COMPARABLE.</b> <see cref="Predicting.Asked"/> only ever draws questions, so holding
+    /// <b>Whole stories and not whole questions, which is what makes the arms
+    /// comparable.</b> <see cref="Predicting.Asked"/> only ever draws questions, so holding
     /// back a question hides its story too; every other arm draws the STATEMENTS, and would
     /// train on the very sentence the examination is about. Holding the story back is the
     /// only rule that means the same thing to all four.
@@ -79,15 +79,15 @@ public sealed record RecalledSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>NEXT-TOKEN AGAINST MASKED IS A SETTLED EXPERIMENT SOMEWHERE ELSE AND SETTLES
-/// NOTHING HERE.</b> Masked prediction beats next-token on comprehension at equal scale,
+/// <b>Next-token against masked is a settled experiment somewhere else and settles
+/// nothing here.</b> Masked prediction beats next-token on comprehension at equal scale,
 /// and it does so because a gradient reaches both sides of the gap — which is a fact about
 /// backpropagation over embeddings and has no analogue in a population of commitments that
 /// are individually blamed. The prior is worth having and it is not an answer.
 /// </para>
 /// <para>
-/// <b>SO EVERY ARM PREDICTS A WORD FROM ONE ALPHABET, AND EVERY ARM SITS THE SAME
-/// EXAMINATION.</b> An objective judged on its own target is unfalsifiable — a next-word
+/// <b>So every arm predicts a word from one alphabet, and every arm sits the same
+/// examination.</b> An objective judged on its own target is unfalsifiable — a next-word
 /// arm scores well at next words and says nothing about whether it understood anything.
 /// What is compared is the POPULATION each one grows, put to an identical set of withheld
 /// questions none of them was trained on.
@@ -99,7 +99,7 @@ public enum Predicting
     /// A question and the story in front of it, expecting the answer.
     /// </summary>
     /// <remarks>
-    /// <b>THE CONTROL, AND ARGUABLY THE ONE CLOSEST TO HOW A CHILD IS TAUGHT.</b> Word
+    /// <b>The control, and arguably the one closest to how a child is taught.</b> Word
     /// meaning is not mostly acquired by tabulating text — it arrives by ostension, with
     /// somebody pointing and naming. A question with a right answer is that shape.
     /// </remarks>
@@ -109,7 +109,7 @@ public enum Predicting
     /// A statement with one word hidden, expecting the word that was hidden.
     /// </summary>
     /// <remarks>
-    /// <b>JOHN'S CO-OCCURRENCE, MADE FALSIFIABLE, WHICH IS THE WHOLE OF WHAT IT NEEDED.</b>
+    /// <b>John's co-occurrence, made falsifiable, which is the whole of what it needed.</b>
     /// Counting what occurs together can never be wrong; hiding one of them and demanding it
     /// back can. <b>And the hiding is not a detail</b> — a target still present in the moment
     /// is answerable by naming something already there, so nothing could ever be refuted and
@@ -121,7 +121,7 @@ public enum Predicting
     /// The words of a statement so far, expecting the one that comes next.
     /// </summary>
     /// <remarks>
-    /// <b>THE ARM NOBODY WANTS, HERE SO THE OTHERS MEAN SOMETHING.</b> Without it a
+    /// <b>The arm nobody wants, here so the others mean something.</b> Without it a
     /// comparison between two objectives John already prefers would be a comparison with no
     /// floor. <b>And a scope is a SET, so *the words so far* reaches this learner as a bag
     /// with the order thrown away</b> — which is a real handicap on this arm rather than a
@@ -133,8 +133,8 @@ public enum Predicting
     /// Masked statements and asked questions, interleaved in the order written.
     /// </summary>
     /// <remarks>
-    /// <b>JOHN'S CURRICULUM, WHICH IS THE ONE ARM THAT IS NOT A CHOICE BETWEEN THE
-    /// OTHERS.</b> Read the language, then answer about it — and C4 permits it, because a
+    /// <b>John's curriculum, which is the one arm that is not a choice between the
+    /// others.</b> Read the language, then answer about it — and C4 permits it, because a
     /// boundary the experimenter knows about is not a boundary the learner can detect. Here
     /// there is not even a boundary to detect: the two kinds of moment arrive interleaved,
     /// exactly as the corpus wrote them.
@@ -146,16 +146,16 @@ public enum Predicting
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE FAIR FORM OF <see cref="Masked"/>, AND IT EXISTS BECAUSE THE NAIVE FORM
-    /// FAILED FOR A REASON THAT IS NOT ABOUT CO-OCCURRENCE.</b> Hiding every word in turn
+    /// <b>THE FAIR FORM OF <see cref="Masked"/>, and it exists because the naive form
+    /// failed for a reason that is not about co-occurrence.</b> Hiding every word in turn
     /// spends most of the demand on <i>the</i>, <i>to</i> and <i>back</i>, which is where a
     /// bag of words predicts best and carries least — so the population fills with the
     /// skeleton of English and answers a question with a preposition. Refuting an idea in
     /// the one form that was always going to lose is not refuting it.
     /// </para>
     /// <para>
-    /// <b>AND FREQUENCY IS NOT A STOP LIST, WHICH IS THE LINE THIS HAS TO STAY THE RIGHT
-    /// SIDE OF.</b> No parser, tagger, template or hand-written word set goes near it — it
+    /// <b>And frequency is not a stop list, which is the line this has to stay the right
+    /// side of.</b> No parser, tagger, template or hand-written word set goes near it — it
     /// is a count over the corpus, the same kind of fact <see cref="Babi.Commonest"/> is.
     /// What it is close to is worth saying out loud: a measured proxy for <i>informative</i>
     /// rather than a declared one, and the honest version of gating on surprise, which is a
@@ -170,14 +170,14 @@ public enum Predicting
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>WHICH WORDS WERE THE QUESTION IS A FACT ABOUT THE SIGNAL AND NOT A CONCLUSION</b>,
+/// <b>Which words were the question is a fact about the signal and not a conclusion</b>,
 /// so a world is allowed to say it — the same licence <see cref="Codes.Coded.Groups"/>
 /// carries for <i>these codes were one object</i>. What nothing here says is what to make
 /// of the split, which is the front end's business and then the learner's.
 /// </para>
 /// <para>
-/// <b>AND UNIONING THEM AT THE WORLD WOULD HAVE THROWN IT AWAY BEFORE ANYBODY COULD
-/// CHOOSE.</b> A bag of words is what a scope sees, and a bag cannot be asked whether the
+/// <b>And unioning them at the world would have thrown it away before anybody could
+/// choose.</b> A bag of words is what a scope sees, and a bag cannot be asked whether the
 /// question named something the story named — so the one structural fact this task turns
 /// on would have been destroyed by the world, one call before the translation that wants
 /// it.
@@ -190,15 +190,15 @@ public readonly record struct Asking
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>KEPT APART AND ORDERED, BECAUSE A BAG CANNOT BE ASKED WHICH SENTENCE A WORD CAME
-    /// FROM.</b> A world saying <i>these words were one sentence, and it was the latest</i>
+    /// <b>Kept apart and ordered, because a bag cannot be asked which sentence a word came
+    /// from.</b> A world saying <i>these words were one sentence, and it was the latest</i>
     /// is stating a fact about its signal — the same licence
     /// <see cref="Codes.Coded.Groups"/> and <see cref="Codes.Coded.Sequence"/> already
     /// carry. What to make of the order is the front end's, and every arm that wants none
     /// of it flattens this in one call.
     /// </para>
     /// <para>
-    /// <b>NEWEST FIRST SO THAT A POSITION MEANS THE SAME THING IN EVERY STORY.</b> Counting
+    /// <b>Newest first so that a position means the same thing in every story.</b> Counting
     /// from the start would make <i>the second statement</i> a different distance from the
     /// question in a two-line story and a nine-line one, so a code minted on it would name
     /// two unrelated things.
@@ -225,7 +225,7 @@ public readonly record struct Asking
 /// What one withheld question said, in the English the corpus wrote it in.
 /// </summary>
 /// <remarks>
-/// <b>THE TRANSCRIPT AND NOT THE MOMENT, AND NOTHING THAT LEARNS EVER SEES IT.</b> A word
+/// <b>The transcript and not the moment, and nothing that learns ever sees it.</b> A word
 /// reaches the population as a hash and a hash goes nowhere back, so a run could report
 /// that it answered four questions in five and never say which — which is a score with no
 /// way to be embarrassed by it. This is here so an answer can be printed in words beside
@@ -248,29 +248,29 @@ public sealed record Quizzed
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>NO RUN HAS EVER PUT TEXT THROUGH THIS LEARNER, WHICH IS WHY THIS IS SMALL.</b>
+/// <b>No run has ever put text through this learner, which is why this is small.</b>
 /// <see cref="Babi"/> has parsed the corpus into codes since before the commitment
 /// primitive existed, and everything built on it was walk-shaped — an occasion writing
 /// edges into clusters. Nothing joined the same words to a population of commitments,
 /// so <i>can this learn from text at all</i> has been an argument rather than a number.
 /// </para>
 /// <para>
-/// <b>A MOMENT IS WORDS AND AN OUTCOME IS AN INDEX, WHICH IS WHAT KEEPS ONE BRAIN ONE
-/// BRAIN.</b> The answer is a position in this task's answer alphabet rather than a word
+/// <b>A moment is words and an outcome is an index, which is what keeps one brain one
+/// brain.</b> The answer is a position in this task's answer alphabet rather than a word
 /// code, so <see cref="Machines.Brain.Says"/> maps it exactly as it maps a multiplexer
 /// bit — and a compound answer is one string and therefore one outcome, which is how the
 /// two structurally unanswerable tasks stop being a special case here.
 /// </para>
 /// <para>
-/// <b>THE ANSWER WORD IS IN THE MOMENT AND THAT IS THE POINT RATHER THAN A LEAK.</b>
+/// <b>The answer word is in the moment and that is the point rather than a leak.</b>
 /// <i>kitchen</i> is a word of the story and <i>the answer is kitchen</i> is an outcome,
 /// and the one-code commitment joining them is exactly what genesis is for. What the
 /// text does NOT hand over is which of the two places in the bag is the current one, and
 /// that is the whole of the question this world asks.
 /// </para>
 /// <para>
-/// <b>AND WHAT IT MEASURES WHEN IT FAILS IS WORTH MORE THAN WHAT IT MEASURES WHEN IT
-/// PASSES.</b> <c>Tally.Wanting</c> is the share of blamed rounds nothing in the scope
+/// <b>And what it measures when it fails is worth more than what it measures when it
+/// passes.</b> <c>Tally.Wanting</c> is the share of blamed rounds nothing in the scope
 /// language separates, computed every round since the branch began. A high reading here
 /// is the ladder's own admission rule firing on text, which is the signal the design
 /// exists for — and it is a different finding from a low score.
@@ -297,20 +297,20 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
                 Task = settings.Task,
                 Corpus = settings.Corpus,
 
-                // OFF, BECAUSE A CODE NAMING ONE STORY IS PRESENT ONCE AND NEVER AGAIN.
+                // Off, because a code naming one story is present once and never again.
                 // Genesis roots on a code that was live when the outcome started, so a
                 // per-story code mints a commitment that can never fire a second time --
                 // one resident a story, for a population that is bounded.
                 Stories = false,
             }).Lines;
 
-        // WHETHER THE TEXT ASKS ANYTHING, WHICH DECIDES WHAT THE EXAMINATION CAN BE AND
-        // IS NOT A DIAL. bAbI writes questions, so the exam is the withheld questions.
+        // Whether the text asks anything, which decides what the examination can be and
+        // is not a dial. bAbI writes questions, so the exam is the withheld questions.
         // Plain English writes none, so the only thing a withheld sentence can be
         // examined on is the objective itself -- the word that was hidden from it.
         var nothingAsks = !lines.Any(line => line.Asking);
 
-        // ONE ALPHABET FOR EVERY ARM, AND IT IS THE VOCABULARY RATHER THAN THE ANSWER SET.
+        // One alphabet for every arm, and it is the vocabulary rather than the answer set.
         // A masked arm predicts any word of a statement and an asked arm predicts an answer,
         // so numbering only the answers would give the two objectives different outcome
         // spaces -- and an accuracy is not comparable across two different spaces. Sorted
@@ -331,8 +331,8 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
             .Select((word, at) => (word, at))
             .ToDictionary(one => one.word, one => one.at, StringComparer.Ordinal);
 
-        // HOW OFTEN EACH WORD IS WRITTEN, COUNTED OVER THE WHOLE FILE INCLUDING THE HELD
-        // STORIES. Which words a language uses often is a fact about the language rather
+        // How often each word is written, counted over the whole file including the held
+        // stories. Which words a language uses often is a fact about the language rather
         // than about this examination, and taking it from the drawn half alone would make
         // the arm's choice move with how much was withheld.
         var rarity = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -341,7 +341,7 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
             foreach (var word in Babi.Words(line.Text ?? string.Empty))
                 rarity[word] = rarity.GetValueOrDefault(word) + 1;
 
-        // WHICH STORIES ARE HELD BACK, DECIDED BEFORE A SINGLE TURN IS BUILT. Every line of
+        // Which stories are held back, decided before a single turn is built. Every line of
         // them is skipped by every arm, so no objective can train on a sentence another
         // objective's examination is about.
         var stories = lines.Count == 0 ? 0 : lines[^1].Story + 1;
@@ -356,7 +356,7 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
 
         foreach (var line in lines)
         {
-            // A NEW STORY FORGETS THE LAST ONE, which is the corpus's own boundary and not
+            // A new story forgets the last one, which is the corpus's own boundary and not
             // an episode the learner can see. Nothing about the machine changes here; what
             // changes is which words the world says are in front of it.
             if (line.Story != story)
@@ -373,7 +373,7 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
                 said.Add(line.Words);
                 wording.Add(line.Text ?? string.Empty);
 
-                // A WITHHELD SENTENCE OF A TEXT THAT ASKS NOTHING IS THE EXAMINATION, and
+                // A withheld sentence of a text that asks nothing is the examination, and
                 // this is the one place the two corpora part. On bAbI a held statement is
                 // dropped, because its story's QUESTIONS are what the exam is made of and
                 // training on the statement would be training on the answer. Plain English
@@ -393,7 +393,7 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
             for (var one = said.Count - 1; one >= from; one--)
                 before.Add(new HashSet<Code>(said[one]));
 
-            // THE ANSWER AS A WORD RATHER THAN AS AN ANSWER, which is what lets an arm that
+            // The answer as a word rather than as an answer, which is what lets an arm that
             // never saw a question sit this examination at all. A compound answer takes its
             // first word and is wrong by construction, which is the honest reading -- the
             // two tasks whose answers are pairs were always unanswerable here.
@@ -409,7 +409,7 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
             {
                 quizzed.Add(turn);
 
-                // THE SAME SLICE THE MOMENT WAS BUILT FROM, so a transcript can never show a
+                // The same slice the moment was built from, so a transcript can never show a
                 // statement the population was not given. A readback taken from the whole
                 // story while the moment held one line would read as a machine that ignored
                 // what it was told, which is a bug in the printing wearing a finding's clothes.
@@ -437,8 +437,8 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
     /// Turns one statement into whatever the objective asks the learner to be wrong about.
     /// </summary>
     /// <remarks>
-    /// <b>NOTHING AT ALL UNDER <see cref="Predicting.Asked"/>, WHICH IS THE POINT OF THE
-    /// CONTROL.</b> A statement with no question attached settles nothing, and a round that
+    /// <b>NOTHING AT ALL UNDER <see cref="Predicting.Asked"/>, which is the point of the
+    /// control.</b> A statement with no question attached settles nothing, and a round that
     /// settles nothing takes no score, no genesis and no repair — so plain English moves not
     /// one counter. That is the whole reason a primer needed an objective before it could
     /// teach anything here.
@@ -455,7 +455,7 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
         var words = Babi.Words(line.Text ?? string.Empty);
         if (words.Count < 2) return;
 
-        // ONE MOMENT A STATEMENT RATHER THAN ONE A WORD, which is most of what this arm
+        // One moment a statement rather than one a word, which is most of what this arm
         // changes. `Masked` demands every word of every sentence and so demands `the` far
         // more often than any place; this demands one word, and picks the one the corpus
         // says least often. Ties go to the earliest, which is arbitrary and fixed.
@@ -470,8 +470,8 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
         {
             if (only >= 0 && at != only) continue;
 
-            // THE MOMENT IS EVERY OTHER WORD, OR EVERY EARLIER ONE, AND THE DIFFERENCE IS
-            // THE WHOLE EXPERIMENT. Both hand the learner a bag and demand one word back;
+            // The moment is every other word, or every earlier one, and the difference is
+            // the whole experiment. Both hand the learner a bag and demand one word back;
             // only the second one throws away half the evidence to do it.
             var moment = new HashSet<Code>();
 
@@ -495,7 +495,7 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
 
     /// <summary>Every word the task uses, in the order the outcome index numbers them.</summary>
     /// <remarks>
-    /// <b>THE OUTCOME SPACE EVERY ARM SHARES</b>, so a masked arm and an asked arm are
+    /// <b>The outcome space every arm shares</b>, so a masked arm and an asked arm are
     /// scored against the same alphabet and their accuracies mean the same thing.
     /// </remarks>
     public ImmutableArray<string> Vocabulary { get; }
@@ -504,7 +504,7 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
     /// What each withheld question said, in the same order <see cref="Withheld"/> holds them.
     /// </summary>
     /// <remarks>
-    /// <b>ONE ROW A WITHHELD TURN, WHICH IS WHAT LETS A SCORE BE READ AS A CONVERSATION.</b>
+    /// <b>One row a withheld turn, which is what lets a score be read as a conversation.</b>
     /// Nothing that learns is given any of it — see <see cref="Quizzed"/>.
     /// </remarks>
     public ImmutableArray<Quizzed> Transcript { get; }
@@ -519,8 +519,8 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
     /// What always giving the commonest answer would score ON THE EXAMINATION.
     /// </summary>
     /// <remarks>
-    /// <b>TAKEN OVER THE WITHHELD SET AND NEVER OVER THE DRAWN ONE, WHICH IS THE ONLY WAY
-    /// FOUR OBJECTIVES SHARE A BAR.</b> Each arm draws a different stream — masked moments,
+    /// <b>Taken over the withheld set and never over the drawn one, which is the only way
+    /// four objectives share a bar.</b> Each arm draws a different stream — masked moments,
     /// next-word moments, questions — so a marginal read off what an arm SAW would be four
     /// different numbers, and every score would be measured against its own arm's skew.
     /// The examination is identical for all of them, so its marginal is too.
@@ -531,7 +531,7 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
 
     /// <inheritdoc/>
     /// <remarks>
-    /// <b>IN THE ORDER WRITTEN AND WRAPPING, so the stream is the file read over and
+    /// <b>In the order written and wrapping, so the stream is the file read over and
     /// over.</b> Drawing at random would be a different world — the corpus puts a
     /// question after the statements that answer it, and reordering that is the one
     /// property a story has.
@@ -545,8 +545,8 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
 
     /// <inheritdoc/>
     /// <remarks>
-    /// <b>THE QUESTIONS OF WHOLE STORIES THIS WORLD NEVER TELLS, AND IT IS THE SAME SET
-    /// UNDER EVERY OBJECTIVE.</b> Holding back a question alone would work for
+    /// <b>The questions of whole stories this world never tells, and it is the same set
+    /// under every objective.</b> Holding back a question alone would work for
     /// <see cref="Predicting.Asked"/>, which never draws a statement, and would leak
     /// outright for every other arm — the masked stream would carry the very sentence the
     /// examination is about. So a whole story goes, and the exam does not move when the

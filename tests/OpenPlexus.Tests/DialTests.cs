@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Commitments;
+using OpenPlexus.Commitments;
 using OpenPlexus.Bus;
 using OpenPlexus.Worlds;
 
@@ -17,7 +17,7 @@ namespace OpenPlexus.Tests;
 /// budget.
 /// </para>
 /// <para>
-/// <b>ADDING A DIAL FAILS THIS TEST UNTIL SOMEBODY SAYS WHICH IT IS.</b> Either
+/// <b>Adding a dial fails this test until somebody says which it is.</b> Either
 /// something sets it from what the run is doing, or there is a written reason it
 /// cannot be — and "nobody has got to it yet" is a perfectly good reason, as long
 /// as it is written down where it can be counted.
@@ -49,7 +49,7 @@ public sealed class DialTests
     /// </summary>
     private static readonly Dictionary<string, string> HandSet = new(StringComparer.Ordinal)
     {
-        // ---- ARRIVED WITH THE COMMITMENT BRANCH ----------------------------
+        // ---- Arrived with the commitment branch ----------------------------
 
         ["Recency"] =
             "OPEN, AND FORK 27 IS THE WHOLE OF IT. How fast the local estimate "
@@ -253,9 +253,9 @@ public sealed class DialTests
             + "construction -- promiscuous while the population accounts for nothing "
             + "and quiet once it does -- so there is no level here to aim at",
 
-        // ---- ARRIVED FROM THE WORLDS, 2026-08-04 ---------------------------
+        // ---- arrived from the worlds, 2026-08-04 ---------------------------
         //
-        // NONE OF THESE IS NEW. Every one was already a dial, passed to a `*Run`
+        // none of these is new. Every one was already a dial, passed to a `*Run`
         // constructor where this census could not see it -- so the budget below
         // jumping from seven is the CHECK BEING FIXED rather than the system
         // growing knobs. Several had DIFFERENT DEFAULTS in different worlds,
@@ -268,8 +268,8 @@ public sealed class DialTests
     /// What a dial is allowed to move: the RANKING, the PRICE, or both.
     /// </summary>
     /// <remarks>
-    /// <b>ONE WEIGHT DOING TWO JOBS IS THIS DESIGN'S RECURRING FAULT, AND THIS IS
-    /// THE CHEAP DETECTOR FOR IT.</b> An edge weight both ranks a partner and
+    /// <b>One weight doing two jobs is this design's recurring fault, and this is
+    /// the cheap detector for it.</b> An edge weight both ranks a partner and
     /// prices the hop to it, so a change meaning to improve one has twice now
     /// silently wrecked the other — `Pricing.Sender` moves the ranking while
     /// meaning to move the price, and `Doubt` applied to both destroyed the
@@ -286,8 +286,8 @@ public sealed class DialTests
     [Fact]
     public void Every_dial_is_either_driven_or_has_a_written_reason_it_is_not()
     {
-        // BOTH SETTINGS TYPES, BECAUSE THIS FILE HAS ALREADY MEASURED ITS OWN BLIND
-        // SPOT ONCE. It enumerated `WalkSettings` while eleven dials sat in `*Run`
+        // Both settings types, because this file has already measured its own blind
+        // spot once. It enumerated `WalkSettings` while eleven dials sat in `*Run`
         // constructors where it could not look. A second brain arriving with seven
         // knobs of its own would have repeated that exactly, and the census would
         // have reported the same thirteen while the real number was twenty.
@@ -326,38 +326,38 @@ public sealed class DialTests
     [Fact]
     public void The_number_of_hand_set_dials_is_visible_and_does_not_grow()
     {
-        // THE BUDGET, AND THE POINT OF THE WHOLE FILE. The number is arbitrary;
+        // The budget, and the point of the whole file. The number is arbitrary;
         // having one is not. It sits AT the current count rather than above it,
         // because unlike a doc there is no ordinary edit that should raise this —
         // every new hand-set dial is a decision worth arguing about, and every
         // one retired should lower the cap behind it.
         //
-        // IT HAS MOVED IN BOTH DIRECTIONS ALREADY, AND THAT IS THE MECHANISM
-        // WORKING. `Doubt` arrived within the hour of this file being written
+        // It has moved in both directions already, and that is the mechanism
+        // working. `Doubt` arrived within the hour of this file being written
         // and failed the build until somebody said what it was. `Value` left
         // when `ArrivalValue.Lift` was deleted, because an enum with one member
         // is a dial that chooses nothing.
         //
-        // RAISED TO SIX FOR `Toll`, WHICH IS THE ARGUMENT THIS FILE WANTS HAD.
+        // RAISED TO SIX FOR `Toll`, which is the argument this file wants had.
         // It buys the split the plan has called outstanding three times over: a
         // sixth knob against the row entry finally doing one job.
         //
-        // AND TO SEVEN FOR `Row`, WHICH IS A DIFFERENT KIND OF ARGUMENT. It is not
+        // AND TO SEVEN FOR `Row`, which is a different kind of argument. It is not
         // a level to be found: what a node can afford to hold is a fact about the
         // machine rather than about the run, so it belongs with `Pricing` and
         // `Toll` as a knob nothing in the walk could hunt. What it buys is the only
         // forgetting this design has -- the bet is that nothing can be unlearned,
         // only outvoted, and until now there was no way to test whether that bet is
         // survivable.
-        // IT WENT TO EIGHTEEN AND THEN BACK TO TWELVE, AND NEITHER MOVE WAS ABOUT
-        // KNOBS BEING ADDED OR REMOVED. John moved the dials out of the worlds and
+        // It went to eighteen and then back to twelve, and neither move was about
+        // knobs being added or removed. John moved the dials out of the worlds and
         // into the brain on 2026-08-04, and eleven of them had been `*Run`
         // constructor arguments -- somewhere this census could not look, because it
-        // enumerates `WalkSettings`. THE BUDGET WAS MEASURING ITS OWN BLIND SPOT: a
+        // enumerates `WalkSettings`. The budget was measuring its own blind spot: a
         // file whose job is to notice a sixth dial arriving beside five could not
         // see eleven of them.
         //
-        // THEN SIX WENT AWAY THE SAME DAY, and that WAS a real fall. `Kinds`,
+        // Then six went away the same day, and that WAS a real fall. `Kinds`,
         // `Surprising`, `Gated`, `Chunking`, `Recent` and `IncludeEmpty` were all
         // on/off flags, and John's rule is that you build it and it is ON. A dial
         // with two positions where one of them is "not running" was never a level
@@ -365,8 +365,8 @@ public sealed class DialTests
         // `Budget` went with them: the controller is unconditional now, so it is
         // not a switch and not a level either.
         //
-        // AND TO THIRTEEN FOR `Fanout`, WHICH IS THE ARGUMENT THIS FILE EXISTS TO
-        // FORCE. It is not a level: the WIDTH is the quantity that could be hunted
+        // AND TO THIRTEEN FOR `Fanout`, which is the argument this file exists to
+        // force. It is not a level: the WIDTH is the quantity that could be hunted
         // and a node already sets that from its own row's widest gap, so what is
         // left is which of two named rules applies -- the same shape as `Pricing`
         // and `Toll`. It arrived as a bool and as a swept integer beside it, and
@@ -377,8 +377,8 @@ public sealed class DialTests
         //
         // THIRTEEN IS THE HONEST NUMBER, and it is still much worse than seven.
         //
-        // AND TO TWENTY FOR THE COMMITMENT BRANCH, WHICH IS SEVEN AT ONCE AND HAS TO
-        // BE ARGUED FOR RATHER THAN NOTED. Three of them are not levels at all --
+        // And to twenty for the commitment branch, which is seven at once and has to
+        // be argued for rather than noted. Three of them are not levels at all --
         // `Floor` is a property of the test, `Capacity` is a fact about the machine,
         // `Choosing` is which of two rules applies. `Budget` is a guard that has
         // already been caught binding. That leaves `Recency`, `Alpha` and
@@ -386,12 +386,12 @@ public sealed class DialTests
         // the three have one sitting unused: the switching world for the first and
         // the vote's own margin for the last.
         //
-        // THE CENSUS WAS EXTENDED IN THE SAME EDIT, and that matters more than the
+        // The census was extended in the same edit, and that matters more than the
         // count. A second brain with its own settings record would have been
         // invisible to this file exactly as eleven `*Run` arguments once were.
         //
-        // AND TO TWENTY-ONE FOR `Surprising`, WHICH IS THE SAME NAME COMING BACK IN A
-        // DIFFERENT SHAPE AND OWES AN ARGUMENT FOR THAT. It left in the cull above as
+        // AND TO TWENTY-ONE FOR `Surprising`, which is the same name coming back in a
+        // different shape and owes an argument for that. It left in the cull above as
         // an on/off flag, and John's rule is right: a switch whose off position is
         // "not running" was never a level to hunt. What returns is two named rules
         // that BOTH mint -- `AnyFailure` on any failure at all, `Unaccounted` only
@@ -399,122 +399,122 @@ public sealed class DialTests
         // `Choosing` and `Fanout` already have, and it is a comparison rather than a
         // mechanism beside its own absence.
         //
-        // IT ALSO EARNED THE RETURN, WHICH A FLAG NEVER DID. On winnowed CIFAR the
+        // It also earned the return, which a flag never did. On winnowed CIFAR the
         // old rule minted 414,087 commitments in twenty thousand rounds against
         // 23,296, ran seven and a half times slower, and scored LOWER. A dial nobody
         // can hunt is still worth having when the two rules differ by that much.
-        // AND TO TWENTY-THREE FOR `Mending`, WHICH IS THE THIRD IN A ROW AND IS WHY
-        // THE COUNT RISING TWICE IN ONE SESSION IS THE FINDING RATHER THAN THE COST.
+        // AND TO TWENTY-THREE FOR `Mending`, which is the third in a row and is why
+        // the count rising twice in one session is the finding rather than the cost.
         // `Sharpness`, `Weighing` and `Mending` were read as each having a best value
         // that moves between two worlds with no combination best on both. Two of the three
         // are deleted now and the third turned out to be two settings crossed, so the row
         // this paragraph was written to explain does not survive any of them.
         //
-        // FORK 37 NAMES THE SIGNAL ALL THREE ARE STANDING IN FOR: whether a parent
+        // Fork 37 names the signal all three are standing in for: whether a parent
         // still has failures no child covers. It is vote-independent and
         // world-independent, the repair gate already computes most of it, and it
         // separates the two cases these dials keep splitting the difference between.
         // The next entry in this list should be its DELETION of three of them.
         //
-        // AND BACK TO TWENTY-FOUR, WHICH IS THE FIRST TIME THIS NUMBER HAS FALLEN FOR
-        // THE RIGHT REASON. `Rooting` was here for one commit while it was being compared
+        // And back to twenty-four, which is the first time this number has fallen for
+        // the right reason. `Rooting` was here for one commit while it was being compared
         // against the thing it replaced; it won at twelve seeds -- 7.4 standard errors
         // ahead where there is background, 0.2 apart where there is none -- so it BECAME
         // the code and its arm was deleted. An arm that has won and stayed an arm is dead
         // code with a comparison attached.
-        // AND TO TWENTY-FIVE, WHICH IS A NAME ARRIVING RATHER THAN A DECISION. `Mending`
+        // And to twenty-five, which is a name arriving rather than a decision. `Mending`
         // was one setting deciding a gate and a timing at once, so the census has been
         // counting one entry for two things the machine was always doing -- `Uncovered`
         // and `Improving` repaired every round while `Outvoted` and `Neglected` waited for
         // a failure, and no comparison against the list could move either axis alone.
         //
-        // SO THE HONEST COUNT WENT UP WHEN THE CONFLATION WAS REMOVED, and this file is
+        // So the honest count went up when the conflation was removed, and this file is
         // the one place where that reads as progress rather than sprawl. A number that can
         // only fall is a number people keep by hiding things inside existing names, which
         // is exactly what happened here.
         //
-        // AND IT DID NOT FALL TO TWENTY-THREE, WHICH IS THE MEASUREMENT ANSWERING A
-        // DIFFERENT QUESTION FROM THE ONE THIS FILE ASKED. The trigger was `Strongest`
+        // And it did not fall to twenty-three, which is the measurement answering a
+        // different question from the one this file asked. The trigger was `Strongest`
         // against `Summing` at ONE fixed power on more than one world, and at the shipped
         // power of five over eight worlds the sum led on NONE of them -- so by the rule as
         // written both entries went.
         //
-        // THE DELETION WAS CARRIED OUT AND THEN UNDONE, WHICH IS WHY THIS IS EVIDENCE AND
-        // NOT A HESITATION. With the sum gone, the six-bit multiplexer falls from 0.963 to
+        // The deletion was carried out and then undone, which is why this is evidence and
+        // not a hesitation. With the sum gone, the six-bit multiplexer falls from 0.963 to
         // 0.926 on seed one and finds five of the world's eight rules where the sum finds
         // seven, holding 31 residents against 47. And `Abstracting.Shared` returns NOTHING
         // at eleven bits, so rung five names nothing and the three tests that measure the
         // counts merge lose their subject entirely.
         //
-        // SO THE RULE ASKED WHETHER THE SUM WINS AND THE ANSWER CAME BACK ONCE THE VOTE
-        // STOPPED STEERING THE SEARCH. Under `Repairing.EveryRound` all three weighings
+        // So the rule asked whether the sum wins and the answer came back once the vote
+        // stopped steering the search. Under `Repairing.EveryRound` all three weighings
         // build populations equal PER SEED, so a vote arm is a readout at last -- and over
         // ten worlds `Strongest` leads on three and the sum on none. Both losers are
         // deleted with revival rows, and `Sharpness` goes with the arm it parameterised.
         //
-        // WHICH IS WHY THE COUNT FALLS BY TWO HERE AND THE FALL IS THE FINDING. Every
+        // Which is why the count falls by two here and the fall is the finding. Every
         // earlier reading of these two was taken while the vote decided what repair ran on,
         // so it moved the search and the readout at once; the timing separated them and the
         // question answered itself.
         //
-        // AND TWENTY-SIX IS `Widening`, WHICH IS THE LADDER'S OTHER DIRECTION ARRIVING AS
-        // AN ARM RATHER THAN AS A SETTING. It ships OFF, so every number recorded before
+        // AND TWENTY-SIX IS `Widening`, which is the ladder's other direction arriving as
+        // an arm rather than as a setting. It ships OFF, so every number recorded before
         // it existed still stands and it is measured on from a known baseline -- and it is
         // already refuted as built, which is the honest reason it is a census entry rather
         // than a default: the count grows when a mechanism is added and MEASURED, and
         // shrinks only when one is deleted with a revival row.
         //
-        // AND TWENTY-EIGHT IS `Budgeting`, WHICH IS THE ONLY ONE HERE THAT ADDS NO FREEDOM
-        // AT ALL. It does not set a level or pick between two behaviours a world could
+        // AND TWENTY-EIGHT IS `Budgeting`, which is the only one here that adds no freedom
+        // at all. It does not set a level or pick between two behaviours a world could
         // want differently -- it says which QUESTION `Budget` is asking, and the answer
         // turned out to be that the shipped one has never asked about children. A child
         // adds one code, so distinct children are capped by the vocabulary far below the
         // budget, and `Children` cannot bind on any world this repo has.
         //
-        // SO THE HONEST END OF THIS ROW IS A DELETION AND IT NEEDS THE WORLD THAT WOULD
-        // SHOW IT. By this file's own rule an arm only lives while it is compared, and
+        // So the honest end of this row is a deletion and it needs the world that would
+        // show it. By this file's own rule an arm only lives while it is compared, and
         // `Children` is currently indistinguishable from removing the budget -- but
         // `BudgetTests` says removing it outright is worse at every width under the
         // shipped timing, so the two are not the same claim and the cell that separates
         // them is a world whose vocabulary reaches sixty-four. `BudgetingTests` carries
         // the tripwire that fires on the day one arrives.
-        // AND `Minting` LEFT AS AN ARM, WHICH TOOK IT BACK TO TWENTY-EIGHT -- BUT NOT BY THE
-        // CONDITION THAT WAS WRITTEN DOWN FOR IT. That condition said the row goes if naming
+        // AND `Minting` left as an arm, which took it back to twenty-eight -- but not by the
+        // condition that was written down for it. That condition said the row goes if naming
         // until the gate refuses raises neither `named` nor `stacked` outside the seed
         // spread. It raised both, by a lot, on both worlds that name anything at all -- and
         // it is deleted anyway, because hard-round coverage fell 2.7 standard errors while
         // they rose. A pre-registered condition written on columns a skewed world can raise
         // is a pre-registration of the wrong question, and passing one is not a defence.
         //
-        // AND TWENTY-SEVEN IS `Forking`, WHICH ARRIVES BECAUSE THE ARM BEFORE IT FAILED IN
-        // A DIRECTION THAT NAMED THIS ONE. A two-code step made each attempt reach DEEPER
+        // AND TWENTY-SEVEN IS `Forking`, which arrives because the arm before it failed in
+        // a direction that named this one. A two-code step made each attempt reach DEEPER
         // and lost coverage by overshooting the world's minimum sound depth; this makes each
         // attempt reach somewhere ELSE at the same depth, so the failure that closed fork 74
         // does not carry over. The count going up for a second search arm in one session is
         // the finding rather than the cost -- both were pre-registered for deletion.
         //
-        // `Stepping` ARRIVED AND LEFT WITHOUT THIS NUMBER EVER BEING PUSHED, WHICH IS THE
-        // FIRST TIME THAT HAS HAPPENED AND IS WHAT THIS FILE IS FOR. Its entry said the
+        // `Stepping` arrived and left without this number ever being pushed, which is the
+        // first time that has happened and is what this file is for. Its entry said the
         // honest end was a deletion the day the reading landed; the reading landed and it
         // went. A repair stepping two codes at once loses hard-round coverage by two to four
         // standard errors on three worlds, and its carriers overshoot the world's minimum
         // sound depth by nine tenths of a code.
         //
-        // AND THE COUNT NOT MOVING IS THE POINT RATHER THAN AN ACCIDENT. A dial whose
+        // And the count not moving is the point rather than an accident. A dial whose
         // deletion was pre-registered costs nothing to try, so the budget this file keeps is
         // a budget on dials that STAY -- which is the only version of it that does not make
         // measuring an idea more expensive than not measuring it.
         //
-        // AND TWENTY-EIGHT IS `Coarsening`, WHICH ARRIVED AS `Recasting` WITH THREE POSITIONS
-        // AND LOST TWO OF THEM IN THE SAME SESSION. Fork 85 asked for an operator that
+        // AND TWENTY-EIGHT IS `Coarsening`, WHICH ARRIVED AS `Recasting` with three positions
+        // and lost two of them in the same session. Fork 85 asked for an operator that
         // PROPOSES the coarse claim; it was built, measured over three seeds, and cost 60
         // rules where reading the entailment cost none. So the two proposing positions are
         // deleted with a revival row and what is left is a judge.
         //
-        // THE COUNT DID NOT FALL WITH THEM, AND THAT IS THE HONEST BOOKKEEPING. A dial that
+        // The count did not fall with them, and that is the honest bookkeeping. A dial that
         // arrives and loses most of itself in one session still leaves one behind, and this
         // file's own rule is that the budget is on dials that STAY.
-        // AND `Sequencing` ARRIVED AND WENT IN ONE SESSION WITHOUT THIS NUMBER STAYING UP,
+        // AND `Sequencing` arrived and went in one session without this number staying up,
         // which is the second time that has happened and is what this file is for. Rung
         // three shipped for one commit as a three-armed dial defaulting to OFF, justified
         // by every recorded number being reproduced -- and John caught it. The closure lost
@@ -522,11 +522,11 @@ public sealed class DialTests
         // there is nothing to switch, and the mechanism is simply on. See
         // `A_dial_that_ships_off_has_a_refutation_behind_it`, which is the check that stops
         // the next one.
-        // AND FIFTEEN IS THE WALK GOING, WHICH IS THE BIGGEST FALL THIS NUMBER HAS EVER
-        // TAKEN AND THE LEAST INTERESTING. Thirteen of the twenty-eight were the walk's --
+        // And fifteen is the walk going, which is the biggest fall this number has ever
+        // taken and the least interesting. Thirteen of the twenty-eight were the walk's --
         // `Pricing`, `Toll`, `Doubt`, `Row`, `Span`, `Ranking`, `Carried`, `Depth`, `Names`,
         // `Fanout`, `Horizon`, `Reflect`, `Foresight` -- and they left with the code rather
-        // than by being driven or refused. NOTHING WAS SOLVED BY THIS DROP, which is worth
+        // than by being driven or refused. Nothing was solved by this drop, which is worth
         // saying because a budget falling usually means work was done.
         Assert.Equal(15, HandSet.Count);
     }
@@ -536,7 +536,7 @@ public sealed class DialTests
     /// never been compared, whatever its reason says.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THE WEAKEST POSSIBLE FORM OF <i>AN ARM ONLY LIVES WHILE IT IS COMPARED</i>, AND
+    /// <b>THE WEAKEST POSSIBLE FORM OF <i>an arm only lives while it is compared</i>, AND
     /// THINGS STILL FAIL IT.</b> This does not ask whether an arm won, or on how many
     /// worlds, or against what — only whether any test anywhere ever names it. `Fanout` has
     /// two arms and neither has ever been written down outside its own declaration, so it
@@ -557,7 +557,7 @@ public sealed class DialTests
         {
             if (!dial.PropertyType.IsEnum) continue;
 
-            // THE SAME EXEMPTION LIST AS THE TWO-WORLD BAR, because an arm nothing selects
+            // The same exemption list as the two-world bar, because an arm nothing selects
             // and a dial nothing measures are one situation read at two grains -- and every
             // entry on it today is on the walk learner, which is going.
             if (Waiting.ContainsKey(dial.Name)
@@ -586,21 +586,21 @@ public sealed class DialTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>JOHN'S BAR, AND IT IS THIS REPO'S OWN TRAP SAID AS A RULE.</b> <i>A grid of
+    /// <b>John's bar, and it is this repo's own trap said as a rule.</b> <i>A grid of
     /// identical rows is a verdict on the worlds rather than on the arm</i>, and <i>a grid
     /// can rank arms on columns a skewed world raises for free</i>. So a mechanism measured
     /// in one place has a number and not a comparison, however many seeds it took.
     /// </para>
     /// <para>
-    /// <b>BY WHAT THE TESTS ACTUALLY BUILD, AND THE FIRST VERSION OF THIS CHECK ASKED THE
-    /// REASON TEXT INSTEAD AND WAS WRONG.</b> Reading the written reason for world names
+    /// <b>By what the tests actually build, and the first version of this check asked the
+    /// reason text instead and was wrong.</b> Reading the written reason for world names
     /// measures whether somebody happened to put them in backticks — eleven of fourteen
     /// dials failed it, including several measured on six worlds — so it would have bought
     /// a round of cosmetic edits and no coverage at all. What a test CONSTRUCTS is the
     /// fact; what its author wrote about it is not.
     /// </para>
     /// <para>
-    /// <b>AND THE EXEMPTIONS ARE A RATCHET, ON <c>DeadCodeTests</c>' PATTERN.</b> Each entry
+    /// <b>And the exemptions are a ratchet, on <c>DeadCodeTests</c>' PATTERN.</b> Each entry
     /// is one dial that fails today with what it is waiting for. The list may only shrink;
     /// adding to it wants John and a reason in the commit message.
     /// </para>
@@ -626,7 +626,7 @@ public sealed class DialTests
 
                 var source = File.ReadAllText(path);
 
-                // A FILE THAT NEVER NAMES THE DIAL SAYS NOTHING ABOUT IT, whatever worlds it
+                // A file that never names the dial says nothing about it, whatever worlds it
                 // builds. Both forms count: selecting an arm by name, and assigning the
                 // property in a settings initialiser.
                 if (!arms.Any(arm => source.Contains(
@@ -701,28 +701,28 @@ public sealed class DialTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>JOHN'S RULE, AND IT REPLACED A WEAKER ONE OF MINE THE SAME DAY.</b> My first
+    /// <b>John's rule, and it replaced a weaker one of mine the same day.</b> My first
     /// version let a dial ship OFF if its type was named in the plan's refutation table —
     /// on the reasoning that a refuted mechanism legitimately ships off. He pointed out the
     /// hole: <i>writing a reason is easy</i>, and a check whose escape hatch is prose is a
     /// check you can talk your way around.
     /// </para>
     /// <para>
-    /// <b>AND THE STRONGER RULE IS ALSO THE SIMPLER ONE, BECAUSE A DIAL IS ONLY EVER ONE OF
-    /// TWO THINGS.</b> Either it is a NEW ability, in which case it is on — there is no
+    /// <b>And the stronger rule is also the simpler one, because a dial is only ever one of
+    /// two things.</b> Either it is a NEW ability, in which case it is on — there is no
     /// other reason to have built it — and it is kept while it is being made to work, or
     /// deleted when it will not. Or it REPLACES something, in which case both arms are live
     /// while they are compared, and afterwards the winner is the code and the loser is
     /// gone. <b>Neither road ends at a dial whose default does nothing.</b>
     /// </para>
     /// <para>
-    /// <b>SO A DIAL THAT WOULD SHIP OFF IS A DIAL THAT SHOULD NOT EXIST</b>, and the fix is
+    /// <b>So a dial that would ship off is a dial that should not exist</b>, and the fix is
     /// to delete the mechanism with a revival row rather than to explain the default. The
     /// code is not lost — it is in the history, and the revival row is what says when to go
     /// and get it.
     /// </para>
     /// <para>
-    /// <b>AND DELETION IS NOT THE ONLY MOVE AVAILABLE: ADJUSTING A LOSING ARM IS ALLOWED.</b>
+    /// <b>And deletion is not the only move available: adjusting a losing arm is allowed.</b>
     /// A mechanism that lost as built may be worth one more shape before it goes, and this
     /// repo has read that as <i>delete immediately</i> more than once. What is not allowed
     /// is leaving it switched off while nobody decides.
@@ -739,8 +739,8 @@ public sealed class DialTests
 
             var settings = Activator.CreateInstance(dial.DeclaringType!);
 
-            // `Never` BY NAME, WHICH IS THIS REPO'S OWN WORD FOR THE POSITION WHERE NOTHING
-            // HAPPENS. A check inferring which arm is inert would be guessing at behaviour
+            // `Never` by name, which is this repo's own word for the position where nothing
+            // happens. A check inferring which arm is inert would be guessing at behaviour
             // from a type; the naming convention is a decision somebody made on purpose and
             // is what a reader goes by too.
             if (dial.GetValue(settings)?.ToString() == "Never") idle.Add(dial.Name);
@@ -760,8 +760,8 @@ public sealed class DialTests
     /// Dials shipping off today, each owed a deletion rather than an explanation.
     /// </summary>
     /// <remarks>
-    /// <b>THIS LIST MAY ONLY SHRINK, AND AN ENTRY IS CLEARED BY DELETING THE DIAL RATHER
-    /// THAN BY IMPROVING ITS REASON.</b> That is the whole difference between this and the
+    /// <b>This list may only shrink, and an entry is cleared by deleting the dial rather
+    /// than by improving its reason.</b> That is the whole difference between this and the
     /// check it replaced. Nothing new may be added — a mechanism arriving today ships on.
     /// </remarks>
     private static readonly Dictionary<string, string> Owed = new(StringComparer.Ordinal)
@@ -783,22 +783,22 @@ public sealed class DialTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THERE ARE EXACTLY TWO HONEST REASONS TO SHIP `Never`, AND ONE OF THEM LEAVES A
-    /// TRACE.</b> Either the mechanism LOST its comparison — in which case this repo's own
+    /// <b>There are exactly two honest reasons to ship `Never`, and one of them leaves a
+    /// trace.</b> Either the mechanism LOST its comparison — in which case this repo's own
     /// rule says the loser is deleted and leaves a revival row — or it is the first thing of
     /// its kind and must be on. What is forbidden is the third: built, better, and left off
     /// so that the numbers already recorded do not have to be re-taken. <i>An arm only lives
     /// while it is compared</i>, and <i>a better brain beats intact numbers</i>.
     /// </para>
     /// <para>
-    /// <b>SO THE CHECK IS THE TRACE RATHER THAN THE INTENT, WHICH IS THE ONLY PART A BUILD
-    /// CAN READ.</b> A refuted mechanism is named in DO NOT RE-TRY with what would revive it;
+    /// <b>So the check is the trace rather than the intent, which is the only part a build
+    /// can read.</b> A refuted mechanism is named in DO NOT RE-TRY with what would revive it;
     /// a mechanism switched off to protect a baseline is named nowhere, because there is
     /// nothing to say. The second is what this fails on.
     /// </para>
     /// <para>
-    /// <b>IT IS WRITTEN AGAINST A CASE THAT ALREADY PASSES AND A CASE THAT ALREADY
-    /// FAILED.</b> `Widening` ships `Never` and is refuted twice over in the table, so it
+    /// <b>It is written against a case that already passes and a case that already
+    /// failed.</b> `Widening` ships `Never` and is refuted twice over in the table, so it
     /// passes. `Sequencing` shipped `Never` for one commit with no row anywhere, because
     /// there was no refutation — it had WON — and this is the check that would have said so
     /// before John had to.
@@ -814,14 +814,14 @@ public sealed class DialTests
         {
             if (!dial.PropertyType.IsEnum) continue;
 
-            // THE DECLARING TYPE RATHER THAN A HAND-KEPT LIST, so a settings record nobody
+            // The declaring type rather than a hand-kept list, so a settings record nobody
             // told this check about is still asked. `Activator` because a required member is
             // a compile-time check and this never writes one.
             var settings = Activator.CreateInstance(dial.DeclaringType!);
             var shipped = dial.GetValue(settings)?.ToString();
 
-            // `Never` BY NAME, WHICH IS THIS REPO'S OWN WORD FOR THE POSITION WHERE NOTHING
-            // HAPPENS. A check inferring which arm is inert would be guessing at behaviour
+            // `Never` by name, which is this repo's own word for the position where nothing
+            // happens. A check inferring which arm is inert would be guessing at behaviour
             // from a type; the naming convention is a decision somebody made on purpose and
             // is what a reader goes by too.
             if (shipped != "Never") continue;

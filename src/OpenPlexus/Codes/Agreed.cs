@@ -5,8 +5,8 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>NOT <see cref="object.GetHashCode"/>, AND THAT IS THE WHOLE REASON THIS
-/// EXISTS.</b> String hashing is randomised per process in .NET, so anything built
+/// <b>NOT <see cref="object.GetHashCode"/>, and that is the whole reason this
+/// exists.</b> String hashing is randomised per process in .NET, so anything built
 /// on it gives a different answer in every run — and this design turns on two
 /// names agreeing without anyone being asked.
 /// <see cref="Commitments.Commitment.Name"/> derives a commitment's identity from

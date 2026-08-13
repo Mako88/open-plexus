@@ -7,7 +7,7 @@ public sealed record ArrangedSettings
 {
     /// <summary>How many cells across the grid is.</summary>
     /// <remarks>
-    /// <b>THREE, BECAUSE THE WHOLE SPACE HAS TO BE ENUMERABLE.</b> Soundness by
+    /// <b>Three, because the whole space has to be enumerable.</b> Soundness by
     /// enumeration is the instrument <see cref="Cifar"/> had to do without, and it
     /// costs one coding of every scene the world admits — nine cells with one
     /// distractor is ten thousand of them, and four is a quarter of a million.
@@ -16,7 +16,7 @@ public sealed record ArrangedSettings
 
     /// <summary>How many pixels across one cell is.</summary>
     /// <remarks>
-    /// <b>THE RESOLUTION DIAL, AND IT IS THE WORLD'S.</b> How finely a scene shows
+    /// <b>The resolution dial, and it is the world's.</b> How finely a scene shows
     /// itself is a fact about what is being looked at; the reading is
     /// <c>(Side * Cell)</c> squared numbers, and <see cref="Codes.Winnowing"/> spends
     /// one winner per twenty cells of a sheet that is linear in that.
@@ -25,7 +25,7 @@ public sealed record ArrangedSettings
 
     /// <summary>How many shapes are present that the answer does not depend on.</summary>
     /// <remarks>
-    /// <b>THE MULTIPLEXER'S PROPERTY, IN A WORLD MADE OF PHOTONS.</b> Several cues
+    /// <b>The multiplexer's property, in a world made of photons.</b> Several cues
     /// arrive together and only some carry the outcome — here the irrelevant ones are
     /// whole recurring parts rather than bits, and they move around, so what has to be
     /// ignored is different every scene.
@@ -35,13 +35,13 @@ public sealed record ArrangedSettings
     /// <summary>One arrangement in this many is never drawn. Nought withholds nothing.</summary>
     /// <remarks>
     /// <para>
-    /// <b>THE SHARPEST INSTRUMENT THIS WORLD HAS, AND IT IS AIMED AT THE THING A
-    /// SCORE CANNOT SEE.</b> A learner that stores one rule per arrangement is
+    /// <b>The sharpest instrument this world has, and it is aimed at the thing a
+    /// score cannot see.</b> A learner that stores one rule per arrangement is
     /// arbitrarily accurate on what it has been shown and holds no notion of LEFT OF.
     /// Arrangements it was never shown are where the two come apart.
     /// </para>
     /// <para>
-    /// <b>HELD BACK IN PAIRS, SO THE EXAM IS BALANCED BY CONSTRUCTION.</b> Every
+    /// <b>Held back in pairs, so the exam is balanced by construction.</b> Every
     /// arrangement has a partner with the two markers swapped and the opposite answer;
     /// withholding one without the other would hand the held-out set a majority class
     /// and let a constant answer beat chance on it.
@@ -64,7 +64,7 @@ public readonly record struct Placed
 /// One scene: what is where, and what that arrangement means.
 /// </summary>
 /// <remarks>
-/// <b>THE ANSWER KEY IS THE SCENE AND NOT THE INPUT, WHICH IS CLEVR'S SHAPE.</b> What
+/// <b>The answer key is the scene and not the input, which is CLEVR's shape.</b> What
 /// reaches a front end is <see cref="Arranged.Render"/>'s pixels; this is what the
 /// world knows about them, and it exists so that soundness can be settled by
 /// enumeration rather than sampled.
@@ -79,8 +79,8 @@ public readonly record struct Layout
 
     /// <summary>Whether the world ever draws this, or holds its arrangement back.</summary>
     /// <remarks>
-    /// <b>ON THE SCENE RATHER THAN ON A SECOND LIST, BECAUSE EVERYTHING THAT READS THE
-    /// SPACE NEEDS BOTH HALVES.</b> Soundness wants every scene and does not care;
+    /// <b>On the scene rather than on a second list, because everything that reads the
+    /// space needs both halves.</b> Soundness wants every scene and does not care;
     /// a yardstick has to be fitted on one half and scored on the other, or it is not a
     /// held-out number at all. Two methods returning two lists would let those drift.
     /// </remarks>
@@ -119,29 +119,29 @@ public readonly record struct Layout
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE WORLD STEP FOUR SAID IT COULD NOT BE.</b> <see cref="Cifar"/> ships photons
+/// <b>The world step four said it could not be.</b> <see cref="Cifar"/> ships photons
 /// and measures a front end, and a ten-way label per picture has no parts and no
 /// arrangement — so no score on it can tell a front end that manufactures REUSABLE
 /// symbols from one that emits a holistic blob per image. Both separate ten classes;
 /// only the first leads anywhere.
 /// </para>
 /// <para>
-/// <b>SO THE ONE HARD CONSTRAINT IS THAT A BAG OF PARTS MUST SCORE CHANCE, AND HERE IT
-/// IS A THEOREM RATHER THAN A HOPE.</b> Swapping which cell holds the first marker and
+/// <b>So the one hard constraint is that a bag of parts must score chance, and here it
+/// is a theorem rather than a hope.</b> Swapping which cell holds the first marker and
 /// which holds the second leaves the multiset of shapes untouched, flips the answer,
 /// and lands on a scene the world draws exactly as often. That map is an involution on
 /// the whole space, so what is present carries no information about the outcome AT ALL
 /// — see <see cref="Swapped"/>, which the tests enumerate rather than sample.
 /// </para>
 /// <para>
-/// <b>AND IT IS GENERATED, WHICH RESTORES SOUNDNESS BY ENUMERATION ON A WORLD MADE OF
-/// PHOTONS.</b> <see cref="Layouts"/> is the entire space, so a commitment can be asked
+/// <b>And it is generated, which restores soundness by enumeration on a world made of
+/// photons.</b> <see cref="Layouts"/> is the entire space, so a commitment can be asked
 /// whether it is TRUE — coded through whatever front end is in use, checked against
 /// every scene it fires on — rather than whether it agrees with a basis somebody chose.
 /// That is the instrument step four had to do without, and the reason the grid is small.
 /// </para>
 /// <para>
-/// <b>WHAT IT STILL DOES NOT TEST IS THE OTHER HALF OF THE GOAL.</b> A scene is
+/// <b>What it still does not test is the other half of the goal.</b> A scene is
 /// single-shot and independent: no action, no intervention, no sequence. Settlement is
 /// trivial, <c>Abstain</c> cannot fire, and entailment depth is always one. This is the
 /// front end and the scope language, measured together and honestly, and nothing more.
@@ -151,7 +151,7 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
 {
     /// <summary>How many shapes there are, markers first.</summary>
     /// <remarks>
-    /// <b>FIVE, AND THE FIRST TWO ARE THE ONES THE ANSWER IS ABOUT.</b> They are drawn
+    /// <b>Five, and the first two are the ones the answer is about.</b> They are drawn
     /// by the same arithmetic as the clutter and are told apart only by which cells the
     /// world reads — nothing about a marker's pixels says it is special, which is what
     /// stops the problem being solvable by counting ink.
@@ -230,7 +230,7 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
         _settings = settings;
         _rng = new Random(seed);
 
-        // THE SPLIT IS A POSITION IN A CANONICAL ORDER AND NOT A DRAW, so every seed
+        // The split is a position in a canonical order and not a draw, so every seed
         // sits the same exam. A held-out set chosen by the world's own generator would
         // move with the seed, and two seeds would then be scored against two different
         // questions.
@@ -241,7 +241,7 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
 
         for (var which = 0; which < pairs.Count; which++)
         {
-            // BOTH ORDERINGS GO THE SAME WAY, which is what balances the exam. One
+            // Both orderings go the same way, which is what balances the exam. One
             // half of a pair held back would give the withheld set a majority class.
             var (low, high) = pairs[which];
 
@@ -274,8 +274,8 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
 
     /// <summary>One scene, drawn uniformly from the arrangements the world shows.</summary>
     /// <remarks>
-    /// <b>UNIFORM OVER THE WHOLE DRAWN SPACE, WHICH IS WHAT MAKES THE INVOLUTION AN
-    /// ARGUMENT.</b> An arrangement is picked uniformly and its clutter is picked
+    /// <b>Uniform over the whole drawn space, which is what makes the involution an
+    /// argument.</b> An arrangement is picked uniformly and its clutter is picked
     /// uniformly, and every arrangement admits the same number of clutterings — so
     /// every drawn scene is equally likely, and a scene and its swap therefore arrive
     /// equally often.
@@ -291,7 +291,7 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
         // as a soundness score that cannot see its own world.
         var slots = Enumerable.Range(0, Cells - Markers).ToList();
 
-        // A UNIFORM SUBSET BY PARTIAL SHUFFLE, then sorted -- so what is drawn is a
+        // A uniform subset by partial shuffle, then sorted -- so what is drawn is a
         // SET of slots with a shape each, which is exactly what `Clutterings`
         // enumerates. Drawing an ordered tuple instead would over-count.
         for (var taken = 0; taken < _settings.Clutter; taken++)
@@ -323,7 +323,7 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
     /// Every scene this world admits, drawn and withheld alike.
     /// </summary>
     /// <remarks>
-    /// <b>THE WHOLE SPACE, BECAUSE A RULE IS TRUE OF THE WORLD OR IT IS NOT.</b>
+    /// <b>The whole space, because a rule is true of the world or it is not.</b>
     /// Soundness asked only over the drawn scenes would call a rule true when it merely
     /// has not been contradicted yet, which is the same fault as scoring a learner on
     /// what it was taught. It is exact rather than sampled, and it is what
@@ -347,14 +347,14 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
     /// </summary>
     /// <param name="scene">The scene to swap.</param>
     /// <remarks>
-    /// <b>THE INVOLUTION THE WHOLE WORLD RESTS ON.</b> It leaves the multiset of shapes
+    /// <b>The involution the whole world rests on.</b> It leaves the multiset of shapes
     /// exactly as it was, flips the outcome, and lands inside the space at the same
     /// probability — so knowing every part that is present tells you nothing whatever
     /// about the answer. That is the constraint the plan writes down as unscoreable by a
     /// bag of parts, said as a map rather than as a wish.
     /// </remarks>
     /// <remarks>
-    /// <b>AND IT STAYS ON ITS OWN SIDE OF THE HELD-OUT LINE.</b> Arrangements are
+    /// <b>And it stays on its own side of the held-out line.</b> Arrangements are
     /// withheld in swapped PAIRS, so a scene the world draws swaps to one it draws and a
     /// withheld one swaps to a withheld one. Which is why the exam is balanced without
     /// anything balancing it, and why <see cref="Layout.Shown"/> is carried across rather
@@ -389,8 +389,8 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
     /// <param name="scene">What is where.</param>
     /// <remarks>
     /// <para>
-    /// <b>THE SAME GLYPH IN EVERY CELL IT EVER APPEARS IN, WHICH IS THE RECURRENCE THE
-    /// WORLD EXISTS TO OFFER.</b> A front end that manufactures a reusable symbol per
+    /// <b>The same glyph in every cell it ever appears in, which is the recurrence the
+    /// world exists to offer.</b> A front end that manufactures a reusable symbol per
     /// part will emit something in common between two scenes holding the same shape
     /// somewhere; one that codes the picture as a whole will not. Nothing here makes
     /// either happen — it makes the difference VISIBLE, which is the job of a world.
@@ -429,14 +429,14 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
     /// <param name="cell">How many pixels across the patch is.</param>
     /// <remarks>
     /// <para>
-    /// <b>SAID AS A PREDICATE OVER THE PATCH RATHER THAN AS A BITMAP, so the shapes
+    /// <b>Said as a predicate over the patch rather than as a bitmap, so the shapes
     /// survive the resolution dial.</b> A hand-drawn three-by-three would have to be
     /// redrawn at every <see cref="ArrangedSettings.Cell"/>, and a shape that changed
     /// when the world got sharper would make the resolution arm a comparison between
     /// two different problems.
     /// </para>
     /// <para>
-    /// <b>AND NO SHAPE IS A SOLID BLOCK, WHICH IS A CONSTRAINT AND NOT A TASTE.</b> A
+    /// <b>And no shape is a solid block, which is a constraint and not a taste.</b> A
     /// front end worth having asks what SHAPE a reading has and not how loud it was —
     /// <see cref="Codes.Winnow"/> centres before it projects, for the reason a smell
     /// twice as strong is the same smell. A uniformly filled patch and an empty one are
@@ -452,7 +452,7 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
     /// </remarks>
     private static bool Inked(int shape, int down, int across, int cell)
     {
-        // THE MIDDLE THIRD, BY INTEGER ARITHMETIC. At three pixels it is the centre
+        // The middle third, by integer arithmetic. At three pixels it is the centre
         // one; at six it is the middle two. Nothing here rounds differently on
         // another machine, which a fraction of a pixel would.
         var middling = down * 3 / cell == 1;
@@ -473,7 +473,7 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
 
     /// <summary>Unordered cell pairs the markers may occupy, in canonical order.</summary>
     /// <remarks>
-    /// <b>DIFFERENT COLUMNS, BECAUSE THE QUESTION IS ABOUT COLUMNS.</b> Two markers in
+    /// <b>Different columns, because the question is about columns.</b> Two markers in
     /// one column have no left and no right, and admitting them would need a third
     /// outcome that is about the world's geometry rather than about arrangement.
     /// </remarks>
@@ -487,7 +487,7 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
 
     /// <summary>Every way the clutter can be placed, ignoring where the markers went.</summary>
     /// <remarks>
-    /// <b>OVER SLOTS RATHER THAN OVER CELLS, so the count is the same for every
+    /// <b>Over slots rather than over cells, so the count is the same for every
     /// arrangement.</b> <see cref="Compose"/> maps a slot onto whichever cell is free,
     /// which is what makes the draw uniform over scenes and the two markers
     /// interchangeable — a clutter enumerated against real cells would admit more

@@ -7,8 +7,8 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE SIMPLEST TRANSLATION THERE IS, AND IT LIVES HERE RATHER THAN IN A
-/// WORLD.</b> A world that minted its own codes would be deciding what the brain
+/// <b>The simplest translation there is, and it lives here rather than in a
+/// world.</b> A world that minted its own codes would be deciding what the brain
 /// perceives, which is the mixing this arrangement exists to prevent — so even the
 /// trivial pipe is a pipe.
 /// </para>
@@ -18,7 +18,7 @@ namespace OpenPlexus.Codes;
 /// reading and separates nothing.
 /// </para>
 /// <para>
-/// <b>AND THE PACKING NEEDED A WIDTH, WHICH IT DID NOT HAVE.</b> This said <i>whole
+/// <b>And the packing needed a width, which it did not have.</b> This said <i>whole
 /// numbers</i> and packed <c>(position &lt;&lt; 1) | value</c>, so position one holding
 /// nought and position nought holding two were THE SAME CODE — two attributes silently
 /// conflated, and a learner blamed for it. Nothing had ever caught it because the only
@@ -42,7 +42,7 @@ public sealed class Bits : IQuantizer<IReadOnlyList<int>>
     /// One more than the largest value a position may hold. <b>Two, which is a bit.</b>
     /// </param>
     /// <remarks>
-    /// <b>ONE CODE A READING, AND A SECOND COARSER ONE WAS BUILT AND DELETED.</b> Emitting
+    /// <b>One code a reading, and a second coarser one was built and deleted.</b> Emitting
     /// the position with its value thrown away made the shared part of <i>bit three is
     /// zero</i> and <i>bit three is one</i> into a code — and it reached no scope, because
     /// genesis refuses a code that has never been absent and repair refuses one that
@@ -87,7 +87,7 @@ public sealed class Bits : IQuantizer<IReadOnlyList<int>>
         ArgumentOutOfRangeException.ThrowIfNegative(value);
         ArgumentOutOfRangeException.ThrowIfLessThan(stride, 2);
 
-        // THE COLLISION, REFUSED RATHER THAN PRODUCED. A value at or above the stride
+        // The collision, refused rather than produced. A value at or above the stride
         // lands on the next position's block, and the two readings become one
         // observation -- which is the `Tending` fault exactly: a byte that wrapped and
         // made two different pictures the same thing, silently.

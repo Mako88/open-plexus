@@ -11,22 +11,22 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A FRONT-END ARM HAS A CEILING COMPUTABLE WITH NO LEARNING AND IT COSTS MILLISECONDS
-/// AGAINST A RUNNER'S HOUR</b>, which is this repo's own trap and the reason this file
+/// <b>A front-end arm has a ceiling computable with no learning and it costs milliseconds
+/// against a runner's hour</b>, which is this repo's own trap and the reason this file
 /// exists before any matcher does. A grid cannot tell a rule that failed to bind from a
 /// front end that threw the binding away one call earlier; these three facts can, because
 /// each is exact.
 /// </para>
 /// <para>
-/// <b>AND THEY ARE FACTS RATHER THAN MEASUREMENTS, WHICH IS WHY THEY ARE ASSERTED TIGHT AND
-/// NOT PRINTED.</b> Nothing here is a sweep: the bag is the same bag in every draw, the
+/// <b>And they are facts rather than measurements, which is why they are asserted tight and
+/// not printed.</b> Nothing here is a sweep: the bag is the same bag in every draw, the
 /// right sentence is the only one holding the asked word, and the answer is the last word of
 /// it. If any of the three ever stops holding, the world has drifted away from the question
 /// it was built to ask and every number taken on it is owed a re-take.
 /// </para>
 /// <para>
-/// <b>THE THIRD PROBE READS A POSITION AND MAY NEVER SHIP, WHICH IS SAID HERE RATHER THAN
-/// DISCOVERED LATER.</b> It knows the template, so it is the far end of a gap in exactly the
+/// <b>The third probe reads a position and may never ship, which is said here rather than
+/// discovered later.</b> It knows the template, so it is the far end of a gap in exactly the
 /// standing of <c>ReturningTests</c>' tagged cell and fork 88's handed selection. What it is
 /// for is to say that 1.0 is reachable at all, so a learner sitting at 0.5 is known to be
 /// short of the world rather than at it.
@@ -59,7 +59,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         /// </summary>
         /// <param name="observation">One moment.</param>
         /// <remarks>
-        /// <b>THE QUESTION'S WORDS GET NO POSITION, WHICH IS DELIBERATE.</b> A question and
+        /// <b>The question's words get no position, which is deliberate.</b> A question and
         /// a statement are two utterances, so a claim that one of their words came before
         /// another would be inventing a sequencing nobody stated — the same reason
         /// <see cref="Compound{TFrame}.Order"/> refuses to offset two front ends onto one
@@ -67,8 +67,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         /// </remarks>
         public IReadOnlyDictionary<Code, int>? Order(Recited observation)
         {
-            // ONLY THE ARM THAT CLAIMS TO SEE ORDER REPORTS ONE, WHICH IS WHERE THE AXIS
-            // LIVES NOW. There is no dial on the brain: a machine turns whatever order it
+            // Only the arm that claims to see order reports one, which is where the axis
+            // lives now. There is no dial on the brain: a machine turns whatever order it
             // is given into precedences, always. Whether a sense can tell word order is a
             // fact about the sense, so the control is a front end that says nothing.
             if (reading != Reading.Placed) return null;
@@ -102,7 +102,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
 
             if (reading != Reading.Ordered) return moment;
 
-            // EVERY ORDERED PAIR, WHICH IS WHY THIS IS A PRICE AND NOT A MECHANISM. Handing
+            // Every ordered pair, which is why this is a price and not a mechanism. Handing
             // the whole relation over exhaustively is the most a learner reading order could
             // ever derive, so what it scores is the CEILING on a sequence rung rather than
             // what one would earn -- and it is quadratic in a sentence's length, which is
@@ -136,8 +136,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         /// <see cref="IQuantizer{TObservation}.Order"/> — <b>the shipped mechanism.</b>
         /// </summary>
         /// <remarks>
-        /// <b>THE FRONT END SAYS WHERE THE WORDS STOOD AND THE MACHINE DERIVES WHAT THAT
-        /// ENTAILS</b>, which is the seam this whole file is about. It hands over the same
+        /// <b>The front end says where the words stood and the machine derives what that
+        /// entails</b>, which is the seam this whole file is about. It hands over the same
         /// codes <see cref="Chosen"/> does, so the two differ in exactly one thing.
         /// </remarks>
         Placed,
@@ -147,7 +147,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         /// rung, handed over rather than learnt.</b>
         /// </summary>
         /// <remarks>
-        /// <b>AN INSTRUMENT AND NEVER A SHIPPABLE FRONT END, on the standing
+        /// <b>An instrument and never a shippable front end, on the standing
         /// <see cref="Unifying"/> holds: a price taken before a mechanism is designed.</b>
         /// It is not the refuted arm that emitted a POSITION beside a fused code — that one
         /// reached every moment and no scope, being never absent, and this is absent
@@ -175,8 +175,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// <summary>Which sentence shares most words with the question.</summary>
     /// <param name="told">One moment.</param>
     /// <remarks>
-    /// <b>FORK 88'S MECHANISM, WHICH IS SETTLED AND IS PRICED HERE AGAINST A WORLD THAT
-    /// LEAVES IT SHORT.</b> Intersecting the question with each statement answers bAbI's
+    /// <b>FORK 88'S mechanism, which is settled and is priced here against a world that
+    /// leaves it short.</b> Intersecting the question with each statement answers bAbI's
     /// first task; on this world it is worth one half and never one, and separating the two
     /// by a world rather than by an argument is the whole reason this file is not a grid.
     /// </remarks>
@@ -200,11 +200,11 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE BAG IS THE SAME BAG IN EVERY DRAW, so nothing conditioned on it can beat the
+    /// <b>The bag is the same bag in every draw, so nothing conditioned on it can beat the
     /// marginal.</b> The first ceiling, and it is proved rather than measured.
     /// </summary>
     /// <remarks>
-    /// <b>THIS IS THE PROPERTY THE WHOLE WORLD RESTS ON.</b> The givers are a permutation of
+    /// <b>This is the property the whole world rests on.</b> The givers are a permutation of
     /// the people and the takers are another, so every person is said exactly twice and
     /// every thing exactly once, whoever handed what to whom. A learner reading
     /// <see cref="Recited.Bagged"/> is therefore looking at a constant and answering from
@@ -230,8 +230,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// same claim and the half a constant bag cannot supply on its own.
     /// </summary>
     /// <remarks>
-    /// <b>A WORLD WHOSE ANSWER WAS ALSO CONSTANT WOULD PASS THE CHECK ABOVE AND MEASURE
-    /// NOTHING</b>, so the marginal is read here rather than assumed. Every person is the
+    /// <b>A world whose answer was also constant would pass the check above and measure
+    /// nothing</b>, so the marginal is read here rather than assumed. Every person is the
     /// taker about equally often, which is what makes 1/<see cref="People"/> the number the
     /// first rung stands at rather than an upper bound somebody hoped for.
     /// </remarks>
@@ -252,7 +252,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// people.</b> The second ceiling, and it is one half exactly.
     /// </summary>
     /// <remarks>
-    /// <b>BOTH HALVES OR THE NUMBER IS NOT A HALF.</b> That the overlap picks the right
+    /// <b>Both halves or the number is not a half.</b> That the overlap picks the right
     /// sentence every time is what makes selection free; that the sentence holds two
     /// candidates and one of them is the answer is what makes the best a selector can do a
     /// coin flip. A world where the right sentence sometimes named three people would sit
@@ -269,7 +269,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
             var turn = world.Next();
             var sentence = turn.Seen.Said[Selected(turn.Seen)];
 
-            // THE ASKED THING IS IN IT, which is what says the selection was right without
+            // The asked thing is in it, which is what says the selection was right without
             // the probe being handed which sentence to look at.
             Assert.Contains(turn.Seen.Asked[^1], sentence);
 
@@ -295,7 +295,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// arriving as a number on a world built to hold it still.
     /// </para>
     /// <para>
-    /// <b>SO THE MIDDLE RUNG NEEDS THE BACKGROUND SUBTRACTED, WHICH IS
+    /// <b>So the middle rung needs the background subtracted, which is
     /// <see cref="Joining.Distinguished"/>'S RULE AND IS ALREADY BUILT.</b> Taken here
     /// rather than found in a grid, this costs a millisecond and saves attributing a
     /// selector's failure to a learner's — which is exactly what a ceiling is for.
@@ -317,8 +317,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
             if (first.Contains(turn.Seen.Asked[^1])) right++;
         }
 
-        // AT THE MARGINAL, BECAUSE IT IS THE NEWEST SENTENCE AND THE QUESTION IS DRAWN
-        // INDEPENDENTLY OF WHICH THAT IS. So the arm reaches the right sentence exactly as
+        // At the marginal, because it is the newest sentence and the question is drawn
+        // independently of which that is. So the arm reaches the right sentence exactly as
         // often as guessing would, and a run using it measures recency.
         Assert.InRange(right / (double)Draws, 0.20, 0.30);
     }
@@ -328,7 +328,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// so anything above a half on this world is binding and nothing else.
     /// </summary>
     /// <remarks>
-    /// <b>THE PROBE KNOWS THE TEMPLATE AND MAY NEVER SHIP</b>, which is the whole of its
+    /// <b>The probe knows the template and may never ship</b>, which is the whole of its
     /// standing — see this class's own remarks. What it establishes is that the world is
     /// answerable at all from what it hands over, so a run stuck on the coin flip is short
     /// of the world rather than at it.
@@ -353,7 +353,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// between the second ceiling and the third is carried by nothing else.
     /// </summary>
     /// <remarks>
-    /// <b>THE ONE CHECK THAT SAYS THE WORLD IS HONEST RATHER THAN MERELY HARD.</b> If the
+    /// <b>The one check that says the world is honest rather than merely hard.</b> If the
     /// giver and the taker differed in any other way a code could carry — a word only ever
     /// said in one of the two places, a thing that only ever goes one way, a person who is
     /// always the receiver — then a bag of that sentence would separate them and the third
@@ -381,30 +381,30 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>ONE COMMITMENT FIRES ON TWO MOMENTS THAT WANT DIFFERENT ANSWERS, so whatever it
+    /// <b>One commitment fires on two moments that want different answers, so whatever it
     /// expects it is wrong about one of them.</b> Fork 105's blocker, said as a fact about
     /// the learner rather than about the world.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>AND IT IS UNIVERSAL RATHER THAN A PROPERTY OF THIS SCOPE, WHICH IS WHY IT IS
-    /// WORTH A CHECK.</b> <see cref="Commitment.Fires"/> takes an
+    /// <b>And it is universal rather than a property of this scope, which is why it is
+    /// worth a check.</b> <see cref="Commitment.Fires"/> takes an
     /// <see cref="IReadOnlySet{T}"/>, so two moments that are the same SET are the same
     /// moment to every commitment there could ever be — no scope, no repair, no rung of the
     /// ladder and no matcher over sets separates them. Finding one such pair refutes the
     /// whole language at once.
     /// </para>
     /// <para>
-    /// <b>SO THE BLOCKER IS THE SCOPE LANGUAGE AND NOT THE FRONT END, WHICH IS THE CORRECTION
-    /// THIS FILE EXISTS TO MAKE.</b> The world hands the order over —
+    /// <b>So the blocker is the scope language and not the front end, which is the correction
+    /// this file exists to make.</b> The world hands the order over —
     /// <see cref="Recited.Said"/> is a list and not a bag, on the licence
     /// <see cref="IQuantizer{TFrame}.Order"/> already carries — and it is dropped at
     /// <c>Trial</c>'s <c>new HashSet&lt;Code&gt;(said)</c>, one call before anything could
     /// use it. Fork 33 priced the MATCHER, and the matcher was never what was in the way.
     /// </para>
     /// <para>
-    /// <b>AND FUSING THE POSITION INTO THE WORD IS NOT THE ESCAPE, WHICH IS SAID HERE
-    /// BECAUSE IT IS THE FIRST THING ANYBODY WOULD REACH FOR.</b> A code meaning
+    /// <b>And fusing the position into the word is not the escape, which is said here
+    /// because it is the first thing anybody would reach for.</b> A code meaning
     /// <i>john-in-last-place</i> makes the moment separable and costs the identity: nothing
     /// downstream could then see that it is the same john who stood first in another
     /// sentence. That is the architecture's own line — every input is an ATTRIBUTE of a
@@ -423,7 +423,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         {
             var turn = world.Next();
 
-            // THE WHOLE MOMENT AND NOT THE CHOSEN SENTENCE, so the claim is about what the
+            // The whole moment and not the chosen sentence, so the claim is about what the
             // learner is handed rather than about what some front end selected out of it.
             // A pair found here is a pair no arm on this world can ever separate.
             var moment = Bag(turn.Seen);
@@ -463,8 +463,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE TYPE DOES NOT STOP IT AND THE SETTLEMENT DOES, WHICH IS WHY THIS IS A CHECK
-    /// AND NOT A COMMENT.</b> <see cref="Commitment.Expects"/> is a <see cref="Code"/> and
+    /// <b>The type does not stop it and the settlement does, which is why this is a check
+    /// and not a comment.</b> <see cref="Commitment.Expects"/> is a <see cref="Code"/> and
     /// <see cref="Unifying.Any"/> returns one, so a commitment expecting <i>whoever filled
     /// the slot</i> CONSTRUCTS. What refutes it is <c>Population</c>'s settlement, which is
     /// an equality against what arrived — and no world may emit
@@ -472,7 +472,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// holding a pattern would make a scope match itself.
     /// </para>
     /// <para>
-    /// <b>SO THE PLAN'S LEAF ON RUNG FOUR IS HALF A SENTENCE SHORT.</b> <i>A condition
+    /// <b>So the plan's leaf on rung four is half a sentence short.</b> <i>A condition
     /// naming no argument is what buys transfer</i> — but a condition naming no argument
     /// with a CONSTANT consequent says <i>whoever stood last, the answer is john</i>, which
     /// is right exactly when the filler was john and is therefore the one-rule-per-person
@@ -506,22 +506,22 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A CONTROL BEATS AN ARGUMENT, WHICH IS WHY THIS RUNS AT ALL WHEN EVERY CAP IS
-    /// PROVED.</b> A proof says what the front end permits; it does not say whether the
+    /// <b>A control beats an argument, which is why this runs at all when every cap is
+    /// proved.</b> A proof says what the front end permits; it does not say whether the
     /// learner converts it. <see cref="Roaming"/>'s bagged arm came back with an EMPTY
     /// population because a constant moment surprises nothing and genesis never fires — a
     /// whole arm reading the marginal for a reason that has nothing to do with the marginal.
     /// </para>
     /// <para>
-    /// <b>THE KILL LINE WAS WRITTEN BEFORE THE RUN AND IT WAS A RESULT RATHER THAN A
-    /// VALUE:</b> if handing the order over does not pass 0.60, order is not what carries
+    /// <b>The kill line was written before the run and it was a result rather than a
+    /// value:</b> if handing the order over does not pass 0.60, order is not what carries
     /// roles here and unification is back. It passes at 1.000 on every seed, so <b>a
     /// SEQUENCE rung and not a unifying one is what this world wants</b> — and rung three is
     /// already on the route, unbuilt, while rung four is the expensive one everybody
     /// expected to need.
     /// </para>
     /// <para>
-    /// <b>AND WHAT IT COSTS IS THE READING THAT DECIDES WHERE THE RUNG BELONGS.</b> The
+    /// <b>And what it costs is the reading that decides where the rung belongs.</b> The
     /// ceiling is bought with POPULATION: every ordered pair of a sentence's words is handed
     /// over, so the moment triples, genesis mints on all of it, and the task that four rules
     /// would answer is answered by two hundred. A rung in the SCOPE LANGUAGE would propose a
@@ -570,12 +570,12 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
             }
         }
 
-        // THE BAG DOES NOT SIT AT THE MARGINAL, IT SITS AT NOTHING, AND THE DIFFERENCE IS
-        // THE MECHANISM RATHER THAN THE SCORE. A constant moment surprises nothing, so
+        // The bag does not sit at the marginal, it sits at nothing, and the difference is
+        // the mechanism rather than the score. A constant moment surprises nothing, so
         // genesis never fires, so the population is EMPTY and an empty population abstains
         // rather than guessing -- which reads 0.000 where a guesser would read 0.25.
         //
-        // SECOND TIME THIS REPO HAS HIT IT, WHICH IS WHY IT IS PINNED HERE AND NOT NOTED.
+        // Second time this repo has hit it, which is why it is pinned here and not noted.
         // `Roaming`'s bagged arm did the same for the opposite reason: there a tiny
         // vocabulary made every moment identical after 120 statements, here the world makes
         // it identical by construction. Both look like a learner failing and neither is.
@@ -587,7 +587,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
             + $"{scores["bagged"].Max():F3} for the bag at its best, so the selection buys "
             + "nothing measurable and the middle rung of this world's ladder is not there");
 
-        // AN UPPER BAR, AND IT IS THE ONE THAT PROTECTS EVERY OTHER FINDING HERE. A
+        // An upper bar, and it is the one that protects every other finding here. A
         // set-based learner without the order cannot pass a half -- the chosen sentence
         // names two people and is the same set whichever way round they stood. A run above
         // it means the world stopped isolating binding.
@@ -597,7 +597,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
             + "the giver from the taker without order, and every finding in this file is "
             + "owed a re-take");
 
-        // THE KILL LINE, WRITTEN BEFORE THE RUN AND HELD DOWN WHERE IT CAME OUT. The line
+        // The kill line, written before the run and held down where it came out. The line
         // was 0.60; both sequence arms read 1.000 on all three seeds, so the bar sits at
         // 0.90 -- if either falls back through it, order is not what carries roles here and
         // rung four is back on the list.
@@ -606,8 +606,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
             + "not reach this world's ceiling and what fork 105 needs is unification after "
             + "all");
 
-        // AND ADJACENCY IS STRICTLY CHEAPER FOR THE SAME CEILING, WHICH IS THE READING THAT
-        // DECIDES WHICH ARM SHIPS. The closure says nothing adjacency does not entail on
+        // And adjacency is strictly cheaper for the same ceiling, which is the reading that
+        // decides which arm ships. The closure says nothing adjacency does not entail on
         // this world, and it costs two and a half times the population to say it. A world
         // needing a relation ACROSS an intervening word would show as the adjacent arm
         // falling short -- and none of this world's sentences has one, which is exactly why
@@ -618,8 +618,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
             + "deleted arm was not paying for its expansion after all and its revival row is "
             + "wrong about what would bring it back");
 
-        // AND THE MACHINE DERIVING IT IS THE SAME COMPUTATION AS THE FRONT END HANDING IT
-        // OVER, EXACTLY. `handed` folds the pairs in `Codify` and `preceding` folds the
+        // And the machine deriving it is the same computation as the front end handing it
+        // over, exactly. `handed` folds the pairs in `Codify` and `preceding` folds the
         // identical pairs in `Trial.Sensed`; the codes agree, so the runs agree seed for
         // seed and rule for rule. That is the instrument check on the whole move: what
         // changed when the derivation crossed the seam is WHERE IT LIVES and nothing else,

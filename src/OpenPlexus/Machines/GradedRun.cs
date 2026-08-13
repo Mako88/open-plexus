@@ -5,7 +5,7 @@ namespace OpenPlexus.Machines;
 
 /// <summary>Which translation turns a reading into codes.</summary>
 /// <remarks>
-/// <b>A FACT ABOUT THE PIPE, WHICH IS NEITHER SIDE'S TO DECIDE.</b> Putting this
+/// <b>A fact about the pipe, which is neither side's to decide.</b> Putting this
 /// inside a world would let a world choose what the brain perceives; putting it inside
 /// the brain would make the brain know about worlds. It lives at the join.
 /// </remarks>
@@ -20,7 +20,7 @@ public enum Fronting
 
 /// <summary>The graded world, learnt through a front end that has to make the symbols.</summary>
 /// <remarks>
-/// <b>NO SOUNDNESS HERE, AND THAT IS THE PRICE OF THE INTERFACE.</b> A scope over
+/// <b>No soundness here, and that is the price of the interface.</b> A scope over
 /// banded or winnowed codes does not pin anything, so the exact enumeration that made
 /// the multiplexer's score basis-independent has nothing to enumerate over.
 /// </remarks>

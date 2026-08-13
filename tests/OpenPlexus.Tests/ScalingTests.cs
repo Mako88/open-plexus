@@ -10,7 +10,7 @@ namespace OpenPlexus.Tests;
 /// any of this reaches perception.
 /// </summary>
 /// <remarks>
-/// <b>A FINAL ACCURACY SAYS HOW WELL A WIDTH WAS LEARNT AND NOT WHAT IT COST.</b> Six
+/// <b>A final accuracy says how well a width was learnt and not what it cost.</b> Six
 /// bits, eleven and twenty differ in the number of relevant bits by one each time, so
 /// how rounds-to-target grows across them is the exponent — and an exponent found
 /// cheaply on a generated world is worth far more than the same discovery made
@@ -42,13 +42,13 @@ public sealed class ScalingTests(ITestOutputHelper output)
                 + $"named={learned.Named} exhausted={learned.Exhausted}");
         }
 
-        // WHAT IS ASSERTED IS THAT THE CURVE EXISTS TO BE READ, not where it goes.
+        // What is asserted is that the curve exists to be read, not where it goes.
         // A width that never reaches the target reports zero, and that is a reading
         // rather than a gap.
         Assert.Equal(3, seen.Count);
         Assert.All(seen, one => Assert.True(one.Learned.Rounds == 60000));
 
-        // AND THE NARROWEST WORLD HAS TO GET THERE, or the measurement is of a
+        // And the narrowest world has to get there, or the measurement is of a
         // learner that does not work rather than of how cost grows.
         Assert.True(seen[0].Learned.Reached > 0, "six bits never held the target");
     }
@@ -56,7 +56,7 @@ public sealed class ScalingTests(ITestOutputHelper output)
     [Fact]
     public void What_cannot_be_settled_is_reported_and_not_counted_as_wrong()
     {
-        // A ONE-CODE SCOPE IN A TWENTY-BIT WORLD LEAVES NINETEEN FREE, so folding
+        // A one-code scope in a twenty-bit world leaves nineteen free, so folding
         // the uncheckable into the unsound would make the share of true rules fall
         // with the width of the world for a reason that has nothing to do with
         // learning -- a scaling result manufactured by its own statistic.
@@ -70,7 +70,7 @@ public sealed class ScalingTests(ITestOutputHelper output)
 
         Assert.True(wide.Unchecked > 0, "nothing was too general to settle at twenty bits");
 
-        // AND THE THREE ACCOUNT FOR EVERY EXPERIENCED COMMITMENT between them, so
+        // And the three account for every experienced commitment between them, so
         // none of them is quietly dropping a case.
         var narrow = new MultiplexerRun(
             new MultiplexerSettings { Address = 2 },
@@ -84,14 +84,14 @@ public sealed class ScalingTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_rounds_to_target_costs_as_the_relevant_bits_grow()
     {
-        // THE NUMBER THIS PROJECT SAYS PREDICTS WHETHER ANY OF IT REACHES PERCEPTION, AND IT
-        // HAS ONLY EVER BEEN READ ON ONE SEED. The check above runs three widths at seed one
+        // The number this project says predicts whether any of it reaches perception, and it
+        // has only ever been read on one seed. The check above runs three widths at seed one
         // and asserts the curve exists to be read; what it cannot do is say whether the
         // ordering between two widths is a fact or a draw. This repo's own trap: one seed is
         // not a comparison and will happily invert.
         //
-        // AND ROUNDS-TO-TARGET IS A CENSORED MEASUREMENT, WHICH IS THE PART A MEAN GETS
-        // WRONG. A seed that never holds the target inside the cap reports nought, and
+        // And rounds-to-target is a censored measurement, which is the part a mean gets
+        // wrong. A seed that never holds the target inside the cap reports nought, and
         // averaging that in reads as a width that learnt FAST. Averaging it out reads as a
         // width that learnt fast too, because the slow seeds are exactly the ones dropped. So
         // the count that reached is printed beside the mean and the mean says it is
@@ -135,7 +135,7 @@ public sealed class ScalingTests(ITestOutputHelper output)
     [Fact]
     public void Rounds_to_target_reads_a_trailing_window_and_not_a_running_total()
     {
-        // A LIFETIME ACCURACY CANNOT CROSS A BAR IT SPENT THE EARLY ROUNDS BELOW, so
+        // A lifetime accuracy cannot cross a bar it spent the early rounds below, so
         // rounds-to-target read off a total would measure the length of the run. The
         // check is that a longer run reports the SAME crossing, which only a trailing
         // window can do.

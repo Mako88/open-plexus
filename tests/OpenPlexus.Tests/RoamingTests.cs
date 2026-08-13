@@ -12,14 +12,14 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>bAbI LOOKED LIKE IT DEMANDED REASONING AND ITS HELD-OUT HALF WAS ALL RE-READING.</b>
+/// <b>bAbI looked like it demanded reasoning and its held-out half was all re-reading.</b>
 /// That cost this branch real time, and every score taken on it meant something other than
 /// what it appeared to. So a new world is owed the same interrogation before a learner is
 /// pointed at it, and the interrogation is cheap: the world knows its own state, so what a
 /// shallow rule would reach is arithmetic rather than a training run.
 /// </para>
 /// <para>
-/// <b>THE THREE COLUMNS ARE THE WHOLE INSTRUMENT.</b> The MARGINAL is always saying the
+/// <b>The three columns are the whole instrument.</b> The MARGINAL is always saying the
 /// commonest room. The OPENING rule answers with the room the thing was first said to be
 /// in, which is what a bag of the whole story reads straight off and is right exactly when
 /// nothing moved. The LATEST rule answers with the most recent room word in the transcript,
@@ -27,7 +27,7 @@ namespace OpenPlexus.Tests;
 /// doing. A perfect tracker is 1.000 by construction.
 /// </para>
 /// <para>
-/// <b>SO THE WORLD EARNS ITS KEEP ONLY IF BOTH SHALLOW RULES SIT NEAR THE MARGINAL.</b> If
+/// <b>So the world earns its keep only if both shallow rules sit near the marginal.</b> If
 /// the opening rule is strong the walk is too short and the transcript answers itself; if
 /// recency is strong the world is asking *what happened last* rather than *where is it
 /// now*, and a situation model would be scored for something a one-line rule does.
@@ -65,7 +65,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
                 var story = turn.Seen.Story;
 
-                // WHICH THING IS BEING ASKED ABOUT, READ OFF THE QUESTION. The question is a
+                // Which thing is being asked about, read off the question. The question is a
                 // set of words and exactly one of them is a thing, so this is the front
                 // end's own intersection rather than the world being asked.
                 var about = props.FirstOrDefault(one => turn.Seen.Question.Contains(one));
@@ -79,7 +79,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 if (placed is not null
                     && rooms.FindIndex(placed.Contains) is var was && was == answer) opening++;
 
-                // THE RECENCY RULE, KEYED ON NOTHING. The newest statement holding any room
+                // The recency rule, keyed on nothing. The newest statement holding any room
                 // word at all, which is what a displacement arm reaches when the key it was
                 // given is a word every sentence contains.
                 var newest = story.FirstOrDefault(one => rooms.Any(one.Contains));
@@ -87,7 +87,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 if (newest is not null
                     && rooms.FindIndex(newest.Contains) is var now && now == answer) latest++;
 
-                // AND WHETHER THE ANSWER IS IN THE ROOM AT ALL, which is the instrument check
+                // And whether the answer is in the room at all, which is the instrument check
                 // rather than a ceiling. A world whose answering word is absent from the
                 // transcript is unanswerable and every column above would be measuring that.
                 if (story.Any(one => one.Contains(rooms[answer]))) reachable++;
@@ -107,14 +107,14 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 + "rather than hard");
         }
 
-        // THE BAR, AND `Steps` TURNS OUT TO BE A DIAL RATHER THAN A SETTING. It walks the
+        // THE BAR, AND `Steps` turns out to be a dial rather than a setting. It walks the
         // shallow ceiling from a transcript that answers itself outright down to one where
         // nothing shallow beats guessing, and it does that while the marginal and the
         // recency rule stay flat -- which is one axis moving one thing, and is what a
         // benchmark with a parser, a vocabulary and a quest length all varying could not
         // have given.
         //
-        // SO THE DEEPEST CELL IS WHERE A LEARNER SHOULD BE RUN, and the bar is that both
+        // So the deepest cell is where a learner should be run, and the bar is that both
         // shallow rules have arrived at the marginal there. If either lifts off it again
         // the world has stopped demanding a situation model and every score taken on it is
         // owed a re-take.
@@ -134,7 +134,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + "world is asking what happened LAST rather than where the thing is now -- and "
             + "a one-line rule would be scored as a situation model");
 
-        // AND THE SHALLOW CEILING FALLS RATHER THAN JUMPS, which is what makes `Steps` worth
+        // And the shallow ceiling falls rather than jumps, which is what makes `Steps` worth
         // having as an axis instead of two worlds. A dial that went straight from easy to
         // impossible would be a switch, and nothing could be read off the middle of it.
         Assert.True(shallow[0].Opening > shallow[12].Opening
@@ -151,7 +151,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>TWO COLUMNS AND THEY BRACKET THE LEARNER RATHER THAN PREDICTING IT.</b> PRESENT is
+    /// <b>Two columns and they bracket the learner rather than predicting it.</b> PRESENT is
     /// whether the answering room word survives the translation at all, which is an UPPER
     /// bound: a moment the answer is missing from cannot be answered by anything. PINNED is
     /// whether it is the ONLY room word left, which is a LOWER bound: a moment with one room
@@ -159,8 +159,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// a learner has to work in is the gap between them.
     /// </para>
     /// <para>
-    /// <b>SO A HIGH PRESENT WITH A LOW PINNED IS THE SELECTION PROBLEM, WHICH IS WHERE EVERY
-    /// ARM ON THIS BRANCH HAS ALREADY BEEN.</b> The bag holds every room word in the house
+    /// <b>So a high present with a low pinned is the selection problem, which is where every
+    /// arm on this branch has already been.</b> The bag holds every room word in the house
     /// after a long walk, so it is 1.000 present and near nought pinned — the answer is
     /// there and nothing says which it is. An arm that raises PINNED is doing the thing a
     /// situation model is for.
@@ -175,7 +175,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         var pinning = new Dictionary<string, double>();
         var reaching = new Dictionary<string, double>();
 
-        // THE STORE WALKS ITS DEPTH AXIS AND EVERY OTHER ARM IS ONE CELL, so the grid is a
+        // The store walks its depth axis and every other arm is one cell, so the grid is a
         // cross rather than a list -- and depth nought is the store's own control, where an
         // entry is the statement that wrote it and nothing else.
         var arms = Enum.GetValues<Joining>()
@@ -222,7 +222,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 + $"| pinned {pinned / (double)asked:F3} | rooms left {seen / (double)asked:F2}");
         }
 
-        // THE BAG IS THE CONTROL AND IT HAS TO READ THIS WAY OR THE INSTRUMENT IS WRONG.
+        // The bag is the control and it has to read this way or the instrument is wrong.
         // Every room word of a six-room house is said during a hundred and twenty steps, so
         // a translation that keeps all of them has the answer and cannot say which. If this
         // ever pins anything the world has stopped being the one the ceiling grid measured.
@@ -231,15 +231,15 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + "the moment is not holding every room word and this column is measuring "
             + "something other than what it says");
 
-        // AND THE FINDING, WHICH IS THAT RESOLVING AT UPDATE TIME IS WHAT PUTS THE ANSWER IN
-        // THE ROOM AND NOTHING ELSE ON THIS BRANCH DOES. Every backward-reading arm leaves it
+        // And the finding, which is that resolving at update time is what puts the answer in
+        // the room and nothing else on this branch does. Every backward-reading arm leaves it
         // present on a quarter of questions or fewer, because the newest statement about a
         // thing is *john dropped the apple* and there is no room in it -- the room is in a
         // statement about JOHN, which is not about the apple at all and no lookup keyed on
         // the apple can reach. One hop of the store reaches it, and the depth is a dial on
         // how far.
         //
-        // WHAT IT COSTS IS COMPANY, WHICH IS THE SELECTION PROBLEM ARRIVING AGAIN SMALLER.
+        // What it costs is company, which is the selection problem arriving again smaller.
         // The fold goes through every key of a statement and the story's own background
         // calls a VERB a key, so the room john was in comes in beside the room the last
         // unrelated *went* mentioned. That is fork 95 unsolved, priced here rather than
@@ -257,8 +257,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + "so maintaining a store forwards buys nothing a lookup does not and the whole "
             + "mechanism is `Addressed` by a longer road");
 
-        // AND WHICH KEY THE FOLD FOLLOWS IS WORTH MORE THAN HOW FAR IT FOLLOWS IT, WHICH IS
-        // NOT WHAT THE DEPTH AXIS ALONE SUGGESTED. Folding through every key reaches further
+        // And which key the fold follows is worth more than how far it follows it, which is
+        // not what the depth axis alone suggested. Folding through every key reaches further
         // and arrives with company; following the ONE key whose entry moved most recently
         // reaches nearly as far and arrives nearly alone. Recency over the store knows
         // nothing whatever about the text -- it does not know a verb from a name, which is
@@ -266,7 +266,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // *john dropped the apple* john moved a statement ago and *dropped* has not moved
         // since the last drop.
         //
-        // SO THE BAR IS DOMINANCE AND NOT A LEVEL. The deepest freshest arm must beat the
+        // So the bar is dominance and not a level. The deepest freshest arm must beat the
         // all-keys fold on BOTH columns at once, which is what says the rule is a selection
         // and not a trade. If it ever stops, following one key is buying reach at the price
         // of choice like everything else here and this file's account of it is wrong.
@@ -284,13 +284,13 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>AT 120 STEPS, WHICH IS THE CELL THE CEILING GRID CHOSE RATHER THAN A ROUND
-    /// NUMBER.</b> The opening rule and recency both sit at the marginal there, so anything
+    /// <b>At 120 steps, which is the cell the ceiling grid chose rather than a round
+    /// number.</b> The opening rule and recency both sit at the marginal there, so anything
     /// over it is tracking rather than reading the transcript off.
     /// </para>
     /// <para>
-    /// <b>AND THE VOCABULARY IS TINY WHATEVER THE WALK'S LENGTH, WHICH IS THE PROPERTY THAT
-    /// MAKES THE BAG ARM MEAN SOMETHING.</b> Six rooms, four things and a handful of
+    /// <b>And the vocabulary is tiny whatever the walk's length, which is the property that
+    /// makes the bag arm mean something.</b> Six rooms, four things and a handful of
     /// function words, so a bagged moment is the same size after 120 statements as after
     /// four — every word is present and none of them says WHEN. A bag here cannot be near
     /// the marginal by accident.
@@ -300,7 +300,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_a_learner_reads_where_the_transcript_stops_answering_itself()
     {
-        // THE BACKWARD-READING ARM THAT LEADS, AND THE STORE'S TWO AXES CROSSED. `Bagged`,
+        // The backward-reading arm that leads, and the store's two axes crossed. `Bagged`,
         // `Recent` and `Addressed` are not here because they are compared in the ceiling
         // grid and all three sit at the marginal; `Chained` is the one worth beating, being
         // the best any lookup over the transcript reached on this world.
@@ -322,8 +322,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
         {
             scores[name] = [];
 
-            // SEEDS, BECAUSE THE CLAIM IS A COMPARISON AND A COMPARISON ON ONE RUN IS AN
-            // ANECDOTE. The world and the brain take the same seed, so an arm's whole run
+            // Seeds, because the claim is a comparison and a comparison on one run is an
+            // anecdote. The world and the brain take the same seed, so an arm's whole run
             // moves together rather than the house being redrawn under a fixed population.
             foreach (var seed in new[] { 1, 2, 3 })
             {
@@ -346,7 +346,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         foreach (var (name, taken) in scores)
             output.WriteLine($"{name,-12}| worst {taken.Min():F3} | best {taken.Max():F3}");
 
-        // THE BAR IS TWO COMPARISONS AND NEITHER IS A LEVEL. First, that following the
+        // The bar is two comparisons and neither is a level. First, that following the
         // freshest key beats folding through all of them AT THE SAME DEPTH -- which isolates
         // the key rule, the two arms differing in nothing else. Second, that it beats the
         // best lookup over the transcript, which is what says a forward store is worth
@@ -367,19 +367,19 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + "its best, so maintaining a store forwards buys no score over a lookup and this "
             + "whole mechanism is `Chained` by a longer road");
 
-        // AND THE BAGGED ARM COMES BACK WITH AN EMPTY POPULATION, WHICH IS A FINDING ABOUT
-        // THE FRONT END RATHER THAN A SCORE. Six rooms, four things and a few function
+        // And the bagged arm comes back with an empty population, which is a finding about
+        // the front end rather than a score. Six rooms, four things and a few function
         // words means that after 120 statements essentially every word of the vocabulary is
         // present in every moment -- so the bag is the SAME MOMENT every round, nothing is
         // ever surprising, and genesis never fires at all. A constant moment mints nothing.
         //
-        // IT IS THE OPPOSITE END OF THE FAULT THE ENGLISH ARMS HIT. There a growing
+        // It is the opposite end of the fault the English arms hit. There a growing
         // vocabulary outran the cap; here a tiny one makes the moment a constant. Both are
         // the front end deciding what the learner can possibly see, and both look like the
         // learner failing.
 
-        // AND EVERY ARM IS READ AGAINST ITS OWN CEILING RATHER THAN AGAINST THE OTHERS'
-        // SCORES, which is what makes the two tests in this file one instrument. A moment
+        // And every arm is read against its own ceiling rather than against the others'
+        // scores, which is what makes the two tests in this file one instrument. A moment
         // the answering word is missing from is unanswerable, so `present` in the grid above
         // caps each arm exactly -- and what an arm CONVERTS of its own cap is where the
         // learner's part of this shows. An arm reaching further and scoring lower is failing

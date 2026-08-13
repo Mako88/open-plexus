@@ -7,7 +7,7 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>NINE WORLDS EACH WROTE THEIR OWN FRONT END AND EIGHT OF THEM DID NOTHING.</b>
+/// <b>Nine worlds each wrote their own front end and eight of them did nothing.</b>
 /// <c>Seeing</c>, <c>Feeling</c> twice, <c>Hearing</c>, <c>Looking</c>,
 /// <c>Reading</c> and three <c>Passthrough</c>s — private nested classes returning
 /// the observation they were handed. That is not nine front ends; it is one
@@ -15,7 +15,7 @@ namespace OpenPlexus.Codes;
 /// nowhere for a real quantiser to live either.
 /// </para>
 /// <para>
-/// <b>A WORLD WITH NO SIGNAL IS A LEGITIMATE WORLD AND ALSO A LIMIT — John,
+/// <b>A world with no signal is a legitimate world and also a limit — John,
 /// 2026-08-05.</b> <see cref="Worlds.Motif"/>'s task is compression of token sets
 /// and <see cref="Worlds.Senses"/>'s is the sight–sound pairing; rendering either
 /// as pixels would measure a different thing. So feeding codes straight in stays
@@ -25,7 +25,7 @@ namespace OpenPlexus.Codes;
 /// cannot exercise one.
 /// </para>
 /// <para>
-/// <b>THE OPTIONAL THREE ARE NOT PASSTHROUGH AND THAT IS WHY THEY ARE HERE.</b>
+/// <b>The optional three are not passthrough and that is why they are here.</b>
 /// Grouping, order and fleetingness are things ONLY a front end can know — see
 /// <see cref="IQuantizer{TObservation}.Bind"/> — and four worlds do know them. A
 /// world saying <i>these codes were one object</i> is stating a fact about its

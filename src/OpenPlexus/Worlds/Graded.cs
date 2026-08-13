@@ -14,13 +14,13 @@ public sealed record GradedSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>AND HIGH IS THE EASY END, WHICH IS THE OPPOSITE OF WHAT IT WAS WRITTEN
-    /// DOWN AS.</b> Crowded against the line, every reading falls in one of the two
+    /// <b>And high is the easy end, which is the opposite of what it was written
+    /// down as.</b> Crowded against the line, every reading falls in one of the two
     /// bands either side of it, so a banded front end emits what is almost a bit and
     /// the interface costs nearly nothing.
     /// </para>
     /// <para>
-    /// <b>SPREAD IS THE HARD END, AND IT IS THE ONE THE PLAN CARES ABOUT.</b> At
+    /// <b>Spread is the hard end, and it is the one the plan cares about.</b> At
     /// zero a reading is anywhere in its half, so one dimension speaks in many codes
     /// and the same rule has to be learnt again in each — which is the fragmentation
     /// a symbol's lack of partial credit causes, and it is what population coding is
@@ -45,20 +45,20 @@ public readonly record struct Sample
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE WORLD THE PROJECT'S ACTUAL BET NEEDS, AND THE ONE `csharp` NEVER HAD.</b>
+/// <b>The world the project's actual bet needs, and the one `csharp` NEVER HAD.</b>
 /// Its claim is that this family of systems died at the interface with perception and
 /// that a substrate manufacturing its own symbols repairs it. Every measurement so far
 /// has been on cues that were ALREADY symbols, so it has said nothing about that at
 /// all. Here a front end has to make the symbols, and which front end is the arm.
 /// </para>
 /// <para>
-/// <b>IT IS THE SAME FUNCTION ON PURPOSE.</b> Address dimensions select which data
+/// <b>It is the same function on purpose.</b> Address dimensions select which data
 /// dimension carries the outcome, exactly as before — so what changes between this and
 /// the multiplexer is the interface and nothing else, and a difference in the score is
 /// attributable rather than interesting.
 /// </para>
 /// <para>
-/// <b>AND SPREAD IS WHAT MAKES IT HARD, NOT CROWDING.</b> A dimension whose readings
+/// <b>And spread is what makes it hard, not crowding.</b> A dimension whose readings
 /// range over its whole half speaks in many codes, so the same rule has to be learnt
 /// again in each of them — the fragmentation a symbol's lack of partial credit causes.
 /// Readings crowded against the line collapse into two bands and are nearly bits
@@ -118,7 +118,7 @@ public sealed class Graded : IWorld<IReadOnlyList<double>>
         {
             bits[which] = _rng.Next(2);
 
-            // HOW FAR FROM THE LINE, AND NEVER WHICH SIDE. Crowding moves a reading
+            // How far from the line, and never which side. Crowding moves a reading
             // toward the decision boundary without ever crossing it, so the FUNCTION
             // is untouched and only the CODING changes. A world where this changed
             // the answer would be measuring difficulty and calling it interface risk.

@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
@@ -11,14 +11,14 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A MESSAGE THAT DOES NOT COME BACK IDENTICAL IS FORK 12 SPREAD ACROSS MACHINES.</b>
+/// <b>A message that does not come back identical is fork 12 spread across machines.</b>
 /// A reading is a quantised number, so a double differing in its last bit codes
 /// differently at a band boundary and becomes a DIFFERENT OBSERVATION. That fault has
 /// cost this project twice from inside one process; over a wire it would be worse,
 /// because no single machine could see both sides of it.
 /// </para>
 /// <para>
-/// <b>SO EVERY TEST HERE IS EQUALITY AND NOT APPROXIMATION.</b> There is no tolerance
+/// <b>So every test here is equality and not approximation.</b> There is no tolerance
 /// anywhere in this file on purpose: a wire format is either lossless or it is a source
 /// of drift that will be blamed on the learner.
 /// </para>
@@ -26,7 +26,7 @@ namespace OpenPlexus.Tests;
 public sealed class WireTests(ITestOutputHelper output)
 {
     /// <summary>
-    /// <b>THE VALUES A FORMAT GETS WRONG, RATHER THAN THE ONES IT GETS RIGHT.</b>
+    /// <b>The values a format gets wrong, rather than the ones it gets right.</b>
     /// </summary>
     /// <remarks>
     /// Fifteen significant figures is the default for a lot of serialisers and it loses
@@ -57,7 +57,7 @@ public sealed class WireTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>NEGATIVE ZERO, WHICH THE OBVIOUS COMPARISON CANNOT SEE.</b>
+    /// <b>Negative zero, which the obvious comparison cannot see.</b>
     /// </summary>
     /// <remarks>
     /// It is equal to zero under <c>==</c> and is a different number, so a format that
@@ -79,8 +79,8 @@ public sealed class WireTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>AND THE ONE EITHER SIDE OF A BAND EDGE, WHICH IS WHERE IT WOULD ACTUALLY
-    /// BITE.</b>
+    /// <b>And the one either side of a band edge, which is where it would actually
+    /// bite.</b>
     /// </summary>
     /// <remarks>
     /// A quantiser turns a reading into a code by comparing against an edge. Two readings
@@ -124,13 +124,13 @@ public sealed class WireTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>EVERY PROPERTY OF EVERY MESSAGE REACHES THE WIRE, AND THIS IS THE CHECK THAT
-    /// DOES NOT ROT.</b>
+    /// <b>Every property of every message reaches the wire, and this is the check that
+    /// does not rot.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A ROUND TRIP THAT COMPARES BYTES TO BYTES PROVES STABILITY AND NOT
-    /// LOSSLESSNESS.</b> A field the serialiser cannot see is missing from BOTH sides and
+    /// <b>A round trip that compares bytes to bytes proves stability and not
+    /// losslessness.</b> A field the serialiser cannot see is missing from BOTH sides and
     /// the two agree perfectly — which is precisely how the walk's edge kind behaved: a
     /// struct whose whole state was private, written as <c>{}</c>, read back as a relation
     /// no machine ever named, with nothing thrown and nothing unequal. <b>That type is gone
@@ -138,13 +138,13 @@ public sealed class WireTests(ITestOutputHelper output)
     /// written for.
     /// </para>
     /// <para>
-    /// <b>SO THE PROPERTY IS ASKED OF THE TYPE RATHER THAN OF ONE VALUE.</b> Every public
+    /// <b>So the property is asked of the type rather than of one value.</b> Every public
     /// property must appear in the written form. A message that grows a field later is
     /// covered without this test being edited, which is the difference between a budget
     /// and a list somebody has to remember to update.
     /// </para>
     /// <para>
-    /// <b>AND THE LIST IS THE WHOLE ASK AND ANSWER TREE RATHER THAN THE TWO TOP TYPES.</b>
+    /// <b>And the list is the whole ask and answer tree rather than the two top types.</b>
     /// A nested payload is where a private table or a tuple key hides — <see cref="Counts"/>
     /// is what rung five reads off another machine, and a holder that shipped it as
     /// <c>{}</c> would name nothing and report no error.
@@ -181,7 +181,7 @@ public sealed class WireTests(ITestOutputHelper output)
 
     /// <summary>An instance with nothing left at its default, so a dropped field shows.</summary>
     /// <remarks>
-    /// <b>DEFAULTS ARE THE PROBLEM AND SO THEY ARE AVOIDED.</b> A property left at zero
+    /// <b>Defaults are the problem and so they are avoided.</b> A property left at zero
     /// would be indistinguishable from one the serialiser dropped, so the check would pass
     /// for the fault it exists to find. Every optional member of <see cref="Answer"/> is
     /// filled here for that reason, even though no single answer ever carries all three.
@@ -252,7 +252,7 @@ public sealed class WireTests(ITestOutputHelper output)
     };
 
     /// <summary>
-    /// <b>A WHOLE ASK, WHICH IS WHAT ACTUALLY GOES DOWN THE WIRE.</b>
+    /// <b>A whole ask, which is what actually goes down the wire.</b>
     /// </summary>
     /// <remarks>
     /// The pieces above are the parts that go wrong; this is the thing that has to arrive.
@@ -268,8 +268,8 @@ public sealed class WireTests(ITestOutputHelper output)
 
         output.WriteLine(Wire.Write(ask));
 
-        // NOT `Assert.Equal(ask, back)`, AND THE REASON IS A TRAP THIS REPO HAS ALREADY
-        // PAID FOR ONCE. A synthesised record equality compares `ImmutableArray<T>` by the
+        // NOT `Assert.Equal(ask, back)`, and the reason is a trap this repo has already
+        // paid for once. A synthesised record equality compares `ImmutableArray<T>` by the
         // identity of the array behind it, so two asks holding identical moments are never
         // equal and the assertion could only ever fail. `Multiplexer.Round` carries a
         // hand-written `Equals` with the same note.
@@ -296,7 +296,7 @@ public sealed class WireTests(ITestOutputHelper output)
 
     /// <summary>An answer is what a holder makes of a moment, and it comes back whole.</summary>
     /// <remarks>
-    /// <b>THE WEIGHT IS THE FIELD THIS TEST IS REALLY ABOUT.</b> An advocate's weight is a
+    /// <b>The weight is the field this test is really about.</b> An advocate's weight is a
     /// recency-weighted accuracy, so it is a double that decides an argmax — and a vote
     /// merged from a weight that lost its last bit on the wire would pick a different rule
     /// on some rounds and agree on the rest, which is the hardest kind of wrong to see.
@@ -327,7 +327,7 @@ public sealed class WireTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>SILENCE IS A THING A HOLDER SAYS, AND IT HAS TO SURVIVE THE TRIP.</b>
+    /// <b>Silence is a thing a holder says, and it has to survive the trip.</b>
     /// </summary>
     /// <remarks>
     /// A holder that fired nothing has been HEARD FROM; a holder that died has not, and the

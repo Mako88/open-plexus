@@ -6,15 +6,15 @@ namespace OpenPlexus.Bus;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>EVERY MEASUREMENT IN THIS PROJECT HAS RUN IN ONE PROCESS WITH IN-MEMORY
-/// DELIVERY.</b> C2 says messages are late, jittered and out of order, and the
+/// <b>Every measurement in this project has run in one process with in-memory
+/// delivery.</b> C2 says messages are late, jittered and out of order, and the
 /// whole design rests on that being survivable — but nothing had ever checked it.
 /// Thread-pool dispatch already reorders; what it never produces is a message
 /// arriving LONG after its siblings, which is the case a real network adds and
 /// the one that can outlive a thought's patience.
 /// </para>
 /// <para>
-/// <b>A SMALL SHARE, DELAYED A LOT — not everything delayed a little.</b> Delaying
+/// <b>A small share, delayed a lot — not everything delayed a little.</b> Delaying
 /// every message would multiply run times by the scheduler's resolution and
 /// measure the harness rather than the design. A few percent arriving very late
 /// is both the realistic shape and the one that actually stresses settling.
@@ -37,7 +37,7 @@ public readonly record struct Lateness(double Share, TimeSpan Delay, int Seed);
 /// The bus in one process, with C2 injected rather than assumed.
 /// </summary>
 /// <remarks>
-/// <b>THE HARSHER TEST OF THE SAME TRAFFIC, AND THAT IS WHY IT STAYS.</b> Delivery here is
+/// <b>The harsher test of the same traffic, and that is why it stays.</b> Delivery here is
 /// <see cref="Task.Run(Action)"/> with delays sprinkled in, so it reorders on purpose;
 /// <see cref="Posted"/> crosses a socket and TCP does not reorder within a connection. A
 /// green run over the wire says the bytes and the routing are right and says nothing about
@@ -79,7 +79,7 @@ public sealed class HybridBus : IBus
     /// Who can be asked about commitments, and who is owed the answers.
     /// </summary>
     /// <remarks>
-    /// <b>HERE SO THE SIMULATOR STAYS THE HARSHER TEST OF THE SAME TRAFFIC.</b> This bus
+    /// <b>Here so the simulator stays the harsher test of the same traffic.</b> This bus
     /// reorders and delays on purpose and <see cref="Posted"/> does not, so an ask that
     /// crosses a socket cleanly says the bytes and the routing are right and says nothing
     /// about C2 — and the arm that would measure that has to exist here or the constraint
@@ -100,8 +100,8 @@ public sealed class HybridBus : IBus
 
     /// <inheritdoc/>
     /// <remarks>
-    /// <b>NEARLY UNREACHABLE HERE, AND THAT IS A FACT ABOUT ONE PROCESS RATHER THAN ABOUT
-    /// THE MECHANISM.</b> A holder that has unsubscribed is not in the table, so it is never
+    /// <b>Nearly unreachable here, and that is a fact about one process rather than about
+    /// the mechanism.</b> A holder that has unsubscribed is not in the table, so it is never
     /// in the roster and never owed anything; what is left is a holder that took the ask and
     /// threw, which is the local spelling of a refused connection. Every other way to lose a
     /// question needs a wire, so <see cref="Posted"/> is where fork 53 is measured.
@@ -170,7 +170,7 @@ public sealed class HybridBus : IBus
     {
         ArgumentNullException.ThrowIfNull(ask);
 
-        // NOT NAMED `Holder`, AND THE REASON IS A CHECK RATHER THAN A STYLE. `DeadCodeTests`
+        // NOT NAMED `Holder`, and the reason is a check rather than a style. `DeadCodeTests`
         // asks whether the library ever NAMES a public type, and a tuple field spelt like
         // one answers yes for free -- so `Machines.Holder` read as wired for exactly as
         // long as this line called its second element that.
@@ -189,7 +189,7 @@ public sealed class HybridBus : IBus
 
         IReadOnlyCollection<MachineAddress> asked = [.. everyone.Select(one => one.Who)];
 
-        // WHO IS ABOUT TO BE ASKED, BEFORE ANYONE IS ASKED -- the same window
+        // Who is about to be asked, before anyone is asked -- the same window
         // `BroadcastAsync` opens, and for the same measured reason. Dispatch is `Task.Run`,
         // so a holder can answer before this returns, and an answer to an ask nobody
         // remembers is dropped by design.
@@ -257,7 +257,7 @@ public sealed class HybridBus : IBus
         {
             try
             {
-                // LATE, BEFORE DELIVERY AND INSIDE THE IN-FLIGHT COUNT. See
+                // Late, before delivery and inside the in-flight count. See
                 // `Lateness`. Drawn under the lock because `Random` is not
                 // thread-safe and a torn draw would be a defect in the harness
                 // rather than in the thing being measured.

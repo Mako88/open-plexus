@@ -19,7 +19,7 @@ public sealed record LatentSettings
     /// How many observable channels report the hidden state.
     /// </summary>
     /// <remarks>
-    /// <b>THE NUMBER THE WHOLE CLAIM IS ABOUT.</b> The channels' pairwise relations
+    /// <b>The number the whole claim is about.</b> The channels' pairwise relations
     /// go as <c>k(k-1)/2</c> and one name over them is <c>k</c>, so what a minted
     /// name saves grows with this while what it costs does not — which is why four
     /// is the smallest group worth naming, and why this world is rung five's.
@@ -32,10 +32,10 @@ public sealed record LatentSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE FIRST WORLD HERE WHOSE BEST EXPLANATION IS NOT IN IT.</b> Every moment,
+/// <b>The first world here whose best explanation is not in it.</b> Every moment,
 /// a hidden cause takes one of <see cref="LatentSettings.Causes"/> states and every
-/// channel reports it. The channels therefore co-occur constantly and NONE OF THEM
-/// CAUSES ANY OTHER — the thing that would explain them is never emitted, has no
+/// channel reports it. The channels therefore co-occur constantly and none of them
+/// causes any other — the thing that would explain them is never emitted, has no
 /// code, and cannot be reached by any walk.
 /// </para>
 /// <para>
@@ -46,7 +46,7 @@ public sealed record LatentSettings
 /// channels, and the hub is exactly the cause.
 /// </para>
 /// <para>
-/// <b>THE INTERESTING NUMBER IS COST AND NOT ACCURACY, exactly as on
+/// <b>The interesting number is cost and not accuracy, exactly as on
 /// <see cref="Motif"/>.</b> Pairwise counts already answer this perfectly — the
 /// channels co-occur, so the edges are what they should be. What they cannot do is
 /// stop paying: every moment writes <c>k(k-1)</c> row entries where a hub would
@@ -54,7 +54,7 @@ public sealed record LatentSettings
 /// to show the compression would not have cost anything.
 /// </para>
 /// <para>
-/// <b>AND IT IS HONEST ABOUT WHAT A HUB WOULD BUY AND WHAT IT WOULD COST.</b> A
+/// <b>And it is honest about what a hub would buy and what it would cost.</b> A
 /// posited node makes the answer TWO hops where it was one, so a walk must afford
 /// the extra step; what it saves is the fan-out, since a channel points at one hub
 /// rather than at every sibling. Both directions are reported and neither is
@@ -81,7 +81,7 @@ public sealed class Latent
         ArgumentNullException.ThrowIfNull(world);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(world.Causes);
 
-        // FOUR IS WHERE A HUB STARTS PAYING, so a world below it cannot exercise
+        // Four is where a hub starts paying, so a world below it cannot exercise
         // the thing it exists to measure. Refused rather than left to read as a
         // mechanism that did nothing.
         if (world.Channels < 4)

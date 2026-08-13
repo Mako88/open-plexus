@@ -8,19 +8,19 @@ using Xunit.Abstractions;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// Whether ACCURACY CAN TELL A TRUE RULE FROM A FALSE ONE — <b>the signal every other
+/// Whether accuracy can tell a true rule from a false one — <b>the signal every other
 /// mechanism here is built on, measured for the first time.</b>
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>EVERYTHING IN THIS MACHINE RANKS BY ACCURACY.</b> The vote weights by it, culling
+/// <b>Everything in this machine ranks by accuracy.</b> The vote weights by it, culling
 /// orders by it, subsumption compares it, and repair blames the worst of it. So if a
 /// world's true rules and its false ones have the SAME accuracy, every one of those
 /// mechanisms is reading noise — and no gate, budget, weighing or deletion rule can
 /// recover, because they all consult the same broken instrument.
 /// </para>
 /// <para>
-/// <b>AND SKEW IS PREDICTED TO DO EXACTLY THAT, WHICH IS WHY THIS EXISTS.</b> On a world
+/// <b>And skew is predicted to do exactly that, which is why this exists.</b> On a world
 /// whose answer is one four times in five, a rule saying <i>expect one</i> is right about
 /// eighty-five percent of the time whatever it conditions on — because when its own
 /// reasoning does not apply, the base rate carries it anyway. A true rule is right a
@@ -28,7 +28,7 @@ namespace OpenPlexus.Tests;
 /// forty on the balanced world.
 /// </para>
 /// <para>
-/// <b>IF THE GAP COLLAPSES, THE DEFECT IS UPSTREAM OF EVERY ARM TRIED TONIGHT.</b> Six
+/// <b>If the gap collapses, the defect is upstream of every arm tried tonight.</b> Six
 /// budget cells, three vote rules and two genesis gates were all measured on a world
 /// where the fitness signal itself may not carry the distinction they were being asked to
 /// make.
@@ -45,7 +45,7 @@ public sealed class SeparableTests(ITestOutputHelper output)
     /// <param name="skew">How often a data bit is one, or zero to leave them even.</param>
     /// <param name="seed">The world's generator and the brain's.</param>
     /// <remarks>
-    /// <b>EXPERIENCED AND CHECKABLE ONLY, WHICH IS `Learned.Grade`'S OWN RULE.</b> A
+    /// <b>Experienced and checkable only, which is `Learned.Grade`'S OWN RULE.</b> A
     /// commitment the world cannot decide belongs in neither column, and one that has
     /// barely fired has an accuracy that is a guess rather than a measurement — counting
     /// either would put the answer in the noise this is trying to measure.
@@ -58,7 +58,7 @@ public sealed class SeparableTests(ITestOutputHelper output)
 
         new MultiplexerRun(settings, brain, seed).Run(Rounds);
 
-        // THE SAME MAPPING, REACHED FROM THE SAME SEED. `Truths` and `Sound` read which
+        // The same mapping, reached from the same seed. `Truths` and `Sound` read which
         // data bit each address selects, and that is drawn from the seed -- so a world
         // built again from it answers about the world the run actually saw.
         var world = new Multiplexer(settings, seed);

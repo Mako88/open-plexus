@@ -11,19 +11,19 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE GATE ASKS SOMETHING NO COUNT CAN ANSWER, so it is a round trip and not a
+/// <b>The gate asks something no count can answer, so it is a round trip and not a
 /// merge.</b> <c>Mending.Uncovered</c> needs to know whether anything firing narrows this
 /// commitment, and <c>Narrows</c> is a structural test between two scopes. What comes back
 /// is a boolean, which is why asking keeps C1 where reading a population would not.
 /// </para>
 /// <para>
-/// <b>AND A ROUND TRIP IS THE EXPENSIVE UNIT, WHICH IS THE ONE THING ALREADY MEASURED.</b>
+/// <b>And a round trip is the expensive unit, which is the one thing already measured.</b>
 /// <c>LatencyTests</c> put a hop at a hundred milliseconds between two houses. A query per
 /// candidate per round at that price is not a detail — it decides whether this gate can
 /// exist off a LAN at all, and the count is the whole question.
 /// </para>
 /// <para>
-/// <b>THE QUESTION IS WHICH PART IS CACHEABLE, AND THE TWO HALVES ARE NOT ALIKE.</b>
+/// <b>The question is which part is cacheable, and the two halves are not alike.</b>
 /// <i>Does anybody anywhere hold a specialisation of my scope</i> changes only when
 /// somebody mints one. <i>Did it fire this round</i> changes every round. If most
 /// candidates have no specialisation anywhere, the first answer is a permanent no and the
@@ -69,8 +69,8 @@ public sealed class QueryCostTests(ITestOutputHelper output)
         var cached = 0;
         var answered_yes = 0;
 
-        // WHO COULD EVER COVER WHOM, WHICH IS THE POPULATION-LEVEL HALF AND CHANGES ONLY
-        // ON A MINT. Computed once here because nothing mints during a read-only walk --
+        // Who could ever cover whom, which is the population-level half and changes only
+        // on a mint. Computed once here because nothing mints during a read-only walk --
         // and that is a limit of this measurement rather than a property of the mechanism,
         // said again below.
         var coverable = all
@@ -87,7 +87,7 @@ public sealed class QueryCostTests(ITestOutputHelper output)
             var firing = held.Firing(moment);
             if (firing.IsDefaultOrEmpty) continue;
 
-            // WHAT ACTUALLY FOLLOWED, AND THE FIRST VERSION OF THIS FILE USED A CONSTANT.
+            // What actually followed, and the first version of this file used a constant.
             // `Mend` only considers commitments that were WRONG, so an outcome that never
             // varies makes half the population permanently a candidate and the other half
             // permanently not -- a traffic number measured against a world that was not
@@ -101,10 +101,10 @@ public sealed class QueryCostTests(ITestOutputHelper output)
                 if (one.Expects == arrived) continue;
                 if (one.Misses < dials.Floor) continue;
 
-                // THE NAIVE SCHEME ASKS FOR EVERY CANDIDATE EVERY ROUND.
+                // The naive scheme asks for every candidate every round.
                 naive++;
 
-                // AND THE CACHED ONE ASKS ONLY WHERE THE ANSWER COULD BE YES. A commitment
+                // and the cached one asks only where the answer could be yes. A commitment
                 // nothing in the population specialises can never be covered by anything
                 // firing, so its holder needs no wire at all -- one permanent no, and the
                 // per-round question is never reached.

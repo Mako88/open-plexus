@@ -12,20 +12,20 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>TWO RULES, AND THEY BUY OPPOSITE THINGS.</b> Placing by the whole identity spreads
+/// <b>Two rules, and they buy opposite things.</b> Placing by the whole identity spreads
 /// evenly and sends a child away from its parent, because a child's scope is its parent's
 /// plus one code and hashes nowhere near it. Placing by the parent keeps a lineage together
 /// and deduplicates nothing, because <c>{x}</c> repaired with <c>z</c> and <c>{z}</c>
 /// repaired with <c>x</c> are one scope reached from two roots.
 /// </para>
 /// <para>
-/// <b>JOHN'S IS THE MINIMUM CODE OF THE SORTED SCOPE, AND IT BUYS BOTH.</b> A scope is
+/// <b>John's is the minimum code of the sorted scope, and it buys both.</b> A scope is
 /// already canonicalised as a sorted set, so the minimum is free; identical scopes have
 /// identical minima and land together, and a lineage rooted at that minimum stays together.
 /// What it cannot buy is spread, and that is the number this file exists for.
 /// </para>
 /// <para>
-/// <b>AND THE HARD LIMIT IS DISTINCT ROOTS RATHER THAN BALANCE.</b> A rule placing by one
+/// <b>And the hard limit is distinct roots rather than balance.</b> A rule placing by one
 /// code can only reach as many machines as there are distinct minima, so a narrow world
 /// caps the fleet no matter how many holders are brought up — and that is a fact about the
 /// front end's vocabulary, which is the one thing a placement rule may not depend on.
@@ -59,17 +59,17 @@ public sealed class PlacingTests(ITestOutputHelper output)
 
         var most = sizes.Max();
 
-        // THE RATIO OF THE FULLEST MACHINE TO THE AVERAGE, WHICH IS WHAT A DEPLOYMENT
-        // FEELS. A fleet is as slow as its slowest holder and as big as its biggest, so the
+        // The ratio of the fullest machine to the average, which is what a deployment
+        // feels. A fleet is as slow as its slowest holder and as big as its biggest, so the
         // mean says nothing about whether it fits.
         return (sizes.Count(one => one == 0), most, most / (all.Count / (double)holders));
     }
 
     /// <summary>
-    /// <b>WHAT PLACING BY THE MINIMUM CODE COSTS IN SPREAD — a grid, and no bar.</b>
+    /// <b>What placing by the minimum code costs in spread — a grid, and no bar.</b>
     /// </summary>
     /// <remarks>
-    /// <b>MEASURED BEFORE THE CHANGE RATHER THAN AFTER IT, WHICH IS THE POINT.</b> Fork 3
+    /// <b>Measured before the change rather than after it, which is the point.</b> Fork 3
     /// has carried <i>prefix placement recovers much of it at unmeasured cost in load</i>
     /// since it was written, and the cost has stayed unmeasured because nothing needed it.
     /// Fork 61 needs it: the rule is chosen for what it deduplicates, and if it cannot fill
@@ -103,7 +103,7 @@ public sealed class PlacingTests(ITestOutputHelper output)
             }
         }
 
-        // THE ONE ASSERTION IS THAT THE TWO RULES ARE DIFFERENT RULES, which is not
+        // The one assertion is that the two rules are different rules, which is not
         // guaranteed and would make every row above a tautology. A one-code commitment has
         // its scope's minimum AS its only code, and its identity is a hash of that scope --
         // so if the hash happened to preserve the ordering the grid would compare a rule

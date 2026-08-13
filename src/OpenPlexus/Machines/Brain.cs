@@ -8,14 +8,14 @@ namespace OpenPlexus.Machines;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S RULE: ONE BRAIN ACROSS EVERY WORLD.</b> On `csharp` the dials that
+/// <b>John's rule: one brain across every world.</b> On `csharp` the dials that
 /// decided how thinking worked were passed to a world's runner, and several had
 /// different defaults in different worlds — so switching world switched brain, and
 /// every comparison between two problems was also a comparison between two machines.
 /// </para>
 /// <para>
-/// <b>SO <see cref="CommittingSettings"/> IS CONSTRUCTED ONCE, OUTSIDE ANY WORLD, AND
-/// HANDED IN.</b> A world may turn its own dials as hard as it likes and cannot reach
+/// <b>SO <see cref="CommittingSettings"/> is constructed once, outside any world, and
+/// handed in.</b> A world may turn its own dials as hard as it likes and cannot reach
 /// one of these; `SeparationTests` fails the build if it tries.
 /// </para>
 /// </remarks>
@@ -23,7 +23,7 @@ public sealed class Brain
 {
     /// <summary>The modality every world's outcome is said in.</summary>
     /// <remarks>
-    /// <b>SHARED ACROSS WORLDS ON PURPOSE.</b> A brain that learnt a different
+    /// <b>Shared across worlds on purpose.</b> A brain that learnt a different
     /// alphabet per world would not be one brain — and a commitment about an outcome
     /// would mean something different depending on who was asking.
     /// </remarks>

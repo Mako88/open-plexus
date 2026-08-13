@@ -17,7 +17,7 @@ public enum Verdict
     /// The settlement could not say. <b>Neither counter moves.</b>
     /// </summary>
     /// <remarks>
-    /// <b>C3 REQUIRES THIS AND A TWO-OUTCOME PRIMITIVE CANNOT HAVE IT.</b> A cluster
+    /// <b>C3 requires this and a two-outcome primitive cannot have it.</b> A cluster
     /// vanishing mid-thought is normal rather than an error, so a commitment whose
     /// consequent lived on it would take a miss for a death — and with counts that
     /// only ever rise there is nothing that could take the miss back. Abstaining
@@ -32,12 +32,12 @@ public enum Verdict
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE ENTIRE DIFFERENCE FROM A COUNT.</b> A co-occurrence cell that mispredicts
+/// <b>The entire difference from a count.</b> A co-occurrence cell that mispredicts
 /// becomes a slightly different number; this is WRONG ABOUT SOMETHING, and which
 /// something is the whole of what can be learnt from the failure.
 /// </para>
 /// <para>
-/// <b>THE COUNTING DID NOT GO AWAY, IT MOVED UNDER THE PREDICTION.</b> Repair has to
+/// <b>The counting did not go away, it moved under the prediction.</b> Repair has to
 /// ask which code separates the misses from the hits, and answering that needs a
 /// tally per code seen while firing — which is `csharp`'s `together / seen` indexed
 /// by commitment rather than by node. <see cref="Separations"/> is that tally, and
@@ -71,7 +71,7 @@ public sealed class Commitment
     /// How many buckets the distinct-occasion register has.
     /// </summary>
     /// <remarks>
-    /// <b>ONE WORD PER COMMITMENT, AND THE WIDTH IS THE WORD RATHER THAN A CHOICE.</b>
+    /// <b>One word per commitment, and the width is the word rather than a choice.</b>
     /// An exact set of the occasions a commitment has fired in is commitments times
     /// distinct moments — the same product that already makes
     /// <see cref="Separations"/> the thing that blows up, arriving a second time for a
@@ -93,7 +93,7 @@ public sealed class Commitment
         if (scope.IsDefaultOrEmpty)
             throw new ArgumentException("a commitment with no scope fires always", nameof(scope));
 
-        // SORTED, BECAUSE A SCOPE IS A SET. Two scopes naming the same codes in
+        // Sorted, because a scope is a set. Two scopes naming the same codes in
         // different orders are the same commitment, and canonicalising here is what
         // lets the identity below be computed from the scope rather than from the
         // path that built it.
@@ -156,7 +156,7 @@ public sealed class Commitment
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A FIRING IS NOT AN OBSERVATION WHEN THE WORLD DRAWS THE SAME THING TWICE.</b>
+    /// <b>A firing is not an observation when the world draws the same thing twice.</b>
     /// <see cref="Fired"/> counts how often a commitment was answered;
     /// this counts how much of what it was answered about was DIFFERENT. Where a world
     /// redraws from a bag the two come apart by exactly the recurrence — and every
@@ -164,31 +164,31 @@ public sealed class Commitment
     /// first number is not.
     /// </para>
     /// <para>
-    /// <b>THE ONLY MEASURE OF GENERALITY HERE THAT IS NOT BUILT FROM ACCURACY, AND WHAT
-    /// IT WAS BUILT FOR IS REFUTED.</b> Every repair gate tried — the vote being wrong, a
+    /// <b>The only measure of generality here that is not built from accuracy, and what
+    /// it was built for is refuted.</b> Every repair gate tried — the vote being wrong, a
     /// failure nothing covers, forking having paid — is computed from observed accuracy
     /// or observed failure, and the story was that on a world drawing with replacement
     /// all of them are fooled by children standing on one repeated moment. Subsuming on
     /// THIS instead of on firings said otherwise; see the revival row in the plan.
     /// </para>
     /// <para>
-    /// <b>IT IS KEPT AS AN INSTRUMENT BECAUSE IT SETTLED SOMETHING NO OTHER NUMBER
-    /// COULD.</b> On <see cref="Worlds.Arranged"/> a subsumption rule weighing advantage
+    /// <b>It is kept as an instrument because it settled something no other number
+    /// could.</b> On <see cref="Worlds.Arranged"/> a subsumption rule weighing advantage
     /// against THIS deleted an ordinary 83% of children — the same share as the rules
     /// that weigh it against firings — and landed on the identical withheld score, seed
     /// for seed. The children that sink that world are not memorised. That is a negative
     /// nothing in <see cref="Separations"/> or the counters could have produced.
     /// </para>
     /// <para>
-    /// <b>LINEAR COUNTING OVER A SINGLE WORD, WHICH IS EXACT WHERE IT MATTERS AND
-    /// SATURATES WHERE IT DOES NOT.</b> Each occasion sets one bit; the count is
+    /// <b>Linear counting over a single word, which is exact where it matters and
+    /// saturates where it does not.</b> Each occasion sets one bit; the count is
     /// recovered from how many bits are still clear. At one, two and three occasions it
     /// reads 1.0, 2.0 and 3.1 — the regime the whole question lives in — and above about
     /// two hundred it stops rising, which costs nothing because a proportion tested on
     /// two hundred independent readings already has all the power it will ever need.
     /// </para>
     /// <para>
-    /// <b>LOCAL, LIKE <see cref="Accuracy"/> AND UNLIKE THE COUNTERS.</b> It never
+    /// <b>Local, like <see cref="Accuracy"/> and unlike the counters.</b> It never
     /// merges and never travels, so C1 is untouched: what another node saw is not
     /// evidence this one may count as its own. It is deterministic under a fixed seed,
     /// which is all it has to be — two machines are not required to agree on it, because
@@ -201,7 +201,7 @@ public sealed class Commitment
         {
             var set = System.Numerics.BitOperations.PopCount(_witness);
 
-            // THE LAST BUCKET IS HELD BACK RATHER THAN DIVIDED BY ZERO. A full
+            // The last bucket is held back rather than divided by zero. A full
             // register is an estimate of infinity, and the clamp is what turns it into
             // the largest number the word can honestly stand for.
             var lit = Math.Min(set, Buckets - 1);
@@ -219,8 +219,8 @@ public sealed class Commitment
     {
         ArgumentNullException.ThrowIfNull(moment);
 
-        // WRITTEN OUT RATHER THAN `Scope.All(moment.Contains)`, AND THE REASON IS THAT
-        // THIS IS THE HOTTEST LINE IN THE PROJECT. The first cost profile put matching
+        // WRITTEN OUT RATHER THAN `Scope.All(moment.Contains)`, and the reason is that
+        // this is the hottest line in the project. The first cost profile put matching
         // at a third of the wall clock, and the elegant version pays for it three ways
         // on every call: a delegate allocated fresh because the lambda captures
         // `moment`, the struct enumerator boxed onto the heap to reach `IEnumerable`,
@@ -270,7 +270,7 @@ public sealed class Commitment
 
         if (outcome == Verdict.Abstain)
         {
-            // NOTHING ELSE MOVES, INCLUDING THE TABLE. A settlement that could not
+            // Nothing else moves, including the table. A settlement that could not
             // say is not evidence about which code separates anything, and letting
             // it into the tally would make a run's separation depend on how often
             // the network was unwell.
@@ -284,8 +284,8 @@ public sealed class Commitment
 
         _seen++;
 
-        // THE RUNNING AVERAGE UNTIL THERE IS ENOUGH TO FORGET, WHICH IS XCS'S OWN
-        // PRACTICE AND NOT A KNOB. Widrow-Hoff from zero says a commitment that has
+        // The running average until there is enough to forget, which is XCS's own
+        // practice and not a knob. Widrow-Hoff from zero says a commitment that has
         // been right once is a tenth right, so a fresh commitment is indistinguishable
         // from a refuted one and loses every vote it should win. Averaging for the
         // first 1/recency firings starts it where the evidence actually is, and it
@@ -296,12 +296,12 @@ public sealed class Commitment
 
         var occasion = 0UL;
 
-        // THE TALLY IS OVER WHAT WAS PRESENT AND NOT OVER THE SCOPE. Every scope
+        // The tally is over what was present and not over the scope. Every scope
         // code is present in every firing by definition, so a tally over the scope
-        // separates nothing; what repair needs is the codes that came ALONG.
+        // separates nothing; what repair needs is the codes that came along.
         foreach (var code in moment)
         {
-            // AND THE OCCASION IS FOLDED IN THE SAME PASS, so counting what is
+            // and the occasion is folded in the same pass, so counting what is
             // DIFFERENT about a firing costs no walk of its own -- see
             // <see cref="Occasions"/>. XOR because a moment is a SET: two machines
             // walking it in different orders must reach the same word, and this is
@@ -310,14 +310,14 @@ public sealed class Commitment
 
             if (Scope.Contains(code)) continue;
 
-            // ONE HASH LOOKUP AND NOT TWO, WHICH IS THE WHOLE OF THIS LINE'S POINT.
+            // One hash lookup and not two, which is the whole of this line's point.
             // `TryGetValue` followed by an indexer set hashes the code twice and walks
             // the bucket chain twice to write back a struct sixteen bytes wide. The
             // first cost profile put settling at a third of the wall clock and this loop
             // IS settling: it runs once per firing commitment per code in the moment,
             // which on a wide world is the largest number in the run.
             //
-            // THE TABLE ENDS UP IDENTICAL, ENTRY FOR ENTRY AND IN INSERTION ORDER. A
+            // The table ends up identical, entry for entry and in insertion order. A
             // code not yet present is added as a default <see cref="Separation"/> and
             // then incremented, which is exactly what the pair of calls did — so
             // `Tally.Separations`, the one half of the cost that CAN be barred, does not
@@ -337,8 +337,8 @@ public sealed class Commitment
     /// <param name="from">The commitment being rewritten.</param>
     /// <remarks>
     /// <para>
-    /// <b>THE ONE PLACE EVIDENCE MOVES, AND IT IS NOT AN EXCEPTION TO NEVER EDITING
-    /// A COMMITMENT.</b> Rung five does not change what is claimed — it changes how
+    /// <b>The one place evidence moves, and it is not an exception to never editing
+    /// a commitment.</b> Rung five does not change what is claimed — it changes how
     /// the claim is written, by putting a name where its members were. The two entail
     /// exactly the same moments, which <c>Unfold</c> is what checks.
     /// </para>
@@ -358,7 +358,7 @@ public sealed class Commitment
         _accuracy = from._accuracy;
         _seen = from._seen;
 
-        // THE REGISTER COMES TOO, FOR THE REASON THE TALLY DOES. A rewrite entails
+        // The register comes too, for the reason the tally does. A rewrite entails
         // exactly the moments it did before, so it has fired in exactly the same
         // occasions -- and a mechanism whose reward is looking less general than it is
         // would be one nobody would run.
@@ -372,7 +372,7 @@ public sealed class Commitment
 
     /// <summary>Drops the tally, keeping everything that decides whether it fires.</summary>
     /// <remarks>
-    /// <b>THE TABLE IS WHAT BLOWS UP, NOT THE COMMITMENT.</b> Four fields have to
+    /// <b>The table is what blows up, not the commitment.</b> Four fields have to
     /// stay resident or the commitment cannot match; the per-code tally is large,
     /// and it is only needed while this is a live repair candidate. Fork 31 is
     /// whether it can go and come back without changing what fires.
@@ -384,8 +384,8 @@ public sealed class Commitment
     /// <param name="expects">The code that should follow.</param>
     /// <remarks>
     /// <para>
-    /// <b>DERIVED FROM THE SCOPE ITSELF, AND NOT FROM THE PARENT PLUS THE CONDITION
-    /// ADDED.</b> Both satisfy the rule that two machines must agree without
+    /// <b>Derived from the scope itself, and not from the parent plus the condition
+    /// added.</b> Both satisfy the rule that two machines must agree without
     /// speaking, but parent-plus-condition gives the SAME scope two names when two
     /// nodes reach it by adding the same pair of codes in a different order — and
     /// the plan's own sibling problem is bad enough without a commitment being able
@@ -402,7 +402,7 @@ public sealed class Commitment
         if (scope.IsDefaultOrEmpty)
             throw new ArgumentException("a commitment with no scope fires always", nameof(scope));
 
-        // THE LENGTH IS FOLDED IN FIRST so that no scope can be the prefix of
+        // The length is folded in first so that no scope can be the prefix of
         // another and reach the same name.
         var hash = Agreed.Fold(Agreed.Basis, (ulong)scope.Length);
 

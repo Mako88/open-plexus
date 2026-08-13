@@ -11,22 +11,22 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE PLAN HAS SAID SINCE THE BRANCH BEGAN WHAT WOULD END IT.</b> <i>A control arm
+/// <b>The plan has said since the branch began what would end it.</b> <i>A control arm
 /// where Z is drawn at random from the codes present in the misses. If discriminative-Z
 /// does not beat it, repair does nothing and the bet is dead.</i> Fork 55 answered that on
 /// the even multiplexer over twelve seeds and left it open on every other world — and the
 /// skewed one did not exist to ask.
 /// </para>
 /// <para>
-/// <b>AND EVERY SELECTION RULE TRIED TONIGHT HAS FAILED, WHICH IS WHY THIS IS THE
-/// QUESTION NOW.</b> The budget, two correctness gates, generalisation and an experience
+/// <b>And every selection rule tried tonight has failed, which is why this is the
+/// question now.</b> The budget, two correctness gates, generalisation and an experience
 /// bar all change WHICH resident rule gets the seat, and none of them moves the number
 /// that matters. Three fifths to all of every failure is a round with no true rule
 /// present at all, so the pool is what is wrong rather than the choosing from it — and
 /// repair is the only thing that fills the pool.
 /// </para>
 /// <para>
-/// <b>READ ON <see cref="Census.Paying"/> AND NOT ON CHILDREN MINTED.</b> Fork 55 was
+/// <b>Read on <see cref="Census.Paying"/> and not on children minted.</b> Fork 55 was
 /// settled on how many children each arm produced, which says the arms DIFFER and not
 /// that either is any good. A random condition also mints children.
 /// </para>

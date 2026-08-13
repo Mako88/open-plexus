@@ -27,7 +27,7 @@ public sealed record ClevrSettings
     /// Whether the front end says which attributes belong to which object.
     /// </summary>
     /// <remarks>
-    /// <b>OFF IS THE CEILING FORK 25 MEASURED, ON SOMEBODY ELSE'S SCENES.</b> A
+    /// <b>Off is the ceiling fork 25 measured, on somebody else's scenes.</b> A
     /// scene of a red cube and a blue sphere emits exactly the codes a scene of a
     /// blue cube and a red sphere does, so with this off no amount of counting
     /// separates them — and CLEVR is built almost entirely out of that confusion.
@@ -52,7 +52,7 @@ public sealed record ClevrSettings
     /// Whether those indexes are declared fleeting — one way, index to attribute.
     /// </summary>
     /// <remarks>
-    /// <b>OFF HERE, AND THAT IS NOT THE USUAL RECOMMENDATION.</b> Everywhere else
+    /// <b>Off here, and that is not the usual recommendation.</b> Everywhere else
     /// a fleeting index is the right call, because the row an index writes into a
     /// lasting node grows forever and buys nothing — a question carries the index
     /// it asks about, so the walk starts there and never arrives at one. This
@@ -136,7 +136,7 @@ public sealed record Referred
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THIS IS THE BINDING WORLD'S EXPERIMENT, RUN ON SOMEBODY ELSE'S DATA.</b>
+/// <b>This is the binding world's experiment, run on somebody else's data.</b>
 /// Fork 25 built a world specifically to fail — two objects with swapped
 /// attributes emitting one code set — measured the ceiling, and then lifted it
 /// with grouping and a per-object index. Every one of those numbers was taken on
@@ -152,7 +152,7 @@ public sealed record Referred
 /// <see cref="Codes.IQuantizer{TObservation}.Bind"/> exists to carry.
 /// </para>
 /// <para>
-/// <b>ONLY THE QUESTIONS THIS SYSTEM CAN EXPRESS AN ANSWER TO ARE KEPT</b>, and
+/// <b>Only the questions this system can express an answer to are kept</b>, and
 /// that is most of CLEVR thrown away. A walk returns one endpoint, so counting
 /// (<i>how many cubes</i>), existence (<i>are there any</i>), comparison and
 /// spatial relations are all structurally unanswerable here — as is anything
@@ -184,8 +184,8 @@ public sealed class Clevr
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>WITHOUT IT THE QUESTION IS NOT ASKABLE, AND THAT WAS MEASURED THE HARD
-    /// WAY.</b> <i>The large metal thing</i> names one object of one scene and
+    /// <b>Without it the question is not askable, and that was measured the hard
+    /// way.</b> <i>The large metal thing</i> names one object of one scene and
     /// several hundred objects of the corpus, so a conjunction with no scene in it
     /// found the object meant about as often as picking one at random — which read
     /// as the architecture failing and was the harness never having asked the
@@ -251,8 +251,8 @@ public sealed class Clevr
 
         Asked = _asking.Values.Sum(list => list.Count);
 
-        // CHANCE IS PER ATTRIBUTE AND THE QUESTIONS ARE NOT EVENLY SPLIT BETWEEN
-        // THEM. Colour has eight values and material two, so a run that happened
+        // Chance is per attribute and the questions are not evenly split between
+        // them. Colour has eight values and material two, so a run that happened
         // to draw mostly material questions would look far better against one
         // flat number. This is the blind draw the actual mix of questions faces.
         var answers = _asking.Values
@@ -347,7 +347,7 @@ public sealed class Clevr
                     codes.Add(code);
                     mine[modality] = code;
 
-                    // AN ATTRIBUTE VALUE IS ONE NODE ACROSS THE WHOLE CORPUS, so
+                    // An attribute value is one node across the whole corpus, so
                     // two objects sharing a colour share its code and the group
                     // map cannot hold both. That is the binding problem itself and
                     // not a parsing detail: whichever object claims the code, the
@@ -382,7 +382,7 @@ public sealed class Clevr
                 Codes = [.. codes],
                 Groups = settings.Segmented ? groups : null,
 
-                // THE SCENE IS FLEETING WHATEVER THE ARM SAYS; the arm is about
+                // The scene is fleeting whatever the arm says; the arm is about
                 // the OBJECT indexes, which the walk has to be able to arrive at.
                 Fleeting = settings is { Tagged: true, Fleeting: true }
                     ? indexes
@@ -441,12 +441,12 @@ public sealed class Clevr
                 break;
             }
 
-            // TWO OR MORE, OR IT IS NOT A CONJUNCTION. A single filter names a
+            // Two or more, or it is not a conjunction. A single filter names a
             // whole class rather than an object, and the answer is then whatever
             // is commonest -- which measures the corpus and not the binding.
             if (refused || asking == 0 || origins.Count < 2) continue;
 
-            // WHICH OBJECT THE FILTERS ACTUALLY NAME, worked out by running them.
+            // Which object the filters actually name, worked out by running them.
             // Exactly one, or this is not a reference and the arms that hand the
             // walk an index would have nothing to hand it.
             var matched = -1;
@@ -466,7 +466,7 @@ public sealed class Clevr
 
             var says = question.GetProperty("answer").GetString()!;
 
-            // AND THE CORPUS HAS TO AGREE WITH THE SCENE. If the object the
+            // And the corpus has to agree with the scene. If the object the
             // filters picked does not carry the answer the corpus wrote down,
             // something has been misread and the question is dropped rather than
             // scored against a resolution nobody can trust.

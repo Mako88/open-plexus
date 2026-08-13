@@ -9,7 +9,7 @@ namespace OpenPlexus.Tests;
 /// Whole against tiled, on the world where the difference can show.
 /// </summary>
 /// <remarks>
-/// <b>THE MEASUREMENT THE PLAN HAS BEEN OWED SINCE STEP FOUR.</b> A pooled embedding
+/// <b>The measurement the plan has been owed since step four.</b> A pooled embedding
 /// has no parts and cannot carry an arrangement, and a whole-picture projection is the
 /// same thing by another road. Patch tokens are named as the fix; here is the first
 /// world on which the claim can be wrong.
@@ -23,8 +23,8 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_an_unbounded_repair_budget_costs_on_the_world_that_reaches_the_capacity()
     {
-        // THE GAP THE BUDGET CURVE LEFT, AND IT IS NAMED IN THAT COMMIT RATHER THAN FOUND
-        // AFTERWARDS. `BudgetCurveTests` says every column that is a fact about what was
+        // The gap the budget curve left, and it is named in that commit rather than found
+        // afterwards. `BudgetCurveTests` says every column that is a fact about what was
         // learnt rises monotonically to a FREE budget -- and every cell of it is a
         // multiplexer, where the population never comes near `Capacity`. A dial wired to one
         // world in ten and cashed in as though it were general is this doc's own trap.
@@ -35,7 +35,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         // world whose rules are one code, any repair is damage. If unbounded repair costs
         // anything anywhere, it costs it here.
         //
-        // AND THE READING IS THE WITHHELD SET RATHER THAN A TRAILING WINDOW, which is what
+        // And the reading is the withheld set rather than a trailing window, which is what
         // this world has that the multiplexer does not: scenes the run was never taught on.
         // A population that over-specialises scores on what it has seen and not on those.
         output.WriteLine("budget | unseen accuracy | spread | sound | unsound | residents");
@@ -49,7 +49,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
                 Budget = int.MaxValue,
             }),
 
-            // AND THE ARM WHOSE DISTINGUISHING PROPERTY ONLY APPEARS HERE. `Earned` pays one
+            // And the arm whose distinguishing property only appears here. `Earned` pays one
             // attempt per `Floor` misses, so it binds where misses are SCARCE -- and on the
             // multiplexer they are not, which is why it came back indistinguishable from free
             // on every cell of two worlds. This world's true rules are one code and its
@@ -81,12 +81,12 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     /// <param name="dials">The brain, built once and handed to every seed.</param>
     /// <param name="looking">How the picture is cut up.</param>
     /// <remarks>
-    /// <b>ONE BRAIN PER CONFIGURATION AND FIVE SEEDS OF IT, because one seed is not a
+    /// <b>One brain per configuration and five seeds of it, because one seed is not a
     /// comparison and this repo has watched an ordering invert.</b> Written out twice
     /// before `DuplicationTests` refused the second, which is that budget doing its job
     /// on a measurement file rather than on the library.
     /// <para>
-    /// <b>AND THE COUNT IS A PARAMETER BECAUSE FIVE WAS NOT ENOUGH ONCE.</b> A two-code
+    /// <b>And the count is a parameter because five was not enough once.</b> A two-code
     /// repair step read 0.702 here with a standard error of 0.053, which is a grid unable to
     /// say anything about a difference of that size — so a comparison that expects a small
     /// effect asks for more seeds rather than reporting a spread it cannot use. Five stays the
@@ -110,25 +110,25 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHAT DISTINCT CHILDREN COST WHERE THE WORLD'S RULES ARE ONE CODE — fork 76's
+    /// <b>What distinct children cost where the world's rules are one code — fork 76's
     /// falsifier.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE CASE FOR REFUSING A PARENT ITS SPENT CODES IS ENTIRELY ABOUT QUANTITY.</b>
+    /// <b>The case for refusing a parent its spent codes is entirely about quantity.</b>
     /// Covering what a parent is right about takes many children, and a budget spent
     /// re-deriving one child buys none of them. This world's truths are ONE CODE, so there is
     /// nothing for a child to cover and this doc already carries the row that here any repair
     /// is damage — eight times the children should be eight times that damage.
     /// </para>
     /// <para>
-    /// <b>WHICH MAKES IT THE FALSIFIER RATHER THAN A SECOND OPINION.</b> If distinct children
+    /// <b>Which makes it the falsifier rather than a second opinion.</b> If distinct children
     /// are level or better HERE, then whatever they do on the multiplexer is not about
     /// covering a parent's territory, and a grid winning on both worlds is evidence against
     /// the account rather than for the mechanism.
     /// </para>
     /// <para>
-    /// <b>AND IT ASKS FOR TEN SEEDS BECAUSE THE LAST FALSIFIER RUN HERE COULD NOT SPEAK.</b>
+    /// <b>And it asks for ten seeds because the last falsifier run here could not speak.</b>
     /// A two-code step read 0.755 against 0.702 with a spread of 0.053, which carries nothing
     /// either way — and reporting a direction off a grid that wide is how a noisy reading
     /// becomes a finding.
@@ -140,7 +140,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     {
         output.WriteLine("arm        | unseen accuracy | spread | sound | unsound | residents");
 
-        // AND THE BUDGET COMES WITH IT, BECAUSE THE TWO CANNOT BE CHOSEN APART. Distinct
+        // And the budget comes with it, because the two cannot be chosen apart. Distinct
         // forking at the shipped budget floods this world to its capacity and is five
         // standard errors down; on the multiplexer the same pair has an interior optimum
         // around four to eight, where it beats the shipped rule on coverage AND accuracy. So
@@ -148,7 +148,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         // is also damage is a different question that this grid can answer in one more row.
         foreach (var (arm, forking, budget) in new (string Arm, Forking Forking, int? Budget)[]
         {
-            // PINNED AT WHAT THESE TWO WERE TAKEN UNDER, because the comparison below moved
+            // Pinned at what these two were taken under, because the comparison below moved
             // the default and an unpinned fixture would re-take them at the new one under the
             // old rows' names -- this repo's own trap, made live by this very grid.
             ("repeated", Forking.Repeated, 256),
@@ -157,7 +157,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
             ("distinct 4", Forking.Distinct, 4),
         })
         {
-            // SHIPPED DIALS AND ONE THING MOVED, which is this repo's rule about measuring a
+            // Shipped dials and one thing moved, which is this repo's rule about measuring a
             // mechanism ON from a known baseline rather than OFF from all-on.
             var dials = new CommittingSettings { Forking = forking };
 
@@ -178,27 +178,27 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHETHER SHORTENING A SCOPE IS DAMAGE WHERE THE TRUTHS ARE ALREADY ONE CODE — the
+    /// <b>Whether shortening a scope is damage where the truths are already one code — the
     /// ship gate, and it is the mirror of the grid above.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THIS WORLD IS WHERE AN OPERATOR THAT UNDOES REPAIR SHOULD DO BEST, AND ALSO WHERE
-    /// IT COULD DO THE MOST HARM.</b> Its truths are one code, this doc already carries the
+    /// <b>This world is where an operator that undoes repair should do best, and also where
+    /// it could do the most harm.</b> Its truths are one code, this doc already carries the
     /// row that any repair here is damage, and a handful of one-code rules hold the whole
     /// withheld set. So generalisation is either the correction that world has been asking
     /// for, or it deletes the only rules that were working — and both are large effects
     /// rather than a wash.
     /// </para>
     /// <para>
-    /// <b>AND IT IS THE UNSEEN SET THAT DECIDES, WHICH IS WHY THE GATE IS HERE AND NOT ON
-    /// THE MULTIPLEXER.</b> A generated world has no withheld half, so nothing there can
+    /// <b>And it is the unseen set that decides, which is why the gate is here and not on
+    /// the multiplexer.</b> A generated world has no withheld half, so nothing there can
     /// distinguish a rule that reaches further from a rule that has memorised more. This is
     /// the only bench with the instrument, and shortening a scope is exactly the change
     /// where those two come apart.
     /// </para>
     /// <para>
-    /// <b>TEN SEEDS, FOR THE SAME REASON THE GRID ABOVE ASKS FOR THEM.</b> The last
+    /// <b>Ten seeds, for the same reason the grid above asks for them.</b> The last
     /// falsifier run on this world read 0.755 against 0.702 with a spread of 0.053 and
     /// carried nothing either way; a ship gate that cannot speak is not a gate.
     /// </para>
@@ -211,7 +211,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
 
         foreach (var widening in new[] { Widening.Never, Widening.Unmissed, Widening.Shared })
         {
-            // THE SEARCH PAIR PINNED RATHER THAN INHERITED, and the grid above is why. Both
+            // The search pair pinned rather than inherited, and the grid above is why. Both
             // of these moved while fixtures that named neither were re-taken silently under
             // their own rows' names, so a grid about a THIRD operator states them.
             var dials = new CommittingSettings
@@ -281,18 +281,18 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_the_vote_costs_when_the_population_already_knows_which_rules_are_true()
     {
-        // THE ONE ARM WITH A CLEAN TARGET, SWEPT ON THE ONE DIAL THE PLAN NAMED. Tiled
+        // The one arm with a clean target, swept on the one dial the plan named. Tiled
         // under `AnyFailure` holds every sound single-code rule on every seed, the
         // front end loses nothing a linear probe can find, and the language covers the
         // whole world at depth one. Everything is in place and it scores 0.800.
         //
-        // AND THE POPULATION IS NOT CONFUSED ABOUT WHICH RULES ARE TRUE -- it believes
+        // And the population is not confused about which rules are true -- it believes
         // the sound ones 1.000 and the unsound ones 0.522. So a crowd of rules that
         // LOOK worse is outvoting a handful that look perfect, which is what raising
         // accuracy to a power exists to stop, and five is evidently not enough of it:
         // 0.522^5 is 0.039, and a few dozen of those agreeing beat one weight of 1.
         //
-        // SO THIS IS A PREDICTION WITH A NUMBER ON IT. If the vote is the gap, the
+        // So this is a prediction with a number on it. If the vote is the gap, the
         // score climbs toward 1.000 as the power rises. If it does not, the gap is
         // somewhere nobody has looked yet and this rules out the obvious place.
         var could = new ArrangedRun(
@@ -303,7 +303,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
             $"target {could.CoversUnseen:F3} on the unseen, from {could.Alone.Length} "
             + $"codes sound alone, {could.Least} of them enough");
 
-        // AND THE QUESTION IS SETTLED RATHER THAN SWEPT NOW. This crossed a summed vote at
+        // And the question is settled rather than swept now. This crossed a summed vote at
         // five powers against the scale-free one, to ask whether the peak moves with the
         // world. Both the sum and the power are deleted -- the sum led on no world of ten --
         // so what is left is one cell, and it is the cell that used to be the answer.
@@ -329,18 +329,18 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void And_the_other_half_of_the_decoupling_where_the_target_is_known()
     {
-        // THE SIDE OF THE PREDICTION THAT MUST NOT MOVE. Repair on this world is not
+        // The side of the prediction that must not move. Repair on this world is not
         // the constraint -- the rules that solve it are one code each and genesis mints
         // them directly -- so letting repair run on more rounds should change nothing
         // and the score should stay at the target. If it FALLS, the extra gate was
         // holding back damage rather than search, and the whole argument inverts.
-        // AND THE OCCASION COUNT IS REPORTED BESIDE THE SCORE BECAUSE OF WHAT IT
-        // SETTLED HERE. A third subsumption rule weighing a child's advantage against
+        // And the occasion count is reported beside the score because of what it
+        // settled here. A third subsumption rule weighing a child's advantage against
         // the DISTINCT moments it stands on -- built to delete children that had
         // memorised a corner of the drawn bag -- deleted an ordinary share of them and
         // reached the identical withheld score on all five seeds. What sinks this cell
         // is not children standing on one repeated scene.
-        // THE THREE CELLS THIS GRID WAS TAKEN OVER, AS THE PAIRS THEY TURNED OUT TO BE.
+        // The three cells this grid was taken over, as the pairs they turned out to be.
         // `Mending` was one setting deciding a gate and a timing at once; the arms here are
         // unchanged, and `Fixture.Repairs` is what keeps that true across the four files
         // that sweep them.
@@ -376,21 +376,21 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_the_gap_is_a_fact_about_the_learner_or_about_how_much_it_was_shown()
     {
-        // THREE INSTRUMENTS HAVE NOW SAID THE SAME THING AND NONE OF THEM SAID WHOSE
-        // FAULT IT IS. The children that cost this world a quarter of its score are not
+        // Three instruments have now said the same thing and none of them said whose
+        // fault it is. The children that cost this world a quarter of its score are not
         // memorised, the population is not what is read, and handing every seat back to
         // a general rule changes not one answer -- because those deciders ARE
         // significantly better on what they were shown. A rule true of the drawn
         // arrangements and false of the withheld ones has a perfect observed record, and
         // no statistic over drawn data can see it.
         //
-        // WHICH MAKES THE NEXT QUESTION ABOUT THE EXAM RATHER THAN THE MACHINE. `Hold`
+        // Which makes the next question about the exam rather than the machine. `Hold`
         // withholds every nth arrangement, so a LARGER value draws more of the world. If
         // the gap is what the drawn set cannot distinguish, it closes as this rises. If
         // it does not, the deciders are wrong for a reason coverage does not touch, and
         // that rules out the last explanation this session has left.
         //
-        // NOT COMPARABLE CELL TO CELL, AND SAYING SO IS THE POINT. Each value withholds a
+        // Not comparable cell to cell, and saying so is the point. Each value withholds a
         // different set, so these are different exams -- what is readable is the
         // DIRECTION and whether the drawn score moves with it.
         foreach (var hold in new[] { 2, 4, 8, 16 })
@@ -424,15 +424,15 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_the_gate_that_was_load_bearing_on_photographs_is_one_here()
     {
-        // ONE SEED IS NOT A COMPARISON AND WILL HAPPILY INVERT, which this repo has
+        // One seed is not a comparison and will happily invert, which this repo has
         // already paid for once -- winnowing beat bands on seed one and lost over five.
         // The single-seed reading says `Unaccounted` starves genesis on this world,
         // which is the OPPOSITE of what five seeds said on CIFAR, so it gets error bars
         // before it gets written down as anything.
         foreach (var looking in new[] { Looking.Whole, Looking.Tiled })
         {
-            // HOISTED, BECAUSE THE CEILING IS A FACT ABOUT THE WORLD AND THE FRONT END
-            // AND NEITHER MOVES WITH THE SEED. Recomputing it per run would spend most
+            // Hoisted, because the ceiling is a fact about the world and the front end
+            // and neither moves with the seed. Recomputing it per run would spend most
             // of the grid's time confirming the same number twenty times.
             var could = new ArrangedRun(
                 Small, new Brain(new CommittingSettings(), seed: 1), looking, seed: 1)

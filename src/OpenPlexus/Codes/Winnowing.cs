@@ -5,13 +5,13 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>SO THE FRONT END BECOMES AN ARM RATHER THAN A REWRITE.</b> Banding and
+/// <b>So the front end becomes an arm rather than a rewrite.</b> Banding and
 /// winnowing are two answers to the same question — how a number becomes symbols —
 /// and a comparison between them is only honest if swapping one for the other changes
 /// nothing else at all.
 /// </para>
 /// <para>
-/// <b>A READING BELOW ABOUT TEN DIMENSIONS HAS TOO FEW DISTINCT WIRINGS to expand
+/// <b>A reading below about ten dimensions has too few distinct wirings to expand
 /// into.</b> Six numbers sampled six at a time have exactly one, so every cell would
 /// fire identically and the tag would separate nothing — <see cref="Sheet"/> caps the
 /// sheet at what actually exists rather than producing that quietly.
@@ -51,7 +51,7 @@ public sealed class Winnowing : IQuantizer<IReadOnlyList<double>>
 
     /// <summary>How many distinct things this front end has said.</summary>
     /// <remarks>
-    /// <b>PASSED THROUGH BECAUSE THE COLLAPSE IS INVISIBLE FROM THE OTHER SIDE.</b> A
+    /// <b>Passed through because the collapse is invisible from the other side.</b> A
     /// front end emitting one tag for every reading in the world looks, to whatever
     /// consumes it, exactly like a world with one thing in it — and the constructor's
     /// guard reads the DECLARED width, which real data routinely overstates. Reaching
@@ -69,7 +69,7 @@ public sealed class Winnowing : IQuantizer<IReadOnlyList<double>>
     /// <summary>How wide a sheet a reading of this many dimensions can support.</summary>
     /// <param name="width">How many dimensions are read.</param>
     /// <remarks>
-    /// <b>DERIVED, BECAUSE A FIXED GEOMETRY IS DEGENERATE ON A NARROW READING.</b> The
+    /// <b>Derived, because a fixed geometry is degenerate on a narrow reading.</b> The
     /// fly projects fifty receptors into two thousand cells; the ratio is what
     /// preserves similarity on little data, and it needs dimensions to project FROM.
     /// A narrow world simply gets a small sheet, which is the honest answer.

@@ -7,7 +7,7 @@ namespace OpenPlexus.Bus;
 /// Under continuous input there are always several in flight, so this is not optional.
 /// </para>
 /// <para>
-/// <b>IT LIVES WITH THE BUS AND NOT WITH A LEARNER, WHICH IS WHERE IT WAS.</b> It was
+/// <b>It lives with the bus and not with a learner, which is where it was.</b> It was
 /// written for the walk and sat in <c>Thinking</c>, and by the time anybody looked the
 /// commitment fleet depended on it across five files — <see cref="Ask"/>,
 /// <see cref="IBus"/>, <see cref="HybridBus"/>, <see cref="Posted"/> and

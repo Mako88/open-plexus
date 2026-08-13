@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Codes;
+using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 
 namespace OpenPlexus.Tests;
@@ -42,8 +42,8 @@ public sealed class PopulationTests
     [Fact]
     public void The_condition_added_is_the_one_the_hits_had()
     {
-        // THE OPPOSITE OF WHAT IS EASY TO SAY, AND THE PLAN SAID IT THE WRONG WAY
-        // ROUND. A conjunctive child `X and Z` keeps the firings where Z was there,
+        // The opposite of what is easy to say, and the plan said it the wrong way
+        // round. A conjunctive child `X and Z` keeps the firings where Z was there,
         // so Z has to be what the HITS had -- a code that is more present in the
         // misses is the right condition for a NEGATED one, which is rung two and is
         // not built. Backwards, this mints a child that is reliably wrong.
@@ -53,7 +53,7 @@ public sealed class PopulationTests
 
         Assert.Equal(Of(7), Repair.Discriminator(separating, dials, null));
 
-        // AND THE OTHER WAY ROUND IT REFUSES, rather than quietly adding the code
+        // And the other way round it refuses, rather than quietly adding the code
         // that selects the failures.
         var inverted = Drilled(hits: 200, misses: 200, marker: 7, inHits: 0.1, inMisses: 0.9);
 
@@ -63,7 +63,7 @@ public sealed class PopulationTests
     [Fact]
     public void Nothing_is_repaired_before_there_is_enough_to_test()
     {
-        // BELOW THE FLOOR NO TEST OF A PROPORTION HAS ANY POWER, so a gate that
+        // Below the floor no test of a proportion has any power, so a gate that
         // admitted repairs there would be admitting them on nothing.
         var dials = new CommittingSettings();
 
@@ -80,7 +80,7 @@ public sealed class PopulationTests
     [Fact]
     public void Searching_more_candidates_costs_more_to_clear_the_bar()
     {
-        // THE CORRECTION IS THE PART THAT MATTERS. Testing four hundred candidates
+        // The correction is the part that matters. Testing four hundred candidates
         // and keeping the best clears any fixed bar on noise alone -- this is the
         // 715-names failure, and without the correction it arrives here.
         var dials = new CommittingSettings();
@@ -88,7 +88,7 @@ public sealed class PopulationTests
         var noise = new Random(1);
         var one = One(1, 1);
 
-        // EVERY MARKER IS INDEPENDENT OF THE OUTCOME, so nothing here separates
+        // Every marker is independent of the outcome, so nothing here separates
         // anything and the honest answer is to refuse.
         for (var settle = 0; settle < 400; settle++)
         {
@@ -102,7 +102,7 @@ public sealed class PopulationTests
 
         Assert.Null(Repair.Discriminator(one, dials, null));
 
-        // AND WITHOUT THE CORRECTION IT WOULD NOT REFUSE, which is what makes the
+        // And without the correction it would not refuse, which is what makes the
         // check above worth having rather than a description of a quiet world.
         var strongest = one.Separations
             .Max(seen => Repair.Divergence(
@@ -135,7 +135,7 @@ public sealed class PopulationTests
     [Fact]
     public void The_tail_and_the_divergence_are_the_statistics_they_claim_to_be()
     {
-        // A BAR NOBODY CAN CHECK IS A BAR NOBODY CAN ARGUE ABOUT.
+        // A bar nobody can check is a bar nobody can argue about.
         Assert.Equal(0.5, Normal.Tail(0.0), 6);
         Assert.Equal(0.15865525, Normal.Tail(1.0), 6);
         Assert.Equal(0.02275013, Normal.Tail(2.0), 6);
@@ -143,12 +143,12 @@ public sealed class PopulationTests
 
         Assert.Equal(1.0, Normal.Erfc(0.0), 6);
 
-        // POSITIVE WHEN THE HITS LEAD, which is the direction repair depends on.
+        // positive when the hits lead, which is the direction repair depends on.
         Assert.True(Repair.Divergence(90, 100, 10, 100) > 0);
         Assert.True(Repair.Divergence(10, 100, 90, 100) < 0);
         Assert.Equal(0.0, Repair.Divergence(50, 100, 50, 100), 6);
 
-        // AND NOTHING TO SAY WHERE THERE IS NOTHING TO SAY IT FROM.
+        // And nothing to say where there is nothing to say it from.
         Assert.Equal(0.0, Repair.Divergence(0, 0, 5, 10));
     }
 
@@ -157,7 +157,7 @@ public sealed class PopulationTests
     [Fact]
     public void Many_mediocre_commitments_do_not_outvote_one_accurate_one()
     {
-        // THE STRENGTH-VERSUS-ACCURACY REFUTATION ARRIVES THROUGH THE VOTE, which is
+        // The strength-versus-accuracy refutation arrives through the vote, which is
         // where nobody looks for it: a plain sum lets three commitments that are
         // right half the time beat one that is always right, so the population's
         // COUNT decides and its accuracy does not.
@@ -182,7 +182,7 @@ public sealed class PopulationTests
         Assert.Equal(Says(1), vote.Expects);
         Assert.True(vote.Margin > 0);
 
-        // AND THE OLD SECOND HALF OF THIS CHECK IS GONE WITH THE DIAL IT TURNED. It ran the
+        // And the old second half of this check is gone with the dial it turned. It ran the
         // same population at a sharpness of one and asserted the crowd won, which was what
         // said the power was doing the work. The power was a workaround for a summed vote
         // and both are deleted -- a maximum cannot be outvoted by a count at any power, so
@@ -205,7 +205,7 @@ public sealed class PopulationTests
     [Fact]
     public void Where_a_general_is_as_good_the_specific_one_goes()
     {
-        // THE DIRECTION THAT IS EASY TO GET BACKWARDS, AND THE PLAN HAD IT BACKWARDS.
+        // The direction that is easy to get backwards, and the plan had it backwards.
         // If a scope and a narrower version of it are equally accurate, the narrower
         // says nothing extra, needs more evidence to say it, and covers fewer
         // moments -- so keeping it is how a population drifts toward one rule per
@@ -254,14 +254,14 @@ public sealed class PopulationTests
     [Fact]
     public void Neither_rule_can_see_that_a_child_has_only_ever_been_right_about_one_thing()
     {
-        // A LIMIT CARRIED RATHER THAN DISCOVERED LATER, and the measurement that made it
+        // A limit carried rather than discovered later, and the measurement that made it
         // worth carrying is a NEGATIVE. A child right four hundred times about one
         // moment has one observation, and both rules read it as four hundred: `Weaker`
         // keeps it because a hair of advantage saves it, `Insignificant` keeps it
         // because four hundred firings make that hair significant.
         //
-        // AND WEIGHING THE ADVANTAGE AGAINST THE OCCASIONS INSTEAD WAS BUILT AND
-        // REFUTED. It removes exactly this child, and on the world the whole story was
+        // And weighing the advantage against the occasions instead was built and
+        // refuted. It removes exactly this child, and on the world the whole story was
         // about it removed no more children than these two do and reached the same score
         // seed for seed -- so what sinks that world is not this. See the plan's revival
         // row before building it again.
@@ -318,7 +318,7 @@ public sealed class PopulationTests
         Assert.False(held.Holds(One(1, 1).Identity));
         Assert.True(held.Holds(One(1, 4).Identity));
 
-        // AND A CULLED COMMITMENT STOPS FIRING, or the index outlives the thing it
+        // And a culled commitment stops firing, or the index outlives the thing it
         // points at and a moment matches something nobody holds.
         Assert.Empty(held.Firing(Moment(1)));
     }
@@ -335,12 +335,12 @@ public sealed class PopulationTests
 
         Assert.All(held.All, one => Assert.Single(one.Scope));
 
-        // A DIFFERENT OUTCOME IS A DIFFERENT CLAIM, so the same moment mints again.
+        // A different outcome is a different claim, so the same moment mints again.
         Assert.Equal(3, held.Cover(Moment(1, 2, 3), Says(0), []));
     }
 
     /// <summary>
-    /// <b>A FAILURE THE POPULATION ALREADY HAD AN ACCOUNT OF IS NOT SURPRISING.</b>
+    /// <b>A failure the population already had an account of is not surprising.</b>
     /// </summary>
     /// <remarks>
     /// Something fired and proposed what arrived and was outvoted; that is a claim the
@@ -363,7 +363,7 @@ public sealed class PopulationTests
 
             Assert.Single(firing);
 
-            // THE VOTE SAID 1 AND 1 ARRIVED IS NOT A FAILURE AT ALL; what is being
+            // The vote said 1 and 1 arrived is not a failure at all; what is being
             // tested is the failure where something DID propose what arrived.
             var minted = held.Cover(moment, Says(1), firing);
 
@@ -372,7 +372,7 @@ public sealed class PopulationTests
             else
                 Assert.Equal(2, minted);
 
-            // AND NEITHER RULE IS SATISFIED BY AN OUTCOME NOBODY PROPOSED, or the gate
+            // And neither rule is satisfied by an outcome nobody proposed, or the gate
             // would be refusing genesis outright rather than refusing restatements.
             Assert.Equal(3, held.Cover(moment, Says(7), firing));
         }
@@ -385,14 +385,14 @@ public sealed class PopulationTests
     /// <param name="codes">The codes to establish as varying.</param>
     /// <remarks>
     /// <para>
-    /// <b>GENESIS WILL NOT ROOT ON A CODE THAT HAS NEVER BEEN ABSENT, so a population
+    /// <b>Genesis will not root on a code that has never been absent, so a population
     /// asked to cover before it has witnessed anything mints NOTHING.</b> That is the
     /// gate working rather than a fault — but a test calling <see cref="Population.Cover"/>
     /// straight out of the constructor is asking it to root on codes it has seen exactly
     /// once each, and it correctly declines.
     /// </para>
     /// <para>
-    /// <b>SO THE PRECONDITION IS ESTABLISHED RATHER THAN ASSUMED.</b> One moment holding
+    /// <b>So the precondition is established rather than assumed.</b> One moment holding
     /// the codes and one holding none of them is all it takes: after the second, every one
     /// of them has been absent, and every one is eligible.
     /// </para>

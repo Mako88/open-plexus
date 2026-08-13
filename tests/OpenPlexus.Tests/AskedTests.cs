@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using OpenPlexus.Bus;
 using OpenPlexus.Codes;
@@ -15,26 +15,26 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE ARITHMETIC HALF WAS CLOSED WITHOUT A WIRE AND SAID SO IN EVERY FILE.</b>
+/// <b>The arithmetic half was closed without a wire and said so in every file.</b>
 /// <c>SplitTests</c> proved the vote composes across holders and <c>SplitNamingTests</c>
 /// proved merged counts recover the whole population's name; both carry a note that nothing
 /// in them is late and nothing in them dies. This is where those two exchanges are put on
 /// real ports between machines that share no object.
 /// </para>
 /// <para>
-/// <b>AND IT IS STILL NOT A TEST OF C2, WHICH IS THE THING THAT WILL BE ASSUMED.</b> TCP
+/// <b>And it is still not a test of C2, which is the thing that will be assumed.</b> TCP
 /// does not reorder within a connection, so this exercises LESS adversity than
 /// <see cref="HybridBus"/> does. Green here says the bytes and the routing are right.
 /// </para>
 /// <para>
-/// <b>WHAT IS GENUINELY NEW HERE IS C3.</b> Nothing in one process can die, so
+/// <b>What is genuinely new here is C3.</b> Nothing in one process can die, so
 /// <c>Abstain</c> reads zero for the same reason a check reads zero when it cannot fire —
 /// an open defect in the plan since it was written. A holder whose machine has closed its
 /// door is a death that actually happened, and the last test in this file is the third
 /// outcome arriving.
 /// </para>
 /// <para>
-/// <b>WHAT IS NOT RE-PROVED IS THE MERGE ITSELF.</b> Counts compose by integer addition,
+/// <b>What is not re-proved is the merge itself.</b> Counts compose by integer addition,
 /// so lateness and reordering provably cannot change what they add up to, and the death
 /// threshold that costs rung five its name is measured over arrangements in
 /// <c>SplitNamingTests</c> where it can be swept cheaply. Repeating either here would be a
@@ -47,7 +47,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// Rounds, <b>and the five hundred past the last sweep are the point of the number.</b>
     /// </summary>
     /// <remarks>
-    /// <b>A RUN ENDING ON A SWEEP ROUND IS READ AT ITS MOST EXHAUSTED, and this file's whole
+    /// <b>A run ending on a sweep round is read at its most exhausted, and this file's whole
     /// subject is what a trained population would name NEXT.</b> At twenty thousand exactly,
     /// three seeds in eight have nothing left to say — so the assertions here stood on seed
     /// one happening to be one of the five that did, which is the single-seed ordering this
@@ -73,8 +73,8 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// <b>this file's precondition, and the shipped default is past it.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THE SAME NUMBER AND THE SAME REASON AS <c>SplitNamingTests</c>, WHICH IS WHY BOTH
-    /// SAY WHY RATHER THAN JUST SAYING 64.</b> These tests ask what the WIRE costs rung
+    /// <b>The same number and the same reason as <c>SplitNamingTests</c>, which is why both
+    /// say why rather than just saying 64.</b> These tests ask what the WIRE costs rung
     /// five, so they need shards too small to certify a redundancy unaided — otherwise a
     /// holder names something before any bytes move and the exchange is credited with
     /// nothing. That is a property of how much repair ran, not of the sockets.
@@ -86,7 +86,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// same precondition and was the part nobody wrote down.</b>
     /// </summary>
     /// <remarks>
-    /// <b>SEED ONE FELL OUT OF THE WINDOW WHEN THE VOTE RULE CHANGED.</b> Under
+    /// <b>Seed one fell out of the window when the vote rule changed.</b> Under
     /// <see cref="Repairing.AfterFailure"/> the vote decides what repair may run on, so a
     /// readout change is a search change and *whole names, no shard names alone* moved with
     /// it. Four seeds in twelve satisfy it at this budget and timing — 4, 8, 9 and 10 — so a
@@ -99,23 +99,23 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// <param name="address">Address bits.</param>
     /// <remarks>
     /// <para>
-    /// <b>THE TIMING IS PINNED HERE BECAUSE THIS FILE IS ABOUT THE WIRE AND NOT ABOUT THE
-    /// SEARCH.</b> What these tests need is a population with a sub-scope worth naming, so
+    /// <b>The timing is pinned here because this file is about the wire and not about the
+    /// search.</b> What these tests need is a population with a sub-scope worth naming, so
     /// that a shard failing to name it alone means something — and whether one exists is a
     /// property of the trained population, which every repair dial moves. Inheriting the
     /// default made a socket test depend on the search, and it went red the day the default
     /// changed with nothing wrong on either side of the wire.
     /// </para>
     /// <para>
-    /// <b>AND IT IS <see cref="Repairing.AfterFailure"/> RATHER THAN THE SHIPPED ONE FOR
-    /// THE REASON THE PRECONDITION EXISTS.</b> That timing holds the larger population at
+    /// <b>AND IT IS <see cref="Repairing.AfterFailure"/> rather than the shipped one for
+    /// the reason the precondition exists.</b> That timing holds the larger population at
     /// eleven bits, so it reliably has structure left over once the run's own naming has
     /// taken what it wants. The pin is a fixture choice and says nothing about which timing
     /// is better; <c>RepairingTests</c> is where that is measured, and it finds naming
     /// alive under both on every seed.
     /// </para>
     /// <para>
-    /// <b>AND THE PIN DID NOT REACH THE BUDGET, WHICH IS THE SAME FAULT ONE DIAL ALONG.</b>
+    /// <b>And the pin did not reach the budget, which is the same fault one dial along.</b>
     /// The paragraph above was written the day the timing changed and it names a class of
     /// mistake — <i>whether a nameable sub-scope survives is a property of the trained
     /// population, which every repair dial moves</i> — while pinning exactly one member of
@@ -131,7 +131,7 @@ public sealed class AskedTests(ITestOutputHelper output)
             Repairing = Repairing.AfterFailure,
             Budget = Sparse,
 
-            // AND THE FORKING RULE, WHICH IS THE THIRD SEARCH DIAL TO REACH A WIRE TEST.
+            // And the forking rule, which is the third search dial to reach a wire test.
             // This file's precondition is a population with something LEFT to name, and
             // every dial that changes what repair builds moves it -- which is why the
             // timing and the budget are already pinned here. `Forking.Distinct` gives a
@@ -153,7 +153,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// <param name="address">Address bits.</param>
     /// <param name="many">How many to draw.</param>
     /// <remarks>
-    /// <b>THROUGH <see cref="IWorld{TSeen}"/> RATHER THAN THE WORLD'S OWN CUES</b>, which
+    /// <b>THROUGH <see cref="IWorld{TSeen}"/> rather than the world's own cues</b>, which
     /// is the answer-key-in-the-wrong-alphabet trap wearing a different hat: reading
     /// <c>Multiplexer.Round</c> directly skips the quantiser and produces moments the
     /// population has never been asked in that alphabet.
@@ -176,7 +176,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     // ---- what crosses ------------------------------------------------------
 
     /// <summary>
-    /// <b>MERGED COUNTS CROSS REAL SOCKETS AND RECOVER THE WHOLE POPULATION'S NAME.</b>
+    /// <b>Merged counts cross real sockets and recover the whole population's name.</b>
     /// </summary>
     /// <remarks>
     /// The undistributed answer, reached by three machines that have never seen each
@@ -197,7 +197,7 @@ public sealed class AskedTests(ITestOutputHelper output)
 
         await using var fleet = await Ported.OpenAsync(Fixture.Sharded(all, Holders), dials);
 
-        // ALONE THEY NAME NOTHING, ASSERTED BEFORE THE EXCHANGE. If a shard could name
+        // Alone they name nothing, asserted before the exchange. If a shard could name
         // something by itself this world does not show the problem being fixed, and the
         // line below would be crediting the wire with something free.
         foreach (var held in fleet.Held) Assert.Equal(0, held.Abstract());
@@ -212,7 +212,7 @@ public sealed class AskedTests(ITestOutputHelper output)
 
         var merged = gathering.Merged();
 
-        // THE CHECK THAT ANYTHING CROSSED AT ALL. An empty table merges, names nothing and
+        // The check that anything crossed at all. An empty table merges, names nothing and
         // would fail the line below for a reason that has nothing to do with the wire --
         // and `Recurrence` wrote exactly that shape of nothing before it grew a projection.
         Assert.True(merged.Written().Rows.Length > 0, "the merged table is empty");
@@ -226,7 +226,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A VOTE TAKEN ACROSS THREE MACHINES IS THE VOTE ONE MACHINE WOULD HAVE TAKEN.</b>
+    /// <b>A vote taken across three machines is the vote one machine would have taken.</b>
     /// </summary>
     /// <remarks>
     /// Bit-identical and not within a tolerance, because under
@@ -240,7 +240,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     {
         var (dials, all) = Trained(Narrow);
 
-        // A FRESH WHOLE POPULATION RATHER THAN THE TRAINED ONE. The trained population
+        // A fresh whole population rather than the trained one. The trained population
         // carries whatever naming table the run minted and the shards are given none, so a
         // moment folded through it would fire differently for a reason that is not the
         // wire. Built the same way as the shards, it differs from them in nothing but who
@@ -278,7 +278,7 @@ public sealed class AskedTests(ITestOutputHelper output)
 
             compared++;
 
-            // WHETHER THE SPLIT WAS EVER LOAD-BEARING, WHICH THE EQUALITIES CANNOT SAY. A
+            // Whether the split was ever load-bearing, which the equalities cannot say. A
             // moment where one holder speaks is merged by every rule alike, so a file full
             // of those would assert nothing and pass.
             if (gathering.Spoke > 1) contested++;
@@ -296,7 +296,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     // ---- what a death costs ------------------------------------------------
 
     /// <summary>
-    /// <b>A HOLDER WHOSE MACHINE HAS GONE IS SILENCE, AND THE ASKER CAN SEE IT.</b>
+    /// <b>A holder whose machine has gone is silence, and the asker can see it.</b>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -306,15 +306,15 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// everyone, which <see cref="Population.Decide"/> deliberately cannot tell.
     /// </para>
     /// <para>
-    /// <b>AND NOTHING WAITS ON A CLOCK FOR IT.</b> The dead holder never times out; the ask
+    /// <b>And nothing waits on a clock for it.</b> The dead holder never times out; the ask
     /// is watched failing to leave, which writes it off exactly, and the answer is whatever
     /// the survivors said. A build that awaited its holders would have decided this by the
     /// client's timeout, which is <i>a miss decided by a deadline</i> and carries a revival
     /// row saying never.
     /// </para>
     /// <para>
-    /// <b>AND THIS FILE POLLS FOR THE COUNT RATHER THAN AWAITING THE GATHERING, WHICH IS
-    /// LEFT AS IT WAS ON PURPOSE.</b> The poll was the only shape available before fork 53
+    /// <b>And this file polls for the count rather than awaiting the gathering, which is
+    /// left as it was on purpose.</b> The poll was the only shape available before fork 53
     /// and it asserts the numerator and the denominator, which is what this test is about;
     /// that the round now FINISHES is a different claim and <c>UnreachedTests</c> is where it
     /// is made, against a gathering that would hang if the write-off were removed.
@@ -329,7 +329,7 @@ public sealed class AskedTests(ITestOutputHelper output)
 
         await using var fleet = await Ported.OpenAsync(Fixture.Sharded(all, Holders), dials);
 
-        // WHAT EACH HOLDER HAD ANSWERED BEFORE THE DEATH -- one apiece, from the warm-up
+        // What each holder had answered before the death -- one apiece, from the warm-up
         // ask that `Ported` throws away.
         var before = fleet.Holders.Select(one => one.Answered).ToList();
 
@@ -337,7 +337,7 @@ public sealed class AskedTests(ITestOutputHelper output)
 
         using var gathering = await fleet.Asker.AskAsync(Wanted.Counts);
 
-        // STILL ASKED, WHICH IS THE POINT. A holder leaving is silent on this bus by
+        // Still asked, which is the point. A holder leaving is silent on this bus by
         // design -- a machine that crashed could not have sent a death notice, so a design
         // needing one would work only for the departures that were polite.
         Assert.Equal(Holders, gathering.Asked);
@@ -348,7 +348,7 @@ public sealed class AskedTests(ITestOutputHelper output)
 
         Assert.False(gathering.Whole);
 
-        // AND THE SILENCE IS AT THE DEAD END RATHER THAN ON THE RETURN PATH, which the
+        // And the silence is at the dead end rather than on the return path, which the
         // count above cannot say. A holder that answered and whose answer was lost and a
         // holder that never heard the ask look identical from the asker, and they are
         // completely different faults -- one is the wire and one is C3.
@@ -364,7 +364,7 @@ public sealed class AskedTests(ITestOutputHelper output)
             + $"scopes merged | survivors name "
             + $"{(over is { } one ? Naming.Name(one).Value.ToString(CultureInfo.InvariantCulture) : "nothing")}");
 
-        // NO BAR ON WHAT THE SURVIVORS NAME, and the reason is a measurement rather than
+        // No bar on what the survivors name, and the reason is a measurement rather than
         // caution. `SplitNamingTests` swept this over every arrangement of deaths and
         // found that past about a quarter of holders gone the merge proposes a name the
         // whole population would not -- so a bar here would be asserting either that a
@@ -374,7 +374,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A DEATH TAKING THE LAST ADVOCATE SILENCES THE VOTE, WHICH IS `Abstain` ARMED.</b>
+    /// <b>A death taking the last advocate silences the vote, which is `Abstain` ARMED.</b>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -385,16 +385,16 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// advocates.
     /// </para>
     /// <para>
-    /// <b>SO THE MOMENT IS CHOSEN RATHER THAN DRAWN, AND THAT IS THE ONLY WAY TO REACH
-    /// IT.</b> What is needed is a moment whose advocates all sit on machines that then
+    /// <b>So the moment is chosen rather than drawn, and that is the only way to reach
+    /// it.</b> What is needed is a moment whose advocates all sit on machines that then
     /// die. Waiting for one to turn up by chance is waiting on a coincidence; finding the
     /// scarcest one by asking the shards locally and then killing exactly those holders is
     /// the same event, arranged. C4 permits it explicitly — the constraint is on the
     /// LEARNER, and nothing the machine does depends on what was read here.
     /// </para>
     /// <para>
-    /// <b>AND IT TAKES MORE THAN ONE DEATH, WHICH IS THE PLAN BEING RIGHT RATHER THAN THIS
-    /// TEST BEING WEAK.</b> The first version of this looked for a moment whose every
+    /// <b>And it takes more than one death, which is the plan being right rather than this
+    /// test being weak.</b> The first version of this looked for a moment whose every
     /// advocate sat on ONE machine and found none in four hundred draws: at this width the
     /// population is dense enough that something always advocates from somewhere else,
     /// which is exactly why splitting the vote did not arm the third outcome. How many
@@ -406,7 +406,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     {
         var (dials, all) = Trained(Narrow);
 
-        // TWELVE, SO KILLING EVERY ADVOCATE STILL LEAVES A CROWD ANSWERING. The point is
+        // Twelve, so killing every advocate still leaves a crowd answering. The point is
         // not that a fleet went quiet -- that would be reachable by unplugging everything
         // -- it is that holders answered, in numbers, and none of them had anything to say.
         const int Holders = 12;
@@ -429,7 +429,7 @@ public sealed class AskedTests(ITestOutputHelper output)
                 .Where(at => !speakers[at].Speak(speakers[at].Firing(moment)).Silent)
                 .ToList();
 
-            // A MOMENT NOTHING FIRES ON IS SILENCE WITHOUT A DEATH, and it would pass every
+            // A moment nothing fires on is silence without a death, and it would pass every
             // assertion below while showing nothing at all. What is wanted is a vote that
             // had an answer and stopped having one.
             if (speaking.Count == 0) continue;
@@ -492,7 +492,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     // ---- what distance costs -----------------------------------------------
 
     /// <summary>
-    /// <b>WHAT A ROUND OF ASKS COSTS ON A REAL WIRE — fork 56, measured rather than
+    /// <b>What a round of asks costs on a real wire — fork 56, measured rather than
     /// priced.</b>
     /// </summary>
     /// <remarks>
@@ -503,8 +503,8 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// own delay and the internet adds a great deal more.
     /// </para>
     /// <para>
-    /// <b>NO BAR, BECAUSE A DURATION IS NOT REPRODUCIBLE AND A THRESHOLD ON ONE FAILS THE
-    /// BUILD ON A BUSY MACHINE.</b> This project already has a line about a wall clock
+    /// <b>No bar, because a duration is not reproducible and a threshold on one fails the
+    /// build on a busy machine.</b> This project already has a line about a wall clock
     /// turning reproducibility red. The number is the finding; the only assertion is that
     /// the instrument had something to measure.
     /// </para>
@@ -545,7 +545,7 @@ public sealed class AskedTests(ITestOutputHelper output)
             Assert.Equal(moments.Count, asks);
         }
 
-        // AND THE SHAPE OF THE NUMBER IS THE FINDING RATHER THAN ITS SIZE. If nine holders
+        // And the shape of the number is the finding rather than its size. If nine holders
         // cost about what one holder costs, the fan-out is genuinely in flight at once and
         // the depth is one round trip; if it grows with the count, the scatter is a queue
         // wearing a broadcast's name -- which is what `BroadcastAsync` does today on the

@@ -9,7 +9,7 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>FROZEN IS WHAT MAKES IT LEGAL HERE.</b> The red-ball property says two machines
+/// <b>Frozen is what makes it legal here.</b> The red-ball property says two machines
 /// must agree about what they are looking at without speaking, and a published file of
 /// constants satisfies it exactly as <see cref="Winnow"/>'s arithmetic-derived wiring
 /// does: same file, same numbers, every machine, forever. An encoder that adapted
@@ -17,7 +17,7 @@ namespace OpenPlexus.Codes;
 /// forbids outright.
 /// </para>
 /// <para>
-/// <b>AND IT MAY SAY WHAT IT IS LOOKING AT AND NEVER WHAT TO CONCLUDE.</b> A vector of
+/// <b>And it may say what it is looking at and never what to conclude.</b> A vector of
 /// class scores is a conclusion. CLIP's vision tower emits an embedding by
 /// construction; MobileNet's published export ends at a 1000-way classifier and
 /// <c>fetch.sh</c> cuts the graph one <c>Gemm</c> early for exactly this reason.
@@ -35,8 +35,8 @@ public sealed record Encoder
     /// What the graph calls the output to read, or nothing where it has only one.
     /// </summary>
     /// <remarks>
-    /// <b>NAMED RATHER THAN INDEXED, BECAUSE TAKING OUTPUT ZERO IS A SILENT WRONG
-    /// ANSWER.</b> A vision tower that emits both a pooled embedding and a per-token
+    /// <b>Named rather than indexed, because taking output zero is a silent wrong
+    /// answer.</b> A vision tower that emits both a pooled embedding and a per-token
     /// hidden state offers a 512-wide reading and a 38,400-wide one, and the second is
     /// a perfectly plausible-looking tensor that would be coded, learnt from, and
     /// scored. Where a graph has exactly one output there is nothing to get wrong and
@@ -96,21 +96,21 @@ public sealed record Encoder
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE ENCODER IS A TRANSLATION AND NOT A WORLD DIAL, WHICH IS THE PLAN'S OWN
-/// RULE.</b> <i>The translation is a third thing and belongs at the join</i> — whether
+/// <b>The encoder is a translation and not a world dial, which is the plan's own
+/// rule.</b> <i>The translation is a third thing and belongs at the join</i> — whether
 /// a reading is banded, winnowed, or pushed through somebody's frozen weights first is
 /// neither a fact about the problem nor a setting on the brain. So the world goes on
 /// shipping photons, the brain goes on taking codes, and this sits between them as a
 /// third arm rather than a rewrite of either.
 /// </para>
 /// <para>
-/// <b>IT WRAPS A QUANTISER RATHER THAN REPLACING ONE.</b> An embedding is still a
+/// <b>It wraps a quantiser rather than replacing one.</b> An embedding is still a
 /// reading — 512 or 1024 numbers instead of 3,072 — and something still has to turn
 /// numbers into codes. Composing means the encoder arm and the raw arm differ in
 /// exactly one place, which is the only way the comparison says anything.
 /// </para>
 /// <para>
-/// <b>AND ON ITS OWN IT CANNOT ANSWER THE QUESTION IT IS FOR.</b> The open defect asks
+/// <b>And on its own it cannot answer the question it is for.</b> The open defect asks
 /// whether the ceiling is the front end or the learner behind it. A score here is two
 /// unknowns multiplied; it needs <see cref="Machines.Probe"/> over the SAME embeddings
 /// as the other column, or the number is unanchored — a published 95% was measured
@@ -139,7 +139,7 @@ public sealed class Encoded : IQuantizer<IReadOnlyList<double>>, IDisposable
     /// <param name="width">How many numbers a reading has, three planes together.</param>
     /// <exception cref="FileNotFoundException">The encoder was not fetched.</exception>
     /// <remarks>
-    /// <b>THE INNER FRONT END IS BUILT FROM A WIDTH THE GRAPH IS ASKED FOR, never one
+    /// <b>The inner front end is built from a width the graph is asked for, never one
     /// written down here.</b> CLIP emits 512 and the headless MobileNet 1024, and a
     /// constant would be a number that silently disagrees with whatever
     /// <c>fetch.sh</c> last pulled — which is the aliasing failure again, one layer up.
@@ -165,7 +165,7 @@ public sealed class Encoded : IQuantizer<IReadOnlyList<double>>, IDisposable
         _encoder = encoder;
         _width = width;
 
-        // ONE THREAD, BECAUSE A RUN HAS TO REPRODUCE. Intra-op parallelism reorders
+        // One thread, because a run has to reproduce. Intra-op parallelism reorders
         // floating-point reductions, so the same image encodes to slightly different
         // numbers run to run -- and a code is a QUANTISED number, so a reading either
         // side of a band boundary would emit different codes. Fork 12 has cost this
@@ -214,7 +214,7 @@ public sealed class Encoded : IQuantizer<IReadOnlyList<double>>, IDisposable
     /// </summary>
     /// <param name="observation">One reading, three colour planes together.</param>
     /// <remarks>
-    /// <b>WHAT THE CONTROL ARM NEEDS, AND IT HAS TO BE THE SAME NUMBERS.</b>
+    /// <b>What the control arm needs, and it has to be the same numbers.</b>
     /// <see cref="Machines.Probe"/> is only a yardstick if it reads exactly what the
     /// commitment population reads; an embedding computed down a second path could
     /// differ by a bug rather than by the learner, and the whole comparison would be
@@ -240,15 +240,15 @@ public sealed class Encoded : IQuantizer<IReadOnlyList<double>>, IDisposable
     /// <exception cref="ArgumentOutOfRangeException">A reading is the wrong width.</exception>
     /// <remarks>
     /// <para>
-    /// <b>THE SLOWEST TEST IN THE SUITE WAS ONE ENCODER LOOP, AND IT WAS THIRTEEN PER
-    /// CENT OF EVERYTHING.</b> Measured: 209 seconds putting two thousand CIFAR images
+    /// <b>The slowest test in the suite was one encoder loop, and it was thirteen per
+    /// cent of everything.</b> Measured: 209 seconds putting two thousand CIFAR images
     /// through CLIP, against 21 for the probe that reads them and 3 milliseconds for the
     /// world that draws them. Nothing about it was subtle — an image at a time, on one
     /// core, on a machine with eight.
     /// </para>
     /// <para>
-    /// <b>AND IT IS A DIFFERENT PARALLELISM FROM THE ONE FORK 12 FORBIDS, WHICH IS THE
-    /// WHOLE ARGUMENT FOR IT.</b> The session stays pinned to one thread and sequential,
+    /// <b>And it is a different parallelism from the one fork 12 forbids, which is the
+    /// whole argument for it.</b> The session stays pinned to one thread and sequential,
     /// so no reduction inside an image is ever re-associated and no reading lands on the
     /// other side of a band boundary. What runs at once is WHOLE IMAGES, which are
     /// independent of one another by construction, written to their own slots and read
@@ -256,8 +256,8 @@ public sealed class Encoded : IQuantizer<IReadOnlyList<double>>, IDisposable
     /// is what holds that claim down, and it already ran two sessions to do it.
     /// </para>
     /// <para>
-    /// <b>ONE SESSION SHARED RATHER THAN ONE PER THREAD, BECAUSE THE WEIGHTS ARE THE
-    /// MEMORY.</b> CLIP's graph is 336 MB and a session per core would be most of a CI
+    /// <b>One session shared rather than one per thread, because the weights are the
+    /// memory.</b> CLIP's graph is 336 MB and a session per core would be most of a CI
     /// runner's budget spent on eight copies of the same constants — the memory fault
     /// this project has already had once, arriving by a road that looks like a speed-up.
     /// <c>Run</c> is re-entrant and <see cref="Embed"/> holds nothing between calls.
@@ -281,14 +281,14 @@ public sealed class Encoded : IQuantizer<IReadOnlyList<double>>, IDisposable
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A MEMO OVER A PURE FUNCTION CANNOT CHANGE WHAT FIRES, which is the one thing
+    /// <b>A memo over a pure function cannot change what fires, which is the one thing
     /// it has to be able to say.</b> The graph is frozen and single-threaded, so the
     /// same reading yields the same numbers whether they were computed now or an hour
     /// ago. Fork 31 asks the same question of the separation table's spill, and the
     /// answer there is harder precisely because that one is not a pure function.
     /// </para>
     /// <para>
-    /// <b>AND IT IS THE DIFFERENCE BETWEEN A RUN AND AN AFTERNOON.</b> A world draws
+    /// <b>And it is the difference between a run and an afternoon.</b> A world draws
     /// with replacement from a finite bag, so twenty thousand rounds over twelve
     /// thousand images re-encodes each one nearly twice; at CLIP's 46 ms that is
     /// fifteen minutes of arithmetic already done.
@@ -300,7 +300,7 @@ public sealed class Encoded : IQuantizer<IReadOnlyList<double>>, IDisposable
     /// carried for the life of the repo.
     /// </para>
     /// <para>
-    /// <b>THE TABLE IS LOCKED AND THE GRAPH IS NOT, WHICH IS THE ONLY REASON
+    /// <b>The table is locked and the graph is not, which is the only reason
     /// <see cref="OfAll"/> IS ALLOWED TO EXIST.</b> A <see cref="Dictionary{TKey,TValue}"/>
     /// written from two threads corrupts silently rather than throwing, so it would be
     /// the wrong picture's embedding coming back — the aliasing fault again, by yet
@@ -341,8 +341,8 @@ public sealed class Encoded : IQuantizer<IReadOnlyList<double>>, IDisposable
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>RESIZED STRAIGHT TO THE GRAPH'S SIDE RATHER THAN THROUGH THE PUBLISHED
-    /// SHORTEST-EDGE-THEN-CROP, and that is a deviation said out loud.</b> The
+    /// <b>Resized straight to the graph's side rather than through the published
+    /// shortest-edge-then-crop, and that is a deviation said out loud.</b> The
     /// published pipelines resize the short edge to 224 or 256 and centre-crop, which
     /// on a square 32-pixel source throws away an eighth of the picture at the border
     /// for no gain — the source is already square and already tiny. Every CIFAR linear
@@ -386,7 +386,7 @@ public sealed class Encoded : IQuantizer<IReadOnlyList<double>>, IDisposable
     private static double Bilinear(
         IReadOnlyList<double> reading, int plane, int from, int to, int down, int across)
     {
-        // THE HALF-PIXEL CENTRES ARE NOT DECORATION. Mapping corner to corner instead
+        // The half-pixel centres are not decoration. Mapping corner to corner instead
         // shifts the whole picture by half a source pixel, which on a 32-pixel source
         // stretched sevenfold is a visible translation -- and a front end that sees a
         // shifted picture is measuring something nobody asked about.

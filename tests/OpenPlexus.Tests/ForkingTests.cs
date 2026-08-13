@@ -10,34 +10,34 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>REPAIR IS DETERMINISTIC AND ITS TABLE MOVES BY ONE ENTRY A FIRING, so a parent
+/// <b>Repair is deterministic and its table moves by one entry a firing, so a parent
 /// proposes the same child for thousands of rounds.</b> The argmax is stable, the code it
 /// names stays in the tally because a commitment's table skips only its OWN scope, and
 /// nothing anywhere asks whether this parent has been there before. Collisions run twenty to
 /// fifty times the births at every majority rung, which is that fact counted.
 /// </para>
 /// <para>
-/// <b>SO THE BUDGET HAS ALWAYS BEEN A RE-DERIVATION LIMIT, WHICH IS ALREADY A FINDING HERE
-/// AND HAS NEVER BEEN ACTED ON.</b> A parent under two hundred and fifty-six spends nearly
+/// <b>So the budget has always been a re-derivation limit, which is already a finding here
+/// and has never been acted on.</b> A parent under two hundred and fifty-six spends nearly
 /// all of it arriving where it already is. What has not been tried is spending those attempts
 /// somewhere else.
 /// </para>
 /// <para>
-/// <b>AND QUANTITY IS THE ONE ACCOUNT OF THE UNCOVERED ROUNDS THE EVIDENCE CONFIRMS.</b> A
+/// <b>And quantity is the one account of the uncovered rounds the evidence confirms.</b> A
 /// child fires only where its added code is present, so covering what a parent is right about
 /// takes MANY children, and <c>uncovered</c> falls monotonically as the budget rises. If the
 /// attempts bought distinct children the search would be twenty to fifty times what every
 /// number here was taken under, at the same budget.
 /// </para>
 /// <para>
-/// <b>IT IS THE OPPOSITE HALF OF THE SEARCH FROM THE STEP LENGTH, WHICH IS WHY IT IS WORTH
-/// TRYING AFTER THAT FAILED.</b> A two-code step made each attempt reach DEEPER and lost
+/// <b>It is the opposite half of the search from the step length, which is why it is worth
+/// trying after that failed.</b> A two-code step made each attempt reach DEEPER and lost
 /// coverage by overshooting the world's minimum sound depth; this makes each attempt reach
 /// somewhere ELSE at the same depth. The chain's length does not change, so the failure that
 /// closed fork 74 does not carry over.
 /// </para>
 /// <para>
-/// <b>AND THE HAZARD IS NAMED BEFORE THE GRID: more distinct children is more population, and
+/// <b>And the hazard is named before the grid: more distinct children is more population, and
 /// this doc already carries a row about an arm that raised every count and lowered
 /// coverage.</b> So the reading is <c>Census.Paying</c> with the residents and the carriers'
 /// mean scope beside it, and never accuracy — which has a floor of four in five under skew.
@@ -51,7 +51,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
 
     /// <summary>The budget every reading in this file was taken under.</summary>
     /// <remarks>
-    /// <b>PINNED BECAUSE THE DEFAULT MOVED UNDER THESE GRIDS THE MOMENT THEY DECIDED IT.</b>
+    /// <b>Pinned because the default moved under these grids the moment they decided it.</b>
     /// A fixture inherits every dial it does not pin, so a default moving rewrites an
     /// experiment nobody edited — this repo's own trap, made live by the very comparison
     /// these grids were run to settle. Both readings here are <c>Repeated</c> against
@@ -87,7 +87,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
     /// <b>THE READING: two arms, three worlds, and the ungameable columns.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THE COLLISION COUNT IS WHAT SAYS THE MECHANISM RAN, and it goes beside the score
+    /// <b>The collision count is what says the mechanism ran, and it goes beside the score
     /// rather than instead of it.</b> Two arms landing together is ambiguous between <i>a
     /// distinct child is worth nothing</i> and <i>a parent rarely had a second candidate past
     /// the bar</i>, and only a count of what was BUILT tells those apart — the lesson a
@@ -127,8 +127,8 @@ public sealed class ForkingTests(ITestOutputHelper output)
 
                     paying.Add(census.Paying);
 
-                    // THE COLUMN FORK 76 IS ABOUT, AND THE ONE THE BUDGET CURVE ALREADY
-                    // MOVED. Rounds where nothing sound advocating the right answer fired
+                    // The column fork 76 is about, and the one the budget curve already
+                    // moved. Rounds where nothing sound advocating the right answer fired
                     // fall from 1,354 to 472 as the budget rises, and quantity is the only
                     // account of them the evidence confirms -- so if distinct children buy
                     // anything, they buy it here and this is where it is read.
@@ -138,8 +138,8 @@ public sealed class ForkingTests(ITestOutputHelper output)
                     sound.Add(learned.Sound);
                     unsound.Add(learned.Unsound);
 
-                    // OF THE WORLD'S RULES HELD, HOW MANY COULD EVER FIRE WHERE THE BASE RATE
-                    // FAILS. `found` counts two unlike things at once and both levers on this
+                    // Of the world's rules held, how many could ever fire where the base rate
+                    // fails. `found` counts two unlike things at once and both levers on this
                     // bench moved it without moving coverage; this is the half that bounds
                     // what coverage could reach.
                     payable.Add(learned.Payable);
@@ -171,27 +171,27 @@ public sealed class ForkingTests(ITestOutputHelper output)
 
 
     /// <summary>
-    /// <b>WHAT `Budget` MEANS ONCE A PARENT'S ATTEMPTS BUY DISTINCT CHILDREN — the first
+    /// <b>WHAT `Budget` means once a parent's attempts buy distinct children — the first
     /// time this number has ever been a search limit.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>FORK 66 WAS CLOSED WITH THE ANSWER *A RE-DERIVATION LIMIT*, AND THAT ANSWER WAS
-    /// CONDITIONAL ON A MECHANISM NOBODY HAD CHANGED.</b> Under the rule that ships a parent
+    /// <b>Fork 66 was closed with the answer *a re-derivation limit*, and that answer was
+    /// conditional on a mechanism nobody had changed.</b> Under the rule that ships a parent
     /// proposes the same child until its table drifts, so two hundred and fifty-six attempts
     /// buy two or three distinct children and the number cannot cap a search it is not
     /// running. Refuse a parent its spent codes and every attempt buys a NEW child, so the
     /// same dial becomes what its documentation always claimed.
     /// </para>
     /// <para>
-    /// <b>AND IT DOES NOT BIND AT ITS SHIPPED VALUE, WHICH IS WHY THE LEVELS HERE ARE SMALL.</b>
+    /// <b>And it does not bind at its shipped value, which is why the levels here are small.</b>
     /// A child adds one code, so a parent's distinct children are capped by the vocabulary —
     /// twenty-two at eleven bits, against a budget of two hundred and fifty-six. Every level
     /// above the vocabulary is the same arm, and the interesting range is the one nobody could
     /// reach before.
     /// </para>
     /// <para>
-    /// <b>THE READING IT IS FOR IS THE ELEVEN-BIT FLOOD.</b> Distinct forking takes six bits to
+    /// <b>The reading it is for is the eleven-bit flood.</b> Distinct forking takes six bits to
     /// a perfect score on every seed at the same population, and takes eleven bits to 1,144
     /// residents for 1.6 standard errors of coverage — every count rising while the reading
     /// barely moves, which is the shape of an arm this doc has already deleted once. If the
@@ -210,7 +210,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
         {
             output.WriteLine($"--- {address + (1 << address)} bits, skew {skew:F1} ---");
 
-            // THE BASELINE FIRST AND NAMED AS ONE. Every number this repo holds was taken
+            // The baseline first and named as one. Every number this repo holds was taken
             // under it, so a column that does not beat it has bought nothing whatever it
             // does to the counts.
             foreach (var (arm, forking, budget) in new (string Arm, Forking Forking, int? Budget)[]
@@ -269,10 +269,10 @@ public sealed class ForkingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE ARM IS WIRED AND WHAT IT CLAIMS TO REMOVE IS WHAT FALLS.</b>
+    /// <b>The arm is wired and what it claims to remove is what falls.</b>
     /// </summary>
     /// <remarks>
-    /// <b>IT ASSERTS ON COLLISIONS RATHER THAN ON A SCORE, because that is the event the rule
+    /// <b>It asserts on collisions rather than on a score, because that is the event the rule
     /// is about.</b> How much of the world was FOUND is printed beside it and asserted on by
     /// nothing — this repo's rule is that an accuracy is reported next to a count of the
     /// world's own rules held, and the grid that carries the score has residents and sound

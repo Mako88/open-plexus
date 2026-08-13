@@ -8,7 +8,7 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A SENSOR PER MACHINE WOULD NOT DO THIS, AND THAT IS THE WHOLE POINT.</b> A
+/// <b>A sensor per machine would not do this, and that is the whole point.</b> A
 /// front end is asked for a MOMENT — see <see cref="Machines.Trial{TSeen}"/> — and
 /// a moment is what puts codes together, so a camera on one machine and a
 /// microphone on another would never co-fire, and the sight–sound pairing that
@@ -18,14 +18,14 @@ namespace OpenPlexus.Codes;
 /// each.
 /// </para>
 /// <para>
-/// <b>EACH READS THE WHOLE FRAME AND TAKES THE PART IT KNOWS</b>, which is why
+/// <b>Each reads the whole frame and takes the part it knows</b>, which is why
 /// no splitter is needed: selecting a stream is a front end reading its own
 /// field. A separate router would only earn its keep if ONE stream carried
 /// several modalities that had to be torn apart, and nothing here does that yet.
 /// </para>
 /// <para>
-/// <b>GROUPS ARE OFFSET PER FRONT END, BECAUSE A GROUP NUMBER ONLY MEANS
-/// SOMETHING INSIDE THE THING THAT SAID IT.</b> Two front ends both calling
+/// <b>Groups are offset per front end, because a group number only means
+/// something inside the thing that said it.</b> Two front ends both calling
 /// something "object 0" mean different objects, and merging them unchanged would
 /// assert the binding <see cref="Worlds.Binding"/> exists to withhold — the same
 /// fault a chunk spanning two groups makes, from the other end.
@@ -100,7 +100,7 @@ public sealed class Compound<TFrame> : IQuantizer<TFrame>
 
     /// <inheritdoc/>
     /// <remarks>
-    /// <b>NOT OFFSET, BECAUSE AN ORDER IS A CLAIM ABOUT ONE CLOCK.</b> Two front
+    /// <b>Not offset, because an order is a claim about one clock.</b> Two front
     /// ends numbering from zero each say "mine came first", which is a claim about
     /// the frame and not about each other — so a body whose streams must be
     /// ordered TOGETHER has to say so on one scale. Offsetting would invent a

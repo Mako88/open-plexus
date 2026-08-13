@@ -18,7 +18,7 @@ public sealed record RoamingSettings
 
     /// <summary>How many things happen before the question is asked.</summary>
     /// <remarks>
-    /// <b>WHAT MAKES THE ANSWER MOVE, WHICH IS THE WHOLE WORLD.</b> At nought the opening
+    /// <b>What makes the answer move, which is the whole world.</b> At nought the opening
     /// placements are the answer and a bag reads them straight off; every step after that
     /// is a chance for the truth to change while the sentence that stated the old one is
     /// still sitting there in plain view.
@@ -36,7 +36,7 @@ public sealed record RoamingSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S, 2026-08-12, AND THE ANSWER TO THE QUESTION HE ASKED WITH IT.</b> TextWorld
+/// <b>John's, 2026-08-12, and the answer to the question he asked with it.</b> TextWorld
 /// and Crafter both came up; Crafter is pixels and reward, which puts two unbuilt
 /// subsystems in front of the thing being measured, and this branch has already read that
 /// a photographic front end is the ceiling rather than the learner. TextWorld's shape is
@@ -44,14 +44,14 @@ public sealed record RoamingSettings
 /// is missing here.
 /// </para>
 /// <para>
-/// <b>BUILT RATHER THAN PORTED, WHICH IS THIS REPO'S OWN RULE — borrow the problem, not
+/// <b>Built rather than ported, which is this repo's own rule — borrow the problem, not
 /// the mechanism.</b> A benchmark varies its parser, its vocabulary, its quest length and
 /// its room count at once, and a number off it cannot be attributed to any of them. What
 /// is wanted is the property, one axis at a time, with the state small enough to enumerate
 /// — which is the same reason <see cref="Multiplexer"/> earns its keep and no corpus can.
 /// </para>
 /// <para>
-/// <b>AND WATCHED BEFORE ACTED IN, WHICH IS THE SEQUENCING THAT MATTERS.</b> Nothing here
+/// <b>And watched before acted in, which is the sequencing that matters.</b> Nothing here
 /// acts: action and goals are both on the capability list as unbuilt, so an interactive
 /// world would demand a policy, a goal and a retracting store at once. A scripted walk
 /// generates the transcript and the brain predicts, which exercises individuals,
@@ -65,13 +65,13 @@ public sealed record RoamingSettings
 /// compare across.
 /// </para>
 /// <para>
-/// <b>WHAT IT FIXES ABOUT bAbI IS THE PROPERTY THAT DISQUALIFIED IT.</b> Some two thousand
+/// <b>WHAT IT FIXES ABOUT bAbI is the property that disqualified it.</b> Some two thousand
 /// distinct contexts exist there and no more, so reading it twice is re-reading it. This
 /// draws a fresh house, a fresh scatter of things and a fresh walk every episode, so the
 /// held-out half is genuinely unseen and a score cannot be a lookup.
 /// </para>
 /// <para>
-/// <b>TWINS ARE THE NEXT AXIS AND ARE DELIBERATELY NOT HERE.</b> Two things wearing one
+/// <b>Twins are the next axis and are deliberately not here.</b> Two things wearing one
 /// word is where <see cref="Returning"/>'s finding would land, and it needs a way to ASK
 /// about one of two identical things — which is a relative clause, which is rung four.
 /// Adding it before the base world is read would be two unanswered questions in one grid.
@@ -128,7 +128,7 @@ public sealed class Roaming : IWorld<Asking>, IWithholds<Asking>
     /// from the transcript rather than from the state.</b>
     /// </summary>
     /// <remarks>
-    /// <b>WHAT IT SAID AND NEVER WHAT TO CONCLUDE, WHICH IS THE LINE A WORLD STAYS ON.</b>
+    /// <b>What it said and never what to conclude, which is the line a world stays on.</b>
     /// A probe asking <i>which room word was mentioned last</i> needs to know which codes
     /// are room words, and that is a fact about the vocabulary this world emitted rather
     /// than a hint about the answer. Nothing that learns is ever shown it — the same
@@ -156,7 +156,7 @@ public sealed class Roaming : IWorld<Asking>, IWithholds<Asking>
     /// <summary>One house, one walk round it, and one question about where a thing ended up.</summary>
     private Turn<Asking> Draw()
     {
-        // WHERE EVERYTHING STARTS, STATED OUT LOUD. Without the opening placements the
+        // Where everything starts, stated out loud. Without the opening placements the
         // answer is not derivable from the transcript at all, and the world would be asking
         // about something it never said.
         var at = new int[_settings.Props];
@@ -184,8 +184,8 @@ public sealed class Roaming : IWorld<Asking>, IWithholds<Asking>
                 .Where(one => !carried[one] && at[one] == here)
                 .ToList();
 
-            // MOVE, TAKE OR DROP, AND THE CHOICE IS BETWEEN WHAT IS POSSIBLE RATHER THAN
-            // BETWEEN THREE. A walk that tried to drop what it was not holding would emit a
+            // Move, take or drop, and the choice is between what is possible rather than
+            // between three. A walk that tried to drop what it was not holding would emit a
             // sentence the world's own state contradicts, which is a transcript nothing
             // could be scored against.
             var can = new List<int> { 0 };

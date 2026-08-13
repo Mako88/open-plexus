@@ -337,10 +337,11 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// <para>
     /// <b>And it caps in one direction only</b>, which the four-person learner settled and is
     /// recorded here because the column is read here. A high figure is a proof of a ceiling; a
-    /// low one is not a floor. <see cref="Joining.Distinguished"/> conflates 0.004 of moments at
-    /// four walkers and reads the marginal, against 0.002 and two and a half times the marginal
-    /// for one hop of the store — because a moment that is nobody's twin may never recur, and a
-    /// rule with one observation is a lookup table entry.
+    /// low one is not a floor. <see cref="Joining.Distinguished"/> and one hop of the store both
+    /// conflate under a hundredth of moments at four people, and read the marginal and two and a
+    /// half times it. Neither does the uniqueness of a moment explain the gap: over 0.99 of both
+    /// arms' moments are distinct. What a subset test needs is a recurring SUB-scope, and
+    /// nothing here counts those.
     /// </para>
     /// <para>
     /// <b>The precedences are derived here exactly as the machine derives them</b>, through
@@ -486,8 +487,9 @@ public sealed class RoamingTests(ITestOutputHelper output)
     {
         var company = new Dictionary<(int People, string Arm), List<double>>();
         var pinning = new Dictionary<(int People, string Arm), List<double>>();
-        var walkers = new Dictionary<(int People, string Arm), List<double>>();
+        var peopled = new Dictionary<(int People, string Arm), List<double>>();
         var twinned = new Dictionary<(int People, string Arm), List<double>>();
+        var distinct = new Dictionary<(int People, string Arm), List<double>>();
 
         var reading = new[]
         {
@@ -501,8 +503,9 @@ public sealed class RoamingTests(ITestOutputHelper output)
             {
                 company[(people, name)] = [];
                 pinning[(people, name)] = [];
-                walkers[(people, name)] = [];
+                peopled[(people, name)] = [];
                 twinned[(people, name)] = [];
+                distinct[(people, name)] = [];
             }
 
             // Seeds, because a column read on one house is an anecdote and this axis moves
@@ -554,7 +557,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
                         left += here.Count;
 
                         // And how many people the moment leaves, which is the same ambiguity one
-                        // level up: a fold holding two walkers is a fold that cannot say whose
+                        // level up: a fold holding two people is a fold that cannot say whose
                         // room it is holding, however few rooms it kept.
                         whose += cast.Count(moment.Contains);
 
@@ -572,8 +575,14 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
                     company[(people, name)].Add(left / (double)asked);
                     pinning[(people, name)].Add(pinned / (double)asked);
-                    walkers[(people, name)].Add(whose / (double)asked);
+                    peopled[(people, name)].Add(whose / (double)asked);
                     twinned[(people, name)].Add(Conflated(carried, asked));
+
+                    // How many different moments the questions came in, which is what says
+                    // whether a low conflation means SEPARATED or merely one-off. A share near
+                    // one is a moment per question, and a rule minted on one of those has a
+                    // single observation for ever.
+                    distinct[(people, name)].Add(carried.Count / (double)asked);
                 }
             }
 
@@ -583,9 +592,11 @@ public sealed class RoamingTests(ITestOutputHelper output)
                     $"  {name,-14}| pinned {pinning[(people, name)].Min():F3} to "
                     + $"{pinning[(people, name)].Max():F3} | rooms left "
                     + $"{company[(people, name)].Min():F2} to {company[(people, name)].Max():F2}"
-                    + $" | people left {walkers[(people, name)].Min():F2} to "
-                    + $"{walkers[(people, name)].Max():F2} | conflated "
-                    + $"{twinned[(people, name)].Min():F3} to {twinned[(people, name)].Max():F3}");
+                    + $" | people left {peopled[(people, name)].Min():F2} to "
+                    + $"{peopled[(people, name)].Max():F2} | conflated "
+                    + $"{twinned[(people, name)].Min():F3} to {twinned[(people, name)].Max():F3}"
+                    + $" | distinct {distinct[(people, name)].Min():F3} to "
+                    + $"{distinct[(people, name)].Max():F3}");
             }
         }
 
@@ -609,16 +620,34 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // while the answer stays is the whole of what this cell says.
 
         // WHICH PERSON THE FOLD REACHED, and this is the column that says the key rule is doing
-        // what it is named for. At four people the freshest key leaves 1.34 walkers in the
-        // moment at its worst where folding through all of them leaves 1.76 and three hops
-        // leaves 3.46 -- so recency over the store lands on one walker without knowing that a
-        // walker is a thing. That is fork 95's answer stated in the units of the question.
-        foreach (var name in reading.Where(one => one != "Freshest(1)"))
-            Assert.True(walkers[(4, "Freshest(1)")].Max() < walkers[(4, name)].Min(),
-                $"at four people {name} leaves {walkers[(4, name)].Min():F2} walkers in the "
-                + $"moment at its fewest against {walkers[(4, "Freshest(1)")].Max():F2} at the "
-                + "most for the freshest key, so following the key that moved last is not "
-                + "selecting a person and the column above is measuring something else");
+        // what it is named for. The comparison is against the fold at the SAME DEPTH, which is
+        // the only other arm differing from it in nothing but the key rule -- at four people it
+        // reaches 2.14 people in the moment at its worst against 3.01 for folding through all
+        // of them. So recency over the store narrows towards one person without knowing that a
+        // person is a thing, which is fork 95's answer in the units of the question.
+        //
+        // Against `Chained` it does NOT, and that was asserted here until the placements were
+        // stated: a lookup keeping one statement holds few people for a reason that has nothing
+        // to do with choosing. The bar was comparing two mechanisms and reading the answer off
+        // how much text each kept, which is the trap about a comparison that moves two things.
+        Assert.True(peopled[(4, "Freshest(1)")].Max() < peopled[(4, "Resolved(1)")].Min(),
+            $"at four people folding through every key reaches "
+            + $"{peopled[(4, "Resolved(1)")].Min():F2} people at its fewest against "
+            + $"{peopled[(4, "Freshest(1)")].Max():F2} at the most for the freshest key, so "
+            + "following the key that moved last is not selecting a person at all");
+
+        // The premise the four-person learner's refutation rests on, pinned where the columns
+        // are taken. Two arms whose caps and whose uniqueness are both indistinguishable read a
+        // third of each other, so if either half of that stops holding the refutation is owed a
+        // re-take rather than quietly surviving in a comment.
+        foreach (var name in new[] { nameof(Joining.Distinguished), "Resolved(1)" })
+        {
+            Assert.True(twinned[(4, name)].Max() < 0.01 && distinct[(4, name)].Min() > 0.99,
+                $"at four people {name} conflates {twinned[(4, name)].Max():F3} of moments and "
+                + $"{distinct[(4, name)].Min():F3} of them are distinct, so it no longer sits "
+                + "where a cap and a uniqueness are both near their limit and the reading that "
+                + "says neither ranks an arm has lost one of its two cells");
+        }
 
         // What a second person does to the background rule, which is the finding nobody was
         // looking for and is larger than the one that was. `Distinguished` calls a word not in
@@ -629,7 +658,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
             < pinning[(1, nameof(Joining.Distinguished))].Min() / 4,
             $"the background rule pins {pinning[(4, nameof(Joining.Distinguished))].Max():F3} at "
             + $"four people against {pinning[(1, nameof(Joining.Distinguished))].Min():F3} at "
-            + "one, so a second walker is not what breaks displacement and the account above is "
+            + "one, so a second person is not what breaks displacement and the account above is "
             + "wrong about why");
 
         // So the arms come apart on this axis, which is what an axis is for. At four people one
@@ -667,7 +696,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// </para>
     /// <para>
     /// <b>And a chain that runs out is the number worth having.</b> A person's starting room is
-    /// drawn and never stated, so a walker who takes a thing and puts it down before moving has
+    /// drawn and never stated, so somebody who takes a thing and puts it down before moving has
     /// put it somewhere no rule can name. That share is a hard cap on every arm and on every
     /// learner, and it is not the same thing as the answering word being absent — the word is
     /// present whenever any statement happens to mention that room.
@@ -697,7 +726,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 var story = turn.Seen.Said;
                 var about = props.FirstOrDefault(one => turn.Seen.Asked.Contains(one));
 
-                // The newest statement naming the thing and a walker, which is the event that
+                // The newest statement naming the thing and a person, which is the event that
                 // settled where it is. A thing still in a hand is never asked about, so this
                 // statement is a drop whenever it exists at all -- no verb has to be read.
                 var dropped = -1;
@@ -725,8 +754,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 var moved = -1;
 
                 // Older only, which is what makes this the chain rather than a lookup. Where
-                // the walker stood when the thing was put down is the last move BEFORE that
-                // statement, and a later move took the walker somewhere the thing did not go.
+                // the person stood when the thing was put down is the last move BEFORE that
+                // statement, and a later move took them somewhere the thing did not go.
                 for (var at = dropped + 1; at < story.Count && moved < 0; at++)
                     if (story[at].Contains(who) && story[at].Any(room => rooms.Contains(room)))
                         moved = at;
@@ -749,10 +778,10 @@ public sealed class RoamingTests(ITestOutputHelper output)
             // rule that followed it wrongly.
             Assert.True(right == followed,
                 $"the chain completed on {followed} questions and answered {right} of them, so "
-                + "following the drop to the walker to the room is not what this world does and "
+                + "following the drop to the person to the room is not what this world does and "
                 + "every ceiling in this file is measuring against the wrong ground truth");
 
-            // And the cap the gap is. A walker's starting room is drawn and never stated, so
+            // And the cap the gap is. A person's starting room is drawn and never stated, so
             // one who takes a thing and puts it down before moving has put it somewhere no rule
             // can name: nought at one and two people, five thousandths at four. It stays a
             // recorded cap rather than a repair, because stating the starting rooms would add a
@@ -955,7 +984,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// they come in at one person. What says so is
     /// <see cref="What_a_second_person_does_to_the_key_the_fold_must_follow"/> — one hop
     /// through the freshest key pins 0.180 there where three hops pin 0.128, and three hops
-    /// arrive with 3.39 walkers against 1.28.
+    /// arrive with 3.39 people against 1.28.
     /// </para>
     /// <para>
     /// <b>And what would refute the ceiling is the inversion failing to appear.</b> If depth
@@ -990,18 +1019,18 @@ public sealed class RoamingTests(ITestOutputHelper output)
         var scores = Scored(arms, people: 4);
 
         // The bar that holds whichever way the inversion goes, and it is the one worth having
-        // first: a world with four walkers is still a world this learner reads. The marginal is
+        // first: a world with four people is still a world this learner reads. The marginal is
         // about 0.19 at every cell of the people axis, so an arm under twice it has stopped
         // tracking and the inversion would be a comparison between two failures.
         Assert.True(scores["Freshest(1)"].Min() > 0.38,
             $"one hop through the freshest key reads {scores["Freshest(1)"].Min():F3} at its worst "
-            + "with four people walking, under twice the marginal -- so a second walker has "
+            + "with four people walking, under twice the marginal -- so a second person has "
             + "taken the world out of this learner's reach and the ceiling that says it is "
             + "reachable is measuring something a run cannot convert");
 
         // The pre-registered half, and it held: 0.439 at its worst against 0.401 at three hops'
-        // best. Depth is what a second walker makes expensive, which is what the company column
-        // said before the run -- three hops arrive with 3.39 walkers in the moment against 1.28.
+        // best. Depth is what a second person makes expensive, which is what the company column
+        // said before the run -- three hops arrive with 3.39 people in the moment against 1.28.
         Assert.True(scores["Freshest(1)"].Min() > scores["Freshest(3)"].Max(),
             $"one hop reads {scores["Freshest(1)"].Min():F3} at its worst against "
             + $"{scores["Freshest(3)"].Max():F3} for three at their best, so the inversion the "
@@ -1009,7 +1038,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
         // And the half that was refuted, which is the more useful one. Folding through every key
         // leads here, 0.484 at its worst against the freshest key's 0.471 at its best -- so the
-        // key rule's whole advantage does not survive a second walker, and it was the only thing
+        // key rule's whole advantage does not survive a second person, and it was the only thing
         // separating `Freshest` from `Resolved` at one person.
         //
         // The prediction leaned on `pinned`, one commit after this same file recorded that a
@@ -1019,19 +1048,27 @@ public sealed class RoamingTests(ITestOutputHelper output)
         Assert.True(scores["Resolved(1)"].Min() > scores["Freshest(1)"].Max(),
             $"folding through every key reads {scores["Resolved(1)"].Min():F3} at its worst "
             + $"against {scores["Freshest(1)"].Max():F3} for the freshest key at its best, so the "
-            + "key rule's advantage does survive a second walker after all and fork 95's answer "
+            + "key rule's advantage does survive a second person after all and fork 95's answer "
             + "is what it looked like at one person");
 
         // And the reading that refutes the cap as a ranking outright, which is why these two arms
-        // were added. `Distinguished` conflates 0.004 of moments at four people and `Resolved(1)`
-        // conflates 0.002 -- the same cap, to within a seed -- and they read 0.167 and 0.497. One
-        // is the marginal and the other is two and a half times it.
+        // were added. `Distinguished` and `Resolved(1)` conflate under a hundredth of moments at
+        // four people -- the same cap, to within a seed -- and they read 0.167 and 0.497. One is
+        // the marginal and the other is two and a half times it.
         //
         // So a LOW conflation says nothing, and this is the direction the column cannot be read
-        // in. A moment that is nobody's twin may be unlearnable for the opposite reason: nothing
-        // recurs, so no rule ever gets a second observation. `Distinguished` holds 133 rules where
-        // `Resolved(1)` holds 934, which is what a population of snowflakes looks like from
-        // outside. High conflation is a proof of a ceiling; low conflation is not a floor.
+        // in. High conflation is a proof of a ceiling; low conflation is not a floor.
+        //
+        // Why it is low for both is not the answer either, and that was measured rather than
+        // assumed after the first explanation offered here turned out to be a story. Both arms
+        // have essentially every moment DISTINCT at four people, over 0.99 of questions, so
+        // neither is separating anything -- the moments simply never repeat. Uniqueness does not
+        // rank them any better than conflation does.
+        //
+        // What is left, and what nothing here measures, is whether a moment's SUB-SCOPES recur.
+        // A commitment fires on a subset, so generalisation never needed whole moments to
+        // repeat; `Distinguished` holds 133 rules where the store holds 934 on moments that are
+        // equally unique. That column is the next instrument this file is missing.
         Assert.True(scores["Resolved(1)"].Min() > scores[nameof(Joining.Distinguished)].Max() * 2,
             $"the background rule reads {scores[nameof(Joining.Distinguished)].Max():F3} at its "
             + $"best against {scores["Resolved(1)"].Min():F3} for the store at its worst, so two "
@@ -1039,11 +1076,11 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + "column can be read as a floor after all");
 
         // Both backward-reading arms sit at the marginal here, which is a fact about a second
-        // walker rather than about either rule. A lookup over the transcript answers *which
+        // person rather than about either rule. A lookup over the transcript answers *which
         // statement mentioned this* and the answer is in a statement about somebody else.
         foreach (var name in new[] { nameof(Joining.Distinguished), nameof(Joining.Chained) })
             Assert.True(scores[name].Max() < 0.25,
-                $"{name} reads {scores[name].Max():F3} at its best with four walkers, off the "
+                $"{name} reads {scores[name].Max():F3} at its best with four people, off the "
                 + "marginal of about 0.19 -- so reading the transcript backwards is tracking "
                 + "something after all and the forward store is not what pays here");
     }

@@ -240,7 +240,20 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
 
         var here = new int[_settings.People];
 
-        for (var one = 0; one < _settings.People; one++) here[one] = _walks.Next(_settings.Rooms);
+        // And where each person starts, stated out loud for the reason the things' placements
+        // are. A person who picks a thing up and puts it down before ever moving has put it
+        // somewhere no rule could name, so five thousandths of the questions at four people
+        // were unanswerable by anything -- measured, not supposed. Saying it costs one
+        // statement a person and closes the hole.
+        //
+        // The draw is unchanged and so is every house and every walk: this consumes no
+        // randomness, it says out loud what was already drawn. What moves is the transcript.
+        for (var one = 0; one < _settings.People; one++)
+        {
+            here[one] = _walks.Next(_settings.Rooms);
+
+            told.Add(Said(Cast[one], "is", "in", "the", Places[here[one]]));
+        }
 
         for (var step = 0; step < _settings.Steps; step++)
         {

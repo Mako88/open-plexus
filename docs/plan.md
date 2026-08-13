@@ -9,13 +9,13 @@ refutes it — read its refutation table before repeating anything.
   in its XML comments, where the compiler enforces every reference.
 - **Findings live in the commit** that produced them, and in the test that asserts
   them. Never here.
-- **One line an item.** A cap per ITEM, and a cap on the WHOLE.
-- **JOHN'S TEST, AND IT IS THE ONE THAT DECIDES: if it is long enough that you would
+- **One line an item.** A cap per ITEM, and a cap on the whole.
+- **John's test, and it is the one that decides: if it is long enough that you would
   hesitate to load all of it, it is too long.** This doc exists to be read whole at the
   start of every session. A doc read in pages is the pile of docs it replaced.
 - **So the budget falls by default** and `DocsTests` fails the build the moment the doc
   grows. What will not fit belongs in a commit, a test, or an XML comment.
-- **AND IT MAY BE RAISED FOR SOMETHING GENUINELY NEW — John's, and the conditions are his:
+- **And it may be raised for something genuinely new — John's, and the conditions are his:
   the existing items are reasonable, the new one duplicates nothing, and this is still a
   doc you would load whole.** A cap that only ever falls decides what may be thought about.
 - **Built and decided means GONE FROM HERE, and no arm either.** A winner becomes the
@@ -32,7 +32,7 @@ everything moves; nothing here does.**
 
 - **Understand rather than perform** — answer *what would the world look like if I
   did X*, which a sequence model cannot be.
-- **A COUNT IS NEVER WRONG; A COMMITMENT IS.** A cell that mispredicts becomes a
+- **A count is never wrong; a commitment is.** A cell that mispredicts becomes a
   different number. A commitment that mispredicts is wrong about SOMETHING, and which
   something is the whole of what can be learnt.
 - **The counting does not go away, it moves under the prediction.** Repair asks which
@@ -48,35 +48,35 @@ a mechanism written here is a decision wearing a requirement's clothes. No findi
 
 - **A BRAIN THAT UNDERSTANDS CONCEPTS.** It holds a model of the world and answers from it,
   never by matching the surface of a question to the surface of a text.
-- **A CONCEPT IS A THING IN ITS OWN RIGHT** — distinct from every other and interrelated
+- **A concept is a thing in its own right** — distinct from every other and interrelated
   with every other. That pairing IS the understanding: what a thing is, and how it stands to
   everything else.
-- **AND EVERY INPUT IS AN ATTRIBUTE OF A CONCEPT, NEVER THE CONCEPT.** The look of a thing,
+- **And every input is an attribute of a concept, never the concept.** The look of a thing,
   the sound of it, its temperature, its name: each is one way it shows through one sense. The
-  thing is what they are all attributes OF.
-- **AND RELATIONS ARE CONCEPTS TOO** — association, containment, ownership, movement. If the
+  thing is what they are all attributes of.
+- **And relations are concepts too** — association, containment, ownership, movement. If the
   meta level is not representable then the model is a list rather than an understanding.
-- **AND A CONCEPT AND ITS LABEL ARE INDEPENDENT.** Either may arrive first: a slot with no
+- **And a concept and its label are independent.** Either may arrive first: a slot with no
   word for it yet, or a word for a thing nothing else is known about. Both must be reachable.
-- **AND WHAT IS UNDERSTOOD OF A THING DEEPENS AND BROADENS WITHOUT LIMIT**, thousands of
+- **And what is understood of a thing deepens and broadens without limit**, thousands of
   truths about one individual, each sharpening what it is.
-- **AND PART OF WHAT IS UNDERSTOOD IS WHICH ASPECTS ARE TEMPORAL** — which properties come
+- **And part of what is understood is which aspects are temporal** — which properties come
   and go, what those aspects are in themselves, and how they stand to everything else.
-- **AND KNOWLEDGE IS HELD AT SEVERAL GRAINS AT ONCE** — *a person sleeps in a bedroom* and
+- **And knowledge is held at several grains at once** — *a person sleeps in a bedroom* and
   *this bedroom is Mary's*, both live, neither replacing the other.
-- **AND HOW HARD A BELIEF IS TO SHIFT IS ITS OWN RECORD, NEVER A WEIGHT.** Gravity is
+- **And how hard a belief is to shift is its own record, never a weight.** Gravity is
   immovable because that belief has vast evidence and has never missed; Mary's room moves
   because that one misses constantly.
-- **AND IT LEARNS BY BEING WRONG AND FINDING OUT.** It predicts, is scored, and refines.
+- **And it learns by being wrong and finding out.** It predicts, is scored, and refines.
   What supplies the scoring is left open — a question asked, an action taken, a consequence
   observed.
-- **AND IT MAY BE TOLD AND MUST NEVER BE ARCHITECTED.** A primer may teach it that a room is
+- **And it may be told and must never be architected.** A primer may teach it that a room is
   a space people enter. What is forbidden is an ontology built in by hand: the representation
   is what learning left behind.
-- **AND WHAT IT IS TOLD MUST BE SOMETHING IT CAN BE WRONG ABOUT.** Told and configured are
+- **And what it is told must be something it can be wrong about.** Told and configured are
   indistinguishable from the inside, so a fact it cannot fail on was not taught to it — it
   was installed in it.
-- **AND FROM THAT UNDERSTANDING IT PRODUCES ORIGINAL THOUGHT** — conclusions it was never
+- **And from that understanding it produces original thought** — conclusions it was never
   told and could not have reached by matching.
 
 ### The constraints
@@ -106,7 +106,7 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   Parent-plus-condition gave one scope two.
 - **A front end may say what it is looking at, never what to conclude** — *this is
   the same thing you saw six times*, never *this is a red ball*.
-- **ONE BRAIN, AND A WORLD MAY NEVER REACH INTO IT.** Brain dials are built once and
+- **One brain, and a world may never reach into it.** Brain dials are built once and
   handed in; a world turns only its own. `csharp` had `Ranking` set one way on bAbI
   and another on CLEVR, so a WORLD decided how the brain thought.
 - **Every score was then a comparison between two brains as much as two problems.**
@@ -126,54 +126,54 @@ FORBIDS things, and several of them are already measured.
 
 - **Twenty used phones on one wifi running the brain**, one stronger machine carrying the
   body — camera at a frame or two a second, audio, temperature, motion.
-- **AND THE PHONES ARE LAST RATHER THAN FIRST, WHICH IS JOHN'S ORDERING.** They do not exist
+- **And the phones are last rather than first, which is John's ordering.** They do not exist
   yet and will not be bought until this is worth showing somebody, so the hardware is a
   conclusion of the prototype rather than a precondition for it.
-- **FIRST IS DOCKER CONTAINERS ON ONE BOX, THE BODY A SEPARATE PROCESS, AND THE ONLY SENSE
-  IS ENGLISH.** Talking to it is the first interactive test of the whole system, and it needs
+- **First is Docker containers on one box, the body a separate process, and the only sense
+  is English.** Talking to it is the first interactive test of the whole system, and it needs
   no camera, no phone and no wifi — the fleet is already the thing being exercised.
-- **THEN THE PHONE AS THE BODY AND THE CONTAINERS AS THE BRAIN**, video and sensors in, if
+- **Then the phone as the body and the containers as the brain**, video and sensors in, if
   one machine can hold enough containers to be a fleet. That is the arrangement that says
   whether twenty of anything is needed before twenty of anything is bought.
 - **And a text conversation as a second body**, so one brain is judged on symbols and on a
   stream of the world without being two brains.
-- **THE CONSTRAINTS WERE ALL WRITTEN FOR THIS, so it is a demonstration rather than a
+- **The constraints were all written for this, so it is a demonstration rather than a
   benchmark.** No shared memory, late messages, a cluster vanishing mid-thought.
-- **SO THE CONTAINERS ARE NOT THE THING THAT WAS UNPROVEN**, and the fleet was never the
+- **So the containers are not the thing that was unproven**, and the fleet was never the
   risk. What text teaches this learner is answered in one process on one box, which is where
   it should have been asked.
-- **AND TWENTY IS ALREADY THE MEASURED EDGE.** Placement by minimum code is capped by a
+- **And twenty is already the measured edge.** Placement by minimum code is capped by a
   world's distinct roots, so fleet size and the front end's vocabulary are one number.
-- **SO WHAT THE FOOTPRINT READING IS ABOUT CHANGES WITH THE RUNG.** Containers share one
+- **So what the footprint reading is about changes with the rung.** Containers share one
   machine's memory, so the whole fleet's brain is the number that matters there; on phones
   it is one holder's share. Both come off the same reading.
-- **AND WHAT PRICES A CAMERA IS THE FRONT END'S VOCABULARY**, at residents times codes times
+- **And what prices a camera is the front end's vocabulary**, at residents times codes times
   a hundred bytes rather than anything about the population. That is the number to take
   before a sensor is plumbed.
-- **AND ONE INPUT MACHINE FEEDING TWENTY HOLDERS IS THE IDENTICAL CASE, NOT THE SHARED
-  ONE.** Every holder is told the same moment and the same settlement, so naming converges —
+- **And one input machine feeding twenty holders is the identical case, not the shared
+  one.** Every holder is told the same moment and the same settlement, so naming converges —
   the divergence measured was between machines seeing DIFFERENT streams.
-- **SO A CAMERA PER PHONE IS THE ARRANGEMENT TO AVOID**, and it is the arrangement nobody
+- **So a camera per phone is the arrangement to avoid**, and it is the arrangement nobody
   proposed. What breaks naming is many eyes, not many brains.
-- **A SENSOR IS A WORLD AND A WORLD IS A STREAM**, so nothing here is a new kind of input —
+- **A sensor is a world and a world is a stream**, so nothing here is a new kind of input —
   what is missing is the plumbing, not a mechanism.
-- **AND EVERY GROUND-TRUTH INSTRUMENT GOES DARK.** Soundness, overshoot and hard-round
+- **And every ground-truth instrument goes dark.** Soundness, overshoot and hard-round
   coverage all need a world that can be enumerated, so the generated worlds never leave.
-- **SO THE PROBE IS THE ONE INSTRUMENT THAT CROSSES.** Ask what the codes carry against what
+- **So the probe is the one instrument that crosses.** Ask what the codes carry against what
   the raw reading carries, per sensor, BEFORE building anything on that sensor.
-- **AND A CURRICULUM IS ALLOWED AND C4 IS NOT ABOUT IT.** *No episode boundary* constrains
+- **And a curriculum is allowed and C4 IS NOT ABOUT IT.** *No episode boundary* constrains
   the LEARNER; what an experimenter feeds and in what order is outside the machine.
-- **SO A PRIMER BEFORE A TEST IS EXPECTED RATHER THAN A CHEAT** — the language before the
+- **So a primer before a test is expected rather than a cheat** — the language before the
   play, the room before the question. What is forbidden is the learner being able to tell
   that a boundary happened.
-- **JOHN'S CURRICULUM PROPOSAL: TEACH IT ENGLISH, THEN SET IT A TEXT AND EXAMINE IT**, which
+- **John's curriculum proposal: teach it English, then set it a text and examine it**, which
   is the shape the first conversation takes.
-- **AND MIXING THE TWO IS WORSE THAN EITHER TEACHING ALONE**, so that curriculum costs rather
+- **And mixing the two is worse than either teaching alone**, so that curriculum costs rather
   than pays as built. The function-word rules crowd out the population the questions needed.
-- **AND THE FIRST CONVERSATION DEMANDS UNIFICATION RATHER THAN SEQUENCE**, which inverts what
+- **And the first conversation demands unification rather than sequence**, which inverts what
   the ordering assumed. Binding the question's actor to a statement's actor is rung four, and
   no dose of recency reaches it.
-- **AND THE EXAM IS ALREADY CHOSEN.** Twenty tasks each isolating one prerequisite, written
+- **And the exam is already chosen.** Twenty tasks each isolating one prerequisite, written
   elsewhere with published baselines, and built so surface matching fails. A school
   comprehension test would read nothing until the components pass.
 
@@ -259,7 +259,7 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       are. Does the advantage survive a grid that does not divide the world's. `csharp`
       refuted BANDED POSITION codes for both — row width bought with noise. Fork **44**,
       with **38**.
-    - **OPEN** — THE INTERFACE COSTS MOST OF THE SCORE, and the front end's resolution is a
+    - **OPEN** — the interface costs most of the score, and the front end's resolution is a
       hard floor: a fixed projection can split what is separable at some resolution and can
       never invent a direction. How the projection is AIMED beat both, rung five uninvolved.
     - **OPEN** — quantisation boundary noise is the interface risk and repair AMPLIFIES it:
@@ -402,7 +402,7 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       where the world holds still, ahead where the target moves. Fork **27**.
     - **OPEN** — more unsound commitments resident than sound ones while the score holds: is
       the vote robust to them, or are they why it stops short. Fork **35**.
-    - **OPEN** — THE LIVE PROBLEM IS WHICH RULE GETS THE SEAT, and two arms at it have
+    - **OPEN** — the live problem is which rule gets the seat, and two arms at it have
       failed. Almost none of the population is read, so a gate changing what is HELD cannot
       reach what decides — read the revival rows before a third.
     - **OPEN** — `Alternating` sits on `DeadCodeTests`'s unwired list, the derivation being
@@ -493,7 +493,7 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       wants a `Trial` OR A DELETION, a world going when its question closes, and nothing
       says which. `DeadCodeTests` counts the debt.
     - **NOW** — the vote's arithmetic composes and a whole learner runs over it. Fork **52**.
-    - **NOW** — A ROUND IS A BARRIER, so lateness costs the CLOCK and changes not one answer.
+    - **NOW** — a round is a barrier, so lateness costs the CLOCK and changes not one answer.
       C2's out-of-order half is untestable here for the same reason, and the fleet is paced
       by its unluckiest holder twice a round. Breaking it is unmeasured.
     - **OPEN** — what the repair gate's query costs on a wire, priced on loopback. Open on a
@@ -599,140 +599,140 @@ them. **A class earning a check moves out of here into the check.**
 
 ### The harness lies, and nothing goes red when it does
 
-- **A HAND-TYPED FILTER RUNS THE GRIDS CI EXCLUDES.** Naming a class names its sweeps too, so
+- **A hand-typed filter runs the grids CI excludes.** Naming a class names its sweeps too, so
   two suites ran past forty minutes where `kind!=sweep&` in front takes them to seconds. The
   facts were tagged correctly and the COMMAND was not.
-- **PUSHING FASTER THAN THE SUITE RUNS MEANS NOTHING IS EVER TESTED.** The concurrency group
+- **Pushing faster than the suite runs means nothing is ever tested.** The concurrency group
   cancels whatever is waiting, so a session committing every few minutes cancels its own queue
   all day. Only a `[checkpoint]` escapes.
-- **A BUILD DURING A TEST RUN CAN ABORT IT WITH EVERY TEST PASSING**, the assemblies being
+- **A build during a test run can abort it with every test passing**, the assemblies being
   replaced underneath. The mirror of the `--no-build` staleness rule.
-- **A COST MEASURED ON ONE PLATFORM CAN BE NOUGHT ON ANOTHER.** A refused loopback connect is
+- **A cost measured on one platform can be nought on another.** A refused loopback connect is
   four seconds on Windows and immediate on Linux, so a shard went red for a repair working
   perfectly — and that same four seconds prices the local suite and not CI. Read a wire
   timing on CI.
-- **A WORKFLOW IS THE ONE ARTIFACT WITH NO LOCAL CHECK**, and it is wrong until a push says
-  otherwise. And SKIPPING WORK IS NOT SKIPPING A JOB: a matrix entry that exits immediately
+- **A workflow is the one artifact with no local check**, and it is wrong until a push says
+  otherwise. And skipping work is not skipping a job: a matrix entry that exits immediately
   still took a runner slot.
-- **A TIMED-OUT JOB REPORTS AS CANCELLED AND NOT AS FAILED**, and one such job makes the
+- **A timed-out job reports as cancelled and not as failed**, and one such job makes the
   whole run read cancelled. On a branch where cancellation is the NORMAL outcome, an overrun
   is perfectly disguised as the concurrency group working — which is how a `[checkpoint]`
   can appear to have been cancelled by a later push it is immune to.
 
 ### A check that cannot fire reads exactly like a check that passes
 
-- **ARM ANYTHING THAT HAS ALWAYS READ ZERO.** `Surprise` and `Abstain` were both found wired
+- **Arm anything that has always read zero.** `Surprise` and `Abstain` were both found wired
   and unable to fire, and *promiscuous on purpose* meant EXHAUSTIVE for the life of the repo
   because its gate was mounted nowhere.
-- **A GUARD MOUNTED ON ONE CALLER IS NOT MOUNTED**, and a CODE PATH GUARDED BY A CAP IS
-  UNTESTED UNTIL SOMETHING REACHES THE CAP. Both sat unexercised for the life of the repo
+- **A guard mounted on one caller is not mounted**, and a code path guarded by a cap is
+  untested until something reaches the cap. Both sat unexercised for the life of the repo
   because no world was wide enough.
-- **A DOCUMENTED PROMISE IS NOT A CHECK.** `Posted` said a fan-out was posts in flight while
+- **A documented promise is not a check.** `Posted` said a fan-out was posts in flight while
   both of its fan-outs awaited each post in turn — false from the day it was written, directly
   under the sentence describing the fault. A fix aimed at the callers one measurement touched
   leaves the rest.
-- **A BUDGET CAN BE SATISFIED BY A COINCIDENCE**, and a CAST TO AN INTERFACE THE TYPE DOES NOT
-  IMPLEMENT IS CLEANUP THAT NEVER RUNS. Both compile and read as tidy.
-- **A PREDICTION WRITTEN INTO A WIRING CHECK FAILS TWO WAYS AND READS THE SAME.** Assert that
+- **A budget can be satisfied by a coincidence**, and a cast to an interface the type does not
+  implement is cleanup that never runs. Both compile and read as tidy.
+- **A prediction written into a wiring check fails two ways and reads the same.** Assert that
   arms DIFFER, never which way.
 
 ### A comparison that moves two things at once
 
-- **MEASURE ONE MECHANISM ON FROM A KNOWN BASELINE, NEVER ONE OFF FROM ALL-ON.**
-- **A SETTING CAN DECIDE TWO INDEPENDENT THINGS WHILE BEING NAMED FOR ONE**, so the cell that
+- **Measure one mechanism on from a known baseline, never one off from all-on.**
+- **A setting can decide two independent things while being named for one**, so the cell that
   separates them may already exist and never have been read as a control.
-- **A READOUT ARM IS A SEARCH ARM WHEREVER THE READOUT TRIGGERS THE SEARCH.** Every vote
+- **A readout arm is a search arm wherever the readout triggers the search.** Every vote
   comparison in four sessions moved both.
-- **A FIXTURE INHERITS EVERY DIAL IT DOES NOT PIN**, so a default moving rewrites an
-  experiment nobody edited — and THE GRID THAT DECIDES A DEFAULT REWRITES ITSELF THE MOMENT
-  IT WINS.
-- **A DEFAULT CAN SHORT-CIRCUIT THE MECHANISM BEING MEASURED**, so a sweep on defaults
+- **A fixture inherits every dial it does not pin**, so a default moving rewrites an
+  experiment nobody edited — and the grid that decides a default rewrites itself the moment
+  it wins.
+- **A default can short-circuit the mechanism being measured**, so a sweep on defaults
   returned three identical arms for a gate that was never running.
-- **A TEST CAN FAIL AT BOTH ENDS OF A DIAL FOR OPPOSITE REASONS**, so pinning to the old value
+- **A test can fail at both ends of a dial for opposite reasons**, so pinning to the old value
   fixes nothing while reading as a fix. **Do not attribute a red test to your own change
   without a baseline.**
 
 ### A score reached the wrong way
 
-- **AN ACCURACY CAN BE HIT BY MEMORISING.** Report the commitment count beside every score,
+- **An accuracy can be hit by memorising.** Report the commitment count beside every score,
   and on a world with known ground truth report how much of it was found.
-- **A CORPUS CAN CONTAIN ITS OWN ANSWER, and then a score measures the leak.** A generated
+- **A corpus can contain its own answer, and then a score measures the leak.** A generated
   world cannot, which is half of why the multiplexer is first.
-- **A GRID CAN RANK ARMS ON COLUMNS A SKEWED WORLD RAISES FOR FREE**, and a GRID OF IDENTICAL
-  ROWS IS A VERDICT ON THE WORLDS RATHER THAN ON THE ARM.
-- **A PRECISION TAKEN AT THE ANSWER'S OWN SIZE IS THE EXPERIMENTER HOLDING THE KNIFE.**
+- **A grid can rank arms on columns a skewed world raises for free**, and a grid of identical
+  rows is a verdict on the worlds rather than on the arm.
+- **A precision taken at the answer's own size is the experimenter holding the knife.**
   Nothing inside the machine knows a category has four members. Report the size-free cut.
-- **A FRONT-END ARM HAS A CEILING COMPUTABLE WITH NO LEARNING, AND IT COSTS MILLISECONDS
-  AGAINST A RUNNER'S HOUR.** Take it FIRST — a grid cannot tell a rule that dropped the wrong
+- **A front-end arm has a ceiling computable with no learning, and it costs milliseconds
+  against a runner's hour.** Take it FIRST — a grid cannot tell a rule that dropped the wrong
   sentence from a learner that failed to use the right one.
-- **TWO ARMS THAT SCORE ALIKE NEED NOT BE THE SAME MECHANISM, AND A SCORE CANNOT SAY.** A cap
+- **Two arms that score alike need not be the same mechanism, and a score cannot say.** A cap
   that refuses nothing and a cap that refuses a lot read identically until something counts
   what was BUILT.
 
 ### A statistic whose halves count different things
 
-- **A RATE WHOSE NUMERATOR COUNTS RULES SAYS NOTHING ABOUT HOW MUCH GOT COVERED**, and A SHARE
-  WHOSE HALVES COUNT DIFFERENT EVENTS ANNOUNCES ITSELF BY EXCEEDING ONE.
-- **AN EXACT PARTITION OF WHAT REACHED A MECHANISM SAYS NOTHING ABOUT WHAT NEVER REACHED IT.**
+- **A rate whose numerator counts rules says nothing about how much got covered**, and a share
+  whose halves count different events announces itself by exceeding one.
+- **An exact partition of what reached a mechanism says nothing about what never reached it.**
   The lineage that mattered was absent from the denominator.
-- **A LIST THAT APPENDS A DUPLICATE IS A COUNT WEARING A SET'S SHAPE**, and every reader gets
+- **A list that appends a duplicate is a count wearing a set's shape**, and every reader gets
   whichever it assumed.
-- **A PERIODIC SWEEP INSIDE A CONDITIONAL RUNS AT THAT CONDITION'S RATE**, so subsumption and
+- **A periodic sweep inside a conditional runs at that condition's rate**, so subsumption and
   culling read as mechanisms that bought nothing. Its dual: a periodic sweep against a
   per-round rate that scales with the front end holds a population far above its capacity.
-- **AN EXPLANATION CAN BE ARITHMETICALLY TRUE AND STILL NOT BE WHAT MOVED THE NUMBER.**
+- **An explanation can be arithmetically true and still not be what moved the number.**
 
 ### Too few seeds, or too much trust in the spread
 
-- **ONE SEED IS NOT A COMPARISON AND WILL HAPPILY INVERT.** Error bars before ordering, every
+- **One seed is not a comparison and will happily invert.** Error bars before ordering, every
   time, and count seeds in BOTH directions — a small sample hides a real effect as readily as
   it invents one.
-- **A SEED SPREAD IS NOT ALWAYS A YARDSTICK**, so a kill line resting on one can be vacuous:
+- **A seed spread is not always a yardstick**, so a kill line resting on one can be vacuous:
   identical scores in every cell admit any gain at all.
-- **AN ESTIMATE IS NOISE BEFORE IT IS A STATISTIC, AND A CHAOTIC RUN KEEPS THE PERTURBATION**,
+- **An estimate is noise before it is a statistic, and a chaotic run keeps the perturbation**,
   so a mid-run reading and an end-of-run one are different measurements.
-- **A WINNER-TAKE-ALL ARGMAX IS CHAOTIC IN ITS EVIDENCE**, and two ends of a sweep cannot
+- **A winner-take-all argmax is chaotic in its evidence**, and two ends of a sweep cannot
   show it.
 
 ### Reproducibility broken from outside the code
 
-- **A DEPENDENCY'S DEFAULTS CAN BREAK IT SILENTLY.** Parallel inference reorders float
+- **A dependency's defaults can break it silently.** Parallel inference reorders float
   reductions and a code is a QUANTISED number, so a reading at a band boundary codes
   differently run to run.
-- **A TIE-BREAK BY DICTIONARY WALK IS STABLE UNTIL THERE ARE TWO TABLES** — reproducible in
+- **A tie-break by dictionary walk is stable until there are two tables** — reproducible in
   one process, arbitrary across a merge.
-- **A MEASUREMENT INSIDE A REPORT IS ASSERTED ON BY EVERY EQUALITY READING IT.** A wall clock
+- **A measurement inside a report is asserted on by every equality reading it.** A wall clock
   in a record turns reproducibility red and makes every `NotEqual` beside it pass for free.
 - **A `readonly record struct` HOLDING AN `ImmutableArray` COMPARES BY THE ARRAY'S IDENTITY**,
   so two separately built keys with identical contents are never equal.
-- **A TYPE CAN DROP MOST OF ITSELF ON THE WIRE AND STILL WRITE A PLAUSIBLE NUMBER.** Private
+- **A type can drop most of itself on the wire and still write a plausible number.** Private
   tables and tuple keys serialise to nothing. Pin a format failure with a check on the
   ANSWER, never a comment.
-- **A LOCAL BUILDER'S INVARIANT IS NOT THE RECEIVED FORM'S.** No pair built here holds one
+- **A local builder's invariant is not the received form's.** No pair built here holds one
   code twice; the wire form takes whatever arrived.
 
 ### Reading the machine wrong
 
-- **A DOC CAN NAME THE WRONG BLOCKER AND BE BELIEVED FOR A WHOLE BRANCH.** Read the code
+- **A doc can name the wrong blocker and be believed for a whole branch.** Read the code
   before costing the fix.
-- **READ THE REVIVAL ROWS BEFORE PROPOSING A MISSING ARM** — a row may name the same axis in
+- **Read the revival rows before proposing a missing arm** — a row may name the same axis in
   the mechanism's words rather than the comparison's, which is how a search misses it.
-- **THE TELL IS OFTEN A DISTRIBUTION, NOT A SCORE.** A hard ceiling immediately below a
+- **The tell is often a distribution, not a score.** A hard ceiling immediately below a
   threshold is never a coincidence; read the spread, not the mean.
-- **AN ONLINE SCORE BELOW WHAT THE FINAL POPULATION GETS ON FRESH OBSERVATIONS IS A CHURN
-  SIGNAL** — the population is being rebuilt faster than the trailing window can read it.
-- **A MECHANISM IS LOCAL OR POPULATION-WIDE BY ACCIDENT UNTIL SOMETHING SPLITS IT**, and
+- **An online score below what the final population gets on fresh observations is a churn
+  signal** — the population is being rebuilt faster than the trailing window can read it.
+- **A mechanism is local or population-wide by accident until something splits it**, and
   nothing in one process can tell the two apart.
-- **A COST CAN BE IN MEMORY WHILE EVERY INSTRUMENT WATCHES TIME**, and A CLAIM ABOUT
-  CORRECTNESS WILL DO DUTY AS A CLAIM ABOUT THROUGHPUT UNLESS SOMEBODY MEASURES.
-- **A SIMULATED CONSTRAINT CAN BE HARSHER THAN THE REAL ONE.** `HybridBus` reorders on purpose
+- **A cost can be in memory while every instrument watches time**, and a claim about
+  correctness will do duty as a claim about throughput unless somebody measures.
+- **A simulated constraint can be harsher than the real one.** `HybridBus` reorders on purpose
   and TCP does not, so a green distributed run says nothing about C2.
-- **AN ANSWER KEY IN THE WRONG ALPHABET SCORES NOUGHT AND LOOKS LIKE A VERDICT.**
-- **A FALLBACK IS A CONTROL ARM NOBODY MEANT TO RUN** — silence drifts an arm toward the
+- **An answer key in the wrong alphabet scores nought and looks like a verdict.**
+- **A fallback is a control arm nobody meant to run** — silence drifts an arm toward the
   random bar for free. Report silence beside the score.
-- **DELETING THE LAST ARM DELETES THE CHECK THAT MADE THE DELETION LEGITIMATE**, so a property
+- **Deleting the last arm deletes the check that made the deletion legitimate**, so a property
   asserted across three arms becomes an argument again with one left.
-- **THE INSTRUMENT THAT KILLS A STORY IS USUALLY BUILT FOR SOMETHING ELSE**, so ask which grid
+- **The instrument that kills a story is usually built for something else**, so ask which grid
   already holds the number before running a new one. And ask which half of generate-and-test a
   proposal touches: where no right rule was present, a rule about who WINS cannot reach it.
 

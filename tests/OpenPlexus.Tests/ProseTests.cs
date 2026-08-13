@@ -64,7 +64,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// really is one-way.
     /// </para>
     /// </remarks>
-    private const int Shouting = 2_486;
+    private const int Shouting = 2_404;
 
     /// <summary>
     /// The most words a bold span may hold before it is a sentence rather than a lead.

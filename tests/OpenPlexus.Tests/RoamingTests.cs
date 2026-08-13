@@ -622,6 +622,119 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 + "rewards and the spine's next tier is aimed at the wrong arm");
     }
 
+    /// <summary>
+    /// Whether the transcript can be followed to the answer at all — <b>the world's own claim
+    /// checked</b>, rather than asserted in a comment.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The probe knows the shape of the walk and may never ship</b>, which is
+    /// <c>HandingTests</c>'s standing for the same kind of instrument. It follows the true
+    /// chain: the newest statement naming the thing and a person is the drop that settled it,
+    /// and the room is the newest statement older than that one naming the same person and a
+    /// room. A thing never picked up is where it was first said to be.
+    /// </para>
+    /// <para>
+    /// <b>And a chain that runs out is the number worth having.</b> A person's starting room is
+    /// drawn and never stated, so a walker who takes a thing and puts it down before moving has
+    /// put it somewhere no rule can name. That share is a hard cap on every arm and on every
+    /// learner, and it is not the same thing as the answering word being absent — the word is
+    /// present whenever any statement happens to mention that room.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_the_true_chain_can_be_followed_to_the_answer()
+    {
+        foreach (var people in new[] { 1, 2, 4 })
+        {
+            var world = new Roaming(World(120, people), seed: 1);
+
+            var rooms = world.Named.ToList();
+            var props = world.Called;
+            var cast = world.Walking.ToHashSet();
+
+            var asked = 0;
+            var followed = 0;
+            var right = 0;
+
+            foreach (var turn in world.Withheld)
+            {
+                if (turn.Outcome is not { } answer) continue;
+
+                asked++;
+
+                var story = turn.Seen.Said;
+                var about = props.FirstOrDefault(one => turn.Seen.Asked.Contains(one));
+
+                // The newest statement naming the thing and a walker, which is the event that
+                // settled where it is. A thing still in a hand is never asked about, so this
+                // statement is a drop whenever it exists at all -- no verb has to be read.
+                var dropped = -1;
+
+                for (var at = 0; at < story.Count && dropped < 0; at++)
+                    if (story[at].Contains(about) && story[at].Any(cast.Contains)) dropped = at;
+
+                if (dropped < 0)
+                {
+                    // Never handled, so the opening placement still stands. `Said` is newest
+                    // first, so the oldest statement naming the thing is the one that placed it.
+                    var placed = story.LastOrDefault(
+                        one => one.Contains(about) && rooms.Any(room => one.Contains(room)));
+
+                    if (placed is null) continue;
+
+                    followed++;
+
+                    if (rooms.FindIndex(placed.Contains) == answer) right++;
+
+                    continue;
+                }
+
+                var who = story[dropped].First(cast.Contains);
+                var moved = -1;
+
+                // Older only, which is what makes this the chain rather than a lookup. Where
+                // the walker stood when the thing was put down is the last move BEFORE that
+                // statement, and a later move took the walker somewhere the thing did not go.
+                for (var at = dropped + 1; at < story.Count && moved < 0; at++)
+                    if (story[at].Contains(who) && story[at].Any(room => rooms.Contains(room)))
+                        moved = at;
+
+                if (moved < 0) continue;
+
+                followed++;
+
+                if (rooms.FindIndex(story[moved].Contains) == answer) right++;
+            }
+
+            output.WriteLine(
+                $"people {people} | asked {asked,4} | followed {followed / (double)asked:F3} "
+                + $"| right {right / (double)followed:F3} "
+                + $"| right of all {right / (double)asked:F3}");
+
+            // The half that says the probe is following the world rather than guessing at it.
+            // Where the chain completes it is the answer, exactly, at every cell -- so a gap
+            // in the column beside it is a transcript that cannot be followed and never a
+            // rule that followed it wrongly.
+            Assert.True(right == followed,
+                $"the chain completed on {followed} questions and answered {right} of them, so "
+                + "following the drop to the walker to the room is not what this world does and "
+                + "every ceiling in this file is measuring against the wrong ground truth");
+
+            // And the cap the gap is. A walker's starting room is drawn and never stated, so
+            // one who takes a thing and puts it down before moving has put it somewhere no rule
+            // can name: nought at one and two people, five thousandths at four. It stays a
+            // recorded cap rather than a repair, because stating the starting rooms would add a
+            // statement to every transcript and move every reading ever taken on this world for
+            // a twentieth of a point. The bar is here so that a change making it large fails.
+            Assert.True(followed / (double)asked > 0.99,
+                $"with {people} people the chain runs out on "
+                + $"{1.0 - (followed / (double)asked):F3} of questions, so a real share of this "
+                + "world is unanswerable by anything and every ceiling beside it is being read "
+                + "as if 1.000 were reachable");
+        }
+    }
+
     /// <summary>Which questions share one moment, keyed so two machines agree.</summary>
     /// <param name="groups">Every moment seen so far.</param>
     /// <param name="moment">One moment.</param>

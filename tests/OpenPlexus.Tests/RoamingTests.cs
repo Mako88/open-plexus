@@ -479,6 +479,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         var company = new Dictionary<(int People, string Arm), List<double>>();
         var pinning = new Dictionary<(int People, string Arm), List<double>>();
         var walkers = new Dictionary<(int People, string Arm), List<double>>();
+        var twinned = new Dictionary<(int People, string Arm), List<double>>();
 
         var reading = new[]
         {
@@ -493,6 +494,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 company[(people, name)] = [];
                 pinning[(people, name)] = [];
                 walkers[(people, name)] = [];
+                twinned[(people, name)] = [];
             }
 
             // Seeds, because a column read on one house is an anecdote and this axis moves
@@ -531,6 +533,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
                     var pinned = 0;
                     var left = 0;
                     var whose = 0;
+                    var carried = new Dictionary<string, List<int>>();
 
                     foreach (var turn in world.Withheld)
                     {
@@ -538,6 +541,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
                         var moment = joined.Codify(turn.Seen).ToHashSet();
                         var here = rooms.Where(moment.Contains).ToList();
+                        var whole = new HashSet<Code>(moment);
 
                         left += here.Count;
 
@@ -547,11 +551,21 @@ public sealed class RoamingTests(ITestOutputHelper output)
                         whose += cast.Count(moment.Contains);
 
                         if (here.Count == 1 && here[0] == rooms[answer]) pinned++;
+
+                        // And the column that actually caps a learner, carried alongside the two
+                        // that cap reading the answer off the room. See the conflation grid: a
+                        // commitment expects an outcome code, so a moment with no room word in it
+                        // is still answerable and a moment that is another's twin is not.
+                        if (joined.Order(turn.Seen) is { Count: > 1 } order)
+                            foreach (var precedence in Sequenced.From(order)) whole.Add(precedence);
+
+                        Group(carried, whole).Add(answer);
                     }
 
                     company[(people, name)].Add(left / (double)asked);
                     pinning[(people, name)].Add(pinned / (double)asked);
                     walkers[(people, name)].Add(whose / (double)asked);
+                    twinned[(people, name)].Add(Conflated(carried, asked));
                 }
             }
 
@@ -562,7 +576,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
                     + $"{pinning[(people, name)].Max():F3} | rooms left "
                     + $"{company[(people, name)].Min():F2} to {company[(people, name)].Max():F2}"
                     + $" | people left {walkers[(people, name)].Min():F2} to "
-                    + $"{walkers[(people, name)].Max():F2}");
+                    + $"{walkers[(people, name)].Max():F2} | conflated "
+                    + $"{twinned[(people, name)].Min():F3} to {twinned[(people, name)].Max():F3}");
             }
         }
 
@@ -612,8 +627,16 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // So the arms come apart on this axis, which is what an axis is for. At four people one
         // hop through the freshest key leads every other arm here at its worst against their
         // best -- including the same rule folding three hops, which arrives with more company
-        // than it started with. Depth is what a second person makes expensive and choosing is
-        // what it makes worth doing.
+        // than it started with.
+        //
+        // And this column is not a prediction, which the learner at this cell settled and is
+        // worth saying where the number is printed. `pinned` got the depth comparison right and
+        // the key comparison wrong: `Resolved(1)` pins 0.029 here and OUTSCORES the freshest key
+        // at 0.180, because it leaves two rooms in the moment against one and a quarter and a
+        // commitment that recognises a moment does not need the answer word inside it. What this
+        // caps is reading the answer off the room, which is one strategy rather than the learner.
+        // The conflated column is the cap, and it got the same two comparisons the other way
+        // round -- so neither ranks these arms and both bound them.
         foreach (var name in reading.Where(one => one != "Freshest(1)"))
             Assert.True(pinning[(4, "Freshest(1)")].Min() > pinning[(4, name)].Max(),
                 $"at four people {name} pins {pinning[(4, name)].Max():F3} at its best against "
@@ -947,6 +970,13 @@ public sealed class RoamingTests(ITestOutputHelper output)
             ("Resolved(1)", new Joined(Joining.Resolved, resolution: 1)),
             ("Freshest(1)", new Joined(Joining.Resolved, resolution: 1, freshest: true)),
             ("Freshest(3)", new Joined(Joining.Resolved, resolution: 3, freshest: true)),
+
+            // And the two the conflation column made interesting at this cell rather than at
+            // one person. `Distinguished` conflates 0.004 of moments here against 0.766 at one
+            // person, so its cap is wide open on a world where it pins almost nothing -- which
+            // is the sharpest test there is of whether a cap says anything about a score.
+            (nameof(Joining.Distinguished), new Joined(Joining.Distinguished)),
+            (nameof(Joining.Chained), new Joined(Joining.Chained)),
         };
 
         var scores = Scored(arms, people: 4);
@@ -960,5 +990,28 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + "with four people walking, under twice the marginal -- so a second walker has "
             + "taken the world out of this learner's reach and the ceiling that says it is "
             + "reachable is measuring something a run cannot convert");
+
+        // The pre-registered half, and it held: 0.439 at its worst against 0.401 at three hops'
+        // best. Depth is what a second walker makes expensive, which is what the company column
+        // said before the run -- three hops arrive with 3.39 walkers in the moment against 1.28.
+        Assert.True(scores["Freshest(1)"].Min() > scores["Freshest(3)"].Max(),
+            $"one hop reads {scores["Freshest(1)"].Min():F3} at its worst against "
+            + $"{scores["Freshest(3)"].Max():F3} for three at their best, so the inversion the "
+            + "people grid predicted is not there and what a fold pins says nothing about depth");
+
+        // And the half that was refuted, which is the more useful one. Folding through every key
+        // leads here, 0.484 at its worst against the freshest key's 0.471 at its best -- so the
+        // key rule's whole advantage does not survive a second walker, and it was the only thing
+        // separating `Freshest` from `Resolved` at one person.
+        //
+        // The prediction leaned on `pinned`, one commit after this same file recorded that a
+        // read-it-off column does not cap a learner. `Resolved(1)` pins 0.029 against 0.180 and
+        // wins, because it reaches further: two rooms in the moment against one and a quarter,
+        // and a commitment that recognises a moment does not need the answer word in it.
+        Assert.True(scores["Resolved(1)"].Min() > scores["Freshest(1)"].Max(),
+            $"folding through every key reads {scores["Resolved(1)"].Min():F3} at its worst "
+            + $"against {scores["Freshest(1)"].Max():F3} for the freshest key at its best, so the "
+            + "key rule's advantage does survive a second walker after all and fork 95's answer "
+            + "is what it looked like at one person");
     }
 }

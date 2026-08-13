@@ -91,10 +91,6 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["Homeostat.Viable"] = Stranded,
         ["Rhythm.Beat"] = Stranded,
         ["Rhythm.Turned"] = Stranded,
-        ["Snake.Absolute"] = Stranded,
-        ["Snake.Heading"] = Stranded,
-        ["SnakeSense.Encode"] = Stranded,
-        ["SnakeSense.Turned"] = Stranded,
 
         // ---- And the one that came straight back off, which is the check working -----
         //
@@ -205,7 +201,13 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         //
         // And it only ever falls from here. Nought is the destination and this is a
         // detour with a map, not a new resting place.
-        Assert.Equal(14, Unused.Count);
+        //
+        // Ten, and four came off by `Snake` and `SnakeSense` being DELETED rather than
+        // wired. Their question was prediction conditional on action, which is forks 18 and
+        // 20 -- both settled, and `csharp` disqualified survival as a score and refuted
+        // absolute actions under an unrotated view besides. `PushbackTests` had the decision
+        // recorded and waiting; this is somebody taking it.
+        Assert.Equal(10, Unused.Count);
     }
 
     [Fact]
@@ -265,7 +267,6 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["HomeostatRun"] = Harness,
         ["MotifRun"] = Harness,
         ["SensesRun"] = Harness,
-        ["SnakeRun"] = Harness,
         ["TendingRun"] = Harness,
         ["ClutrrRun"] = Harness,
         ["LatentRun"] = Harness,
@@ -312,11 +313,15 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // which -- a world whose question is LIVE and wants a runner, or a world whose
         // question closed with the walk and wants deleting.
         //
-        // SOME ARE OBVIOUSLY LIVE: `Senses` is the cross-modal pairing nothing has ever run,
-        // `Motif` is rung five's redundancy manufactured on purpose, `Rhythm` is rung
-        // three's, `Latent` is fork 39's. SOME ARE OBVIOUSLY NOT: `Snake` and `SnakeSense`
-        // were built for prediction-conditional-on-action, which is forks 18 and 20, both
-        // SETTLED and both deleted with the walk.
+        // SOME ARE OBVIOUSLY LIVE: `Motif` is rung five's redundancy manufactured on
+        // purpose, `Rhythm` is rung three's, `Latent` is fork 39's. `Snake` and `SnakeSense`
+        // were the obviously-not pair -- prediction conditional on action, forks 18 and 20,
+        // both settled -- and they are gone rather than wired.
+        //
+        // And two of the four on that delete list should not go. `Homeostat` is the only
+        // world here that is acted in and is what `Drives` needs, and `Composed.Segmented`
+        // is one of the dials feeding the unread `Bind` channel, which is a live entry. A
+        // handoff enumerated them as closed without reading what each held.
         //
         // What is forbidden is leaving them here while nobody decides, which is the same
         // sentence the dial rule uses. Deleting them all to make a guard green would delete
@@ -341,8 +346,6 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "two senses and asks about one of them, and the examination shows a sight and "
             + "a sound and asks what the thing FEELS like -- a combination the stream draws "
             + "nought times. `SensesTests` is its caller.",
-        ["Snake"] = Stranded,
-        ["SnakeSense"] = Stranded,
 
         ["HybridBus"] = Composed,
 

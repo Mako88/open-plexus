@@ -91,7 +91,7 @@ public static class Sequenced
     /// <para>
     /// <b>By distinct position and not by list index, which is where the first version was
     /// wrong.</b> A front end may report several codes at ONE position —
-    /// <see cref="Worlds.SnakeSense"/> puts the action at nought and its whole view at one —
+    /// the deleted <c>SnakeSense</c> put the action at nought and its whole view at one —
     /// and walking a sorted list pairwise would emit <i>this view code came before that
     /// one</i>, which the front end never said and which is false. Positions are grouped
     /// first, and every pair across two CONSECUTIVE groups is emitted.

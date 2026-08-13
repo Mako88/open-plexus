@@ -55,14 +55,18 @@ public sealed class PushbackTests(ITestOutputHelper output)
                 + "a cliff means the wait is the price and the objection was wrong."),
 
         new(
-            With: "The eleven stranded worlds",
-            Claim: "The instinct will be to wire all eleven to a Trial because that turns "
-                + "OutstandingTests green. At least three should be DELETED instead -- "
-                + "Snake and SnakeSense were built for forks 18 and 20, both settled and "
-                + "both gone with the walk, so wiring them would be paying to keep a "
-                + "question nobody is asking.",
-            Settles: "A decision per world, recorded. This closes by somebody choosing, "
-                + "not by a measurement."),
+            With: "The remaining stranded worlds",
+            Claim: "Snake and SnakeSense are now deleted, which was this entry's own "
+                + "instruction, and the delete list it came with was wrong about two more. "
+                + "Homeostat is the only world here that is acted in and is exactly what "
+                + "Drives needs, so deleting it would close one red entry by destroying "
+                + "what another needs; Composed.Segmented feeds the unread Bind channel, "
+                + "which is live. Four have no decision recorded at all -- Clevr, Latent, "
+                + "Motif and Rhythm -- and the instinct is still to wire them because that "
+                + "turns OutstandingTests green.",
+            Settles: "A decision per world, recorded, and read against what the world "
+                + "actually holds rather than off a list of names. This closes by somebody "
+                + "choosing for the four left, not by a measurement."),
 
         new(
             With: "DialTests.Every_arm_is_measured_on_at_least_two_worlds",

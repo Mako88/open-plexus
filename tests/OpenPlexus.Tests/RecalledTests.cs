@@ -464,6 +464,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
                         + $"{(ordered ? "ordered" : "bagged ")} | "
                         + $"unseen {unseen?.Accuracy ?? 0.0:F3} "
                         + $"silent {unseen?.Silence ?? 0.0:F3} | "
+                        + $"marginal {world.Commonest:F3} "
+                        + $"chance {1.0 / world.Outcomes:F3} | "
                         + $"drawn {tally.Recent:F3} | "
                         + $"held {brain.Held.Count,6} "
                         + $"names {tally.Named,3} of {tally.Eligible,5} eligible, "

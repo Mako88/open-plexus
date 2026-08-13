@@ -231,10 +231,22 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// <para>
     /// <b>So the two red entries here are one piece of work.</b> <c>Homeostat</c> is on
     /// <see cref="Every_world_is_either_run_by_something_or_gone"/>'s list for seven of its
-    /// twenty-one entries, and the handoff that enumerated that list put it among the worlds
-    /// whose question had closed. Giving it a <c>Trial</c> is what makes <c>Drives</c>
-    /// buildable at all, and deleting it would have closed one entry by destroying the only
-    /// thing the other one needs.
+    /// entries, and the handoff that enumerated that list put it among the worlds whose
+    /// question had closed. Deleting it would have closed one red entry by destroying the
+    /// only thing the other one needs.
+    /// </para>
+    /// <para>
+    /// <b>And a <c>Trial</c> cannot drive it, which corrects the first version of this
+    /// note.</b> <see cref="Worlds.IWorld{TSeen}.Next"/> is a pull: the world produces the
+    /// next turn and the learner chooses nothing, so there is nowhere for
+    /// <c>Homeostat.Step(attend)</c> to be called from. Its seven entries do not close by a
+    /// runner being written, and the estimate that said they did was wrong.
+    /// </para>
+    /// <para>
+    /// <b>What is actually owed first is an action on the world interface</b>, which the plan
+    /// already carries under <i>original thought</i> as unbuilt — action, a consequence that
+    /// can surprise, and a goal. So this entry and <c>Homeostat</c>'s seven are both behind
+    /// that, and both are larger than either was written as.
     /// </para>
     /// <para>
     /// <b>The trap is a doc naming the wrong blocker</b>, which this repo has already been

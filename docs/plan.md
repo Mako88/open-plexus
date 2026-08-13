@@ -371,9 +371,8 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
     - **NOW** — a forward store beside the population, retracting where the counters cannot.
     - **NOW** — rung three, sequence. A precedence is a CODE derived where the moment is
       FORMED, so matching, the tally, repair and the wire are untouched. No dial, and inert where none is reported.
-    - **OPEN** — rung three reads real English through `Recited`. It COSTS where a bag
-      suffices and pays where the bag conflates; why is unread, and the grid asking whether
-      SELECTION is what it buys is dispatched. Fork **109**.
+    - **SETTLED** — rung three reads real English, and its gain tracks the front end's
+      SELECTIVITY rather than the task: largest under `Chained`, nil under a bag. Fork **109**.
     - **OPEN** — a referent is a THIRD store rather than the same one: *Mary's bedroom*
       survives leaving the room and *Mary is in the bedroom* does not, so one store gets one
       lifetime wrong whichever it takes.
@@ -440,7 +439,7 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       pass. Fork **90**.
     - **OPEN** — it is a near-perfect READER and a hopeless SELECTOR, which the two ends say
       together: shown the right statement it is at the ceiling, shown the whole story it
-      takes a fraction of what is present to be answered.
+      takes a fraction of what is present to be answered. SELECTION is where the exam moves.
   - Told, never architected
     - **NOW** — a front end may say what it is looking at, never what to conclude.
       `SeparationTests` fails the build.

@@ -45,18 +45,6 @@ public sealed class Holder : IReceiveAsks
     /// </remarks>
     private readonly string _slot;
 
-    /// <summary>
-    /// One asker at a time reads the population.
-    /// </summary>
-    /// <remarks>
-    /// <b>Because asks arrive on whatever thread the transport chose, and a population is
-    /// not thread-safe.</b> Both buses dispatch deliveries concurrently on purpose, so two
-    /// asks overlapping is the ordinary case and not the rare one. Reading a dictionary
-    /// while another read walks it is the kind of fault that shows up as a corrupted
-    /// answer rather than as an exception.
-    /// </remarks>
-    private readonly Lock _gate = new();
-
     /// <param name="address">Where this holder is asked.</param>
     /// <param name="held">What it holds.</param>
     /// <param name="bus">How its answers get back.</param>
@@ -95,7 +83,12 @@ public sealed class Holder : IReceiveAsks
 
         Answer answer;
 
-        lock (_gate)
+        // One asker at a time in the population, and the lock is the population's rather
+        // than this holder's. Asks arrive on whatever thread the transport chose and both
+        // buses dispatch concurrently on purpose, so two overlapping is the ordinary case;
+        // and the trial reads these same tables from outside, which a lock held only here
+        // does not cover. See `Population.Gate`.
+        lock (_held.Gate)
         {
             answer = new Answer
             {

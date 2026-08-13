@@ -402,6 +402,32 @@ public sealed class Population
     private readonly Dictionary<Code, List<Commitment>> _byCode = [];
 
     /// <summary>
+    /// One party at a time in these tables.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>It lives here rather than on <c>Holder</c>.</b> A holder serialises the asks it is
+    /// delivered, which is enough while it is the only party touching its own population.
+    /// <c>Trial</c> reads every holder's tables from the thread running the trial, and a lock
+    /// on one side of that is not a lock.
+    /// </para>
+    /// <para>
+    /// <b>And the read cannot be ordered after the writes.</b> Waiting for a fleet to go quiet
+    /// means waiting for every holder to answer, and a holder that accepted the question and
+    /// went silent never will — late and absent are one thing under C2, and the deadline
+    /// separating them carries a revival row saying never. So a tally is taken on a fleet that
+    /// is still running, by construction, and what it can be is atomic rather than final.
+    /// </para>
+    /// <para>
+    /// <b>A snapshot is what crosses the gate, never a lazy walk.</b> Handing an iterator out
+    /// under a lock releases it before the caller reads anything, which is the fault this
+    /// found: <see cref="All"/> was a deferred <c>OrderBy</c> over a live dictionary, and a
+    /// key selector on a runner read an entry mid-insert as nothing.
+    /// </para>
+    /// </remarks>
+    private readonly Lock _gate = new();
+
+    /// <summary>
     /// What each commitment has forked into, by name.
     /// </summary>
     /// <remarks>
@@ -567,8 +593,24 @@ public sealed class Population
     /// </remarks>
     public int Count => _byName.Count;
 
+    /// <summary>What a holder takes while it is being asked, so a reader may take it too.</summary>
+    /// <remarks>
+    /// <b>Handed out rather than hidden.</b> The tally walks these tables more than once, and
+    /// each walk under its own acquire is a reading of a different population, so <c>Trial</c>
+    /// holds this across every walk it makes of one holder. The scalar counters beside them
+    /// are single reads and are left outside it. See <see cref="_gate"/> for why ordering the
+    /// read after the writes is not available.
+    /// </remarks>
+    public Lock Gate => _gate;
+
     /// <summary>Every commitment, in a stable order.</summary>
-    public IEnumerable<Commitment> All => _byName.Values.OrderBy(one => one.Identity);
+    /// <remarks>
+    /// <b>Taken as a snapshot under <see cref="Gate"/></b>, for the reason that field gives.
+    /// </remarks>
+    public IReadOnlyList<Commitment> All
+    {
+        get { lock (_gate) return [.. _byName.Values.OrderBy(one => one.Identity)]; }
+    }
 
     /// <inheritdoc cref="Lifetime"/>
     /// <remarks>

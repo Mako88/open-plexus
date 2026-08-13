@@ -903,6 +903,42 @@ public sealed class Trial<TSeen>
                 ct).ConfigureAwait(false);
         }
 
+        // Every column that walks a table, taken in one pass under that holder's own gate.
+        // On a fleet these tables belong to machines that are still running: a round is
+        // complete when every slot has spoken, so a replica nobody waited for can be inside
+        // its own settlement while this runs. Six separate `held.All` walks were six chances
+        // to read an entry mid-insert, and on a runner one of them did.
+        var counted = 0;
+        var separations = 0L;
+        var occasions = 0.0;
+        var minted = new HashSet<Code>();
+        var stacked = 0;
+        var eligible = 0;
+        var stackable = 0;
+
+        foreach (var held in holding)
+        {
+            lock (held.Gate)
+            {
+                var all = held.All;
+
+                counted += all.Count;
+                separations += all.Sum(one => (long)one.Separations.Count);
+                occasions += all.Sum(one => one.Occasions);
+                eligible += all.Count(one => Recurrence.Eligible(one, _brain.Dials));
+
+                stackable += all.Count(one =>
+                    Recurrence.Eligible(one, _brain.Dials) && one.Scope.Length >= 3);
+
+                foreach (var one in held.Names.Means)
+                {
+                    minted.Add(one.Key);
+
+                    if (one.Value.Any(held.Names.Knows)) stacked++;
+                }
+            }
+        }
+
         return new Tally
         {
             Rounds = rounds,
@@ -917,23 +953,14 @@ public sealed class Trial<TSeen>
             Subsumed = cycle.Subsumed,
             Widened = cycle.Widened,
             Minted = cycle.Minted,
-            Resident = holding.Sum(held => held.Count),
-            Separations = holding.Sum(
-                held => held.All.Sum(one => (long)one.Separations.Count)),
+            Resident = counted,
+            Separations = separations,
             Spent = cycle.Spent,
-            Occasions = holding.Sum(held => held.Count) == 0
-                ? 0.0
-                : holding.SelectMany(held => held.All).Average(one => one.Occasions),
-            Named = holding
-                .SelectMany(held => held.Names.Means.Select(one => one.Key))
-                .Distinct()
-                .Count(),
-            Stacked = holding.Sum(held =>
-                held.Names.Means.Count(one => one.Value.Any(held.Names.Knows))),
-            Eligible = holding.Sum(held =>
-                held.All.Count(one => Recurrence.Eligible(one, _brain.Dials))),
-            Stackable = holding.Sum(held => held.All.Count(one =>
-                Recurrence.Eligible(one, _brain.Dials) && one.Scope.Length >= 3)),
+            Occasions = counted == 0 ? 0.0 : occasions / counted,
+            Named = minted.Count,
+            Stacked = stacked,
+            Eligible = eligible,
+            Stackable = stackable,
             Asked = holding.Sum(held => held.Asked),
             Spoke = holding.Sum(held => held.Spoke),
             AtScarce = holding.Sum(held => held.AtScarce),

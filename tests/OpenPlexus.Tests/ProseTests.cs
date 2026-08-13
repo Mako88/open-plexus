@@ -85,7 +85,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// This is the half that stayed a ratchet, because it is the half a script cannot do. A
     /// shouted sentence has one correct rewrite and a bold sentence does not: where the lead
     /// clause ends is a judgement about which part of the claim a reader scans for, and there
-    /// are 1,004 of those judgements left.
+    /// are 958 of those judgements left.
     /// </para>
     /// <para>
     /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
@@ -93,7 +93,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 1_004;
+    private const int Shouted = 958;
 
     /// <summary>
     /// The commit the decay schedule counts from. <b>John's, 2026-08-13.</b>

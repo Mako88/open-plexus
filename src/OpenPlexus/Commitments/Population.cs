@@ -42,8 +42,8 @@ public readonly record struct Vote
     /// worth the same surprise.
     /// </para>
     /// <para>
-    /// <b>Well defined under both weighings, which is why it is the best advocate rather
-    /// than the winner.</b> A sum has no single winner to name; the strongest advocate
+    /// <b>Well defined under both weighings</b>, which is why it is the best advocate rather
+    /// than the winner. A sum has no single winner to name; the strongest advocate
     /// for the winning expectation exists either way, and under
     /// the vote is a maximum, it IS the decision.
     /// </para>
@@ -53,7 +53,7 @@ public readonly record struct Vote
 
 /// <summary>One expectation's case, as the holder that made it would put it.</summary>
 /// <remarks>
-/// <b>THIS IS WHAT C1 allows to cross and the commitment itself is not.</b> The plan says
+/// <b>This is what C1 allows to cross</b>, and the commitment itself is not. The plan says
 /// a commitment records its OWN hits and misses and TELLS anyone who needs them at the
 /// moment it speaks — so what travels is an expectation, a weight already computed from
 /// the speaker's own accuracy, and the name of its best advocate. A reader learns what is
@@ -76,8 +76,8 @@ public readonly record struct Advocacy
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The vote is a fold and its aggregation is associative, which is why this type can
-/// exist at all.</b> The vote keyed weights by expectation and
+/// <b>The vote is a fold and its aggregation is associative</b>, which is why this type can
+/// exist at all. The vote keyed weights by expectation and
 /// combined them with a maximum or a sum; both compose in any order, so a holder can
 /// combine its own commitments first and a reader can combine the results. That is not a
 /// property this design was given — it is one it turned out to have, and fork 52 is
@@ -85,8 +85,8 @@ public readonly record struct Advocacy
 /// <see cref="Population.Decide"/>, which are the two halves it splits into.
 /// </para>
 /// <para>
-/// <b>And ordered by expectation, because the merge must not depend on who spoke
-/// first.</b> Under C2 the partials arrive in whatever order the network chose. Fork 12
+/// <b>And ordered by expectation</b>, because the merge must not depend on who spoke
+/// first. Under C2 the partials arrive in whatever order the network chose. Fork 12
 /// has cost this project twice, and a vote that moved with delivery order would be the
 /// third time.
 /// </para>
@@ -165,12 +165,12 @@ public enum Loss
 
 /// <summary>
 /// What happened to every commitment of one shape — <b>the step between a seed and a
-/// finished rule, which nothing has ever counted.</b>
+/// finished rule</b>, which nothing has ever counted.
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Every link in the chain is verified and the chain produces nothing, which is what
-/// makes a ledger the next thing rather than a seventh explanation.</b> The minority seeds
+/// <b>Every link in the chain is verified and the chain produces nothing</b>, which is what
+/// makes a ledger the next thing rather than a seventh explanation. The minority seeds
 /// are present, the separation test beats its control by the whole distance between
 /// sixteen sound rules and none, repair runs hundreds of times, true rules come out at
 /// perfect accuracy — and not one of them fires on a round the base rate gets wrong. What
@@ -179,7 +179,7 @@ public enum Loss
 /// does is unmeasured.
 /// </para>
 /// <para>
-/// <b>And the expectation is invariant down a lineage, which is what makes this cheap.</b>
+/// <b>And the expectation is invariant down a lineage</b>, which is what makes this cheap.
 /// <see cref="Population.Mend"/> builds <c>[..parent.Scope, added]</c> with the PARENT'S
 /// expectation and <see cref="Population.Widen"/> drops a code and keeps it, so every
 /// descendant of a minority-outcome seed expects the minority outcome forever. No parent
@@ -221,8 +221,8 @@ public readonly record struct Lifetime
     /// Repairs that reached this shape and found it already held.
     /// </summary>
     /// <remarks>
-    /// <b>A collision is the population having got there first, and it is counted apart
-    /// from a birth because reading it as either one is wrong.</b> As a birth it would
+    /// <b>A collision is the population having got there first</b>, and it is counted apart
+    /// from a birth because reading it as either one is wrong. As a birth it would
     /// double-count a rule that exists once; as nothing at all it would hide the case
     /// where repair spends its whole budget re-deriving what it already holds — which
     /// would look exactly like a budget that was too small.
@@ -234,15 +234,15 @@ public readonly record struct Lifetime
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Whether a lineage is even offered to the machinery, which every gate count so
-    /// far has assumed.</b> <see cref="Population.Wrong"/> and the five shares under it
+    /// <b>Whether a lineage is even offered to the machinery</b>, which every gate count so
+    /// far has assumed. <see cref="Population.Wrong"/> and the five shares under it
     /// partition the candidates that reached <see cref="Population.Mend"/>; none of them
     /// says which lineages reached it at all. A lineage that is never blamed is never
     /// repaired, and from every existing instrument that is indistinguishable from a
     /// lineage the gates refused.
     /// </para>
     /// <para>
-    /// <b>And it is the one number the vote can reach from the generate side.</b> Under
+    /// <b>And it is the one number the vote reaches</b> from the generate side. Under
     /// <see cref="Repairing.AfterFailure"/> repair runs only on a round the VOTE got wrong,
     /// so what may be blamed is decided by what the population already answers correctly —
     /// which is not a fact about the commitment being repaired.
@@ -265,8 +265,8 @@ public readonly record struct Lifetime
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Matching is a broadcast to the codes in the moment, which is the shape the
-/// distributed half already has.</b> A commitment is indexed at each code in its
+/// <b>Matching is a broadcast to the codes in the moment</b>, which is the shape the
+/// distributed half already has. A commitment is indexed at each code in its
 /// scope, so a moment gathers candidates from the codes it holds and checks only
 /// those. XCS scans its whole population; that does not survive scale, and this does
 /// not have to.
@@ -331,7 +331,7 @@ public sealed class Population
 
     /// <summary>Cleared every gate and was offered the candidate search.</summary>
     /// <remarks>
-    /// <b>The only one of the five that reaches the scope language at all</b>, so the
+    /// <b>The only one of the five that reaches the scope language</b>, so the
     /// ladder's trigger is a statement about this number and not about
     /// <see cref="Wrong"/>. A run where almost nothing reaches here has not discovered
     /// that its language is too weak; it has discovered that its gates are strict.
@@ -346,7 +346,7 @@ public sealed class Population
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The denominator every naming number in this repo has been an absolute
+    /// <b>The denominator every naming number here has been an absolute
     /// against.</b> <see cref="Naming.Count"/> says how many names exist and nothing about
     /// how many chances produced them, so a cell asked more often and a cell answering more
     /// often are one number. This is fixed by the sweep calendar rather than by the search,
@@ -362,7 +362,7 @@ public sealed class Population
 
     /// <summary>Of those, the asks that proposed a name.</summary>
     /// <remarks>
-    /// <b>Not the same as names minted, and the gap is a rewrite that collided.</b> A
+    /// <b>Not the same as names minted</b>, and the gap is a rewrite that collided. A
     /// proposal always mints; what it then fails to do is shorten anything, because the
     /// rewritten claim is already held.
     /// </remarks>
@@ -406,7 +406,7 @@ public sealed class Population
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>NAMES RATHER THAN A COUNT, so a parent can be asked whether forking PAID.</b>
+    /// <b>Names rather than a count</b>, so a parent can be asked whether forking PAID.
     /// The count alone answers only how many times it has been tried, which is what a
     /// budget needs and not what a decision does — see
     /// <see cref="Mending.Improving"/>. A child that has since been culled simply
@@ -414,8 +414,8 @@ public sealed class Population
     /// evidence.
     /// </para>
     /// <para>
-    /// <b>And both, because they are different numbers and this was a list that held one of
-    /// them twice.</b> A repair reaching a scope the population already holds appended the
+    /// <b>And both, because they are different numbers</b>, and this was a list that held one of
+    /// them twice. A repair reaching a scope the population already holds appended the
     /// same name again, so the names were a multiset — the attempt count wearing the shape
     /// of a child set. Counting the distinct entries of that list on every gate was
     /// quadratic in a parent's attempts and made the instrument the cost of the run, which
@@ -426,7 +426,7 @@ public sealed class Population
 
     /// <summary>What each child's PARENT would have added second, by the child's name.</summary>
     /// <remarks>
-    /// <b>An instrument and not a mechanism, so nothing reads it to decide anything.</b> See
+    /// <b>An instrument and not a mechanism</b>, so nothing reads it to decide anything. See
     /// <see cref="Agreed"/>.
     /// </remarks>
     private readonly Dictionary<Code, Code> _runners = [];
@@ -441,8 +441,8 @@ public sealed class Population
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The gate on repair is the one mechanism that asks about commitments it does not
-    /// own.</b> <see cref="Mending.Uncovered"/> refuses a repair when another firing
+    /// <b>The gate on repair is the one mechanism that asks about commitments</b> it does not
+    /// own. <see cref="Mending.Uncovered"/> refuses a repair when another firing
     /// commitment already narrows it, and in one process <c>firing</c> is everything that
     /// fired. On a ring it is only what this holder was placed with — measured in
     /// <c>SplitRepairTests</c>, where at twelve holders a holder can see about a twelfth
@@ -470,8 +470,7 @@ public sealed class Population
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Genesis is the one operator that would run N times on a fleet and mint one
-    /// thing.</b> Every holder sees every observation, so every holder is surprised by the
+    /// <b>Genesis would run N times on a fleet and mint one thing.</b> Every holder sees every observation, so every holder is surprised by the
     /// same failure and proposes the same one-code rules — a fleet of twelve holding twelve
     /// copies of one population, which is not a shard and is not a distribution. Placement
     /// is what makes the copies disjoint, and it is a fact about the commitment rather than
@@ -507,13 +506,13 @@ public sealed class Population
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The same object the front end folds, and that is a requirement rather than a
-    /// convenience.</b> A category reaches a moment only because <see cref="Sorting.Folded"/>
+    /// <b>The same object the front end folds</b>, and that is a requirement rather than a
+    /// convenience. A category reaches a moment only because <see cref="Sorting.Folded"/>
     /// put it there, so a population handed a different vocabulary would read an entailment
     /// between codes no moment ever holds together.
     /// </para>
     /// <para>
-    /// <b>And it is told rather than derived, which is fork 84'S SEAM AND NOT A HOLE.</b>
+    /// <b>And it is told rather than derived</b>, which is fork 84's seam and not a hole.
     /// What the coarser form of a code is is a fact about how a stream is being read; what
     /// may be DONE with it is the brain's, and is <see cref="Subsume"/>.
     /// </para>
@@ -573,7 +572,7 @@ public sealed class Population
 
     /// <inheritdoc cref="Lifetime"/>
     /// <remarks>
-    /// <b>Keyed by expectation and scope length, which is a lineage and its rung.</b> See
+    /// <b>Keyed by expectation and scope length</b>, which is a lineage and its rung. See
     /// <see cref="Lifetime"/> for why those two are enough to say which lineage a
     /// commitment belongs to without any commitment holding a pointer to its parent.
     /// </remarks>
@@ -636,8 +635,8 @@ public sealed class Population
     /// reachable rather than merely representable.
     /// </para>
     /// <para>
-    /// <b>And a precedence is already in <paramref name="raw"/> by the time it gets here,
-    /// which is a decision about the wire and not about the fold.</b> Rung three is derived
+    /// <b>And a precedence is already in <paramref name="raw"/> by the time it gets here</b>,
+    /// which is a decision about the wire and not about the fold. Rung three is derived
     /// where the moment is FORMED — see <see cref="Machines.Trial{TSeen}"/> — because a
     /// fleet broadcasts the moment as a set of codes and a
     /// precedence IS one. Deriving it here instead would mean every holder needed the
@@ -820,8 +819,8 @@ public sealed class Population
     /// it has been reopened twice already.
     /// </para>
     /// <para>
-    /// <b>And a sharded vote is bit-identical to a whole one, which a sum could never
-    /// be.</b> Floating-point addition is not associative, and a holder summing its own
+    /// <b>And a sharded vote is bit-identical to a whole one</b>, which a sum could never
+    /// be. Floating-point addition is not associative, and a holder summing its own
     /// advocates before the merge saw them made <c>(a+b)+c</c> and <c>a+(b+c)</c> the two
     /// arrangements — differing in the last bits, so the split was only ever asserted
     /// approximately. A maximum of maxima is a maximum exactly, at any number of holders.
@@ -914,8 +913,8 @@ public sealed class Population
     /// and a covering probability is a mode declaration wearing a hat.
     /// </para>
     /// <para>
-    /// <b>And the gate the plan named had never been mounted, so <i>promiscuous</i>
-    /// meant EXHAUSTIVE.</b> Minting on every failure walks the whole
+    /// <b>And the gate the plan named had never been mounted</b>, so <i>promiscuous</i>
+    /// meant EXHAUSTIVE. Minting on every failure walks the whole
     /// <c>code → outcome</c> space given enough failures: on winnowed CIFAR that space
     /// is 25,600 and the population reached 23,762 against a capacity of 2,000. See
     /// <see cref="Surprising"/> for why <i>nothing proposed it</i> is the condition and
@@ -1012,7 +1011,7 @@ public sealed class Population
     /// <summary>Whether a code has been absent from a moment since it first appeared.</summary>
     /// <param name="code">The code to ask about.</param>
     /// <remarks>
-    /// <b>A code live in every moment since it arrived has varied in nothing</b>, so its
+    /// <b>A code live in every moment since it arrived has not varied</b>, so its
     /// presence is not evidence about anything and a commitment rooted on it is a
     /// commitment about the world existing.
     /// </remarks>
@@ -1023,8 +1022,8 @@ public sealed class Population
     /// Rounds where repair had a commitment it was allowed to fix.
     /// </summary>
     /// <remarks>
-    /// <b>The denominator of the ladder's trigger, and without it the numerator says
-    /// nothing.</b> A run that never repairs because the floor and the budget refuse
+    /// <b>The denominator of the ladder's trigger</b>, and without it the numerator says
+    /// nothing. A run that never repairs because the floor and the budget refuse
     /// everything looks, from the score, exactly like a run whose language cannot express
     /// what separates its failures — and those are opposite diagnoses. One says the gates
     /// are too tight and the other says the rung is needed.
@@ -1036,8 +1035,8 @@ public sealed class Population
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>This is the signal the whole design exists for, and it has been computed every
-    /// round and read by nothing.</b> The plan says the language extends when, and only
+    /// <b>This is the signal the whole design exists for</b>, and it has been computed every
+    /// round and read by nothing. The plan says the language extends when, and only
     /// when, no expression in the current one separates the failures from the hits — and
     /// that <i>is decidable and already computed</i>, because it is exactly what
     /// <see cref="Repair.Discriminator"/> returning nothing means. Choosing a rung before
@@ -1045,7 +1044,7 @@ public sealed class Population
     /// killed ILP.
     /// </para>
     /// <para>
-    /// <b>And it is not merely <i>repair found nothing</i>, which is a weaker event.</b> A
+    /// <b>And it is not merely <i>repair found nothing</i></b>, which is a weaker event. A
     /// child that clears the bar and collides with a name already held is the language
     /// REACHING and the population already holding the answer; counting that here would
     /// read a success as a ceiling. Only a round where every eligible culprit was offered
@@ -1073,7 +1072,7 @@ public sealed class Population
     /// <param name="arrived">What followed.</param>
     /// <returns>The child that was minted, or nothing.</returns>
     /// <remarks>
-    /// <b>This is blame, and in step one blame is not a ranking problem.</b> Every
+    /// <b>This is blame</b>, and in step one blame is not a ranking problem. Every
     /// commitment that fired is right or wrong on its own, so the culprit is simply
     /// the one that was wrong and is worst at its job. Ranking a chain of entailments
     /// is what blame becomes when depth comes off the cap, and diffusion is the
@@ -1265,7 +1264,7 @@ public sealed class Population
     /// <returns>How many were new.</returns>
     /// <remarks>
     /// <para>
-    /// <b>THE MIRROR OF <see cref="Mend"/>, and on the sweep rather than on a failure.</b>
+    /// <b>The mirror of <see cref="Mend"/></b>, and on the sweep rather than on a failure.
     /// A failure is what summons a repair; nothing summons a generalisation, because the
     /// commitment asking for one is by construction the one that has never been wrong. So
     /// its trigger is redundancy in the same sense rung five's is, and it runs where the
@@ -1279,8 +1278,8 @@ public sealed class Population
     /// decides — it proposes, and the bars that exist judge.
     /// </para>
     /// <para>
-    /// <b>A one-code scope is left alone, because the empty scope fires on everything and
-    /// says nothing.</b> A commitment that matches every moment is a base rate wearing a
+    /// <b>A one-code scope is left alone</b>, because the empty scope fires on everything and
+    /// says nothing. A commitment that matches every moment is a base rate wearing a
     /// rule's clothes, and this design has a trap for exactly that shape.
     /// </para>
     /// </remarks>
@@ -1328,8 +1327,8 @@ public sealed class Population
     /// <summary>Whether anything could ever propose a shorter version of this.</summary>
     /// <param name="one">The commitment being considered.</param>
     /// <remarks>
-    /// <b>A one-code scope is left alone, because the empty scope fires on everything and
-    /// says nothing</b> — a commitment matching every moment is a base rate wearing a rule's
+    /// <b>A one-code scope is left alone</b>, because the empty scope fires on everything and
+    /// says nothing — a commitment matching every moment is a base rate wearing a rule's
     /// clothes. The rest is <see cref="Widening.Unmissed"/>'s own condition, written once so
     /// that the tally and the walk cannot come to ask different questions.
     /// </remarks>
@@ -1345,8 +1344,8 @@ public sealed class Population
     /// <summary>How many eligible commitments each shortening would come from.</summary>
     /// <param name="eligible">Everything that could be shortened at all.</param>
     /// <remarks>
-    /// <b>Keyed on the shortened claim's identity, which is why it needs no pairwise
-    /// walk.</b> Two clean rules differing in exactly one code and expecting the same thing
+    /// <b>Keyed on the shortened claim's identity</b>, which is why it needs no pairwise
+    /// walk. Two clean rules differing in exactly one code and expecting the same thing
     /// reach the same shorter scope, and a scope's identity is a hash of itself — so
     /// agreement falls out of a dictionary over one pass rather than out of comparing every
     /// resident against every other.
@@ -1378,8 +1377,8 @@ public sealed class Population
     /// <inheritdoc cref="PastFloor"/>
     /// <summary>Whether a commitment has any of its repair budget left.</summary>
     /// <remarks>
-    /// <b>The allowance is a constant under two of the three rules and a function of the
-    /// parent under the third.</b> <see cref="Budgeting.Earned"/> pays one attempt per
+    /// <b>The allowance is a constant under two of the three rules</b>, and a function of the
+    /// parent under the third. <see cref="Budgeting.Earned"/> pays one attempt per
     /// <see cref="CommittingSettings.Floor"/> misses, so a parent that stops being wrong
     /// stops earning and one that becomes wrong again is funded — which is what a design
     /// forbidding episode boundaries needs and what a total cannot be.
@@ -1433,8 +1432,8 @@ public sealed class Population
     /// </summary>
     /// <param name="parent">The commitment being considered for repair.</param>
     /// <remarks>
-    /// <b>True where it has never been tried, because no evidence is not evidence
-    /// against.</b> A parent with no living children has learnt nothing about whether
+    /// <b>True where it has never been tried</b>, because no evidence is not evidence
+    /// against. A parent with no living children has learnt nothing about whether
     /// splitting it helps, and refusing there would turn this into a way of never
     /// repairing rather than a way of stopping when it stops paying.
     /// </remarks>
@@ -1458,8 +1457,8 @@ public sealed class Population
     /// <summary>How many commitments have spent their whole repair budget.</summary>
     /// <param name="budget">The budget each was given.</param>
     /// <remarks>
-    /// <b>A guard has to be shown not to be guarding, or it is a level nobody
-    /// admitted to setting.</b> At eight this bound before it guarded: repair stopped
+    /// <b>A guard has to be shown not to be guarding</b>, or it is a level nobody
+    /// admitted to setting. At eight this bound before it guarded: repair stopped
     /// while the world was still unlearnt, and the flat count of children read
     /// exactly like a ceiling on the mechanism. Anything above zero here means the
     /// number below is deciding what gets learnt.
@@ -1472,8 +1471,8 @@ public sealed class Population
     /// <returns>How many were dropped.</returns>
     /// <remarks>
     /// <para>
-    /// <b>The general one wins, which is the direction that is easy to get
-    /// backwards.</b> If a scope and a narrower version of it are equally accurate,
+    /// <b>The general one wins</b>, which is the direction that is easy to get
+    /// backwards. If a scope and a narrower version of it are equally accurate,
     /// the narrower says nothing extra, needs more evidence to say it, and covers
     /// fewer moments — so keeping it is how a population drifts toward holding one
     /// rule per instance, which is the memorisation this design is otherwise careful
@@ -1518,8 +1517,8 @@ public sealed class Population
     /// readable at the same grain the front end folds at.
     /// </para>
     /// <para>
-    /// <b>And it is one-directional by construction, which is what stops two claims absorbing
-    /// each other.</b> A member entails its category and a category entails no member, so
+    /// <b>And it is one-directional by construction</b>, which is what stops two claims absorbing
+    /// each other. A member entails its category and a category entails no member, so
     /// nothing that pins <i>this look</i> and nothing that pins <i>that kind</i> can each be
     /// the other's specific. A pair that could would be added to <c>doomed</c> twice and both
     /// removed, which is the claim disappearing rather than being generalised.
@@ -1569,8 +1568,8 @@ public sealed class Population
     /// <param name="general">The commitment that would stay.</param>
     /// <param name="specific">The commitment that would go.</param>
     /// <remarks>
-    /// <b>UNDER <see cref="Subsuming.Weaker"/> a hair of advantage saves the child, and
-    /// the claim that it always has one is refuted by <see cref="Lineages"/>.</b> The
+    /// <b>Under <see cref="Subsuming.Weaker"/> a hair of advantage saves the child</b>, and
+    /// the claim that it always has one is refuted by <see cref="Lineages"/>. The
     /// argument was that a child fires less often and has stored more of what it fired on,
     /// so <i>equally accurate</i> is a measure-zero event and this path is unreachable —
     /// and the ladder counts it firing on about four repair children in five, at every rung
@@ -1602,20 +1601,20 @@ public sealed class Population
     /// every rule of the world learnt, and no name for the thing they share.
     /// </para>
     /// <para>
-    /// <b>A rewrite is not a new claim, so the record moves with it.</b> The
+    /// <b>A rewrite is not a new claim</b>, so the record moves with it. The
     /// commitment entails exactly the moments it did before, because the name is
     /// added to a moment precisely when its members are all there.
     /// </para>
     /// <para>
-    /// <b>And this is the one operator that cannot decide locally, which is why it takes
-    /// an argument.</b> Its statistic is the whole population's, so a holder counting only
+    /// <b>And this is the one operator that cannot decide locally</b>, which is why it takes
+    /// an argument. Its statistic is the whole population's, so a holder counting only
     /// its own residents goes silent — measured in <c>SplitNamingTests</c>, where three
     /// shards holding thirty-six eligible scopes each name nothing at all. Nothing else in
     /// this class asks for anything from off the machine.
     /// </para>
     /// <para>
-    /// <b>And sharing observations instead would not do, which is what makes the argument
-    /// load-bearing rather than convenient.</b> <c>OverlapTests</c> puts two machines on
+    /// <b>And sharing observations instead would not do</b>, which is what makes the argument
+    /// load-bearing rather than convenient. <c>OverlapTests</c> puts two machines on
     /// three quarters of one stream and they agree on names as badly as machines sharing
     /// none — the gate picks one pair by argmax, so a small difference in evidence changes
     /// the winner and everything built on it. Counts are the only thing that converges
@@ -1700,8 +1699,8 @@ public sealed class Population
     /// run, so there is nothing here for a controller to hunt.
     /// </para>
     /// <para>
-    /// <b>And it used to filter to <c>Seen >= Floor</c> FIRST, WHICH INVERTED IT
-    /// ENTIRELY.</b> Inexperienced commitments were immortal, so the ask —
+    /// <b>And it used to filter to <c>Seen >= Floor</c> first</b>, which inverted it
+    /// entirely. Inexperienced commitments were immortal, so the ask —
     /// <c>Count - Capacity</c> — routinely exceeded the whole eligible list and the
     /// accuracy ordering never got to choose. Every commitment was deleted the moment
     /// it had enough evidence to be judged, good or bad. On CIFAR the population's
@@ -1709,8 +1708,8 @@ public sealed class Population
     /// commitments over forty thousand rounds: not one ever crossed.
     /// </para>
     /// <para>
-    /// <b>It cost more than half the score — 0.240 against 0.550 at ten-way chance
-    /// of 0.100</b>, and it had never fired anywhere else because no earlier world
+    /// <b>It cost more than half the score</b> — 0.240 against 0.550 at ten-way chance
+    /// of 0.100, and it had never fired anywhere else because no earlier world
     /// overshot the capacity at all. <c>Graded</c> holds 371 commitments and the
     /// multiplexer 203, so both sit under the cap and returned identical numbers with
     /// this path disabled. The first world wide enough to reach the cap is the first
@@ -1757,7 +1756,7 @@ public sealed class Population
     /// <param name="commitment">What is going.</param>
     /// <param name="loss">Which operator is dropping it.</param>
     /// <remarks>
-    /// <b>The reason is a parameter rather than a guess from the caller's name</b>, for
+    /// <b>The reason is a parameter</b>, rather than a guess from the caller's name, for
     /// the reason <see cref="Birth"/> gives: <see cref="Abstract"/> removes and adds the
     /// same claim, and a ledger that read that as a death would report a lineage dying at
     /// exactly the rung where it was compressed.

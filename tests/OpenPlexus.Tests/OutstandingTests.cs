@@ -146,7 +146,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// <para>
     /// Capitals reached nought in one pass because a shouted sentence has exactly one correct
     /// rewrite. Bold sentences do not: where a lead clause ends is a judgement about which part
-    /// of a claim a reader scans for, so no script can make it and 1,164 of them are left.
+    /// of a claim a reader scans for, so no script can make it and 1,127 of them are left.
     /// </para>
     /// <para>
     /// <b>Here because a ratchet does not do what John asked</b>, and it is now half of the
@@ -158,8 +158,8 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// debt it has nothing to do with.
     /// </para>
     /// <para>
-    /// <b>Most have an obvious cut point.</b> Taking it by script is not safe. 812
-    /// of the 1,164 would fall under the cap by closing the bold at the first comma, and 352
+    /// <b>Most have an obvious cut point.</b> Taking it by script is not safe. 787
+    /// of the 1,127 would fall under the cap by closing the bold at the first comma, and 340
     /// need the claim rewritten. A shouted sentence has one correct rewrite and that is why a
     /// script did 2,489 of them; a comma is only usually where a lead ends, so a scripted pass
     /// would trade one mechanical register for another. That is the thing being fixed.

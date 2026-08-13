@@ -85,7 +85,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// This is the half that stayed a ratchet, because it is the half a script cannot do. A
     /// shouted sentence has one correct rewrite and a bold sentence does not: where the lead
     /// clause ends is a judgement about which part of the claim a reader scans for, and there
-    /// are 1,164 of those judgements left.
+    /// are 1,127 of those judgements left.
     /// </para>
     /// <para>
     /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
@@ -93,7 +93,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 1_163;
+    private const int Shouted = 1_127;
 
     /// <summary>
     /// The commit the decay schedule counts from. <b>John's, 2026-08-13.</b>
@@ -123,7 +123,13 @@ public sealed class ProseTests(ITestOutputHelper output)
     private const string Baseline = "8c68253e8a38f43ee79f4715cc93949f39ed8cd7";
 
     /// <summary>How many bold sentences stood at <see cref="Baseline"/>.</summary>
-    private const int Started = 1_164;
+    /// <remarks>
+    /// <b>It was written as 1,164 and that number was wrong</b>, because the count that
+    /// produced it was reading <c>///</c> as a word — see <see cref="Bolds"/>. Re-taken on the
+    /// baseline tree with the fixed count rather than adjusted by the difference, so the
+    /// schedule's zero is a measurement and not an arithmetic correction to one.
+    /// </remarks>
+    private const int Started = 1_128;
 
     /// <summary>
     /// How many bold sentences a commit costs the ceiling.
@@ -136,7 +142,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// harder than it was in the two documents.
     /// </para>
     /// <para>
-    /// It reaches nought in 233 commits from the baseline. Raise it if a pass keeps landing far
+    /// It reaches nought in 226 commits from the baseline. Raise it if a pass keeps landing far
     /// under the ceiling, and lower it if the schedule starts deciding what a session works on
     /// — the tax is meant to be payable alongside the research rather than instead of it.
     /// </para>
@@ -280,10 +286,18 @@ public sealed class ProseTests(ITestOutputHelper output)
     }
 
     /// <summary>Every bold span of more than <see cref="Lead"/> words in one piece of prose.</summary>
+    /// <remarks>
+    /// <b>The comment leader is stripped first</b>, in two passes rather than one. <c>///</c> is
+    /// not a word, and a bold span wrapped across three comment lines was being counted as two
+    /// words longer than it reads — 36 spans in the tree were over the cap on their markup
+    /// alone. <see cref="Shouts"/> had been going through <see cref="Bare"/> since it was
+    /// written and this had not, which is the whole of the fault.
+    /// </remarks>
     private static List<string> Bolds(string prose) =>
         Regex
             .Matches(prose, @"\*\*(?<said>[^*]+)\*\*|<b>(?<said>.+?)</b>", RegexOptions.Singleline)
-            .Select(match => Regex.Replace(match.Groups["said"].Value, @"<[^>]+>|\s+", " ").Trim())
+            .Select(match => Regex.Replace(match.Groups["said"].Value, @"(?m)^\s*///?", " "))
+            .Select(said => Regex.Replace(said, @"<[^>]+>|\s+", " ").Trim())
             .Where(said => said.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length > Lead)
             .ToList();
 
@@ -459,6 +473,17 @@ public sealed class ProseTests(ITestOutputHelper output)
         Assert.Single(Bolds(
             "**Nothing ships switched off, and preserving recorded numbers is never a reason "
             + "to keep anything or to not change it.**"));
+
+        // And a lead clause does not become a sentence by being wrapped, which is the property
+        // the leader strip is for. Eleven words either way; across three comment lines it
+        // counted as thirteen while `///` was going in as a word, so the check was reading the
+        // markup and calling it prose.
+        Assert.Empty(Bolds("/// <b>Nothing ships switched off, and a dial is a new ability.</b>"));
+
+        Assert.Empty(Bolds(
+            "    /// <b>Nothing ships switched off, and a dial\n"
+            + "    /// is a new\n"
+            + "    /// ability.</b>"));
     }
 
     [Fact]

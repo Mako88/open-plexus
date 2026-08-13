@@ -731,6 +731,42 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + "its best, so maintaining a store forwards buys no score over a lookup and this "
             + "whole mechanism is `Chained` by a longer road");
 
+        // And what the word order bought, which is the largest single move any front-end change
+        // has made on this world. The same five arms, the same seeds and the same rounds read
+        // 0.348 at the best before the world spoke `Recited`; the store with the key rule now
+        // reads over half, which is three times the marginal of 0.193.
+        //
+        // A level rather than a comparison, because what it records is a cap being converted.
+        // The bar sits well under the 0.548 it came in at: what it protects against is a
+        // silent return to the era where nothing here cleared twice the marginal.
+        Assert.True(scores["Freshest(3)"].Min() > 0.45,
+            $"the store with the key rule and the order reads {scores["Freshest(3)"].Min():F3} at "
+            + "its worst, back inside the range this world read before it was told which word "
+            + "came first -- so the order has stopped being converted and the conflation "
+            + "ceiling is no longer describing this learner");
+
+        // And the arm the ceiling picked out, which is the prediction worth recording because it
+        // was made before the run. Order takes `Resolved(1)`'s conflation from 0.748 to 0.099 --
+        // the largest fall of any arm -- and it is the arm whose score moved most, out of
+        // `Chained`'s own spread and clear of it. Before the order it read 0.166 at its worst
+        // against `Chained`'s 0.215 at its best, so this comparison inverted.
+        Assert.True(scores["Resolved(1)"].Min() > scores[nameof(Joining.Chained)].Max(),
+            $"folding through every key reads {scores["Resolved(1)"].Min():F3} at its worst "
+            + $"against {scores[nameof(Joining.Chained)].Max():F3} for the lookup at its best, so "
+            + "the arm whose conflation the order cut furthest is not the arm whose score moved "
+            + "furthest and the ceiling column predicts nothing about a learner");
+
+        // And a cap is not a prediction, which is the correction the same grid makes to itself.
+        // `Resolved(3)` had the largest fall of all -- 0.941 conflated to 0.027 -- and gained
+        // four hundredths, because its moment arrives with four rooms of company and separating
+        // two moments is not choosing between what they hold. What an arm CONVERTS of its cap is
+        // still where the learner's part of this shows.
+        Assert.True(scores["Resolved(3)"].Max() < scores["Resolved(1)"].Min(),
+            $"three hops read {scores["Resolved(3)"].Max():F3} at their best against "
+            + $"{scores["Resolved(1)"].Min():F3} for one at its worst, so a deeper fold is no "
+            + "longer paying for the company it brings and the account of why the order helped "
+            + "it least is wrong");
+
         // And the bagged arm comes back with an empty population, which is a finding about
         // the front end rather than a score. Six rooms, four things and a few function
         // words means that after 120 statements essentially every word of the vocabulary is

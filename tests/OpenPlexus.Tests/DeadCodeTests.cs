@@ -96,24 +96,21 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["SnakeSense.Encode"] = Stranded,
         ["SnakeSense.Turned"] = Stranded,
 
-        // ---- AND THE ONE THAT IS NOT A WORLD, WHICH IS THE ONE TO READ ------
+        // ---- AND THE ONE THAT CAME STRAIGHT BACK OFF, WHICH IS THE CHECK WORKING -----
         //
-        // C2 IS THE CONSTRAINT THE WHOLE DESIGN RESTS ON AND ITS ONLY INJECTOR IS NOW
-        // UNCALLED. `Lateness` delays a share of deliveries on purpose and this counts how
-        // many were actually held back -- because a jitter arm that delayed nothing is a
-        // control wearing the arm's name. Its one caller was the walk's latency sweep,
-        // which measured per-hop delay against a thought's DEPTH; a fleet round is two
-        // round trips and not a depth, so that measurement did not carry over.
+        // `HybridBus.Delayed` SPENT ONE COMMIT ON THIS LIST. C2 is the constraint the whole
+        // design rests on and its only injector was left uncalled by the walk going --
+        // `Lateness` delays a share of deliveries on purpose and `Delayed` counts how many
+        // were actually held back, because a jitter arm that delayed nothing is a control
+        // wearing the arm's name. Its one caller had been the walk's latency sweep, which
+        // measured per-hop delay against a thought's DEPTH; a fleet round is two round trips
+        // and not a depth, so that measurement did not carry over.
         //
-        // WHAT IT IS OWED IS FORK 52'S OPEN HALF IN ONE SENTENCE: run a fleet over
-        // `HybridBus` with lateness on and assert it still learns. Every distributed number
-        // here is over `Posted`, and TCP does not reorder within a connection -- so a green
-        // distributed run says nothing about C2, which this repo's trap list already says.
-        ["HybridBus.Delayed"] =
-            "THE C2 INJECTOR'S REPORT, LEFT UNCALLED BY THE WALK GOING. It is kept rather "
-            + "than deleted because deleting it deletes the only way to make C2 real, and "
-            + "what it wants is a fleet over `HybridBus` with lateness -- fork 52 on C2 "
-            + "alone, which is the half `Posted` structurally cannot answer.",
+        // I WROTE THE REASON AND THEN WROTE THE CALLER, AND THIS FILE CAUGHT THE STALE
+        // ENTRY. `LatenessTests` runs a fleet over `HybridBus` with a fifth of its traffic
+        // delayed, which is fork 52's open half -- every distributed number here is over
+        // `Posted`, and TCP does not reorder within a connection. The entry is gone rather
+        // than reworded, which is the only way it is allowed to leave.
 
         ["Multiplexer.Widest"] =
             "THE SOUNDNESS INSTRUMENT'S OWN BOUND, and it reads as uncalled because its one "
@@ -201,13 +198,14 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // outright with nowhere to sit quietly. That is given up here, and what is bought
         // for it is a countable record of what deleting the walk stranded.
         //
-        // FOURTEEN OF THE FIFTEEN ARE ONE FACT REPEATED — a world whose only runner was the
-        // walk's — and they come off together when that world gets a `Trial`. The
-        // fifteenth, `HybridBus.Delayed`, is the one that is not bookkeeping.
+        // IT WAS FIFTEEN FOR ONE COMMIT. THIRTEEN ARE ONE FACT REPEATED — a world whose only
+        // runner was the walk's — and they come off as those worlds are decided. The
+        // fifteenth was `HybridBus.Delayed` and it is already gone, which is what the
+        // entries above and below are each supposed to do.
         //
         // AND IT ONLY EVER FALLS FROM HERE. Nought is the destination and this is a
         // detour with a map, not a new resting place.
-        Assert.Equal(15, Unused.Count);
+        Assert.Equal(14, Unused.Count);
     }
 
     [Fact]
@@ -307,15 +305,22 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // not. They are NOT on `Roaming`'s footing: that one is driven by `Trial` through
         // `IWorld` and has a caller, and these have none at all.
         //
-        // WHAT EACH IS OWED IS THE SAME AND IT IS SMALL: a `Trial` over it, which is the
-        // generic runner the commitment side already has. What decides the ORDER is which
-        // question is live -- `Senses` is the cross-modal pairing nothing has ever run,
-        // `Motif` is rung five's, `Rhythm` is rung three's, `Latent` is fork 39's.
+        // AND THE QUESTION IS NOT ONLY *WHICH GETS A `Trial` FIRST*, WHICH IS HOW THIS WAS
+        // FIRST WRITTEN AND IS HALF THE RULE. `RemindingTests` carries the other half: AN
+        // ISOLATING WORLD IS DELETED WHEN ITS QUESTION CLOSES, and worlds accumulate exactly
+        // as dials do. So each of these is one of two things and the list does not yet say
+        // which -- a world whose question is LIVE and wants a runner, or a world whose
+        // question closed with the walk and wants deleting.
         //
-        // AND THE LIST BEING LONG IS THE ARGUMENT FOR IT RATHER THAN AGAINST. Deleting
-        // eleven worlds to make a guard green would delete the questions with them; leaving
-        // them silent would be eleven mechanisms nobody could see were unreachable. This
-        // entry is what makes the debt countable.
+        // SOME ARE OBVIOUSLY LIVE: `Senses` is the cross-modal pairing nothing has ever run,
+        // `Motif` is rung five's redundancy manufactured on purpose, `Rhythm` is rung
+        // three's, `Latent` is fork 39's. SOME ARE OBVIOUSLY NOT: `Snake` and `SnakeSense`
+        // were built for prediction-conditional-on-action, which is forks 18 and 20, both
+        // SETTLED and both deleted with the walk.
+        //
+        // WHAT IS FORBIDDEN IS LEAVING THEM HERE WHILE NOBODY DECIDES, which is the same
+        // sentence the dial rule uses. Deleting all eleven to make a guard green would
+        // delete live questions; keeping all eleven is a world budget nobody is paying.
         ["Clevr"] = Stranded,
         ["Composed"] = Stranded,
         ["Homeostat"] = Stranded,
@@ -396,9 +401,9 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     /// <summary>Why a world whose only runner was the walk's is named by nothing.</summary>
     private const string Stranded =
         "A WORLD WHOSE RUNNER WENT WITH THE WALK. The data is intact and nothing drives it "
-        + "-- unlike `Roaming`, which `Trial` drives through `IWorld`. What it is owed is a "
-        + "`Trial` over it, and until then its tests assert what the WORLD is and nothing "
-        + "about what is learnt from it.";
+        + "-- unlike `Roaming`, which `Trial` drives through `IWorld`. It wants a `Trial` or "
+        + "a deletion depending on whether its question is still live, and until one or the "
+        + "other its tests assert what the WORLD is and nothing about what is learnt.";
 
     /// <summary>Why a front end is not named by the library that reads through it.</summary>
     private const string Join =

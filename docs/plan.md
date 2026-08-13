@@ -489,8 +489,10 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
     - **BROKEN** — eleven worlds have no runner, every one having been driven by a `*Run`
       that was the walk's. `Trial` is the generic replacement and none is wired to it;
       `DeadCodeTests` counts the debt.
-    - **OPEN** — the vote's arithmetic composes and a whole learner runs over it. Open on C2
-      alone, which TCP cannot show. Fork **52**.
+    - **NOW** — the vote's arithmetic composes and a whole learner runs over it. Fork **52**.
+    - **NOW** — A ROUND IS A BARRIER, so lateness costs the CLOCK and changes not one answer.
+      C2's out-of-order half is untestable here for the same reason, and the fleet is paced
+      by its unluckiest holder twice a round. Breaking it is unmeasured.
     - **OPEN** — what the repair gate's query costs on a wire, priced on loopback. Open on a
       LAN and on building it. Fork **56**.
     - **OPEN** — the vote decides what repair may run on, so under skew blame lands on the
@@ -524,9 +526,6 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       early to drop a 1000-way classifier, which needs `onnx`, which the runner has not got.
     - **BROKEN** — `BudgetTests` crosses two settings and pins neither timing nor budget, so
       it changed arms silently; being a sweep, CI never looked.
-    - **BROKEN** — the catch-all shard runs past its forty-five minute cap, growing whenever
-      a suite is added without a home. It reports as CANCELLED rather than failed, so the
-      whole run does too. `ShardTests` cannot catch this one.
   - Withholding is real and the gap is readable
     - **SETTLED** — a generated world holds assignments back without the learner being able
       to tell, the draw rejecting rather than picking. Fork **48**.

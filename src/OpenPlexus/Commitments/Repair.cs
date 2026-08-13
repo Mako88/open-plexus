@@ -4,8 +4,8 @@ namespace OpenPlexus.Commitments;
 
 /// <summary>Which rule picks the condition a repair adds.</summary>
 /// <remarks>
-/// <b>Two rules that both do something, rather than a mechanism and its own
-/// absence.</b> A boolean here would put the control arm in the code forever as a
+/// <b>Two rules that both do something</b>, rather than a mechanism and its own
+/// absence. A boolean here would put the control arm in the code forever as a
 /// way of not running repair properly; naming both makes it a comparison.
 /// </remarks>
 public enum Choosing
@@ -35,28 +35,28 @@ public enum Surprising
 /// <summary>Whether a commitment may vote before it has been tested.</summary>
 /// <remarks>
 /// <para>
-/// <b>A rule that has been right once weighs one, and the vote raises that to a
-/// power.</b> <see cref="Commitment.Accuracy"/> averages over a commitment's first
+/// <b>A rule that has been right once weighs one</b>, and the vote raises that to a
+/// power. <see cref="Commitment.Accuracy"/> averages over a commitment's first
 /// firings rather than running Widrow-Hoff from zero, and that is deliberate — from zero,
 /// a rule right once reads a tenth right and is indistinguishable from a refuted one, so
 /// it loses every vote it should win. The consequence is the mirror image: it reads
 /// PERFECT, and beats a rule right ninety-five times in a hundred.
 /// </para>
 /// <para>
-/// <b>So the vote consults commitments that have no statistics and ranks them above ones
-/// that do, and it has done since the branch began.</b> Every fresh repair child arrives
+/// <b>So the vote consults commitments that have no statistics</b>, ranks them above ones
+/// that do, and it has done since the branch began. Every fresh repair child arrives
 /// at full weight, decides rounds it has no standing to decide, and only becomes honest
 /// after the population has already moved. Nothing separates a provisional weight from an
 /// earned one anywhere in this machine.
 /// </para>
 /// <para>
-/// <b>And the bar needs no new number, which is the only reason this is buildable.</b>
+/// <b>And the bar needs no new number</b>, which is the only reason this is buildable.
 /// <see cref="CommittingSettings.Floor"/> already means <i>enough firings to judge a
 /// proportion by</i> — subsumption and culling both refuse to weigh a commitment below it.
 /// The vote is the one reader that never asked.
 /// </para>
 /// <para>
-/// <b>What it risks is silence, and that must be read beside the score.</b> A population
+/// <b>What it risks is silence</b>, and that must be read beside the score. A population
 /// whose experienced members do not cover a moment says nothing at all, and a silent arm
 /// scores well on the few rounds it answers — this repo's own trap about a fallback being
 /// a control arm nobody meant to run. <c>Tally.Silent</c> is where that shows.
@@ -74,7 +74,7 @@ public enum Speaking
 /// <summary>Whether anything ever makes a scope SHORTER.</summary>
 /// <remarks>
 /// <para>
-/// <b>The ladder has only ever gone one way, and the plan says what that costs.</b>
+/// <b>The ladder has only ever gone one way</b>, and the plan says what that costs.
 /// <i>A specialise-only machine is arbitrarily accurate and conceptless</i> — genesis
 /// mints one code, repair only adds, and subsumption only deletes, so a commitment that
 /// is too narrow can never become less so. It can only be replaced by a luckier seed that
@@ -148,7 +148,7 @@ public enum Widening
     /// proposes one per agreeing pair, and where nothing agrees it proposes nothing.
     /// </para>
     /// <para>
-    /// <b>Two is not a level, which matters because every other number here would be.</b> One
+    /// <b>Two is not a level</b>, which matters because every other number here would be. One
     /// agreeing parent IS <see cref="Unmissed"/>, so two is the smallest thing that is not
     /// the arm this is compared against — the same shape as <i>has this code ever been
     /// absent</i> rather than a threshold on how often. Three would be a dial, and there is
@@ -162,29 +162,29 @@ public enum Widening
     /// says whether it ran.
     /// </para>
     /// <para>
-    /// <b>And what would kill it is written down before the grid, on the columns a skewed
-    /// world cannot raise for free.</b> It dies if it fails to take a clear majority of
+    /// <b>And what would kill it is written down before the grid</b>, on the columns a skewed
+    /// world cannot raise for free. It dies if it fails to take a clear majority of
     /// <see cref="Unmissed"/>'s hard-round coverage gain over <see cref="Never"/> at both
     /// eleven-bit widths — a cheaper arm that does not reach is not an improvement, it is a
     /// quieter version of doing nothing.
     /// </para>
     /// <para>
-    /// <b>And its ship gate is the world it should ruin, which is the shape that has worked
-    /// twice here.</b> On <see cref="Worlds.Arranged"/> the truths are one code and any
+    /// <b>And its ship gate is the world it should ruin</b>, which is the shape that has worked
+    /// twice here. On <see cref="Worlds.Arranged"/> the truths are one code and any
     /// repair is damage, so an operator undoing repair could help there or could delete the
     /// only rules that hold the withheld set. That is the prediction to run before this
     /// becomes the default, and not after.
     /// </para>
     /// <para>
-    /// <b>And it is population-wide, which is said here because that is how rung five broke.</b>
+    /// <b>And it is population-wide</b>, which is said here because that is how rung five broke.
     /// Its evidence is two residents agreeing, so a holder counting only what it holds sees
     /// fewer pairs — and a fleet that splits the population splits the agreement with it.
     /// <see cref="Unmissed"/> is local by construction, reading one commitment at a time, so
     /// the two arms are not the same kind of mechanism however alike their columns look.
     /// </para>
     /// <para>
-    /// <b>And the count merges where the structure would not, which is the line this repo
-    /// already drew.</b> What a holder would have to hear is how many machines reached each
+    /// <b>And the count merges where the structure would not</b>, which is the line this repo
+    /// already drew. What a holder would have to hear is how many machines reached each
     /// shortened NAME — a frequency, exactly the shape <c>Recurrence</c> already ships for
     /// abstraction, and not a commitment. So the fix if splitting silences it is known and
     /// costs no round trip; what is unmeasured is how much it loses without one.
@@ -199,8 +199,8 @@ public enum Widening
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A category in the moment was not a rewrite of the rules and the compression was never
-/// behind one.</b> Genesis roots on a category code exactly as it roots on anything else, so
+/// <b>A category in the moment was not a rewrite of the rules</b>, and the compression was never
+/// behind one. Genesis roots on a category code exactly as it roots on anything else, so
 /// the coarse rule ALREADY EXISTED — <c>ReturningTests</c> measured 606 rules folded against
 /// 196 once this is on, at three seeds and an unmoved score. What did not exist was any way
 /// to see that <i>this look predicts Y</i> is narrower than <i>that kind of look predicts
@@ -208,7 +208,7 @@ public enum Widening
 /// length with no code in common.
 /// </para>
 /// <para>
-/// <b>So the operator fork 85 asked for is deleted and this is what is left.</b> Proposing
+/// <b>So the operator fork 85 asked for is deleted</b>, and this is what is left. Proposing
 /// the coarse claim as a new commitment with a fresh record was built, measured and removed:
 /// it cost 60 rules over three seeds where this costs none, because a recast must fire
 /// <see cref="CommittingSettings.Floor"/> times before anything may judge it and the claim it
@@ -216,8 +216,8 @@ public enum Widening
 /// vocabulary the brain holds that no moment carries.
 /// </para>
 /// <para>
-/// <b>AND IT IS INERT WITHOUT <c>Population.Sorts</c>, so <see cref="Never"/> is a control
-/// rather than a shipped default.</b> A run that was never told which codes are alternatives
+/// <b>And it is inert without <c>Population.Sorts</c></b>, so <see cref="Never"/> is a control
+/// rather than a shipped default. A run that was never told which codes are alternatives
 /// cannot tell the two apart, which is why turning this on reproduces every number recorded
 /// before it existed.
 /// </para>
@@ -241,8 +241,8 @@ public enum Coarsening
 /// <summary>What it takes for a narrower commitment to survive beside a general one.</summary>
 /// <remarks>
 /// <para>
-/// <b>The one mechanism here that prefers generality, and it was written up as never
-/// firing on evidence that does not say that.</b> <c>Judged.Narrowed</c> reads nought
+/// <b>The one mechanism here that prefers generality</b>, and it was written up as never
+/// firing on evidence that does not say that. <c>Judged.Narrowed</c> reads nought
 /// everywhere, and that was read as subsumption doing nothing. It counts something
 /// narrower: unsound residents that a resident SOUND one already covers. Swapping the
 /// rule below moves the resident count from 116 to 228 at eleven bits, so the clause
@@ -261,7 +261,7 @@ public enum Subsuming
     /// The general one must be AT LEAST AS ACCURATE. What ran before anything questioned it.
     /// </summary>
     /// <remarks>
-    /// <b>And it deletes more than the other rule, not less, which was the surprise.</b>
+    /// <b>And it deletes more than the other rule</b>, not less, which was the surprise.
     /// The worry was that a memorised child is always a hair better and so always kept.
     /// It is kept — but a hair the other way is enough to delete it, and over a run that
     /// is most of them: this holds 116 residents at eleven bits where demanding
@@ -274,20 +274,20 @@ public enum Subsuming
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A child fires less often than its parent, so its advantage has to clear its own
-    /// smaller sample.</b> That is a two-proportion test, which is exactly what the
+    /// <b>A child fires less often than its parent</b>, so its advantage has to clear its own
+    /// smaller sample. That is a two-proportion test, which is exactly what the
     /// repair gate uses to decide whether a condition separates hits from misses — same
     /// arithmetic, same <see cref="CommittingSettings.Alpha"/>, no new number.
     /// </para>
     /// <para>
-    /// <b>And it is a large, uniform win under noise and a wash without it.</b> On the
+    /// <b>And it is a large, uniform win under noise</b>, and a wash without it. On the
     /// noisy multiplexer every repair gate gains about five points and roughly doubles
     /// its sound rules — 0.737 to 0.787, 0.725 to 0.779, 0.731 to 0.778 — while on the
     /// clean world it is level at six bits and slightly behind at eleven.
     /// </para>
     /// <para>
-    /// <b>Which is the first result in this family whose direction follows from a
-    /// property of the world.</b> A significance test is what sampling error calls for,
+    /// <b>Which is the first result in this family whose direction follows</b> from a
+    /// property of the world. A significance test is what sampling error calls for,
     /// and on a clean world a hair of advantage is real signal rather than luck — so
     /// demanding proof throws away something true. It is still not one setting for every
     /// world, but it is the first one whose right value the machine could in principle
@@ -302,8 +302,8 @@ public enum Subsuming
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>It was one setting deciding two independent things while being named for one, which
-/// is a line on this repo&apos;s own trap list.</b> The four cells it shipped were a gate and
+/// <b>It was one setting deciding two independent things</b>, while being named for one, which
+/// is a line on this repo&apos;s own trap list. The four cells it shipped were a gate and
 /// a timing crossed together, so every comparison against it moved both axes at once — and
 /// a row in the plan&apos;s defect list about a world reaching into the brain rested on
 /// exactly that. Separated, every finding taken under the old names is still readable:
@@ -333,8 +333,8 @@ public enum Mending
     /// Anything that failed and cleared the floor and the budget. What ships.
     /// </summary>
     /// <remarks>
-    /// <b>Named for the absence of a gate rather than for the vote, which is what
-    /// separating the axes revealed.</b> The old <c>Outvoted</c> meant <i>the vote had to
+    /// <b>Named for the absence of a gate rather than for the vote</b>, which is what
+    /// separating the axes revealed. The old <c>Outvoted</c> meant <i>the vote had to
     /// be wrong</i>, and that was never a property of the GATE — it was the timing beside
     /// it doing the work. What this cell actually says is that no commitment is refused.
     /// </remarks>
@@ -353,7 +353,7 @@ public enum Mending
     /// whole of the question, answered from the firing set.
     /// </para>
     /// <para>
-    /// <b>And its sign flips with the timing beside it, which is why the split matters.</b>
+    /// <b>And its sign flips with the timing beside it</b>, which is why the split matters.
     /// Every round on the clean multiplexer it is the best thing measured; after a failure
     /// on the same world it is six and a half standard errors behind no gate at all. On
     /// <see cref="Worlds.Arranged"/> it is inert in both timings to three metrics. Its size
@@ -375,8 +375,8 @@ public enum Mending
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A per-commitment signal rather than a per-round gate, which is what fork 45
-    /// asks for.</b> <see cref="Uncovered"/> is the best thing measured on the clean
+    /// <b>A per-commitment signal rather than a per-round gate</b>, which is what fork 45
+    /// asks for. <see cref="Uncovered"/> is the best thing measured on the clean
     /// multiplexer, and the difference between the worlds is not which rounds it fires on
     /// — it is that on one world specialising WORKS and on the other there is nothing to
     /// gain. Nothing in the machine was asking which.
@@ -390,14 +390,14 @@ public enum Mending
     /// specialising</i> from <i>this rule is simply being outvoted</i>.
     /// </para>
     /// <para>
-    /// <b>The first fork is always allowed, because the signal does not exist until it
-    /// has been tried.</b> A parent with no children has no evidence either way, and
+    /// <b>The first fork is always allowed</b>, because the signal does not exist until it
+    /// has been tried. A parent with no children has no evidence either way, and
     /// refusing on no evidence would make this a way of never repairing at all — which
     /// is the shape of arm this repo deletes rather than keeps.
     /// </para>
     /// <para>
-    /// <b>AND IT SHOULD HAVE MADE <c>Budget</c> unnecessary. It did not self-limit at
-    /// all</b>, because a memorised child beats its parent easily — a narrow child that
+    /// <b>And it should have made <c>Budget</c> unnecessary.</b> It did not self-limit at
+    /// all, because a memorised child beats its parent easily — a narrow child that
     /// has stored a corner of the drawn set is far more accurate than the general parent
     /// it came from, so <i>has forking paid</i> answers YES forever.
     /// </para>
@@ -406,16 +406,16 @@ public enum Mending
 }
 
 /// <summary>
-/// WHEN repair runs — <b>the other axis, and the one that was doing most of the work.</b>
+/// WHEN repair runs — <b>the other axis</b>, and the one that was doing most of the work.
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The plan says an outvoted commitment still accrues its own hits and misses</b>, and
+/// <b>The plan says an outvoted commitment accrues its own hits and misses</b>, and
 /// waiting for the vote to be wrong meant it could never spend them — so how hard the
 /// machine searched was a function of how good its answers already were.
 /// </para>
 /// <para>
-/// <b>And separating this from the gate is what showed it was the load-bearing half.</b>
+/// <b>Separating this from the gate showed it was the load-bearing half.</b>
 /// Every-round repair leads on both worlds measured, while the gate beside it is inert on
 /// one of them to three metrics. The defect row calling this family a dial whose best value
 /// moves with the world was written when the setting was read as a list.
@@ -426,14 +426,14 @@ public enum Repairing
     /// <summary>Every round, whatever the vote said. What ships.</summary>
     /// <remarks>
     /// <para>
-    /// <b>The default because it won everywhere it was asked, which took a ledger to
-    /// see.</b> Sixteen standard errors of hard-round coverage at eleven bits skewed, six
+    /// <b>The default because it won everywhere it was asked</b>, which took a ledger to
+    /// see. Sixteen standard errors of hard-round coverage at eleven bits skewed, six
     /// of true rules found, two on <see cref="Worlds.Arranged"/> — the world fork 58
     /// predicted it would die on — and inside one standard error on both even multiplexers.
     /// <c>RepairingTests</c> holds the grid and <c>LineageTests</c> holds the mechanism.
     /// </para>
     /// <para>
-    /// <b>And it is the only thing here that separates the readout from the search.</b>
+    /// <b>And it is the only thing here that separates readout from search.</b>
     /// Under <see cref="AfterFailure"/> the vote decides what repair may run on, so a
     /// weighing rule and a search rule are one change — measured, not argued: the three
     /// weighing arms this repo held built populations equal PER SEED under this timing and
@@ -458,8 +458,8 @@ public enum Repairing
 /// <summary>What a repair budget is spent on.</summary>
 /// <remarks>
 /// <para>
-/// <b>A parent's children are recorded as a list and the same name goes in twice, so the
-/// budget has always counted ATTEMPTS.</b> <see cref="Population.Mend"/> notes the child
+/// <b>A parent's children are recorded as a list</b>, and the same name goes in twice, so the
+/// budget has always counted ATTEMPTS. <see cref="Population.Mend"/> notes the child
 /// before asking whether it was new, and a repair that reaches a scope the population
 /// already holds is exactly as expensive to the budget as one that mints something. What
 /// <see cref="CommittingSettings.Budget"/> limits is therefore how many times a parent may
@@ -474,7 +474,7 @@ public enum Repairing
 /// like from outside, because how often a parent re-derives moves with the width.
 /// </para>
 /// <para>
-/// <b>And it is only askable now, which is why it was not asked before.</b> Loosening the
+/// <b>And it is only askable now</b>, which is why it was not asked before. Loosening the
 /// budget on the skewed world bought nothing, measured over eight seeds — but under
 /// <see cref="Repairing.AfterFailure"/> the lineages that needed the budget were never
 /// blamed, so nothing was waiting on it. The question is a different one once blame
@@ -491,14 +491,14 @@ public enum Budgeting
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Distinct children rather than successful adds, which is the difference that
-    /// matters when something is culled.</b> A child minted, deleted and re-derived is one
+    /// <b>Distinct children rather than successful adds</b>, which is the difference that
+    /// matters when something is culled. A child minted, deleted and re-derived is one
     /// child a parent has thought of twice; counting adds would charge it twice and make
     /// the budget depend on what the CULL did, which is not a fact about the search.
     /// </para>
     /// <para>
-    /// <b>And it is a synonym for <see cref="Attempts"/> under the shipped forking rule,
-    /// which is arithmetic rather than a world.</b> <see cref="Population.Mend"/> charges an
+    /// <b>And it is a synonym for <see cref="Attempts"/> under the shipped forking rule</b>,
+    /// which is arithmetic rather than a world. <see cref="Population.Mend"/> charges an
     /// attempt and adds a name in the same two lines, and <see cref="Forking.Distinct"/>
     /// refuses a parent every code it has already spent — so two codes are two scopes are
     /// two identities, and the set and the counter move together forever. Under
@@ -528,7 +528,7 @@ public enum Budgeting
     /// cannot reach its own cap.
     /// </para>
     /// <para>
-    /// <b>And it needs no new number, which is the only reason it is buildable.</b>
+    /// <b>And it needs no new number</b>, which is the only reason it is buildable.
     /// <see cref="CommittingSettings.Floor"/> already means <i>enough misses to test a
     /// proportion by</i>, and <see cref="Population.Mend"/> already refuses a parent under
     /// it. This is that same rule applied repeatedly rather than once: the first attempt
@@ -536,13 +536,13 @@ public enum Budgeting
     /// earning. <see cref="CommittingSettings.Budget"/> is not read at all.
     /// </para>
     /// <para>
-    /// <b>And the horizon is in events rather than time, which is this design's own rule.</b>
+    /// <b>And the horizon is in events rather than time</b>, which is this design's own rule.
     /// A rate per thousand rounds would bind too and would be a clock — the thing settlement
     /// was built to avoid. Misses are events, they are already counted, and they are exactly
     /// the evidence that a repair is wanted.
     /// </para>
     /// <para>
-    /// <b>What it risks is being free in disguise, and that is what the grid is for.</b> A
+    /// <b>What it risks is being free in disguise</b>, and that is what the grid is for. A
     /// parent wrong on most rounds earns attempts quickly, so on a world where the population
     /// is mostly wrong this may not bind at all — which is the fault <see cref="Children"/>
     /// turned out to have, and the reason it is compared against both of them rather than
@@ -555,29 +555,29 @@ public enum Budgeting
 /// <summary>Whether a parent may propose a fork it has already made.</summary>
 /// <remarks>
 /// <para>
-/// <b>Repair is deterministic and its table moves slowly, so a parent proposes the same
-/// child over and over.</b> <see cref="Repair.Discriminator"/> returns the argmax of a tally
+/// <b>Repair is deterministic and its table moves slowly</b>, so a parent proposes the same
+/// child over and over. <see cref="Repair.Discriminator"/> returns the argmax of a tally
 /// that changes by one entry a firing, so the winner is stable for thousands of rounds — and
 /// the code it names is still in the tally next time, because a commitment's table skips its
 /// OWN scope and knows nothing of its children's. Measured: collisions run twenty to fifty
 /// times the births at every majority rung.
 /// </para>
 /// <para>
-/// <b>WHICH MAKES <see cref="CommittingSettings.Budget"/> a re-derivation limit rather than a
-/// search limit, and that is already written down as a finding.</b> A parent under a budget of
+/// <b>Which makes <see cref="CommittingSettings.Budget"/> a re-derivation limit rather than a
+/// search limit</b>, and that is already written down as a finding. A parent under a budget of
 /// two hundred and fifty-six spends nearly all of it arriving where it already is. What has
 /// never been tried is spending those attempts somewhere else.
 /// </para>
 /// <para>
-/// <b>And quantity is the one account of the uncovered rounds the evidence confirms.</b> A
+/// <b>Quantity is the one account of the uncovered rounds the evidence confirms.</b> A
 /// child fires only where its added code is present, so covering what a parent is right about
 /// takes MANY children — and <c>uncovered</c> falls monotonically as the budget rises, 1354 at
 /// eight to 472 free. If a parent's attempts bought distinct children, its effective search
 /// would be twenty to fifty times what every number here was taken under, at the same budget.
 /// </para>
 /// <para>
-/// <b>It is the opposite half of the search from the step length, which is why it is worth
-/// trying after that failed.</b> A two-code step made each attempt reach DEEPER and lost
+/// <b>It is the opposite half of the search from the step length</b>, which is why it is worth
+/// trying after that failed. A two-code step made each attempt reach DEEPER and lost
 /// coverage by overshooting; this makes each attempt reach somewhere ELSE at the same depth.
 /// Nothing about the chain's length changes, so the failure that closed fork 74 does not
 /// apply to it.
@@ -587,10 +587,10 @@ public enum Forking
 {
     /// <summary>
     /// The best code in the table, whether or not this parent has already forked on it.
-    /// <b>The control, and what every number taken before this shipped was taken under.</b>
+    /// <b>The control</b>, and what every number taken before this shipped was taken under.
     /// </summary>
     /// <remarks>
-    /// <b>Kept rather than deleted, which is the exception this repo's arm rule allows.</b> A
+    /// <b>Kept rather than deleted</b>, which is the exception this repo's arm rule allows. A
     /// loser goes with a revival row — but this one is the baseline every recorded reading in
     /// the tree sits on, and deleting it would make the whole history unreproducible rather
     /// than merely superseded. It is the only arm here whose job is to be the old number.
@@ -600,8 +600,8 @@ public enum Forking
     /// <summary>The best code this parent has NOT already forked on.</summary>
     /// <remarks>
     /// <para>
-    /// <b>The correction still divides by the whole table, which is the part that could have
-    /// gone wrong silently.</b> Excluding a parent's spent codes shrinks the candidate set, and
+    /// <b>The correction still divides by the whole table</b>, which is the part that could have
+    /// gone wrong silently. Excluding a parent's spent codes shrinks the candidate set, and
     /// a Bonferroni over a smaller set is a LOOSER bar — so a parent that had forked fifty
     /// times would face an easier test than one that had forked once, and every late child
     /// would enter on a bar its siblings never had to clear. The search that found the tenth
@@ -626,8 +626,8 @@ public sealed record CommittingSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE PLAN SAYS `Surprise` gates genesis and has never run, and on a wide
-    /// front end that is not a detail.</b> Covering mints one commitment per live code,
+    /// <b>The plan says `Surprise` gates genesis and has never run</b>, and on a wide
+    /// front end that is not a detail. Covering mints one commitment per live code,
     /// and a winnowed eight-by-eight thumbnail is 128 live codes over a sheet of 2,560
     /// cells. With ten outcomes the complete one-code space is 25,600 — and minting on
     /// every failure took the population to 23,762 against a capacity of 2,000. Genesis
@@ -643,8 +643,8 @@ public sealed record CommittingSettings
     /// claims it already holds.
     /// </para>
     /// <para>
-    /// <b>So it is promiscuous early and quiet late, which is the shape the plan asked
-    /// for.</b> With nothing held, nothing proposes anything and every failure mints.
+    /// <b>So it is promiscuous early and quiet late</b>, which is the shape the plan asked
+    /// for. With nothing held, nothing proposes anything and every failure mints.
     /// Once the outcome space is covered, the right answer is usually proposed by
     /// something among the hundreds that fire, and genesis stops on its own rather than
     /// against a number somebody chose.
@@ -673,7 +673,7 @@ public sealed record CommittingSettings
     /// <summary>How many times one commitment may ever separate.</summary>
     /// <remarks>
     /// <para>
-    /// <b>It was written down as a runaway guard and it is a level.</b> At eight it
+    /// <b>It was written down as a runaway guard</b>, and it is a level. At eight it
     /// bound before it guarded — repairs flat from twenty thousand rounds to four
     /// hundred thousand, and the score flat with it. Raised, and the same shape
     /// appeared one width up: at twenty bits it plateaus under this and crosses the
@@ -685,8 +685,8 @@ public sealed record CommittingSettings
     /// optimum is what a LEVEL has, and <c>BudgetCurveTests</c> is where it is read.
     /// </para>
     /// <para>
-    /// <b>And the optimum does not move with the relevant bits, which is the puzzle this
-    /// number carried for the life of the branch.</b> Six bits and eleven both peak on the
+    /// <b>And the optimum does not move with the relevant bits</b>, which is the puzzle this
+    /// number carried for the life of the branch. Six bits and eleven both peak on the
     /// 128-to-256 plateau and both are worse free, so this is not a per-world number and
     /// no world is reaching into the brain through it. The moving optimum was measured
     /// under <see cref="Repairing.AfterFailure"/>, where the lineages that would have spent
@@ -694,14 +694,14 @@ public sealed record CommittingSettings
     /// which is the third thing that coupling has turned out to be.
     /// </para>
     /// <para>
-    /// <b>So sixty-four was the level and it was too low, measured at four worlds.</b> At
+    /// <b>So sixty-four was the level and it was too low</b>, measured at four worlds. At
     /// eleven bits even this leads it by 2.6 standard errors of trailing accuracy, 2.9 of
     /// sound rules and 3.8 of hard-round coverage; at six bits it is level on accuracy and
     /// ahead on coverage. Nothing measured is worse.
     /// </para>
     /// <para>
-    /// <b>And then it fell from two hundred and fifty-six to eight, which is not a retraction
-    /// of any of that.</b> Every level above the vocabulary was the same arm while a parent
+    /// <b>And then it fell from two hundred and fifty-six to eight</b>, which is not a retraction
+    /// of any of that. Every level above the vocabulary was the same arm while a parent
     /// re-proposed the same child, so the readings above are about how much RE-DERIVATION a
     /// lineage was allowed. Under <see cref="Forking.Distinct"/> an attempt buys a new child
     /// and this caps the search for the first time — which is why the optimum moved from
@@ -709,7 +709,7 @@ public sealed record CommittingSettings
     /// machine it was taken on.
     /// </para>
     /// <para>
-    /// <b>Eight rather than four on three columns of four, and neither is free.</b> Two is
+    /// <b>Eight rather than four on three columns of four</b>, and neither is free. Two is
     /// worse than repeating on every world; free floods `Arranged` to its capacity and is five
     /// standard errors down there. The two dials are chosen together or not at all.
     /// </para>
@@ -722,23 +722,23 @@ public sealed record CommittingSettings
     /// <summary>Whether repair waits for the VOTE to be wrong, or only for a commitment to be.</summary>
     /// <remarks>
     /// <para>
-    /// <b>The plan already says these are two different things and the code treats them
-    /// as one.</b> <i>An outvoted commitment still accrues its own hits and misses, which
+    /// <b>The plan already says these are two different things</b>, and the code treats them
+    /// as one. <i>An outvoted commitment still accrues its own hits and misses, which
     /// keeps C1 and stops the winner monopolising the learning.</i> It accrues them and
     /// then cannot act on them: covering and repair run only on a round the WINNER got
     /// wrong, so a commitment that fired, was wrong, and was outvoted banks a miss it can
     /// never spend.
     /// </para>
     /// <para>
-    /// <b>Which makes how hard the machine searches a function of how good its answers
-    /// already are, and nobody designed that.</b> Measured rather than suspected:
+    /// <b>Which makes the machine's search depth a function of its own accuracy</b>, and
+    /// nobody designed that. Measured rather than suspected:
     /// concentrating the vote costs 169 repairs to 105 at six bits and 12.3 true rules to
     /// 8.7 at eleven, and on a noisy world where both arms fail the same rounds they
     /// repair identically and differ only in score.
     /// </para>
     /// <para>
-    /// <b>And the gate turns out to be load-bearing, which refutes the paragraph above as
-    /// an argument for removing it.</b> On <see cref="Worlds.Multiplexer"/> at eleven bits,
+    /// <b>And the gate turns out to be load-bearing</b>, which refutes the paragraph above as
+    /// an argument for removing it. On <see cref="Worlds.Multiplexer"/> at eleven bits,
     /// dropping it takes 0.944 to 0.983 under the best-advocate vote. On
     /// <see cref="Worlds.Arranged"/> it is a disaster: 1.000 falls to 0.752, because the
     /// gated arm repairs NINE times in twenty thousand rounds and the ungated one mints
@@ -746,8 +746,8 @@ public sealed record CommittingSettings
     /// unsound ones from 178 to 325, and the score went with the second number.
     /// </para>
     /// <para>
-    /// <b>So <i>only fix what is broken</i> is the right rule and this is another dial
-    /// whose value moves with the world — the disease and not the cure.</b> Where the true
+    /// <b>So <i>only fix what is broken</i> is the right rule</b>, and this is another dial
+    /// whose value moves with the world — the disease and not the cure. Where the true
     /// rules are one code, repair has nothing useful to do and the brake protects the
     /// population from itself; where they are three-code conjunctions, the brake starves
     /// the only mechanism that can reach them. The readout cannot tell those apart because
@@ -796,8 +796,8 @@ public sealed record CommittingSettings
 
     /// <summary>How the condition to add is picked.</summary>
     /// <remarks>
-    /// <b>The most important comparison in step one, and it is a choice between two
-    /// rules rather than a level.</b> If choosing the separating condition does not
+    /// <b>The most important comparison in step one</b>, and it is a choice between two
+    /// rules rather than a level. If choosing the separating condition does not
     /// beat choosing any condition the failures happened to contain, repair is doing
     /// nothing and the whole bet is dead — and without the second arm a run cannot
     /// tell a mechanism from the narrowing that ANY added condition buys.
@@ -849,8 +849,8 @@ public static class Repair
     /// </param>
     /// <remarks>
     /// <para>
-    /// <b>The condition must be more present in the hits, which is the opposite of
-    /// what is easy to say.</b> A conjunctive child <c>X and Z</c> keeps the firings
+    /// <b>The condition must be more present in the hits</b>, which is the opposite of
+    /// what is easy to say. A conjunctive child <c>X and Z</c> keeps the firings
     /// where Z was there, so to keep the hits and shed the misses, Z has to be what
     /// the hits had. A code that is more present in the MISSES is the right condition
     /// for a NEGATED one — <c>X and not Z</c> — which is rung two and is not built.
@@ -936,23 +936,23 @@ public static class Repair
     /// <param name="dials">Every number the machinery is allowed to have.</param>
     /// <remarks>
     /// <para>
-    /// <b>Fork 74 asks whether a chain could be walked in one pass, and this is the half of
-    /// it that is decidable.</b> A four-code truth costs three miss floors because a fresh
+    /// <b>Fork 74 asks whether a chain could be walked in one pass</b>, and this is the half of
+    /// it that is decidable. A four-code truth costs three miss floors because a fresh
     /// child re-earns one before it may add the next. If a parent's table could pick both
     /// codes at once the chain would collapse — but the table is not conditioned on the
     /// first code, so whether it can is a question about the world rather than about the
     /// arithmetic.
     /// </para>
     /// <para>
-    /// <b>So the reading is whether this agrees with what the child later chooses.</b> A
+    /// <b>So the reading is whether this agrees with the child's later choice.</b> A
     /// child picks from its OWN table, re-earned over its own firings and therefore
     /// conditioned on the code its parent added. Agreement means one table could have picked
     /// both and the pass is a saving; disagreement means conditioning is what the second
     /// choice needed, which is exactly what a chain buys and a single pass cannot.
     /// </para>
     /// <para>
-    /// <b>And it is subject to the same bar as the winner, or it would be comparing a
-    /// certified choice against an uncertified one.</b> The correction divides among the same
+    /// <b>And it is subject to the same bar as the winner</b>, or it would be comparing a
+    /// certified choice against an uncertified one. The correction divides among the same
     /// candidate count, because the search that found the runner-up is the same search.
     /// </para>
     /// </remarks>
@@ -1006,8 +1006,8 @@ public static class Repair
     /// only if they would. This answers that and changes no behaviour.
     /// </para>
     /// <para>
-    /// <b>The same statistic with its arguments swapped, which is the whole of the
-    /// difference.</b> <see cref="Discriminator"/> wants a code that leads in the HITS,
+    /// <b>The same statistic with its arguments swapped</b>, which is the whole of the
+    /// difference. <see cref="Discriminator"/> wants a code that leads in the HITS,
     /// because a conjunctive child keeps the firings that code was in. A negated child
     /// keeps the firings it was ABSENT from, so its condition must lead in the MISSES —
     /// the plan says this in one sentence and says that conflating the two is how one
@@ -1022,7 +1022,7 @@ public static class Repair
     /// already keeps is where that is read.
     /// </para>
     /// <para>
-    /// <b>It costs a second walk of the table and only where nothing separated</b>, which
+    /// <b>It costs a second walk of the table</b>, and only where nothing separated, which
     /// is a small share of a small share of rounds. Said out loud because the walk it
     /// mirrors is deliberately last in its own chain for exactly this reason.
     /// </para>

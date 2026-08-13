@@ -494,8 +494,8 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       `Message`, `Arrival`, `Settled`, `Question`, `WalkSettings` · `Chunk`, `Macro`,
       `Stated`, `Posit` · `Drives`, `Foresight`, `Consequence`, `Reflection`. Bring the IDEAS
       out of the minters without the mechanisms, and cite the idea rather than the type.
-    - **OPEN** — both learners are co-resident, so the head-to-head needs no branch: one
-      world, one front end, one held-out set and TWO READERS. It blocks nothing.
+    - **OPEN** — the head-to-head is BLOCKED and was recorded free: the walk reads
+      `Coded` and the commitment learner `Asking`, so one corpus is two front ends.
     - **OPEN** — the vote's arithmetic composes and a whole learner runs over it. Open on C2
       alone, which TCP cannot show. Fork **52**.
     - **OPEN** — what the repair gate's query costs on a wire, priced on loopback. Open on a

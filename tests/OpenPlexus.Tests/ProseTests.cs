@@ -96,6 +96,17 @@ public sealed class ProseTests(ITestOutputHelper output)
     private const int Shouted = 958;
 
     /// <summary>
+    /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>
+    /// </summary>
+    /// <remarks>
+    /// It began at 77, found by reading rather than by checking: thirteen turned up in three
+    /// files during one pass, which is what says the class is not incidental. No schedule sits
+    /// on this one — <see cref="Falls"/> paces the bold half and a second clock would be two
+    /// deadlines on one session for the same debt.
+    /// </remarks>
+    private const int Opened = 77;
+
+    /// <summary>
     /// The commit the decay schedule counts from. <b>John's, 2026-08-13.</b>
     /// </summary>
     /// <remarks>
@@ -294,12 +305,65 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// written and this had not, which is the whole of the fault.
     /// </remarks>
     private static List<string> Bolds(string prose) =>
+        Said(prose)
+            .Where(said => said.Length > Lead)
+            .Select(said => string.Join(' ', said))
+            .ToList();
+
+    /// <summary>Every bold span in one piece of prose, as its words.</summary>
+    /// <remarks>
+    /// Shared by <see cref="Bolds"/> and <see cref="Leads"/> so the two cannot disagree about
+    /// what a bold span is or where one ends. They ask different questions of the same list.
+    /// </remarks>
+    private static IEnumerable<string[]> Said(string prose) =>
         Regex
             .Matches(prose, @"\*\*(?<said>[^*]+)\*\*|<b>(?<said>.+?)</b>", RegexOptions.Singleline)
             .Select(match => Regex.Replace(match.Groups["said"].Value, @"(?m)^\s*///?", " "))
             .Select(said => Regex.Replace(said, @"<[^>]+>|\s+", " ").Trim())
-            .Where(said => said.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length > Lead)
-            .ToList();
+            .Select(said => said.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+
+    /// <summary>Every bold span that opens in capitals and then continues in lower case.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The shout the six-word threshold cannot see.</b> <see cref="Words"/> was measured
+    /// against a tree where a shouted sentence ran six words or more in the clear, and two
+    /// things get under it: a run broken in the middle by an inline <c>&lt;c&gt;</c> or
+    /// <c>&lt;see&gt;</c>, whose mixed-case content ends the run; and a shouted lead of four or
+    /// five words, which is shorter than the longest legitimate label.
+    /// </para>
+    /// <para>
+    /// <b>So it separates them by position rather than by length</b>, and that is what makes it
+    /// safe at two words where a plain threshold would not be. A label is the WHOLE of its bold
+    /// — <c>**WHAT THE MACHINE MUST SURVIVE**</c> ends where the capitals do. A shout is a
+    /// prefix of one, with the sentence carrying on in lower case after it.
+    /// </para>
+    /// <para>
+    /// Measured rather than guessed, in the same shape <see cref="Words"/> was: at the commit
+    /// that introduced this, 77 spans matched and every one read as a shout. No heading, status
+    /// token or route branch was among them, because none of those has lower case after it.
+    /// </para>
+    /// <para>
+    /// <b>One capitalised word is left alone on purpose.</b> <i>a SET, never a variable</i>
+    /// reads closer to italics than to shouting, so the run has to reach two before this looks
+    /// at it — which is why <c>UNDER &lt;see cref="Subsuming.Weaker"/&gt;</c> is not caught.
+    /// </para>
+    /// </remarks>
+    private static List<string> Leads(string prose)
+    {
+        var found = new List<string>();
+
+        foreach (var said in Said(prose))
+        {
+            var run = said
+                .TakeWhile(word => Regex.IsMatch(word.Trim('.', ',', ':', ';', '—', '-'),
+                    @"^[A-Z][A-Z'’-]+$"))
+                .ToList();
+
+            if (run.Count >= 2 && run.Count < said.Length) found.Add(string.Join(' ', run));
+        }
+
+        return found;
+    }
 
     /// <summary>
     /// How many bold sentences the tree holds, for <see cref="OutstandingTests"/> to read.
@@ -310,6 +374,9 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// two readers each got whichever definition they assumed.
     /// </remarks>
     internal static int BoldSentences() => Written().Sum(path => Bolds(Prose(path)).Count);
+
+    /// <summary>How many bold spans open in capitals, for <see cref="OutstandingTests"/>.</summary>
+    internal static int ShoutedLeads() => Written().Sum(path => Leads(Prose(path)).Count);
 
     /// <summary>How many of something each file holds, worst first, for the message.</summary>
     private static string Worst(Func<string, List<string>> count)
@@ -360,6 +427,41 @@ public sealed class ProseTests(ITestOutputHelper output)
                     + $"The ceiling falls by {Rate} a commit and this branch is "
                     + $"{found - scheduled} behind it. Cut that many bold spans back to the "
                     + $"lead clause anywhere in the tree, then lower `Shouted`:\n  {Worst(Bolds)}");
+    }
+
+    [Fact]
+    public void No_more_of_the_prose_opens_a_lead_in_capitals()
+    {
+        var found = Written().Sum(path => Leads(Prose(path)).Count);
+
+        output.WriteLine($"{found} bold spans opening in capitals against a ratchet of {Opened}");
+
+        Assert.True(found <= Opened,
+            $"{found} bold spans open in capitals and carry on in lower case, against {Opened}. "
+            + "A label is the whole of its bold and a shout is a prefix of one, so this is the "
+            + $"shout that gets under the {Words}-word threshold. Lowercase the lead and keep "
+            + $"the bold:\n  {Worst(Leads)}");
+    }
+
+    [Fact]
+    public void A_label_is_the_whole_of_its_bold_and_a_shout_is_the_start_of_one()
+    {
+        // The companion, and this one is the reason the rule can be safe at two words where a
+        // length threshold cannot. Every label below is real and none may ever trip it.
+        Assert.Empty(Leads("- **WHAT IT MUST DO** — one entry a line of THE ARCHITECTURE"));
+        Assert.Empty(Leads("- **WHAT THE MACHINE MUST SURVIVE** — C1 to C4 do not move"));
+        Assert.Empty(Leads("**NOW** — a commitment fires when its scope is a subset"));
+
+        // And one word is left alone on purpose, which is what `UNDER <see .../>` relies on.
+        Assert.Empty(Leads("<b>UNDER <see cref=\"Weaker\"/> a hair of advantage saves it.</b>"));
+
+        // The two shapes that were getting under the threshold, both real and both found by
+        // reading. The first is broken into runs of five and two by the tag in the middle of
+        // it; the second is four words, shorter than the longest label in the tree.
+        Assert.Single(Leads(
+            "<b>AND IT IS INERT WITHOUT <c>Population.Sorts</c>, so it is a control.</b>"));
+
+        Assert.Single(Leads("**NAMES RATHER THAN A COUNT, so a parent can be asked.**"));
     }
 
     [Fact]

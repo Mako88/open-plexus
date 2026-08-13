@@ -171,26 +171,35 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// script would have taken all 45.
     /// </para>
     /// <para>
-    /// <b>Closes by the count reaching nought.</b> It reads
-    /// <see cref="ProseTests.BoldSentences"/> rather than a list of its own. The typography is
-    /// all any check here can see; the reveal, the stinger and the corrective turn are written
-    /// down in CLAUDE.md and nothing reaches them.
+    /// <b>Closes by two counts reaching nought.</b> It reads
+    /// <see cref="ProseTests.BoldSentences"/> and <see cref="ProseTests.ShoutedLeads"/> rather
+    /// than a list of its own. The second was added when a pass turned up thirteen shouted
+    /// leads in three files that <c>ProseTests.Shouts</c> could not see — an inline tag breaks
+    /// the run, and a four-word shout is shorter than the longest real label. Both are the same
+    /// debt in the same register, so they close together rather than as two entries.
+    /// </para>
+    /// <para>
+    /// The typography is all any check here can see; the reveal, the stinger and the corrective
+    /// turn are written down in CLAUDE.md and nothing reaches them.
     /// </para>
     /// </remarks>
     [Fact]
     public void The_prose_is_out_of_the_engagement_register()
     {
-        var left = ProseTests.BoldSentences();
+        var bold = ProseTests.BoldSentences();
+        var shouted = ProseTests.ShoutedLeads();
 
         output.WriteLine(
-            left == 0
-                ? "no bold sentences left"
-                : $"{left} bold sentences still to cut back to a lead clause");
+            bold + shouted == 0
+                ? "no bold sentences and no shouted leads left"
+                : $"{bold} bold sentences to cut back to a lead clause, {shouted} leads to "
+                    + "lowercase");
 
-        Assert.True(left == 0,
-            $"{left} bold spans are a sentence rather than the lead clause bold is for. Cut "
-            + "each back to the claim a reader scans for, then lower `ProseTests.Shouted` to "
-            + "what the pass achieved. This test is red on purpose and closes on that count, "
+        Assert.True(bold + shouted == 0,
+            $"{bold} bold spans are a sentence rather than the lead clause bold is for, and "
+            + $"{shouted} open in capitals. Cut each back to the claim a reader scans for and "
+            + "lowercase the leads, then lower `ProseTests.Shouted` and `ProseTests.Opened` to "
+            + "what the pass achieved. This test is red on purpose and closes on those counts, "
             + "not on this file.");
     }
 

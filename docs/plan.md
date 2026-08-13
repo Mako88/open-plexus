@@ -283,9 +283,8 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       a constant. Fork **105**.
     - **OPEN** — anti-unification as rung four's admission, gated by a hole whose covered
       values never co-occur. Open on the build. Fork **102**, gated by fork **97**.
-    - **OPEN** — a second hop keyed on what the first reading supplied, banded by hop. Open
-      at three facts. `csharp` refuted the cheap version: a second pass where a task merely
-      LOOKS deep buys nothing, so the hop has to be real. Fork **96**.
+    - **SETTLED** — a second hop pays where a second fact is needed and is damage where one
+      suffices, so the depth is the task's rather than the mechanism's. Fork **96**.
     - **OPEN** — a commitment ABOUT commitments is expressible and not built, an identity
       being a code. Metacognition, and where a self-model starts.
   - Concept and label independent
@@ -437,9 +436,9 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       single capacity sizes both. Fork **101**.
     - **BLOCKED** — the exam tier above bAbI is unpriced, and blocked until the components
       pass. Fork **90**.
-    - **OPEN** — it is a near-perfect READER and a hopeless SELECTOR, which the two ends say
-      together: shown the right statement it is at the ceiling, shown the whole story it
-      takes a fraction of what is present to be answered. SELECTION is where the exam moves.
+    - **OPEN** — it is a near-perfect READER and a hopeless SELECTOR, and a front end that
+      hands it the right statement answers a whole task at a twentieth of the bag's
+      population. What SELECTS without being handed the question's own words is unbuilt.
   - Told, never architected
     - **NOW** — a front end may say what it is looking at, never what to conclude.
       `SeparationTests` fails the build.

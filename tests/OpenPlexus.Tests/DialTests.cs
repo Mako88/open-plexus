@@ -774,6 +774,167 @@ public sealed class DialTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// Every arm of every dial is set by something — <b>an arm nothing ever selects has
+    /// never been compared, whatever its reason says.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE WEAKEST POSSIBLE FORM OF <i>AN ARM ONLY LIVES WHILE IT IS COMPARED</i>, AND
+    /// THINGS STILL FAIL IT.</b> This does not ask whether an arm won, or on how many
+    /// worlds, or against what — only whether any test anywhere ever names it. `Fanout` has
+    /// two arms and neither has ever been written down outside its own declaration, so it
+    /// has been a choice nobody has ever made for the life of the branch.
+    /// </remarks>
+    [Fact]
+    public void Every_arm_of_every_dial_is_selected_by_something()
+    {
+        var sources = Directory
+            .GetFiles(Path.Combine(Tree.Repo(), "tests", "OpenPlexus.Tests"), "*.cs")
+            .Where(one => Path.GetFileName(one) != "DialTests.cs")
+            .Select(File.ReadAllText)
+            .ToList();
+
+        var unselected = new List<string>();
+
+        foreach (var dial in Census())
+        {
+            if (!dial.PropertyType.IsEnum) continue;
+
+            // THE SAME EXEMPTION LIST AS THE TWO-WORLD BAR, because an arm nothing selects
+            // and a dial nothing measures are one situation read at two grains -- and every
+            // entry on it today is on the walk learner, which is going.
+            if (Waiting.ContainsKey(dial.Name)
+                || Waiting.ContainsKey(dial.PropertyType.Name)) continue;
+
+            foreach (var arm in Enum.GetNames(dial.PropertyType))
+            {
+                var named = $"{dial.PropertyType.Name}.{arm}";
+
+                if (!sources.Any(one => one.Contains(named, StringComparison.Ordinal)))
+                    unselected.Add(named);
+            }
+        }
+
+        Assert.True(unselected.Count == 0,
+            $"arm(s) no test selects yet: {string.Join(", ", unselected)}. Nothing has "
+            + "compared these, so nobody can say whether they help -- which is a gap in what "
+            + "we know rather than a fault in the code. Give one a comparison and we learn "
+            + "something; delete it with a revival row and we lose nothing, because the "
+            + "revival row says exactly what would bring it back");
+    }
+
+    /// <summary>
+    /// Every arm dial is measured on at least TWO worlds — <b>because one world's grid is a
+    /// verdict on the world.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>JOHN'S BAR, AND IT IS THIS REPO'S OWN TRAP SAID AS A RULE.</b> <i>A grid of
+    /// identical rows is a verdict on the worlds rather than on the arm</i>, and <i>a grid
+    /// can rank arms on columns a skewed world raises for free</i>. So a mechanism measured
+    /// in one place has a number and not a comparison, however many seeds it took.
+    /// </para>
+    /// <para>
+    /// <b>BY WHAT THE TESTS ACTUALLY BUILD, AND THE FIRST VERSION OF THIS CHECK ASKED THE
+    /// REASON TEXT INSTEAD AND WAS WRONG.</b> Reading the written reason for world names
+    /// measures whether somebody happened to put them in backticks — eleven of fourteen
+    /// dials failed it, including several measured on six worlds — so it would have bought
+    /// a round of cosmetic edits and no coverage at all. What a test CONSTRUCTS is the
+    /// fact; what its author wrote about it is not.
+    /// </para>
+    /// <para>
+    /// <b>AND THE EXEMPTIONS ARE A RATCHET, ON <c>DeadCodeTests</c>' PATTERN.</b> Each entry
+    /// is one dial that fails today with what it is waiting for. The list may only shrink;
+    /// adding to it wants John and a reason in the commit message.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Every_arm_is_measured_on_at_least_two_worlds()
+    {
+        var thin = new List<string>();
+
+        foreach (var dial in Census())
+        {
+            if (!dial.PropertyType.IsEnum) continue;
+            if (Waiting.ContainsKey(dial.Name)
+                || Waiting.ContainsKey(dial.PropertyType.Name)) continue;
+
+            var arms = Enum.GetNames(dial.PropertyType);
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+
+            foreach (var path in Directory.GetFiles(
+                Path.Combine(Tree.Repo(), "tests", "OpenPlexus.Tests"), "*.cs"))
+            {
+                if (Path.GetFileName(path) == "DialTests.cs") continue;
+
+                var source = File.ReadAllText(path);
+
+                // A FILE THAT NEVER NAMES THE DIAL SAYS NOTHING ABOUT IT, whatever worlds it
+                // builds. Both forms count: selecting an arm by name, and assigning the
+                // property in a settings initialiser.
+                if (!arms.Any(arm => source.Contains(
+                        $"{dial.PropertyType.Name}.{arm}", StringComparison.Ordinal))
+                    && !System.Text.RegularExpressions.Regex.IsMatch(
+                        source, $@"\b{dial.Name}\s*[=:]"))
+                    continue;
+
+                foreach (var world in Worlds)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(
+                            source, $@"\bnew {world}\s*[({{]|\bFixture\.{world}\b|\b{world}Settings\b|\b{world}Run\b"))
+                        seen.Add(world);
+            }
+
+            if (seen.Count < 2) thin.Add($"{dial.Name} ({seen.Count})");
+        }
+
+        Assert.True(thin.Count == 0,
+            $"dial(s) measured on one world so far: {string.Join(", ", thin)}. One world's "
+            + "grid is a verdict on the world rather than on the arm, so a second world is "
+            + "what turns a number into a comparison -- that is the whole of what this "
+            + "wants. A second world, a deletion with a revival row, or an entry in "
+            + "`Waiting` saying what it is waiting for are all good answers");
+    }
+
+    /// <summary>Every world this repo has, by name, for the check above.</summary>
+    private static readonly HashSet<string> Worlds =
+        [.. Directory
+            .GetFiles(Path.Combine(Tree.Repo(), "src", "OpenPlexus", "Worlds"), "*.cs")
+            .Select(one => Path.GetFileNameWithoutExtension(one))
+            .Where(one => !one.EndsWith("Run", StringComparison.Ordinal))];
+
+    /// <summary>
+    /// Dials that fail the two-world bar today, with what each is waiting for.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE LIST MAY ONLY SHRINK.</b> It is not a place to put a new dial — a mechanism
+    /// arriving today can be measured on two worlds today, and one that cannot is one
+    /// nobody can rank. These are the ones that predate the bar.
+    /// </remarks>
+    private static readonly Dictionary<string, string> Waiting = new(StringComparer.Ordinal)
+    {
+        ["Coarsening"] =
+            "`Returning` ONLY, and it is the one dial where that may be honest rather than "
+            + "owed: it reads a vocabulary of alternatives and no other world hands one in, "
+            + "so it is INERT everywhere else by construction. What it is waiting for is a "
+            + "second world whose front end derives its own categories -- which is "
+            + "`Alternating`'s wiring, and blocked on when a front end re-derives",
+
+        ["Speaking"] =
+            "`Multiplexer` ONLY, and this one IS owed. Whether an untested commitment may "
+            + "vote is not a question about any world's vocabulary, so nothing stops it "
+            + "being taken on `Arranged` or `Roaming` beyond nobody having done it. Its own "
+            + "reason already says the finding is that excluding them moves no metric -- a "
+            + "null result on one world, which is the weakest thing a grid can say",
+
+        ["Fanout"] =
+            "NO WORLD AT ALL, and it is on the walk learner, which is being deleted. This "
+            + "entry goes with it rather than being satisfied",
+
+        ["Accumulate"] =
+            "the walk learner again, and `InertDialTests` already records the sharper "
+            + "version: it is wired and measurably does nothing. It goes with the walk",
+    };
+
+    /// <summary>
     /// A dial shipping in its DO-NOTHING position is named in the plan's refutation table —
     /// <b>the budget for building something better and leaving it switched off.</b>
     /// </summary>
@@ -827,11 +988,11 @@ public sealed class DialTests(ITestOutputHelper output)
         }
 
         Assert.True(unexplained.Count == 0,
-            $"dial(s) shipping in their do-nothing position with no refutation anywhere: "
-            + $"{string.Join(", ", unexplained)}. Either the mechanism lost, in which case "
-            + "delete the loser and leave a revival row in DO NOT RE-TRY, or it did not, in "
-            + "which case turn it on and re-take whatever goes red. Building something "
-            + "better and shipping it off to protect a baseline is the one option this repo "
-            + "does not have");
+            $"dial(s) shipping in their do-nothing position with no refutation recorded: "
+            + $"{string.Join(", ", unexplained)}. If the mechanism lost, delete the loser "
+            + "and leave a revival row in DO NOT RE-TRY -- that is the good outcome and the "
+            + "row is what makes it reusable. If it did NOT lose, it has earned its place: "
+            + "turn it on and re-take whatever goes red, because the old numbers are safe in "
+            + "the commits and a better brain is worth more than an intact baseline");
     }
 }

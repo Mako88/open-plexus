@@ -48,7 +48,7 @@ public sealed record RoamingSettings
 }
 
 /// <summary>
-/// A house, a person walking round it, and things that get picked up and put down —
+/// A house, people walking round it, and things that get picked up and put down —
 /// <b>TextWorld's shape, generated here rather than ported, so the ground truth can be
 /// enumerated.</b>
 /// </summary>

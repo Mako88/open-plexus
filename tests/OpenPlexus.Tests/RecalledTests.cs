@@ -306,7 +306,22 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </para>
     /// <para>
     /// <b>What would drop the arm</b> is the held-out accuracy falling while the population
-    /// grows, which is that same pattern arriving a third time.
+    /// grows, which is that same pattern arriving a third time. It fired on task one at both
+    /// spans on the first dispatch, and the number is in that commit.
+    /// </para>
+    /// <para>
+    /// <b>The capacity is an arm rather than a setting here</b>, because the first dispatch
+    /// could not tell one story from the other. Order took task one from 203 residents to a
+    /// population pinned at 2001, and a pinned arm and an unpinned one are two machines. So
+    /// the same grid runs at a capacity nothing reaches, and the pair says whether order is
+    /// bad or merely expensive.
+    /// </para>
+    /// <para>
+    /// <b>Seeds are gone, and their absence is the finding that removed them.</b> Five of
+    /// them returned min equal to max in every cell of the first dispatch. This world draws
+    /// nothing — the corpus is read in order and wraps — and the brain's seed feeds
+    /// <c>Population</c>'s blind generator, which only the random-condition control arm
+    /// consumes. So a range here was decoration and cost five runners' work for one reading.
     /// </para>
     /// </remarks>
     [Fact]
@@ -317,17 +332,11 @@ public sealed class RecalledTests(ITestOutputHelper output)
         {
             foreach (var span in new[] { 1, 2 })
             {
-                foreach (var ordered in new[] { false, true })
+                foreach (var capacity in new[] { 2_000, 20_000 })
                 {
-                    var unseen = new List<double>();
-                    var drawn = new List<double>();
-                    var held = new List<int>();
-                    var named = new List<int>();
-                    var silent = new List<double>();
-
-                    for (var seed = 1; seed <= 5; seed++)
+                    foreach (var ordered in new[] { false, true })
                     {
-                        var brain = new Brain(new CommittingSettings { Capacity = 2000 }, seed);
+                        var brain = new Brain(new CommittingSettings { Capacity = capacity }, 1);
                         var world = new Recalled(World(task, span));
 
                         var trial = ordered
@@ -337,20 +346,18 @@ public sealed class RecalledTests(ITestOutputHelper output)
                         var tally = trial.Run(
                             rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
 
-                        unseen.Add(tally.Unseen?.Accuracy ?? 0.0);
-                        silent.Add(tally.Unseen?.Silence ?? 0.0);
-                        drawn.Add(tally.Recent);
-                        held.Add(brain.Held.Count);
-                        named.Add(brain.Held.Names.Count);
-                    }
+                        var unseen = tally.Unseen;
 
-                    output.WriteLine(
-                        $"task {task} span {span} {(ordered ? "ordered" : "bagged ")} | "
-                        + $"unseen {unseen.Min():F3}-{unseen.Max():F3} "
-                        + $"silent {silent.Min():F3}-{silent.Max():F3} | "
-                        + $"drawn {drawn.Min():F3}-{drawn.Max():F3} | "
-                        + $"held {held.Min(),5}-{held.Max(),5} "
-                        + $"names {named.Min(),3}-{named.Max(),3}");
+                        output.WriteLine(
+                            $"task {task} span {span} cap {capacity,6} "
+                            + $"{(ordered ? "ordered" : "bagged ")} | "
+                            + $"unseen {unseen?.Accuracy ?? 0.0:F3} "
+                            + $"silent {unseen?.Silence ?? 0.0:F3} | "
+                            + $"drawn {tally.Recent:F3} | "
+                            + $"held {brain.Held.Count,6} of {capacity} "
+                            + $"names {brain.Held.Names.Count,3} "
+                            + $"wanting {tally.Wanting:F3}");
+                    }
                 }
             }
         }

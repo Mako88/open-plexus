@@ -660,6 +660,48 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// the marginal by accident.
     /// </para>
     /// </remarks>
+    /// <summary>What each arm's learner scores on the held-out half, over three seeds.</summary>
+    /// <param name="arms">The translations to run.</param>
+    /// <param name="people">How many walk the house.</param>
+    /// <remarks>
+    /// <b>Seeds, because a comparison on one run is an anecdote.</b> The world and the brain
+    /// take the same seed, so an arm's whole run moves together rather than the house being
+    /// redrawn under a fixed population. <b>Written once because two grids read it</b>, and
+    /// two loops that drifted apart would make their columns unreadable against each other.
+    /// </remarks>
+    private Dictionary<string, List<double>> Scored(
+        IEnumerable<(string Name, Joined Joined)> arms, int people)
+    {
+        var scores = new Dictionary<string, List<double>>();
+
+        foreach (var (name, joined) in arms)
+        {
+            scores[name] = [];
+
+            foreach (var seed in new[] { 1, 2, 3 })
+            {
+                var world = new Roaming(World(120, people), seed);
+                var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed);
+
+                var tally = new Trial<Recited>(world, joined, brain)
+                    .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
+
+                var exam = tally.Unseen?.Accuracy ?? 0.0;
+
+                scores[name].Add(exam);
+
+                output.WriteLine(
+                    $"{name,-12}| seed {seed} | exam {exam:F3} | own {tally.Recent:F3} "
+                    + $"| held {brain.Held.Count}");
+            }
+        }
+
+        foreach (var (name, taken) in scores)
+            output.WriteLine($"{name,-12}| worst {taken.Min():F3} | best {taken.Max():F3}");
+
+        return scores;
+    }
+
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_a_learner_reads_where_the_transcript_stops_answering_itself()
@@ -680,35 +722,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         }))
         .ToList();
 
-        var scores = new Dictionary<string, List<double>>();
-
-        foreach (var (name, joined) in arms)
-        {
-            scores[name] = [];
-
-            // Seeds, because the claim is a comparison and a comparison on one run is an
-            // anecdote. The world and the brain take the same seed, so an arm's whole run
-            // moves together rather than the house being redrawn under a fixed population.
-            foreach (var seed in new[] { 1, 2, 3 })
-            {
-                var world = new Roaming(World(120, people: 1), seed);
-                var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed);
-
-                var tally = new Trial<Recited>(world, joined, brain)
-                    .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
-
-                var exam = tally.Unseen?.Accuracy ?? 0.0;
-
-                scores[name].Add(exam);
-
-                output.WriteLine(
-                    $"{name,-12}| seed {seed} | exam {exam:F3} | own {tally.Recent:F3} "
-                    + $"| held {brain.Held.Count}");
-            }
-        }
-
-        foreach (var (name, taken) in scores)
-            output.WriteLine($"{name,-12}| worst {taken.Min():F3} | best {taken.Max():F3}");
+        var scores = Scored(arms, people: 1);
 
         // The bar is two comparisons and neither is a level. First, that following the
         // freshest key beats folding through all of them AT THE SAME DEPTH -- which isolates
@@ -784,5 +798,54 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // word of this world supplies, so a moment missing the answering room word is still
         // answerable and only a moment that is another moment's twin is not. An arm reaching
         // further and scoring lower is failing to choose, which is the selection problem.
+    }
+
+    /// <summary>
+    /// The same learner where four people walk the house — <b>the rank inversion the ceiling
+    /// predicts, run as its own measurement.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Pre-registered before the run, in one line</b>: at four people
+    /// <c>Freshest(1)</c> should beat <c>Freshest(3)</c>, which is the opposite of the order
+    /// they come in at one person. What says so is
+    /// <see cref="What_a_second_person_does_to_the_key_the_fold_must_follow"/> — one hop
+    /// through the freshest key pins 0.180 there where three hops pin 0.128, and three hops
+    /// arrive with 3.39 walkers against 1.28.
+    /// </para>
+    /// <para>
+    /// <b>And what would refute the ceiling is the inversion failing to appear.</b> If depth
+    /// still wins where the company it drags along has trebled, then what a fold pins says
+    /// nothing about what a learner scores, and the columns that chose the arms in this file
+    /// are decoration.
+    /// </para>
+    /// <para>
+    /// <b>Its own runner rather than a cell of the one above</b>, because the list in
+    /// <c>sweeps.yml</c> is one entry a runner and a class holding two independent grids is two
+    /// runners' work sitting on one.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_a_learner_reads_when_four_people_walk_the_house()
+    {
+        var arms = new (string Name, Joined Joined)[]
+        {
+            ("Resolved(1)", new Joined(Joining.Resolved, resolution: 1)),
+            ("Freshest(1)", new Joined(Joining.Resolved, resolution: 1, freshest: true)),
+            ("Freshest(3)", new Joined(Joining.Resolved, resolution: 3, freshest: true)),
+        };
+
+        var scores = Scored(arms, people: 4);
+
+        // The bar that holds whichever way the inversion goes, and it is the one worth having
+        // first: a world with four walkers is still a world this learner reads. The marginal is
+        // about 0.19 at every cell of the people axis, so an arm under twice it has stopped
+        // tracking and the inversion would be a comparison between two failures.
+        Assert.True(scores["Freshest(1)"].Min() > 0.38,
+            $"one hop through the freshest key reads {scores["Freshest(1)"].Min():F3} at its worst "
+            + "with four people walking, under twice the marginal -- so a second walker has "
+            + "taken the world out of this learner's reach and the ceiling that says it is "
+            + "reachable is measuring something a run cannot convert");
     }
 }

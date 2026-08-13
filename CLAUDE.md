@@ -155,6 +155,30 @@ is lower than it reads.** The rule was written for interruptions. Several of his
 better than the arc they interrupted — if one is cheap and aimed at the live question, take
 it and say why.
 
+## How to write here
+
+John's, 2026-08-13, and it is a correction to the existing prose as much as an instruction
+for new prose.
+
+**Say the thing. Do not build up to it.** The reveal structure — *and here is what actually
+happened* — is a way of making a finding feel important, and it works whether or not the
+finding is. That is the same fault as a number in a commit message doing duty for a reading
+in a test: the emphasis stops being a signal once everything gets it.
+
+**One claim a sentence, and the same name for the same thing every time.** A synonym is a
+second name for one idea and this repo has already been bitten by two ideas sharing one name
+— `Choosing` read as measured on two worlds because an unrelated type had a property spelt
+the same.
+
+**Let the number carry the weight.** If a result matters, the evidence says so. If it needs
+capitals to seem to matter, ask whether it does.
+
+**AND THE EXISTING PROSE IS THE PROBLEM, NOT JUST THE NEXT COMMIT.** This file, `docs/plan.md`
+and most XML comments are written in the register above and a session matching its
+surroundings will reproduce it. Rewriting them is a real task and is on the handoff. Do not
+do it in the same commit as anything else, and do not lose content to it — a guard must not
+cost information.
+
 ## The epistemics
 
 These are the parts worth more than the code.

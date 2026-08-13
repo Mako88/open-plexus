@@ -16,6 +16,24 @@ public sealed record RoamingSettings
     /// <summary>How many things are lying about in it.</summary>
     public required int Props { get; init; }
 
+    /// <summary>How many people are walking round it.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>What makes the chain to the answer real, and one person cannot.</b> A thing's room is
+    /// where whoever dropped it was standing, so the answer is reached by two hops: the thing
+    /// names a person, the person names a room. With one person that middle hop is free — every
+    /// action statement names the same word, so there is only ever one candidate and the walk
+    /// is answerable by following anything at all.
+    /// </para>
+    /// <para>
+    /// <b>And it is the axis fork 95 was waiting for.</b> Which key a fold should follow is
+    /// unanswerable where the only key that connects statements is a verb; a second person
+    /// makes the informative key exist, so a rule that picks it can be told from a rule that
+    /// picks any of them. The company a fold arrives with is what this should cut.
+    /// </para>
+    /// </remarks>
+    public required int People { get; init; }
+
     /// <summary>How many things happen before the question is asked.</summary>
     /// <remarks>
     /// <b>What makes the answer move, which is the whole world.</b> At nought the opening
@@ -97,6 +115,9 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
     /// </remarks>
     private const byte Word = 46;
 
+    /// <summary>What holds a thing that is lying on the floor.</summary>
+    private const int Nobody = -1;
+
     private static readonly string[] Places =
     [
         "kitchen", "garden", "office", "bathroom", "bedroom", "hallway", "cellar", "attic",
@@ -105,6 +126,17 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
     private static readonly string[] Things =
     [
         "apple", "football", "milk", "book", "lamp", "kettle", "hat", "brush",
+    ];
+
+    /// <summary>Who is walking about, in outcome order for nothing.</summary>
+    /// <remarks>
+    /// <b>John first</b>, so a walk of one person is the walk this world always had. Every
+    /// reading taken before a second person existed was taken on a transcript naming him, and
+    /// keeping him at the front means those readings are still about the same sentences.
+    /// </remarks>
+    private static readonly string[] Cast =
+    [
+        "john", "mary", "sandra", "daniel", "fred", "julie", "bill", "emma",
     ];
 
     private readonly RoamingSettings _settings;
@@ -120,6 +152,8 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
         ArgumentOutOfRangeException.ThrowIfGreaterThan(settings.Rooms, Places.Length);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Props);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(settings.Props, Things.Length);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.People);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(settings.People, Cast.Length);
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Steps);
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Withheld);
 
@@ -151,6 +185,15 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
     public IReadOnlyList<Code> Called =>
         [.. Things.Take(_settings.Props).Select(thing => Kinds.Named(Word, thing))];
 
+    /// <summary>The code for each person's word, in cast order. <b>The same standing.</b></summary>
+    /// <remarks>
+    /// <b>What a probe following the chain needs</b>, and it is a fact about the vocabulary. Asking whether
+    /// this world is answerable by following the thing to a person and the person to a room
+    /// needs to know which codes are people. Nothing that learns is ever shown it.
+    /// </remarks>
+    public IReadOnlyList<Code> Walking =>
+        [.. Cast.Take(_settings.People).Select(one => Kinds.Named(Word, one))];
+
     /// <inheritdoc/>
     public IReadOnlyList<Turn<Recited>> Withheld => _kept;
 
@@ -175,7 +218,13 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
         // answer is not derivable from the transcript at all, and the world would be asking
         // about something it never said.
         var at = new int[_settings.Props];
-        var carried = new bool[_settings.Props];
+
+        // Who is holding each thing, or nobody. A flag would have been enough for one person
+        // and says the wrong thing for two: a thing in a hand is somewhere, and which hand it
+        // is in is what the room it lands in depends on.
+        var held = new int[_settings.Props];
+
+        Array.Fill(held, Nobody);
 
         // Newest first, which is what `Recited` promises. So the list is built forwards and
         // reversed at the end rather than each statement being inserted at the front, which
@@ -189,14 +238,23 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
             told.Add(Said("the", Things[prop], "is", "in", "the", Places[at[prop]]));
         }
 
-        var here = _walks.Next(_settings.Rooms);
+        var here = new int[_settings.People];
+
+        for (var one = 0; one < _settings.People; one++) here[one] = _walks.Next(_settings.Rooms);
 
         for (var step = 0; step < _settings.Steps; step++)
         {
-            var holding = Enumerable.Range(0, _settings.Props).Where(one => carried[one]).ToList();
+            // Whose turn it is, and one person is nobody to choose between. A draw over one
+            // option decides nothing, so it is not taken -- which also leaves the walk of a
+            // one-person house the walk every earlier reading was taken on.
+            var who = _settings.People == 1 ? 0 : _walks.Next(_settings.People);
+
+            var holding = Enumerable.Range(0, _settings.Props)
+                .Where(one => held[one] == who)
+                .ToList();
 
             var loose = Enumerable.Range(0, _settings.Props)
-                .Where(one => !carried[one] && at[one] == here)
+                .Where(one => held[one] == Nobody && at[one] == here[who])
                 .ToList();
 
             // Move, take or drop, and the choice is between what is possible rather than
@@ -212,35 +270,37 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
                 case 1:
                     var taken = loose[_walks.Next(loose.Count)];
 
-                    carried[taken] = true;
+                    held[taken] = who;
 
-                    told.Add(Said("john", "took", "the", Things[taken]));
+                    told.Add(Said(Cast[who], "took", "the", Things[taken]));
 
                     break;
 
                 case 2:
                     var dropped = holding[_walks.Next(holding.Count)];
 
-                    carried[dropped] = false;
-                    at[dropped] = here;
+                    held[dropped] = Nobody;
+                    at[dropped] = here[who];
 
-                    told.Add(Said("john", "dropped", "the", Things[dropped]));
+                    told.Add(Said(Cast[who], "dropped", "the", Things[dropped]));
 
                     break;
 
                 default:
-                    here = _walks.Next(_settings.Rooms);
+                    here[who] = _walks.Next(_settings.Rooms);
 
-                    told.Add(Said("john", "went", "to", "the", Places[here]));
+                    told.Add(Said(Cast[who], "went", "to", "the", Places[here[who]]));
 
                     break;
             }
         }
 
-        // ASKED ABOUT SOMETHING PUT DOWN, so the answer is a room. A thing still in hand is
-        // wherever john is, which is a different question with a different ceiling, and
+        // Asked about something put down, so the answer is a room. A thing still in hand is
+        // wherever its holder is, which is a different question with a different ceiling, and
         // mixing the two would average two problems into one number.
-        var settled = Enumerable.Range(0, _settings.Props).Where(one => !carried[one]).ToList();
+        var settled = Enumerable.Range(0, _settings.Props)
+            .Where(one => held[one] == Nobody)
+            .ToList();
 
         var about = settled.Count > 0
             ? settled[_walks.Next(settled.Count)]
@@ -255,7 +315,7 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
                 Said = told,
                 Asked = Said("where", "is", "the", Things[about]),
             },
-            Outcome = carried[about] ? null : at[about],
+            Outcome = held[about] == Nobody ? at[about] : null,
         };
     }
 }

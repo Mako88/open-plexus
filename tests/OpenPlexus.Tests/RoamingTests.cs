@@ -35,8 +35,83 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class RoamingTests(ITestOutputHelper output)
 {
-    private static RoamingSettings World(int steps) =>
-        new() { Rooms = 6, Props = 4, Steps = steps, Withheld = 600 };
+    /// <summary>The house every reading here is taken in.</summary>
+    /// <param name="steps">How long the walk is.</param>
+    /// <param name="people">How many are walking it.</param>
+    /// <remarks>
+    /// <b>One person is the cell every earlier reading was taken at</b>, and it is named at
+    /// each call rather than defaulted. A fixture inheriting a dial it does not pin is how a
+    /// default moving rewrites an experiment nobody edited.
+    /// </remarks>
+    private static RoamingSettings World(int steps, int people) =>
+        new() { Rooms = 6, Props = 4, People = people, Steps = steps, Withheld = 600 };
+
+    /// <summary>What the rules that need no learning reach on one house.</summary>
+    /// <param name="world">The house.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>The marginal is always saying the commonest room.</b> The opening rule answers with
+    /// the room the thing was first said to be in, which is what a bag of the whole story reads
+    /// straight off and is right exactly when nothing moved. The latest rule answers with the
+    /// most recent room word in the transcript, which is recency and is what every displacement
+    /// arm on this branch has been doing. A perfect tracker is 1.000 by construction.
+    /// </para>
+    /// <para>
+    /// <b>And reachable is the instrument check rather than a ceiling.</b> A transcript its own
+    /// answering word is missing from is unanswerable, and every column beside it would be
+    /// measuring that instead of what it says.
+    /// </para>
+    /// </remarks>
+    private static (int Asked, double Marginal, double Opening, double Latest, int Reachable)
+        Shallow(Roaming world)
+    {
+        var rooms = world.Named.ToList();
+        var props = world.Called;
+
+        var asked = 0;
+        var marginal = new int[rooms.Count];
+        var opening = 0;
+        var latest = 0;
+        var reachable = 0;
+
+        foreach (var turn in world.Withheld)
+        {
+            if (turn.Outcome is not { } answer) continue;
+
+            asked++;
+            marginal[answer]++;
+
+            var story = turn.Seen.Said;
+
+            // Which thing is being asked about, read off the question. The question is a
+            // handful of words and exactly one of them is a thing, so this is the front end's
+            // own intersection rather than the world being asked.
+            var about = props.FirstOrDefault(one => turn.Seen.Asked.Contains(one));
+
+            // `Said` is newest first, so the oldest statement naming this thing is the
+            // placement that opened the episode -- which is what a bag holding the whole
+            // transcript has in front of it and no reason to discount.
+            var placed = story.LastOrDefault(
+                one => one.Contains(about) && rooms.Any(room => one.Contains(room)));
+
+            if (placed is not null
+                && rooms.FindIndex(placed.Contains) is var was && was == answer) opening++;
+
+            // Keyed on nothing: the newest statement holding any room word at all, which is
+            // what a displacement arm reaches when the key it was given is a word every
+            // sentence contains.
+            var newest = story.FirstOrDefault(one => rooms.Any(room => one.Contains(room)));
+
+            if (newest is not null
+                && rooms.FindIndex(newest.Contains) is var now && now == answer) latest++;
+
+            if (story.Any(one => one.Contains(rooms[answer]))) reachable++;
+        }
+
+        return (
+            asked, marginal.Max() / (double)asked, opening / (double)asked,
+            latest / (double)asked, reachable);
+    }
 
     /// <summary>Every translation this file takes a ceiling on, named.</summary>
     /// <remarks>
@@ -64,61 +139,16 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
         foreach (var steps in new[] { 0, 4, 12, 30, 60, 120 })
         {
-            var world = new Roaming(World(steps), seed: 1);
+            var world = new Roaming(World(steps, people: 1), seed: 1);
 
-            var rooms = world.Named.ToList();
-            var props = world.Called;
-
-            var asked = 0;
-            var marginal = new int[rooms.Count];
-            var opening = 0;
-            var latest = 0;
-            var reachable = 0;
-
-            foreach (var turn in world.Withheld)
-            {
-                if (turn.Outcome is not { } answer) continue;
-
-                asked++;
-                marginal[answer]++;
-
-                var story = turn.Seen.Said;
-
-                // Which thing is being asked about, read off the question. The question is a
-                // handful of words and exactly one of them is a thing, so this is the front
-                // end's own intersection rather than the world being asked.
-                var about = props.FirstOrDefault(one => turn.Seen.Asked.Contains(one));
-
-                // The opening rule. `Said` is newest first, so the oldest statement naming
-                // this thing is the placement that opened the episode -- which is what a bag
-                // holding the whole transcript has in front of it and no reason to discount.
-                var placed = story.LastOrDefault(
-                    one => one.Contains(about) && rooms.Any(room => one.Contains(room)));
-
-                if (placed is not null
-                    && rooms.FindIndex(placed.Contains) is var was && was == answer) opening++;
-
-                // The recency rule, keyed on nothing. The newest statement holding any room
-                // word at all, which is what a displacement arm reaches when the key it was
-                // given is a word every sentence contains.
-                var newest = story.FirstOrDefault(one => rooms.Any(room => one.Contains(room)));
-
-                if (newest is not null
-                    && rooms.FindIndex(newest.Contains) is var now && now == answer) latest++;
-
-                // And whether the answer is in the room at all, which is the instrument check
-                // rather than a ceiling. A world whose answering word is absent from the
-                // transcript is unanswerable and every column above would be measuring that.
-                if (story.Any(one => one.Contains(rooms[answer]))) reachable++;
-            }
+            var (asked, marginal, opening, latest, reachable) = Shallow(world);
 
             output.WriteLine(
-                $"steps {steps,3} | asked {asked,4} | marginal {marginal.Max() / (double)asked:F3} "
-                + $"| opening {opening / (double)asked:F3} | latest {latest / (double)asked:F3} "
+                $"steps {steps,3} | asked {asked,4} | marginal {marginal:F3} "
+                + $"| opening {opening:F3} | latest {latest:F3} "
                 + $"| answer present {reachable / (double)asked:F3}");
 
-            shallow[steps] = (
-                marginal.Max() / (double)asked, opening / (double)asked, latest / (double)asked);
+            shallow[steps] = (marginal, opening, latest);
 
             Assert.True(reachable == asked,
                 $"the answering room word is missing from {asked - reachable} transcripts, so "
@@ -195,7 +225,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
     [Fact]
     public void What_each_translation_leaves_in_the_room()
     {
-        var world = new Roaming(World(120), seed: 1);
+        var world = new Roaming(World(120, people: 1), seed: 1);
 
         var rooms = world.Named.ToHashSet();
         var pinning = new Dictionary<string, double>();
@@ -321,7 +351,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
     [Fact]
     public void What_the_word_order_takes_out_of_the_conflated_moments()
     {
-        var world = new Roaming(World(120), seed: 1);
+        var world = new Roaming(World(120, people: 1), seed: 1);
 
         var bagged = new Dictionary<string, double>();
         var ordered = new Dictionary<string, double>();
@@ -418,6 +448,180 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + "is owed a re-take");
     }
 
+    /// <summary>
+    /// What a second person does to the company a fold arrives with — <b>fork 95's question
+    /// on a world where the informative key exists.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>With one person the middle hop is free</b>, which is what made the key rule
+    /// unfalsifiable. A thing's room is where whoever dropped it stood, so the answer is
+    /// reached by following the thing to a person and the person to a room. One person is
+    /// named by every action statement, so his entry accumulates the whole walk and following
+    /// him is the same as following anything.
+    /// </para>
+    /// <para>
+    /// <b>So the axis is what picking the right key is worth.</b> Four people means
+    /// four narrow entries where there was one wide one, and the company a fold arrives with
+    /// is what should fall. If it does not, then following the freshest key was never about
+    /// reaching a person and this file's account of fork 95 is wrong.
+    /// </para>
+    /// <para>
+    /// <b>The walk is held at the length every other reading here uses</b>, so a transcript is
+    /// the same size whoever is walking it. That does make each person's own walk shorter, and
+    /// the shallow columns are printed at every cell for exactly that reason: a world that got
+    /// easier rather than differently hard says so in the opening rule.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_a_second_person_does_to_the_key_the_fold_must_follow()
+    {
+        var company = new Dictionary<(int People, string Arm), List<double>>();
+        var pinning = new Dictionary<(int People, string Arm), List<double>>();
+        var walkers = new Dictionary<(int People, string Arm), List<double>>();
+
+        var reading = new[]
+        {
+            nameof(Joining.Distinguished), nameof(Joining.Chained),
+            "Resolved(1)", "Resolved(3)", "Freshest(1)", "Freshest(3)",
+        };
+
+        foreach (var people in new[] { 1, 2, 4 })
+        {
+            foreach (var name in reading)
+            {
+                company[(people, name)] = [];
+                pinning[(people, name)] = [];
+                walkers[(people, name)] = [];
+            }
+
+            // Seeds, because a column read on one house is an anecdote and this axis moves
+            // things by hundredths. The first version of this fact rested a bar on one seed
+            // and a gap of eleven thousandths, which is the trap this repo names first.
+            foreach (var seed in new[] { 1, 2, 3 })
+            {
+                var world = new Roaming(World(120, people), seed);
+
+                var rooms = world.Named.ToList();
+                var cast = world.Walking.ToHashSet();
+
+                // The same shallow rules the first fact reads, at this cell rather than at one
+                // person. A world whose opening placement is answering again is a world where
+                // the walk has become too short to move anything, and every column below it
+                // would be measuring the length of a walk.
+                var (asked, marginal, opening, _, reachable) = Shallow(world);
+
+                output.WriteLine(
+                    $"people {people} | seed {seed} | asked {asked,4} | marginal {marginal:F3} "
+                    + $"| opening {opening:F3} | answer present {reachable / (double)asked:F3}");
+
+                Assert.True(reachable == asked,
+                    $"with {people} people the answering room word is missing from "
+                    + $"{asked - reachable} transcripts, so those questions cannot be answered "
+                    + "by anything and a second person has broken the world rather than "
+                    + "deepened it");
+
+                Assert.True(opening < marginal + 0.05,
+                    $"with {people} people the opening statement reaches {opening:F3} against a "
+                    + $"marginal of {marginal:F3}, so the walk is no longer moving things and "
+                    + "this axis is measuring its own length");
+
+                foreach (var (name, joined) in Arms().Where(one => reading.Contains(one.Name)))
+                {
+                    var pinned = 0;
+                    var left = 0;
+                    var whose = 0;
+
+                    foreach (var turn in world.Withheld)
+                    {
+                        if (turn.Outcome is not { } answer) continue;
+
+                        var moment = joined.Codify(turn.Seen).ToHashSet();
+                        var here = rooms.Where(moment.Contains).ToList();
+
+                        left += here.Count;
+
+                        // And how many people the moment leaves, which is the same ambiguity one
+                        // level up: a fold holding two walkers is a fold that cannot say whose
+                        // room it is holding, however few rooms it kept.
+                        whose += cast.Count(moment.Contains);
+
+                        if (here.Count == 1 && here[0] == rooms[answer]) pinned++;
+                    }
+
+                    company[(people, name)].Add(left / (double)asked);
+                    pinning[(people, name)].Add(pinned / (double)asked);
+                    walkers[(people, name)].Add(whose / (double)asked);
+                }
+            }
+
+            foreach (var name in reading)
+            {
+                output.WriteLine(
+                    $"  {name,-14}| pinned {pinning[(people, name)].Min():F3} to "
+                    + $"{pinning[(people, name)].Max():F3} | rooms left "
+                    + $"{company[(people, name)].Min():F2} to {company[(people, name)].Max():F2}"
+                    + $" | people left {walkers[(people, name)].Min():F2} to "
+                    + $"{walkers[(people, name)].Max():F2}");
+            }
+        }
+
+        // The finding, and it is about which key rather than how many people. Following the
+        // freshest key arrives with less company the moment there is a key worth following,
+        // because a person named by a quarter of the action statements holds a quarter of the
+        // walk -- so the entry the fold reaches through is narrow for a reason the rule knows
+        // nothing about. That is fork 95's answer measured rather than argued.
+        //
+        // WORST AGAINST BEST, which is the form this file uses everywhere a lead has to
+        // survive the seed spread: the four-person cell at its widest must still be narrower
+        // than the one-person cell at its narrowest.
+        Assert.True(company[(4, "Freshest(1)")].Max() < company[(1, "Freshest(1)")].Min(),
+            $"the freshest key arrives with {company[(4, "Freshest(1)")].Max():F2} rooms at four "
+            + $"people at its widest against {company[(1, "Freshest(1)")].Min():F2} at one at its "
+            + "narrowest, so a second person is not narrowing what the fold drags along and "
+            + "following one key was never about reaching a person");
+
+        // And what it PINS does not separate over three seeds, 0.169 to 0.187 at one person
+        // against 0.180 to 0.191 at four, so there is no bar on it here. The company falling
+        // while the answer stays is the whole of what this cell says.
+
+        // WHICH PERSON THE FOLD REACHED, and this is the column that says the key rule is doing
+        // what it is named for. At four people the freshest key leaves 1.34 walkers in the
+        // moment at its worst where folding through all of them leaves 1.76 and three hops
+        // leaves 3.46 -- so recency over the store lands on one walker without knowing that a
+        // walker is a thing. That is fork 95's answer stated in the units of the question.
+        foreach (var name in reading.Where(one => one != "Freshest(1)"))
+            Assert.True(walkers[(4, "Freshest(1)")].Max() < walkers[(4, name)].Min(),
+                $"at four people {name} leaves {walkers[(4, name)].Min():F2} walkers in the "
+                + $"moment at its fewest against {walkers[(4, "Freshest(1)")].Max():F2} at the "
+                + "most for the freshest key, so following the key that moved last is not "
+                + "selecting a person and the column above is measuring something else");
+
+        // What a second person does to the background rule, which is the finding nobody was
+        // looking for and is larger than the one that was. `Distinguished` calls a word not in
+        // every statement a key, so a room is a key -- and with four people walking, a newer
+        // statement about a room supersedes the placement of a thing that is still sitting
+        // there. It pins an order of magnitude less at four people than at one.
+        Assert.True(pinning[(4, nameof(Joining.Distinguished))].Max()
+            < pinning[(1, nameof(Joining.Distinguished))].Min() / 4,
+            $"the background rule pins {pinning[(4, nameof(Joining.Distinguished))].Max():F3} at "
+            + $"four people against {pinning[(1, nameof(Joining.Distinguished))].Min():F3} at "
+            + "one, so a second walker is not what breaks displacement and the account above is "
+            + "wrong about why");
+
+        // So the arms come apart on this axis, which is what an axis is for. At four people one
+        // hop through the freshest key leads every other arm here at its worst against their
+        // best -- including the same rule folding three hops, which arrives with more company
+        // than it started with. Depth is what a second person makes expensive and choosing is
+        // what it makes worth doing.
+        foreach (var name in reading.Where(one => one != "Freshest(1)"))
+            Assert.True(pinning[(4, "Freshest(1)")].Min() > pinning[(4, name)].Max(),
+                $"at four people {name} pins {pinning[(4, name)].Max():F3} at its best against "
+                + $"{pinning[(4, "Freshest(1)")].Min():F3} at the worst for one hop through the "
+                + "freshest key, so following the key that moved last is not what this world "
+                + "rewards and the spine's next tier is aimed at the wrong arm");
+    }
+
     /// <summary>Which questions share one moment, keyed so two machines agree.</summary>
     /// <param name="groups">Every moment seen so far.</param>
     /// <param name="moment">One moment.</param>
@@ -487,7 +691,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
             // moves together rather than the house being redrawn under a fixed population.
             foreach (var seed in new[] { 1, 2, 3 })
             {
-                var world = new Roaming(World(120), seed);
+                var world = new Roaming(World(120, people: 1), seed);
                 var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed);
 
                 var tally = new Trial<Recited>(world, joined, brain)

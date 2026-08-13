@@ -502,9 +502,10 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       wants a `Trial` OR A DELETION, a world going when its question closes, and nothing
       says which. `DeadCodeTests` counts the debt.
     - **NOW** — the vote's arithmetic composes and a whole learner runs over it. Fork **52**.
-    - **NOW** — a round is a barrier, so lateness costs the CLOCK and changes not one answer.
-      C2's out-of-order half is untestable here for the same reason, and the fleet is paced
-      by its unluckiest holder twice a round. Breaking it is unmeasured.
+    - **NOW** — a round is a barrier, so lateness costs the CLOCK and not one answer, and C2's
+      out-of-order half is untestable here. Breaking it is unmeasured.
+    - **NOW** — a fleet cannot be quiesced, because waiting for every holder waits forever on
+      a silent one. A tally therefore reads machines still writing, and is atomic, not final.
     - **OPEN** — what the repair gate's query costs on a wire, priced on loopback. Open on a
       LAN and on building it. Fork **56**.
     - **OPEN** — the vote decides what repair may run on, so under skew blame lands on the

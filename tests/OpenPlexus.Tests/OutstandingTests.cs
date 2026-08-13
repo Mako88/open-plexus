@@ -140,6 +140,46 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// <b>The prose is half out of the register.</b> The other half is by hand.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Capitals reached nought in one pass because a shouted sentence has exactly one correct
+    /// rewrite. Bold sentences do not: where a lead clause ends is a judgement about which part
+    /// of a claim a reader scans for, so no script can make it and 1,209 of them are left.
+    /// </para>
+    /// <para>
+    /// <b>Here because a ratchet does not do what John asked.</b> A ratchet stops the count
+    /// rising and says nothing about it ever falling, so the honest form of <i>make sure some
+    /// get fixed every commit</i> is an entry that is red until they all are. The straight
+    /// reading — a check demanding the count fall on every commit — was refused because it
+    /// would block a one-line fix on a tone debt it has nothing to do with.
+    /// </para>
+    /// <para>
+    /// <b>Closes by the count reaching nought.</b> It reads
+    /// <see cref="ProseTests.BoldSentences"/> rather than a list of its own. The typography is
+    /// all any check here can see; the reveal, the stinger and the corrective turn are written
+    /// down in CLAUDE.md and nothing reaches them.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_prose_is_out_of_the_engagement_register()
+    {
+        var left = ProseTests.BoldSentences();
+
+        output.WriteLine(
+            left == 0
+                ? "no bold sentences left"
+                : $"{left} bold sentences still to cut back to a lead clause");
+
+        Assert.True(left == 0,
+            $"{left} bold spans are a sentence rather than the lead clause bold is for. Cut "
+            + "each back to the claim a reader scans for, then lower `ProseTests.Shouted` to "
+            + "what the pass achieved. This test is red on purpose and closes on that count, "
+            + "not on this file.");
+    }
+
+    /// <summary>
     /// <b>`Drives` is the last idea owed off `csharp`, and that branch is not coming back.</b>
     /// </summary>
     /// <remarks>

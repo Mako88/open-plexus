@@ -84,14 +84,15 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// This is the half that stayed a ratchet, because it is the half a script cannot do. A
     /// shouted sentence has one correct rewrite and a bold sentence does not: where the lead
     /// clause ends is a judgement about which part of the claim a reader scans for, and there
-    /// are 1,210 of those judgements left.
+    /// are 1,209 of those judgements left.
     /// </para>
     /// <para>
-    /// Every pass lowers this to what that pass achieved. A ratchet nobody turns is a budget
-    /// rather than a target, so something has to stop it sitting here.
+    /// Every pass lowers this to what that pass achieved.
+    /// <see cref="OutstandingTests.The_prose_is_out_of_the_engagement_register"/> is what stops
+    /// it sitting here, since a ratchet nobody turns is a budget rather than a target.
     /// </para>
     /// </remarks>
-    private const int Shouted = 1_210;
+    private const int Shouted = 1_209;
 
     /// <summary>
     /// Every file whose prose this repo is responsible for.
@@ -179,6 +180,16 @@ public sealed class ProseTests(ITestOutputHelper output)
             .Select(match => Regex.Replace(match.Groups["said"].Value, @"<[^>]+>|\s+", " ").Trim())
             .Where(said => said.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length > Lead)
             .ToList();
+
+    /// <summary>
+    /// How many bold sentences the tree holds, for <see cref="OutstandingTests"/> to read.
+    /// </summary>
+    /// <remarks>
+    /// Exposed rather than reimplemented there, so the outstanding entry and the ratchet cannot
+    /// disagree about what they are counting. One of this repo's own traps is a statistic whose
+    /// two readers each got whichever definition they assumed.
+    /// </remarks>
+    internal static int BoldSentences() => Written().Sum(path => Bolds(Prose(path)).Count);
 
     /// <summary>How many of something each file holds, worst first, for the message.</summary>
     private static string Worst(Func<string, List<string>> count)

@@ -1818,41 +1818,82 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// how much. If addressing is the newest statement on every task then it is a span of one
     /// under a second name, and every cell reported for it is a cell about something else.
     /// </para>
+    /// <para>
+    /// <b>It runs the whole exam because the ceiling is free.</b> Twenty tasks with no
+    /// learning is a second, and it says which of them a front end could answer before a
+    /// runner is spent on any of them. One selected statement carries the answer above the
+    /// marginal on 8 of 20.
+    /// </para>
+    /// <para>
+    /// <b>The alphabet column is what makes the rest readable.</b> Tasks 6, 7, 10, 17, 18 and
+    /// 19 answer <i>yes</i>, a count or a path, so the answer is never a word any statement
+    /// says and a nought beside them is about the answer key rather than the retrieval — this
+    /// repo's own trap, which the first run of this walked into. Only where the answer is
+    /// sayable does the column say anything, and the count above is taken over those.
+    /// </para>
+    /// <para>
+    /// <b>Tasks 11 and 13 are the sharpest cells here.</b> The answer is a word the story says
+    /// every time, addressing picks a statement every time, and it is the wrong statement
+    /// every time. Both are the coreference tasks: the newest statement says <i>he</i> rather
+    /// than the name the question used, so the one rule that answers task 1 outright cannot
+    /// see the sentence it needs. That is a retrieval failure with the answer present, which
+    /// is the one shape a learner cannot repair.
+    /// </para>
     /// </remarks>
     [Fact]
     public void Whether_addressing_picks_anything_a_span_of_one_would_not()
     {
         var apart = 0;
+        var reaches = 0;
 
-        foreach (var task in new[] { 1, 2, 3 })
+        foreach (var task in Enumerable.Range(1, 20))
         {
             var world = new Recalled(World(task: task, span: 0));
 
             var newest = 0;
             var nothing = 0;
             var carries = 0;
+            var sayable = 0;
 
             for (var one = 0; one < world.Withheld.Count; one++)
             {
                 var asking = world.Withheld[one].Seen.Bagged;
+                var answer = Babi.Of(world.Transcript[one].Answer);
                 var at = Reading(asking, asking.Question, 0);
+
+                // Whether the answer is a word the story says at all, which decides whether
+                // the column beside it means anything. A task answering *yes* or a count or a
+                // path has its answer in another alphabet, so a statement can never contain it
+                // and a nought there is about the answer key rather than about the retrieval.
+                if (asking.Story.Any(said => said.Contains(answer))) sayable++;
 
                 if (at < 0) { nothing++; continue; }
 
                 if (at == 0) newest++;
 
-                if (asking.Story[at].Contains(Babi.Of(world.Transcript[one].Answer))) carries++;
+                if (asking.Story[at].Contains(answer)) carries++;
             }
 
             var read = world.Withheld.Count - nothing;
+            var said = sayable / (double)world.Withheld.Count;
+            var ceiling = carries / (double)world.Withheld.Count;
 
             apart += read - newest;
 
+            // Counted only where the answer is in the story's own alphabet, or the
+            // denominator holds tasks this column cannot speak about.
+            if (said > 0.5 && ceiling > world.Commonest) reaches++;
+
             output.WriteLine(
-                $"task {task} | {read} of {world.Withheld.Count} questions name something said "
+                $"task {task,-2} | {read,3} of {world.Withheld.Count} questions name something "
+                + $"said | the answer is a word the story says {said:F3} "
                 + $"| the newest statement {newest / (double)Math.Max(1, read):F3} of them "
-                + $"| the answer is in the one picked {carries / (double)Math.Max(1, read):F3}");
+                + $"| the answer is in the one picked {ceiling:F3} "
+                + $"| marginal {world.Commonest:F3}");
         }
+
+        output.WriteLine(
+            $"one selected statement carries the answer above the marginal on {reaches} of 20");
 
         // The arms differ somewhere or the addressed cells are a span of one under a second
         // name. Which task separates them is not asserted, because that is a prediction and
@@ -1861,6 +1902,12 @@ public sealed class RecalledTests(ITestOutputHelper output)
             apart > 0,
             "addressing picked the newest statement on every question of every task, so it is "
             + "a one-statement span renamed and its cells report that arm");
+
+        // And the exam is twenty tasks each isolating one prerequisite, so one statement
+        // carrying the answer everywhere would mean the corpus holds its own answer and the
+        // tasks isolate nothing. Both ends can fail and neither is a prediction about which
+        // tasks fall where.
+        Assert.InRange(reaches, 1, 19);
     }
 
     /// <summary>

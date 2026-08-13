@@ -217,9 +217,30 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// <para>
     /// <b>Borrow the source of the signal and not the mechanism</b> — <c>csharp</c>'s own
     /// build of it lost, and the plan's refutation table is where that lives. What is worth
-    /// inheriting is where the signal COMES FROM, which is the half no world here supplies:
-    /// every world is watched rather than acted in, so nothing has a body with variables of
-    /// its own to be in trouble about.
+    /// inheriting is where the signal COMES FROM, which is a body with variables of its own
+    /// to be in trouble about.
+    /// </para>
+    /// <para>
+    /// <b>And this entry said no world here supplies one, which is false.</b>
+    /// <see cref="Worlds.Homeostat"/> is exactly that world: <c>Needs</c> internal variables
+    /// that drain at uneven rates, an act of attention that restores one of them, a
+    /// <c>Viable</c> predicate that says whether the body is still holding, and
+    /// <c>Lowest</c> and <c>Falling</c> to say which variable is in trouble and how fast.
+    /// It is acted in rather than watched, and it was built before the walk went.
+    /// </para>
+    /// <para>
+    /// <b>So the two red entries here are one piece of work.</b> <c>Homeostat</c> is on
+    /// <see cref="Every_world_is_either_run_by_something_or_gone"/>'s list for seven of its
+    /// twenty-one entries, and the handoff that enumerated that list put it among the worlds
+    /// whose question had closed. Giving it a <c>Trial</c> is what makes <c>Drives</c>
+    /// buildable at all, and deleting it would have closed one entry by destroying the only
+    /// thing the other one needs.
+    /// </para>
+    /// <para>
+    /// <b>The trap is a doc naming the wrong blocker</b>, which this repo has already been
+    /// believed on for a whole branch. The sentence above was written when the walk's deletion
+    /// enumerated the worlds without checking what each one held — the same pass that put
+    /// <c>Recalled</c> on the stranded list when <c>Trial</c> had always driven it.
     /// </para>
     /// <para>
     /// <b>Closes by building it or by dropping it with a revival row</b>, which are the only

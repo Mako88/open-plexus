@@ -247,13 +247,12 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
   - Every input an attribute of it
     - **NOW** — several front ends manufacture symbols from a signal, and each is priced.
     - **OPEN** — nothing makes them attributes of one THING. Rung five names what co-fires,
-      which is what a seen ball and a heard *ball* do, and it has never run across two
-      modalities.
+      which is what a seen ball and a heard *ball* do.
     - **SETTLED** — the binding world was built to fail, failed as predicted, and has since
       lifted. Fork **25**.
-    - **OPEN** — text as an IMAGE is the one perceptual world whose ground truth stays
-      enumerable, so soundness survives where a camera kills it. `Senses` runs and its gate is
-      open: a name IS minted over two modalities. Fork **107**.
+    - **OPEN** — text as an IMAGE keeps ground truth enumerable, so soundness survives where
+      a camera kills it. `Senses` runs and names cross two senses, so the gate is open.
+      Fork **107**.
     - **OPEN** — spreading a reading over its range costs most of the score at both front
       ends: fragmentation, or the search the extra codes buy. Fork **38**.
     - **OPEN** — a reading under about ten dimensions has too few distinct wirings for a
@@ -372,9 +371,9 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
     - **NOW** — a forward store beside the population, retracting where the counters cannot.
     - **NOW** — rung three, sequence. A precedence is a CODE derived where the moment is
       FORMED, so matching, the tally, repair and the wire are untouched. No dial, and inert where none is reported.
-    - **OPEN** — `Recalled` speaks `Recited`, so rung three reads real English. It COSTS
-      where a bag already suffices and pays where the bag conflates, capacity unbound, and
-      why the split falls that way is unread. Fork **109**.
+    - **OPEN** — rung three reads real English through `Recited`. It COSTS where a bag
+      suffices and pays where the bag conflates; why is unread, and the grid asking whether
+      SELECTION is what it buys is dispatched. Fork **109**.
     - **OPEN** — a referent is a THIRD store rather than the same one: *Mary's bedroom*
       survives leaving the room and *Mary is in the bedroom* does not, so one store gets one
       lifetime wrong whichever it takes.
@@ -500,7 +499,7 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       the learning loop still existing exactly once. THE WALK IS GONE and forks 1, 5, 6, 11,
       18, 20, 21, 22 and 24 went with it; `csharp` keeps their code and their numbers.
     - **OPEN** — `Drives` is the one idea still owed off it: a third factor from the body's
-      own variables.
+      own variables. `Homeostat` IS that body, stranded, so this and the debt below are one job.
     - **BROKEN** — eight worlds have no runner, their `*Run` files being the walk's. Each
       wants a `Trial` OR A DELETION, a world going when its question closes, and nothing
       says which. `DeadCodeTests` counts the debt.

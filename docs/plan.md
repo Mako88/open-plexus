@@ -485,10 +485,10 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       the learning loop still existing exactly once. THE WALK IS GONE and forks 1, 5, 6, 11,
       18, 20, 21, 22 and 24 went with it; `csharp` keeps their code and their numbers.
     - **OPEN** — `Drives` is the one idea still owed off it: a third factor from the body's
-      own variables, never handed in.
-    - **BROKEN** — eleven worlds have no runner, every one having been driven by a `*Run`
-      that was the walk's. `Trial` is the generic replacement and none is wired to it;
-      `DeadCodeTests` counts the debt.
+      own variables.
+    - **BROKEN** — eleven worlds have no runner, their `*Run` files being the walk's. Each
+      wants a `Trial` OR A DELETION, a world going when its question closes, and nothing
+      says which. `DeadCodeTests` counts the debt.
     - **NOW** — the vote's arithmetic composes and a whole learner runs over it. Fork **52**.
     - **NOW** — A ROUND IS A BARRIER, so lateness costs the CLOCK and changes not one answer.
       C2's out-of-order half is untestable here for the same reason, and the fleet is paced

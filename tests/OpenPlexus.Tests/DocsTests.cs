@@ -87,7 +87,7 @@ public sealed class DocsTests
     /// John.
     /// </para>
     /// </remarks>
-    private const int Whole = 9_763;
+    private const int Whole = 9_761;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

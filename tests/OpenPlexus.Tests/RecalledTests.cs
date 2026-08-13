@@ -447,6 +447,23 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// nowhere to put. The accuracy is read beside the exam's own bound, or a saturated cell
     /// reads as a refutation.
     /// </para>
+    /// <para>
+    /// <b><see cref="Joining.Addressed"/> answers all of task one, at 27 residents bagged and
+    /// 69 ordered.</b> That is the largest held-out score on this branch and the smallest
+    /// population taking one, against 802 for the chain and 4,929 for the bag. The last
+    /// handoff called the chain's 0.800 the largest, which this corrects: the arm above it was
+    /// already in the tree and had never been run beside it.
+    /// </para>
+    /// <para>
+    /// <b>And its task two cell is the one-statement bag rather than a reading about
+    /// addressing</b>, which
+    /// <see cref="Whether_addressing_picks_anything_a_span_of_one_would_not"/> is what says
+    /// so. Addressing picks the newest statement on 0.485 of task one and on every question of
+    /// tasks two and three, because the question there names the prop and the newest statement
+    /// always names it too. So the refutation above does not fire on that cell: it has room on
+    /// the exam, and it also has one statement in the moment, which is the inertness the span-one
+    /// dispatch already paid for.
+    /// </para>
     /// </remarks>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
@@ -1776,6 +1793,74 @@ public sealed class RecalledTests(ITestOutputHelper output)
                         .Max(rule => ceiling[$"{rule}|{hops}"]) >= ceiling[$"the newest|{hops}"],
                     $"task {task} at {hops} hops: no key rule beat taking the newest");
         }
+    }
+
+    /// <summary>
+    /// Whether addressing picks a different statement from taking the newest one.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Because it scored bit-identically to a one-statement bag on task two.</b> Same
+    /// exam, same drawn score, same residents to the commitment — and this repo has already
+    /// been caught once by an arm reading identically to its control, which was a joining
+    /// with nothing to choose between. An identical cell is the reading that says a grid asked
+    /// nothing, so what the selection actually picks is counted here rather than argued.
+    /// </para>
+    /// <para>
+    /// <b>The two rules are different by construction and may still coincide.</b> A span of
+    /// one keeps the newest statement whatever it says; addressing keeps the newest statement
+    /// naming a word of the question. They agree exactly when the question's subject is what
+    /// was last spoken about, which a templated corpus may do far more often than a text
+    /// would.
+    /// </para>
+    /// <para>
+    /// <b>What is asserted is that the arms differ somewhere</b>, and never which way or by
+    /// how much. If addressing is the newest statement on every task then it is a span of one
+    /// under a second name, and every cell reported for it is a cell about something else.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_addressing_picks_anything_a_span_of_one_would_not()
+    {
+        var apart = 0;
+
+        foreach (var task in new[] { 1, 2, 3 })
+        {
+            var world = new Recalled(World(task: task, span: 0));
+
+            var newest = 0;
+            var nothing = 0;
+            var carries = 0;
+
+            for (var one = 0; one < world.Withheld.Count; one++)
+            {
+                var asking = world.Withheld[one].Seen.Bagged;
+                var at = Reading(asking, asking.Question, 0);
+
+                if (at < 0) { nothing++; continue; }
+
+                if (at == 0) newest++;
+
+                if (asking.Story[at].Contains(Babi.Of(world.Transcript[one].Answer))) carries++;
+            }
+
+            var read = world.Withheld.Count - nothing;
+
+            apart += read - newest;
+
+            output.WriteLine(
+                $"task {task} | {read} of {world.Withheld.Count} questions name something said "
+                + $"| the newest statement {newest / (double)Math.Max(1, read):F3} of them "
+                + $"| the answer is in the one picked {carries / (double)Math.Max(1, read):F3}");
+        }
+
+        // The arms differ somewhere or the addressed cells are a span of one under a second
+        // name. Which task separates them is not asserted, because that is a prediction and
+        // a prediction written into a wiring check fails two ways and reads the same.
+        Assert.True(
+            apart > 0,
+            "addressing picked the newest statement on every question of every task, so it is "
+            + "a one-statement span renamed and its cells report that arm");
     }
 
     /// <summary>

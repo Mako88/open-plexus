@@ -70,6 +70,12 @@ a new failure against. Adding an entry is stricter than adding anywhere else: it
 somebody has DECIDED to do, computable without judgement, and closeable. An open question
 goes in the plan as `OPEN`.
 
+**`PushbackTests` IS GREEN AND PRINTS — read it, it is the other half of the same idea.**
+CLAUDE.md asks for pushback the moment it is seen, and a disagreement stated in a reply is
+gone by the next context window. These are standing objections to things the repo currently
+does, each with what would settle it either way. **An entry leaves by being settled, never by
+being dropped**, which is why the count is asserted.
+
 **Put `kind!=sweep&` in front of every local filter, always.** CI does this and a hand-typed
 filter does not, so a filter naming a class runs that class's GRIDS as well — which is how
 `WideningTests` and `NarrowingTests` once ran past forty minutes and had to be killed. The

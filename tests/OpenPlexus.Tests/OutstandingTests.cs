@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using OpenPlexus.Codes;
 using Xunit.Abstractions;
 
@@ -34,13 +34,16 @@ namespace OpenPlexus.Tests;
 public sealed class OutstandingTests(ITestOutputHelper output)
 {
     /// <summary>
-    /// <b>ELEVEN WORLDS HAVE NO RUNNER. EACH WANTS A `Trial` OR A DELETION.</b>
+    /// <b>ELEVEN WORLDS HAVE NO RUNNER — 23 ENTRIES, BECAUSE MEMBERS COUNT TOO.</b>
     /// </summary>
     /// <remarks>
     /// <para>
     /// Every one was driven by a <c>*Run</c> in <c>Worlds/</c> and every one of those was the
     /// walk's, so the world data survived and the thing that turned it into a measurement did
     /// not. The commitment side's generic runner is <c>Trial</c> and nothing is wired to it.
+    /// <b>The count is 23 rather than 11 because a world's unreachable MEMBERS are listed
+    /// beside its type</b> — that second number is how much of each world is dead rather
+    /// than merely undriven, and it is what tells a `Trial` from a deletion.
     /// </para>
     /// <para>
     /// <b>AND A `Trial` IS ONLY HALF THE ANSWER, WHICH IS THE PART THAT WAS FIRST WRITTEN
@@ -68,7 +71,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
                 : $"{stranded.Count} stranded: {string.Join(", ", stranded)}");
 
         Assert.True(stranded.Count == 0,
-            $"{stranded.Count} world(s) and member(s) nothing can run: "
+            $"{stranded.Count} entries across eleven worlds nothing can run: "
             + $"{string.Join(", ", stranded)}. Give the world a `Trial`, or DELETE it "
             + "because its question closed — then take its entry off `DeadCodeTests`. "
             + "This test is red on purpose and closes on that edit, not on this file.");
@@ -101,15 +104,21 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     [Fact]
     public void No_front_end_channel_is_read_by_nothing()
     {
-        // WHERE A READER WOULD BE: anywhere in `src` that is not the interface declaring it
-        // and not a front end merely FORWARDING it. `Compound` and `Alternating` both pass
-        // these straight through, which is plumbing rather than a consumer -- and a check
-        // that counted a forward as a reader would already be green and say nothing.
-        var forwarding = new[] { "IQuantizer.cs", "Compound.cs", "Alternating.cs", "Joined.cs", "Passthrough.cs" };
-
-        var sources = Directory
-            .GetFiles(Path.Combine(Tree.Repo(), "src"), "*.cs", SearchOption.AllDirectories)
-            .Where(one => !forwarding.Contains(Path.GetFileName(one), StringComparer.Ordinal))
+        // WHERE A READER WOULD BE, RATHER THAN WHERE A FORWARD WOULD BE -- and scoping it
+        // this way is what makes the check mean something. Everything in `Codes/` either
+        // DECLARES these or passes them straight through: `Compound` merges what its senses
+        // said, `Alternating` hands its inner one's answer back, and a front end returning
+        // its own field is not a consumer. A reader is something that ACTS on the channel,
+        // and that lives where the learner is.
+        //
+        // AND IT REPLACED A LIST OF FILENAMES TO IGNORE, which was the fragile version: a
+        // new forwarder in `Codes/` would have turned this green while nothing had changed,
+        // and an unrelated `.Bind(` anywhere in `src` would have done the same.
+        var sources = new[] { "Commitments", "Machines" }
+            .SelectMany(where => Directory.GetFiles(
+                Path.Combine(Tree.Repo(), "src", "OpenPlexus", where),
+                "*.cs",
+                SearchOption.AllDirectories))
             .Select(File.ReadAllText)
             .ToList();
 
@@ -125,8 +134,9 @@ public sealed class OutstandingTests(ITestOutputHelper output)
 
         Assert.True(unread.Count == 0,
             $"{string.Join(", ", unread)} on `IQuantizer` are implemented everywhere and read "
-            + "nowhere. Wire one to something that ACTS on it, or delete it together with the "
-            + "world dials that feed it. This test is red on purpose.");
+            + "nowhere in `Commitments/` or `Machines/`. Wire one to something that ACTS on "
+            + "it, or delete it together with the world dials that feed it. This test is red "
+            + "on purpose.");
     }
 
     /// <summary>

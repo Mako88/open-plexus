@@ -38,6 +38,25 @@ public sealed class RoamingTests(ITestOutputHelper output)
     private static RoamingSettings World(int steps) =>
         new() { Rooms = 6, Props = 4, Steps = steps, Withheld = 600 };
 
+    /// <summary>Every translation this file takes a ceiling on, named.</summary>
+    /// <remarks>
+    /// <b>The store walks its depth axis and the rest are one cell</b>, so the grid is
+    /// a cross rather than a list — and depth nought is the store's own control, where an
+    /// entry is the statement that wrote it and nothing else. <b>Written once because two
+    /// ceilings read it</b>, and a grid that differed between them would make the two columns
+    /// unreadable against each other.
+    /// </remarks>
+    private static IEnumerable<(string Name, Joined Joined)> Arms() =>
+        Enum.GetValues<Joining>()
+            .Where(one => one != Joining.Resolved)
+            .Select(one => (Name: one.ToString(), Joined: new Joined(one)))
+            .Concat(Enumerable.Range(0, 4).Select(depth =>
+                (Name: $"Resolved({depth})",
+                 Joined: new Joined(Joining.Resolved, resolution: depth))))
+            .Concat(Enumerable.Range(1, 3).Select(depth =>
+                (Name: $"Freshest({depth})",
+                 Joined: new Joined(Joining.Resolved, resolution: depth, freshest: true))));
+
     [Fact]
     public void Whether_the_walk_makes_the_transcript_stop_answering_itself()
     {
@@ -63,18 +82,18 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 asked++;
                 marginal[answer]++;
 
-                var story = turn.Seen.Story;
+                var story = turn.Seen.Said;
 
                 // Which thing is being asked about, read off the question. The question is a
-                // set of words and exactly one of them is a thing, so this is the front
+                // handful of words and exactly one of them is a thing, so this is the front
                 // end's own intersection rather than the world being asked.
-                var about = props.FirstOrDefault(one => turn.Seen.Question.Contains(one));
+                var about = props.FirstOrDefault(one => turn.Seen.Asked.Contains(one));
 
-                // THE OPENING RULE. `Story` is newest first, so the oldest statement naming
+                // The opening rule. `Said` is newest first, so the oldest statement naming
                 // this thing is the placement that opened the episode -- which is what a bag
                 // holding the whole transcript has in front of it and no reason to discount.
-                var placed = story
-                    .LastOrDefault(one => one.Contains(about) && rooms.Any(one.Contains));
+                var placed = story.LastOrDefault(
+                    one => one.Contains(about) && rooms.Any(room => one.Contains(room)));
 
                 if (placed is not null
                     && rooms.FindIndex(placed.Contains) is var was && was == answer) opening++;
@@ -82,7 +101,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 // The recency rule, keyed on nothing. The newest statement holding any room
                 // word at all, which is what a displacement arm reaches when the key it was
                 // given is a word every sentence contains.
-                var newest = story.FirstOrDefault(one => rooms.Any(one.Contains));
+                var newest = story.FirstOrDefault(one => rooms.Any(room => one.Contains(room)));
 
                 if (newest is not null
                     && rooms.FindIndex(newest.Contains) is var now && now == answer) latest++;
@@ -151,12 +170,19 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Two columns and they bracket the learner rather than predicting it.</b> PRESENT is
-    /// whether the answering room word survives the translation at all, which is an UPPER
-    /// bound: a moment the answer is missing from cannot be answered by anything. PINNED is
-    /// whether it is the ONLY room word left, which is a LOWER bound: a moment with one room
-    /// word in it is answerable by a rule as simple as <i>say the room you can see</i>. What
-    /// a learner has to work in is the gap between them.
+    /// <b>Two columns and they bracket one strategy rather than the learner.</b> PRESENT is
+    /// whether the answering room word survives the translation at all; PINNED is whether it
+    /// is the ONLY room word left, and a moment with one room word in it is answerable by a
+    /// rule as simple as <i>say the room you can see</i>. What lies between them is how much
+    /// choosing is left to do.
+    /// </para>
+    /// <para>
+    /// <b>And presence is not a cap on a learner</b>, which corrects what this file used to
+    /// say. A commitment expects an OUTCOME code, and no word of this world supplies
+    /// one — so a moment the answering room word is missing from is still answerable, by a
+    /// rule that recognises the moment and names the room. What caps an arm is
+    /// <see cref="What_the_word_order_takes_out_of_the_conflated_moments"/>: two moments that
+    /// are one set are one moment to every commitment there could be.
     /// </para>
     /// <para>
     /// <b>So a high present with a low pinned is the selection problem, which is where every
@@ -175,20 +201,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         var pinning = new Dictionary<string, double>();
         var reaching = new Dictionary<string, double>();
 
-        // The store walks its depth axis and every other arm is one cell, so the grid is a
-        // cross rather than a list -- and depth nought is the store's own control, where an
-        // entry is the statement that wrote it and nothing else.
-        var arms = Enum.GetValues<Joining>()
-            .Where(one => one != Joining.Resolved)
-            .Select(one => (Name: one.ToString(), Joined: new Joined(one)))
-            .Concat(Enumerable.Range(0, 4).Select(depth =>
-                (Name: $"Resolved({depth})",
-                 Joined: new Joined(Joining.Resolved, resolution: depth))))
-            .Concat(Enumerable.Range(1, 3).Select(depth =>
-                (Name: $"Freshest({depth})",
-                 Joined: new Joined(Joining.Resolved, resolution: depth, freshest: true))));
-
-        foreach (var (name, joined) in arms)
+        foreach (var (name, joined) in Arms())
         {
             var asked = 0;
             var present = 0;
@@ -279,6 +292,153 @@ public sealed class RoamingTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// How many moments are the same set wanting different answers, with the word order and
+    /// without it — <b>what rung three is worth here, taken before a learner runs.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A conflated moment is one no scope can ever separate</b>, which is the ceiling
+    /// <c>HandingTests</c> demonstrates with a single pair and this counts. A commitment fires
+    /// on a subset of a set, so two moments that are the same set are one moment to every
+    /// commitment there could be: whatever either expects, it is wrong about one of them. The
+    /// fraction of questions sitting in such a group is a cap on any learner reading that arm,
+    /// and it costs milliseconds.
+    /// </para>
+    /// <para>
+    /// <b>The precedences are derived here exactly as the machine derives them</b>, through
+    /// <see cref="Sequenced.From"/> off the front end's own report — so this is the moment a
+    /// holder would broadcast rather than a model of it. What the column says is how much of
+    /// the conflation is undone by the one fact a bag of a sentence cannot carry.
+    /// </para>
+    /// <para>
+    /// <b>The kill line was written before the run</b>: order buys nothing here unless it
+    /// lowers the conflated fraction of the arm that leads. Rung three was measured on the world
+    /// built for it, where roles are carried by order and by nothing else. A world whose verbs
+    /// already separate its relations may have no use for it at all, and that is the result
+    /// this instrument is able to return.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_the_word_order_takes_out_of_the_conflated_moments()
+    {
+        var world = new Roaming(World(120), seed: 1);
+
+        var bagged = new Dictionary<string, double>();
+        var ordered = new Dictionary<string, double>();
+
+        foreach (var (name, joined) in Arms())
+        {
+            var plain = new Dictionary<string, List<int>>();
+            var carried = new Dictionary<string, List<int>>();
+            var asked = 0;
+            var placed = 0;
+            var pairs = 0;
+
+            foreach (var turn in world.Withheld)
+            {
+                if (turn.Outcome is not { } answer) continue;
+
+                asked++;
+
+                var moment = joined.Codify(turn.Seen).ToHashSet();
+                var whole = new HashSet<Code>(moment);
+
+                // The same guard `Trial` applies, so an arm reporting one position or none
+                // carries exactly the codes it always carried. A report of one word entails
+                // no precedence at all, which is why the count and not the null matters.
+                if (joined.Order(turn.Seen) is { Count: > 1 } order)
+                {
+                    placed += order.Count;
+
+                    foreach (var precedence in Sequenced.From(order))
+                        if (whole.Add(precedence)) pairs++;
+                }
+
+                Group(plain, moment).Add(answer);
+                Group(carried, whole).Add(answer);
+            }
+
+            bagged[name] = Conflated(plain, asked);
+            ordered[name] = Conflated(carried, asked);
+
+            output.WriteLine(
+                $"{name,-14}| conflated {bagged[name]:F3} | with order {ordered[name]:F3} "
+                + $"| placed {placed / (double)asked:F1} | pairs {pairs / (double)asked:F1}");
+        }
+
+        // The bag is the control and it says the thing this world already knows in a column
+        // rather than in a comment: after 120 statements every word of a tiny vocabulary is
+        // present, so every moment is the SAME set and all of them are conflated. That is why
+        // its population came back empty -- a constant moment surprises nothing.
+        Assert.True(bagged[nameof(Joining.Bagged)] > 0.99,
+            $"the bag conflates {bagged[nameof(Joining.Bagged)]:F3} of questions, so the moment "
+            + "is no longer a constant and this world has stopped being the one every other "
+            + "reading here was taken on");
+
+        // And the order cannot save it, which is the half worth asserting. Word order inside a
+        // statement says nothing about WHICH statement, so an arm that kept every statement
+        // hands over a report where almost every word was said more than once and is dropped.
+        // Rung three needs a selection in front of it.
+        Assert.True(ordered[nameof(Joining.Bagged)] > 0.99,
+            $"the order takes the bag's conflation to {ordered[nameof(Joining.Bagged)]:F3}, so a "
+            + "precedence over a whole transcript is separating moments after all and this "
+            + "file's account of why selection comes first is wrong");
+
+        // And the finding, which is that rung three is worth something on a world nobody built
+        // for it. Every arm that selects more than one statement conflates less with the order
+        // than without it, so the kill line is not reached: `Handing` measured a rung that
+        // carries roles by position, and here the same rung separates a placement from a
+        // movement -- `in` then a room against `to` then a room, which is the one distinction
+        // a folded bag of two statements cannot hold.
+        //
+        // `Addressed` is the exception that says what the rung needs, and it is left out of
+        // the bar rather than excused: it keeps ONE statement, and one statement about a thing
+        // being picked up names no room whichever way round its words stood.
+        var narrowing = new[]
+        {
+            nameof(Joining.Distinguished), nameof(Joining.Chained),
+            "Resolved(1)", "Resolved(2)", "Resolved(3)",
+            "Freshest(1)", "Freshest(2)", "Freshest(3)",
+        };
+
+        foreach (var name in narrowing)
+            Assert.True(ordered[name] < bagged[name],
+                $"{name} conflates {ordered[name]:F3} of questions with the word order against "
+                + $"{bagged[name]:F3} without it, so rung three separates nothing this arm "
+                + "left conflated and the order report is not worth its derivation here");
+
+        // The strongest cell, and it is a level rather than a comparison because what it caps
+        // is a learner nothing has run yet. One hop of the store plus the order leaves a
+        // twentieth of the questions in a moment no scope can separate, against three
+        // quarters for the same arm reading a bag -- so a run short of that is short of the
+        // front end rather than at it.
+        Assert.True(ordered["Resolved(1)"] < 0.20,
+            $"one hop of the store with the order conflates {ordered["Resolved(1)"]:F3}, so the "
+            + "ceiling the learner arm is read against has moved and every score taken on it "
+            + "is owed a re-take");
+    }
+
+    /// <summary>Which questions share one moment, keyed so two machines agree.</summary>
+    /// <param name="groups">Every moment seen so far.</param>
+    /// <param name="moment">One moment.</param>
+    private static List<int> Group(Dictionary<string, List<int>> groups, HashSet<Code> moment)
+    {
+        var key = string.Join(
+            ",", moment.Select(one => $"{one.Modality}:{one.Value}").Order(StringComparer.Ordinal));
+
+        if (!groups.TryGetValue(key, out var answers)) groups[key] = answers = [];
+
+        return answers;
+    }
+
+    /// <summary>What share of the questions sit in a moment that wants two answers.</summary>
+    /// <param name="groups">Every moment seen, and which answers it was asked for.</param>
+    /// <param name="asked">How many questions there were.</param>
+    private static double Conflated(Dictionary<string, List<int>> groups, int asked) =>
+        groups.Values.Where(answers => answers.Distinct().Count() > 1).Sum(answers => answers.Count)
+        / (double)asked;
+
+    /// <summary>
     /// What the learner reads where nothing shallow works — <b>the first score on a world
     /// whose held-out half is genuinely unseen.</b>
     /// </summary>
@@ -330,7 +490,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 var world = new Roaming(World(120), seed);
                 var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed);
 
-                var tally = new Trial<Asking>(world, joined, brain)
+                var tally = new Trial<Recited>(world, joined, brain)
                     .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
 
                 var exam = tally.Unseen?.Accuracy ?? 0.0;
@@ -379,10 +539,10 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // learner failing.
 
         // And every arm is read against its own ceiling rather than against the others'
-        // scores, which is what makes the two tests in this file one instrument. A moment
-        // the answering word is missing from is unanswerable, so `present` in the grid above
-        // caps each arm exactly -- and what an arm CONVERTS of its own cap is where the
-        // learner's part of this shows. An arm reaching further and scoring lower is failing
-        // to choose, which is the selection problem and not a failure to read.
+        // scores, which is what makes the facts in this file one instrument. The cap is the
+        // conflated column and never `present`: a commitment expects an outcome code that no
+        // word of this world supplies, so a moment missing the answering room word is still
+        // answerable and only a moment that is another moment's twin is not. An arm reaching
+        // further and scoring lower is failing to choose, which is the selection problem.
     }
 }

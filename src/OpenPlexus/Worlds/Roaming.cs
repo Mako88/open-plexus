@@ -59,10 +59,19 @@ public sealed record RoamingSettings
 /// world rather than a different world.
 /// </para>
 /// <para>
-/// <b>IT SPEAKS <see cref="Asking"/> ON PURPOSE.</b> The whole text front end applies
-/// unchanged — every <see cref="Joining"/> arm, the ceilings, the withheld exam — so a
-/// reading here stands beside bAbI's rather than starting a second scale nobody can
-/// compare across.
+/// <b>It speaks <see cref="Recited"/></b>, which is <see cref="Asking"/> with the word order
+/// still on it. The whole text front end applies unchanged — every
+/// <see cref="Joining"/> arm reads <see cref="Recited.Bagged"/> and gets the codes it always
+/// got, so a reading here stands beside bAbI's rather than starting a second scale nobody
+/// can compare across. What the shape adds is the order report, which is the one thing a bag
+/// of a sentence cannot carry and the thing rung three is made of.
+/// </para>
+/// <para>
+/// <b>And this is the spine, so it is the world that grows.</b> Order is the first tier of
+/// it and twins are the next; an acting arm is the last. A world built to isolate one
+/// question is still built freely and goes when that question shuts, because only a
+/// constructed world can prove a ceiling — what a growing world buys is that each tier is
+/// read against the one below it on the same scale.
 /// </para>
 /// <para>
 /// <b>WHAT IT FIXES ABOUT bAbI is the property that disqualified it.</b> Some two thousand
@@ -77,7 +86,7 @@ public sealed record RoamingSettings
 /// Adding it before the base world is read would be two unanswered questions in one grid.
 /// </para>
 /// </remarks>
-public sealed class Roaming : IWorld<Asking>, IWithholds<Asking>
+public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
 {
     /// <summary>The modality a word rides on.</summary>
     /// <remarks>
@@ -100,7 +109,7 @@ public sealed class Roaming : IWorld<Asking>, IWithholds<Asking>
 
     private readonly RoamingSettings _settings;
     private readonly Random _walks;
-    private readonly List<Turn<Asking>> _kept = [];
+    private readonly List<Turn<Recited>> _kept = [];
 
     /// <param name="settings">How the world is set up.</param>
     /// <param name="seed">What draws the houses and the walks.</param>
@@ -143,18 +152,24 @@ public sealed class Roaming : IWorld<Asking>, IWithholds<Asking>
         [.. Things.Take(_settings.Props).Select(thing => Kinds.Named(Word, thing))];
 
     /// <inheritdoc/>
-    public IReadOnlyList<Turn<Asking>> Withheld => _kept;
+    public IReadOnlyList<Turn<Recited>> Withheld => _kept;
 
     /// <inheritdoc/>
-    public Turn<Asking> Next() => Draw();
+    public Turn<Recited> Next() => Draw();
 
-    /// <summary>The codes for one sentence.</summary>
-    /// <param name="words">The words of it, in any order — <b>a statement is a set.</b></param>
-    private static HashSet<Code> Said(params string[] words) =>
+    /// <summary>The codes for one sentence, in the order the words were said.</summary>
+    /// <param name="words">The words of it, in order.</param>
+    /// <remarks>
+    /// <b>A list rather than a set, on the licence <see cref="Recited"/> carries.</b> Order is
+    /// a fact about the signal; which word is the room and which the thing is a role, and no
+    /// world here may say that. A front end that wants none of the order flattens this in one
+    /// call.
+    /// </remarks>
+    private static IReadOnlyList<Code> Said(params string[] words) =>
         [.. words.Select(word => Kinds.Named(Word, word))];
 
     /// <summary>One house, one walk round it, and one question about where a thing ended up.</summary>
-    private Turn<Asking> Draw()
+    private Turn<Recited> Draw()
     {
         // Where everything starts, stated out loud. Without the opening placements the
         // answer is not derivable from the transcript at all, and the world would be asking
@@ -162,10 +177,10 @@ public sealed class Roaming : IWorld<Asking>, IWithholds<Asking>
         var at = new int[_settings.Props];
         var carried = new bool[_settings.Props];
 
-        // NEWEST FIRST, WHICH IS WHAT `Asking` PROMISES. So the list is built forwards and
+        // Newest first, which is what `Recited` promises. So the list is built forwards and
         // reversed at the end rather than each statement being inserted at the front, which
         // is the same order written the cheap way round.
-        var told = new List<IReadOnlySet<Code>>();
+        var told = new List<IReadOnlyList<Code>>();
 
         for (var prop = 0; prop < _settings.Props; prop++)
         {
@@ -233,12 +248,12 @@ public sealed class Roaming : IWorld<Asking>, IWithholds<Asking>
 
         told.Reverse();
 
-        return new Turn<Asking>
+        return new Turn<Recited>
         {
-            Seen = new Asking
+            Seen = new Recited
             {
-                Story = told,
-                Question = Said("where", "is", "the", Things[about]),
+                Said = told,
+                Asked = Said("where", "is", "the", Things[about]),
             },
             Outcome = carried[about] ? null : at[about],
         };

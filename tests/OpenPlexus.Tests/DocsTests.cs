@@ -106,7 +106,13 @@ public sealed class DocsTests
     // than an exception to it. It buys the rule itself: two lines saying the budget may
     // rise for something genuinely new. A cap that could only fall would have had to be
     // paid for by deleting an item, which is the failure the paragraph describes.
-    private const int Whole = 9_809;
+    //
+    // 9,831 is the second, and it buys John's own direction: which world is the spine. The
+    // doc named no world at all before it, so a session asking which one to grow had the
+    // handoff and nothing that outlives a handoff. The three conditions are met -- nothing
+    // else in the route says it, no item was deleted, and forty-five words is not the
+    // difference between loading this and not.
+    private const int Whole = 9_831;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

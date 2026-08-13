@@ -455,6 +455,9 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
   - Original thought
     - **NOW** — nothing. Every world here is watched rather than acted in, and action, a
       consequence that can surprise, and a goal are all unbuilt.
+    - **OPEN** — `Roaming` is the spine, so it grows to each tier rather than closing: word
+      order first, then twins, then acting. An isolating world is still built freely and goes
+      when its question shuts, because only a constructed world can prove a ceiling.
     - **OPEN** — TextWorld's shape is built here and watched before acted in; Crafter puts
       two unbuilt subsystems in front of the measurement. Open on twins. `csharp` disqualified
       SURVIVAL as a score and refuted absolute actions under an unrotated view, so an acting

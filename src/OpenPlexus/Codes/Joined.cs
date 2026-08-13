@@ -259,7 +259,7 @@ public enum Joining
 /// ever used it, and on this corpus none does.
 /// </para>
 /// </remarks>
-public sealed class Joined : IQuantizer<Asking>
+public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
 {
     /// <summary>The modality a coincidence rides on.</summary>
     /// <remarks>
@@ -380,18 +380,22 @@ public sealed class Joined : IQuantizer<Asking>
     /// <inheritdoc/>
     public IReadOnlyCollection<Code> Codify(Asking observation)
     {
-        var said = new HashSet<Code>(observation.Words);
-        said.UnionWith(observation.Question);
+        var read = Read(observation);
+        var said = new HashSet<Code>(observation.Question);
+
+        foreach (var at in read.Count == 0 ? Every(observation) : read)
+            said.UnionWith(observation.Story[at]);
 
         if (_joining == Joining.Recent) return _categories.Folded(Banding(said, observation));
 
-        if (_joining == Joining.Distinguished) return _categories.Folded(Situating(observation));
+        if (_joining == Joining.Distinguished) return _categories.Folded(said);
 
-        if (_joining == Joining.Addressed) return _categories.Folded(Addressing(said, observation));
+        if (_joining == Joining.Addressed) return _categories.Folded(said);
 
-        if (_joining == Joining.Chained) return _categories.Folded(Chaining(said, observation));
+        if (_joining == Joining.Chained)
+            return _categories.Folded(_banded ? Banded(said, observation, read) : said);
 
-        if (_joining == Joining.Resolved) return _categories.Folded(Storing(said, observation));
+        if (_joining == Joining.Resolved) return _categories.Folded(said);
 
         if (_joining == Joining.Bagged) return _categories.Folded(said);
 
@@ -442,6 +446,37 @@ public sealed class Joined : IQuantizer<Asking>
         return new Code(Sorted, Agreed.Mix(hash));
     }
 
+    /// <summary>Which statements of the story this arm read, in the order it read them.</summary>
+    /// <param name="observation">The story and the question.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>Every arm here selects statements</b>, which is what lets one report serve two
+    /// channels. A moment is the question plus the words of whatever was selected, so
+    /// <see cref="Codify(Asking)"/> unions and <see cref="Order(Recited)"/> positions — off
+    /// the same list, so the two cannot disagree about what was read.
+    /// </para>
+    /// <para>
+    /// <b>An empty list means the arm selected nothing</b>, and the caller reads everything.
+    /// That is the fallback three of them already had, for the reason written on each: an arm
+    /// going silent would be scoring its own abstentions rather than its mechanism. <b>The
+    /// failure is reported rather than papered over</b>, because <see cref="Joining.Chained"/>
+    /// bands what its chain read and a chain that read nothing must band nothing.
+    /// </para>
+    /// </remarks>
+    private List<int> Read(Asking observation) => _joining switch
+    {
+        Joining.Distinguished => Situating(observation),
+        Joining.Addressed => Addressing(observation),
+        Joining.Chained => Chaining(observation),
+        Joining.Resolved => Storing(observation),
+        _ => Every(observation),
+    };
+
+    /// <summary>Every statement, which is what an arm that selects none of them reads.</summary>
+    /// <param name="observation">The story and the question.</param>
+    private static List<int> Every(Asking observation) =>
+        [.. Enumerable.Range(0, observation.Story.Count)];
+
     /// <summary>
     /// The question, and every statement of the story nothing newer has superseded.
     /// </summary>
@@ -464,9 +499,9 @@ public sealed class Joined : IQuantizer<Asking>
     /// the situation is being asked about.
     /// </para>
     /// </remarks>
-    private HashSet<Code> Situating(Asking observation)
+    private List<int> Situating(Asking observation)
     {
-        var said = new HashSet<Code>(observation.Question);
+        var kept = new List<int>();
         var claimed = new HashSet<Code>();
         var keys = new List<Code>();
 
@@ -475,13 +510,13 @@ public sealed class Joined : IQuantizer<Asking>
         // row: the motion verbs straddle the names, so no rank separates them.
         var constant = Shared(observation);
 
-        foreach (var statement in observation.Story)
+        for (var at = 0; at < observation.Story.Count; at++)
         {
             keys.Clear();
 
             var superseded = false;
 
-            foreach (var one in statement)
+            foreach (var one in observation.Story[at])
             {
                 if (constant.Contains(one)) continue;
 
@@ -494,10 +529,10 @@ public sealed class Joined : IQuantizer<Asking>
 
             foreach (var key in keys) claimed.Add(key);
 
-            said.UnionWith(statement);
+            kept.Add(at);
         }
 
-        return said;
+        return kept;
     }
 
     /// <summary>
@@ -511,27 +546,22 @@ public sealed class Joined : IQuantizer<Asking>
     /// which is the same line <see cref="Joining.Named"/> stands on: every word of the story
     /// is in the story, so only the two halves know which are in both.
     /// </remarks>
-    private static HashSet<Code> Addressing(HashSet<Code> said, Asking observation)
+    private static List<int> Addressing(Asking observation)
     {
-        foreach (var statement in observation.Story)
+        for (var at = 0; at < observation.Story.Count; at++)
         {
             var names = false;
 
-            foreach (var one in statement)
+            foreach (var one in observation.Story[at])
                 if (observation.Question.Contains(one)) { names = true; break; }
 
-            if (!names) continue;
-
-            var found = new HashSet<Code>(observation.Question);
-            found.UnionWith(statement);
-
-            return found;
+            if (names) return [at];
         }
 
         // Nothing the question names was ever said, so there is no store entry to read and
         // the bag is what is left. See the arm's remarks: going silent would score the
         // abstention rather than the mechanism.
-        return said;
+        return [];
     }
 
     /// <summary>
@@ -551,13 +581,12 @@ public sealed class Joined : IQuantizer<Asking>
     /// exactly the questions it found hardest.
     /// </para>
     /// </remarks>
-    private HashSet<Code> Chaining(HashSet<Code> said, Asking observation)
+    private List<int> Chaining(Asking observation)
     {
         var background = Shared(observation);
-        var moment = new HashSet<Code>(observation.Question);
+        var chain = new List<int>();
         var key = observation.Question;
         var from = 0;
-        var read = 0;
 
         for (var hop = 0; hop < _hops; hop++)
         {
@@ -569,18 +598,7 @@ public sealed class Joined : IQuantizer<Asking>
 
             if (at < 0) break;
 
-            moment.UnionWith(observation.Story[at]);
-            read++;
-
-            // And which hop found it, where the arm asks for it. A scope is a subset test
-            // over a set, so *the statement the question named* and *the one that named*
-            // are the same words in one bag and unsayable apart -- which is why a chain
-            // that fetched the right sentence bought nothing. The band makes the
-            // difference sayable, and the plain word stays beside it so two occurrences of
-            // one word at different depths remain relatable.
-            if (_banded)
-                foreach (var code in observation.Story[at])
-                    moment.Add(new Code(Both, unchecked(code.Value * Bands + (ulong)Math.Min(hop, Bands - 1) + 2)));
+            chain.Add(at);
 
             key = new HashSet<Code>(observation.Story[at]
                 .Where(code => !key.Contains(code) && !background.Contains(code)));
@@ -591,13 +609,39 @@ public sealed class Joined : IQuantizer<Asking>
         // Nothing the question names was ever said, so there is no store entry to read at all
         // and the bag is what is left -- the same fallback Addressing takes, and for the same
         // reason: going silent would score the abstention rather than the mechanism.
-        return read == 0 ? said : moment;
+        return chain;
+    }
+
+    /// <summary>The chain's words again, each carrying which hop found it.</summary>
+    /// <param name="said">The moment so far.</param>
+    /// <param name="observation">The story and the question.</param>
+    /// <param name="chain">Which statement each hop read, in hop order.</param>
+    /// <remarks>
+    /// <b>Which hop found it, where the arm asks for it.</b> A scope is a subset test over a
+    /// set, so <i>the statement the question named</i> and <i>the one that named</i> are the
+    /// same words in one bag and unsayable apart — which is why a chain that fetched the right
+    /// sentence bought nothing. The band makes the difference sayable, and the plain word
+    /// stays beside it so two occurrences of one word at different depths remain relatable.
+    /// <b>The hop is the position in the chain</b>, so this reads what the walk already
+    /// recorded rather than re-walking it.
+    /// </remarks>
+    private static HashSet<Code> Banded(HashSet<Code> said, Asking observation, List<int> chain)
+    {
+        for (var hop = 0; hop < chain.Count; hop++)
+        {
+            foreach (var code in observation.Story[chain[hop]])
+            {
+                said.Add(new Code(
+                    Both, unchecked(code.Value * Bands + (ulong)Math.Min(hop, Bands - 1) + 2)));
+            }
+        }
+
+        return said;
     }
 
     /// <summary>
-    /// The question, and what a forward store holds about the things the question names.
+    /// Which statements a forward store holds about the things the question names.
     /// </summary>
-    /// <param name="said">The plain bag, which is what a store with nothing to say falls back to.</param>
     /// <param name="observation">The story and the question.</param>
     /// <remarks>
     /// <para>
@@ -631,10 +675,17 @@ public sealed class Joined : IQuantizer<Asking>
     /// rather than an accumulation. Replacement IS the retraction; keeping the old value
     /// means nothing is ever forgotten, and a moment that forgets nothing is the bag.
     /// </para>
+    /// <para>
+    /// <b>An entry is which statements wrote it and not their words</b>, which is exact rather
+    /// than a summary: every value here is a union of whole statements, so the words are
+    /// recoverable from the indices and the word order with them. It is what lets
+    /// <see cref="Order(Recited)"/> position a folded moment at all — a store of sets has
+    /// thrown the order away one call before the report is asked for.
+    /// </para>
     /// </remarks>
-    private HashSet<Code> Storing(HashSet<Code> said, Asking observation)
+    private List<int> Storing(Asking observation)
     {
-        var levels = new Dictionary<Code, HashSet<Code>>[_resolution + 1];
+        var levels = new Dictionary<Code, HashSet<int>>[_resolution + 1];
 
         for (var depth = 0; depth <= _resolution; depth++) levels[depth] = [];
 
@@ -671,15 +722,15 @@ public sealed class Joined : IQuantizer<Asking>
             // Written after every value is computed, never during. See the remarks: an entry
             // that could see a sibling written by the same statement would make the moment
             // depend on a hash set's enumeration order, which is fork 12's failure.
-            var written = new HashSet<Code>[_resolution + 1][];
+            var written = new HashSet<int>[_resolution + 1][];
 
             for (var depth = 0; depth <= _resolution; depth++)
             {
-                written[depth] = new HashSet<Code>[keys.Count];
+                written[depth] = new HashSet<int>[keys.Count];
 
                 for (var one = 0; one < keys.Count; one++)
                 {
-                    var value = new HashSet<Code>(statement);
+                    var value = new HashSet<int> { back };
 
                     if (depth > 0)
                         foreach (var other in keys)
@@ -702,17 +753,15 @@ public sealed class Joined : IQuantizer<Asking>
             foreach (var key in keys) wrote[key] = observation.Story.Count - back;
         }
 
-        var moment = new HashSet<Code>(observation.Question);
-        var read = 0;
+        var read = new HashSet<int>();
 
         foreach (var one in observation.Question)
-            if (levels[_resolution].TryGetValue(one, out var held))
-            {
-                moment.UnionWith(held);
-                read++;
-            }
+            if (levels[_resolution].TryGetValue(one, out var held)) read.UnionWith(held);
 
-        return read == 0 ? said : moment;
+        // Newest first, which is the order every other arm here returns and the order
+        // `Story` itself arrives in. The store was walked the other way round to maintain
+        // it, so this is where that gets undone rather than left for a caller to know about.
+        return [.. read.OrderBy(at => at)];
     }
 
     /// <summary>
@@ -767,20 +816,11 @@ public sealed class Joined : IQuantizer<Asking>
 
     /// <inheritdoc/>
     /// <remarks>
-    /// <para>
-    /// <b>Not the order of the words</b>, and the reason changed the day rung three was
-    /// built. It used to be that a sequence had nowhere to go —
-    /// <see cref="Sequenced"/> now takes one and turns it into a code, so an order reported
-    /// here would be read rather than ignored.
-    /// </para>
-    /// <para>
-    /// <b>What blocks it is that <see cref="Worlds.Asking.Story"/> is a list of sets.</b>
-    /// A statement's words arrive here already unordered, so this arm has nothing to report
-    /// — the order is destroyed by the shape of what the world hands over, one type before
-    /// the front end. <see cref="Worlds.Recited"/> is the same moment with the word order
-    /// still on it, and every text world here would need that shape before rung three could
-    /// be measured on one.
-    /// </para>
+    /// <b>Nothing, because <see cref="Worlds.Asking.Story"/> is a list of sets.</b> A
+    /// statement's words arrive here already unordered, so a front end reading this shape has
+    /// nothing to report — the order was destroyed one type before the front end.
+    /// <see cref="Worlds.Recited"/> is the same moment with it still on, and
+    /// <see cref="Order(Recited)"/> is the same arms reading that.
     /// </remarks>
     public IReadOnlyDictionary<Code, int>? Order(Asking observation) => null;
 
@@ -788,9 +828,76 @@ public sealed class Joined : IQuantizer<Asking>
     public IReadOnlySet<Code>? Fleeting(Asking observation) => null;
 
     /// <inheritdoc/>
-
-    /// <inheritdoc/>
-
-    /// <inheritdoc/>
     public IReadOnlySet<Code>? Forced(Asking observation) => null;
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <b>The same codes the bagged shape gets, exactly.</b> An arm reads statements and unions
+    /// their words either way, so what a world speaking <see cref="Recited"/> buys is the
+    /// ORDER report beside the moment rather than a different moment.
+    /// </remarks>
+    public IReadOnlyCollection<Code> Codify(Recited observation) => Codify(observation.Bagged);
+
+    /// <summary>
+    /// Where the words of the statements this arm read stood, oldest first.
+    /// </summary>
+    /// <param name="observation">One moment, with the word order still on it.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>Only what the arm read</b>, which is what makes the report say anything at all. A
+    /// whole transcript says every word many times over, so a position map of it is a map of a
+    /// word's LAST occurrence and nothing else. Selection is what leaves few enough statements
+    /// for a position to be a fact — so rung three fires here only where a situation model has
+    /// already narrowed the moment, and the bagged arm gets no order because it deserves none.
+    /// </para>
+    /// <para>
+    /// <b>A word said twice is reported at neither place.</b> Position is one number a code,
+    /// so a repeated word would take its last occurrence and claim to have stood only there.
+    /// Dropping it is what makes <i>in</i> then <i>kitchen</i> derivable across the
+    /// <i>the</i> between them, which is the precedence that separates a placement from a
+    /// movement on <see cref="Worlds.Roaming"/>.
+    /// </para>
+    /// <para>
+    /// <b>Oldest first, because the transcript happened that way round.</b>
+    /// <see cref="Recited.Said"/> arrives newest first so that a distance from the question
+    /// means one thing in every story; a precedence means <i>this was said before that</i>,
+    /// which is the other direction. A pair spanning two statements says the older one's last
+    /// surviving word came before the newer one's first, and the arm's own selection is what
+    /// put them next to each other.
+    /// </para>
+    /// <para>
+    /// <b>And the question's words get no position</b>, which is
+    /// <c>HandingTests</c>'s line exactly. A question and a statement are two utterances, so
+    /// claiming one of their words came before another would invent a sequencing nobody
+    /// stated.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyDictionary<Code, int>? Order(Recited observation)
+    {
+        // The arm is run again rather than remembered, and the front end stays a function of
+        // its input. A cached last answer would be state on a type whose whole contract is
+        // that the same input gives the same codes on every machine forever.
+        var read = Read(observation.Bagged);
+        var said = observation.Said;
+
+        if (read.Count == 0) return null;
+
+        var placed = new Dictionary<Code, int>();
+        var twice = new HashSet<Code>();
+        var at = 0;
+
+        foreach (var statement in read.OrderByDescending(one => one))
+        {
+            foreach (var word in said[statement])
+            {
+                if (!placed.TryAdd(word, at)) twice.Add(word);
+
+                at++;
+            }
+        }
+
+        foreach (var word in twice) placed.Remove(word);
+
+        return placed.Count > 1 ? placed : null;
+    }
 }

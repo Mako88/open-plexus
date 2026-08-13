@@ -2,26 +2,6 @@
 namespace OpenPlexus.Bus;
 
 /// <summary>
-/// Local delivery by direct call, remote delivery over the wire, one interface.
-/// </summary>
-/// <remarks>
-/// <para>
-/// <b>ONLY THE LOCAL HALF EXISTS.</b> There is no second machine yet, so there
-/// is no wire, and building one before it has a caller is how the Python grew
-/// three dead modules. An address that is not local <b>throws</b> rather than
-/// being dropped: with no wire, an unknown address can only be a routing bug,
-/// and a silent drop would be indistinguishable from the ordinary C2 message
-/// loss it is not. When the wire lands, that same case becomes a lost message.
-/// </para>
-/// <para>
-/// <b>The speed difference between local and remote is not a wart, it is the
-/// experiment.</b> Codes that land together are cheap to walk between and codes
-/// that land apart are not, so a machine's contents become a region of the
-/// graph that thinks faster internally than externally. That is what a column
-/// is, and here it costs nothing extra — see open fork 3.
-/// </para>
-/// </remarks>
-/// <summary>
 /// Lateness, injected — <b>C2 made real instead of assumed.</b>
 /// </summary>
 /// <remarks>
@@ -53,6 +33,17 @@ namespace OpenPlexus.Bus;
 /// </param>
 public readonly record struct Lateness(double Share, TimeSpan Delay, int Seed);
 
+/// <summary>
+/// The bus in one process, with C2 injected rather than assumed.
+/// </summary>
+/// <remarks>
+/// <b>THE HARSHER TEST OF THE SAME TRAFFIC, AND THAT IS WHY IT STAYS.</b> Delivery here is
+/// <see cref="Task.Run(Action)"/> with delays sprinkled in, so it reorders on purpose;
+/// <see cref="Posted"/> crosses a socket and TCP does not reorder within a connection. A
+/// green run over the wire says the bytes and the routing are right and says nothing about
+/// C2 — <i>a simulated constraint can be harsher than the real one</i>, and here that is the
+/// point rather than the trap.
+/// </remarks>
 public sealed class HybridBus : IBus
 {
     /// <inheritdoc cref="Bus.Lateness"/>
@@ -103,12 +94,9 @@ public sealed class HybridBus : IBus
     /// <summary>Deliveries dispatched and not yet finished.</summary>
     private int _inFlight;
     private long _messages;
-    private long _reports;
+    private long _answers;
 
     private TaskCompletionSource _quiet = Quiet();
-
-    /// <inheritdoc/>
-    public event Action<ClusterAddress>? Deaths;
 
     /// <inheritdoc/>
     /// <remarks>
@@ -128,12 +116,11 @@ public sealed class HybridBus : IBus
     public event Action<Exception>? Faults;
 
     /// <summary>
-    /// Every message put on the bus, across every envelope.
+    /// Every ask put on the bus, counted once per holder it went to.
     /// </summary>
     /// <remarks>
-    /// What a real network would have had to carry. Counted because
-    /// receiver-weighing trades messages for exactness — 26.7 a step against the
-    /// deleted sender arm's 17.0 — and the trade is worth knowing the size of.
+    /// What a real network would have had to carry, and the scatter half of it. A fan-out
+    /// to twelve holders is twelve messages however concurrently they were dispatched.
     /// </remarks>
     public long Messages
     {
@@ -147,16 +134,16 @@ public sealed class HybridBus : IBus
     }
 
     /// <summary>
-    /// Reports put on the return path, across every thought.
+    /// Answers put on the return path, across every gathering.
     /// </summary>
     /// <remarks>
-    /// <b>Counted separately from <see cref="Messages"/> so a report that never
-    /// arrives can be distinguished from one that was never sent.</b> Fork 22
-    /// turned on exactly that question, and nothing recorded either half of it.
+    /// <b>Counted separately from <see cref="Messages"/> so an answer that never arrives can
+    /// be distinguished from one that was never sent.</b> A gathering that never completes
+    /// looks the same from the asker either way, and only one of the two is the bus's fault.
     /// </remarks>
-    public long Reports
+    public long Answers
     {
-        get { lock (_gate) return _reports; }
+        get { lock (_gate) return _answers; }
     }
 
     /// <inheritdoc/>
@@ -224,15 +211,13 @@ public sealed class HybridBus : IBus
         IReceiveAnswers? receiver;
         lock (_gate)
         {
-            // DROPPED RATHER THAN THROWN, unlike everything else this bus refuses to
-            // route. `Unreachable` exists because with no wire an unknown address can only
-            // be a routing bug -- but an asker that has gone between asking and being
+            // DROPPED RATHER THAN THROWN. An asker that has gone between asking and being
             // answered is C3 happening, and it is the case this whole payload exists to
-            // measure.
+            // measure -- throwing would make one machine's departure another's error.
             if (!_askers.TryGetValue(to, out receiver)) return ValueTask.CompletedTask;
 
             _inFlight++;
-            _reports++;
+            _answers++;
         }
 
         Dispatch(() => receiver.DeliverAsync(answer, ct));
@@ -320,45 +305,4 @@ public sealed class HybridBus : IBus
     private static TaskCompletionSource Quiet() =>
         new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-    private static InvalidOperationException Unreachable(string address) =>
-        new($"nothing local is at {address}, and there is no wire yet; " +
-            "with no remote half an unknown address can only be a routing bug, " +
-            "and dropping it would look exactly like ordinary message loss");
-
-    private void Leave(ClusterAddress address)
-    {
-        bool left;
-        lock (_gate) left = _clusters.Remove(address);
-
-        // LEAVING IS NOT SILENT. Routes heading into this cluster are never
-        // coming back, and the origin has no other way to learn that without a
-        // deadline guessing on its behalf.
-        if (left) Deaths?.Invoke(address);
-    }
-
-    private void Leave(MachineAddress address)
-    {
-        lock (_gate) _machines.Remove(address);
-    }
-
-    private sealed class Leaving : IDisposable
-    {
-        private readonly HybridBus _bus;
-        private readonly ClusterAddress? _cluster;
-        private readonly MachineAddress? _machine;
-        private bool _gone;
-
-        public Leaving(HybridBus bus, ClusterAddress cluster) => (_bus, _cluster) = (bus, cluster);
-
-        public Leaving(HybridBus bus, MachineAddress machine) => (_bus, _machine) = (bus, machine);
-
-        public void Dispose()
-        {
-            if (_gone) return;
-            _gone = true;
-
-            if (_cluster is { } cluster) _bus.Leave(cluster);
-            if (_machine is { } machine) _bus.Leave(machine);
-        }
-    }
 }

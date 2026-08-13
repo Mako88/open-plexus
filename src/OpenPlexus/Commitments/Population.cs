@@ -638,8 +638,8 @@ public sealed class Population
     /// <para>
     /// <b>AND A PRECEDENCE IS ALREADY IN <paramref name="raw"/> BY THE TIME IT GETS HERE,
     /// WHICH IS A DECISION ABOUT THE WIRE AND NOT ABOUT THE FOLD.</b> Rung three is derived
-    /// where the moment is FORMED — see <see cref="Machines.InputMachine{TFrame}"/> and
-    /// <c>Trial</c> — because a fleet broadcasts the moment as a set of codes and a
+    /// where the moment is FORMED — see <see cref="Machines.Trial{TSeen}"/> — because a
+    /// fleet broadcasts the moment as a set of codes and a
     /// precedence IS one. Deriving it here instead would mean every holder needed the
     /// front end's order report on the wire beside the moment it already has.
     /// </para>

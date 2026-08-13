@@ -117,9 +117,9 @@ public sealed record Sentence
 /// front end here is as dumb as it can be: a sentence is its words, a word is the
 /// hash of its letters, and no stop-list, parser, tagger or template goes
 /// anywhere near it. The common words are left in deliberately — <i>the</i> and
-/// <i>to</i> occur with everything, which is precisely what the anti-hub property
-/// in <see cref="Graph.Pricing.Receiver"/> claims to refuse, and this is the first
-/// time that claim has been put to real text.
+/// <i>to</i> occur with everything, and a learner that cannot survive that has not
+/// been put to real text. It is also the wall the plan records: the informative
+/// words are the unpredictable ones and the predictable ones are these.
 /// </para>
 /// <para>
 /// <b>The corpus is not in this repository.</b> It is CC BY 3.0 and eleven

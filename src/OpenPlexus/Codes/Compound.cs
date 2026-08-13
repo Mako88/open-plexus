@@ -8,11 +8,11 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A SENSOR PER MACHINE WOULD NOT DO THIS, AND THAT IS THE WHOLE POINT.</b>
-/// Each <see cref="Machines.InputMachine{TFrame}"/> builds its own occasion, and
-/// an occasion is what pairs codes together — so a camera on one machine and a
-/// microphone on another would never co-occur, and the sight–sound edge that
-/// <see cref="Worlds.Senses"/> exists to measure could not be written at all.
+/// <b>A SENSOR PER MACHINE WOULD NOT DO THIS, AND THAT IS THE WHOLE POINT.</b> A
+/// front end is asked for a MOMENT — see <see cref="Machines.Trial{TSeen}"/> — and
+/// a moment is what puts codes together, so a camera on one machine and a
+/// microphone on another would never co-fire, and the sight–sound pairing that
+/// <see cref="Worlds.Senses"/> exists to measure could not be reached at all.
 /// <b>Cross-modal binding needs the streams in ONE moment</b>, which means one
 /// machine holding several front ends rather than several machines holding one
 /// each.
@@ -56,8 +56,8 @@ public sealed class Compound<TFrame> : IQuantizer<TFrame>
     /// </summary>
     /// <remarks>
     /// A compound has no single modality by construction — that is what it is for.
-    /// <see cref="Thinking.Thought"/> narrows on <see cref="Code.Modality"/>, which
-    /// the codes carry themselves.
+    /// Anything that needs to know reads <see cref="Code.Modality"/>, which the codes
+    /// carry themselves.
     /// </remarks>
     public byte Modality => _senses[0].Modality;
 

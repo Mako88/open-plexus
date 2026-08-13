@@ -131,8 +131,8 @@ public sealed record Episode
 /// present belonged to the colour, because a forced choice isolates binding from
 /// recognition. Here a forced choice would break the sharpest control: grouping
 /// means <c>A₀</c> pairs only with <c>tag₀</c>, so between <c>C₀</c> and
-/// <c>C₁</c> even a single attribute would lean the right way and
-/// <see cref="ComposedRun"/>'s one-attribute arm would not sit near chance.
+/// <c>C₁</c> even a single attribute would lean the right way and the
+/// one-attribute arm would not sit near chance.
 /// Ranked over the whole alphabet, one attribute reaches every index it has ever
 /// met and picks between them at random, which is the control the design needs.
 /// </para>

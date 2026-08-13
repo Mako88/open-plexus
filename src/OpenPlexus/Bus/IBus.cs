@@ -2,22 +2,14 @@ namespace OpenPlexus.Bus;
 
 /// <summary>
 /// Something that holds commitments and can be asked what it makes of them —
-/// <b>fork 52, and the only traffic on this bus that is LEARNING rather than thinking.</b>
+/// <b>fork 52, and the only traffic on this bus.</b>
 /// </summary>
 /// <remarks>
-/// <para>
-/// <b>EVERYTHING ELSE HERE CARRIES A THOUGHT ACROSS A WIRE AND NOTHING CARRIES WHAT WAS
-/// LEARNT.</b> Fork 1 is open for exactly that reason: an occasion writes its edges into
-/// locally-held clusters, so a machine can think across a wire and cannot learn across
-/// one. A whole commitment learner now runs over this — see <c>Machines.Fleet</c> — so
-/// what is left of that fork is the walk.
-/// </para>
-/// <para>
-/// <b>SEPARATE FROM <see cref="IReceiveEnvelopes"/> BECAUSE A HOLDER IS NOT A CLUSTER.</b>
-/// A cluster owns nodes and forwards routes; a holder owns commitments and answers
-/// questions about them. They are addressed differently, they die differently, and the
-/// only thing they share is a socket.
-/// </para>
+/// <b>THE BUS CARRIES WHAT WAS LEARNT AND NOTHING ELSE, WHICH IS FORK 1 SETTLING BY
+/// DELETION.</b> The walk could think across a wire and could only learn at home, so it had
+/// a second half here — envelopes into locally-held clusters, routes, reports, deaths. It is
+/// gone, and what stayed is the half that was always the whole point: a holder is asked what
+/// it makes of a moment and says so, so a fleet learns what one machine learns.
 /// </remarks>
 public interface IReceiveAsks
 {
@@ -31,9 +23,10 @@ public interface IReceiveAsks
 /// </summary>
 /// <remarks>
 /// <b>THE RETURN PATH IS A MESSAGE AND NOT A RESPONSE BODY.</b> An asker does not block on
-/// its holders — see <see cref="Ask"/> for why that matters more here than anywhere else
-/// on this bus — so an answer arrives the way a <see cref="Report"/> does, addressed to
-/// whoever asked and correlated by the ask's own id.
+/// its holders — see <see cref="Ask"/> for why that matters more here than anywhere else on
+/// this bus — so an answer arrives as its own delivery, addressed to whoever asked and
+/// correlated by the ask's own id. <i>Push, never pull</i>: an awaited response body is a
+/// deadline by the back door, and a deadline is what C2 says cannot be trusted.
 /// </remarks>
 public interface IReceiveAnswers
 {
@@ -46,9 +39,10 @@ public interface IReceiveAnswers
 /// How anything reaches anything else.
 /// </summary>
 /// <remarks>
-/// <b>The cluster subscribes, not the node.</b> A node is still reachable by
-/// any broadcast; the cluster is the envelope, and that is what lets 200
-/// partners across 12 clusters cost 12 sends.
+/// <b>THE ADDRESSABLE THING IS A MACHINE, WHICH IS C3'S UNIT NOW THAT THE WALK IS GONE.</b>
+/// The constraint is stated over a cluster because a cluster was what owned nodes and
+/// forwarded routes; nothing here owns either. What can vanish mid-round is a holder, and
+/// every write-off below is holder-shaped for that reason.
 /// </remarks>
 public interface IBus
 {
@@ -58,12 +52,12 @@ public interface IBus
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>UNLIKE A CLUSTER LEAVING, AND THE ASYMMETRY IS THE POINT.</b> A route in flight
-    /// toward a dead cluster is stranded and the origin cannot write it off without being
-    /// told, so <see cref="Deaths"/> exists. An ask that reaches nobody costs an answer
-    /// that never arrives, which is a thing the asker can see for itself by counting —
-    /// and a holder that crashed could not have sent a death notice anyway, so a design
-    /// that needed one would work only for the departures that were polite.
+    /// <b>THERE IS NO DEATH NOTICE, AND THE WALK'S IS WHAT SAYS WHY.</b> A route in flight
+    /// toward a departed cluster was stranded and the origin could not write it off without
+    /// being told, so the walk announced departures. An ask that reaches nobody costs an
+    /// answer that never arrives, which is a thing the asker can see for itself by counting
+    /// — and a holder that crashed could not have sent a notice anyway, so a design that
+    /// needed one would work only for the departures that were polite.
     /// </para>
     /// <para>
     /// <b>AND WHAT THE ASKER COULD SEE FOR ITSELF WAS THE NUMERATOR, WHICH IS WHERE FORK 53
@@ -104,33 +98,16 @@ public interface IBus
     ValueTask SendAsync(MachineAddress to, Answer answer, CancellationToken ct = default);
 
     /// <summary>
-    /// A cluster left. Routes that were heading into it are never coming back.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>Cluster granularity, not machine.</b> A route is stranded by the
-    /// departure of whatever holds its next node, and that is a cluster; a
-    /// machine leaving is every one of its clusters leaving.
-    /// </para>
-    /// <para>
-    /// <b>What a thought should DO with this is not decided</b> — see open
-    /// fork 5. A thought does not track which clusters its routes are sitting
-    /// in, so it cannot tell whether a given death affects it.
-    /// </para>
-    /// </remarks>
-    event Action<ClusterAddress>? Deaths;
-
-    /// <summary>
     /// One holder was never handed one ask, so no answer to that ask is owed from it —
     /// <b>fork 53, and it is the walk's write-off rather than a new idea.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>NOT A DEATH NOTICE, WHICH IS WHY IT NAMES AN ASK AND NOT JUST A MACHINE.</b>
-    /// <see cref="Deaths"/> says a cluster is gone and every route into it is stranded; this
-    /// says one question never left. That is the smaller claim and the exact one — a holder
-    /// that was not handed a question cannot answer it, and whether it is dead, wedged or
-    /// merely behind a wire that lost this one message does not change that by a bit.
+    /// <b>NOT A DEATH NOTICE, WHICH IS WHY IT NAMES AN ASK AND NOT JUST A MACHINE.</b> The
+    /// walk's said a cluster was gone and every route into it stranded; this says one
+    /// question never left. That is the smaller claim and the exact one — a holder that was
+    /// not handed a question cannot answer it, and whether it is dead, wedged or merely
+    /// behind a wire that lost this one message does not change that by a bit.
     /// </para>
     /// <para>
     /// <b>SO IT NEEDS NO POLITENESS AND NO CLOCK, WHICH IS WHAT THE ASYMMETRY ABOVE WAS

@@ -29,8 +29,8 @@ public sealed class Marked<TFrame> : IQuantizer<TFrame>
     /// <param name="reading">
     /// Which discrete value of the frame this sense reads. <b>Null is a stream
     /// that said nothing this moment</b>, which is an act not taken rather than an
-    /// act taken with no name — see <see cref="Learning.LiveSet"/> for why the
-    /// difference matters to an onset.
+    /// act taken with no name — a code that is absent cannot be in any scope, and a
+    /// code standing for <i>nothing happened</i> would be in every one.
     /// </param>
     /// <param name="modality">The modality its code rides on.</param>
     public Marked(Func<TFrame, int?> reading, byte modality)

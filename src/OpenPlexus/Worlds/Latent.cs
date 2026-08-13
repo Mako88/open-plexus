@@ -19,11 +19,10 @@ public sealed record LatentSettings
     /// How many observable channels report the hidden state.
     /// </summary>
     /// <remarks>
-    /// <b>THE NUMBER THE WHOLE CLAIM IS ABOUT.</b> The channels' pairwise edges go
-    /// as <c>k(k-1)/2</c> and a hub over them is <c>k</c>, so what a posited node
-    /// saves grows with this while what it costs does not — see
-    /// <see cref="Learning.Paying.Cheaper"/>, which is why four is the smallest
-    /// group worth naming.
+    /// <b>THE NUMBER THE WHOLE CLAIM IS ABOUT.</b> The channels' pairwise relations
+    /// go as <c>k(k-1)/2</c> and one name over them is <c>k</c>, so what a minted
+    /// name saves grows with this while what it costs does not — which is why four
+    /// is the smallest group worth naming, and why this world is rung five's.
     /// </remarks>
     public int Channels { get; init; } = 6;
 }

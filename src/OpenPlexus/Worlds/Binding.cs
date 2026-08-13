@@ -53,8 +53,10 @@ public sealed record BindingSettings
     /// <remarks>
     /// <b>It changes nothing the world emits.</b> The same four codes arrive in
     /// the same order; only the grouping alongside them appears, so the arm is
-    /// still measured against bit-identical input. See
-    /// <see cref="Learning.Occasion.Groups"/>.
+    /// still measured against bit-identical input. It rides
+    /// <see cref="Codes.IQuantizer{TObservation}.Bind"/>, <b>which has had no reader
+    /// since the walk went</b> — so this dial is currently a world stating a fact
+    /// nothing can act on.
     /// </remarks>
     public bool Segmented { get; init; }
 
@@ -86,12 +88,12 @@ public sealed record BindingSettings
     /// a world that hands out no indexes.
     /// </para>
     /// <para>
-    /// <b>It changes nothing the world emits, and it is the answer to the one
-    /// quantity that grew without bound.</b> The same codes arrive in the same
-    /// order; only the rendezvous stops writing the reverse edge, so an
-    /// attribute's row no longer gains a permanent entry per scene. See
-    /// <see cref="Learning.Occasion.Fleeting"/> for why that edge could never
-    /// have been worth anything.
+    /// <b>It changes nothing the world emits, and it answered the one quantity that
+    /// grew without bound.</b> The same codes arrive in the same order; the walk's
+    /// rendezvous stopped writing the reverse edge, so an attribute's row no longer
+    /// gained a permanent entry per scene. It rides
+    /// <see cref="Codes.IQuantizer{TObservation}.Fleeting"/>, <b>which has had no
+    /// reader since that rendezvous went.</b>
     /// </para>
     /// </remarks>
     public bool Fleeting { get; init; }

@@ -23,11 +23,12 @@ namespace OpenPlexus.Codes;
 /// the whole of what a router would have been.
 /// </para>
 /// <para>
-/// <b>AND IT LIVES HERE RATHER THAN IN THE WORLD.</b> <see cref="Worlds.Tending"/>
+/// <b>AND IT LIVES HERE RATHER THAN IN THE WORLD.</b> The walk's tending world
 /// banded its own moisture and called <see cref="Grains"/> itself, which is a
 /// world deciding how it is coded — John's line, 2026-08-05: what the world IS
 /// stays, how the brain THINKS goes. The bands and the grain are adapter
-/// settings and belong on this side of it.
+/// settings and belong on this side of it. That world is gone and the rule it
+/// broke is not, which is why this paragraph outlived it.
 /// </para>
 /// </remarks>
 /// <typeparam name="TFrame">What the body reads.</typeparam>
@@ -63,11 +64,12 @@ public sealed class Banded<TFrame> : IQuantizer<TFrame>
     /// anywhere said so.
     /// </para>
     /// <para>
-    /// <b>IT WAS ALREADY KNOWN AND GUARDED IN EXACTLY ONE WORLD.</b>
-    /// <see cref="Worlds.Tending"/> refuses more plants than its block holds, and that
-    /// guard has sat there while <see cref="Machines.GradedRun"/> built the same type
-    /// with no check at all. A defence mounted on one caller is the failure this repo
-    /// keeps re-finding, so it moves here where it covers all of them.
+    /// <b>IT WAS ALREADY KNOWN AND GUARDED IN EXACTLY ONE WORLD.</b> The walk's tending
+    /// world refused more plants than its block held, and that guard sat there while
+    /// <see cref="Machines.GradedRun"/> built the same type with no check at all. A
+    /// defence mounted on one caller is the failure this repo keeps re-finding, so it
+    /// moved here where it covers all of them — and the world it was copied from has
+    /// since been deleted, which is exactly why it had to move.
     /// </para>
     /// <para>
     /// <b>AND IT IS THE CEILING ON THIS FRONT END REACHING PERCEPTION.</b> Roughly

@@ -62,13 +62,13 @@ public sealed record HomeostatSettings
     /// something to be conditional on.
     /// </para>
     /// <para>
-    /// <b>IT IS THE <see cref="Learning.Occasion.Groups"/> SPLIT AGAIN, AND THE
-    /// SAME CAVEAT APPLIES WORD FOR WORD.</b> Comparison is pre-attentive here
-    /// exactly as segmentation is there — Ashby's units deviate against each
+    /// <b>IT IS THE <see cref="Codes.IQuantizer{TObservation}.Bind"/> SPLIT AGAIN,
+    /// AND THE SAME CAVEAT APPLIES WORD FOR WORD.</b> Comparison is pre-attentive
+    /// here exactly as segmentation is there — Ashby's units deviate against each
     /// other by their physics, not by deliberation. So the front end supplies the
-    /// ORDERING and the graph must still learn what an ordering MEANS: nothing
+    /// ORDERING and the learner must still work out what an ordering MEANS: nothing
     /// says rank nought is the urgent end rather than the safe one, and nothing
-    /// connects <c>Act:2</c> to <c>Need+2</c>. <b>This tests whether the graph can
+    /// connects <c>Act:2</c> to <c>Need+2</c>. <b>This tests whether a learner can
     /// USE an ordinal, not whether it can DISCOVER ordering</b>, and it must not
     /// be written up as if it were the whole problem.
     /// </para>

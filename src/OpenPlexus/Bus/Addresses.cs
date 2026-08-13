@@ -1,14 +1,12 @@
 namespace OpenPlexus.Bus;
 
-/// <summary>Where a cluster's envelopes are sent.</summary>
-public readonly record struct ClusterAddress(string Value);
-
 /// <summary>
-/// Where a machine's arrivals and death reports are sent.
+/// Where a machine's asks and answers are sent.
 /// </summary>
 /// <remarks>
-/// <b>Machines carry the addresses; nodes do not.</b> A machine holds no edges
-/// and is in no walk, which is why an arbitrary sensor or actuator can be
-/// attached without the graph knowing what it is.
+/// <b>THE ONLY ADDRESS THERE IS, AND THAT IS C1 BEING STRUCTURAL RATHER THAN A
+/// SIMPLIFICATION.</b> Nothing on this bus is addressed more finely than a machine, so
+/// nothing can name another machine's commitment — a holder is asked what it makes of a
+/// moment and answers in its own words, which is the only thing anyone is ever told.
 /// </remarks>
 public readonly record struct MachineAddress(string Value);

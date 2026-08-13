@@ -17,7 +17,7 @@ public readonly record struct Peer(string Host);
 /// <remarks>
 /// <para>
 /// <b>THIS IS THE FIRST THING IN THE PROJECT THAT CAN ACTUALLY BE DISTRIBUTED.</b>
-/// <see cref="HybridBus"/> is a dictionary of clusters called through
+/// <see cref="HybridBus"/> is a dictionary of holders called through
 /// <see cref="Task.Run(Action)"/> with delays sprinkled in, so C2 and C3 have been
 /// honoured by a SIMULATION of a network for the life of the repo. Twenty phones cannot
 /// run a dictionary lookup between them.
@@ -31,14 +31,14 @@ public readonly record struct Peer(string Host);
 /// and this is where it is measured that the bytes are right.
 /// </para>
 /// <para>
-/// <b>WHERE A CLUSTER LIVES IS LEARNED AND NOT CONFIGURED.</b> A machine announces the
+/// <b>WHERE A HOLDER LIVES IS LEARNED AND NOT CONFIGURED.</b> A machine announces the
 /// addresses it holds when they subscribe, so a roster of hosts is all any of them is
 /// told — which is what lets a machine arrive late, and is the only shape that survives
 /// C3, since a machine that dies and returns announces itself again.
 /// </para>
 /// <para>
 /// <b>SENDS DO NOT WAIT ON RECEIVERS, exactly as the interface promises.</b> A fan-out to
-/// twelve clusters is twelve posts in flight rather than twelve round trips end to end;
+/// twelve holders is twelve posts in flight rather than twelve round trips end to end;
 /// awaiting each would turn a broadcast into a queue and put the network's latency into
 /// the search once per hop.
 /// </para>
@@ -61,18 +61,17 @@ public sealed class Posted : IBus, IAsyncDisposable
     private readonly Dictionary<MachineAddress, IReceiveAsks> _holders = [];
     private readonly Dictionary<MachineAddress, IReceiveAnswers> _askers = [];
 
-    private readonly Dictionary<ClusterAddress, string> _elsewhere = [];
-
     /// <summary>
-    /// Where a machine that is not here can be reached.
+    /// Where an asker that is not here can be reached.
     /// </summary>
     /// <remarks>
-    /// <b>ONE TABLE FOR REPORTS AND ANSWERS BOTH, BECAUSE BOTH ARE ADDRESSED TO A
-    /// MACHINE.</b> A second table keyed the same way by the same type is a second chance
-    /// for one of them to be populated and the other not — and the failure would be a
-    /// return path that silently drops, which is the hardest kind here to see.
+    /// <b>SEPARATE FROM <see cref="_holding"/> BECAUSE AN ASK IS A BROADCAST AND AN ANSWER
+    /// IS NOT.</b> An answer goes to the one machine that asked, so this table only has to
+    /// say where that one is; an ask goes to every holder, so the other one decides the
+    /// denominator of a gathering. Folding them together would put every asker into the
+    /// vote's population count, and each would then be a holder that never answers.
     /// </remarks>
-    private readonly Dictionary<MachineAddress, string> _reporting = [];
+    private readonly Dictionary<MachineAddress, string> _answering = [];
 
     private readonly Dictionary<MachineAddress, string> _holding = [];
 
@@ -143,24 +142,19 @@ public sealed class Posted : IBus, IAsyncDisposable
         _door.Prefixes.Add($"{_me}/");
     }
 
-    /// <summary>Everything this machine has heard about, for the tests that ask.</summary>
-    /// <remarks>
-    /// <b>A machine's picture of the world is PARTIAL and that is not a fault</b> — it
-    /// knows the clusters that have announced themselves to it, which is every one that
-    /// was alive and reachable when it subscribed and no others.
-    /// </remarks>
-    public IReadOnlyCollection<ClusterAddress> Known
-    {
-        get { lock (_gate) return [.. _clusters.Keys.Concat(_elsewhere.Keys).Order()]; }
-    }
-
     /// <summary>Every holder this machine could ask, for the tests that ask.</summary>
     /// <remarks>
-    /// <b>SEPARATE FROM <see cref="Known"/> BECAUSE IT IS THE DENOMINATOR OF A
-    /// GATHERING.</b> How many clusters exist decides how many replies a thought waits
-    /// for; how many HOLDERS exist decides how much of a population a vote was taken over,
-    /// and a run that quietly asked eleven of twelve would score like one that asked all
-    /// twelve and be wrong about something nothing reports.
+    /// <para>
+    /// <b>A machine's picture of the world is PARTIAL and that is not a fault</b> — it
+    /// knows the holders that have announced themselves to it, which is every one that was
+    /// alive and reachable when it subscribed and no others.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS THE DENOMINATOR OF A GATHERING, which is why the partial picture has to
+    /// be reportable.</b> How many HOLDERS exist decides how much of a population a vote was
+    /// taken over, and a run that quietly asked eleven of twelve would score like one that
+    /// asked all twelve and be wrong about something nothing reports.
+    /// </para>
     /// </remarks>
     public IReadOnlyCollection<MachineAddress> Holding
     {
@@ -177,9 +171,6 @@ public sealed class Posted : IBus, IAsyncDisposable
     }
 
     /// <inheritdoc/>
-    public event Action<ClusterAddress>? Deaths;
-
-    /// <inheritdoc/>
     public event Action<BroadcastId, MachineAddress>? Unreached;
 
     /// <summary>Opens the door and tells everyone what this machine holds.</summary>
@@ -194,7 +185,7 @@ public sealed class Posted : IBus, IAsyncDisposable
     }
 
     /// <summary>
-    /// Tells every peer which clusters and machines live here.
+    /// Tells every peer which askers and holders live here.
     /// </summary>
     /// <param name="ct">Cancellation.</param>
     /// <remarks>
@@ -202,7 +193,7 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// <b>A PEER THAT CANNOT BE REACHED IS NOT AN ERROR, WHICH IS C3 AT STARTUP.</b> A
     /// machine that is not up yet, or never will be, must not stop this one from running —
     /// so a failed announcement is dropped and the peer simply does not know about these
-    /// clusters until the next one.
+    /// holders until the next one.
     /// </para>
     /// <para>
     /// <b>AND IT IS A FAN-OUT LIKE EVERY OTHER ONE HERE, WHICH IT WAS NOT UNTIL SOMETHING
@@ -234,17 +225,7 @@ public sealed class Posted : IBus, IAsyncDisposable
             return new Roster
             {
                 Host = _me,
-                Clusters = [.. _clusters.Keys.Select(one => one.Value)],
-
-                // THE UNION, BECAUSE A MACHINE IS ANNOUNCED FOR WHERE IT CAN BE REACHED
-                // AND NOT FOR WHAT IT DOES WITH WHAT ARRIVES. An asker that takes answers
-                // and no reports is still a machine at an address, and announcing only the
-                // reporting half would leave every answer to it undeliverable.
-                Machines =
-                [
-                    .. _machines.Keys.Concat(_askers.Keys).Select(one => one.Value).Distinct(),
-                ],
-
+                Askers = [.. _askers.Keys.Select(one => one.Value)],
                 Holders = [.. _holders.Keys.Select(one => one.Value)],
             };
     }
@@ -255,8 +236,7 @@ public sealed class Posted : IBus, IAsyncDisposable
     {
         lock (_gate)
         {
-            foreach (var one in roster.Clusters) _elsewhere[new ClusterAddress(one)] = roster.Host;
-            foreach (var one in roster.Machines) _reporting[new MachineAddress(one)] = roster.Host;
+            foreach (var one in roster.Askers) _answering[new MachineAddress(one)] = roster.Host;
             foreach (var one in roster.Holders) _holding[new MachineAddress(one)] = roster.Host;
         }
     }
@@ -358,8 +338,8 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// <b>A FAULT ON THIS PATH HAS NOWHERE TO GO, AND AN UNOBSERVED TASK IS WORSE THAN A
     /// SWALLOWED ONE.</b> The caller has already been handed its answer — who was asked, or
     /// who is about to be sent to — so there is no return value left to carry a failure on.
-    /// What reaches here is a cluster or a holder departing inside the window between being
-    /// listed and being sent to, which is C3 happening rather than a routing bug.
+    /// What reaches here is a holder departing inside the window between being listed and
+    /// being sent to, which is C3 happening rather than a routing bug.
     /// </remarks>
     private static void Away(Func<Task> delivery, CancellationToken ct) =>
         _ = Task.Run(
@@ -424,7 +404,7 @@ public sealed class Posted : IBus, IAsyncDisposable
         lock (_gate)
         {
             _askers.TryGetValue(to, out here);
-            _reporting.TryGetValue(to, out there);
+            _answering.TryGetValue(to, out there);
         }
 
         if (here is not null)
@@ -496,26 +476,6 @@ public sealed class Posted : IBus, IAsyncDisposable
 
         switch (what)
         {
-            case "envelope":
-                IReceiveEnvelopes? cluster;
-                lock (_gate) _clusters.TryGetValue(new ClusterAddress(who), out cluster);
-
-                if (cluster is not null)
-                    await cluster.DeliverAsync(Wire.Read<Envelope>(sent), ct).ConfigureAwait(false);
-                break;
-
-            case "report":
-                IReceiveReports? machine;
-                lock (_gate) _machines.TryGetValue(new MachineAddress(who), out machine);
-
-                if (machine is not null)
-                    await machine.DeliverAsync(Wire.Read<Report>(sent), ct).ConfigureAwait(false);
-                break;
-
-            case "settled":
-                await DeliverLocallyAsync(Wire.Read<Settled>(sent), ct).ConfigureAwait(false);
-                break;
-
             case "ask":
                 IReceiveAsks? holder;
                 lock (_gate) _holders.TryGetValue(new MachineAddress(who), out holder);
@@ -555,14 +515,12 @@ public sealed class Posted : IBus, IAsyncDisposable
                 Absorb(Wire.Read<Roster>(sent));
                 break;
 
-            case "died":
-                var gone = new ClusterAddress(who);
-
-                lock (_gate) _elsewhere.Remove(gone);
-
-                Deaths?.Invoke(gone);
-                break;
-
+            // AND THERE IS NO `died` PATH, WHICH IS C3 REACHED BY OBSERVATION RATHER THAN BY
+            // ANNOUNCEMENT. The walk had one because a route in flight toward a departed
+            // cluster is stranded and the origin cannot write it off without being told; an
+            // ask is written off by the sender watching it fail to leave -- see `Fire` --
+            // which needs nothing of the dying machine and so covers the impolite departure
+            // the notice never could.
             default: break;
         }
     }
@@ -592,7 +550,7 @@ public sealed class Posted : IBus, IAsyncDisposable
         catch (Exception) when (!ct.IsCancellationRequested)
         {
             // C3: A MACHINE THAT IS NOT THERE IS NORMAL AND NOT AN ERROR. The design says
-            // a cluster vanishing mid-thought is expected, so a refused connection is the
+            // a holder vanishing mid-round is expected, so a refused connection is the
             // same event arriving by a faster road than a timeout.
             //
             // AND IT IS COUNTED NOW, BECAUSE THE SENTENCE ABOVE IS TRUE OF A DEATH AND
@@ -602,9 +560,6 @@ public sealed class Posted : IBus, IAsyncDisposable
             return false;
         }
     }
-
-    private static InvalidOperationException Unreachable(string cluster) =>
-        new($"no machine holds cluster '{cluster}', and none has announced one");
 
     /// <summary>What a machine holds, as it tells its peers.</summary>
     /// <remarks>
@@ -620,22 +575,19 @@ public sealed class Posted : IBus, IAsyncDisposable
         /// <summary>Where the machine sending this can be reached.</summary>
         public required string Host { get; init; }
 
-        /// <summary>The clusters it holds.</summary>
-        public required ImmutableArray<string> Clusters { get; init; }
-
-        /// <summary>The machines it holds.</summary>
-        public required ImmutableArray<string> Machines { get; init; }
+        /// <summary>The askers it holds, which answers can be sent back to.</summary>
+        public required ImmutableArray<string> Askers { get; init; }
 
         /// <summary>
         /// The holders of commitments it has, which can be asked.
         /// </summary>
         /// <remarks>
-        /// <b>ANNOUNCED SEPARATELY FROM <see cref="Machines"/> BECAUSE AN ASK IS A
-        /// BROADCAST AND A REPORT IS NOT.</b> A report goes to one named machine, so the
+        /// <b>ANNOUNCED SEPARATELY FROM <see cref="Askers"/> BECAUSE AN ASK IS A BROADCAST
+        /// AND AN ANSWER IS NOT.</b> An answer goes to the one machine that asked, so the
         /// roster only has to say where that one is; an ask goes to EVERY holder, so the
         /// roster is what decides the denominator of a gathering. Folding them together
-        /// would put every input machine and every actuator into the vote's population
-        /// count, and each of them would then be a holder that never answers.
+        /// would put every asker into the vote's population count, and each of them would
+        /// then be a holder that never answers.
         /// </remarks>
         public ImmutableArray<string> Holders { get; init; } = [];
     }

@@ -74,12 +74,12 @@ public sealed record RhythmSettings
 /// comparison cannot be assembled after the fact.
 /// </para>
 /// <para>
-/// <b>ONE SYMBOL PER MOMENT, WHICH MAKES THE TEMPORAL EDGE THE WHOLE TASK.</b>
-/// Nothing is ever simultaneous with anything, so an occasion's onsets pair with
-/// an empty live set and the graph learns precisely nothing unless
-/// <see cref="Learning.Window"/> carries the previous symbol forward. That makes
-/// the window's span not an arm here but the mechanism under test: at zero this
-/// world has no edges at all, which is the sharpest control in the project.
+/// <b>ONE SYMBOL PER MOMENT, WHICH MAKES CARRYING THE PAST THE WHOLE TASK.</b>
+/// Nothing is ever simultaneous with anything, so a moment holds one code and
+/// nothing co-fires with it — a learner reading moments alone has no scope longer
+/// than one code to reach for. What carries the previous symbol forward is
+/// therefore not an arm here but the mechanism under test: with nothing carried,
+/// this world states nothing at all, which is the sharpest control in the project.
 /// </para>
 /// </remarks>
 public sealed class Rhythm

@@ -35,8 +35,8 @@ public sealed class Passthrough : IQuantizer<Coded>
     /// </summary>
     /// <remarks>
     /// The codes carry the modality their world minted them with, so there is no
-    /// single answer here and nothing asks for one — <see cref="Thinking.Thought"/>
-    /// narrows on <see cref="Code.Modality"/> and never on a front end's.
+    /// single answer here and nothing asks for one — anything that needs to know reads
+    /// <see cref="Code.Modality"/> and never a front end's.
     /// </remarks>
     public byte Modality => 0;
 

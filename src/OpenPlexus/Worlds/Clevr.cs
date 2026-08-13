@@ -31,7 +31,8 @@ public sealed record ClevrSettings
     /// scene of a red cube and a blue sphere emits exactly the codes a scene of a
     /// blue cube and a red sphere does, so with this off no amount of counting
     /// separates them — and CLEVR is built almost entirely out of that confusion.
-    /// See <see cref="Learning.Occasion.Groups"/>.
+    /// It rides <see cref="Codes.IQuantizer{TObservation}.Bind"/>, which has had no
+    /// reader since the walk went.
     /// </remarks>
     public bool Segmented { get; init; } = true;
 
@@ -147,8 +148,8 @@ public sealed record Referred
 /// <b>No vision, and none is needed.</b> The scene graphs ship as JSON with each
 /// object's colour, size, shape and material already separated, which is the
 /// front end this architecture would otherwise have to fake. What is being tested
-/// is what the graph does with a segmented signal, which is exactly the split
-/// <see cref="Learning.Occasion.Groups"/> says is the right one.
+/// is what a learner does with a segmented signal, which is the split
+/// <see cref="Codes.IQuantizer{TObservation}.Bind"/> exists to carry.
 /// </para>
 /// <para>
 /// <b>ONLY THE QUESTIONS THIS SYSTEM CAN EXPRESS AN ANSWER TO ARE KEPT</b>, and

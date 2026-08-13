@@ -33,11 +33,19 @@ public interface IQuantizer<in TObservation>
     /// <b>Null by default, which is every front end that cannot.</b>
     /// </summary>
     /// <remarks>
-    /// <b>Segmentation is a front-end job, not a graph job</b> — see
-    /// <see cref="Learning.Occasion.Groups"/>. A retina hands the cortex an
+    /// <para>
+    /// <b>Segmentation is a front-end job.</b> A retina hands the cortex an
     /// already-grouped signal; nothing downstream has to work out which edges
     /// belonged to which object. Defaulted so that adding it breaks no existing
     /// quantiser and changes no existing measurement.
+    /// </para>
+    /// <para>
+    /// <b>AND NOTHING READS IT SINCE THE WALK WENT, WHICH MAKES IT A CHANNEL WITH NO
+    /// FAR END.</b> The walk's occasion was the only consumer; a commitment's scope is a
+    /// SET of codes and has nowhere to put a group. It stays only until something
+    /// decides between wiring it to rung four's binding and deleting it — and a front-end
+    /// ability nothing can act on is the shape this repo keeps finding read as built.
+    /// </para>
     /// </remarks>
     IReadOnlyDictionary<Code, int>? Bind(TObservation observation) => null;
 
@@ -49,10 +57,11 @@ public interface IQuantizer<in TObservation>
     /// <b>THE ORDER IS A FRONT-END JOB FOR THE SAME REASON SEGMENTATION IS.</b>
     /// A phase cannot survive C2 — late, jittered, out-of-order messages are
     /// exactly what destroys an oscillator relationship — so the order has to
-    /// travel INSIDE the occasion, where lateness cannot reach it. Only the front
-    /// end knows it: by the time codes are in the graph they are a set. See
-    /// <see cref="Learning.Occasion.Sequence"/>. Defaulted so that adding it
-    /// breaks no existing quantiser and changes no existing measurement.
+    /// travel INSIDE the moment, where lateness cannot reach it. Only the front end
+    /// knows it: by the time codes reach a population they are a set. <b>THE ONE OF
+    /// THESE FOUR WITH A READER</b> — <see cref="Machines.Trial{TSeen}"/> turns it into
+    /// the precedence codes rung three is made of. Defaulted so that adding it breaks
+    /// no existing quantiser and changes no existing measurement.
     /// </remarks>
     IReadOnlyDictionary<Code, int>? Order(TObservation observation) => null;
 
@@ -63,11 +72,15 @@ public interface IQuantizer<in TObservation>
     /// </summary>
     /// <remarks>
     /// <b>Only the front end can know this</b>, for the same reason only it can
-    /// segment: a code is opaque to the graph, and "this one will never be seen
-    /// again" is a fact about how it was minted. See
-    /// <see cref="Learning.Occasion.Fleeting"/> for what the rendezvous does with
-    /// it. Defaulted so that adding it breaks no existing quantiser and changes
-    /// no existing measurement.
+    /// segment: a code is opaque downstream, and "this one will never be seen again"
+    /// is a fact about how it was minted. Defaulted so that adding it breaks no
+    /// existing quantiser and changes no existing measurement.
+    /// <para>
+    /// <b>AND IT HAS NO READER EITHER — see <see cref="Bind"/>.</b> The walk's
+    /// rendezvous refused to write an edge onto a code that would never recur;
+    /// nothing on this side has the equivalent, and a commitment that never fires
+    /// twice is disposed of by its own statistics rather than by being marked.
+    /// </para>
     /// </remarks>
     IReadOnlySet<Code>? Fleeting(TObservation observation) => null;
 
@@ -76,18 +89,17 @@ public interface IQuantizer<in TObservation>
     /// is every occasion this design has ever written.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THE SIXTH CHANNEL, AND IT OWES AN ARGUMENT AGAINST THE OTHER FIVE.</b>
-    /// None of them can carry it: grouping is about objects, fleetingness about
-    /// recurrence, order about time, and the two relation channels about what a
-    /// moment STATES. This is about how the moment came to happen at all, which is
-    /// a fact nothing in the moment records. See
-    /// <see cref="Learning.Occasion.Forced"/> and <see cref="Graph.Kind.Meddled"/>
-    /// — it is the difference between <c>P(y | x)</c> and <c>P(y | do(x))</c>, and
-    /// no amount of counting the first yields the second.
+    /// <b>THE CHANNEL THAT OWES AN ARGUMENT AGAINST THE OTHERS.</b> None of them can
+    /// carry it: grouping is about objects, fleetingness about recurrence, and order
+    /// about time. This is about how the moment came to happen at all, which is a fact
+    /// nothing in the moment records — the difference between <c>P(y | x)</c> and
+    /// <c>P(y | do(x))</c>, and no amount of counting the first yields the second.
     /// <para>
-    /// <b>It stays on the line the other five stay on.</b> <i>I picked this without
-    /// looking at the state</i> is something the body knows about what it did;
-    /// what follows from it is left to the walk.
+    /// <b>AND ITS READER WAS THE WALK'S INTERVENED EDGE KIND, SO IT HAS NONE — see
+    /// <see cref="Bind"/>.</b> <i>I picked this without looking at the state</i> is
+    /// something a body knows about what it did; nothing here can be told it, which is
+    /// the same hole the plan records under <i>original thought</i>: every world is
+    /// watched rather than acted in.
     /// </para>
     /// </remarks>
     IReadOnlySet<Code>? Forced(TObservation observation) => null;

@@ -7,11 +7,12 @@ namespace OpenPlexus.Codes;
 /// <para>
 /// <b>NOT <see cref="object.GetHashCode"/>, AND THAT IS THE WHOLE REASON THIS
 /// EXISTS.</b> String hashing is randomised per process in .NET, so anything built
-/// on it gives a different answer in every run — and two places in this design
-/// depend on agreeing without asking anyone. <see cref="Bus.Ring"/> puts a code on
-/// the same cluster on every machine; <see cref="Learning.Chunk"/> mints the same
-/// name for the same set on every machine. Both are coordination-free only while
-/// the arithmetic is fixed.
+/// on it gives a different answer in every run — and this design turns on two
+/// names agreeing without anyone being asked.
+/// <see cref="Commitments.Commitment.Name"/> derives a commitment's identity from
+/// its SCOPE, so every repair path that reaches a scope converges on one name;
+/// <see cref="Commitments.Naming"/> mints the same name for the same set on every
+/// machine. Both are coordination-free only while the arithmetic is fixed.
 /// </para>
 /// <para>
 /// <b>It was written twice and `DuplicationTests` refused it</b>, which is the

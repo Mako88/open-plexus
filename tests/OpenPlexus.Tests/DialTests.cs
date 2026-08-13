@@ -935,6 +935,88 @@ public sealed class DialTests(ITestOutputHelper output)
     };
 
     /// <summary>
+    /// No dial ships in a do-nothing position — <b>full stop, and a written reason is not a
+    /// way past it.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>JOHN'S RULE, AND IT REPLACED A WEAKER ONE OF MINE THE SAME DAY.</b> My first
+    /// version let a dial ship OFF if its type was named in the plan's refutation table —
+    /// on the reasoning that a refuted mechanism legitimately ships off. He pointed out the
+    /// hole: <i>writing a reason is easy</i>, and a check whose escape hatch is prose is a
+    /// check you can talk your way around.
+    /// </para>
+    /// <para>
+    /// <b>AND THE STRONGER RULE IS ALSO THE SIMPLER ONE, BECAUSE A DIAL IS ONLY EVER ONE OF
+    /// TWO THINGS.</b> Either it is a NEW ability, in which case it is on — there is no
+    /// other reason to have built it — and it is kept while it is being made to work, or
+    /// deleted when it will not. Or it REPLACES something, in which case both arms are live
+    /// while they are compared, and afterwards the winner is the code and the loser is
+    /// gone. <b>Neither road ends at a dial whose default does nothing.</b>
+    /// </para>
+    /// <para>
+    /// <b>SO A DIAL THAT WOULD SHIP OFF IS A DIAL THAT SHOULD NOT EXIST</b>, and the fix is
+    /// to delete the mechanism with a revival row rather than to explain the default. The
+    /// code is not lost — it is in the history, and the revival row is what says when to go
+    /// and get it.
+    /// </para>
+    /// <para>
+    /// <b>AND DELETION IS NOT THE ONLY MOVE AVAILABLE: ADJUSTING A LOSING ARM IS ALLOWED.</b>
+    /// A mechanism that lost as built may be worth one more shape before it goes, and this
+    /// repo has read that as <i>delete immediately</i> more than once. What is not allowed
+    /// is leaving it switched off while nobody decides.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_dial_ships_in_a_position_that_does_nothing()
+    {
+        var idle = new List<string>();
+
+        foreach (var dial in Census())
+        {
+            if (!dial.PropertyType.IsEnum || Owed.ContainsKey(dial.Name)) continue;
+
+            var settings = Activator.CreateInstance(dial.DeclaringType!);
+
+            // `Never` BY NAME, WHICH IS THIS REPO'S OWN WORD FOR THE POSITION WHERE NOTHING
+            // HAPPENS. A check inferring which arm is inert would be guessing at behaviour
+            // from a type; the naming convention is a decision somebody made on purpose and
+            // is what a reader goes by too.
+            if (dial.GetValue(settings)?.ToString() == "Never") idle.Add(dial.Name);
+        }
+
+        Assert.True(idle.Count == 0,
+            $"dial(s) shipping in a position that does nothing: {string.Join(", ", idle)}. "
+            + "A dial is either a new ability -- in which case turn it on, that is why it "
+            + "was built -- or a replacement, in which case both arms run until one wins and "
+            + "the loser goes. Neither ends here. If the mechanism lost, delete it with a "
+            + "revival row: the code stays in the history and the row says when to fetch it. "
+            + "And if it lost as BUILT rather than as an idea, adjusting it and running again "
+            + "is a perfectly good third answer");
+    }
+
+    /// <summary>
+    /// Dials shipping off today, each owed a deletion rather than an explanation.
+    /// </summary>
+    /// <remarks>
+    /// <b>THIS LIST MAY ONLY SHRINK, AND AN ENTRY IS CLEARED BY DELETING THE DIAL RATHER
+    /// THAN BY IMPROVING ITS REASON.</b> That is the whole difference between this and the
+    /// check it replaced. Nothing new may be added — a mechanism arriving today ships on.
+    /// </remarks>
+    private static readonly Dictionary<string, string> Owed = new(StringComparer.Ordinal)
+    {
+        ["Widening"] =
+            "THREE ARMS AND NOTHING LEFT TO CHOOSE BETWEEN. `Significant` is already deleted "
+            + "with a revival row; `Unmissed` is refuted as built -- it selects the rules "
+            + "with the LEAST evidence, mints about four wrong rules per right one, and pins "
+            + "the population at capacity. So what ships is `Never`, which is a dial whose "
+            + "only live position does nothing, which is not a dial. CLEARED BY DELETING IT "
+            + "with a revival row, or -- John's third answer -- by adjusting the arm and "
+            + "running it again, since what is wrong with it is the SHORTENING rather than "
+            + "the parent it picks",
+    };
+
+    /// <summary>
     /// A dial shipping in its DO-NOTHING position is named in the plan's refutation table —
     /// <b>the budget for building something better and leaving it switched off.</b>
     /// </summary>

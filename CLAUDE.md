@@ -147,6 +147,16 @@ These are the parts worth more than the code.
 - **An arm only lives while it is compared.** A winner becomes the code; the loser is deleted
   and leaves a revival row saying what would bring it back. A row without one is a
   superstition.
+- **Nothing ships switched off, and preserving recorded numbers is never a reason to keep
+  anything or to not change it.** A dial is a new ability — turn it on, that is why it was
+  built — or a replacement, so both arms run until one wins and the loser goes. Neither road
+  ends at a default that does nothing. The baseline is safe in the commit and the test.
+- **And ADJUSTING a losing arm is allowed** — one more shape before it goes, where what lost
+  was the build rather than the idea. What is forbidden is leaving it off while nobody
+  decides. `DialTests` holds both halves.
+- **Run the guards and READ what they print.** `RemindingTests` lists the rules that could
+  not be made into checks and prints them into that same output. An entry there leaves by
+  becoming a guard.
 - **A number in a commit message is a claim, not a record.** Put the reading in the test.
 - **Build a budget for each failure class.** A new kind of mistake earns a check that fails
   the build, not just a fix. The traps list in `docs/plan.md` is where the ones without a

@@ -96,6 +96,22 @@ public sealed class RemindingTests(ITestOutputHelper output)
          + "present, a rule about who WINS cannot reach it.",
          "Four sessions of vote arms went into the half that was not the problem."),
 
+        ("CONTROL A PREDICTION BY CHANGING THE ACTION NAMED IN IT, and floor that against the "
+         + "SAME question asked twice. An accuracy cannot tell a world model from a "
+         + "next-frame predictor, and a count of the times two arms differed cannot either.",
+         "A rule about what an instrument must carry, and the instrument does not exist here "
+         + "yet — fork 103 is where it lands. Taken off `csharp`, where three attempts went "
+         + "by before the floor was found, and a positive count and a zero one proved "
+         + "equally little without it."),
+
+        ("EMIT ON ONSET AND OFFSET, NEVER PER TICK. A front end over a signal that persists "
+         + "says what started and what stopped; persistence is the absence of a message, and "
+         + "duration comes off it free.",
+         "Nothing here samples a persisting stream, so there is nothing yet to check. "
+         + "Sampling one manufactures the always-present hub this plan records twice as a "
+         + "symptom — fork 51, and the refuted genesis-on-a-never-varied code — and never as "
+         + "a cure. It bites the day a camera arrives."),
+
         ("A REASON IS EASY TO WRITE. Where a rule could be a check, it should be one, and an "
          + "entry here is a debt rather than a home.",
          "This list is the thing most likely to be gamed by its own author, so it says so."),

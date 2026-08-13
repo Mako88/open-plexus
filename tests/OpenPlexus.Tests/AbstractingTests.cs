@@ -207,6 +207,49 @@ public sealed class AbstractingTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void A_scope_still_speaking_the_members_stands_in_no_relation_to_one_that_took_the_name()
+    {
+        // WHAT REFUTED `Chunk`'S RULE WHEN IT WAS PORTED HERE, AND A LIVE DEFECT
+        // UNDERNEATH IT. On the walk, a name covering the whole MOMENT destroyed the
+        // pairing it was meant to compress and `Senses` fell 0.8621 to 0.4138, so the
+        // rule there was that a fold must leave something standing. The scope version
+        // of that rule -- refuse the rewrite where the name would cover the whole
+        // scope -- was built, measured and deleted, because the two things are not the
+        // same shape: a scope rewrite destroys no evidence at all. Counting happened
+        // first, `Unfold` recovers the claim, and the commitment fires on exactly the
+        // moments it did.
+        //
+        // WHAT IT DOES INSTEAD IS SPLIT THE POPULATION INTO TWO VOCABULARIES.
+        // `Commitment.Narrows` is a subset test over codes and does not unfold, so a
+        // commitment left holding `{A,B}` and its own children holding `{name,C}` have
+        // no code in common and stand in NO relation -- subsumption never looks at
+        // them, and no instrument here would say so. Eight seeds on the eleven-bit
+        // multiplexer: it fired on six, `sound` moved +4.8 against a standard error of
+        // 9.9 which is nothing, and `unsound` rose on all five seeds that moved it at
+        // all, +1 to +41, with `resident` up on five of six. More rules held and no
+        // more of them true.
+        //
+        // AND THE REWRITE ALREADY HAS ONE PATH THAT LEAVES A SCOPE BEHIND -- the
+        // identity collision in `Population.Abstract`, which is rare and is this same
+        // split. That is why this is pinned here rather than left with the arm.
+        var names = new Naming();
+        var name = names.Mint([Of(1), Of(2)]);
+
+        var members = new Commitment([Of(1), Of(2)], Says(1));
+        var took = new Commitment([name, Of(6)], Says(1));
+
+        Assert.False(took.Narrows(members),
+            "these are comparable after all, so the split this pins has been closed");
+
+        // AND UNFOLDING IS WHAT WOULD RESTORE IT — the revival condition, and the same
+        // grain `Population.Under` already reaches for to read a category's entailment.
+        var spelled = names.Unfold(took.Scope);
+
+        Assert.All(names.Unfold(members.Scope), code => Assert.Contains(code, spelled));
+        Assert.True(spelled.Length > members.Scope.Length);
+    }
+
+    [Fact]
     public void Nothing_is_named_twice()
     {
         var held = new Population(new CommittingSettings(), seed: 1);

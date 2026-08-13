@@ -112,7 +112,14 @@ public sealed class DocsTests
     // handoff and nothing that outlives a handoff. The three conditions are met -- nothing
     // else in the route says it, no item was deleted, and forty-five words is not the
     // difference between loading this and not.
-    private const int Whole = 9_831;
+    //
+    // And 9,911 is the third, for two ideas John raised in conversation that the doc had no
+    // home for and that a reply loses at the next context window. Text as an IMAGE, which is
+    // the only perceptual world whose ground truth stays enumerable; and whether a word should
+    // be one hash at all, given that `walked` and `walking` are currently as unrelated as
+    // `walked` and `kitchen`. Both duplicate nothing here, and eighty words is not the
+    // difference between loading this and not.
+    private const int Whole = 9_911;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -251,6 +251,9 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       modalities.
     - **SETTLED** — the binding world was built to fail, failed as predicted, and has since
       lifted. Fork **25**.
+    - **OPEN** — text as an IMAGE is the one perceptual world whose ground truth stays
+      enumerable, so soundness survives where a camera kills it. Gated on `Senses` running at
+      all, two stable symbolic channels being cheaper than pixels. Fork **107**.
     - **OPEN** — spreading a reading over its range costs most of the score at both front
       ends: fragmentation, or the search the extra codes buy. Fork **38**.
     - **OPEN** — a reading under about ten dimensions has too few distinct wirings for a
@@ -300,6 +303,9 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       unnameable.
     - **OPEN** — label-first is unbuilt: being told a word for a thing nothing else is known
       about.
+    - **OPEN** — a word is one hash, so `walked` and `walking` are as unrelated as `walked`
+      and `kitchen`. Sub-word codes BESIDE the atom, never instead; letters are background by
+      construction. Priced by a corpus statistic first. Fork **108**.
     - **DEAD** — graded codes to make a POSITION nameable; the code reached the moment and
       no scope. Revives if naming ever looks inside a scope. Fork **36**.
     - **OPEN** — whether rung five buys anything a better-aimed projection does not, patch

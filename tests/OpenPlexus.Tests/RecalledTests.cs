@@ -307,7 +307,20 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// <para>
     /// <b>What would drop the arm</b> is the held-out accuracy falling while the population
     /// grows, which is that same pattern arriving a third time. It fired on task one at both
-    /// spans on the first dispatch, and the number is in that commit.
+    /// spans and did not fire on task two, and the numbers are in those two commits.
+    /// </para>
+    /// <para>
+    /// <b>So the pre-registration was under-specified and the arm stays</b>, which is a
+    /// correction to what was written here rather than to what was measured. A kill line has
+    /// to name the world it is read on: this repo already refuses a dial tuned until both
+    /// worlds pass, and a kill fired by one world out of two is the same fault mirrored. What
+    /// the grid refutes is the claim that order is unambiguously worth having.
+    /// </para>
+    /// <para>
+    /// <b>And order is a fact about English rather than a setting on the brain</b>, which is
+    /// why the arm that loses it is the artificial one. <see cref="Unordered"/> exists to be
+    /// compared against and not to be shipped; a front end reading a corpus somebody wrote
+    /// and reporting no order is the odd choice, not the default.
     /// </para>
     /// <para>
     /// <b>The capacity is an arm rather than a setting here</b>, because the first dispatch

@@ -372,9 +372,9 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
     - **NOW** — a forward store beside the population, retracting where the counters cannot.
     - **NOW** — rung three, sequence. A precedence is a CODE derived where the moment is
       FORMED, so matching, the tally, repair and the wire are untouched. No dial, and inert where none is reported.
-    - **OPEN** — `Recalled` speaks `Recited`, so rung three reads real English word order
-      rather than a generated sentence's. Whether it PAYS is unread, and widening a moment
-      has twice bought the drawn score and sold the held-out one here. Fork **109**.
+    - **OPEN** — `Recalled` speaks `Recited`, so rung three reads real English. It COSTS
+      where a bag already suffices and pays where the bag conflates, capacity unbound, and
+      why the split falls that way is unread. Fork **109**.
     - **OPEN** — a referent is a THIRD store rather than the same one: *Mary's bedroom*
       survives leaving the room and *Mary is in the bedroom* does not, so one store gets one
       lifetime wrong whichever it takes.

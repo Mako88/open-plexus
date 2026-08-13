@@ -149,18 +149,26 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// of a claim a reader scans for, so no script can make it and 1,164 of them are left.
     /// </para>
     /// <para>
-    /// <b>Here because a ratchet does not do what John asked.</b> A ratchet stops the count
-    /// rising and says nothing about it ever falling, so the honest form of <i>make sure some
-    /// get fixed every commit</i> is an entry that is red until they all are. The straight
-    /// reading — a check demanding the count fall on every commit — was refused because it
-    /// would block a one-line fix on a tone debt it has nothing to do with.
+    /// <b>Here because a ratchet does not do what John asked</b>, and it is now half of the
+    /// answer rather than the whole of it. A ratchet stops the count rising and says nothing
+    /// about it ever falling, so this entry is red until they are all gone. What paces the fall
+    /// is <see cref="ProseTests.Falls"/>: the ceiling drops by five a commit, so the debt is
+    /// owed by the branch and no single commit is taxed. The straight reading — one commit in
+    /// five must do prose work — was refused because it would block a one-line fix on a tone
+    /// debt it has nothing to do with.
     /// </para>
     /// <para>
-    /// <b>Most have an obvious cut point.</b> Taking it by script is not safe. 833
-    /// of the 1,209 would fall under the cap by closing the bold at the first comma, and 373
+    /// <b>Most have an obvious cut point.</b> Taking it by script is not safe. 812
+    /// of the 1,164 would fall under the cap by closing the bold at the first comma, and 352
     /// need the claim rewritten. A shouted sentence has one correct rewrite and that is why a
     /// script did 2,489 of them; a comma is only usually where a lead ends, so a scripted pass
     /// would trade one mechanical register for another. That is the thing being fixed.
+    /// </para>
+    /// <para>
+    /// <b>The first pass measured that ratio rather than assuming it.</b> Of 45 done by hand at
+    /// the schedule's baseline, the comma cut was right for 33 and wrong for 12 — and where it
+    /// was wrong the claim came second, so the lead had to move rather than be trimmed. A
+    /// script would have taken all 45.
     /// </para>
     /// <para>
     /// <b>Closes by the count reaching nought.</b> It reads

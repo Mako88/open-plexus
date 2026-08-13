@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Xunit.Abstractions;
 
@@ -87,12 +88,117 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// are 1,164 of those judgements left.
     /// </para>
     /// <para>
-    /// Every pass lowers this to what that pass achieved.
-    /// <see cref="OutstandingTests.The_prose_is_out_of_the_engagement_register"/> is what stops
-    /// it sitting here, since a ratchet nobody turns is a budget rather than a target.
+    /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
+    /// is the tight one — <see cref="Scheduled"/> is what stops it sitting still, and this is
+    /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 1_164;
+    private const int Shouted = 1_163;
+
+    /// <summary>
+    /// The commit the decay schedule counts from. <b>John's, 2026-08-13.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <see cref="Shouted"/> alone says nothing about the count ever falling, and John asked
+    /// for a rule that some prose work happens as the repo moves. The straight form of that was
+    /// <i>one commit in five must do prose work</i>, refused because it would block a one-line
+    /// fix on a tone debt it has nothing to do with. This is what was offered instead: the
+    /// ceiling falls with the commit count, so the debt is owed by the branch rather than by
+    /// any one commit, and a session pays it whenever it likes.
+    /// </para>
+    /// <para>
+    /// <b>A commit's verdict here does not change once it is made.</b> The clock is how many
+    /// commits are on the first-parent path from this SHA, which is as fixed a property of a
+    /// commit as the files in it — so an old commit re-run gives the answer it always gave, and
+    /// a bisect is still readable. That was the objection to the per-commit form and it is
+    /// answered rather than inherited.
+    /// </para>
+    /// <para>
+    /// It is not on `master`, so this SHA must survive the merge. Rebasing the branch would
+    /// take it out of the history and `git rev-list` would then fail rather than pass, which is
+    /// the right way round for a clock that has lost its zero.
+    /// </para>
+    /// </remarks>
+    private const string Baseline = "8c68253e8a38f43ee79f4715cc93949f39ed8cd7";
+
+    /// <summary>How many bold sentences stood at <see cref="Baseline"/>.</summary>
+    private const int Started = 1_164;
+
+    /// <summary>
+    /// How many bold sentences a commit costs the ceiling.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Measured rather than guessed. The pass at <see cref="Baseline"/> did 45 by hand in one
+    /// sitting, and John's proposal was one commit in five doing prose work — 45 spread over
+    /// five commits is nine, and five is that with room for the commits where the judgement is
+    /// harder than it was in the two documents.
+    /// </para>
+    /// <para>
+    /// It reaches nought in 233 commits from the baseline. Raise it if a pass keeps landing far
+    /// under the ceiling, and lower it if the schedule starts deciding what a session works on
+    /// — the tax is meant to be payable alongside the research rather than instead of it.
+    /// </para>
+    /// </remarks>
+    private const int Rate = 5;
+
+    /// <summary>The ceiling the schedule has reached after a given number of commits.</summary>
+    /// <param name="commits">Commits on the first-parent path since <see cref="Baseline"/>.</param>
+    /// <remarks>
+    /// <b>The first commit is not billed</b>, and that is arithmetic rather than a fudge. The
+    /// commit that installs a schedule is the one that writes this file, so billing it would
+    /// make the schedule red the moment it was committed and the only way to land it would be
+    /// to bundle prose work with it — which is the one thing CLAUDE.md says the rewrite must
+    /// not do.
+    /// </remarks>
+    internal static int Falls(int commits) =>
+        Math.Max(0, Started - (Rate * Math.Max(0, commits - 1)));
+
+    /// <summary>
+    /// How many commits have landed since <see cref="Baseline"/>, on the first parent.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>First-parent, so a merge counts once.</b> Counting everything reachable would let a
+    /// long branch merged in jump the clock by its whole length, and the schedule would then
+    /// demand hundreds of sentences for work that was already done somewhere else.
+    /// </para>
+    /// <para>
+    /// <b>Throws rather than skipping</b>, in the shape <see cref="Tree"/> uses. A clock that
+    /// silently reads nought would park the ceiling at <see cref="Started"/> forever and read
+    /// exactly like a branch that is keeping up.
+    /// </para>
+    /// </remarks>
+    private static int Count(string range)
+    {
+        using var git = Process.Start(new ProcessStartInfo
+        {
+            FileName = "git",
+            ArgumentList = { "rev-list", "--count", "--first-parent", range },
+            WorkingDirectory = Tree.Repo(),
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+        }) ?? throw new InvalidOperationException("`git` did not start");
+
+        var said = git.StandardOutput.ReadToEnd();
+        var complained = git.StandardError.ReadToEnd();
+
+        git.WaitForExit();
+
+        if (git.ExitCode == 0 && int.TryParse(said.Trim(), out var commits)) return commits;
+
+        throw new InvalidOperationException(
+            $"could not count `{range}`. A shallow clone is the likely cause — CI checks out "
+            + "with `fetch-depth: 0` for this. If the SHA is genuinely gone, the branch was "
+            + $"rebased and the schedule needs a new zero.\n{complained.Trim()}");
+    }
+
+    /// <summary>How far the clock has run.</summary>
+    private static int Since() => Count($"{Baseline}..HEAD");
+
+    /// <summary>Where the decay schedule has reached on this commit.</summary>
+    private static int Scheduled() => Falls(Since());
 
     /// <summary>
     /// Every file whose prose this repo is responsible for.
@@ -221,13 +327,48 @@ public sealed class ProseTests(ITestOutputHelper output)
     public void No_more_of_the_prose_is_bolded_by_the_sentence_than_was()
     {
         var found = Written().Sum(path => Bolds(Prose(path)).Count);
+        var scheduled = Scheduled();
+        var ceiling = Math.Min(Shouted, scheduled);
 
-        output.WriteLine($"{found} bold sentences against a ratchet of {Shouted}");
+        output.WriteLine(
+            $"{found} bold sentences against a ratchet of {Shouted} and a schedule of "
+            + $"{scheduled}, {Since()} commits on from {Baseline[..7]}");
 
-        Assert.True(found <= Shouted,
-            $"{found} bold spans over {Lead} words, against {Shouted}. Bold marks the claim a "
-            + "reader scans for, and a bold sentence is the same emphasis-as-volume the "
-            + $"capitals are:\n  {Worst(Bolds)}");
+        // Which of the two bit changes what the next commit has to do, so the message says.
+        // The ratchet going red is a commit that ADDED bold sentences and the fix is in that
+        // commit; the schedule going red is prose work the branch owes and the fix is anywhere.
+        Assert.True(found <= ceiling,
+            found > Shouted
+                ? $"{found} bold spans over {Lead} words, against a ratchet of {Shouted}. Bold "
+                    + "marks the claim a reader scans for, and a bold sentence is the same "
+                    + $"emphasis-as-volume the capitals are:\n  {Worst(Bolds)}"
+                : $"{found} bold spans over {Lead} words, against a schedule of {scheduled}. "
+                    + $"The ceiling falls by {Rate} a commit and this branch is "
+                    + $"{found - scheduled} behind it. Cut that many bold spans back to the "
+                    + $"lead clause anywhere in the tree, then lower `Shouted`:\n  {Worst(Bolds)}");
+    }
+
+    [Fact]
+    public void The_schedule_falls_to_nought_and_stops()
+    {
+        // The companion, and the schedule needs one more than most: it is the only ceiling here
+        // that no commit edits, so an arithmetic slip in it would move silently and read as the
+        // branch keeping up or as the branch being hopeless, with nothing to compare against.
+        Assert.Equal(Started, Falls(0));
+        Assert.Equal(Started, Falls(1));
+        Assert.Equal(Started - Rate, Falls(2));
+
+        // It floors rather than going negative, which matters because the ratchet is the other
+        // half of a `Math.Min`. A negative ceiling would demand the tree hold fewer than no
+        // bold sentences and could never be satisfied.
+        Assert.Equal(0, Falls(Started));
+        Assert.Equal(0, Falls(int.MaxValue / Rate));
+
+        // And the clock's zero has to be on this history rather than merely be a SHA that
+        // parses. Nought commits back the other way is what makes the baseline an ancestor of
+        // HEAD; a rebase that dropped it would leave `Since` counting from a commit on nobody's
+        // branch, and the ceiling would then sit at `Started` and read as a branch keeping up.
+        Assert.Equal(0, Count($"HEAD..{Baseline}"));
     }
 
     /// <summary>

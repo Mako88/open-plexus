@@ -75,6 +75,19 @@ public sealed class PushbackTests(ITestOutputHelper output)
                 + "problem."),
 
         new(
+            With: "ProseTests.Rate, the prose decay schedule",
+            Claim: "It bills a COMMIT, and a commit is a poor proxy for work. CLAUDE.md says "
+                + "to push whenever and never to hold one back, so a session that commits in "
+                + "small increments pays five times the prose tax of one that commits in "
+                + "lumps, for the same research. Two rules now pull opposite ways and the "
+                + "cheaper one is to commit less often, which is the habit this repo spent a "
+                + "workflow file learning to avoid.",
+            Settles: "Count commits per session over the last ten sessions. A tight spread "
+                + "means a commit is a fair unit and the objection was wrong; a wide one "
+                + "means the tax is arbitrary and the clock should key on sessions or on "
+                + "lines of prose touched instead."),
+
+        new(
             With: "Winnow, against rung two",
             Claim: "The plan says graded codes unbound rung two's candidate set and treats "
                 + "that as a known price. Nothing measures it, and rung two is not built -- "
@@ -134,6 +147,6 @@ public sealed class PushbackTests(ITestOutputHelper output)
     [Fact]
     public void A_disagreement_leaves_by_being_settled_and_not_by_being_dropped()
     {
-        Assert.Equal(4, Open.Length);
+        Assert.Equal(5, Open.Length);
     }
 }

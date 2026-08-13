@@ -257,7 +257,15 @@ jobs:
           - "(FullyQualifiedName!~BindingTests&FullyQualifiedName!~ClevrTests&FullyQualifiedName!~HomeostatTests&FullyQualifiedName!~EncodedTests&FullyQualifiedName!~ArrangedTests&FullyQualifiedName!~SensesTests&FullyQualifiedName!~GradedTests&FullyQualifiedName!~MotifTests&FullyQualifiedName!~RhythmTests&FullyQualifiedName!~AskedTests&FullyQualifiedName!~FleetTests&FullyQualifiedName!~UnreachedTests&FullyQualifiedName!~SlotTests&FullyQualifiedName!~RecalledTests&FullyQualifiedName!~PostedTests)"
 
     steps:
+      # THE WHOLE HISTORY, BECAUSE ONE CHECK READS A CLOCK OFF IT. `ProseTests` has a decay
+      # schedule whose ceiling falls with the commit count since a named SHA, and the default
+      # shallow checkout does not contain that SHA -- so `git rev-list` fails and the check
+      # throws. That is the intended failure rather than a silent nought, and this is what
+      # stops it happening on every run. The repository is 45 MB of history, so this costs
+      # seconds and nothing else.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-dotnet@v4
         with:

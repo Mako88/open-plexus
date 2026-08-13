@@ -195,8 +195,8 @@ FORBIDS things, and several of them are already measured.
   counting concept a conjunctive scope CANNOT express**, a language-ceiling probe with a
   published number attached.
 - **Why none of it scaled**: noise sensitivity, hand-specified language bias, and no way to
-  learn from probabilistic or sensory background knowledge. **And the failure was at the
-  interface with perception, not in the logic** — the one place this project is unusually
+  learn from probabilistic or sensory background knowledge. **And the failure was at the interface with
+  perception**, not in the logic — the one place this project is unusually
   well placed, because its substrate manufactures symbols. That is the bet, said plainly.
 
 ---

@@ -146,7 +146,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// <para>
     /// Capitals reached nought in one pass because a shouted sentence has exactly one correct
     /// rewrite. Bold sentences do not: where a lead clause ends is a judgement about which part
-    /// of a claim a reader scans for, so no script can make it and 1,065 of them are left.
+    /// of a claim a reader scans for, so no script can make it and 1,004 of them are left.
     /// </para>
     /// <para>
     /// <b>Here because a ratchet does not do what John asked</b>, and it is now half of the

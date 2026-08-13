@@ -125,7 +125,11 @@ public sealed class DocsTests
     // generated sentence -- and whether that PAYS is a question the route had no leaf for,
     // the only rung-three item being fork 105's on `Handing`. Forty-two words, no item
     // deleted, and nothing else here says it.
-    private const int Whole = 9_953;
+    //
+    // And 9,949 is the ratchet doing its ordinary work in the same session. Compaction
+    // reworded the fork 107 gate and the rung-three leaf once each had a number behind it,
+    // which is four words back. A raise that is not spent stays spent otherwise.
+    private const int Whole = 9_949;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

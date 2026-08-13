@@ -488,14 +488,11 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
   - A fleet learns what one machine learns
     - **NOW** — `Posted` and `Cycle`: envelopes, reports, deaths, questions and settlements
       over real sockets, with the learning loop still existing exactly once.
-    - **OPEN** — the WALK still learns nowhere but at home, so nothing an occasion writes
-      reaches another machine. Fork **1**.
-    - **OPEN** — and when it goes, all of it goes: `Node`, `Edge`, `Kind`, `Tie` · `Thought`,
-      `Message`, `Arrival`, `Settled`, `Question`, `WalkSettings` · `Chunk`, `Macro`,
-      `Stated`, `Posit` · `Drives`, `Foresight`, `Consequence`, `Reflection`. Bring the IDEAS
-      out of the minters without the mechanisms, and cite the idea rather than the type.
-    - **OPEN** — the head-to-head is BLOCKED and was recorded free: the walk reads
-      `Coded` and the commitment learner `Asking`, so one corpus is two front ends.
+    - **DEAD** — fork **1**: the walk learnt only at home, and goes with it. Revives if a
+      second learner is ever built that writes locally.
+    - **OPEN** — `Graph`, `Thinking`, the twelve `Worlds/*Run` files and every bus member
+      typed on them. The ideas are out bar `Drives`: a third factor from the body's own
+      variables, never handed in.
     - **OPEN** — the vote's arithmetic composes and a whole learner runs over it. Open on C2
       alone, which TCP cannot show. Fork **52**.
     - **OPEN** — what the repair gate's query costs on a wire, priced on loopback. Open on a
@@ -551,9 +548,6 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
 
 ## DO NOT RE-TRY
 
-A refutation is conditional on its configuration, so a row without a revival
-condition is a superstition.
-
 | what | what refuted it | what would revive it |
 |---|---|---|
 | Proposing a category's claim as a new commitment | It costs population where reading the entailment costs none: a fresh record must fire before anything may judge it, and genesis already mints the coarse claim from the moment | A vocabulary the brain holds that no moment carries, so nothing else mints it |
@@ -593,6 +587,7 @@ condition is a superstition.
 | Displacement as a way AROUND unification | At every width it is at its ceiling only where it keeps one statement, and a better key rule bought a better ceiling and no more score | Never as a substitute. A store must be read BY KEY, and reading by key is rung four |
 | A forward store whose fold is transitive | It reaches every answer with nearly every room word still there, which is the bag by a longer road | Never uncapped. The depth's optimum is interior, so the reading that set the cap refuses a fold without one |
 | A precedence's TRANSITIVE closure rather than the adjacent pairs | Identical ceiling on `Handing` for two and a half the population: a quadratic expansion to say what adjacency entails | A world whose relation spans an intervening position, where adjacency falls short |
+| `Chunk`'s whole-moment rule ported to rung five | Two vocabularies: `Narrows` is syntactic, so a scope keeping the members and its children taking the name stand in no relation. Unsound rose on every seed that moved | A subsumption test read at the UNFOLDED grain |
 | A front end putting a word's POSITION in the moment | Beside the code it is never absent, reaching every moment and no scope; FUSED in, it costs the identity — an input is an attribute, never the concept | Never. Order derives its own code: rung three |
 
 ---

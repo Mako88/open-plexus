@@ -37,8 +37,8 @@ public enum Joining
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The plan's own cheapest test of the most expensive rung, and throwing the
-    /// identity away is the whole mechanism.</b> A variable is a thing whose identity does
+    /// <b>The plan's own cheapest test of the most expensive rung</b>, and throwing the
+    /// identity away is the whole mechanism. A variable is a thing whose identity does
     /// not matter to the rule that uses it, so a code meaning <i>whoever was asked about
     /// was mentioned</i> is a variable's shadow — a shared sub-code rather than a binding.
     /// <see cref="Named"/> holds the identity and is the control that says whether
@@ -58,7 +58,7 @@ public enum Joining
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The absence said positively, which is the only way a conjunction can read one.</b>
+    /// <b>The absence said positively</b>, which is the only way a conjunction can read one.
     /// <see cref="Anonymous"/> marks the rounds where the asked-about word was mentioned
     /// and leaves the others untouched — but the rounds a rule must be kept OFF are exactly
     /// the untouched ones, and a scope is a subset test with no way to say <i>and not
@@ -66,7 +66,7 @@ public enum Joining
     /// and lose none it should.
     /// </para>
     /// <para>
-    /// <b>And it is John's own proposal for rung two, moved to the front end.</b> Emitting
+    /// <b>And it is John's own proposal for rung two</b>, moved to the front end. Emitting
     /// <i>Z was absent</i> as its own code needs no negation in the scope language and no
     /// new matcher. What it costs there is a settled occasion; what it costs here is that
     /// the front end must know which absence is worth a name, and a coincidence is one it
@@ -80,14 +80,14 @@ public enum Joining
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Recency as a code, which is what a scope needs to express *the latest one*.</b> A
+    /// <b>Recency as a code</b>, which is what a scope needs to express *the latest one*. A
     /// scope is a subset test over a set, so <i>most recent</i> is unsayable however the
     /// bag is arranged — there is no position in a set. Minting <i>bedroom, one statement
     /// back</i> as its own code makes it sayable, and the learner is free to prefer it, to
     /// ignore it, or to specialise on it.
     /// </para>
     /// <para>
-    /// <b>And the plain word is kept beside it, which is the point rather than a hedge.</b>
+    /// <b>And the plain word is kept beside it</b>, which is the point rather than a hedge.
     /// Emitting only the tagged form would make two occurrences of one word in different
     /// sentences unrelatable, which is the quantisation-boundary fault this repo already
     /// refuses. Several codes per reading so near readings overlap is
@@ -109,8 +109,8 @@ public enum Joining
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Because frequency cannot separate a verb from a name here, and that is
-    /// arithmetic rather than bad luck.</b> Cutting the vocabulary at a rank was the first
+    /// <b>Because frequency cannot separate a verb from a name here</b>, and that is
+    /// arithmetic rather than bad luck. Cutting the vocabulary at a rank was the first
     /// version and it is deleted: on this corpus <i>went</i> is written more often than any
     /// of the four people while <i>journeyed</i>, <i>travelled</i> and <i>moved</i> are
     /// written less than all of them. The verbs straddle the names, so no rank keeps the
@@ -118,14 +118,14 @@ public enum Joining
     /// about different people.
     /// </para>
     /// <para>
-    /// <b>So the background is taken from the story instead: a key is any word not in every
-    /// statement of it.</b> Where each sentence says <i>went to the</i>, those three are
+    /// <b>So the background is taken from the story instead</b>: a key is any word not in every
+    /// statement of it. Where each sentence says <i>went to the</i>, those three are
     /// background and <i>mary</i> is not — so <i>Mary went to the garden</i> supersedes
     /// <i>Mary went to the kitchen</i> and leaves <i>John went to the office</i> standing,
     /// with nothing told to the front end at all.
     /// </para>
     /// <para>
-    /// <b>And its failure mode is named before it runs, because it is the same one.</b> One
+    /// <b>And its failure mode is named before it runs</b>, because it is the same one. One
     /// sentence saying <i>journeyed</i> drops <i>went</i> out of the intersection and makes
     /// it a key again, so a story mixing its verbs supersedes across people exactly as the
     /// deleted rank did. The ceiling column says how often that happens without anything
@@ -136,7 +136,7 @@ public enum Joining
 
     /// <summary>
     /// The newest statement the question names something in — <b>the store read at the key
-    /// the question supplies, rather than at whichever key moved last.</b>
+    /// the question supplies</b>, rather than at whichever key moved last.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -147,8 +147,8 @@ public enum Joining
     /// mary</i> names <i>mary</i>, and the statement wanted is the newest one about her.
     /// </para>
     /// <para>
-    /// <b>It is selection and not displacement, which is why it is a different arm rather
-    /// than a setting.</b> <see cref="Distinguished"/> asks what a newer statement made false and
+    /// <b>It is selection and not displacement</b>, which is why it is a different arm rather
+    /// than a setting. <see cref="Distinguished"/> asks what a newer statement made false and
     /// throws that away for good; this asks what the question is about and reads only that.
     /// One is a store maintained forwards, the other a lookup done backwards, and the grid
     /// says the first pays only by accident.
@@ -173,7 +173,7 @@ public enum Joining
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Fork 96, and what held it to one hop was never the learner.</b>
+    /// <b>Fork 96</b>, and what held it to one hop was never the learner.
     /// <see cref="Addressed"/> returns the first statement naming anything the question
     /// names, and stops. Where the question names the apple, the apple's newest statement
     /// says who picked it up and never where he went — so the answering word was not in the
@@ -185,14 +185,14 @@ public enum Joining
     /// reach near a half and a quarter, three reach four in seven and two in five.
     /// </para>
     /// <para>
-    /// <b>Its control is a span-matched bag and never one hop, which is the reading that cost
-    /// the most to get.</b> Every statement of this corpus says <i>to</i> and <i>the</i>, so a
+    /// <b>Its control is a span-matched bag and never one hop</b>, which is the reading that cost
+    /// the most to get. Every statement of this corpus says <i>to</i> and <i>the</i>, so a
     /// chain keyed on everything walks back a sentence at a time and never follows a referent
     /// — and about half of what the hops buy is exactly that. Scored against one hop this arm
     /// reads twice as good as it is.
     /// </para>
     /// <para>
-    /// <b>The key is what the reading added and is not the story's background</b>, which is
+    /// <b>The key is what the reading added</b>, and is not the story's background, which is
     /// <see cref="Distinguished"/>'s own answer to fork 95 reused rather than a second rule. A
     /// key already used is the hop just taken, so carrying one forward returns the same
     /// statement for ever; and a key every sentence contains is recency wearing a chain's
@@ -204,12 +204,12 @@ public enum Joining
 
     /// <summary>
     /// A store maintained FORWARDS through the story, read at the question's words — <b>what
-    /// is known about a thing now, rather than which sentence mentioned it last.</b>
+    /// is known about a thing now</b>, rather than which sentence mentioned it last.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Every arm above reads the transcript backwards at question time, which is the
-    /// property they share and the one that caps them.</b> <see cref="Distinguished"/> walks
+    /// <b>Every arm above reads the transcript backwards at question time</b>, which is the
+    /// property they share and the one that caps them. <see cref="Distinguished"/> walks
     /// back dropping superseded statements, <see cref="Addressed"/> walks back to the first
     /// one the question names, <see cref="Chained"/> walks back again at the key that found.
     /// All three are a LOOKUP over a fixed text, so nothing that was read ever changed
@@ -217,15 +217,15 @@ public enum Joining
     /// must change something.
     /// </para>
     /// <para>
-    /// <b>So this one is maintained oldest first and holds one value per key, which is
-    /// retraction.</b> A newer statement naming a key REPLACES what was held about it rather
+    /// <b>So this one is maintained oldest first</b>, holds one value per key, and that is
+    /// retraction. A newer statement naming a key REPLACES what was held about it rather
     /// than sitting in front of it, so the store says what is true now and the transcript
     /// says what was said. That is the store the monotone counters forbid, built where they
     /// cannot reach it — beside the population rather than inside it.
     /// </para>
     /// <para>
-    /// <b>And what makes it more than a record is the resolution depth, which is an axis on
-    /// <see cref="Joined"/> And carries its own control at nought.</b> At depth nought an
+    /// <b>And what makes it more than a record is the resolution depth</b>, which is an axis on
+    /// <see cref="Joined"/> And carries its own control at nought. At depth nought an
     /// entry is the statement and nothing else, which for <i>john dropped the apple</i> is
     /// john and dropping and no room at all. Past that an entry also takes what was known
     /// about the statement's OTHER keys, so the apple's entry absorbs wherever john was — an
@@ -247,13 +247,13 @@ public enum Joining
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The coincidence is computed here because it is not a fact about the text.</b> That
+/// <b>The coincidence is computed here</b>, because it is not a fact about the text. That
 /// <i>mary</i> occurs in both halves is arithmetic over two sets; that it MATTERS is a
 /// claim, and a world making it would be a world deciding what the brain perceives. What
 /// the world says is which words were the question, which is what it saw.
 /// </para>
 /// <para>
-/// <b>And nothing here knows what a person is, which is what keeps it a front end.</b> No
+/// <b>And nothing here knows what a person is</b>, which is what keeps it a front end. No
 /// stop list, no parser, no notion that <i>mary</i> is an actor and <i>garden</i> a place
 /// — it intersects two sets of hashes. The same call would mark <i>the</i> if a question
 /// ever used it, and on this corpus none does.
@@ -271,7 +271,7 @@ public sealed class Joined : IQuantizer<Asking>
 
     /// <summary>The one code <see cref="Joining.Anonymous"/> emits.</summary>
     /// <remarks>
-    /// <b>A constant, because its whole content is that it is the same one every time.</b>
+    /// <b>A constant</b>, because its whole content is that it is the same one every time.
     /// A code derived from what was shared would be <see cref="Joining.Named"/> by a side
     /// door, and the arm would stop measuring what it is for.
     /// </remarks>
@@ -297,14 +297,14 @@ public sealed class Joined : IQuantizer<Asking>
     /// <summary>The modality a category rides on.</summary>
     /// <remarks>
     /// <para>
-    /// <b>ITS OWN, AND NOT <c>Naming.Meant</c>, because the two fold the opposite
-    /// way.</b> A minted name is present when ALL its members are, which is what makes it a
+    /// <b>Its own, and not <c>Naming.Meant</c></b>, because the two fold the opposite
+    /// way. A minted name is present when ALL its members are, which is what makes it a
     /// name for a co-firing set; a category is present when ANY member is, which is what
     /// makes it a name for a set of alternatives. Sharing a modality would let a soundness
     /// check spell one out as the other.
     /// </para>
     /// <para>
-    /// <b>And it is a front end saying what it is looking at rather than what to conclude.</b>
+    /// <b>And it is a front end saying what it is looking at</b>, rather than what to conclude.
     /// <i>This code is one of a set that never co-occurs and keeps one company</i> is
     /// arithmetic over what was seen, in the same licence <see cref="Codes.Coded.Groups"/>
     /// carries for <i>these codes were one object</i>. Which category matters, and to what,
@@ -336,8 +336,8 @@ public sealed class Joined : IQuantizer<Asking>
     /// </param>
     /// <param name="banded">
     /// Whether <see cref="Joining.Chained"/> also tags each word with WHICH HOP found it.
-    /// <b>An axis rather than a second arm, because the chain without it is the control that
-    /// says whether the banding is what pays</b> — and the chain alone is already measured to
+    /// <b>An axis rather than a second arm</b>, because the chain without it is the control that
+    /// says whether the banding is what pays — and the chain alone is already measured to
     /// raise what is in the room and not what is answered.
     /// </param>
     /// <param name="resolution">
@@ -351,11 +351,11 @@ public sealed class Joined : IQuantizer<Asking>
     /// <param name="freshest">
     /// Whether <see cref="Joining.Resolved"/> folds through ONE of a statement's other keys —
     /// the one whose entry was written most recently — rather than through all of them.
-    /// <b>An axis rather than a second arm, and the cheapest thing that could answer fork
-    /// 95.</b> The story's own background calls every word not in every statement a key, so a
+    /// <b>An axis rather than a second arm</b>, and the cheapest thing that could answer fork
+    /// 95. The story's own background calls every word not in every statement a key, so a
     /// VERB is a key and folding through it drags the last unrelated statement it appeared in
     /// along; which key is the one worth following is the question that rule cannot answer.
-    /// <b>Recency over the store is a candidate that knows nothing about the text</b> — in
+    /// <b>Recency over the store knows nothing about the text</b> — in
     /// <i>john dropped the apple</i> john has been written a statement ago and <i>dropped</i>
     /// not since the last drop, so the freshest is the one that moved.
     /// </param>
@@ -459,8 +459,8 @@ public sealed class Joined : IQuantizer<Asking>
     /// would kill it. Only survivors write.
     /// </para>
     /// <para>
-    /// <b>And the question's words go in unconditionally, because the question is not part
-    /// of the situation.</b> It supersedes nothing and is superseded by nothing; it is what
+    /// <b>And the question's words go in unconditionally</b>, because the question is not part
+    /// of the situation. It supersedes nothing and is superseded by nothing; it is what
     /// the situation is being asked about.
     /// </para>
     /// </remarks>
@@ -601,34 +601,34 @@ public sealed class Joined : IQuantizer<Asking>
     /// <param name="observation">The story and the question.</param>
     /// <remarks>
     /// <para>
-    /// <b>Oldest first, which is the opposite of every other arm here and is the point.</b>
+    /// <b>Oldest first</b>, which is the opposite of every other arm here and is the point.
     /// <see cref="Asking.Story"/> arrives newest first because a distance from the question
     /// means the same thing in every story; a store is maintained in the order the world
     /// happened, so this walks it backwards to go forwards.
     /// </para>
     /// <para>
-    /// <b>Every new entry is computed from the store as it stood before the statement, so
+    /// <b>Every new entry is computed from the store as it stood before</b>, so
     /// the result does not depend on the order the keys of one statement are enumerated
-    /// in.</b> Writing as it goes would make a moment a fact about a hash set's iteration
+    /// in. Writing as it goes would make a moment a fact about a hash set's iteration
     /// order, which is fork 12's failure wearing a front end's clothes.
     /// </para>
     /// <para>
-    /// <b>The read is at the question's words and not at one of them</b>, which is the same
+    /// <b>The read is at the question's words</b>, and not at one of them, which is the same
     /// line <see cref="Addressing"/> stands on: the front end intersects two sets and never
     /// decides which member of the question is the subject. A question naming nothing the
     /// store has an entry for falls back to the bag, because an arm that went silent would
     /// be scoring its own abstentions.
     /// </para>
     /// <para>
-    /// <b>One store per depth, which is what makes the fold capped rather than transitive.</b>
+    /// <b>One store per depth</b>, which is what makes the fold capped rather than transitive.
     /// Level nought is the statement alone; level <i>i</i> is the statement plus the OTHER
     /// keys' level <i>i-1</i> as it stood before this statement. Folding a key's own level
     /// <i>i</i> back in would make an entry grow without bound over a story, and the first
     /// version of this did exactly that — see the revival row.
     /// </para>
     /// <para>
-    /// <b>And never against its own old entry at any depth, which is what makes this a store
-    /// rather than an accumulation.</b> Replacement IS the retraction; keeping the old value
+    /// <b>And never against its own old entry at any depth</b>, which is what makes this a store
+    /// rather than an accumulation. Replacement IS the retraction; keeping the old value
     /// means nothing is ever forgotten, and a moment that forgets nothing is the bag.
     /// </para>
     /// </remarks>
@@ -719,7 +719,7 @@ public sealed class Joined : IQuantizer<Asking>
     /// The words every statement of this story uses, which are the ones that key nothing.
     /// </summary>
     /// <remarks>
-    /// <b>The intersection and not a count, because a threshold is the thing that failed.</b>
+    /// <b>The intersection and not a count</b>, because a threshold is the thing that failed.
     /// A word in every sentence distinguishes no two of them by construction, which is the
     /// property wanted — and unlike a rank it cannot put a verb on the wrong side of the
     /// names. <b>A story of one statement has itself as its background</b>, so nothing is a
@@ -741,8 +741,8 @@ public sealed class Joined : IQuantizer<Asking>
     /// Every word again, carrying how many statements back it was said.
     /// </summary>
     /// <remarks>
-    /// <b>The question's own words are not banded, because they are not in the story and a
-    /// band on them would say something false.</b> A depth is a distance from the question,
+    /// <b>The question's own words are not banded</b>, because they are not in the story and a
+    /// band on them would say something false. A depth is a distance from the question,
     /// so the question sits at no distance from itself.
     /// </remarks>
     private static HashSet<Code> Banding(HashSet<Code> said, Asking observation)
@@ -768,8 +768,8 @@ public sealed class Joined : IQuantizer<Asking>
     /// <inheritdoc/>
     /// <remarks>
     /// <para>
-    /// <b>Not the order of the words, and the reason changed the day rung three was
-    /// built.</b> It used to be that a sequence had nowhere to go —
+    /// <b>Not the order of the words</b>, and the reason changed the day rung three was
+    /// built. It used to be that a sequence had nowhere to go —
     /// <see cref="Sequenced"/> now takes one and turns it into a code, so an order reported
     /// here would be read rather than ignored.
     /// </para>

@@ -47,8 +47,9 @@ public sealed record RecalledSettings
     /// words and <i>Mary went to the kitchen, Mary went to the garden, where is Mary</i>
     /// puts both places in it with nothing to tell them apart. A bounded span is the
     /// crudest possible way to hand the bag some recency, and the gap between the two
-    /// readings is what sequence is worth on this text before rung three exists to
-    /// measure it properly.
+    /// readings is what sequence is worth on this text at the grain of a whole statement.
+    /// Rung three works at the grain of a WORD and is orthogonal to it: this world reports
+    /// order through <see cref="Recited"/> whatever the span is.
     /// </para>
     /// <para>
     /// <b>And it is a fact about what was shown rather than about how to think</b>, which
@@ -123,9 +124,10 @@ public enum Predicting
     /// <remarks>
     /// <b>The arm nobody wants, here so the others mean something.</b> Without it a
     /// comparison between two objectives John already prefers would be a comparison with no
-    /// floor. <b>And a scope is a SET, so *the words so far* reaches this learner as a bag
-    /// with the order thrown away</b> — which is a real handicap on this arm rather than a
-    /// thumb on the scale, and it is the same missing rung three everything else here wants.
+    /// floor. <b>And a scope is a SET</b>, so <i>the words so far</i> reaches the matcher as a
+    /// bag — which is a real handicap on this arm rather than a thumb on the scale. Rung
+    /// three softens it rather than removing it: the words are reported in order, so the
+    /// precedences say which came after which and the scope still holds a set.
     /// </remarks>
     Next,
 
@@ -276,10 +278,10 @@ public sealed record Quizzed
 /// exists for — and it is a different finding from a low score.
 /// </para>
 /// </remarks>
-public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
+public sealed class Recalled : IWorld<Recited>, IWithholds<Recited>
 {
-    private readonly List<Turn<Asking>> _asked;
-    private readonly ImmutableArray<Turn<Asking>> _kept;
+    private readonly List<Turn<Recited>> _asked;
+    private readonly ImmutableArray<Turn<Recited>> _kept;
     private int _at;
 
     /// <param name="settings">Which text, how much is visible, and how much is held back.</param>
@@ -347,8 +349,8 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
         var stories = lines.Count == 0 ? 0 : lines[^1].Story + 1;
         var keeping = Math.Max(0, stories - settings.Withheld);
 
-        var told = new List<Turn<Asking>>();
-        var quizzed = new List<Turn<Asking>>();
+        var told = new List<Turn<Recited>>();
+        var quizzed = new List<Turn<Recited>>();
         var wrote = new List<Quizzed>();
         var story = -1;
         var said = new List<ImmutableArray<Code>>();
@@ -389,9 +391,9 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
 
             // NEWEST FIRST, which is the walk backwards from the question rather than
             // forwards from the story's start.
-            var before = new List<IReadOnlySet<Code>>();
+            var before = new List<IReadOnlyList<Code>>();
             for (var one = said.Count - 1; one >= from; one--)
-                before.Add(new HashSet<Code>(said[one]));
+                before.Add(said[one]);
 
             // The answer as a word rather than as an answer, which is what lets an arm that
             // never saw a question sit this examination at all. A compound answer takes its
@@ -399,9 +401,9 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
             // two tasks whose answers are pairs were always unanswerable here.
             var answering = Babi.Words(line.Answer!);
 
-            var turn = new Turn<Asking>
+            var turn = new Turn<Recited>
             {
-                Seen = new Asking { Story = before, Question = new HashSet<Code>(line.Words) },
+                Seen = new Recited { Said = before, Asked = line.Words },
                 Outcome = index[answering[0]],
             };
 
@@ -444,7 +446,7 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
     /// teach anything here.
     /// </remarks>
     private static void Reading(
-        List<Turn<Asking>> told,
+        List<Turn<Recited>> told,
         Predicting predicting,
         Sentence line,
         IReadOnlyDictionary<string, int> index,
@@ -473,7 +475,12 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
             // The moment is every other word, or every earlier one, and the difference is
             // the whole experiment. Both hand the learner a bag and demand one word back;
             // only the second one throws away half the evidence to do it.
-            var moment = new HashSet<Code>();
+            //
+            // In the order they were written, with the hidden word simply missing rather
+            // than marked. A masked statement is still a sentence, so the words either side
+            // of the gap did stand that way round -- and closing the gap is what the
+            // learner is asked about, not a claim this world makes.
+            var moment = new List<Code>();
 
             for (var one = 0; one < words.Count; one++)
             {
@@ -485,9 +492,9 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
 
             if (moment.Count == 0) continue;
 
-            told.Add(new Turn<Asking>
+            told.Add(new Turn<Recited>
             {
-                Seen = new Asking { Story = [moment], Question = new HashSet<Code>() },
+                Seen = new Recited { Said = [moment], Asked = [] },
                 Outcome = index[words[at]],
             });
         }
@@ -536,7 +543,7 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
     /// question after the statements that answer it, and reordering that is the one
     /// property a story has.
     /// </remarks>
-    public Turn<Asking> Next()
+    public Turn<Recited> Next()
     {
         var turn = _asked[_at];
         _at = (_at + 1) % _asked.Count;
@@ -552,5 +559,5 @@ public sealed class Recalled : IWorld<Asking>, IWithholds<Asking>
     /// examination is about. So a whole story goes, and the exam does not move when the
     /// objective does.
     /// </remarks>
-    public IReadOnlyList<Turn<Asking>> Withheld => _kept;
+    public IReadOnlyList<Turn<Recited>> Withheld => _kept;
 }

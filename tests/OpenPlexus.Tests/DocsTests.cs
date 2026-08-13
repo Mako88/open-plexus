@@ -119,7 +119,13 @@ public sealed class DocsTests
     // be one hash at all, given that `walked` and `walking` are currently as unrelated as
     // `walked` and `kitchen`. Both duplicate nothing here, and eighty words is not the
     // difference between loading this and not.
-    private const int Whole = 9_911;
+    //
+    // And 9,953 is the fourth, for rung three arriving on real English. `Recalled` speaks
+    // `Recited` now, so the sequence rung reads a corpus somebody else wrote rather than a
+    // generated sentence -- and whether that PAYS is a question the route had no leaf for,
+    // the only rung-three item being fork 105's on `Handing`. Forty-two words, no item
+    // deleted, and nothing else here says it.
+    private const int Whole = 9_953;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

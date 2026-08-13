@@ -118,7 +118,7 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
         // The modality words arrive on, read off the signal rather than named. `Babi` keeps
         // it private and a test is not a reason to publish it — a probe that had to widen
         // the library to take a reading would be changing what it measures.
-        var told = world.Withheld[0].Seen.Words.First().Modality;
+        var told = world.Withheld[0].Seen.Bagged.Words.First().Modality;
 
         // The four shapes, and the constant one is the control rather than a fifth arm. A
         // subset test tries exactly one membership per scope code, so a two-code constant
@@ -164,11 +164,11 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
         for (var ask = 0; ask < Asked; ask++)
         {
             var turn = world.Next();
-            var moment = Tagged(turn.Seen);
+            var moment = Tagged(turn.Seen.Bagged);
 
             moments++;
             words += moment.Count;
-            asked += turn.Seen.Question.Count;
+            asked += turn.Seen.Asked.Count;
 
             var index = Unifying.Index(moment);
 
@@ -235,7 +235,7 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
             Predicting = Predicting.Asked,
         });
 
-        new Trial<Asking>(world, new Joined(Joining.Bagged), brain)
+        new Trial<Recited>(world, new Joined(Joining.Bagged), brain)
             .Run(Rounds, sweep: 1000, target: 0.9, window: 2000);
 
         var all = brain.Held.All.ToList();
@@ -268,9 +268,9 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
 
         foreach (var turn in world.Withheld)
         {
-            var moment = new HashSet<Code>(turn.Seen.Words);
+            var moment = new HashSet<Code>(turn.Seen.Bagged.Words);
 
-            moment.UnionWith(turn.Seen.Question);
+            moment.UnionWith(turn.Seen.Asked);
 
             rounds++;
             visited += all.Count(one => one.Scope.Any(moment.Contains));

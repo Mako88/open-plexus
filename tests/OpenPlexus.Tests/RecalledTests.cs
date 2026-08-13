@@ -17,10 +17,10 @@ namespace OpenPlexus.Tests;
 /// teach this learner anything at all, and no arrangement of processes changes that.
 /// </para>
 /// <para>
-/// <b>A scope is a set and a sentence is a sequence</b>, which is the whole question.
-/// Rung three is not built, so a moment holding a story is a bag of words — and the two
-/// span arms below are the cheapest possible reading of what that costs, taken before
-/// anything is built to fix it.
+/// <b>A scope is a set and a sentence is a sequence</b>, which is the whole question. The
+/// span arms are the cheapest reading of what a bag costs at the grain of a statement, and
+/// rung three is the answer at the grain of a word — this world speaks
+/// <see cref="Recited"/>, so the precedences of each sentence reach every moment here.
 /// </para>
 /// </remarks>
 public sealed class RecalledTests(ITestOutputHelper output)
@@ -54,10 +54,10 @@ public sealed class RecalledTests(ITestOutputHelper output)
     ];
 
     /// <summary>The moment as the bagged control sees it, which is every word once.</summary>
-    private static IEnumerable<Code> Codify(Asking asking) =>
-        new Joined(Joining.Bagged).Codify(asking).Order();
+    private static IEnumerable<Code> Codify(Recited recited) =>
+        new Joined(Joining.Bagged).Codify(recited).Order();
 
-    private static (Recalled World, Trial<Asking> Trial, Brain Brain) Made(
+    private static (Recalled World, Trial<Recited> Trial, Brain Brain) Made(
         RecalledSettings settings, Joining joining = Joining.Bagged, int capacity = 2000,
         IReadOnlyList<IReadOnlySet<Code>>? categories = null, int seed = 1, int hops = 2,
         bool banded = false)
@@ -67,8 +67,38 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
         return (
             world,
-            new Trial<Asking>(world, new Joined(joining, categories, hops, banded), brain),
+            new Trial<Recited>(world, new Joined(joining, categories, hops, banded), brain),
             brain);
+    }
+
+    /// <summary>
+    /// The same words this corpus always handed over, with nothing said about where they
+    /// stood.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The control for rung three</b>, and it is a front end because there is no dial. A
+    /// machine turns whatever order it is given into precedences, always, and whether a
+    /// sense can tell word order is a fact about the sense. <c>HandingTests</c> arranges its
+    /// own arms the same way and for the same reason.
+    /// </para>
+    /// <para>
+    /// <b>It delegates the codes rather than rebuilding them</b>, so the two arms cannot
+    /// drift apart over what a moment holds. <see cref="Joined.Codify(Recited)"/> is
+    /// <see cref="Joined.Codify(Asking)"/> of the same moment bagged, so this is exactly the
+    /// reading every text number on this branch was taken under.
+    /// </para>
+    /// </remarks>
+    private sealed class Unordered(Joining joining) : IQuantizer<Recited>
+    {
+        private readonly Joined _through = new(joining);
+
+        /// <inheritdoc/>
+        public byte Modality => _through.Modality;
+
+        /// <inheritdoc/>
+        public IReadOnlyCollection<Code> Codify(Recited observation) =>
+            _through.Codify(observation);
     }
 
     [Fact]
@@ -89,7 +119,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
             var near = last.Next();
 
             Assert.Equal(wide.Outcome, near.Outcome);
-            Assert.True(near.Seen.Words.Count <= wide.Seen.Words.Count);
+            Assert.True(near.Seen.Bagged.Words.Count <= wide.Seen.Bagged.Words.Count);
         }
 
         output.WriteLine($"task 1: {whole.Questions} questions, {whole.Outcomes} answers");
@@ -199,6 +229,131 @@ public sealed class RecalledTests(ITestOutputHelper output)
         output.WriteLine($"wanting    : {tally.Wanting:F3} of blamed rounds nothing separated");
         output.WriteLine($"twins      : {twinned} of {unseen.Asked} exam moments appear "
             + $"word for word among the {drawn.Count} distinct moments drawn");
+    }
+
+    /// <summary>
+    /// The order the corpus wrote reaches the moment, as that sentence's own adjacent pairs.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Armed rather than assumed, which is this repo's oldest trap.</b> A rung wired and
+    /// unable to fire reads exactly like a rung that fired and bought nothing, and
+    /// <c>Surprise</c> and <c>Abstain</c> were both found in that state after a long time
+    /// looking correct. Rung three is inert wherever a front end reports no order, so the
+    /// question of whether English reports any has to be a check rather than a reading of
+    /// the code.
+    /// </para>
+    /// <para>
+    /// <b>The expected pairs come from the words</b> rather than from the report, so
+    /// the two have to agree about what the corpus said. A word said twice is at neither
+    /// place — <see cref="Joined.Order(Recited)"/>'s own rule — so the pairs are the adjacent
+    /// ones among the words this statement says once.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Word_order_reaches_a_moment_of_real_english()
+    {
+        var world = new Recalled(World(task: 1, span: 1));
+        var front = new Joined(Joining.Bagged);
+
+        var reported = 0;
+        var pairs = 0;
+
+        for (var draw = 0; draw < world.Questions; draw++)
+        {
+            var seen = world.Next().Seen;
+
+            if (front.Order(seen) is not { } order) continue;
+
+            reported++;
+
+            var said = seen.Said[0];
+            var once = said.Where(word => said.Count(other => other == word) == 1).ToList();
+
+            var wanted = new List<Code>();
+            for (var at = 0; at + 1 < once.Count; at++)
+                wanted.Add(Sequenced.Of(once[at], once[at + 1]));
+
+            Assert.Equal(wanted, [.. Sequenced.From(order)]);
+
+            pairs += wanted.Count;
+        }
+
+        // EVERY question moment and not merely some, because a statement of one distinct
+        // word would report nothing and this corpus writes none. A partial count here would
+        // mean the rung fires on a subset nobody chose.
+        Assert.Equal(world.Questions, reported);
+
+        output.WriteLine($"order reported on {reported} of {world.Questions} moments");
+        output.WriteLine($"precedences: {pairs / (double)reported:F2} a moment");
+    }
+
+    /// <summary>
+    /// What the word order is worth, against the same words with the order thrown away.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The first time rung three is asked about English</b> rather than about a generated
+    /// sentence. <see cref="Handing"/> proves the three ceilings by
+    /// construction and answers whether the mechanism works; this asks whether a corpus
+    /// somebody else wrote contains an order worth reading.
+    /// </para>
+    /// <para>
+    /// <b>The held-out column is the one to read</b>, and the drawn one is the trap.
+    /// Widening what a moment says buys the drawn score and sells the held-out one, measured
+    /// twice already on this world under two unrelated mechanisms, and a precedence per
+    /// adjacent pair is a widening whatever else it is.
+    /// </para>
+    /// <para>
+    /// <b>What would drop the arm</b> is the held-out accuracy falling while the population
+    /// grows, which is that same pattern arriving a third time.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_word_order_pays_on_real_english()
+    {
+        foreach (var task in new[] { 1, 2 })
+        {
+            foreach (var span in new[] { 1, 2 })
+            {
+                foreach (var ordered in new[] { false, true })
+                {
+                    var unseen = new List<double>();
+                    var drawn = new List<double>();
+                    var held = new List<int>();
+                    var named = new List<int>();
+                    var silent = new List<double>();
+
+                    for (var seed = 1; seed <= 5; seed++)
+                    {
+                        var brain = new Brain(new CommittingSettings { Capacity = 2000 }, seed);
+                        var world = new Recalled(World(task, span));
+
+                        var trial = ordered
+                            ? new Trial<Recited>(world, new Joined(Joining.Bagged), brain)
+                            : new Trial<Recited>(world, new Unordered(Joining.Bagged), brain);
+
+                        var tally = trial.Run(
+                            rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
+
+                        unseen.Add(tally.Unseen?.Accuracy ?? 0.0);
+                        silent.Add(tally.Unseen?.Silence ?? 0.0);
+                        drawn.Add(tally.Recent);
+                        held.Add(brain.Held.Count);
+                        named.Add(brain.Held.Names.Count);
+                    }
+
+                    output.WriteLine(
+                        $"task {task} span {span} {(ordered ? "ordered" : "bagged ")} | "
+                        + $"unseen {unseen.Min():F3}-{unseen.Max():F3} "
+                        + $"silent {silent.Min():F3}-{silent.Max():F3} | "
+                        + $"drawn {drawn.Min():F3}-{drawn.Max():F3} | "
+                        + $"held {held.Min(),5}-{held.Max(),5} "
+                        + $"names {named.Min(),3}-{named.Max(),3}");
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -755,7 +910,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
         for (var one = 0; one < world.Withheld.Count; one++)
         {
-            var asking = world.Withheld[one].Seen;
+            var asking = world.Withheld[one].Seen.Bagged;
             var budget = told.Codify(asking).Count;
 
             var shuffled = asking.Story.OrderBy(_ => draw.Next()).ToList();
@@ -837,8 +992,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <b>A grid rather than a check, so it prints and asserts nothing.</b> <c>Span</c> is
-    /// the crudest possible dose of sequence and rung three is not built, so this is the
-    /// reading that says what building it would be worth.
+    /// the crudest possible dose of sequence, at the grain of a whole statement, so this is
+    /// the reading that says what recency alone is worth.
     /// </remarks>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
@@ -1418,7 +1573,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
                 for (var one = 0; one < world.Withheld.Count; one++)
                 {
-                    var asking = world.Withheld[one].Seen;
+                    var asking = world.Withheld[one].Seen.Bagged;
                     var answer = Babi.Of(world.Transcript[one].Answer);
 
                     var background = new HashSet<Code>(asking.Story.Count == 0 ? [] : asking.Story[0]);

@@ -431,6 +431,22 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// <b>Seeds are gone for the reason they went from the other grid.</b> This world draws
     /// nothing, so five of them returned min equal to max in every cell.
     /// </para>
+    /// <para>
+    /// <b>The first dispatch had no one-hop control either.</b>
+    /// <see cref="Joining.Chained"/> at one hop IS <see cref="Joining.Addressed"/> — the same
+    /// lookup, not taken again — so a chain read against <see cref="Joining.Bagged"/> alone
+    /// reports the narrowing and the hop as one number. It is also the sharpest selector here,
+    /// keeping one statement where the chain keeps two, so it is where the selectivity reading
+    /// makes its largest claim.
+    /// </para>
+    /// <para>
+    /// <b>A flat cell is not a refutation on its own.</b> What would refute the selectivity
+    /// reading is an arm with room left on the exam and no gain from order.
+    /// <c>What_a_chain_scores_against_a_bag_of_the_same_width</c> has this arm answering all
+    /// of task one at a smaller capacity, and an arm at its ceiling cannot show a gain it has
+    /// nowhere to put. The accuracy is read beside the exam's own bound, or a saturated cell
+    /// reads as a refutation.
+    /// </para>
     /// </remarks>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
@@ -439,7 +455,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         foreach (var task in new[] { 1, 2 })
         {
             foreach (var joining in new[]
-                { Joining.Bagged, Joining.Distinguished, Joining.Chained })
+                { Joining.Bagged, Joining.Distinguished, Joining.Chained, Joining.Addressed })
             {
                 foreach (var ordered in new[] { false, true })
                 {

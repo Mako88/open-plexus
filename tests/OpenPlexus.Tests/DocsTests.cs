@@ -136,7 +136,10 @@ public sealed class DocsTests
     // two leaves it earns say what is built and what a policy is still handed in for.
     // Twelve words after the addition was tightened, no item deleted, and the route said
     // none of it -- the third condition being what a leaf reading "nothing" cannot meet.
-    private const int Whole = 9_961;
+    //
+    // And 9,959 is the ratchet again in the same session. `Homeostat` is no longer stranded,
+    // so the `Drives` leaf saying so was corrected and came in two words shorter.
+    private const int Whole = 9_959;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

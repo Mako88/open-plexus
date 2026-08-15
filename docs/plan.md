@@ -495,7 +495,7 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       the learning loop still existing exactly once. THE WALK IS GONE and forks 1, 5, 6, 11,
       18, 20, 21, 22 and 24 went with it; `csharp` keeps their code and their numbers.
     - **OPEN** — `Drives` is the one idea still owed off it: a third factor from the body's
-      own variables. `Homeostat` IS that body, stranded, so this and the debt below are one job.
+      own variables. `Homeostat` is that body and `IActed` drives it; the chooser is missing.
     - **BROKEN** — seven worlds have no runner, their `*Run` files being the walk's. Each
       wants a `Trial` OR A DELETION, a world going when its question closes, and nothing
       says which. `DeadCodeTests` counts the debt.

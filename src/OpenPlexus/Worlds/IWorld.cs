@@ -142,8 +142,8 @@ public interface IActed<TSeen> : IWorld<TSeen>
 /// <typeparam name="TSeen">Whatever this world natively produces.</typeparam>
 /// <remarks>
 /// <para>
-/// <b>C4 constrains the learner and not the experimenter, and conflating the two is
-/// why this was missing.</b> <i>No episode boundary, so nothing may depend on
+/// <b>C4 constrains the learner and not the experimenter</b>, and conflating the two is
+/// why this was missing. <i>No episode boundary, so nothing may depend on
 /// train-then-test</i> forbids the MACHINE knowing about a boundary — it may not wait
 /// for one, switch behaviour at one, or be scored on a lifetime average that assumes
 /// one. Nothing in it forbids the person running the experiment from keeping some

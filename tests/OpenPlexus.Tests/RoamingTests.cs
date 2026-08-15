@@ -298,7 +298,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
             $"one hop of the store reaches {reaching["Resolved(1)"]:F3} against "
             + $"{reaching[nameof(Joining.Distinguished)]:F3} for the best backward-reading arm, "
             + "so maintaining a store forwards buys nothing a lookup does not and the whole "
-            + "mechanism is `Addressed` by a longer road");
+            + "mechanism is a one-hop chain by a longer road");
 
         // And which key the fold follows is worth more than how far it follows it, which is
         // not what the depth axis alone suggested. Folding through every key reaches further
@@ -430,9 +430,9 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // movement -- `in` then a room against `to` then a room, which is the one distinction
         // a folded bag of two statements cannot hold.
         //
-        // `Addressed` is the exception that says what the rung needs, and it is left out of
-        // the bar rather than excused: it keeps ONE statement, and one statement about a thing
-        // being picked up names no room whichever way round its words stood.
+        // A one-hop chain is the exception that says what the rung needs, and it is left out
+        // of the bar rather than excused: it keeps ONE statement, and one statement about a
+        // thing being picked up names no room whichever way round its words stood.
         var narrowing = new[]
         {
             nameof(Joining.Distinguished), nameof(Joining.Chained),
@@ -879,10 +879,10 @@ public sealed class RoamingTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_a_learner_reads_where_the_transcript_stops_answering_itself()
     {
-        // The backward-reading arm that leads, and the store's two axes crossed. `Bagged`,
-        // `Recent` and `Addressed` are not here because they are compared in the ceiling
-        // grid and all three sit at the marginal; `Chained` is the one worth beating, being
-        // the best any lookup over the transcript reached on this world.
+        // The backward-reading arm that leads, and the store's two axes crossed. `Bagged`
+        // and the one-hop chain are not here because they are compared in the ceiling grid and
+        // both sit at the marginal; `Chained` at its default depth is the one worth beating,
+        // being the best any lookup over the transcript reached on this world.
         var arms = new (string Name, Joined Joined)[]
         {
             (nameof(Joining.Chained), new Joined(Joining.Chained)),

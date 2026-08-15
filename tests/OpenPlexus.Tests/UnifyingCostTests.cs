@@ -13,8 +13,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The worth is already priced and the cost is not.</b> <c>Joining.Addressed</c> did
-/// the selection in the front end and answered bAbI's first task outright where the bag
+/// <b>The worth is already priced and the cost is not.</b> <c>Joining.Chained</c> at one
+/// hop did the selection in the front end and answered bAbI's first task outright where the bag
 /// sits at its marginal, so what a unifying matcher would BUY is a number this repo
 /// already has. What it would cost has been an argument — <i>it breaks the indexing that
 /// makes matching cheap</i> — and an argument is what this file replaces.

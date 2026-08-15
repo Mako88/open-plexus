@@ -53,16 +53,19 @@ public enum Joining
     Distinguished,
 
     /// <summary>
-    /// The newest statement the question names something in — <b>the store read at the key
-    /// the question supplies</b>, rather than at whichever key moved last.
+    /// The newest statement the question names something in, and then the same lookup again
+    /// at the key THAT supplied — <b>the store read at the key the question gives</b>, walked
+    /// as far as the hops allow.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Fork 88, and the arm the displacement grid points at.</b> Every situation arm
-    /// before this keys on recency and is at its ceiling only where it keeps ONE statement,
-    /// because a matcher that can ask only whether a code is present cannot choose between
-    /// two states in the room. So the choosing is done where the key is: <i>where is
-    /// mary</i> names <i>mary</i>, and the statement wanted is the newest one about her.
+    /// <b>Fork 88 at one hop, fork 96 past it</b>, and one mechanism either way. Every
+    /// situation arm before this keys on recency and is at its ceiling only where it keeps
+    /// ONE statement, because a matcher that can ask only whether a code is present cannot
+    /// choose between two states in the room. So the choosing is done where the key is:
+    /// <i>where is mary</i> names <i>mary</i>, and the statement wanted is the newest one
+    /// about her. The hop count is the axis, and one hop is the arm that used to be
+    /// spelt separately — two names for one rule, which cost a session and is now a check.
     /// </para>
     /// <para>
     /// <b>It is selection and not displacement</b>, which is why it is a different arm rather
@@ -82,20 +85,11 @@ public enum Joining
     /// moment with no statement in it can answer nothing at all, and an arm that went silent
     /// would be scoring its own abstentions.
     /// </para>
-    /// </remarks>
-    Addressed,
-
-    /// <summary>
-    /// The same lookup, taken again at the key the LAST reading supplied — <b>a chain of
-    /// statements rather than one.</b>
-    /// </summary>
-    /// <remarks>
     /// <para>
-    /// <b>Fork 96</b>, and what held it to one hop was never the learner.
-    /// <see cref="Addressed"/> returns the first statement naming anything the question
-    /// names, and stops. Where the question names the apple, the apple's newest statement
-    /// says who picked it up and never where he went — so the answering word was not in the
-    /// room, and no learner could have found it. Reading again at <i>john</i> is the hop.
+    /// And what a second hop is for: where the question names the apple, the apple's
+    /// newest statement says who picked it up and never where he went — so the answering word
+    /// was not in the room, and no learner could have found it. Reading again at <i>john</i>
+    /// is the hop.
     /// </para>
     /// <para>
     /// <b>And the ceiling says the room was the whole shortfall.</b> One hop leaves the answer
@@ -128,9 +122,9 @@ public enum Joining
     /// <para>
     /// <b>Every arm above reads the transcript backwards at question time</b>, which is the
     /// property they share and the one that caps them. <see cref="Distinguished"/> walks
-    /// back dropping superseded statements, <see cref="Addressed"/> walks back to the first
-    /// one the question names, <see cref="Chained"/> walks back again at the key that found.
-    /// All three are a LOOKUP over a fixed text, so nothing that was read ever changed
+    /// back dropping superseded statements, <see cref="Chained"/> walks back to the first
+    /// one the question names and then again at the key that found.
+    /// Both are a LOOKUP over a fixed text, so nothing that was read ever changed
     /// anything — and the plan's own statement of the problem is that reading a statement
     /// must change something.
     /// </para>
@@ -344,7 +338,6 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     private List<int> Read(Asking observation) => _joining switch
     {
         Joining.Distinguished => Situating(observation),
-        Joining.Addressed => Addressing(observation),
         Joining.Chained => Chaining(observation),
         Joining.Resolved => Storing(observation),
         _ => Every(observation),
@@ -414,38 +407,16 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     }
 
     /// <summary>
-    /// The question, and the newest statement that names something the question names.
-    /// </summary>
-    /// <remarks>
-    /// <b>Newest first makes this one pass and one statement.</b> The story arrives newest
-    /// first, so the first statement intersecting the question IS the newest one about
-    /// whatever was asked — no scoring, no comparison, and nothing to tie-break.
-    /// <b>The intersection is against the question's words and never against the bag</b>,
-    /// and every word of the story is in the story, so only the two halves know which are in
-    /// both.
-    /// </remarks>
-    private static List<int> Addressing(Asking observation)
-    {
-        for (var at = 0; at < observation.Story.Count; at++)
-        {
-            var names = false;
-
-            foreach (var one in observation.Story[at])
-                if (observation.Question.Contains(one)) { names = true; break; }
-
-            if (names) return [at];
-        }
-
-        // Nothing the question names was ever said, so there is no store entry to read and
-        // the bag is what is left. See the arm's remarks: going silent would score the
-        // abstention rather than the mechanism.
-        return [];
-    }
-
-    /// <summary>
     /// The question, and a chain of statements each found at the key the last one supplied.
     /// </summary>
     /// <remarks>
+    /// <para>
+    /// Newest first makes each hop one pass and one statement. The story arrives newest
+    /// first, so the first statement intersecting the key IS the newest one about whatever
+    /// that key names — no scoring, no comparison, and nothing to tie-break.
+    /// <b>The first hop reads against the question's words</b> and never against the bag, and
+    /// every word of the story is in the story, so only the two halves know which are in both.
+    /// </para>
     /// <para>
     /// <b>Older only, because the chain runs backwards in time.</b> Whatever a statement
     /// mentions was established before it, so the search resumes past the statement just
@@ -536,7 +507,7 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     /// </para>
     /// <para>
     /// <b>The read is at the question's words</b>, and not at one of them, which is the same
-    /// line <see cref="Addressing"/> stands on: the front end intersects two sets and never
+    /// line <see cref="Chaining"/> stands on: the front end intersects two sets and never
     /// decides which member of the question is the subject. A question naming nothing the
     /// store has an entry for falls back to the bag, because an arm that went silent would
     /// be scoring its own abstentions.

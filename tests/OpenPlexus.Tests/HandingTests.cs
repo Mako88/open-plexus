@@ -282,8 +282,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
 
     /// <summary>
     /// <b>And a selector that takes the first sentence sharing ANY word with the question
-    /// is worth nothing at all here</b>, which is a fact about <see cref="Joining.Addressed"/>
-    /// rather than about this world.
+    /// is worth nothing at all here</b>, which is a fact about <see cref="Joining.Chained"/>
+    /// at one hop rather than about this world.
     /// </summary>
     /// <remarks>
     /// <para>

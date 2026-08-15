@@ -89,9 +89,9 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// reading every text number on this branch was taken under.
     /// </para>
     /// </remarks>
-    private sealed class Unordered(Joining joining) : IQuantizer<Recited>
+    private sealed class Unordered(Joining joining, int hops = 2) : IQuantizer<Recited>
     {
-        private readonly Joined _through = new(joining);
+        private readonly Joined _through = new(joining, hops: hops);
 
         /// <inheritdoc/>
         public byte Modality => _through.Modality;
@@ -433,11 +433,10 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </para>
     /// <para>
     /// <b>The first dispatch had no one-hop control either.</b>
-    /// <see cref="Joining.Chained"/> at one hop IS <see cref="Joining.Addressed"/> — the same
-    /// lookup, not taken again — so a chain read against <see cref="Joining.Bagged"/> alone
-    /// reports the narrowing and the hop as one number. It is also the sharpest selector here,
-    /// keeping one statement where the chain keeps two, so it is where the selectivity reading
-    /// makes its largest claim.
+    /// <see cref="Joining.Chained"/> at one hop is the lookup not taken again, so a chain read
+    /// against <see cref="Joining.Bagged"/> alone reports the narrowing and the hop as one
+    /// number. It is also the sharpest selector here, keeping one statement where a deeper
+    /// chain keeps two, so it is where the selectivity reading makes its largest claim.
     /// </para>
     /// <para>
     /// <b>A flat cell is not a refutation on its own.</b> What would refute the selectivity
@@ -448,15 +447,15 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// reads as a refutation.
     /// </para>
     /// <para>
-    /// <b><see cref="Joining.Addressed"/> answers all of task one, at 27 residents bagged and
-    /// 69 ordered.</b> That is the largest held-out score on this branch and the smallest
-    /// population taking one, against 802 for the chain and 4,929 for the bag. The last
-    /// handoff called the chain's 0.800 the largest, which this corrects: the arm above it was
-    /// already in the tree and had never been run beside it.
+    /// <b><see cref="Joining.Chained"/> at one hop answers all of task one, at 27 residents
+    /// bagged and 69 ordered.</b> That is the largest held-out score on this branch and the
+    /// smallest population taking one, against 802 for the two-hop chain and 4,929 for the bag.
+    /// An earlier handoff called the two-hop chain's 0.800 the largest, which this corrects:
+    /// the one-hop cell was already in the tree and had never been run beside it.
     /// </para>
     /// <para>
-    /// <b>And its task two cell is the one-statement bag rather than a reading about
-    /// addressing</b>, which
+    /// <b>And its task two cell is the one-statement bag rather than a reading about the
+    /// hop</b>, which
     /// <see cref="Whether_addressing_picks_anything_a_span_of_one_would_not"/> is what says
     /// so. Addressing picks the newest statement on 0.485 of task one and on every question of
     /// tasks two and three, because the question there names the prop and the newest statement
@@ -471,8 +470,11 @@ public sealed class RecalledTests(ITestOutputHelper output)
     {
         foreach (var task in new[] { 1, 2 })
         {
-            foreach (var joining in new[]
-                { Joining.Bagged, Joining.Distinguished, Joining.Chained, Joining.Addressed })
+            foreach (var (joining, hops) in new[]
+            {
+                (Joining.Bagged, 2), (Joining.Distinguished, 2),
+                (Joining.Chained, 2), (Joining.Chained, 1),
+            })
             {
                 foreach (var ordered in new[] { false, true })
                 {
@@ -484,8 +486,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     var world = new Recalled(World(task, span: 0));
 
                     var trial = ordered
-                        ? new Trial<Recited>(world, new Joined(joining), brain)
-                        : new Trial<Recited>(world, new Unordered(joining), brain);
+                        ? new Trial<Recited>(world, new Joined(joining, hops: hops), brain)
+                        : new Trial<Recited>(world, new Unordered(joining, hops), brain);
 
                     var tally = trial.Run(
                         rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
@@ -493,7 +495,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     var unseen = tally.Unseen;
 
                     output.WriteLine(
-                        $"task {task} span 0 {joining,-13} "
+                        $"task {task} span 0 {joining,-13} x{hops} "
                         + $"{(ordered ? "ordered" : "bagged ")} | "
                         + $"unseen {unseen?.Accuracy ?? 0.0:F3} "
                         + $"silent {unseen?.Silence ?? 0.0:F3} | "
@@ -614,16 +616,16 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
         // And reading at the question's key takes Mary's newest and nothing else, which is a
         // different statement from the newest overall wherever somebody else spoke last.
-        var addressed = new Joined(Joining.Addressed).Codify(story);
+        var chained = new Joined(Joining.Chained, hops: 1).Codify(story);
 
-        Assert.Contains(Babi.Of("garden"), addressed);
-        Assert.DoesNotContain(Babi.Of("kitchen"), addressed);
-        Assert.DoesNotContain(Babi.Of("office"), addressed);
-        Assert.DoesNotContain(Babi.Of("john"), addressed);
+        Assert.Contains(Babi.Of("garden"), chained);
+        Assert.DoesNotContain(Babi.Of("kitchen"), chained);
+        Assert.DoesNotContain(Babi.Of("office"), chained);
+        Assert.DoesNotContain(Babi.Of("john"), chained);
 
         output.WriteLine(
             $"bag {new Joined(Joining.Bagged).Codify(story).Count} "
-            + $"| distinguished {situated.Count} | addressed {addressed.Count}");
+            + $"| distinguished {situated.Count} | chained x1 {chained.Count}");
     }
 
     /// <summary>
@@ -707,7 +709,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         foreach (var task in new[] { 1, 2, 3 })
         {
             var world = new Recalled(World(task: task, span: 0));
-            var asked = new Joined(Joining.Addressed);
+            var asked = new Joined(Joining.Chained, hops: 1);
 
             var reachable = 0;
 
@@ -719,7 +721,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
             }
 
             output.WriteLine(
-                $"task {task} addressed | answer present "
+                $"task {task} chained x1 | answer present "
                 + $"{reachable / (double)world.Withheld.Count:F3} of {world.Withheld.Count}");
         }
     }
@@ -752,9 +754,9 @@ public sealed class RecalledTests(ITestOutputHelper output)
     public void Whether_addressing_survives_more_than_one_supporting_fact()
     {
         foreach (var task in new[] { 1, 2, 3 })
-        foreach (var joining in new[] { Joining.Bagged, Joining.Addressed })
+        foreach (var joining in new[] { Joining.Bagged, Joining.Chained })
         {
-            var (world, trial, brain) = Made(World(task: task, span: 0), joining);
+            var (world, trial, brain) = Made(World(task: task, span: 0), joining, hops: 1);
             var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
             var unseen = tally.Unseen;
 
@@ -825,7 +827,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         // two columns. It keeps ONE statement, so its budget is the narrowest here — and if
         // its ceiling is high while its budget is small, that is the pair no recency rule
         // has managed and the whole reason fork 88 is worth taking.
-        var asked = new Joined(Joining.Addressed);
+        var asked = new Joined(Joining.Chained, hops: 1);
 
         var aimed = 0;
         var cost = 0;
@@ -840,7 +842,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         }
 
         output.WriteLine(
-            $"addressed     | answer present {aimed / (double)world.Withheld.Count:F3} | "
+            $"chained x1    | answer present {aimed / (double)world.Withheld.Count:F3} | "
             + $"kept {cost / (double)whole:F3} of the bag");
 
         // The dominance put in the test, because it is the reading the whole arc turns on.
@@ -849,7 +851,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         // any budget. A recency rule is at its ceiling only where it keeps one statement,
         // and this keeps one statement AND has no ceiling to be short of.
         Assert.Equal(world.Withheld.Count, aimed);
-        Assert.True(cost < held, $"addressed kept {cost} against displacement's {held}");
+        Assert.True(cost < held, $"the one-hop chain kept {cost} against displacement's {held}");
 
         // And the control that says whether the key is doing anything at all, matched
         // question by question on how many words survived. Both columns moving together is
@@ -1055,7 +1057,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                 ("bag span 1  ", World(task, span: 1), Joining.Bagged, 1),
                 ("bag span 2  ", World(task, span: 2), Joining.Bagged, 1),
                 ("bag span 3  ", World(task, span: 3), Joining.Bagged, 1),
-                ("addressed   ", World(task, span: 0), Joining.Addressed, 1),
+                ("chained x1  ", World(task, span: 0), Joining.Chained, 1),
                 ("chained x2  ", World(task, span: 0), Joining.Chained, 2),
                 ("chained x3  ", World(task, span: 0), Joining.Chained, 3),
                 ("banded x2   ", World(task, span: 0), Joining.Chained, 2),
@@ -1076,14 +1078,14 @@ public sealed class RecalledTests(ITestOutputHelper output)
             }
 
             // A hop not needed is damage, and task one is where that is unmistakable: the
-            // addressed arm answers everything and every deeper arm answers less. This is
+            // one-hop chain answers everything and every deeper arm answers less. This is
             // asserted rather than printed because it is the finding that stops a future
             // session shipping the chain as a default on a ceiling reading alone.
             if (task == 1)
             {
-                Assert.Equal(1.0, scored["addressed"]);
+                Assert.Equal(1.0, scored["chained x1"]);
                 Assert.True(
-                    scored["chained x2"] < scored["addressed"],
+                    scored["chained x2"] < scored["chained x1"],
                     $"a second hop cost nothing on task 1: {scored["chained x2"]:F3}");
 
                 Assert.True(
@@ -1669,16 +1671,16 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
             var ceiling = reached / (double)world.Withheld.Count;
 
-            foreach (var joining in new[] { Joining.Addressed, Joining.Bagged })
+            foreach (var joining in new[] { Joining.Chained, Joining.Bagged })
             {
                 var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, 1);
                 var trial = new Trial<Recited>(
-                    new Recalled(World(task, span: 0)), new Joined(joining), brain);
+                    new Recalled(World(task, span: 0)), new Joined(joining, hops: 1), brain);
 
                 var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
                 var unseen = tally.Unseen?.Accuracy ?? 0.0;
 
-                if (joining == Joining.Addressed && ceiling > 0.0)
+                if (joining == Joining.Chained && ceiling > 0.0)
                     converted.Add(unseen / ceiling);
 
                 output.WriteLine(
@@ -1701,12 +1703,12 @@ public sealed class RecalledTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// A chain of one hop reads the statement addressing reads, and nothing else.
+    /// A chain of one hop reads the newest statement the question names, and nothing else.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The check that makes a deletion legitimate, written before the deletion.</b>
-    /// <see cref="Joining.Addressed"/> and <see cref="Joining.Chained"/> at one hop are the
+    /// <b>The check that made a deletion legitimate, written before the deletion.</b> A
+    /// deleted <c>Joining.Addressed</c> and <see cref="Joining.Chained"/> at one hop were the
     /// same rule said twice — walk the story newest first, keep the first statement naming
     /// anything the question named, stop. Two names for one mechanism is the fault this repo
     /// has a whole trap about, and it cost a session: the selection grid compared the chain
@@ -1722,7 +1724,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     [Fact]
-    public void A_chain_of_one_hop_reads_what_addressing_reads()
+    public void A_chain_of_one_hop_reads_the_newest_statement_the_question_names()
     {
         foreach (var task in new[] { 1, 2, 3 })
         {
@@ -1850,8 +1852,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
         output.WriteLine(
             $"one selected statement carries the answer above the marginal on {reaches} of 20");
 
-        // The arms differ somewhere or the addressed cells are a span of one under a second
-        // name. Which task separates them is not asserted, because that is a prediction and
+        // The arms differ somewhere or the one-hop chain's cells are a span of one under a
+        // second name. Which task separates them is not asserted, because that is a prediction and
         // a prediction written into a wiring check fails two ways and reads the same.
         Assert.True(
             apart > 0,
@@ -1978,14 +1980,14 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// of it off the raw text with no learner and no key.
     /// </para>
     /// <para>
-    /// <b>And it pays five times more under the bag</b> than under the addressed front end,
-    /// which is the reading the second arm exists for. Addressed hands the learner one statement
+    /// <b>And it pays five times more under the bag</b> than under the one-hop chain,
+    /// which is the reading the second arm exists for. The chain hands the learner one statement
     /// and has already done the selecting, so a category has almost nothing left to
     /// generalise over and buys a point or two; the bag hands over the whole story and the
     /// category buys five, on both tasks that need more than one fact.
     /// </para>
     /// <para>
-    /// <b>And under the bag it is bought for nothing</b>, where under the addressed arm it
+    /// <b>And under the bag it is bought for nothing</b>, where under the one-hop chain it
     /// costs a third more population. The task that sits at its capacity keeps the identical
     /// budget and scores better with it, so what the category buys there is not more rules —
     /// it is the same rules saying more.
@@ -2024,18 +2026,19 @@ public sealed class RecalledTests(ITestOutputHelper output)
             // cannot be the yardstick here and the reading has to be taken against the
             // marginal instead.
             //
-            // And both front ends, because the addressed one has already done the narrowing.
+            // And both front ends, because the one-hop chain has already done the narrowing.
             // It hands the learner one statement, where a category has almost nothing left to
             // generalise over; the bag hands it the whole story. An arm measured only under
             // the front end that solved the problem would be reporting the front end.
-            foreach (var joining in new[] { Joining.Bagged, Joining.Addressed })
+            foreach (var joining in new[] { Joining.Bagged, Joining.Chained })
             {
                 var scored = new double[2];
 
                 foreach (var sorted in new[] { false, true })
                 {
                     var (world, trial, brain) = Made(
-                        World(task, span: 0), joining, categories: sorted ? categories : null);
+                        World(task, span: 0), joining, categories: sorted ? categories : null,
+                        hops: 1);
 
                     var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
 
@@ -2107,7 +2110,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     {
         foreach (var task in new[] { 1, 2, 3 })
         {
-            var (world, trial, brain) = Made(World(task, span: 0), Joining.Addressed);
+            var (world, trial, brain) = Made(World(task, span: 0), Joining.Chained, hops: 1);
             var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
 
             var (naming, company) = Counted(task);

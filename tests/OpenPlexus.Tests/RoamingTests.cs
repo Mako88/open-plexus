@@ -640,6 +640,15 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // are taken. Two arms whose caps and whose uniqueness are both indistinguishable read a
         // third of each other, so if either half of that stops holding the refutation is owed a
         // re-take rather than quietly surviving in a comment.
+        //
+        // And no other arm can stand in this cell, which is the reading that stopped a
+        // deletion. `Distinguished` was listed for removal as a joining that loses to
+        // `Chained` everywhere -- it does, 0.152 to 0.166 against 0.177 to 0.191 at four
+        // people, both at or under a marginal near 0.19. What it does that nothing else does
+        // is conflate 0.000 to 0.004 while scoring the marginal, and `Chained` conflates
+        // 0.121 to 0.139 here, an order of magnitude away. So the arm that would be deleted
+        // for being worse is the one holding half of the only comparison that refutes the
+        // conflation column as a ranking, and there is no substitute in the tree.
         foreach (var name in new[] { nameof(Joining.Distinguished), "Resolved(1)" })
         {
             Assert.True(twinned[(4, name)].Max() < 0.01 && distinct[(4, name)].Min() > 0.99,

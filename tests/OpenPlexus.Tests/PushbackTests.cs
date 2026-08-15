@@ -106,6 +106,33 @@ public sealed class PushbackTests(ITestOutputHelper output)
                 + "on the strength of an argument.",
             Settles: "Count the candidates rung two would consider under Winnow against "
                 + "under Banded, on one world. It needs no learner and costs minutes."),
+
+        new(
+            With: "The one-mechanism-an-area reduction, as it is listed",
+            Claim: "The list names eight brain dials to delete and every one of them is "
+                + "either a control or a winner. Repairing.AfterFailure, Coarsening.Never, "
+                + "Forking.Repeated and Budgeting.Children each carry a sentence in their "
+                + "own XML comment saying they are kept as a control or a check, and "
+                + "Surprising.AnyFailure has a refutation row saying it survives as the arm. "
+                + "Subsuming.Insignificant gains about five points and doubles the sound "
+                + "rules on the noisy multiplexer, and Mending.Uncovered is the best thing "
+                + "measured on the clean one -- so both are the winner on a world. The two "
+                + "left are entangled with open questions rather than free: "
+                + "Speaking.Experienced is half of the grid that answers what Widening "
+                + "should be, which is one of the two decisions the reduction was waiting "
+                + "on, and Mending.Improving is fork 45's driver. The same reading applies "
+                + "to Joining.Resolved, which the list also has going: it beats every "
+                + "backward-reading arm on Roaming at four people, 0.497 against 0.167 and "
+                + "0.19 marginal, and it is the only mechanism standing for a whole "
+                + "architecture requirement. Executing the list as written would delete "
+                + "instruments and world-winners while the tree is already at one mechanism "
+                + "an area, which is the opposite of what the wide build is for.",
+            Settles: "The audit above is the whole of the objection, so it closes by "
+                + "somebody reading it and either re-issuing a shorter list or agreeing "
+                + "the dials are already reduced. What would refute it is a per-dial "
+                + "reading showing one of the five self-declared controls is not compared "
+                + "against anything -- a control nothing reads is a candidate wearing a "
+                + "control's clothes, and that one really should go."),
     ];
 
     /// <summary>
@@ -158,6 +185,6 @@ public sealed class PushbackTests(ITestOutputHelper output)
     [Fact]
     public void A_disagreement_leaves_by_being_settled_and_not_by_being_dropped()
     {
-        Assert.Equal(5, Open.Length);
+        Assert.Equal(6, Open.Length);
     }
 }

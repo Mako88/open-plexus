@@ -129,7 +129,14 @@ public sealed class DocsTests
     // And 9,949 is the ratchet doing its ordinary work in the same session. Compaction
     // reworded the fork 107 gate and the rung-three leaf once each had a number behind it,
     // which is four words back. A raise that is not spent stays spent otherwise.
-    private const int Whole = 9_949;
+    //
+    // And 9,961 is the fifth, for a world that can be ACTED IN. `IWorld.Next` was a pull for
+    // the life of the branch, so no learner ever chose anything and *original thought* was
+    // the one architecture line with nothing under it at all. `IActed` is the verb, and the
+    // two leaves it earns say what is built and what a policy is still handed in for.
+    // Twelve words after the addition was tightened, no item deleted, and the route said
+    // none of it -- the third condition being what a leaf reading "nothing" cannot meet.
+    private const int Whole = 9_961;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

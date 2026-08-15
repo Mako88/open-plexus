@@ -1,4 +1,6 @@
 using OpenPlexus.Codes;
+using OpenPlexus.Commitments;
+using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
@@ -19,6 +21,8 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     private static HomeostatSettings World() => new();
 
     private const int Steps = 400;
+
+    private const long Rounds = 20_000;
 
     // ---- what the world is, asserted rather than described -----------------
 
@@ -130,4 +134,246 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         Assert.Equal(Enumerable.Range(0, ranked.Needs), standing.Order());
     }
 
+    // ---- and what it is when it is acted in --------------------------------
+
+    /// <summary>Whichever variable is furthest from where it should be.</summary>
+    /// <remarks>
+    /// <b>The oracle, and it reads the world rather than the codes</b>, which is the
+    /// licence a ceiling has and a mechanism does not. It says how well the body could be
+    /// held with these actions, so a learner's number is read against something rather
+    /// than against nothing.
+    /// </remarks>
+    private static Func<IReadOnlyCollection<Code>, int?> Aimed(Homeostat body) =>
+        _ => body.Lowest;
+
+    /// <summary>A variable drawn uniformly, knowing nothing.</summary>
+    private static Func<IReadOnlyCollection<Code>, int?> Blindly(Homeostat body, Random draw) =>
+        _ => draw.Next(body.Doings);
+
+    /// <summary>How much of a run a body stayed inside its bounds.</summary>
+    /// <param name="body">The world.</param>
+    /// <param name="choosing">What to do about each state.</param>
+    /// <param name="steps">How many turns.</param>
+    private static double Held(
+        Homeostat body, Func<IReadOnlyCollection<Code>, int?> choosing, int steps)
+    {
+        var front = new Bodied(Feeling.Acted);
+        var viable = 0;
+
+        for (var step = 0; step < steps; step++)
+        {
+            body.Do(choosing(front.Codify(body.Now)));
+            body.Next();
+
+            if (body.Viable) viable++;
+        }
+
+        return viable / (double)steps;
+    }
+
+    /// <summary>
+    /// The verb exists and the world answers it, which is what nothing could do before.
+    /// </summary>
+    /// <remarks>
+    /// <b>The property rather than a comparison</b>, so it outlives whatever arms are run
+    /// over it. A turn reports the state an action was taken in and the consequence that
+    /// followed, so the state must be the one BEFORE the step and the outcome the one after
+    /// -- reading both after would hand a commitment what it did and what it did it to at
+    /// once, with nothing left to be wrong about.
+    /// </remarks>
+    [Fact]
+    public void A_turn_reports_the_state_it_was_acted_in_and_what_followed()
+    {
+        var body = new Homeostat(World());
+
+        var before = body.Feels();
+
+        body.Do(0);
+
+        var turn = body.Next();
+
+        // The state acted in, not the one that resulted. Compared AS A SEQUENCE, because a
+        // `readonly record struct` holding an `ImmutableArray` compares by the array's
+        // identity -- this repo's own trap, and it fires here on two arrays that print the
+        // same and are not the same object.
+        Assert.Equal<IEnumerable<Code>>(before, turn.Seen.Felt);
+        Assert.Equal(0, turn.Seen.Did);
+
+        // And the consequence, read after the step. `Lowest` is a fact about where the body
+        // stands NOW, so it must have moved on from what `before` describes.
+        Assert.Equal(body.Lowest, turn.Outcome);
+
+        // An action is spent once. A second turn with nothing chosen does nothing, which is
+        // the arm rather than the absence of one -- and a pending action surviving its own
+        // step would make every later round act on a choice nobody made.
+        var next = body.Next();
+
+        Assert.Null(next.Seen.Did);
+    }
+
+    /// <summary>
+    /// Acting is worth something here, which is what makes the world an instrument.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The control a verb needs, and it costs no learning at all.</b> A world that could be
+    /// held as well by drawing uniformly measures nothing about choosing, and this repo has
+    /// already been caught by an arm reading identically to its control. The three arms are
+    /// every choice that needs no population: the oracle, a uniform draw, and doing nothing.
+    /// </para>
+    /// <para>
+    /// <b>Doing nothing is the arm rather than the absence of one</b>, which is why it is run
+    /// here. Everything falls whether or not anything is done, so idling is the fastest way
+    /// to fail -- and a learner scoring above it has cleared a bar that a world rewarding
+    /// caution would not have set.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Aiming_holds_the_body_where_guessing_and_idling_do_not()
+    {
+        var aimed = new Homeostat(World());
+        var blind = new Homeostat(World());
+        var idle = new Homeostat(World());
+
+        var byAim = Held(aimed, Aimed(aimed), Steps);
+        var byLuck = Held(blind, Blindly(blind, new Random(1)), Steps);
+        var byNothing = Held(idle, _ => null, Steps);
+
+        output.WriteLine(
+            $"viable | aimed {byAim:F3} | uniform {byLuck:F3} | idle {byNothing:F3} "
+            + $"| idling lasts {idle.Idling} steps of {Steps}");
+
+        // The ceiling is reachable, or the world is unholdable and every arm over it is a
+        // comparison between two failures.
+        Assert.True(byAim > 0.99, $"the oracle held the body only {byAim:F3} of the time");
+
+        // And it is not reachable by luck, or attending to the lowest and attending at
+        // random differ in variance alone -- which is the world measuring nothing. The
+        // margin is left unstated on purpose: what is asserted is that the arms differ, and
+        // a prediction written into a wiring check fails two ways and reads the same.
+        Assert.True(byLuck < byAim, $"a uniform draw held the body {byLuck:F3} against {byAim:F3}");
+
+        // And idling is the floor rather than a safe option, which is the whole reason this
+        // world replaced one scored on survival.
+        Assert.True(byNothing < byLuck, $"doing nothing held the body {byNothing:F3}");
+    }
+
+    /// <summary>
+    /// A trial refuses to run an acted world with nothing to act with.
+    /// </summary>
+    /// <remarks>
+    /// <b>A fallback is a control arm nobody meant to run</b>, and this is that trap caught at
+    /// the constructor. A run that quietly did nothing every round would report a body that
+    /// had failed within <see cref="Homeostat.Idling"/> steps as though it were a learner's
+    /// score, and nothing in the tally would say which had happened.
+    /// </remarks>
+    [Fact]
+    public void An_acted_world_with_no_chooser_is_refused_rather_than_left_idle()
+    {
+        var body = new Homeostat(World());
+        var brain = new Brain(new CommittingSettings(), 1);
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new Trial<Bodily>(body, new Bodied(Feeling.Acted), brain));
+
+        // And the other way round, because a chooser nobody asks is an arm that reads as
+        // having run. The multiplexer is watched, so a chooser handed to it would sit
+        // unused while its cell reported a policy.
+        Assert.Throws<ArgumentException>(() =>
+            new Trial<IReadOnlyList<int>>(
+                new Multiplexer(new MultiplexerSettings { Address = 2 }, 1),
+                new Bits(2 + 4),
+                brain,
+                acting: _ => 0));
+    }
+
+    /// <summary>
+    /// Whether telling the learner what it DID buys anything over telling it only what it felt.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The reading the verb exists for</b>, and the control that could kill it. An action in
+    /// the moment is only worth having if the moment could not already say what follows. Under
+    /// a uniform chooser the action is independent of the state, so it is information the bands
+    /// do not contain — which makes this the cell where the two arms can differ at all.
+    /// </para>
+    /// <para>
+    /// <b>What was said before the run is wrong.</b> It was that the arms would sit together
+    /// under the oracle, and the reasoning was that attending to the lowest makes the action a
+    /// deterministic function of the state, so saying it adds a code the learner could have
+    /// derived. What happens is 0.000 against 0.500, and the reason is the shipped genesis
+    /// rule: a body held perfectly steady emits the same bands every round, nothing has ever
+    /// varied, and genesis roots on nothing — 20,000 rounds, no commitment minted, silent
+    /// throughout. The action is the ONLY thing that varies there, because attending to the
+    /// lowest makes which-variable rotate while the magnitudes barely move.
+    /// </para>
+    /// <para>
+    /// <b>So a perfectly regulated body teaches nothing about itself</b>, which is a fact about
+    /// this design meeting Ashby's rather than a fault in either. The never-varied rule is in
+    /// the refutation table for good reasons measured elsewhere, and this is the first world
+    /// where it takes a whole arm to silence. What is left to learn from is what was DONE.
+    /// </para>
+    /// <para>
+    /// <b>And the uniform cell went the other way</b>, 0.975 blind against 0.956 acted, so
+    /// saying what was done costs a little there. Which is arithmetic once it is looked at:
+    /// one restore rarely moves which variable is lowest, so the bands almost determine the
+    /// answer and the action code is mostly noise beside them. The kill line did not fire —
+    /// it was the arms sitting TOGETHER under the uniform chooser, and they do not — but the
+    /// cell that carries the design is the oracle one and that was not the prediction.
+    /// </para>
+    /// <para>
+    /// <b>And what is asserted is that they differ somewhere</b>, never which way or by how
+    /// much. A prediction written into a wiring check fails two ways and reads the same, and
+    /// this repo has already paid for that once — which is why the numbers above could be
+    /// recorded as a correction instead of quietly matching a bar.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_saying_what_was_done_buys_anything_over_saying_what_was_felt()
+    {
+        var scored = new Dictionary<string, double>(StringComparer.Ordinal);
+
+        foreach (var uniform in new[] { true, false })
+        foreach (var feeling in new[] { Feeling.Blind, Feeling.Acted })
+        {
+            var body = new Homeostat(World());
+            var draw = new Random(1);
+            var brain = new Brain(new CommittingSettings { Capacity = 2000 }, 1);
+
+            var trial = new Trial<Bodily>(
+                body,
+                new Bodied(feeling),
+                brain,
+                acting: uniform ? Blindly(body, draw) : Aimed(body));
+
+            var tally = trial.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000);
+
+            scored[$"{(uniform ? "uniform" : "aimed  ")} {feeling}"] = tally.Recent;
+
+            output.WriteLine(
+                $"{(uniform ? "uniform" : "aimed  ")} {feeling,-6} | drawn {tally.Recent:F3} "
+                + $"| chance {trial.Chance:F3} | viable {(body.Viable ? "yes" : "no ")} "
+                + $"| held {brain.Held.Count,4} | silent {tally.Silent} "
+                + $"| repaired {tally.Repaired}");
+        }
+
+        // Under a uniform chooser the action is the one thing the bands cannot supply, so the
+        // arms have to come apart there or the moment is not carrying it.
+        Assert.NotEqual(scored["uniform Blind"], scored["uniform Acted"], precision: 3);
+
+        // And under the oracle the blind arm holds NOTHING, which is the reading worth failing
+        // the build over. A body held steady never varies a band, genesis roots on nothing,
+        // and the run is silent for its whole length -- so the acted arm is not merely ahead
+        // there, it is the only arm with a population at all. This asserts the silence rather
+        // than the gap, because the gap is a score and the silence is the mechanism.
+        var quiet = new Homeostat(World());
+
+        var blind = new Trial<Bodily>(
+            quiet,
+            new Bodied(Feeling.Blind),
+            new Brain(new CommittingSettings { Capacity = 2000 }, 1),
+            acting: Aimed(quiet));
+
+        Assert.Equal(Rounds, blind.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000).Silent);
+    }
 }

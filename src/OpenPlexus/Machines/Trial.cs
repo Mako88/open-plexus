@@ -593,6 +593,7 @@ public sealed class Trial<TSeen>
     private readonly IQuantizer<TSeen> _sensing;
     private readonly Brain _brain;
     private readonly Func<ImmutableArray<Code>, Code, bool>? _sound;
+    private readonly Func<IReadOnlyCollection<Code>, int?>? _acting;
 
     /// <param name="world">The problem.</param>
     /// <param name="sensing">The translation between it and the brain.</param>
@@ -616,20 +617,57 @@ public sealed class Trial<TSeen>
     /// nothing on a world whose truth cannot be enumerated anyway.
     /// </para>
     /// </remarks>
+    /// <param name="acting">
+    /// What to do about the state the world is in, given the codes it reads as —
+    /// <b>required of a world that can be acted in</b>, and refused of one that cannot.
+    /// </param>
+    /// <remarks>
+    /// <para>
+    /// <b>A delegate rather than a policy type</b>, for the same reason <c>sound</c> is one. A
+    /// trial may not know which world it is running, and a chooser that named
+    /// <c>Homeostat</c> would put one world's vocabulary in front of every other.
+    /// </para>
+    /// <para>
+    /// <b>An acted world with no chooser is refused</b> rather than left doing nothing,
+    /// which is this repo's own trap about a fallback being a control arm nobody meant to run.
+    /// Doing nothing IS an arm on a body whose variables fall unattended — it is the fastest
+    /// way to fail, and a run that took it by omission would report a dead body as a learner's
+    /// score. It has to be asked for, and asking for it is a chooser that returns nothing.
+    /// </para>
+    /// <para>
+    /// <b>The chooser reads codes and never the world's own terms</b>, so the seam it sits on
+    /// is the same one the brain sits on. An oracle is then a chooser that was handed the
+    /// answer, a control is one that draws uniformly, and a learner is one that reads a
+    /// population — three arms over one interface rather than three kinds of trial.
+    /// </para>
+    /// </remarks>
     public Trial(
         IWorld<TSeen> world,
         IQuantizer<TSeen> sensing,
         Brain brain,
-        Func<ImmutableArray<Code>, Code, bool>? sound = null)
+        Func<ImmutableArray<Code>, Code, bool>? sound = null,
+        Func<IReadOnlyCollection<Code>, int?>? acting = null)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(sensing);
         ArgumentNullException.ThrowIfNull(brain);
 
+        if (world is IActed<TSeen> && acting is null)
+            throw new ArgumentNullException(nameof(acting),
+                "this world is acted in and nothing was given to act with, so every round "
+                + "would do nothing -- which is an arm rather than an absence. Pass a chooser, "
+                + "and pass one returning null if doing nothing is the arm wanted");
+
+        if (world is not IActed<TSeen> && acting is not null)
+            throw new ArgumentException(
+                "this world cannot be acted in, so a chooser would never be asked and its "
+                + "arm would read as having run", nameof(acting));
+
         _world = world;
         _sensing = sensing;
         _brain = brain;
         _sound = sound;
+        _acting = acting;
     }
 
     /// <summary>What a blind guess scores on this world.</summary>
@@ -777,6 +815,13 @@ public sealed class Trial<TSeen>
 
         for (long round = 0; round < rounds; round++)
         {
+            // Chosen in the state the world is in, and spent by the step that follows. The
+            // chooser reads `Now` through the same front end the learner reads its moments
+            // through, so what it is allowed to see is exactly what the learner is allowed to
+            // see -- an oracle that read the world's own terms would be a fourth channel
+            // nobody declared.
+            if (_world is IActed<TSeen> acted) acted.Do(_acting!(Sensed(acted.Now)));
+
             var turn = _world.Next();
 
             var said = Sensed(turn.Seen);

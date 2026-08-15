@@ -83,12 +83,19 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // budget below is back off nought for the first time since it reached it, which
         // should read as a debt rather than as a threshold being relaxed.
         ["Composed.Third"] = Stranded,
-        ["Homeostat.Act"] = Stranded,
-        ["Homeostat.Attended"] = Stranded,
-        ["Homeostat.Attending"] = Stranded,
-        ["Homeostat.Idling"] = Stranded,
-        ["Homeostat.Lowest"] = Stranded,
-        ["Homeostat.Viable"] = Stranded,
+
+        // FIVE OF `Homeostat`'S SIX CAME OFF TOGETHER, which is what the entry said would
+        // happen: each leaves by its world getting a runner. `IActed` is that runner's
+        // missing half -- `Act`, `Attending` and `Lowest` are called by the front end and
+        // the oracle, and `Viable` and `Idling` by the control that says the world
+        // discriminates. What is left is the reverse mapping.
+        ["Homeostat.Attended"] =
+            "THE MAPPING RUN BACKWARDS, and nothing reads an action out of a moment yet. "
+            + "`Attending` turns a variable into a code and the front end calls it; the "
+            + "inverse is what a CHOOSER reading a population's expectation would need, "
+            + "which is `Drives` and is not built. It leaves when something asks a "
+            + "commitment what it would do rather than what would follow.",
+
         ["Rhythm.Beat"] = Stranded,
         ["Rhythm.Turned"] = Stranded,
 
@@ -207,7 +214,14 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // 20 -- both settled, and `csharp` disqualified survival as a score and refuted
         // absolute actions under an unrotated view besides. `PushbackTests` had the decision
         // recorded and waiting; this is somebody taking it.
-        Assert.Equal(10, Unused.Count);
+        //
+        // Five, and the other five came off the way the entries said they would: by their
+        // world getting a runner. `Homeostat` had six here and every one of them was
+        // unreachable because `IWorld.Next` is a pull, so a body that takes an action had
+        // nowhere to be asked from. `IActed` is that call, and `Act`, `Attending`, `Lowest`,
+        // `Viable` and `Idling` are all read the moment a world can be acted in. The sixth
+        // is the mapping run backwards and has a reason of its own now.
+        Assert.Equal(5, Unused.Count);
     }
 
     [Fact]
@@ -285,6 +299,13 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["Felt"] = "used by `Sensing`, which shares its file — the own-file rule "
             + "cannot see a caller sitting beside it.",
 
+        ["Bodied"] = "A FRONT END IS CHOSEN AT THE JOIN, so the library naming one would "
+            + "be the library deciding how a world is perceived -- the same line `Posted` "
+            + "sits on one layer out. `IQuantizer` is what `src` knows about; which "
+            + "translation runs is a harness's decision, and `Joined` and `Bits` are on "
+            + "this footing without being on this list only because a `*Run` still names "
+            + "them.",
+
         // And both entries changed their reason rather than their status, which is the
         // more interesting outcome. `Asker` came off this list because `Fleet` names it,
         // and the two that remain are not unmounted any more -- they are the deployment,
@@ -328,7 +349,14 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // live questions; keeping them all is a world budget nobody is paying.
         ["Clevr"] = Stranded,
         ["Composed"] = Stranded,
-        ["Homeostat"] = Stranded,
+
+        ["Homeostat"] =
+            "A WORLD, ON `Roaming`'S FOOTING SINCE `IActed` EXISTS, and it is the first "
+            + "world here that is acted in rather than watched. `Trial` drives it through "
+            + "`IActed` -- the same seam `IWorld` sits on, with a chooser handed in at the "
+            + "join -- so the library naming it would be the library naming a world, which "
+            + "is the fault this list exists to catch and not a debt it records.",
+
         ["Latent"] = Stranded,
         ["Motif"] = Stranded,
         ["Recalled"] = "A WORLD, ON `Roaming`'S FOOTING, and it was on the stranded list "

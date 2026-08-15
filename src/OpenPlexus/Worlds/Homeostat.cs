@@ -82,6 +82,31 @@ public sealed record HomeostatSettings
     public bool Ranked { get; init; }
 }
 
+/// <summary>What a body felt, and what was done about it.</summary>
+/// <remarks>
+/// <para>
+/// <b>The two halves of a moment in an acted world</b>, and they arrive together because a
+/// consequence is a fact about both. <i>Variable two was low</i> predicts nothing on its own;
+/// <i>variable two was low and I attended to variable nought</i> predicts what follows, and
+/// the difference between those is the whole of what an action buys.
+/// </para>
+/// <para>
+/// <b>Codes rather than numbers, because the body already quantised them.</b> Every other
+/// world here hands over its own terms and lets a front end code them, and this one's terms
+/// ARE bands — a drive is felt as a state rather than read as a float, which is
+/// <see cref="Homeostat.Feels"/>'s own line. What a front end is left to decide is whether the
+/// action goes in the moment at all, which is the arm.
+/// </para>
+/// </remarks>
+public readonly record struct Bodily
+{
+    /// <summary>What the body felt about itself, before anything was done.</summary>
+    public required ImmutableArray<Code> Felt { get; init; }
+
+    /// <summary>Which variable was attended to, or nothing where nothing was done.</summary>
+    public required int? Did { get; init; }
+}
+
 /// <summary>
 /// Ashby's homeostat: internal variables that must be kept in bounds, and no
 /// reward for keeping them there.
@@ -108,7 +133,7 @@ public sealed record HomeostatSettings
 /// rather than time until death.
 /// </para>
 /// </remarks>
-public sealed class Homeostat
+public sealed class Homeostat : IActed<Bodily>
 {
     /// <summary>The first variable's modality; need <c>i</c> is <c>Need + i</c>.</summary>
     private const byte Need = 80;
@@ -132,6 +157,12 @@ public sealed class Homeostat
     private readonly HomeostatSettings _settings;
     private readonly double[] _at;
 
+    // What a chooser asked for and the next step has not spent yet. Held here rather than
+    // passed to `Next` because an action is taken IN a state and a turn reports one that has
+    // already been acted in -- see `IActed`. Cleared by the step, so an unanswered `Do` can
+    // never be spent twice.
+    private int? _pending;
+
     /// <param name="settings">The shape of the body.</param>
     public Homeostat(HomeostatSettings settings)
     {
@@ -154,6 +185,65 @@ public sealed class Homeostat
 
     /// <summary>Where every variable stands right now.</summary>
     public IReadOnlyList<double> At => _at;
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <b>One a variable</b>, because attending is the only thing this body can do. Ashby's
+    /// unit deviates and its neighbours are what it deviates against, so the whole action
+    /// space here is <i>which one to look after</i> — and doing nothing is
+    /// <see cref="Do"/>'s null rather than an extra doing, so a chooser drawing uniformly
+    /// draws over acts and not over acts-plus-idling.
+    /// </remarks>
+    public int Doings => _settings.Needs;
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <b>Nothing done yet</b>, which is what makes this the state an action is chosen in.
+    /// <see cref="Bodily.Did"/> is null here and carries the choice in the turn that follows,
+    /// so a chooser reading this cannot see its own answer.
+    /// </remarks>
+    public Bodily Now => new() { Felt = Feels(), Did = null };
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <b>Which variable is worst NOW, which is the consequence a chooser needs.</b> Whether
+    /// the body is still viable would be the obvious outcome and is nearly always true, so a
+    /// population answering <i>yes</i> forever would score above nine tenths having learnt
+    /// nothing. Which one is in trouble moves every step under a policy that holds the body,
+    /// because the drains are uneven — see <see cref="HomeostatSettings.Drain"/>, where that
+    /// rotation is the same property the rank codes were built for.
+    /// </remarks>
+    public int Outcomes => _settings.Needs;
+
+    /// <inheritdoc/>
+    public void Do(int? doing)
+    {
+        if (doing is { } which)
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(which, _settings.Needs);
+
+        if (doing is { } low) ArgumentOutOfRangeException.ThrowIfNegative(low);
+
+        _pending = doing;
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <b>The state is read before the step and the outcome after it</b>, which is the only
+    /// arrangement that makes the turn a claim about a consequence. Reading both after would
+    /// report a body that had already been restored, and a commitment learning from that
+    /// would be told what it did AND what it did it to, with nothing left to be wrong about.
+    /// </remarks>
+    public Turn<Bodily> Next()
+    {
+        var felt = Feels();
+        var did = _pending;
+
+        _pending = null;
+
+        Step(did);
+
+        return new Turn<Bodily> { Seen = new Bodily { Felt = felt, Did = did }, Outcome = Lowest };
+    }
 
     /// <summary>How fast need <paramref name="which"/> falls.</summary>
     public double Falls(int which)

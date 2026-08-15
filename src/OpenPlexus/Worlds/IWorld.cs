@@ -73,6 +73,70 @@ public interface IWorld<TSeen>
 }
 
 /// <summary>
+/// A world that is ACTED IN rather than only watched — <b>the verb <see cref="IWorld{TSeen}"/>
+/// never had.</b>
+/// </summary>
+/// <typeparam name="TSeen">Whatever this world natively produces.</typeparam>
+/// <remarks>
+/// <para>
+/// <b><see cref="IWorld{TSeen}.Next"/> is a pull, so no learner has ever chosen anything.</b>
+/// Every world on this branch produces its next turn unasked and the machine's only job is to
+/// say what will follow. That is enough for reading, for the multiplexer and for every
+/// perceptual world here, and it is not enough for <i>original thought</i>: a conclusion the
+/// machine was never told and could not have reached by matching needs something it can do
+/// that the world answers.
+/// </para>
+/// <para>
+/// <b>What is added is one call and no policy</b>, which is deliberate. This says the world
+/// takes an action; it does not say who chooses one, because choosing needs a preference over
+/// consequences and a preference is a DRIVE. Putting the chooser in here would decide that
+/// question by interface rather than by measurement, and the whole point of the split is that
+/// a random chooser, an oracle and a learner are three arms over one seam.
+/// </para>
+/// <para>
+/// <b>The action is in the moment rather than beside it</b>, which is what keeps the learner
+/// unchanged. A world reports the state it was acted in AND what was done as ordinary codes,
+/// so a commitment's scope can name both and its expectation is the consequence — <i>what
+/// would the world look like if I did X</i> falls out of the machinery that already exists,
+/// with no new matcher. That is the same move rung three made with precedences.
+/// </para>
+/// <para>
+/// <b>And <see cref="Now"/> is what a chooser reads</b>, because an action is taken IN a state
+/// and <see cref="IWorld{TSeen}.Next"/> reports one that has already been acted in. Without it
+/// a chooser would be picking blind or the interface would have to hand it the last turn,
+/// which is a state the world has already left.
+/// </para>
+/// </remarks>
+public interface IActed<TSeen> : IWorld<TSeen>
+{
+    /// <summary>How many distinct things can be done.</summary>
+    /// <remarks>
+    /// <b>What a blind chooser is against</b>, exactly as <see cref="IWorld{TSeen}.Outcomes"/>
+    /// is what a blind guess is against. A control arm that had to be told the action count
+    /// separately could be told it wrong.
+    /// </remarks>
+    int Doings { get; }
+
+    /// <summary>What is true now, before anything is done about it.</summary>
+    /// <remarks>
+    /// <b>Read-only and it moves nothing</b>, which is what separates it from
+    /// <see cref="IWorld{TSeen}.Next"/>. Asking what the state is must not BE a step, or a
+    /// chooser that looked twice would have run the world twice.
+    /// </remarks>
+    TSeen Now { get; }
+
+    /// <summary>Do this, and the next turn is its consequence.</summary>
+    /// <param name="doing">Which of <see cref="Doings"/>, or nothing to do nothing.</param>
+    /// <remarks>
+    /// <b>Doing nothing is expressible</b>, and it is not the same as not being asked. A body
+    /// whose variables fall whether or not it acts makes standing still a choice with a cost,
+    /// which is the whole reason such a world cannot be gamed by inaction — so the interface
+    /// must be able to say it rather than leaving it as the absence of a call.
+    /// </remarks>
+    void Do(int? doing);
+}
+
+/// <summary>
 /// A world built from a finite bag, holding some of it back.
 /// </summary>
 /// <typeparam name="TSeen">Whatever this world natively produces.</typeparam>

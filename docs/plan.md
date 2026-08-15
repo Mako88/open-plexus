@@ -455,8 +455,10 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       Being told which word the question is about is information no amount of co-occurrence
       contains, and it is the pointing-and-naming shape.
   - Original thought
-    - **NOW** — nothing. Every world here is watched rather than acted in, and action, a
-      consequence that can surprise, and a goal are all unbuilt.
+    - **NOW** — `IActed` is the verb, and what was done rides in the moment as a code, so a
+      scope names it and expects the consequence.
+    - **OPEN** — the chooser and the goal are unbuilt. A body held steady varies no band, so
+      what was DONE is all there is to learn from.
     - **OPEN** — `Roaming` is the spine, so it grows to each tier rather than closing: word
       order first, then twins, then acting. An isolating world is still built freely and goes
       when its question shuts, because only a constructed world can prove a ceiling.
@@ -494,7 +496,7 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       18, 20, 21, 22 and 24 went with it; `csharp` keeps their code and their numbers.
     - **OPEN** — `Drives` is the one idea still owed off it: a third factor from the body's
       own variables. `Homeostat` IS that body, stranded, so this and the debt below are one job.
-    - **BROKEN** — eight worlds have no runner, their `*Run` files being the walk's. Each
+    - **BROKEN** — seven worlds have no runner, their `*Run` files being the walk's. Each
       wants a `Trial` OR A DELETION, a world going when its question closes, and nothing
       says which. `DeadCodeTests` counts the debt.
     - **NOW** — the vote's arithmetic composes and a whole learner runs over it. Fork **52**.

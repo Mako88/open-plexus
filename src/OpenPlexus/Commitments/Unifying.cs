@@ -34,9 +34,9 @@ namespace OpenPlexus.Commitments;
 /// <b>Which is the half the front end has to supply and on text does not.</b>
 /// <see cref="Codes.Joined"/> unions the question's words into the story's bag under one
 /// modality, so <i>asked</i> and <i>told</i> are the same code and a repeated entry
-/// binds against nothing. <see cref="Joining.Anonymous"/> is that join computed in the
-/// front end with the identity thrown away; keeping the identity is what a variable is,
-/// and it needs the two halves to be tellable apart in the moment.
+/// binds against nothing. A front end computing that join with the identity thrown away was
+/// measured and is deleted; keeping the identity is what a variable is, and it needs the two
+/// halves to be tellable apart in the moment.
 /// </para>
 /// </remarks>
 public static class Unifying

@@ -18,9 +18,8 @@ namespace OpenPlexus.Codes;
 /// all.</b> Matching, the tally, the discriminative gate, naming, subsumption and the wire
 /// all read a set of codes, and a precedence IS one — so it is matched by the same subset
 /// test and chosen by the same repair. <b>It is the trick
-/// <see cref="Commitments.Unifying.Any"/> uses for a variable and
-/// <see cref="Joining.Either"/> uses for an absence</b>, which is John's own rung-two
-/// proposal moved to where it needs no new machinery.
+/// <see cref="Commitments.Unifying.Any"/> uses for a variable</b>, and the shape John's own
+/// rung-two proposal takes where it needs no new machinery.
 /// </para>
 /// <para>
 /// <b>And it is the learner that derives it, which is the seam this sits the right side

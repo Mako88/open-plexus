@@ -569,50 +569,6 @@ public sealed class RecalledTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// The coincidence code says what it claims, on a moment built by hand.
-    /// </summary>
-    /// <remarks>
-    /// <b>The arm is worth nothing if the marker is misplaced</b>, and a
-    /// front end that silently marked nothing would read as <i>the coincidence does not
-    /// pay</i> — the same conclusion from a wire that was never connected. Two moments,
-    /// one sharing a word and one not.
-    /// </remarks>
-    [Fact]
-    public void The_coincidence_is_marked_only_where_there_is_one()
-    {
-        var matching = new Asking
-        {
-            Story = [new HashSet<Code> { Babi.Of("mary"), Babi.Of("garden") }],
-            Question = new HashSet<Code> { Babi.Of("where"), Babi.Of("mary") },
-        };
-
-        var missing = matching with
-        {
-            Question = new HashSet<Code> { Babi.Of("where"), Babi.Of("john") },
-        };
-
-        Assert.DoesNotContain(Joined.Coincided, new Joined(Joining.Bagged).Codify(matching));
-        Assert.Contains(Joined.Coincided, new Joined(Joining.Anonymous).Codify(matching));
-        Assert.DoesNotContain(Joined.Coincided, new Joined(Joining.Anonymous).Codify(missing));
-
-        // Named carries which word it was, so it is not the anonymous code under another
-        // name — the whole difference between the two arms is this one assertion.
-        Assert.DoesNotContain(Joined.Coincided, new Joined(Joining.Named).Codify(matching));
-        Assert.Contains(
-            new Code(Joined.Both, Babi.Of("mary").Value),
-            new Joined(Joining.Named).Codify(matching));
-
-        // And the absence is said out loud, which is the only arm that speaks when nothing
-        // coincided. `Sundered` and `Coincided` are exclusive by construction.
-        Assert.Contains(Joined.Sundered, new Joined(Joining.Either).Codify(missing));
-        Assert.DoesNotContain(Joined.Sundered, new Joined(Joining.Either).Codify(matching));
-        Assert.Contains(Joined.Coincided, new Joined(Joining.Either).Codify(matching));
-
-        output.WriteLine($"matched: {new Joined(Joining.Either).Codify(matching).Count} codes");
-        output.WriteLine($"missed : {new Joined(Joining.Either).Codify(missing).Count} codes");
-    }
-
-    /// <summary>
     /// A newer statement supersedes an older one about the same thing, and only that one.
     /// </summary>
     /// <remarks>
@@ -668,160 +624,6 @@ public sealed class RecalledTests(ITestOutputHelper output)
         output.WriteLine(
             $"bag {new Joined(Joining.Bagged).Codify(story).Count} "
             + $"| distinguished {situated.Count} | addressed {addressed.Count}");
-    }
-
-    /// <summary>
-    /// Whether holding one state per thing dissolves the selection this learner cannot do.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>The measured failure is a near-perfect reader and a hopeless selector</b>, and every
-    /// arm so far has tried to help it select. A narrow view picks the sentence by hand
-    /// and reaches the ceiling; a recency band hands the position over in the alphabet and
-    /// buys about half of that. This arm does not help it select at all — it overwrites, so
-    /// that by the time the bag is built there is one place for Mary in it and selecting is
-    /// not required.
-    /// </para>
-    /// <para>
-    /// <b>The kill condition, written before the arm ran</b>: if no setting of the dial beats
-    /// <see cref="Joining.Recent"/> at the whole story, drop it. Displacement would then
-    /// be buying nothing a position code does not already buy, and the situation model would
-    /// be answering a question this world does not ask. Beating the BAG is not enough — the
-    /// bottom of this dial is a one-statement span, so an arm that only beat the bag would
-    /// be reporting the span arm under a new name.
-    /// </para>
-    /// <para>
-    /// <b>And the capacity is an axis</b>, for the reason the recency grid found. That arm's
-    /// gain evaporated as the population was allowed to grow, which is what said the extra
-    /// alphabet was being spent memorising. This one REMOVES codes rather than adding them,
-    /// so if it is real its gain should go the other way — and a single capacity could not
-    /// tell.
-    /// </para>
-    /// </remarks>
-    [Fact]
-    [Trait(Sweeps.Kind, Sweeps.Name)]
-    public void Whether_a_situation_dissolves_the_selection()
-    {
-        foreach (var capacity in new[] { 2000, 8000 })
-        {
-            // THE TWO CONTROLS FIRST, so the row they have to beat is printed in the same
-            // grid rather than cited from another one taken under other dials.
-            foreach (var joining in new[] { Joining.Bagged, Joining.Recent })
-                Row(capacity, joining);
-
-            // The displacement arm, which keys on recency and has no dial because the
-            // story supplies its own background.
-            Row(capacity, Joining.Distinguished);
-
-            // And the one the ceiling says should win outright. Pre-registered: it hands
-            // over one statement with a ceiling of one, and this learner is measured at
-            // ninety-nine per cent of its ceiling wherever it is handed one statement — so
-            // anything short of the nineties says the reader finding was conditional on
-            // something nobody has named.
-            Row(capacity, Joining.Addressed);
-        }
-
-        void Row(int capacity, Joining joining)
-        {
-            var (world, trial, brain) = Made(World(task: 1, span: 0), joining, capacity);
-
-            var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
-            var unseen = tally.Unseen;
-
-            output.WriteLine(
-                $"cap {capacity,4} {joining,-13} | "
-                + $"exam {unseen?.Accuracy ?? 0.0:F3} silent {unseen?.Silence ?? 0.0:F3} | "
-                + $"own {tally.Recent:F3} | marginal {world.Commonest:F3} | "
-                + $"held {brain.Held.Count,5} names {tally.Named,4} of {tally.Eligible,5} eligible, spoke {tally.Speaking:F2} "
-                + $"wanting {tally.Wanting:F3}");
-        }
-    }
-
-    /// <summary>
-    /// Whether naming the coincidence between a question and a story is what was missing.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>The control is in the file</b>, which is the only reason the other two mean
-    /// anything. <see cref="Joining.Bagged"/> is every reading taken before this
-    /// existed, so the three run the same world, the same seed and the same brain and
-    /// differ in one call.
-    /// </para>
-    /// <para>
-    /// <b>And the two arms separate a lookup from a variable.</b>
-    /// <see cref="Joining.Named"/> keeps which word was shared and reaches one rule per
-    /// person per place; <see cref="Joining.Anonymous"/> throws the identity away and
-    /// reaches one rule per place, which is what a variable buys. If they come back level
-    /// the identity was never the cost.
-    /// </para>
-    /// </remarks>
-    [Fact]
-    [Trait(Sweeps.Kind, Sweeps.Name)]
-    public void Whether_naming_the_coincidence_pays()
-    {
-        foreach (var task in new[] { 1, 2 })
-        {
-            foreach (var joining in new[] { Joining.Bagged, Joining.Named, Joining.Anonymous, Joining.Either })
-            {
-                var (world, trial, brain) = Made(World(task, span: 1), joining);
-                var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
-                var unseen = tally.Unseen;
-
-                output.WriteLine(
-                    $"task {task} {joining,-9} | "
-                    + $"drawn {tally.Recent:F3} unseen {unseen?.Accuracy ?? 0.0:F3} "
-                    + $"silent {unseen?.Silence ?? 0.0:F3} | commonest {world.Commonest:F3} | "
-                    + $"held {brain.Held.Count,5} names {tally.Named,4} of {tally.Eligible,5} eligible, spoke {tally.Speaking:F2} "
-                    + $"wanting {tally.Wanting:F3}");
-            }
-        }
-    }
-
-    /// <summary>
-    /// Whether recency as a CODE recovers what a narrow view was throwing away.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>The ceiling says this learner reads near-perfectly and selects hopelessly</b>,
-    /// and this is the first mechanism aimed at the second half. Shown one statement it
-    /// answers all but a hair of what is present; shown the whole story, where everything
-    /// is present, it takes under a third. What it cannot do is say WHICH sentence, because
-    /// a scope is a subset test over a set and a set has no positions.
-    /// </para>
-    /// <para>
-    /// <b>The prediction, written before the arm ran</b>: banded at the whole story it should
-    /// reach at least what the one-statement view reached. The narrow view wins by
-    /// throwing information away, and a band hands the same information over while keeping
-    /// the rest — so anything short of that says the learner cannot use recency even when
-    /// it is spelled out in its own alphabet, which is a finding about the LEARNER and not
-    /// about the front end.
-    /// </para>
-    /// </remarks>
-    [Fact]
-    [Trait(Sweeps.Kind, Sweeps.Name)]
-    public void Whether_recency_as_a_code_recovers_the_selection()
-    {
-        // And the capacity is an axis rather than a constant, because the first reading of
-        // this arm came back pinned at the cap. Banding multiplies the alphabet, so the
-        // banded population saturated where the control sat at a twentieth of the limit --
-        // and a comparison where one arm is against a wall and the other is not measures
-        // the wall. Both arms get both caps, which is the only way to tell which it was.
-        foreach (var capacity in new[] { 2000, 8000 })
-        {
-            foreach (var span in new[] { 0, 2 })
-            foreach (var joining in new[] { Joining.Bagged, Joining.Recent })
-            {
-                var (world, trial, brain) = Made(World(task: 1, span: span), joining, capacity);
-                var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
-                var unseen = tally.Unseen;
-
-                output.WriteLine(
-                    $"cap {capacity,4} span {span} {joining,-7} | exam {unseen?.Accuracy ?? 0.0:F3} "
-                    + $"silent {unseen?.Silence ?? 0.0:F3} | own {tally.Recent:F3} | "
-                    + $"marginal {world.Commonest:F3} | held {brain.Held.Count,5} "
-                    + $"names {tally.Named,4} of {tally.Eligible,5} eligible, spoke {tally.Speaking:F2} wanting {tally.Wanting:F3}");
-            }
-        }
     }
 
     /// <summary>
@@ -1896,6 +1698,56 @@ public sealed class RecalledTests(ITestOutputHelper output)
             converted.Max() - converted.Min() > 0.05,
             $"every task converted its ceiling alike, from {converted.Min():F3} to "
             + $"{converted.Max():F3}, so the ceiling is the whole of the score");
+    }
+
+    /// <summary>
+    /// A chain of one hop reads the statement addressing reads, and nothing else.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The check that makes a deletion legitimate, written before the deletion.</b>
+    /// <see cref="Joining.Addressed"/> and <see cref="Joining.Chained"/> at one hop are the
+    /// same rule said twice — walk the story newest first, keep the first statement naming
+    /// anything the question named, stop. Two names for one mechanism is the fault this repo
+    /// has a whole trap about, and it cost a session: the selection grid compared the chain
+    /// against a bag and never against its own one-hop form, because the one-hop form was
+    /// spelt differently.
+    /// </para>
+    /// <para>
+    /// <b>It asserts the property rather than the equivalence</b>, which is what lets it
+    /// survive what it licenses. A test comparing the two arms would have to be deleted with
+    /// the arm it justified — and this repo's trap list says that deleting the last arm
+    /// deletes the check that made the deletion legitimate. What is asserted here is what the
+    /// surviving arm DOES, so the guard outlives the thing it replaced.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_chain_of_one_hop_reads_what_addressing_reads()
+    {
+        foreach (var task in new[] { 1, 2, 3 })
+        {
+            var world = new Recalled(World(task, span: 0));
+            var front = new Joined(Joining.Chained, hops: 1);
+
+            for (var one = 0; one < world.Withheld.Count; one++)
+            {
+                var asking = world.Withheld[one].Seen.Bagged;
+                var at = Reading(asking, asking.Question, 0);
+
+                // The fallback is a real case and not an error: a question naming nothing
+                // the story said has no statement to read, and both arms take the whole bag
+                // rather than going silent, because an arm that abstained would be scoring
+                // its own silence.
+                var wanted = new HashSet<Code>(asking.Question);
+
+                if (at < 0)
+                    foreach (var said in asking.Story) wanted.UnionWith(said);
+                else
+                    wanted.UnionWith(asking.Story[at]);
+
+                Assert.Equal(wanted, new HashSet<Code>(front.Codify(asking)));
+            }
+        }
     }
 
     /// <summary>

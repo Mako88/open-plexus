@@ -254,12 +254,11 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       a camera kills it. `Senses` runs and names cross two senses, so the gate is open.
       Fork **107**.
     - **OPEN** — spreading a reading over its range costs most of the score at both front
-      ends: fragmentation, or the search the extra codes buy. Fork **38**.
-    - **OPEN** — a reading under about ten dimensions has too few distinct wirings for a
-      projection to expand into, and population coding's floor is undocumented. Fork **39**.
+      ends. Fork **38**.
+    - **OPEN** — under about ten dimensions there are too few distinct wirings for a
+      projection to expand into. Fork **39**.
     - **OPEN** — the tiled patch is the arranged world's cell, so it is told where the parts
-      are. Does the advantage survive a grid that does not divide the world's. `csharp`
-      refuted BANDED POSITION codes for both — row width bought with noise. Fork **44**,
+      are. Does the advantage survive a grid that does not divide the world's. Fork **44**,
       with **38**.
     - **OPEN** — the interface costs most of the score, and the front end's resolution is a
       hard floor: a fixed projection can split what is separable at some resolution and can
@@ -271,8 +270,7 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       scope that is a SUBSET still fires, at the price that its sparsity unbounds rung two's
       candidate set. What graded codes cost is SEARCH.
     - **OPEN** — the multiplexer does not test the bet, its inputs being symbols already, so
-      step one measures the learner and the front end not at all. The encoders are in
-      `corpora/encoders` and `fetch.sh` gets them, frozen so the red-ball property survives.
+      step one measures the learner and the front end not at all.
   - Relations are concepts too
     - **NOW** — a commitment IS a relation and carries a code, so relations nest with no new
       machinery.
@@ -309,7 +307,7 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
     - **OPEN** — whether rung five buys anything a better-aimed projection does not, patch
       tokens having raised the floor while abstracting nothing. Fork **42**.
     - **OPEN** — two clean rules disagreeing about one code name the redundant one neither
-      can see. Open on why it is damage where truths are one code. Fork **80**.
+      can see. Fork **80**.
     - **OPEN** — should the separation bar be charged by what a scope's codes STAND FOR
       rather than by how many there are. Fork **71**.
     - **OPEN** — a category is the set of codes that are ALTERNATIVES, derived from moments
@@ -334,11 +332,10 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
     - **OPEN** — it only ever NARROWS, rungs one to four making a scope smaller and nothing
       broadening but rung five. A specialise-only machine is arbitrarily accurate and
       conceptless, and the ladder's ORDER is a bias over when a construct is tried.
-    - **OPEN** — a repair budget per parent, so one commitment cannot fork forever. A TOTAL
-      is a lifetime, which C4 refuses, and what it should count is open.
+    - **OPEN** — a repair budget per parent. A TOTAL is a lifetime, which C4 refuses, and
+      what it should count is open.
     - **OPEN** — a fresh child starts BLIND and re-earns its statistics, a floor every rung
-      of a chain pays while only the last pays off. Nothing is learnt from one example, and
-      the escape is rung five rather than a smaller N — that is the 715-names failure.
+      of a chain pays while only the last pays off. The escape is rung five, not a smaller N.
     - **OPEN** — rung two, negation, *X and NOT Z*. Unsound against a live moment, so it may
       only be read against a SETTLED occasion and fires one settlement behind; its candidates
       must be bounded to codes seen in this commitment's own hits. Fork **30**.
@@ -377,8 +374,7 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
       lifetime wrong whichever it takes.
     - **OPEN** — nothing SCORES the update, so what retracts is the experimenter's rule. Fork
       **104** carries it, under *what it is told must be settleable*.
-    - **OPEN** — banding a word by how many statements back it was buys half what narrowing
-      the view buys. Does a band the learner MINTS differ. Fork **92**.
+    - **OPEN** — does a band the learner MINTS differ from one handed over. Fork **92**.
     - **OPEN** — does overwriting dissolve the selection rather than help it. Open on
       `Distinguished`. Fork **94**.
     - **OPEN** — the key that moved last is not worth following: it leads where one walker
@@ -598,6 +594,8 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
 | A precedence's TRANSITIVE closure rather than the adjacent pairs | Identical ceiling on `Handing` for two and a half the population: a quadratic expansion to say what adjacency entails | A world whose relation spans an intervening position, where adjacency falls short |
 | `Chunk`'s whole-moment rule ported to rung five | Two vocabularies: `Narrows` is syntactic, so a scope keeping the members and its children taking the name stand in no relation. Unsound rose on every seed that moved | A subsumption test read at the UNFOLDED grain |
 | A front end putting a word's POSITION in the moment | Beside the code it is never absent, reaching every moment and no scope; FUSED in, it costs the identity — an input is an attribute, never the concept | Never. Order derives its own code: rung three |
+| Marking the question-story coincidence — `Named`, `Anonymous`, `Either` | Rung four's cheap tests, and they answered: what blocks it is admission, not cost | A derived code over `Bind`'s groups that cannot say *this one is in two of them* |
+| `Joining.Recent` — a word banded by how far back it was said | Half what narrowing the view buys, and the front end picks the bands | A band the learner mints. Fork 92 |
 
 ---
 

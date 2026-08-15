@@ -22,88 +22,6 @@ public enum Joining
     Bagged,
 
     /// <summary>
-    /// One extra code for every word the question and the story both used.
-    /// </summary>
-    /// <remarks>
-    /// <b>The shared thing named, which is a lookup dressed as a binding.</b>
-    /// <i>Mary is in both</i> becomes its own code, so a scope can hold <i>the asked
-    /// person was mentioned</i> AND which person it was. That is one rule per person per
-    /// place, which is sound and finite and is not a variable.
-    /// </remarks>
-    Named,
-
-    /// <summary>
-    /// One code saying the question and the story shared a word, and never which.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>The plan's own cheapest test of the most expensive rung</b>, and throwing the
-    /// identity away is the whole mechanism. A variable is a thing whose identity does
-    /// not matter to the rule that uses it, so a code meaning <i>whoever was asked about
-    /// was mentioned</i> is a variable's shadow — a shared sub-code rather than a binding.
-    /// <see cref="Named"/> holds the identity and is the control that says whether
-    /// dropping it is what pays.
-    /// </para>
-    /// <para>
-    /// <b>And it reaches one rule a place where <see cref="Named"/> REACHES ONE A PAIR.</b>
-    /// If the coincidence is what carries the task, this is the arm that generalises across
-    /// people it has never seen — and if it is not, the two arms come back together and the
-    /// signal was the identity all along.
-    /// </para>
-    /// </remarks>
-    Anonymous,
-
-    /// <summary>
-    /// A code when they shared a word and a different code when they shared none.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>The absence said positively</b>, which is the only way a conjunction can read one.
-    /// <see cref="Anonymous"/> marks the rounds where the asked-about word was mentioned
-    /// and leaves the others untouched — but the rounds a rule must be kept OFF are exactly
-    /// the untouched ones, and a scope is a subset test with no way to say <i>and not
-    /// this</i>. So the arm that names only the coincidence can gain a seat it already had
-    /// and lose none it should.
-    /// </para>
-    /// <para>
-    /// <b>And it is John's own proposal for rung two</b>, moved to the front end. Emitting
-    /// <i>Z was absent</i> as its own code needs no negation in the scope language and no
-    /// new matcher. What it costs there is a settled occasion; what it costs here is that
-    /// the front end must know which absence is worth a name, and a coincidence is one it
-    /// can compute without knowing anything about the text.
-    /// </para>
-    /// </remarks>
-    Either,
-
-    /// <summary>
-    /// Every word plainly, and again tagged with how many statements back it was.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>Recency as a code</b>, which is what a scope needs to express *the latest one*. A
-    /// scope is a subset test over a set, so <i>most recent</i> is unsayable however the
-    /// bag is arranged — there is no position in a set. Minting <i>bedroom, one statement
-    /// back</i> as its own code makes it sayable, and the learner is free to prefer it, to
-    /// ignore it, or to specialise on it.
-    /// </para>
-    /// <para>
-    /// <b>And the plain word is kept beside it</b>, which is the point rather than a hedge.
-    /// Emitting only the tagged form would make two occurrences of one word in different
-    /// sentences unrelatable, which is the quantisation-boundary fault this repo already
-    /// refuses. Several codes per reading so near readings overlap is
-    /// <see cref="Winnow"/>'s own answer, arriving on time rather than position.
-    /// </para>
-    /// <para>
-    /// <b>It costs vocabulary, and vocabulary is the memory budget here.</b> Residents times
-    /// codes is what a holder carries, so banding multiplies the alphabet by the number of
-    /// bands — which is why the bands are few and the oldest is a single catch-all rather
-    /// than a code per depth.
-    /// </para>
-    /// </remarks>
-    Recent,
-
-
-    /// <summary>
     /// The same displacement, keyed on what this story does not share — <b>no corpus
     /// statistic, no dial, and no threshold to straddle.</b>
     /// </summary>
@@ -269,21 +187,7 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     /// </remarks>
     public const byte Both = 42;
 
-    /// <summary>The one code <see cref="Joining.Anonymous"/> emits.</summary>
-    /// <remarks>
-    /// <b>A constant</b>, because its whole content is that it is the same one every time.
-    /// A code derived from what was shared would be <see cref="Joining.Named"/> by a side
-    /// door, and the arm would stop measuring what it is for.
-    /// </remarks>
-    public static readonly Code Coincided = new(Both, 0);
 
-    /// <summary>The code <see cref="Joining.Either"/> emits when there was no coincidence.</summary>
-    /// <remarks>
-    /// <b>One, because nought is already the other answer to the same question.</b> They
-    /// are mutually exclusive by construction, so a moment carrying both would be a bug
-    /// this arm could not otherwise see.
-    /// </remarks>
-    public static readonly Code Sundered = new(Both, 1);
 
     /// <summary>How many statements back get their own band before the rest share one.</summary>
     /// <remarks>
@@ -386,37 +290,11 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
         foreach (var at in read.Count == 0 ? Every(observation) : read)
             said.UnionWith(observation.Story[at]);
 
-        if (_joining == Joining.Recent) return _categories.Folded(Banding(said, observation));
-
-        if (_joining == Joining.Distinguished) return _categories.Folded(said);
-
-        if (_joining == Joining.Addressed) return _categories.Folded(said);
-
-        if (_joining == Joining.Chained)
-            return _categories.Folded(_banded ? Banded(said, observation, read) : said);
-
-        if (_joining == Joining.Resolved) return _categories.Folded(said);
-
-        if (_joining == Joining.Bagged) return _categories.Folded(said);
-
-        // The intersection is taken over the halves and never over the union, which reads
-        // as pedantry until the union has already lost the distinction. Every code in the
-        // bag is in the bag; only the two halves know which are in both.
-        var shared = observation.Question.Where(observation.Words.Contains).ToList();
-
-        // The one arm that speaks when there is nothing to say, which is its whole point.
-        // Every other arm falls through to the plain bag here, and the bag is what cannot
-        // be conditioned off.
-        if (shared.Count == 0)
-        {
-            if (_joining == Joining.Either) said.Add(Sundered);
-            return said;
-        }
-
-        if (_joining == Joining.Named) foreach (var one in shared) said.Add(new Code(Both, one.Value));
-        else said.Add(Coincided);
-
-        return _categories.Folded(said);
+        // Only the chain adds anything to what was read, and only when it is banding by
+        // hop. Every other arm differs in WHICH statements it read rather than in what it
+        // says about them, which is what `Read` decides and this does not.
+        return _categories.Folded(
+            _joining == Joining.Chained && _banded ? Banded(said, observation, read) : said);
     }
 
     /// <summary>What a category of these members is called, on every machine, forever.</summary>
@@ -543,8 +421,8 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     /// first, so the first statement intersecting the question IS the newest one about
     /// whatever was asked — no scoring, no comparison, and nothing to tie-break.
     /// <b>The intersection is against the question's words and never against the bag</b>,
-    /// which is the same line <see cref="Joining.Named"/> stands on: every word of the story
-    /// is in the story, so only the two halves know which are in both.
+    /// and every word of the story is in the story, so only the two halves know which are in
+    /// both.
     /// </remarks>
     private static List<int> Addressing(Asking observation)
     {
@@ -786,29 +664,6 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
         return every;
     }
 
-    /// <summary>
-    /// Every word again, carrying how many statements back it was said.
-    /// </summary>
-    /// <remarks>
-    /// <b>The question's own words are not banded</b>, because they are not in the story and a
-    /// band on them would say something false. A depth is a distance from the question,
-    /// so the question sits at no distance from itself.
-    /// </remarks>
-    private static HashSet<Code> Banding(HashSet<Code> said, Asking observation)
-    {
-        for (var back = 0; back < observation.Story.Count; back++)
-        {
-            // Everything past the last band shares its code, so an alphabet stays finite
-            // over a story that is not. The catch-all says *older than this* rather than
-            // *this far back*, which is the honest reading of what it can support.
-            var band = Math.Min(back, Bands - 1);
-
-            foreach (var one in observation.Story[back])
-                said.Add(new Code(Both, unchecked(one.Value * Bands + (ulong)band + 2)));
-        }
-
-        return said;
-    }
 
     /// <inheritdoc/>
     /// <remarks><b>Nothing, which is what a world that says none of these gets.</b></remarks>

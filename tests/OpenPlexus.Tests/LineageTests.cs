@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -301,7 +301,6 @@ public sealed class LineageTests(ITestOutputHelper output)
     {
         Covered = into.Covered + one.Covered,
         Repaired = into.Repaired + one.Repaired,
-        Widened = into.Widened + one.Widened,
         Reborn = into.Reborn + one.Reborn,
         Subsumed = into.Subsumed + one.Subsumed,
         Culled = into.Culled + one.Culled,

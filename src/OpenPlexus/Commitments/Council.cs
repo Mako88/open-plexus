@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Diagnostics;
 using OpenPlexus.Codes;
 
@@ -22,16 +22,6 @@ public readonly record struct Learnt
 
     /// <summary>Narrower commitments a general one took the place of.</summary>
     public required long Subsumed { get; init; }
-
-    /// <summary>Shorter commitments proposed by generalisation.</summary>
-    /// <remarks>
-    /// <b>Counted from the day it was written, because this repo keeps finding mechanisms
-    /// that were running and invisible.</b> <see cref="Widening"/> is off by default, so
-    /// without a count the only way to tell a proposal that was refused from one that was
-    /// never made is to read the source — and <i>a gate that reads as running and is not</i>
-    /// has cost this project three sessions already.
-    /// </remarks>
-    public required long Widened { get; init; }
 
 }
 
@@ -226,7 +216,7 @@ public sealed class Alone : ICouncil
 
         at = Mark(ref _settling, at);
 
-        long subsumed = 0, widened = 0;
+        long subsumed = 0;
 
         // The sweep is not part of failing, and it sat inside the failure branch for the
         // whole of step one. Once the learner is right most of the time, the chance of a
@@ -238,13 +228,6 @@ public sealed class Alone : ICouncil
         // conditional on how often the world was quiet -- the same trap by a new door.
         if (sweeping)
         {
-            // Widening before subsumption, because subsumption is its judge. A proposed
-            // generalisation is worth keeping exactly when it absorbs the parent it came
-            // from, and that is the comparison `Subsume` already makes -- running it
-            // first would leave every fresh proposal unjudged until the next sweep, a
-            // thousand rounds later, with its parent still deciding in the meantime.
-            widened = _held.Widen();
-
             subsumed = _held.Subsume();
             _held.Abstract(heard);
             _held.Cull();
@@ -257,7 +240,7 @@ public sealed class Alone : ICouncil
         // something to have arrived; no repair, because blame needs a failure. A monotone
         // counter cannot retract a slur.
         if (arrived is not { } outcome)
-            return new Learnt { Minted = 0, Repaired = 0, Subsumed = subsumed, Widened = widened };
+            return new Learnt { Minted = 0, Repaired = 0, Subsumed = subsumed };
 
         long repaired = 0;
 
@@ -272,7 +255,7 @@ public sealed class Alone : ICouncil
         at = Mark(ref _mending, at);
 
         if (!wrong)
-            return new Learnt { Minted = 0, Repaired = repaired, Subsumed = subsumed, Widened = widened };
+            return new Learnt { Minted = 0, Repaired = repaired, Subsumed = subsumed };
 
         // Covering runs only on a failure and is not moved with repair. Genesis mints per
         // live code, so running it every round walks the whole `code -> outcome` space --
@@ -289,7 +272,7 @@ public sealed class Alone : ICouncil
 
         Mark(ref _mending, at);
 
-        return new Learnt { Minted = minted, Repaired = repaired, Subsumed = subsumed, Widened = widened };
+        return new Learnt { Minted = minted, Repaired = repaired, Subsumed = subsumed };
     }
 
     private static double Milliseconds(long ticks) =>

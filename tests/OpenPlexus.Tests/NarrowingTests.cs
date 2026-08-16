@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -118,5 +118,59 @@ public sealed class NarrowingTests(ITestOutputHelper output)
 
             output.WriteLine("");
         }
+    }
+
+    /// <summary>
+    /// <b>The overshoot reading fires, and it is not the same number at both widths.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A column that is always nought is a check that cannot fire</b>, which this repo
+    /// has now found twice by arming something that had always read zero. So the instrument
+    /// is asserted to have a subject before any row above is read as a comparison.
+    /// </para>
+    /// <para>
+    /// <b>It arrived here with the widening deletion</b>, having been written for the grid
+    /// that priced an operator making scopes shorter. That operator is gone and the reading
+    /// is not: a sound rule containing a shorter sound rule is fork 68's question asked of
+    /// the population rather than of a rung, and fork 75 wants the same number.
+    /// </para>
+    /// <para>
+    /// <b>And it is one seed a width on purpose, because this asks whether the number
+    /// EXISTS and not how big it is.</b> How much a population overshoots is the grid's
+    /// question and carries error bars there.
+    /// </para>
+    /// <para>
+    /// <b>What it would mean for the two to be equal is worth saying first.</b> Repair
+    /// refuses a parent under <c>Floor</c> misses and a sound rule on a clean world never
+    /// misses, so a chain that only ever narrows what is still wrong cannot pass a sound
+    /// depth by that route — it can only arrive at one along a lineage that was never sound.
+    /// A width where this reads nought is a width where every route was short enough for
+    /// that to be the whole story.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_overshoot_reading_has_a_subject_before_any_row_is_read()
+    {
+        Learned Held(int address) =>
+            new MultiplexerRun(
+                new MultiplexerSettings { Address = address, Skew = 0.0 },
+                new Brain(new CommittingSettings(), seed: 1),
+                seed: 1,
+                census: true).Run(Rounds);
+
+        var narrow = Held(2);
+        var wide = Held(3);
+
+        output.WriteLine(
+            $"6 bits: {narrow.Overshot} of {narrow.Sound} sound over-specialised");
+        output.WriteLine(
+            $"11 bits: {wide.Overshot} of {wide.Sound} sound over-specialised");
+
+        Assert.True(wide.Overshot > 0,
+            "no sound commitment at eleven bits contains a shorter sound one, so either the "
+            + "chain always stops at a minimum or the reading is not wired");
+
+        Assert.NotEqual(narrow.Overshot, wide.Overshot);
     }
 }

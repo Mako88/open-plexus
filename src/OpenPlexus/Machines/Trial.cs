@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Worlds;
@@ -123,9 +123,6 @@ public sealed record Tally
     /// the difference between these two numbers and was visible in neither.
     /// </remarks>
     public required long Subsumed { get; init; }
-
-    /// <inheritdoc cref="Commitments.Cycle.Widened"/>
-    public required long Widened { get; init; }
 
 
     /// <summary>Commitments minted by genesis, before anything culled them.</summary>
@@ -996,7 +993,6 @@ public sealed class Trial<TSeen>
             Reached = cycle.Reached,
             Repaired = cycle.Repaired,
             Subsumed = cycle.Subsumed,
-            Widened = cycle.Widened,
             Minted = cycle.Minted,
             Resident = counted,
             Separations = separations,

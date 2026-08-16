@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Commitments;
@@ -158,16 +158,6 @@ public sealed class Cycle
     /// unreadable without it.
     /// </remarks>
     public long Subsumed { get; private set; }
-
-    /// <summary>Shorter commitments proposed by generalisation.</summary>
-    /// <remarks>
-    /// <b>BESIDE <see cref="Repaired"/> because they are the two directions of the
-    /// ladder.</b> Repair is the only thing that makes a scope longer and this is the only
-    /// thing that makes one shorter, so a population's drift toward one rule per instance
-    /// is the difference between them — and until this existed only one of the two numbers
-    /// could be read at all.
-    /// </remarks>
-    public long Widened { get; private set; }
 
 
     /// <summary>Commitments minted by genesis.</summary>
@@ -368,6 +358,5 @@ public sealed class Cycle
         Minted += learnt.Minted;
         Repaired += learnt.Repaired;
         Subsumed += learnt.Subsumed;
-        Widened += learnt.Widened;
     }
 }

@@ -1,4 +1,4 @@
-namespace OpenPlexus.Tests;
+﻿namespace OpenPlexus.Tests;
 
 /// <summary>
 /// <b>A fact that checks nothing is a measurement, and a measurement belongs to
@@ -10,7 +10,7 @@ namespace OpenPlexus.Tests;
 /// <c>RepairingTests</c> held six facts and not one assertion — eight seeds at twenty
 /// thousand rounds an arm, writing rows to a test output nobody reads on CI, seventeen
 /// minutes of every run. It was a sweep in everything but the trait, and
-/// <c>WideningTests</c> beside it carries that trait for grids of identical shape.
+/// <c>NarrowingTests</c> beside it carries that trait for a grid of identical shape.
 /// </para>
 /// <para>
 /// <b>And nothing could see it, which is why this is a check rather than a fix.</b> A fact

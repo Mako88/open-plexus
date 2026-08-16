@@ -1,12 +1,13 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
+using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
 
 /// <summary>
 /// The gate, the vote, and the two ways a commitment leaves.
 /// </summary>
-public sealed class PopulationTests
+public sealed class PopulationTests(ITestOutputHelper output)
 {
     private static Code Of(ulong value) => new(1, value);
 
@@ -376,6 +377,78 @@ public sealed class PopulationTests
             // would be refusing genesis outright rather than refusing restatements.
             Assert.Equal(3, held.Cover(moment, Says(7), firing));
         }
+    }
+
+    /// <summary>
+    /// <b>A perfect record at the miss floor is already significant, so a gate reading one
+    /// has nothing left to refuse.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>It outlived the mechanism it was written for.</b> <c>Widening.Significant</c> was
+    /// to refuse a clean record that is not significant against the base rate, by the pooled
+    /// two-proportion z repair already owns and at the same
+    /// <see cref="CommittingSettings.Alpha"/> — <i>zero misses over twenty firings is not the
+    /// same claim as zero over four hundred</i>. It was built and came back bit-identical to
+    /// the ungated arm on all four cells of its grid, and widening went with it.
+    /// </para>
+    /// <para>
+    /// <b>The reason is arithmetic rather than a world, which is why the check stays.</b> A
+    /// perfect record over n firings clears a one-sided bar at <c>alpha</c> for every base
+    /// rate below roughly <c>n / (n + 2.71)</c>. At the shipped floor of twenty that is 0.88,
+    /// and the most skewed world on this bench draws four in five — so ANY future gate
+    /// charging a clean record for its significance is inert here before it is built.
+    /// </para>
+    /// <para>
+    /// <b>So the revival condition is a number rather than a hope, and this is what would
+    /// spot it.</b> The day a world's commonest outcome passes the boundary below, or the day
+    /// the floor drops far enough to move the boundary under a world already here, that gate
+    /// stops being inert. The plan's widening rows cite this test for it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_clean_record_at_the_floor_is_significant_against_every_world_here()
+    {
+        var dials = new CommittingSettings();
+
+        // A clean record at exactly the floor, which is the thinnest one such a gate can
+        // ever see. Anything it would refuse it would refuse here first.
+        var thinnest = dials.Floor;
+
+        double Refused(double rate)
+        {
+            const long Trials = 1_000_000L;
+
+            return Normal.Tail(
+                Repair.Ahead(thinnest, thinnest, (long)(rate * Trials), Trials));
+        }
+
+        foreach (var rate in new[] { 0.5, 0.8, 0.85, 0.9, 0.95 })
+            output.WriteLine($"  base rate {rate:F2} -> p={Refused(rate):F4}");
+
+        // The worlds this bench has, named rather than assumed. `Multiplexer`'s answer is a
+        // data bit, so its commonest outcome IS the skew, and 0.8 is the steepest tilt any
+        // grid here runs.
+        Assert.True(Refused(0.5) <= dials.Alpha);
+        Assert.True(Refused(0.8) <= dials.Alpha,
+            "the steepest world on this bench now refuses a clean record at the floor, so a "
+            + "gate charging one for its significance is no longer inert -- see the plan's "
+            + "widening revival rows");
+
+        // AND WHERE IT WOULD BITE, so the check fails from BOTH sides. A bar that refuses
+        // nothing anywhere is not a bar, and asserting only the inert half would pass for
+        // free if `Ahead` ever returned a constant.
+        Assert.True(Refused(0.95) > dials.Alpha);
+
+        // The boundary itself, which is the number the revival row cites. Below it the
+        // floor has already paid for the significance; above it a gate has something to
+        // say. It moves with the floor and with nothing else.
+        var boundary = thinnest / (thinnest + 2.71);
+
+        output.WriteLine($"boundary at floor {thinnest}: {boundary:F4}");
+
+        Assert.True(Refused(boundary - 0.02) <= dials.Alpha);
+        Assert.True(Refused(boundary + 0.02) > dials.Alpha);
     }
 
     /// <summary>

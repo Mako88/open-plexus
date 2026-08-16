@@ -92,7 +92,6 @@ jobs:
             "ArrangingTests.Whether_the_gap_is_a_fact",
             "ArrangingTests.Whether_the_gate_that_was_load_bearing",
             "ArrangingTests.Whether_distinct_children_are_damage",
-            "ArrangingTests.Whether_shortening_a_scope_is_damage",
             "BudgetTests","ChoosingTests","FleetTests","FoldingTests",
             "EncodedTests.The_population_reaches_most",
             "ForkingTests.What_a_parents_attempts_buy",
@@ -147,9 +146,7 @@ jobs:
             "RecalledTests.What_one_selected_statement_converts_across_the_exam",
             "SensesTests.Whether_the_cross_modal_question",
             "SeparableTests",
-            "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests",
-            "WideningTests.Whether_shortening_a_scope",
-            "WideningTests.Whether_the_cost_of_widening"
+            "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests"
           ]'
 
           if [ -z "$ONLY" ]; then

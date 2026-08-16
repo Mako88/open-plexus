@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 using OpenPlexus.Codes;
 
@@ -129,9 +129,8 @@ internal sealed class Forks
 /// <summary>How a commitment came to be held.</summary>
 /// <remarks>
 /// <b>Named at the call site rather than inferred from the scope's length</b>, because
-/// a one-code scope can arrive from genesis or from a widening and a two-code one from
-/// repair or from a rename — and a ledger that guessed would report the operator it
-/// expected instead of the one that ran.
+/// a two-code scope can arrive from repair or from a rename — and a ledger that guessed
+/// would report the operator it expected instead of the one that ran.
 /// </remarks>
 public enum Birth
 {
@@ -140,9 +139,6 @@ public enum Birth
 
     /// <summary>Repair added a condition to a parent.</summary>
     Repaired,
-
-    /// <summary>A generalisation dropped a code from a parent.</summary>
-    Widened,
 
     /// <summary>The same claim said shorter, after a name was minted.</summary>
     Renamed,
@@ -181,10 +177,9 @@ public enum Loss
 /// <para>
 /// <b>And the expectation is invariant down a lineage</b>, which is what makes this cheap.
 /// <see cref="Population.Mend"/> builds <c>[..parent.Scope, added]</c> with the PARENT'S
-/// expectation and <see cref="Population.Widen"/> drops a code and keeps it, so every
-/// descendant of a minority-outcome seed expects the minority outcome forever. No parent
-/// pointer is needed to ask which lineage something belongs to — the expectation IS the
-/// root's, and the scope's length is how far it has got.
+/// expectation, so every descendant of a minority-outcome seed expects the minority
+/// outcome forever. No parent pointer is needed to ask which lineage something belongs
+/// to — the expectation IS the root's, and the scope's length is how far it has got.
 /// </para>
 /// <para>
 /// <b>The counts balance, and that is the check.</b> Births minus losses at one
@@ -200,9 +195,6 @@ public readonly record struct Lifetime
 
     /// <inheritdoc cref="Birth.Repaired"/>
     public long Repaired { get; init; }
-
-    /// <inheritdoc cref="Birth.Widened"/>
-    public long Widened { get; init; }
 
     /// <inheritdoc cref="Birth.Renamed"/>
     public long Reborn { get; init; }
@@ -254,7 +246,7 @@ public readonly record struct Lifetime
     public long Searched { get; init; }
 
     /// <summary>Everything that ever entered at this shape.</summary>
-    public long Born => Covered + Repaired + Widened + Reborn;
+    public long Born => Covered + Repaired + Reborn;
 
     /// <summary>Everything that ever left it.</summary>
     public long Lost => Subsumed + Culled + Rewritten;
@@ -632,7 +624,6 @@ public sealed class Population
         {
             Birth.Covered => life with { Covered = life.Covered + 1 },
             Birth.Repaired => life with { Repaired = life.Repaired + 1 },
-            Birth.Widened => life with { Widened = life.Widened + 1 },
             _ => life with { Reborn = life.Reborn + 1 },
         };
     }
@@ -1297,114 +1288,6 @@ public sealed class Population
                 }
             }
         }
-    }
-
-    /// <summary>
-    /// Proposes each experienced never-wrong commitment with one code taken out —
-    /// <b>the only thing here that makes a scope shorter.</b>
-    /// </summary>
-    /// <returns>How many were new.</returns>
-    /// <remarks>
-    /// <para>
-    /// <b>The mirror of <see cref="Mend"/></b>, and on the sweep rather than on a failure.
-    /// A failure is what summons a repair; nothing summons a generalisation, because the
-    /// commitment asking for one is by construction the one that has never been wrong. So
-    /// its trigger is redundancy in the same sense rung five's is, and it runs where the
-    /// other periodic operators run.
-    /// </para>
-    /// <para>
-    /// <b>AND IT ADDS WITHOUT REMOVING, exactly as repair does.</b> The narrow parent
-    /// keeps its counts and its place; if the shorter rule is equally accurate,
-    /// <see cref="Subsume"/> is already the mechanism that drops the longer one, and if it
-    /// is not, its own accuracy will say so and culling already reads that. Nothing here
-    /// decides — it proposes, and the bars that exist judge.
-    /// </para>
-    /// <para>
-    /// <b>A one-code scope is left alone</b>, because the empty scope fires on everything and
-    /// says nothing. A commitment that matches every moment is a base rate wearing a
-    /// rule's clothes, and this design has a trap for exactly that shape.
-    /// </para>
-    /// </remarks>
-    public int Widen()
-    {
-        if (_dials.Widening == Widening.Never) return 0;
-
-        var widened = 0;
-
-        // A COPY, BECAUSE `Add` WRITES TO WHAT THIS WALKS. Every other sweep operator
-        // here takes one for the same reason, and a run that mutated mid-walk would be
-        // ordering-dependent in a way fork 12 has already been reopened over twice.
-        var eligible = All.Where(Widenable).ToList();
-
-        // How many clean parents have to agree, and it is the whole difference between the
-        // two arms. One is every drop of every clean rule; two is only the drops that two
-        // clean rules reach together, which is a code they DISAGREE about while agreeing on
-        // everything else and on what follows.
-        var counted = _dials.Widening == Widening.Shared ? Agreement(eligible) : null;
-
-        foreach (var one in eligible)
-            foreach (var dropped in one.Scope)
-            {
-                var proposed = Shortened(one, dropped);
-
-                if (counted is not null
-                    && (!counted.TryGetValue(proposed.Identity, out var parents)
-                        || parents < 2))
-                    continue;
-
-                // The placement gate again, and it has to be asked here too. A shorter
-                // scope has a different minimum code, so a fleet would otherwise mint the
-                // same generalisation on every holder that could see the parent.
-                if (Places is not null && !Places(proposed)) continue;
-
-                if (!Add(proposed)) continue;
-
-                Born(proposed, Birth.Widened);
-                widened++;
-            }
-
-        return widened;
-    }
-
-    /// <summary>Whether anything could ever propose a shorter version of this.</summary>
-    /// <param name="one">The commitment being considered.</param>
-    /// <remarks>
-    /// <b>A one-code scope is left alone</b>, because the empty scope fires on everything and
-    /// says nothing — a commitment matching every moment is a base rate wearing a rule's
-    /// clothes. The rest is <see cref="Widening.Unmissed"/>'s own condition, written once so
-    /// that the tally and the walk cannot come to ask different questions.
-    /// </remarks>
-    private bool Widenable(Commitment one) =>
-        one.Scope.Length >= 2 && one.Seen >= _dials.Floor && one.Misses == 0;
-
-    /// <summary>The same claim with one code taken out.</summary>
-    /// <param name="one">What to shorten.</param>
-    /// <param name="dropped">The code to leave out.</param>
-    private static Commitment Shortened(Commitment one, Code dropped) =>
-        new([.. one.Scope.Where(code => code != dropped)], one.Expects);
-
-    /// <summary>How many eligible commitments each shortening would come from.</summary>
-    /// <param name="eligible">Everything that could be shortened at all.</param>
-    /// <remarks>
-    /// <b>Keyed on the shortened claim's identity</b>, which is why it needs no pairwise
-    /// walk. Two clean rules differing in exactly one code and expecting the same thing
-    /// reach the same shorter scope, and a scope's identity is a hash of itself — so
-    /// agreement falls out of a dictionary over one pass rather than out of comparing every
-    /// resident against every other.
-    /// </remarks>
-    private static Dictionary<Code, int> Agreement(IEnumerable<Commitment> eligible)
-    {
-        var counted = new Dictionary<Code, int>();
-
-        foreach (var one in eligible)
-            foreach (var dropped in one.Scope)
-            {
-                var name = Shortened(one, dropped).Identity;
-
-                counted[name] = counted.TryGetValue(name, out var already) ? already + 1 : 1;
-            }
-
-        return counted;
     }
 
     /// <summary>Whether a commitment has missed enough times to be worth repairing.</summary>

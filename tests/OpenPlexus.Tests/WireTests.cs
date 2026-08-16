@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
@@ -227,7 +227,6 @@ public sealed class WireTests(ITestOutputHelper output)
         Minted = 1,
         Repaired = 2,
         Subsumed = 3,
-        Widened = 4,
     };
 
     private static Ask FilledAsk => new()

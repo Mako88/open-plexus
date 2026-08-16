@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 
 namespace OpenPlexus.Tests;
@@ -151,12 +151,22 @@ public sealed class DocsTests
     //
     // And 10,052 is the ratchet's ordinary work again: the repair-budget leaf was written
     // as settled ahead of its grid, the grid refuted it, and the correction is shorter than
+    // the claim was.
+    //
     // And 10,058, raised by six for `Drives`. The rule allows a rise for something genuinely
     // new, and a chooser reading a population is a mechanism this branch did not have -- its
     // leaf duplicates nothing and fork 111 is what its refutation opened. Deleting an item to
     // afford it was the alternative, and a guard must not cost information.
-    // the claim was.
-    private const int Whole = 10_058;
+    //
+    // And 10,072 is the seventh raise, and the smallest: fourteen words for `Widening`'s
+    // deletion. Three arms and a gate went in one commit, and the row REPLACES the one the
+    // gate already had rather than sitting beside it -- which is what keeps a three-armed
+    // refutation to a single line. The evidence column stays a reason and not a readout, so
+    // both arms' readings are in the commit and in `PopulationTests`, and what the row buys
+    // is the two facts a session would otherwise rebuild the mechanism to rediscover: a drop
+    // usually makes a sound scope unsound, and no significance gate reaches that under
+    // `Floor`.
+    private const int Whole = 10_072;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

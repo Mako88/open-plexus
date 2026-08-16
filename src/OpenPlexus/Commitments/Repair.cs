@@ -71,128 +71,6 @@ public enum Speaking
     Experienced,
 }
 
-/// <summary>Whether anything ever makes a scope SHORTER.</summary>
-/// <remarks>
-/// <para>
-/// <b>The ladder has only ever gone one way</b>, and the plan says what that costs.
-/// <i>A specialise-only machine is arbitrarily accurate and conceptless</i> — genesis
-/// mints one code, repair only adds, and subsumption only deletes, so a commitment that
-/// is too narrow can never become less so. It can only be replaced by a luckier seed that
-/// never arrives, because genesis saturates its whole space in the opening rounds.
-/// </para>
-/// <para>
-/// <b>And the problem is measured now rather than argued.</b> On the skewed multiplexer
-/// the machine holds sound rules at perfect accuracy that fire on not one of nearly four
-/// thousand rounds the base rate gets wrong — true, never mistaken, and too specific to
-/// pay for themselves. That is what a missing generalisation operator looks like from
-/// outside.
-/// </para>
-/// <para>
-/// <b>An arm and not a replacement, measured ON from a known baseline.</b> This repo's
-/// own trap says to measure one mechanism on from a baseline rather than one off from
-/// all-on, so <see cref="Never"/> is what ships and every number recorded before it
-/// existed was taken under it.
-/// </para>
-/// </remarks>
-public enum Widening
-{
-    /// <summary>Nothing shortens a scope. Every measurement before this existed.</summary>
-    Never,
-
-    /// <summary>
-    /// A commitment that has never once been wrong proposes each of itself with one code
-    /// removed.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>Never missed is the gate because it needs no number</b>, exactly as
-    /// <c>Varied</c> asks whether a code has ever been absent rather than comparing a
-    /// base rate against a threshold. A rule that has been wrong has already been told
-    /// where one of its edges is; a rule that has never been wrong has been told only
-    /// that it has not been asked widely enough to find out.
-    /// </para>
-    /// <para>
-    /// <b>And it generates rather than chooses, which the table forces.</b> Repair picks
-    /// its added code from the tally of what came ALONG, and that tally skips scope codes
-    /// on purpose since every one of them is present in every firing. So nothing in this
-    /// machine can say which scope code is the redundant one — the honest answer is to
-    /// propose all of them and let the bars that judge a repair judge these too:
-    /// subsumption already prefers the general one where both are equally accurate, and
-    /// culling already removes what turns out to be wrong.
-    /// </para>
-    /// </remarks>
-    Unmissed,
-
-    /// <summary>
-    /// Only a shortening that TWO clean commitments reach is proposed.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>The one thing the table cannot say, asked of the population instead.</b>
-    /// <see cref="Unmissed"/>'s own row explains why it proposes every drop: a commitment's
-    /// tally skips its scope codes, since every one of them is present in every firing, so
-    /// nothing inside a rule can name its redundant code. But two clean rules agreeing on
-    /// everything except one code, and on what follows, are evidence about that code from
-    /// OUTSIDE either of them.
-    /// </para>
-    /// <para>
-    /// <b>Which is rung five's trigger pointing down instead of up.</b> Abstraction mints a
-    /// name when several commitments share a sub-scope; this proposes a RULE for the shared
-    /// part when several commitments share it and disagree about the rest. Same evidence,
-    /// same direction of reasoning, and no new number.
-    /// </para>
-    /// <para>
-    /// <b>And what it is for is the flood.</b> A scope of length k proposes k shortenings
-    /// under the other arm, so a population of clean narrow rules proposes thousands and
-    /// pins itself at its capacity — which is where widening costs the most accuracy. This
-    /// proposes one per agreeing pair, and where nothing agrees it proposes nothing.
-    /// </para>
-    /// <para>
-    /// <b>Two is not a level</b>, which matters because every other number here would be. One
-    /// agreeing parent IS <see cref="Unmissed"/>, so two is the smallest thing that is not
-    /// the arm this is compared against — the same shape as <i>has this code ever been
-    /// absent</i> rather than a threshold on how often. Three would be a dial, and there is
-    /// nothing here for a controller to hunt.
-    /// </para>
-    /// <para>
-    /// <b>Its risk is silence, and the instrument for that already exists.</b> A world whose
-    /// clean rules never come in near-identical pairs gives it nothing to do, and an arm that
-    /// proposes nothing drifts toward the baseline for free — this repo's own trap about a
-    /// fallback being a control arm nobody meant to run. <c>widened</c> is the column that
-    /// says whether it ran.
-    /// </para>
-    /// <para>
-    /// <b>And what would kill it is written down before the grid</b>, on the columns a skewed
-    /// world cannot raise for free. It dies if it fails to take a clear majority of
-    /// <see cref="Unmissed"/>'s hard-round coverage gain over <see cref="Never"/> at both
-    /// eleven-bit widths — a cheaper arm that does not reach is not an improvement, it is a
-    /// quieter version of doing nothing.
-    /// </para>
-    /// <para>
-    /// <b>And its ship gate is the world it should ruin</b>, which is the shape that has worked
-    /// twice here. On <see cref="Worlds.Arranged"/> the truths are one code and any
-    /// repair is damage, so an operator undoing repair could help there or could delete the
-    /// only rules that hold the withheld set. That is the prediction to run before this
-    /// becomes the default, and not after.
-    /// </para>
-    /// <para>
-    /// <b>And it is population-wide</b>, which is said here because that is how rung five broke.
-    /// Its evidence is two residents agreeing, so a holder counting only what it holds sees
-    /// fewer pairs — and a fleet that splits the population splits the agreement with it.
-    /// <see cref="Unmissed"/> is local by construction, reading one commitment at a time, so
-    /// the two arms are not the same kind of mechanism however alike their columns look.
-    /// </para>
-    /// <para>
-    /// <b>And the count merges where the structure would not</b>, which is the line this repo
-    /// already drew. What a holder would have to hear is how many machines reached each
-    /// shortened NAME — a frequency, exactly the shape <c>Recurrence</c> already ships for
-    /// abstraction, and not a commitment. So the fix if splitting silences it is known and
-    /// costs no round trip; what is unmeasured is how much it loses without one.
-    /// </para>
-    /// </remarks>
-    Shared,
-}
-
 /// <summary>
 /// Whether subsumption may read a member's entailment of its CATEGORY — <b>fork 85, and
 /// the half of it that survived being measured.</b>
@@ -866,9 +744,6 @@ public sealed record CommittingSettings
     /// tell a mechanism from the narrowing that ANY added condition buys.
     /// </remarks>
     public Choosing Choosing { get; init; } = Choosing.Separating;
-
-    /// <inheritdoc cref="Commitments.Widening"/>
-    public Widening Widening { get; init; } = Widening.Never;
 
     /// <inheritdoc cref="Commitments.Coarsening"/>
     public Coarsening Coarsening { get; init; } = Coarsening.Judged;

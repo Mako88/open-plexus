@@ -1,4 +1,4 @@
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
 
@@ -118,9 +118,10 @@ public sealed class PushbackTests(ITestOutputHelper output)
                 + "rules on the noisy multiplexer, and Mending.Uncovered is the best thing "
                 + "measured on the clean one -- so both are the winner on a world. The two "
                 + "left are entangled with open questions rather than free: "
-                + "Speaking.Experienced is half of the grid that answers what Widening "
-                + "should be, which is one of the two decisions the reduction was waiting "
-                + "on, and Mending.Improving is fork 45's driver. The same reading applies "
+                + "Speaking.Experienced is the only reading of whether an untested rule "
+                + "should decide a round, which is a defect the widening deletion left "
+                + "behind rather than took with it, and Mending.Improving is fork 45's "
+                + "driver. The same reading applies "
                 + "to Joining.Resolved, which the list also has going: it beats every "
                 + "backward-reading arm on Roaming at four people, 0.497 against 0.167 and "
                 + "0.19 marginal, and it is the only mechanism standing for a whole "

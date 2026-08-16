@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Bus;
 using OpenPlexus.Worlds;
 
@@ -243,33 +243,6 @@ public sealed class DialTests
             + "hunt: the accuracy bar that judges every other subsumption judges "
             + "this one",
 
-        ["Widening"] =
-            "the ladder's other direction. It began as a mechanism against its own "
-            + "absence and is two rules that do something now, because the failure "
-            + "named the axis: WHAT SUMMONS a shortening, a clean record or two "
-            + "clean rules agreeing a code is droppable. "
-            + "Measured ON from the baseline every earlier number was taken under, "
-            + "which is what this repo's trap list asks for. NOT A LEVEL: whether "
-            + "anything generalises is not a quantity. AND IT IS REFUTED AS BUILT, "
-            + "which is why it ships off. `Unmissed` selects the commitments with "
-            + "the LEAST evidence -- never having missed is nearly free for a "
-            + "narrow rule, because a narrow rule barely fires -- and dropping a "
-            + "code from a sound scope usually makes it unsound, so it mints about "
-            + "four wrong rules per right one and each has wider reach than its "
-            + "parent. It buys hard-round coverage at eleven bits and costs "
-            + "accuracy on every world. AND THE GATE THAT WAS SUPPOSED TO FIX IT "
-            + "IS REFUTED: reading how much a rule has been TESTED is bit-identical "
-            + "to not reading it, because `Floor` already demands twenty firings "
-            + "and a perfect twenty is significant against every base rate under "
-            + "0.88. What is wrong with it is the shortening rather than the "
-            + "parent, and it pins the population at its capacity. SO THE SECOND "
-            + "ARM ASKS THE POPULATION WHAT NO TABLE CAN: a rule's tally skips its "
-            + "own scope codes, so nothing inside a commitment can name its "
-            + "redundant one -- but two clean rules agreeing on everything except "
-            + "one code, and on what follows, are evidence about that code from "
-            + "outside either of them. Rung five's trigger pointing down instead of "
-            + "up, and it proposes 34 shortenings where the other proposes 1715",
-
         ["Forking"] =
             "WHETHER A PARENT MAY PROPOSE A FORK IT HAS ALREADY MADE, and it is two "
             + "rules that both do something rather than a level. Repair is "
@@ -506,12 +479,11 @@ public sealed class DialTests
         // so it moved the search and the readout at once; the timing separated them and the
         // question answered itself.
         //
-        // AND TWENTY-SIX IS `Widening`, which is the ladder's other direction arriving as
-        // an arm rather than as a setting. It ships OFF, so every number recorded before
-        // it existed still stands and it is measured on from a known baseline -- and it is
-        // already refuted as built, which is the honest reason it is a census entry rather
-        // than a default: the count grows when a mechanism is added and MEASURED, and
-        // shrinks only when one is deleted with a revival row.
+        // AND TWENTY-SIX WAS `Widening`, which is the ladder's other direction arriving as
+        // an arm rather than as a setting, and it is gone again -- see the fourteen below.
+        // It is left in this history because the row it wrote is the rule working: the
+        // count grows when a mechanism is added and MEASURED, and shrinks only when one is
+        // deleted with a revival row, and this entry did both within a fortnight.
         //
         // AND TWENTY-EIGHT IS `Budgeting`, which is the only one here that adds no freedom
         // at all. It does not set a level or pick between two behaviours a world could
@@ -577,7 +549,14 @@ public sealed class DialTests
         // `Fanout`, `Horizon`, `Reflect`, `Foresight` -- and they left with the code rather
         // than by being driven or refused. Nothing was solved by this drop, which is worth
         // saying because a budget falling usually means work was done.
-        Assert.Equal(15, HandSet.Count);
+        //
+        // And to fourteen for `Widening`, which is the other kind of fall. It was refuted
+        // on both of its arms on its own pre-registered ship gate and deleted with revival
+        // rows, so the entry left by the road this file says a losing dial leaves by rather
+        // than with a subsystem it happened to be attached to. `Owed` is empty behind it,
+        // which is the first time nothing in the tree ships in a position that does
+        // nothing.
+        Assert.Equal(14, HandSet.Count);
     }
 
     /// <summary>
@@ -810,21 +789,21 @@ public sealed class DialTests
     /// Dials shipping off today, each owed a deletion rather than an explanation.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// <b>This list may only shrink, and an entry is cleared by deleting the dial rather
     /// than by improving its reason.</b> That is the whole difference between this and the
     /// check it replaced. Nothing new may be added — a mechanism arriving today ships on.
+    /// </para>
+    /// <para>
+    /// <b>It is empty, and it got there by its own rule.</b> `Widening` was the only entry
+    /// and it left by the deletion the entry asked for rather than by a better reason being
+    /// written under it. The dictionary stays because the exemption it grants is what
+    /// <see cref="No_dial_ships_in_a_position_that_does_nothing"/> reads, and a list
+    /// deleted the day it reaches nought cannot be seen to have reached nought.
+    /// </para>
     /// </remarks>
     private static readonly Dictionary<string, string> Owed = new(StringComparer.Ordinal)
     {
-        ["Widening"] =
-            "THREE ARMS AND NOTHING LEFT TO CHOOSE BETWEEN. `Significant` is already deleted "
-            + "with a revival row; `Unmissed` is refuted as built -- it selects the rules "
-            + "with the LEAST evidence, mints about four wrong rules per right one, and pins "
-            + "the population at capacity. So what ships is `Never`, which is a dial whose "
-            + "only live position does nothing, which is not a dial. CLEARED BY DELETING IT "
-            + "with a revival row, or -- John's third answer -- by adjusting the arm and "
-            + "running it again, since what is wrong with it is the SHORTENING rather than "
-            + "the parent it picks",
     };
 
     /// <summary>
@@ -847,11 +826,13 @@ public sealed class DialTests
     /// nothing to say. The second is what this fails on.
     /// </para>
     /// <para>
-    /// <b>It is written against a case that already passes and a case that already
-    /// failed.</b> `Widening` ships `Never` and is refuted twice over in the table, so it
-    /// passes. `Sequencing` shipped `Never` for one commit with no row anywhere, because
-    /// there was no refutation — it had WON — and this is the check that would have said so
-    /// before John had to.
+    /// <b>It has no subject today, which is said here rather than left to be discovered.</b>
+    /// `Widening` was the last dial shipping `Never` and it is deleted, so this passes over an
+    /// empty set — a tripwire rather than a reading. It was written against a case that
+    /// passed and a case that failed: `Widening` was refuted twice over in the table, and
+    /// `Sequencing` shipped `Never` for one commit with no row anywhere because there was no
+    /// refutation — it had WON — and this is the check that would have said so before John
+    /// had to.
     /// </para>
     /// </remarks>
     [Fact]

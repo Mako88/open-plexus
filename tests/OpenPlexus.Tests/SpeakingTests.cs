@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -19,9 +19,9 @@ namespace OpenPlexus.Tests;
 /// </para>
 /// <para>
 /// <b>So every fresh repair child has decided rounds it had no standing to decide, since
-/// the branch began.</b> This is not a widening problem: widening merely made it loud
-/// enough to notice, by putting eighteen hundred untested rules into a population of six
-/// hundred.
+/// the branch began.</b> Widening made it loud enough to notice, by putting eighteen
+/// hundred untested rules into a population of six hundred, and the defect outlived that
+/// operator's deletion because it was never widening's.
 /// </para>
 /// <para>
 /// <b>And silence is the failure mode to watch, which is why it is reported here.</b>
@@ -40,14 +40,12 @@ public sealed class SpeakingTests(ITestOutputHelper output)
     /// <param name="address">Address bits.</param>
     /// <param name="skew">How often a data bit is one, or zero to leave them even.</param>
     /// <param name="speaking">Whether the untested may vote.</param>
-    /// <param name="widening">Whether anything shortens a scope.</param>
     /// <param name="seed">The world's generator and the brain's.</param>
     private static Learned Run(
-        int address, double skew, Speaking speaking, Widening widening, int seed) =>
+        int address, double skew, Speaking speaking, int seed) =>
         new MultiplexerRun(
             new MultiplexerSettings { Address = address, Skew = skew },
-            new Brain(
-                new CommittingSettings { Speaking = speaking, Widening = widening }, seed),
+            new Brain(new CommittingSettings { Speaking = speaking }, seed),
             seed,
             census: true).Run(Rounds);
 
@@ -55,36 +53,34 @@ public sealed class SpeakingTests(ITestOutputHelper output)
     /// <b>Whether refusing the untested a vote reaches the rounds guessing misses.</b>
     /// </summary>
     /// <remarks>
-    /// <b>Crossed with widening, because the two are one question.</b> Generalisation was
-    /// refuted for flooding the population with untested rules; if that is really what
-    /// went wrong, then the same operator under an experienced-only vote should stop being
-    /// ruinous. If it is still ruinous, the flood was not the mechanism and the
-    /// generalisation is simply wrong.
+    /// <b>It was crossed with widening, and the other axis is gone.</b> That operator was
+    /// refuted on its own ship gate and deleted, so the two cells asking whether an
+    /// experienced-only vote rescued the flood went with it. What is left is the question
+    /// the crossing was only ever half of: whether refusing the untested a vote reaches the
+    /// rounds guessing misses at all.
     /// </remarks>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public async Task Whether_refusing_the_untested_a_vote_reaches_the_hard_rounds()
     {
-        var cells = new (string Cell, Speaking Speaking, Widening Widening)[]
+        var cells = new (string Cell, Speaking Speaking)[]
         {
-            ("anyone", Speaking.Anyone, Widening.Never),
-            ("experienced", Speaking.Experienced, Widening.Never),
-            ("anyone+widen", Speaking.Anyone, Widening.Unmissed),
-            ("experienced+widen", Speaking.Experienced, Widening.Unmissed),
+            ("anyone", Speaking.Anyone),
+            ("experienced", Speaking.Experienced),
         };
 
         foreach (var (address, skew) in new[] { (2, 0.0), (3, 0.0), (2, 0.8), (3, 0.8) })
         {
             output.WriteLine($"--- {address + (1 << address)} bits, skew {skew:F1} ---");
 
-            foreach (var (cell, speaking, widening) in cells)
+            foreach (var (cell, speaking) in cells)
             {
                 var once = new Dictionary<int, Learned>();
 
                 Learned Cached(int seed)
                 {
                     if (!once.TryGetValue(seed, out var learned))
-                        once[seed] = learned = Run(address, skew, speaking, widening, seed);
+                        once[seed] = learned = Run(address, skew, speaking, seed);
 
                     return learned;
                 }
@@ -131,8 +127,8 @@ public sealed class SpeakingTests(ITestOutputHelper output)
     [Fact]
     public void Refusing_the_untested_a_vote_changes_what_the_machine_answers()
     {
-        var anyone = Run(2, skew: 0.0, Speaking.Anyone, Widening.Never, seed: 1);
-        var earned = Run(2, skew: 0.0, Speaking.Experienced, Widening.Never, seed: 1);
+        var anyone = Run(2, skew: 0.0, Speaking.Anyone, seed: 1);
+        var earned = Run(2, skew: 0.0, Speaking.Experienced, seed: 1);
 
         output.WriteLine($"anyone      | recent {anyone.Recent:F4} "
             + $"| silent {anyone.Silent} | residents {anyone.Resident}");

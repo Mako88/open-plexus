@@ -166,7 +166,13 @@ public sealed class DocsTests
     // is the two facts a session would otherwise rebuild the mechanism to rediscover: a drop
     // usually makes a sound scope unsound, and no significance gate reaches that under
     // `Floor`.
-    private const int Whole = 10_072;
+    //
+    // And 10,077, five words for the architecture line that had nothing under it. *What it
+    // is told must be falsifiable* read `NOW -- nothing`, and it is the only entry John's
+    // order of the work names as owed a mechanism however bad. The replacement leaf says
+    // what the mechanism is and the OPEN beside it says which half of fork 104 is still
+    // open, which the old pair could not, since a leaf reading `nothing` cannot narrow.
+    private const int Whole = 10_077;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

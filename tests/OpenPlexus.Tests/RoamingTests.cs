@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -44,7 +44,15 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// default moving rewrites an experiment nobody edited.
     /// </remarks>
     private static RoamingSettings World(int steps, int people) =>
-        new() { Rooms = 6, Props = 4, People = people, Steps = steps, Withheld = 600 };
+        new()
+        {
+            Rooms = 6,
+            Props = 4,
+            People = people,
+            Steps = steps,
+            Withheld = 600,
+            Examining = Examining.Where,
+        };
 
     /// <summary>What the rules that need no learning reach on one house.</summary>
     /// <param name="world">The house.</param>
@@ -845,6 +853,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// <summary>What each arm's learner scores on the held-out half, over three seeds.</summary>
     /// <param name="arms">The translations to run.</param>
     /// <param name="people">How many walk the house.</param>
+    /// <param name="examining">Which question the house is asked.</param>
     /// <remarks>
     /// <b>Seeds, because a comparison on one run is an anecdote.</b> The world and the brain
     /// take the same seed, so an arm's whole run moves together rather than the house being
@@ -852,7 +861,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// two loops that drifted apart would make their columns unreadable against each other.
     /// </remarks>
     private Dictionary<string, List<double>> Scored(
-        IEnumerable<(string Name, Joined Joined)> arms, int people)
+        IEnumerable<(string Name, Joined Joined)> arms, int people, Examining examining)
     {
         var scores = new Dictionary<string, List<double>>();
 
@@ -862,7 +871,9 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
             foreach (var seed in new[] { 1, 2, 3 })
             {
-                var world = new Roaming(World(120, people), seed);
+                var world = new Roaming(
+                    World(120, people) with { Examining = examining }, seed);
+
                 var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed);
 
                 var tally = new Trial<Recited>(world, joined, brain)
@@ -904,7 +915,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         }))
         .ToList();
 
-        var scores = Scored(arms, people: 1);
+        var scores = Scored(arms, people: 1, Examining.Where);
 
         // The bar is two comparisons and neither is a level. First, that following the
         // freshest key beats folding through all of them AT THE SAME DEPTH -- which isolates
@@ -1025,7 +1036,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
             (nameof(Joining.Chained), new Joined(Joining.Chained)),
         };
 
-        var scores = Scored(arms, people: 4);
+        var scores = Scored(arms, people: 4, Examining.Where);
 
         // The bar that holds whichever way the inversion goes, and it is the one worth having
         // first: a world with four people is still a world this learner reads. The marginal is
@@ -1092,5 +1103,168 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 $"{name} reads {scores[name].Max():F3} at its best with four people, off the "
                 + "marginal of about 0.19 -- so reading the transcript backwards is tracking "
                 + "something after all and the forward store is not what pays here");
+    }
+
+    /// <summary>
+    /// <b>What the effect question is worth</b> before anything learns.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Taken before any learner runs, which is this repo's own rule.</b> A front-end
+    /// ceiling costs milliseconds against a runner's hour, and a grid cannot tell a rule that
+    /// answered from the question's own words from a learner that used the transcript.
+    /// </para>
+    /// <para>
+    /// <b>Three columns, and they come back as TWO.</b> The marginal is always saying the
+    /// commoner answer. The verb ceiling is the best constant per verb, which is every
+    /// conjunctive rule over the question alone — and it lands exactly on the marginal,
+    /// because <i>went</i> is the commonest verb and still moves nothing four times in five.
+    /// <i>Took</i> and <i>dropped</i> are free and buy no accuracy, since the constant they
+    /// license is the constant everything else already licenses.
+    /// </para>
+    /// <para>
+    /// <b>Which corrects what was written here before the reading</b>, and makes the world
+    /// better rather than worse. The prediction was a verb ceiling ABOVE the marginal
+    /// with the binding cases above that, so a learner would have had two bars and the lower
+    /// one reachable by a one-code rule. There is no cheap rule in between: every point over
+    /// the marginal is a walker carrying something, which no word of the question names.
+    /// </para>
+    /// <para>
+    /// <b>The verb is read by POSITION and never by an answer key.</b> A question is
+    /// <c>who verb ...</c>, so grouping on its second code needs no vocabulary — and the
+    /// length separates <i>went</i> from the other two, five words against four, which is a
+    /// fact about the transcript rather than a hint about the answer.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_the_effect_question_is_worth_before_anything_learns()
+    {
+        var world = new Roaming(
+            World(120, people: 4) with { Examining = Examining.Effect }, seed: 1);
+
+        var asked = Enumerable.Range(0, 2_000).Select(_ => world.Next()).ToList();
+
+        var moved = asked.Count(one => one.Outcome == 1);
+
+        var byVerb = asked
+            .GroupBy(one => one.Seen.Asked[1])
+            .Select(group => (
+                Words: group.First().Seen.Asked.Count,
+                Count: group.Count(),
+                Moved: group.Count(one => one.Outcome == 1)))
+            .OrderByDescending(one => one.Count)
+            .ToList();
+
+        var ceiling = byVerb.Sum(one => Math.Max(one.Moved, one.Count - one.Moved))
+            / (double)asked.Count;
+
+        output.WriteLine($"asked {asked.Count} | moved {moved / (double)asked.Count:F3} "
+            + $"| marginal {Math.Max(moved, asked.Count - moved) / (double)asked.Count:F3} "
+            + $"| verb ceiling {ceiling:F3}");
+
+        foreach (var (words, count, up) in byVerb)
+            output.WriteLine(
+                $"  {words}-word verb | {count,5} asked | moved {up / (double)count:F3}");
+
+        // The instrument has a subject, which is the first thing to establish. A question
+        // whose answer never varies is a constant wearing a question's clothes.
+        Assert.InRange(moved / (double)asked.Count, 0.02, 0.98);
+
+        // And the verb does not answer it, which is the whole reason this world is worth
+        // asking. If a constant per verb were perfect the effect question would be a verb
+        // classifier and every score on it would be a front-end reading.
+        Assert.True(ceiling < 0.99,
+            $"a constant per verb answers {ceiling:F3} of the effect question, so it is "
+            + "answerable from the question's own words and the transcript is decoration");
+
+        // And it is ON the marginal, which is the property that makes one bar readable. A
+        // verb ceiling ABOVE the marginal would put a one-code rule between guessing and
+        // binding, and a learner sitting between them would be unattributable. This asserts
+        // the gap is nought so that any point over the marginal is the carrying case.
+        var marginal = Math.Max(moved, asked.Count - moved) / (double)asked.Count;
+
+        Assert.True(ceiling - marginal < 0.005,
+            $"a constant per verb reads {ceiling:F3} against a marginal of {marginal:F3}, so "
+            + "there is a cheap rule between guessing and binding after all and a learner "
+            + "between the two bars says nothing about either");
+    }
+
+    /// <summary>
+    /// <b>The effect question changes what is asked</b>, never the house it is about.
+    /// </summary>
+    /// <remarks>
+    /// <b>A world whose second question redrew the walk</b> would make its two arms
+    /// incomparable, and nothing else here could say so — two transcripts differing by
+    /// one draw read identically from every column. The walk is asserted identical and the
+    /// question asserted different, which is the pair of failures that look like one.
+    /// </remarks>
+    [Fact]
+    public void The_effect_question_is_asked_about_the_same_walk()
+    {
+        var where = new Roaming(World(120, people: 4), seed: 7).Next();
+        var effect = new Roaming(
+            World(120, people: 4) with { Examining = Examining.Effect }, seed: 7).Next();
+
+        // The effect arm holds the walk's last statement back as its question, so its
+        // transcript is one shorter and the rest is word for word the same.
+        Assert.Equal(where.Seen.Said.Count - 1, effect.Seen.Said.Count);
+
+        foreach (var (mine, theirs) in effect.Seen.Said.Zip(where.Seen.Said.Skip(1)))
+            Assert.Equal(theirs, mine);
+
+        Assert.Equal(where.Seen.Said[0], effect.Seen.Asked);
+        Assert.NotEqual(where.Seen.Asked, effect.Seen.Asked);
+
+        Assert.Equal(6, new Roaming(World(120, people: 4), seed: 7).Outcomes);
+        Assert.Equal(
+            2,
+            new Roaming(World(120, people: 4) with { Examining = Examining.Effect }, seed: 7)
+                .Outcomes);
+    }
+
+    /// <summary>
+    /// <b>Whether a statement it is being told</b> can be learnt about at all.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The architecture line that had nothing under it, asked as a question.</b> Under
+    /// <see cref="Examining.Where"/> a statement is background and the learner is never
+    /// wrong about one; here it commits to what the statement DOES and the world settles it.
+    /// Whether the commitment is any good is what this grid is for.
+    /// </para>
+    /// <para>
+    /// <b>One bar, and the ceiling grid is what makes it one.</b> A constant per verb lands
+    /// on the marginal, so there is no cheap rule between guessing and binding — every point
+    /// over about 0.86 is a walker carrying something, which no word of the question names.
+    /// </para>
+    /// <para>
+    /// <b>What would drop this world, written before the grid runs.</b> Every arm landing on
+    /// the marginal within the seed spread says the effect question is rung four's and this
+    /// world reaches it no more than <c>Roaming</c>'s other one does — in which case the
+    /// mechanism stands as the architecture line's answer and the WORLD is what to replace,
+    /// because a question no arm can move ranks nothing.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_what_a_statement_does_can_be_learnt_from_the_transcript()
+    {
+        // The same arms the where question is read on, so a difference between the two grids
+        // is the question. `Chained` is the best lookup over the transcript and the two
+        // `Resolved` cells are the store at the depths its own grid separates.
+        var arms = new (string Name, Joined Joined)[]
+        {
+            (nameof(Joining.Chained), new Joined(Joining.Chained)),
+            ("Resolved(1)", new Joined(Joining.Resolved, resolution: 1)),
+            ("Freshest(3)", new Joined(Joining.Resolved, resolution: 3, freshest: true)),
+        };
+
+        var scores = Scored(arms, people: 4, Examining.Effect);
+
+        // NO BAR. The marginal is in the ceiling grid and the prediction is on the method,
+        // read against these rows rather than enforced by an assertion somebody would have
+        // to edit the day the world's dials move.
+        foreach (var (name, taken) in scores)
+            output.WriteLine($"{name,-12}| worst {taken.Min():F3} | best {taken.Max():F3}");
     }
 }

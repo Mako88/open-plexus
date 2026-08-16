@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
 
@@ -45,6 +45,64 @@ public sealed record RoamingSettings
 
     /// <summary>How many questions are kept back and never drawn.</summary>
     public required int Withheld { get; init; }
+
+    /// <inheritdoc cref="Worlds.Examining"/>
+    public required Examining Examining { get; init; }
+}
+
+/// <summary>
+/// What the world asks about the walk it just recited — <b>where a thing ended up</b>, or
+/// what the last thing it was told did.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>The architecture line with nothing under it, given a mechanism however bad.</b> What
+/// it is told must be falsifiable, and told and configured are indistinguishable from the
+/// inside — so a statement the learner cannot be wrong about was installed in it rather than
+/// taught to it. Under <see cref="Where"/> every statement in the transcript is background
+/// the answer is read out of, and no commitment is ever about a statement.
+/// </para>
+/// <para>
+/// <b>And it is a second QUESTION rather than a second world</b>, which is what keeps the
+/// two comparable. The house, the scatter and the walk are drawn identically under both —
+/// the same seed produces the same transcript — so a difference between the arms is the
+/// question and cannot be the world.
+/// </para>
+/// <para>
+/// <b>What it does not close is the store's own update rule</b>, and saying so is cheaper
+/// than having it read as more than it is. The settlement is the world's ground truth about
+/// its own state, so what becomes falsifiable is <i>this statement changes what is known</i>
+/// and not <i>my store was right to overwrite</i>. Fork 104 wants the second and this is the
+/// first, which is the half that needs no new machinery.
+/// </para>
+/// </remarks>
+public enum Examining
+{
+    /// <summary>Where a thing ended up. Every reading taken before this existed.</summary>
+    Where,
+
+    /// <summary>
+    /// Whether the statement the walk ended on moved anything.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The verb decides two of the three cases</b> and the store decides the third. A
+    /// thing taken is where its holder already stood and a thing dropped lands in the room
+    /// the dropper is already in, so <i>took</i> and <i>dropped</i> never move anything.
+    /// <i>Went</i> moves a thing exactly when the walker is carrying one and the room is
+    /// different — which needs the transcript read backwards to a take that has no word in
+    /// common with the question.
+    /// </para>
+    /// <para>
+    /// <b>So the verb-only ceiling is what this is read against</b>, and it is computed
+    /// before any learner runs. A conjunctive rule over the question's own words reaches
+    /// <i>took</i> and <i>dropped</i> for nothing, and everything above that ceiling is
+    /// binding. If the learner lands on it, the reading is that the headroom here is rung
+    /// four's — which is a finding rather than a failure, and this repo's own rule is that
+    /// a front-end ceiling costing milliseconds is taken FIRST.
+    /// </para>
+    /// </remarks>
+    Effect,
 }
 
 /// <summary>
@@ -157,6 +215,12 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Steps);
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Withheld);
 
+        // The effect question is about a STEP, and a walk of no steps ends on a placement.
+        // Asking what a placement did is asking about the round before the world started,
+        // which is a question with no answer rather than an answer of nought.
+        if (settings.Examining == Examining.Effect)
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Steps);
+
         _settings = settings;
         _walks = new Random(seed);
 
@@ -164,7 +228,13 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
     }
 
     /// <inheritdoc/>
-    public int Outcomes => _settings.Rooms;
+    /// <remarks>
+    /// <b>Two under <see cref="Examining.Effect"/></b>, because what a blind guess is against
+    /// is the answer alphabet and the effect question's is <i>moved</i> and <i>did not</i>.
+    /// A world reporting its room count there would price every arm against the wrong bar.
+    /// </remarks>
+    public int Outcomes =>
+        _settings.Examining == Examining.Effect ? 2 : _settings.Rooms;
 
     /// <summary>
     /// The code for each room's word, in outcome order — <b>so a ceiling can be computed
@@ -211,7 +281,19 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
     private static IReadOnlyList<Code> Said(params string[] words) =>
         [.. words.Select(word => Kinds.Named(Word, word))];
 
-    /// <summary>One house, one walk round it, and one question about where a thing ended up.</summary>
+    /// <summary>Which room every thing is in, whether it is on a floor or in a hand.</summary>
+    /// <param name="at">Where each loose thing lies.</param>
+    /// <param name="held">Who is holding each thing, or <see cref="Nobody"/>.</param>
+    /// <param name="here">Where each person is standing.</param>
+    /// <remarks>
+    /// <b>A thing in a hand is where the hand is</b>, which is the whole of why the effect
+    /// question needs the transcript rather than the verb. Nothing in <i>john went to the
+    /// garden</i> names the football, and the football is in the garden.
+    /// </remarks>
+    private static int[] Placed(int[] at, int[] held, int[] here) =>
+        [.. at.Select((room, one) => held[one] == Nobody ? room : here[held[one]])];
+
+    /// <summary>One house, one walk round it, and one question about what happened in it.</summary>
     private Turn<Recited> Draw()
     {
         // Where everything starts, stated out loud. Without the opening placements the
@@ -255,8 +337,16 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
             told.Add(Said(Cast[one], "is", "in", "the", Places[here[one]]));
         }
 
+        // Whether the walk's LAST statement moved anything, which is the effect question's
+        // whole answer. Taken around that one step rather than around every one: the vector
+        // costs a pass over the props and only the final step is ever asked about.
+        var moved = false;
+
         for (var step = 0; step < _settings.Steps; step++)
         {
+            var asked = step == _settings.Steps - 1;
+            var before = asked ? Placed(at, held, here) : null;
+
             // Whose turn it is, and one person is nobody to choose between. A draw over one
             // option decides nothing, so it is not taken -- which also leaves the walk of a
             // one-person house the walk every earlier reading was taken on.
@@ -306,6 +396,8 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
 
                     break;
             }
+
+            if (asked) moved = !before!.SequenceEqual(Placed(at, held, here));
         }
 
         // Asked about something put down, so the answer is a room. A thing still in hand is
@@ -315,9 +407,32 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
             .Where(one => held[one] == Nobody)
             .ToList();
 
+        // Drawn under both arms and used by one, which is what keeps the two comparable. The
+        // effect question has no thing to pick, and skipping the draw would leave the walks
+        // aligned for one episode and diverging from the second -- two transcripts differing
+        // by one draw read identically from every column, so nothing else here could say so.
         var about = settled.Count > 0
             ? settled[_walks.Next(settled.Count)]
             : _walks.Next(_settings.Props);
+
+        if (_settings.Examining == Examining.Effect)
+        {
+            // The statement the walk ended on is the QUESTION rather than the last line of
+            // the transcript, so the learner is answering about something it is being told
+            // now and not about something it has already read. Leaving it in `Said` as well
+            // would put the answer's own sentence in the background, which is the shape a
+            // corpus containing its own answer has.
+            var last = told[^1];
+
+            told.RemoveAt(told.Count - 1);
+            told.Reverse();
+
+            return new Turn<Recited>
+            {
+                Seen = new Recited { Said = told, Asked = last },
+                Outcome = moved ? 1 : 0,
+            };
+        }
 
         told.Reverse();
 

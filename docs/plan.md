@@ -448,10 +448,10 @@ Three: refining. Anything before three that reads as tuning is out of order.
     - **OPEN** — how hard a fleet searches is a deployment choice, which is a world reaching
       into the brain one level out. Fork **60** carries it, under the machine.
   - What it is told must be settleable
-    - **NOW** — nothing. Told and configured are indistinguishable from the inside, so a fact
-      it cannot fail on was installed rather than taught.
-    - **OPEN** — the store's update rule is the experimenter's, so nothing can be wrong about
-      it. What must settle is *this statement changes what is known about that*. Fork **104**.
+    - **NOW** — `Roaming` asks what the statement it is telling DID, so a told statement
+      carries a settlement and can be wrong. No constant per verb beats the marginal.
+    - **OPEN** — the store's update rule is still the experimenter's, so what is falsifiable
+      is *this statement changes what is known* and not *my store was right*. Fork **104**.
     - **OPEN** — a primer moves no counter, a round the world cannot settle taking no score,
       no genesis and no repair. A world that asks is one way to fix that and an action with
       a consequence is another; what is missing is any of them.

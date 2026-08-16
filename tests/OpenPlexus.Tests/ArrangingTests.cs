@@ -57,30 +57,62 @@ public sealed class ArrangingTests(ITestOutputHelper output)
             // anywhere on this bench it binds here, and if it does not it is a third off
             // switch and goes the way of `Children`.
             //
-            // IT DOES NOT BIND. Ten seeds: the shipped total reads 0.725 unseen at 709 sound
-            // and 525 unsound; free reads 0.663 at 94 and 1195; earned reads 0.651 at 95 and
-            // 1281, holding 1868 residents against a capacity of 2000. So it sits with FREE
-            // on every column and not with the total -- the sound rules collapse sevenfold,
-            // the unsound ones nearly treble, and the withheld score falls seven points.
+            // It does not bind. The shipped total reads 0.725 unseen at 709 sound and 525
+            // unsound; free reads 0.663 at 94 and 1195; earned reads 0.651 at 95 and 1281,
+            // holding 1868 residents against a capacity of 2000. So it sits with FREE on
+            // every column and not with the total -- the sound rules collapse sevenfold, the
+            // unsound ones nearly treble, and the withheld score falls seven points.
             //
-            // And the reason is the rule's own arithmetic rather than this world. One attempt
-            // per `Floor` misses funds a parent in proportion to how WRONG it is, and on a
-            // world whose truths are one code every repair is damage -- so the parents doing
-            // the most damage are exactly the ones earning fastest. That is the shape John's
-            // curve names: an almost-always-wrong parent should fall off a cliff rather than
-            // be funded, which is fork 110 and is what would make this rule a budget.
+            // And those three rows were taken at five seeds and recorded as ten, which is
+            // corrected here rather than carried. `f26b6ed`'s message and the note that stood
+            // in this place both said ten; this grid has called `Sweep` at its default since
+            // the row was written. The direction survives the correction and the WIDTH may
+            // not: this file's own two-code reading says five seeds on this world carry a
+            // spread of 0.053, and the gap being read is 0.074. That is 1.4 spreads, which is
+            // the width at which this file already refused to report a direction.
             //
-            // So C4's objection to a lifetime total stands and this is not the replacement.
-            // Neither arm may be deleted on this reading: the total is measured better here
-            // and is still a lifetime, which is the contradiction fork 110 has to resolve.
+            // So the grid asks for ten and every row is retaken together, which is the only
+            // honest way to add a fourth. A number in a commit message is a claim rather than
+            // a record, and this one was a claim about how the record was taken.
+            //
+            // And the reason offered for it not binding is the rule's own arithmetic rather
+            // than this world. One attempt per `Floor` misses funds a parent in proportion to
+            // how WRONG it is, and on a world whose truths are one code every repair is
+            // damage -- so the parents doing the most damage are exactly the ones earning
+            // fastest. That is the shape John's curve names, and it is the row below.
             ("earned", new CommittingSettings
             {
                 Surprising = Surprising.AnyFailure,
                 Budgeting = Budgeting.Earned,
             }),
+
+            // Fork 110, and it is the term the row above is missing rather than a fourth
+            // opinion. `Curved` divides the same floors and takes the SCARCER counter, so its
+            // allowance is `Earned`'s multiplied by `min(hits/misses, 1)` -- inert on a parent
+            // right half the time or better, and a ninth of the grant for one right a round in
+            // ten. The 1281 unsound rules the row above holds are exactly the population it
+            // bites on, so this is aimed at the damage the reading blamed.
+            //
+            // What would drop it: landing on `earned`'s numbers rather than the total's. That
+            // would say the cap never binds where it matters and the arm is a free budget
+            // wearing a limit's name, which is `Children`'s refutation and needs no second
+            // one. It already differs from `Earned` on the six-bit multiplexer, so it is
+            // wired -- `BudgetingTests` holds that check, and being wired is not being worth
+            // anything.
+            //
+            // And the cell that would say the curve is the wrong SHAPE rather than the wrong
+            // rule is this one landing between the two: a cap that recovers some of the total's
+            // score and not all of it says the term belongs and `min` is too blunt a form of
+            // it. That is a different next step from the arm dying, so the three outcomes are
+            // separated before the run rather than after.
+            ("curved", new CommittingSettings
+            {
+                Surprising = Surprising.AnyFailure,
+                Budgeting = Budgeting.Curved,
+            }),
         })
         {
-            var (unseen, last) = Sweep(Small, dials, Looking.Tiled);
+            var (unseen, last) = Sweep(Small, dials, Looking.Tiled, seeds: 10);
 
             output.WriteLine(
                 $"{arm,6} | {unseen.Average(),15:F3} | {Spread(unseen),6:F3} "

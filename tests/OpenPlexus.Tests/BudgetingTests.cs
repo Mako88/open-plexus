@@ -11,36 +11,36 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Collisions run twenty to fifty times the births at every majority rung, and each one
-/// spends the parent's budget.</b> <see cref="Population.Mend"/> records the child before
+/// <b>Collisions run twenty to fifty times the births</b> at every majority rung, and each
+/// one spends the parent's budget. <see cref="Population.Mend"/> records the child before
 /// asking whether it was new, so a parent that keeps separating on the same code exhausts
 /// sixty-four attempts on one distinct child. See <see cref="Budgeting"/>.
 /// </para>
 /// <para>
-/// <b>The prediction is written down before the run and it is specific enough to be
-/// wrong.</b> If the budget is mostly spent on re-derivation, counting distinct children
+/// <b>The prediction is written down before the run</b>, and it is specific enough to be
+/// wrong. If the budget is mostly spent on re-derivation, counting distinct children
 /// takes <c>exhausted</c> towards nought and raises repairs and sound rules; if the budget
 /// was not binding under this timing, every column stays inside its error bars and the
 /// plan's standing puzzle about an interior optimum needs a different answer.
 /// </para>
 /// <para>
-/// <b>AND IT IS ASKED UNDER <see cref="Repairing.EveryRound"/>, which is why it is a new
-/// question.</b> Loosening the budget under the shipped timing bought nothing over eight
+/// <b>And it is asked under <see cref="Repairing.EveryRound"/></b>, which is why it is a new
+/// question. Loosening the budget under the shipped timing bought nothing over eight
 /// seeds — but the lineages that would have spent it were never blamed, so nothing was
 /// waiting on the gate. Both timings are run here so that null is visible rather than
 /// assumed.
 /// </para>
 /// <para>
-/// <b>And the answer is that it has never bound on children at all, which is arithmetic
-/// once it is said out loud.</b> A child adds one code, so a parent's distinct children are
+/// <b>And the answer is that it has never bound on children at all</b>, which is arithmetic
+/// once it is said out loud. A child adds one code, so a parent's distinct children are
 /// bounded by the vocabulary — twelve codes at six bits and twenty-two at eleven, against a
 /// budget of sixty-four. <c>exhausted</c> is exactly nought in every cell under
 /// <see cref="Budgeting.Children"/> because it cannot be anything else, so that arm is a
 /// FREE budget and the tripwire below says when it stops being one.
 /// </para>
 /// <para>
-/// <b>And the two findings compose into a second prediction, which is why eleven bits even
-/// is in the grid.</b> <see cref="Repairing.EveryRound"/> walks the culprits on every round
+/// <b>And the two findings compose into a second prediction</b>, which is why eleven bits
+/// even is in the grid. <see cref="Repairing.EveryRound"/> walks the culprits on every round
 /// rather than on the wrong seventh of them, so a parent spends its attempts about seven
 /// times faster — and there it repairs LESS and holds seventeen fewer sound rules than the
 /// shipped timing, at nearly five standard errors. If attempts are what the budget counts,
@@ -156,13 +156,13 @@ public sealed class BudgetingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHAT `Children` counts under the shipped forking rule, which is what `Attempts`
-    /// COUNTS.</b>
+    /// <b>What `Children` counts under the shipped forking rule</b>, which is what
+    /// `Attempts` counts.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Fork 77 said the arm could bind for the first time now that <c>Budget</c> sits
-    /// below the vocabulary, and it cannot — for a completely different reason.</b>
+    /// <b>Fork 77 said the arm could bind for the first time</b> now that <c>Budget</c> sits
+    /// below the vocabulary, and it cannot — for a completely different reason.
     /// <see cref="Population.Mend"/> charges <c>Attempts</c> and adds to <c>Names</c> in the
     /// same two lines, and <see cref="Forking.Distinct"/> refuses a parent every code it has
     /// already spent. Two different codes added to one scope are two different scopes and so
@@ -170,8 +170,8 @@ public sealed class BudgetingTests(ITestOutputHelper output)
     /// together forever and the two arms are one arm.
     /// </para>
     /// <para>
-    /// <b>So the arm is free under one forking rule and a synonym under the other, and
-    /// there is no third thing it could be.</b> That is not a fact about a world or about a
+    /// <b>So the arm is free under one forking rule and a synonym under the other</b>, and
+    /// there is no third thing it could be. That is not a fact about a world or about a
     /// budget's level, which is why no grid was owed after all and why this is a check
     /// rather than a sweep.
     /// </para>
@@ -185,19 +185,6 @@ public sealed class BudgetingTests(ITestOutputHelper output)
     [Fact]
     public void Counting_distinct_children_is_counting_attempts_once_forking_is_distinct()
     {
-        static Learned Run(Forking forking, Budgeting budgeting, int address, double skew)
-        {
-            var seed = Seeds.Apart(1, Purpose);
-
-            return new MultiplexerRun(
-                new MultiplexerSettings { Address = address, Skew = skew },
-                new Brain(
-                    new CommittingSettings { Forking = forking, Budgeting = budgeting },
-                    seed),
-                seed,
-                census: true).Run(Rounds);
-        }
-
         foreach (var (address, skew) in new[] { (2, 0.0), (3, 0.8) })
         {
             var attempts = Run(Forking.Distinct, Budgeting.Attempts, address, skew);
@@ -229,6 +216,83 @@ public sealed class BudgetingTests(ITestOutputHelper output)
             + $"resident={loosened.Resident}");
 
         Assert.NotEqual(repeated.Repaired, loosened.Repaired);
+    }
+
+    /// <summary>
+    /// <b>Whether capping the earned rate by a parent's hits</b> refuses anything at all.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><see cref="Budgeting.Curved"/> is <see cref="Budgeting.Earned"/> with its allowance
+    /// bounded by the parent's hits.</b> Fork 110, and it exists because the earned rate funds
+    /// a parent in proportion to how wrong it is — measured on <c>Arranged</c>, where the
+    /// world's truths are one code and the parents doing the most damage earn fastest.
+    /// </para>
+    /// <para>
+    /// <b>The bound is on the allowance rather than on the run</b>, so this check cannot be
+    /// written as an inequality. Per parent at any instant the cap allows no more, which is
+    /// arithmetic; a run under it repairs 152 here against 146, because refusing one repair
+    /// changes what fires and moves every counter afterwards.
+    /// </para>
+    /// <para>
+    /// <b>The failure it has to be checked against is <see cref="Budgeting.Children"/>'s.</b>
+    /// That arm was refused for being a free budget wearing a limit's name, and it read as a
+    /// mechanism for the life of the branch because nothing asked whether it ever bound. A
+    /// cap that never binds is the identical fault, and here it would mean parents holding
+    /// more hits than misses everywhere — which is what a population above chance looks like,
+    /// so this is a live possibility rather than a formality.
+    /// </para>
+    /// <para>
+    /// <b>It asserts the arms DIFFER and never which way</b>, which is this repo's own trap:
+    /// a prediction written into a wiring check fails two ways and reads the same. Which way
+    /// is a sweep's question and <c>BudgetCurveTests</c> carries it.
+    /// </para>
+    /// <para>
+    /// <b>And it is asked on the even world</b>, rather than the skewed one, because a skewed
+    /// world raises columns for free. At six bits even the vote is wrong often enough that
+    /// parents carry both counters, so a cap that binds binds on evidence rather than on a
+    /// base rate.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Capping_the_earned_rate_by_a_parents_hits_refuses_something()
+    {
+        var earned = Run(Forking.Distinct, Budgeting.Earned, 2, 0.0);
+        var curved = Run(Forking.Distinct, Budgeting.Curved, 2, 0.0);
+
+        output.WriteLine(
+            $"6 bits even | earned repaired={earned.Repaired} resident={earned.Resident} "
+            + $"sound={earned.Sound} || curved repaired={curved.Repaired} "
+            + $"resident={curved.Resident} sound={curved.Sound}");
+
+        // The cap can only ever refuse, so a difference in either direction on this column is
+        // the arm being wired. Equality is the reading that kills it, and it would say the
+        // hits are never the scarcer counter -- `Children`'s fault by a different road.
+        Assert.NotEqual(earned.Repaired, curved.Repaired);
+    }
+
+    /// <summary>One seed of one pair of rules, on one multiplexer.</summary>
+    /// <param name="forking">Whether a parent may propose a fork it has already made.</param>
+    /// <param name="budgeting">What the repair budget is spent on.</param>
+    /// <param name="address">Address bits.</param>
+    /// <param name="skew">How often a data bit is one, or zero to leave them even.</param>
+    /// <remarks>
+    /// <b>Read by the two checks below</b>, which is why it is here rather than inside one.
+    /// Both ask whether a budgeting rule is wired to anything, so a second copy would be two
+    /// harnesses that could drift into asking different questions under one name.
+    /// </remarks>
+    private static Learned Run(
+        Forking forking, Budgeting budgeting, int address, double skew)
+    {
+        var seed = Seeds.Apart(1, Purpose);
+
+        return new MultiplexerRun(
+            new MultiplexerSettings { Address = address, Skew = skew },
+            new Brain(
+                new CommittingSettings { Forking = forking, Budgeting = budgeting },
+                seed),
+            seed,
+            census: true).Run(Rounds);
     }
 
     /// <summary>A mean and its standard error, in one column.</summary>

@@ -170,7 +170,20 @@ public sealed class DialTests
             + "`Children` is FREE under `Repeated` and a SYNONYM under `Distinct`, "
             + "with no third thing available; measured bit-identical on two worlds "
             + "and 36 against 452 repairs under the other rule. It is kept as "
-            + "exactly that check, which goes red the day forking changes",
+            + "exactly that check, which goes red the day forking changes. AND A "
+            + "FOURTH CELL ARRIVES BECAUSE THE THIRD READ FREE: `Earned` funds a "
+            + "parent in proportion to how WRONG it is, so on `Arranged`, where "
+            + "the truths are one code and every repair is damage, the parents "
+            + "doing the most damage earn fastest -- 0.651 unseen at 95 sound "
+            + "against the total's 0.725 at 709. `Curved` divides the same floors "
+            + "and takes the SCARCER of hits and misses, so its allowance is "
+            + "`Earned`'s times min(hits/misses, 1): inert on a parent right half "
+            + "the time or better, a ninth of the grant for one right a round in "
+            + "ten. It is fork 110, it is wired rather than measured, and what "
+            + "would drop it is landing on `earned`'s row rather than the total's "
+            + "-- a cap that never binds where it matters is `Children`'s "
+            + "refutation a second time. `BudgetingTests` holds the check that the "
+            + "two earned arms DIFFER, and `ArrangingTests` holds the grid",
 
         ["Repairing"] =
             "OPEN, AND IT ARRIVES BY SEPARATION RATHER THAN BY INVENTION, which is "

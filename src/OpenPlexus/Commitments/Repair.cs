@@ -550,6 +550,69 @@ public enum Budgeting
     /// </para>
     /// </remarks>
     Earned,
+
+    /// <summary>
+    /// <see cref="Earned"/>'s rate, capped by what the parent has been RIGHT about —
+    /// <b>one attempt per <see cref="CommittingSettings.Floor"/> misses and per
+    /// <see cref="CommittingSettings.Floor"/> hits, whichever is scarcer.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><see cref="Earned"/> reads misses alone</b>, so it funds a parent in proportion to
+    /// how wrong it is. Measured on <see cref="Worlds.Arranged"/>, whose true rules are one
+    /// code and where any repair is therefore damage: 0.651 unseen at 95 sound rules against
+    /// the shipped total's 0.725 at 709. The parents doing the most damage are the ones
+    /// earning fastest, which is a rate reading free rather than a budget. See
+    /// <c>ArrangingTests</c>.
+    /// </para>
+    /// <para>
+    /// <b>And the missing term is already counted.</b> A child fires only where its added
+    /// code is present, so it covers a SUBSET of what its parent was right about — a parent's
+    /// hits bound what any repair of it can preserve. Funding a parent past that spends the
+    /// search on territory that does not exist, and a parent with no hits has nothing for a
+    /// narrower version of it to keep.
+    /// </para>
+    /// <para>
+    /// <b>So the allowance is the smaller of the two streams</b>, in floors, which is
+    /// John's curve on how right a rule is. A parent always right earns nothing because it
+    /// has no misses, one almost always wrong earns nothing because it has no hits, and one
+    /// sometimes right earns most — being sometimes right IS holding a truth without enough
+    /// specificity, which is the case narrowing exists for.
+    /// </para>
+    /// <para>
+    /// <b>It needs no new number.</b> <see cref="CommittingSettings.Floor"/> is already the
+    /// unit of <i>enough evidence to test a proportion by</i> and both counters are already
+    /// on the commitment; <see cref="CommittingSettings.Budget"/> is not read, so C4's
+    /// objection to a lifetime total does not transfer.
+    /// </para>
+    /// <para>
+    /// <b>The cap is on the ALLOWANCE and not on the run's repairs</b>, which is worth
+    /// writing down because the first version of this note said the second and was wrong
+    /// within one reading. Per parent at any instant this allows no more than
+    /// <see cref="Earned"/> — that is arithmetic, <c>min(hits, misses) &lt;= misses</c>. What
+    /// does not follow is that a run repairs less: refusing one repair changes the population,
+    /// which changes what fires, which moves every counter afterwards. Measured at six bits
+    /// even, this arm repairs 152 against <see cref="Earned"/>'s 146. A winner-take-all argmax
+    /// is chaotic in its evidence and a total over twenty thousand rounds is downstream of it.
+    /// </para>
+    /// <para>
+    /// <b>And the ratio it applies is <c>min(hits/misses, 1)</c></b>, so it is inert on any
+    /// parent right half the time or better and bites hardest where a rule is almost always
+    /// wrong. A rule right one round in ten is allowed a ninth of what
+    /// <see cref="Earned"/> grants it. That is where the refuted arm's damage was — 1281
+    /// unsound rules on <see cref="Worlds.Arranged"/> — so the cap is aimed at the population
+    /// the reading blamed rather than at the whole of it.
+    /// </para>
+    /// <para>
+    /// <b>What would drop it before a grid runs: being indistinguishable from
+    /// <see cref="Earned"/>.</b> That is <see cref="Children"/>'s fault — a free budget
+    /// wearing a limit's name — and it happens wherever parents hold more hits than misses,
+    /// so the cap never binds. <c>BudgetingTests</c> asserts the two arms DIFFER rather than
+    /// which way, because a prediction written into a wiring check fails two ways and reads
+    /// the same.
+    /// </para>
+    /// </remarks>
+    Curved,
 }
 
 /// <summary>Whether a parent may propose a fork it has already made.</summary>

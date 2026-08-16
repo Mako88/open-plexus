@@ -339,8 +339,8 @@ Three: refining. Anything before three that reads as tuning is out of order.
       conceptless, and the ladder's ORDER is a bias over when a construct is tried.
     - **OPEN** — a total is a lifetime, which C4 refuses, and the earned rate meant to replace
       it reads as free on `Arranged` rather than as a budget.
-    - **OPEN** — so the rate wants a curve on how right a rule is, which is what stops an
-      always-wrong parent earning without bound. Fork **110**.
+    - **OPEN** — the curve is `Curved`, that rate capped by the parent's hits, and it is wired
+      rather than measured. Its grid is `Arranged`'s. Fork **110**.
     - **OPEN** — a fresh child starts BLIND and re-earns its statistics, a floor every rung
       of a chain pays while only the last pays off. The escape is rung five, not a smaller N.
     - **OPEN** — rung two, negation, *X and NOT Z*. Unsound against a live moment, so it may

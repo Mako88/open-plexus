@@ -1419,21 +1419,31 @@ public sealed class Population
     /// <inheritdoc cref="PastFloor"/>
     /// <summary>Whether a commitment has any of its repair budget left.</summary>
     /// <remarks>
-    /// <b>The allowance is a constant under two of the three rules</b>, and a function of the
-    /// parent under the third. <see cref="Budgeting.Earned"/> pays one attempt per
+    /// <b>The allowance is a constant under two of the four rules</b>, and a function of the
+    /// parent under the other two. <see cref="Budgeting.Earned"/> pays one attempt per
     /// <see cref="CommittingSettings.Floor"/> misses, so a parent that stops being wrong
     /// stops earning and one that becomes wrong again is funded — which is what a design
     /// forbidding episode boundaries needs and what a total cannot be.
+    /// <see cref="Budgeting.Curved"/> is that rate capped by the parent's hits, so an
+    /// almost-always-wrong parent stops earning too.
     /// </remarks>
     private bool PastBudget(Commitment one) => Children(one.Identity) < Allowed(one);
 
     /// <summary>How many attempts this parent may have made by now.</summary>
     /// <param name="one">The parent.</param>
     /// <inheritdoc cref="Budgeting"/>
-    private int Allowed(Commitment one) =>
-        _dials.Budgeting == Budgeting.Earned
-            ? (int)(one.Misses / _dials.Floor)
-            : _dials.Budget;
+    /// <remarks>
+    /// <b>The two earned rules share one division</b>, differing only in what is divided,
+    /// which is what makes <see cref="Budgeting.Curved"/> a cap on
+    /// <see cref="Budgeting.Earned"/> rather than a second rule beside it. Written as one
+    /// expression so no edit can move one and not the other.
+    /// </remarks>
+    private int Allowed(Commitment one) => _dials.Budgeting switch
+    {
+        Budgeting.Earned => (int)(one.Misses / _dials.Floor),
+        Budgeting.Curved => (int)(Math.Min(one.Hits, one.Misses) / _dials.Floor),
+        _ => _dials.Budget,
+    };
 
     /// <inheritdoc cref="PastFloor"/>
     /// <summary>Whether no child already covers this commitment's failure.</summary>
@@ -1460,9 +1470,9 @@ public sealed class Population
     /// <param name="name">What the commitment is called.</param>
     /// <inheritdoc cref="Budgeting"/>
     /// <remarks>
-    /// <b>ONLY <see cref="Budgeting.Children"/> COUNTS NAMES.</b> <see cref="Budgeting.Earned"/>
-    /// limits the same thing <see cref="Budgeting.Attempts"/> does — how often a parent has
-    /// tried — and differs in what it is allowed to spend rather than in what spends it.
+    /// <b>Only <see cref="Budgeting.Children"/> counts names.</b> Both earned rules limit the
+    /// same thing <see cref="Budgeting.Attempts"/> does — how often a parent has tried — and
+    /// differ in what a parent is allowed to spend rather than in what spends it.
     /// </remarks>
     private int Children(Code name) =>
         !_minted.TryGetValue(name, out var born) ? 0

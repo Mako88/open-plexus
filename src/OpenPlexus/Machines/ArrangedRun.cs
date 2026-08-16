@@ -22,7 +22,7 @@ public sealed record Grounded
 
     /// <summary>What the world says about the rules the trial left behind.</summary>
     /// <remarks>
-    /// <b>Its own record, because a tally is what a run did and this is not.</b> They
+    /// <b>Its own record</b>, because a tally is what a run did and this is not. They
     /// are gathered at different times by different code — one counts as the rounds go
     /// by, the other enumerates a world afterwards — and flattening them into one shape
     /// meant the grader had to hand back a half-built report with a <c>required</c>
@@ -35,8 +35,8 @@ public sealed record Grounded
     /// How many distinct things the front end said, over how many readings.
     /// </summary>
     /// <remarks>
-    /// <b>The collapse instrument, and this world is small enough for it to have a
-    /// ceiling.</b> On CLEVR a projection over three numbers emitted one tag for four
+    /// <b>The collapse instrument</b>, and this world is small enough for it to have a
+    /// ceiling. On CLEVR a projection over three numbers emitted one tag for four
     /// thousand objects, and nothing said so. Here what the front end could possibly
     /// distinguish is known and small — every scene for <see cref="Looking.Whole"/>,
     /// every distinct patch for <see cref="Looking.Tiled"/> — so a count far below it is
@@ -88,7 +88,7 @@ public sealed record Judged
 
     /// <summary>Unsound residents that narrow no resident sound one at all.</summary>
     /// <remarks>
-    /// <b>And it is every one of them, which is not what was expected.</b> The guess was
+    /// <b>And it is every one of them</b>, which is not what was expected. The guess was
     /// that these would be memorised children of sound parents that subsumption declined
     /// to absorb. <see cref="Narrowed"/> reads NOUGHT on both arms under both gates: the
     /// unsound residents are almost all ONE CODE, so there is nothing narrower about them
@@ -96,7 +96,7 @@ public sealed record Judged
     /// false somewhere in the world.
     /// </remarks>
     /// <remarks>
-    /// <b>So nothing in the mechanism set removes them, and nothing is supposed to.</b>
+    /// <b>So nothing in the mechanism set removes them</b>, and nothing is supposed to.
     /// Genesis is promiscuous by design and the vote is what is meant to handle a rule
     /// that is often wrong — <see cref="Commitments.Population.Cull"/> returns early
     /// below capacity, and this world never reaches it. Which puts the remaining gap

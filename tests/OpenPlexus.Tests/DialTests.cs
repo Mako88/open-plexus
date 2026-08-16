@@ -655,7 +655,10 @@ public sealed class DialTests
     /// <summary>Every world this repo has, by name, for the check above.</summary>
     private static readonly HashSet<string> Worlds =
         [.. Directory
-            .GetFiles(Path.Combine(Tree.Repo(), "src", "OpenPlexus", "Worlds"), "*.cs")
+            .GetFiles(
+                Path.Combine(Tree.Repo(), "src", "OpenPlexus", "Worlds"),
+                "*.cs",
+                SearchOption.AllDirectories)
             .Select(one => Path.GetFileNameWithoutExtension(one))
             .Where(one => !one.EndsWith("Run", StringComparison.Ordinal))];
 

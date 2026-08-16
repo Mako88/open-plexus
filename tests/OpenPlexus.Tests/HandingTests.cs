@@ -18,15 +18,15 @@ namespace OpenPlexus.Tests;
 /// each is exact.
 /// </para>
 /// <para>
-/// <b>And they are facts rather than measurements, which is why they are asserted tight and
-/// not printed.</b> Nothing here is a sweep: the bag is the same bag in every draw, the
+/// <b>And they are facts rather than measurements</b>, which is why they are asserted tight and
+/// not printed. Nothing here is a sweep: the bag is the same bag in every draw, the
 /// right sentence is the only one holding the asked word, and the answer is the last word of
 /// it. If any of the three ever stops holding, the world has drifted away from the question
 /// it was built to ask and every number taken on it is owed a re-take.
 /// </para>
 /// <para>
-/// <b>The third probe reads a position and may never ship, which is said here rather than
-/// discovered later.</b> It knows the template, so it is the far end of a gap in exactly the
+/// <b>The third probe reads a position and may never ship</b>, which is said here rather than
+/// discovered later. It knows the template, so it is the far end of a gap in exactly the
 /// standing of <c>ReturningTests</c>' tagged cell and fork 88's handed selection. What it is
 /// for is to say that 1.0 is reachable at all, so a learner sitting at 0.5 is known to be
 /// short of the world rather than at it.
@@ -39,7 +39,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
 
     /// <summary>
     /// The two front ends whose ceilings are proved above, and nothing else — <b>a set of
-    /// codes either way, because that is all the learner can receive.</b>
+    /// codes either way</b>, because that is all the learner can receive.
     /// </summary>
     /// <remarks>
     /// <b>WRITTEN HERE RATHER THAN IN <c>src</c> BECAUSE NEITHER IS A MECHANISM.</b> One is
@@ -200,8 +200,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The bag is the same bag in every draw, so nothing conditioned on it can beat the
-    /// marginal.</b> The first ceiling, and it is proved rather than measured.
+    /// <b>The bag is the same bag in every draw</b>, so nothing conditioned on it can beat the
+    /// marginal. The first ceiling, and it is proved rather than measured.
     /// </summary>
     /// <remarks>
     /// <b>This is the property the whole world rests on.</b> The givers are a permutation of

@@ -139,7 +139,16 @@ public sealed class DocsTests
     //
     // And 9,959 is the ratchet again in the same session. `Homeostat` is no longer stranded,
     // so the `Drives` leaf saying so was corrected and came in two words shorter.
-    private const int Whole = 9_959;
+    //
+    // And 10,064 is the sixth raise, for John's ORDER OF THE WORK and the fork it settles.
+    // The doc said which world is the spine and what every requirement wants; it never said
+    // in which ORDER, so a session could read the route and start refining rung one with two
+    // requirements unstarted -- which is the drift the last two handoffs both had to correct
+    // by hand. Four sentences that outlive a context window against a correction that has
+    // now cost two sessions. And the repair-budget leaf is settled the same day it is
+    // quoted, `Attempts` going and `Earned` shipping, so its replacement carries the
+    // decision and the curve John wants over it rather than the open question it replaced.
+    private const int Whole = 10_064;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

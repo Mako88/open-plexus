@@ -17,8 +17,8 @@ namespace OpenPlexus.Machines;
 /// read it is the caller's decision, made from something other than a timer.
 /// </para>
 /// <para>
-/// <b>And the denominator is carried beside the numerator, which is the whole C3
-/// INSTRUMENT.</b> <see cref="Population.Decide"/> cannot tell a silent holder from a dead
+/// <b>And the denominator is carried beside the numerator</b>, which is the whole C3
+/// INSTRUMENT. <see cref="Population.Decide"/> cannot tell a silent holder from a dead
 /// one and is not supposed to; <see cref="Asked"/> against <see cref="Heard"/> is where
 /// that difference lives, and without it a vote over eight survivors of twelve reads
 /// exactly like a vote over twelve.
@@ -42,8 +42,8 @@ public sealed class Gathering : IDisposable
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The roster rather than the count, which is the whole of what fork 53 needed
-    /// here.</b> A count can only be compared with another count, so a gathering holding one
+    /// <b>The roster rather than the count</b>, which is the whole of what fork 53 needed
+    /// here. A count can only be compared with another count, so a gathering holding one
     /// could tell that somebody was missing and never which somebody — and a write-off has
     /// to name a machine or it is a decrement, which is a deadline with the clock hidden.
     /// </para>
@@ -78,8 +78,8 @@ public sealed class Gathering : IDisposable
     /// </param>
     /// <remarks>
     /// <para>
-    /// <b>It does not carry which ask it is, because nothing outside the asker needs to
-    /// know.</b> The correlation is the <see cref="Asker"/>'s bookkeeping and holding it
+    /// <b>It does not carry which ask it is</b>, because nothing outside the asker needs to
+    /// know. The correlation is the <see cref="Asker"/>'s bookkeeping and holding it
     /// here as well would be a second copy of one fact — and this repo's dead-code budget
     /// is the check that asks whether a public member has a caller at all.
     /// </para>

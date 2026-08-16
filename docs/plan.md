@@ -210,6 +210,11 @@ gets one home and a cross-reference by number from anywhere else it serves; numb
 renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, point
 `DocsTests` at `csharp` for them rather than weakening it.
 
+**The order of the work is John's**, 2026-08-16, and nothing here is taken out of it. One:
+a mechanism for every entry of THE ARCHITECTURE, however bad, and `Roaming` wired through
+all of them. Two: the intentional reds cleared, which is the stable state to refine from.
+Three: refining. Anything before three that reads as tuning is out of order.
+
     Commitment := scope (codes that must all be present)
                 → expects (a code that should follow)
                 + hits, misses, abstains
@@ -332,8 +337,11 @@ renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, p
     - **OPEN** — it only ever NARROWS, rungs one to four making a scope smaller and nothing
       broadening but rung five. A specialise-only machine is arbitrarily accurate and
       conceptless, and the ladder's ORDER is a bias over when a construct is tried.
-    - **OPEN** — a repair budget per parent. A TOTAL is a lifetime, which C4 refuses, and
-      what it should count is open.
+    - **NOW** — a repair budget is EARNED, one attempt per miss floor, because a total is a
+      lifetime and C4 refuses one.
+    - **OPEN** — that floor is a constant and John wants a curve, on how right a rule is: one
+      always right gains little, one sometimes right is the ideal candidate, and one almost
+      always wrong falls off a cliff and wants culling. Fork **110**.
     - **OPEN** — a fresh child starts BLIND and re-earns its statistics, a floor every rung
       of a chain pays while only the last pays off. The escape is rung five, not a smaller N.
     - **OPEN** — rung two, negation, *X and NOT Z*. Unsound against a live moment, so it may

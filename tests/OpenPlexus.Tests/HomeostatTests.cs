@@ -150,6 +150,47 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     private static Func<IReadOnlyCollection<Code>, int?> Blindly(Homeostat body, Random draw) =>
         _ => draw.Next(body.Doings);
 
+    /// <summary>
+    /// <b>How much this body wants an outcome</b>, read off what it feels and nothing else.
+    /// </summary>
+    /// <param name="expects">The outcome a commitment expects to follow.</param>
+    /// <param name="felt">What the front end said about the state being acted in.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>The outcome here is which variable is lowest</b>, so an action is wanted by how well
+    /// off the variable it leaves at the bottom is. Attending to the worst variable raises it
+    /// and hands the bottom to a better one, so a body that prefers a high bottom is a body
+    /// that regulates — and nothing about regulating is written down, it falls out of the
+    /// preference.
+    /// </para>
+    /// <para>
+    /// <b>And it reads the felt bands rather than <see cref="Homeostat.At"/></b>, which is the
+    /// whole difference between this and the oracle. The band is what the front end emitted;
+    /// the value is what the world holds. A drive on the second would be a reward handed in
+    /// wearing a preference's name.
+    /// </para>
+    /// <para>
+    /// <b>An outcome the body cannot feel is wanted least</b>, rather than treated as absent.
+    /// A missing band means the expectation names no variable this state reported, and
+    /// ranking it with the rest would let a claim about nothing win a round.
+    /// </para>
+    /// </remarks>
+    private static double Wants(Code expects, IReadOnlyCollection<Code> felt)
+    {
+        // The outcome's own number, recovered the way it was made. `Brain.Says` is the one
+        // place an outcome becomes a code, so reading it back here rather than by arithmetic
+        // on the modality keeps the two ends of the mapping together.
+        foreach (var code in felt)
+        {
+            if (Homeostat.Sensed(code) is not int which) continue;
+            if (Brain.Says(which) != expects) continue;
+
+            return code.Value;
+        }
+
+        return double.NegativeInfinity;
+    }
+
     /// <summary>How much of a run a body stayed inside its bounds.</summary>
     /// <param name="body">The world.</param>
     /// <param name="choosing">What to do about each state.</param>
@@ -256,6 +297,146 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         // And idling is the floor rather than a safe option, which is the whole reason this
         // world replaced one scored on survival.
         Assert.True(byNothing < byLuck, $"doing nothing held the body {byNothing:F3}");
+    }
+
+    /// <summary>
+    /// <b>Whether a chooser reading a population holds the body</b> better than one drawing.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>Drives</c>, and it is the last idea owed off <c>csharp</c>.</b> A third factor
+    /// from the body's own variables rather than a reward handed in: the population says what
+    /// follows each action, and the preference over those outcomes is computed from the bands
+    /// the learner feels. Nothing here is told that regulating is the task.
+    /// </para>
+    /// <para>
+    /// <b>Three arms over one seam, which <c>IActed</c> named before anything filled it.</b>
+    /// The oracle reads <c>Lowest</c> off the world and is the ceiling; the uniform draw is the
+    /// floor; this is the learner between them. A number against neither says nothing, which is
+    /// why both controls run in this same test rather than being cited from another.
+    /// </para>
+    /// <para>
+    /// <b>What would drop it: landing on the uniform draw.</b> That says the population's
+    /// expectations carry nothing about consequence and the preference is decorating a random
+    /// walk. Beating the oracle is not the bar and would be the reading to distrust — the
+    /// oracle sees the state exactly and this sees a quantised report of it.
+    /// </para>
+    /// <para>
+    /// <b>It did not land on the floor, it landed through it.</b> Regulated 0.001 against the
+    /// uniform draw's 0.238 and the oracle's 1.000, on 19,994 rounds of 20,000 where a
+    /// commitment named the action — so the fallback is not what ran and the chooser is worse
+    /// than choosing at random by two orders.
+    /// </para>
+    /// <para>
+    /// <b>And it predicted perfectly while doing it</b>, 1.000 against the uniform arm's 0.956,
+    /// off fourteen commitments against ninety-four. The two halves came apart: a chooser that
+    /// ranks by what it expects can win the prediction by making the world constant, and a
+    /// collapsed body is perfectly predictable. Nothing scored the regulating, so nothing
+    /// stopped it.
+    /// </para>
+    /// <para>
+    /// <b>Which is the never-varied genesis rule arriving from the other end.</b> This file
+    /// already records that a body held perfectly steady emits the same bands every round and
+    /// mints nothing; a body pinned at the floor is equally constant, and the fourteen
+    /// commitments are what a run learns from a world that stopped moving. The rule is
+    /// symmetric and only one end of it had been seen.
+    /// </para>
+    /// <para>
+    /// <b>So the preference is what lost rather than the idea</b>, and this repo allows a
+    /// losing arm one more shape on exactly that reading. Wanting a high band on the expected
+    /// lowest variable is satisfiable by making every band equal at the bottom, so the
+    /// preference has no term that a dead body fails. What is forbidden is leaving it off
+    /// while nobody decides, so it stays wired and measured until the next shape is run
+    /// against this row.
+    /// </para>
+    /// <para>
+    /// <b>And the silence is reported beside the score</b>, because a fallback is a control arm
+    /// nobody meant to run. A chooser told nothing on most rounds IS its fallback, and this
+    /// repo has already watched an arm drift to its control for free. <c>Told</c> against
+    /// <c>Untold</c> is what says which mechanism was running.
+    /// </para>
+    /// <para>
+    /// <b>The fallback is the uniform draw rather than idling</b>, which is a decision and not
+    /// a default. Idling is measured as the floor here, so falling back to it would make an
+    /// early run score below its own control for a reason that is not about choosing.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_a_chooser_reading_a_population_holds_the_body_better_than_drawing()
+    {
+        var spent = default(Drives);
+
+        // One instrument for all three, sampled at one point in the round, and every arm
+        // inside a trial that learns. The alternative was to score this arm on `tally.Recent`
+        // and the controls on `Held` -- a statistic whose halves count different things, which
+        // is one of this repo's named traps and reads as a comparison. `Held` cannot carry the
+        // learner because it does not settle anything, so a `Drives` inside it would read an
+        // empty population every round and BE its own fallback.
+        double Regulated(
+            string arm, Func<Homeostat, Brain, Func<IReadOnlyCollection<Code>, int?>> choosing)
+        {
+            var body = new Homeostat(World());
+            var brain = new Brain(new CommittingSettings { Capacity = 2000 }, 1);
+            var chosen = choosing(body, brain);
+
+            var viable = 0;
+            var steps = 0;
+
+            var trial = new Trial<Bodily>(
+                body,
+                new Bodied(Feeling.Acted),
+                brain,
+                acting: felt =>
+                {
+                    // Sampled before the step, and identically for every arm. Which side of
+                    // the action it is read on shifts all three together, so the ordering is
+                    // the arms' and not the sampling point's.
+                    steps++;
+                    if (body.Viable) viable++;
+
+                    return chosen(felt);
+                });
+
+            var tally = trial.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000);
+
+            output.WriteLine(
+                $"{arm,-8} | regulated {viable / (double)steps:F3} | predicted {tally.Recent:F3} "
+                + $"| chance {trial.Chance:F3} | held {brain.Held.Count,4}");
+
+            return viable / (double)steps;
+        }
+
+        var byDrives = Regulated("drives", (body, brain) =>
+        {
+            var draw = new Random(1);
+
+            spent = new Drives(
+                brain.Held,
+                code => code.Modality == Homeostat.Act ? Homeostat.Attended(code) : null,
+                Wants,
+                () => draw.Next(body.Doings));
+
+            return spent.Choose;
+        });
+
+        var byAim = Regulated("aimed", (body, _) => Aimed(body));
+        var byLuck = Regulated("uniform", (body, _) => Blindly(body, new Random(1)));
+
+        var drives = spent!;
+
+        output.WriteLine(
+            $"drives told {drives.Told} of {drives.Told + drives.Untold}, "
+            + $"untold {drives.Untold} | aimed {byAim:F3} | uniform {byLuck:F3} "
+            + $"| drives {byDrives:F3}");
+
+        // No bar on the score, because what a population-reading chooser is worth on this body
+        // has never been measured and a threshold written before the first reading would be the
+        // answer rather than the finding. What IS asserted is that the mechanism ran: a chooser
+        // told nothing every round is the fallback wearing its name, and that reading would be
+        // indistinguishable from the uniform control no matter what the score said.
+        Assert.True(drives.Told > 0,
+            $"the population named an action on none of {Rounds} rounds, so every choice was "
+            + "the fallback and this arm is its own control");
     }
 
     /// <summary>

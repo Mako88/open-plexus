@@ -22,7 +22,7 @@ public sealed record RecalledSettings
     /// nothing by it; the tasks are numbered one to twenty, so nought was free.
     /// </para>
     /// <para>
-    /// <b>And it is not a choice of corpus so much as the only one left.</b> bAbI's
+    /// <b>And it is not a choice of corpus</b> so much as the only one left. bAbI's
     /// held-out half is 1.000 recalled — some two thousand distinct contexts exist and
     /// no more — so reading it twice is re-reading it, whatever any arm scores. See
     /// <c>PrimerTests.Is_reading_real_english_predictive_at_all</c>.
@@ -42,7 +42,7 @@ public sealed record RecalledSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>This is the one dial worth having and it is an arm rather than a setting.</b> A
+    /// <b>This is the one dial worth having</b>, and it is an arm rather than a setting. A
     /// scope is a set of co-present codes, so a moment holding a whole story is a bag of
     /// words and <i>Mary went to the kitchen, Mary went to the garden, where is Mary</i>
     /// puts both places in it with nothing to tell them apart. A bounded span is the
@@ -52,7 +52,7 @@ public sealed record RecalledSettings
     /// order through <see cref="Recited"/> whatever the span is.
     /// </para>
     /// <para>
-    /// <b>And it is a fact about what was shown rather than about how to think</b>, which
+    /// <b>And it is a fact about what was shown</b>, rather than about how to think, which
     /// is the line a world's own dials have to stay on. How much of a page a reader is
     /// allowed to see is the experiment's business; what a reader does with it is not, and
     /// nothing here names a brain type.
@@ -80,8 +80,8 @@ public sealed record RecalledSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Next-token against masked is a settled experiment somewhere else and settles
-/// nothing here.</b> Masked prediction beats next-token on comprehension at equal scale,
+/// <b>Next-token against masked is a settled experiment somewhere else</b>, and it settles
+/// nothing here. Masked prediction beats next-token on comprehension at equal scale,
 /// and it does so because a gradient reaches both sides of the gap — which is a fact about
 /// backpropagation over embeddings and has no analogue in a population of commitments that
 /// are individually blamed. The prior is worth having and it is not an answer.
@@ -100,7 +100,7 @@ public enum Predicting
     /// A question and the story in front of it, expecting the answer.
     /// </summary>
     /// <remarks>
-    /// <b>The control, and arguably the one closest to how a child is taught.</b> Word
+    /// <b>The control</b>, and arguably the one closest to how a child is taught. Word
     /// meaning is not mostly acquired by tabulating text — it arrives by ostension, with
     /// somebody pointing and naming. A question with a right answer is that shape.
     /// </remarks>

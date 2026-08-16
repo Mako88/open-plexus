@@ -151,8 +151,12 @@ public sealed class DocsTests
     //
     // And 10,052 is the ratchet's ordinary work again: the repair-budget leaf was written
     // as settled ahead of its grid, the grid refuted it, and the correction is shorter than
+    // And 10,058, raised by six for `Drives`. The rule allows a rise for something genuinely
+    // new, and a chooser reading a population is a mechanism this branch did not have -- its
+    // leaf duplicates nothing and fork 111 is what its refutation opened. Deleting an item to
+    // afford it was the alternative, and a guard must not cost information.
     // the claim was.
-    private const int Whole = 10_052;
+    private const int Whole = 10_058;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

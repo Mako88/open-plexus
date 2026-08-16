@@ -84,17 +84,18 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // should read as a debt rather than as a threshold being relaxed.
         ["Composed.Third"] = Stranded,
 
-        // FIVE OF `Homeostat`'S SIX CAME OFF TOGETHER, which is what the entry said would
+        // Five of `Homeostat`'s six came off together, which is what the entry said would
         // happen: each leaves by its world getting a runner. `IActed` is that runner's
         // missing half -- `Act`, `Attending` and `Lowest` are called by the front end and
         // the oracle, and `Viable` and `Idling` by the control that says the world
-        // discriminates. What is left is the reverse mapping.
-        ["Homeostat.Attended"] =
-            "THE MAPPING RUN BACKWARDS, and nothing reads an action out of a moment yet. "
-            + "`Attending` turns a variable into a code and the front end calls it; the "
-            + "inverse is what a CHOOSER reading a population's expectation would need, "
-            + "which is `Drives` and is not built. It leaves when something asks a "
-            + "commitment what it would do rather than what would follow.",
+        // discriminates. What was left was the reverse mapping.
+        //
+        // And the sixth is off now, by the condition it was written with rather than by a
+        // rewrite of it. That entry said it leaves when something asks a commitment what it
+        // would DO rather than what would follow; `Drives` splits a scope's action code out
+        // with `Attended` and does exactly that. `Sensed` arrived beside it as the other
+        // inverse a preference needs -- which variable a felt band is about -- and is called
+        // by the same arm.
 
         ["Rhythm.Beat"] = Stranded,
         ["Rhythm.Turned"] = Stranded,
@@ -221,7 +222,13 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // nowhere to be asked from. `IActed` is that call, and `Act`, `Attending`, `Lowest`,
         // `Viable` and `Idling` are all read the moment a world can be acted in. The sixth
         // is the mapping run backwards and has a reason of its own now.
-        Assert.Equal(5, Unused.Count);
+        //
+        // Four, and the sixth came off by the condition its own entry carried rather than by
+        // that entry being rewritten. It said `Attended` leaves when something asks a
+        // commitment what it would DO rather than what would follow; `Drives` splits an
+        // action code out of a scope and does that. A member whose reason names the thing
+        // that would read it is a reason that expires, which is the only kind worth writing.
+        Assert.Equal(4, Unused.Count);
     }
 
     [Fact]
@@ -283,6 +290,18 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["SensesRun"] = Harness,
         ["TendingRun"] = Harness,
         ["ClutrrRun"] = Harness,
+
+        // A chooser is composed rather than constructed, which is `Composed`'s reason one
+        // layer in. `Trial` takes what to act with as a delegate on purpose -- a random
+        // chooser, an oracle and a learner are three arms over one seam, and a library that
+        // named one of them would be the library deciding which. The preference it ranks by
+        // is a fact about a body, so `src` naming this would also be `src` deciding what a
+        // world is for. `HomeostatTests` is what runs it, against both controls.
+        ["Drives"] =
+            "A CHOOSER IS CHOSEN BY WHOEVER COMPOSES THE RUN, so the library naming one "
+            + "would decide which of three arms over `IActed`'s seam is the policy -- the "
+            + "same fault as a world naming a brain type, one layer out. `Trial` takes it as "
+            + "a delegate and `HomeostatTests` supplies it beside the oracle and the draw.",
         ["LatentRun"] = Harness,
         ["MultiplexerRun"] = Harness,
         ["GradedRun"] = Harness,

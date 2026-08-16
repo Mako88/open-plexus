@@ -369,6 +369,20 @@ public sealed class Homeostat : IActed<Bodily>
     /// <summary>Which variable an action code is about.</summary>
     public static int Attended(Code code) => (int)code.Value;
 
+    /// <summary>
+    /// Which variable a felt code is about, or nothing where it is about none.
+    /// </summary>
+    /// <param name="code">One code out of <see cref="Feels"/>.</param>
+    /// <remarks>
+    /// <b>The inverse of the band half of <see cref="Feels"/></b>, as
+    /// <see cref="Attended"/> is the inverse of <see cref="Attending"/>. A drive over this
+    /// body reads how well off a variable is, and the only honest place to read that is the
+    /// code the front end emitted — so the mapping back has to exist for a preference to be
+    /// computable from what the learner feels rather than from <see cref="At"/>.
+    /// </remarks>
+    public static int? Sensed(Code code) =>
+        code.Modality >= Need && code.Modality < Rank ? code.Modality - Need : null;
+
     /// <inheritdoc cref="HomeostatSettings.Needs"/>
     public int Needs => _settings.Needs;
 

@@ -464,8 +464,10 @@ Three: refining. Anything before three that reads as tuning is out of order.
   - Original thought
     - **NOW** — `IActed` is the verb, and what was done rides in the moment as a code, so a
       scope names it and expects the consequence.
-    - **OPEN** — the chooser and the goal are unbuilt. A body held steady varies no band, so
-      what was DONE is all there is to learn from.
+    - **NOW** — the chooser is `Drives`, reading a population and preferring by felt bands.
+      It loses to both controls as built.
+    - **OPEN** — ranking by its own expectation wins by making the world CONSTANT, so the
+      preference wants a term a dead body fails. The goal is unbuilt. Fork **111**.
     - **OPEN** — `Roaming` is the spine, so it grows to each tier rather than closing: word
       order first, then twins, then acting. An isolating world is still built freely and goes
       when its question shuts, because only a constructed world can prove a ceiling.
@@ -501,8 +503,7 @@ Three: refining. Anything before three that reads as tuning is out of order.
     - **NOW** — `Posted` and `Cycle`: asks, answers and settlements over real sockets, with
       the learning loop still existing exactly once. THE WALK IS GONE and forks 1, 5, 6, 11,
       18, 20, 21, 22 and 24 went with it; `csharp` keeps their code and their numbers.
-    - **OPEN** — `Drives` is the one idea still owed off it: a third factor from the body's
-      own variables. `Homeostat` is that body and `IActed` drives it; the chooser is missing.
+    - **SETTLED** — `Drives` is built and measured, so nothing is owed off `csharp`.
     - **BROKEN** — seven worlds have no runner, their `*Run` files being the walk's. Each
       wants a `Trial` OR A DELETION, a world going when its question closes, and nothing
       says which. `DeadCodeTests` counts the debt.

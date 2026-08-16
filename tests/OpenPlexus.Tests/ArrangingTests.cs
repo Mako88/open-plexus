@@ -275,6 +275,24 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         // population against one with headroom, and culling decides the withheld set in one
         // cell and not in the other. The raised-capacity row below is what separates them, and
         // until it is read the flip is not licensed either way.
+        //
+        // It is read, and it separates them against the arm. At a capacity of 8,000 `Never` is
+        // bit-identical to itself at 2,000 -- 0.805, 863 sound, 296 unsound, 1164 residents --
+        // so it was never pinned and the control is clean. `Shared` unpinned reads 0.750 at
+        // 4,039 residents, which is WORSE than its own pinned 0.762 and further behind. The
+        // cap was not what cost it four points; lifting the cap costs it another point.
+        //
+        // And the disagreement above dissolves with it, which is the part worth keeping. The
+        // cleaner population was the CAP's doing rather than the operator's: unsound rules go
+        // from 52 to 1470 when the ceiling comes off, twenty-eightfold, while sound ones go
+        // 1277 to 1578. So culling at 2,000 was removing what widening manufactures, and the
+        // reading that `Shared` holds the cleanest population of the three was an artifact of
+        // the instrument that was confounding the score.
+        //
+        // So the ship gate fired and the default does not flip. `Widening` is refuted on both
+        // of its arms on this bench -- `Unmissed` at 0.721 and `Shared` at 0.750 unpinned,
+        // against 0.805 for no operator at all -- and by this repo's own rule an arm only
+        // lives while it is compared. Both are owed a deletion and a revival row.
         foreach (var (widening, capacity) in new[]
         {
             (Widening.Never, 2_000),

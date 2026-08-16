@@ -44,6 +44,42 @@ public sealed class DialTests
         typeof(CommittingSettings).GetProperties();
 
     /// <summary>
+    /// Every dial the two-world bar applies to, as a name and the enum behind it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Two sources, because the bar was reading one of them.</b> A brain dial is a
+    /// property of <see cref="CommittingSettings"/> and always was; a TRANSLATION dial is an
+    /// enum in <c>OpenPlexus.Codes</c> — <c>Joining</c> and <c>Feeling</c> today — and the
+    /// check never saw one. That hole is how <c>Feeling</c> shipped on a single world with
+    /// every guard green.
+    /// </para>
+    /// <para>
+    /// <b>And <c>Feeling</c> passes for the wrong reason</b>, which is said here rather than
+    /// banked. It is measured on <c>Homeostat</c> alone; <c>HomeostatTests</c> also names
+    /// <c>Multiplexer</c>, in the check that a watched world refuses a chooser, and the bar
+    /// counts worlds a FILE mentions. That is the attribution defect <c>PushbackTests</c>
+    /// already has an entry for, arriving a second time — so closing the hole did not make
+    /// this dial measured, it made the defect load-bearing for one more row.
+    /// </para>
+    /// <para>
+    /// <b>And a world's own run dial is deliberately not here.</b> <c>Looking</c> and
+    /// <c>Fronting</c> live on <c>ArrangedRun</c> and <c>GradedRun</c>, and the plan's line
+    /// is that a world may turn its own dials and never the brain's — so a bar demanding a
+    /// second world of them would be demanding that one world's setting be measured on
+    /// another, which is the mixing the rule exists to prevent.
+    /// </para>
+    /// </remarks>
+    private static IEnumerable<(string Name, Type Kind)> Arms() =>
+        Census()
+            .Where(one => one.PropertyType.IsEnum)
+            .Select(one => (one.Name, Kind: one.PropertyType))
+            .Concat(typeof(CommittingSettings).Assembly
+                .GetExportedTypes()
+                .Where(one => one.IsEnum && one.Namespace == "OpenPlexus.Codes")
+                .Select(one => (Name: one.Name, Kind: one)));
+
+    /// <summary>
     /// Dials nothing drives, each with the reason. <b>A reason, not an excuse</b>
     /// — several of these say outright that nobody has found the signal yet.
     /// </summary>
@@ -610,13 +646,11 @@ public sealed class DialTests
     {
         var thin = new List<string>();
 
-        foreach (var dial in Census())
+        foreach (var (name, kind) in Arms())
         {
-            if (!dial.PropertyType.IsEnum) continue;
-            if (Waiting.ContainsKey(dial.Name)
-                || Waiting.ContainsKey(dial.PropertyType.Name)) continue;
+            if (Waiting.ContainsKey(name) || Waiting.ContainsKey(kind.Name)) continue;
 
-            var arms = Enum.GetNames(dial.PropertyType);
+            var arms = Enum.GetNames(kind);
             var seen = new HashSet<string>(StringComparer.Ordinal);
 
             foreach (var path in Directory.GetFiles(
@@ -630,9 +664,9 @@ public sealed class DialTests
                 // builds. Both forms count: selecting an arm by name, and assigning the
                 // property in a settings initialiser.
                 if (!arms.Any(arm => source.Contains(
-                        $"{dial.PropertyType.Name}.{arm}", StringComparison.Ordinal))
+                        $"{kind.Name}.{arm}", StringComparison.Ordinal))
                     && !System.Text.RegularExpressions.Regex.IsMatch(
-                        source, $@"\b{dial.Name}\s*[=:]"))
+                        source, $@"\b{name}\s*[=:]"))
                     continue;
 
                 foreach (var world in Worlds)
@@ -641,7 +675,7 @@ public sealed class DialTests
                         seen.Add(world);
             }
 
-            if (seen.Count < 2) thin.Add($"{dial.Name} ({seen.Count})");
+            if (seen.Count < 2) thin.Add($"{name} ({seen.Count})");
         }
 
         Assert.True(thin.Count == 0,

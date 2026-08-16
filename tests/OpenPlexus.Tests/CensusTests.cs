@@ -48,7 +48,7 @@ public sealed class CensusTests(ITestOutputHelper output)
 
     /// <summary>
     /// <b>Whether a parent's table already knows what its child will want — fork 74's
-    /// precondition, and it changes nothing.</b>
+    /// precondition</b>, and it changes nothing.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -66,8 +66,8 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// conditioning is the whole point and no single pass can replace it.
     /// </para>
     /// <para>
-    /// <b>And the answer means something either way, which is why it is worth a run before a
-    /// mechanism.</b> Agreement makes fork 74 buildable; disagreement kills it and says why —
+    /// <b>And the answer means something either way</b>, which is why it is worth a run before a
+    /// mechanism. Agreement makes fork 74 buildable; disagreement kills it and says why —
     /// the same reason a minted name overshoots, arriving through the search rather than
     /// through the vocabulary.
     /// </para>
@@ -179,8 +179,8 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// them.</b>
     /// </summary>
     /// <remarks>
-    /// <b>The vote is re-derived before the step, so this is the check that it is the same
-    /// vote.</b> Reading the population a second time is only sound if the reading agrees
+    /// <b>The vote is re-derived before the step</b>, so this is the check that it is the same
+    /// vote. Reading the population a second time is only sound if the reading agrees
     /// with what the loop did — a census that partitioned a DIFFERENT set of wrong rounds
     /// would look exactly as informative and mean nothing, which is this repo's oldest
     /// trap wearing an instrument. Rounds where nothing fired are wrong in neither count.

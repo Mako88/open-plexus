@@ -13,23 +13,23 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The two deaths are not one death, which is the whole reason this file exists beside
-/// that one.</b> A machine whose door is shut refuses the connection, so the sender watches
+/// <b>The two deaths are not one death</b>, which is the whole reason this file exists beside
+/// that one. A machine whose door is shut refuses the connection, so the sender watches
 /// the question fail to leave and writes it off exactly — no clock, no politeness, no guess.
 /// A machine that accepted the question and went is silent in a way nothing can observe:
 /// late and absent are one thing under C2, and the only mechanism that separates them is a
 /// deadline, which this project carries a revival row against saying never.
 /// </para>
 /// <para>
-/// <b>So the answer is not to observe harder, it is to not need that machine.</b> Partition
+/// <b>So the answer is not to observe harder</b>, it is to not need that machine. Partition
 /// the population into slots and give each slot R machines holding the identical shard. A
 /// round is complete when every SLOT has spoken or been written off entirely, rather than
 /// every holder — so a slot survives its own member dying mid-question and the round
 /// finishes on evidence that is complete rather than on evidence that is timely.
 /// </para>
 /// <para>
-/// <b>And the replicas cost nothing to keep in sync, which is why this is affordable at
-/// all.</b> Every machine is told the same moment and the same settlement, and where a
+/// <b>And the replicas cost nothing to keep in sync</b>, which is why this is affordable at
+/// all. Every machine is told the same moment and the same settlement, and where a
 /// commitment is placed is a fact about the commitment — so two machines in one slot mint
 /// the same children independently and stay identical with no message between them. That
 /// they do is asserted below rather than assumed, because it is also a free check on fork

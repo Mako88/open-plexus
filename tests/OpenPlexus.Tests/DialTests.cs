@@ -826,7 +826,7 @@ public sealed class DialTests
     /// nothing to say. The second is what this fails on.
     /// </para>
     /// <para>
-    /// <b>It has no subject today, which is said here rather than left to be discovered.</b>
+    /// <b>It has no subject today</b>, which is said here rather than left to be discovered.
     /// `Widening` was the last dial shipping `Never` and it is deleted, so this passes over an
     /// empty set — a tripwire rather than a reading. It was written against a case that
     /// passed and a case that failed: `Widening` was refuted twice over in the table, and

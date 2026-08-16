@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using OpenPlexus.Codes;
 using Xunit.Abstractions;
 
@@ -34,16 +34,17 @@ namespace OpenPlexus.Tests;
 public sealed class OutstandingTests(ITestOutputHelper output)
 {
     /// <summary>
-    /// <b>Eight worlds have no runner</b> — 21 entries, because members count too.
+    /// <b>Worlds with no runner</b>, and a member counts as an entry too.
     /// </summary>
     /// <remarks>
     /// <para>
     /// Every one was driven by a <c>*Run</c> in <c>Worlds/</c> and every one of those was the
     /// walk's, so the world data survived and the thing that turned it into a measurement did
     /// not. The commitment side's generic runner is <c>Trial</c> and nothing is wired to it.
-    /// <b>The count is 23 rather than 11 because a world's unreachable MEMBERS are listed
-    /// beside its type</b> — that second number is how much of each world is dead rather
-    /// than merely undriven, and it is what tells a `Trial` from a deletion.
+    /// <b>A world's unreachable MEMBERS are listed beside its type</b>, which is how much of
+    /// each world is dead rather than merely undriven — and it is what tells a `Trial` from a
+    /// deletion. The count is printed rather than written here, because a count written into
+    /// a remark rots the first time the list moves and this one already had.
     /// </para>
     /// <para>
     /// <b>AND A `Trial` is only half the answer, which is the part that was first written
@@ -56,8 +57,8 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// <b>Some are obviously live and some are obviously not.</b> <c>Senses</c> is the
     /// cross-modal pairing nothing has ever run, <c>Motif</c> is rung five's redundancy
     /// manufactured on purpose, <c>Rhythm</c> is rung three's, <c>Latent</c> is fork 39's.
-    /// <c>Snake</c> and <c>SnakeSense</c> were built for prediction-conditional-on-action,
-    /// which is forks 18 and 20 — both settled, both deleted with the walk.
+    /// <c>Clevr</c> is the perceptual world with a published bar beside it, and
+    /// <c>Composed</c> and <c>Latent</c> are the front end's own questions.
     /// </para>
     /// </remarks>
     [Fact]

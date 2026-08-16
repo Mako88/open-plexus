@@ -1238,11 +1238,30 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// over about 0.86 is a walker carrying something, which no word of the question names.
     /// </para>
     /// <para>
-    /// <b>What would drop this world, written before the grid runs.</b> Every arm landing on
-    /// the marginal within the seed spread says the effect question is rung four's and this
-    /// world reaches it no more than <c>Roaming</c>'s other one does — in which case the
-    /// mechanism stands as the architecture line's answer and the WORLD is what to replace,
-    /// because a question no arm can move ranks nothing.
+    /// <b>What would drop this world was written before the grid ran</b>, and it fired.
+    /// Every arm landing on the marginal within the seed spread was to say the effect
+    /// question is rung four's and this world reaches it no better than <c>Roaming</c>'s
+    /// other one does. They landed BELOW it — 0.838 to 0.855 against a marginal of 0.865,
+    /// three seeds each, the store and the backward lookup alike.
+    /// </para>
+    /// <para>
+    /// <b>Below rather than on is the sharper reading</b>, and it is not the one predicted.
+    /// A population blind to the carrying case would sit ON the constant by answering *did
+    /// not move* everywhere; sitting under it means commitments are answering *moved* on
+    /// evidence that does not support it. What is scarce here is not coverage.
+    /// </para>
+    /// <para>
+    /// <b>So this ranks no arms and is kept as a ceiling probe</b>, which is a different job
+    /// and is said here so nobody reads a future row off it as a comparison. What it now
+    /// prices is rung four, on a bar computed with no learning and a headroom named exactly:
+    /// a walker carrying something, which no word of the question names.
+    /// </para>
+    /// <para>
+    /// <b>And it leaves the mechanism itself unmeasured</b>, which is the honest gap. A told
+    /// statement settles now and this is the only world that asks one to, so whether the
+    /// machinery is any good at what a statement DOES cannot be told apart from whether this
+    /// question needs an unbuilt rung. An effect question a conjunction could answer would
+    /// separate them, and that is the next world rather than the next arm.
     /// </para>
     /// </remarks>
     [Fact]
@@ -1261,10 +1280,17 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
         var scores = Scored(arms, people: 4, Examining.Effect);
 
-        // NO BAR. The marginal is in the ceiling grid and the prediction is on the method,
-        // read against these rows rather than enforced by an assertion somebody would have
-        // to edit the day the world's dials move.
         foreach (var (name, taken) in scores)
             output.WriteLine($"{name,-12}| worst {taken.Min():F3} | best {taken.Max():F3}");
+
+        // A TRIPWIRE RATHER THAN A BAR, and it is pointed the way the reading went. The
+        // marginal is 0.865 at these dials, measured in the ceiling grid beside this one,
+        // and the best of nine runs here is 0.855. So this fails the day something reaches
+        // the carrying case -- which is the day this world stops being a ceiling probe and
+        // starts ranking arms, and the day the leaf above needs rewriting.
+        Assert.True(scores.Values.Max(one => one.Max()) < 0.865,
+            "an arm has moved the effect question off its marginal, so the headroom that was "
+            + "rung four's is reachable after all. Read the rows above before the plan's leaf "
+            + "-- this world was kept as a probe on the reading that nothing reaches it");
     }
 }

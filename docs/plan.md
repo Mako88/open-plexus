@@ -449,7 +449,9 @@ Three: refining. Anything before three that reads as tuning is out of order.
       into the brain one level out. Fork **60** carries it, under the machine.
   - What it is told must be settleable
     - **NOW** — `Roaming` asks what the statement it is telling DID, so a told statement
-      carries a settlement and can be wrong. No constant per verb beats the marginal.
+      carries a settlement and can be wrong.
+    - **OPEN** — no arm reaches its marginal, so it prices rung four rather than ranking
+      anything, and testing the MECHANISM wants an effect a conjunction can reach.
     - **OPEN** — the store's update rule is still the experimenter's, so what is falsifiable
       is *this statement changes what is known* and not *my store was right*. Fork **104**.
     - **OPEN** — a primer moves no counter, a round the world cannot settle taking no score,
@@ -504,9 +506,9 @@ Three: refining. Anything before three that reads as tuning is out of order.
       the learning loop still existing exactly once. THE WALK IS GONE and forks 1, 5, 6, 11,
       18, 20, 21, 22 and 24 went with it; `csharp` keeps their code and their numbers.
     - **SETTLED** — `Drives` is built and measured, so nothing is owed off `csharp`.
-    - **BROKEN** — seven worlds have no runner, their `*Run` files being the walk's. Each
-      wants a `Trial` OR A DELETION, a world going when its question closes, and nothing
-      says which. `DeadCodeTests` counts the debt.
+    - **BROKEN** — worlds with no runner, their `*Run` files being the walk's. Each wants a
+      `Trial` OR A DELETION, a world going when its question closes, and nothing says which.
+      `OutstandingTests` prints the debt.
     - **NOW** — the vote's arithmetic composes and a whole learner runs over it. Fork **52**.
     - **NOW** — a round is a barrier, so lateness costs the CLOCK and not one answer, and C2's
       out-of-order half is untestable here. Breaking it is unmeasured.

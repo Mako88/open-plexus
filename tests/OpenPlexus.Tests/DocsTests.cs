@@ -172,7 +172,18 @@ public sealed class DocsTests
     // order of the work names as owed a mechanism however bad. The replacement leaf says
     // what the mechanism is and the OPEN beside it says which half of fork 104 is still
     // open, which the old pair could not, since a leaf reading `nothing` cannot narrow.
-    private const int Whole = 10_077;
+    //
+    // And 10,076 is the ratchet's ordinary work: the stranded leaf named seven worlds and
+    // the live count is eight entries across five, so the number came out and the test that
+    // prints it went in. A count in a doc rots the first time the list moves.
+    //
+    // And 10,097, twenty-one words for the reading that came back on the mechanism above.
+    // The leaf saying a told statement settles was written the same session, and the grid
+    // says no arm reaches that world's marginal -- so a route entry claiming a mechanism
+    // where nothing can be shown to work is the exact drift this doc exists to prevent.
+    // The OPEN beside it names the next world rather than the next arm, which is the part
+    // no commit message survives long enough to say.
+    private const int Whole = 10_097;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

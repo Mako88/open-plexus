@@ -56,6 +56,23 @@ public sealed class ArrangingTests(ITestOutputHelper output)
             // accuracy is high, so its parents are wrong far less often. If the rule binds
             // anywhere on this bench it binds here, and if it does not it is a third off
             // switch and goes the way of `Children`.
+            //
+            // IT DOES NOT BIND. Ten seeds: the shipped total reads 0.725 unseen at 709 sound
+            // and 525 unsound; free reads 0.663 at 94 and 1195; earned reads 0.651 at 95 and
+            // 1281, holding 1868 residents against a capacity of 2000. So it sits with FREE
+            // on every column and not with the total -- the sound rules collapse sevenfold,
+            // the unsound ones nearly treble, and the withheld score falls seven points.
+            //
+            // And the reason is the rule's own arithmetic rather than this world. One attempt
+            // per `Floor` misses funds a parent in proportion to how WRONG it is, and on a
+            // world whose truths are one code every repair is damage -- so the parents doing
+            // the most damage are exactly the ones earning fastest. That is the shape John's
+            // curve names: an almost-always-wrong parent should fall off a cliff rather than
+            // be funded, which is fork 110 and is what would make this rule a budget.
+            //
+            // So C4's objection to a lifetime total stands and this is not the replacement.
+            // Neither arm may be deleted on this reading: the total is measured better here
+            // and is still a lifetime, which is the contradiction fork 110 has to resolve.
             ("earned", new CommittingSettings
             {
                 Surprising = Surprising.AnyFailure,

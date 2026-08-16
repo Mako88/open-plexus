@@ -337,11 +337,10 @@ Three: refining. Anything before three that reads as tuning is out of order.
     - **OPEN** — it only ever NARROWS, rungs one to four making a scope smaller and nothing
       broadening but rung five. A specialise-only machine is arbitrarily accurate and
       conceptless, and the ladder's ORDER is a bias over when a construct is tried.
-    - **NOW** — a repair budget is EARNED, one attempt per miss floor, because a total is a
-      lifetime and C4 refuses one.
-    - **OPEN** — that floor is a constant and John wants a curve, on how right a rule is: one
-      always right gains little, one sometimes right is the ideal candidate, and one almost
-      always wrong falls off a cliff and wants culling. Fork **110**.
+    - **OPEN** — a total is a lifetime, which C4 refuses, and the earned rate meant to replace
+      it reads as free on `Arranged` rather than as a budget.
+    - **OPEN** — so the rate wants a curve on how right a rule is, which is what stops an
+      always-wrong parent earning without bound. Fork **110**.
     - **OPEN** — a fresh child starts BLIND and re-earns its statistics, a floor every rung
       of a chain pays while only the last pays off. The escape is rung five, not a smaller N.
     - **OPEN** — rung two, negation, *X and NOT Z*. Unsound against a live moment, so it may

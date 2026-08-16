@@ -148,7 +148,11 @@ public sealed class DocsTests
     // now cost two sessions. And the repair-budget leaf is settled the same day it is
     // quoted, `Attempts` going and `Earned` shipping, so its replacement carries the
     // decision and the curve John wants over it rather than the open question it replaced.
-    private const int Whole = 10_064;
+    //
+    // And 10,052 is the ratchet's ordinary work again: the repair-budget leaf was written
+    // as settled ahead of its grid, the grid refuted it, and the correction is shorter than
+    // the claim was.
+    private const int Whole = 10_052;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

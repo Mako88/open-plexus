@@ -147,8 +147,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         /// rung, handed over rather than learnt.</b>
         /// </summary>
         /// <remarks>
-        /// <b>An instrument and never a shippable front end, on the standing
-        /// <see cref="Unifying"/> holds: a price taken before a mechanism is designed.</b>
+        /// <b>An instrument and never a shippable front end</b>, on the standing
+        /// <see cref="Unifying"/> holds: a price taken before a mechanism is designed.
         /// It is not the refuted arm that emitted a POSITION beside a fused code — that one
         /// reached every moment and no scope, being never absent, and this is absent
         /// whenever the two words stood the other way round. And it is not a fused code
@@ -248,8 +248,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The right sentence is decidable with no learning, and it names exactly two
-    /// people.</b> The second ceiling, and it is one half exactly.
+    /// <b>The right sentence is decidable with no learning</b>, and it names exactly two
+    /// people. The second ceiling, and it is one half exactly.
     /// </summary>
     /// <remarks>
     /// <b>Both halves or the number is not a half.</b> That the overlap picks the right
@@ -287,16 +287,16 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>EVERY SENTENCE SAYS <i>the</i> AND SO DOES THE QUESTION, so first-any-overlap
+    /// <b>EVERY SENTENCE SAYS <i>the</i> AND SO DOES THE QUESTION</b>, so first-any-overlap
     /// returns the newest sentence every time and the middle rung is not reached by the arm
-    /// that looks like it should reach it.</b> The refutation table already says this in
+    /// that looks like it should reach it. The refutation table already says this in
     /// <see cref="Joining.Chained"/>'s words — a chain keyed on everything walks back a
     /// sentence at a time and never follows a referent — and this is the same sentence
     /// arriving as a number on a world built to hold it still.
     /// </para>
     /// <para>
-    /// <b>So the middle rung needs the background subtracted, which is
-    /// <see cref="Joining.Distinguished"/>'S RULE AND IS ALREADY BUILT.</b> Taken here
+    /// <b>So the middle rung needs the background subtracted</b>, which is
+    /// <see cref="Joining.Distinguished"/>'S RULE AND IS ALREADY BUILT. Taken here
     /// rather than found in a grid, this costs a millisecond and saves attributing a
     /// selector's failure to a learner's — which is exactly what a ceiling is for.
     /// </para>

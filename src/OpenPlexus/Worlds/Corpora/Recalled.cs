@@ -62,8 +62,8 @@ public sealed record RecalledSettings
 
     /// <summary>Stories from the end of the file that this world will never draw.</summary>
     /// <remarks>
-    /// <b>Whole stories and not whole questions, which is what makes the arms
-    /// comparable.</b> <see cref="Predicting.Asked"/> only ever draws questions, so holding
+    /// <b>Whole stories and not whole questions</b>, which is what makes the arms
+    /// comparable. <see cref="Predicting.Asked"/> only ever draws questions, so holding
     /// back a question hides its story too; every other arm draws the STATEMENTS, and would
     /// train on the very sentence the examination is about. Holding the story back is the
     /// only rule that means the same thing to all four.
@@ -76,7 +76,7 @@ public sealed record RecalledSettings
 
 /// <summary>
 /// What a text world asks the learner to predict — <b>the choice this whole comparison
-/// exists to make, and one nothing in the field has made for a learner like this.</b>
+/// exists to make</b>, and one nothing in the field has made for a learner like this.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -87,8 +87,8 @@ public sealed record RecalledSettings
 /// are individually blamed. The prior is worth having and it is not an answer.
 /// </para>
 /// <para>
-/// <b>So every arm predicts a word from one alphabet, and every arm sits the same
-/// examination.</b> An objective judged on its own target is unfalsifiable — a next-word
+/// <b>So every arm predicts a word from one alphabet</b>, and every arm sits the same
+/// examination. An objective judged on its own target is unfalsifiable — a next-word
 /// arm scores well at next words and says nothing about whether it understood anything.
 /// What is compared is the POPULATION each one grows, put to an identical set of withheld
 /// questions none of them was trained on.
@@ -156,8 +156,8 @@ public enum Predicting
     /// the one form that was always going to lose is not refuting it.
     /// </para>
     /// <para>
-    /// <b>And frequency is not a stop list, which is the line this has to stay the right
-    /// side of.</b> No parser, tagger, template or hand-written word set goes near it — it
+    /// <b>And frequency is not a stop list</b>, which is the line this has to stay the right
+    /// side of. No parser, tagger, template or hand-written word set goes near it — it
     /// is a count over the corpus, the same kind of fact <see cref="Babi.Commonest"/> is.
     /// What it is close to is worth saying out loud: a measured proxy for <i>informative</i>
     /// rather than a declared one, and the honest version of gating on surprise, which is a
@@ -227,7 +227,7 @@ public readonly record struct Asking
 /// What one withheld question said, in the English the corpus wrote it in.
 /// </summary>
 /// <remarks>
-/// <b>The transcript and not the moment, and nothing that learns ever sees it.</b> A word
+/// <b>The transcript and not the moment</b>, and nothing that learns ever sees it. A word
 /// reaches the population as a hash and a hash goes nowhere back, so a run could report
 /// that it answered four questions in five and never say which — which is a score with no
 /// way to be embarrassed by it. This is here so an answer can be printed in words beside

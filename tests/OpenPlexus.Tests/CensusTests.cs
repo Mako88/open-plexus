@@ -205,11 +205,11 @@ public sealed class CensusTests(ITestOutputHelper output)
 
     /// <summary>
     /// <b>THE READING ITSELF: how much of the failure any vote rule could ever have
-    /// reached, and whether what it holds covers the rounds guessing gets wrong.</b>
+    /// reached</b>, and whether what it holds covers the rounds guessing gets wrong.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>One walk over four worlds rather than two, which is what the vote arms cost.</b>
+    /// <b>One walk over four worlds rather than two</b>, which is what the vote arms cost.
     /// These were two readings because each crossed the four worlds with its own list of
     /// weighing arms; the arms are deleted, and what was left was the same four runs taken
     /// twice for two sets of columns. `DuplicationTests` refused it, correctly.
@@ -223,8 +223,8 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// rather than the learner, walked into again.
     /// </para>
     /// <para>
-    /// <b>And it still has not learnt the world, which is what the second row
-    /// separates.</b> That rule fires exactly when guessing the commoner answer already
+    /// <b>And it still has not learnt the world</b>, which is what the second row
+    /// separates. That rule fires exactly when guessing the commoner answer already
     /// works, so it buys nothing. <see cref="Census.Paying"/> asks the question no
     /// alternative rule set can game: of the rounds where the base rate is WRONG, how many
     /// had a true rule present and firing.
@@ -382,7 +382,7 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>What the two known gates cost and buy, read on the bucket that decides it.</b>
+    /// <b>What the two known gates cost and buy</b>, read on the bucket that decides it.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -393,7 +393,7 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// <see cref="Census.Uncovered"/>, and nothing has ever counted those.
     /// </para>
     /// <para>
-    /// <b>And the gate's question is answered by any rule at all, which is the suspect.</b>
+    /// <b>And the gate's question is answered by any rule at all</b>, which is the suspect.
     /// <c>firing.Any(one =&gt; one.Expects == arrived)</c> is satisfied by a commitment that
     /// is unsound, inaccurate and outvoted — so one worthless rule proposing an outcome
     /// blocks covering on every round that outcome arrives, forever. This says whether

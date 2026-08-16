@@ -226,7 +226,35 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     {
         output.WriteLine("arm        | unseen accuracy | spread | sound | unsound | residents");
 
-        foreach (var widening in new[] { Widening.Never, Widening.Unmissed, Widening.Shared })
+        // Ten seeds, and the gate fires: Never 0.805 at 863 sound and 296 unsound over 1164
+        // residents; Unmissed 0.721 at 448 and 309; Shared 0.762 at 1277 and 52. So the arm
+        // costs four points of the withheld score on the world it was predicted to be
+        // dangerous on, which is what this grid was written to ask.
+        //
+        // And the two halves disagree, which is the reading rather than the verdict. `Shared`
+        // holds the MOST sound rules of the three by a half and the FEWEST unsound by five --
+        // its population is far cleaner than the arm that beats it. A cleaner population that
+        // answers worse is not a mechanism failing; it is a mechanism whose output is not
+        // reaching the vote.
+        //
+        // And the comparison moves two things, which is this repo's oldest trap. Both widening
+        // arms sit at 2001 residents against a capacity of 2000 and `Never` sits at 1164, so
+        // this is not the operator measured against no operator -- it is a capacity-bound
+        // population against one with headroom, and culling decides the withheld set in one
+        // cell and not in the other. The raised-capacity row below is what separates them, and
+        // until it is read the flip is not licensed either way.
+        foreach (var (widening, capacity) in new[]
+        {
+            (Widening.Never, 2_000),
+            (Widening.Unmissed, 2_000),
+            (Widening.Shared, 2_000),
+
+            // The same arm with room, so the pin is not doing the work. If `Shared` still
+            // trails here then the operator costs on this world and the gate stands; if it
+            // catches up, what was measured above was the cap.
+            (Widening.Never, 8_000),
+            (Widening.Shared, 8_000),
+        })
         {
             // The search pair pinned rather than inherited, and the grid above is why. Both
             // of these moved while fixtures that named neither were re-taken silently under
@@ -236,12 +264,13 @@ public sealed class ArrangingTests(ITestOutputHelper output)
                 Widening = widening,
                 Forking = Forking.Distinct,
                 Budget = 8,
+                Capacity = capacity,
             };
 
             var (unseen, last) = Sweep(Small, dials, Looking.Tiled, seeds: 10);
 
             output.WriteLine(
-                $"{widening,-10} | {unseen.Average(),15:F3} | {Spread(unseen),6:F3} "
+                $"{widening,-10} {capacity,5} | {unseen.Average(),15:F3} | {Spread(unseen),6:F3} "
                 + $"| {last.Rules.Sound,5} | {last.Rules.Unsound,7} "
                 + $"| {last.Tally.Resident,9} | widened {last.Tally.Widened}");
         }

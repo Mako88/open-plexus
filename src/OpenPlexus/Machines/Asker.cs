@@ -84,8 +84,8 @@ public sealed class Gathering : IDisposable
     /// is the check that asks whether a public member has a caller at all.
     /// </para>
     /// <para>
-    /// <b>A holder alone is a slot of one named after itself, so no partition is not a
-    /// special case.</b> With nothing handed in, every holder is its own slot and every
+    /// <b>A holder alone is a slot of one named after itself</b>, so no partition is not a
+    /// special case. With nothing handed in, every holder is its own slot and every
     /// condition below reduces to counting holders — which is what makes R=1 bit-identical
     /// to the machine before fork 62 rather than merely close to it.
     /// </para>
@@ -138,8 +138,8 @@ public sealed class Gathering : IDisposable
     /// the replicas are there rather than merely configured.</b>
     /// </summary>
     /// <remarks>
-    /// <b>A check can be wired and unable to fire, which is why the dropped answers are
-    /// counted rather than dropped silently.</b> A fleet declared with two machines a slot
+    /// <b>A check can be wired and unable to fire</b>, which is why the dropped answers are
+    /// counted rather than dropped silently. A fleet declared with two machines a slot
     /// where one of them never answers is a fleet of one wearing redundancy's name, and it
     /// survives every death test by being lucky about which machine died. This reads nought
     /// in exactly that case and never in the healthy one.
@@ -164,8 +164,8 @@ public sealed class Gathering : IDisposable
 
     /// <summary>How many holders were never handed the question at all.</summary>
     /// <remarks>
-    /// <b>The term that separates a silence from a loss, and it is not the same as
-    /// <see cref="Asked"/> MINUS <see cref="Heard"/>.</b> That difference is every holder
+    /// <b>The term that separates a silence from a loss</b>, and it is not the same as
+    /// <see cref="Asked"/> MINUS <see cref="Heard"/>. That difference is every holder
     /// yet to speak, of which some are thinking and some are gone; this is the share the
     /// sender watched fail to leave. A run reading only the first cannot tell a fleet that
     /// was slow from a fleet that was smaller than it thought.
@@ -177,14 +177,14 @@ public sealed class Gathering : IDisposable
 
     /// <summary>Whether everyone asked has answered.</summary>
     /// <remarks>
-    /// <b>Not a condition anything may block on forever, and deliberately not what
-    /// <see cref="Everyone"/> WAITS FOR SINCE FORK 53.</b> A round finished by a write-off
+    /// <b>Not a condition anything may block on forever</b>, and deliberately not what
+    /// <see cref="Everyone"/> WAITS FOR SINCE FORK 53. A round finished by a write-off
     /// completes without being whole, and keeping the two apart is what stops a fleet of
     /// twelve that heard eight reading like a fleet of eight — which is the C3 instrument
     /// and the reason the denominator is carried at all.
     /// </remarks>
     /// <remarks>
-    /// <b>And an echo counts towards it, because a replica that spoke was heard from.</b>
+    /// <b>And an echo counts towards it</b>, because a replica that spoke was heard from.
     /// What this asks is whether every machine put to answered, which is a question about the
     /// fleet's health; what <see cref="Heard"/> asks is how much distinct evidence arrived,
     /// which is a question about the vote. Under R=1 they are the same number and this is the

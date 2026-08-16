@@ -36,8 +36,8 @@ namespace OpenPlexus.Tests;
 /// 12 across a wire.
 /// </para>
 /// <para>
-/// <b>The death is a muted holder rather than a raced kill, and that is a measurement
-/// decision.</b> See <see cref="Ported.Mute"/>: killing a machine mid-round means winning a
+/// <b>The death is a muted holder rather than a raced kill</b>, and that is a measurement
+/// decision. See <see cref="Ported.Mute"/>: killing a machine mid-round means winning a
 /// race against a socket, so which round it landed in would vary and a green suite would be
 /// evidence about scheduling. A holder that accepts every question and answers none is the
 /// same condition with the timing removed and made permanent, which is strictly harsher.

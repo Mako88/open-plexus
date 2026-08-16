@@ -23,8 +23,8 @@ public readonly record struct Peer(string Host);
 /// run a dictionary lookup between them.
 /// </para>
 /// <para>
-/// <b>AND `HybridBus` stays the harsher test, which is the part that will be assumed the
-/// other way round.</b> It reorders deliveries on purpose because C2 says messages arrive
+/// <b>AND `HybridBus` stays the harsher test</b>, which is the part that will be assumed the
+/// other way round. It reorders deliveries on purpose because C2 says messages arrive
 /// out of order; HTTP over TCP does not reorder within a connection, so a run over this
 /// exercises LESS adversity than a run in one process. A green distributed run is
 /// therefore not evidence that C2 is satisfied — the simulator is where that is measured,
@@ -43,8 +43,8 @@ public readonly record struct Peer(string Host);
 /// the search once per hop.
 /// </para>
 /// <para>
-/// <b>And that paragraph was false from the day it was written, which is why it is still
-/// here.</b> Both fan-outs awaited each post in turn, so a broadcast cost the SUM of the
+/// <b>And that paragraph was false from the day it was written</b>, which is why it is still
+/// here. Both fan-outs awaited each post in turn, so a broadcast cost the SUM of the
 /// hops and the origin was paced by the slowest machine in the fleet — the exact failure
 /// the sentence above describes, sitting underneath it. Nothing caught it because nothing
 /// on the thinking path had ever been timed across a socket; it turned up when the LEARNING

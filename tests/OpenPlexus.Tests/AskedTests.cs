@@ -22,7 +22,7 @@ namespace OpenPlexus.Tests;
 /// real ports between machines that share no object.
 /// </para>
 /// <para>
-/// <b>And it is still not a test of C2, which is the thing that will be assumed.</b> TCP
+/// <b>And it is still not a test of C2</b>, which is the thing that will be assumed. TCP
 /// does not reorder within a connection, so this exercises LESS adversity than
 /// <see cref="HybridBus"/> does. Green here says the bytes and the routing are right.
 /// </para>
@@ -47,8 +47,8 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// Rounds, <b>and the five hundred past the last sweep are the point of the number.</b>
     /// </summary>
     /// <remarks>
-    /// <b>A run ending on a sweep round is read at its most exhausted, and this file's whole
-    /// subject is what a trained population would name NEXT.</b> At twenty thousand exactly,
+    /// <b>A run ending on a sweep round is read at its most exhausted</b>, and this file's whole
+    /// subject is what a trained population would name NEXT. At twenty thousand exactly,
     /// three seeds in eight have nothing left to say — so the assertions here stood on seed
     /// one happening to be one of the five that did, which is the single-seed ordering this
     /// repo's traps list already names. Five hundred rounds of repair past the last sweep
@@ -73,8 +73,8 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// <b>this file's precondition, and the shipped default is past it.</b>
     /// </summary>
     /// <remarks>
-    /// <b>The same number and the same reason as <c>SplitNamingTests</c>, which is why both
-    /// say why rather than just saying 64.</b> These tests ask what the WIRE costs rung
+    /// <b>The same number and the same reason as <c>SplitNamingTests</c></b>, which is why both
+    /// say why rather than just saying 64. These tests ask what the WIRE costs rung
     /// five, so they need shards too small to certify a redundancy unaided — otherwise a
     /// holder names something before any bytes move and the exchange is credited with
     /// nothing. That is a property of how much repair ran, not of the sockets.

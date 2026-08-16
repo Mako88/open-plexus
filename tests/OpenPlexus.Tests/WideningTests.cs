@@ -71,6 +71,37 @@ public sealed class WideningTests(ITestOutputHelper output)
     /// <summary>
     /// <b>Whether generalisation reaches the rounds guessing misses.</b>
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The kill line, taken and read.</b> <see cref="Widening.Shared"/> dies if it fails
+    /// to take a clear majority of <see cref="Widening.Unmissed"/>'s hard-round coverage gain
+    /// over <see cref="Widening.Never"/> at both eleven-bit widths. Eight seeds:
+    /// </para>
+    /// <para>
+    /// Even eleven bits — 0.905, 0.944, 0.935 — so the gain is 0.039 and Shared takes 0.030
+    /// of it, or 77 of a hundred. Skewed eleven bits — 0.835, 0.910, 0.875 — so the gain is
+    /// 0.075 and Shared takes 0.040, or 53. Both are majorities, the second is not a clear
+    /// one, and the line does not fire on a majority twice.
+    /// </para>
+    /// <para>
+    /// <b>And the cost column says otherwise</b>: the skewed cell is not the comparison it
+    /// looks like.
+    /// <see cref="Widening.Unmissed"/> holds 2001 residents against a capacity of 2000 at both
+    /// eleven-bit widths — it is AT the cap, so its coverage is taken on a population being
+    /// culled hard rather than on one the gate chose. Shared holds 999 and 796 for 569 and 656
+    /// widenings against 7,467 and 2,791. An eighth of the work for half to three quarters of
+    /// the gain, and at the skewed width it holds the MOST sound rules of the three: 247
+    /// against Never's 222 and Unmissed's 216.
+    /// </para>
+    /// <para>
+    /// <b>So the default is not chosen against <see cref="Widening.Unmissed"/></b> at all,
+    /// which the kill line's shape obscures. That arm is already refuted in the plan's table
+    /// for minting unsound rules with wider reach, so it was never a candidate to ship — it is
+    /// the ceiling Shared is priced against. The live comparison is Shared against Never, and
+    /// Shared leads hard-round coverage at both eleven-bit widths and is level at both six-bit
+    /// ones, for about sixty percent more residents.
+    /// </para>
+    /// </remarks>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public async Task Whether_shortening_a_scope_reaches_what_specialising_cannot()

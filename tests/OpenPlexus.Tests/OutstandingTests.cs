@@ -106,6 +106,13 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// it with the dials that feed it. <c>Order</c> is the one of the four with a reader and
     /// is what rung three is made of, so it is not counted here.
     /// </para>
+    /// <para>
+    /// <b>And <c>Forced</c>'s missing half has moved</b>, which its own doc now says. It was
+    /// unsayable while every world was watched; <see cref="Worlds.IActed{TSeen}"/> means a
+    /// world can say which code it was handed rather than drew. What is absent is a reader
+    /// that tells a causal claim from an observational one — so the work is a mechanism in
+    /// <c>Commitments</c> and no longer a world.
+    /// </para>
     /// </remarks>
     [Fact]
     public void No_front_end_channel_is_read_by_nothing()

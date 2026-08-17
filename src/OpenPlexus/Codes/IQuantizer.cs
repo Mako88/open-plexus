@@ -95,11 +95,21 @@ public interface IQuantizer<in TObservation>
     /// nothing in the moment records — the difference between <c>P(y | x)</c> and
     /// <c>P(y | do(x))</c>, and no amount of counting the first yields the second.
     /// <para>
-    /// <b>And its reader was the walk's intervened edge kind, so it has none — see
-    /// <see cref="Bind"/>.</b> <i>I picked this without looking at the state</i> is
-    /// something a body knows about what it did; nothing here can be told it, which is
-    /// the same hole the plan records under <i>original thought</i>: every world is
-    /// watched rather than acted in.
+    /// <b>Its reader was the walk's intervened edge kind, so it has none — see
+    /// <see cref="Bind"/>.</b> What has changed is which half is missing.
+    /// <i>I picked this without looking at the state</i> used to be unsayable here
+    /// because every world was watched rather than acted in;
+    /// <see cref="Worlds.IActed{TSeen}"/> is that call now and
+    /// <see cref="Worlds.Homeostat"/> is acted in through it, so a world CAN say which
+    /// code it was handed rather than drew.
+    /// </para>
+    /// <para>
+    /// <b>What is still missing is a reader that treats the two differently.</b> A scope
+    /// naming a forced code is a causal claim and one naming the same code unforced is
+    /// an observational one, and nothing in <c>Commitments</c> can tell them apart — so
+    /// this closes by a mechanism that acts on the distinction, or by going. Naming the
+    /// wrong half of that would be this repo's oldest trap, which is why the correction
+    /// is written here rather than left to be found.
     /// </para>
     /// </remarks>
     IReadOnlySet<Code>? Forced(TObservation observation) => null;

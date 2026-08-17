@@ -85,7 +85,13 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// This is the half that stayed a ratchet, because it is the half a script cannot do. A
     /// shouted sentence has one correct rewrite and a bold sentence does not: where the lead
     /// clause ends is a judgement about which part of the claim a reader scans for, and there
-    /// are 828 of those judgements left.
+    /// are 799 of those judgements left.
+    /// </para>
+    /// <para>
+    /// And the pass that took it to 799 measured the same ratio the entry above claims. Of
+    /// 36 taken by hand, the comma cut was right for 31 — the claim already came second and
+    /// the bold only had to close earlier. Five needed the clause reordered because the lead
+    /// a reader scans for was the second half, which is the judgement no script makes.
     /// </para>
     /// <para>
     /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
@@ -93,7 +99,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 828;
+    private const int Shouted = 799;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>
@@ -103,8 +109,14 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// files during one pass, which is what says the class is not incidental. No schedule sits
     /// on this one — <see cref="Falls"/> paces the bold half and a second clock would be two
     /// deadlines on one session for the same debt.
+    /// <para>
+    /// It falls to 68 as a side effect rather than as a pass, which is worth saying because
+    /// the two debts are not independent. A bold sentence being cut back to its lead often
+    /// leaves the shouted words as the whole of the bold, and a label is allowed to be
+    /// capitals — so three came off here without anybody looking for them.
+    /// </para>
     /// </remarks>
-    private const int Opened = 71;
+    private const int Opened = 68;
 
     /// <summary>
     /// The commit the decay schedule counts from. <b>John's, 2026-08-13.</b>

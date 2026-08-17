@@ -11,8 +11,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A front-end arm has a ceiling computable with no learning and it costs milliseconds
-/// against a runner's hour</b>, which is this repo's own trap and the reason this file
+/// <b>A front-end arm has a ceiling computable with no learning</b>, and it costs
+/// milliseconds against a runner's hour — which is this repo's own trap and the reason this file
 /// exists before any matcher does. A grid cannot tell a rule that failed to bind from a
 /// front end that threw the binding away one call earlier; these three facts can, because
 /// each is exact.
@@ -54,8 +54,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         public byte Modality => 47;
 
         /// <summary>
-        /// Where each word of the chosen sentence stood — <b>a fact about the signal, and
-        /// the only thing this front end is allowed to say about order.</b>
+        /// Where each word of the chosen sentence stood — <b>a fact about the signal</b>,
+        /// and the only thing this front end is allowed to say about order.
         /// </summary>
         /// <param name="observation">One moment.</param>
         /// <remarks>
@@ -136,8 +136,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         /// <see cref="IQuantizer{TObservation}.Order"/> — <b>the shipped mechanism.</b>
         /// </summary>
         /// <remarks>
-        /// <b>The front end says where the words stood and the machine derives what that
-        /// entails</b>, which is the seam this whole file is about. It hands over the same
+        /// <b>The front end says where the words stood</b>, and the machine derives what
+        /// that entails, which is the seam this whole file is about. It hands over the same
         /// codes <see cref="Chosen"/> does, so the two differ in exactly one thing.
         /// </remarks>
         Placed,
@@ -175,8 +175,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// <summary>Which sentence shares most words with the question.</summary>
     /// <param name="told">One moment.</param>
     /// <remarks>
-    /// <b>FORK 88'S mechanism, which is settled and is priced here against a world that
-    /// leaves it short.</b> Intersecting the question with each statement answers bAbI's
+    /// <b>Fork 88's mechanism, settled</b>, and priced here against a world that
+    /// leaves it short. Intersecting the question with each statement answers bAbI's
     /// first task; on this world it is worth one half and never one, and separating the two
     /// by a world rather than by an argument is the whole reason this file is not a grid.
     /// </remarks>
@@ -230,8 +230,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// same claim and the half a constant bag cannot supply on its own.
     /// </summary>
     /// <remarks>
-    /// <b>A world whose answer was also constant would pass the check above and measure
-    /// nothing</b>, so the marginal is read here rather than assumed. Every person is the
+    /// <b>A world whose answer was also constant would measure nothing</b>, and would pass
+    /// the check above, so the marginal is read here rather than assumed. Every person is the
     /// taker about equally often, which is what makes 1/<see cref="People"/> the number the
     /// first rung stands at rather than an upper bound somebody hoped for.
     /// </remarks>
@@ -281,8 +281,8 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>And a selector that takes the first sentence sharing ANY word with the question
-    /// is worth nothing at all here</b>, which is a fact about <see cref="Joining.Chained"/>
+    /// <b>And first-any-overlap is worth nothing at all here</b> — a selector taking the
+    /// first sentence sharing any word with the question, which is a fact about <see cref="Joining.Chained"/>
     /// at one hop rather than about this world.
     /// </summary>
     /// <remarks>
@@ -349,11 +349,11 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>And the two people in that sentence are told apart by ORDER alone</b>, so the gap
+    /// <b>And the two people are told apart by ORDER alone</b>, so the gap
     /// between the second ceiling and the third is carried by nothing else.
     /// </summary>
     /// <remarks>
-    /// <b>The one check that says the world is honest rather than merely hard.</b> If the
+    /// <b>The one check that says the world is honest</b> rather than merely hard. If the
     /// giver and the taker differed in any other way a code could carry — a word only ever
     /// said in one of the two places, a thing that only ever goes one way, a person who is
     /// always the receiver — then a bag of that sentence would separate them and the third
@@ -381,30 +381,30 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>One commitment fires on two moments that want different answers, so whatever it
-    /// expects it is wrong about one of them.</b> Fork 105's blocker, said as a fact about
+    /// <b>One commitment fires on two moments that want different answers</b>, so whatever
+    /// it expects it is wrong about one of them. Fork 105's blocker, said as a fact about
     /// the learner rather than about the world.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>And it is universal rather than a property of this scope, which is why it is
-    /// worth a check.</b> <see cref="Commitment.Fires"/> takes an
+    /// <b>And it is universal rather than a property of this scope</b>, which is why it is
+    /// worth a check. <see cref="Commitment.Fires"/> takes an
     /// <see cref="IReadOnlySet{T}"/>, so two moments that are the same SET are the same
     /// moment to every commitment there could ever be — no scope, no repair, no rung of the
     /// ladder and no matcher over sets separates them. Finding one such pair refutes the
     /// whole language at once.
     /// </para>
     /// <para>
-    /// <b>So the blocker is the scope language and not the front end, which is the correction
-    /// this file exists to make.</b> The world hands the order over —
+    /// <b>So the blocker is the scope language and not the front end</b>, which is the
+    /// correction this file exists to make. The world hands the order over —
     /// <see cref="Recited.Said"/> is a list and not a bag, on the licence
     /// <see cref="IQuantizer{TFrame}.Order"/> already carries — and it is dropped at
     /// <c>Trial</c>'s <c>new HashSet&lt;Code&gt;(said)</c>, one call before anything could
     /// use it. Fork 33 priced the MATCHER, and the matcher was never what was in the way.
     /// </para>
     /// <para>
-    /// <b>And fusing the position into the word is not the escape, which is said here
-    /// because it is the first thing anybody would reach for.</b> A code meaning
+    /// <b>And fusing the position into the word is not the escape</b>, which is said here
+    /// because it is the first thing anybody would reach for. A code meaning
     /// <i>john-in-last-place</i> makes the moment separable and costs the identity: nothing
     /// downstream could then see that it is the same john who stood first in another
     /// sentence. That is the architecture's own line — every input is an ATTRIBUTE of a
@@ -458,13 +458,13 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>And a variable put where the ANSWER goes is refuted by every settlement there
-    /// is</b>, which is the half of rung four that naming a condition does not buy.
+    /// <b>And a variable put where the ANSWER goes is refuted by every settlement</b>,
+    /// which is the half of rung four that naming a condition does not buy.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The type does not stop it and the settlement does, which is why this is a check
-    /// and not a comment.</b> <see cref="Commitment.Expects"/> is a <see cref="Code"/> and
+    /// <b>The type does not stop it and the settlement does</b>, which is why this is a check
+    /// and not a comment. <see cref="Commitment.Expects"/> is a <see cref="Code"/> and
     /// <see cref="Unifying.Any"/> returns one, so a commitment expecting <i>whoever filled
     /// the slot</i> CONSTRUCTS. What refutes it is <c>Population</c>'s settlement, which is
     /// an equality against what arrived — and no world may emit
@@ -501,27 +501,27 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     }
 
     /// <summary>
-    /// The three arms against the three ceilings — <b>and ORDER is what carries roles here,
-    /// which is fork 105 answered without unification being built.</b>
+    /// The three arms against the three ceilings — <b>and ORDER is what carries roles
+    /// here</b>, which is fork 105 answered without unification being built.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A control beats an argument, which is why this runs at all when every cap is
-    /// proved.</b> A proof says what the front end permits; it does not say whether the
+    /// <b>A control beats an argument</b>, which is why this runs at all when every cap is
+    /// proved. A proof says what the front end permits; it does not say whether the
     /// learner converts it. <see cref="Roaming"/>'s bagged arm came back with an EMPTY
     /// population because a constant moment surprises nothing and genesis never fires — a
     /// whole arm reading the marginal for a reason that has nothing to do with the marginal.
     /// </para>
     /// <para>
-    /// <b>The kill line was written before the run and it was a result rather than a
-    /// value:</b> if handing the order over does not pass 0.60, order is not what carries
+    /// <b>The kill line was a result rather than a value</b>, and it was written before the
+    /// run: if handing the order over does not pass 0.60, order is not what carries
     /// roles here and unification is back. It passes at 1.000 on every seed, so <b>a
-    /// SEQUENCE rung and not a unifying one is what this world wants</b> — and rung three is
+    /// SEQUENCE rung is what this world wants</b>, not a unifying one — and rung three is
     /// already on the route, unbuilt, while rung four is the expensive one everybody
     /// expected to need.
     /// </para>
     /// <para>
-    /// <b>And what it costs is the reading that decides where the rung belongs.</b> The
+    /// <b>And what it costs decides where the rung belongs.</b> The
     /// ceiling is bought with POPULATION: every ordered pair of a sentence's words is handed
     /// over, so the moment triples, genesis mints on all of it, and the task that four rules
     /// would answer is answered by two hundred. A rung in the SCOPE LANGUAGE would propose a

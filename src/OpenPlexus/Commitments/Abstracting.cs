@@ -8,8 +8,8 @@ namespace OpenPlexus.Commitments;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Two bars and never one, which is `Paying`'S finding carried over rather than
-/// its code.</b> Description length alone minted 715 names on a pure-noise control
+/// <b>Two bars and never one</b>, which is `Paying`'S finding carried over rather than
+/// its code. Description length alone minted 715 names on a pure-noise control
 /// against 245 on structured data — because a shorter description of noise is still
 /// a shorter description. So a name has to pay for itself AND beat what independent
 /// scopes would have produced anyway.
@@ -30,7 +30,7 @@ public readonly record struct Tallied
 
     /// <summary>The second of the pair, or nothing where this row is one code alone.</summary>
     /// <remarks>
-    /// <b>One row type and not two, so a reader cannot receive half a table.</b> The two
+    /// <b>One row type and not two</b>, so a reader cannot receive half a table. The two
     /// counts are meaningless apart — a pair's frequency is tested against what its members
     /// do separately — and two arrays are two chances for one to arrive without the other.
     /// </remarks>
@@ -57,20 +57,20 @@ public sealed record Counts
 
 /// <summary>
 /// How often each code and each pair of codes turns up across a set of scopes —
-/// <b>everything the naming gate reads, and the only thing that has to cross a wire for
-/// it to work.</b>
+/// <b>everything the naming gate reads</b>, and the only thing that has to cross a wire for
+/// it to work.
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Rung five's statistic is population-wide and nothing about holding more per machine
-/// fixes that.</b> Measured in <c>SplitNamingTests</c>: sharding one population three ways
+/// <b>Rung five's statistic is population-wide</b>, and nothing about holding more per
+/// machine fixes that. Measured in <c>SplitNamingTests</c>: sharding one population three ways
 /// leaves each holder thirty-six eligible scopes — far past every count the gate asks for
 /// — and all three go silent, because the z it computes carries a factor of the square
 /// root of the scope count. Splitting a population does not remove a redundancy; it
 /// removes the ability to certify one.
 /// </para>
 /// <para>
-/// <b>And counts are the one thing this design already merges without a coordinator.</b>
+/// <b>And counts already merge without a coordinator.</b>
 /// Hits, misses and abstains are G-Counters for exactly this reason. These two tables are
 /// the same shape, so <see cref="Absorb"/> is addition and the merged answer is EXACTLY
 /// the whole population's — integers, so none of the floating-point caveat that
@@ -99,7 +99,7 @@ public sealed class Recurrence
 
     /// <summary>
     /// Whether rung five is offered this commitment at all — <b>its denominator, in one
-    /// place because two copies is how a count comes to be read against the wrong total.</b>
+    /// place</b>, because two copies is how a count comes to be read against the wrong total.
     /// </summary>
     /// <param name="one">The commitment to ask about.</param>
     /// <param name="dials">The gate's numbers, for the experience floor.</param>
@@ -109,12 +109,12 @@ public sealed class Recurrence
     /// evidence that anything recurs — it is evidence that covering ran.
     /// </para>
     /// <para>
-    /// <b>And a one-code scope has no pair to contribute, which makes this rung's input
-    /// exactly repair's surviving output.</b> Covering mints one code and nothing longer, so
+    /// <b>And a one-code scope has no pair to contribute</b>, which makes this rung's input
+    /// exactly repair's surviving output. Covering mints one code and nothing longer, so
     /// every scope this admits was reached by a specialisation — and how many there are is a
     /// fact about the repair budget and the repair timing rather than about redundancy.
-    /// <b>A naming count read without this beside it is a repair result wearing an
-    /// abstraction's name.</b>
+    /// <b>A naming count read without this beside it</b> is a repair result wearing an
+    /// abstraction's name.
     /// </para>
     /// </remarks>
     public static bool Eligible(Commitment one, CommittingSettings dials)
@@ -168,7 +168,7 @@ public sealed class Recurrence
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The working type cannot cross and that was not noticed when it was built.</b>
+    /// <b>The working type cannot cross</b>, and that was not noticed when it was built.
     /// <see cref="Recurrence"/> keys its pairs on a tuple and keeps both tables private, so
     /// a serialiser writes <c>Scopes</c> and drops everything else — which is worse than
     /// writing nothing, because a plausible number and no error is indistinguishable from a
@@ -252,8 +252,8 @@ public sealed class Recurrence
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE PARTITION <see cref="Abstracting.Shared(Recurrence, CommittingSettings)"/> never had, and the reason a yield
-/// could fall with no account of why.</b> The gate answers a pair or nothing, so every
+/// <b>The partition <see cref="Abstracting.Shared(Recurrence, CommittingSettings)"/> never
+/// had</b>, and the reason a yield could fall with no account of why. The gate answers a pair or nothing, so every
 /// reading of it in this repo has been a count of the times it spoke — and a count of
 /// silences says nothing whatever about which of four completely different things
 /// happened. <c>Tally.Eligible</c> put a denominator under the successes; this puts one
@@ -278,8 +278,8 @@ public enum Refused
 
     /// <summary>Eligible scopes existed and none of them contributed a pair.</summary>
     /// <remarks>
-    /// <b>UNREACHABLE WHILE <see cref="Recurrence.Eligible"/> WANTS TWO CODES, and kept
-    /// because that is a fact about the caller and not about this gate.</b> A reading that
+    /// <b>Unreachable while <see cref="Recurrence.Eligible"/> wants two codes</b>, and kept
+    /// because that is a fact about the caller and not about this gate. A reading that
     /// ever lands here is a reading taken over scopes some other rule admitted.
     /// </remarks>
     Unpaired,
@@ -297,11 +297,11 @@ public enum Refused
 }
 
 /// <summary>
-/// Everything the naming gate read and what it did with it — <b>the gate's own working,
-/// which is the only place its refusals can be told apart.</b>
+/// Everything the naming gate read and what it did with it — <b>the gate's own
+/// working</b>, which is the only place its refusals can be told apart.
 /// </summary>
 /// <remarks>
-/// <b>A reading rather than a log, so it can be counted rather than eyeballed.</b> This
+/// <b>A reading rather than a log</b>, so it can be counted rather than eyeballed. This
 /// is what <see cref="Abstracting.Propose"/> returns on every ask, and
 /// <see cref="Abstracting.Shared(Recurrence, CommittingSettings)"/> is the one field of it
 /// the learner needs. Nothing here
@@ -313,8 +313,8 @@ public readonly record struct Proposed
     public required int Scopes { get; init; }
 
     /// <summary>
-    /// Distinct pairs considered — <b>the correction's multiplier, so it is a bar and not
-    /// merely a workload.</b>
+    /// Distinct pairs considered — <b>the correction's multiplier</b>, so it is a bar and
+    /// not merely a workload.
     /// </summary>
     public required int Candidates { get; init; }
 
@@ -323,11 +323,11 @@ public readonly record struct Proposed
 
     /// <summary>
     /// The best z among the repaying pairs, whatever its sign — <b>and not the best among
-    /// the pairs that WON, which is what the selection loop reports.</b>
+    /// the pairs that WON</b>, which is what the selection loop reports.
     /// </summary>
     /// <remarks>
-    /// <b>Signed, because the interesting failure is below nought and the gate cannot say
-    /// so.</b> Selection starts at zero and takes strict improvements, so a population
+    /// <b>Signed</b>, because the interesting failure is below nought and the gate cannot say
+    /// so. Selection starts at zero and takes strict improvements, so a population
     /// whose every repaying pair is RARER than chance reads identically to one that had no
     /// repaying pair at all. Those are opposite findings.
     /// <see cref="double.NegativeInfinity"/> where nothing repaid.
@@ -382,20 +382,20 @@ public static class Abstracting
     /// </param>
     /// <remarks>
     /// <para>
-    /// <b>A pair already named is not a candidate, and the arm that allowed one is deleted.</b>
+    /// <b>A pair already named is not a candidate</b>, and the arm that allowed one is gone.
     /// Proposing a pair twice mints nothing — a name's identity is its members — and this
     /// mints at most once an ask, so an ask spent on a known pair cannot add vocabulary. The
     /// old arm did that on a third of its asks at the shipped cadence. See the plan's
     /// revival row.
     /// </para>
     /// <para>
-    /// <b>And dropping them before the candidate count is principle rather than gain.</b> The
+    /// <b>And dropping them before the candidate count is principle</b> rather than gain. The
     /// correction multiplies by what was searched, and a pair that could never be accepted
     /// was not searched — but the refusal counts did not move between the arms, so the whole
     /// of the measured effect was the ask being spent where it could still buy a name.
     /// </para>
     /// <para>
-    /// <b>NOTHING PASSED MEANS NOTHING SKIPPED, which is what a merge and a test want.</b>
+    /// <b>Nothing passed means nothing skipped</b>, which is what a merge and a test want.
     /// There is no one population whose vocabulary it would be.
     /// </para>
     /// </remarks>

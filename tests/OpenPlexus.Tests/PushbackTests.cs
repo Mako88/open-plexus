@@ -62,12 +62,19 @@ public sealed class PushbackTests(ITestOutputHelper output)
                 + "Drives needs, so deleting it would close one red entry by destroying "
                 + "what another needs; Composed.Segmented feeds the unread Bind channel, "
                 + "which is live. Rhythm is decided and wired, for a reason its own entry "
-                + "did not carry: it is the only world whose ANSWER moves. Three have no "
-                + "decision recorded at all -- Clevr, Latent and Motif -- and the instinct "
-                + "is still to wire them because that turns OutstandingTests green.",
+                + "did not carry: it is the only world whose ANSWER moves. Motif is decided "
+                + "and wired for a reason its entry DID carry -- the world holds its own "
+                + "control, so the run that reaches it is the run that prices the naming "
+                + "gate. Two are left, Clevr and Latent, and Latent is where the instinct "
+                + "to wire for a green guard would produce a runner exercising nothing: its "
+                + "redundancy is in the MOMENT and rung five's trigger is redundancy across "
+                + "SCOPES, and a deterministic world genesis answers at one code leaves "
+                + "nothing longer to be eligible.",
             Settles: "A decision per world, recorded, and read against what the world "
-                + "actually holds rather than off a list of names. This closes by somebody "
-                + "choosing for the three left, not by a measurement."),
+                + "actually holds rather than off a list of names. For Latent that is a "
+                + "runner plus the eligible count: nothing ever eligible says the question "
+                + "is unreachable as built and the world goes with a revival row, and "
+                + "anything eligible refutes this half outright."),
 
         new(
             With: "DialTests.Every_arm_is_measured_on_at_least_two_worlds",

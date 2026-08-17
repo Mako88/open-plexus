@@ -13,13 +13,13 @@ namespace OpenPlexus.Codes;
 /// folds the opposite way.
 /// </para>
 /// <para>
-/// <b>So the test is exclusion and shared company, and both are facts about the moments.</b>
+/// <b>So the test is exclusion and shared company</b>, and both are facts about the moments.
 /// Nothing here reads a world's tables, a vocabulary or an outcome. Two codes that have
 /// never been seen together and that keep the same company are alternatives, and that is
 /// arithmetic over what arrived.
 /// </para>
 /// <para>
-/// <b>And it is why the individual and the category are one mechanism rather than two.</b>
+/// <b>And it is why the individual and the category are one mechanism</b> rather than two.
 /// The looks a thing wears across sightings never co-occur — a basket at two moments does
 /// not co-occur with itself, which is what makes rung five structurally unable to reach it —
 /// and they keep the same company by construction. So a thing's appearances ARE a category,

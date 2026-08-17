@@ -8,7 +8,7 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A sensor per machine would not do this, and that is the whole point.</b> A
+/// <b>A sensor per machine would not do this</b>, and that is the whole point. A
 /// front end is asked for a MOMENT — see <see cref="Machines.Trial{TSeen}"/> — and
 /// a moment is what puts codes together, so a camera on one machine and a
 /// microphone on another would never co-fire, and the sight–sound pairing that

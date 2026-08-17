@@ -54,7 +54,7 @@ public enum Wanted
 /// <summary>One holder's counts, as told to the others.</summary>
 /// <remarks>
 /// <para>
-/// <b>Every holder's table goes to every holder, and each drops its own row.</b>
+/// <b>Every holder's table goes to every holder</b>, and each drops its own row.
 /// <see cref="Commitments.Population.Abstract"/> takes what OTHERS counted and adds it to
 /// what it counts here, so a table that already included this machine would weigh its own
 /// scopes twice — silently, plausibly, and in the direction that makes a redundancy look
@@ -182,7 +182,7 @@ public sealed record Ask
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Neither field is a commitment and that is the whole of why this is allowed.</b> A
+/// <b>Neither field is a commitment</b>, and that is the whole of why this is allowed. A
 /// <see cref="Testimony"/> is expectations and weights already computed from the speaker's
 /// own accuracy; a <see cref="Counts"/> is how often codes co-occurred across scopes. A
 /// reader learns what is claimed and how often something recurred, and never what the

@@ -15,7 +15,7 @@ namespace OpenPlexus.Bus;
 /// dictionary lookup between them, and this is the file that says what crosses instead.
 /// </para>
 /// <para>
-/// <b>The one thing this has to get exactly right is doubles, and fork 12 is why.</b> A
+/// <b>The one thing this has to get exactly right is doubles</b>, and fork 12 is why. A
 /// reading is a QUANTISED number, so a value that comes back differing in its last bit
 /// codes differently at a band boundary and becomes a different observation. That fault
 /// has cost this project twice already — once from a graph's intra-op parallelism, once

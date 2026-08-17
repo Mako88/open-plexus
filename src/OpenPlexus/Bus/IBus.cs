@@ -5,7 +5,7 @@ namespace OpenPlexus.Bus;
 /// <b>fork 52, and the only traffic on this bus.</b>
 /// </summary>
 /// <remarks>
-/// <b>The bus carries what was learnt and nothing else, which settled by deletion.</b> The walk could think across a wire and could only learn at home, so it had
+/// <b>The bus carries what was learnt and nothing else</b>, which settled by deletion. The walk could think across a wire and could only learn at home, so it had
 /// a second half here — envelopes into locally-held clusters, routes, reports, deaths. It is
 /// gone, and what stayed is the half that was always the whole point: a holder is asked what
 /// it makes of a moment and says so, so a fleet learns what one machine learns.
@@ -38,7 +38,7 @@ public interface IReceiveAnswers
 /// How anything reaches anything else.
 /// </summary>
 /// <remarks>
-/// <b>The addressable thing is a machine, which is C3'S unit now that the walk is gone.</b>
+/// <b>The addressable thing is a machine</b>, which is C3's unit now that the walk is gone.
 /// The constraint is stated over a cluster because a cluster was what owned nodes and
 /// forwarded routes; nothing here owns either. What can vanish mid-round is a holder, and
 /// every write-off below is holder-shaped for that reason.
@@ -102,7 +102,7 @@ public interface IBus
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Not a death notice, which is why it names an ask and not just a machine.</b> The
+    /// <b>Not a death notice</b>, which is why it names an ask and not just a machine. The
     /// walk's said a cluster was gone and every route into it stranded; this says one
     /// question never left. That is the smaller claim and the exact one — a holder that was
     /// not handed a question cannot answer it, and whether it is dead, wedged or merely

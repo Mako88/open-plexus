@@ -3,11 +3,11 @@ namespace OpenPlexus.Bus;
 /// <summary>Which broadcast a message belongs to.</summary>
 /// <remarks>
 /// <para>
-/// <b>Without this, two questions in flight mix their chains and their death counts.</b>
+/// Without this, <b>two questions in flight mix their chains and their death counts.</b>
 /// Under continuous input there are always several in flight, so this is not optional.
 /// </para>
 /// <para>
-/// <b>It lives with the bus and not with a learner, which is where it was.</b> It was
+/// <b>It lives with the bus and not with a learner</b>, which is where it was. It was
 /// written for the walk and sat in <c>Thinking</c>, and by the time anybody looked the
 /// commitment fleet depended on it across five files — <see cref="Ask"/>,
 /// <see cref="IBus"/>, <see cref="HybridBus"/>, <see cref="Posted"/> and

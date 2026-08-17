@@ -7,7 +7,7 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Nine worlds each wrote their own front end and eight of them did nothing.</b>
+/// <b>Nine worlds each wrote their own front end</b>, and eight of them did nothing.
 /// <c>Seeing</c>, <c>Feeling</c> twice, <c>Hearing</c>, <c>Looking</c>,
 /// <c>Reading</c> and three <c>Passthrough</c>s — private nested classes returning
 /// the observation they were handed. That is not nine front ends; it is one

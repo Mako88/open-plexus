@@ -4,7 +4,7 @@ namespace OpenPlexus.Bus;
 /// A subscription handle that runs one action once.
 /// </summary>
 /// <remarks>
-/// <b>Once, because a double dispose is ordinary and a double departure is not.</b> A
+/// <b>Once</b>, because a double dispose is ordinary and a double departure is not. A
 /// <see langword="using"/> inside a method that also disposes on a path out is normal C#;
 /// firing the action twice would announce a death that already happened, and on this bus a
 /// second departure notice for something that has since come back would remove it again.

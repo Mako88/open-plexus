@@ -30,7 +30,7 @@ namespace OpenPlexus.Codes;
 /// which relations exist.
 /// </para>
 /// <para>
-/// <b>There is no dial, and that is a correction rather than the design.</b> This shipped
+/// <b>There is no dial</b>, and that is a correction rather than the design. This shipped
 /// for one commit as a three-armed setting defaulting to OFF, justified by every recorded
 /// number being reproduced — which is what this repo's own rules forbid twice over: an arm
 /// only lives while it is compared, and a better brain beats intact numbers. The transitive

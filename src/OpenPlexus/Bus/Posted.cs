@@ -120,7 +120,7 @@ public sealed class Posted : IBus, IAsyncDisposable
 
     /// <summary>Messages this machine took delivery of and then could not act on.</summary>
     /// <remarks>
-    /// <b>The other end of the same silence, and it is a different fault.</b> A drop is
+    /// <b>The other end of the same silence</b>, and it is a different fault. A drop is
     /// the sender failing to hand it over; this is the receiver accepting the bytes and
     /// throwing while reading or dispatching them. From the waiting asker they are one
     /// event — no answer — and only one of them is about the network.
@@ -190,7 +190,7 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// <param name="ct">Cancellation.</param>
     /// <remarks>
     /// <para>
-    /// <b>A peer that cannot be reached is not an error, which is C3 AT STARTUP.</b> A
+    /// <b>A peer that cannot be reached is not an error</b>, which is C3 at startup. A
     /// machine that is not up yet, or never will be, must not stop this one from running —
     /// so a failed announcement is dropped and the peer simply does not know about these
     /// holders until the next one.
@@ -563,7 +563,7 @@ public sealed class Posted : IBus, IAsyncDisposable
 
     /// <summary>What a machine holds, as it tells its peers.</summary>
     /// <remarks>
-    /// <b>Internal, because it is a shape on the wire and not part of what a bus offers.</b>
+    /// <b>Internal</b>, because it is a shape on the wire and not part of what a bus offers.
     /// </remarks>
     /// <remarks>
     /// <b>Strings rather than the address types, because a roster is the one message whose

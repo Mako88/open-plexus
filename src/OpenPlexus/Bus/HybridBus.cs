@@ -37,7 +37,7 @@ public readonly record struct Lateness(double Share, TimeSpan Delay, int Seed);
 /// The bus in one process, with C2 injected rather than assumed.
 /// </summary>
 /// <remarks>
-/// <b>The harsher test of the same traffic, and that is why it stays.</b> Delivery here is
+/// <b>The harsher test of the same traffic</b>, and that is why it stays. Delivery here is
 /// <see cref="Task.Run(Action)"/> with delays sprinkled in, so it reorders on purpose;
 /// <see cref="Posted"/> crosses a socket and TCP does not reorder within a connection. A
 /// green run over the wire says the bytes and the routing are right and says nothing about

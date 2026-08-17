@@ -54,11 +54,16 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// entry leaves <see cref="DeadCodeTests"/>, by either road.
     /// </para>
     /// <para>
-    /// <b>Some are obviously live and some are obviously not.</b> <c>Senses</c> is the
-    /// cross-modal pairing nothing has ever run, <c>Motif</c> is rung five's redundancy
-    /// manufactured on purpose, <c>Rhythm</c> is rung three's, <c>Latent</c> is fork 39's.
-    /// <c>Clevr</c> is the perceptual world with a published bar beside it, and
-    /// <c>Composed</c> and <c>Latent</c> are the front end's own questions.
+    /// <b>Some are obviously live and some are obviously not.</b> <c>Motif</c> is rung five's
+    /// redundancy manufactured on purpose and <c>Latent</c> is fork 39's. <c>Clevr</c> is the
+    /// perceptual world with a published bar beside it, and <c>Composed</c> and
+    /// <c>Latent</c> are the front end's own questions.
+    /// </para>
+    /// <para>
+    /// <b>And two have come off, by roads worth telling apart.</b> <c>Senses</c> got a
+    /// runner for the question it was built for; <c>Rhythm</c> got one for a question its
+    /// own entry never named, that entry having called it rung three's when the rung it can
+    /// hold still is repair. A world's stated purpose is not the same as its live one.
     /// </para>
     /// </remarks>
     [Fact]
@@ -222,43 +227,30 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// to be in trouble about.
     /// </para>
     /// <para>
-    /// <b>And this entry said no world here supplies one, which is false.</b>
-    /// <see cref="Worlds.Homeostat"/> is exactly that world: <c>Needs</c> internal variables
-    /// that drain at uneven rates, an act of attention that restores one of them, a
-    /// <c>Viable</c> predicate that says whether the body is still holding, and
-    /// <c>Lowest</c> and <c>Falling</c> to say which variable is in trouble and how fast.
-    /// It is acted in rather than watched, and it was built before the walk went.
+    /// <b>The world it needed was here all along</b>, and this entry twice said otherwise.
+    /// <see cref="Worlds.Homeostat"/> has internal variables that drain at uneven rates, an
+    /// act of attention that restores one, a predicate saying whether the body still holds,
+    /// and readouts for which variable is in trouble and how fast.
     /// </para>
     /// <para>
-    /// <b>So the two red entries here are one piece of work.</b> <c>Homeostat</c> is on
-    /// <see cref="Every_world_is_either_run_by_something_or_gone"/>'s list for seven of its
-    /// entries, and the handoff that enumerated that list put it among the worlds whose
-    /// question had closed. Deleting it would have closed one red entry by destroying the
-    /// only thing the other one needs.
+    /// <b>What blocked it was the world interface and not the world</b>, which is the version
+    /// of this note that turned out to be right. <see cref="Worlds.IWorld{TSeen}.Next"/> is a
+    /// pull, so a body that takes an action had nowhere to be asked from;
+    /// <see cref="Worlds.IActed{TSeen}"/> is that call, and <c>Drives</c> is the chooser over
+    /// it. Both are built and the entry is green.
     /// </para>
     /// <para>
-    /// <b>And a <c>Trial</c> cannot drive it, which corrects the first version of this
-    /// note.</b> <see cref="Worlds.IWorld{TSeen}.Next"/> is a pull: the world produces the
-    /// next turn and the learner chooses nothing, so there is nowhere for
-    /// <c>Homeostat.Step(attend)</c> to be called from. Its seven entries do not close by a
-    /// runner being written, and the estimate that said they did was wrong.
+    /// <b>Two earlier readings of the blocker are left standing here on purpose</b>, because
+    /// the trap is a doc naming the wrong one and this repo has been believed on a wrong one
+    /// for a whole branch. The first said no world supplied a body; the second said a
+    /// <c>Trial</c> could drive it. Both were written by enumerating names without reading
+    /// what each held, which is the pass that also put <c>Recalled</c> on the stranded list
+    /// when <c>Trial</c> had always driven it.
     /// </para>
     /// <para>
-    /// <b>What is actually owed first is an action on the world interface</b>, which the plan
-    /// already carries under <i>original thought</i> as unbuilt — action, a consequence that
-    /// can surprise, and a goal. So this entry and <c>Homeostat</c>'s seven are both behind
-    /// that, and both are larger than either was written as.
-    /// </para>
-    /// <para>
-    /// <b>The trap is a doc naming the wrong blocker</b>, which this repo has already been
-    /// believed on for a whole branch. The sentence above was written when the walk's deletion
-    /// enumerated the worlds without checking what each one held — the same pass that put
-    /// <c>Recalled</c> on the stranded list when <c>Trial</c> had always driven it.
-    /// </para>
-    /// <para>
-    /// <b>Closes by building it or by dropping it with a revival row</b>, which are the only
-    /// two endings this repo allows an idea. Either way the plan leaf goes, and this test
-    /// reads the plan rather than a list of its own.
+    /// <b>An idea ends by being built or by being dropped with a revival row</b>, and this one
+    /// was built. What it is worth is a separate question and the plan carries it: the chooser
+    /// loses to both of its controls, and fork 111 is what that opened.
     /// </para>
     /// </remarks>
     [Fact]

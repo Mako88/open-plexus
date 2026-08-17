@@ -183,7 +183,15 @@ public sealed class DocsTests
     // where nothing can be shown to work is the exact drift this doc exists to prevent.
     // The OPEN beside it names the next world rather than the next arm, which is the part
     // no commit message survives long enough to say.
-    private const int Whole = 10_097;
+    //
+    // And 10,127 is the eighth raise, thirty words for the world that came off the stranded
+    // list. `Rhythm` is the only one here whose ANSWER moves and the only one whose moment
+    // holds a single code, so it is the one place `malleability is the record` can be right
+    // or wrong and the one place repair can be held still while the vote is not. That leaf
+    // duplicates nothing: the branch above it had a mechanism and no world that could test
+    // it. Deleting an item to afford it was the alternative, and a guard must not cost
+    // information.
+    private const int Whole = 10_127;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

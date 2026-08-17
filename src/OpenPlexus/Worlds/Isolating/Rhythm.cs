@@ -82,7 +82,7 @@ public sealed record RhythmSettings
 /// this world states nothing at all, which is the sharpest control in the project.
 /// </para>
 /// </remarks>
-public sealed class Rhythm
+public sealed class Rhythm : IWorld<Coded>
 {
     /// <summary>The one modality this world emits.</summary>
     public const byte Beat = 60;
@@ -91,6 +91,9 @@ public sealed class Rhythm
     private int[] _cycle;
     private readonly Random _rng;
     private int _at;
+
+    /// <summary>The symbol the stream sounded last, or nothing before it has sounded.</summary>
+    private int? _last;
 
     /// <param name="settings">The shape of the stream.</param>
     /// <param name="seed">The world's own generator.</param>
@@ -138,20 +141,131 @@ public sealed class Rhythm
     /// Always naming the commonest symbol, which is any one of the cycle's.
     /// </summary>
     /// <remarks>
-    /// <b>The baseline a model with no sense of WHEN scores</b>, and the one that
+    /// <para>
+    /// The baseline a model with no sense of WHEN scores, and the one that
     /// matters — a system that has learnt only which symbols are frequent, and
     /// nothing about order, lands here.
+    /// </para>
+    /// <para>
+    /// <b>Exact rather than <c>Ceiling / Period</c>, which was the same number rounded
+    /// down.</b> A cycle symbol also arrives as somebody else's violation, so its share is
+    /// the times the cycle called for it plus the times a violation happened to draw it —
+    /// and a control the reading rests on may not be approximate in the direction that
+    /// flatters the learner.
+    /// </para>
     /// </remarks>
-    public double Marginal => Ceiling / _settings.Period;
+    public double Marginal =>
+        (Ceiling / _settings.Period)
+        + ((_settings.Period - 1) * Strayed / _settings.Period);
+
+    /// <summary>
+    /// The best any model reading only the LAST symbol could score — <b>the bar the
+    /// learner is actually run against, computed with no learning.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><see cref="Ceiling"/> is unreachable through this world's own moment</b>, and a
+    /// bar the learner cannot reach reads as a failure. A perfect model of the stream knows
+    /// WHERE IN THE CYCLE it is; a moment here carries one symbol and nothing else, so the
+    /// phase has to be inferred from that symbol — and a violation puts a cycle symbol
+    /// somewhere the cycle never called for it.
+    /// </para>
+    /// <para>
+    /// A symbol the cycle does call for names its own position on nearly every showing, so
+    /// the best rule for it is the successor of that position. A symbol the cycle never
+    /// calls for arrives only as a violation, so it says nothing about where the stream is
+    /// and every successor is equally good.
+    /// </para>
+    /// <para>
+    /// <b>So the distance between this and <see cref="Ceiling"/> is what one symbol of
+    /// memory costs</b>, which is a fact about the observation and not about the learner.
+    /// A world whose cycle repeated a symbol would put a second gap under this one, and
+    /// that gap is what rung three would have to earn.
+    /// </para>
+    /// </remarks>
+    public double Carried
+    {
+        get
+        {
+            var kept = Ceiling;
+            var stray = Strayed;
+            var others = _settings.Period - 1;
+
+            // Shown where the cycle called for it, and the successor arrived as called.
+            // Plus the same symbol arriving at one of the other positions as a violation,
+            // where the successor this rule names arrives as a violation too.
+            var named = (kept * kept) + (others * stray * stray);
+
+            // And the symbols the cycle never calls for, which reach the moment only by
+            // violation. Their best rule is any one successor, right at that successor's
+            // own rate.
+            var strangers = _settings.Symbols - _settings.Period;
+
+            return named
+                + (strangers / (double)_settings.Period * stray * (kept + (others * stray)));
+        }
+    }
+
+    /// <summary>How often a violation draws one PARTICULAR other symbol.</summary>
+    private double Strayed =>
+        _settings.Symbols == 1 ? 0.0 : _settings.Violations / (_settings.Symbols - 1);
 
     /// <summary>What the cycle calls for at a given moment.</summary>
     public int Wanted(long moment) => _cycle[(int)(moment % _cycle.Length)];
+
+    /// <inheritdoc/>
+    public int Outcomes => _settings.Symbols;
+
+    /// <summary>
+    /// The symbol before this one, and the symbol that followed it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>One code in the moment, so repair, rung three and rung five are all inert
+    /// here</b> — which is what this world is worth to the rest of the suite. A scope
+    /// cannot be made longer where there is nothing to add, so what a run of this measures
+    /// is genesis, the vote and the local decaying estimate with every other mechanism held
+    /// still. Nothing else here can hold them still.
+    /// </para>
+    /// <para>
+    /// <b>And it is the only world that can change its answer</b>, which is where
+    /// <i>malleability is the record</i> is either true or not. Under
+    /// <see cref="RhythmSettings.Turns"/> the successor of every symbol is redrawn while the
+    /// statistics stay exactly where they were, so a population that tracks and a population
+    /// that keeps what it first learnt are separated by the score and by nothing else.
+    /// </para>
+    /// <para>
+    /// <b>The stream is primed here rather than in the constructor</b>, so a caller reading
+    /// <see cref="Strike"/> alone gets the sequence it always got. A world that had sounded
+    /// once before anybody asked would shift <see cref="Wanted"/> under every test written
+    /// against the raw stream.
+    /// </para>
+    /// </remarks>
+    public Turn<Coded> Next()
+    {
+        _last ??= Struck().Symbol;
+
+        var before = _last.Value;
+        var struck = Struck().Symbol;
+
+        _last = struck;
+
+        return new Turn<Coded> { Seen = Coded.Of(Of(before)), Outcome = struck };
+    }
 
     /// <summary>
     /// The next moment: usually what the cycle calls for, occasionally not.
     /// </summary>
     /// <returns>The symbol shown, and whether it broke the rule.</returns>
-    public (Code Shown, bool Violated) Next()
+    public (Code Shown, bool Violated) Strike()
+    {
+        var (symbol, violated) = Struck();
+
+        return (Of(symbol), violated);
+    }
+
+    /// <summary>The same draw, as the number the world holds it as.</summary>
+    private (int Symbol, bool Violated) Struck()
     {
         // THE WORLD CHANGES ITS MIND, and it does so BEFORE the moment is drawn so
         // that the turn is complete rather than half-applied. `Wanted` is what any
@@ -165,7 +279,7 @@ public sealed class Rhythm
 
         var wanted = Wanted(_at++);
 
-        if (_rng.NextDouble() >= _settings.Violations) return (Of(wanted), false);
+        if (_rng.NextDouble() >= _settings.Violations) return (wanted, false);
 
         // A DIFFERENT SYMBOL, never the one the cycle called for -- a "violation"
         // that happened to draw the expected symbol is not a violation, and
@@ -174,7 +288,7 @@ public sealed class Rhythm
         var instead = _rng.Next(_settings.Symbols - 1);
         if (instead >= wanted) instead++;
 
-        return (Of(instead), true);
+        return (instead, true);
     }
 
     /// <summary>The code for one symbol.</summary>

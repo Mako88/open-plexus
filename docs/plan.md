@@ -409,6 +409,8 @@ Three: refining. Anything before three that reads as tuning is out of order.
       merges. This one works.
     - **SETTLED** — the local decaying estimate earns its keep: level with a lifetime average
       where the world holds still, ahead where the target moves. Fork **27**.
+    - **NOW** — `Rhythm` is run: the one world whose ANSWER moves, and the one where a scope
+      cannot grow, so repair and every rung above it are held still.
     - **OPEN** — more unsound commitments resident than sound ones while the score holds: is
       the vote robust to them, or are they why it stops short. Fork **35**.
     - **OPEN** — the live problem is which rule gets the seat, and two arms at it have

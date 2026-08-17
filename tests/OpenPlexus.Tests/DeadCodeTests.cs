@@ -97,8 +97,10 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // inverse a preference needs -- which variable a felt band is about -- and is called
         // by the same arm.
 
-        ["Rhythm.Beat"] = Stranded,
-        ["Rhythm.Turned"] = Stranded,
+        // And `Rhythm`'s two came off together, by the condition this list is written with.
+        // `Beat` is the modality every moment of that stream rides and `Turned` is how many
+        // times the world redrew its answer, so both are read by the arm that prices how
+        // fast a turning world is tracked. Neither entry was rewritten.
 
         // ---- And the one that came straight back off, which is the check working -----
         //
@@ -228,7 +230,12 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // commitment what it would DO rather than what would follow; `Drives` splits an
         // action code out of a scope and does that. A member whose reason names the thing
         // that would read it is a reason that expires, which is the only kind worth writing.
-        Assert.Equal(4, Unused.Count);
+        //
+        // Two, and `Rhythm`'s pair left the same way. Its entry said each leaves by the world
+        // getting a `Trial`; `Trial` drives it through `IWorld` now, and the arm that prices
+        // how fast a turning world is tracked reads the modality and the turn count both.
+        // What is left on the list is `Composed.Third` alone.
+        Assert.Equal(2, Unused.Count);
     }
 
     [Fact]
@@ -354,9 +361,12 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // question closed with the walk and wants deleting.
         //
         // SOME ARE OBVIOUSLY LIVE: `Motif` is rung five's redundancy manufactured on
-        // purpose, `Rhythm` is rung three's, `Latent` is fork 39's. `Snake` and `SnakeSense`
-        // were the obviously-not pair -- prediction conditional on action, forks 18 and 20,
-        // both settled -- and they are gone rather than wired.
+        // purpose and `Latent` is fork 39's. `Snake` and `SnakeSense` were the obviously-not
+        // pair -- prediction conditional on action, forks 18 and 20, both settled -- and
+        // they are gone rather than wired. `Rhythm` came off by the third road, which is
+        // that its live question was not the one its own entry named: it was written for a
+        // prediction budget that is dead, and what it is worth is being the only world whose
+        // ANSWER moves.
         //
         // And two of the four on that delete list should not go. `Homeostat` is the only
         // world here that is acted in and is what `Drives` needs, and `Composed.Segmented`
@@ -387,7 +397,13 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "the walk had actually been driving. A budget can be satisfied by a "
             + "coincidence, and so can a debt.",
 
-        ["Rhythm"] = Stranded,
+        ["Rhythm"] = "A WORLD, ON `Roaming`'S FOOTING, AND IT CAME OFF THE STRANDED LIST BY "
+            + "GETTING A RUNNER. `Trial` drives it through `IWorld` now: a moment is the "
+            + "symbol the stream sounded last and the outcome is the one that followed. It "
+            + "is the only world here whose ANSWER moves, and the only one where a scope "
+            + "cannot be made longer -- so repair, rung three and rung five are all held "
+            + "still while the vote and the local decaying estimate are not. `RhythmTests` "
+            + "is its caller.",
         ["Senses"] = "A WORLD, ON `Roaming`'S FOOTING, AND IT CAME OFF THIS LIST BY "
             + "GETTING A RUNNER. `Trial` drives it through `IWorld` now: an occasion shows "
             + "two senses and asks about one of them, and the examination shows a sight and "

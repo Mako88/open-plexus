@@ -61,12 +61,13 @@ public sealed class PushbackTests(ITestOutputHelper output)
                 + "Homeostat is the only world here that is acted in and is exactly what "
                 + "Drives needs, so deleting it would close one red entry by destroying "
                 + "what another needs; Composed.Segmented feeds the unread Bind channel, "
-                + "which is live. Four have no decision recorded at all -- Clevr, Latent, "
-                + "Motif and Rhythm -- and the instinct is still to wire them because that "
-                + "turns OutstandingTests green.",
+                + "which is live. Rhythm is decided and wired, for a reason its own entry "
+                + "did not carry: it is the only world whose ANSWER moves. Three have no "
+                + "decision recorded at all -- Clevr, Latent and Motif -- and the instinct "
+                + "is still to wire them because that turns OutstandingTests green.",
             Settles: "A decision per world, recorded, and read against what the world "
                 + "actually holds rather than off a list of names. This closes by somebody "
-                + "choosing for the four left, not by a measurement."),
+                + "choosing for the three left, not by a measurement."),
 
         new(
             With: "DialTests.Every_arm_is_measured_on_at_least_two_worlds",

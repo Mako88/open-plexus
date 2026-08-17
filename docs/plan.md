@@ -475,9 +475,12 @@ Three: refining. Anything before three that reads as tuning is out of order.
       It loses to both controls as built.
     - **OPEN** — ranking by its own expectation wins by making the world CONSTANT, so the
       preference wants a term a dead body fails. The goal is unbuilt. Fork **111**.
-    - **OPEN** — `Roaming` is the spine, so it grows to each tier rather than closing: word
-      order first, then twins, then acting. An isolating world is still built freely and goes
-      when its question shuts, because only a constructed world can prove a ceiling.
+    - **NOW** — `Roaming` is acted in, the learner taking the walk's last step, and declining
+      leaves the walk the world drew. So the watched arm is a chooser rather than a second
+      world, and every reading taken before it stands.
+    - **OPEN** — and nothing ranks a chooser there, a house having nothing to want. Twins are
+      the tier still unbuilt and are rung four's; an isolating world is still built freely and
+      goes when its question shuts, only a constructed world proving a ceiling.
     - **OPEN** — TextWorld's shape is built here and watched before acted in; Crafter puts
       two unbuilt subsystems in front of the measurement. Open on twins. `csharp` disqualified
       SURVIVAL as a score and refuted absolute actions under an unrotated view, so an acting

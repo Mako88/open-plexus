@@ -199,7 +199,14 @@ public sealed class DocsTests
     // depth needs, and that is a limit on the mechanism rather than a number about one run.
     // It duplicates nothing above it and it names its own axis, which is what makes it
     // closeable rather than a note.
-    private const int Whole = 10_164;
+    //
+    // And 10,205 is the tenth raise, forty-one words for the spine's last tier. One OPEN
+    // became a NOW and an OPEN: `Roaming` can be acted in, and nothing on it can rank a
+    // chooser because a house has nothing to want. The second half is what a single leaf
+    // could not carry -- a tier that is built and a tier that is blocked read identically
+    // from one line, and John's order asks for a mechanism for every architecture entry
+    // rather than a measurement, so which of the two this is has to be sayable.
+    private const int Whole = 10_205;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

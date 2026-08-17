@@ -854,6 +854,10 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// <param name="arms">The translations to run.</param>
     /// <param name="people">How many walk the house.</param>
     /// <param name="examining">Which question the house is asked.</param>
+    /// <param name="acting">
+    /// What to do about the state the walk is in, or nothing to leave it drawing its own
+    /// steps — <b>the arm every earlier reading was taken on.</b>
+    /// </param>
     /// <remarks>
     /// <b>Seeds, because a comparison on one run is an anecdote.</b> The world and the brain
     /// take the same seed, so an arm's whole run moves together rather than the house being
@@ -861,7 +865,10 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// two loops that drifted apart would make their columns unreadable against each other.
     /// </remarks>
     private Dictionary<string, List<double>> Scored(
-        IEnumerable<(string Name, Joined Joined)> arms, int people, Examining examining)
+        IEnumerable<(string Name, Joined Joined)> arms,
+        int people,
+        Examining examining,
+        Func<IReadOnlyCollection<Code>, int?>? acting = null)
     {
         var scores = new Dictionary<string, List<double>>();
 
@@ -876,7 +883,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
                 var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed);
 
-                var tally = new Trial<Recited>(world, joined, brain)
+                var tally = new Trial<Recited>(world, joined, brain, acting: acting ?? (_ => null))
                     .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
 
                 var exam = tally.Unseen?.Accuracy ?? 0.0;
@@ -1220,6 +1227,112 @@ public sealed class RoamingTests(ITestOutputHelper output)
             2,
             new Roaming(World(120, people: 4) with { Examining = Examining.Effect }, seed: 7)
                 .Outcomes);
+    }
+
+    /// <summary>
+    /// Declining to intervene is the walk the world always drew, statement for statement.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The spine's last tier</b>, and the first thing it owes is that it cost nothing.
+    /// Every reading on this world was taken watched, and a seam that shifted the draw by one
+    /// call would have made all of them incomparable with everything taken after it — two
+    /// transcripts differing by one draw read identically from every column, so nothing but
+    /// this could say so.
+    /// </para>
+    /// <para>
+    /// <b>Nothing means the learner does not intervene</b>, rather than the walk standing
+    /// still. The people here walk whether or not anything chooses for them, so declining
+    /// leaves the world drawing its own last step — which is what makes the watched arm a
+    /// chooser rather than a different world.
+    /// </para>
+    /// <para>
+    /// <b>And the state is read before every step</b>, which is what could have shifted it.
+    /// <see cref="IActed{TSeen}.Now"/> draws the house and every step but the last so that
+    /// there is a state to be read at all, and <see cref="IWorld{TSeen}.Next"/> finishes that
+    /// same walk. A caller that never asks gets the walk drawn whole, and the assertion is
+    /// that the two roads consume the generator identically.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Declining_to_intervene_is_the_walk_the_world_always_drew()
+    {
+        var watched = new Roaming(World(120, people: 4), seed: 7);
+        var acted = new Roaming(World(120, people: 4), seed: 7);
+
+        for (var episode = 0; episode < 40; episode++)
+        {
+            // The order `Trial` uses: read the state, decide, then take the turn. Reading it
+            // is what draws the walk as far as its last step, so this is the road that could
+            // differ and the other one is the road every earlier reading took.
+            _ = acted.Now;
+            acted.Do(null);
+
+            var one = watched.Next();
+            var two = acted.Next();
+
+            Assert.Equal(one.Outcome, two.Outcome);
+            Assert.Equal(one.Seen.Asked, two.Seen.Asked);
+            Assert.Equal(one.Seen.Said.Count, two.Seen.Said.Count);
+
+            foreach (var (mine, theirs) in one.Seen.Said.Zip(two.Seen.Said))
+                Assert.Equal(mine, theirs);
+        }
+
+        // And the held-out half is drawn where no chooser exists, so it asks about steps
+        // nobody picked. That is stated rather than hidden: an exam over actions drawn
+        // uniformly is what says a model of consequences survives past whatever the policy
+        // happened to prefer.
+        Assert.Equal(watched.Withheld.Count, acted.Withheld.Count);
+    }
+
+    /// <summary>
+    /// A chosen verb is what the walk does, and one that cannot be done is a wait.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>An impossible wish is not quietly turned into a possible one.</b> Substituting the
+    /// nearest action would make the chooser's arm the world's own draw wearing the chooser's
+    /// name, which is a fallback arm nobody meant to run — and dropping the step would leave
+    /// the effect question answering about a statement nobody made.
+    /// </para>
+    /// <para>
+    /// <b>Going somewhere is the one that is always possible</b>, so it is the verb this can
+    /// assert on without arranging the house first. Taking needs something loose underfoot
+    /// and dropping needs a full hand, and at the opening of a walk neither is guaranteed.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_chosen_verb_is_done_where_it_can_be_and_waited_where_it_cannot()
+    {
+        var went = Kinds.Named(46, "went");
+        var waited = Kinds.Named(46, "waited");
+
+        var going = new Roaming(
+            World(1, people: 1) with { Examining = Examining.Effect }, seed: 5);
+
+        var dropping = new Roaming(
+            World(1, people: 1) with { Examining = Examining.Effect }, seed: 5);
+
+        for (var episode = 0; episode < 40; episode++)
+        {
+            _ = going.Now;
+            going.Do(0);
+
+            _ = dropping.Now;
+            dropping.Do(2);
+
+            // The effect question holds the last statement back as what it asks about, so
+            // the chosen step is exactly the question and nothing has to be dug out of the
+            // transcript to read it.
+            Assert.Contains(went, going.Next().Seen.Asked);
+
+            // And a walk of one step opens with nobody holding anything, so dropping is
+            // never possible on it and the wish is refused every time.
+            Assert.Contains(waited, dropping.Next().Seen.Asked);
+        }
+
+        Assert.Equal(3, new Roaming(World(120, people: 4), seed: 5).Doings);
     }
 
     /// <summary>

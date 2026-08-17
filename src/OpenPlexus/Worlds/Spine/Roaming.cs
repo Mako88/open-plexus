@@ -162,7 +162,7 @@ public enum Examining
 /// Adding it before the base world is read would be two unanswered questions in one grid.
 /// </para>
 /// </remarks>
-public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
+public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>, IActed<Recited>
 {
     /// <summary>The modality a word rides on.</summary>
     /// <remarks>
@@ -200,6 +200,12 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
     private readonly RoamingSettings _settings;
     private readonly Random _walks;
     private readonly List<Turn<Recited>> _kept = [];
+
+    /// <summary>The walk drawn as far as its last step, waiting to be told what it is.</summary>
+    private Walk? _open;
+
+    /// <summary>What the chooser asked for, or nothing where it declined to intervene.</summary>
+    private int? _wish;
 
     /// <param name="settings">How the world is set up.</param>
     /// <param name="seed">What draws the houses and the walks.</param>
@@ -268,7 +274,20 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
     public IReadOnlyList<Turn<Recited>> Withheld => _kept;
 
     /// <inheritdoc/>
-    public Turn<Recited> Next() => Draw();
+    /// <remarks>
+    /// <b>The walk <see cref="Now"/> opened, finished by whatever <see cref="Do"/> was told</b>
+    /// — and drawn whole here where nothing asked. A chooser is spent by the step that
+    /// follows it, so neither the walk nor the wish survives into the next episode.
+    /// </remarks>
+    public Turn<Recited> Next()
+    {
+        var walk = _open ?? Open();
+        var wish = _wish;
+
+        (_open, _wish) = (null, null);
+
+        return Close(walk, wish);
+    }
 
     /// <summary>The codes for one sentence, in the order the words were said.</summary>
     /// <param name="words">The words of it, in order.</param>
@@ -293,8 +312,81 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
     private static int[] Placed(int[] at, int[] held, int[] here) =>
         [.. at.Select((room, one) => held[one] == Nobody ? room : here[held[one]])];
 
-    /// <summary>One house, one walk round it, and one question about what happened in it.</summary>
-    private Turn<Recited> Draw()
+    /// <summary>A house, a scatter and a walk, drawn as far as its last step.</summary>
+    /// <param name="At">Where each loose thing lies.</param>
+    /// <param name="Held">Who is holding each thing, or <see cref="Nobody"/>.</param>
+    /// <param name="Here">Where each person is standing.</param>
+    /// <param name="Told">The statements so far, oldest first.</param>
+    private sealed record Walk(
+        int[] At, int[] Held, int[] Here, List<IReadOnlyList<Code>> Told);
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <b>Go, take or drop</b>, which is the verb set the scripted walk already draws from.
+    /// Who does it and what they do it to stay the world's, because a chooser reading codes
+    /// cannot know which thing is loose in the room somebody is standing in — and a world
+    /// that let it name one would be answering the question through the action channel.
+    /// </remarks>
+    public int Doings => 3;
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <para>
+    /// <b>The walk with its last step still to happen</b>, so what is read is the state an
+    /// action is taken in rather than one it has already been taken in. Asking for it draws
+    /// the house, the scatter and every step but the last, and the same walk is what
+    /// <see cref="Next"/> then finishes — a caller that never asks gets the walk drawn whole
+    /// on the spot and the identical sequence out of the generator either way.
+    /// </para>
+    /// <para>
+    /// <b>The question slot says what is being asked</b>, never what to conclude. Which
+    /// thing the walk will be asked about is not drawn yet under
+    /// <see cref="Examining.Where"/>, and putting it here would show the chooser a question
+    /// the learner has not been asked.
+    /// </para>
+    /// </remarks>
+    public Recited Now
+    {
+        get
+        {
+            _open ??= Open();
+
+            return new Recited
+            {
+                Said = [.. Enumerable.Reverse(_open.Told)],
+                Asked = Said("what", "next"),
+            };
+        }
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <para>
+    /// <b>Nothing means the learner does not intervene</b>, rather than the walk standing
+    /// still. The people here are walking whether or not anything is choosing for them, so
+    /// declining leaves the world drawing its own last step — which is the arm every reading
+    /// taken before this existed was taken on, down to the draw.
+    /// </para>
+    /// <para>
+    /// <b>And a verb that cannot be done is done as waiting</b>, said out loud. Substituting
+    /// the nearest possible action would make a chooser's arm the world's own draw wearing
+    /// the chooser's name, and dropping the step silently would leave the effect question
+    /// answering about a statement nobody made.
+    /// </para>
+    /// </remarks>
+    public void Do(int? doing)
+    {
+        if (doing is { } wanted)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(wanted, nameof(doing));
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(wanted, Doings, nameof(doing));
+        }
+
+        _wish = doing;
+    }
+
+    /// <summary>The house, the scatter, and every step but the one still to be chosen.</summary>
+    private Walk Open()
     {
         // Where everything starts, stated out loud. Without the opening placements the
         // answer is not derivable from the transcript at all, and the world would be asking
@@ -337,67 +429,108 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>
             told.Add(Said(Cast[one], "is", "in", "the", Places[here[one]]));
         }
 
+        var walk = new Walk(at, held, here, told);
+
+        // Every step but the last, because the last is the one an action gets to be. A walk
+        // of no steps has no last step and this loop runs nowhere, which is the same walk it
+        // always was.
+        for (var step = 0; step < _settings.Steps - 1; step++) Step(walk, null);
+
+        return walk;
+    }
+
+    /// <summary>One step of the walk, chosen or drawn.</summary>
+    /// <param name="walk">The house and where everything in it stands.</param>
+    /// <param name="wish">Which of <see cref="Doings"/>, or nothing to let the walk draw.</param>
+    private void Step(Walk walk, int? wish)
+    {
+        var (at, held, here, told) = walk;
+
+        // Whose turn it is, and one person is nobody to choose between. A draw over one
+        // option decides nothing, so it is not taken -- which also leaves the walk of a
+        // one-person house the walk every earlier reading was taken on.
+        var who = _settings.People == 1 ? 0 : _walks.Next(_settings.People);
+
+        var holding = Enumerable.Range(0, _settings.Props)
+            .Where(one => held[one] == who)
+            .ToList();
+
+        var loose = Enumerable.Range(0, _settings.Props)
+            .Where(one => held[one] == Nobody && at[one] == here[who])
+            .ToList();
+
+        // Move, take or drop, and a drawn choice is between what is possible rather than
+        // between three. A walk that tried to drop what it was not holding would emit a
+        // sentence the world's own state contradicts, which is a transcript nothing could be
+        // scored against.
+        var can = new List<int> { 0 };
+        if (loose.Count > 0) can.Add(1);
+        if (holding.Count > 0) can.Add(2);
+
+        // And a CHOSEN one is not filtered, because filtering it would hand a chooser the
+        // world's knowledge of what is possible through the back of the interface. What an
+        // impossible wish gets is a step that happens and does nothing.
+        var doing = wish ?? can[_walks.Next(can.Count)];
+
+        if (wish is not null && !can.Contains(doing))
+        {
+            told.Add(Said(Cast[who], "waited"));
+
+            return;
+        }
+
+        switch (doing)
+        {
+            case 1:
+                var taken = loose[_walks.Next(loose.Count)];
+
+                held[taken] = who;
+
+                told.Add(Said(Cast[who], "took", "the", Things[taken]));
+
+                break;
+
+            case 2:
+                var dropped = holding[_walks.Next(holding.Count)];
+
+                held[dropped] = Nobody;
+                at[dropped] = here[who];
+
+                told.Add(Said(Cast[who], "dropped", "the", Things[dropped]));
+
+                break;
+
+            default:
+                here[who] = _walks.Next(_settings.Rooms);
+
+                told.Add(Said(Cast[who], "went", "to", "the", Places[here[who]]));
+
+                break;
+        }
+    }
+
+    /// <summary>One house, one walk round it, and one question about what happened in it.</summary>
+    private Turn<Recited> Draw() => Close(Open(), null);
+
+    /// <summary>The walk's last step, and the question about what it left behind.</summary>
+    /// <param name="walk">The house drawn as far as its last step.</param>
+    /// <param name="wish">Which of <see cref="Doings"/>, or nothing to let the walk draw.</param>
+    private Turn<Recited> Close(Walk walk, int? wish)
+    {
+        var (at, held, here, told) = walk;
+
         // Whether the walk's LAST statement moved anything, which is the effect question's
         // whole answer. Taken around that one step rather than around every one: the vector
         // costs a pass over the props and only the final step is ever asked about.
         var moved = false;
 
-        for (var step = 0; step < _settings.Steps; step++)
+        if (_settings.Steps > 0)
         {
-            var asked = step == _settings.Steps - 1;
-            var before = asked ? Placed(at, held, here) : null;
+            var before = Placed(at, held, here);
 
-            // Whose turn it is, and one person is nobody to choose between. A draw over one
-            // option decides nothing, so it is not taken -- which also leaves the walk of a
-            // one-person house the walk every earlier reading was taken on.
-            var who = _settings.People == 1 ? 0 : _walks.Next(_settings.People);
+            Step(walk, wish);
 
-            var holding = Enumerable.Range(0, _settings.Props)
-                .Where(one => held[one] == who)
-                .ToList();
-
-            var loose = Enumerable.Range(0, _settings.Props)
-                .Where(one => held[one] == Nobody && at[one] == here[who])
-                .ToList();
-
-            // Move, take or drop, and the choice is between what is possible rather than
-            // between three. A walk that tried to drop what it was not holding would emit a
-            // sentence the world's own state contradicts, which is a transcript nothing
-            // could be scored against.
-            var can = new List<int> { 0 };
-            if (loose.Count > 0) can.Add(1);
-            if (holding.Count > 0) can.Add(2);
-
-            switch (can[_walks.Next(can.Count)])
-            {
-                case 1:
-                    var taken = loose[_walks.Next(loose.Count)];
-
-                    held[taken] = who;
-
-                    told.Add(Said(Cast[who], "took", "the", Things[taken]));
-
-                    break;
-
-                case 2:
-                    var dropped = holding[_walks.Next(holding.Count)];
-
-                    held[dropped] = Nobody;
-                    at[dropped] = here[who];
-
-                    told.Add(Said(Cast[who], "dropped", "the", Things[dropped]));
-
-                    break;
-
-                default:
-                    here[who] = _walks.Next(_settings.Rooms);
-
-                    told.Add(Said(Cast[who], "went", "to", "the", Places[here[who]]));
-
-                    break;
-            }
-
-            if (asked) moved = !before!.SequenceEqual(Placed(at, held, here));
+            moved = !before.SequenceEqual(Placed(at, held, here));
         }
 
         // Asked about something put down, so the answer is a room. A thing still in hand is

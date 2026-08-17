@@ -291,15 +291,15 @@ Three: refining. Anything before three that reads as tuning is out of order.
     - **OPEN** — a commitment ABOUT commitments is expressible and not built, an identity
       being a code. Metacognition, and where a self-model starts.
   - Concept and label independent
-    - **NOW** — rung five, and it goes UP: where several commitments share a sub-scope, mint
-      a code for the shared part and rewrite them in terms of it. Gated by two bars, and its
-      trigger is REDUNDANCY rather than failure, so it is the one rung a failure cannot summon.
-    - **NOW** — and that code is available inside any future scope, including one that
-      abstracts again — the recursion DreamCoder gets `sort` out of. Load-bearing for
-      hierarchy, transfer, learned features and anything resembling one-shot learning.
-    - **OPEN** — the recursion is scarce where the redundancy is manufactured on purpose,
-      naming a scope leaving it too short to carry a further name. `Motif` is the bench and
-      the cue's length is the axis.
+    - **NOW** — rung five, and it goes UP: mint a code for a shared sub-scope and rewrite in
+      terms of it, gated by two bars. Its trigger is REDUNDANCY, so no failure can summon it,
+      and the code is reusable inside a scope that abstracts again. `Abstracting` says why.
+    - **OPEN** — the recursion is scarce on both benches and blocked differently. Naming a
+      `Motif` scope leaves it too short to carry a name, the cue's length being the axis;
+      `Latent`'s three-code scopes fire 0.2 times each, so repair's third code is a
+      coincidence and depth is never tested. Fork **112**.
+    - **SETTLED** — a deterministic world offers rung five nothing, and a channel that can
+      lie is what makes the group necessary. `Latent.Noise` at nought is the control.
     - **NOW** — concept-before-label is measured, and alternation groups things with no word
       for them yet.
     - **OPEN** — what rung five names is a SET, never a variable, so the two rungs are not
@@ -515,8 +515,7 @@ Three: refining. Anything before three that reads as tuning is out of order.
       18, 20, 21, 22 and 24 went with it; `csharp` keeps their code and their numbers.
     - **SETTLED** — `Drives` is built and measured, so nothing is owed off `csharp`.
     - **BROKEN** — worlds with no runner, their `*Run` files being the walk's. Each wants a
-      `Trial` OR A DELETION, a world going when its question closes, and nothing says which.
-      `OutstandingTests` prints the debt.
+      `Trial` or a deletion, and `OutstandingTests` prints the debt.
     - **NOW** — the vote's arithmetic composes and a whole learner runs over it. Fork **52**.
     - **NOW** — a round is a barrier, so lateness costs the CLOCK and not one answer, and C2's
       out-of-order half is untestable here. Breaking it is unmeasured.

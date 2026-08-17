@@ -348,6 +348,31 @@ public readonly record struct Proposed
     public required ImmutableArray<Code>? Named { get; init; }
 }
 
+/// <summary>
+/// Rung five: the one rung that makes a scope SHORTER.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>The trigger is redundancy rather than failure</b>, which is what separates this from
+/// every other rung. Where several commitments share a sub-scope, a code is minted for the
+/// shared part and they are rewritten in terms of it — so nothing has to be wrong for this
+/// to run, and no failure can summon it.
+/// </para>
+/// <para>
+/// <b>And the minted code is available inside any future scope</b>, including one that
+/// abstracts again. That recursion is what DreamCoder gets <c>sort</c> out of, and it is
+/// load-bearing for hierarchy, for transfer, for learned features, and for anything
+/// resembling one-shot learning. A machine with rungs one to four alone is arbitrarily
+/// accurate and conceptless, which is the plan's own refutation row.
+/// </para>
+/// <para>
+/// <b>What the recursion costs is the thing it needs</b>, and two benches say so from
+/// opposite directions. Naming a pair that is the whole scope removes that commitment from
+/// <see cref="Recurrence.Eligible"/> forever, so on <c>Motif</c> a name leaves its scope too
+/// short to carry another; on <c>Latent</c> three-code scopes exist in hundreds and fire a
+/// fraction of once, so the depth is there and is never tested.
+/// </para>
+/// </remarks>
 public static class Abstracting
 {
     /// <summary>The sub-scope most worth naming, or nothing if none has earned it.</summary>

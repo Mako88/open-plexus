@@ -61,20 +61,20 @@ public sealed class PushbackTests(ITestOutputHelper output)
                 + "Homeostat is the only world here that is acted in and is exactly what "
                 + "Drives needs, so deleting it would close one red entry by destroying "
                 + "what another needs; Composed.Segmented feeds the unread Bind channel, "
-                + "which is live. Rhythm is decided and wired, for a reason its own entry "
-                + "did not carry: it is the only world whose ANSWER moves. Motif is decided "
-                + "and wired for a reason its entry DID carry -- the world holds its own "
-                + "control, so the run that reaches it is the run that prices the naming "
-                + "gate. Two are left, Clevr and Latent, and Latent is where the instinct "
-                + "to wire for a green guard would produce a runner exercising nothing: its "
-                + "redundancy is in the MOMENT and rung five's trigger is redundancy across "
-                + "SCOPES, and a deterministic world genesis answers at one code leaves "
-                + "nothing longer to be eligible.",
+                + "which is live. Rhythm, Motif and Latent are decided and wired, each by a "
+                + "different road -- Rhythm for a question its own entry did not name, Motif "
+                + "for the one it did, and Latent by a prediction this entry made and half "
+                + "lost. Clevr and Composed are what is left, and neither is the shape the "
+                + "instinct to wire for a green guard would damage: Clevr has a published "
+                + "bar beside it and Composed is the front end's own question, so what "
+                + "either wants is a decision rather than a defence.",
             Settles: "A decision per world, recorded, and read against what the world "
-                + "actually holds rather than off a list of names. For Latent that is a "
-                + "runner plus the eligible count: nothing ever eligible says the question "
-                + "is unreachable as built and the world goes with a revival row, and "
-                + "anything eligible refutes this half outright."),
+                + "actually holds rather than off a list of names. Latent showed what that "
+                + "costs and what it is worth: the prediction that a runner would exercise "
+                + "nothing was exactly right about the world as shipped, nought eligible on "
+                + "every seed, and wrong about the world -- a channel that can lie leaves "
+                + "hundreds of scopes eligible, and it is what makes the group necessary at "
+                + "all. Clevr and Composed close the same way, by a runner and a number."),
 
         new(
             With: "DialTests.Every_arm_is_measured_on_at_least_two_worlds",

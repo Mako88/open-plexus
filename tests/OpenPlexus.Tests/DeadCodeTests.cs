@@ -392,7 +392,18 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "join -- so the library naming it would be the library naming a world, which "
             + "is the fault this list exists to catch and not a debt it records.",
 
-        ["Latent"] = Stranded,
+        ["Latent"] = "A WORLD, ON `Roaming`'S FOOTING, AND IT CAME OFF THE STRANDED LIST BY "
+            + "GETTING A RUNNER AND A DIAL. `Trial` drives it through `IWorld` now: a moment "
+            + "is every channel but the last and the outcome is what the last one reported. "
+            + "It came off by a fourth road, which is that a standing objection had predicted "
+            + "the runner would exercise nothing and was half right. As shipped every channel "
+            + "reported the cause deterministically, so genesis answered at one code, repair "
+            + "was never asked, and nought was ever eligible -- measured, not argued. A "
+            + "channel that can LIE is what makes the group necessary, which is what a latent "
+            + "cause was always for: under noise no single channel settles the answer and "
+            + "hundreds of scopes are eligible. `LatentSettings.Noise` at nought is the "
+            + "control and it is the world the objection described. `LatentTests` is its "
+            + "caller.",
 
         ["Motif"] = "A WORLD, ON `Roaming`'S FOOTING, AND IT CAME OFF THE STRANDED LIST BY "
             + "GETTING A RUNNER. `Trial` drives it through `IWorld` now: a moment is the "

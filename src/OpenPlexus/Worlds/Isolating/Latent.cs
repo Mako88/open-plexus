@@ -25,6 +25,28 @@ public sealed record LatentSettings
     /// is the smallest group worth naming, and why this world is rung five's.
     /// </remarks>
     public int Channels { get; init; } = 6;
+
+    /// <summary>
+    /// The share of reports in which a channel shows the wrong state.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Zero is the control</b>, and it is the shape this world shipped in. A channel
+    /// that never lies makes every other channel redundant in the sense that costs
+    /// nothing: one code settles the answer, so genesis mints a one-code commitment that
+    /// is never wrong, repair is never asked, and no scope longer than one code ever
+    /// exists. Rung five's trigger is redundancy across scopes and there are no scopes to
+    /// hold it. Measured rather than argued — see <c>LatentTests</c>.
+    /// </para>
+    /// <para>
+    /// <b>So a lying channel is what makes the group necessary</b>, which is what this
+    /// world claims to be about. Under noise no single channel settles the answer and
+    /// agreement between several does, so repair grows scopes over channels that always
+    /// co-occur — and a sub-scope shared between two such scopes is exactly the hub the
+    /// cause would have been.
+    /// </para>
+    /// </remarks>
+    public double Noise { get; init; } = 0.1;
 }
 
 /// <summary>
@@ -61,7 +83,7 @@ public sealed record LatentSettings
 /// assumed.
 /// </para>
 /// </remarks>
-public sealed class Latent
+public sealed class Latent : IWorld<Coded>
 {
     /// <summary>The modality every observable channel emits into.</summary>
     /// <remarks>
@@ -80,6 +102,14 @@ public sealed class Latent
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(world.Causes);
+        ArgumentOutOfRangeException.ThrowIfNegative(world.Noise);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(world.Noise, 1.0);
+
+        // A lie has to have somewhere to go, so one state and a lying channel are
+        // incompatible rather than merely uninteresting.
+        if (world.Noise > 0 && world.Causes < 2)
+            throw new ArgumentOutOfRangeException(nameof(world),
+                "a channel cannot show the wrong state where there is only one state");
 
         // Four is where a hub starts paying, so a world below it cannot exercise
         // the thing it exists to measure. Refused rather than left to read as a
@@ -118,17 +148,119 @@ public sealed class Latent
             Agreed.Fold(Agreed.Basis, (ulong)channel), (ulong)cause)));
     }
 
-    /// <summary>Which state the hidden thing is in, and what every channel showed.</summary>
+    /// <summary>Which state the hidden thing is in, and which state each channel reported.</summary>
     /// <remarks>
-    /// <b>The cause is returned so a test can check the world, and is NEVER
-    /// emitted.</b> It has no code and joins no occasion — that is the whole point
-    /// of it.
+    /// <para>
+    /// <b>The cause is returned so a test can check the world, and is never emitted.</b>
+    /// It has no code and joins no occasion — that is the whole point of it.
+    /// </para>
+    /// <para>
+    /// <b>A lying channel shows another state and never nothing</b>, so a lie is
+    /// indistinguishable from the truth at the code, which is what makes agreement between
+    /// channels the only evidence there is. A silent channel would be a lie the learner
+    /// could see.
+    /// </para>
     /// </remarks>
-    public (int Cause, ImmutableArray<Code> Shown) Moment()
+    public (int Cause, ImmutableArray<int> Reported) Draw()
     {
         var cause = _rng.Next(_world.Causes);
 
+        var reported = new int[_world.Channels];
+
+        for (var channel = 0; channel < _world.Channels; channel++)
+        {
+            if (_world.Noise > 0 && _rng.NextDouble() < _world.Noise)
+            {
+                // Uniform over the other states, drawn as an offset so no state is ever
+                // its own lie and no state is lied onto more often than another.
+                reported[channel] = (cause + 1 + _rng.Next(_world.Causes - 1)) % _world.Causes;
+                continue;
+            }
+
+            reported[channel] = cause;
+        }
+
+        return (cause, [.. reported]);
+    }
+
+    /// <inheritdoc cref="Draw"/>
+    public (int Cause, ImmutableArray<Code> Shown) Moment()
+    {
+        var (cause, reported) = Draw();
+
         return (cause,
-            [.. Enumerable.Range(0, _world.Channels).Select(one => Shows(one, cause))]);
+            [.. Enumerable.Range(0, _world.Channels).Select(one => Shows(one, reported[one]))]);
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <b>The states of the hidden thing</b>, because the last channel shows one of them
+    /// and a question naming the other channels asks which. The answer is a state rather
+    /// than the cause, and the two are the same number only where nothing lies.
+    /// </remarks>
+    public int Outcomes => _world.Causes;
+
+    /// <summary>
+    /// What a model that knew the generative process would score.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>An upper bound rather than an attainable score</b>, and it is stated that way
+    /// because the two come apart here. Knowing the cause exactly still leaves the withheld
+    /// channel free to lie, and it does so at <see cref="LatentSettings.Noise"/> — so no
+    /// model of any kind passes one minus that. Inferring the cause from the other channels
+    /// is nearly free at a low noise rate and is not free, so the attainable score sits
+    /// under this by however much the inference misses.
+    /// </para>
+    /// <para>
+    /// <b>The gap to <see cref="Marginal"/> is the whole of what the channels carry</b>,
+    /// which is what makes the bar worth computing. Accuracy is here to show a hub would
+    /// have cost nothing, exactly as on <see cref="Motif"/>.
+    /// </para>
+    /// </remarks>
+    public double Ceiling => 1.0 - _world.Noise;
+
+    /// <summary>Always naming one state, whichever it is.</summary>
+    /// <remarks>
+    /// <b>The same as <see cref="Chance"/> here</b>, because the cause is drawn uniformly
+    /// and a lie is drawn uniformly over the rest — so every state arrives as the withheld
+    /// channel's report exactly one time in <see cref="LatentSettings.Causes"/>, at any
+    /// noise rate. Both are reported because they come apart the moment either draw is
+    /// skewed, and a bar that silently equals another is a bar nobody can read.
+    /// </remarks>
+    public double Marginal => 1.0 / _world.Causes;
+
+    /// <summary>
+    /// One moment through the seam every world shares: every channel but the last, and
+    /// what the last one showed.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The withheld channel is the last one</b> rather than a drawn one, so the question
+    /// is the same question every round and the cue never varies in shape. Which channel is
+    /// held back cannot matter, the channels being interchangeable by construction.
+    /// </para>
+    /// <para>
+    /// <b>The outcome is what that channel reported</b>, which is the cause where it told
+    /// the truth and another state where it did not. Answering the cause instead would hand
+    /// the learner a fact no channel carries, and the ceiling would then be a number the
+    /// world does not have.
+    /// </para>
+    /// <para>
+    /// <b>The cause is still never emitted.</b> It has no code, joins no moment, and reaches
+    /// the learner only as the thing several channels are evidence about.
+    /// </para>
+    /// </remarks>
+    public Turn<Coded> Next()
+    {
+        var (_, reported) = Draw();
+
+        return new Turn<Coded>
+        {
+            Seen = Coded.Of(
+                [.. Enumerable.Range(0, _world.Channels - 1)
+                    .Select(one => Shows(one, reported[one]))]),
+            Outcome = reported[^1],
+        };
     }
 }

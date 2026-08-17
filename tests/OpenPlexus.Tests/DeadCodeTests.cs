@@ -360,13 +360,19 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // which -- a world whose question is LIVE and wants a runner, or a world whose
         // question closed with the walk and wants deleting.
         //
-        // SOME ARE OBVIOUSLY LIVE: `Motif` is rung five's redundancy manufactured on
+        // SOME ARE OBVIOUSLY LIVE: `Motif` was rung five's redundancy manufactured on
         // purpose and `Latent` is fork 39's. `Snake` and `SnakeSense` were the obviously-not
         // pair -- prediction conditional on action, forks 18 and 20, both settled -- and
         // they are gone rather than wired. `Rhythm` came off by the third road, which is
         // that its live question was not the one its own entry named: it was written for a
         // prediction budget that is dead, and what it is worth is being the only world whose
         // ANSWER moves.
+        //
+        // And `Motif` came off by the first road, which is the plain one: its question was
+        // live, so it got a `Trial`. What decided the mapping was that the world already
+        // carried its own control -- `Motifs` at nought is the same stream with nothing
+        // recurring in it -- so the run that makes it reachable is also the run that asks
+        // whether the naming gate reads recurrence or reads the stream.
         //
         // And two of the four on that delete list should not go. `Homeostat` is the only
         // world here that is acted in and is what `Drives` needs, and `Composed.Segmented`
@@ -387,7 +393,15 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "is the fault this list exists to catch and not a debt it records.",
 
         ["Latent"] = Stranded,
-        ["Motif"] = Stranded,
+
+        ["Motif"] = "A WORLD, ON `Roaming`'S FOOTING, AND IT CAME OFF THE STRANDED LIST BY "
+            + "GETTING A RUNNER. `Trial` drives it through `IWorld` now: a moment is the "
+            + "cue half of a set and the outcome is one of the codes that set withheld, "
+            + "drawn uniformly. It is the world where rung five's redundancy is "
+            + "manufactured on purpose, and its control is the same stream with nothing "
+            + "recurring in it -- which is this repo's oldest refutation put to the current "
+            + "gate rather than to the one it killed. `MotifTests` is its caller.",
+
         ["Recalled"] = "A WORLD, ON `Roaming`'S FOOTING, and it was on the stranded list "
             + "by mistake. Both halves of that reason are false of it: `Trial` drives it "
             + "through `IWorld` -- `RecalledTests.Made` builds a `Trial<Recited>` over it -- "

@@ -55,7 +55,7 @@ public sealed record MotifSettings
 /// somebody set. This world varies both.
 /// </para>
 /// </remarks>
-public sealed class Motif
+public sealed class Motif : IWorld<Coded>
 {
     /// <summary>The one modality this world emits.</summary>
     public const byte Token = 70;
@@ -95,28 +95,76 @@ public sealed class Motif
     public IReadOnlyList<ImmutableArray<Code>> Motifs => _motifs;
 
     /// <summary>
-    /// The chance a blind guess completes a set.
+    /// How many of a set's codes a moment shows — <b>half, rounded down, and at least
+    /// one.</b>
     /// </summary>
     /// <remarks>
-    /// <b>Over the codes that are NOT in the cue</b>, because the cue is struck
-    /// out of the candidates before anything is ranked — so a blind draw is over
-    /// what is left, not over the whole alphabet.
+    /// <para>
+    /// Showing all but one makes the completion a lookup; showing one makes it a marginal.
+    /// </para>
+    /// <para>
+    /// <b>And it is the axis rather than a constant</b>, because rung five's two readings
+    /// need different lengths. A scope of two codes may be named and can never carry a
+    /// name, so a name standing for a name is unreachable at any cue under three however
+    /// much redundancy the stream holds. <see cref="MotifSettings.Size"/> is what moves it.
+    /// </para>
     /// </remarks>
-    public double Chance =>
-        _motifs.Count == 0 || _settings.Symbols <= Cue
-            ? 0.0
-            : (_settings.Size - Cue) / (double)(_settings.Symbols - Cue);
+    public int Cue => Math.Max(1, _settings.Size / 2);
 
-    /// <summary>How many of a set's codes a question shows.</summary>
+    /// <inheritdoc/>
     /// <remarks>
-    /// <b>Half, rounded down, and at least one.</b> Showing all but one makes the
-    /// completion a lookup; showing one makes it a marginal.
+    /// <b>The whole alphabet</b>, because the outcome is one symbol of it and a noise
+    /// moment can be followed by any of them.
     /// </remarks>
-    private int Cue => Math.Max(1, _settings.Size / 2);
+    public int Outcomes => _settings.Symbols;
+
+    /// <summary>
+    /// The best a model that knew everything could score — <b>computed with no learning.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The sets are disjoint, so a cue that belongs to a set names that set outright and
+    /// nothing is left to work out. What remains is which of the <see cref="Cue"/> codes
+    /// the set withheld arrived, and that is a uniform draw — so a motif moment is capped
+    /// at one over the number withheld and no amount of learning moves it.
+    /// </para>
+    /// <para>
+    /// A noise moment carries no information at all: its codes were drawn without
+    /// replacement from the alphabet, so the outcome is uniform over whatever the cue did
+    /// not show.
+    /// </para>
+    /// </remarks>
+    public double Ceiling =>
+        (Recurring / (double)(_settings.Size - Cue))
+        + ((1.0 - Recurring) / (_settings.Symbols - Cue));
+
+    /// <summary>
+    /// Always naming the commonest outcome, which is one of the withheld members of a set.
+    /// </summary>
+    /// <remarks>
+    /// <b>The control that matters here</b>, because a model that has learnt only which
+    /// symbols are frequent lands on it. Every member a set withholds arrives at its own
+    /// set's share of the motif moments, and every other symbol only ever arrives by noise.
+    /// </remarks>
+    public double Marginal =>
+        (_motifs.Count == 0
+            ? 0.0
+            : Recurring / (_motifs.Count * (double)(_settings.Size - Cue)))
+        + ((1.0 - Recurring) / _settings.Symbols);
+
+    /// <summary>
+    /// The share of moments that show a set, which is nought where there are none.
+    /// </summary>
+    /// <remarks>
+    /// <b>Read off the sets rather than off the dial</b>, because the control turns the
+    /// sets off and leaves <see cref="MotifSettings.Density"/> where it was. A bar computed
+    /// from the dial would price a stream this world never draws.
+    /// </remarks>
+    private double Recurring => _motifs.Count == 0 ? 0.0 : _settings.Density;
 
     /// <summary>One moment: either a whole set, or that many codes at random.</summary>
     /// <returns>The codes shown, and which set they were if any.</returns>
-    public (ImmutableArray<Code> Shown, int Which) Next()
+    public (ImmutableArray<Code> Shown, int Which) Draw()
     {
         if (_motifs.Count > 0 && _rng.NextDouble() < _settings.Density)
         {
@@ -142,9 +190,54 @@ public sealed class Motif
         ArgumentOutOfRangeException.ThrowIfNegative(which);
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(which, _motifs.Count);
 
-        var motif = _motifs[which];
+        var (asked, wanted) = Split(_motifs[which]);
 
-        return ([.. motif.Take(Cue)], motif.Skip(Cue).ToHashSet());
+        return (asked, wanted.ToHashSet());
+    }
+
+    /// <summary>Where a moment stops being shown and starts being asked about.</summary>
+    private (ImmutableArray<Code> Asked, IEnumerable<Code> Wanted) Split(
+        ImmutableArray<Code> whole) =>
+        ([.. whole.Take(Cue)], whole.Skip(Cue));
+
+    /// <summary>
+    /// One moment through the seam every world shares: the cue, and one code it withheld.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The completion put to the learner one code at a time</b>, because a moment settles
+    /// on one outcome and a set withholds several. Which of them arrives is drawn uniformly,
+    /// so the same cue is followed by a different answer from one showing to the next and
+    /// the accuracy is capped at <see cref="Ceiling"/> by the world rather than by anything
+    /// the population does.
+    /// </para>
+    /// <para>
+    /// <b>And that cap is what gives repair a foothold</b>, which is what this world is for.
+    /// A single cue code names its set outright, so no conjunction over the cue tells anyone
+    /// which set is showing and a scope could never earn a second code from the sets alone.
+    /// What it earns one from is noise: a set's code turns up in a random moment at the
+    /// cue's share of the alphabet, and a second code of the same set is what strikes those
+    /// moments out. So the scopes grow, they grow over codes that always co-occur, and rung
+    /// five has redundancy to name.
+    /// </para>
+    /// <para>
+    /// <b>The outcome is the symbol's own number</b> rather than a code, which is the shared
+    /// alphabet <see cref="Turn{TSeen}.Outcome"/> asks for. A world minting its own outcome
+    /// coding would be a world deciding what a brain answers in.
+    /// </para>
+    /// </remarks>
+    public Turn<Coded> Next()
+    {
+        var (shown, _) = Draw();
+        var (asked, wanted) = Split(shown);
+
+        var withheld = wanted.ToList();
+
+        return new Turn<Coded>
+        {
+            Seen = Coded.Of(asked),
+            Outcome = (int)withheld[_rng.Next(withheld.Count)].Value,
+        };
     }
 
     /// <summary>The code for one symbol.</summary>

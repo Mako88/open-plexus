@@ -297,6 +297,9 @@ Three: refining. Anything before three that reads as tuning is out of order.
     - **NOW** — and that code is available inside any future scope, including one that
       abstracts again — the recursion DreamCoder gets `sort` out of. Load-bearing for
       hierarchy, transfer, learned features and anything resembling one-shot learning.
+    - **OPEN** — the recursion is scarce where the redundancy is manufactured on purpose,
+      naming a scope leaving it too short to carry a further name. `Motif` is the bench and
+      the cue's length is the axis.
     - **NOW** — concept-before-label is measured, and alternation groups things with no word
       for them yet.
     - **OPEN** — what rung five names is a SET, never a variable, so the two rungs are not

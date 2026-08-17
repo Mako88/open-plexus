@@ -191,7 +191,15 @@ public sealed class DocsTests
     // duplicates nothing: the branch above it had a mechanism and no world that could test
     // it. Deleting an item to afford it was the alternative, and a guard must not cost
     // information.
-    private const int Whole = 10_127;
+    //
+    // And 10,164 is the ninth raise, thirty-seven words for the question the world that came
+    // off the list next asked. `Motif` manufactures rung five's redundancy on purpose, and
+    // the branch above the new leaf claimed a recursion -- a name standing for a name -- with
+    // nowhere it had ever been watched. Naming a scope shortens it, so the rung consumes what
+    // depth needs, and that is a limit on the mechanism rather than a number about one run.
+    // It duplicates nothing above it and it names its own axis, which is what makes it
+    // closeable rather than a note.
+    private const int Whole = 10_164;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

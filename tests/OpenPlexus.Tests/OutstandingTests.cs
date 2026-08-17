@@ -54,16 +54,21 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// entry leaves <see cref="DeadCodeTests"/>, by either road.
     /// </para>
     /// <para>
-    /// <b>Some are obviously live and some are obviously not.</b> <c>Motif</c> is rung five's
-    /// redundancy manufactured on purpose and <c>Latent</c> is fork 39's. <c>Clevr</c> is the
-    /// perceptual world with a published bar beside it, and <c>Composed</c> and
-    /// <c>Latent</c> are the front end's own questions.
+    /// <b>Some are obviously live and some are obviously not.</b> <c>Latent</c> is fork 39's,
+    /// <c>Clevr</c> is the perceptual world with a published bar beside it, and
+    /// <c>Composed</c> and <c>Latent</c> are the front end's own questions.
     /// </para>
     /// <para>
-    /// <b>And two have come off, by roads worth telling apart.</b> <c>Senses</c> got a
+    /// <b>And three have come off, by roads worth telling apart.</b> <c>Senses</c> got a
     /// runner for the question it was built for; <c>Rhythm</c> got one for a question its
     /// own entry never named, that entry having called it rung three's when the rung it can
     /// hold still is repair. A world's stated purpose is not the same as its live one.
+    /// </para>
+    /// <para>
+    /// <b>And <c>Motif</c> is the plain case</b>, which is worth naming beside the other two.
+    /// Its question was the one its entry said it was, so the runner is the whole of what it
+    /// wanted — and the world had carried its own control since the day it was written, so
+    /// the run that reaches it is also the run that prices the naming gate.
     /// </para>
     /// </remarks>
     [Fact]

@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -18,7 +18,7 @@ namespace OpenPlexus.Tests;
 /// level results better than any of the mechanisms did.
 /// </para>
 /// <para>
-/// <b>And the partition is only available on a world that can say what is true.</b> A
+/// <b>And the partition is only available</b> on a world that can say what is true. A
 /// sound commitment that fires is right by definition, so the split is exact rather than
 /// estimated — which is why this file is the multiplexer's and cannot be `Arranged`'s.
 /// </para>
@@ -47,8 +47,8 @@ public sealed class CensusTests(ITestOutputHelper output)
             census: true).Run(Rounds);
 
     /// <summary>
-    /// <b>Whether a parent's table already knows what its child will want — fork 74's
-    /// precondition</b>, and it changes nothing.
+    /// <b>Whether a parent's table already knows</b> what its child will want — fork 74's
+    /// precondition, and it changes nothing.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -119,8 +119,8 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// its accuracy says so.
     /// </para>
     /// <para>
-    /// <b>And an unsound child that is no better than its parent is exactly what subsumption
-    /// removes.</b> Under <see cref="Subsuming.Weaker"/> the general rule survives wherever it
+    /// <b>And an unsound child that is no better than its parent</b> is exactly what subsumption
+    /// removes. Under <see cref="Subsuming.Weaker"/> the general rule survives wherever it
     /// is at least as accurate, and a child that has pinned one of three needed codes usually
     /// is not better yet. So the chain may be capped not by the search but by the ladder being
     /// kicked away halfway up.
@@ -175,8 +175,8 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The census counts the run's own failures and not a second opinion about
-    /// them.</b>
+    /// <b>The census counts the run's own failures</b> and not a second opinion about
+    /// them.
     /// </summary>
     /// <remarks>
     /// <b>The vote is re-derived before the step</b>, so this is the check that it is the same
@@ -204,8 +204,8 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE READING ITSELF: how much of the failure any vote rule could ever have
-    /// reached</b>, and whether what it holds covers the rounds guessing gets wrong.
+    /// <b>THE READING ITSELF</b>: how much of the failure any vote rule could ever have
+    /// reached, and whether what it holds covers the rounds guessing gets wrong.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -215,8 +215,8 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// twice for two sets of columns. `DuplicationTests` refused it, correctly.
     /// </para>
     /// <para>
-    /// <b>A dozen perfectly accurate true rules and an answer key scoring nought are the
-    /// same run.</b> On the skewed multiplexer every data bit is one four times in five,
+    /// <b>A dozen perfectly accurate true rules</b> and an answer key scoring nought are the
+    /// same run. On the skewed multiplexer every data bit is one four times in five,
     /// so <i>all four data bits are one</i> holds on about two rounds in five and entails
     /// the answer whatever the address selects. That rule is sound, never misses, and is
     /// not in the key — this repo's own trap about a single answer key marking the basis
@@ -281,8 +281,8 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The same partition on the world whose ceiling is known in advance — where an
-    /// uncovered round means the opposite of what it means on the multiplexer.</b>
+    /// <b>The same partition on the world whose ceiling is known</b> in advance — where an
+    /// uncovered round means the opposite of what it means on the multiplexer.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -324,19 +324,19 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Whether the uncovered bucket empties once the true rules are all held — the
-    /// internal claim two instruments can check and neither can alone.</b>
+    /// <b>Whether the uncovered bucket empties once the true rules are all held</b> — the
+    /// internal claim two instruments can check and neither can alone.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>At six bits ungated the run ends holding all eight true rules and still reports
-    /// three hundred uncovered rounds.</b> Those eight partition the input space, so once
+    /// <b>At six bits ungated the run ends holding all eight true rules</b> and still reports
+    /// three hundred uncovered rounds. Those eight partition the input space, so once
     /// they are resident every round must have a correct advocate — which means the
     /// uncovered rounds have to be EARLY ones, before the rules existed. That is the
     /// parsimonious reading and it was a guess until this counted.
     /// </para>
     /// <para>
-    /// <b>And if it is wrong the fault is in matching rather than in learning</b>, which
+    /// <b>And if it is wrong the fault is in matching</b> rather than in learning, which
     /// no score could distinguish. A correct rule that is resident and does not fire on a
     /// moment it covers is a defect; a correct rule that did not exist yet is a run
     /// getting on with it. `Found` and `Uncovered` are computed by different code from
@@ -386,8 +386,8 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Both arms have been compared on accuracy and neither has ever been read on
-    /// coverage.</b> <see cref="Surprising.Unaccounted"/> won on score and the reason
+    /// <b>Both arms have been compared on accuracy</b> and neither has ever been read on
+    /// coverage. <see cref="Surprising.Unaccounted"/> won on score and the reason
     /// given was that ungated genesis walks the whole <c>code → outcome</c> space — which
     /// is a statement about its COST. What it buys is rounds moved out of
     /// <see cref="Census.Uncovered"/>, and nothing has ever counted those.
@@ -441,11 +441,11 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>WHEN GENESIS STOPS, which the totals imply and no reading has ever shown.</b>
+    /// <b>WHEN GENESIS STOPS</b>, which the totals imply and no reading has ever shown.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Seventeen mints in twenty thousand rounds is not a rate, it is an event.</b> The
+    /// <b>Seventeen mints in twenty thousand rounds is not a rate</b>, it is an event. The
     /// same total under three different vote rules says the vote does not touch genesis at
     /// all, and a total that small on a world wanting eight rules says covering is not
     /// running for most of the run. Whether it tails off or stops is the difference
@@ -489,13 +489,13 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Which bucket a vote rule actually moves — and the census says it should be able
-    /// to move only one of them.</b>
+    /// <b>Which bucket a vote rule actually moves</b> — and the census says it should be able
+    /// to move only one of them.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A vote decides who gets the seat, so it can only reach the outvoted bucket —
-    /// except that it also steers repair.</b> This repo already records that no change to
+    /// <b>A vote decides who gets the seat</b>, so it can only reach the outvoted bucket —
+    /// except that it also steers repair. This repo already records that no change to
     /// the vote is only a readout, because covering and repair run on the rounds the
     /// WINNER got wrong. So a vote rule can move the uncovered bucket too, by changing
     /// what gets minted rather than by changing what gets read.
@@ -531,8 +531,8 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Taking the census does not change the run, which is what buys its exemption
-    /// from `ShapeTests`.</b>
+    /// <b>Taking the census does not change the run</b>, which is what buys its exemption
+    /// from `ShapeTests`.
     /// </summary>
     /// <remarks>
     /// <para>

@@ -94,12 +94,18 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// a reader scans for was the second half, which is the judgement no script makes.
     /// </para>
     /// <para>
+    /// And 783 is one file rather than a sweep, which is the shape that fits a session with
+    /// research in it. Sixteen came off <c>CensusTests</c> alone, every one of them by
+    /// closing the bold early, and the ratio held again — the claim came second in fourteen
+    /// and the lead had to be shortened rather than moved in the other two.
+    /// </para>
+    /// <para>
     /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
     /// is the tight one — <see cref="Scheduled"/> is what stops it sitting still, and this is
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 799;
+    private const int Shouted = 783;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>
@@ -116,7 +122,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// capitals — so three came off here without anybody looking for them.
     /// </para>
     /// </remarks>
-    private const int Opened = 68;
+    private const int Opened = 66;
 
     /// <summary>
     /// The commit the decay schedule counts from. <b>John's, 2026-08-13.</b>

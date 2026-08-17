@@ -115,7 +115,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// alive under both on every seed.
     /// </para>
     /// <para>
-    /// <b>And the pin did not reach the budget, which is the same fault one dial along.</b>
+    /// <b>And the pin did not reach the budget</b>, which is the same fault one dial along.
     /// The paragraph above was written the day the timing changed and it names a class of
     /// mistake — <i>whether a nameable sub-scope survives is a property of the trained
     /// population, which every repair dial moves</i> — while pinning exactly one member of
@@ -296,7 +296,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     // ---- what a death costs ------------------------------------------------
 
     /// <summary>
-    /// <b>A holder whose machine has gone is silence, and the asker can see it.</b>
+    /// <b>A holder whose machine has gone is silence</b>, and the asker can see it.
     /// </summary>
     /// <remarks>
     /// <para>

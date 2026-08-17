@@ -9,14 +9,14 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The run half of this file went with the walk, and the property did not.</b> Fork 12
+/// <b>The run half of this file went with the walk</b>, and the property did not. Fork 12
 /// asked whether a fixed seed reproduces a run exactly, and it is answered on this side by
 /// <c>GradedTests.A_fixed_seed_reproduces_a_graded_run_exactly</c> — which asks MORE than
 /// the deleted version did, running its two copies side by side so a learner that agreed
 /// with itself through anything ambient could not pass.
 /// </para>
 /// <para>
-/// <b>What is left here is the equality itself, and it is a different question.</b> Every
+/// <b>What is left here is the equality itself</b>, and it is a different question. Every
 /// one of those reproducibility tests compares two reports with <c>Assert.Equal</c>, so
 /// what a report counts as part of itself decides what they are asserting. A wall clock in
 /// there turns every one of them red on a correct machine; a field MISSING from there makes
@@ -38,7 +38,7 @@ public sealed class DeterminismTests
             seed: 1).Run(rounds: 200).Tally;
 
     /// <summary>
-    /// <b>A wall clock is not part of a run's identity, and for two days it was.</b>
+    /// <b>A wall clock is not part of a run's identity</b>, and for two days it was.
     /// </summary>
     /// <remarks>
     /// <b>THE THREE <i>a fixed seed reproduces a run exactly</i> tests went red on a

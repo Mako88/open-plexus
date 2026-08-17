@@ -250,7 +250,7 @@ public sealed record Quizzed
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>No run has ever put text through this learner, which is why this is small.</b>
+/// <b>No run has ever put text through this learner</b>, which is why this is small.
 /// <see cref="Babi"/> has parsed the corpus into codes since before the commitment
 /// primitive existed, and everything built on it was walk-shaped — an occasion writing
 /// edges into clusters. Nothing joined the same words to a population of commitments,
@@ -511,7 +511,7 @@ public sealed class Recalled : IWorld<Recited>, IWithholds<Recited>
     /// What each withheld question said, in the same order <see cref="Withheld"/> holds them.
     /// </summary>
     /// <remarks>
-    /// <b>One row a withheld turn, which is what lets a score be read as a conversation.</b>
+    /// <b>One row a withheld turn</b>, which is what lets a score be read as a conversation.
     /// Nothing that learns is given any of it — see <see cref="Quizzed"/>.
     /// </remarks>
     public ImmutableArray<Quizzed> Transcript { get; }

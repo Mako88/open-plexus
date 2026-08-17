@@ -22,7 +22,7 @@ namespace OpenPlexus.Tests;
 /// <c>Abstract</c> with no argument.
 /// </para>
 /// <para>
-/// <b>And it is not a test of C2, which is what will be assumed.</b> TCP does not reorder
+/// <b>And it is not a test of C2</b>, which is what will be assumed. TCP does not reorder
 /// within a connection, so this exercises less adversity than <see cref="Bus.HybridBus"/>
 /// does. Green here says the bytes, the routing and the arithmetic are right, and says
 /// nothing whatever about lateness.
@@ -349,7 +349,7 @@ public sealed class FleetTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>And a fleet run reproduces itself, which a wire could easily have cost.</b>
+    /// <b>And a fleet run reproduces itself</b>, which a wire could easily have cost.
     /// </summary>
     /// <remarks>
     /// <b>Fork 12, with the two halves on different machines.</b> Every merge here is

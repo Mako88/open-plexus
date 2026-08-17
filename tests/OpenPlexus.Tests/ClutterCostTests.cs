@@ -10,21 +10,21 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A code live in every moment separates nothing, and repair already knows that.</b>
+/// <b>A code live in every moment separates nothing</b>, and repair already knows that.
 /// <see cref="Repair.Divergence"/> asks how often a code was present in hits against in
 /// misses; present in all of both gives one and one, so its separation is nought and it
 /// can never be chosen as a condition. The mechanism John asked after is, for repair,
 /// already there.
 /// </para>
 /// <para>
-/// <b>Genesis had no such guard and now does, which is what the grid below is against.</b>
+/// <b>Genesis had no such guard and now does</b>, which is what the grid below is against.
 /// It used to mint one commitment per live code on a surprise, so background became a
 /// ROOT and every child hanging off it inherited a code that could never earn its place —
 /// half the resident population, on eight bits of it. <see cref="Population.Cover"/>
 /// refuses to root on a code that has never once been absent.
 /// </para>
 /// <para>
-/// <b>And the tally still has no guard, which is the half of fork 51 left open.</b>
+/// <b>And the tally still has no guard</b>, which is the half of fork 51 left open.
 /// <see cref="Commitment.Settle"/> stores an entry per non-scope code in every moment a
 /// commitment fires on, so an always-on code is an entry in EVERY commitment's table with
 /// a divergence pinned at nought for the life of the run. The grid still shows the table

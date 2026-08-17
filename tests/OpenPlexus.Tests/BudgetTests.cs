@@ -101,7 +101,7 @@ public sealed class BudgetTests(ITestOutputHelper output)
             census: true).Run(Rounds);
 
     /// <summary>
-    /// <b>Six cells, and the shipped one is a corner rather than the middle.</b>
+    /// <b>Six cells</b>, and the shipped one is a corner rather than the middle.
     /// </summary>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]

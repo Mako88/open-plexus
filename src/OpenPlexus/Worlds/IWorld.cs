@@ -23,7 +23,7 @@ public readonly record struct Turn<TSeen>
     /// different alphabet per world would not be one brain.
     /// </para>
     /// <para>
-    /// <b>And nullable, because a world that does not know had no way to say so.</b> Most
+    /// <b>And nullable</b>, because a world that does not know had no way to say so. Most
     /// moments in any real stream are followed by nothing anybody observes, and this type
     /// could only express a stream where every one of them is. What was missing was a
     /// world's ability to say <i>nothing followed that I saw</i>.

@@ -55,7 +55,7 @@ public sealed record HomeostatSettings
     /// no state variation for a state-conditional association to attach to.
     /// </para>
     /// <para>
-    /// <b>A rank fixes both at once, and the second is the surprising half.</b>
+    /// <b>A rank fixes both at once</b>, and the second is the surprising half.
     /// Drains are uneven, so attending to the lowest makes which-variable-is-worst
     /// ROTATE while the values themselves barely move. The ordering varies exactly
     /// where the magnitudes do not, which is what gives a well-behaved run

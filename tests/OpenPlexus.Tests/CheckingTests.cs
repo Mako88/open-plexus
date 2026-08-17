@@ -13,7 +13,7 @@
 /// <c>NarrowingTests</c> beside it carries that trait for a grid of identical shape.
 /// </para>
 /// <para>
-/// <b>And nothing could see it, which is why this is a check rather than a fix.</b> A fact
+/// <b>And nothing could see it</b>, which is why this is a check rather than a fix. A fact
 /// with no assertion is GREEN — greener than a real test, since it cannot fail. It reads as
 /// coverage, it runs forever, and the only symptom is a clock. <c>SweepListTests</c> guards
 /// the sweeps that declare themselves and <c>ShardTests</c> guards where a class runs;
@@ -29,7 +29,7 @@ public sealed class CheckingTests
 {
     /// <summary>What counts as a test being able to fail.</summary>
     /// <remarks>
-    /// <b>`Assert` covers xunit, and the others are the ways this repo already writes one.</b>
+    /// <b>`Assert` covers xunit</b>, and the others are the ways this repo already writes one.
     /// A helper that asserts on the caller's behalf still names one of these inside itself,
     /// and the check reads the helper's own body as well — so a fact delegating its whole
     /// verification to a private method is not flagged.

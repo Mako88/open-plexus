@@ -7,7 +7,7 @@ public sealed record ReturningSettings
 {
     /// <summary>How many individuals the room holds.</summary>
     /// <remarks>
-    /// <b>Individuals and not kinds, which is the whole of what this world is for.</b> Every
+    /// <b>Individuals and not kinds</b>, which is the whole of what this world is for. Every
     /// other world here shows a fresh draw from a distribution; this one shows THE SAME
     /// THINGS AGAIN, so a moment can be about something that was already met.
     /// </remarks>

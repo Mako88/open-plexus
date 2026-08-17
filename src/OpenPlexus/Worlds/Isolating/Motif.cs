@@ -32,7 +32,7 @@ public sealed record MotifSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The world for minting a name, and it was built before anything could.</b>
+/// <b>The world for minting a name</b>, and it was built before anything could.
 /// When a set of codes recurs, a code standing for the WHOLE set should come into
 /// existence — which is what lets the alphabet GROW, where a quantiser alone fixes
 /// it forever. That is rung five, and this world is where the redundancy it needs

@@ -52,7 +52,7 @@ public sealed class FootprintTests(ITestOutputHelper output)
     /// half a gigabyte and a gigabyte a process can actually have.
     /// </para>
     /// <para>
-    /// <b>And the first guess here was 64MB, which was wrong in the direction that matters.</b>
+    /// <b>And the first guess here was 64MB</b>, which was wrong in the direction that matters.
     /// A bar eight times too tight fails a population that would have run perfectly well on
     /// the machine it was written about, and the failure would have read as the learner
     /// being too fat rather than as the bar being invented. A number about somebody else's

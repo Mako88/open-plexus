@@ -35,7 +35,7 @@ namespace OpenPlexus.Tests;
 /// coverage at the shipped end's accuracy, the trade dissolves and that budget ships.
 /// </para>
 /// <para>
-/// <b>Both worlds, because the two halves of the trade live on different ones.</b> The
+/// <b>Both worlds</b>, because the two halves of the trade live on different ones. The
 /// coverage and the sound rules are bought on the skewed world where the base rate pays
 /// nothing; the accuracy is sold on the even world where it pays. A curve on one of them
 /// would read as a clean win in whichever direction it was taken.

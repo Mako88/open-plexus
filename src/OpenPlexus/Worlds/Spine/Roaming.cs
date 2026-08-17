@@ -247,7 +247,7 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>, IActed<Recit
     /// from the transcript rather than from the state.</b>
     /// </summary>
     /// <remarks>
-    /// <b>What it said and never what to conclude, which is the line a world stays on.</b>
+    /// <b>What it said and never what to conclude</b>, which is the line a world stays on.
     /// A probe asking <i>which room word was mentioned last</i> needs to know which codes
     /// are room words, and that is a fact about the vocabulary this world emitted rather
     /// than a hint about the answer. Nothing that learns is ever shown it — the same

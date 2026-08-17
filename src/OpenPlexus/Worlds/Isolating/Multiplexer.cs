@@ -125,7 +125,7 @@ public sealed record MultiplexerSettings
     /// stream, which is fork 12 arriving as a feature.
     /// </para>
     /// <para>
-    /// <b>And it is not a simulation of a network, which is why it is a world dial.</b>
+    /// <b>And it is not a simulation of a network</b>, which is why it is a world dial.
     /// Most moments in any real stream are followed by nothing anybody observes; a
     /// generated world can say so exactly and cheaply, and what anything downstream does
     /// about it is not this world's business.
@@ -240,7 +240,7 @@ public readonly record struct Truth
 /// this project once. Nothing drawn from a generator can.
 /// </para>
 /// <para>
-/// <b>And its ground truth is a known rule set, which is the other half.</b> An
+/// <b>And its ground truth is a known rule set</b>, which is the other half. An
 /// accuracy can be reached by memorising, so accuracy alone cannot tell a learner
 /// that found the structure from one that stored the instances. <see cref="Truths"/>
 /// is the answer key: how many of those were found EXACTLY is the number step one is

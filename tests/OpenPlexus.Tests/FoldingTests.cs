@@ -56,7 +56,7 @@ public sealed class FoldingTests(ITestOutputHelper output)
     /// <param name="world">The world's generator — which observations are seen.</param>
     /// <param name="brain">The brain's own generator, used by the control arm.</param>
     /// <remarks>
-    /// <b>Two seeds and not one, because otherwise the arm below cannot be built.</b>
+    /// <b>Two seeds and not one</b>, because otherwise the arm below cannot be built.
     /// Holding the world fixed and moving the brain asks whether the SAME evidence mints
     /// the same names; moving both asks whether two machines that saw different things
     /// end up anywhere near each other. One number without the other is unreadable —

@@ -151,7 +151,7 @@ public sealed class Latent : IWorld<Coded>
     /// <summary>Which state the hidden thing is in, and which state each channel reported.</summary>
     /// <remarks>
     /// <para>
-    /// <b>The cause is returned so a test can check the world, and is never emitted.</b>
+    /// <b>The cause is returned so a test can check the world</b>, and is never emitted.
     /// It has no code and joins no occasion — that is the whole point of it.
     /// </para>
     /// <para>

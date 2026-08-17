@@ -23,7 +23,7 @@ namespace OpenPlexus.Tests;
 /// types deleted weeks earlier on the day it was switched on.
 /// </para>
 /// <para>
-/// <b>And it was on for the library only, which meant the tests rotted freely.</b> The
+/// <b>And it was on for the library only</b>, which meant the tests rotted freely. The
 /// sentence above was written about one project and read as being about the tree, so a test
 /// citing a deleted type compiled quietly — five files went on explaining themselves in
 /// terms of two vote arms that had been removed. It is on for this project now, with
@@ -227,7 +227,7 @@ public sealed class DocsTests
     /// a `BROKEN` leaf against the requirement it blocks.
     /// </para>
     /// <para>
-    /// <b>And the fork index went earlier, which is what the route becoming a tree bought.</b>
+    /// <b>And the fork index went earlier</b>, which is what the route becoming a tree bought.
     /// Ninety-four flat rows that had to be read whole to find the one bearing on your work.
     /// The numbers still resolve, because
     /// <see cref="Every_fork_the_code_cites_is_in_the_index"/> reads the whole doc rather

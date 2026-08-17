@@ -64,7 +64,7 @@ public readonly record struct Placed
 /// One scene: what is where, and what that arrangement means.
 /// </summary>
 /// <remarks>
-/// <b>The answer key is the scene and not the input, which is CLEVR's shape.</b> What
+/// <b>The answer key is the scene and not the input</b>, which is CLEVR's shape. What
 /// reaches a front end is <see cref="Arranged.Render"/>'s pixels; this is what the
 /// world knows about them, and it exists so that soundness can be settled by
 /// enumeration rather than sampled.
@@ -323,7 +323,7 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
     /// Every scene this world admits, drawn and withheld alike.
     /// </summary>
     /// <remarks>
-    /// <b>The whole space, because a rule is true of the world or it is not.</b>
+    /// <b>The whole space</b>, because a rule is true of the world or it is not.
     /// Soundness asked only over the drawn scenes would call a rule true when it merely
     /// has not been contradicted yet, which is the same fault as scoring a learner on
     /// what it was taught. It is exact rather than sampled, and it is what
@@ -436,7 +436,7 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
     /// two different problems.
     /// </para>
     /// <para>
-    /// <b>And no shape is a solid block, which is a constraint and not a taste.</b> A
+    /// <b>And no shape is a solid block</b>, which is a constraint and not a taste. A
     /// front end worth having asks what SHAPE a reading has and not how loud it was —
     /// <see cref="Codes.Winnow"/> centres before it projects, for the reason a smell
     /// twice as strong is the same smell. A uniformly filled patch and an empty one are

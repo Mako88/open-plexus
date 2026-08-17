@@ -20,7 +20,7 @@ public sealed record GradedSettings
     /// the interface costs nearly nothing.
     /// </para>
     /// <para>
-    /// <b>Spread is the hard end, and it is the one the plan cares about.</b> At
+    /// <b>Spread is the hard end</b>, and it is the one the plan cares about. At
     /// zero a reading is anywhere in its half, so one dimension speaks in many codes
     /// and the same rule has to be learnt again in each — which is the fragmentation
     /// a symbol's lack of partial credit causes, and it is what population coding is

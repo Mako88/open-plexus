@@ -614,7 +614,7 @@ public sealed class DialTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>John's bar, and it is this repo's own trap said as a rule.</b> <i>A grid of
+    /// <b>John's bar</b>, and it is this repo's own trap said as a rule. <i>A grid of
     /// identical rows is a verdict on the worlds rather than on the arm</i>, and <i>a grid
     /// can rank arms on columns a skewed world raises for free</i>. So a mechanism measured
     /// in one place has a number and not a comparison, however many seeds it took.
@@ -730,7 +730,7 @@ public sealed class DialTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>John's rule, and it replaced a weaker one of mine the same day.</b> My first
+    /// <b>John's rule</b>, and it replaced a weaker one of mine the same day. My first
     /// version let a dial ship OFF if its type was named in the plan's refutation table —
     /// on the reasoning that a refuted mechanism legitimately ships off. He pointed out the
     /// hole: <i>writing a reason is easy</i>, and a check whose escape hatch is prose is a

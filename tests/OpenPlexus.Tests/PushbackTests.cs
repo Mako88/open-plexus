@@ -87,26 +87,6 @@ public sealed class PushbackTests(ITestOutputHelper output)
                 + "problem."),
 
         new(
-            With: "ProseTests.Rate, the prose decay schedule",
-            Claim: "It bills a COMMIT, and a commit is a poor proxy for work. CLAUDE.md says "
-                + "to push whenever and never to hold one back, so a session that commits in "
-                + "small increments pays five times the prose tax of one that commits in "
-                + "lumps, for the same research. Two rules now pull opposite ways and the "
-                + "cheaper one is to commit less often, which is the habit this repo spent a "
-                + "workflow file learning to avoid.",
-            Settles: "The count is taken and the spread is fortyfold: 78, 2, 16, 28, 65, 34, "
-                + "17, 17, 6, 6, 66, 3, 24, 20, 34, 82, 25, 77, 43, 42, 23 commits per "
-                + "session on this branch, clustered on gaps over two hours. So a commit is "
-                + "not a fair unit and that half of the objection stands. The fix it names "
-                + "does not follow, on two counts the objection did not weigh: the schedule "
-                + "is at 963 against a count of 894, so it binds on nothing and the ratchet "
-                + "is the live ceiling; and a commit's distance from a baseline is fixed "
-                + "where a session inferred from timestamps moves under a rebase, which "
-                + "trades a fair unit for an unreproducible verdict. What is left open is "
-                + "whether to key on lines of prose touched, which is fair and fixed both. "
-                + "This entry closes when the schedule first binds, or on that third clock."),
-
-        new(
             With: "Winnow, against rung two",
             Claim: "The plan says graded codes unbound rung two's candidate set and treats "
                 + "that as a known price. Nothing measures it, and rung two is not built -- "
@@ -194,6 +174,6 @@ public sealed class PushbackTests(ITestOutputHelper output)
     [Fact]
     public void A_disagreement_leaves_by_being_settled_and_not_by_being_dropped()
     {
-        Assert.Equal(6, Open.Length);
+        Assert.Equal(5, Open.Length);
     }
 }

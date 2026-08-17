@@ -58,9 +58,9 @@ public interface IQuantizer<in TObservation>
     /// A phase cannot survive C2 — late, jittered, out-of-order messages are
     /// exactly what destroys an oscillator relationship — so the order has to
     /// travel INSIDE the moment, where lateness cannot reach it. Only the front end
-    /// knows it: by the time codes reach a population they are a set. <b>The one of
-    /// these four with a reader</b> — <see cref="Machines.Trial{TSeen}"/> turns it into
-    /// the precedence codes rung three is made of. Defaulted so that adding it breaks
+    /// knows it: by the time codes reach a population they are a set. <b>Read by
+    /// <see cref="Machines.Trial{TSeen}"/></b>, which turns it into the precedence codes rung
+    /// three is made of — the seam <see cref="Forced"/> now shares. Defaulted so that adding it breaks
     /// no existing quantiser and changes no existing measurement.
     /// </remarks>
     IReadOnlyDictionary<Code, int>? Order(TObservation observation) => null;
@@ -95,21 +95,27 @@ public interface IQuantizer<in TObservation>
     /// nothing in the moment records — the difference between <c>P(y | x)</c> and
     /// <c>P(y | do(x))</c>, and no amount of counting the first yields the second.
     /// <para>
-    /// <b>Its reader was the walk's intervened edge kind, so it has none — see
-    /// <see cref="Bind"/>.</b> What has changed is which half is missing.
-    /// <i>I picked this without looking at the state</i> used to be unsayable here
-    /// because every world was watched rather than acted in;
-    /// <see cref="Worlds.IActed{TSeen}"/> is that call now and
-    /// <see cref="Worlds.Homeostat"/> is acted in through it, so a world CAN say which
-    /// code it was handed rather than drew.
+    /// <b>Its reader was the walk's intervened edge kind</b>, and it had none for the life
+    /// of this branch — see <see cref="Bind"/>. Both halves were missing and they went in
+    /// order. <i>I picked this without looking at the state</i> was unsayable while every
+    /// world was watched; <see cref="Worlds.IActed{TSeen}"/> is that call, and
+    /// <see cref="Worlds.Roaming"/> is the world that says it.
     /// </para>
     /// <para>
-    /// <b>What is still missing is a reader that treats the two differently.</b> A scope
-    /// naming a forced code is a causal claim and one naming the same code unforced is
-    /// an observational one, and nothing in <c>Commitments</c> can tell them apart — so
-    /// this closes by a mechanism that acts on the distinction, or by going. Naming the
-    /// wrong half of that would be this repo's oldest trap, which is why the correction
-    /// is written here rather than left to be found.
+    /// <b>And the reader is <see cref="Intervened"/></b>, on rung three's seam. A moment
+    /// carries a derived code beside each forced one, so a scope naming the plain code fires
+    /// either way and a scope naming the derived one fires only under intervention — which
+    /// makes the causal claim and the observational one two different scopes with their own
+    /// statistics, where they used to be one scope with the evidence added together. Genesis
+    /// may not root on one, exactly as it may not root on a precedence.
+    /// </para>
+    /// <para>
+    /// <b>Repair reaches for it</b>, which is the half that had to be measured. A derivation
+    /// nothing selects would be a channel with a reader that reads nothing, which is the same
+    /// fault one layer in. On <see cref="Worlds.Roaming"/>'s effect question under a chooser
+    /// that acts on a coin, 193 of 318 resident scopes name a doing — see
+    /// <c>RoamingTests</c>, where the always-acting arm is printed beside it because acting
+    /// every round makes provenance and <i>in the question</i> the same fact.
     /// </para>
     /// </remarks>
     IReadOnlySet<Code>? Forced(TObservation observation) => null;

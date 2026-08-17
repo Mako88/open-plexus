@@ -1406,4 +1406,96 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + "rung four's is reachable after all. Read the rows above before the plan's leaf "
             + "-- this world was kept as a probe on the reading that nothing reaches it");
     }
+
+    /// <summary>
+    /// Whether a scope ever takes the provenance of a step, given the chance.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><see cref="IQuantizer{TObservation}.Forced"/> had no reader for the life of the
+    /// branch</b>, so a scope naming a code the learner chose and one naming the same code
+    /// the world drew were the same scope with their evidence added together. That is
+    /// <c>P(y | x)</c> standing in for <c>P(y | do(x))</c>, and no amount of counting the
+    /// first yields the second. <see cref="Intervened"/> is the reader, on rung three's seam:
+    /// the moment carries a derived code beside each forced one, so a scope may name the
+    /// doing and repair may reach for it.
+    /// </para>
+    /// <para>
+    /// <b>Genesis is barred from rooting on one</b>, exactly as it is barred from rooting on
+    /// a precedence. <i>I did something</i> with no idea what followed is a rule about agency
+    /// rather than about the world, so the only way one of these enters a scope is repair
+    /// choosing it — which happens where the plain code fails to separate the misses from
+    /// the hits, and that is what a causal claim IS here.
+    /// </para>
+    /// <para>
+    /// <b>What would drop the arm, written before the run.</b> If no resident scope names an
+    /// intervention code under a chooser, then nothing here comes apart between doing and
+    /// seeing, the reader buys nothing, and the channel goes with a revival row saying a
+    /// world where a common cause makes them differ would bring it back.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_chosen_step_is_marked_and_the_population_may_read_it()
+    {
+        var scopes = 0;
+        var resident = 0;
+        var repairs = 0L;
+
+        // Two choosers, and the second is what the assertion rests on. Acting EVERY round
+        // makes the question the chosen statement every round, so a doing is present exactly
+        // where its word is in the question -- and a scope taking it would be separating on
+        // position wearing provenance's name, which is this repo's own trap about two arms
+        // that score alike not being one mechanism. Acting on a coin makes the question the
+        // last statement either way, so the doing is the only thing that moved.
+        foreach (var (name, often) in new[] { ("always", 1.0), ("half", 0.5) })
+        {
+            var world = new Roaming(
+                World(120, people: 4) with { Examining = Examining.Effect }, seed: 1);
+
+            var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed: 1);
+            var picking = new Random(1);
+
+            var tally = new Trial<Recited>(
+                    world,
+                    new Joined(Joining.Resolved, resolution: 1),
+                    brain,
+                    acting: _ => picking.NextDouble() < often ? picking.Next(3) : null)
+                .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
+
+            var naming = brain.Held.All.Count(one => one.Scope.Any(Intervened.Names));
+
+            output.WriteLine(
+                $"{name,-7}| held {tally.Resident} commitments, {tally.Repaired} repairs, "
+                + $"{naming} scopes naming a doing | drawn {tally.Recent:F3}");
+
+            (scopes, resident, repairs) = (naming, tally.Resident, tally.Repaired);
+        }
+
+        // The moment carries them, which is the half this asserts outright. A run where the
+        // world marked nothing would leave the population figure at nought for a reason that
+        // has nothing to do with what repair chose.
+        var marked = new Roaming(
+            World(4, people: 4) with { Examining = Examining.Effect }, seed: 1);
+
+        _ = marked.Now;
+        marked.Do(0);
+
+        Assert.NotNull(marked.Next().Seen.Assigned);
+
+        // And declining marks nothing, which is what keeps the watched arm the arm every
+        // earlier reading was taken on.
+        var declined = new Roaming(
+            World(4, people: 4) with { Examining = Examining.Effect }, seed: 1);
+
+        _ = declined.Now;
+        declined.Do(null);
+
+        Assert.Null(declined.Next().Seen.Assigned);
+
+        Assert.True(scopes > 0,
+            $"{resident} commitments were held over {repairs} repairs and not "
+            + "one scope names a doing, so nothing here comes apart between doing a thing "
+            + "and seeing it. Delete `Forced` and `Intervened` with a revival row naming a "
+            + "world where a common cause makes them differ.");
+    }
 }

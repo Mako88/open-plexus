@@ -524,6 +524,12 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>, IActed<Recit
         // costs a pass over the props and only the final step is ever asked about.
         var moved = false;
 
+        // A wish with no step to spend it on marked nothing, which is the difference between
+        // a chooser that was asked and one that was heard. `Open` adds the placements before
+        // any walking, so without this the opening statement of a no-step walk would be
+        // reported as the learner's doing.
+        var chose = wish is not null && _settings.Steps > 0;
+
         if (_settings.Steps > 0)
         {
             var before = Placed(at, held, here);
@@ -562,7 +568,17 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>, IActed<Recit
 
             return new Turn<Recited>
             {
-                Seen = new Recited { Said = told, Asked = last },
+                Seen = new Recited
+                {
+                    Said = told,
+                    Asked = last,
+
+                    // The step the learner chose, said in the words it came out as. A wish
+                    // the house could not grant comes out as waiting, and that sentence is
+                    // as much the learner's doing as a granted one -- so what is marked is
+                    // the statement the choice PRODUCED rather than the verb it asked for.
+                    Assigned = chose ? new HashSet<Code>(last) : null,
+                },
                 Outcome = moved ? 1 : 0,
             };
         }
@@ -575,6 +591,11 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>, IActed<Recit
             {
                 Said = told,
                 Asked = Said("where", "is", "the", Things[about]),
+
+                // The chosen step is a STATEMENT here rather than the question, so what is
+                // marked is the words of it wherever they ended up. A `where is` question
+                // is about the state the walk left behind and names nothing the learner did.
+                Assigned = chose ? new HashSet<Code>(told[0]) : null,
             },
             Outcome = held[about] == Nobody ? at[about] : null,
         };

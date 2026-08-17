@@ -696,11 +696,23 @@ public sealed class Trial<TSeen>
     {
         var said = _sensing.Codify(seen);
 
-        if (_sensing.Order(seen) is not { Count: > 1 } order) return said;
+        var order = _sensing.Order(seen) is { Count: > 1 } reported ? reported : null;
+        var forced = _sensing.Forced(seen) is { Count: > 0 } assigned ? assigned : null;
+
+        if (order is null && forced is null) return said;
 
         var carried = new HashSet<Code>(said);
 
-        foreach (var precedence in Sequenced.From(order)) carried.Add(precedence);
+        if (order is not null)
+            foreach (var precedence in Sequenced.From(order)) carried.Add(precedence);
+
+        // And what was DONE rather than seen, on the same seam and for the same reason. The
+        // channel has reported it since the day it was written and nothing read it, so a
+        // scope naming a code the learner chose and one naming the code the world drew were
+        // the same scope with their evidence added together -- which is `P(y | x)` standing
+        // in for `P(y | do(x))`, and no amount of counting the first yields the second.
+        if (forced is not null)
+            foreach (var doing in Intervened.From(forced)) carried.Add(doing);
 
         return carried;
     }

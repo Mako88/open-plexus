@@ -994,7 +994,13 @@ public sealed class Population
             // REPAIR MAY STILL CHOOSE ONE, which is the whole point: a precedence enters a
             // scope where a plain code does not separate the misses from the hits, which is
             // what the ladder's admission asks and the only place this rung belongs.
-            if (Sequenced.Names(code)) continue;
+            // And an intervention sits on that line for the same reason. `I did something`
+            // with no idea what was done or what followed is a rule about agency rather than
+            // about the world, and the moment carries one for every forced code -- so a
+            // chooser being wired would fill the population with them. Repair may still
+            // choose one, and that is exactly where a causal claim belongs: a scope takes
+            // the provenance where the plain code fails to separate the misses from the hits.
+            if (Sequenced.Names(code) || Intervened.Names(code)) continue;
 
             var proposed = new Commitment([code], arrived);
 

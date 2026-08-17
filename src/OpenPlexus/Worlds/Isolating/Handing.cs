@@ -63,6 +63,18 @@ public readonly record struct Recited
     /// <summary>The words of the question itself, in order.</summary>
     public required IReadOnlyList<Code> Asked { get; init; }
 
+    /// <summary>
+    /// Which of these words came from a step the learner CHOSE, or nothing where it chose
+    /// none.
+    /// </summary>
+    /// <remarks>
+    /// <b>What a world is allowed to say about provenance</b>, and it is a fact about the
+    /// signal in the same way order is. The world says which words it was handed rather than
+    /// drew; what that entails is the learner's to derive, and
+    /// <see cref="Codes.Intervened"/> is where that happens.
+    /// </remarks>
+    public IReadOnlySet<Code>? Assigned { get; init; }
+
     /// <summary>The same moment with the order thrown away.</summary>
     /// <remarks>
     /// <b>What every existing text arm reads, and the ceiling it imposes is the marginal

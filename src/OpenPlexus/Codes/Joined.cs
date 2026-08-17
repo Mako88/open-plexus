@@ -726,4 +726,31 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
 
         return placed.Count > 1 ? placed : null;
     }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <para>
+    /// <b>Passed through rather than derived</b>, which is the line this side of the seam
+    /// sits on. Which words the learner was handed is a fact about the signal and the world
+    /// is the only thing that knows it; what that entails is
+    /// <see cref="Intervened"/>'s, and a front end deriving it would be deciding what a
+    /// learner may conclude from having acted.
+    /// </para>
+    /// <para>
+    /// <b>And it is the arm's own words rather than the world's</b>, which matters because a
+    /// selecting arm may not have read the statement at all. The intersection is taken so a
+    /// chosen statement the arm dropped marks nothing — the provenance of a word nobody saw
+    /// is not a fact about this moment.
+    /// </para>
+    /// </remarks>
+    public IReadOnlySet<Code>? Forced(Recited observation)
+    {
+        if (observation.Assigned is not { Count: > 0 } assigned) return null;
+
+        var said = new HashSet<Code>(Codify(observation));
+
+        said.IntersectWith(assigned);
+
+        return said.Count > 0 ? said : null;
+    }
 }

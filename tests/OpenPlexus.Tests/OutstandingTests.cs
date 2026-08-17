@@ -112,11 +112,19 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// is what rung three is made of, so it is not counted here.
     /// </para>
     /// <para>
-    /// <b>And <c>Forced</c>'s missing half has moved</b>, which its own doc now says. It was
-    /// unsayable while every world was watched; <see cref="Worlds.IActed{TSeen}"/> means a
-    /// world can say which code it was handed rather than drew. What is absent is a reader
-    /// that tells a causal claim from an observational one — so the work is a mechanism in
-    /// <c>Commitments</c> and no longer a world.
+    /// <b>And <c>Forced</c> has come off</b>, by the road this entry named. It was unsayable
+    /// while every world was watched; <see cref="Worlds.IActed{TSeen}"/> let a world say
+    /// which code it was handed, <see cref="Worlds.Roaming"/> says it, and
+    /// <see cref="Codes.Intervened"/> derives a code beside each forced one so a scope may
+    /// name the doing. Repair takes it on 193 of 318 resident scopes, so the reader reads
+    /// something rather than merely existing.
+    /// </para>
+    /// <para>
+    /// <b>Which leaves two, and they are not the same shape.</b> <c>Bind</c> has a named home
+    /// in rung four's binding and is waiting on that rung; <c>Fleeting</c> has none — a
+    /// commitment that never fires twice is disposed of by its own statistics rather than by
+    /// being marked, so the honest question about it is whether anything would ever act on
+    /// it at all.
     /// </para>
     /// </remarks>
     [Fact]

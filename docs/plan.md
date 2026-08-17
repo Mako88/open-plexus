@@ -253,8 +253,7 @@ Three: refining. Anything before three that reads as tuning is out of order.
     - **NOW** — several front ends manufacture symbols from a signal, and each is priced.
     - **OPEN** — nothing makes them attributes of one THING. Rung five names what co-fires,
       which is what a seen ball and a heard *ball* do.
-    - **SETTLED** — the binding world was built to fail, failed as predicted, and has since
-      lifted. Fork **25**.
+    - **SETTLED** — the binding world failed as predicted and has since lifted. Fork **25**.
     - **OPEN** — text as an IMAGE keeps ground truth enumerable, so soundness survives where
       a camera kills it. `Senses` runs and names cross two senses, so the gate is open.
       Fork **107**.
@@ -298,8 +297,6 @@ Three: refining. Anything before three that reads as tuning is out of order.
       `Motif` scope leaves it too short to carry a name, the cue's length being the axis;
       `Latent`'s three-code scopes fire 0.2 times each, so repair's third code is a
       coincidence and depth is never tested. Fork **112**.
-    - **SETTLED** — a deterministic world offers rung five nothing, and a channel that can
-      lie is what makes the group necessary. `Latent.Noise` at nought is the control.
     - **NOW** — concept-before-label is measured, and alternation groups things with no word
       for them yet.
     - **OPEN** — what rung five names is a SET, never a variable, so the two rungs are not
@@ -475,9 +472,12 @@ Three: refining. Anything before three that reads as tuning is out of order.
       It loses to both controls as built.
     - **OPEN** — ranking by its own expectation wins by making the world CONSTANT, so the
       preference wants a term a dead body fails. The goal is unbuilt. Fork **111**.
-    - **NOW** — `Roaming` is acted in, the learner taking the walk's last step, and declining
-      leaves the walk the world drew. So the watched arm is a chooser rather than a second
-      world, and every reading taken before it stands.
+    - **NOW** — `Roaming` is acted in and declining leaves the walk the world drew, so the
+      watched arm is a chooser rather than a second world.
+    - **NOW** — `do(x)` is distinguishable from `x`: `Intervened` derives a code beside each
+      one the learner was handed, on rung three's seam. Repair takes it on 193 of 318 scopes.
+    - **OPEN** — and no world here holds a common cause, so nothing says those claims are
+      better.
     - **OPEN** — and nothing ranks a chooser there, a house having nothing to want. Twins are
       the tier still unbuilt and are rung four's; an isolating world is still built freely and
       goes when its question shuts, only a constructed world proving a ceiling.

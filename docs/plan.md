@@ -558,8 +558,8 @@ out of it, and anything before six that reads as tuning is out of order.
       is unbuilt, so the refusal is not yet a backpressure reading.
     - **OPEN** — a commitment is settled by the SUCCESSOR moment from the same source, so
       absence is established by arrival rather than by a clock. C2 forbids the deadline.
-    - **OPEN** — and across senses it needs `Ask` to return an occasion `Tell` takes back:
-      `Alone` holds ONE pending firing, so a second source clobbers the first's.
+    - **OPEN** — and a settlement must CARRY the moment it settles, which `Holder` already
+      does and `Alone` does not. Two sources clobber its one remembered firing.
     - **NOW** — `IInput` is one WORLD pushing stamped moments, `Watching` is the join,
       `Bench` is the loop. `Trial` is gone; `Alone` stays, being the substrate seam.
     - **OPEN** — `IWorld.Next` is still a pull behind `Watching`. A sense on its own schedule

@@ -41,6 +41,23 @@ public sealed class AbstainTests(ITestOutputHelper output)
             new Brain(new CommittingSettings(), seed),
             seed).Run(Rounds);
 
+    /// <summary>One moment from one source, at a stamp the caller chooses.</summary>
+    /// <param name="sequence">Which moment it is from that source.</param>
+    /// <param name="codes">What is live.</param>
+    /// <param name="followed">What the source says followed, or nothing.</param>
+    /// <remarks>
+    /// <b>The stamp is the argument</b>, because two of the tests below turn on it. A
+    /// helper that counted for its caller could not express a repeat, and a repeat is the
+    /// other thing a brain refuses to settle on.
+    /// </remarks>
+    private static Pushed Push(long sequence, IReadOnlySet<Code> codes, Code? followed) =>
+        new()
+        {
+            From = new Stamp { Source = Trial<int>.Watched, Sequence = sequence },
+            Codes = codes,
+            Followed = followed,
+        };
+
     /// <summary>
     /// <b>A round the world cannot settle costs a commitment exactly nothing.</b>
     /// </summary>
@@ -54,18 +71,19 @@ public sealed class AbstainTests(ITestOutputHelper output)
     [Fact]
     public async Task An_unsettled_round_moves_nothing_but_the_abstain_count()
     {
-        var held = new Population(new CommittingSettings(), seed: 1);
+        var brain = new Brain(new CommittingSettings(), seed: 1);
+        var held = brain.Held;
 
         var one = Fixture.C(1);
         var two = Fixture.C(2);
 
         held.Add(new Commitment([one], Brain.Says(0)));
 
-        var loop = new Round(new Alone(held), rounds: 10, sweep: 1000, target: 0.9, window: 2);
+        var loop = new Round(brain, rounds: 10, sweep: 1000, target: 0.9, window: 2);
 
         var moment = new HashSet<Code> { one, two };
 
-        await loop.StepAsync(moment, Brain.Says(0));
+        await loop.StepAsync(Push(1, moment, Brain.Says(0)));
 
         var mind = held.All.Single();
 
@@ -74,7 +92,7 @@ public sealed class AbstainTests(ITestOutputHelper output)
         var accuracy = mind.Accuracy;
         var separations = mind.Separations.Count;
 
-        await loop.StepAsync(moment, arrived: null);
+        await loop.StepAsync(Push(2, moment, followed: null));
 
         Assert.Equal(1, loop.Abstained);
         Assert.Equal(1, mind.Abstains);
@@ -202,5 +220,62 @@ public sealed class AbstainTests(ITestOutputHelper output)
                 + $"| {sound.Average(),5:F1} | {resident.Average(),8:F0} "
                 + $"| {reached.Average(),7:F0}");
         }
+    }
+
+    /// <summary>
+    /// <b>A moment whose stamp does not advance its source is refused.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The other way nothing moves, and it is a different absence from the one above. An
+    /// abstain is the world unable to say what followed; this is the brain declining to
+    /// read a moment as an answer at all — C2 permits a message to be late, duplicated or
+    /// out of order, and a settlement taken from one of those would be an answer counted
+    /// against a question it was never about.
+    /// </para>
+    /// <para>
+    /// <b>And it is not a round</b>, which is the half a single counter would lose. A
+    /// repeat leaves <see cref="Round.Rounds"/> alone and moves <see cref="Round.Refused"/>
+    /// instead, so a source that pushed everything twice reads as half the rounds it
+    /// claimed rather than as a population that stopped learning.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task A_repeated_stamp_is_refused_and_is_not_a_round()
+    {
+        var brain = new Brain(new CommittingSettings(), seed: 1);
+
+        var one = Fixture.C(1);
+
+        brain.Held.Add(new Commitment([one], Brain.Says(0)));
+
+        var loop = new Round(brain, rounds: 10, sweep: 1000, target: 0.9, window: 2);
+
+        var moment = new HashSet<Code> { one };
+
+        await loop.StepAsync(Push(1, moment, Brain.Says(0)));
+
+        var mind = brain.Held.All.Single();
+
+        var hits = mind.Hits;
+
+        await loop.StepAsync(Push(1, moment, Brain.Says(0)));
+
+        // Settled once, for the one moment there was. A second hit here would be the
+        // duplicate counted as evidence, which is the failure the stamp exists to stop.
+        Assert.Equal(hits, mind.Hits);
+
+        Assert.Equal(1, loop.Rounds);
+        Assert.Equal(1, loop.Refused);
+
+        // And an older stamp goes the same way, because late and duplicated are one thing
+        // to a receiver that may only ask whether a moment advances its source.
+        await loop.StepAsync(Push(0, moment, Brain.Says(0)));
+
+        Assert.Equal(hits, mind.Hits);
+        Assert.Equal(2, loop.Refused);
+
+        output.WriteLine(
+            $"{loop.Rounds} rounds | {loop.Refused} refused | {mind.Hits} hits");
     }
 }

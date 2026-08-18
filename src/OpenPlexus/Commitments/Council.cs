@@ -4,6 +4,82 @@ using OpenPlexus.Codes;
 
 namespace OpenPlexus.Commitments;
 
+/// <summary>Where a run's wall clock went, by phase, in milliseconds.</summary>
+/// <remarks>
+/// <para>
+/// <b>No report has ever carried a cost, and this project's own trap list says so.</b>
+/// <i>A cost can be in memory while every instrument watches time</i> — and the truth was
+/// worse than that: nothing watched EITHER. A run that was memory-bound and a run that was
+/// spending its life in a quadratic sweep report the same everything.
+/// </para>
+/// <para>
+/// <b>So the point is which phase, never the total.</b> A total says a run was slow, which
+/// anybody watching already knew. What decides where to spend an optimisation is whether
+/// the clock is in matching, in the per-code tally, or in a sweep that is quadratic in the
+/// population — and those want three completely different answers.
+/// </para>
+/// <para>
+/// <b>And it is a measurement rather than a check, so nothing may assert on it.</b> A
+/// duration is not reproducible under a fixed seed, and a threshold on one would fail the
+/// build on a busy machine — which is how a timing number becomes a thing that must not
+/// change. <c>Tally.Separations</c> beside it IS reproducible, and is the one to bar.
+/// </para>
+/// </remarks>
+public sealed record Spent
+{
+    /// <summary>Gathering what fired and taking the vote.</summary>
+    public required double Firing { get; init; }
+
+    /// <summary>Telling everything that fired what the settlement said, and tallying it.</summary>
+    public required double Settling { get; init; }
+
+    /// <summary>Subsuming, abstracting and culling on the sweep.</summary>
+    public required double Sweeping { get; init; }
+
+    /// <summary>Genesis.</summary>
+    public required double Genesis { get; init; }
+
+    /// <summary>Choosing a condition and minting a child.</summary>
+    public required double Repair { get; init; }
+
+    /// <summary>
+    /// <b>Two runs that differ only in how long they took are the same run.</b>
+    /// </summary>
+    /// <param name="other">The other clock, which is not compared.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>The rule above was written and broken in one commit, and only the compiler was
+    /// enforcing anything.</b> <i>Nothing may assert on it</i> is three lines up, and
+    /// this record went inside <see cref="Machines.Tally"/> — whose generated equality
+    /// asserts on every field it has. So the three <i>a fixed seed reproduces a run
+    /// exactly</i> tests began comparing a wall clock, and went red on a machine doing
+    /// nothing wrong. Fork 12, reopened by the instrument that was supposed to be the
+    /// one thing nobody could bar.
+    /// </para>
+    /// <para>
+    /// <b>And the half that was not red was worse.</b> Every <c>Assert.NotEqual</c> over
+    /// a <see cref="Machines.Tally"/> passed the moment the clocks differed, which they
+    /// always do — so the controls beside those three tests could not fail. A check that
+    /// cannot fire reads as a pass, and this project has a line in its trap list about
+    /// exactly that.
+    /// </para>
+    /// <para>
+    /// <b>So it is enforced here rather than at the three call sites.</b> Normalising the
+    /// clock away in each test would be a guard mounted on one caller, and the fourth
+    /// determinism test — written later, by somebody who never read this — would
+    /// reintroduce it. Excluding it by hand from <see cref="Machines.Tally"/>'s equality
+    /// would be worse still: that list would then have to be edited every time the report
+    /// grows a field, and the field that got forgotten would be silently uncompared.
+    /// Here, both records may grow freely and the clock never counts.
+    /// </para>
+    /// </remarks>
+    /// <returns><see langword="true"/> for any other clock at all.</returns>
+    public bool Equals(Spent? other) => other is not null;
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => 0;
+}
+
 /// <summary>What one round of learning added, from whoever did it.</summary>
 /// <remarks>
 /// <b>Three counts rather than three return values, because on a fleet they come back

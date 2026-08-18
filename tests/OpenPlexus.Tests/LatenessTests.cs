@@ -114,18 +114,18 @@ public sealed class LatenessTests(ITestOutputHelper output)
 
         var council = new Fleet(asker, dials);
 
-        // A brain is handed in and its population is not the one that learns, exactly as
-        // `FleetTests` has it: `Trial` holds the world and the front end, and `RunAsync`
-        // asks the COUNCIL rather than the brain beside it. Same world, same seed, same
-        // front end, same dials across both arms -- the lateness is the only difference.
-        var brain = new Brain(dials, seed);
+        // The brain's own population is not the one that learns, exactly as `FleetTests`
+        // has it: the substrate is the fleet, and the population this constructor makes
+        // stays empty. Same world, same seed, same front end, same dials across both arms
+        // -- the lateness is the only difference.
+        var brain = new Brain(dials, seed, _ => council);
 
         var world = new Multiplexer(new MultiplexerSettings { Address = Narrow }, seed);
         var trial = new Trial<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit), brain);
 
         try
         {
-            var running = trial.RunAsync(council, holding, Rounds);
+            var running = trial.RunAsync(holding, Rounds);
 
             // The experimenter's patience and never the machine's, exactly as `FleetTests`
             // has it. A fleet waits on its gathering forever by design -- correct, and a

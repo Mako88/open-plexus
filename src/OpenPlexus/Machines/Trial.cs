@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Worlds;
@@ -83,6 +83,16 @@ public sealed record Tally
     /// <summary>Rounds where nothing fired, so there was no prediction to be wrong.</summary>
     public required long Silent { get; init; }
 
+    /// <summary>Moments the brain would not take.</summary>
+    /// <remarks>
+    /// <b>Reported beside the score, because silence drifts an arm toward the random
+    /// bar.</b> A run whose every moment was refused reports the rounds it asked for and
+    /// nothing learnt, which reads as a mechanism that failed rather than as a stream the
+    /// brain had already answered. Two trials sharing a <see cref="Stamp.Source"/> is how
+    /// that happens.
+    /// </remarks>
+    public required long Refused { get; init; }
+
     /// <summary>Rounds the world could not say the outcome of.</summary>
     /// <remarks>
     /// <b>Reported because a verdict nobody counts is a verdict nobody knows fired.</b>
@@ -102,7 +112,7 @@ public sealed record Tally
     /// <remarks>
     /// <b>Armed here for the first time</b>, and the plan said it already was. The
     /// margin has been computed every round for the life of the branch and read by
-    /// nothing — see <see cref="Commitments.Round.Confidence"/>. Near nought it says the
+    /// nothing — see <see cref="Round.Confidence"/>. Near nought it says the
     /// answer is being settled by how many advocates each side had rather than by how
     /// accurate any of them is, which is the one failure the vote's whole shape exists
     /// to prevent and the one thing no score reports.
@@ -591,6 +601,7 @@ public sealed class Trial<TSeen>
     private readonly Brain _brain;
     private readonly Func<ImmutableArray<Code>, Code, bool>? _sound;
     private readonly Func<IReadOnlyCollection<Code>, int?>? _acting;
+    private readonly byte _source;
 
     /// <param name="world">The problem.</param>
     /// <param name="sensing">The translation between it and the brain.</param>
@@ -618,6 +629,16 @@ public sealed class Trial<TSeen>
     /// What to do about the state the world is in, given the codes it reads as —
     /// <b>required of a world that can be acted in</b>, and refused of one that cannot.
     /// </param>
+    /// <param name="source">
+    /// Which stream this world pushes on — <b>distinct per world where one brain runs
+    /// two.</b>
+    /// </param>
+    /// <remarks>
+    /// <b>A brain settles by the stamp</b>, so two trials sharing a source share a
+    /// sequence, and the second one to start would be pushing moments the brain has already
+    /// answered. It refuses them rather than settling twice, which is correct and reads as a
+    /// run that did nothing — <see cref="Tally.Refused"/> is what says which it was.
+    /// </remarks>
     /// <remarks>
     /// <para>
     /// <b>A delegate rather than a policy type</b>, for the same reason <c>sound</c> is one. A
@@ -643,7 +664,8 @@ public sealed class Trial<TSeen>
         IQuantizer<TSeen> sensing,
         Brain brain,
         Func<ImmutableArray<Code>, Code, bool>? sound = null,
-        Func<IReadOnlyCollection<Code>, int?>? acting = null)
+        Func<IReadOnlyCollection<Code>, int?>? acting = null,
+        byte source = Watched)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(sensing);
@@ -665,7 +687,16 @@ public sealed class Trial<TSeen>
         _brain = brain;
         _sound = sound;
         _acting = acting;
+        _source = source;
     }
+
+    /// <summary>The source a pulled world pushes on, where nobody says otherwise.</summary>
+    /// <remarks>
+    /// <b>One stream, because a world behind <see cref="IWorld{TSeen}"/> is one.</b> Its
+    /// turns arrive in an order it decides and nothing in it can say which sense a reading
+    /// came from, so a second stamp inside one trial would be a composition nobody built.
+    /// </remarks>
+    public const byte Watched = 1;
 
     /// <summary>What a blind guess scores on this world.</summary>
     public double Chance => 1.0 / _world.Outcomes;
@@ -730,10 +761,9 @@ public sealed class Trial<TSeen>
     /// </remarks>
     public Tally Run(long rounds, int sweep = 1000, double target = 0.9, int window = 2000)
     {
-        var running = RunAsync(
-            new Alone(_brain.Held), [_brain.Held], rounds, sweep, target, window);
+        var running = RunAsync([_brain.Held], rounds, sweep, target, window);
 
-        // A council that would have made this wait is refused rather than waited for, and
+        // A substrate that would have made this wait is refused rather than waited for, and
         // that is what keeps sync-over-async to one line that cannot fire. `Alone`
         // completes every task before returning it, so this is a completed task being
         // unwrapped; a fleet reaches `RunAsync` directly and never comes through here. If
@@ -741,14 +771,13 @@ public sealed class Trial<TSeen>
         // hundred synchronous call sites are still driving.
         if (!running.IsCompleted)
             throw new InvalidOperationException(
-                "the council did not answer on the calling thread, so this run would be "
+                "the substrate did not answer on the calling thread, so this run would be "
                 + "blocking a thread on a wire — call `RunAsync`");
 
         return running.GetAwaiter().GetResult();
     }
 
     /// <summary>Runs the world through the translation into whoever holds the commitments.</summary>
-    /// <param name="council">One population, or a fleet of them.</param>
     /// <param name="holding">
     /// Whose commitments to report on — <b>one machine's, or every machine's.</b>
     /// </param>
@@ -784,7 +813,6 @@ public sealed class Trial<TSeen>
     /// </para>
     /// </remarks>
     public async Task<Tally> RunAsync(
-        ICouncil council,
         IReadOnlyList<Population> holding,
         long rounds,
         int sweep = 1000,
@@ -792,10 +820,9 @@ public sealed class Trial<TSeen>
         int window = 2000,
         CancellationToken ct = default)
     {
-        ArgumentNullException.ThrowIfNull(council);
         ArgumentNullException.ThrowIfNull(holding);
 
-        var loop = new Round(council, rounds, sweep, target, window);
+        var loop = new Round(_brain, rounds, sweep, target, window);
 
         long codes = 0;
         long outvoted = 0, uncovered = 0, deeper = 0, hard = 0, carried = 0, untested = 0;
@@ -951,9 +978,17 @@ public sealed class Trial<TSeen>
             // A round the world could not settle passes nothing rather than a number, and
             // that is the whole of what arms `Abstain`. Every world that always knows its
             // outcome reaches the same call it always did.
+            //
+            // One source and a sequence that is the round, because a pulled world is one
+            // stream by construction. A stamp per sense is what the composition wants and
+            // there is nothing here to compose yet.
             await loop.StepAsync(
-                new HashSet<Code>(said),
-                turn.Outcome is { } outcome ? Brain.Says(outcome) : null,
+                new Pushed
+                {
+                    From = new Stamp { Source = _source, Sequence = round },
+                    Codes = new HashSet<Code>(said),
+                    Followed = turn.Outcome is { } outcome ? Brain.Says(outcome) : null,
+                },
                 ct).ConfigureAwait(false);
         }
 
@@ -996,6 +1031,7 @@ public sealed class Trial<TSeen>
         return new Tally
         {
             Rounds = rounds,
+            Refused = loop.Refused,
             Right = loop.Right,
             Wrong = loop.Wrong,
             Silent = loop.Silent,

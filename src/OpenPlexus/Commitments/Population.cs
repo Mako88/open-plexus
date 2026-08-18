@@ -553,7 +553,7 @@ public sealed class Population
 
     /// <summary>Every number the brain was handed.</summary>
     /// <remarks>
-    /// <b>READ BY <see cref="Round"/>, which owns the loop and not the dials.</b> Handing
+    /// <b>Read by <c>Machines.Round</c></b>, which owns the loop and not the dials. Handing
     /// the same settings record to both would be two references to one object with two
     /// chances to be given different ones — and a learning loop configured differently
     /// from the population it drives is the sort of fault that shows up as a mechanism

@@ -75,16 +75,16 @@ public sealed class FleetTests(ITestOutputHelper output)
     private static async Task<(Tally Tally, Ported Fleet, Fleet Council)> Spread(
         CommittingSettings dials, int address, long rounds, int seed, int holders)
     {
-        var brain = new Brain(dials, seed);
-
-        var world = new Multiplexer(new MultiplexerSettings { Address = address }, seed);
-        var trial = new Trial<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit), brain);
-
         var fleet = await Ported.OpenAsync(holders, dials, seed);
 
         var council = new Fleet(fleet.Asker, dials);
 
-        var running = trial.RunAsync(council, fleet.Held, rounds);
+        var brain = new Brain(dials, seed, _ => council);
+
+        var world = new Multiplexer(new MultiplexerSettings { Address = address }, seed);
+        var trial = new Trial<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit), brain);
+
+        var running = trial.RunAsync(fleet.Held, rounds);
 
         // The experimenter's patience and never the machine's. A fleet waits on its
         // gathering forever by design, so a single lost message is a run that never ends --

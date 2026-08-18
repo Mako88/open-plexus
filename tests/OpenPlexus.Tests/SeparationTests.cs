@@ -133,15 +133,25 @@ public sealed class SeparationTests
             new Bits(Multiplexer.Bit),
             brain);
 
+        // A second SOURCE, because two worlds are two streams and a brain settles by the
+        // stamp. Sharing one would have the second trial pushing sequences the brain has
+        // already answered, and it refuses those rather than settling twice -- which is the
+        // seam's own rule catching the arrangement this test exists to assert.
         var graded = new Trial<IReadOnlyList<double>>(
             new Graded(new GradedSettings { Address = 3, Crowding = 0.9 }, seed: 1),
             new Winnowing(Multiplexer.Bit, 11),
-            brain);
+            brain,
+            source: Trial<int>.Watched + 1);
 
         var first = symbolic.Run(4000);
         var second = graded.Run(4000);
 
         Assert.True(first.Rounds == 4000 && second.Rounds == 4000);
+
+        // And nothing was refused on either, which is the half that says the two streams
+        // stayed apart. A shared source reads as a run that did nothing and this is what
+        // tells the two apart.
+        Assert.True(first.Refused == 0 && second.Refused == 0);
 
         // And it carries what it learnt across, because the population is the brain's
         // and not the trial's. Whether that HELPS is a separate question nobody has

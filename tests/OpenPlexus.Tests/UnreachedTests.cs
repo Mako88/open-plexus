@@ -259,14 +259,14 @@ public sealed class UnreachedTests(ITestOutputHelper output)
 
         var dials = new CommittingSettings();
 
-        var brain = new Brain(dials, seed: 1);
-        var world = new Multiplexer(new MultiplexerSettings { Address = Narrow }, seed: 1);
-        var trial = new Trial<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit), brain);
-
         await using var fleet = await Ported.OpenAsync(Holders, dials, seed: 1);
         var council = new Fleet(fleet.Asker, dials);
 
-        var before = await Ran(trial.RunAsync(council, fleet.Held, Half), Holders, "before the death");
+        var brain = new Brain(dials, seed: 1, _ => council);
+        var world = new Multiplexer(new MultiplexerSettings { Address = Narrow }, seed: 1);
+        var trial = new Trial<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit), brain);
+
+        var before = await Ran(trial.RunAsync(fleet.Held, Half), Holders, "before the death");
 
         Assert.Equal(Holders, council.Heard);
 
@@ -274,7 +274,7 @@ public sealed class UnreachedTests(ITestOutputHelper output)
 
         await fleet.KillAsync(1);
 
-        var after = await Ran(trial.RunAsync(council, fleet.Held, Half), Holders, "after the death");
+        var after = await Ran(trial.RunAsync(fleet.Held, Half), Holders, "after the death");
 
         // And the denominator came down once, by observation. The first round after the
         // death asked four and heard three; every round after that asked the three that are

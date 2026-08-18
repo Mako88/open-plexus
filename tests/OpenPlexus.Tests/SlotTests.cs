@@ -213,7 +213,7 @@ public sealed class SlotTests(ITestOutputHelper output)
 
         await using var fleet = raised;
 
-        var before = await Ran(trial.RunAsync(council, fleet.Held, Half), "before the silence");
+        var before = await Ran(trial.RunAsync(fleet.Held, Half), "before the silence");
 
         Assert.Equal(Slots * Replicas, council.Asked);
         Assert.Equal(Slots, council.Heard);
@@ -222,7 +222,7 @@ public sealed class SlotTests(ITestOutputHelper output)
 
         fleet.Mute(0);
 
-        var after = await Ran(trial.RunAsync(council, fleet.Held, Half), "after the silence");
+        var after = await Ran(trial.RunAsync(fleet.Held, Half), "after the silence");
 
         // Still asked and still not heard from, every round to the end of the run. A fleet
         // that had quietly stopped asking it would read as three machines and would be
@@ -280,7 +280,7 @@ public sealed class SlotTests(ITestOutputHelper output)
 
         await using var fleet = raised;
 
-        await Ran(trial.RunAsync(council, fleet.Held, 2000), "with everybody answering");
+        await Ran(trial.RunAsync(fleet.Held, 2000), "with everybody answering");
 
         for (var slot = 0; slot < Slots; slot++)
         {
@@ -326,13 +326,15 @@ public sealed class SlotTests(ITestOutputHelper output)
     {
         var dials = new CommittingSettings();
 
-        var brain = new Brain(dials, seed: 1);
+        var fleet = await Ported.OpenAsync(slots, replicas, dials, seed: 1);
+
+        var council = new Fleet(fleet.Asker, dials);
+
+        var brain = new Brain(dials, seed: 1, _ => council);
         var world = new Multiplexer(new MultiplexerSettings { Address = Narrow }, seed: 1);
         var trial = new Trial<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit), brain);
 
-        var fleet = await Ported.OpenAsync(slots, replicas, dials, seed: 1);
-
-        return (trial, fleet, new Fleet(fleet.Asker, dials));
+        return (trial, fleet, council);
     }
 
     /// <summary>Every commitment a population holds, by name.</summary>

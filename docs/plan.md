@@ -555,12 +555,12 @@ out of it, and anything before six that reads as tuning is out of order.
       stream agree as poorly as machines sharing none, so merging the counts is the only
       thing that works rather than an optimisation.
   - The world pushes and the brain receives
-    - **OPEN** — a world is a set of INPUTS that push a moment, and the brain answers with
-      what it did. `IWorld.Next` is a pull, so no learner here has ever chosen when to think.
+    - **NOW** — `Brain.Receive` takes a stamped moment and answers, and a moment that does
+      not advance its source is refused rather than settled. `Tally.Refused` says how many.
     - **OPEN** — a commitment is settled by the SUCCESSOR moment from the same source, so
       absence is established by arrival rather than by a clock. C2 forbids the deadline.
-    - **OPEN** — a source stamps a sequence and the brain says when a moment settled, so a
-      bench pushes and waits where a body pushes and forgets. Fork **113**.
+    - **OPEN** — a world is a set of INPUTS that push, and `IWorld.Next` is still a pull
+      behind `Trial`. A bench waits where a body forgets. Fork **113**.
     - **OPEN** — a brain that is overrun ABSTAINS rather than mis-settles, which makes the
       abstain count a backpressure reading and not only a verdict.
     - **OPEN** — the world marks which codes it was handed and the learner derives the doing.

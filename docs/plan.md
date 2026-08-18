@@ -260,12 +260,12 @@ out of it, and anything before six that reads as tuning is out of order.
       seen twice.
   - Every input an attribute of it
     - **NOW** — several front ends manufacture symbols from a signal, and each is priced.
-    - **OPEN** — nothing makes them attributes of one THING. Rung five names what co-fires,
-      which is what a seen ball and a heard *ball* do.
+    - **OPEN** — nothing makes them attributes of one THING, and a `Body`'s senses push
+      SEPARATE moments so no scope crosses two. Binding wants moments FUSED across sources,
+      which rung five's co-firing never reaches.
     - **SETTLED** — the binding world failed as predicted and has since lifted. Fork **25**.
     - **OPEN** — text as an IMAGE keeps ground truth enumerable, so soundness survives where
-      a camera kills it. `Senses` runs and names cross two senses, so the gate is open.
-      Fork **107**.
+      a camera kills it. `Senses` names cross two senses, so the gate is open. Fork **107**.
     - **OPEN** — spreading a reading over its range costs most of the score at both front
       ends. Fork **38**.
     - **OPEN** — under about ten dimensions there are too few distinct wirings for a

@@ -217,8 +217,8 @@ out of it, and anything before six that reads as tuning is out of order.
   what it did, and `Trial` goes. It carries its own repair: a phase leaving the suite
   unreadable makes the next one blind, so one ends when the reds are the three that are named.
 - **Two, a mechanism for every entry of THE ARCHITECTURE**, however bad, and `Roaming`
-  exercising all of them. `DocsTests` holds the first half; the second is UNMEASURED and
-  where two resumes.
+  exercising all of them. `DocsTests` holds the first half and `OutstandingTests` the
+  second; adhesion and nesting fail it.
 - **Three, the intentional reds cleared**, which is the stable state to refine from.
 - **Four, audit TRAPS and DO NOT RE-TRY** — a failure class that has earned a check belongs
   in the check, and a revival condition that has expired is a superstition.
@@ -251,7 +251,7 @@ out of it, and anything before six that reads as tuning is out of order.
       one is still an entry in every table forever. Fork **51**.
   - A concept a thing in its own right
     - **NOW** — `Code`. A commitment's identity is one, and adhesion over a window reaches
-      one group a persistent SOURCE.
+      one group a persistent SOURCE. Derived offline, so no run reaches it.
     - **OPEN** — nothing tracks a source through a CHANGE, so a thing that moves is a new
       one, and adhesion reaches a source and never an individual. Fork **106**.
     - **OPEN** — minting an INDIVIDUAL is unbuilt. Where a thing never moves a source and a
@@ -285,8 +285,8 @@ out of it, and anything before six that reads as tuning is out of order.
     - **OPEN** — the multiplexer does not test the bet, its inputs being symbols already, so
       step one measures the learner and the front end not at all.
   - Relations are concepts too
-    - **NOW** — a commitment IS a relation and carries a code, so relations nest with no new
-      machinery.
+    - **NOW** — a commitment IS a relation and is scored as one. Nesting is expressible on
+      that rather than reached.
     - **SETTLED** — unification costs its candidate set rather than a subset test's price,
       and what blocks rung four is admission rather than cost. Fork **33**.
     - **SETTLED** — roles are carried by ORDER rather than unification; rung three reaches
@@ -296,8 +296,8 @@ out of it, and anything before six that reads as tuning is out of order.
       values never co-occur. Open on the build. Fork **102**, gated by fork **97**.
     - **SETTLED** — a second hop pays where a second fact is needed and is damage where one
       suffices, so the depth is the task's rather than the mechanism's. Fork **96**.
-    - **OPEN** — a commitment ABOUT commitments is expressible and not built, an identity
-      being a code. Metacognition, and where a self-model starts.
+    - **OPEN** — no moment carries an identity, so nothing roots on one and no scope holds a
+      commitment. Metacognition, and where a self-model starts.
   - Concept and label independent
     - **NOW** — rung five, and it goes UP: mint a code for a shared sub-scope and rewrite in
       terms of it, gated by two bars. Its trigger is REDUNDANCY, so no failure can summon it,

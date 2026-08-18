@@ -248,7 +248,14 @@ public sealed class DocsTests
     // nothing. And a drive that cannot be sated is a fault in the design — John's, and it
     // belongs here because a preference term is chosen once and lived with, which is a
     // different kind of decision from a dial.
-    private const int Whole = 10_709;
+    //
+    // And 10,721 is the fifteenth raise, twelve words for what phase two's second half turned
+    // up. Two leaves were claiming more than a run reaches: adhesion is derived offline, and
+    // nesting a commitment inside a scope is a property of the type rather than a mechanism —
+    // a `Committed` code is a dictionary key and never enters a moment, so nothing can root
+    // on one anywhere. Correcting a leaf that reads as built is the one thing this budget
+    // must never price out, a doc whose claims outrun its code being worse than a long one.
+    private const int Whole = 10_721;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

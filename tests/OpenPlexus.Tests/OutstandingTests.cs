@@ -306,4 +306,51 @@ public sealed class OutstandingTests(ITestOutputHelper output)
             + "drop it with a revival row saying what would bring it back, and take the leaf "
             + "out of the plan. This test is red on purpose and reads the plan, not a list.");
     }
+
+    /// <summary>
+    /// <b>Phase two's second half</b> — a mechanism for every entry of THE ARCHITECTURE is
+    /// the first, and the spine world exercising all of them is this.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The two halves are different questions and only one had a check.</b>
+    /// <see cref="DocsTests.Every_requirement_has_a_mechanism"/> reads the doc against itself:
+    /// every entry carries a NOW leaf, so nothing is claimed with nothing under it. That says
+    /// nothing about whether any run reaches the mechanism, and a mechanism no run reaches is
+    /// the fault this repo keeps finding read as built.
+    /// </para>
+    /// <para>
+    /// <b>The reading is <see cref="ExercisedTests"/>'s and the assertion is here</b>, which
+    /// is the arrangement <see cref="Every_world_is_either_run_by_something_or_gone"/> already
+    /// uses. Each entry names what a run would have to show for it, and an entry is reached
+    /// when either of the world's arms shows it.
+    /// </para>
+    /// <para>
+    /// <b>Two are unreached, and the two close by different roads.</b>
+    /// Adhesion never runs, <c>Alternating</c> being derived offline and nothing setting
+    /// <c>Population.Sorts</c> — the plan carries that as an open question about when a front
+    /// end re-derives. A commitment's identity never sits inside another's scope, and that one
+    /// is not about this world: a <c>Committed</c> code is minted as a dictionary key and
+    /// never enters a moment, so no genesis and no repair can root on one anywhere. Nesting is
+    /// a property of the type rather than a mechanism, and the leaf claiming it says
+    /// <i>expressible</i> and reads as built.
+    /// </para>
+    /// <para>
+    /// <b>It costs a minute and a half</b>, being two runs of ten thousand rounds, which is
+    /// why nothing else calls it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_spine_world_exercises_every_entry_of_the_architecture()
+    {
+        var unreached = ExercisedTests.StillUnreached(output.WriteLine);
+
+        Assert.True(unreached.Count == 0,
+            $"{unreached.Count} of THE ARCHITECTURE's {ExercisedTests.Asked} entries have a "
+            + "mechanism the spine world never reaches:\n  "
+            + string.Join("\n  ", unreached)
+            + "\nPhase two is `Roaming` exercising all of them, so each is phase-two work and "
+            + "comes before rung four. This test is red on purpose and closes on the "
+            + "mechanism being reached, not on this file.");
+    }
 }

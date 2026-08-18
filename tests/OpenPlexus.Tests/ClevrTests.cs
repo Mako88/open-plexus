@@ -1,3 +1,6 @@
+using OpenPlexus.Codes;
+using OpenPlexus.Commitments;
+using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
@@ -108,6 +111,47 @@ public sealed class ClevrTests(ITestOutputHelper output)
             }
     }
 
+    /// <summary>
+    /// A round puts a question the scene on its own does not carry.
+    /// </summary>
+    /// <remarks>
+    /// <b>The check that tells a hard problem from an empty one.</b> If the filters were
+    /// re-stated as their own attribute codes, the moment would
+    /// be identical whether the question referred by size or the scene merely happened to
+    /// hold a large thing — so a population would be scored on a question nobody put, and
+    /// what came back would be chance either way. That is the failure the walk had on this
+    /// world, and it read as the architecture failing for as long as it went unchecked.
+    /// </remarks>
+    [Fact]
+    public void A_round_puts_a_question_the_scene_alone_does_not_carry()
+    {
+        var world = new Clevr(World(scenes: 200));
+        var scenes = world.Scenes.ToDictionary(one => Clevr.Seen(one.Scene));
+
+        for (var round = 0; round < 200; round++)
+        {
+            var codes = world.Next().Seen.Codes.ToList();
+
+            // Which picture, and it is what makes the rest of the moment checkable at all.
+            var scene = scenes[Assert.Single(codes, code => code.Modality == Clevr.Where)];
+
+            Assert.Single(codes, code => code.Modality == Clevr.Asks);
+
+            var refers = codes.Where(code => code.Modality == Clevr.Refers).ToList();
+
+            Assert.True(refers.Count >= 2,
+                "a reference of fewer than two filters is not a conjunction");
+
+            Assert.Equal(refers.Count, refers.Distinct().Count());
+
+            // Derived rather than re-stated, which is the whole content of the modality.
+            Assert.Empty(refers.Intersect(scene.Codes));
+
+            // And nothing else is added, so the moment is the scene plus the question.
+            Assert.Equal(scene.Codes.Length, codes.Count - refers.Count - 1);
+        }
+    }
+
     // ---- what the graph does with it ---------------------------------------
 
     /// <summary>Enough scenes to put a few hundred questions behind an arm.</summary>
@@ -115,6 +159,111 @@ public sealed class ClevrTests(ITestOutputHelper output)
     /// <b>Most of CLEVR is thrown away</b> — see <see cref="Clevr"/> — so a scene
     /// yields well under one answerable question on average.
     /// </remarks>
-    private const int Scenes = 700;
+    private const int Scenes = 3000;
 
+    /// <summary>
+    /// CLEVR reaches the commitment learner, and the held-back questions are answered at
+    /// chance.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The runner a standing objection asked for. This world had a <c>ClevrRun</c> driven by
+    /// the walk, so when the walk went the scenes survived and the thing that turned them
+    /// into a measurement did not — and a world nothing runs asserts what the corpus is and
+    /// nothing about what is learnt.
+    /// </para>
+    /// <para>
+    /// <b>A round is one question rather than one scene.</b> A commitment expects one code
+    /// and CLEVR asks several things about a picture, so the moment is the scene's codes,
+    /// one <see cref="Clevr.Refers"/> code per filter of the question's chain, and one
+    /// <see cref="Clevr.Asks"/> code saying which attribute is wanted. Nothing in that says
+    /// what to conclude: the filters never name the attribute being queried, which
+    /// <see cref="Only_the_questions_this_architecture_can_answer_are_kept"/> asserts.
+    /// </para>
+    /// <para>
+    /// <b><see cref="Clevr.Chance"/> is the bar and <c>Tally</c>'s is not.</b> The tally
+    /// divides one by <see cref="Clevr.Outcomes"/>, which is a blind guess over all fifteen
+    /// attribute values at once; the questions ask for one attribute each and do not divide
+    /// evenly between the four, so the guesser a learner has to beat is the weighted one the
+    /// world computes. Reading the tally's column here would flatter the learner by about
+    /// three times.
+    /// </para>
+    /// <para>
+    /// <b>The finding is that the withheld set sits on the bar.</b> The population answers
+    /// every one of the three hundred held-back questions and gets them right at the rate a
+    /// weighted blind guess does. Nothing composed, and the harness did ask — a hundred and
+    /// sixteen distinct commitments took a seat on those questions, so this is a learner
+    /// answering rather than a run with no question in it.
+    /// </para>
+    /// <para>
+    /// <b>And the drawn score is memorisation, which the corpus size shows outright.</b>
+    /// Most of CLEVR is thrown away, so a run walks its questions over and over: at seven
+    /// hundred scenes it drew a hundred and sixty-six of them and scored 0.940, and at three
+    /// thousand it draws eight hundred and seventeen and scores 0.586. A score that falls as
+    /// the corpus grows is fitting what it has been shown.
+    /// </para>
+    /// <para>
+    /// <b>This is fork 25's ceiling on scenes nobody here generated.</b> That fork built a
+    /// world specifically to fail at attribute binding, measured it, and lifted it with
+    /// grouping and a per-object index — every number on scenes generated by the same hands
+    /// that built the mechanism. The lift does not arrive here, and it cannot: the two
+    /// channels that carry it, <see cref="Codes.IQuantizer{TObservation}.Bind"/> and the
+    /// per-object index, are reported by this world and read by nothing since the walk went.
+    /// A conjunctive scope over an unsegmented bag cannot say <i>the one that is large and
+    /// also metal</i>, which is rung four's claim and is why it is rung four.
+    /// </para>
+    /// <para>
+    /// <b>What would drop the wiring, written before the run.</b> If nothing fires on a
+    /// withheld question at all, then the moment does not carry a question the population
+    /// can match and this is a harness that has not asked anything — the same failure the
+    /// walk had here, where a conjunction with no scene in it found the object about as
+    /// often as picking one at random and read as the architecture failing. It fired on all
+    /// three hundred, so the reading stands.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Clevr_reaches_the_commitment_learner()
+    {
+        var world = new Clevr(World(scenes: Scenes) with { Withheld = 300 });
+        var brain = new Brain(new CommittingSettings { Capacity = 4000 }, seed: 1);
+
+        var tally = new Bench(new Watching<Coded>(world, new Passthrough()), brain)
+            .Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
+
+        var unseen = tally.Unseen;
+
+        output.WriteLine(
+            $"asked {world.Asked}, {world.Withheld.Count} held back | outcomes "
+            + $"{world.Outcomes}, chance {world.Chance:F3} | drawn {tally.Recent:F3} | "
+            + $"held {tally.Resident}, {tally.Repaired} repairs, {tally.Minted} minted");
+
+        Assert.NotNull(unseen);
+
+        var composed = unseen.Answered == 0 ? 0.0 : unseen.Right / (double)unseen.Answered;
+
+        output.WriteLine(
+            $"withheld {unseen.Right}/{unseen.Answered} answered of {unseen.Asked} asked = "
+            + $"{composed:F3}, {unseen.Deciders} deciders");
+
+        Assert.True(tally.Recent > world.Chance,
+            $"{tally.Recent:F3} is under the {world.Chance:F3} a blind guess weighted by "
+            + "the question mix scores, so the question is not reaching the learner");
+
+        Assert.True(unseen.Answered > 0,
+            "nothing fired on a single withheld question, so the moment does not carry a "
+            + "question the population can match and this run asked nothing");
+
+        // The reading, and it is an upper bar rather than a target. Three standard errors of
+        // the weighted chance over however many were answered, so the width is the sample's
+        // and not a constant somebody chose. Going red here means the withheld set moved off
+        // the bar, which is the day something composed -- take the number, say what changed,
+        // and raise this.
+        var spread = 3.0 * Math.Sqrt(
+            world.Chance * (1.0 - world.Chance) / unseen.Answered);
+
+        Assert.True(composed < world.Chance + spread,
+            $"{composed:F3} on the withheld set is more than three standard errors "
+            + $"({spread:F3}) above the {world.Chance:F3} bar, so something composed. This "
+            + "assertion is the record of a null result and closing it is progress.");
+    }
 }

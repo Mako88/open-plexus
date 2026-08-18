@@ -382,7 +382,16 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // What is forbidden is leaving them here while nobody decides, which is the same
         // sentence the dial rule uses. Deleting them all to make a guard green would delete
         // live questions; keeping them all is a world budget nobody is paying.
-        ["Clevr"] = Stranded,
+        ["Clevr"] = "A WORLD, ON `Roaming`'S FOOTING, AND IT CAME OFF THIS LIST BY GETTING "
+            + "A RUNNER AND A NULL RESULT. `Watching` drives it through `IWorld` now: a "
+            + "round is one QUESTION rather than one scene, the moment being the scene's "
+            + "codes plus a `Refers` code per filter of the question's chain and one `Asks` "
+            + "code saying which attribute is wanted. It came off by the first road, which "
+            + "is that its question was the one its entry named -- and the answer is that "
+            + "the held-back questions are answered at the weighted chance bar while the "
+            + "drawn stream is memorised. `ClevrTests` holds the reading and the bar it must "
+            + "not cross.",
+
         ["Composed"] = Stranded,
 
         ["Homeostat"] =

@@ -61,20 +61,21 @@ public sealed class PushbackTests(ITestOutputHelper output)
                 + "Homeostat is the only world here that is acted in and is exactly what "
                 + "Drives needs, so deleting it would close one red entry by destroying "
                 + "what another needs; Composed.Segmented feeds the unread Bind channel, "
-                + "which is live. Rhythm, Motif and Latent are decided and wired, each by a "
-                + "different road -- Rhythm for a question its own entry did not name, Motif "
-                + "for the one it did, and Latent by a prediction this entry made and half "
-                + "lost. Clevr and Composed are what is left, and neither is the shape the "
-                + "instinct to wire for a green guard would damage: Clevr has a published "
-                + "bar beside it and Composed is the front end's own question, so what "
-                + "either wants is a decision rather than a defence.",
+                + "which is live. Rhythm, Motif, Latent and Clevr are decided and wired, "
+                + "each by a different road -- Rhythm for a question its own entry did not "
+                + "name, Motif for the one it did, Latent by a prediction this entry made "
+                + "and half lost, and Clevr by the plain one, its question being exactly "
+                + "what its entry said. Composed is what is left, and it is not the shape "
+                + "the instinct to wire for a green guard would damage: it is the front "
+                + "end's own question, so what it wants is a decision rather than a "
+                + "defence.",
             Settles: "A decision per world, recorded, and read against what the world "
-                + "actually holds rather than off a list of names. Latent showed what that "
-                + "costs and what it is worth: the prediction that a runner would exercise "
-                + "nothing was exactly right about the world as shipped, nought eligible on "
-                + "every seed, and wrong about the world -- a channel that can lie leaves "
-                + "hundreds of scopes eligible, and it is what makes the group necessary at "
-                + "all. Clevr and Composed close the same way, by a runner and a number."),
+                + "actually holds rather than off a list of names. Clevr showed what that "
+                + "buys where the world is live: a runner, and a null result worth having "
+                + "-- the held-back questions answered at the weighted chance bar while the "
+                + "drawn stream is memorised, which is fork 25's ceiling on scenes nobody "
+                + "here generated. Composed closes the same way, and its answer arrives in "
+                + "a SUCCESSOR moment, so the seam it wants is the one still open."),
 
         new(
             With: "DialTests.Every_arm_is_measured_on_at_least_two_worlds",

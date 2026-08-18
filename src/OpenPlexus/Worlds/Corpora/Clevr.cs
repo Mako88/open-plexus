@@ -62,6 +62,24 @@ public sealed record ClevrSettings
     /// what that costs.
     /// </remarks>
     public bool Fleeting { get; init; }
+
+    /// <summary>How many of the questions are kept back to be examined on.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The only anti-memorisation instrument a corpus world can have.</b> The sharp one
+    /// is soundness by enumeration, which needs a rule set to enumerate; CLEVR ships scenes
+    /// and questions and no rules, so the choice here is this or a score that cannot be told
+    /// from a lookup table.
+    /// </para>
+    /// <para>
+    /// <b>Every nth question rather than the last n</b>, because the corpus is read from the
+    /// front of the validation split and the questions arrive grouped by scene. Taking a
+    /// suffix would hold back whole scenes, which asks whether the learner generalises to
+    /// unseen PICTURES; taking every nth holds a question back about a scene it saw, which
+    /// is the composition question this world was kept for.
+    /// </para>
+    /// </remarks>
+    public int Withheld { get; init; }
 }
 
 /// <summary>One CLEVR scene, as codes.</summary>
@@ -162,7 +180,7 @@ public sealed record Referred
 /// is making a claim about.
 /// </para>
 /// </remarks>
-public sealed class Clevr
+public sealed class Clevr : IWorld<Coded>, IWithholds<Coded>
 {
     /// <summary>One of eight colours.</summary>
     public const byte Colour = 50;
@@ -201,6 +219,34 @@ public sealed class Clevr
     /// </remarks>
     public const byte Where = 55;
 
+    /// <summary>Which attribute the question wants, and nothing about the answer.</summary>
+    /// <remarks>
+    /// <b>Without it the moment carries no question at all.</b> A scene has four attributes
+    /// of every object in it and any of them could be the one being asked for, so an arm
+    /// with no way to say which is scored against a question nobody put — the same hole
+    /// <see cref="Senses.Asks"/> was minted to fill on a world with three senses.
+    /// </remarks>
+    public const byte Asks = 56;
+
+    /// <summary>What the question refers BY, one code per filter of the chain.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Beside the attribute code rather than instead of it</b>, which is the whole reason
+    /// this modality exists. <i>Large</i> is already in the moment because the scene holds a
+    /// large thing, so re-stating the same code would say nothing: the moment would read
+    /// identically whether the question referred by size or merely happened to contain one.
+    /// A code of its own is what makes <i>you are being asked about the large one</i>
+    /// sayable.
+    /// </para>
+    /// <para>
+    /// <b>It says what is being pointed at and never what to conclude.</b> The answer is an
+    /// attribute of the object the filters name, and no filter is ever the attribute being
+    /// queried — the corpus's own programs guarantee it, and a question whose filters do not
+    /// name exactly one object is thrown away before it gets here.
+    /// </para>
+    /// </remarks>
+    public const byte Refers = 57;
+
     /// <summary>
     /// What the corpus calls each attribute, and which modality it becomes.
     /// </summary>
@@ -227,6 +273,30 @@ public sealed class Clevr
     /// ceiling arm hand the walk the index the question is not supposed to have.
     /// </remarks>
     private readonly Dictionary<int, List<Dictionary<byte, Code>>> _objects = [];
+
+    /// <summary>Every question, paired with the scene it is about, in corpus order.</summary>
+    /// <remarks>
+    /// <b>Flattened once rather than walked per round</b>, because a round is one question
+    /// and the questions arrive grouped by scene. A loop that re-walked the grouping every
+    /// round would make the cost of a round a function of how many questions its scene
+    /// happened to attract.
+    /// </remarks>
+    private readonly List<(Sighting Scene, Referred Question)> _turns = [];
+
+    /// <summary>The questions kept back, in the shape an examiner takes.</summary>
+    private readonly List<Turn<Coded>> _kept = [];
+
+    /// <summary>Which small whole number each distinct answer is.</summary>
+    /// <remarks>
+    /// <b>One alphabet across the four attributes, because a commitment expects ONE code.</b>
+    /// A per-attribute numbering would give <i>colour 0</i> and <i>shape 0</i> the same
+    /// outcome code, so a rule that had learnt a colour would read as right whenever the
+    /// answer was the first shape.
+    /// </remarks>
+    private readonly Dictionary<Code, int> _answers = [];
+
+    /// <summary>Which turn is next.</summary>
+    private long _at;
 
     /// <param name="settings">How much to read, and which arms are on.</param>
     /// <exception cref="FileNotFoundException">The corpus is not there.</exception>
@@ -267,6 +337,40 @@ public sealed class Clevr
 
         Chance = Asked == 0 ? 0.0 : answers.Sum(group =>
             group.Count() / (double)Asked / Math.Max(values.GetValueOrDefault(group.Key, 1), 1));
+
+        // Numbered over the questions rather than over the fifteen attribute values the
+        // corpus holds, so an outcome nothing is ever asked for is not an outcome. A blind
+        // guess is scored against what is actually asked -- see `Chance`, which weights the
+        // four attributes by how the questions divide between them and is the sharper bar.
+        foreach (var answer in _asking.Values
+                     .SelectMany(list => list)
+                     .Select(question => question.Answer)
+                     .Distinct()
+                     .Order())
+            _answers[answer] = _answers.Count;
+
+        // A STRIDE FROM A COUNT, so that `Withheld` means the same thing here as on every
+        // other world -- how many questions are held back. Spreading them evenly is what
+        // makes each one about a scene the learner has seen: holding back a suffix would
+        // hold back whole scenes, which asks whether it generalises to an unseen PICTURE
+        // rather than whether it can compose a reference on one it is looking at.
+        var stride = settings.Withheld > 0 && settings.Withheld < Asked
+            ? Asked / settings.Withheld
+            : 0;
+
+        var at = 0;
+
+        foreach (var scene in Scenes)
+        {
+            foreach (var question in About(scene.Scene))
+            {
+                if (stride > 0 && at % stride == 0 && _kept.Count < settings.Withheld)
+                    _kept.Add(Posed(scene, question));
+                else _turns.Add((scene, question));
+
+                at++;
+            }
+        }
     }
 
     /// <summary>The scenes, in the order the corpus numbers them.</summary>
@@ -516,4 +620,85 @@ public sealed class Clevr
 
     /// <inheritdoc cref="ClevrSettings.Fleeting"/>
     public bool Fleeting => _settings.Fleeting;
+
+    /// <summary>How many distinct answers the questions between them have.</summary>
+    /// <remarks>
+    /// <b>And <see cref="Chance"/> is the sharper bar, so a run reads that one.</b> A blind
+    /// guess over this alphabet is one in fifteen; a blind guess over the attribute the
+    /// question actually asks for is one in eight for colour and one in two for material,
+    /// and the questions do not divide evenly between them. Both are honest numbers about
+    /// different guessers, and the weighted one is the guesser a learner has to beat.
+    /// </remarks>
+    public int Outcomes => _answers.Count;
+
+    /// <inheritdoc/>
+    public IReadOnlyList<Turn<Coded>> Withheld => _kept;
+
+    /// <summary>One question about one scene.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A round is a question rather than a scene</b>, which is the translation this world
+    /// needed and never had. CLEVR asks several things about one picture and a commitment
+    /// expects one code, so a scene-shaped round would have to be scored against several
+    /// answers at once — and the thing under test is whether a conjunction singles out an
+    /// object, which is a property of the question and not of the picture.
+    /// </para>
+    /// <para>
+    /// <b>The corpus is walked in order and then walked again</b>, so a run longer than the
+    /// questions read sees them repeatedly. That is memorisation ground and it is why
+    /// <see cref="ClevrSettings.Withheld"/> exists: what is scored on the stream says how
+    /// well the population fits what it has been shown, and what is scored on the held-back
+    /// questions says whether any of it composed.
+    /// </para>
+    /// </remarks>
+    public Turn<Coded> Next()
+    {
+        if (_turns.Count == 0)
+            throw new InvalidOperationException(
+                "no question of these scenes is a pure filter chain ending in a query, so "
+                + "there is nothing to ask — read more scenes, or hold fewer back");
+
+        var (scene, question) = _turns[(int)(_at++ % _turns.Count)];
+
+        return Posed(scene, question);
+    }
+
+    /// <summary>The moment one question puts, and the answer the corpus gives it.</summary>
+    private Turn<Coded> Posed(Sighting scene, Referred question)
+    {
+        var codes = new List<Code>(scene.Codes.Length + question.Origins.Length + 1);
+
+        codes.AddRange(scene.Codes);
+
+        foreach (var origin in question.Origins) codes.Add(Refer(origin));
+
+        codes.Add(new Code(Asks, question.Asking));
+
+        return new Turn<Coded>
+        {
+            Seen = new Coded
+            {
+                Codes = codes,
+
+                // Forwarded as the corpus read them, and both channels are still consumed by
+                // nothing. A world reporting what it knows is not the same as a learner
+                // acting on it, and pretending otherwise is how `Surprise` read as wired for
+                // the life of a branch.
+                Groups = scene.Groups,
+                Passing = scene.Fleeting,
+            },
+            Outcome = _answers[question.Answer],
+        };
+    }
+
+    /// <summary>The code for <i>the question refers by this</i>.</summary>
+    /// <remarks>
+    /// <b>Derived from the attribute code rather than drawn beside it</b>, so every machine
+    /// reaches the same name for the same reference from the code alone. A table minted per
+    /// run would give two machines two names for <i>asked about large</i>, which is the
+    /// fitted-quantiser refutation arriving through a world.
+    /// </remarks>
+    private static Code Refer(Code origin) => new(
+        Refers,
+        Hashing.Mix(Hashing.Fold(Hashing.Fold(Hashing.Basis, origin.Modality), origin.Value)));
 }

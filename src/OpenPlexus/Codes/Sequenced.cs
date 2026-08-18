@@ -79,7 +79,7 @@ public static class Sequenced
     /// SPECIALISATION and never a root: <i>this stood before that</i> with no idea what
     /// either of them is about is a rule about grammar rather than about the world, and a
     /// population rooting on them fills with pairs the moment order arrives. See
-    /// <see cref="Commitments.Population.Cover"/>, where the same argument already keeps a
+    /// <see cref="Commitments.Population.Genesis"/>, where the same argument already keeps a
     /// never-absent code from being a root.
     /// </remarks>
     public static bool Names(Code code) => code.Modality == Ordered;

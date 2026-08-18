@@ -701,11 +701,11 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         // REPAIR'S DOOR. A code present in every hit and every miss has the same share on
         // both sides, so the pooled two-proportion z is nought however many times it was
         // seen -- it can never be the argmax and could never clear the bar if it were.
-        var everywhere = Repair.Divergence(inHits: 400, hits: 400, inMisses: 100, misses: 100);
+        var everywhere = Conditions.Divergence(inHits: 400, hits: 400, inMisses: 100, misses: 100);
 
         // AND ONE THAT VARIES, or the line above passes for free on a `Divergence` that
         // returns nought to everything.
-        var sometimes = Repair.Divergence(inHits: 380, hits: 400, inMisses: 20, misses: 100);
+        var sometimes = Conditions.Divergence(inHits: 380, hits: 400, inMisses: 20, misses: 100);
 
         output.WriteLine($"always present z={everywhere:F3} | discriminating z={sometimes:F3}");
 
@@ -728,7 +728,7 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
                 : [always];
 
             held.Witness(live);
-            held.Cover(live, new Code(Multiplexer.Said, 0), []);
+            held.Genesis(live, new Code(Multiplexer.Said, 0), []);
         }
 
         var rooted = held.All.Select(one => one.Scope[0]).ToHashSet();

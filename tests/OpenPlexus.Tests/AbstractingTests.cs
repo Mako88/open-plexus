@@ -11,7 +11,7 @@ namespace OpenPlexus.Tests;
 /// Rung five: the only operator here that goes up.
 /// </summary>
 /// <remarks>
-/// <b>Everything else narrows.</b> Covering mints one-code claims, repair adds
+/// <b>Everything else narrows.</b> Genesis mints one-code claims, repair adds
 /// conditions, subsumption and culling remove — so without this the machine can be
 /// arbitrarily accurate and hold no concept at all.
 /// </remarks>

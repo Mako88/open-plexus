@@ -426,7 +426,7 @@ public sealed record Census
     /// <b>Repair adds a condition and never changes what a commitment expects</b>, and a child
     /// fires only where its parent does. So a round where nothing expecting the right
     /// answer fired cannot be covered by narrowing anything resident, this round or ever.
-    /// Covering it needs a new claim about a new outcome — which is GENESIS, and genesis
+    /// Reaching it needs a new claim about a new outcome — which is genesis, and genesis
     /// saturates its one-code space in the opening hundred rounds and never mints again.
     /// </para>
     /// <para>
@@ -445,7 +445,7 @@ public sealed record Census
     /// <remarks>
     /// <b>A commitment that fires expecting what arrived is right on that round</b>, and takes a
     /// hit for it. Its misses come from other rounds entirely, and
-    /// <see cref="Commitments.Population.Mend"/> refuses anything under
+    /// <see cref="Commitments.Population.Repair"/> refuses anything under
     /// <see cref="Commitments.CommittingSettings.Floor"/> of them. So the rule that most
     /// needs narrowing is never the culprit where it is needed, and may never accrue the
     /// evidence to be narrowed anywhere else. This counts how often that is the state of
@@ -466,7 +466,7 @@ public sealed record Census
     /// <remarks>
     /// <b>Fork 73, and it is the one join nothing here had.</b> Every budget arm counts
     /// repairs and every coverage column counts rounds, so a child that buys hard rounds and
-    /// a child that buys none are the same line in every grid this bench prints. Covering
+    /// a child that buys none are the same line in every grid this bench prints. Genesis
     /// mints one code and nothing longer, so a scope past one came from repair — and this is
     /// how many of them ever paid.
     /// </remarks>
@@ -836,8 +836,8 @@ public sealed class Trial<TSeen>
             var said = Sensed(turn.Seen);
             codes += said.Count;
 
-            // Taken before the step, because the step teaches. `Settle`, `Cover` and
-            // `Mend` all move the population, so the same three read-only calls after it
+            // Taken before the step, because the step teaches. `Settle`, `Genesis` and
+            // `Repair` all move the population, so the same three read-only calls after it
             // would be asking a different machine what it thought a moment ago. These are
             // the same calls `Examine` is built out of and they change nothing.
             if (censusing is not null && turn.Outcome is { } expected)
@@ -916,7 +916,7 @@ public sealed class Trial<TSeen>
                         // CONDITION and never changes what a commitment expects, and a child
                         // fires only where its parent fires -- so if nothing expecting the
                         // right answer fired this round, no descendant of anything resident
-                        // can fire here either, however long the run goes on. Covering that
+                        // can fire here either, however long the run goes on. Reaching that
                         // round needs GENESIS, and genesis saturates its one-code space in
                         // the opening hundred rounds and never mints again.
                         var present = firing.Where(one => one.Expects == arrived).ToList();
@@ -926,7 +926,7 @@ public sealed class Trial<TSeen>
                         // And whether repair was ever allowed to touch what was present.
                         // A commitment that fires expecting what arrived is RIGHT this round
                         // and takes a hit for it, so its misses come from other rounds
-                        // entirely -- and `Mend` refuses anything under `Floor` of them. Where
+                        // entirely -- and `Repair` refuses anything under `Floor` of them. Where
                         // every present candidate is under the floor, the material is in the
                         // room and the one operator that could sharpen it is barred.
                         else if (present.TrueForAll(one => one.Misses < _brain.Dials.Floor))
@@ -1066,7 +1066,7 @@ public sealed class Trial<TSeen>
     /// incidental.</b> <see cref="Population.Moment"/> folds names without minting one,
     /// <see cref="Population.Firing"/> gathers candidates without touching them, and
     /// <c>Population.Predict</c> reads accuracies it does not write.
-    /// <c>Settle</c>, <c>Cover</c> and <c>Mend</c> are the three that teach and none of
+    /// <c>Settle</c>, <c>Genesis</c> and <c>Repair</c> are the three that teach and none of
     /// them is called — an examination that moved a single counter would be a second
     /// training run wearing the word <i>held-out</i>, and the number would be worth
     /// less than no number.

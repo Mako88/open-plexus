@@ -36,10 +36,10 @@ public sealed record Spent
     public required double Sweeping { get; init; }
 
     /// <summary>Genesis.</summary>
-    public required double Covering { get; init; }
+    public required double Genesis { get; init; }
 
     /// <summary>Choosing a condition and minting a child.</summary>
-    public required double Mending { get; init; }
+    public required double Repair { get; init; }
 
     /// <summary>
     /// <b>Two runs that differ only in how long they took are the same run.</b>

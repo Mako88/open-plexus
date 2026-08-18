@@ -88,7 +88,7 @@ public sealed class QueryCostTests(ITestOutputHelper output)
             if (firing.IsDefaultOrEmpty) continue;
 
             // What actually followed, and the first version of this file used a constant.
-            // `Mend` only considers commitments that were WRONG, so an outcome that never
+            // `Repair` only considers commitments that were WRONG, so an outcome that never
             // varies makes half the population permanently a candidate and the other half
             // permanently not -- a traffic number measured against a world that was not
             // running.

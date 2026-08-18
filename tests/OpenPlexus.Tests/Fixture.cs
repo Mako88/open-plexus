@@ -142,7 +142,7 @@ public static class Fixture
     /// <param name="held">What the brain holds.</param>
     /// <remarks>
     /// <b>What genesis can mint, which is the question a soundness count cannot
-    /// answer.</b> Covering mints one-code commitments and nothing else, so a code that
+    /// answer.</b> Genesis mints one-code commitments and nothing else, so a code that
     /// is sound ON ITS OWN is reachable by the very first thing the machine does.
     /// Whether it is resident afterwards separates a learner that never found it from
     /// one that found it and was outvoted — and those want different work.

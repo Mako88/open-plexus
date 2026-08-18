@@ -163,7 +163,7 @@ public sealed class StaleClaimTests
             .Select(match => match.Groups[1].Value)
 
             // THE LAST SEGMENT, because the source calls `Absent`, never
-            // `Repair.Absent`, and a dotted claim is about the same mechanism.
+            // `Conditions.Absent`, and a dotted claim is about the same mechanism.
             .Select(named => named.Split('.')[^1])
 
             // A one or two letter name is noise and would match half the source.

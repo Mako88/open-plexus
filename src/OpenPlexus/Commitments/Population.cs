@@ -135,7 +135,7 @@ internal sealed class Forks
 public enum Birth
 {
     /// <summary>Genesis minted it on a surprise.</summary>
-    Covered,
+    Genesis,
 
     /// <summary>Repair added a condition to a parent.</summary>
     Repaired,
@@ -176,7 +176,7 @@ public enum Loss
 /// </para>
 /// <para>
 /// <b>And the expectation is invariant down a lineage</b>, which is what makes this cheap.
-/// <see cref="Population.Mend"/> builds <c>[..parent.Scope, added]</c> with the PARENT'S
+/// <see cref="Population.Repair"/> builds <c>[..parent.Scope, added]</c> with the PARENT'S
 /// expectation, so every descendant of a minority-outcome seed expects the minority
 /// outcome forever. No parent pointer is needed to ask which lineage something belongs
 /// to — the expectation IS the root's, and the scope's length is how far it has got.
@@ -190,8 +190,8 @@ public enum Loss
 /// </remarks>
 public readonly record struct Lifetime
 {
-    /// <inheritdoc cref="Birth.Covered"/>
-    public long Covered { get; init; }
+    /// <inheritdoc cref="Birth.Genesis"/>
+    public long Genesis { get; init; }
 
     /// <inheritdoc cref="Birth.Repaired"/>
     public long Repaired { get; init; }
@@ -228,7 +228,7 @@ public readonly record struct Lifetime
     /// <para>
     /// <b>Whether a lineage is even offered to the machinery</b>, which every gate count so
     /// far has assumed. <see cref="Population.Wrong"/> and the five shares under it
-    /// partition the candidates that reached <see cref="Population.Mend"/>; none of them
+    /// partition the candidates that reached <see cref="Population.Repair"/>; none of them
     /// says which lineages reached it at all. A lineage that is never blamed is never
     /// repaired, and from every existing instrument that is indistinguishable from a
     /// lineage the gates refused.
@@ -246,7 +246,7 @@ public readonly record struct Lifetime
     public long Searched { get; init; }
 
     /// <summary>Everything that ever entered at this shape.</summary>
-    public long Born => Covered + Repaired + Reborn;
+    public long Born => Genesis + Repaired + Reborn;
 
     /// <summary>Everything that ever left it.</summary>
     public long Lost => Subsumed + Culled + Rewritten;
@@ -504,7 +504,7 @@ public sealed class Population
     /// is worth what a uniform ring gives up.
     /// </para>
     /// <para>
-    /// <b>And the asymmetry has a price nobody designed, which is fork 60.</b> <c>Mend</c>
+    /// <b>And the asymmetry has a price nobody designed, which is fork 60.</b> <c>Repair</c>
     /// mints at most one child per call and the loop calls it once a round per POPULATION —
     /// so a fleet of three repairs up to three times a round where one machine repairs
     /// once, while genesis, being placed, mints exactly what one machine would. How hard a
@@ -622,7 +622,7 @@ public sealed class Population
 
         life = how switch
         {
-            Birth.Covered => life with { Covered = life.Covered + 1 },
+            Birth.Genesis => life with { Genesis = life.Genesis + 1 },
             Birth.Repaired => life with { Repaired = life.Repaired + 1 },
             _ => life with { Reborn = life.Reborn + 1 },
         };
@@ -954,7 +954,7 @@ public sealed class Population
     /// <i>the vote was wrong</i> is not.
     /// </para>
     /// </remarks>
-    public int Cover(IReadOnlySet<Code> moment, Code arrived, ImmutableArray<Commitment> firing)
+    public int Genesis(IReadOnlySet<Code> moment, Code arrived, ImmutableArray<Commitment> firing)
     {
         ArgumentNullException.ThrowIfNull(moment);
 
@@ -1011,7 +1011,7 @@ public sealed class Population
 
             if (!Add(proposed)) continue;
 
-            Born(proposed, Birth.Covered);
+            Born(proposed, Birth.Genesis);
             minted++;
         }
 
@@ -1078,7 +1078,7 @@ public sealed class Population
     /// round and read by nothing. The plan says the language extends when, and only
     /// when, no expression in the current one separates the failures from the hits — and
     /// that <i>is decidable and already computed</i>, because it is exactly what
-    /// <see cref="Repair.Discriminator"/> returning nothing means. Choosing a rung before
+    /// <see cref="Conditions.Discriminator"/> returning nothing means. Choosing a rung before
     /// this number is read is hand-specified bias by a side door, which is the fault that
     /// killed ILP.
     /// </para>
@@ -1117,7 +1117,7 @@ public sealed class Population
     /// is what blame becomes when depth comes off the cap, and diffusion is the
     /// failure waiting there.
     /// </remarks>
-    public Commitment? Mend(ImmutableArray<Commitment> firing, Code arrived)
+    public Commitment? Repair(ImmutableArray<Commitment> firing, Code arrived)
     {
         // Where the candidates die, counted before the chain rather than inside it. The
         // chain below is lazy and stops at the first child it manages to add, so counting
@@ -1191,7 +1191,7 @@ public sealed class Population
                 // empty set are the same answer and neither needs a branch here.
                 _minted.TryGetValue(culprit.Identity, out var ledger);
 
-                if (Repair.Discriminator(culprit, _dials, _blind, ledger?.Codes)
+                if (Conditions.Discriminator(culprit, _dials, _blind, ledger?.Codes)
                     is not { } added)
                 {
                     // And a refusal by the arm is not a ceiling in the language, which is the
@@ -1213,7 +1213,7 @@ public sealed class Population
                     if (ledger is not null
                         && _dials.Forking == Forking.Distinct
                         && _dials.Choosing == Choosing.Separating
-                        && Repair.Discriminator(culprit, _dials, _blind) is not null)
+                        && Conditions.Discriminator(culprit, _dials, _blind) is not null)
                     {
                         separated = true;
                         continue;
@@ -1223,7 +1223,7 @@ public sealed class Population
                     // present-code search came back empty, so it costs a second walk of one
                     // table on a small share of a small share of rounds -- and it may not
                     // change what this method does, or the instrument would be the rung.
-                    if (!absent && Repair.Absent(culprit, _dials) is not null) absent = true;
+                    if (!absent && Conditions.Absent(culprit, _dials) is not null) absent = true;
 
                     continue;
                 }
@@ -1252,7 +1252,7 @@ public sealed class Population
 
                 var child = new Commitment([.. culprit.Scope, added], culprit.Expects);
 
-                if (Repair.Runner(culprit, _dials) is { } runner)
+                if (Conditions.Runner(culprit, _dials) is { } runner)
                     _runners[child.Identity] = runner;
 
                 if (ledger is null) _minted[culprit.Identity] = ledger = new Forks();
@@ -1524,7 +1524,7 @@ public sealed class Population
         if (_dials.Subsuming == Subsuming.Weaker)
             return general.Accuracy >= specific.Accuracy;
 
-        var ahead = Repair.Ahead(
+        var ahead = Conditions.Ahead(
             specific.Hits, specific.Fired, general.Hits, general.Fired);
 
         return Normal.Tail(ahead) > _dials.Alpha;

@@ -165,7 +165,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     /// <remarks>
     /// <para>
     /// <b>The case for refusing a parent its spent codes is entirely about quantity.</b>
-    /// Covering what a parent is right about takes many children, and a budget spent
+    /// Reaching everything a parent is right about takes many children, and a budget spent
     /// re-deriving one child buys none of them. This world's truths are ONE CODE, so there is
     /// nothing for a child to cover and this doc already carries the row that here any repair
     /// is damage — eight times the children should be eight times that damage.

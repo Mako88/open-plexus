@@ -319,7 +319,7 @@ public sealed class FleetTests(ITestOutputHelper output)
             var (here, held) = Alone_(dials, Address, Rounds, seed);
 
             // The gate of a fleet and the population of one machine. `Placing` is read by
-            // `Mend` alone -- firing, voting and settling never see it -- so this run
+            // `Repair` alone -- firing, voting and settling never see it -- so this run
             // differs from the one above in the repair gate and in nothing else.
             var placed = new Brain(dials, seed);
 

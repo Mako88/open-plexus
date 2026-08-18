@@ -119,7 +119,7 @@ public sealed class LineageTests(ITestOutputHelper output)
                 output.WriteLine(
                     $"{(at.Minority ? "minority" : "majority"),-8} {at.Depth,4}  "
                     + $"{life.Blamed,7} {life.Searched,8}  "
-                    + $"{life.Covered,7} {life.Repaired,8}  {life.Collided,8}"
+                    + $"{life.Genesis,7} {life.Repaired,8}  {life.Collided,8}"
                     + $"  {life.Subsumed,8} {life.Rewritten,7}"
                     + $"  {resident.GetValueOrDefault(at),8} {sound.GetValueOrDefault(at),6}"
                     + $"  {reached.GetValueOrDefault(at),5}");
@@ -137,7 +137,7 @@ public sealed class LineageTests(ITestOutputHelper output)
     /// <para>
     /// <b>The ladder says a minority lineage is never offered to repair, and that is an
     /// observation rather than a mechanism.</b> <see cref="Repairing.AfterFailure"/> runs
-    /// <see cref="Population.Mend"/> only on a round the VOTE got wrong; under skew nearly
+    /// <see cref="Population.Repair"/> only on a round the VOTE got wrong; under skew nearly
     /// every such round is a minority-outcome round, and on one of those a
     /// minority-expecting commitment expected CORRECTLY and cannot be a culprit. So the
     /// only rounds repair may run on are the rounds where minority rules are right.
@@ -299,7 +299,7 @@ public sealed class LineageTests(ITestOutputHelper output)
     /// <param name="one">This seed's counts.</param>
     private static Lifetime Merge(Lifetime into, Lifetime one) => new()
     {
-        Covered = into.Covered + one.Covered,
+        Genesis = into.Genesis + one.Genesis,
         Repaired = into.Repaired + one.Repaired,
         Reborn = into.Reborn + one.Reborn,
         Subsumed = into.Subsumed + one.Subsumed,

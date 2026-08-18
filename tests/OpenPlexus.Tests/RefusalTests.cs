@@ -48,7 +48,7 @@ public sealed class RefusalTests(ITestOutputHelper output)
     /// <b>A partition that does not partition is a pie chart of a different pie.</b> Each
     /// wrong commitment is charged to the FIRST gate that refused it, so the five counts
     /// and the search must total the candidates exactly — and if a sixth gate is ever
-    /// added to <c>Mend</c> without being counted here, this is what goes red.
+    /// added to <c>Repair</c> without being counted here, this is what goes red.
     /// </remarks>
     [Fact]
     public void Every_repair_candidate_is_charged_to_exactly_one_gate()

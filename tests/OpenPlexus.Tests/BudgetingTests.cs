@@ -12,7 +12,7 @@ namespace OpenPlexus.Tests;
 /// <remarks>
 /// <para>
 /// <b>Collisions run twenty to fifty times the births</b> at every majority rung, and each
-/// one spends the parent's budget. <see cref="Population.Mend"/> records the child before
+/// one spends the parent's budget. <see cref="Population.Repair"/> records the child before
 /// asking whether it was new, so a parent that keeps separating on the same code exhausts
 /// sixty-four attempts on one distinct child. See <see cref="Budgeting"/>.
 /// </para>
@@ -163,7 +163,7 @@ public sealed class BudgetingTests(ITestOutputHelper output)
     /// <para>
     /// <b>Fork 77 said the arm could bind for the first time</b> now that <c>Budget</c> sits
     /// below the vocabulary, and it cannot — for a completely different reason.
-    /// <see cref="Population.Mend"/> charges <c>Attempts</c> and adds to <c>Names</c> in the
+    /// <see cref="Population.Repair"/> charges <c>Attempts</c> and adds to <c>Names</c> in the
     /// same two lines, and <see cref="Forking.Distinct"/> refuses a parent every code it has
     /// already spent. Two different codes added to one scope are two different scopes and so
     /// two different identities — so under the shipped rule the set and the counter move

@@ -116,8 +116,8 @@ public sealed class Alone : ICouncil
     private long _firingTicks;
     private long _settling;
     private long _sweeping;
-    private long _covering;
-    private long _mending;
+    private long _genesis;
+    private long _repair;
 
     /// <param name="held">What the machine holds.</param>
     public Alone(Population held)
@@ -133,8 +133,8 @@ public sealed class Alone : ICouncil
         Firing = Milliseconds(_firingTicks),
         Settling = Milliseconds(_settling),
         Sweeping = Milliseconds(_sweeping),
-        Covering = Milliseconds(_covering),
-        Mending = Milliseconds(_mending),
+        Genesis = Milliseconds(_genesis),
+        Repair = Milliseconds(_repair),
     };
 
     /// <summary>
@@ -249,28 +249,28 @@ public sealed class Alone : ICouncil
         // right answer meant it could never spend them, so how hard the machine searched
         // was a function of how good its answers already were.
         if (_held.Dials.Repairing == Repairing.EveryRound
-            && _held.Mend(_firing, outcome) is not null)
+            && _held.Repair(_firing, outcome) is not null)
             repaired++;
 
-        at = Mark(ref _mending, at);
+        at = Mark(ref _repair, at);
 
         if (!wrong)
             return new Learnt { Minted = 0, Repaired = repaired, Subsumed = subsumed };
 
-        // Covering runs only on a failure and is not moved with repair. Genesis mints per
+        // Genesis runs only on a failure and is not moved with repair. It mints per
         // live code, so running it every round walks the whole `code -> outcome` space --
         // which is the refutation that put `Surprising` back, and it would arrive again by
         // this door. And it is gated again inside, on whether anything that fired proposed
         // what arrived.
-        long minted = _held.Cover(_moment, outcome, _firing);
+        long minted = _held.Genesis(_moment, outcome, _firing);
 
-        at = Mark(ref _covering, at);
+        at = Mark(ref _genesis, at);
 
         if (_held.Dials.Repairing == Repairing.AfterFailure
-            && _held.Mend(_firing, outcome) is not null)
+            && _held.Repair(_firing, outcome) is not null)
             repaired++;
 
-        Mark(ref _mending, at);
+        Mark(ref _repair, at);
 
         return new Learnt { Minted = minted, Repaired = repaired, Subsumed = subsumed };
     }

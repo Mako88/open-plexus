@@ -13,7 +13,7 @@ namespace OpenPlexus.Tests;
 /// <remarks>
 /// <para>
 /// <b>Repair's evidence is per-commitment and survives splitting by construction.</b>
-/// <c>Repair.Discriminator</c> is handed ONE commitment and reads the table that
+/// <c>Conditions.Discriminator</c> is handed ONE commitment and reads the table that
 /// commitment kept of its own hits and misses. A ring places a commitment whole, so
 /// nothing about sharding touches that table — which is <i>decide local</i> working
 /// exactly as the plan says it should.
@@ -86,7 +86,7 @@ public sealed class SplitRepairTests(ITestOutputHelper output)
 
             foreach (var one in firing)
             {
-                // THE FILTERS `Mend` APPLIES BEFORE THE GATE, so what is counted is
+                // THE FILTERS `Repair` APPLIES BEFORE THE GATE, so what is counted is
                 // commitments repair would actually be deciding about. Measuring the gate
                 // over everything that fired would report a rate for a question that is
                 // never asked of most of them.

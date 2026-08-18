@@ -2129,7 +2129,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
             // of exactly the disagreement the design wants kept.
             //
             // And a one-code scope leaves an empty frame, which is admitted rather than
-            // skipped. Covering mints one code and nothing longer, so a run whose population
+            // skipped. Genesis mints one code and nothing longer, so a run whose population
             // is mostly one-code rules would report no family at all under a length bar — and
             // the family it would have missed is every code that predicts one answer.
             var families = new Dictionary<string, List<Commitment>>(StringComparer.Ordinal);

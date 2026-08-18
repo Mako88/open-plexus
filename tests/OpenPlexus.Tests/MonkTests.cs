@@ -289,7 +289,7 @@ public sealed class MonkTests(ITestOutputHelper output)
     /// a rung is admitted when and only when no expression in the current language
     /// separates the failures from the hits, and that choosing one before a failure asks is
     /// hand-specified bias by a side door — the fault that killed ILP. That condition is
-    /// exactly <c>Repair.Discriminator</c> coming back empty, which has happened every run
+    /// exactly <c>Conditions.Discriminator</c> coming back empty, which has happened every run
     /// since the branch began and has never been counted. <c>Tally.Wanting</c> is the count.
     /// </para>
     /// <para>

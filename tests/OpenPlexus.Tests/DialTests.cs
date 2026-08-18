@@ -163,7 +163,7 @@ public sealed class DialTests
             + "about how long a parent lives, and whether it BINDS is the question "
             + "-- `Children` was refused for turning out to be free in disguise. "
             + "AND THE CELL THAT WOULD SEPARATE IT DOES NOT EXIST, WHICH IS "
-            + "ARITHMETIC AND NOT A MISSING WORLD: `Mend` charges an attempt and "
+            + "ARITHMETIC AND NOT A MISSING WORLD: `Repair` charges an attempt and "
             + "adds a name in the same two lines, and `Forking.Distinct` refuses a "
             + "parent every code it has spent -- so two codes are two scopes are "
             + "two identities, and the set and the counter move together forever. "

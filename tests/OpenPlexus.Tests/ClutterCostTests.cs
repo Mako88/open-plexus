@@ -11,7 +11,7 @@ namespace OpenPlexus.Tests;
 /// <remarks>
 /// <para>
 /// <b>A code live in every moment separates nothing</b>, and repair already knows that.
-/// <see cref="Repair.Divergence"/> asks how often a code was present in hits against in
+/// <see cref="Conditions.Divergence"/> asks how often a code was present in hits against in
 /// misses; present in all of both gives one and one, so its separation is nought and it
 /// can never be chosen as a condition. The mechanism John asked after is, for repair,
 /// already there.
@@ -20,7 +20,7 @@ namespace OpenPlexus.Tests;
 /// <b>Genesis had no such guard and now does</b>, which is what the grid below is against.
 /// It used to mint one commitment per live code on a surprise, so background became a
 /// ROOT and every child hanging off it inherited a code that could never earn its place —
-/// half the resident population, on eight bits of it. <see cref="Population.Cover"/>
+/// half the resident population, on eight bits of it. <see cref="Population.Genesis"/>
 /// refuses to root on a code that has never once been absent.
 /// </para>
 /// <para>

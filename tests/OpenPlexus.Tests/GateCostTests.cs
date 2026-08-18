@@ -19,7 +19,7 @@ namespace OpenPlexus.Tests;
 /// </para>
 /// <para>
 /// <b>And it under-repairs rather than over-repairing, which is why the title of this file
-/// is not the question it was opened with.</b> <c>Mend</c> mints once a round, so the gate
+/// is not the question it was opened with.</b> <c>Repair</c> mints once a round, so the gate
 /// never controlled how MANY repairs happen — only which commitment gets the one attempt.
 /// Admitting covered commitments puts low-accuracy generals at the front of a list ordered
 /// by accuracy ascending and they consume it. The gate aims repair; it does not limit it.
@@ -156,13 +156,13 @@ public sealed class GateCostTests(ITestOutputHelper output)
         //
         // And it asserts a difference rather than a direction, because the first version
         // asserted a direction and got it backwards. Blinding the gate admits MORE
-        // candidates and mints FEWER children -- `Mend` returns after one successful mint,
+        // candidates and mints FEWER children -- `Repair` returns after one successful mint,
         // so the gate never controlled how many repairs happen, only which commitment gets
         // the attempt. A prediction written into a wiring check fails for two completely
         // different reasons and reads the same either way.
         Assert.True(Math.Abs(repaired[2].Mean - repaired[0].Mean) > 0.0,
             $"blinding the gate minted {repaired[2].Mean:F1} children against "
-            + $"{repaired[0].Mean:F1} whole — `Placing` is not reaching `Mend`");
+            + $"{repaired[0].Mean:F1} whole — `Placing` is not reaching `Repair`");
 
         // NO BAR ON THE SCORE, because what blinding the gate SHOULD cost has never been
         // measured and a threshold written before the first reading would be a prediction
@@ -254,7 +254,7 @@ public sealed class GateCostTests(ITestOutputHelper output)
         // point of running a second world is that the direction is what might invert.
         Assert.True(Math.Abs(repaired[2].Mean - repaired[0].Mean) > 0.0,
             $"blinding minted {repaired[2].Mean:F1} against {repaired[0].Mean:F1} whole — "
-            + "`Placing` is not reaching `Mend` on this world");
+            + "`Placing` is not reaching `Repair` on this world");
 
         // And the withheld set has to exist, or every row above is a nullable defaulting to
         // nought and three arms of zero agree perfectly.

@@ -337,7 +337,7 @@ public enum Repairing
 /// <remarks>
 /// <para>
 /// <b>A parent's children are recorded as a list</b>, and the same name goes in twice, so the
-/// budget has always counted ATTEMPTS. <see cref="Population.Mend"/> notes the child
+/// budget has always counted ATTEMPTS. <see cref="Population.Repair"/> notes the child
 /// before asking whether it was new, and a repair that reaches a scope the population
 /// already holds is exactly as expensive to the budget as one that mints something. What
 /// <see cref="CommittingSettings.Budget"/> limits is therefore how many times a parent may
@@ -376,7 +376,7 @@ public enum Budgeting
     /// </para>
     /// <para>
     /// <b>And it is a synonym for <see cref="Attempts"/> under the shipped forking rule</b>,
-    /// which is arithmetic rather than a world. <see cref="Population.Mend"/> charges an
+    /// which is arithmetic rather than a world. <see cref="Population.Repair"/> charges an
     /// attempt and adds a name in the same two lines, and <see cref="Forking.Distinct"/>
     /// refuses a parent every code it has already spent — so two codes are two scopes are
     /// two identities, and the set and the counter move together forever. Under
@@ -408,7 +408,7 @@ public enum Budgeting
     /// <para>
     /// <b>And it needs no new number</b>, which is the only reason it is buildable.
     /// <see cref="CommittingSettings.Floor"/> already means <i>enough misses to test a
-    /// proportion by</i>, and <see cref="Population.Mend"/> already refuses a parent under
+    /// proportion by</i>, and <see cref="Population.Repair"/> already refuses a parent under
     /// it. This is that same rule applied repeatedly rather than once: the first attempt
     /// costs the floor, the second costs another, and a parent that stops being wrong stops
     /// earning. <see cref="CommittingSettings.Budget"/> is not read at all.
@@ -497,7 +497,7 @@ public enum Budgeting
 /// <remarks>
 /// <para>
 /// <b>Repair is deterministic and its table moves slowly</b>, so a parent proposes the same
-/// child over and over. <see cref="Repair.Discriminator"/> returns the argmax of a tally
+/// child over and over. <see cref="Conditions.Discriminator"/> returns the argmax of a tally
 /// that changes by one entry a firing, so the winner is stable for thousands of rounds — and
 /// the code it names is still in the tally next time, because a commitment's table skips its
 /// OWN scope and knows nothing of its children's. Measured: collisions run twenty to fifty
@@ -568,7 +568,7 @@ public sealed record CommittingSettings
     /// <remarks>
     /// <para>
     /// <b>The plan says `Surprise` gates genesis and has never run</b>, and on a wide
-    /// front end that is not a detail. Covering mints one commitment per live code,
+    /// front end that is not a detail. Genesis mints one commitment per live code,
     /// and a winnowed eight-by-eight thumbnail is 128 live codes over a sheet of 2,560
     /// cells. With ten outcomes the complete one-code space is 25,600 — and minting on
     /// every failure took the population to 23,762 against a capacity of 2,000. Genesis
@@ -576,7 +576,7 @@ public sealed record CommittingSettings
     /// <c>code → outcome</c> is a lookup table however it is scored.
     /// </para>
     /// <para>
-    /// <b>And the division of labour is XCS's own.</b> Covering exists for a moment
+    /// <b>And the division of labour is XCS's own.</b> Genesis exists for a moment
     /// nothing accounts for; the wrongness of a rule that DID account for it is what
     /// repair is for. A failure where something fired and proposed the right answer and
     /// was outvoted needs no new commitment — it needs the vote to weigh better, which
@@ -704,13 +704,13 @@ public sealed record CommittingSettings
     /// </para>
     /// <para>
     /// <b>And <see cref="Mending.Uncovered"/> is not "repair every round".</b>
-    /// <see cref="Population.Mend"/> already refuses anything under
+    /// <see cref="Population.Repair"/> already refuses anything under
     /// <see cref="Floor"/> misses, over <see cref="Budget"/> children, or without a
     /// condition past the separation bar and its correction. Every gate the design
     /// specifies stays; what goes is the one it did not.
     /// </para>
     /// <para>
-    /// <b>Covering is not moved with it, and that is deliberate.</b> Genesis mints per
+    /// <b>Genesis is not moved with it, and that is deliberate.</b> It mints per
     /// live code, so running it on every round would walk the whole
     /// <c>code → outcome</c> space -- the refutation that put `Surprising` back. Repair
     /// adds ONE child to ONE parent that has already earned it, which is a bounded thing
@@ -773,7 +773,7 @@ public sealed record CommittingSettings
 /// paid for out of how many candidates were looked at, or it is decorative.
 /// </para>
 /// </remarks>
-public static class Repair
+public static class Conditions
 {
     /// <summary>
     /// The code to add to a commitment's scope, or nothing if none has earned it.

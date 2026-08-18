@@ -52,13 +52,13 @@ public sealed class PopulationTests(ITestOutputHelper output)
 
         var separating = Drilled(hits: 200, misses: 200, marker: 7, inHits: 0.9, inMisses: 0.1);
 
-        Assert.Equal(Of(7), Repair.Discriminator(separating, dials, null));
+        Assert.Equal(Of(7), Conditions.Discriminator(separating, dials, null));
 
         // And the other way round it refuses, rather than quietly adding the code
         // that selects the failures.
         var inverted = Drilled(hits: 200, misses: 200, marker: 7, inHits: 0.1, inMisses: 0.9);
 
-        Assert.Null(Repair.Discriminator(inverted, dials, null));
+        Assert.Null(Conditions.Discriminator(inverted, dials, null));
     }
 
     [Fact]
@@ -71,11 +71,11 @@ public sealed class PopulationTests(ITestOutputHelper output)
         var thin = Drilled(hits: 10, misses: 5, marker: 7, inHits: 1.0, inMisses: 0.0);
 
         Assert.True(thin.Misses < dials.Floor);
-        Assert.Null(Repair.Discriminator(thin, dials, null));
+        Assert.Null(Conditions.Discriminator(thin, dials, null));
 
         var thick = Drilled(hits: 60, misses: 60, marker: 7, inHits: 1.0, inMisses: 0.0);
 
-        Assert.NotNull(Repair.Discriminator(thick, dials, null));
+        Assert.NotNull(Conditions.Discriminator(thick, dials, null));
     }
 
     [Fact]
@@ -101,12 +101,12 @@ public sealed class PopulationTests(ITestOutputHelper output)
             one.Settle(settle % 2 == 0 ? Verdict.Hit : Verdict.Miss, moment, 0.1);
         }
 
-        Assert.Null(Repair.Discriminator(one, dials, null));
+        Assert.Null(Conditions.Discriminator(one, dials, null));
 
         // And without the correction it would not refuse, which is what makes the
         // check above worth having rather than a description of a quiet world.
         var strongest = one.Separations
-            .Max(seen => Repair.Divergence(
+            .Max(seen => Conditions.Divergence(
                 seen.Value.InHits, one.Hits, seen.Value.InMisses, one.Misses));
 
         Assert.True(Normal.Tail(strongest) < dials.Alpha,
@@ -128,7 +128,7 @@ public sealed class PopulationTests(ITestOutputHelper output)
         var drawn = new HashSet<Code>();
 
         for (var draw = 0; draw < 50; draw++)
-            if (Repair.Discriminator(one, dials, new Random(draw)) is { } code) drawn.Add(code);
+            if (Conditions.Discriminator(one, dials, new Random(draw)) is { } code) drawn.Add(code);
 
         Assert.Equal([Of(6)], drawn);
     }
@@ -145,12 +145,12 @@ public sealed class PopulationTests(ITestOutputHelper output)
         Assert.Equal(1.0, Normal.Erfc(0.0), 6);
 
         // positive when the hits lead, which is the direction repair depends on.
-        Assert.True(Repair.Divergence(90, 100, 10, 100) > 0);
-        Assert.True(Repair.Divergence(10, 100, 90, 100) < 0);
-        Assert.Equal(0.0, Repair.Divergence(50, 100, 50, 100), 6);
+        Assert.True(Conditions.Divergence(90, 100, 10, 100) > 0);
+        Assert.True(Conditions.Divergence(10, 100, 90, 100) < 0);
+        Assert.Equal(0.0, Conditions.Divergence(50, 100, 50, 100), 6);
 
         // And nothing to say where there is nothing to say it from.
-        Assert.Equal(0.0, Repair.Divergence(0, 0, 5, 10));
+        Assert.Equal(0.0, Conditions.Divergence(0, 0, 5, 10));
     }
 
     // ---- the vote ----------------------------------------------------------
@@ -330,14 +330,14 @@ public sealed class PopulationTests(ITestOutputHelper output)
         var held = Varied(1, 2, 3);
 
         // NOTHING FIRED, so every gate agrees the moment was unaccounted for.
-        Assert.Equal(3, held.Cover(Moment(1, 2, 3), Says(1), []));
+        Assert.Equal(3, held.Genesis(Moment(1, 2, 3), Says(1), []));
         Assert.Equal(3, held.Count);
-        Assert.Equal(0, held.Cover(Moment(1, 2, 3), Says(1), []));
+        Assert.Equal(0, held.Genesis(Moment(1, 2, 3), Says(1), []));
 
         Assert.All(held.All, one => Assert.Single(one.Scope));
 
         // A different outcome is a different claim, so the same moment mints again.
-        Assert.Equal(3, held.Cover(Moment(1, 2, 3), Says(0), []));
+        Assert.Equal(3, held.Genesis(Moment(1, 2, 3), Says(0), []));
     }
 
     /// <summary>
@@ -366,7 +366,7 @@ public sealed class PopulationTests(ITestOutputHelper output)
 
             // The vote said 1 and 1 arrived is not a failure at all; what is being
             // tested is the failure where something DID propose what arrived.
-            var minted = held.Cover(moment, Says(1), firing);
+            var minted = held.Genesis(moment, Says(1), firing);
 
             if (rule == Surprising.Unaccounted)
                 Assert.Equal(0, minted);
@@ -375,7 +375,7 @@ public sealed class PopulationTests(ITestOutputHelper output)
 
             // And neither rule is satisfied by an outcome nobody proposed, or the gate
             // would be refusing genesis outright rather than refusing restatements.
-            Assert.Equal(3, held.Cover(moment, Says(7), firing));
+            Assert.Equal(3, held.Genesis(moment, Says(7), firing));
         }
     }
 
@@ -420,7 +420,7 @@ public sealed class PopulationTests(ITestOutputHelper output)
             const long Trials = 1_000_000L;
 
             return Normal.Tail(
-                Repair.Ahead(thinnest, thinnest, (long)(rate * Trials), Trials));
+                Conditions.Ahead(thinnest, thinnest, (long)(rate * Trials), Trials));
         }
 
         foreach (var rate in new[] { 0.5, 0.8, 0.85, 0.9, 0.95 })
@@ -460,7 +460,7 @@ public sealed class PopulationTests(ITestOutputHelper output)
     /// <para>
     /// <b>Genesis will not root on a code that has never been absent, so a population
     /// asked to cover before it has witnessed anything mints NOTHING.</b> That is the
-    /// gate working rather than a fault — but a test calling <see cref="Population.Cover"/>
+    /// gate working rather than a fault — but a test calling <see cref="Population.Genesis"/>
     /// straight out of the constructor is asking it to root on codes it has seen exactly
     /// once each, and it correctly declines.
     /// </para>

@@ -111,8 +111,8 @@ public sealed class Fleet : ICouncil
         Firing = Milliseconds(_asking),
         Settling = Milliseconds(_telling),
         Sweeping = Milliseconds(_counting),
-        Covering = 0.0,
-        Mending = 0.0,
+        Genesis = 0.0,
+        Repair = 0.0,
     };
 
     /// <inheritdoc/>

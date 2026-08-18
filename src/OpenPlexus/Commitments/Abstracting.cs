@@ -110,7 +110,7 @@ public sealed class Recurrence
     /// </para>
     /// <para>
     /// <b>And a one-code scope has no pair to contribute</b>, which makes this rung's input
-    /// exactly repair's surviving output. Covering mints one code and nothing longer, so
+    /// exactly repair's surviving output. Genesis mints one code and nothing longer, so
     /// every scope this admits was reached by a specialisation — and how many there are is a
     /// fact about the repair budget and the repair timing rather than about redundancy.
     /// <b>A naming count read without this beside it</b> is a repair result wearing an

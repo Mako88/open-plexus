@@ -167,8 +167,8 @@ public static class Fixture
 
         return (
             new Machines.Bench(
-                new Worlds.Body(new Machines.Watching<IReadOnlyList<int>>(
-                    world, new Codes.Bits(Worlds.Multiplexer.Bit))),
+                new Machines.Watching<IReadOnlyList<int>>(
+                    world, new Codes.Bits(Worlds.Multiplexer.Bit)),
                 brain),
             council);
     }

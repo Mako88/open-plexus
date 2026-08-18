@@ -279,7 +279,7 @@ public sealed class MultiplexerRun
         _census = census;
 
         _trial = new Bench(
-            new Body(new Watching<IReadOnlyList<int>>(_world, new Bits(Multiplexer.Bit))),
+            new Watching<IReadOnlyList<int>>(_world, new Bits(Multiplexer.Bit)),
             brain,
             sound: census ? _world.Sound : null);
     }

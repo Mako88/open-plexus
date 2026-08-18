@@ -595,11 +595,11 @@ public sealed record Census
 /// </remarks>
 public sealed class Bench
 {
-    private readonly Body _body;
+    private readonly IInput _world;
     private readonly Brain _brain;
     private readonly Func<ImmutableArray<Code>, Code, bool>? _sound;
 
-    /// <param name="body">Every sense pushing at the brain.</param>
+    /// <param name="world">What pushes moments at the brain.</param>
     /// <param name="brain">The one brain, already configured.</param>
     /// <param name="sound">
     /// Whether a scope-and-expectation is TRUE of the world, or nothing where the world
@@ -620,22 +620,22 @@ public sealed class Bench
     /// </para>
     /// </remarks>
     public Bench(
-        Body body,
+        IInput world,
         Brain brain,
         Func<ImmutableArray<Code>, Code, bool>? sound = null)
     {
-        ArgumentNullException.ThrowIfNull(body);
+        ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(brain);
 
-        _body = body;
+        _world = world;
         _brain = brain;
         _sound = sound;
     }
 
     /// <summary>What a blind guess scores on this world.</summary>
-    public double Chance => 1.0 / _body.Outcomes;
+    public double Chance => 1.0 / _world.Outcomes;
 
-    /// <summary>Runs the body into the brain.</summary>
+    /// <summary>Runs the world into the brain.</summary>
     /// <param name="rounds">How many rounds.</param>
     /// <param name="sweep">How often to subsume, abstract and cull.</param>
     /// <param name="target">The trailing accuracy <see cref="Tally.Reached"/> waits for.</param>
@@ -664,7 +664,7 @@ public sealed class Bench
         return running.GetAwaiter().GetResult();
     }
 
-    /// <summary>Runs the body into the brain, reporting on whoever holds the commitments.</summary>
+    /// <summary>Runs the world into the brain, reporting on whoever holds the commitments.</summary>
     /// <param name="holding">
     /// Whose commitments to report on — <b>one machine's, or every machine's.</b>
     /// </param>
@@ -738,11 +738,11 @@ public sealed class Bench
 
         for (long round = 0; round < rounds; round++)
         {
-            // Nothing where no sense had anything to say, which spends the round rather
-            // than looping. No `IInput` here is ever quiet -- a pulled world always has a
-            // next turn -- so what makes this reachable is a real sensor, and `Rounds`
-            // below is the loop's count rather than the number asked for.
-            if (_body.Push() is not { } pushed) continue;
+            // Nothing where the world had nothing to say, which spends the round rather than
+            // looping. No `IInput` here is ever quiet -- a pulled world always has a next
+            // turn -- so what makes this reachable is a world waiting on something outside
+            // itself, and `Rounds` below is the loop's count rather than the number asked for.
+            if (_world.Push() is not { } pushed) continue;
 
             codes += pushed.Codes.Count;
 
@@ -1000,20 +1000,15 @@ public sealed class Bench
     /// </remarks>
     private Examined? Examine(IReadOnlyList<Population> holding)
     {
-        // Every sense that keeps something back, asked together, because an examination is
-        // put to the population and the population has one. A body whose camera withholds
-        // and whose thermometer does not is examined on the camera's questions -- and the
-        // codes are the sense's own, so nothing here has to know which sense wrote them.
-        //
-        // And a body that can withhold and is not withholding reports absent rather than
-        // nought, which is the same distinction one layer in. An empty examination answers
-        // nothing, so every count would be nought and the accuracy with them -- which reads
-        // as a population that generalises to NOTHING rather than as a question nobody
-        // asked. `WithheldTests` names that trap and this is where it would arrive from.
-        var exam = _body.Senses
-            .OfType<IExamines>()
-            .SelectMany(one => one.Exam)
-            .ToList();
+        // Nothing where the world does not withhold, and a world that CAN withhold while
+        // withholding nothing reports absent rather than nought -- the same distinction one
+        // layer in. An empty examination answers nothing, so every count would be nought and
+        // the accuracy with them, which reads as a population that generalises to NOTHING
+        // rather than as a question nobody asked. `WithheldTests` names that trap and this is
+        // where it would arrive from.
+        if (_world is not IExamines examining) return null;
+
+        var exam = examining.Exam;
 
         if (exam.Count == 0) return null;
 

@@ -3,10 +3,10 @@ namespace OpenPlexus.Codes;
 /// <summary>Where a moment came from, and which one it is from there.</summary>
 /// <remarks>
 /// <para>
-/// <b>A sequence per source</b>, because two senses run on two clocks. A camera at two
-/// frames a second and a thermometer at one reading a minute are separate streams, and
-/// what follows a frame is the next frame rather than whatever happened to arrive next.
-/// A single counter over everything would make one sense's rate a fact about another's.
+/// <b>A sequence per source</b>, and a source is a whole world rather than one of its
+/// modalities. A brain judged on a generated world and on a text conversation at once has
+/// two streams to settle, and what follows a moment of one is the next moment of that one.
+/// A single counter over both would make one world's rate a fact about the other's.
 /// </para>
 /// <para>
 /// <b>And it is what tells a repeat from a successor</b>, which is all C2 leaves a
@@ -16,12 +16,21 @@ namespace OpenPlexus.Codes;
 /// </remarks>
 public readonly record struct Stamp
 {
+    /// <summary>The source a lone input pushes on.</summary>
+    /// <remarks>
+    /// <b>One rather than nought, so an unset source is not a valid one.</b> A default
+    /// <see langword="byte"/> is nought, and an input that forgot to say which stream it was
+    /// would then silently share one with whichever other input did the same.
+    /// </remarks>
+    public const byte First = 1;
+
     /// <summary>Which source pushed it.</summary>
     /// <remarks>
-    /// <b>A modality is not this</b>, and the two are close enough to be worth separating.
-    /// A <see cref="Code"/>'s modality says which alphabet a fragment is written in; this
-    /// says which stream it arrived on. Two cameras emit the same modality and are two
-    /// sources, and one camera's frame carries codes from several modalities at once.
+    /// <b>A modality is not this</b>, and conflating them is the error this comment now
+    /// exists to prevent. A <see cref="Code"/>'s modality says which alphabet a fragment is
+    /// written in, and one moment carries several — a camera and a microphone on one world
+    /// go into ONE moment, which is what makes a scope able to span them. This says which
+    /// world the moment came from, and there is normally one.
     /// </remarks>
     public required byte Source { get; init; }
 
@@ -32,10 +41,10 @@ public readonly record struct Stamp
 /// <summary>One moment, as a source pushed it.</summary>
 /// <remarks>
 /// <para>
-/// <b>Codes rather than the world's own terms</b>, because a world is a composition of
-/// senses and they have to compose in one alphabet. The translation is a third thing and
-/// it belongs at the join, so what reaches the brain has already been read by a front end
-/// — which is why nothing here is generic over what a world natively produces.
+/// <b>Codes rather than the world's own terms</b>, because a world's modalities have to
+/// compose in one alphabet. The translation is a third thing and it belongs at the join, so
+/// what reaches the brain has already been read by a front end — <see cref="Compound{T}"/>
+/// is where several of them merge into one moment.
 /// </para>
 /// <para>
 /// <b>And the brain is not asked</b>. A push arrives when the source has something, which

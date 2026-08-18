@@ -92,7 +92,7 @@ public sealed class OverlapTests(ITestOutputHelper output)
         // score, settle, sweep, cover and repair is the one duplication that could
         // silently start learning something else, and the clone budget exists for it.
         new Bench(
-            new Body(new Watching<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit))),
+            new Watching<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit)),
             brain).Run(Rounds);
 
         return brain.Held;

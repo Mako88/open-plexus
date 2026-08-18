@@ -182,13 +182,61 @@ public sealed class SensesTests(ITestOutputHelper output)
     /// exam number would say nothing about composition.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// <b>A scope spans two senses</b>, because a moment carries both.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The architecture's own line, asserted on a population rather than argued. Every input
+    /// is an attribute of a CONCEPT, and binding a seen thing to a heard one is the link this
+    /// design exists to make — so a world showing sight beside sound has to be able to leave
+    /// a rule naming both, and nothing had ever checked that it does.
+    /// </para>
+    /// <para>
+    /// <b>It is a fact about where modalities meet</b>, and that is the whole content. A scope
+    /// is built from one moment, so two modalities reach one scope exactly when they reach one
+    /// moment — which is what <see cref="Codes.Compound{TFrame}"/> is for and what
+    /// <see cref="Senses"/> does natively. A composition that gave each modality its own
+    /// moment would read nought here forever, and this repo briefly shipped one.
+    /// </para>
+    /// <para>
+    /// <b>Repair is what reaches it</b>, because genesis mints one code. So a nought here is
+    /// also the reading that says the second code never came from the other sense, which is
+    /// the same claim from the mechanism's side.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_scope_spans_two_senses_because_a_moment_carries_both()
+    {
+        var world = new Senses(Clean(), seed: 1);
+        var brain = new Brain(new CommittingSettings { Capacity = 4000 }, seed: 1);
+
+        new Bench(new Watching<Coded>(world, new Passthrough()), brain)
+            .Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
+
+        var all = brain.Held.All.ToList();
+
+        var crossing = all
+            .Count(one => one.Scope.Select(code => code.Modality).Distinct().Count() > 1);
+
+        Assert.True(crossing > 0,
+            $"not one of {all.Count} resident scopes names two modalities, so nothing the "
+            + "population holds is about a seen thing AND a heard one. A scope is built from "
+            + "one moment, so this is nought whenever the modalities are not in the same "
+            + "moment -- check the front end before the learner.");
+
+        output.WriteLine(
+            $"{crossing} of {all.Count} resident scopes span two senses "
+            + $"({crossing / (double)all.Count:F3})");
+    }
+
     [Fact]
     public void Senses_reaches_the_commitment_learner()
     {
         var world = new Senses(Clean() with { Withheld = 200 }, seed: 1);
         var brain = new Brain(new CommittingSettings { Capacity = 4000 }, seed: 1);
 
-        var tally = new Bench(new Body(new Watching<Coded>(world, new Passthrough())), brain)
+        var tally = new Bench(new Watching<Coded>(world, new Passthrough()), brain)
             .Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
 
         var unseen = Assert.IsType<Examined>(tally.Unseen);
@@ -247,7 +295,7 @@ public sealed class SensesTests(ITestOutputHelper output)
                     var brain = new Brain(new CommittingSettings { Capacity = 4000 }, seed: 1);
 
                     var tally = new Bench(
-                        new Body(new Watching<Coded>(world, new Passthrough())),
+                        new Watching<Coded>(world, new Passthrough()),
                         brain)
                         .Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
 

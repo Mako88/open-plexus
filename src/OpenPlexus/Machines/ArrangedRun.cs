@@ -406,7 +406,7 @@ public sealed class ArrangedRun
             _watching = () => (winnowing.Distinct, winnowing.Emitted);
         }
 
-        _trial = new Bench(new Body(new Watching<IReadOnlyList<double>>(World, _sensing)), brain);
+        _trial = new Bench(new Watching<IReadOnlyList<double>>(World, _sensing), brain);
     }
 
     /// <summary>Runs the world, learns from it, and asks whether what it holds is true.</summary>

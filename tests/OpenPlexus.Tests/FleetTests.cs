@@ -54,7 +54,7 @@ public sealed class FleetTests(ITestOutputHelper output)
 
         var world = new Multiplexer(new MultiplexerSettings { Address = address }, seed);
         var trial = new Bench(
-            new Body(new Watching<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit))),
+            new Watching<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit)),
             brain);
 
         return (trial.Run(rounds), brain.Held);
@@ -85,7 +85,7 @@ public sealed class FleetTests(ITestOutputHelper output)
 
         var world = new Multiplexer(new MultiplexerSettings { Address = address }, seed);
         var trial = new Bench(
-            new Body(new Watching<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit))),
+            new Watching<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit)),
             brain);
 
         var running = trial.RunAsync(fleet.Held, rounds);
@@ -332,7 +332,7 @@ public sealed class FleetTests(ITestOutputHelper output)
             var world = new Multiplexer(new MultiplexerSettings { Address = Address }, seed);
 
             var apart = new Bench(
-                new Body(new Watching<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit))),
+                new Watching<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit)),
                 placed).Run(Rounds);
 
             var (there, fleet, council) = await Spread(dials, Address, Rounds, seed, Holders);

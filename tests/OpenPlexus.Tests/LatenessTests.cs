@@ -122,7 +122,7 @@ public sealed class LatenessTests(ITestOutputHelper output)
 
         var world = new Multiplexer(new MultiplexerSettings { Address = Narrow }, seed);
         var trial = new Bench(
-            new Body(new Watching<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit))),
+            new Watching<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit)),
             brain);
 
         try

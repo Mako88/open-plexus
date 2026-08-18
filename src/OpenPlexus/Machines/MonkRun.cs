@@ -58,8 +58,8 @@ public sealed class MonkRun
         // is the only one that cannot alias -- which is the fault `Bits` already carried
         // once, when its only caller happened to be binary.
         _trial = new Bench(
-            new Body(new Watching<IReadOnlyList<int>>(
-                _world, new Bits(Monk.Attribute, Monk.Stride))),
+            new Watching<IReadOnlyList<int>>(
+                _world, new Bits(Monk.Attribute, Monk.Stride)),
             brain,
             sound: census
                 ? (scope, expects) => Monk.Sound(world.Puzzle, scope, expects)

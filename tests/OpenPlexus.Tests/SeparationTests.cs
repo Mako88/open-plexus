@@ -129,9 +129,9 @@ public sealed class SeparationTests
         var brain = new Brain(new CommittingSettings(), seed: 1);
 
         var symbolic = new Bench(
-            new Body(new Watching<IReadOnlyList<int>>(
+            new Watching<IReadOnlyList<int>>(
                 new Multiplexer(new MultiplexerSettings { Address = 2 }, seed: 1),
-                new Bits(Multiplexer.Bit))),
+                new Bits(Multiplexer.Bit)),
             brain);
 
         // A second SOURCE, because two worlds are two streams and a brain settles by the
@@ -139,10 +139,10 @@ public sealed class SeparationTests
         // already answered, and it refuses those rather than settling twice -- which is the
         // seam's own rule catching the arrangement this test exists to assert.
         var graded = new Bench(
-            new Body(new Watching<IReadOnlyList<double>>(
+            new Watching<IReadOnlyList<double>>(
                 new Graded(new GradedSettings { Address = 3, Crowding = 0.9 }, seed: 1),
                 new Winnowing(Multiplexer.Bit, 11),
-                source: Body.First + 1)),
+                source: Stamp.First + 1),
             brain);
 
         var first = symbolic.Run(4000);

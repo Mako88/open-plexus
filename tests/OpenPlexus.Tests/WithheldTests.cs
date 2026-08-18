@@ -80,9 +80,9 @@ public sealed class WithheldTests(ITestOutputHelper output)
 
         return (
             new Bench(
-                new Body(new Watching<IReadOnlyList<double>>(
+                new Watching<IReadOnlyList<double>>(
                     world,
-                    new Winnowing(CifarRun.Pixel, world.Width))),
+                    new Winnowing(CifarRun.Pixel, world.Width)),
                 brain),
             brain);
     }

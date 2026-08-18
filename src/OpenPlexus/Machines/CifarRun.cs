@@ -141,7 +141,7 @@ public sealed class CifarRun : IDisposable
             Reading = _encoded.Embedding;
         }
 
-        _trial = new Bench(new Body(new Watching<IReadOnlyList<double>>(World, sensing)), brain);
+        _trial = new Bench(new Watching<IReadOnlyList<double>>(World, sensing), brain);
     }
 
     /// <summary>Releases the encoder's graph, where there is one.</summary>

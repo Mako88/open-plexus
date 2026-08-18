@@ -50,7 +50,7 @@ public sealed class GradedRun
             : new Banded<IReadOnlyList<double>>(
                 reading => reading, Multiplexer.Bit, made.Width, Bands, Grains);
 
-        _trial = new Bench(new Body(new Watching<IReadOnlyList<double>>(made, sensing)), brain);
+        _trial = new Bench(new Watching<IReadOnlyList<double>>(made, sensing), brain);
     }
 
     /// <summary>Runs the world and learns from it.</summary>

@@ -68,9 +68,9 @@ public sealed class RecalledTests(ITestOutputHelper output)
         return (
             world,
             new Bench(
-                new Body(new Watching<Recited>(
+                new Watching<Recited>(
                     world,
-                    new Joined(joining, categories, hops, banded))),
+                    new Joined(joining, categories, hops, banded)),
                 brain),
             brain);
     }
@@ -360,12 +360,12 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
                         var trial = ordered
                             ? new Bench(
-                                new Body(new Watching<Recited>(world, new Joined(Joining.Bagged))),
+                                new Watching<Recited>(world, new Joined(Joining.Bagged)),
                                 brain)
                             : new Bench(
-                                new Body(new Watching<Recited>(
+                                new Watching<Recited>(
                                     world,
-                                    new Unordered(Joining.Bagged))),
+                                    new Unordered(Joining.Bagged)),
                                 brain);
 
                         var tally = trial.Run(
@@ -497,10 +497,10 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
                     var trial = ordered
                         ? new Bench(
-                            new Body(new Watching<Recited>(world, new Joined(joining, hops: hops))),
+                            new Watching<Recited>(world, new Joined(joining, hops: hops)),
                             brain)
                         : new Bench(
-                            new Body(new Watching<Recited>(world, new Unordered(joining, hops))),
+                            new Watching<Recited>(world, new Unordered(joining, hops)),
                             brain);
 
                     var tally = trial.Run(
@@ -1689,9 +1689,9 @@ public sealed class RecalledTests(ITestOutputHelper output)
             {
                 var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, 1);
                 var trial = new Bench(
-                    new Body(new Watching<Recited>(
+                    new Watching<Recited>(
                         new Recalled(World(task, span: 0)),
-                        new Joined(joining, hops: 1))),
+                        new Joined(joining, hops: 1)),
                     brain);
 
                 var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);

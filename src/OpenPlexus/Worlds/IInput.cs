@@ -2,16 +2,22 @@ using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
 
-/// <summary>One stream of moments, pushing at whatever will take them.</summary>
+/// <summary>One world pushing moments, at whatever will take them.</summary>
 /// <remarks>
 /// <para>
-/// <b>One sense, and a body is several of them.</b> A camera, a microphone and a
-/// thermometer are three of these and one <see cref="Body"/>, each stamping its own
-/// sequence — so what follows a frame is the next frame rather than whatever arrived next.
-/// A single stream carrying every sense would make one sensor's rate a fact about another's.
+/// <b>One world and one stream, and a moment carries every modality at once.</b> A camera, a
+/// microphone and a thermometer on one world are three front ends and ONE moment — which is
+/// what lets a scope span them, and it is the link this design exists to make.
+/// <see cref="Codes.Compound{TFrame}"/> is where they merge.
 /// </para>
 /// <para>
-/// <b>Codes rather than a world's own terms</b>, because senses have to compose in one
+/// <b>Interleaving them was the error this comment replaces.</b> A composition that asked
+/// each modality in turn gave each its own moment, so no scope could ever hold two of them —
+/// a limit read as a fact about the architecture when it was a fact about the composition.
+/// Modalities were never meant to be apart.
+/// </para>
+/// <para>
+/// <b>Codes rather than a world's own terms</b>, because modalities have to compose in one
 /// alphabet. That puts the translation on this side of the seam, which is where the plan
 /// has always said it belongs: whether a reading is banded or winnowed is neither a fact
 /// about the problem nor a setting on the brain.
@@ -27,9 +33,9 @@ public interface IInput
 {
     /// <summary>Which source this is.</summary>
     /// <remarks>
-    /// <b>Distinct per sense</b>, because a settlement is the next moment from the same
-    /// place. Two senses sharing one number would have each answering the other's
-    /// questions.
+    /// <b>Distinct per world</b>, because a settlement is the next moment from the same
+    /// place. Two worlds on one number would have each answering the other's questions, and
+    /// there is normally one.
     /// </remarks>
     byte Source { get; }
 
@@ -42,10 +48,10 @@ public interface IInput
 
     /// <summary>The next moment, or nothing where this source has nothing to say now.</summary>
     /// <remarks>
-    /// <b>Nothing is a quiet sense rather than the end of the stream.</b> A thermometer
-    /// read once a minute has nothing to say on almost every pass, and that is the shape a
-    /// body of senses running at different rates is in — so a null here must not be read as
-    /// a source that has finished.
+    /// <b>Nothing is a quiet world rather than the end of the stream.</b> A world waiting on
+    /// something outside itself has nothing to say for a while and is not finished, so a null
+    /// here must not be read as one. A modality that is slower than the others is NOT this
+    /// case: it contributes no codes to the moment and the moment still happens.
     /// </remarks>
     Pushed? Push();
 }

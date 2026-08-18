@@ -557,7 +557,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
                     new CommittingSettings { Capacity = 4000 }, seed);
 
                 var tally = new Machines.Bench(
-                    new Body(new Machines.Watching<Recited>(world, new Reciting(reading))),
+                    new Machines.Watching<Recited>(world, new Reciting(reading)),
                     brain)
                     .Run(5_000, sweep: 1000, target: 0.9, window: 2000);
 

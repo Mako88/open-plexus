@@ -58,7 +58,7 @@ public sealed class Watching<TSeen> : IInput, IExamines
     public Watching(
         IWorld<TSeen> world,
         IQuantizer<TSeen> sensing,
-        byte source = Body.First,
+        byte source = Stamp.First,
         Func<IReadOnlyCollection<Code>, int?>? acting = null)
     {
         ArgumentNullException.ThrowIfNull(world);

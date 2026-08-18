@@ -884,10 +884,10 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed);
 
                 var tally = new Bench(
-                    new Body(new Watching<Recited>(
+                    new Watching<Recited>(
                         world,
                         joined,
-                        acting: acting ?? (_ => null))),
+                        acting: acting ?? (_ => null)),
                     brain)
                     .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
 
@@ -1461,10 +1461,10 @@ public sealed class RoamingTests(ITestOutputHelper output)
             var picking = new Random(1);
 
             var tally = new Bench(
-                new Body(new Watching<Recited>(
+                new Watching<Recited>(
                     world,
                     new Joined(Joining.Resolved, resolution: 1),
-                    acting: _ => picking.NextDouble() < often ? picking.Next(3) : null)),
+                    acting: _ => picking.NextDouble() < often ? picking.Next(3) : null),
                 brain)
                 .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
 

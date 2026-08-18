@@ -260,9 +260,8 @@ out of it, and anything before six that reads as tuning is out of order.
       seen twice.
   - Every input an attribute of it
     - **NOW** — several front ends manufacture symbols from a signal, and each is priced.
-    - **OPEN** — nothing makes them attributes of one THING, and a `Body`'s senses push
-      SEPARATE moments so no scope crosses two. Binding wants moments FUSED across sources,
-      which rung five's co-firing never reaches.
+    - **OPEN** — nothing makes them attributes of one THING. Rung five names what co-fires,
+      which is what a seen ball and a heard *ball* do.
     - **SETTLED** — the binding world failed as predicted and has since lifted. Fork **25**.
     - **OPEN** — text as an IMAGE keeps ground truth enumerable, so soundness survives where
       a camera kills it. `Senses` names cross two senses, so the gate is open. Fork **107**.
@@ -561,8 +560,8 @@ out of it, and anything before six that reads as tuning is out of order.
       absence is established by arrival rather than by a clock. C2 forbids the deadline.
     - **OPEN** — and across senses it needs `Ask` to return an occasion `Tell` takes back:
       `Alone` holds ONE pending firing, so a second source clobbers the first's.
-    - **NOW** — `Body` composes `IInput`s each stamping their own sequence, `Watching` is the
-      join, `Bench` is the loop. `Trial` is gone; `Alone` stays, being the substrate seam.
+    - **NOW** — `IInput` is one WORLD pushing stamped moments, `Watching` is the join,
+      `Bench` is the loop. `Trial` is gone; `Alone` stays, being the substrate seam.
     - **OPEN** — `IWorld.Next` is still a pull behind `Watching`. A sense on its own schedule
       is a second `IInput`, not a second bench. Fork **113**.
     - **OPEN** — with no outcome slot a commitment may expect any code in the successor, which

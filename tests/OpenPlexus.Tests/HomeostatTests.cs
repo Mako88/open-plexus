@@ -383,7 +383,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
             var steps = 0;
 
             var trial = new Bench(
-                new Body(new Watching<Bodily>(
+                new Watching<Bodily>(
                     body,
                     new Bodied(Feeling.Acted),
                     acting: felt =>
@@ -395,7 +395,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
                         if (body.Viable) viable++;
 
                         return chosen(felt);
-                    })),
+                    }),
                 brain);
 
             var tally = trial.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000);
@@ -456,17 +456,17 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         var brain = new Brain(new CommittingSettings(), 1);
 
         Assert.Throws<ArgumentNullException>(() =>
-            new Bench(new Body(new Watching<Bodily>(body, new Bodied(Feeling.Acted))), brain));
+            new Bench(new Watching<Bodily>(body, new Bodied(Feeling.Acted)), brain));
 
         // And the other way round, because a chooser nobody asks is an arm that reads as
         // having run. The multiplexer is watched, so a chooser handed to it would sit
         // unused while its cell reported a policy.
         Assert.Throws<ArgumentException>(() =>
             new Bench(
-                new Body(new Watching<IReadOnlyList<int>>(
+                new Watching<IReadOnlyList<int>>(
                     new Multiplexer(new MultiplexerSettings { Address = 2 }, 1),
                     new Bits(2 + 4),
-                    acting: _ => 0)),
+                    acting: _ => 0),
                 brain));
     }
 
@@ -524,10 +524,10 @@ public sealed class HomeostatTests(ITestOutputHelper output)
             var brain = new Brain(new CommittingSettings { Capacity = 2000 }, 1);
 
             var trial = new Bench(
-                new Body(new Watching<Bodily>(
+                new Watching<Bodily>(
                     body,
                     new Bodied(feeling),
-                    acting: uniform ? Blindly(body, draw) : Aimed(body))),
+                    acting: uniform ? Blindly(body, draw) : Aimed(body)),
                 brain);
 
             var tally = trial.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000);
@@ -553,7 +553,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         var quiet = new Homeostat(World());
 
         var blind = new Bench(
-            new Body(new Watching<Bodily>(quiet, new Bodied(Feeling.Blind), acting: Aimed(quiet))),
+            new Watching<Bodily>(quiet, new Bodied(Feeling.Blind), acting: Aimed(quiet)),
             new Brain(new CommittingSettings { Capacity = 2000 }, 1));
 
         Assert.Equal(Rounds, blind.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000).Silent);

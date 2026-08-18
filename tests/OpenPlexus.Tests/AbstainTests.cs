@@ -53,7 +53,7 @@ public sealed class AbstainTests(ITestOutputHelper output)
     private static Pushed Push(long sequence, IReadOnlySet<Code> codes, Code? followed) =>
         new()
         {
-            From = new Stamp { Source = Body.First, Sequence = sequence },
+            From = new Stamp { Source = Stamp.First, Sequence = sequence },
             Codes = codes,
             Followed = followed,
         };
@@ -308,9 +308,9 @@ public sealed class AbstainTests(ITestOutputHelper output)
         var brain = new Brain(new CommittingSettings(), seed: 1);
 
         var bench = new Bench(
-            new Body(new Watching<IReadOnlyList<int>>(
+            new Watching<IReadOnlyList<int>>(
                 new Multiplexer(new MultiplexerSettings { Address = 2 }, seed: 1),
-                new Bits(Multiplexer.Bit))),
+                new Bits(Multiplexer.Bit)),
             brain);
 
         const long Half = 500;

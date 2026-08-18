@@ -210,14 +210,19 @@ gets one home and a cross-reference by number from anywhere else it serves; numb
 renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, point
 `DocsTests` at `csharp` for them rather than weakening it.
 
-**The order of the work is John's**, 2026-08-16 and amended 2026-08-18, and nothing here is
-taken out of it. One: a mechanism for every entry of THE ARCHITECTURE, however bad, and
-`Roaming` wired through all of them. Two: the intentional reds cleared, which is the stable
-state to refine from. Three: audit TRAPS and DO NOT RE-TRY, because a failure class that has
-earned a check belongs in the check and a revival condition that has expired is a
-superstition. Four: split `Population`, which holds matching, voting, genesis, repair,
-subsumption, naming and culling at once. Five: refining. Anything before five that reads as
-tuning is out of order.
+The order of the work is John's, 2026-08-16 and reordered 2026-08-18. Nothing here is taken
+out of it, and anything before six that reads as tuning is out of order.
+
+- **One, the seam** — a world becomes a set of inputs pushing moments, the brain answers with
+  what it did, and `Trial` goes. It carries its own repair: a phase leaving the suite
+  unreadable makes the next one blind, so one ends when the reds are the three that are named.
+- **Two, a mechanism for every entry of THE ARCHITECTURE**, however bad, and `Roaming`
+  exercising all of them.
+- **Three, the intentional reds cleared**, which is the stable state to refine from.
+- **Four, audit TRAPS and DO NOT RE-TRY** — a failure class that has earned a check belongs
+  in the check, and a revival condition that has expired is a superstition.
+- **Five, split `Population`** and any other class holding several mechanisms at once.
+- **Six, refining** toward the first north star.
 
     Commitment := scope (codes that must all be present)
                 → expects (a code that should follow)
@@ -553,6 +558,9 @@ tuning is out of order.
       An action that could not be done must never read as one that was.
     - **OPEN** — with no outcome slot a commitment may expect any code in the successor, which
       multiplies genesis by the moment's WIDTH. What gates that is unbuilt. Fork **114**.
+    - **OPEN** — what is predicted is a SET and what is done is a set, so one motor moving and
+      a sentence written out are one shape. Scoring becomes precision and recall, and every
+      baseline here is re-taken rather than preserved.
 - **WHAT THE INSTRUMENTS MUST SAY** — an instrument that cannot fail says nothing, and every
   ground-truth one here needs a world that can be enumerated.
   - A run reproduces exactly

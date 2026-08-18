@@ -57,7 +57,7 @@ public interface ICouncil
 {
     /// <summary>Where the wall clock went, by phase.</summary>
     /// <remarks>
-    /// <b>And no dials beside it, which is a deliberate absence.</b> <c>Cycle</c> read
+    /// <b>And no dials beside it, which is a deliberate absence.</b> <c>Round</c> read
     /// <c>Repairing</c> off the population to decide where a call sat, so one setting was
     /// consulted in two places and a cell that moved the gate also moved the timing.
     /// Every dial that decides something is now read where it decides, and a loop that

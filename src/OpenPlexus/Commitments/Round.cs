@@ -96,7 +96,7 @@ public sealed record Spent
 /// so the seam is exactly one call wide.
 /// </para>
 /// </remarks>
-public sealed class Cycle
+public sealed class Round
 {
     private readonly ICouncil _council;
     private readonly int _sweep;
@@ -112,7 +112,7 @@ public sealed class Cycle
     /// <param name="sweep">How often to subsume, abstract and cull.</param>
     /// <param name="target">The trailing accuracy <see cref="Reached"/> waits for.</param>
     /// <param name="window">How many answered predictions that accuracy is over.</param>
-    public Cycle(ICouncil council, long rounds, int sweep, double target, int window)
+    public Round(ICouncil council, long rounds, int sweep, double target, int window)
     {
         ArgumentNullException.ThrowIfNull(council);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(rounds);

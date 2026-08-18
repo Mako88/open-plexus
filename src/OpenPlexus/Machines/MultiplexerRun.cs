@@ -169,7 +169,7 @@ public sealed record Learned
     /// <para>
     /// <b>Written once because the clone budget refused the second copy</b>, on the day
     /// the second enumerable world arrived — the same thing that happened to
-    /// <see cref="Commitments.Cycle"/>, and for a better reason than tidiness. Two copies
+    /// <see cref="Commitments.Round"/>, and for a better reason than tidiness. Two copies
     /// of a grading pass are two places for <i>experienced</i>, <i>checkable</i> and
     /// <i>sound</i> to drift apart, and a soundness count meaning one thing on one world
     /// and something else on another is not comparable between them — which is most of

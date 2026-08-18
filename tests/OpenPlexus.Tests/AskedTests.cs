@@ -10,7 +10,7 @@ using Xunit.Abstractions;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// Learning across a socket — <b>fork 52's transport half, and the first traffic in this
+/// Round across a socket — <b>fork 52's transport half, and the first traffic in this
 /// project that is not a thought.</b>
 /// </summary>
 /// <remarks>
@@ -155,7 +155,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// <remarks>
     /// <b>THROUGH <see cref="IWorld{TSeen}"/> rather than the world's own cues</b>, which
     /// is the answer-key-in-the-wrong-alphabet trap wearing a different hat: reading
-    /// <c>Multiplexer.Round</c> directly skips the quantiser and produces moments the
+    /// <c>Multiplexer.Assignment</c> directly skips the quantiser and produces moments the
     /// population has never been asked in that alphabet.
     /// </remarks>
     private static List<IReadOnlySet<Code>> Moments(int address, int many)

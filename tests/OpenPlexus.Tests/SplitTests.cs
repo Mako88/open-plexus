@@ -80,7 +80,7 @@ public sealed class SplitTests(ITestOutputHelper output)
         // only from familiar moments would be measuring the merge on the easy half.
         //
         // AND THROUGH `IWorld` RATHER THAN THE WORLD'S OWN `Next`, so these moments are
-        // coded by exactly the path `Trial` used in training. `Multiplexer.Round` carries
+        // coded by exactly the path `Trial` used in training. `Multiplexer.Assignment` carries
         // cues that are already codes, and reading them directly would skip the quantiser
         // -- producing moments the population had never been asked in that alphabet, which
         // is the answer-key-in-the-wrong-alphabet trap wearing a different hat.
@@ -282,7 +282,7 @@ public sealed class SplitTests(ITestOutputHelper output)
             var whole = held.Predict(firing);
             if (whole.Weight <= 0) continue;
 
-            // RELATIVE RATHER THAN ABSOLUTE, matching `Cycle.Confidence` exactly. A weight
+            // RELATIVE RATHER THAN ABSOLUTE, matching `Round.Confidence` exactly. A weight
             // is an accuracy and was once an accuracy raised to a power, which made an
             // absolute margin incomparable between two settings; relative survived the dial.
             var confidence = whole.Margin / whole.Weight;

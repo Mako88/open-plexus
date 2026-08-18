@@ -553,7 +553,7 @@ public sealed class Population
 
     /// <summary>Every number the brain was handed.</summary>
     /// <remarks>
-    /// <b>READ BY <see cref="Cycle"/>, which owns the loop and not the dials.</b> Handing
+    /// <b>READ BY <see cref="Round"/>, which owns the loop and not the dials.</b> Handing
     /// the same settings record to both would be two references to one object with two
     /// chances to be given different ones — and a learning loop configured differently
     /// from the population it drives is the sort of fault that shows up as a mechanism
@@ -959,7 +959,7 @@ public sealed class Population
         ArgumentNullException.ThrowIfNull(moment);
 
         // The gate is read here because this is where the dials live. Putting it in
-        // `Cycle` would give the learning loop a second opinion about the brain's
+        // `Round` would give the learning loop a second opinion about the brain's
         // numbers, and there is exactly one place those are allowed to be read.
         if (_dials.Surprising == Surprising.Unaccounted
             && !firing.IsDefaultOrEmpty

@@ -18,7 +18,7 @@ namespace OpenPlexus.Tests;
 /// object, and both are asked of a population somebody else had already trained. Nothing
 /// had ever LEARNT across a wire: fork 1 is open because an occasion writes its edges into
 /// locally-held clusters, and the commitment learner was in the same position for a
-/// different reason — <c>Cycle</c> called <c>Predict</c> on its own population and
+/// different reason — <c>Round</c> called <c>Predict</c> on its own population and
 /// <c>Abstract</c> with no argument.
 /// </para>
 /// <para>

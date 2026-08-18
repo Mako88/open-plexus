@@ -270,7 +270,7 @@ public sealed class WireTests(ITestOutputHelper output)
         // NOT `Assert.Equal(ask, back)`, and the reason is a trap this repo has already
         // paid for once. A synthesised record equality compares `ImmutableArray<T>` by the
         // identity of the array behind it, so two asks holding identical moments are never
-        // equal and the assertion could only ever fail. `Multiplexer.Round` carries a
+        // equal and the assertion could only ever fail. `Multiplexer.Assignment` carries a
         // hand-written `Equals` with the same note.
         Assert.Equal(Wire.Write(ask), Wire.Write(back));
 

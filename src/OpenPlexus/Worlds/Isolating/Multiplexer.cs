@@ -140,12 +140,12 @@ public sealed record MultiplexerSettings
     public double Unsettled { get; init; }
 }
 
-/// <summary>One round: what was shown, and what should follow it.</summary>
+/// <summary>One assignment of the bits: what was shown, and what should follow it.</summary>
 /// <remarks>
 /// <b>Two fields and not a frame</b> — how a round becomes occasions is the runner's
 /// business, because a world is a PROBLEM and the frame protocol is not part of one.
 /// </remarks>
-public readonly record struct Round
+public readonly record struct Assignment
 {
     /// <summary>One code per bit, carrying its position and its value.</summary>
     public required ImmutableArray<Code> Cues { get; init; }
@@ -166,7 +166,7 @@ public readonly record struct Round
     /// able to fail.
     /// </remarks>
     /// <param name="other">The round to compare against.</param>
-    public bool Equals(Round other) =>
+    public bool Equals(Assignment other) =>
         Answer == other.Answer
         && Outcome == other.Outcome
         && Cues.AsSpan().SequenceEqual(other.Cues.AsSpan());
@@ -419,7 +419,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// scoring against the answer it had at the start would measure the switch.
     /// </para>
     /// <para>
-    /// <b>And it carries <see cref="Round.Answer"/> rather than the emitted outcome.</b>
+    /// <b>And it carries <see cref="Assignment.Answer"/> rather than the emitted outcome.</b>
     /// Noise flips what a learner is TOLD, and nothing here is ever told to anyone — an
     /// examination asks what the population would say about a case the world kept, so the
     /// thing to mark it against is what the function says rather than what a lie would
@@ -485,7 +485,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     }
 
     /// <summary>One round of the world.</summary>
-    public Round Next()
+    public Assignment Next()
     {
         // The mapping moves before the round it affects, so a run that switches
         // every N rounds has the old target for exactly N of them. Moving it after
@@ -534,7 +534,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
             ? 1 - answer
             : answer;
 
-        return new Round
+        return new Assignment
         {
             Cues = [.. Enumerable.Range(0, Bits).Select(which => Of(which, bits[which]))],
             Answer = Says(answer),

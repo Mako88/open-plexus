@@ -93,7 +93,7 @@ public readonly record struct Layout
     /// identity of the array behind it, so two scenes built from the same placement
     /// compare UNEQUAL — and every determinism check written against it would have
     /// passed by never being able to fail. The same fault, and the same fix, as
-    /// <see cref="Round"/>.
+    /// <see cref="Assignment"/>.
     /// </remarks>
     /// <param name="other">The scene to compare against.</param>
     public bool Equals(Layout other) =>

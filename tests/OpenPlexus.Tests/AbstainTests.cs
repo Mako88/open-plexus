@@ -15,7 +15,7 @@ namespace OpenPlexus.Tests;
 /// is unarmed in any run — nothing in one process can die, so C3's third outcome is
 /// exercised only by unit tests.</i> Distribution was never the wall.
 /// <see cref="Commitment.Settle"/> has always handled the verdict correctly and
-/// <see cref="Population.Settle"/> has always taken a nullable code; <c>Cycle.Step</c> took
+/// <see cref="Population.Settle"/> has always taken a nullable code; <c>Round.Step</c> took
 /// a NON-NULLABLE one, so no caller could produce a single abstain on any number of
 /// machines with any number of deaths.
 /// </para>
@@ -61,11 +61,11 @@ public sealed class AbstainTests(ITestOutputHelper output)
 
         held.Add(new Commitment([one], Brain.Says(0)));
 
-        var cycle = new Cycle(new Alone(held), rounds: 10, sweep: 1000, target: 0.9, window: 2);
+        var loop = new Round(new Alone(held), rounds: 10, sweep: 1000, target: 0.9, window: 2);
 
         var moment = new HashSet<Code> { one, two };
 
-        await cycle.StepAsync(moment, Brain.Says(0));
+        await loop.StepAsync(moment, Brain.Says(0));
 
         var mind = held.All.Single();
 
@@ -74,9 +74,9 @@ public sealed class AbstainTests(ITestOutputHelper output)
         var accuracy = mind.Accuracy;
         var separations = mind.Separations.Count;
 
-        await cycle.StepAsync(moment, arrived: null);
+        await loop.StepAsync(moment, arrived: null);
 
-        Assert.Equal(1, cycle.Abstained);
+        Assert.Equal(1, loop.Abstained);
         Assert.Equal(1, mind.Abstains);
 
         // Not one of these moves, and the table is the one that would be missed. Hits and
@@ -91,7 +91,7 @@ public sealed class AbstainTests(ITestOutputHelper output)
         // AND THE ROUND HAPPENED, which is the half that separates this from the loop
         // simply skipping the call. A round nobody counted would leave every number above
         // equal for the wrong reason.
-        Assert.Equal(2, cycle.Rounds);
+        Assert.Equal(2, loop.Rounds);
 
         // AND NOTHING WAS MINTED EITHER. Genesis needs something to have arrived to be
         // surprised by, so an unsettled round cannot cover -- and if it could, a quiet

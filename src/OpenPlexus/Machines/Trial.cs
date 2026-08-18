@@ -102,7 +102,7 @@ public sealed record Tally
     /// <remarks>
     /// <b>Armed here for the first time</b>, and the plan said it already was. The
     /// margin has been computed every round for the life of the branch and read by
-    /// nothing — see <see cref="Commitments.Cycle.Confidence"/>. Near nought it says the
+    /// nothing — see <see cref="Commitments.Round.Confidence"/>. Near nought it says the
     /// answer is being settled by how many advocates each side had rather than by how
     /// accurate any of them is, which is the one failure the vote's whole shape exists
     /// to prevent and the one thing no score reports.
@@ -795,7 +795,7 @@ public sealed class Trial<TSeen>
         ArgumentNullException.ThrowIfNull(council);
         ArgumentNullException.ThrowIfNull(holding);
 
-        var cycle = new Cycle(council, rounds, sweep, target, window);
+        var loop = new Round(council, rounds, sweep, target, window);
 
         long codes = 0;
         long outvoted = 0, uncovered = 0, deeper = 0, hard = 0, carried = 0, untested = 0;
@@ -951,7 +951,7 @@ public sealed class Trial<TSeen>
             // A round the world could not settle passes nothing rather than a number, and
             // that is the whole of what arms `Abstain`. Every world that always knows its
             // outcome reaches the same call it always did.
-            await cycle.StepAsync(
+            await loop.StepAsync(
                 new HashSet<Code>(said),
                 turn.Outcome is { } outcome ? Brain.Says(outcome) : null,
                 ct).ConfigureAwait(false);
@@ -996,19 +996,19 @@ public sealed class Trial<TSeen>
         return new Tally
         {
             Rounds = rounds,
-            Right = cycle.Right,
-            Wrong = cycle.Wrong,
-            Silent = cycle.Silent,
-            Abstained = cycle.Abstained,
-            Recent = cycle.Recent,
-            Confidence = cycle.Confidence,
-            Reached = cycle.Reached,
-            Repaired = cycle.Repaired,
-            Subsumed = cycle.Subsumed,
-            Minted = cycle.Minted,
+            Right = loop.Right,
+            Wrong = loop.Wrong,
+            Silent = loop.Silent,
+            Abstained = loop.Abstained,
+            Recent = loop.Recent,
+            Confidence = loop.Confidence,
+            Reached = loop.Reached,
+            Repaired = loop.Repaired,
+            Subsumed = loop.Subsumed,
+            Minted = loop.Minted,
             Resident = counted,
             Separations = separations,
-            Spent = cycle.Spent,
+            Spent = loop.Spent,
             Occasions = counted == 0 ? 0.0 : occasions / counted,
             Named = minted.Count,
             Stacked = stacked,

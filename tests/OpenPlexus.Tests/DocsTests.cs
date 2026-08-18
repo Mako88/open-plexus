@@ -225,7 +225,19 @@ public sealed class DocsTests
     // the one place a phase can live: `OutstandingTests` takes only entries computable
     // without judgement, and which traps have earned a check is a judgement an entry at a
     // time.
-    private const int Whole = 10_467;
+    // And 10,567 is the thirteenth raise, a hundred words for John's
+    // reordering on 2026-08-18 and the decision under it. The seam moves to phase one,
+    // because every mechanism built against `Trial` would have to be ported once it goes;
+    // clearing the reds moves to three; refining moves to six. The amendment beside it is
+    // the seam carrying its own repair — a phase that leaves the suite unreadable makes the
+    // next one blind.
+    //
+    // The leaf is the other half. What is predicted is a SET and what is done is a set, so
+    // scoring becomes precision and recall and every baseline is re-taken. That sentence
+    // cost a raise rather than a trade on purpose: preserving recorded numbers is never a
+    // reason to keep anything, and a doc that had to delete an item to say so would be
+    // paying the same fee twice.
+    private const int Whole = 10_567;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

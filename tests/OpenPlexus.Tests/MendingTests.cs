@@ -12,7 +12,7 @@ namespace OpenPlexus.Tests;
 /// <remarks>
 /// <para>
 /// <b>The setting decides two independent things and is named for one.</b> Whether repair
-/// runs every round or only after the vote was wrong is decided in <c>Cycle</c>;
+/// runs every round or only after the vote was wrong is decided in <c>Round</c>;
 /// whether a commitment something else already narrows may be repaired at all is decided
 /// in <c>Population.Repair</c>. <c>Mending.Outvoted</c> is after-failure with no
 /// gate, <see cref="Mending.Uncovered"/> is every-round WITH the gate — so the two differ

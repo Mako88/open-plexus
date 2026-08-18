@@ -536,6 +536,19 @@ Three: refining. Anything before three that reads as tuning is out of order.
     - **NOW** — only IDENTICAL evidence converges on a name. Machines sharing most of a
       stream agree as poorly as machines sharing none, so merging the counts is the only
       thing that works rather than an optimisation.
+  - The world pushes and the brain receives
+    - **OPEN** — a world is a set of INPUTS that push a moment, and the brain answers with
+      what it did. `IWorld.Next` is a pull, so no learner here has ever chosen when to think.
+    - **OPEN** — a commitment is settled by the SUCCESSOR moment from the same source, so
+      absence is established by arrival rather than by a clock. C2 forbids the deadline.
+    - **OPEN** — a source stamps a sequence and the brain says when a moment settled, so a
+      bench pushes and waits where a body pushes and forgets. Fork **113**.
+    - **OPEN** — a brain that is overrun ABSTAINS rather than mis-settles, which makes the
+      abstain count a backpressure reading and not only a verdict.
+    - **OPEN** — the world marks which codes it was handed and the learner derives the doing.
+      An action that could not be done must never read as one that was.
+    - **OPEN** — with no outcome slot a commitment may expect any code in the successor, which
+      multiplies genesis by the moment's WIDTH. What gates that is unbuilt. Fork **114**.
 - **WHAT THE INSTRUMENTS MUST SAY** — an instrument that cannot fail says nothing, and every
   ground-truth one here needs a world that can be enumerated.
   - A run reproduces exactly
@@ -559,6 +572,8 @@ Three: refining. Anything before three that reads as tuning is out of order.
       to tell, the draw rejecting rather than picking. Fork **48**.
     - **OPEN** — the held-out gap as a function of RECURRENCE, which is the number saying how
       big a bag a world needs. Fork **41**.
+    - **OPEN** — a withheld observation becomes a PAIR under settlement by successor, the
+      moment and the one after it. Every generated world owes it.
   - A score says how often and never which
     - **NOW** — a transcript is an instrument and the cheapest one here. A population
       answering everything with the commonest word and one that has learnt the task read

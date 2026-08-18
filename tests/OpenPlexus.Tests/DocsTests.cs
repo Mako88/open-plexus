@@ -206,7 +206,20 @@ public sealed class DocsTests
     // could not carry -- a tier that is built and a tier that is blocked read identically
     // from one line, and John's order asks for a mechanism for every architecture entry
     // rather than a measurement, so which of the two this is has to be sayable.
-    private const int Whole = 10_205;
+    // And 10,419 is the eleventh raise, two hundred and fourteen words for the push
+    // architecture: a world becomes a set of inputs, a moment settles the one before it, and
+    // the brain answers with what it did. Seven leaves and one new entry, because the seam
+    // moves under every branch at once and a single leaf could not say which half is decided.
+    //
+    // IT WAS PAID FOR BY A COMPACTION THAT FAILED, and the failure is the reason to record
+    // it. Eleven SETTLED leaves looked like the doc's own rule going unapplied -- built and
+    // decided means gone from here -- and deleting ten of them freed two hundred and fifty
+    // one words. `Every_fork_the_code_cites_is_in_the_index` then went red on forks 25, 27,
+    // 33, 48, 66, 88 and 96: a SETTLED leaf is where a closed fork's NUMBER lives, and the
+    // XML comments cite those numbers. So the leaves are the index rather than residue, the
+    // deletion was reverted, and this is a raise rather than a trade. A guard must not cost
+    // information, and the only reason it did not is that another guard was watching.
+    private const int Whole = 10_419;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

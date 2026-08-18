@@ -100,12 +100,19 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// and the lead had to be shortened rather than moved in the other two.
     /// </para>
     /// <para>
+    /// And 650 is five files, taken to clear the schedule ahead of a conversion rather than as
+    /// the session's work. The ratio held a third time: of 80 cut, 66 closed at a punctuation
+    /// mark the claim was already sitting behind, 14 had none and closed at a clause boundary,
+    /// and 3 of those needed the claim moved because the lead a reader scans for was the
+    /// second half.
+    /// </para>
+    /// <para>
     /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
     /// is the tight one — <see cref="Scheduled"/> is what stops it sitting still, and this is
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 730;
+    private const int Shouted = 650;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>
@@ -121,8 +128,12 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// leaves the shouted words as the whole of the bold, and a label is allowed to be
     /// capitals — so three came off here without anybody looking for them.
     /// </para>
+    /// <para>
+    /// And it falls to 64 the same way, two of them having been the whole of a bold that a cut
+    /// left standing in capitals. Neither was looked for.
+    /// </para>
     /// </remarks>
-    private const int Opened = 66;
+    private const int Opened = 64;
 
     /// <summary>
     /// The commit the decay schedule counts from. <b>John's, 2026-08-13.</b>

@@ -111,8 +111,8 @@ public sealed record Judged
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The number that says whether the vote could possibly reach the gap, and it
-    /// costs one pass.</b> An expectation is worth its best advocate, so a crowd of
+    /// <b>The number that says whether the vote could possibly reach the gap</b>, and it
+    /// costs one pass. An expectation is worth its best advocate, so a crowd of
     /// mediocre rules cannot outvote one that is always right at any scale — which only
     /// helps if the crowd LOOKS worse from inside.
     /// </para>
@@ -175,8 +175,8 @@ public sealed record Yardstick
 
     /// <summary>How many features the coded probe was given.</summary>
     /// <remarks>
-    /// <b>Beside the score, because a probe handed forty times as many features is a
-    /// different probe.</b> A front end allowed to say more has more to be fitted on,
+    /// <b>Beside the score</b>, because a probe handed forty times as many features is a
+    /// different probe. A front end allowed to say more has more to be fitted on,
     /// and comparing two arms without this rewards whichever one talks most.
     /// </remarks>
     public required int Features { get; init; }
@@ -187,8 +187,8 @@ public sealed record Yardstick
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The plan's own rule for extending the language is decidable and nobody had
-/// decided it.</b> <i>The language extends when, and only when, no expression in the
+/// <b>The plan's own rule for extending the language is decidable</b> and nobody had
+/// decided it. <i>The language extends when, and only when, no expression in the
 /// current language separates the failures from the hits.</i> Until something computes
 /// that, choosing the next rung is a guess about which construct sounds useful — which
 /// is the hand-specified language bias the refutation table calls ILP's cause of death,
@@ -202,8 +202,8 @@ public sealed record Yardstick
 /// because a sound rule is right wherever it fires.
 /// </para>
 /// <para>
-/// <b>Which is a target and not a ceiling, and the difference cost a wrong sentence
-/// here.</b> See <see cref="CoversUnseen"/>: a population of rules the world contradicts
+/// <b>Which is a target and not a ceiling</b>, and the difference cost a wrong sentence
+/// here. See <see cref="CoversUnseen"/>: a population of rules the world contradicts
 /// can score ABOVE this by being right on average, and one of them does. What the number
 /// bounds is what UNDERSTANDING the world would get you, which is the thing worth
 /// wanting and is not the same as the thing worth scoring.
@@ -235,13 +235,13 @@ public sealed record Reached
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>What a sound-only population would score, which is not a bound on every
-    /// population.</b> A sound rule is right wherever it fires, so a population holding
+    /// <b>What a sound-only population would score</b>, which is not a bound on every
+    /// population. A sound rule is right wherever it fires, so a population holding
     /// every sound rule and nothing else answers every covered scene correctly and
     /// abstains on the rest. That is exact, and it is the number worth aiming at.
     /// </para>
     /// <para>
-    /// <b>And it is not a ceiling, which this said and was wrong about.</b> A rule the
+    /// <b>And it is not a ceiling</b>, which this said and was wrong about. A rule the
     /// world contradicts SOMEWHERE can still be right on most of the held-out set, and a
     /// vote full of them can beat a sound-only population — measured, not argued: the
     /// whole-image arm scores 0.956 on the unseen against 0.877 here, over five seeds.
@@ -260,8 +260,8 @@ public sealed record Reached
 
     /// <summary>How many sound scopes a greedy cover needs.</summary>
     /// <remarks>
-    /// <b>The size of the rule set the world actually wants, to put beside
-    /// <see cref="Tally.Resident"/>.</b> The plan asks for a resident count near the
+    /// <b>The size of the rule set the world actually wants</b>, to put beside
+    /// <see cref="Tally.Resident"/>. The plan asks for a resident count near the
     /// true rule set and has never had the second number on a perceptual world. Greedy
     /// is an over-estimate of the minimum cover and is said to be one — the exact
     /// answer is set cover, and a bound nobody can compute is worse than a loose one
@@ -292,7 +292,7 @@ public sealed record Reached
 
 /// <summary>How a picture is cut up before it is winnowed.</summary>
 /// <remarks>
-/// <b>The arm this world was built to run, and the one <see cref="Cifar"/> COULD NOT.</b>
+/// <b>The arm this world was built to run</b>, and the one <see cref="Cifar"/> COULD NOT.
 /// A ten-way label has no parts, so a front end that reads the whole picture at once and
 /// one that reads it patch by patch score the same on it — and only the second can carry
 /// an arrangement. Here they need not.
@@ -325,7 +325,7 @@ public enum Looking
 /// does not.
 /// </para>
 /// <para>
-/// <b>So the arm is whole against tiled, which is the one the plan calls the fix.</b>
+/// <b>So the arm is whole against tiled</b>, which is the one the plan calls the fix.
 /// Both are the same projection with the same geometry; what differs is whether it reads
 /// the picture at once or one patch at a time. See <see cref="Looking"/>.
 /// </para>
@@ -370,8 +370,8 @@ public sealed class ArrangedRun
     /// <param name="looking">How the picture is cut up before it is winnowed.</param>
     /// <param name="seed">The world's own generator.</param>
     /// <remarks>
-    /// <b>The patch is the world's cell, and that is the one thing here worth arguing
-    /// about.</b> A front end told where the parts are has been handed half the problem,
+    /// <b>The patch is the world's cell</b>, and that is the one thing here worth arguing
+    /// about. A front end told where the parts are has been handed half the problem,
     /// which is the hand-specified bias this project exists to avoid. What saves it is
     /// that RESOLUTION is a world dial by the plan's own rule — how finely a scene shows
     /// itself is a fact about what is being looked at — and a patch size is a resolution.
@@ -436,20 +436,20 @@ public sealed class ArrangedRun
     /// <param name="seed">The probe's shuffle, which is not the world's.</param>
     /// <remarks>
     /// <para>
-    /// <b>Fitted on every scene the world draws and scored on every one it does not,
-    /// which is exactly the exam the population sits.</b> Not a sample of the drawn
+    /// <b>Fitted on every scene the world draws</b> and scored on every one it does not,
+    /// which is exactly the exam the population sits. Not a sample of the drawn
     /// scenes — all of them — because a probe shown less than the population was would
     /// be a bar set low by accident, and a bar set low by accident is worse than none.
     /// </para>
     /// <para>
-    /// <b>It is allowed to train and the population is not, and that is the point.</b>
+    /// <b>It is allowed to train and the population is not</b>, and that is the point.
     /// C4 forbids the MACHINE depending on a train-then-test boundary; a yardstick is
     /// not the machine. Holding it to the architecture's constraints would stop it being
     /// a yardstick and make it a second unmeasured learner.
     /// </para>
     /// <para>
-    /// <b>The coded probe reads an indicator per code, which is what the population
-    /// reads.</b> A commitment's scope is a subset test over a set of codes; a linear
+    /// <b>The coded probe reads an indicator per code</b>, which is what the population
+    /// reads. A commitment's scope is a subset test over a set of codes; a linear
     /// model over the same set as ones and zeroes is the dullest thing that could use
     /// the identical information. Any other encoding would hand one side something the
     /// other never had.
@@ -499,8 +499,8 @@ public sealed class ArrangedRun
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>An inverted index rather than the obvious nested loop, and the reason is that
-    /// the obvious one does not finish.</b> A few thousand commitments against ten
+    /// <b>An inverted index rather than the obvious nested loop</b>, and the reason is that
+    /// the obvious one does not finish. A few thousand commitments against ten
     /// thousand scenes is tens of millions of subset tests per run, which is enough to
     /// make the instrument the expensive part of the experiment — and an instrument
     /// somebody switches off to save time is an instrument that is not there.
@@ -644,8 +644,8 @@ public sealed class ArrangedRun
     /// <param name="budget">How many scopes to build before giving up and saying so.</param>
     /// <remarks>
     /// <para>
-    /// <b>A sound scope makes every narrower one redundant, which is subsumption and is
-    /// why this finishes.</b> Where a scope and a narrower version of it are equally
+    /// <b>A sound scope makes every narrower one redundant</b>, which is subsumption and is
+    /// why this finishes. Where a scope and a narrower version of it are equally
     /// accurate the general one stays, so a code already sound on its own is never
     /// extended — the plan's own rule, doing double duty as the pruning that makes an
     /// exhaustive search affordable.
@@ -823,8 +823,8 @@ public sealed class ArrangedRun
     /// Every scene coded once, with a bitset per code saying where it fires.
     /// </summary>
     /// <remarks>
-    /// <b>Shared, because both things that ask the world a question need it and they
-    /// must ask the same world.</b> Soundness reads what the population holds against
+    /// <b>Shared</b>, because both things that ask the world a question need it and they
+    /// must ask the same world. Soundness reads what the population holds against
     /// this; the ceiling reads what the LANGUAGE could hold against it. Two builds of
     /// the same index could differ by a bug rather than by a finding, and the whole
     /// value of the second number is that it stands beside the first.

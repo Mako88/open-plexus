@@ -17,7 +17,7 @@ namespace OpenPlexus.Tests;
 /// because somebody chose it.
 /// </para>
 /// <para>
-/// <b>What varies is a parameter; what has never varied is a constant here.</b> An
+/// <b>What varies is a parameter</b>; what has never varied is a constant here. An
 /// arm that wants otherwise says <c>with { Whatever = ... }</c> at the point of use
 /// and is visibly the exception, rather than adding a parameter nobody else passes.
 /// </para>
@@ -30,8 +30,8 @@ public static class Fixture
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>It was five seconds in four files and 5, 10 and 30 inline in eight more,
-    /// and CI had started flapping on it.</b> Two <c>MachineTests</c> failed a run
+    /// <b>It was five seconds in four files</b> and 5, 10 and 30 inline in eight more,
+    /// and CI had started flapping on it. Two <c>MachineTests</c> failed a run
     /// with <see cref="TimeoutException"/> and passed the one before it, having
     /// changed nothing — so the RED SET WAS NOT STABLE, and a suite whose failures
     /// come and go cannot be the baseline anything is measured against.
@@ -41,8 +41,8 @@ public static class Fixture
     /// <c>Motif</c> run now moves 360,000 messages where the number that chose
     /// five seconds was measured against a fraction of that, so what the bound
     /// actually tested by the end was how loaded the runner happened to be.
-    /// <b>A wall-clock bound on a workload that grew is a measurement of the
-    /// machine.</b>
+    /// <b>A wall-clock bound on a workload that grew</b> is a measurement of the
+    /// machine.
     /// </para>
     /// <para>
     /// <b>So it is generous on purpose.</b> The only question this is entitled to
@@ -99,16 +99,16 @@ public static class Fixture
     /// <returns>What each arm returned, in the order the arms were given.</returns>
     /// <remarks>
     /// <para>
-    /// <b>The suite is serial and stays serial; this is the exemption `Parallelism.cs`
-    /// ALREADY NAMES.</b> A test that genuinely needs concurrency must create it INSIDE
+    /// <b>The suite is serial and stays serial</b>; this is the exemption `Parallelism.cs`
+    /// ALREADY NAMES. A test that genuinely needs concurrency must create it INSIDE
     /// itself — and the reason the assembly is serialised is that numbers move with how
     /// busy the machine is, measured: the walk's agreement with itself reads 0.8833
     /// alone and 1.0000 under load. That is a fact about DELIVERY, and delivery is the
     /// bus.
     /// </para>
     /// <para>
-    /// <b>So this is for the learner and never for the walk, and the signature is the
-    /// guard.</b> <see cref="Machines.ArrangedRun"/>, <see cref="Machines.MultiplexerRun"/>,
+    /// <b>So this is for the learner and never for the walk</b>, and the signature is the
+    /// guard. <see cref="Machines.ArrangedRun"/>, <see cref="Machines.MultiplexerRun"/>,
     /// <see cref="Machines.CifarRun"/> and <see cref="Machines.GradedRun"/> hold no bus
     /// and are synchronous end to end: a fixed seed determines every number they report
     /// whatever else the machine is doing. Every bus world answers with a
@@ -117,8 +117,8 @@ public static class Fixture
     /// comment nobody reads at the moment it matters.
     /// </para>
     /// <para>
-    /// <b>Answered in order, because the order is what the output and the assertions
-    /// read.</b> A grid printed in completion order is a grid whose rows move between
+    /// <b>Answered in order</b>, because the order is what the output and the assertions
+    /// read. A grid printed in completion order is a grid whose rows move between
     /// runs, and this project reads its grids.
     /// </para>
     /// </remarks>
@@ -141,14 +141,14 @@ public static class Fixture
     /// </summary>
     /// <param name="held">What the brain holds.</param>
     /// <remarks>
-    /// <b>What genesis can mint, which is the question a soundness count cannot
-    /// answer.</b> Genesis mints one-code commitments and nothing else, so a code that
+    /// <b>What genesis can mint</b>, which is the question a soundness count cannot
+    /// answer. Genesis mints one-code commitments and nothing else, so a code that
     /// is sound ON ITS OWN is reachable by the very first thing the machine does.
     /// Whether it is resident afterwards separates a learner that never found it from
     /// one that found it and was outvoted — and those want different work.
     /// <para>
-    /// <b>Unfolded, so a minted name cannot hide a scope that is really one code wearing
-    /// a hat.</b> Written out twice in two measurement files before `DuplicationTests`
+    /// <b>Unfolded</b>, so a minted name cannot hide a scope that is really one code wearing
+    /// a hat. Written out twice in two measurement files before `DuplicationTests`
     /// refused the second, which is that budget doing exactly its job.
     /// </para>
     /// </remarks>
@@ -169,8 +169,8 @@ public static class Fixture
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Shared so the grids stay comparable across files, which is the whole risk of
-    /// splitting an enum.</b> Four files sweep these cells and every finding in the
+    /// <b>Shared so the grids stay comparable across files</b>, which is the whole risk of
+    /// splitting an enum. Four files sweep these cells and every finding in the
     /// commits is labelled by them; four private copies of the mapping is four chances for
     /// one row to mean something different from the row it is being read against.
     /// </para>
@@ -202,15 +202,15 @@ public static class Fixture
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A separate row rather than two more entries above, and the reason is that they
-    /// are not the same kind of thing.</b> <see cref="Repairs"/> is a historical record —
+    /// <b>A separate row rather than two more entries above</b>, and the reason is that they
+    /// are not the same kind of thing. <see cref="Repairs"/> is a historical record —
     /// four arrangements that shipped, that every commit's numbers are labelled by, and
     /// that four files sweep. These two were never REFUSED; they were unreachable, because
     /// one enum decided both axes and no value of it landed here.
     /// </para>
     /// <para>
-    /// <b>So a grid that wants all six concatenates, and one that wants the old four is
-    /// untouched.</b> Adding these above would silently widen every existing sweep, and the
+    /// <b>So a grid that wants all six concatenates</b>, and one that wants the old four is
+    /// untouched. Adding these above would silently widen every existing sweep, and the
     /// four rows those sweeps print would stop being the four rows their commits recorded.
     /// </para>
     /// </remarks>
@@ -225,8 +225,8 @@ public static class Fixture
     /// The repair budgets a curve is read at, from well below the level to no limit at all.
     /// </summary>
     /// <remarks>
-    /// <b>SHARED FOR THE REASON <see cref="ReadAsync"/> is shared, and the clone budget said
-    /// so a second time.</b> Two grids sweeping the budget are only comparable if they sweep
+    /// <b>Shared for the reason <see cref="ReadAsync"/> is shared</b>, and the clone budget
+    /// said so a second time. Two grids sweeping the budget are only comparable if they sweep
     /// the same budgets, and a list written out per file is how one of them comes to bracket
     /// a default the other does not. <c>BudgetCurveTests</c> asserts the shipped default is
     /// in here, so every reader of this list inherits that guard rather than restating it.
@@ -237,8 +237,8 @@ public static class Fixture
     /// The four multiplexers a budget curve is read on, as address bits and skew.
     /// </summary>
     /// <remarks>
-    /// <b>Both widths and both tilts, because the two halves of every trade measured here
-    /// live on different ones.</b> Coverage and sound rules are bought where the base rate
+    /// <b>Both widths and both tilts</b>, because the two halves of every trade measured here
+    /// live on different ones. Coverage and sound rules are bought where the base rate
     /// pays nothing; trailing accuracy is sold where it pays. A curve on one of them reads as
     /// a clean win in whichever direction it was taken.
     /// </remarks>
@@ -251,8 +251,8 @@ public static class Fixture
     /// <param name="all">The whole population.</param>
     /// <param name="holders">How many machines to spread it over.</param>
     /// <remarks>
-    /// <b>Shared because a second copy would make two grids that look comparable and are
-    /// not.</b> <c>SplitNamingTests</c> measured what sharding costs rung five and
+    /// <b>Shared because a second copy would make two grids</b> that look comparable and are
+    /// not. <c>SplitNamingTests</c> measured what sharding costs rung five and
     /// <c>AskedTests</c> puts the same exchange on a socket, so a difference in HOW the
     /// population is split would show up as a difference the wire appeared to cause.
     /// </remarks>
@@ -291,7 +291,7 @@ public static class Fixture
     /// </param>
     /// <param name="readings">What to pull out of each run.</param>
     /// <remarks>
-    /// <b>The same six statements were in two grids and the clone budget said so.</b> They
+    /// <b>The same six statements were in two grids</b> and the clone budget said so. They
     /// are not incidentally alike: a cell of a sweep IS a configuration, a seed count and a
     /// list of readings, and writing that out per file is how two grids come to print
     /// columns that look comparable while one of them quietly sweeps a different number of

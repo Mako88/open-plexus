@@ -17,8 +17,8 @@ public sealed record MultiplexerSettings
     /// The share of rounds whose outcome is flipped, in 0..1.
     /// </summary>
     /// <remarks>
-    /// <b>Zero is the world the published numbers are against, so it is the
-    /// default.</b> Noise is here because the repair gate is the one mechanism that
+    /// <b>Zero is the world the published numbers are against</b>, so it is the
+    /// default. Noise is here because the repair gate is the one mechanism that
     /// cannot be tested on a clean world: on a deterministic target every failure
     /// really is explained by some absent condition, so a gate that admits
     /// everything scores exactly as well as one that admits only what it should.
@@ -26,8 +26,8 @@ public sealed record MultiplexerSettings
     public double Noise { get; init; }
 
     /// <summary>
-    /// How often a DATA bit is drawn as one, in 0..1 — <b>zero leaves them even, which
-    /// is every multiplexer this repo has ever run.</b>
+    /// How often a DATA bit is drawn as one, in 0..1 — <b>zero leaves them even</b>, which
+    /// is every multiplexer this repo has ever run.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -40,8 +40,8 @@ public sealed record MultiplexerSettings
     /// number cannot move an argmax.
     /// </para>
     /// <para>
-    /// <b>The address bits stay even, which is what makes this a control rather than a new
-    /// world.</b> Skewing them would make some address values rare and quietly change how
+    /// <b>The address bits stay even</b>, which is what makes this a control rather than a new
+    /// world. Skewing them would make some address values rare and quietly change how
     /// often each true rule can be exercised, so two arms would differ in the outcome
     /// distribution AND in how much evidence each rule got. Only the data bits move here,
     /// so <see cref="Multiplexer.Truths"/> is unchanged, soundness still enumerates, and
@@ -71,15 +71,15 @@ public sealed record MultiplexerSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Fork 48: the one world where depth is genuinely needed withheld nothing, so
+    /// <b>Fork 48</b>: the one world where depth is genuinely needed withheld nothing, so
     /// every instrument that wants a held-out set was blind exactly where it was most
-    /// wanted.</b> A generated world can hold assignments back and the learner cannot
+    /// wanted. A generated world can hold assignments back and the learner cannot
     /// tell, because there is no boundary to notice — the world simply never emits them,
     /// which is what C4 asks and what a train-then-test split is not.
     /// </para>
     /// <para>
-    /// <b>Taken from the end of the assignment order, so the split is a position rather
-    /// than a sample</b> — <see cref="Cifar"/> and <see cref="Monk"/> both do this, and
+    /// <b>Taken from the end of the assignment order</b>, so the split is a position rather
+    /// than a sample — <see cref="Cifar"/> and <see cref="Monk"/> both do this, and
     /// for the reason those give: a held-out set chosen by the world's own generator
     /// moves with the seed, and two seeds are then scored against two different
     /// questions.
@@ -92,14 +92,14 @@ public sealed record MultiplexerSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Fork 51: a code live in every moment separates nothing, and no world here had
-    /// one.</b> Every multiplexer code is a (position, value) pair present about half the
+    /// <b>Fork 51</b>: a code live in every moment separates nothing, and no world here had
+    /// one. Every multiplexer code is a (position, value) pair present about half the
     /// time, so background — the thing that is simply always there — could not be studied
     /// on the world where everything else is exactly known.
     /// </para>
     /// <para>
-    /// <b>What the learner does with it is not this file's business, and the world's job
-    /// is only to pose it.</b> A code present in every moment is present in every hit and
+    /// <b>What the learner does with it is not this file's business</b>, and the world's job
+    /// is only to pose it. A code present in every moment is present in every hit and
     /// every miss alike, so any statistic asking what SEPARATES the two has nothing to
     /// find in it — and whether anything downstream exploits that, or pays for the code
     /// anyway in candidates and in stored counts, is exactly what this dial is for
@@ -119,8 +119,8 @@ public sealed record MultiplexerSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Zero is every measurement ever taken here, and the draw is short-circuited so
-    /// the generator is untouched at zero.</b> A dial that consumed one number a round
+    /// <b>Zero is every measurement ever taken here</b>, and the draw is short-circuited so
+    /// the generator is untouched at zero. A dial that consumed one number a round
     /// even when off would move every existing figure on this world by shifting the
     /// stream, which is fork 12 arriving as a feature.
     /// </para>
@@ -306,8 +306,8 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// <summary>The modality for one POSITION, whatever it says.</summary>
     /// <remarks>
     /// <para>
-    /// <b>THE CODE <see cref="Bit"/>'S own remark says separates nothing, and that is
-    /// precisely why it is worth emitting.</b> A code true in every round cannot win a
+    /// <b>The code <see cref="Bit"/> separates nothing</b>, and that is precisely why it is
+    /// worth emitting. A code true in every round cannot win a
     /// repair and can never be the condition that tells a failure from a hit. But rung five
     /// does not name what separates — it names what is SHARED, and what the address bits
     /// share is exactly their positions with the values thrown away.
@@ -408,8 +408,8 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The instrument fork 48 was about, and the multiplexer is the world that needed
-    /// it most.</b> Depth is genuinely required here — a rule shorter than the address
+    /// <b>The instrument fork 48 was about</b>, and the multiplexer is the world that needed
+    /// it most. Depth is genuinely required here — a rule shorter than the address
     /// plus one is unsound — so this is where a held-out score can say something no other
     /// generated world can, and it was the one world that held nothing back.
     /// </para>
@@ -547,7 +547,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The count is <c>2^Address * 2</c> and it is derived rather than quoted.</b>
+    /// <b>The count is <c>2^Address * 2</c></b>, and it is derived rather than quoted.
     /// One rule per (address value, value of the bit that address selects): the
     /// address bits are pinned, the selected data bit is pinned, and every other
     /// data bit is left unsaid because it genuinely does not matter. Eight rules at
@@ -586,8 +586,8 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
 
     /// <summary>The widest gap this will enumerate across.</summary>
     /// <remarks>
-    /// <b>Sixty-five thousand assignments per commitment, which is affordable across
-    /// a population and is where affordable stops.</b> The alternative is sampling,
+    /// <b>Sixty-five thousand assignments per commitment</b>, which is affordable across
+    /// a population and is where affordable stops. The alternative is sampling,
     /// and a soundness score that sampled would be a probability wearing the clothes
     /// of a proof.
     /// </remarks>
@@ -596,8 +596,8 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// <summary>Whether a scope pins enough that its soundness can be settled exactly.</summary>
     /// <param name="scope">The codes that must be present.</param>
     /// <remarks>
-    /// <b>A count of sound rules is a lie if the uncheckable ones are counted as
-    /// unsound.</b> A one-code scope in a twenty-bit world leaves nineteen free, so
+    /// <b>A count of sound rules is a lie</b> if the uncheckable ones are counted as
+    /// unsound. A one-code scope in a twenty-bit world leaves nineteen free, so
     /// what cannot be settled is reported as its own number rather than folded into
     /// the bad news.
     /// </remarks>
@@ -622,14 +622,14 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// <param name="expects">What is claimed to follow.</param>
     /// <remarks>
     /// <para>
-    /// <b>The answer key is one basis and the world admits several, which
-    /// <see cref="Truths"/> ALONE CANNOT SAY.</b> Pinning both data bits an address
+    /// <b>The answer key is one basis and the world admits several</b>, which
+    /// <see cref="Truths"/> ALONE CANNOT SAY. Pinning both data bits an address
     /// pair could select — *this address bit is zero, and the two bits it might
     /// choose between are both zero* — is a TRUE rule, and it is not in the key. A
     /// learner scored only against the key is being marked on which basis it picked.
     /// </para>
     /// <para>
-    /// <b>So this asks whether the rule is true rather than whether it is mine</b>,
+    /// <b>So this asks whether the rule is true</b> rather than whether it is mine,
     /// by enumerating every assignment the scope leaves open and checking the
     /// function agrees on all of them. That is exact rather than sampled, and it is
     /// basis-independent, which is what a ground-truth score was supposed to be.

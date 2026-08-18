@@ -8,20 +8,20 @@ using Xunit.Abstractions;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// A holder vanishing mid-round — <b>fork 53, and it is <c>DepartureTests</c>' mechanism
-/// carried over rather than a new one.</b>
+/// A holder vanishing mid-round — <b>fork 53</b>, and it is <c>DepartureTests</c>' mechanism
+/// carried over rather than a new one.
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The walk has solved this since the day the event bus was built.</b> A thought knows
+/// <b>The walk has solved this</b> since the day the event bus was built. A thought knows
 /// how many of its routes are heading into each cluster, so a departure writes off exactly
 /// those and the thought settles by its own accounting. What the commitment fleet had
 /// instead was a denominator it could only watch: an asker knew it had asked twelve and
 /// heard eight, and had nothing whatever to do about the four.
 /// </para>
 /// <para>
-/// <b>And the missing term was not a death notice, which is why the asymmetry in
-/// <see cref="Bus.IBus"/> Was right and still left a fleet stopped.</b> A holder that
+/// <b>And the missing term was not a death notice</b>, which is why the asymmetry in
+/// <see cref="Bus.IBus"/> was right and still left a fleet stopped. A holder that
 /// crashed sends nothing, so a design waiting to be told would work for the polite
 /// departures alone. What is observable without anybody's cooperation is the sender's own
 /// failure to hand the question over — a refused connection, which is a fact rather than an
@@ -29,8 +29,8 @@ namespace OpenPlexus.Tests;
 /// given a question cannot answer it.
 /// </para>
 /// <para>
-/// <b>So what is closed here is every round after the one a holder died in, and not the
-/// round it died in.</b> A holder that took the question and went before answering is owed
+/// <b>What is closed is every round after the death</b>, and not the round it
+/// died in. A holder that took the question and went before answering is owed
 /// for the rest of the run, correctly — late and absent are one thing under C2, and only a
 /// deadline separates them. That half is fork 62's and its condition is completeness rather
 /// than a clock. The distinction matters because a fleet that recovers on the NEXT round is
@@ -67,7 +67,7 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A holder the ask never reached is written off, and the round finishes.</b>
+    /// <b>A holder the ask never reached is written off</b>, and the round finishes.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -78,8 +78,8 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     /// that never completes at all.
     /// </para>
     /// <para>
-    /// <b>And the denominator is unchanged, which is the half a write-off could silently
-    /// destroy.</b> The obvious build subtracts the departed from what was asked, and then a
+    /// <b>And the denominator is unchanged</b>, which is the half a write-off could silently
+    /// destroy. The obvious build subtracts the departed from what was asked, and then a
     /// fleet of four that lost one reads exactly like a fleet of three — the C3 instrument
     /// erased by the mechanism that was supposed to use it. <see cref="Gathering.Asked"/> is
     /// what was tried, <see cref="Gathering.Unreached"/> is what the sender watched fail to
@@ -123,8 +123,8 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     /// <b>One departure writes off one holder and leaves the rest owed.</b>
     /// </summary>
     /// <remarks>
-    /// <b>The companion, and without it every assertion in this file passes for a machine
-    /// that abandons the whole fleet the moment anything fails.</b> <c>DepartureTests</c>
+    /// <b>The companion</b>, and without it every assertion in this file passes for a machine
+    /// that abandons the whole fleet the moment anything fails. <c>DepartureTests</c>
     /// carries the identical pair for the same reason. What makes it real here is that the
     /// survivors' answers are what completed the gathering — the write-off removed one claim
     /// and the other three were waited for, in full, exactly as they always were.
@@ -166,7 +166,7 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Losing every holder finishes the round, and the vote comes back with no answer.</b>
+    /// <b>Losing every holder finishes the round</b>, and the vote comes back with no answer.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -225,8 +225,8 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A fleet goes on learning after a holder dies mid-run — the north star's blocker,
-    /// and the reading that says it is gone.</b>
+    /// <b>A fleet goes on learning after a holder dies mid-run</b> — the north star's blocker,
+    /// and the reading that says it is gone.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -236,16 +236,16 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     /// otherwise alive and idle.
     /// </para>
     /// <para>
-    /// <b>The second half's accuracy is printed and barred low, because what is being
-    /// asserted is that it ran.</b> A quarter of the population went with the machine that
+    /// <b>The second half's accuracy is printed and barred low</b>, because what is being
+    /// asserted is that it ran. A quarter of the population went with the machine that
     /// held it, and what that costs a curve is a measurement rather than a check — the fleet
     /// re-mints what it lost, from a placement that now has a hole in it, and how quickly is
     /// exactly the kind of number this file must not invent a threshold for. Four-way chance
     /// is a quarter; the bar says the survivors are learning and nothing more.
     /// </para>
     /// <para>
-    /// <b>And the round the death lands in is still owed, which is why the kill is between
-    /// runs rather than inside one.</b> A holder that took a question and died before
+    /// <b>And the round the death lands in is still owed</b>, which is why the kill is between
+    /// runs rather than inside one. A holder that took a question and died before
     /// answering it stops that round for good, and no amount of write-off reaches it — see
     /// this file's header, and fork 62. Killing between two runs asks the question this
     /// mechanism actually answers: whether a fleet that has LOST a machine can go on.
@@ -295,21 +295,21 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A holder that could not be reached is not asked again, and that is what makes a
-    /// run possible rather than merely correct.</b>
+    /// <b>A holder that could not be reached is not asked again</b>, and that is what makes a
+    /// run possible rather than merely correct.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The number that put this line in the code, and it is the transport's rather than
-    /// the design's.</b> A post to a machine that has closed its door costs a flat four
+    /// <b>The number that put this line in the code</b>, and it is the transport's rather than
+    /// the design's. A post to a machine that has closed its door costs a flat four
     /// seconds on loopback — a connect giving up, measured at 4.09s an ask over ten asks
     /// against 2.6ms with everybody alive. The write-off ends the round; it cannot end it
     /// before the transport admits the question did not go, so a fleet still asking a dead
     /// holder pays four seconds every round forever.
     /// </para>
     /// <para>
-    /// <b>So the roster loses it, which is the walk's other half and was always part of the
-    /// port.</b> A cluster death removes it from where routes are addressed; this removes a
+    /// <b>So the roster loses it</b>, which is the walk's other half and was always part of the
+    /// port. A cluster death removes it from where routes are addressed; this removes a
     /// holder from where asks are addressed, reached by watching a post fail rather than by
     /// being told. What it costs is written down beside it: a machine that stayed up while
     /// one message to it was lost is out until it announces again.
@@ -321,16 +321,16 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     /// comparison rather than a clock.
     /// </para>
     /// <para>
-    /// <b>And that comparison is the platform's rather than the mechanism's, which it took a
-    /// red shard to find out.</b> Four seconds is what a Windows loopback connect spends
+    /// <b>And that comparison is the platform's rather than the mechanism's</b>, which it took a
+    /// red shard to find out. Four seconds is what a Windows loopback connect spends
     /// giving up; a Linux runner answers a closed port with a reset immediately, so the FIRST
     /// ask costs a millisecond and there is nothing left for the second to be half of. The
     /// check then fails on a machine where the fault it guards against cannot happen — which
     /// is the mirror of a check that cannot fire, and worse, because it reads as a defect.
     /// </para>
     /// <para>
-    /// <b>So the counts are the assertion and the clock is a report wherever there is a clock
-    /// to read.</b> <see cref="Gathering.Asked"/> coming down and
+    /// <b>So the counts are the assertion</b> and the clock is a report wherever there is a clock
+    /// to read. <see cref="Gathering.Asked"/> coming down and
     /// <see cref="Gathering.Unreached"/> reading nought already say the dead holder was not
     /// asked again, exactly, on every platform — <i>anything asserting a COST must assert a
     /// count</i>, and the count was here all along.
@@ -402,8 +402,8 @@ public sealed class UnreachedTests(ITestOutputHelper output)
     /// <param name="holders">How many machines, for the message.</param>
     /// <param name="when">Which half, for the message.</param>
     /// <remarks>
-    /// <b>The experimenter's patience and never the machine's, which is <c>FleetTests</c>'
-    /// Rule and is unchanged by any of this.</b> A holder that took a question and died
+    /// <b>The experimenter's patience and never the machine's</b>, which is <c>FleetTests</c>'
+    /// Rule and is unchanged by any of this. A holder that took a question and died
     /// still owes an answer forever, so a suite that inherited the wait would hang rather
     /// than fail. What the write-off removes is the case where a fleet stops with every
     /// surviving machine idle — not the general promise, which was never one.

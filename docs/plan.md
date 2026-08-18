@@ -578,7 +578,8 @@ out of it, and anything before six that reads as tuning is out of order.
   - The table fits and the clock allows
     - **OPEN** — the TABLE is what blows up, not the commitments, needing an entry per code
       seen while firing. It spills to SQLite on the owning node, rehydrated if it becomes a
-      candidate again — and a spill that changes what fires is an undeclared dial. Fork **31**.
+      candidate again — and it is repair's candidate set, so a spill necessarily changes what
+      fires. Fork **31**.
     - **OPEN** — matching and settling are nine tenths of the clock on a narrow world whose
       table never grows. Where they go on a WIDE one, and what ends the run. Fork **49**.
     - **OPEN** — a child fires only where its parent does and matching IGNORES that, going

@@ -306,7 +306,7 @@ public sealed class Commitment
             // <see cref="Occasions"/>. XOR because a moment is a SET: two machines
             // walking it in different orders must reach the same word, and this is
             // the one place where that comes free rather than from sorting.
-            occasion ^= Agreed.Mix(code.Value ^ Agreed.Mix(code.Modality));
+            occasion ^= Hashing.Mix(code.Value ^ Hashing.Mix(code.Modality));
 
             if (Scope.Contains(code)) continue;
 
@@ -330,7 +330,7 @@ public sealed class Commitment
                 : seen with { InMisses = seen.InMisses + 1 };
         }
 
-        _witness |= 1UL << (int)(Agreed.Mix(occasion) & (Buckets - 1));
+        _witness |= 1UL << (int)(Hashing.Mix(occasion) & (Buckets - 1));
     }
 
     /// <summary>Takes over another commitment's record, when it is the same claim said shorter.</summary>
@@ -392,7 +392,7 @@ public sealed class Commitment
     /// to be its own sibling. From the scope, every path that arrives converges.
     /// </para>
     /// <para>
-    /// <b><see cref="Agreed"/> and never <see cref="object.GetHashCode"/></b>, which
+    /// <b><see cref="Hashing"/> and never <see cref="object.GetHashCode"/></b>, which
     /// is randomised per process — a codebook resting on a library's internals would
     /// mean two machines quietly disagreeing about what a commitment IS.
     /// </para>
@@ -404,18 +404,18 @@ public sealed class Commitment
 
         // The length is folded in first so that no scope can be the prefix of
         // another and reach the same name.
-        var hash = Agreed.Fold(Agreed.Basis, (ulong)scope.Length);
+        var hash = Hashing.Fold(Hashing.Basis, (ulong)scope.Length);
 
         foreach (var code in scope.Distinct().Order())
         {
-            hash = Agreed.Fold(hash, code.Modality);
-            hash = Agreed.Fold(hash, code.Value);
+            hash = Hashing.Fold(hash, code.Modality);
+            hash = Hashing.Fold(hash, code.Value);
         }
 
-        hash = Agreed.Fold(hash, expects.Modality);
-        hash = Agreed.Fold(hash, expects.Value);
+        hash = Hashing.Fold(hash, expects.Modality);
+        hash = Hashing.Fold(hash, expects.Value);
 
-        return new Code(Committed, Agreed.Mix(hash));
+        return new Code(Committed, Hashing.Mix(hash));
     }
 }
 

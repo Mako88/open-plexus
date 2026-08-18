@@ -144,8 +144,8 @@ public sealed class Latent : IWorld<Coded>
         ArgumentOutOfRangeException.ThrowIfNegative(channel);
         ArgumentOutOfRangeException.ThrowIfNegative(cause);
 
-        return new Code(Seen, Agreed.Mix(Agreed.Fold(
-            Agreed.Fold(Agreed.Basis, (ulong)channel), (ulong)cause)));
+        return new Code(Seen, Hashing.Mix(Hashing.Fold(
+            Hashing.Fold(Hashing.Basis, (ulong)channel), (ulong)cause)));
     }
 
     /// <summary>Which state the hidden thing is in, and which state each channel reported.</summary>

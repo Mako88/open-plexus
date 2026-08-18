@@ -59,7 +59,7 @@ public readonly record struct Vote
 /// the speaker's own accuracy, and the name of its best advocate. A reader learns what is
 /// claimed and never what the claimant is made of.
 /// </remarks>
-public readonly record struct Advocacy
+public readonly record struct Weighted
 {
     /// <summary>What is expected to follow.</summary>
     public required Code Expects { get; init; }
@@ -81,7 +81,7 @@ public readonly record struct Advocacy
 /// combined them with a maximum or a sum; both compose in any order, so a holder can
 /// combine its own commitments first and a reader can combine the results. That is not a
 /// property this design was given — it is one it turned out to have, and fork 52 is
-/// cheap because of it. See <see cref="Population.Speak"/> and
+/// cheap because of it. See <see cref="Population.Weigh"/> and
 /// <see cref="Population.Decide"/>, which are the two halves it splits into.
 /// </para>
 /// <para>
@@ -91,10 +91,10 @@ public readonly record struct Advocacy
 /// third time.
 /// </para>
 /// </remarks>
-public readonly record struct Testimony
+public readonly record struct Weights
 {
     /// <summary>What the holder's commitments advocate, ordered by expectation.</summary>
-    public required ImmutableArray<Advocacy> Advocates { get; init; }
+    public required ImmutableArray<Weighted> Each { get; init; }
 
     /// <summary>Nothing fired here, which is a real thing to say and not an absence.</summary>
     /// <remarks>
@@ -103,7 +103,7 @@ public readonly record struct Testimony
     /// the merge may not treat them alike — one closes the count and the other is what
     /// <c>Abstain</c> exists for.
     /// </remarks>
-    public bool Silent => Advocates.IsDefaultOrEmpty;
+    public bool Silent => Each.IsDefaultOrEmpty;
 }
 
 /// <summary>What one parent's repair budget has gone on.</summary>
@@ -445,7 +445,7 @@ public sealed class Population
     /// <summary>What each child's PARENT would have added second, by the child's name.</summary>
     /// <remarks>
     /// <b>An instrument and not a mechanism</b>, so nothing reads it to decide anything. See
-    /// <see cref="Agreed"/>.
+    /// <see cref="Hashing"/>.
     /// </remarks>
     private readonly Dictionary<Code, Code> _runners = [];
 
@@ -525,7 +525,7 @@ public sealed class Population
     /// <remarks>
     /// <para>
     /// <b>The same object the front end folds</b>, and that is a requirement rather than a
-    /// convenience. A category reaches a moment only because <see cref="Sorting.Folded"/>
+    /// convenience. A category reaches a moment only because <see cref="Categories.Folded"/>
     /// put it there, so a population handed a different vocabulary would read an entailment
     /// between codes no moment ever holds together.
     /// </para>
@@ -539,7 +539,7 @@ public sealed class Population
     /// both readers, so a run without categories pays nothing for them.
     /// </para>
     /// </remarks>
-    public Sorting? Sorts { get; set; }
+    public Categories? Sorts { get; set; }
 
     /// <param name="dials">Every number the machinery is allowed to have.</param>
     /// <param name="seed">The control arm's generator, used only when it is running.</param>
@@ -573,7 +573,7 @@ public sealed class Population
     /// </remarks>
     public long Agreed => _agreed;
 
-    /// <inheritdoc cref="Agreed"/>
+    /// <inheritdoc cref="Hashing"/>
     /// <summary>Children whose own first repair chose something else.</summary>
     public long Differed => _differed;
 
@@ -742,7 +742,7 @@ public sealed class Population
     {
         if (firing.IsDefaultOrEmpty) return default;
 
-        return Decide([Speak(firing)]);
+        return Decide([Weigh(firing)]);
     }
 
 
@@ -765,9 +765,9 @@ public sealed class Population
     /// undetectable.
     /// </para>
     /// </remarks>
-    public Testimony Speak(ImmutableArray<Commitment> firing)
+    public Weights Weigh(ImmutableArray<Commitment> firing)
     {
-        if (firing.IsDefaultOrEmpty) return new Testimony { Advocates = [] };
+        if (firing.IsDefaultOrEmpty) return new Weights { Each = [] };
 
         var weights = new Dictionary<Code, double>();
 
@@ -808,20 +808,20 @@ public sealed class Population
                     : weight;
         }
 
-        return new Testimony { Advocates = Spell(weights, loudest) };
+        return new Weights { Each = Ordered(weights, loudest) };
     }
 
     /// <summary>Puts a weight table into the one order everything downstream assumes.</summary>
     /// <param name="weights">Weight per expectation.</param>
     /// <param name="loudest">Best advocate per expectation.</param>
-    private static ImmutableArray<Advocacy> Spell(
+    private static ImmutableArray<Weighted> Ordered(
         Dictionary<Code, double> weights,
         Dictionary<Code, (double Weight, Code By)> loudest)
     {
-        var advocates = ImmutableArray.CreateBuilder<Advocacy>(weights.Count);
+        var advocates = ImmutableArray.CreateBuilder<Weighted>(weights.Count);
 
         foreach (var expects in weights.Keys.Order())
-            advocates.Add(new Advocacy
+            advocates.Add(new Weighted
             {
                 Expects = expects,
                 Weight = weights[expects],
@@ -859,11 +859,11 @@ public sealed class Population
     /// approximately. A maximum of maxima is a maximum exactly, at any number of holders.
     /// </para>
     /// </remarks>
-    public static Vote Decide(IReadOnlyCollection<Testimony> heard)
+    public static Vote Decide(IReadOnlyCollection<Weights> heard)
     {
         ArgumentNullException.ThrowIfNull(heard);
 
-        var cases = new Dictionary<Code, List<Advocacy>>();
+        var cases = new Dictionary<Code, List<Weighted>>();
 
         foreach (var testimony in heard)
         {
@@ -872,7 +872,7 @@ public sealed class Population
             // the caller's question, since only the caller knows how many it asked.
             if (testimony.Silent) continue;
 
-            foreach (var advocacy in testimony.Advocates)
+            foreach (var advocacy in testimony.Each)
             {
                 if (!cases.TryGetValue(advocacy.Expects, out var at))
                     cases[advocacy.Expects] = at = [];

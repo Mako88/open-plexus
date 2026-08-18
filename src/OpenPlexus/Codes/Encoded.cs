@@ -316,12 +316,12 @@ public sealed class Encoded : IQuantizer<IReadOnlyList<double>>, IDisposable
     /// </remarks>
     private ImmutableArray<double> Remembered(IReadOnlyList<double> reading)
     {
-        var hash = Agreed.Basis;
+        var hash = Hashing.Basis;
 
         foreach (var number in reading)
-            hash = Agreed.Fold(hash, (ulong)BitConverter.DoubleToInt64Bits(number));
+            hash = Hashing.Fold(hash, (ulong)BitConverter.DoubleToInt64Bits(number));
 
-        var key = Agreed.Mix(hash);
+        var key = Hashing.Mix(hash);
 
         lock (_memo)
         {

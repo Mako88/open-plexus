@@ -29,7 +29,7 @@ public sealed class HybridBusTests
     {
         Broadcast = BroadcastId.New(),
         From = new MachineAddress("holder"),
-        Said = new Testimony { Advocates = [] },
+        Said = new Weights { Each = [] },
     };
 
     /// <summary>Records what it was handed, and can be made to wait.</summary>

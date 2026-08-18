@@ -154,8 +154,8 @@ public sealed class WireTests(ITestOutputHelper output)
     [InlineData(typeof(Ask))]
     [InlineData(typeof(Answer))]
     [InlineData(typeof(Tabled))]
-    [InlineData(typeof(Testimony))]
-    [InlineData(typeof(Advocacy))]
+    [InlineData(typeof(Weights))]
+    [InlineData(typeof(Weighted))]
     [InlineData(typeof(Counts))]
     [InlineData(typeof(Tallied))]
     [InlineData(typeof(Learnt))]
@@ -190,21 +190,21 @@ public sealed class WireTests(ITestOutputHelper output)
         message == typeof(Ask) ? FilledAsk
         : message == typeof(Answer) ? FilledAnswer
         : message == typeof(Tabled) ? FilledTabled
-        : message == typeof(Testimony) ? FilledTestimony
-        : message == typeof(Advocacy) ? FilledAdvocacy
+        : message == typeof(Weights) ? FilledTestimony
+        : message == typeof(Weighted) ? FilledAdvocacy
         : message == typeof(Counts) ? FilledCounts
         : message == typeof(Tallied) ? FilledTallied
         : message == typeof(Learnt) ? (object)FilledLearnt
         : throw new ArgumentOutOfRangeException(nameof(message), $"no sample for {message.Name}");
 
-    private static Advocacy FilledAdvocacy => new()
+    private static Weighted FilledAdvocacy => new()
     {
         Expects = new Code(5, 12345678901234567),
         Weight = 1.0 / 3.0,
         By = new Code(6, 77),
     };
 
-    private static Testimony FilledTestimony => new() { Advocates = [FilledAdvocacy] };
+    private static Weights FilledTestimony => new() { Each = [FilledAdvocacy] };
 
     private static Tallied FilledTallied => new()
     {
@@ -315,8 +315,8 @@ public sealed class WireTests(ITestOutputHelper output)
         Assert.Equal(answer.Counted!.Scopes, back.Counted!.Scopes);
         Assert.Equal(answer.Counted.Rows.ToArray(), back.Counted.Rows.ToArray());
 
-        var said = answer.Said!.Value.Advocates[0];
-        var got = back.Said!.Value.Advocates[0];
+        var said = answer.Said!.Value.Each[0];
+        var got = back.Said!.Value.Each[0];
 
         Assert.Equal(said.Expects, got.Expects);
         Assert.Equal(said.By, got.By);
@@ -330,7 +330,7 @@ public sealed class WireTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// A holder that fired nothing has been HEARD FROM; a holder that died has not, and the
-    /// merge may not treat them alike — see <see cref="Testimony.Silent"/>. An empty array
+    /// merge may not treat them alike — see <see cref="Weights.Silent"/>. An empty array
     /// that came back null would turn every silence into a death and quietly lower the
     /// denominator C3 is read off.
     /// </remarks>
@@ -341,7 +341,7 @@ public sealed class WireTests(ITestOutputHelper output)
         {
             Broadcast = BroadcastId.New(),
             From = new MachineAddress("holder-2"),
-            Said = new Testimony { Advocates = [] },
+            Said = new Weights { Each = [] },
         };
 
         var back = Wire.Read<Answer>(Wire.Write(quiet));

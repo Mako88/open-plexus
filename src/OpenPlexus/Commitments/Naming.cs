@@ -66,15 +66,15 @@ public sealed class Naming
         if (members.IsDefaultOrEmpty || members.Distinct().Count() < 2)
             throw new ArgumentException("a name for fewer than two codes says nothing", nameof(members));
 
-        var hash = Agreed.Fold(Agreed.Basis, (ulong)members.Distinct().Count());
+        var hash = Hashing.Fold(Hashing.Basis, (ulong)members.Distinct().Count());
 
         foreach (var code in members.Distinct().Order())
         {
-            hash = Agreed.Fold(hash, code.Modality);
-            hash = Agreed.Fold(hash, code.Value);
+            hash = Hashing.Fold(hash, code.Modality);
+            hash = Hashing.Fold(hash, code.Value);
         }
 
-        return new Code(Meant, Agreed.Mix(hash));
+        return new Code(Meant, Hashing.Mix(hash));
     }
 
     /// <summary>Mints a name for a set of codes.</summary>

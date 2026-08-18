@@ -426,7 +426,7 @@ public sealed class AskedTests(ITestOutputHelper output)
         foreach (var moment in Moments(Narrow, many: 2000))
         {
             var speaking = Enumerable.Range(0, Holders)
-                .Where(at => !speakers[at].Speak(speakers[at].Firing(moment)).Silent)
+                .Where(at => !speakers[at].Weigh(speakers[at].Firing(moment)).Silent)
                 .ToList();
 
             // A moment nothing fires on is silence without a death, and it would pass every

@@ -17,7 +17,7 @@ namespace OpenPlexus.Bus;
 /// <b>And what is wanted travels with the question rather than being inferred from which
 /// field is filled.</b> A reader that guessed would read an empty moment as <i>counts</i>
 /// and a holder that fired nothing as the same thing, which is exactly the
-/// silence-versus-absence conflation <see cref="Testimony.Silent"/> exists to refuse.
+/// silence-versus-absence conflation <see cref="Weights.Silent"/> exists to refuse.
 /// </para>
 /// </remarks>
 public enum Wanted
@@ -183,15 +183,15 @@ public sealed record Ask
 /// <remarks>
 /// <para>
 /// <b>Neither field is a commitment</b>, and that is the whole of why this is allowed. A
-/// <see cref="Testimony"/> is expectations and weights already computed from the speaker's
+/// <see cref="Weights"/> is expectations and weights already computed from the speaker's
 /// own accuracy; a <see cref="Counts"/> is how often codes co-occurred across scopes. A
 /// reader learns what is claimed and how often something recurred, and never what the
 /// claimant is made of.
 /// </para>
 /// <para>
 /// <b>Both are nullable and the ask says which to read.</b> A holder that fired nothing
-/// answers with a <see cref="Testimony"/> whose advocates are empty, which is
-/// <see cref="Testimony.Silent"/> and IS an answer; a holder that was never asked for a
+/// answers with a <see cref="Weights"/> whose advocates are empty, which is
+/// <see cref="Weights.Silent"/> and IS an answer; a holder that was never asked for a
 /// vote answers with no testimony at all. Collapsing those two into one absent field is
 /// the conflation C3 turns into a wrong number.
 /// </para>
@@ -211,7 +211,7 @@ public sealed record Answer
     public required MachineAddress From { get; init; }
 
     /// <summary>What its commitments advocate, for a <see cref="Wanted.Vote"/>.</summary>
-    public Testimony? Said { get; init; }
+    public Weights? Said { get; init; }
 
     /// <summary>What recurs across its scopes, for <see cref="Wanted.Counts"/>.</summary>
     public Counts? Counted { get; init; }

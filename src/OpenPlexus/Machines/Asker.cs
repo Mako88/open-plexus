@@ -310,7 +310,7 @@ public sealed class Gathering : IDisposable
     /// </remarks>
     public Vote Decide()
     {
-        List<Testimony> said;
+        List<Weights> said;
 
         lock (_gate)
             said =

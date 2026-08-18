@@ -25,7 +25,7 @@ namespace OpenPlexus.Codes;
 /// together, and codes for adjacent cells of one view are neighbouring values.
 /// </para>
 /// </remarks>
-public static class Agreed
+public static class Hashing
 {
     /// <summary>The FNV-1a offset basis. Where a fold starts.</summary>
     public const ulong Basis = 0xcbf29ce484222325;

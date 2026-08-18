@@ -85,14 +85,14 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// seed is a run rather than two independent draws that could be varied apart.
     /// </param>
     /// <remarks>
-    /// <b>ONE <see cref="Sorting"/> for the front end and the population both.</b> A
+    /// <b>ONE <see cref="Categories"/> for the front end and the population both.</b> A
     /// category's code is derived from its members, so two vocabularies built from the same
     /// groups would agree — but a rewrite reading a vocabulary the front end is not folding
     /// mints rules that can never fire, and nothing downstream would report it.
     /// </remarks>
     private (double Exam, int Held) Cell(
         ReturningSettings settings, string label,
-        Sorting? categories = null, Coarsening coarsening = Coarsening.Never, int seed = 1)
+        Categories? categories = null, Coarsening coarsening = Coarsening.Never, int seed = 1)
     {
         var world = new Returning(settings, seed: seed);
 
@@ -258,7 +258,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
                 $"  modality {kind.Key,-6}| {kind.Count(),3} groups | sizes "
                 + $"{string.Join(",", kind.Select(one => one.Count).OrderDescending().Take(8))}");
 
-        var sorting = new Sorting(found);
+        var sorting = new Categories(found);
 
         var (plain, byLook) = Cell(settings, "twinned anonymous placed");
         var (sorted, byCategory) = Cell(
@@ -396,7 +396,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
             // watching THIS run would have seen. A vocabulary derived once and reused would
             // make seeds two and three a test of how well seed one's categories travel,
             // which is a different question and a much easier one.
-            var sorting = new Sorting(
+            var sorting = new Categories(
                 Alternating.From(Watched(settings, seed), company: 0.5, floor: 20));
 
             output.WriteLine($"seed {seed}, {sorting.Count} categories derived");
@@ -588,8 +588,8 @@ public sealed class ReturningTests(ITestOutputHelper output)
                 + $"{On(byTime, 25).Count}, against four and eight -- so the separation this "
                 + "arm is built on is a fact about seed one");
 
-            var perPair = new Sorting(bySpace);
-            var perThing = new Sorting(byTime);
+            var perPair = new Categories(bySpace);
+            var perThing = new Categories(byTime);
 
             var none = Cell(running, $"seed {seed}, no categories", seed: seed);
 
@@ -694,7 +694,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
 
             var places = On(byTime, 25);
 
-            var sorted = Cell(settings, "  folded and judged", new Sorting(byTime), Coarsening.Judged);
+            var sorted = Cell(settings, "  folded and judged", new Categories(byTime), Coarsening.Judged);
             var plain = Cell(settings, "  no categories", seed: 1);
 
             lift[drifting] = sorted.Exam - plain.Exam;

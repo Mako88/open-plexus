@@ -28,7 +28,7 @@ namespace OpenPlexus.Codes;
 /// thing, and folding them together would make the second cost the first.
 /// </para>
 /// </remarks>
-public sealed class Sorting
+public sealed class Categories
 {
     private readonly List<IReadOnlySet<Code>> _groups = [];
     private readonly Dictionary<Code, Code> _coarser = [];
@@ -45,7 +45,7 @@ public sealed class Sorting
     /// make <see cref="Coarser"/> a choice rather than a lookup, which is a decision hiding
     /// in what was meant to be an alphabet.
     /// </remarks>
-    public Sorting(IEnumerable<IReadOnlySet<Code>> groups)
+    public Categories(IEnumerable<IReadOnlySet<Code>> groups)
     {
         ArgumentNullException.ThrowIfNull(groups);
 

@@ -56,20 +56,20 @@ public static class Sequenced
     /// <param name="second">What came after it.</param>
     /// <remarks>
     /// <b>Derived from the pair and order-sensitive, so two machines reach the same code
-    /// with nothing to ask</b> — the property every code here has. <see cref="Agreed"/>
+    /// with nothing to ask</b> — the property every code here has. <see cref="Hashing"/>
     /// rather than <see cref="object.GetHashCode"/>, which is randomised per process, so a
     /// codebook resting on it would mean two machines quietly disagreeing about what a
     /// precedence IS.
     /// </remarks>
     public static Code Of(Code first, Code second)
     {
-        var hash = Agreed.Fold(Agreed.Basis, first.Modality);
+        var hash = Hashing.Fold(Hashing.Basis, first.Modality);
 
-        hash = Agreed.Fold(hash, first.Value);
-        hash = Agreed.Fold(hash, second.Modality);
-        hash = Agreed.Fold(hash, second.Value);
+        hash = Hashing.Fold(hash, first.Value);
+        hash = Hashing.Fold(hash, second.Modality);
+        hash = Hashing.Fold(hash, second.Value);
 
-        return new Code(Ordered, Agreed.Mix(hash));
+        return new Code(Ordered, Hashing.Mix(hash));
     }
 
     /// <summary>Whether a code is a precedence rather than something a sense reported.</summary>

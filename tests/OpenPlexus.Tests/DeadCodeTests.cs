@@ -474,7 +474,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "measurement is FOR is deciding whether to admit it. `ReturningTests` reads "
             + "it: the appearances come back exactly and the twins do not, so a category "
             + "reaches a kind and never an individual. A category MAY enter a scope now -- "
-            + "`Sorting` carries the vocabulary and `Population.Recast` reads it -- and this "
+            + "`Categories` carries the vocabulary and `Population.Recast` reads it -- and this "
             + "entry stays because the DERIVATION is still the experimenter's. The day a "
             + "front end runs it on its own stream is the day it comes off.",
 

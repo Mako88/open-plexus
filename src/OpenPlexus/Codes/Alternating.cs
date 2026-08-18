@@ -54,7 +54,7 @@ public static class Alternating
     /// <para>
     /// <b>Greedy, and its order is the codes' own rather than the stream's.</b> Two machines
     /// seeing the same moments in different orders must reach the same groups or a category
-    /// means one thing here and another there — the rule <c>Agreed</c> stands on, and the
+    /// means one thing here and another there — the rule <c>Hashing</c> stands on, and the
     /// reason a fitted quantiser is refused.
     /// </para>
     /// <para>
@@ -197,7 +197,7 @@ public static class Alternating
     /// <para>
     /// <b>Greedy, and its order is the codes' own rather than the stream's.</b> Two machines
     /// seeing the same moments in different orders must reach the same groups or a category
-    /// means one thing here and another there — the rule <c>Agreed</c> stands on, and the
+    /// means one thing here and another there — the rule <c>Hashing</c> stands on, and the
     /// reason a fitted quantiser is refused.
     /// </para>
     /// <para>
@@ -295,7 +295,7 @@ public static class Alternating
 /// category the front end folds and one the brain may rewrite over have to be the same code
 /// or the rewrite names something no moment ever holds.
 /// </param>
-public sealed class Sorted<TObservation>(IQuantizer<TObservation> inner, Sorting categories)
+public sealed class Sorted<TObservation>(IQuantizer<TObservation> inner, Categories categories)
     : IQuantizer<TObservation>
 {
     /// <inheritdoc/>

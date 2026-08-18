@@ -212,7 +212,7 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     public const byte Sorted = 43;
 
     private readonly Joining _joining;
-    private readonly Sorting _categories;
+    private readonly Categories _categories;
     private readonly int _hops;
     private readonly bool _banded;
     private readonly int _resolution;
@@ -265,7 +265,7 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
         ArgumentOutOfRangeException.ThrowIfNegative(resolution);
 
         _joining = joining;
-        _categories = new Sorting(categories ?? []);
+        _categories = new Categories(categories ?? []);
         _hops = hops;
         _banded = banded;
         _resolution = resolution;
@@ -307,15 +307,15 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
         if (members.Count < 2)
             throw new ArgumentException("a category of fewer than two codes says nothing", nameof(members));
 
-        var hash = Agreed.Fold(Agreed.Basis, (ulong)members.Count);
+        var hash = Hashing.Fold(Hashing.Basis, (ulong)members.Count);
 
         foreach (var code in members.Order())
         {
-            hash = Agreed.Fold(hash, code.Modality);
-            hash = Agreed.Fold(hash, code.Value);
+            hash = Hashing.Fold(hash, code.Modality);
+            hash = Hashing.Fold(hash, code.Value);
         }
 
-        return new Code(Sorted, Agreed.Mix(hash));
+        return new Code(Sorted, Hashing.Mix(hash));
     }
 
     /// <summary>Which statements of the story this arm read, in the order it read them.</summary>

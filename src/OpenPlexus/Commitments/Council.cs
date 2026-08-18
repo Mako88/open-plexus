@@ -147,7 +147,7 @@ public sealed class Alone : ICouncil
     /// whether there is one machine or twenty — which is what stops a fleet growing a
     /// second copy of the learning loop.
     /// </remarks>
-    public Testimony Said => _held.Speak(_firing);
+    public Weights Weighed => _held.Weigh(_firing);
 
     /// <inheritdoc/>
     public ValueTask<Vote> AskAsync(IReadOnlySet<Code> raw, CancellationToken ct = default) =>

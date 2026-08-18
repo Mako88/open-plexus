@@ -94,7 +94,7 @@ public sealed class Holder : IReceiveAsks
             {
                 Broadcast = ask.Broadcast,
                 From = Address,
-                Said = ask.Wants == Wanted.Vote ? Speaking(ask) : null,
+                Said = ask.Wants == Wanted.Vote ? Weighing(ask) : null,
                 Counted = ask.Wants == Wanted.Counts
                     ? Recurrence.Of(_held.All, _held.Dials).Written()
                     : null,
@@ -113,7 +113,7 @@ public sealed class Holder : IReceiveAsks
     /// <para>
     /// <b>An empty testimony is an answer and not an absence.</b> A holder none of whose
     /// commitments fired has been heard from, which the merge may not treat as a holder
-    /// that died — see <see cref="Testimony.Silent"/>, and C3 for why the distinction is
+    /// that died — see <see cref="Weights.Silent"/>, and C3 for why the distinction is
     /// the whole point of asking.
     /// </para>
     /// <para>
@@ -124,11 +124,11 @@ public sealed class Holder : IReceiveAsks
     /// told to settle would judge every code by a table that had not seen it.
     /// </para>
     /// </remarks>
-    private Testimony Speaking(Ask ask)
+    private Weights Weighing(Ask ask)
     {
         _round.Ask(new HashSet<Code>(ask.Moment));
 
-        return _round.Said;
+        return _round.Weighed;
     }
 
     /// <summary>Learns from what the settlement said, and reports what that added.</summary>

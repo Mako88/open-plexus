@@ -16,7 +16,7 @@ namespace OpenPlexus.Tests;
 /// <b>The commitment learner runs in one process, so C1 IS KEPT BY CONVENTION.</b> No
 /// node has ever had the OPPORTUNITY to read another's data, which is not the same as a
 /// design that forbids it — and a constraint nothing has ever been able to break is a
-/// check that cannot fire. <see cref="Population.Speak"/> is the narrow seam that makes
+/// check that cannot fire. <see cref="Population.Weigh"/> is the narrow seam that makes
 /// the difference testable: a holder emits expectations and weights, and a merge that
 /// only ever sees those cannot cheat.
 /// </para>
@@ -107,12 +107,12 @@ public sealed class SplitTests(ITestOutputHelper output)
     /// <param name="missing">A holder that says nothing at all, or -1 for none.</param>
     /// <remarks>
     /// <b>A missing holder is not a silent one and the parameter is named for the
-    /// difference.</b> A holder that fires nothing returns an empty <see cref="Testimony"/> and
+    /// difference.</b> A holder that fires nothing returns an empty <see cref="Weights"/> and
     /// has been heard from; this one is never asked, which is what a death looks like from
     /// the outside. <see cref="Population.Decide"/> cannot tell them apart and is not
     /// supposed to — the count of who was asked lives with the asker.
     /// </remarks>
-    private static List<Testimony> Spread(
+    private static List<Weights> Spread(
         ImmutableArray<Commitment> firing, Population held, int holders, int missing = -1)
     {
         var shards = new List<ImmutableArray<Commitment>.Builder>(holders);
@@ -123,12 +123,12 @@ public sealed class SplitTests(ITestOutputHelper output)
         foreach (var commitment in firing)
             shards[(int)(commitment.Identity.Value % (ulong)holders)].Add(commitment);
 
-        var heard = new List<Testimony>(holders);
+        var heard = new List<Weights>(holders);
 
         for (var holder = 0; holder < holders; holder++)
         {
             if (holder == missing) continue;
-            heard.Add(held.Speak(shards[holder].ToImmutable()));
+            heard.Add(held.Weigh(shards[holder].ToImmutable()));
         }
 
         return heard;
@@ -199,7 +199,7 @@ public sealed class SplitTests(ITestOutputHelper output)
         // Asked because the other payload built this session could not cross. `Recurrence`
         // was committed as the thing that travels and had never been near a serialiser; it
         // wrote its scope count and dropped both tables, silently and plausibly. Assuming
-        // `Testimony` is fine because it looks fine is the same reasoning that shipped
+        // `Weights` is fine because it looks fine is the same reasoning that shipped
         // that one.
         //
         // And the weights are doubles, which is why this is not a formality. `Wire` exists
@@ -219,7 +219,7 @@ public sealed class SplitTests(ITestOutputHelper output)
             var heard = Spread(firing, held, holders: 12);
 
             var arrived = heard
-                .Select(one => OpenPlexus.Bus.Wire.Read<Testimony>(OpenPlexus.Bus.Wire.Write(one)))
+                .Select(one => OpenPlexus.Bus.Wire.Read<Weights>(OpenPlexus.Bus.Wire.Write(one)))
                 .ToList();
 
             // On the decision and not only on the fields. Two testimonies comparing equal

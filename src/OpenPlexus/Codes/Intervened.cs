@@ -58,17 +58,17 @@ public static class Intervened
     /// <param name="done">The code that was assigned rather than selected.</param>
     /// <remarks>
     /// <b>Derived from the code</b>, so two machines reach the same name with nothing to ask.
-    /// <see cref="Agreed"/> rather than <see cref="object.GetHashCode"/>, which is randomised
+    /// <see cref="Hashing"/> rather than <see cref="object.GetHashCode"/>, which is randomised
     /// per process — a codebook resting on that would mean two machines quietly disagreeing
     /// about what an intervention IS.
     /// </remarks>
     public static Code Of(Code done)
     {
-        var hash = Agreed.Fold(Agreed.Basis, done.Modality);
+        var hash = Hashing.Fold(Hashing.Basis, done.Modality);
 
-        hash = Agreed.Fold(hash, done.Value);
+        hash = Hashing.Fold(hash, done.Value);
 
-        return new Code(Did, Agreed.Mix(hash));
+        return new Code(Did, Hashing.Mix(hash));
     }
 
     /// <summary>Whether a code says something was done rather than reporting a sense.</summary>

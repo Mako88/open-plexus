@@ -1124,7 +1124,7 @@ public sealed class Trial<TSeen>
                 .Select(held =>
                 {
                     var moment = held.Moment(new HashSet<Code>(said_));
-                    return held.Speak(held.Firing(moment));
+                    return held.Weigh(held.Firing(moment));
                 })
                 .ToList();
 

@@ -125,7 +125,7 @@ public sealed class Drives
         var advocates = new Dictionary<int, List<Commitment>>();
 
         // One snapshot, taken under the gate by `All` itself, and the groups below keep its
-        // order. `Speak` breaks a tie between two advocates by which came first and says so,
+        // order. `Weigh` breaks a tie between two advocates by which came first and says so,
         // so a group in any other order would decide differently on a machine that held the
         // same rules -- and `All` is already sorted by identity, which is the order that
         // reader documents.
@@ -159,7 +159,7 @@ public sealed class Drives
         foreach (var doing in advocates.Keys.Order())
         {
             var vote = Population.Decide(
-                [_held.Speak([.. advocates[doing]])]);
+                [_held.Weigh([.. advocates[doing]])]);
 
             if (vote.Expects is not Code expects) continue;
 

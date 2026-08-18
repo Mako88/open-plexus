@@ -2115,7 +2115,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
             var (naming, company) = Counted(task);
 
-            string Spell(Code code) =>
+            string Ordered(Code code) =>
                 naming.TryGetValue(code, out var word) ? word
                 : brain.Held.Names.Knows(code) ? $"name#{code.Value % 1000}"
                 : $"?{code.Value % 1000}";
@@ -2160,8 +2160,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
                 var one = families[frame][0];
 
                 output.WriteLine(
-                    $"task {task} | {{{string.Join(" ", one.Scope.Where(code => !slots[frame].Contains(code)).Select(Spell))}}}"
-                    + $" + [{string.Join(" ", slots[frame].Order().Select(Spell))}] -> {Answering(one)}");
+                    $"task {task} | {{{string.Join(" ", one.Scope.Where(code => !slots[frame].Contains(code)).Select(Ordered))}}}"
+                    + $" + [{string.Join(" ", slots[frame].Order().Select(Ordered))}] -> {Answering(one)}");
             }
 
             // And the slot is then partitioned by fork 98's statistic, which is the whole
@@ -2172,7 +2172,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
             foreach (var frame in varying)
                 foreach (var group in Grouped(slots[frame], company))
                     if (group.Count >= 2)
-                        recovered.Add(string.Join(" ", group.Select(Spell).Order(StringComparer.Ordinal)));
+                        recovered.Add(string.Join(" ", group.Select(Ordered).Order(StringComparer.Ordinal)));
 
             // Pure means no group straddles two of the key's categories, and a group of verbs
             // is not scored either way — there is no verb key and inventing one would be the

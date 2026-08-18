@@ -16,7 +16,7 @@ public readonly record struct Peer(string Host);
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>This is the first thing in the project that can actually be distributed.</b>
+/// <b>This is the first thing in the project</b> that can actually be distributed.
 /// <see cref="HybridBus"/> is a dictionary of holders called through
 /// <see cref="Task.Run(Action)"/> with delays sprinkled in, so C2 and C3 have been
 /// honoured by a SIMULATION of a network for the life of the repo. Twenty phones cannot
@@ -51,8 +51,8 @@ public readonly record struct Peer(string Host);
 /// path was, because that one is measured in milliseconds and a queue shows.
 /// </para>
 /// <para>
-/// <b>So a documented promise is not a check, and the only reason this one is true now is
-/// that something put a clock on it.</b> The cost of a fan-out is in
+/// <b>So a documented promise is not a check</b>, and the only reason this one is true now is
+/// that something put a clock on it. The cost of a fan-out is in
 /// <c>AskedTests</c>: nine holders at two and a half times one, rather than at nine.
 /// </para>
 /// </remarks>
@@ -65,8 +65,8 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// Where an asker that is not here can be reached.
     /// </summary>
     /// <remarks>
-    /// <b>SEPARATE FROM <see cref="_holding"/> because an ask is a broadcast and an answer
-    /// is not.</b> An answer goes to the one machine that asked, so this table only has to
+    /// <b>Separate from <see cref="_holding"/></b>, because an ask is a broadcast and an
+    /// answer is not. An answer goes to the one machine that asked, so this table only has to
     /// say where that one is; an ask goes to every holder, so the other one decides the
     /// denominator of a gathering. Folding them together would put every asker into the
     /// vote's population count, and each would then be a holder that never answers.
@@ -101,8 +101,8 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A bus that drops silently needs a count, or the loss is a fact nothing can
-    /// see.</b> Every failed post here is swallowed on purpose — a machine that is not
+    /// <b>A bus that drops silently needs a count</b>, or the loss is a fact nothing can
+    /// see. Every failed post here is swallowed on purpose — a machine that is not
     /// there is C3 rather than an error — and that reasoning is right for a DEATH and
     /// wrong for a hiccup. The two are the same event to <see cref="PostAsync"/> and they
     /// are completely different to whoever was waiting, because a fleet gathers from a
@@ -145,13 +145,13 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// <summary>Every holder this machine could ask, for the tests that ask.</summary>
     /// <remarks>
     /// <para>
-    /// <b>A machine's picture of the world is PARTIAL and that is not a fault</b> — it
+    /// <b>A machine's picture of the world is PARTIAL</b> and that is not a fault — it
     /// knows the holders that have announced themselves to it, which is every one that was
     /// alive and reachable when it subscribed and no others.
     /// </para>
     /// <para>
-    /// <b>And it is the denominator of a gathering, which is why the partial picture has to
-    /// be reportable.</b> How many HOLDERS exist decides how much of a population a vote was
+    /// <b>And it is the denominator of a gathering</b>, which is why the partial picture has to
+    /// be reportable. How many HOLDERS exist decides how much of a population a vote was
     /// taken over, and a run that quietly asked eleven of twelve would score like one that
     /// asked all twelve and be wrong about something nothing reports.
     /// </para>
@@ -196,8 +196,8 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// holders until the next one.
     /// </para>
     /// <para>
-    /// <b>And it is a fan-out like every other one here, which it was not until something
-    /// timed a fleet coming up.</b> This awaited each peer in turn, so a machine opening paid
+    /// <b>And it is a fan-out like every other one here</b>, which it was not until something
+    /// timed a fleet coming up. This awaited each peer in turn, so a machine opening paid
     /// the SUM of its peers rather than the slowest of them — the identical defect the class
     /// remark describes at length for a broadcast, in the method underneath it, surviving the
     /// commit that fixed the other two.
@@ -273,8 +273,8 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// <param name="ask">The question.</param>
     /// <param name="ct">Cancellation.</param>
     /// <remarks>
-    /// <b>The one delivery on this bus whose failure somebody is waiting on, which is why
-    /// it is the one not simply swallowed.</b> Every other path here loses a message and
+    /// <b>The one delivery on this bus whose failure somebody is waiting on</b>, which is why
+    /// it is the one not simply swallowed. Every other path here loses a message and
     /// costs whoever needed it a fact; this one loses a message and costs an asker its
     /// denominator, so the gathering never completes and a fleet that is alive and idle
     /// stops for good. See <see cref="IBus.Unreached"/>.
@@ -335,8 +335,8 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// <param name="delivery">What to do.</param>
     /// <param name="ct">Cancellation.</param>
     /// <remarks>
-    /// <b>A fault on this path has nowhere to go, and an unobserved task is worse than a
-    /// swallowed one.</b> The caller has already been handed its answer — who was asked, or
+    /// <b>A fault on this path has nowhere to go</b>, and an unobserved task is worse than a
+    /// swallowed one. The caller has already been handed its answer — who was asked, or
     /// who is about to be sent to — so there is no return value left to carry a failure on.
     /// What reaches here is a holder departing inside the window between being listed and
     /// being sent to, which is C3 happening rather than a routing bug.
@@ -566,8 +566,8 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// <b>Internal</b>, because it is a shape on the wire and not part of what a bus offers.
     /// </remarks>
     /// <remarks>
-    /// <b>Strings rather than the address types, because a roster is the one message whose
-    /// contents are addresses</b> — and an address is a record struct over a string, so
+    /// <b>Strings rather than the address types</b>, because a roster is the one message whose
+    /// contents are addresses — and an address is a record struct over a string, so
     /// naming it here would buy a wrapper and no safety.
     /// </remarks>
     internal sealed record Roster
@@ -582,8 +582,8 @@ public sealed class Posted : IBus, IAsyncDisposable
         /// The holders of commitments it has, which can be asked.
         /// </summary>
         /// <remarks>
-        /// <b>ANNOUNCED SEPARATELY FROM <see cref="Askers"/> because an ask is a broadcast
-        /// and an answer is not.</b> An answer goes to the one machine that asked, so the
+        /// <b>Announced separately from <see cref="Askers"/></b>, because an ask is a
+        /// broadcast and an answer is not. An answer goes to the one machine that asked, so the
         /// roster only has to say where that one is; an ask goes to EVERY holder, so the
         /// roster is what decides the denominator of a gathering. Folding them together
         /// would put every asker into the vote's population count, and each of them would
@@ -596,7 +596,7 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// Shuts the door. <b>Twice is the same as once.</b>
     /// </summary>
     /// <remarks>
-    /// <b>And it threw the second time until something killed a machine on purpose.</b>
+    /// <b>And it threw the second time</b> until something killed a machine on purpose.
     /// <see cref="CancellationTokenSource.CancelAsync"/> on a disposed source is an
     /// <see cref="ObjectDisposedException"/>, so a harness that took a machine down mid-run
     /// and then tore the fleet down could not do both — which reads as the C3 test failing

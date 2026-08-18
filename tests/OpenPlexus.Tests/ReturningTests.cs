@@ -7,8 +7,8 @@ using Xunit.Abstractions;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// What an INDIVIDUAL would be worth, measured before one is built — <b>John's basket, as a
-/// grid with both ends of the gap in it.</b>
+/// What an INDIVIDUAL would be worth, measured before one is built — <b>John's basket</b>, as a
+/// grid with both ends of the gap in it.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -19,7 +19,7 @@ namespace OpenPlexus.Tests;
 /// all, and the twinned row says what identity is worth once appearance has run out.
 /// </para>
 /// <para>
-/// <b>And the cell nobody may ship is the one that makes the others legible.</b> A handed
+/// <b>And the cell nobody may ship</b> is the one that makes the others legible. A handed
 /// index is exactly what John's ordering forbids — point a phone at a basket, look away,
 /// look back, and nothing outside the learner may say it is the same basket. It is here
 /// because a gap needs two ends, in the same way fork 88 priced rung four by handing the
@@ -45,8 +45,8 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// <param name="seed">Which stream.</param>
     /// <param name="sightings">How many moments to watch.</param>
     /// <remarks>
-    /// <b>A separate instance at the same seed, so the groups are found in what a front end
-    /// would have seen rather than in the examination.</b> It sees the same distribution and
+    /// <b>A separate instance at the same seed</b>, so the groups are found in what a front end
+    /// would have seen rather than in the examination. It sees the same distribution and
     /// none of the withheld sightings.
     /// </remarks>
     private static List<IReadOnlySet<Code>> Watched(
@@ -201,8 +201,8 @@ public sealed class ReturningTests(ITestOutputHelper output)
 
     /// <summary>
     /// Whether the appearances a thing wears can be found to be ONE CATEGORY from the
-    /// moments alone — <b>John's account of a category, and the reason the individual and
-    /// the category are one mechanism rather than two.</b>
+    /// moments alone — <b>John's account of a category</b>, and the reason the individual and
+    /// the category are one mechanism rather than two.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -213,16 +213,16 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// rule is <see cref="Alternating"/> and never abstraction.
     /// </para>
     /// <para>
-    /// <b>And nothing is handed over, which is the difference from every ceiling in the
-    /// grid above.</b> The groups are derived from drawn moments by exclusion and shared
+    /// <b>And nothing is handed over</b>, which is the difference from every ceiling in the
+    /// grid above. The groups are derived from drawn moments by exclusion and shared
     /// company. The world's own tables are never read — which matters especially here,
     /// because a landmark's codes are drawn per THING, so handing that grouping over would
     /// be the index of the forbidden cell wearing a different hat.
     /// </para>
     /// <para>
-    /// <b>What would refute the route, said before it runs: if the derived categories do not
+    /// <b>What would refute the route</b>, said before it runs: if the derived categories do not
     /// cut the rule count, then a name over alternatives does not compress and the
-    /// individual-as-category account is wrong however tidy it sounds.</b> The score is the
+    /// individual-as-category account is wrong however tidy it sounds. The score is the
     /// second column and not the first — the placed cell already answers everything, so what
     /// is being asked for is the 9.3x.
     /// </para>
@@ -350,7 +350,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// than one pinning its category.
     /// </para>
     /// <para>
-    /// <b>And the operator fork 85 actually asked for was built here and deleted.</b> It
+    /// <b>And the operator fork 85 actually asked for</b> was built here and deleted. It
     /// proposed the coarse claim as a new commitment with a fresh record — which is not
     /// optional, since carrying the parent's would keep a rule's evidence while widening what
     /// it claims — and it cost 60 rules over three seeds where the judge cost none. A
@@ -359,7 +359,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// coarse code exactly as it roots on anything else in the moment.
     /// </para>
     /// <para>
-    /// <b>WHAT WOULD REVIVE IT is a vocabulary the brain holds that no moment carries.</b>
+    /// <b>What would revive it</b> is a vocabulary the brain holds that no moment carries.
     /// Every sentence above turns on the front end folding the category in; a category
     /// derived and kept inside the population would have nothing minting its rules.
     /// </para>
@@ -458,7 +458,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The derivation sees a bag of moments and no order, which is why the twins merged.</b>
+    /// <b>The derivation sees a bag of moments and no order</b>, which is why the twins merged.
     /// Substitutability is a fact about moments, and twins are substitutable by construction —
     /// so eight things came back as four groups of eight landmarks, each holding both twins'.
     /// Nothing about looking harder at moments can fix that.
@@ -470,9 +470,9 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// is handed exactly what it was handed before.
     /// </para>
     /// <para>
-    /// <b>What would kill it, said before it runs and carried from the handoff that named
+    /// <b>What would kill it</b>, said before it runs and carried from the handoff that named
     /// it: if the landmarks still come back four-of-eight, continuity does not separate
-    /// substitutable things and the route back is a GATE reading what a proposal predicts.</b>
+    /// substitutable things and the route back is a GATE reading what a proposal predicts.
     /// That is the honest alternative and it is a different kind of mechanism — a derivation
     /// over what arrived against a judge of what a claim earns.
     /// </para>
@@ -482,8 +482,8 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// is reading some other regularity and the runs were never what paid.
     /// </para>
     /// <para>
-    /// <b>It does not come back empty, and that is a property of the bar rather than of the
-    /// world.</b> A ratio against chance corrects for nothing, so out of every pair in the
+    /// <b>It does not come back empty</b>, and that is a property of the bar rather than of the
+    /// world. A ratio against chance corrects for nothing, so out of every pair in the
     /// alphabet one clears it by luck — the same failure rung five's gate exists against and
     /// pays for with a correction by the count of candidates. What the control can say is
     /// that noise reaches a PAIR and structure reaches the thing, and the distance between
@@ -650,12 +650,12 @@ public sealed class ReturningTests(ITestOutputHelper output)
 
     /// <summary>
     /// Whether what continuity recovers is a THING or a place a thing never leaves —
-    /// <b>the control this world's own doc asked for before any of it was measured.</b>
+    /// <b>the control this world's own doc asked for</b> before any of it was measured.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A landmark fixed for the life of the world is pinned by a conjunction, which is
-    /// rung one and already built.</b> So <i>adhesion recovers the individual</i> is a claim
+    /// <b>A landmark fixed for the life of the world</b> is pinned by a conjunction, which is
+    /// rung one and already built. So <i>adhesion recovers the individual</i> is a claim
     /// with an obvious cheaper explanation sitting under it: a thing's landmark codes adhere
     /// because the thing has one landmark forever, and what is being recovered is the place.
     /// Nothing in the reading above separates those two.
@@ -666,10 +666,10 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// the fact that makes a place stop being a name for it.
     /// </para>
     /// <para>
-    /// <b>What would refute the identity reading, said before this runs: if the landmark
+    /// <b>What would refute the identity reading</b>, said before this runs: if the landmark
     /// groups survive drift, adhesion is following the thing through its move and the
     /// individual is real; if they collapse or scatter, what was recovered was the place and
-    /// the earlier reading is a conjunction wearing identity's clothes.</b> The score is the
+    /// the earlier reading is a conjunction wearing identity's clothes. The score is the
     /// second column — a place category can only predict a thing's hidden attribute while
     /// nobody else has stood there.
     /// </para>

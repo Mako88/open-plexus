@@ -49,12 +49,12 @@ public sealed class SlotTests(ITestOutputHelper output)
     private const int Narrow = 2;
 
     /// <summary>
-    /// <b>A holder that took the question and went quiet stops the round for good.</b>
+    /// <b>A holder that took the question and went quiet</b> stops the round for good.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The control, and without it every test below is a claim that something was fixed
-    /// with no evidence that it was ever broken.</b> This is the same fleet with one machine
+    /// <b>The control</b>, and without it every test below is a claim that something was fixed
+    /// with no evidence that it was ever broken. This is the same fleet with one machine
     /// a slot, which is what fork 53 shipped — and the write-off it ships cannot reach this
     /// at all, because there is nothing to write off: the ask was handed over, acknowledged,
     /// and nobody is coming back.
@@ -95,8 +95,8 @@ public sealed class SlotTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A slot whose other machine answers finishes the round, and the death costs
-    /// nothing.</b>
+    /// <b>A slot whose other machine answers finishes the round</b>, and the death costs
+    /// nothing.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -106,8 +106,8 @@ public sealed class SlotTests(ITestOutputHelper output)
     /// present.
     /// </para>
     /// <para>
-    /// <b>And the second replica's answer is dropped rather than added, which is the half a
-    /// completion could silently destroy.</b> <see cref="Gathering.Merged"/> and
+    /// <b>And the second replica's answer is dropped rather than added</b>, which is the half a
+    /// completion could silently destroy. <see cref="Gathering.Merged"/> and
     /// <see cref="Gathering.Added"/> both ADD what they are handed, so two identical shards
     /// counted twice is one machine's scopes weighed double — the exact fault
     /// <see cref="Gathering"/>'s own header describes for a duplicated message, arriving by
@@ -150,11 +150,11 @@ public sealed class SlotTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>And nothing is dropped where there is nothing to drop, which is R=1 BEING THE OLD
-    /// MACHINE EXACTLY.</b>
+    /// <b>And nothing is dropped where there is nothing to drop</b>, which is R=1 BEING THE OLD
+    /// MACHINE EXACTLY.
     /// </summary>
     /// <remarks>
-    /// <b>The budget against the way this change could be wrong and still look right.</b> A
+    /// <b>The budget against the way this change could be wrong</b> and still look right. A
     /// slot condition that quietly deduplicated on an unpartitioned fleet would silence
     /// holders on every measurement this project has ever taken over a wire, and every one of
     /// them would still finish and still score. What says it did not is that a fleet of slots
@@ -178,8 +178,8 @@ public sealed class SlotTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A fleet goes on learning while a machine it is still asking never answers — the
-    /// round a phone dies inside, and the last hard blocker on the north star.</b>
+    /// <b>A fleet learns on while a machine it still asks never answers</b> — the round a
+    /// phone dies inside, and the last hard blocker on the north star.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -190,13 +190,13 @@ public sealed class SlotTests(ITestOutputHelper output)
     /// observed, arriving four thousand times instead of once.
     /// </para>
     /// <para>
-    /// <b>And the denominator does not come down here, which is the difference from fork 53
-    /// said in a number.</b> A refused connection takes a holder off the roster; a holder
+    /// <b>And the denominator does not come down here</b>, which is the difference from fork 53
+    /// said in a number. A refused connection takes a holder off the roster; a holder
     /// that accepts and is quiet stays on it forever, correctly, because nothing has been
     /// observed about it. The fleet asks four and hears two and finishes anyway.
     /// </para>
     /// <para>
-    /// <b>The score is printed and barred low, for the reason its neighbour gives.</b> What
+    /// <b>The score is printed and barred low</b>, for the reason its neighbour gives. What
     /// is being asserted is that the run happened at all — it could not have before this, on
     /// a fleet where every surviving machine was alive and idle. Four-way chance is a
     /// quarter.
@@ -242,29 +242,29 @@ public sealed class SlotTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Two machines in one slot do not hold the same population, and what separates them
-    /// is the completeness condition itself.</b>
+    /// <b>Two machines in one slot do not hold the same population</b>, and what separates them
+    /// is the completeness condition itself.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>This was written to assert identity and it failed on the first machine that was not
-    /// mine.</b> The plan's claim is that replicas fed one stream mint the same children
+    /// <b>This was written to assert identity</b> and it failed on the first machine that was not
+    /// mine. The plan's claim is that replicas fed one stream mint the same children
     /// independently and stay identical, so redundancy costs coordination nothing — 88
     /// commitments against 89 with twenty held by only one of them, on a runner, where the
     /// same code is bit-identical here. A green local run said the claim held; it said the
     /// machine was fast.
     /// </para>
     /// <para>
-    /// <b>And the mechanism is the slot, which makes this a cost of fork 62 rather than a bug
-    /// in it.</b> A round finishes when ONE replica answers, so the other is never waited on
+    /// <b>And the mechanism is the slot</b>, which makes this a cost of fork 62 rather than a bug
+    /// in it. A round finishes when ONE replica answers, so the other is never waited on
     /// — and asks are dispatched per arrival rather than in order, so a replica running
     /// behind can be handed the next moment before the last settlement. Identical evidence
     /// converges; evidence in a different ORDER does not, and nothing was making the order
     /// the same except this machine being quick enough that it never came up.
     /// </para>
     /// <para>
-    /// <b>So what is asserted is what survives: both replicas learn, and the slots are
-    /// different from each other.</b> The divergence is printed rather than barred, because a
+    /// <b>So what is asserted is what survives</b>: both replicas learn, and the slots are
+    /// different from each other. The divergence is printed rather than barred, because a
     /// threshold on how far two populations drift is a prediction and this has been measured
     /// exactly once. What it costs is fork 62's open half — a failover replica is a similar
     /// population and not the same one.
@@ -316,8 +316,8 @@ public sealed class SlotTests(ITestOutputHelper output)
     /// <param name="replicas">How many machines hold each one.</param>
     /// <returns>The trial, the fleet the caller must dispose, and the council over it.</returns>
     /// <remarks>
-    /// <b>The fleet is handed back rather than disposed here, which is what the duplication
-    /// budget costs and it is worth it.</b> Two tests wrote these six lines identically and
+    /// <b>The fleet is handed back rather than disposed here</b>, which is what the duplication
+    /// budget costs and it is worth it. Two tests wrote these six lines identically and
     /// the check refused the second copy — rightly, because a difference between them would
     /// read as a difference the replication caused.
     /// </remarks>
@@ -341,8 +341,8 @@ public sealed class SlotTests(ITestOutputHelper output)
     /// <param name="running">The run.</param>
     /// <param name="when">Which half, for the message.</param>
     /// <remarks>
-    /// <b>The experimenter's patience and never the machine's, which is <c>FleetTests</c>'
-    /// Rule and is unchanged by any of this.</b> A slot every one of whose machines went
+    /// <b>The experimenter's patience and never the machine's</b>, which is <c>FleetTests</c>'
+    /// Rule and is unchanged by any of this. A slot every one of whose machines went
     /// quiet still owes an answer forever, so a suite that inherited the wait would hang
     /// rather than fail.
     /// </remarks>

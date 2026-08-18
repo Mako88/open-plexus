@@ -107,12 +107,19 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// second half.
     /// </para>
     /// <para>
+    /// And 568 is six more files taken the same way, in the same session and after the work
+    /// rather than before it. Of 80, 57 closed at punctuation, 23 at a clause boundary, and 4
+    /// of those needed the claim moved or the shout lowercased. Two passes of eighty in one
+    /// session is what says the rate is a judgement cost rather than a search cost — finding
+    /// them is instant and deciding where each lead ends is the whole of the work.
+    /// </para>
+    /// <para>
     /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
     /// is the tight one — <see cref="Scheduled"/> is what stops it sitting still, and this is
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 648;
+    private const int Shouted = 568;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>
@@ -134,7 +141,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// rewritten as `Bench`, which is the same road: prose that goes takes its debt with it.
     /// </para>
     /// </remarks>
-    private const int Opened = 63;
+    private const int Opened = 59;
 
     /// <summary>
     /// The commit the decay schedule counts from. <b>John's, 2026-08-13.</b>

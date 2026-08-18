@@ -7,20 +7,20 @@ namespace OpenPlexus.Tests;
 
 /// <summary>
 /// What breaking the vote's hold over repair costs — <b>the other half of the lineage
-/// reading, and the half that decides whether it changes anything.</b>
+/// reading</b>, and the half that decides whether it changes anything.
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b><c>LineageTests</c> says the defect is a coupling and <see cref="Repairing"/> is
-/// the dial that removes it.</b> Under <see cref="Repairing.AfterFailure"/> repair runs
+/// <b><c>LineageTests</c> says the defect is a coupling</b>, and <see cref="Repairing"/> is
+/// the dial that removes it. Under <see cref="Repairing.AfterFailure"/> repair runs
 /// only on a round the vote got wrong, so under skew almost all blame lands on the
 /// majority lineages and the rules that would carry the hard rounds are never offered.
 /// <see cref="Repairing.EveryRound"/> touches the vote in no way and takes hard-round
 /// coverage from 4% to 97% at six bits.
 /// </para>
 /// <para>
-/// <b>The kill condition is written down before the run, because the plan already holds
-/// evidence against it.</b> Fork 58 says the gate's sign flips with the timing and that
+/// <b>The kill condition is written down before the run</b>, because the plan already holds
+/// evidence against it. Fork 58 says the gate's sign flips with the timing and that
 /// on <see cref="Worlds.Arranged"/> repairing without waiting for the vote minted 1,349
 /// children where the waiting arm minted nine, taking a perfect withheld score to 0.752.
 /// So this is a default candidate only if it costs nothing on the worlds where the vote
@@ -46,7 +46,7 @@ public sealed class RepairingTests(ITestOutputHelper output)
     ];
 
     /// <summary>
-    /// <b>What the coupling costs and what removing it costs, on every width and skew.</b>
+    /// <b>What the coupling costs and what removing it costs</b>, on every width and skew.
     /// </summary>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
@@ -137,11 +137,11 @@ public sealed class RepairingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Peak to peak, which the grid above does not do and a trap names by name.</b>
+    /// <b>Peak to peak</b>, which the grid above does not do and a trap names by name.
     /// </summary>
     /// <remarks>
-    /// <b>Two arms can peak at different budgets, and these two spend one at different
-    /// rates by construction.</b> <see cref="Repairing.EveryRound"/> walks the culprits on
+    /// <b>Two arms can peak at different budgets</b>, and these two spend one at different
+    /// rates by construction. <see cref="Repairing.EveryRound"/> walks the culprits on
     /// every round and <see cref="Repairing.AfterFailure"/> on the wrong seventh of them,
     /// so at one fixed <see cref="CommittingSettings.Budget"/> the arms are not offered the
     /// same search — which makes the grid above a comparison at ONE point of a curve whose
@@ -193,11 +193,11 @@ public sealed class RepairingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Whether the two things that redirect blame are one thing, which decides what
-    /// ships.</b>
+    /// <b>Whether the two things that redirect blame are one thing</b>, which decides what
+    /// ships.
     /// </summary>
     /// <remarks>
-    /// <b>Both acted on the same coupling and so did not add, which was the prediction.</b>
+    /// <b>Both acted on the same coupling and so did not add</b>, which was the prediction.
     /// A vote arm dividing by the answer's base rate reached the blame by making the vote say
     /// the rare answer, and <see cref="Repairing.EveryRound"/> reaches it by not consulting
     /// the vote at all — so under the second the first had nothing left to redirect. That is
@@ -243,13 +243,13 @@ public sealed class RepairingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Whether the new timing starves rung five, which a precondition found by
-    /// failing.</b>
+    /// <b>Whether the new timing starves rung five</b>, which a precondition found by
+    /// failing.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>`AskedTests` asserts that a trained population has something worth naming before
-    /// it tests the wire, and under <see cref="Repairing.EveryRound"/> IT HAS NOT.</b>
+    /// <b>`AskedTests` asserts that a trained population has something worth naming</b>
+    /// before it tests the wire, and under <see cref="Repairing.EveryRound"/> it has not.
     /// <see cref="Abstracting.Shared(Recurrence, CommittingSettings)"/> came back empty at eleven bits, which is a fact
     /// about the population rather than about the socket — and it is the one cost of this
     /// timing that no grid here would have shown, because every reading taken so far is
@@ -307,11 +307,11 @@ public sealed class RepairingTests(ITestOutputHelper output)
     /// discipline this borrows and whose purpose word it deliberately does not reuse.
     /// </remarks>
     /// <summary>
-    /// <b>Whether the names come back with the rules once the budget stops binding.</b>
+    /// <b>Whether the names come back with the rules</b> once the budget stops binding.
     /// </summary>
     /// <remarks>
-    /// <b>The naming cost and the smaller population are the same observation, and one of
-    /// them is already known to be the budget's.</b> <see cref="Repairing.EveryRound"/>
+    /// <b>The naming cost and the smaller population are the same observation</b>, and one of
+    /// them is already known to be the budget's. <see cref="Repairing.EveryRound"/>
     /// walks the culprits every round rather than on the wrong seventh, so a parent spends
     /// its ATTEMPTS about seven times faster — and `BudgetingTests` shows that with the
     /// budget counting distinct children instead, the same timing holds 126.6 sound rules

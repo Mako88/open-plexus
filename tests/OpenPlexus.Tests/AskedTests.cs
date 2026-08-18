@@ -10,12 +10,12 @@ using Xunit.Abstractions;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// Round across a socket — <b>fork 52's transport half, and the first traffic in this
-/// project that is not a thought.</b>
+/// Round across a socket — <b>fork 52's transport half</b>, and the first traffic in this
+/// project that is not a thought.
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The arithmetic half was closed without a wire and said so in every file.</b>
+/// <b>The arithmetic half was closed without a wire</b> and said so in every file.
 /// <c>SplitTests</c> proved the vote composes across holders and <c>SplitNamingTests</c>
 /// proved merged counts recover the whole population's name; both carry a note that nothing
 /// in them is late and nothing in them dies. This is where those two exchanges are put on
@@ -44,10 +44,10 @@ namespace OpenPlexus.Tests;
 public sealed class AskedTests(ITestOutputHelper output)
 {
     /// <summary>
-    /// Rounds, <b>and the five hundred past the last sweep are the point of the number.</b>
+    /// Rounds, <b>and the five hundred past the last sweep</b> are the point of the number.
     /// </summary>
     /// <remarks>
-    /// <b>A run ending on a sweep round is read at its most exhausted</b>, and this file's whole
+    /// <b>A run ending on a sweep round</b> is read at its most exhausted, and this file's whole
     /// subject is what a trained population would name NEXT. At twenty thousand exactly,
     /// three seeds in eight have nothing left to say — so the assertions here stood on seed
     /// one happening to be one of the five that did, which is the single-seed ordering this
@@ -82,8 +82,8 @@ public sealed class AskedTests(ITestOutputHelper output)
     private const int Sparse = 64;
 
     /// <summary>
-    /// The seed the window is read on — <b>pinned with the pair, because it is part of the
-    /// same precondition and was the part nobody wrote down.</b>
+    /// The seed the window is read on — <b>pinned with the pair</b>, because it is part of the
+    /// same precondition and was the part nobody wrote down.
     /// </summary>
     /// <remarks>
     /// <b>Seed one fell out of the window when the vote rule changed.</b> Under
@@ -99,16 +99,16 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// <param name="address">Address bits.</param>
     /// <remarks>
     /// <para>
-    /// <b>The timing is pinned here because this file is about the wire and not about the
-    /// search.</b> What these tests need is a population with a sub-scope worth naming, so
+    /// <b>The timing is pinned here</b> because this file is about the wire and not about the
+    /// search. What these tests need is a population with a sub-scope worth naming, so
     /// that a shard failing to name it alone means something — and whether one exists is a
     /// property of the trained population, which every repair dial moves. Inheriting the
     /// default made a socket test depend on the search, and it went red the day the default
     /// changed with nothing wrong on either side of the wire.
     /// </para>
     /// <para>
-    /// <b>AND IT IS <see cref="Repairing.AfterFailure"/> rather than the shipped one for
-    /// the reason the precondition exists.</b> That timing holds the larger population at
+    /// <b>And it is <see cref="Repairing.AfterFailure"/></b> rather than the shipped one, for
+    /// the reason the precondition exists. That timing holds the larger population at
     /// eleven bits, so it reliably has structure left over once the run's own naming has
     /// taken what it wants. The pin is a fixture choice and says nothing about which timing
     /// is better; <c>RepairingTests</c> is where that is measured, and it finds naming
@@ -226,7 +226,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A vote taken across three machines is the vote one machine would have taken.</b>
+    /// <b>A vote taken across three machines</b> is the vote one machine would have taken.
     /// </summary>
     /// <remarks>
     /// Bit-identical and not within a tolerance, because under
@@ -313,8 +313,8 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// row saying never.
     /// </para>
     /// <para>
-    /// <b>And this file polls for the count rather than awaiting the gathering, which is
-    /// left as it was on purpose.</b> The poll was the only shape available before fork 53
+    /// <b>And this file polls for the count rather than awaiting the gathering</b>, which is
+    /// left as it was on purpose. The poll was the only shape available before fork 53
     /// and it asserts the numerator and the denominator, which is what this test is about;
     /// that the round now FINISHES is a different claim and <c>UnreachedTests</c> is where it
     /// is made, against a gathering that would hang if the write-off were removed.
@@ -374,7 +374,7 @@ public sealed class AskedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A death taking the last advocate silences the vote, which is `Abstain` ARMED.</b>
+    /// <b>A death taking the last advocate silences the vote</b>, which is `Abstain` ARMED.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -385,16 +385,16 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// advocates.
     /// </para>
     /// <para>
-    /// <b>So the moment is chosen rather than drawn, and that is the only way to reach
-    /// it.</b> What is needed is a moment whose advocates all sit on machines that then
+    /// <b>So the moment is chosen rather than drawn</b>, and that is the only way to reach
+    /// it. What is needed is a moment whose advocates all sit on machines that then
     /// die. Waiting for one to turn up by chance is waiting on a coincidence; finding the
     /// scarcest one by asking the shards locally and then killing exactly those holders is
     /// the same event, arranged. C4 permits it explicitly — the constraint is on the
     /// LEARNER, and nothing the machine does depends on what was read here.
     /// </para>
     /// <para>
-    /// <b>And it takes more than one death, which is the plan being right rather than this
-    /// test being weak.</b> The first version of this looked for a moment whose every
+    /// <b>And it takes more than one death</b>, which is the plan being right rather than this
+    /// test being weak. The first version of this looked for a moment whose every
     /// advocate sat on ONE machine and found none in four hundred draws: at this width the
     /// population is dense enough that something always advocates from somewhere else,
     /// which is exactly why splitting the vote did not arm the third outcome. How many
@@ -492,8 +492,8 @@ public sealed class AskedTests(ITestOutputHelper output)
     // ---- what distance costs -----------------------------------------------
 
     /// <summary>
-    /// <b>What a round of asks costs on a real wire — fork 56, measured rather than
-    /// priced.</b>
+    /// <b>What a round of asks costs on a real wire</b> — fork 56, measured rather than
+    /// priced.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -503,8 +503,8 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// own delay and the internet adds a great deal more.
     /// </para>
     /// <para>
-    /// <b>No bar, because a duration is not reproducible and a threshold on one fails the
-    /// build on a busy machine.</b> This project already has a line about a wall clock
+    /// <b>No bar</b>, because a duration is not reproducible and a threshold on one fails the
+    /// build on a busy machine. This project already has a line about a wall clock
     /// turning reproducibility red. The number is the finding; the only assertion is that
     /// the instrument had something to measure.
     /// </para>

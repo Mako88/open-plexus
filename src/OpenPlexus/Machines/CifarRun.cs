@@ -73,7 +73,7 @@ public sealed class CifarRun : IDisposable
     /// </remarks>
     public const byte Pixel = 148;
 
-    private readonly Trial<IReadOnlyList<double>> _trial;
+    private readonly Bench _trial;
     private readonly Encoded? _encoded;
 
     /// <summary>The world, for asking what it holds.</summary>
@@ -141,7 +141,7 @@ public sealed class CifarRun : IDisposable
             Reading = _encoded.Embedding;
         }
 
-        _trial = new Trial<IReadOnlyList<double>>(World, sensing, brain);
+        _trial = new Bench(new Body(new Watching<IReadOnlyList<double>>(World, sensing)), brain);
     }
 
     /// <summary>Releases the encoder's graph, where there is one.</summary>

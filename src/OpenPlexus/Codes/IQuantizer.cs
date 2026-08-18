@@ -59,7 +59,7 @@ public interface IQuantizer<in TObservation>
     /// exactly what destroys an oscillator relationship — so the order has to
     /// travel INSIDE the moment, where lateness cannot reach it. Only the front end
     /// knows it: by the time codes reach a population they are a set. <b>Read by
-    /// <see cref="Machines.Trial{TSeen}"/></b>, which turns it into the precedence codes rung
+    /// <see cref="Machines.Watching{TSeen}"/></b>, which turns it into the precedence codes rung
     /// three is made of — the seam <see cref="Forced"/> now shares. Defaulted so that adding it breaks
     /// no existing quantiser and changes no existing measurement.
     /// </remarks>

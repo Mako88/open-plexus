@@ -121,7 +121,9 @@ public sealed class LatenessTests(ITestOutputHelper output)
         var brain = new Brain(dials, seed, _ => council);
 
         var world = new Multiplexer(new MultiplexerSettings { Address = Narrow }, seed);
-        var trial = new Trial<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit), brain);
+        var trial = new Bench(
+            new Body(new Watching<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit))),
+            brain);
 
         try
         {

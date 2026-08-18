@@ -88,10 +88,12 @@ public sealed class OverlapTests(ITestOutputHelper output)
             overlap,
             seed);
 
-        // THROUGH `Trial` rather than a loop written here. A second copy of predict,
+        // THROUGH `Bench` rather than a loop written here. A second copy of predict,
         // score, settle, sweep, cover and repair is the one duplication that could
         // silently start learning something else, and the clone budget exists for it.
-        new Trial<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit), brain).Run(Rounds);
+        new Bench(
+            new Body(new Watching<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit))),
+            brain).Run(Rounds);
 
         return brain.Held;
     }

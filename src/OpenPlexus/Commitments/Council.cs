@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using OpenPlexus.Codes;
 
@@ -123,7 +123,7 @@ public readonly record struct Learnt
 /// <b>And it is asynchronous on purpose, including where it never yields.</b>
 /// <see cref="Alone"/> completes every task synchronously and allocates nothing to do it,
 /// so a one-process run pays for this seam in exactly nothing — see
-/// <c>Machines.Trial.Run</c>, which refuses a council that would have made it wait. What the
+/// <c>Machines.Bench.Run</c>, which refuses a council that would have made it wait. What the
 /// shape buys is that a gathering arriving when it arrives needs no second learning loop,
 /// and two copies of this loop is the one duplication that could silently start learning two
 /// different things.

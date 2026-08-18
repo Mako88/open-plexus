@@ -32,7 +32,7 @@ public sealed class GradedRun
     /// <summary>How many coarser retellings the banded arm adds.</summary>
     public const int Grains = 2;
 
-    private readonly Trial<IReadOnlyList<double>> _trial;
+    private readonly Bench _trial;
 
     /// <param name="world">The shape of the world.</param>
     /// <param name="brain">The one brain, already configured.</param>
@@ -50,7 +50,7 @@ public sealed class GradedRun
             : new Banded<IReadOnlyList<double>>(
                 reading => reading, Multiplexer.Bit, made.Width, Bands, Grains);
 
-        _trial = new Trial<IReadOnlyList<double>>(made, sensing, brain);
+        _trial = new Bench(new Body(new Watching<IReadOnlyList<double>>(made, sensing)), brain);
     }
 
     /// <summary>Runs the world and learns from it.</summary>

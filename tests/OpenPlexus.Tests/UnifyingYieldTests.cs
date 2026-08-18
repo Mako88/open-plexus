@@ -147,13 +147,17 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
     {
         var text = new Brain(new CommittingSettings { Capacity = 2000 }, seed: 1);
 
-        new Trial<Recited>(
-            new Recalled(new RecalledSettings
-            {
-                Corpus = Tree.Babi(), Task = 1, Span = 0, Withheld = 40,
-                Predicting = Predicting.Asked,
-            }),
-            new Joined(Joining.Bagged),
+        new Bench(
+            new Body(new Watching<Recited>(
+                new Recalled(new RecalledSettings
+                {
+                    Corpus = Tree.Babi(),
+                    Task = 1,
+                    Span = 0,
+                    Withheld = 40,
+                    Predicting = Predicting.Asked,
+                }),
+                new Joined(Joining.Bagged))),
             text)
             .Run(Rounds, sweep: 1000, target: 0.9, window: 2000);
 

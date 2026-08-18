@@ -159,7 +159,7 @@ public sealed class RhythmTests(ITestOutputHelper output)
         var world = new Rhythm(settings, seed);
         var brain = new Brain(new CommittingSettings { Capacity = 4000 }, seed);
 
-        var tally = new Trial<Coded>(world, new Passthrough(), brain)
+        var tally = new Bench(new Body(new Watching<Coded>(world, new Passthrough())), brain)
             .Run(rounds, sweep: 1000, target: 0.9, window: 2000);
 
         return (world, tally, brain.Held.Count);

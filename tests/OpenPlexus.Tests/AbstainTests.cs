@@ -53,7 +53,7 @@ public sealed class AbstainTests(ITestOutputHelper output)
     private static Pushed Push(long sequence, IReadOnlySet<Code> codes, Code? followed) =>
         new()
         {
-            From = new Stamp { Source = Trial<int>.Watched, Sequence = sequence },
+            From = new Stamp { Source = Body.First, Sequence = sequence },
             Codes = codes,
             Followed = followed,
         };

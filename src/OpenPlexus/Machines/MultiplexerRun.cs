@@ -260,7 +260,7 @@ public sealed class MultiplexerRun
 {
     private readonly Multiplexer _world;
     private readonly Brain _brain;
-    private readonly Trial<IReadOnlyList<int>> _trial;
+    private readonly Bench _trial;
     private readonly bool _census;
 
     /// <param name="world">The shape of the world.</param>
@@ -278,8 +278,10 @@ public sealed class MultiplexerRun
         _brain = brain;
         _census = census;
 
-        _trial = new Trial<IReadOnlyList<int>>(
-            _world, new Bits(Multiplexer.Bit), brain, census ? _world.Sound : null);
+        _trial = new Bench(
+            new Body(new Watching<IReadOnlyList<int>>(_world, new Bits(Multiplexer.Bit))),
+            brain,
+            sound: census ? _world.Sound : null);
     }
 
     /// <summary>What the brain holds.</summary>

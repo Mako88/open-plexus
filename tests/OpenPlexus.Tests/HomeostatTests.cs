@@ -382,20 +382,21 @@ public sealed class HomeostatTests(ITestOutputHelper output)
             var viable = 0;
             var steps = 0;
 
-            var trial = new Trial<Bodily>(
-                body,
-                new Bodied(Feeling.Acted),
-                brain,
-                acting: felt =>
-                {
-                    // Sampled before the step, and identically for every arm. Which side of
-                    // the action it is read on shifts all three together, so the ordering is
-                    // the arms' and not the sampling point's.
-                    steps++;
-                    if (body.Viable) viable++;
+            var trial = new Bench(
+                new Body(new Watching<Bodily>(
+                    body,
+                    new Bodied(Feeling.Acted),
+                    acting: felt =>
+                    {
+                        // Sampled before the step, and identically for every arm. Which side
+                        // of the action it is read on shifts all three together, so the
+                        // ordering is the arms' and not the sampling point's.
+                        steps++;
+                        if (body.Viable) viable++;
 
-                    return chosen(felt);
-                });
+                        return chosen(felt);
+                    })),
+                brain);
 
             var tally = trial.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000);
 
@@ -455,17 +456,18 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         var brain = new Brain(new CommittingSettings(), 1);
 
         Assert.Throws<ArgumentNullException>(() =>
-            new Trial<Bodily>(body, new Bodied(Feeling.Acted), brain));
+            new Bench(new Body(new Watching<Bodily>(body, new Bodied(Feeling.Acted))), brain));
 
         // And the other way round, because a chooser nobody asks is an arm that reads as
         // having run. The multiplexer is watched, so a chooser handed to it would sit
         // unused while its cell reported a policy.
         Assert.Throws<ArgumentException>(() =>
-            new Trial<IReadOnlyList<int>>(
-                new Multiplexer(new MultiplexerSettings { Address = 2 }, 1),
-                new Bits(2 + 4),
-                brain,
-                acting: _ => 0));
+            new Bench(
+                new Body(new Watching<IReadOnlyList<int>>(
+                    new Multiplexer(new MultiplexerSettings { Address = 2 }, 1),
+                    new Bits(2 + 4),
+                    acting: _ => 0)),
+                brain));
     }
 
     /// <summary>
@@ -521,11 +523,12 @@ public sealed class HomeostatTests(ITestOutputHelper output)
             var draw = new Random(1);
             var brain = new Brain(new CommittingSettings { Capacity = 2000 }, 1);
 
-            var trial = new Trial<Bodily>(
-                body,
-                new Bodied(feeling),
-                brain,
-                acting: uniform ? Blindly(body, draw) : Aimed(body));
+            var trial = new Bench(
+                new Body(new Watching<Bodily>(
+                    body,
+                    new Bodied(feeling),
+                    acting: uniform ? Blindly(body, draw) : Aimed(body))),
+                brain);
 
             var tally = trial.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000);
 
@@ -549,11 +552,9 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         // than the gap, because the gap is a score and the silence is the mechanism.
         var quiet = new Homeostat(World());
 
-        var blind = new Trial<Bodily>(
-            quiet,
-            new Bodied(Feeling.Blind),
-            new Brain(new CommittingSettings { Capacity = 2000 }, 1),
-            acting: Aimed(quiet));
+        var blind = new Bench(
+            new Body(new Watching<Bodily>(quiet, new Bodied(Feeling.Blind), acting: Aimed(quiet))),
+            new Brain(new CommittingSettings { Capacity = 2000 }, 1));
 
         Assert.Equal(Rounds, blind.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000).Silent);
     }

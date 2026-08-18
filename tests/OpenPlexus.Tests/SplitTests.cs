@@ -80,7 +80,7 @@ public sealed class SplitTests(ITestOutputHelper output)
         // only from familiar moments would be measuring the merge on the easy half.
         //
         // AND THROUGH `IWorld` RATHER THAN THE WORLD'S OWN `Next`, so these moments are
-        // coded by exactly the path `Trial` used in training. `Multiplexer.Assignment` carries
+        // coded by exactly the path `Watching` used in training. `Multiplexer.Assignment` carries
         // cues that are already codes, and reading them directly would skip the quantiser
         // -- producing moments the population had never been asked in that alphabet, which
         // is the answer-key-in-the-wrong-alphabet trap wearing a different hat.

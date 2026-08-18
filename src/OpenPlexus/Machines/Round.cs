@@ -183,7 +183,7 @@ public sealed class Round
     /// gather of whatever comes back, so a loop that could not wait could not take one —
     /// and building a second loop that could is the duplication that would let two copies
     /// of this start learning different things. In one process nothing here ever yields;
-    /// see <see cref="Alone"/> and <see cref="Trial{TSeen}.Run"/>, which refuses a
+    /// see <see cref="Alone"/> and <see cref="Bench.Run"/>, which refuses a
     /// substrate that would have made it wait.
     /// </para>
     /// <para>

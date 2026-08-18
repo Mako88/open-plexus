@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Codes;
+using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -390,7 +390,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 var moment = joined.Codify(turn.Seen).ToHashSet();
                 var whole = new HashSet<Code>(moment);
 
-                // The same guard `Trial` applies, so an arm reporting one position or none
+                // The same guard `Watching` applies, so an arm reporting one position or none
                 // carries exactly the codes it always carried. A report of one word entails
                 // no precedence at all, which is why the count and not the null matters.
                 if (joined.Order(turn.Seen) is { Count: > 1 } order)
@@ -883,7 +883,12 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
                 var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed);
 
-                var tally = new Trial<Recited>(world, joined, brain, acting: acting ?? (_ => null))
+                var tally = new Bench(
+                    new Body(new Watching<Recited>(
+                        world,
+                        joined,
+                        acting: acting ?? (_ => null))),
+                    brain)
                     .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
 
                 var exam = tally.Unseen?.Accuracy ?? 0.0;
@@ -1262,7 +1267,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
         for (var episode = 0; episode < 40; episode++)
         {
-            // The order `Trial` uses: read the state, decide, then take the turn. Reading it
+            // The order `Watching` uses: read the state, decide, then take the turn. Reading it
             // is what draws the walk as far as its last step, so this is the road that could
             // differ and the other one is the road every earlier reading took.
             _ = acted.Now;
@@ -1455,11 +1460,12 @@ public sealed class RoamingTests(ITestOutputHelper output)
             var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed: 1);
             var picking = new Random(1);
 
-            var tally = new Trial<Recited>(
+            var tally = new Bench(
+                new Body(new Watching<Recited>(
                     world,
                     new Joined(Joining.Resolved, resolution: 1),
-                    brain,
-                    acting: _ => picking.NextDouble() < often ? picking.Next(3) : null)
+                    acting: _ => picking.NextDouble() < often ? picking.Next(3) : null)),
+                brain)
                 .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
 
             var naming = brain.Held.All.Count(one => one.Scope.Any(Intervened.Names));

@@ -533,7 +533,7 @@ out of it, and anything before six that reads as tuning is out of order.
       18, 20, 21, 22 and 24 went with it; `csharp` keeps their code and their numbers.
     - **SETTLED** — `Drives` is built and measured, so nothing is owed off `csharp`.
     - **BROKEN** — worlds with no runner, their `*Run` files being the walk's. Each wants a
-      `Trial` or a deletion, and `OutstandingTests` prints the debt.
+      `Bench` or a deletion, and `OutstandingTests` prints the debt.
     - **NOW** — the vote's arithmetic composes and a whole learner runs over it. Fork **52**.
     - **NOW** — a round is a barrier, so lateness costs the CLOCK and not one answer, and C2's
       out-of-order half is untestable here. Breaking it is unmeasured.
@@ -555,16 +555,16 @@ out of it, and anything before six that reads as tuning is out of order.
       stream agree as poorly as machines sharing none, so merging the counts is the only
       thing that works rather than an optimisation.
   - The world pushes and the brain receives
-    - **NOW** — `Brain.Receive` takes a stamped moment and answers, and a moment that does
-      not advance its source is refused rather than settled. `Tally.Refused` says how many.
+    - **NOW** — `Brain.Receive` takes a stamped moment, and one not advancing its source is
+      refused rather than settled. `Tally.Refused` counts them.
     - **OPEN** — a commitment is settled by the SUCCESSOR moment from the same source, so
       absence is established by arrival rather than by a clock. C2 forbids the deadline.
-    - **OPEN** — a world is a set of INPUTS that push, and `IWorld.Next` is still a pull
-      behind `Trial`. A bench waits where a body forgets. Fork **113**.
+    - **NOW** — `Body` composes `IInput`s each stamping their own sequence, `Watching` is the
+      join, `Bench` is the loop. `Trial` is gone; `Alone` stays, being the substrate seam.
+    - **OPEN** — `IWorld.Next` is still a pull behind `Watching`. A sense on its own schedule
+      is a second `IInput`, not a second bench. Fork **113**.
     - **OPEN** — a brain that is overrun ABSTAINS rather than mis-settles, which makes the
       abstain count a backpressure reading and not only a verdict.
-    - **OPEN** — the world marks which codes it was handed and the learner derives the doing.
-      An action that could not be done must never read as one that was.
     - **OPEN** — with no outcome slot a commitment may expect any code in the successor, which
       multiplies genesis by the moment's WIDTH. What gates that is unbuilt. Fork **114**.
     - **OPEN** — what is predicted is a SET and what is done is a set, so one motor moving and

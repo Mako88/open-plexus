@@ -66,13 +66,31 @@ public sealed class WithheldTests(ITestOutputHelper output)
         output.WriteLine($"20,000 draws, none of the {kept.Count} withheld readings among them");
     }
 
-    [Fact]
-    public void An_examination_moves_nothing_in_the_population()
+    /// <summary>A bench over the withholding world, and the brain it teaches.</summary>
+    /// <remarks>
+    /// <b>Extracted because the clone budget refused the second copy</b>, which is what that
+    /// budget is for. Two tests below want the identical arrangement — same world, same seed,
+    /// same front end — and a difference between them would read as a difference the
+    /// examination caused.
+    /// </remarks>
+    private static (Bench Bench, Brain Brain) Made()
     {
         var brain = new Brain(new CommittingSettings(), 1);
         var world = new Cifar(World(), seed: 1);
-        var trial = new Trial<IReadOnlyList<double>>(
-            world, new Winnowing(CifarRun.Pixel, world.Width), brain);
+
+        return (
+            new Bench(
+                new Body(new Watching<IReadOnlyList<double>>(
+                    world,
+                    new Winnowing(CifarRun.Pixel, world.Width))),
+                brain),
+            brain);
+    }
+
+    [Fact]
+    public void An_examination_moves_nothing_in_the_population()
+    {
+        var (trial, brain) = Made();
 
         trial.Run(rounds: 3000, sweep: 1000, target: 0.5, window: 500);
 
@@ -98,10 +116,7 @@ public sealed class WithheldTests(ITestOutputHelper output)
     [Fact]
     public void The_held_out_score_is_reported_beside_its_silence()
     {
-        var brain = new Brain(new CommittingSettings(), 1);
-        var world = new Cifar(World(), seed: 1);
-        var trial = new Trial<IReadOnlyList<double>>(
-            world, new Winnowing(CifarRun.Pixel, world.Width), brain);
+        var (trial, brain) = Made();
 
         var tally = trial.Run(rounds: 3000, sweep: 1000, target: 0.5, window: 500);
 

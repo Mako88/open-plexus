@@ -136,6 +136,43 @@ public static class Fixture
     /// <summary>A code in the plain test modality.</summary>
     public static Code C(ulong value) => new(Modality: 1, value);
 
+    /// <summary>A bench over the narrow multiplexer, driving a fleet already open.</summary>
+    /// <param name="fleet">The machines that hold the commitments.</param>
+    /// <param name="dials">The brain's numbers, shared with every holder.</param>
+    /// <param name="address">Address bits.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>Extracted because the clone budget refused the third copy</b>, which is what that
+    /// budget is for. Three fleet files want the identical arrangement and a difference
+    /// between them would read as a difference the deployment caused.
+    /// </para>
+    /// <para>
+    /// <b>The fleet is opened first and the brain built over it</b>, which is the order the
+    /// substrate now imposes. A brain whose council is handed to the run rather than to the
+    /// constructor could be given a different one per call, and then a run and its baseline
+    /// would not have to be the same machine.
+    /// </para>
+    /// </remarks>
+    public static (Machines.Bench Bench, Machines.Fleet Council) Multiplexed(
+        Ported fleet, Commitments.CommittingSettings dials, int address)
+    {
+        ArgumentNullException.ThrowIfNull(fleet);
+
+        var council = new Machines.Fleet(fleet.Asker, dials);
+
+        var brain = new Machines.Brain(dials, seed: 1, _ => council);
+
+        var world = new Worlds.Multiplexer(
+            new Worlds.MultiplexerSettings { Address = address }, seed: 1);
+
+        return (
+            new Machines.Bench(
+                new Worlds.Body(new Machines.Watching<IReadOnlyList<int>>(
+                    world, new Codes.Bits(Worlds.Multiplexer.Bit))),
+                brain),
+            council);
+    }
+
     /// <summary>
     /// The ONE-CODE scopes a population holds, with any minted name spelled back out.
     /// </summary>

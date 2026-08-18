@@ -354,7 +354,7 @@ public sealed class ArrangedRun
     private readonly Brain _brain;
     private readonly IQuantizer<IReadOnlyList<double>> _sensing;
     private readonly Func<(int Tags, long Readings)> _watching;
-    private readonly Trial<IReadOnlyList<double>> _trial;
+    private readonly Bench _trial;
 
     /// <summary>The world, for asking what it holds.</summary>
     public Arranged World { get; }
@@ -406,7 +406,7 @@ public sealed class ArrangedRun
             _watching = () => (winnowing.Distinct, winnowing.Emitted);
         }
 
-        _trial = new Trial<IReadOnlyList<double>>(World, _sensing, brain);
+        _trial = new Bench(new Body(new Watching<IReadOnlyList<double>>(World, _sensing)), brain);
     }
 
     /// <summary>Runs the world, learns from it, and asks whether what it holds is true.</summary>

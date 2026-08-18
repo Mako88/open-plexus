@@ -399,7 +399,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// correction this file exists to make. The world hands the order over —
     /// <see cref="Recited.Said"/> is a list and not a bag, on the licence
     /// <see cref="IQuantizer{TFrame}.Order"/> already carries — and it is dropped at
-    /// <c>Trial</c>'s <c>new HashSet&lt;Code&gt;(said)</c>, one call before anything could
+    /// <c>Watching</c>'s <c>new HashSet&lt;Code&gt;(said)</c>, one call before anything could
     /// use it. Fork 33 priced the MATCHER, and the matcher was never what was in the way.
     /// </para>
     /// <para>
@@ -556,7 +556,9 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
                 var brain = new Machines.Brain(
                     new CommittingSettings { Capacity = 4000 }, seed);
 
-                var tally = new Machines.Trial<Recited>(world, new Reciting(reading), brain)
+                var tally = new Machines.Bench(
+                    new Body(new Machines.Watching<Recited>(world, new Reciting(reading))),
+                    brain)
                     .Run(5_000, sweep: 1000, target: 0.9, window: 2000);
 
                 var exam = tally.Unseen?.Accuracy ?? 0.0;
@@ -620,7 +622,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
 
         // And the machine deriving it is the same computation as the front end handing it
         // over, exactly. `handed` folds the pairs in `Codify` and `preceding` folds the
-        // identical pairs in `Trial.Sensed`; the codes agree, so the runs agree seed for
+        // identical pairs in `Watching.Sensed`; the codes agree, so the runs agree seed for
         // seed and rule for rule. That is the instrument check on the whole move: what
         // changed when the derivation crossed the seam is WHERE IT LIVES and nothing else,
         // which is what makes the front-end version legitimate as a price and illegitimate

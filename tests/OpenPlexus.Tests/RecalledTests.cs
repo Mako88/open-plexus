@@ -57,7 +57,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     private static IEnumerable<Code> Codify(Recited recited) =>
         new Joined(Joining.Bagged).Codify(recited).Order();
 
-    private static (Recalled World, Trial<Recited> Trial, Brain Brain) Made(
+    private static (Recalled World, Bench Bench, Brain Brain) Made(
         RecalledSettings settings, Joining joining = Joining.Bagged, int capacity = 2000,
         IReadOnlyList<IReadOnlySet<Code>>? categories = null, int seed = 1, int hops = 2,
         bool banded = false)
@@ -67,7 +67,11 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
         return (
             world,
-            new Trial<Recited>(world, new Joined(joining, categories, hops, banded), brain),
+            new Bench(
+                new Body(new Watching<Recited>(
+                    world,
+                    new Joined(joining, categories, hops, banded))),
+                brain),
             brain);
     }
 
@@ -355,8 +359,14 @@ public sealed class RecalledTests(ITestOutputHelper output)
                         var world = new Recalled(World(task, span));
 
                         var trial = ordered
-                            ? new Trial<Recited>(world, new Joined(Joining.Bagged), brain)
-                            : new Trial<Recited>(world, new Unordered(Joining.Bagged), brain);
+                            ? new Bench(
+                                new Body(new Watching<Recited>(world, new Joined(Joining.Bagged))),
+                                brain)
+                            : new Bench(
+                                new Body(new Watching<Recited>(
+                                    world,
+                                    new Unordered(Joining.Bagged))),
+                                brain);
 
                         var tally = trial.Run(
                             rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
@@ -486,8 +496,12 @@ public sealed class RecalledTests(ITestOutputHelper output)
                     var world = new Recalled(World(task, span: 0));
 
                     var trial = ordered
-                        ? new Trial<Recited>(world, new Joined(joining, hops: hops), brain)
-                        : new Trial<Recited>(world, new Unordered(joining, hops), brain);
+                        ? new Bench(
+                            new Body(new Watching<Recited>(world, new Joined(joining, hops: hops))),
+                            brain)
+                        : new Bench(
+                            new Body(new Watching<Recited>(world, new Unordered(joining, hops))),
+                            brain);
 
                     var tally = trial.Run(
                         rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
@@ -1674,8 +1688,11 @@ public sealed class RecalledTests(ITestOutputHelper output)
             foreach (var joining in new[] { Joining.Chained, Joining.Bagged })
             {
                 var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, 1);
-                var trial = new Trial<Recited>(
-                    new Recalled(World(task, span: 0)), new Joined(joining, hops: 1), brain);
+                var trial = new Bench(
+                    new Body(new Watching<Recited>(
+                        new Recalled(World(task, span: 0)),
+                        new Joined(joining, hops: 1))),
+                    brain);
 
                 var tally = trial.Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
                 var unseen = tally.Unseen?.Accuracy ?? 0.0;

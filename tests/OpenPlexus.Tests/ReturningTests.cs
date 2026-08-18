@@ -105,7 +105,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
             ? new Passthrough()
             : new Sorted<Coded>(new Passthrough(), categories);
 
-        var tally = new Trial<Coded>(world, front, brain)
+        var tally = new Bench(new Body(new Watching<Coded>(world, front)), brain)
             .Run(Rounds, sweep: 1000, target: 0.95, window: 2000);
 
         var exam = tally.Unseen?.Accuracy ?? 0.0;

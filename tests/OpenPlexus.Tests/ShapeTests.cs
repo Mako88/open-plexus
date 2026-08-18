@@ -57,7 +57,7 @@ public sealed class ShapeTests(ITestOutputHelper output)
     /// picture is read whole or in patches, whether a reading is banded or winnowed, and
     /// which frozen encoder it passes through are none of them facts about the problem
     /// and none of them settings on the brain — so <c>looking</c>, <c>fronting</c> and
-    /// <c>through</c> live exactly where <see cref="Machines.Trial{TSeen}"/> says the
+    /// <c>through</c> live exactly where <see cref="Machines.Bench"/> says the
     /// choice is made. Putting them on the brain would be a brain that knows worlds
     /// exist; putting them inside a world would be a world deciding what is perceived.
     /// </para>

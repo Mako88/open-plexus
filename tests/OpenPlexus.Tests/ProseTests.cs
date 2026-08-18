@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Xunit.Abstractions;
 
@@ -112,7 +112,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 650;
+    private const int Shouted = 648;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>
@@ -130,10 +130,11 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// </para>
     /// <para>
     /// And it falls to 64 the same way, two of them having been the whole of a bold that a cut
-    /// left standing in capitals. Neither was looked for.
+    /// left standing in capitals. Neither was looked for. It reached 63 when `Trial` was
+    /// rewritten as `Bench`, which is the same road: prose that goes takes its debt with it.
     /// </para>
     /// </remarks>
-    private const int Opened = 64;
+    private const int Opened = 63;
 
     /// <summary>
     /// The commit the decay schedule counts from. <b>John's, 2026-08-13.</b>

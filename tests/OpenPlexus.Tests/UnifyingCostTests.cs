@@ -235,7 +235,7 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
             Predicting = Predicting.Asked,
         });
 
-        new Trial<Recited>(world, new Joined(Joining.Bagged), brain)
+        new Bench(new Body(new Watching<Recited>(world, new Joined(Joining.Bagged))), brain)
             .Run(Rounds, sweep: 1000, target: 0.9, window: 2000);
 
         var all = brain.Held.All.ToList();

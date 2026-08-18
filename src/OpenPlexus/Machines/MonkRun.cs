@@ -27,7 +27,7 @@ public sealed class MonkRun
     private readonly Monk _world;
     private readonly Puzzle _puzzle;
     private readonly Brain _brain;
-    private readonly Trial<IReadOnlyList<int>> _trial;
+    private readonly Bench _trial;
 
     /// <param name="world">Which puzzle, and how much is held back.</param>
     /// <param name="brain">The one brain, already configured.</param>
@@ -57,11 +57,13 @@ public sealed class MonkRun
         // four colours and the tie has two, so a stride taken from the widest attribute
         // is the only one that cannot alias -- which is the fault `Bits` already carried
         // once, when its only caller happened to be binary.
-        _trial = new Trial<IReadOnlyList<int>>(
-            _world,
-            new Bits(Monk.Attribute, Monk.Stride),
+        _trial = new Bench(
+            new Body(new Watching<IReadOnlyList<int>>(
+                _world, new Bits(Monk.Attribute, Monk.Stride))),
             brain,
-            census ? (scope, expects) => Monk.Sound(world.Puzzle, scope, expects) : null);
+            sound: census
+                ? (scope, expects) => Monk.Sound(world.Puzzle, scope, expects)
+                : null);
     }
 
     /// <summary>What the brain holds.</summary>

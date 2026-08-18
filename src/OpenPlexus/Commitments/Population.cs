@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 using OpenPlexus.Codes;
 
@@ -400,7 +400,7 @@ public sealed class Population
     /// <para>
     /// <b>It lives here rather than on <c>Holder</c>.</b> A holder serialises the asks it is
     /// delivered, which is enough while it is the only party touching its own population.
-    /// <c>Trial</c> reads every holder's tables from the thread running the trial, and a lock
+    /// <c>Bench</c> reads every holder's tables from the thread running the trial, and a lock
     /// on one side of that is not a lock.
     /// </para>
     /// <para>
@@ -588,7 +588,7 @@ public sealed class Population
     /// <summary>What a holder takes while it is being asked, so a reader may take it too.</summary>
     /// <remarks>
     /// <b>Handed out rather than hidden.</b> The tally walks these tables more than once, and
-    /// each walk under its own acquire is a reading of a different population, so <c>Trial</c>
+    /// each walk under its own acquire is a reading of a different population, so <c>Bench</c>
     /// holds this across every walk it makes of one holder. The scalar counters beside them
     /// are single reads and are left outside it. See <see cref="_gate"/> for why ordering the
     /// read after the writes is not available.
@@ -670,7 +670,7 @@ public sealed class Population
     /// <para>
     /// <b>And a precedence is already in <paramref name="raw"/> by the time it gets here</b>,
     /// which is a decision about the wire and not about the fold. Rung three is derived
-    /// where the moment is FORMED — see <see cref="Machines.Trial{TSeen}"/> — because a
+    /// where the moment is FORMED — see <see cref="Machines.Watching{TSeen}"/> — because a
     /// fleet broadcasts the moment as a set of codes and a
     /// precedence IS one. Deriving it here instead would mean every holder needed the
     /// front end's order report on the wire beside the moment it already has.

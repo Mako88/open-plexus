@@ -260,11 +260,8 @@ public sealed class UnreachedTests(ITestOutputHelper output)
         var dials = new CommittingSettings();
 
         await using var fleet = await Ported.OpenAsync(Holders, dials, seed: 1);
-        var council = new Fleet(fleet.Asker, dials);
 
-        var brain = new Brain(dials, seed: 1, _ => council);
-        var world = new Multiplexer(new MultiplexerSettings { Address = Narrow }, seed: 1);
-        var trial = new Trial<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit), brain);
+        var (trial, council) = Fixture.Multiplexed(fleet, dials, Narrow);
 
         var before = await Ran(trial.RunAsync(fleet.Held, Half), Holders, "before the death");
 

@@ -577,9 +577,8 @@ public sealed record Census
 }
 
 /// <summary>
-/// A world, a translation, and the brain — joined here and nowhere else.
+/// A body pushing at a brain, and every count that comes off the run.
 /// </summary>
-/// <typeparam name="TSeen">Whatever the world natively produces.</typeparam>
 /// <remarks>
 /// <para>
 /// <b>The seam is one call wide in each direction.</b> A world says what happened in
@@ -594,17 +593,13 @@ public sealed record Census
 /// putting it inside the brain is how the brain starts knowing about worlds.
 /// </para>
 /// </remarks>
-public sealed class Trial<TSeen>
+public sealed class Bench
 {
-    private readonly IWorld<TSeen> _world;
-    private readonly IQuantizer<TSeen> _sensing;
+    private readonly Body _body;
     private readonly Brain _brain;
     private readonly Func<ImmutableArray<Code>, Code, bool>? _sound;
-    private readonly Func<IReadOnlyCollection<Code>, int?>? _acting;
-    private readonly byte _source;
 
-    /// <param name="world">The problem.</param>
-    /// <param name="sensing">The translation between it and the brain.</param>
+    /// <param name="body">Every sense pushing at the brain.</param>
     /// <param name="brain">The one brain, already configured.</param>
     /// <param name="sound">
     /// Whether a scope-and-expectation is TRUE of the world, or nothing where the world
@@ -612,11 +607,10 @@ public sealed class Trial<TSeen>
     /// </param>
     /// <remarks>
     /// <para>
-    /// <b>A delegate rather than a world</b>, because a trial may not know which world it is
-    /// running. Naming <c>Multiplexer</c> here would put one world's vocabulary in
-    /// front of every other one and would fail <c>SeparationTests</c> from the other
-    /// direction — a question only some worlds can answer arrives as a function some
-    /// callers pass.
+    /// <b>A delegate rather than a world</b>, because a bench may not know which world it is
+    /// running. Naming <c>Multiplexer</c> here would put one world's vocabulary in front of
+    /// every other one and would fail <c>SeparationTests</c> from the other direction — a
+    /// question only some worlds can answer arrives as a function some callers pass.
     /// </para>
     /// <para>
     /// <b>And it is off unless asked for</b>, because it costs a second match every round.
@@ -625,130 +619,23 @@ public sealed class Trial<TSeen>
     /// nothing on a world whose truth cannot be enumerated anyway.
     /// </para>
     /// </remarks>
-    /// <param name="acting">
-    /// What to do about the state the world is in, given the codes it reads as —
-    /// <b>required of a world that can be acted in</b>, and refused of one that cannot.
-    /// </param>
-    /// <param name="source">
-    /// Which stream this world pushes on — <b>distinct per world where one brain runs
-    /// two.</b>
-    /// </param>
-    /// <remarks>
-    /// <b>A brain settles by the stamp</b>, so two trials sharing a source share a
-    /// sequence, and the second one to start would be pushing moments the brain has already
-    /// answered. It refuses them rather than settling twice, which is correct and reads as a
-    /// run that did nothing — <see cref="Tally.Refused"/> is what says which it was.
-    /// </remarks>
-    /// <remarks>
-    /// <para>
-    /// <b>A delegate rather than a policy type</b>, for the same reason <c>sound</c> is one. A
-    /// trial may not know which world it is running, and a chooser that named
-    /// <c>Homeostat</c> would put one world's vocabulary in front of every other.
-    /// </para>
-    /// <para>
-    /// <b>An acted world with no chooser is refused</b> rather than left doing nothing,
-    /// which is this repo's own trap about a fallback being a control arm nobody meant to run.
-    /// Doing nothing IS an arm on a body whose variables fall unattended — it is the fastest
-    /// way to fail, and a run that took it by omission would report a dead body as a learner's
-    /// score. It has to be asked for, and asking for it is a chooser that returns nothing.
-    /// </para>
-    /// <para>
-    /// <b>The chooser reads codes and never the world's own terms</b>, so the seam it sits on
-    /// is the same one the brain sits on. An oracle is then a chooser that was handed the
-    /// answer, a control is one that draws uniformly, and a learner is one that reads a
-    /// population — three arms over one interface rather than three kinds of trial.
-    /// </para>
-    /// </remarks>
-    public Trial(
-        IWorld<TSeen> world,
-        IQuantizer<TSeen> sensing,
+    public Bench(
+        Body body,
         Brain brain,
-        Func<ImmutableArray<Code>, Code, bool>? sound = null,
-        Func<IReadOnlyCollection<Code>, int?>? acting = null,
-        byte source = Watched)
+        Func<ImmutableArray<Code>, Code, bool>? sound = null)
     {
-        ArgumentNullException.ThrowIfNull(world);
-        ArgumentNullException.ThrowIfNull(sensing);
+        ArgumentNullException.ThrowIfNull(body);
         ArgumentNullException.ThrowIfNull(brain);
 
-        if (world is IActed<TSeen> && acting is null)
-            throw new ArgumentNullException(nameof(acting),
-                "this world is acted in and nothing was given to act with, so every round "
-                + "would do nothing -- which is an arm rather than an absence. Pass a chooser, "
-                + "and pass one returning null if doing nothing is the arm wanted");
-
-        if (world is not IActed<TSeen> && acting is not null)
-            throw new ArgumentException(
-                "this world cannot be acted in, so a chooser would never be asked and its "
-                + "arm would read as having run", nameof(acting));
-
-        _world = world;
-        _sensing = sensing;
+        _body = body;
         _brain = brain;
         _sound = sound;
-        _acting = acting;
-        _source = source;
     }
-
-    /// <summary>The source a pulled world pushes on, where nobody says otherwise.</summary>
-    /// <remarks>
-    /// <b>One stream, because a world behind <see cref="IWorld{TSeen}"/> is one.</b> Its
-    /// turns arrive in an order it decides and nothing in it can say which sense a reading
-    /// came from, so a second stamp inside one trial would be a composition nobody built.
-    /// </remarks>
-    public const byte Watched = 1;
 
     /// <summary>What a blind guess scores on this world.</summary>
-    public double Chance => 1.0 / _world.Outcomes;
+    public double Chance => 1.0 / _body.Outcomes;
 
-    /// <summary>
-    /// One observation as the codes a machine broadcasts for it — <b>the front end's
-    /// reading</b>, plus whatever rung three derives from the order it reported.
-    /// </summary>
-    /// <param name="seen">What the world showed.</param>
-    /// <remarks>
-    /// <para>
-    /// <b>Where the moment is formed and not where it is matched</b>, which is a decision about
-    /// the wire. A fleet broadcasts a moment as a set of codes, and a precedence IS one
-    /// — so deriving it here means it travels with everything else and no holder needs the
-    /// order report beside the moment it already has. Doing it in
-    /// <see cref="Population.Moment"/> would have put the front end's order on the wire.
-    /// </para>
-    /// <para>
-    /// <b>And it is the machine that derives it, not the front end</b>, which is the
-    /// seam that matters. <see cref="IQuantizer{TObservation}.Order"/> reports word
-    /// order, which is a fact about the signal; turning it into <i>these two stood this way
-    /// round</i> is a derivation, and a front end doing it would be deciding which relations
-    /// exist. There is no dial: a front end reporting no order gets exactly the codes it
-    /// always did, which is a fact about the sense rather than a setting on the brain.
-    /// </para>
-    /// </remarks>
-    private IReadOnlyCollection<Code> Sensed(TSeen seen)
-    {
-        var said = _sensing.Codify(seen);
-
-        var order = _sensing.Order(seen) is { Count: > 1 } reported ? reported : null;
-        var forced = _sensing.Forced(seen) is { Count: > 0 } assigned ? assigned : null;
-
-        if (order is null && forced is null) return said;
-
-        var carried = new HashSet<Code>(said);
-
-        if (order is not null)
-            foreach (var precedence in Sequenced.From(order)) carried.Add(precedence);
-
-        // And what was DONE rather than seen, on the same seam and for the same reason. The
-        // channel has reported it since the day it was written and nothing read it, so a
-        // scope naming a code the learner chose and one naming the code the world drew were
-        // the same scope with their evidence added together -- which is `P(y | x)` standing
-        // in for `P(y | do(x))`, and no amount of counting the first yields the second.
-        if (forced is not null)
-            foreach (var doing in Intervened.From(forced)) carried.Add(doing);
-
-        return carried;
-    }
-
-    /// <summary>Runs the world through the translation into the brain.</summary>
+    /// <summary>Runs the body into the brain.</summary>
     /// <param name="rounds">How many rounds.</param>
     /// <param name="sweep">How often to subsume, abstract and cull.</param>
     /// <param name="target">The trailing accuracy <see cref="Tally.Reached"/> waits for.</param>
@@ -777,7 +664,7 @@ public sealed class Trial<TSeen>
         return running.GetAwaiter().GetResult();
     }
 
-    /// <summary>Runs the world through the translation into whoever holds the commitments.</summary>
+    /// <summary>Runs the body into the brain, reporting on whoever holds the commitments.</summary>
     /// <param name="holding">
     /// Whose commitments to report on — <b>one machine's, or every machine's.</b>
     /// </param>
@@ -851,26 +738,21 @@ public sealed class Trial<TSeen>
 
         for (long round = 0; round < rounds; round++)
         {
-            // Chosen in the state the world is in, and spent by the step that follows. The
-            // chooser reads `Now` through the same front end the learner reads its moments
-            // through, so what it is allowed to see is exactly what the learner is allowed to
-            // see -- an oracle that read the world's own terms would be a fourth channel
-            // nobody declared.
-            if (_world is IActed<TSeen> acted) acted.Do(_acting!(Sensed(acted.Now)));
+            // Nothing where no sense had anything to say, which spends the round rather
+            // than looping. No `IInput` here is ever quiet -- a pulled world always has a
+            // next turn -- so what makes this reachable is a real sensor, and `Rounds`
+            // below is the loop's count rather than the number asked for.
+            if (_body.Push() is not { } pushed) continue;
 
-            var turn = _world.Next();
-
-            var said = Sensed(turn.Seen);
-            codes += said.Count;
+            codes += pushed.Codes.Count;
 
             // Taken before the step, because the step teaches. `Settle`, `Genesis` and
             // `Repair` all move the population, so the same three read-only calls after it
             // would be asking a different machine what it thought a moment ago. These are
             // the same calls `Examine` is built out of and they change nothing.
-            if (censusing is not null && turn.Outcome is { } expected)
+            if (censusing is not null && pushed.Followed is { } arrived)
             {
-                var arrived = Brain.Says(expected);
-                var firing = censusing.Firing(censusing.Moment(new HashSet<Code>(said)));
+                var firing = censusing.Firing(censusing.Moment(pushed.Codes));
                 var vote = censusing.Predict(firing);
 
                 // Whether a true rule was there, asked on every round and not only on the
@@ -975,21 +857,11 @@ public sealed class Trial<TSeen>
                 }
             }
 
-            // A round the world could not settle passes nothing rather than a number, and
-            // that is the whole of what arms `Abstain`. Every world that always knows its
-            // outcome reaches the same call it always did.
-            //
-            // One source and a sequence that is the round, because a pulled world is one
-            // stream by construction. A stamp per sense is what the composition wants and
-            // there is nothing here to compose yet.
-            await loop.StepAsync(
-                new Pushed
-                {
-                    From = new Stamp { Source = _source, Sequence = round },
-                    Codes = new HashSet<Code>(said),
-                    Followed = turn.Outcome is { } outcome ? Brain.Says(outcome) : null,
-                },
-                ct).ConfigureAwait(false);
+            // A moment the source could not settle passes nothing rather than a number, and
+            // that is the whole of what arms `Abstain`. The stamp came from the sense that
+            // pushed it, so a body of several is settled per source with no bookkeeping
+            // here at all.
+            await loop.StepAsync(pushed, ct).ConfigureAwait(false);
         }
 
         // Every column that walks a table, taken in one pass under that holder's own gate.
@@ -1030,7 +902,7 @@ public sealed class Trial<TSeen>
 
         return new Tally
         {
-            Rounds = rounds,
+            Rounds = loop.Rounds,
             Refused = loop.Refused,
             Right = loop.Right,
             Wrong = loop.Wrong,
@@ -1128,40 +1000,31 @@ public sealed class Trial<TSeen>
     /// </remarks>
     private Examined? Examine(IReadOnlyList<Population> holding)
     {
-        if (_world is not IWithholds<TSeen> withholding) return null;
+        // Every sense that keeps something back, asked together, because an examination is
+        // put to the population and the population has one. A body whose camera withholds
+        // and whose thermometer does not is examined on the camera's questions -- and the
+        // codes are the sense's own, so nothing here has to know which sense wrote them.
+        //
+        // And a body that can withhold and is not withholding reports absent rather than
+        // nought, which is the same distinction one layer in. An empty examination answers
+        // nothing, so every count would be nought and the accuracy with them -- which reads
+        // as a population that generalises to NOTHING rather than as a question nobody
+        // asked. `WithheldTests` names that trap and this is where it would arrive from.
+        var exam = _body.Senses
+            .OfType<IExamines>()
+            .SelectMany(one => one.Exam)
+            .ToList();
 
-        // And a world that can withhold but is not withholding reports absent rather than
-        // nought, which is the same distinction one layer in. It used to be carried by the
-        // interface alone — a world either held things back or did not implement this —
-        // and that stopped being true the moment `Multiplexer` gained a dial for it. An
-        // empty examination answers nothing, so every count is nought and the accuracy
-        // with them, which reads as a population that generalises to NOTHING rather than
-        // as a question nobody asked. `WithheldTests` names that trap and this is where it
-        // would have arrived from.
-        if (withholding.Withheld.Count == 0) return null;
+        if (exam.Count == 0) return null;
 
         var answered = 0;
         var right = 0;
         var deciders = new HashSet<Code>();
 
-        // And a withheld observation with no outcome is not asked at all, because there is
-        // nothing to score it against. Counting it would report as SILENCE -- a population
-        // that declined to answer -- when what happened is that the examiner had no answer
-        // key for that row, which is a completely different fact.
-        var answerable = withholding.Withheld.Where(one => one.Outcome is not null).ToList();
-
-        if (answerable.Count == 0) return null;
-
-        foreach (var turn in answerable)
+        foreach (var question in exam)
         {
-            var said_ = Sensed(turn.Seen);
-
             var heard = holding
-                .Select(held =>
-                {
-                    var moment = held.Moment(new HashSet<Code>(said_));
-                    return held.Weigh(held.Firing(moment));
-                })
+                .Select(held => held.Weigh(held.Firing(held.Moment(question.Codes))))
                 .ToList();
 
             var vote = Population.Decide(heard);
@@ -1170,12 +1033,12 @@ public sealed class Trial<TSeen>
 
             answered++;
             if (vote.By is { } by) deciders.Add(by);
-            if (said == Brain.Says(turn.Outcome!.Value)) right++;
+            if (said == question.Followed) right++;
         }
 
         return new Examined
         {
-            Asked = answerable.Count,
+            Asked = exam.Count,
             Answered = answered,
             Right = right,
             Deciders = deciders.Count,

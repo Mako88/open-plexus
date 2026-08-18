@@ -91,7 +91,7 @@ public sealed class SeparationTests
         Assert.Contains("Population", brainish);
         Assert.Contains("CommittingSettings", brainish);
         Assert.Contains("Brain", brainish);
-        Assert.Contains("Trial", brainish);
+        Assert.Contains("Bench", brainish);
 
         Assert.DoesNotContain("Multiplexer", brainish);
         Assert.DoesNotContain("Graded", brainish);
@@ -128,20 +128,22 @@ public sealed class SeparationTests
         // one -- so switching world cannot switch brain, because there is only one.
         var brain = new Brain(new CommittingSettings(), seed: 1);
 
-        var symbolic = new Trial<IReadOnlyList<int>>(
-            new Multiplexer(new MultiplexerSettings { Address = 2 }, seed: 1),
-            new Bits(Multiplexer.Bit),
+        var symbolic = new Bench(
+            new Body(new Watching<IReadOnlyList<int>>(
+                new Multiplexer(new MultiplexerSettings { Address = 2 }, seed: 1),
+                new Bits(Multiplexer.Bit))),
             brain);
 
         // A second SOURCE, because two worlds are two streams and a brain settles by the
         // stamp. Sharing one would have the second trial pushing sequences the brain has
         // already answered, and it refuses those rather than settling twice -- which is the
         // seam's own rule catching the arrangement this test exists to assert.
-        var graded = new Trial<IReadOnlyList<double>>(
-            new Graded(new GradedSettings { Address = 3, Crowding = 0.9 }, seed: 1),
-            new Winnowing(Multiplexer.Bit, 11),
-            brain,
-            source: Trial<int>.Watched + 1);
+        var graded = new Bench(
+            new Body(new Watching<IReadOnlyList<double>>(
+                new Graded(new GradedSettings { Address = 3, Crowding = 0.9 }, seed: 1),
+                new Winnowing(Multiplexer.Bit, 11),
+                source: Body.First + 1)),
+            brain);
 
         var first = symbolic.Run(4000);
         var second = graded.Run(4000);

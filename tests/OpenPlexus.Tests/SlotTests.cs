@@ -321,18 +321,14 @@ public sealed class SlotTests(ITestOutputHelper output)
     /// the check refused the second copy — rightly, because a difference between them would
     /// read as a difference the replication caused.
     /// </remarks>
-    private static async Task<(Trial<IReadOnlyList<int>> Trial, Ported Fleet, Fleet Council)>
+    private static async Task<(Bench Bench, Ported Fleet, Fleet Council)>
         RaisedAsync(int slots, int replicas)
     {
         var dials = new CommittingSettings();
 
         var fleet = await Ported.OpenAsync(slots, replicas, dials, seed: 1);
 
-        var council = new Fleet(fleet.Asker, dials);
-
-        var brain = new Brain(dials, seed: 1, _ => council);
-        var world = new Multiplexer(new MultiplexerSettings { Address = Narrow }, seed: 1);
-        var trial = new Trial<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit), brain);
+        var (trial, council) = Fixture.Multiplexed(fleet, dials, Narrow);
 
         return (trial, fleet, council);
     }

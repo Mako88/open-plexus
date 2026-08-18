@@ -219,7 +219,13 @@ public sealed class DocsTests
     // XML comments cite those numbers. So the leaves are the index rather than residue, the
     // deletion was reverted, and this is a raise rather than a trade. A guard must not cost
     // information, and the only reason it did not is that another guard was watching.
-    private const int Whole = 10_419;
+    // And 10,467 is the twelfth raise, forty-eight words for two phases John added to the
+    // order of the work on 2026-08-18. Three is auditing TRAPS and DO NOT RE-TRY, four is
+    // splitting `Population`, and refining moves from three to five. The order paragraph is
+    // the one place a phase can live: `OutstandingTests` takes only entries computable
+    // without judgement, and which traps have earned a check is a judgement an entry at a
+    // time.
+    private const int Whole = 10_467;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

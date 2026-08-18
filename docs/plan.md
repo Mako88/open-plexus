@@ -210,10 +210,14 @@ gets one home and a cross-reference by number from anywhere else it serves; numb
 renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, point
 `DocsTests` at `csharp` for them rather than weakening it.
 
-**The order of the work is John's**, 2026-08-16, and nothing here is taken out of it. One:
-a mechanism for every entry of THE ARCHITECTURE, however bad, and `Roaming` wired through
-all of them. Two: the intentional reds cleared, which is the stable state to refine from.
-Three: refining. Anything before three that reads as tuning is out of order.
+**The order of the work is John's**, 2026-08-16 and amended 2026-08-18, and nothing here is
+taken out of it. One: a mechanism for every entry of THE ARCHITECTURE, however bad, and
+`Roaming` wired through all of them. Two: the intentional reds cleared, which is the stable
+state to refine from. Three: audit TRAPS and DO NOT RE-TRY, because a failure class that has
+earned a check belongs in the check and a revival condition that has expired is a
+superstition. Four: split `Population`, which holds matching, voting, genesis, repair,
+subsumption, naming and culling at once. Five: refining. Anything before five that reads as
+tuning is out of order.
 
     Commitment := scope (codes that must all be present)
                 → expects (a code that should follow)

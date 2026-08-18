@@ -278,4 +278,54 @@ public sealed class AbstainTests(ITestOutputHelper output)
         output.WriteLine(
             $"{loop.Rounds} rounds | {loop.Refused} refused | {mind.Hits} hits");
     }
+
+    /// <summary>
+    /// <b>A second run on one bench keeps counting where the first stopped.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The budget for a failure class this session created and CI caught. The first build of
+    /// the seam stamped a moment with the loop's round number, so a bench run twice pushed
+    /// sequences 0 to 3,999 both times — and the second run was refused entirely, round for
+    /// round, while reporting the rounds it had been asked for. Two fleet tests went red on a
+    /// count that had not moved, and nothing local looked at them.
+    /// </para>
+    /// <para>
+    /// <b>The class is a stamp taken from something that restarts</b>, and the fix is that the
+    /// sequence belongs to the source. <see cref="Watching{TSeen}"/> holds it, so it survives
+    /// however many times a bench is run — and this is the check that says so rather than the
+    /// comment beside the field.
+    /// </para>
+    /// <para>
+    /// <b>Read on <see cref="Tally.Refused"/> rather than on a score</b>, because a refused run
+    /// scores whatever the first one left behind. That is why the original went unnoticed for a
+    /// commit: the population was still there, still accurate, and had simply stopped learning.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_bench_run_twice_takes_every_moment_of_the_second_run()
+    {
+        var brain = new Brain(new CommittingSettings(), seed: 1);
+
+        var bench = new Bench(
+            new Body(new Watching<IReadOnlyList<int>>(
+                new Multiplexer(new MultiplexerSettings { Address = 2 }, seed: 1),
+                new Bits(Multiplexer.Bit))),
+            brain);
+
+        const long Half = 500;
+
+        var first = bench.Run(Half, sweep: 1000, target: 0.9, window: 100);
+        var second = bench.Run(Half, sweep: 1000, target: 0.9, window: 100);
+
+        Assert.Equal(0, first.Refused);
+        Assert.Equal(0, second.Refused);
+
+        Assert.Equal(Half, first.Rounds);
+        Assert.Equal(Half, second.Rounds);
+
+        output.WriteLine(
+            $"{first.Rounds} + {second.Rounds} rounds | "
+            + $"{first.Refused} + {second.Refused} refused");
+    }
 }

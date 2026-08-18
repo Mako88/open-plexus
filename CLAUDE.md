@@ -87,6 +87,11 @@ correctly and it is the command that is wrong.
 dotnet test --no-build --filter "kind!=sweep&FullyQualifiedName~Whatever" -v q --nologo
 ```
 
+**And the catch-all shard is not the suite.** Its filter excludes every named shard, so a
+local run of it can read green while the fleet shard is red — which has happened, on a count
+that had stopped moving rather than on anything that threw. Reproducing CI locally means
+running the shard list, and the cheaper move is to push and read CI.
+
 ## The measurements
 
 Sweeps are excluded from the suite by the `kind=sweep` trait and dispatched by hand:

@@ -55,21 +55,24 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// entry leaves <see cref="DeadCodeTests"/>, by either road.
     /// </para>
     /// <para>
-    /// <b>Some are obviously live and some are obviously not.</b> <c>Latent</c> is fork 39's,
-    /// <c>Clevr</c> is the perceptual world with a published bar beside it, and
-    /// <c>Composed</c> and <c>Latent</c> are the front end's own questions.
+    /// <b>What is left is <c>Composed</c>, the front end's own question.</b> Its
+    /// answer arrives in a SUCCESSOR moment — three moments a scene, the referring
+    /// attributes in the first two and the answer in the third — which no <c>Turn</c> can
+    /// say, a turn being one moment and one outcome. So the seam it wants is settlement by
+    /// successor, which is open.
     /// </para>
     /// <para>
-    /// <b>And three have come off, by roads worth telling apart.</b> <c>Senses</c> got a
+    /// <b>And four have come off, by roads worth telling apart.</b> <c>Senses</c> got a
     /// runner for the question it was built for; <c>Rhythm</c> got one for a question its
     /// own entry never named, that entry having called it rung three's when the rung it can
     /// hold still is repair. A world's stated purpose is not the same as its live one.
     /// </para>
     /// <para>
-    /// <b>And <c>Motif</c> is the plain case</b>, which is worth naming beside the other two.
-    /// Its question was the one its entry said it was, so the runner is the whole of what it
-    /// wanted — and the world had carried its own control since the day it was written, so
-    /// the run that reaches it is also the run that prices the naming gate.
+    /// <b>And <c>Motif</c> and <c>Clevr</c> are the plain cases</b>, worth naming beside the
+    /// other two. Each question was the one its entry said it was, so a runner is the whole
+    /// of what either wanted — <c>Motif</c> had carried its own control since the day it was
+    /// written, and <c>Clevr</c>'s runner returned a null result worth having: the held-back
+    /// questions answered at the weighted chance bar while the drawn stream is memorised.
     /// </para>
     /// </remarks>
     [Fact]
@@ -122,10 +125,21 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// </para>
     /// <para>
     /// <b>Which leaves two, and they are not the same shape.</b> <c>Bind</c> has a named home
-    /// in rung four's binding and is waiting on that rung; <c>Fleeting</c> has none — a
-    /// commitment that never fires twice is disposed of by its own statistics rather than by
-    /// being marked, so the honest question about it is whether anything would ever act on
-    /// it at all.
+    /// in rung four's binding and is waiting on that rung. <c>Fleeting</c> had no home at all
+    /// and the honest question about it was whether anything would ever act on it, which
+    /// <see cref="ClevrTests.Clevr_reaches_the_commitment_learner"/> now answers with a
+    /// number: 94% of that run's table is rows for object and scene indexes, each minted
+    /// fresh for one scene and unable to recur. Fork 31 says the table is what blows up, and
+    /// this is what it is made of.
+    /// </para>
+    /// <para>
+    /// <b>So the reader is a row a fleeting code does not get</b>, and it must be shown to
+    /// change nothing that fires. A code seen once is already refused as a genesis root by
+    /// the varied test, and a separation over one firing is too thin for the repair bar — so
+    /// the arm is the world's own <c>Clevr.Fleeting</c> dial with the reader on and off, and
+    /// it dies if any count but the table's moves. The mark has to travel: it is a fact only
+    /// the world holds, so it goes on <c>Pushed</c> and through <c>ICouncil</c> to the
+    /// machine that writes the row.
     /// </para>
     /// </remarks>
     [Fact]

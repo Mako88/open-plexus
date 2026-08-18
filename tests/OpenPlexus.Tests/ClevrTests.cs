@@ -232,10 +232,20 @@ public sealed class ClevrTests(ITestOutputHelper output)
 
         var unseen = tally.Unseen;
 
+        // What the per-scene codes cost the table, which is fork 31's question asked on the
+        // world that makes it sharp. An object index and a scene index are minted fresh
+        // every scene and can never be seen again, so every row they write is a row nothing
+        // will ever read -- and this world mints eleven of them a scene.
+        var rows = brain.Held.All.Sum(one => (long)one.Separations.Count);
+        var once = brain.Held.All.Sum(one => (long)one.Separations.Keys.Count(code =>
+            code.Modality == Clevr.Object || code.Modality == Clevr.Where));
+
         output.WriteLine(
             $"asked {world.Asked}, {world.Withheld.Count} held back | outcomes "
             + $"{world.Outcomes}, chance {world.Chance:F3} | drawn {tally.Recent:F3} | "
-            + $"held {tally.Resident}, {tally.Repaired} repairs, {tally.Minted} minted");
+            + $"held {tally.Resident}, {tally.Repaired} repairs, {tally.Minted} minted | "
+            + $"table {rows} rows, {once} of them per-scene "
+            + $"({(rows == 0 ? 0.0 : once / (double)rows):P1})");
 
         Assert.NotNull(unseen);
 
@@ -260,6 +270,16 @@ public sealed class ClevrTests(ITestOutputHelper output)
         // and raise this.
         var spread = 3.0 * Math.Sqrt(
             world.Chance * (1.0 - world.Chance) / unseen.Answered);
+
+        // And the table is mostly rows for codes that cannot recur, which is the reading
+        // this world was the one to take. A bar rather than an equality, because the share
+        // moves with how many scopes repair happens to grow -- what it must not do is fall
+        // quietly, which would mean the per-scene codes had stopped reaching the table and
+        // nobody had said so.
+        Assert.True(once > rows / 2,
+            $"{once} of {rows} table rows are for codes minted per scene, which is under "
+            + "half. This world mints eleven such codes a scene and they can never be seen "
+            + "again, so a drop here means the moment changed rather than the learner");
 
         Assert.True(composed < world.Chance + spread,
             $"{composed:F3} on the withheld set is more than three standard errors "

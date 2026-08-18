@@ -481,6 +481,15 @@ out of it, and anything before six that reads as tuning is out of order.
       It loses to both controls as built.
     - **OPEN** — ranking by its own expectation wins by making the world CONSTANT, so the
       preference wants a term a dead body fails. The goal is unbuilt. Fork **111**.
+    - **OPEN** — a commitment read BACKWARDS is a plan: want a code, take the scopes that
+      entail it, do the part of one you can. No new machinery, and what bounds it is the
+      entailment cap of one. Fork **115**.
+    - **OPEN** — a goal is a SET of codes wanted present, so a goal and a prediction are one
+      type once what is expected is a set. What is missing is which set, never how to say it.
+    - **OPEN** — prefer the doing whose consequence is least certain, off `Vote.Margin`, which
+      needs no body and nothing told. Dies unless it beats a coin on rounds-to-target.
+    - **OPEN** — a drive that cannot be sated is a fault in the design and not a risk to
+      manage, so a term must have a point where it stops pulling. John's, 2026-08-18.
     - **NOW** — `Roaming` is acted in and declining leaves the walk the world drew, so the
       watched arm is a chooser rather than a second world.
     - **NOW** — `do(x)` is distinguishable from `x`: `Intervened` derives a code beside each

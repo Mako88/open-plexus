@@ -237,7 +237,18 @@ public sealed class DocsTests
     // cost a raise rather than a trade on purpose: preserving recorded numbers is never a
     // reason to keep anything, and a doc that had to delete an item to say so would be
     // paying the same fee twice.
-    private const int Whole = 10_567;
+    // And 10,709 is the fourteenth raise, a hundred and forty-two words for how a predictor
+    // acts. A commitment read BACKWARDS is a plan, which needs no machinery that is not
+    // already here — and it took the whole branch to notice, because every leaf under
+    // `Original thought` was about what to build and none was about reading what exists the
+    // other way round.
+    //
+    // Two of the four are constraints rather than questions. A goal and a prediction are one
+    // type once an expectation is a set, so the set decision bought the goal's grammar for
+    // nothing. And a drive that cannot be sated is a fault in the design — John's, and it
+    // belongs here because a preference term is chosen once and lived with, which is a
+    // different kind of decision from a dial.
+    private const int Whole = 10_709;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

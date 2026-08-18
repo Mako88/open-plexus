@@ -532,6 +532,87 @@ public sealed class DocsTests
             + string.Join("\n  ", adrift));
     }
 
+    /// <summary>
+    /// Every requirement has at least one mechanism, however bad.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Phase two of the order of the work, made checkable.</b> That phase is <i>a
+    /// mechanism for every entry of THE ARCHITECTURE, however bad</i>, and whether it held
+    /// was answered by reading thirteen entries and counting — which is a session's word for
+    /// a state the build should be able to say. An entry whose leaves are all OPEN is a
+    /// requirement nothing carries, and the neighbouring check cannot see it: that one holds
+    /// the two sections one for one, so a row with an entry and no mechanism passes it.
+    /// </para>
+    /// <para>
+    /// <b>NOW is the token that means built</b>, and the other five do not. SETTLED is a
+    /// question closed rather than a mechanism standing, BLOCKED and BROKEN are the opposite
+    /// of one, and DEAD is one that was deleted. So a branch carried entirely by SETTLED
+    /// leaves reads as finished and holds nothing up.
+    /// </para>
+    /// <para>
+    /// <b>And it says nothing about whether the mechanism is any good</b>, which is the whole
+    /// point of <i>however bad</i>. Phase six is where that is asked, and a check demanding a
+    /// mechanism WORK would be phase six wearing phase two's clothes.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Every_requirement_has_a_mechanism()
+    {
+        var route = Nested(Section("THE ROUTE"));
+
+        var branch = route.FindIndex(bullet =>
+            bullet.Depth == 0
+            && bullet.Text.Contains("WHAT IT MUST DO", StringComparison.Ordinal));
+
+        Assert.True(branch >= 0, "`THE ROUTE` has no `WHAT IT MUST DO` branch");
+
+        var under = route.Skip(branch + 1).TakeWhile(bullet => bullet.Depth > 0).ToList();
+
+        Assert.NotEmpty(under);
+
+        var without = Unbuilt(under);
+
+        Assert.True(without.Count == 0,
+            $"{without.Count} of `WHAT IT MUST DO`'s entries carry no NOW leaf, so an "
+            + "architecture line has an entry and no mechanism:\n  "
+            + string.Join("\n  ", without)
+            + "\nPhase two is a mechanism for every one of them, however bad.");
+    }
+
+    /// <summary>The entries under a branch with no <c>NOW</c> leaf beneath them.</summary>
+    /// <param name="under">Everything nested under the branch, in order.</param>
+    /// <remarks>
+    /// <b>A helper rather than a loop in the test</b>, so the companion can put a bare entry
+    /// to it. A detector that accepts everything passes in silence and reads exactly like a
+    /// doc in order, which is the fault every companion in this file exists for.
+    /// </remarks>
+    private static List<string> Unbuilt(IEnumerable<(int Depth, string Text)> under)
+    {
+        var without = new List<string>();
+
+        string? entry = null;
+        var built = false;
+
+        foreach (var bullet in under)
+        {
+            if (bullet.Depth == 1)
+            {
+                if (entry is not null && !built) without.Add(entry);
+
+                entry = bullet.Text;
+                built = false;
+                continue;
+            }
+
+            if (bullet.Text.StartsWith("**NOW**", StringComparison.Ordinal)) built = true;
+        }
+
+        if (entry is not null && !built) without.Add(entry);
+
+        return without;
+    }
+
     [Fact]
     public void Every_leaf_carries_exactly_one_status()
     {
@@ -601,6 +682,22 @@ public sealed class DocsTests
         // English sentences and the order half of the correspondence check is worth nothing.
         Assert.False(Significant("What it must never do").Overlaps(
             Significant("EVERY INPUT IS AN ATTRIBUTE, WHICH MUST NEVER BE THE THING")));
+
+        // A branch whose second entry is carried by an OPEN alone. The first has a mechanism
+        // and the third's NOW must not reach back over the entry between them, which is the
+        // off-by-one a running flag invites.
+        Assert.Equal(
+            ["carried by nothing"],
+            Unbuilt(
+            [
+                (1, "carried"), (2, "**NOW** — a mechanism"),
+                (1, "carried by nothing"), (2, "**OPEN** — a question"),
+                (1, "carried too"), (2, "**NOW** — another"),
+            ]));
+
+        // And a branch in order must come back empty, or the check above is a constant.
+        Assert.Empty(Unbuilt([(1, "carried"), (2, "**OPEN** — a question"),
+            (2, "**NOW** — a mechanism")]));
 
         Assert.True(Revivable("**DEAD** — refuted, and it revives when a world holds still"));
         Assert.True(Revivable("**DEAD** — refuted; the row is in DO NOT RE-TRY"));

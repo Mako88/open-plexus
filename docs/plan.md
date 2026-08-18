@@ -217,7 +217,8 @@ out of it, and anything before six that reads as tuning is out of order.
   what it did, and `Trial` goes. It carries its own repair: a phase leaving the suite
   unreadable makes the next one blind, so one ends when the reds are the three that are named.
 - **Two, a mechanism for every entry of THE ARCHITECTURE**, however bad, and `Roaming`
-  exercising all of them.
+  exercising all of them. `DocsTests` holds the first half; the second is UNMEASURED and
+  where two resumes.
 - **Three, the intentional reds cleared**, which is the stable state to refine from.
 - **Four, audit TRAPS and DO NOT RE-TRY** — a failure class that has earned a check belongs
   in the check, and a revival condition that has expired is a superstition.

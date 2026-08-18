@@ -147,6 +147,18 @@ public sealed record Ask
     public ImmutableArray<Code> Moment { get; init; } = [];
 
     /// <summary>
+    /// Which of those codes the source says will not come back. <b>Empty where it did not
+    /// say.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>It reaches the table and nothing else</b>, so a holder on an older build that
+    /// ignored the field would hold a bigger table and take every identical decision. That
+    /// is the property that makes it safe to send: a mark that could change a vote would be
+    /// a world reaching into the brain over a wire.
+    /// </remarks>
+    public ImmutableArray<Code> Fleeting { get; init; } = [];
+
+    /// <summary>
     /// What followed the moment, for a <see cref="Wanted.Settle"/> — <b>nothing where the
     /// settlement could not say, which is the third verdict.</b>
     /// </summary>

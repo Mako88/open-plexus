@@ -93,7 +93,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Three front-end channels have no reader since the walk went.</b>
+    /// <b>Three channels lost their reader with the walk, and one is left.</b>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -124,22 +124,25 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// something rather than merely existing.
     /// </para>
     /// <para>
-    /// <b>Which leaves two, and they are not the same shape.</b> <c>Bind</c> has a named home
-    /// in rung four's binding and is waiting on that rung. <c>Fleeting</c> had no home at all
-    /// and the honest question about it was whether anything would ever act on it, which
-    /// <see cref="ClevrTests.Clevr_reaches_the_commitment_learner"/> now answers with a
-    /// number: 94% of that run's table is rows for object and scene indexes, each minted
-    /// fresh for one scene and unable to recur. Fork 31 says the table is what blows up, and
-    /// this is what it is made of.
+    /// <b>And <c>Fleeting</c> has come off, by a road neither alternative named.</b> The
+    /// honest question about it was whether anything would ever act on it, and
+    /// <see cref="ClevrTests.Clevr_reaches_the_commitment_learner"/> answered it with a
+    /// number: 93% of that run's table is rows for object and scene indexes, each minted
+    /// fresh for one scene and unable to recur. The reader is a row a fleeting code does not
+    /// get, and it travels on <c>Pushed</c> and through <c>ICouncil</c> to whoever writes it.
     /// </para>
     /// <para>
-    /// <b>So the reader is a row a fleeting code does not get</b>, and it must be shown to
-    /// change nothing that fires. A code seen once is already refused as a genesis root by
-    /// the varied test, and a separation over one firing is too thin for the repair bar — so
-    /// the arm is the world's own <c>Clevr.Fleeting</c> dial with the reader on and off, and
-    /// it dies if any count but the table's moves. The mark has to travel: it is a fact only
-    /// the world holds, so it goes on <c>Pushed</c> and through <c>ICouncil</c> to the
-    /// machine that writes the row.
+    /// <b>The prediction attached to it was wrong.</b> It was
+    /// written before the build: the mark reaches the table and nothing else, so the arm dies
+    /// if any other count moves. Repairs went from 3,169 to 18,733 and minted from 178 to
+    /// 1,418. The table is not a cache — it is repair's candidate set — so there is no such
+    /// thing as changing one and not the other, and most of what repair had been ranking were
+    /// codes that could not fire again.
+    /// </para>
+    /// <para>
+    /// <b>Which leaves <c>Bind</c>, and it has a named home.</b> Rung four's binding is where
+    /// it goes, and it waits on that rung rather than on a decision. <c>Composed</c> waits on
+    /// the same thing, so the two entries close together or not at all.
     /// </para>
     /// </remarks>
     [Fact]

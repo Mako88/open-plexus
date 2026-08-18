@@ -517,12 +517,14 @@ public sealed class Asker : IReceiveAnswers
     /// accounting — how many did I tell, how many answered — is one mechanism rather than
     /// two. What makes it a telling rather than a question is only which fields are filled.
     /// </remarks>
+    /// <param name="fleeting">Which of the moment's codes the source says will not come back.</param>
     public Task<Gathering> TellAsync(
         IReadOnlySet<Code> moment,
         Code? arrived,
         bool wrong,
         bool sweeping,
         ImmutableArray<Tabled> counted,
+        IReadOnlySet<Code>? fleeting = null,
         CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(moment);
@@ -533,6 +535,7 @@ public sealed class Asker : IReceiveAnswers
             ReturnTo = Address,
             Wants = Wanted.Settle,
             Moment = [.. moment.Order()],
+            Fleeting = fleeting is null ? [] : [.. fleeting.Order()],
             Arrived = arrived,
             Wrong = wrong,
             Sweeping = sweeping,

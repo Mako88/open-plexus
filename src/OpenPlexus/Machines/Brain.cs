@@ -158,7 +158,9 @@ public sealed class Brain
 
         _seen[moment.From.Source] = moment.From.Sequence;
 
-        var vote = await _substrate.AskAsync(moment.Codes, ct).ConfigureAwait(false);
+        var vote = await _substrate
+            .AskAsync(moment.Codes, moment.Fleeting, ct)
+            .ConfigureAwait(false);
 
         // Wrong is the fleet's verdict and never a holder's, which is why it is told rather
         // than worked out where genesis runs. A shard that had nothing to say about a moment

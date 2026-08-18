@@ -57,6 +57,7 @@ public sealed class Fleet : ICouncil
     private readonly CommittingSettings _dials;
 
     private IReadOnlySet<Code> _moment = new HashSet<Code>();
+    private IReadOnlySet<Code>? _fleeting;
 
     private long _asking;
     private long _telling;
@@ -117,7 +118,9 @@ public sealed class Fleet : ICouncil
 
     /// <inheritdoc/>
     public async ValueTask<Vote> AskAsync(
-        IReadOnlySet<Code> raw, CancellationToken ct = default)
+        IReadOnlySet<Code> raw,
+        IReadOnlySet<Code>? fleeting = null,
+        CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(raw);
 
@@ -125,6 +128,7 @@ public sealed class Fleet : ICouncil
         // state keyed by a vote that C2 permits never to be followed up. The asker is the
         // one machine that certainly knows both halves of a round happened.
         _moment = raw;
+        _fleeting = fleeting;
 
         var at = Stopwatch.GetTimestamp();
 
@@ -175,7 +179,7 @@ public sealed class Fleet : ICouncil
         var at = Stopwatch.GetTimestamp();
 
         using var told = await _asker
-            .TellAsync(_moment, arrived, wrong, sweeping, counted, ct)
+            .TellAsync(_moment, arrived, wrong, sweeping, counted, _fleeting, ct)
             .ConfigureAwait(false);
 
         await told.Everyone.ConfigureAwait(false);

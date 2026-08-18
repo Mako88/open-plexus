@@ -152,7 +152,15 @@ public interface ICouncil
     /// machine's vocabulary onto machines that may not share it — and whether they share it
     /// is exactly what the counts merge exists to establish.
     /// </remarks>
-    ValueTask<Vote> AskAsync(IReadOnlySet<Code> raw, CancellationToken ct = default);
+    /// <param name="fleeting">
+    /// Which of those codes the source says will not come back, or nothing where it did not
+    /// say. <b>It reaches the table and nothing else</b>, so a holder that ignored it would
+    /// hold a bigger table and take every identical decision.
+    /// </param>
+    ValueTask<Vote> AskAsync(
+        IReadOnlySet<Code> raw,
+        IReadOnlySet<Code>? fleeting = null,
+        CancellationToken ct = default);
 
     /// <summary>
     /// Settles what fired on the last ask, sweeps if it is a sweep round, and covers and
@@ -187,6 +195,7 @@ public sealed class Alone : ICouncil
     private readonly Population _held;
 
     private IReadOnlySet<Code> _moment = new HashSet<Code>();
+    private IReadOnlySet<Code>? _fleeting;
     private ImmutableArray<Commitment> _firing;
 
     private long _firingTicks;
@@ -226,8 +235,11 @@ public sealed class Alone : ICouncil
     public Weights Weighed => _held.Weigh(_firing);
 
     /// <inheritdoc/>
-    public ValueTask<Vote> AskAsync(IReadOnlySet<Code> raw, CancellationToken ct = default) =>
-        ValueTask.FromResult(Ask(raw));
+    public ValueTask<Vote> AskAsync(
+        IReadOnlySet<Code> raw,
+        IReadOnlySet<Code>? fleeting = null,
+        CancellationToken ct = default) =>
+        ValueTask.FromResult(Ask(raw, fleeting));
 
     /// <summary>
     /// The same ask, and <b>the shape everything here is really in.</b>
@@ -240,11 +252,17 @@ public sealed class Alone : ICouncil
     /// unwrapping it at every call site would put a sync-over-async at each of them; this
     /// way there is exactly one place where the two shapes meet, and it is the line above.
     /// </remarks>
-    public Vote Ask(IReadOnlySet<Code> raw)
+    /// <param name="fleeting">Which of the moment's codes the source says will not come back.</param>
+    public Vote Ask(IReadOnlySet<Code> raw, IReadOnlySet<Code>? fleeting = null)
     {
         ArgumentNullException.ThrowIfNull(raw);
 
         var at = Stopwatch.GetTimestamp();
+
+        // Kept for the settlement, because the mark arrives with the ask and is spent by the
+        // telling. A holder is told a moment once and settles it once, so carrying it here
+        // is the same slot the firing is already kept in.
+        _fleeting = fleeting;
 
         _moment = _held.Moment(raw);
 
@@ -288,7 +306,7 @@ public sealed class Alone : ICouncil
     {
         var at = Stopwatch.GetTimestamp();
 
-        _held.Settle(_firing, _moment, arrived);
+        _held.Settle(_firing, _moment, arrived, _fleeting);
 
         at = Mark(ref _settling, at);
 

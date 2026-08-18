@@ -130,6 +130,12 @@ public sealed class Watching<TSeen> : IInput, IExamines
         {
             From = new Stamp { Source = Source, Sequence = _sequence++ },
             Codes = new HashSet<Code>(Sensed(turn.Seen)),
+
+            // Read here and forwarded whole, because it is the world's claim about its own
+            // codes rather than a translation of them. `Sensed` derives precedences and
+            // intervention codes and neither is fleeting -- a derived code is as durable as
+            // what it was derived from.
+            Fleeting = _sensing.Fleeting(turn.Seen),
             Followed = turn.Outcome is { } outcome ? Brain.Says(outcome) : null,
         };
     }

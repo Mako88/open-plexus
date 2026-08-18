@@ -158,7 +158,10 @@ public sealed class Holder : IReceiveAsks
     /// </remarks>
     private Learnt Settling(Ask ask)
     {
-        _round.Ask(new HashSet<Code>(ask.Moment));
+        // The mark travels with the settlement rather than being kept from the vote, which
+        // is the same reason the moment does: C2 permits a vote never to be followed up, so
+        // a holder keeping state keyed by one would be keeping it forever.
+        _round.Ask(new HashSet<Code>(ask.Moment), new HashSet<Code>(ask.Fleeting));
 
         Recurrence? heard = null;
 

@@ -65,6 +65,19 @@ public readonly record struct Pushed
     /// </remarks>
     public required IReadOnlySet<Code> Codes { get; init; }
 
+    /// <summary>
+    /// Which of those codes the source says will not come back.
+    /// </summary>
+    /// <remarks>
+    /// <b>A fact only the world holds</b>, which is why it travels rather than being worked
+    /// out. A code seen once and a code about to be seen again look identical to a receiver
+    /// until the second sighting, so nothing downstream can derive this — and what it buys
+    /// is a table row not written, never a decision changed. An index minted for one scene
+    /// is the case: it is needed while the scene is live and can never be a candidate for
+    /// anything afterwards.
+    /// </remarks>
+    public IReadOnlySet<Code>? Fleeting { get; init; }
+
     /// <summary>What the source says followed it, or nothing where it cannot say.</summary>
     /// <remarks>
     /// <b>Nothing is the third verdict rather than a miss</b>. Most moments in any real

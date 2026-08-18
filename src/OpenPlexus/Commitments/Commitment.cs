@@ -262,7 +262,12 @@ public sealed class Commitment
     /// <param name="outcome">What the settlement said.</param>
     /// <param name="moment">What was live when it fired.</param>
     /// <param name="recency">How fast the local estimate forgets, in 0..1.</param>
-    public void Settle(Verdict outcome, IReadOnlySet<Code> moment, double recency)
+    /// <param name="fleeting">Which of the moment's codes the source says will not come back.</param>
+    public void Settle(
+        Verdict outcome,
+        IReadOnlySet<Code> moment,
+        double recency,
+        IReadOnlySet<Code>? fleeting = null)
     {
         ArgumentNullException.ThrowIfNull(moment);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(recency);
@@ -309,6 +314,13 @@ public sealed class Commitment
             occasion ^= Hashing.Mix(code.Value ^ Hashing.Mix(code.Modality));
 
             if (Scope.Contains(code)) continue;
+
+            // A code the world says will not come back gets no row. It is still folded into
+            // the occasion above, because a firing beside a fresh index genuinely IS a
+            // distinct firing and dropping it there would make two scenes read as one -- what
+            // it may not do is claim a row nothing will ever read again. See fork 31: the
+            // table is what blows up, and on `Clevr` 94% of it is codes of exactly this kind.
+            if (fleeting is not null && fleeting.Contains(code)) continue;
 
             // One hash lookup and not two, which is the whole of this line's point.
             // `TryGetValue` followed by an indexer set hashes the code twice and walks

@@ -920,7 +920,12 @@ public sealed class Population
     /// <param name="firing">What fired.</param>
     /// <param name="moment">What was live when it fired.</param>
     /// <param name="arrived">What followed, or nothing if the settlement could not say.</param>
-    public void Settle(ImmutableArray<Commitment> firing, IReadOnlySet<Code> moment, Code? arrived)
+    /// <param name="fleeting">Which of the moment's codes the source says will not come back.</param>
+    public void Settle(
+        ImmutableArray<Commitment> firing,
+        IReadOnlySet<Code> moment,
+        Code? arrived,
+        IReadOnlySet<Code>? fleeting = null)
     {
         ArgumentNullException.ThrowIfNull(moment);
 
@@ -929,7 +934,8 @@ public sealed class Population
                 arrived is null ? Verdict.Abstain
                     : commitment.Expects == arrived ? Verdict.Hit : Verdict.Miss,
                 moment,
-                _dials.Recency);
+                _dials.Recency,
+                fleeting);
     }
 
     /// <summary>Mints a one-code commitment for everything live, if the moment surprised.</summary>

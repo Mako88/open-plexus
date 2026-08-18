@@ -40,15 +40,16 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// <para>
     /// Every one was driven by a <c>*Run</c> in <c>Worlds/</c> and every one of those was the
     /// walk's, so the world data survived and the thing that turned it into a measurement did
-    /// not. The commitment side's generic runner is <c>Bench</c> and nothing is wired to it.
+    /// not. The commitment side's runner is <c>Bench</c>, and a world reaches it as a
+    /// <c>Watching</c> inside a <c>Body</c>.
     /// <b>A world's unreachable MEMBERS are listed beside its type</b>, which is how much of
-    /// each world is dead rather than merely undriven — and it is what tells a `Bench` from a
+    /// each world is dead rather than merely undriven — and it is what tells a runner from a
     /// deletion. The count is printed rather than written here, because a count written into
     /// a remark rots the first time the list moves and this one already had.
     /// </para>
     /// <para>
-    /// <b>AND A `Bench` is only half the answer, which is the part that was first written
-    /// wrong.</b> <see cref="RemindingTests"/> prints the other half: an isolating world is
+    /// <b>And a runner is only half the answer</b>, which is the part that was first written
+    /// wrong. <see cref="RemindingTests"/> prints the other half: an isolating world is
     /// DELETED when its question closes, and worlds accumulate exactly as dials do. So each
     /// name below is one of two things and this test does not care which — it closes when the
     /// entry leaves <see cref="DeadCodeTests"/>, by either road.
@@ -83,7 +84,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
 
         Assert.True(stranded.Count == 0,
             $"{stranded.Count} entries across the worlds nothing can run: "
-            + $"{string.Join(", ", stranded)}. Give the world a `Bench`, or DELETE it "
+            + $"{string.Join(", ", stranded)}. Give the world a `Watching`, or DELETE it "
             + "because its question closed — then take its entry off `DeadCodeTests`. "
             + "This test is red on purpose and closes on that edit, not on this file.");
     }

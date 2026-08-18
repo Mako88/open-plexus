@@ -79,7 +79,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // rather than merely undriven. Every entry here was called by a `*Run` in
         // `Worlds/`, and every one of those runs was the walk's.
         //
-        // Each leaves by its world getting a `Bench`, NOT BY ANYBODY EDITING THIS. And the
+        // Each leaves by its world getting a `Watching`, NOT BY ANYBODY EDITING THIS. And the
         // budget below is back off nought for the first time since it reached it, which
         // should read as a debt rather than as a threshold being relaxed.
         ["Composed.Third"] = Stranded,
@@ -232,7 +232,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // that would read it is a reason that expires, which is the only kind worth writing.
         //
         // Two, and `Rhythm`'s pair left the same way. Its entry said each leaves by the world
-        // getting a `Bench`; `Bench` drives it through `IWorld` now, and the arm that prices
+        // getting a runner; `Watching` drives it through `IWorld` now, and the arm that prices
         // how fast a turning world is tracked reads the modality and the turn count both.
         // What is left on the list is `Composed.Third` alone.
         Assert.Equal(2, Unused.Count);
@@ -299,7 +299,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["ClutrrRun"] = Harness,
 
         // A chooser is composed rather than constructed, which is `Composed`'s reason one
-        // layer in. `Bench` takes what to act with as a delegate on purpose -- a random
+        // layer in. `Watching` takes what to act with as a delegate on purpose -- a random
         // chooser, an oracle and a learner are three arms over one seam, and a library that
         // named one of them would be the library deciding which. The preference it ranks by
         // is a fact about a body, so `src` naming this would also be `src` deciding what a
@@ -307,7 +307,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["Drives"] =
             "A CHOOSER IS CHOSEN BY WHOEVER COMPOSES THE RUN, so the library naming one "
             + "would decide which of three arms over `IActed`'s seam is the policy -- the "
-            + "same fault as a world naming a brain type, one layer out. `Bench` takes it as "
+            + "same fault as a world naming a brain type, one layer out. `Watching` takes it as "
             + "a delegate and `HomeostatTests` supplies it beside the oracle and the draw.",
         ["LatentRun"] = Harness,
         ["MultiplexerRun"] = Harness,
@@ -350,10 +350,10 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // and this is the one place the whole deletion is visible as a cost. Each of these
         // had a `*Run` in `Worlds/` that drove it, and every one of those was the walk's --
         // so the world data survived and the thing that turned it into a measurement did
-        // not. They are NOT on `Roaming`'s footing: that one is driven by `Bench` through
+        // not. They are NOT on `Roaming`'s footing: that one is driven by `Watching` through
         // `IWorld` and has a caller, and these have none at all.
         //
-        // And the question is not only *which gets a `Bench` first*, which is how this was
+        // And the question is not only *which gets a `Watching` first*, which is how this was
         // first written and is half the rule. `RemindingTests` carries the other half: An
         // isolating world is deleted when its question closes, and worlds accumulate exactly
         // as dials do. So each of these is one of two things and the list does not yet say
@@ -369,7 +369,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // ANSWER moves.
         //
         // And `Motif` came off by the first road, which is the plain one: its question was
-        // live, so it got a `Bench`. What decided the mapping was that the world already
+        // live, so it got a `Watching`. What decided the mapping was that the world already
         // carried its own control -- `Motifs` at nought is the same stream with nothing
         // recurring in it -- so the run that makes it reachable is also the run that asks
         // whether the naming gate reads recurrence or reads the stream.
@@ -387,13 +387,13 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
 
         ["Homeostat"] =
             "A WORLD, ON `Roaming`'S FOOTING SINCE `IActed` EXISTS, and it is the first "
-            + "world here that is acted in rather than watched. `Bench` drives it through "
+            + "world here that is acted in rather than watched. `Watching` drives it through "
             + "`IActed` -- the same seam `IWorld` sits on, with a chooser handed in at the "
             + "join -- so the library naming it would be the library naming a world, which "
             + "is the fault this list exists to catch and not a debt it records.",
 
         ["Latent"] = "A WORLD, ON `Roaming`'S FOOTING, AND IT CAME OFF THE STRANDED LIST BY "
-            + "GETTING A RUNNER AND A DIAL. `Bench` drives it through `IWorld` now: a moment "
+            + "GETTING A RUNNER AND A DIAL. `Watching` drives it through `IWorld` now: a moment "
             + "is every channel but the last and the outcome is what the last one reported. "
             + "It came off by a fourth road, which is that a standing objection had predicted "
             + "the runner would exercise nothing and was half right. As shipped every channel "
@@ -406,7 +406,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "caller.",
 
         ["Motif"] = "A WORLD, ON `Roaming`'S FOOTING, AND IT CAME OFF THE STRANDED LIST BY "
-            + "GETTING A RUNNER. `Bench` drives it through `IWorld` now: a moment is the "
+            + "GETTING A RUNNER. `Watching` drives it through `IWorld` now: a moment is the "
             + "cue half of a set and the outcome is one of the codes that set withheld, "
             + "drawn uniformly. It is the world where rung five's redundancy is "
             + "manufactured on purpose, and its control is the same stream with nothing "
@@ -414,8 +414,8 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "gate rather than to the one it killed. `MotifTests` is its caller.",
 
         ["Recalled"] = "A WORLD, ON `Roaming`'S FOOTING, and it was on the stranded list "
-            + "by mistake. Both halves of that reason are false of it: `Bench` drives it "
-            + "through `IWorld` -- `RecalledTests.Made` builds a `Bench` over it -- "
+            + "by mistake. Both halves of that reason are false of it: `Watching` drives it "
+            + "through `IWorld` -- `RecalledTests.Made` builds a `Watching` over it -- "
             + "and its tests assert what is LEARNT rather than what the world is, every "
             + "text reading on this branch having come off them. It went on the list when "
             + "the walk's deletion enumerated the worlds, and nothing checked which of them "
@@ -423,14 +423,14 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "coincidence, and so can a debt.",
 
         ["Rhythm"] = "A WORLD, ON `Roaming`'S FOOTING, AND IT CAME OFF THE STRANDED LIST BY "
-            + "GETTING A RUNNER. `Bench` drives it through `IWorld` now: a moment is the "
+            + "GETTING A RUNNER. `Watching` drives it through `IWorld` now: a moment is the "
             + "symbol the stream sounded last and the outcome is the one that followed. It "
             + "is the only world here whose ANSWER moves, and the only one where a scope "
             + "cannot be made longer -- so repair, rung three and rung five are all held "
             + "still while the vote and the local decaying estimate are not. `RhythmTests` "
             + "is its caller.",
         ["Senses"] = "A WORLD, ON `Roaming`'S FOOTING, AND IT CAME OFF THIS LIST BY "
-            + "GETTING A RUNNER. `Bench` drives it through `IWorld` now: an occasion shows "
+            + "GETTING A RUNNER. `Watching` drives it through `IWorld` now: an occasion shows "
             + "two senses and asks about one of them, and the examination shows a sight and "
             + "a sound and asks what the thing FEELS like -- a combination the stream draws "
             + "nought times. `SensesTests` is its caller.",
@@ -447,19 +447,19 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["Marked"] = Join,
         ["Passthrough"] = Join,
 
-        ["Roaming"] = "A WORLD, ON THE SAME FOOTING AS `Returning`: `Bench` drives it "
+        ["Roaming"] = "A WORLD, ON THE SAME FOOTING AS `Returning`: `Watching` drives it "
             + "through `IWorld`, so there is no run for `src` to name and naming the world "
             + "itself would be the library knowing which problem it is pointed at. "
             + "`RoamingTests` is its caller.",
 
         ["Returning"] = "A WORLD, AND THE LIBRARY NAMES `IWorld` RATHER THAN ANY OF "
-            + "THEM. It has no run of its own because `Bench` drives it directly, so "
+            + "THEM. It has no run of its own because `Watching` drives it directly, so "
             + "there is not even a harness entry point for `src` to mention -- and a "
             + "world the library named would be the library knowing what problem it is "
             + "being pointed at, which is the fault `SeparationTests` guards from the "
             + "other side. `ReturningTests` is its caller.",
 
-        ["Handing"] = "A WORLD, ON `Roaming`'S FOOTING, and it has no `Bench` behind it "
+        ["Handing"] = "A WORLD, ON `Roaming`'S FOOTING, and it has no `Watching` behind it "
             + "yet for a reason of its own: what has been taken on it so far is the three "
             + "CEILINGS, which need no learner at all. It is fork 105 isolated -- a "
             + "sentence naming two people where a bag of words is provably at the marginal, "
@@ -507,7 +507,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <b>Derived rather than listed, which is the whole value.</b> An entry leaves by being
-    /// deleted from the dictionaries above — because its world got a `Bench`, or because its
+    /// deleted from the dictionaries above — because its world got a runner, or because its
     /// world was deleted — and the red test that demands it closes on the same edit. A second
     /// hand-kept list would be a second thing to forget.
     /// </remarks>
@@ -521,7 +521,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     /// <summary>Why a world whose only runner was the walk's is named by nothing.</summary>
     private const string Stranded =
         "A WORLD WHOSE RUNNER WENT WITH THE WALK. The data is intact and nothing drives it "
-        + "-- unlike `Roaming`, which `Bench` drives through `IWorld`. It wants a `Bench` or "
+        + "-- unlike `Roaming`, which `Watching` drives through `IWorld`. It wants one or "
         + "a deletion depending on whether its question is still live, and until one or the "
         + "other its tests assert what the WORLD is and nothing about what is learnt.";
 

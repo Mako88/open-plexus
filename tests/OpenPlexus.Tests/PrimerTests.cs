@@ -16,8 +16,8 @@ namespace OpenPlexus.Tests;
 /// English and the node exists.
 /// </para>
 /// <para>
-/// <b>The node does start existing and the score does not move, which is a
-/// finding about COST rather than about the idea.</b> Two facts collide. Real
+/// <b>The node does start existing and the score does not move.</b> Which is a
+/// finding about COST rather than about the idea. Two facts collide. Real
 /// English is a heavier-tailed distribution than anything
 /// <see cref="SensesSettings.Skew"/> was pushed to — the commonest word is in half
 /// of all sentences — so ingesting it is ruinous. And the words the tasks need are

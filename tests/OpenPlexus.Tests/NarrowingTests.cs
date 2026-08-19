@@ -136,8 +136,8 @@ public sealed class NarrowingTests(ITestOutputHelper output)
     /// the population rather than of a rung, and fork 75 wants the same number.
     /// </para>
     /// <para>
-    /// <b>And it is one seed a width on purpose, because this asks whether the number
-    /// EXISTS and not how big it is.</b> How much a population overshoots is the grid's
+    /// <b>And it is one seed a width on purpose.</b> Because this asks whether the number
+    /// EXISTS and not how big it is. How much a population overshoots is the grid's
     /// question and carries error bars there.
     /// </para>
     /// <para>

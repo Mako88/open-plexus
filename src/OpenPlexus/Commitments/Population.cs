@@ -974,8 +974,17 @@ public sealed class Population
 
         var minted = 0;
 
+        // What may enter a WIDE scope, kept so it is exactly what the narrow arm rooted on.
+        // Letting background in was measured and is worse -- the revival row is in the plan.
+        var eligible = new List<Code>();
+
         foreach (var code in moment.Order())
         {
+            // A precedence and an intervention are refused to BOTH arms, for the same reason:
+            // `this stood before that` and `I did something` are rules about grammar and about
+            // agency rather than about the world, and the moment carries one for every pair.
+            if (Sequenced.Names(code) || Intervened.Names(code)) continue;
+
             // And the second gate asks which code rather than whether at all. A code that
             // has never once been absent separates nothing and cannot ever win a repair,
             // but it can still be a ROOT -- and every child hanging off it inherits the
@@ -990,24 +999,12 @@ public sealed class Population
             // been absent* has one answer and needs nothing.
             if (!Varied(code)) continue;
 
-            // And a precedence is a specialisation and never a root, which is the same
-            // argument the line above makes about a code that has never been absent. `this
-            // stood before that` with no idea what either of them is about is a rule about
-            // grammar rather than about the world -- and with the order folded in, the
-            // moment holds a precedence for every pair, so rooting on them would fill the
-            // population with pairs the day the rung is switched on.
-            //
-            // REPAIR MAY STILL CHOOSE ONE, which is the whole point: a precedence enters a
-            // scope where a plain code does not separate the misses from the hits, which is
-            // what the ladder's admission asks and the only place this rung belongs.
-            // And an intervention sits on that line for the same reason. `I did something`
-            // with no idea what was done or what followed is a rule about agency rather than
-            // about the world, and the moment carries one for every forced code -- so a
-            // chooser being wired would fill the population with them. Repair may still
-            // choose one, and that is exactly where a causal claim belongs: a scope takes
-            // the provenance where the plain code fails to separate the misses from the hits.
-            if (Sequenced.Names(code) || Intervened.Names(code)) continue;
+            eligible.Add(code);
 
+            // REPAIR MAY STILL CHOOSE A PRECEDENCE OR AN INTERVENTION, which is the whole
+            // point of refusing them as roots rather than everywhere. One enters a scope where
+            // a plain code does not separate the misses from the hits, which is what the
+            // ladder's admission asks and the only place either rung belongs.
             var proposed = new Commitment([code], arrived);
 
             // And the third gate asks whose it is, which is nothing at all on one machine.
@@ -1019,6 +1016,21 @@ public sealed class Population
 
             Born(proposed, Birth.Genesis);
             minted++;
+        }
+
+        // And the whole moment as one scope, where the arm asks for it. It is the conjunction a
+        // told statement states, minted rather than discovered by failing -- see `Rooting` for
+        // why that is a different thing from minting one on a guess, and for where it is dead
+        // weight. Two codes at least, or it is the one-code rule the loop above already made.
+        if (_dials.Rooting is Rooting.Wholly && eligible.Count > 1)
+        {
+            var whole = new Commitment([.. eligible], arrived);
+
+            if ((Places is null || Places(whole)) && Add(whole))
+            {
+                Born(whole, Birth.Genesis);
+                minted++;
+            }
         }
 
         return minted;

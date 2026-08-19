@@ -6,8 +6,8 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>THE LADDER'S THIRD RUNG IS <i>X THEN Y</i> RATHER THAN <i>X AND Y</i>, and the obvious
-/// way to build it is the expensive one.</b> A scope entry saying <i>this one came after
+/// <b>THE LADDER'S THIRD RUNG IS <i>X THEN Y</i> RATHER THAN <i>X AND Y</i>.</b> And the obvious
+/// way to build it is the expensive one. A scope entry saying <i>this one came after
 /// that one</i> needs a scope that is no longer an array of codes, a
 /// <see cref="Commitments.Commitment.Fires"/> that is no longer a subset test, a tally keyed
 /// by pairs, a repair that proposes them, a subsumption that reads them and a wire format

@@ -112,6 +112,23 @@ public enum Asserting
     /// </remarks>
     Nothing,
 
+    /// <summary>Its rarest word so far, left out of the moment as well as claimed.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>What a WIDE scope needs, and it is the difference between the two claiming arms.</b>
+    /// A commitment over the whole moment fires only where every one of its codes is present,
+    /// so a moment still holding the claimed word mints a rule that can never fire on a
+    /// question — the question does not say the answer.
+    /// </para>
+    /// <para>
+    /// <b>And it closes the tautology the other arm leaves open.</b> With the word still there,
+    /// <i>meow predicts meow</i> is mintable, right on every statement round, useless, and well
+    /// placed to outvote a rule that says something. That is fork <b>117</b> arriving through
+    /// the telling rather than through the asking.
+    /// </para>
+    /// </remarks>
+    Withheld,
+
     /// <summary>Its rarest word so far, which is what the statement is taken to claim.</summary>
     /// <remarks>
     /// <para>
@@ -619,13 +636,21 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
             var coded = Said(words);
             var asking = one.EndsWith('?');
 
+
             if (!asking)
             {
                 _said.Add(coded);
 
                 foreach (var word in words) _often[word] = _often.GetValueOrDefault(word) + 1;
 
-                _asserted = _settings.Asserting is Asserting.Rarest ? Claimed(words) : null;
+                var claim = _settings.Asserting is Asserting.Nothing ? null : Claimed(words);
+
+                _asserted = claim is { } at ? _index[words[at]] : null;
+
+                // Left out where the arm withholds it, so a scope over what is left can fire on
+                // a question that names the same things.
+                if (claim is { } drop && _settings.Asserting is Asserting.Withheld)
+                    coded = Said([.. words.Where((_, where) => where != drop)]);
             }
 
             var before = new List<IReadOnlyList<Code>>();
@@ -651,24 +676,19 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
         _ => false,
     };
 
-    /// <summary>Which of a statement's words it is taken to claim.</summary>
+    /// <summary>Where in a statement the word it is taken to claim sits.</summary>
     /// <remarks>
     /// <b>The one this conversation has said least often</b>, ties to the earliest, which is
     /// arbitrary and fixed. A statement of one word claims nothing, because a claim with its
     /// whole scope removed is a claim about nothing being present.
     /// </remarks>
-    private int? Claimed(IReadOnlyList<string> words)
-    {
-        if (words.Count < 2) return null;
-
-        var rarest = words
+    private int? Claimed(IReadOnlyList<string> words) => words.Count < 2
+        ? null
+        : words
             .Select((word, at) => (word, at))
             .OrderBy(one => _often.GetValueOrDefault(one.word, 0))
             .ThenBy(one => one.at)
-            .First().word;
-
-        return _index.TryGetValue(rarest, out var at) ? at : null;
-    }
+            .First().at;
 
     /// <summary>One typed line, cut into the sentences it holds.</summary>
     /// <remarks>

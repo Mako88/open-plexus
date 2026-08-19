@@ -207,8 +207,8 @@ public static class Alternating
     /// alphabet.
     /// </para>
     /// <para>
-    /// <b>And the exclusion clause is here rather than in either caller, because it is the
-    /// half of John's account that is not negotiable.</b> What the two derivations differ in
+    /// <b>And the exclusion clause is here rather than in either caller.</b> Because it is the
+    /// half of John's account that is not negotiable. What the two derivations differ in
     /// is what counts as keeping the same company; that alternatives never co-occur is the
     /// same claim in both.
     /// </para>

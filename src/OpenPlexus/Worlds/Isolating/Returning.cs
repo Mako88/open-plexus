@@ -86,8 +86,8 @@ public sealed record ReturningSettings
     /// recovers. One number without the other two is a score with nothing to mean.
     /// </para>
     /// <para>
-    /// <b>The landmark is fixed for the life of the world, which is the honest limit and is
-    /// said here rather than discovered later.</b> A basket that never moves is pinned by a
+    /// <b>The landmark is fixed for the life of the world.</b> Which is the honest limit and is
+    /// said here rather than discovered later. A basket that never moves is pinned by a
     /// conjunction, and a conjunction is rung one and already built — so a win in this cell
     /// is a claim about RELATIONS carrying identity and not about anything tracking a thing
     /// through change. A landmark that moved would break the conjunction and is the next

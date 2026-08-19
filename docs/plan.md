@@ -579,8 +579,12 @@ before six that reads as tuning is out of order.
     - **NOW** — and REPETITION earns it, at the repair gate's floor rather than the lesson's.
     - **OPEN** — what a moment carries beside its own sentence. A question re-handing the story
       leaves every code always-present, so genesis roots on nothing. Fork **120**.
+    - **NOW** — an assertion may mint its WHOLE scope, so a conjunction is stated rather than
+      discovered by failing, and a fact costs fewer tellings. John's. `Rooting`.
+    - **OPEN** — and it does not reach ONE telling. The rule is minted after two and believed
+      after eight, so what the tellings buy is the VOTE rather than the mint. Fork **121**.
     - **OPEN** — rarest is one split of a statement into scope and claim, and the brain does not
-      choose it. What picks the claim with no experimenter. Fork **121**.
+      choose it. What picks the claim with no experimenter. Fork **123**.
     - **NOW** — a contradicted belief is REPLACED by being outvoted rather than retracted, far
       more cheaply than installing. Uncontradicted facts do not move. John's.
     - **OPEN** — one brain process, worlds attached over a stream: fork **113**'s shape as a

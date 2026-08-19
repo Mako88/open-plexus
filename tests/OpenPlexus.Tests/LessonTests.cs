@@ -25,11 +25,13 @@ public sealed class LessonTests(ITestOutputHelper output)
 {
     private static (Tally Tally, Tutor Tutor, Conversing World) Ran(
         Lesson lesson, Carrying carrying, int seed, int passes, int capacity = 2000,
-        Asserting asserting = Asserting.Nothing, int tellings = 1, int revising = 0)
+        Asserting asserting = Asserting.Nothing, int tellings = 1, int revising = 0,
+        Rooting rooting = Rooting.Singly)
     {
         var tutor = new Tutor(lesson, TextWriter.Null, passes, tellings, revising);
 
-        var brain = new Brain(new CommittingSettings { Capacity = capacity }, seed);
+        var brain = new Brain(
+            new CommittingSettings { Capacity = capacity, Rooting = rooting }, seed);
 
         var world = new Conversing(new ConversingSettings
         {
@@ -337,5 +339,77 @@ public sealed class LessonTests(ITestOutputHelper output)
         Assert.True(right[3] <= lesson.Exam.Count - changed,
             $"three contradictions already scored {right[3]:F1}, so a belief is being replaced "
             + "more cheaply than it was installed by more than this test claims");
+    }
+
+    [Fact]
+    public void Minting_the_whole_statement_as_one_scope_cuts_what_a_fact_costs_but_not_to_one()
+    {
+        const int Seeds = 3;
+
+        int[] tellings = [1, 2, 3, 8, 10];
+
+        // John's: twenty misses is not what a fact costs, it is what DISCOVERING THE
+        // CONJUNCTION costs. Genesis mints one code a commitment, so `cat AND sound -> meow` is
+        // reachable only by narrowing `cat -> meow` after it has failed enough times on a
+        // question the statement already answered. An assertion is not a guess -- it hands over
+        // the scope and the claim together, so it should be able to mint the conjunction.
+        var lesson = Lesson.Creatures;
+        var bar = new Tutor(lesson, TextWriter.Null).Marginal / (double)lesson.Exam.Count;
+
+        output.WriteLine($"{Seeds} seeds, one examination pass, marginal {bar:F3}");
+        output.WriteLine($"{"tellings",-10}{"singly",9}{"wholly",9}{"minted",9}{"repaired",10}");
+
+        var narrow = new Dictionary<int, double>();
+        var wide = new Dictionary<int, double>();
+
+        foreach (var many in tellings)
+        {
+            var one = new List<double>();
+            var other = new List<double>();
+            var minted = new List<double>();
+            var repaired = new List<double>();
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var narrowly = Ran(
+                    lesson, Carrying.Never, seed, passes: 1, asserting: Asserting.Withheld,
+                    tellings: many);
+
+                var widely = Ran(
+                    lesson, Carrying.Never, seed, passes: 1, asserting: Asserting.Withheld,
+                    tellings: many, rooting: Rooting.Wholly);
+
+                one.Add(Right(narrowly.Tutor, 0));
+                other.Add(Right(widely.Tutor, 0));
+                minted.Add(widely.Tally.Minted);
+                repaired.Add(widely.Tally.Repaired);
+            }
+
+            narrow[many] = one.Average();
+            wide[many] = other.Average();
+
+            output.WriteLine(
+                $"{many,-10}{one.Average(),9:F3}{other.Average(),9:F3}{minted.Average(),9:F1}"
+                + $"{repaired.Average(),10:F1}");
+        }
+
+        // The wide arm reaches the same place in fewer tellings, which is the reading. It is
+        // the conjunction being STATED rather than found by failing.
+        Assert.True(wide[3] > narrow[3],
+            $"at three tellings the wide arm read {wide[3]:F3} and the narrow one "
+            + $"{narrow[3]:F3}, so minting the statement as one scope is buying nothing");
+
+        Assert.True(wide[8] > narrow[8],
+            $"at eight tellings the wide arm read {wide[8]:F3} and the narrow one "
+            + $"{narrow[8]:F3}");
+
+        // And it does NOT reach one telling, which is the half still owed. Minting saturates
+        // after two tellings, so the rule exists long before it is believed -- what the extra
+        // tellings buy is the VOTE, a fresh commitment having no statistics with which to
+        // outrank the one-code rules it was minted beside. That is the provisional-weight
+        // defect `CommittingSettings.Speaking` already names, arriving here.
+        Assert.True(wide[1] <= bar,
+            $"one telling read {wide[1]:F3} on the wide arm, so a fact now costs a single "
+            + "telling and the reading this test is named for has moved");
     }
 }

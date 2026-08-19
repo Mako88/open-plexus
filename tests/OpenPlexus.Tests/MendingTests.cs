@@ -206,8 +206,8 @@ public sealed class MendingTests(ITestOutputHelper output)
     /// and nothing has ever looked at it.
     /// </para>
     /// <para>
-    /// <b>And the other new cell is the one that should be worst, which is what makes it
-    /// a control rather than a sixth guess.</b> <i>Improving, after a failure</i> stacks
+    /// <b>And the other new cell is the one that should be worst.</b> Which is what makes it
+    /// a control rather than a sixth guess. <i>Improving, after a failure</i> stacks
     /// the two brakes that were each measured as costly on their own — waiting for the
     /// vote to be wrong, and then also asking whether forking has ever paid. A grid where
     /// it is not last would say the two brakes are not additive, which is a fact about

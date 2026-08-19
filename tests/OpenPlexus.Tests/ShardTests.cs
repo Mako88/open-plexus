@@ -9,8 +9,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The suite is split four ways by name and the fourth is everything else, which is one
-/// typo from a test that runs nowhere.</b> Three shards name their classes and the last
+/// <b>The suite is split four ways by name and the fourth is everything else.</b> Which is one
+/// typo from a test that runs nowhere. Three shards name their classes and the last
 /// excludes exactly those nine names; a class added to one and not excluded from the other
 /// runs twice, and a name misspelt in the exclusion list runs nowhere at all. The second is
 /// the dangerous one — a test that runs in no shard is green everywhere, because nothing

@@ -121,8 +121,8 @@ public sealed record Referred
     /// Which object of that scene the filters pick out.
     /// </summary>
     /// <remarks>
-    /// <b>Resolved by running the filter chain against the scene, and a question
-    /// that does not pick out exactly one object is thrown away.</b> CLEVR
+    /// <b>Resolved by running the filter chain against the scene.</b> And a question
+    /// that does not pick out exactly one object is thrown away. CLEVR
     /// guarantees this for its own programs — <c>unique</c> is in the chain — but
     /// checking it here is what lets the index arm exist: the ceiling arm has to
     /// be able to hand the walk the very index the question is not supposed to

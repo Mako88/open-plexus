@@ -130,8 +130,8 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     /// <param name="dials">The brain, built once and handed to every seed.</param>
     /// <param name="looking">How the picture is cut up.</param>
     /// <remarks>
-    /// <b>One brain per configuration and five seeds of it, because one seed is not a
-    /// comparison and this repo has watched an ordering invert.</b> Written out twice
+    /// <b>One brain per configuration and five seeds of it.</b> Because one seed is not a
+    /// comparison and this repo has watched an ordering invert. Written out twice
     /// before `DuplicationTests` refused the second, which is that budget doing its job
     /// on a measurement file rather than on the library.
     /// <para>

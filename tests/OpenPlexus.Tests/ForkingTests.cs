@@ -10,8 +10,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Repair is deterministic and its table moves by one entry a firing, so a parent
-/// proposes the same child for thousands of rounds.</b> The argmax is stable, the code it
+/// <b>Repair is deterministic and its table moves by one entry a firing.</b> So a parent
+/// proposes the same child for thousands of rounds. The argmax is stable, the code it
 /// names stays in the tally because a commitment's table skips only its OWN scope, and
 /// nothing anywhere asks whether this parent has been there before. Collisions run twenty to
 /// fifty times the births at every majority rung, which is that fact counted.

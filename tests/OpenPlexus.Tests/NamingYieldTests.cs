@@ -666,8 +666,8 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The coarse code reaches the moment and no scope, and every operator refuses it for
-    /// the property that makes it worth having.</b>
+    /// <b>The coarse code reaches the moment and no scope.</b> And every operator refuses it for
+    /// the property that makes it worth having.
     /// </summary>
     /// <remarks>
     /// <para>

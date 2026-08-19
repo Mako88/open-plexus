@@ -34,7 +34,7 @@ namespace OpenPlexus.Tests;
 /// </para>
 /// <para>
 /// <b>Every number this file has ever recorded was taken under a timing it no longer
-/// runs, and that is not a change anybody made here.</b> These cells name
+/// runs.</b> And that is not a change anybody made here. These cells name
 /// <see cref="CommittingSettings.Budget"/> and <see cref="Mending"/> and pin nothing else,
 /// so the arms inherited <see cref="Repairing.AfterFailure"/> when it was the default and
 /// inherit <see cref="Repairing.EveryRound"/> now. The recorded verdict — a free budget is

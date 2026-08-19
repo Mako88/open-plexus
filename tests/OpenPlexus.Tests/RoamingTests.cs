@@ -223,8 +223,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// are one set are one moment to every commitment there could be.
     /// </para>
     /// <para>
-    /// <b>So a high present with a low pinned is the selection problem, which is where every
-    /// arm on this branch has already been.</b> The bag holds every room word in the house
+    /// <b>So a high present with a low pinned is the selection problem.</b> Which is where every
+    /// arm on this branch has already been. The bag holds every room word in the house
     /// after a long walk, so it is 1.000 present and near nought pinned — the answer is
     /// there and nothing says which it is. An arm that raises PINNED is doing the thing a
     /// situation model is for.

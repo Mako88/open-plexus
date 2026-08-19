@@ -32,6 +32,35 @@ public enum Surprising
     Unaccounted,
 }
 
+/// <summary>How wide a scope genesis is allowed to mint.</summary>
+/// <remarks>
+/// <para>
+/// <b>Two rules that both do something</b>, exactly as <see cref="Surprising"/> is. A boolean
+/// would put the arm in the code forever as a way of not minting properly.
+/// </para>
+/// <para>
+/// <b>John's, and the observation behind it is that a conjunction is currently DISCOVERED.</b>
+/// Genesis mints one code a commitment, so <i>this and that predict the other</i> is reachable
+/// only by narrowing a one-code rule after it has failed enough times to clear the repair
+/// floor — which is a price paid to find out something a told statement said outright. An
+/// assertion is not a guess: it hands over the scope and the claim together.
+/// </para>
+/// <para>
+/// <b>And the risk is named before the reading.</b> A whole-moment scope fires only where every
+/// one of its codes is present, so on a world whose moments never repeat it fires once and
+/// never again. It pays exactly where a later moment is a SUPERSET — a question naming what a
+/// statement named — and is dead weight everywhere else. Fork <b>63</b>.
+/// </para>
+/// </remarks>
+public enum Rooting
+{
+    /// <summary>One code a commitment, so a conjunction is only ever reached by repair.</summary>
+    Singly,
+
+    /// <summary>One code each, and the whole moment as one scope beside them.</summary>
+    Wholly,
+}
+
 /// <summary>Whether a commitment may vote before it has been tested.</summary>
 /// <remarks>
 /// <para>
@@ -592,6 +621,13 @@ public sealed record CommittingSettings
     /// </para>
     /// </remarks>
     public Surprising Surprising { get; init; } = Surprising.Unaccounted;
+
+    /// <summary>How wide a scope genesis may mint.</summary>
+    /// <remarks>
+    /// <b>Singly is the control and is every earlier reading.</b> See <see cref="Rooting"/> for
+    /// what the wide arm is for and where it is dead weight.
+    /// </remarks>
+    public Rooting Rooting { get; init; } = Rooting.Singly;
 
     /// <summary>How fast the local estimate forgets, in 0..1.</summary>
     /// <remarks>

@@ -303,7 +303,15 @@ public sealed class DocsTests
     // leaves it would have come out of are the ones printed by the length check, and every one
     // of them is already a sentence a clause short of unreadable -- so the words would have
     // been bought by losing content, which is the one thing a guard may never cost.
-    private const int Whole = 11_142;
+    //
+    // And 11,204 is the twentieth raise, sixty-two words for the second half of the same
+    // session. John's objection was that the repair floor's twenty misses look arbitrary, and
+    // it turned out not to be a threshold problem at all: genesis mints one code a commitment,
+    // so a conjunction a statement STATES is reachable only by narrowing a one-code rule after
+    // it has failed enough times. `Rooting` lets an assertion mint its whole scope, and the
+    // three leaves are that, the reading that it still does not reach one telling, and the
+    // fork that renumbered behind it.
+    private const int Whole = 11_204;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

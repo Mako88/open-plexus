@@ -33,6 +33,9 @@ internal static class Program
     private static int Main(string[] args)
     {
         var capacity = Number(args, "--capacity", 2000);
+        var rooting = Given(args, "--rooting") is { } wide
+            ? Enum.Parse<Rooting>(wide, ignoreCase: true)
+            : Rooting.Singly;
         var seed = Number(args, "--seed", 1);
         var rate = Fraction(args, "--asking", 0.25);
         var passes = Number(args, "--passes", 3);
@@ -58,7 +61,7 @@ internal static class Program
         if (lesson is not null && Given(args, "--told") == "no")
             lesson = lesson with { Statements = [] };
 
-        var brain = new Brain(new CommittingSettings { Capacity = capacity }, seed);
+        var brain = new Brain(new CommittingSettings { Capacity = capacity, Rooting = rooting }, seed);
 
         // The tutor owns the writer, because seeing the prompt is how it knows a reply is
         // wanted. A session with nobody scripted prints straight at the console.
@@ -87,7 +90,8 @@ internal static class Program
             $"talking, {rounds} rounds, capacity {capacity}, seed {seed}, asking "
             + $"{rate.ToString("F2", CultureInfo.InvariantCulture)} of the time, carrying "
             + $"{carrying.ToString().ToLowerInvariant()}, asserting "
-            + $"{asserting.ToString().ToLowerInvariant()}");
+            + $"{asserting.ToString().ToLowerInvariant()}, rooting "
+            + $"{rooting.ToString().ToLowerInvariant()}");
 
         if (lesson is null || tutor is null)
         {

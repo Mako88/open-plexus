@@ -188,9 +188,9 @@ public sealed class Winnow
     /// How many distinct sets of inputs a cell could possibly listen to.
     /// </summary>
     /// <remarks>
-    /// <b>Saturating rather than exact, because the honest answer for a real
+    /// <b>Saturating rather than exact.</b> The honest answer for a real
     /// sense overflows and the question is only ever "is it bigger than the
-    /// sheet".</b> C(50, 6) is about sixteen million and C(1000, 6) is past
+    /// sheet". C(50, 6) is about sixteen million and C(1000, 6) is past
     /// anything a <see cref="long"/> holds, so the multiplication stops as soon as
     /// it passes what any caller could ask for.
     /// </remarks>

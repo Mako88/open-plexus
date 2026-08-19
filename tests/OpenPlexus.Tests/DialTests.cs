@@ -85,6 +85,14 @@ public sealed class DialTests
     /// </summary>
     private static readonly Dictionary<string, string> HandSet = new(StringComparer.Ordinal)
     {
+        ["Rooting"] =
+            "how wide a scope genesis may mint, and it is an ARM rather than a "
+            + "level -- there is no third value between one code and the whole "
+            + "moment. `LessonTests` runs both against each other on the "
+            + "conversation and the wide one wins there; nothing has put it to a "
+            + "generated world yet, and until something does, a controller would be "
+            + "choosing between two arms on one world's evidence",
+
         // ---- Arrived with the commitment branch ----------------------------
 
         ["Recency"] =
@@ -556,7 +564,13 @@ public sealed class DialTests
         // than with a subsystem it happened to be attached to. `Owed` is empty behind it,
         // which is the first time nothing in the tree ships in a position that does
         // nothing.
-        Assert.Equal(14, HandSet.Count);
+        //
+        // And to fifteen for `Rooting`, which is a RISE and is written down as one. How wide a
+        // scope genesis may mint arrived as an arm rather than a level, with two values and
+        // nothing between them, and it has been run on one world. A controller chosen on one
+        // world's evidence is the fault this file exists for; the entry leaves when a generated
+        // world has put the two arms against each other.
+        Assert.Equal(15, HandSet.Count);
     }
 
     /// <summary>

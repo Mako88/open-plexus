@@ -33,12 +33,12 @@ internal static class Program
     private static int Main(string[] args)
     {
         var capacity = Number(args, "--capacity", 2000);
-        // The three arms that were measured to win on the conversation, shipped rather than
-        // left off. A statement withholds what it claims so a wide scope can fire on a question
-        // that names the same things; genesis mints that scope in one shot rather than finding
-        // it by failing; and a mint is credited with the round that made it, so a correct rule
-        // is believed without waiting to hear the same thing twice. No generated world has
-        // weighed in on any of them -- see `DialTests`.
+        // The three arms that were measured to win, shipped rather than left off, and all three
+        // are load-bearing: a statement claims every word in turn so that nothing has to pick
+        // one, genesis mints the whole remaining scope rather than finding it by failing, and a
+        // mint is credited with the round that made it so a correct rule is believed without
+        // hearing the sentence twice. Together they answer a lesson told ONCE; any two of them
+        // reach a fraction of it. No generated world has weighed in -- see `DialTests`.
         var rooting = Given(args, "--rooting") is { } wide
             ? Enum.Parse<Rooting>(wide, ignoreCase: true)
             : Rooting.Wholly;
@@ -61,7 +61,7 @@ internal static class Program
         // `--asking 1.0` where the reply is scripted and the settlements are the point.
         var asserting = Given(args, "--asserting") is { } claim
             ? Enum.Parse<Asserting>(claim, ignoreCase: true)
-            : Asserting.Withheld;
+            : Asserting.Everything;
         var lesson = Taught(args);
 
         // The control, and it is the only thing that says whether the telling taught anything.
@@ -93,7 +93,12 @@ internal static class Program
                 acting: felt => Speaking(curiosity.Choose(felt))),
             brain);
 
-        var rounds = tutor?.Moments ?? Number(args, "--rounds", 400);
+        // Budgeted for the widest statement, because `Asserting.Everything` makes a sentence
+        // one moment a word. A run stopping at the moment count would end before the
+        // examination; the spare rounds after the lesson go by empty and are reported.
+        var rounds = tutor is null
+            ? Number(args, "--rounds", 400)
+            : asserting is Asserting.Everything ? tutor.Moments * tutor.Longest : tutor.Moments;
 
         Console.WriteLine(
             $"talking, {rounds} rounds, capacity {capacity}, seed {seed}, asking "

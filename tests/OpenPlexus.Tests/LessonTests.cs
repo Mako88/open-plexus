@@ -56,8 +56,13 @@ public sealed class LessonTests(ITestOutputHelper output)
         var watching = new Watching<Recited>(
             world, front, acting: felt => Speaking(curiosity.Choose(felt)));
 
-        var tally = new Bench(watching, brain)
-            .Run(tutor.Moments, sweep: 200, target: 0.9, window: 50);
+        // Budgeted for the widest statement, because `Asserting.Everything` makes a sentence
+        // one moment a word. A run stopping at the moment count would end before the exam.
+        var rounds = asserting is Asserting.Everything
+            ? tutor.Moments * tutor.Longest
+            : tutor.Moments;
+
+        var tally = new Bench(watching, brain).Run(rounds, sweep: 200, target: 0.9, window: 50);
 
         return (tally, tutor, world);
     }
@@ -484,5 +489,80 @@ public sealed class LessonTests(ITestOutputHelper output)
         Assert.True(credited[1] <= bar,
             $"one telling read {credited[1]:F3}, so a fact now costs a single telling and this "
             + "reading has moved");
+    }
+
+    [Fact]
+    public void Told_once_and_never_examined_before_it_answers_every_question()
+    {
+        const int Seeds = 3;
+
+        // John's, and it is what the whole day was for: stating something once should be
+        // enough. Three mechanisms had to be in place and none of them is sufficient alone.
+        var lesson = Lesson.Creatures;
+        var untold = lesson with { Statements = [] };
+        var bar = new Tutor(lesson, TextWriter.Null).Marginal / (double)lesson.Exam.Count;
+
+        output.WriteLine($"{Seeds} seeds, told ONCE, one examination pass, marginal {bar:F3}");
+        output.WriteLine($"{"rooting",-10}{"crediting",-12}{"right",8}{"resident",10}");
+
+        var reached = new Dictionary<(Rooting, Crediting), double>();
+
+        foreach (var rooting in new[] { Rooting.Singly, Rooting.Wholly })
+        {
+            foreach (var crediting in new[] { Crediting.Nothing, Crediting.Birth })
+            {
+                var right = new List<double>();
+                var resident = new List<double>();
+
+                for (var seed = 1; seed <= Seeds; seed++)
+                {
+                    var one = Ran(
+                        lesson, Carrying.Never, seed, passes: 1,
+                        asserting: Asserting.Everything, tellings: 1, rooting: rooting,
+                        crediting: crediting);
+
+                    right.Add(Right(one.Tutor, 0));
+                    resident.Add(one.Tally.Resident);
+                }
+
+                reached[(rooting, crediting)] = right.Average();
+
+                output.WriteLine(
+                    $"{rooting.ToString().ToLowerInvariant(),-10}"
+                    + $"{crediting.ToString().ToLowerInvariant(),-12}{right.Average(),8:F3}"
+                    + $"{resident.Average(),10:F1}");
+            }
+        }
+
+        var without = new List<double>();
+
+        for (var seed = 1; seed <= Seeds; seed++)
+            without.Add(Right(
+                Ran(untold, Carrying.Never, seed, passes: 1, asserting: Asserting.Everything,
+                    tellings: 1, rooting: Rooting.Wholly, crediting: Crediting.Birth).Tutor,
+                0));
+
+        output.WriteLine($"nothing told at all: {without.Average():F3}");
+
+        // Told once, it answers all twelve on an examination it has never sat.
+        Assert.True(reached[(Rooting.Wholly, Crediting.Birth)] > 0.9,
+            $"told once it reached {reached[(Rooting.Wholly, Crediting.Birth)]:F3}");
+
+        // And with the statements DELETED it answers none, which is what says the telling did
+        // it. The same run sees the identical questions.
+        Assert.True(without.Average() <= bar,
+            $"the untold arm reached {without.Average():F3} with no statements at all");
+
+        // Every one of the three is load-bearing, and this is the table that says so. Claiming
+        // every word in turn removes the need to pick one; minting the whole scope states the
+        // conjunction instead of finding it by failing; crediting the minting round lets a
+        // correct rule be believed without hearing the sentence twice. Any two of them reach a
+        // fraction of what three do.
+        Assert.True(reached[(Rooting.Singly, Crediting.Birth)] < 0.9,
+            "one-code mints alone reach one telling, so minting the whole scope is not needed "
+            + "and the wide arm should go");
+
+        Assert.True(reached[(Rooting.Wholly, Crediting.Nothing)] <= bar,
+            "a blank record reaches one telling, so crediting is not needed and it should go");
     }
 }

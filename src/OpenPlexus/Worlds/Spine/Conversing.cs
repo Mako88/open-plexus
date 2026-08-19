@@ -112,6 +112,24 @@ public enum Asserting
     /// </remarks>
     Nothing,
 
+    /// <summary>Every word in turn, each its own moment with that word left out.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>John's one-shot, and the honest answer to which word a statement claims.</b> Every
+    /// other arm here picks one, and picking needs a count the conversation has not got on
+    /// first hearing — every word of a sentence said once has been said once, so the tie goes
+    /// to whichever came first and the statement claims its opening word. Not picking removes
+    /// the question rather than answering it.
+    /// </para>
+    /// <para>
+    /// <b>A statement becomes as many moments as it has words</b>, which is the cost and is
+    /// bounded by the sentence. The human still said it once; the machine does more with it.
+    /// A moment carries one outcome, so claiming several means several moments and not a
+    /// set — that is a separate question and it is open.
+    /// </para>
+    /// </remarks>
+    Everything,
+
     /// <summary>Its rarest word so far, left out of the moment as well as claimed.</summary>
     /// <remarks>
     /// <para>
@@ -206,6 +224,10 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     // What is left of the last typed line. A line may hold several sentences and each is its
     // own moment, so the reading of a line and the pushing of a moment are not one call.
     private readonly Queue<string> _sentences = new();
+
+    // The statement now being expanded, as the words and which of them each moment claims.
+    // `Everything` makes a sentence several moments, and a moment carries one outcome.
+    private readonly Queue<(IReadOnlyList<string> Words, int Claim)> _claims = new();
 
     private Recited? _pending;
     private int? _settled;
@@ -626,6 +648,19 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
                 continue;
             }
 
+            // A statement mid-expansion, where one sentence is several moments. Its words were
+            // heard and counted when the sentence arrived, so only the claim moves here.
+            if (_claims.Count > 0)
+            {
+                var (said, at) = _claims.Dequeue();
+
+                _asserted = _index[said[at]];
+
+                return Moment(
+                    Said([.. said.Where((_, where) => where != at)]), asking: false,
+                    coded: null);
+            }
+
             var one = _sentences.Dequeue();
             var words = Babi.Words(one);
 
@@ -636,12 +671,20 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
             var coded = Said(words);
             var asking = one.EndsWith('?');
 
-
             if (!asking)
             {
                 _said.Add(coded);
 
                 foreach (var word in words) _often[word] = _often.GetValueOrDefault(word) + 1;
+
+                // Every word in turn, which is one moment each and no word picked at all.
+                if (_settings.Asserting is Asserting.Everything && words.Count > 1)
+                {
+                    for (var where = 0; where < words.Count; where++)
+                        _claims.Enqueue((words, where));
+
+                    continue;
+                }
 
                 var claim = _settings.Asserting is Asserting.Nothing ? null : Claimed(words);
 
@@ -653,19 +696,31 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
                     coded = Said([.. words.Where((_, where) => where != drop)]);
             }
 
-            var before = new List<IReadOnlyList<Code>>();
-
-            // The topic so far where this arm hands it over, and the sentence alone where it
-            // does not. `_said` accumulates either way, so the arms differ in what a moment
-            // holds and in nothing else -- a world that stopped accumulating would be two
-            // worlds wearing one name.
-            if (Carries(asking))
-                for (var back = _said.Count - 1; back >= 0; back--) before.Add(_said[back]);
-            else if (!asking)
-                before.Add(coded);
-
-            return new Recited { Said = before, Asked = asking ? coded : [] };
+            return Moment(coded, asking, coded);
         }
+    }
+
+    /// <summary>One sentence's codes as a moment, with whatever the arm carries beside it.</summary>
+    /// <param name="sentence">The words of this moment.</param>
+    /// <param name="asking">Whether it is a question.</param>
+    /// <param name="coded">
+    /// The whole sentence as told, or nothing where this moment is one of several from it.
+    /// </param>
+    /// <remarks>
+    /// <b>`_said` accumulates whatever the arm carries</b>, so the carrying arms differ in what
+    /// a moment holds and in nothing else. A world that stopped accumulating would be two
+    /// worlds wearing one name.
+    /// </remarks>
+    private Recited Moment(IReadOnlyList<Code> sentence, bool asking, IReadOnlyList<Code>? coded)
+    {
+        var before = new List<IReadOnlyList<Code>>();
+
+        if (Carries(asking))
+            for (var back = _said.Count - 1; back >= 0; back--) before.Add(_said[back]);
+        else if (!asking)
+            before.Add(sentence);
+
+        return new Recited { Said = before, Asked = asking ? coded ?? sentence : [] };
     }
 
     /// <summary>Whether this moment is handed the topic in front of it.</summary>

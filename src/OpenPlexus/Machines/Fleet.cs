@@ -27,8 +27,8 @@ namespace OpenPlexus.Machines;
 /// nothing at all.
 /// </para>
 /// <para>
-/// <b>It waits for everyone still owed, and what is owed comes down — fork 53, and the
-/// signal is not a clock.</b> A holder the question could not be handed to is written off by
+/// <b>It waits for everyone still owed.</b> And what is owed comes down — fork 53, and the
+/// signal is not a clock. A holder the question could not be handed to is written off by
 /// <see cref="Gathering.WriteOff"/>, so a fleet that has lost a machine finishes its rounds
 /// on the arrivals it can still expect rather than stopping here forever. What a deadline
 /// would have guessed at is instead observed: the sender watched the ask fail to leave, and

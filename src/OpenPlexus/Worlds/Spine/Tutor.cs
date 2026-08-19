@@ -258,6 +258,16 @@ public sealed class Tutor : TextReader
     /// <summary>Where a session should print, so that a prompt can be seen.</summary>
     public TextWriter Printed => _printed;
 
+    /// <summary>The most words any one statement has.</summary>
+    /// <remarks>
+    /// <b>What a run has to budget for where a statement is several moments.</b>
+    /// <see cref="Asserting.Everything"/> makes a sentence one moment a word, so a round count
+    /// taken off <see cref="Moments"/> alone would stop the run before the examination.
+    /// </remarks>
+    public int Longest => _lesson.Statements.Count == 0
+        ? 1
+        : _lesson.Statements.Max(one => Math.Max(1, Babi.Words(one).Count));
+
     /// <summary>How many moments the whole lesson is, which is how long a run has to be.</summary>
     public int Moments =>
         (_lesson.Statements.Count * _tellings) + (_lesson.Revisions.Count * _revising)

@@ -583,8 +583,10 @@ before six that reads as tuning is out of order.
       discovered by failing, and a fact costs fewer tellings. John's. `Rooting`.
     - **NOW** — a mint is CREDITED with the round that made it, being right about it by
       construction, and a correct rule is then believed a telling sooner. `Crediting`.
-    - **OPEN** — one telling still fails, and now on the CLAIM. The rarest word so far is a tie
-      on first hearing, so a statement claims its first word. Fork **121**, and **123** is it.
+    - **NOW** — a statement claims EVERY word in turn, one moment each, so nothing picks one.
+      Told once, it answers an exam never sat. John's. Forks **121** and **123**.
+    - **OPEN** — claiming, width and crediting are all load-bearing and unweighed on any
+      generated world. Fork **124**.
     - **OPEN** — rarest is one split of a statement into scope and claim, and the brain does not
       choose it. What picks the claim with no experimenter. Fork **123**.
     - **NOW** — a contradicted belief is REPLACED by being outvoted rather than retracted, far

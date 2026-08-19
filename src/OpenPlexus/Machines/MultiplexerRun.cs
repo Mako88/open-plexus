@@ -51,8 +51,8 @@ public sealed record Learned
     /// number tells them apart.
     /// </para>
     /// <para>
-    /// <b>Nothing where it was not asked for, because it is the most expensive reading here
-    /// and it timed a CI shard out.</b> One soundness check enumerates every assignment the
+    /// <b>Nothing where it was not asked for.</b> Because it is the most expensive reading here
+    /// and it timed a CI shard out. One soundness check enumerates every assignment the
     /// scope leaves open — up to <c>2^Widest</c> — and this asks one per code of every sound
     /// rule, each with one MORE bit free than the check it came from. On a wide world that is
     /// hundreds of millions of assignments per graded run, and it is charged once per run

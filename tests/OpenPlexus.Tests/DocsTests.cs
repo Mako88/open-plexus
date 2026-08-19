@@ -316,7 +316,12 @@ public sealed class DocsTests
     // of chasing one-shot learning to its actual blocker. Crediting a mint with the round that
     // made it is one; the other says one telling still fails, and it fails on the CLAIM rather
     // than on the vote or the gate -- the rarest word so far is a tie on first hearing.
-    private const int Whole = 11_236;
+    //
+    // And 11,248 is the twenty-second raise, twelve words for the leaf that closes John's
+    // one-shot question and the one that says what is still unweighed behind it. A statement
+    // claims every word in turn rather than picking one, and told once it answers an exam it
+    // has never sat.
+    private const int Whole = 11_248;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

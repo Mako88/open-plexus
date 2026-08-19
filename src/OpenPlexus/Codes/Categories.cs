@@ -6,8 +6,8 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The two vocabularies are the same shape and the opposite entailment, which is why
-/// this is a type and not a list.</b> A minted name means every member is present, so it
+/// <b>The two vocabularies are the same shape and the opposite entailment.</b> Which is why
+/// this is a type and not a list. A minted name means every member is present, so it
 /// enters a moment when they all are and a scope may be rewritten over it with the record
 /// carried. A category means ANY member is present, so it enters a moment when one is — and
 /// a scope rewritten over it CLAIMS MORE THAN IT DID. Everything fork 85 says follows from

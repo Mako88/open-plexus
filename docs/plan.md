@@ -386,8 +386,8 @@ before six that reads as tuning is out of order.
     - **SETTLED** — rung three reads real English, and its gain tracks the front end's
       SELECTIVITY rather than the task: largest under `Chained`, nil under a bag. Fork **109**.
     - **OPEN** — rung three is blind on a word said TWICE, `Order` dropping what it cannot place
-      once. A thing that MOVES repeats the room it returns to, so order is blind on the one word
-      that says where it is. Placing a repeat at its LATEST is the arm. Fork **119**.
+      once, so a thing that MOVES is not tracked. Placing a repeat at its LATEST removes the
+      collapse on a conversation and owes every text world a baseline. Fork **119**.
     - **OPEN** — a referent is a THIRD store rather than the same one: *Mary's bedroom*
       survives leaving the room and *Mary is in the bedroom* does not, so one store gets one
       lifetime wrong whichever it takes.

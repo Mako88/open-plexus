@@ -135,8 +135,61 @@ public sealed class ConversingTests(ITestOutputHelper output)
         private int _moved;
     }
 
+    /// <summary>
+    /// The same front end, placing a repeated word at its LATEST mention rather than dropping it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Fork 119's arm, taken here before it is taken anywhere</b>. <c>Joined.Order</c> drops
+    /// every word it placed twice, which is correct — a word in two statements has no one
+    /// position — and is why order is blind on the room a moving thing returns to. Keeping the
+    /// last mention says <i>where it is now</i>, which is the question being asked.
+    /// </para>
+    /// <para>
+    /// <b>A wrapper rather than a dial, and that is deliberate</b>. <c>Joined</c> is shared by
+    /// every text world, so a dial on it moves <c>Recalled</c>, <c>Roaming</c> and
+    /// <c>Handing</c> at once and owes them all a baseline. This is the cheap reading first: if
+    /// the arm cannot win where the effect must be largest, nothing else needs disturbing.
+    /// </para>
+    /// <para>
+    /// <b>And it places every word, function words included</b>, which the dropping rule was
+    /// also getting for free. That is the one change and it is not free — <c>Sequenced</c>
+    /// already refuses a code preceding itself, so the guard for it was written before the arm
+    /// was.
+    /// </para>
+    /// </remarks>
+    private sealed class Freshest(Joined through) : IQuantizer<Recited>
+    {
+        public byte Modality => through.Modality;
+
+        public IReadOnlyCollection<Code> Codify(Recited observation) => through.Codify(observation);
+
+        public IReadOnlySet<Code>? Fleeting(Recited observation) =>
+            ((IQuantizer<Recited>)through).Fleeting(observation);
+
+        public IReadOnlySet<Code>? Forced(Recited observation) => through.Forced(observation);
+
+        public IReadOnlyDictionary<Code, int>? Bind(Recited observation) =>
+            ((IQuantizer<Recited>)through).Bind(observation);
+
+        public IReadOnlyDictionary<Code, int>? Order(Recited observation)
+        {
+            var placed = new Dictionary<Code, int>();
+            var at = 0;
+
+            // `Said` is newest first, so this walks it backwards to go oldest first and lets the
+            // last write win. Every word therefore holds the position of its LAST mention.
+            for (var one = observation.Said.Count - 1; one >= 0; one--)
+                foreach (var word in observation.Said[one])
+                    placed[word] = at++;
+
+            return placed.Count > 1 ? placed : null;
+        }
+    }
+
     private static (Conversing World, Bench Bench, Brain Brain, Curiosity Asking, Human Typing)
-        Made(double rate, int exchanges, int seed = 1, int capacity = 2000, int moves = 1)
+        Made(double rate, int exchanges, int seed = 1, int capacity = 2000, int moves = 1,
+            bool freshest = false)
     {
         var printed = new StringBuilder();
         var typing = new Human(printed, exchanges, seed, moves);
@@ -150,10 +203,12 @@ public sealed class ConversingTests(ITestOutputHelper output)
 
         var asking = new Curiosity(brain, rate, seed, world.Naming);
 
+        var joined = new Joined(Joining.Bagged);
+
         var bench = new Bench(
             new Watching<Recited>(
                 world,
-                new Joined(Joining.Bagged),
+                freshest ? new Freshest(joined) : joined,
                 acting: felt => Speaking(asking.Choose(felt))),
             brain);
 
@@ -354,12 +409,14 @@ public sealed class ConversingTests(ITestOutputHelper output)
 
         output.WriteLine($"{Seeds} seeds, {Exchanges} exchanges each, asking at the ceiling");
         output.WriteLine(
-            $"{"moves",-7}{"told",14}{"right",8}{"blind",8}{"resident",10}{"minted",9}"
-            + $"{"wanting",9}");
+            $"{"moves",-7}{"placing",-8}{"told",14}{"right",8}{"blind",8}{"resident",10}"
+            + $"{"minted",9}{"wanting",9}");
 
-        var right = new List<double>();
+        var right = new Dictionary<(int Moves, bool Freshest), double>();
+        var held = new Dictionary<(int Moves, bool Freshest), double>();
 
-        foreach (var move in moves)
+        foreach (var (move, freshest) in moves.SelectMany(
+            one => new[] { (one, false), (one, true) }))
         {
             var sure = new List<double>();
             var told = new List<double>();
@@ -370,7 +427,7 @@ public sealed class ConversingTests(ITestOutputHelper output)
 
             for (var seed = 1; seed <= Seeds; seed++)
             {
-                var made = Made(rate: 1.0, Exchanges, seed, moves: move);
+                var made = Made(rate: 1.0, Exchanges, seed, moves: move, freshest: freshest);
                 var tally = made.Bench.Run(Exchanges * 2, sweep: 200, target: 0.9, window: 50);
 
                 told.Add(made.World.Told);
@@ -383,19 +440,37 @@ public sealed class ConversingTests(ITestOutputHelper output)
                 wanting.Add(tally.Wanting);
             }
 
-            right.Add(sure.Average());
+            right[(move, freshest)] = sure.Average();
+            held[(move, freshest)] = resident.Average();
 
             output.WriteLine(
-                $"{move,-7}{Spread(told),14}{sure.Average(),8:F3}{blind.Average(),8:F0}"
-                + $"{resident.Average(),10:F1}{minted.Average(),9:F1}{wanting.Average(),9:F3}");
+                $"{move,-7}{(freshest ? "latest" : "once"),-8}{Spread(told),14}"
+                + $"{sure.Average(),8:F3}{blind.Average(),8:F0}{resident.Average(),10:F1}"
+                + $"{minted.Average(),9:F1}{wanting.Average(),9:F3}");
         }
 
-        // Every arm answers something, which is the only thing asserted. What a move costs is
-        // read off the column rather than pinned to a threshold nobody has measured yet, and a
-        // prediction written into a wiring check fails two ways and reads the same.
-        Assert.All(right, one => Assert.InRange(one, 0.0, 1.0));
-        Assert.True(right[0] > 0.5,
-            $"the standing case scored {right[0]:F3}, so the comparison has no floor under it");
+        // The control, and it is what makes the rest of the column readable. At one move
+        // nothing is ever said twice, so the two placings have nothing to differ about and
+        // must not -- `Joining.Bagged` reads every statement, which is exactly what the
+        // wrapper reads, so the arm changes the treatment of a repeat and nothing else. Any
+        // gap here is a second change nobody declared.
+        Assert.Equal(right[(1, false)], right[(1, true)], 6);
+        Assert.Equal(held[(1, false)], held[(1, true)], 6);
+
+        // And a standing thing is tracked, so the comparison has a floor under it.
+        Assert.True(right[(1, false)] > 0.5,
+            $"the standing case scored {right[(1, false)]:F3}");
+
+        // Dropping a repeat collapses on a thing that moves and keeping the last mention does
+        // not. The margin asserted is far inside the measured gap, which is what stops this
+        // being a threshold written before the first run.
+        Assert.True(right[(8, false)] < 0.6,
+            $"dropping a repeat scored {right[(8, false)]:F3} over eight moves, so the thing "
+            + "this arm exists to fix has stopped happening");
+
+        Assert.True(right[(8, true)] > right[(8, false)] + 0.2,
+            $"keeping the last mention scored {right[(8, true)]:F3} against "
+            + $"{right[(8, false)]:F3} — the arm has stopped paying");
     }
 
     [Fact]

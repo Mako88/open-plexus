@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -143,12 +143,12 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     /// held with these actions, so a learner's number is read against something rather
     /// than against nothing.
     /// </remarks>
-    private static Func<IReadOnlyCollection<Code>, int?> Aimed(Homeostat body) =>
-        _ => body.Lowest;
+    private static IChooses Aimed(Homeostat body) =>
+        Chooses.From(_ => body.Lowest);
 
     /// <summary>A variable drawn uniformly, knowing nothing.</summary>
-    private static Func<IReadOnlyCollection<Code>, int?> Blindly(Homeostat body, Random draw) =>
-        _ => draw.Next(body.Doings);
+    private static IChooses Blindly(Homeostat body, Random draw) =>
+        Chooses.From(_ => draw.Next(body.Doings));
 
     /// <summary>
     /// <b>How much this body wants an outcome</b>, read off what it feels and nothing else.
@@ -196,14 +196,14 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     /// <param name="choosing">What to do about each state.</param>
     /// <param name="steps">How many turns.</param>
     private static double Held(
-        Homeostat body, Func<IReadOnlyCollection<Code>, int?> choosing, int steps)
+        Homeostat body, IChooses choosing, int steps)
     {
         var front = new Bodied(Feeling.Acted);
         var viable = 0;
 
         for (var step = 0; step < steps; step++)
         {
-            body.Do(choosing(front.Codify(body.Now)));
+            body.Do(choosing.Choose(front.Codify(body.Now)));
             body.Next();
 
             if (body.Viable) viable++;
@@ -278,7 +278,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
 
         var byAim = Held(aimed, Aimed(aimed), Steps);
         var byLuck = Held(blind, Blindly(blind, new Random(1)), Steps);
-        var byNothing = Held(idle, _ => null, Steps);
+        var byNothing = Held(idle, Chooses.From(_ => null), Steps);
 
         output.WriteLine(
             $"viable | aimed {byAim:F3} | uniform {byLuck:F3} | idle {byNothing:F3} "
@@ -373,7 +373,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         // learner because it does not settle anything, so a `Drives` inside it would read an
         // empty population every round and BE its own fallback.
         double Regulated(
-            string arm, Func<Homeostat, Brain, Func<IReadOnlyCollection<Code>, int?>> choosing)
+            string arm, Func<Homeostat, Brain, IChooses> choosing)
         {
             var body = new Homeostat(World());
             var brain = new Brain(new CommittingSettings { Capacity = 2000 }, 1);
@@ -386,7 +386,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
                 new Watching<Bodily>(
                     body,
                     new Bodied(Feeling.Acted),
-                    acting: felt =>
+                    acting: Chooses.From(felt =>
                     {
                         // Sampled before the step, and identically for every arm. Which side
                         // of the action it is read on shifts all three together, so the
@@ -394,8 +394,8 @@ public sealed class HomeostatTests(ITestOutputHelper output)
                         steps++;
                         if (body.Viable) viable++;
 
-                        return chosen(felt);
-                    }),
+                        return chosen.Choose(felt);
+                    })),
                 brain);
 
             var tally = trial.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000);
@@ -417,7 +417,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
                 Wants,
                 () => draw.Next(body.Doings));
 
-            return spent.Choose;
+            return Chooses.From(spent.Choose);
         });
 
         var byAim = Regulated("aimed", (body, _) => Aimed(body));
@@ -466,7 +466,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
                 new Watching<IReadOnlyList<int>>(
                     new Multiplexer(new MultiplexerSettings { Address = 2 }, 1),
                     new Bits(2 + 4),
-                    acting: _ => 0),
+                    acting: Chooses.From(_ => 0)),
                 brain));
     }
 

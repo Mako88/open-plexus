@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -58,6 +58,31 @@ public sealed class ConversingTests(ITestOutputHelper output)
         Props,
     }
 
+    /// <summary>What a person does with a guess that is wrong.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The generous half was the only half</b>, and it is the unusual one. Somebody who
+    /// answers <i>is it the kitchen</i> by saying <i>the garden</i> has dictated the answer, so
+    /// every wrong guess still settles the round and a machine that could ask again would have
+    /// nothing to ask again about. A person who says <i>no</i> is ordinary English and is what
+    /// the refusal path in <c>Conversing.Answering</c> was written for.
+    /// </para>
+    /// <para>
+    /// <b>It is an arm on the WORLD</b>, and it is harder rather than kinder. Under
+    /// <see cref="Refuses"/> the answer is never handed over, so the only route to a settlement
+    /// is naming it and being told yes — which is what makes a second doing worth anything and
+    /// is also why the score under it is lower for every arm.
+    /// </para>
+    /// </remarks>
+    private enum Replying
+    {
+        /// <summary>A wrong guess is answered with the answer.</summary>
+        Corrects,
+
+        /// <summary>A wrong guess is answered <i>no</i>, and the answer is never dictated.</summary>
+        Refuses,
+    }
+
     /// <summary>
     /// Somebody at a terminal, who answers a question about a question and shrugs at everything
     /// else.
@@ -70,7 +95,7 @@ public sealed class ConversingTests(ITestOutputHelper output)
     /// </remarks>
     private sealed class Human(
         StringBuilder printed, int exchanges, int seed, int moves = 1,
-        Telling telling = Telling.Alone)
+        Telling telling = Telling.Alone, Replying replying = Replying.Corrects)
         : TextReader
     {
         private readonly Random _draws = new(seed);
@@ -87,6 +112,14 @@ public sealed class ConversingTests(ITestOutputHelper output)
 
         /// <summary>How many times it corrected one.</summary>
         public int Corrected { get; private set; }
+
+        /// <summary>How many times it said <i>no</i> and nothing else.</summary>
+        /// <remarks>
+        /// <b>The rounds a one-doing machine gets nothing at all from</b>, which is what the
+        /// budget is read against. A refusal settles nothing, so under a budget of one these
+        /// are asks spent for no settlement whatever.
+        /// </remarks>
+        public int Refused { get; private set; }
 
         /// <summary>Questions put.</summary>
         public int Questions { get; private set; }
@@ -109,11 +142,11 @@ public sealed class ConversingTests(ITestOutputHelper output)
             var tail = whole[(whole.LastIndexOf('\n') + 1)..];
 
             return tail.StartsWith("  ? ", StringComparison.Ordinal)
-                ? Replying(tail[4..].Trim())
+                ? Answering(tail[4..].Trim())
                 : Saying();
         }
 
-        private string Replying(string guessed)
+        private string Answering(string guessed)
         {
             if (_answer is null)
             {
@@ -127,6 +160,13 @@ public sealed class ConversingTests(ITestOutputHelper output)
                 Confirmed++;
 
                 return "yes";
+            }
+
+            if (replying is Replying.Refuses)
+            {
+                Refused++;
+
+                return "no";
             }
 
             Corrected++;
@@ -351,16 +391,18 @@ public sealed class ConversingTests(ITestOutputHelper output)
     private static (Conversing World, Bench Bench, Brain Brain, Curiosity Asking, Human Typing)
         Made(double rate, int exchanges, int seed = 1, int capacity = 2000, int moves = 1,
             Placing placing = Placing.Once, bool wrapped = false,
-            Telling telling = Telling.Alone)
+            Telling telling = Telling.Alone, Replying replying = Replying.Corrects,
+            int budget = 3)
     {
         var printed = new StringBuilder();
-        var typing = new Human(printed, exchanges, seed, moves, telling);
+        var typing = new Human(printed, exchanges, seed, moves, telling, replying);
         var brain = new Brain(new CommittingSettings { Capacity = capacity }, seed);
 
         var world = new Conversing(new ConversingSettings
         {
             Typed = typing,
             Printed = new StringWriter(printed),
+            Budget = budget,
         });
 
         var asking = new Curiosity(brain, rate, seed, world.Naming);
@@ -371,7 +413,8 @@ public sealed class ConversingTests(ITestOutputHelper output)
             new Watching<Recited>(
                 world,
                 wrapped ? new Placed(joined, placing) : joined,
-                acting: felt => Speaking(asking.Choose(felt))),
+                acting: Chooses.From(
+                    felt => Speaking(asking.Choose(felt)), asking.Cleared)),
             brain);
 
         return (world, bench, brain, asking, typing);
@@ -733,6 +776,98 @@ public sealed class ConversingTests(ITestOutputHelper output)
     }
 
     /// <summary>The standard error of a mean.</summary>
+    /// <summary>
+    /// What a second doing about one moment buys, against the human who refuses and the one who
+    /// dictates.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The arm is the budget and the world is the reply</b>, and the second axis is here
+    /// because the first is inert without it. A human who answers every wrong guess by saying
+    /// the answer settles the round on the first ask however large the budget, so the whole of
+    /// what asking again can buy is bounded by how often the machine is told <i>no</i>.
+    /// </para>
+    /// <para>
+    /// <b>Settlements per exchange rather than per ask</b>, because the budget changes the ask
+    /// count and a rate over asks would move for that reason alone. What is being asked is how
+    /// much the machine got out of a conversation of a fixed length, and the human typed the
+    /// same number of lines in every cell.
+    /// </para>
+    /// <para>
+    /// <b>The kill line, written before the grid ran</b>: three doings that do not obtain more
+    /// settlements per exchange than one, under the human who refuses, means asking again
+    /// reaches nothing and the loop is machinery with no effect.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Asking_again_after_a_refusal_is_what_a_second_doing_buys()
+    {
+        const int Exchanges = 300;
+
+        var settled = new Dictionary<(Replying, int), (double Gain, double Error)>();
+
+        output.WriteLine("8 seeds, 300 exchanges each, asking at the ceiling");
+        output.WriteLine(
+            "reply     budget       asked          settled        per exchange  refused");
+
+        foreach (var replying in new[] { Replying.Corrects, Replying.Refuses })
+        {
+            foreach (var budget in new[] { 1, 2, 3, 5 })
+            {
+                var asked = new List<double>();
+                var got = new List<double>();
+                var each = new List<double>();
+                var refused = new List<double>();
+
+                for (var seed = 1; seed <= 8; seed++)
+                {
+                    var made = Made(
+                        rate: 1.0, Exchanges, seed, replying: replying, budget: budget);
+
+                    made.Bench.Run(Exchanges * 2, sweep: 200, target: 0.9, window: 50);
+
+                    asked.Add(made.World.Asked);
+
+                    // Confirmations and shrugs alike, because both settle a round and a machine
+                    // told that nobody knew has learnt where not to ask. What is NOT counted is
+                    // a refusal, which settles nothing by design.
+                    got.Add(made.World.Told + made.World.Shrugged);
+                    each.Add((made.World.Told + made.World.Shrugged) / (double)Exchanges);
+                    refused.Add(made.Typing.Refused);
+                }
+
+                settled[(replying, budget)] = (each.Average(), Deviation(each));
+
+                output.WriteLine(
+                    $"{replying,-10}{budget,-6}{Error(asked),16}{Error(got),16}"
+                    + $"{Error(each),16}{refused.Average(),8:F0}");
+            }
+        }
+
+        // The control, and it is the half that says the mechanism is bounded rather than free.
+        // Where every wrong guess is answered, the round settles on the first ask and any
+        // budget above one spends nothing -- so every cell of that row must be the SAME
+        // reading, not merely close. Anything else means the loop ran where nothing refused it.
+        foreach (var budget in new[] { 2, 3, 5 })
+            Assert.Equal(
+                settled[(Replying.Corrects, 1)].Gain, settled[(Replying.Corrects, budget)].Gain,
+                precision: 10);
+
+        // And where the answer is never dictated, asking again is the only route to a
+        // settlement the first ask did not reach.
+        var (one, oneError) = settled[(Replying.Refuses, 1)];
+        var (three, threeError) = settled[(Replying.Refuses, 3)];
+
+        var gap = three - one;
+        var error = Math.Sqrt((oneError * oneError) + (threeError * threeError));
+
+        Assert.True(gap - (3.0 * error) > 0.0,
+            $"under a human who refuses, three doings settled {three:F3} of the exchanges "
+            + $"against {one:F3} for one, a gap of {gap:F3} ±{error:F3} -- inside three "
+            + "standard errors. Asking again reaches nothing, so the loop is machinery with "
+            + "no effect and the budget goes back to one with a revival row");
+    }
+
     private static double Deviation(IReadOnlyCollection<double> of)
     {
         if (of.Count < 2) return 0.0;

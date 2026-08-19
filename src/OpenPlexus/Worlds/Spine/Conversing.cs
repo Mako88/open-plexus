@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
 
@@ -30,6 +30,27 @@ public sealed record ConversingSettings
     /// and no repair, so telling one moves no counter at all.
     /// </remarks>
     public Asserting Asserting { get; init; } = Asserting.Nothing;
+
+    /// <summary>How many doings this world will take about one moment.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>An arm, and the reason it is more than one</b>. A machine that speaks once about a
+    /// moment cannot ask, be refused, and ask again, so a refusal costs it nothing and every
+    /// reading of whether asking pays was taken on a machine that got one go.
+    /// </para>
+    /// <para>
+    /// <b>Three because the gain saturates there</b>, and <c>ConversingTests</c> holds the
+    /// grid. Against a human who never dictates an answer, one doing settles 0.649 of the
+    /// exchanges and three settles 1.485; five reads 1.407, which is inside the spread of
+    /// three. Against a human who answers every wrong guess the four cells are identical to
+    /// the digit, because a settled round stops listening.
+    /// </para>
+    /// <para>
+    /// <b>A ceiling, so a quiet chooser is not made to fill it.</b> The machine stops where it
+    /// runs out of things to say, and what this decides is how long the human will sit there.
+    /// </para>
+    /// </remarks>
+    public int Budget { get; init; } = 3;
 
     /// <summary>Words the outcome alphabet starts with.</summary>
     /// <remarks>
@@ -240,25 +261,20 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     // How often each word has been said, which is what `Asserting.Rarest` reads. Counted as the
     // conversation goes, because a world cannot read ahead.
     private readonly Dictionary<string, int> _often = new(StringComparer.Ordinal);
-    private Spoke _did;
 
-    /// <summary>What the machine did with the last moment it was shown.</summary>
-    /// <remarks>
-    /// <b>Three states rather than a flag</b>, because staying quiet is a choice with a cost
-    /// here. A machine that never asks learns nothing and a machine that always asks is a
-    /// machine nobody will talk to twice.
-    /// </remarks>
-    private enum Spoke
-    {
-        /// <summary>Let the line go by.</summary>
-        Nothing,
+    // What the machine did about the moment on the table, as two facts rather than one state.
+    // A moment takes several doings, so it may claim AND ask, and an enum with one value at a
+    // time would have to pick which of the two happened.
+    private bool _claimed;
+    private bool _questioned;
 
-        /// <summary>Said a word out loud as a claim.</summary>
-        Claim,
-
-        /// <summary>Asked whether a word was the answer.</summary>
-        Question,
-    }
+    // How many doings this moment has taken, and whether it will take another at all. The
+    // count is the human's patience and the flag is everything that ends a moment early: a
+    // settlement, because the round carries one outcome and a second answer would be one
+    // obtained and thrown away, and a decline, because that is the machine saying it has
+    // nothing to say here.
+    private int _doings;
+    private bool _finished;
 
     /// <summary>The outcome meaning nobody knew.</summary>
     /// <remarks>
@@ -383,6 +399,24 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     /// </remarks>
     public int Doings => 2 * _vocabulary.Count;
 
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <para>
+    /// <b>While the round is unsettled and the human's patience holds</b>, which is the whole
+    /// of what a second doing is for. An ask that is refused settles nothing, so the machine
+    /// may name another word; an ask that is answered settles the round, and a moment carries
+    /// one outcome — so a third and fourth answer would be settlements obtained and thrown
+    /// away, which is worse than never having asked.
+    /// </para>
+    /// <para>
+    /// <b>So this is inert wherever nothing refuses.</b> A human who answers every wrong guess
+    /// by saying the answer settles the round on the first ask however large the budget, and
+    /// the reading is then the one-doing reading exactly. What the budget buys is bounded by
+    /// how often the machine is told <i>no</i> and nothing else.
+    /// </para>
+    /// </remarks>
+    public bool Listening => !_finished && _doings < _settings.Budget;
+
     /// <summary>Saying a word out loud as a claim.</summary>
     /// <param name="word">Where the word sits in <see cref="Vocabulary"/>.</param>
     public static int Asserts(int word)
@@ -425,16 +459,21 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     /// </remarks>
     public void Do(int? doing)
     {
-        _settled = null;
-        _did = Spoke.Nothing;
-
-        if (Ended) return;
+        if (Ended)
+        {
+            _finished = true;
+            return;
+        }
 
         if (doing is not { } chosen)
         {
             Quiet++;
+            _finished = true;
+
             return;
         }
+
+        _doings++;
 
         ArgumentOutOfRangeException.ThrowIfNegative(chosen, nameof(doing));
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(chosen, Doings, nameof(doing));
@@ -450,18 +489,24 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
             Declined++;
             Quiet++;
 
+            // Declining is the machine saying it has nothing to say about this moment, so it
+            // ends the moment rather than costing one of its doings. A machine that declined
+            // and then asked anyway would be spending a budget on a moment it had just
+            // written off.
+            _finished = true;
+
             return;
         }
 
         if (chosen % 2 == 0)
         {
-            _did = Spoke.Claim;
+            _claimed = true;
             _settings.Printed.WriteLine($"  . {word}");
 
             return;
         }
 
-        _did = Spoke.Question;
+        _questioned = true;
         Asked++;
 
         _settings.Printed.Write($"  ? {word} ");
@@ -482,13 +527,24 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
         if (told is null || string.Equals(told.Trim(), Over, StringComparison.Ordinal))
         {
             Ended = true;
+            _finished = true;
+
             return;
         }
 
-        _settled = Answering(told, word);
+        var answer = Answering(told, word);
 
-        if (_settled == Nothing) Shrugged++;
-        else if (_settled is not null) Told++;
+        if (answer == Nothing) Shrugged++;
+        else if (answer is not null) Told++;
+
+        // A reply that settled anything ends the moment, so the first settlement is the round's
+        // and there is never a second to choose between. Only a refusal leaves the moment open,
+        // which is exactly the case a second doing exists for: `no` says the answer is not this
+        // word and says nothing about what it is, so the machine may name another.
+        if (answer is null) return;
+
+        _settled = answer;
+        _finished = true;
     }
 
     /// <summary>What a reply to <c>? word</c> settles on.</summary>
@@ -609,16 +665,27 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
         _settled = null;
         _asserted = null;
 
-        var spoke = _did switch
-        {
-            Spoke.Claim => Said(["said"]),
-            Spoke.Question => Said(["asked"]),
-            _ => null,
-        };
+        // The moment's slate, cleared where the moment ends. `Do` may run several times about
+        // one of them and must not be the place this happens, which is how the first
+        // settlement stays the round's.
+        _doings = 0;
+        _finished = false;
 
-        _did = Spoke.Nothing;
+        // Both, where the moment got both. A machine that claimed and then asked has done two
+        // things and a moment saying only one of them would be the world reporting less than
+        // happened -- and which one it dropped would be this file's choice rather than the
+        // machine's.
+        var spoken = new List<string>(2);
 
-        if (spoke is null) return new Turn<Recited> { Seen = moment, Outcome = outcome };
+        if (_claimed) spoken.Add("said");
+        if (_questioned) spoken.Add("asked");
+
+        _claimed = false;
+        _questioned = false;
+
+        if (spoken.Count == 0) return new Turn<Recited> { Seen = moment, Outcome = outcome };
+
+        var spoke = Said(spoken);
 
         return new Turn<Recited>
         {

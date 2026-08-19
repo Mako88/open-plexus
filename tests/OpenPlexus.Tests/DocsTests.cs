@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 
 namespace OpenPlexus.Tests;
@@ -374,7 +374,15 @@ public sealed class DocsTests
     // statements so genesis can root, a carried story so a SELECTING front end has something
     // to walk. Nought on the implied half under every front end this repo has, and worse on
     // the stated half than carrying nothing.
-    private const int Whole = 11_703;
+    //
+    // And 11,806 is the thirty-second raise, a hundred and three words for a mechanism, the
+    // arm it revives, and one fork of John's. A moment now takes more than one doing: the world says
+    // whether it will take another and the chooser says whether it has more, so a machine can
+    // ask, be refused, and ask again. That is the revival row for recording a refusal, which
+    // was dropped because nothing avoided what it was refused and now something does. John's
+    // fork is an exam whose problem is unsolved and whose progress is partial, which is a way
+    // of measuring rather than another tier of tasks.
+    private const int Whole = 11_806;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

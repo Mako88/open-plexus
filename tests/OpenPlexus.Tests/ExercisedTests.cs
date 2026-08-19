@@ -141,7 +141,7 @@ public sealed class ExercisedTests
             new Watching<Recited>(
                 world,
                 noted,
-                acting: acting ? drives.Choose : _ => null),
+                acting: Chooses.From(acting ? drives.Choose : _ => null)),
             brain)
             .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
 

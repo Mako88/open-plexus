@@ -1,4 +1,4 @@
-# Where this is going
+﻿# Where this is going
 
 A different bet from `csharp`, on purpose. That branch counts co-occurrences and
 walks them. This one counts CONDITIONED ON A PREDICTION, so what is counted is
@@ -461,6 +461,9 @@ before six that reads as tuning is out of order.
     - **OPEN** — two English objectives read one corpus at wildly different rates, so no single
       capacity sizes both. Fork **101**.
     - **BLOCKED** — the exam tier above bAbI is unpriced until the components pass. Fork **90**.
+    - **OPEN** — a subject told once and then an UNSOLVED problem, scored by partial progress so
+      improvement has a scale rather than a pass mark. John's, and it is a measurement design
+      rather than a task list. Blocked behind rung four. Fork **128**.
     - **OPEN** — it is a near-perfect READER and a hopeless SELECTOR, a front end handing it
       the right statement answering a whole task at a twentieth of the bag's population.
       Selecting IS reading a commitment backwards, so fork **115** carries it.
@@ -502,6 +505,11 @@ before six that reads as tuning is out of order.
     - **NOW** — asking is a RATE and the signal is the POPULATION's, every chooser that read the
       vote having lost. What predicts whether a reply can settle is learnt from being wrong about
       it rather than chosen.
+    - **NOW** — more than one doing a moment, so the machine can ask, be refused, and ask again.
+      The world says whether it will take another and the chooser whether it has more, and where
+      nothing refuses it changes no reading.
+    - **OPEN** — recording a refusal, whose revival row now reads: a chooser exists that will not
+      repeat what it was refused. Fork **127**.
     - **OPEN** — a drive that cannot be sated is a fault in the design and not a risk to
       manage, so a term must have a point where it stops pulling. John's.
     - **NOW** — `Roaming` is acted in and declining leaves the walk the world drew, so the

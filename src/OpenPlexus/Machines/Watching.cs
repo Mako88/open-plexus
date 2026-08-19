@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Machines;
@@ -24,7 +24,7 @@ public sealed class Watching<TSeen> : IInput, IExamines
 {
     private readonly IWorld<TSeen> _world;
     private readonly IQuantizer<TSeen> _sensing;
-    private readonly Func<IReadOnlyCollection<Code>, int?>? _acting;
+    private readonly IChooses? _acting;
 
     private long _sequence;
 
@@ -37,9 +37,10 @@ public sealed class Watching<TSeen> : IInput, IExamines
     /// </param>
     /// <remarks>
     /// <para>
-    /// <b>A delegate rather than a policy type</b>, because a sense may not know which world
-    /// it is reading. A chooser that named <c>Homeostat</c> would put one world's vocabulary
-    /// in front of every other one.
+    /// <b>An interface that names no world</b>, because a sense may not know which world it
+    /// is reading. A chooser that named <c>Homeostat</c> would put one world's vocabulary in
+    /// front of every other one, and <see cref="Chooses.From"/> is there for the arms that
+    /// really are one expression.
     /// </para>
     /// <para>
     /// <b>An acted world with no chooser is refused</b> rather than left doing nothing, which
@@ -59,7 +60,7 @@ public sealed class Watching<TSeen> : IInput, IExamines
         IWorld<TSeen> world,
         IQuantizer<TSeen> sensing,
         byte source = Stamp.First,
-        Func<IReadOnlyCollection<Code>, int?>? acting = null)
+        IChooses? acting = null)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(sensing);
@@ -117,12 +118,7 @@ public sealed class Watching<TSeen> : IInput, IExamines
     /// </remarks>
     public Pushed? Push()
     {
-        // Chosen in the state the world is in, and spent by the step that follows. The
-        // chooser reads `Now` through the same front end the learner reads its moments
-        // through, so what it is allowed to see is exactly what the learner is allowed to
-        // see -- an oracle that read the world's own terms would be a fourth channel
-        // nobody declared.
-        if (_world is IActed<TSeen> acted) acted.Do(_acting!(Sensed(acted.Now)));
+        if (_world is IActed<TSeen> acted) Acting(acted);
 
         var turn = _world.Next();
 
@@ -138,6 +134,57 @@ public sealed class Watching<TSeen> : IInput, IExamines
             Fleeting = _sensing.Fleeting(turn.Seen),
             Followed = turn.Outcome is { } outcome ? Brain.Says(outcome) : null,
         };
+    }
+
+    /// <summary>Everything the chooser has to say about the moment the world is in.</summary>
+    /// <param name="acted">The world, in the state its next turn is the consequence of.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>For as long as both sides have something in it</b>, and one call was a real ceiling
+    /// rather than a simplification. A machine that speaks once about a moment cannot ask,
+    /// hear <i>no</i>, and ask again — so a refusal is worth nothing to it, and every reading
+    /// of whether asking pays was taken on a machine that got one go.
+    /// </para>
+    /// <para>
+    /// <b>Two conditions rather than a count, because the halves are different questions.</b>
+    /// The chooser says whether it has anything more to say and the world says whether hearing
+    /// it would change anything, and a loop that read only the first would collect answers a
+    /// settled round has nowhere to put. The first doing is never asked about: every world
+    /// takes one.
+    /// </para>
+    /// <para>
+    /// <b>The state is re-read every time round</b>, because a doing is allowed to change it.
+    /// Hoisting the reading out of the loop would show a chooser the world as it was before
+    /// its own last action, which is the state <see cref="IActed{TSeen}.Now"/> exists to
+    /// avoid handing anybody.
+    /// </para>
+    /// <para>
+    /// <b>And a quiet moment is still told to the world</b>, exactly once. A world counts the
+    /// rounds nothing was said about it, and a loop that simply broke would stop counting
+    /// them — so the one call that used to happen still happens where nothing was said, and
+    /// where something was the world has already heard it.
+    /// </para>
+    /// </remarks>
+    private void Acting(IActed<TSeen> acted)
+    {
+        var said = 0;
+
+        while (said == 0 || acted.Listening)
+        {
+            // The chooser reads `Now` through the same front end the learner reads its
+            // moments through, so what it is allowed to see is exactly what the learner is
+            // allowed to see -- an oracle that read the world's own terms would be a fourth
+            // channel nobody declared.
+            if (_acting!.Choose(Sensed(acted.Now)) is not { } doing) break;
+
+            acted.Do(doing);
+
+            said++;
+        }
+
+        if (said == 0) acted.Do(null);
+
+        _acting!.Cleared();
     }
 
     /// <summary>

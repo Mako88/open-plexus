@@ -1,4 +1,4 @@
-namespace OpenPlexus.Worlds;
+﻿namespace OpenPlexus.Worlds;
 
 /// <summary>One step of a world: what it showed, and what followed.</summary>
 /// <typeparam name="TSeen">Whatever this world natively produces.</typeparam>
@@ -116,6 +116,33 @@ public interface IActed<TSeen> : IWorld<TSeen>
     /// separately could be told it wrong.
     /// </remarks>
     int Doings { get; }
+
+    /// <summary>Whether this world will take ANOTHER doing about the moment it is on.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Every world takes at least one</b>, so this is only ever asked about the second. A
+    /// machine that speaks once about a moment cannot ask, hear <i>no</i>, and ask again — so
+    /// a refusal is worth nothing to it, and every reading of whether asking pays was taken on
+    /// a machine that got one go.
+    /// </para>
+    /// <para>
+    /// <b>The world's half rather than the chooser's</b>, and the two halves are different
+    /// questions. A chooser says whether it has anything more to say; this says whether
+    /// hearing it would change anything — and a world whose round has already settled would be
+    /// collecting answers it has nowhere to put.
+    /// </para>
+    /// <para>
+    /// <b>Nought extra doings is a perfectly good answer</b>, and it is what a world with a
+    /// clock gives. A body's variables fall whether or not it is attended to, so letting a
+    /// chooser tend three of them in the time one drop takes would be measuring a slower body.
+    /// </para>
+    /// <para>
+    /// <b>It must go false</b>, which is this interface asking to be trusted. A world that
+    /// never stops listening and a chooser that never runs out are a loop with no end in it,
+    /// and nothing outside can tell that from a world with a great deal to say.
+    /// </para>
+    /// </remarks>
+    bool Listening { get; }
 
     /// <summary>What is true now, before anything is done about it.</summary>
     /// <remarks>

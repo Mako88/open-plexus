@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -50,7 +50,8 @@ public sealed class LessonTests(ITestOutputHelper output)
         var front = new Joined(joining);
 
         var watching = new Watching<Recited>(
-            world, front, acting: felt => Speaking(curiosity.Choose(felt)));
+            world, front,
+            acting: Chooses.From(felt => Speaking(curiosity.Choose(felt)), curiosity.Cleared));
 
         // Budgeted for the widest statement, because `Asserting.Everything` makes a sentence
         // one moment a word. A run stopping at the moment count would end before the exam.
@@ -794,7 +795,8 @@ public sealed class LessonTests(ITestOutputHelper output)
         var curiosity = new Curiosity(brain, rate: 1.0, seed: 1, world.Naming);
 
         var watching = new Watching<Recited>(
-            world, new Joined(Joining.Bagged), acting: felt => Speaking(curiosity.Choose(felt)));
+            world, new Joined(Joining.Bagged),
+            acting: Chooses.From(felt => Speaking(curiosity.Choose(felt)), curiosity.Cleared));
 
         new Bench(watching, brain)
             .Run(tutor.Moments * tutor.Longest, sweep: 200, target: 0.9, window: 50);

@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
@@ -195,6 +195,16 @@ public sealed class Homeostat : IActed<Bodily>
     /// draws over acts and not over acts-plus-idling.
     /// </remarks>
     public int Doings => _settings.Needs;
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <b>Never, because a tick is one action</b> and the falling is the clock. Every variable
+    /// drops by the same amount whatever is done about it, so letting a chooser attend to
+    /// three of them in the time one drop takes would be handing it a body that falls slower
+    /// than the one measured — and the arm being read here is which variable to attend to
+    /// rather than how many.
+    /// </remarks>
+    public bool Listening => false;
 
     /// <inheritdoc/>
     /// <remarks>

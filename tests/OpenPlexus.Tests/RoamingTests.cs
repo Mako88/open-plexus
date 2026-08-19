@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -868,7 +868,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         IEnumerable<(string Name, Joined Joined)> arms,
         int people,
         Examining examining,
-        Func<IReadOnlyCollection<Code>, int?>? acting = null)
+        IChooses? acting = null)
     {
         var scores = new Dictionary<string, List<double>>();
 
@@ -887,7 +887,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
                     new Watching<Recited>(
                         world,
                         joined,
-                        acting: acting ?? (_ => null)),
+                        acting: acting ?? Chooses.From(_ => null)),
                     brain)
                     .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
 
@@ -1464,7 +1464,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 new Watching<Recited>(
                     world,
                     new Joined(Joining.Resolved, resolution: 1),
-                    acting: _ => picking.NextDouble() < often ? picking.Next(3) : null),
+                    acting: Chooses.From(
+                        _ => picking.NextDouble() < often ? picking.Next(3) : null)),
                 brain)
                 .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
 

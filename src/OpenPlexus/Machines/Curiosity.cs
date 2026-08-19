@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 
 namespace OpenPlexus.Machines;
 
@@ -50,6 +50,12 @@ public sealed class Curiosity
     private readonly Random _coins;
     private readonly Func<Code, int?> _naming;
 
+    // What it has already said about the moment on the table. A world that takes several
+    // doings a moment asks with the same codes in front of it every time, so without this the
+    // vote's word comes back until the budget is gone and the machine asks one question five
+    // times rather than five questions once.
+    private readonly HashSet<int> _already = [];
+
     /// <param name="brain">Whose population is read.</param>
     /// <param name="rate">
     /// How often to ask rather than let a moment go — <b>one to ask about everything</b>.
@@ -84,9 +90,17 @@ public sealed class Curiosity
 
     /// <summary>How many moments it had nothing to say about.</summary>
     /// <remarks>
+    /// <para>
     /// <b>Nothing to say rather than nothing to ask</b>. A moment carrying no word this world
     /// numbers has no question to put, which is the shape of the problem rather than a decision
     /// this makes.
+    /// </para>
+    /// <para>
+    /// <b>Moments and never calls</b>, which matters once a moment takes more than one. A
+    /// chooser is asked until it declines, so every moment ends in a decline unless the budget
+    /// ran out first — counting those would make this a count of moments that finished, and
+    /// its halves would be a rate over the wrong denominator.
+    /// </para>
     /// </remarks>
     public long Silences { get; private set; }
 
@@ -125,6 +139,18 @@ public sealed class Curiosity
     /// a sentence is made of — the same wall <c>Predicting.Salient</c> was built for. Drawing by
     /// rarity is the arm owed here, and it wants a count over what has been typed.
     /// </para>
+    /// <para>
+    /// <b>And a word already said this moment is not said again</b>, which is what makes a
+    /// second doing worth having. The vote does not move between two calls about one moment, so
+    /// a machine that repeated itself would spend a budget of five on one question and read as
+    /// having asked five times. Skipping the vote's word drops it to the blind draw, which is
+    /// the same fall a moment nothing predicted takes.
+    /// </para>
+    /// <para>
+    /// <b>The word rather than the doing</b>, because claiming what was just refused is the
+    /// same repeat by a different verb. What the machine has spent is its chances to name
+    /// something, and how it named it is not what ran out.
+    /// </para>
     /// </remarks>
     public Wondered Choose(IReadOnlyCollection<Code> felt)
     {
@@ -134,7 +160,7 @@ public sealed class Curiosity
 
         var vote = _brain.Voting(felt);
 
-        if (vote.Expects is { } said && Brain.Meant(said) is { } word)
+        if (vote.Expects is { } said && Brain.Meant(said) is { } word && _already.Add(word))
         {
             if (asking) Questions++; else Claims++;
 
@@ -146,7 +172,7 @@ public sealed class Curiosity
         var candidates = new List<int>();
 
         foreach (var code in felt)
-            if (_naming(code) is { } outcome)
+            if (_naming(code) is { } outcome && !_already.Contains(outcome))
                 candidates.Add(outcome);
 
         if (candidates.Count == 0) return Nothing();
@@ -159,12 +185,26 @@ public sealed class Curiosity
         Blind++;
         Questions++;
 
-        return new Wondered { Word = candidates[_coins.Next(candidates.Count)], Asking = true };
+        var drawn = candidates[_coins.Next(candidates.Count)];
+
+        _already.Add(drawn);
+
+        return new Wondered { Word = drawn, Asking = true };
     }
+
+    /// <summary>The moment is over, so what was said about it is forgotten.</summary>
+    /// <remarks>
+    /// <b>Told rather than worked out</b>, because two moments running can carry the same
+    /// codes and a chooser comparing them would call that one moment. Whoever runs the loop is
+    /// the only thing that knows where a moment stops.
+    /// </remarks>
+    public void Cleared() => _already.Clear();
 
     private Wondered Nothing()
     {
-        Silences++;
+        // Only where the moment got nothing at all. A chooser asked until it declines ends
+        // every moment here, so counting each decline would count moments that finished.
+        if (_already.Count == 0) Silences++;
 
         return new Wondered { Word = null, Asking = false };
     }

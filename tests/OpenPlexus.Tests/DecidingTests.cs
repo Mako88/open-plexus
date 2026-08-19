@@ -39,7 +39,7 @@ public sealed class DecidingTests(ITestOutputHelper output)
         new Watching<Recited>(
             new Roaming(Fixture.House(Examining.Where), seed),
             new Joined(Joining.Resolved, resolution: 3, freshest: true),
-            acting: _ => null);
+            acting: Chooses.From(_ => null));
 
     /// <summary>The narrow world, whose answer a handful of rules reach.</summary>
     /// <param name="seed">What draws the addresses.</param>

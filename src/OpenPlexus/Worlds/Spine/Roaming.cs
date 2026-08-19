@@ -331,6 +331,14 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>, IActed<Recit
 
     /// <inheritdoc/>
     /// <remarks>
+    /// <b>Never, because a doing here is a STEP</b>, and a moment is where the walker stands.
+    /// Two steps about one moment is two moments with the middle one unreported, so listening
+    /// twice would hide half the walk from the learner while the chooser saw all of it.
+    /// </remarks>
+    public bool Listening => false;
+
+    /// <inheritdoc/>
+    /// <remarks>
     /// <para>
     /// <b>The walk with its last step still to happen</b>, so what is read is the state an
     /// action is taken in rather than one it has already been taken in. Asking for it draws

@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -108,7 +108,8 @@ internal static class Program
             new Watching<Recited>(
                 world,
                 new Joined(joining),
-                acting: felt => Speaking(curiosity.Choose(felt))),
+                acting: Chooses.From(
+                    felt => Speaking(curiosity.Choose(felt)), curiosity.Cleared)),
             brain);
 
         // Budgeted for the widest statement, because `Asserting.Everything` makes a sentence

@@ -41,8 +41,8 @@ namespace OpenPlexus.Tests;
 /// worse at every width — is therefore about a machine where repair waited for the vote.
 /// </para>
 /// <para>
-/// <b>Which is exactly the condition that made the budget read as inert, so the verdict is
-/// suspect in a specific direction.</b> Under the old timing the lineages that would have
+/// <b>Which is exactly the condition that made the budget read as inert.</b> So the verdict is
+/// suspect in a specific direction. Under the old timing the lineages that would have
 /// spent a loosened budget were never blamed, so nothing was waiting on either the count or
 /// the condition. <b>A gate asking whether a parent still has failures no child covers can
 /// only bind where that parent gets blamed at all.</b> Re-taken, this grid is fork 67.

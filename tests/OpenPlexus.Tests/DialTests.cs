@@ -646,8 +646,8 @@ public sealed class DialTests
     /// in one place has a number and not a comparison, however many seeds it took.
     /// </para>
     /// <para>
-    /// <b>By what the tests actually build, and the first version of this check asked the
-    /// reason text instead and was wrong.</b> Reading the written reason for world names
+    /// <b>By what the tests actually build.</b> And the first version of this check asked the
+    /// reason text instead and was wrong. Reading the written reason for world names
     /// measures whether somebody happened to put them in backticks — eleven of fourteen
     /// dials failed it, including several measured on six worlds — so it would have bought
     /// a round of cosmetic edits and no coverage at all. What a test CONSTRUCTS is the

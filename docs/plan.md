@@ -593,9 +593,8 @@ before six that reads as tuning is out of order.
       ONE contradiction, and uncontradicted facts do not move. John's.
     - **OPEN** — one brain process, worlds attached over a stream: fork **113**'s shape as a
       HOST. Blocked on cost, a pipe making every grid a round-trip. John's.
-    - **OPEN** — with no outcome slot a commitment may expect any code in the successor, which
-      multiplies genesis by the moment's WIDTH. Arms: every unproposed arrived code, against
-      one a moment. Fork **114**.
+    - **NOW** — one claim a MOMENT rather than a set, which is fork **114**'s second arm: a
+      statement carrying several claims becomes several moments and genesis is unchanged.
     - **OPEN** — what is predicted is a SET and what is done is a set, so one motor moving and
       a sentence written out are one shape. Scoring becomes precision and recall, and every
       baseline here is re-taken rather than preserved.
@@ -686,6 +685,7 @@ before six that reads as tuning is out of order.
 | Curiosity read off the vote — `Unsure` on the margin, `Untested` on the weight | Both lose to a coin per ask, tenfold and fiftyfold over eight seeds: a conversation leaves the machine unsure exactly where nobody can answer | A signal saying whether a reply CAN settle, not whether the machine is sure |
 | Keeping every mention of a repeated word, and marking the last | Worse than dropping the repeat where a thing moves, and a marker for *nothing follows this* moved it nothing. More precedences give repair more to grab, so `wanting` falls to nought while the score does | A rung that can say a NEGATIVE — fork 30 |
 | `Joining.Recent` — a word banded by how far back it was said | Half what narrowing the view buys, and the front end picks the bands | A band the learner mints. Fork 92 |
+| Background admitted to a WIDE genesis scope, a code in every moment being unable to change when the rule fires | A third of what the varied filter reaches at three tellings and three quarters at ten | A world where the varied gate refuses a code a conjunction needed |
 
 ---
 

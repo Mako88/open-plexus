@@ -155,7 +155,7 @@ public sealed record ReturningSettings
 
 /// <summary>
 /// The same things, met again — <b>the world where a referent is the only thing that could
-/// answer, and no front end is allowed to supply one.</b>
+/// answer.</b> And no front end is allowed to supply one.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -300,8 +300,8 @@ public sealed class Returning : IWorld<Coded>, IWithholds<Coded>
 
     /// <summary>One sighting of one thing, uniformly or in a run.</summary>
     /// <remarks>
-    /// <b>The run is drawn before anything else is, so a sighting's look and landmark are
-    /// exactly what they would have been.</b> Continuity decides WHICH thing is met and
+    /// <b>The run is drawn before anything else is.</b> So a sighting's look and landmark are
+    /// exactly what they would have been. Continuity decides WHICH thing is met and
     /// changes nothing about how a met thing is shown — otherwise the arm would be handing
     /// over a second channel and reading it as order.
     /// </remarks>

@@ -321,7 +321,12 @@ public sealed class DocsTests
     // one-shot question and the one that says what is still unweighed behind it. A statement
     // claims every word in turn rather than picking one, and told once it answers an exam it
     // has never sat.
-    private const int Whole = 11_248;
+    //
+    // And 11,294 is the twenty-third raise, forty-six words for the refuted row a deleted arm
+    // owes. Background codes were let into a wide genesis scope and it lost; the row says by
+    // how much and what would bring it back, and a row without one is a superstition. Fork
+    // 114 closed in the same pass and paid part of it back.
+    private const int Whole = 11_294;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

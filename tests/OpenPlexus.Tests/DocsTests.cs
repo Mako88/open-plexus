@@ -279,7 +279,18 @@ public sealed class DocsTests
     // holds repair still does it with a one-code moment, which any brain-side code breaks --
     // one already did, this session. A control whose codes never vary would hold on
     // principle rather than by accident.
-    private const int Whole = 10_893;
+    //
+    // And 10,982 is the seventeenth raise, eighty-nine words for John changing the order on
+    // 2026-08-19. The conversation harness comes before the rest of phase two, and the reason
+    // is a leaf that was already here: a primer moves no counter, so reading a corpus is a
+    // no-op and a world that ASKS is what makes it teach anything. His own curriculum --
+    // teach it English, then examine it -- is measured to cost rather than pay, so the
+    // conversation is not the exam after the reading. It is what makes the reading work.
+    //
+    // The second line is what to leave alone, which is the half a direction change usually
+    // loses. Naming the three on the path names the six that are not, and a session reading
+    // only the ordering above would have finished adhesion first for a phase's sake.
+    private const int Whole = 10_982;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

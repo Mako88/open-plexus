@@ -210,8 +210,8 @@ gets one home and a cross-reference by number from anywhere else it serves; numb
 renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, point
 `DocsTests` at `csharp` for them rather than weakening it.
 
-The order of the work is John's, 2026-08-16 and reordered 2026-08-18. Nothing here is taken
-out of it, and anything before six that reads as tuning is out of order.
+The order of the work is John's, 2026-08-16 and reordered 2026-08-18 and 2026-08-19. Nothing
+here is taken out of it, and anything before six that reads as tuning is out of order.
 
 - **One, the seam** — a world becomes a set of inputs pushing moments, the brain answers with
   what it did, and `Trial` goes. It carries its own repair: a phase leaving the suite
@@ -219,6 +219,12 @@ out of it, and anything before six that reads as tuning is out of order.
 - **Two, a mechanism for every entry of THE ARCHITECTURE**, however bad, and `Roaming`
   exercising all of them. `DocsTests` holds the first half and `OutstandingTests` the
   second; adhesion and nesting fail it.
+- **And two waits, John's, 2026-08-19** — the conversation harness comes first. A primer
+  moves no counter, so a world that ASKS is what makes reading teach anything at all, and
+  talking to it is the first interactive test of the whole system.
+- **It is an INSTRUMENT rather than a score**, so it is read for which piece bites. The path
+  to a conversation is statements as MOMENTS, the situation store's evidence rule and rung
+  four; the fleet, adhesion, the individual and goals are off it.
 - **Three, the intentional reds cleared**, which is the stable state to refine from.
 - **Four, audit TRAPS and DO NOT RE-TRY** — a failure class that has earned a check belongs
   in the check, and a revival condition that has expired is a superstition.

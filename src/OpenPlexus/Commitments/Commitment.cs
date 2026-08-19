@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 using OpenPlexus.Codes;
 
@@ -429,6 +429,15 @@ public sealed class Commitment
 
         return new Code(Committed, Hashing.Mix(hash));
     }
+
+    /// <summary>Whether a code is a commitment's identity.</summary>
+    /// <param name="code">The code.</param>
+    /// <remarks>
+    /// <b>Beside <c>Sequenced.Names</c> and <c>Intervened.Names</c></b>, because a moment
+    /// can now carry one and genesis has to refuse it as a root exactly as it refuses those.
+    /// The modality is the whole test, two never colliding.
+    /// </remarks>
+    public static bool Names(Code code) => code.Modality == Committed;
 }
 
 /// <summary>How often one code was there when a commitment hit, and when it missed.</summary>

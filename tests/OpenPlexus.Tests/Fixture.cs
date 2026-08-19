@@ -1,4 +1,4 @@
-using OpenPlexus.Bus;
+﻿using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -52,6 +52,29 @@ public static class Fixture
     /// </para>
     /// </remarks>
     public static readonly TimeSpan Patience = TimeSpan.FromSeconds(120);
+
+    /// <summary>
+    /// The spine world's house, at the cell its own grids read — <b>one house rather than a
+    /// literal per instrument.</b>
+    /// </summary>
+    /// <param name="examining">Which question the house is asked.</param>
+    /// <remarks>
+    /// <b>Named at every call and defaulted nowhere else</b>, which is the rule this repo
+    /// learnt the hard way: a fixture inherits every dial it does not pin, so a default
+    /// moving rewrites an experiment nobody edited. What is shared here is the whole house
+    /// and the one axis that differs, so two instruments cannot drift apart while reading
+    /// against each other. Four people, because one leaves the middle hop free.
+    /// </remarks>
+    public static Worlds.RoamingSettings House(Worlds.Examining examining) =>
+        new()
+        {
+            Rooms = 6,
+            Props = 4,
+            People = 4,
+            Steps = 120,
+            Withheld = 600,
+            Examining = examining,
+        };
 
     /// <summary>The senses world, clean unless a test asks for noise.</summary>
     public static SensesSettings Senses(

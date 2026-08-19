@@ -33,24 +33,6 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class ExercisedTests
 {
-    /// <summary>What every arm here is run at.</summary>
-    /// <param name="examining">Which question the house is asked.</param>
-    /// <remarks>
-    /// <b>The cell the ceiling grid chose</b>, so a reading here stands beside every other
-    /// Roaming number rather than starting a second scale. Four people, because one leaves
-    /// the middle hop free and gives an acting arm nobody to choose between.
-    /// </remarks>
-    private static RoamingSettings World(Examining examining) =>
-        new()
-        {
-            Rooms = 6,
-            Props = 4,
-            People = 4,
-            Steps = 120,
-            Withheld = 600,
-            Examining = examining,
-        };
-
     /// <summary>What one run of the world left behind.</summary>
     /// <param name="Examining">Which question the house was asked.</param>
     /// <param name="Tally">Every counter the bench reports.</param>
@@ -139,7 +121,7 @@ public sealed class ExercisedTests
     /// </remarks>
     private static Watched Run(Examining examining, bool acting)
     {
-        var world = new Roaming(World(examining), seed: 1);
+        var world = new Roaming(Fixture.House(examining), seed: 1);
         var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed: 1);
         var noted = new Noted(new Joined(Joining.Resolved, resolution: 3, freshest: true));
         var falling = new Random(1);

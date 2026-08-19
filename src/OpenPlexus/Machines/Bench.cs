@@ -752,7 +752,15 @@ public sealed class Bench
             // the same calls `Examine` is built out of and they change nothing.
             if (censusing is not null && pushed.Followed is { } arrived)
             {
-                var firing = censusing.Firing(censusing.Moment(pushed.Codes));
+                // The moment the brain is about to be put, rather than the one the world
+                // said. A relation that held last round enters the moment on the brain's
+                // side, so a census matching the world's codes alone fires a different
+                // population than the round does -- and this partition is asserted exact.
+                var asked = _brain.Standing(pushed.From.Source) is { } standing
+                    ? new HashSet<Code>(pushed.Codes) { standing }
+                    : pushed.Codes;
+
+                var firing = censusing.Firing(censusing.Moment(asked));
                 var vote = censusing.Predict(firing);
 
                 // Whether a true rule was there, asked on every round and not only on the

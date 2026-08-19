@@ -41,8 +41,8 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     /// Rounds, <b>and the five hundred past the last sweep are the point of the number.</b>
     /// </summary>
     /// <remarks>
-    /// <b>A run ending on a sweep round is read at its most exhausted, and this file's whole
-    /// subject is what a trained population would name NEXT.</b> At twenty thousand exactly,
+    /// <b>A run ending on a sweep round is read at its most exhausted.</b> This file's whole
+    /// subject is what a trained population would name NEXT. At twenty thousand exactly,
     /// three seeds in eight have nothing left to say — so the assertions here stood on seed
     /// one happening to be one of the five that did, which is the single-seed ordering this
     /// repo's traps list already names. Five hundred rounds of repair past the last sweep

@@ -458,8 +458,8 @@ public sealed class PopulationTests(ITestOutputHelper output)
     /// <param name="codes">The codes to establish as varying.</param>
     /// <remarks>
     /// <para>
-    /// <b>Genesis will not root on a code that has never been absent, so a population
-    /// asked to cover before it has witnessed anything mints NOTHING.</b> That is the
+    /// <b>Genesis will not root on a code that has never been absent.</b> So a population
+    /// asked to cover before it has witnessed anything mints NOTHING. That is the
     /// gate working rather than a fault — but a test calling <see cref="Population.Genesis"/>
     /// straight out of the constructor is asking it to root on codes it has seen exactly
     /// once each, and it correctly declines.

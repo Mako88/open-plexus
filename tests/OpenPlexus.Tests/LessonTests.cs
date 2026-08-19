@@ -25,9 +25,9 @@ public sealed class LessonTests(ITestOutputHelper output)
 {
     private static (Tally Tally, Tutor Tutor, Conversing World) Ran(
         Lesson lesson, Carrying carrying, int seed, int passes, int capacity = 2000,
-        Asserting asserting = Asserting.Nothing, int tellings = 1)
+        Asserting asserting = Asserting.Nothing, int tellings = 1, int revising = 0)
     {
-        var tutor = new Tutor(lesson, TextWriter.Null, passes, tellings);
+        var tutor = new Tutor(lesson, TextWriter.Null, passes, tellings, revising);
 
         var brain = new Brain(new CommittingSettings { Capacity = capacity }, seed);
 
@@ -272,5 +272,70 @@ public sealed class LessonTests(ITestOutputHelper output)
         Assert.True(reached[1] <= marginal,
             $"one telling reached {reached[1]:F3}, so the repetition is buying nothing and the "
             + "threshold this test is named for has moved");
+    }
+
+    [Fact]
+    public void A_belief_is_replaced_by_being_contradicted_and_it_costs_a_quarter_of_installing_it()
+    {
+        const int Seeds = 3;
+        const int Tellings = 20;
+
+        int[] revisings = [0, 3, 4, 5, 10];
+
+        // John's, and it is the half a monotone counter cannot do. Nothing here deletes the old
+        // belief: hits and misses are G-counters, so a superseded commitment keeps everything it
+        // ever counted and simply starts missing, while a newer one minted on the contradiction
+        // starts hitting. What moves is the vote.
+        var lesson = Lesson.Corrected;
+
+        // Three of the twelve are changed and nine are left alone, so the run carries its own
+        // control. Forgetting everything on being contradicted and being uncorrectable are
+        // opposite failures, and one number over twelve questions reads the same for both.
+        var changed = lesson.Revisions.Count;
+
+        output.WriteLine(
+            $"{Seeds} seeds, told {Tellings} times, {changed} of {lesson.Exam.Count} facts "
+            + "changed afterwards, one examination pass");
+        output.WriteLine($"{"revising",-10}{"right",8}{"of",8}");
+
+        var right = new Dictionary<int, double>();
+
+        foreach (var many in revisings)
+        {
+            var scored = new List<double>();
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var one = Ran(
+                    lesson, Carrying.Never, seed, passes: 1, asserting: Asserting.Rarest,
+                    tellings: Tellings, revising: many);
+
+                scored.Add(one.Tutor.Confirmed[0]);
+            }
+
+            right[many] = scored.Average();
+
+            output.WriteLine($"{many,-10}{scored.Average(),8:F1}{lesson.Exam.Count,8}");
+        }
+
+        // Never contradicted, it answers the nine it was told and misses the three it was not.
+        // That is the floor this reads against, and it is exact rather than approximate.
+        Assert.Equal(lesson.Exam.Count - changed, right[0]);
+
+        // Contradicted enough, every one of the three flips and none of the nine moves. A
+        // machine that lost the nine would read below this, not above it.
+        Assert.Equal(lesson.Exam.Count, right[10]);
+
+        // And correcting is far cheaper than installing, which is the reading. Twenty tellings
+        // put the belief there and five take it out, because installing must clear the repair
+        // gate's twenty misses to narrow a rule and correcting only has to out-vote one that is
+        // already narrow.
+        Assert.True(right[5] > right[3],
+            $"five contradictions scored {right[5]:F1} and three scored {right[3]:F1}, so "
+            + "repetition is no longer what moves a held belief");
+
+        Assert.True(right[3] <= lesson.Exam.Count - changed,
+            $"three contradictions already scored {right[3]:F1}, so a belief is being replaced "
+            + "more cheaply than it was installed by more than this test claims");
     }
 }

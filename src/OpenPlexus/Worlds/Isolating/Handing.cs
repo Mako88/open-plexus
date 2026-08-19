@@ -91,8 +91,8 @@ public readonly record struct Recited
 
 /// <summary>
 /// People handing things to people, and a question about who ended up with one —
-/// <b>a world built so that a bag of words cannot beat the marginal, and it is a fact about
-/// the world rather than a finding about a run.</b>
+/// <b>a world built so that a bag of words cannot beat the marginal.</b> That is a fact about
+/// the world rather than a finding about a run.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -103,8 +103,8 @@ public readonly record struct Recited
 /// thing, however either of them is named. This world is that sentence and nothing else.
 /// </para>
 /// <para>
-/// <b>The ladder has three rungs and all three ceilings are exact by construction, which is
-/// the whole reason to generate a world rather than read one.</b>
+/// <b>The ladder has three rungs and all three ceilings are exact by construction.</b> That is
+/// the whole reason to generate a world rather than read one.
 /// </para>
 /// <list type="number">
 /// <item><b>A bag of the story's words reaches 1/<see cref="HandingSettings.People"/></b>,

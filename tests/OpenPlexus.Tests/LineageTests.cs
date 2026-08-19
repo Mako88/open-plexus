@@ -21,8 +21,8 @@ namespace OpenPlexus.Tests;
 /// behaviour and answers where in the ladder a minority lineage stops.
 /// </para>
 /// <para>
-/// <b>A seed is one code and a true rule is <c>Address + 1</c>, so something has to survive
-/// two specialisations at six bits and three at eleven.</b> Whether anything ever reaches
+/// <b>A seed is one code and a true rule is <c>Address + 1</c>.</b> So something has to survive
+/// two specialisations at six bits and three at eleven. Whether anything ever reaches
 /// the last rung, and what removes it if it does, is what
 /// <see cref="Population.Lineages"/> was built to say — see <see cref="Lifetime"/> for why
 /// an expectation and a scope length name a lineage and its rung exactly.

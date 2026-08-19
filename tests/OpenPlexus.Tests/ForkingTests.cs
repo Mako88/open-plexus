@@ -37,9 +37,9 @@ namespace OpenPlexus.Tests;
 /// closed fork 74 does not carry over.
 /// </para>
 /// <para>
-/// <b>And the hazard is named before the grid: more distinct children is more population, and
+/// <b>And the hazard is named before the grid.</b> More distinct children is more population, and
 /// this doc already carries a row about an arm that raised every count and lowered
-/// coverage.</b> So the reading is <c>Census.Paying</c> with the residents and the carriers'
+/// coverage. So the reading is <c>Census.Paying</c> with the residents and the carriers'
 /// mean scope beside it, and never accuracy — which has a floor of four in five under skew.
 /// </para>
 /// </remarks>

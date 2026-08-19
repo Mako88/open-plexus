@@ -61,8 +61,8 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>And the question's words are not also put in the story's bag, which the first
-    /// version of this file did and it cost the reading.</b> <c>Joined</c> unions them, so
+    /// <b>And the question's words are not also put in the story's bag.</b> The first
+    /// version of this file did and it cost the reading. <c>Joined</c> unions them, so
     /// every asked word is a told word by construction — and under that moment <i>the word
     /// asked about was told</i> is true of every question ever asked. It fired 400 times
     /// out of 400 at one candidate tried, which reads as unification being free and is

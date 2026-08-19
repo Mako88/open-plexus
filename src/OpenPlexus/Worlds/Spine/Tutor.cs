@@ -49,6 +49,15 @@ public sealed record Lesson
     /// <summary>The questions, in the order they are put.</summary>
     public required IReadOnlyList<Quiz> Exam { get; init; }
 
+    /// <summary>Statements told AFTER the telling that contradict it.</summary>
+    /// <remarks>
+    /// <b>John's, and it is the half a monotone counter cannot do.</b> Hits and misses are
+    /// G-counters and nothing can retract, so a superseded belief is never deleted — it
+    /// accrues misses while a newer commitment accrues hits, and the vote is what moves. How
+    /// much correction that takes is the reading rather than the design.
+    /// </remarks>
+    public IReadOnlyList<string> Revisions { get; init; } = [];
+
     /// <summary>Four creatures and three properties each, with a category over them.</summary>
     /// <remarks>
     /// <para>
@@ -105,6 +114,44 @@ public sealed record Lesson
             new Quiz { Question = "what is the bird sound?", Answer = "tweet" },
         ],
     };
+
+    /// <summary>The same four creatures, with three facts changed after the telling.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>John's, and a monotone counter cannot do it by deleting.</b> Three
+    /// creatures are given a new food, covering and sound after the lesson has been told, and
+    /// the examination expects the new ones. Nothing retracts the old belief: it accrues misses
+    /// while a newer commitment accrues hits, and what moves is the vote.
+    /// </para>
+    /// <para>
+    /// <b>Three changed and nine left alone, so it controls itself.</b> A machine
+    /// that simply forgot everything on being contradicted would lose the nine, and a machine
+    /// that could not be corrected would lose the three — those are opposite failures and one
+    /// number over twelve questions would read the same for both.
+    /// </para>
+    /// </remarks>
+    public static Lesson Corrected { get; } = Creatures with
+    {
+        About = "the same four creatures, with three facts changed later",
+
+        Revisions =
+        [
+            "the cat food is milk.",
+            "the bird covering is down.",
+            "the snake sound is rattle.",
+        ],
+
+        Exam =
+        [
+            .. Creatures.Exam.Select(one => one.Question switch
+            {
+                "what is the cat food?" => one with { Answer = "milk" },
+                "what is the bird covering?" => one with { Answer = "down" },
+                "what is the snake sound?" => one with { Answer = "rattle" },
+                _ => one,
+            }),
+        ],
+    };
 }
 
 /// <summary>
@@ -141,6 +188,7 @@ public sealed class Tutor : TextReader
     private readonly Lesson _lesson;
     private readonly int _passes;
     private readonly int _tellings;
+    private readonly int _revising;
     private readonly int _clarifying;
     private readonly TextReader? _person;
     private readonly Watched _printed;
@@ -151,6 +199,7 @@ public sealed class Tutor : TextReader
     private int _told;
     private int _at;
     private int _pass;
+    private int _revised;
     private int _clarified;
 
     // Whether the keyboard is the person's rather than the script's. While it is, every read
@@ -171,6 +220,7 @@ public sealed class Tutor : TextReader
     /// different amounts of evidence for the same claim, and which of them a machine needs is
     /// the reading.
     /// </param>
+    /// <param name="revising">How many times the contradicting statements are told after it.</param>
     /// <param name="clarifying">
     /// How many moments the person gets between the telling and the examination —
     /// <b>John's, and it is where the back and forth happens</b>. The machine's questions are
@@ -180,12 +230,13 @@ public sealed class Tutor : TextReader
     /// <param name="person">Whose keyboard the clarifying window reads.</param>
     public Tutor(
         Lesson lesson, TextWriter printed, int passes = 1, int tellings = 1,
-        int clarifying = 0, TextReader? person = null)
+        int revising = 0, int clarifying = 0, TextReader? person = null)
     {
         ArgumentNullException.ThrowIfNull(lesson);
         ArgumentNullException.ThrowIfNull(printed);
         ArgumentOutOfRangeException.ThrowIfLessThan(passes, 1);
         ArgumentOutOfRangeException.ThrowIfNegative(tellings);
+        ArgumentOutOfRangeException.ThrowIfNegative(revising);
         ArgumentOutOfRangeException.ThrowIfNegative(clarifying);
 
         if (clarifying > 0 && person is null)
@@ -196,6 +247,7 @@ public sealed class Tutor : TextReader
         _lesson = lesson;
         _passes = passes;
         _tellings = tellings;
+        _revising = revising;
         _clarifying = clarifying;
         _person = person;
         _printed = new Watched(printed);
@@ -208,7 +260,8 @@ public sealed class Tutor : TextReader
 
     /// <summary>How many moments the whole lesson is, which is how long a run has to be.</summary>
     public int Moments =>
-        (_lesson.Statements.Count * _tellings) + _clarifying + (_lesson.Exam.Count * _passes);
+        (_lesson.Statements.Count * _tellings) + (_lesson.Revisions.Count * _revising)
+        + _clarifying + (_lesson.Exam.Count * _passes);
 
     /// <summary>What closes the clarifying window early, typed on a line of its own.</summary>
     public const string Done = ".done";
@@ -356,6 +409,13 @@ public sealed class Tutor : TextReader
             _answer = null;
 
             return _lesson.Statements[_told++ % _lesson.Statements.Count];
+        }
+
+        if (_revised < _lesson.Revisions.Count * _revising)
+        {
+            _answer = null;
+
+            return _lesson.Revisions[_revised++ % _lesson.Revisions.Count];
         }
 
         if (_clarified < _clarifying)

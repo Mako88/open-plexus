@@ -671,8 +671,8 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The graded arm is wired at the front end and inert behind it, which a grid of
-    /// nearly-identical rows could not have told apart from a null result.</b> Naming counts
+    /// <b>The graded arm is wired at the front end and inert behind it.</b> A grid of
+    /// nearly-identical rows could not have told that apart from a null result. Naming counts
     /// pairs over SCOPES, so a code that never enters a scope can never enter a name — and
     /// nothing in this machine can put this one in one.
     /// </para>

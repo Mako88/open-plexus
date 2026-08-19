@@ -32,8 +32,8 @@ namespace OpenPlexus.Tests;
 /// no longer exist, and twenty param tags that had drifted off their signatures.
 /// </para>
 /// <para>
-/// <b>So this file is down to what a compiler cannot check: is the one remaining
-/// doc still small, and do the fork numbers the code cites still resolve.</b>
+/// <b>So this file is down to what a compiler cannot check.</b> Is the one remaining
+/// doc still small, and do the fork numbers the code cites still resolve.
 /// </para>
 /// </remarks>
 public sealed class DocsTests
@@ -60,8 +60,8 @@ public sealed class DocsTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>John's test, 2026-08-12, and it is the one that decides: if it is long enough that
-    /// you would hesitate to load all of it, it is too long.</b> The whole point of collapsing
+    /// <b>John's test, 2026-08-12, and it is the one that decides.</b> If it is long enough
+    /// that you would hesitate to load all of it, it is too long. The whole point of collapsing
     /// several docs into one was that a session could read the plan WHOLE before starting. A
     /// doc read in pages is the pile of docs it replaced, wearing one filename.
     /// </para>

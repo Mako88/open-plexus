@@ -191,9 +191,9 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A variable is a generalisation and every operator here narrows, so the risk is
+    /// <b>A variable is a generalisation and every operator here narrows.</b> So the risk is
     /// named before the number: a scope with a hole in it fires far more often than any
-    /// sibling it covers, and firing more can only cost accuracy.</b> If the parent is
+    /// sibling it covers, and firing more can only cost accuracy. If the parent is
     /// worse than the siblings it replaces then repair would refuse it exactly as it
     /// refuses any other child that does not clear the bars, and rung four would mint
     /// nothing that survives however cheap the matcher is.

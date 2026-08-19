@@ -9,7 +9,7 @@ namespace OpenPlexus.Codes;
 /// <remarks>
 /// <para>
 /// <b>The plan asks for "a hash spending its bits where the data is without
-/// being fitted", and that reads as a contradiction until the adaptivity moves.</b>
+/// being fitted".</b> That reads as a contradiction until the adaptivity moves.
 /// A projection chosen to suit the data is a fitted codebook, which the red-ball
 /// property forbids outright — two machines fitted on different samples agree
 /// about under 0.12 of items. So the projection cannot adapt. <b>What CAN adapt

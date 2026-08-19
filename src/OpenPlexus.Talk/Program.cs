@@ -38,10 +38,18 @@ internal static class Program
         var passes = Number(args, "--passes", 3);
         var tellings = Number(args, "--tellings", 1);
         var clarifying = Number(args, "--clarifying", 0);
+        var revising = Number(args, "--revising", 0);
         var carrying = Carried(args);
+        // Claiming by default, because a statement that claims nothing cannot teach anything
+        // and a session at a terminal is mostly statements.
+        //
+        // And the asking rate stays low FOR THE PERSON rather than for the population. A claim
+        // prints an answer and costs nothing; an ask opens a prompt and eats the next line they
+        // type, so a machine asking on every moment is one nobody will talk to twice. Pass
+        // `--asking 1.0` where the reply is scripted and the settlements are the point.
         var asserting = Given(args, "--asserting") is { } claim
             ? Enum.Parse<Asserting>(claim, ignoreCase: true)
-            : Asserting.Nothing;
+            : Asserting.Rarest;
         var lesson = Taught(args);
 
         // The control, and it is the only thing that says whether the telling taught anything.
@@ -54,7 +62,7 @@ internal static class Program
 
         // The tutor owns the writer, because seeing the prompt is how it knows a reply is
         // wanted. A session with nobody scripted prints straight at the console.
-        var tutor = lesson is null ? null : new Tutor(lesson, Console.Out, passes, tellings, clarifying, Console.In);
+        var tutor = lesson is null ? null : new Tutor(lesson, Console.Out, passes, tellings, revising, clarifying, Console.In);
 
         var world = new Conversing(new ConversingSettings
         {
@@ -171,12 +179,20 @@ internal static class Program
             ? null
             : string.Equals(named, "creatures", StringComparison.OrdinalIgnoreCase)
                 ? Lesson.Creatures
-                : throw new ArgumentException($"no lesson called `{named}`", nameof(args));
+                : string.Equals(named, "corrected", StringComparison.OrdinalIgnoreCase)
+                    ? Lesson.Corrected
+                    : throw new ArgumentException($"no lesson called `{named}`", nameof(args));
 
     /// <summary>How much of the topic a moment holds.</summary>
+    /// <remarks>
+    /// <b>Bare by default, because the other two are measured to mint nothing.</b> A moment
+    /// carrying the topic so far leaves every word said always-present, and genesis may not
+    /// root on a code that has never been absent — so a session that accumulates never starts
+    /// a population at all. <c>LessonTests</c> holds the reading.
+    /// </remarks>
     private static Carrying Carried(string[] args) =>
         Given(args, "--carrying") is not { } named
-            ? Carrying.Always
+            ? Carrying.Never
             : Enum.Parse<Carrying>(named, ignoreCase: true);
 
     private static string Share(int of, int over) => over == 0

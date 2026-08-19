@@ -190,8 +190,8 @@ FORBIDS things, and several of them are already measured.
   counting concept a conjunctive scope CANNOT express**, a language-ceiling probe with a
   published number attached.
 - **Why none of it scaled**: noise sensitivity, hand-specified language bias, and no way to
-  learn from probabilistic or sensory background knowledge. **And the failure was at the interface with
-  perception**, not in the logic — the one place this project is unusually
+  learn from probabilistic or sensory background knowledge. **And the failure was at the
+  interface with perception** rather than in the logic — the one place this project is unusually
   well placed, because its substrate manufactures symbols. That is the bet, said plainly.
 
 ---
@@ -388,9 +388,8 @@ before six that reads as tuning is out of order.
     - **OPEN** — rung three is blind on a word said TWICE, `Order` dropping what it cannot place
       once, so a thing that MOVES is not tracked. Placing a repeat at its LATEST removes the
       collapse on a conversation and owes every text world a baseline. Fork **119**.
-    - **OPEN** — a referent is a THIRD store rather than the same one: *Mary's bedroom*
-      survives leaving the room and *Mary is in the bedroom* does not, so one store gets one
-      lifetime wrong whichever it takes.
+    - **OPEN** — a referent is a THIRD store: *Mary's bedroom* survives leaving the room and
+      *Mary is in the bedroom* does not, so one store gets a lifetime wrong whichever it takes.
     - **OPEN** — nothing SCORES the update, so what retracts is the experimenter's rule. Fork
       **104** carries it, under *what it is told must be settleable*.
     - **OPEN** — does a band the learner MINTS differ from one handed over. Fork **92**.
@@ -404,9 +403,9 @@ before six that reads as tuning is out of order.
     - **OPEN** — the gradient is fragile: the vote takes the narrowest every round and
       subsumption the general one every thousandth. A second store needs an
       evidence rule the first lacked, or it collapses too.
-    - **OPEN** — specificity as a gradient across the SITUATION stores too. Rules have that
-      gradient; situations have nowhere to keep one — repetition for a general rule,
-      assertion for a particular, and the vote ranks repetition only.
+    - **OPEN** — specificity as a gradient across the SITUATION stores too. Rules have one;
+      situations have nowhere to keep it — repetition for a general rule, assertion for a
+      particular, and the vote ranks repetition only.
     - **OPEN** — whether compression is self-regulating. On no signal found yet. Fork **23**.
     - **OPEN** — project each scope code to its COARSER form when counting pairs. Test the
       rewrite first: a name no scope can be said in is a word with no referent. Fork **83**.
@@ -430,9 +429,9 @@ before six that reads as tuning is out of order.
       reach what decides — read the revival rows before a third.
     - **OPEN** — `Alternating` is derived offline, and re-deriving orphans every scope
       holding a category, its name being its members. Add-only, as `Naming` is.
-    - **OPEN** — mutual exclusion is unbuilt, so a belief can be wrong and never
-      CONTRADICTED. A miss says *I expected Y and got Z*; nothing says Y and Z cannot both
-      hold, which is the whole of what a conflict is. Fork **99**.
+    - **OPEN** — mutual exclusion is unbuilt, so a belief can be wrong and never CONTRADICTED.
+      A miss says *I expected Y and got Z* and nothing says the two cannot both hold, which is
+      the whole of what a conflict is. Fork **99**.
   - Learns by being wrong
     - **NOW** — commitment, settlement, blame capped at one hop, repair, and abstention so a
       round that could not settle costs nothing. Reading is an objective at last: a sentence
@@ -678,24 +677,22 @@ them. **A class earning a check moves out of here into the check.**
 ### The harness lies, and nothing goes red when it does
 
 - **A hand-typed filter runs the grids CI excludes.** Naming a class names its sweeps too, so
-  two suites ran past forty minutes where `kind!=sweep&` in front takes them to seconds. The
-  facts were tagged correctly and the COMMAND was not.
+  two suites ran past forty minutes where `kind!=sweep&` takes them to seconds. The facts were
+  tagged correctly and the COMMAND was not.
 - **Pushing faster than the suite runs means nothing is ever tested.** The concurrency group
-  cancels whatever is waiting, so a session committing every few minutes cancels its own queue
-  all day. Only a `[checkpoint]` escapes.
-- **A build during a test run can abort it**, with every test passing and the assemblies being
+  cancels whatever is waiting, so a session committing every few minutes cancels its own queue.
+  Only a `[checkpoint]` escapes.
+- **A build during a test run can abort it**, every test passing while the assemblies are
   replaced underneath. The mirror of the `--no-build` staleness rule.
 - **A cost measured on one platform can be nought on another.** A refused loopback connect is
   four seconds on Windows and immediate on Linux, so a shard went red for a repair working
-  perfectly — and that same four seconds prices the local suite and not CI. Read a wire
-  timing on CI.
+  perfectly, and the same four seconds prices the local suite alone. Read a wire timing on CI.
 - **A workflow is the one artifact with no local check**, and it is wrong until a push says
-  otherwise. And skipping work is not skipping a job: a matrix entry that exits immediately
-  still took a runner slot.
-- **A timed-out job reports as cancelled and not as failed**, and one such job makes the
-  whole run read cancelled. On a branch where cancellation is the NORMAL outcome, an overrun
-  is perfectly disguised as the concurrency group working — which is how a `[checkpoint]`
-  can appear to have been cancelled by a later push it is immune to.
+  otherwise. And skipping work is not skipping a job: a matrix entry that exits at once still
+  took a runner slot.
+- **A timed-out job reports as cancelled and not as failed**, and one makes the whole run read
+  cancelled. Where cancellation is the NORMAL outcome an overrun is disguised as the concurrency
+  group working, which is how a `[checkpoint]` can look cancelled by a push it is immune to.
 
 ### A check that cannot fire reads exactly like a check that passes
 
@@ -706,9 +703,9 @@ them. **A class earning a check moves out of here into the check.**
   untested until something reaches the cap. Both sat unexercised for the life of the repo
   because no world was wide enough.
 - **A documented promise is not a check.** `Posted` said a fan-out was posts in flight while
-  both of its fan-outs awaited each post in turn — false from the day it was written, directly
-  under the sentence describing the fault. A fix aimed at the callers one measurement touched
-  leaves the rest.
+  both of its fan-outs awaited each post in turn, false from the day it was written and directly
+  under the sentence describing the fault. A fix aimed at one measurement's callers leaves the
+  rest.
 - **A budget can be satisfied by a coincidence**, and a cast to an interface the type does not
   implement is cleanup that never runs. Both compile and read as tidy.
 - **A prediction written into a wiring check fails two ways**, and reads the same. Assert that
@@ -719,13 +716,14 @@ them. **A class earning a check moves out of here into the check.**
 - **Measure one mechanism on from a known baseline**, never one off from all-on.
 - **A setting can decide two independent things while being named for one**, so the cell that
   separates them may already exist and never have been read as a control.
-- **A readout arm is a search arm** wherever the readout triggers the search. Every vote
+- **A readout arm is a search arm** wherever the readout triggers the search, and every vote
   comparison in four sessions moved both.
-- **A fixture inherits every dial it does not pin**, so a default moving rewrites an
-  experiment nobody edited — and the grid that decides a default rewrites itself the moment
-  it wins.
+- **A fixture inherits every dial it does not pin**, so a moving default rewrites an experiment
+  nobody edited — and the grid deciding a default rewrites itself the moment it wins.
 - **A default can short-circuit the mechanism being measured**, so a sweep on defaults
   returned three identical arms for a gate that was never running.
+- **A forced control is not a control.** A chooser made to ask wherever nothing fired spent a
+  quarter of its budget by the harness rather than by the arm.
 - **A test can fail at both ends of a dial**, for opposite reasons, so pinning to the old value
   fixes nothing while reading as a fix. **Never attribute a red test to your own change without
   a baseline.**

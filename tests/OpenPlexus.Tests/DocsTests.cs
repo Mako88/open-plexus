@@ -411,7 +411,16 @@ public sealed class DocsTests
     // is the seat exactly, so the axis is time rather than the vote rule: more tellings close
     // it unaided, and what is wanted is a correct young rule outranking a wrong old one
     // sooner. That names the next arm, which is what a route entry is for.
-    private const int Whole = 12_024;
+    //
+    // And 12,124 is the thirty-eighth raise, a hundred words for John's, 2026-08-19.
+    // A label is welcome and what is required beside it is everything the thing stands to,
+    // which corrects a reading of the architecture rather than the rule. And fork 129, which
+    // is the wall both designs hit: `csharp` refuted widening a walk three ways and asked for
+    // a likeness the graph did not compute, this branch refuted a similarity code, and what
+    // neither tried is likeness read off the POPULATION -- two codes alike where the
+    // commitments naming them expect the same things, which never asks whether they
+    // co-occurred. Four tries, two designs, one target, and that is worth the words.
+    private const int Whole = 12_124;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

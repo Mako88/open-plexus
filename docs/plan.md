@@ -58,6 +58,7 @@ a mechanism written here is a decision wearing a requirement's clothes. No findi
   meta level is not representable then the model is a list rather than an understanding.
 - **And a concept and its label are independent.** Either may arrive first: a slot with no
   word for it yet, or a word for a thing nothing else is known about. Both must be reachable.
+  A label is welcome; what is required beside it is everything the thing stands to. John's.
 - **And what is understood of a thing deepens and broadens without limit**, thousands of
   truths about one individual, each sharpening what it is.
 - **And part of what is understood is which aspects are temporal** — which properties come
@@ -330,6 +331,12 @@ before six that reads as tuning is out of order.
       **85** want a told alphabet. Fork **97**.
     - **OPEN** — a name over ALTERNATIVES is derivable and not admitted, rung five being the
       wrong SHAPE: it names what CO-FIRES, and alternatives never do.
+    - **OPEN** — so likeness read off the POPULATION rather than the moment: two codes are
+      alike where the commitments naming them EXPECT the same things. Never asks whether they
+      co-occurred, which is the one thing they never do. Fork **129**.
+    - **OPEN** — and it is the wall both architectures hit. `csharp` refuted widening a walk in
+      three shapes and its row asks for a likeness the GRAPH DID NOT COMPUTE; this branch
+      refuted a similarity code. Four tries, two designs, one target.
   - Understanding deepens without limit
     - **NOW** — repair. Specialisation on failure, gated, adding a narrower rule and never
       editing the old. Rung one of the ladder, conjunction, and the only rung there is.

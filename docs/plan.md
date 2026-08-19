@@ -508,8 +508,8 @@ before six that reads as tuning is out of order.
     - **NOW** — more than one doing a moment, so the machine can ask, be refused, and ask again.
       The world says whether it will take another and the chooser whether it has more, and where
       nothing refuses it changes no reading.
-    - **OPEN** — recording a refusal, whose revival row now reads: a chooser exists that will not
-      repeat what it was refused. Fork **127**.
+    - **DEAD** — a refusal as a code in the moment, the chooser having already refused to
+      repeat itself. Revives where the exclusion must survive the moment. Fork **127**.
     - **OPEN** — a drive that cannot be sated is a fault in the design and not a risk to
       manage, so a term must have a point where it stops pulling. John's.
     - **NOW** — `Roaming` is acted in and declining leaves the walk the world drew, so the
@@ -709,6 +709,7 @@ before six that reads as tuning is out of order.
 | A second hop in three shapes: every conclusion made live, the winner's alone, and only rules that USED one voting | Nought on the implied half in all three, and the run's own accuracy fell each time | RELEVANCE, or a sub-question — a question not NAMING the intermediate cannot trigger the link to it |
 | `Joining.Recent` — a word banded by how far back it was said | Half what narrowing the view buys, and the front end picks the bands | A band the learner mints. Fork 92 |
 | Background admitted to a WIDE genesis scope, a code in every moment being unable to change when the rule fires | A third of what the varied filter reaches at three tellings and three quarters at ten | A world where the varied gate refuses a code a conjunction needed |
+| A refusal as a CODE in the moment, so a negative fact enters positively | Level on both shapes for a larger population. The chooser already refuses to repeat itself, so the fact was acted on before the code arrived | The exclusion having to SURVIVE the moment, which is a store's job rather than a code's |
 
 ---
 

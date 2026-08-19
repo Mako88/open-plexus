@@ -382,7 +382,14 @@ public sealed class DocsTests
     // was dropped because nothing avoided what it was refused and now something does. John's
     // fork is an exam whose problem is unsolved and whose progress is partial, which is a way
     // of measuring rather than another tier of tasks.
-    private const int Whole = 11_806;
+    //
+    // And 11,870 is the thirty-third raise, sixty-four words for a refuted row and the entry
+    // it closes. A refusal as a code in the moment: `no` says the answer is not this word, the
+    // counters are monotone and cannot hold a negative, so it enters positively instead.
+    // Nought over eight seeds in two shapes, and the reason is what the words buy -- the
+    // chooser had already refused to repeat what it said, so the fact was acted on before the
+    // code arrived.
+    private const int Whole = 11_870;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

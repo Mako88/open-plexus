@@ -788,6 +788,20 @@ public sealed class DocsTests
         ("a default named as a seat rather than an arm", @"(?i)\bthe shipped \w+"),
         ("a claim dated by the session", @"(?i)\b(this|last|next) (session|morning|afternoon|week)\b"),
         ("a claim dated by the day", @"(?i)\b(today|yesterday|tomorrow)\b(?!'s)"),
+
+        // AND THE HISTORICAL RECORD, John's, and it is the same rule the findings check makes
+        // about numbers. The commit history is the record; this doc is where the project is
+        // going. A stamp says WHEN a decision was taken, which `git blame` answers exactly and
+        // this file answers staler every week -- and provenance is the half that does work,
+        // because `John's` says who may change a line where a date says nothing.
+        //
+        // The two below are the same fault wearing prose. A doc narrating its own edits grows
+        // a changelog nobody asked for: the ordering carried `reordered` twice in three days,
+        // which is a diff written longhand where the list should simply have moved. State what
+        // is true and let the history be history.
+        ("a date stamp", @"\d{4}-\d{2}-\d{2}"),
+        ("a change narrated rather than stated", @"(?i)\bno longer\b|\b(has|have) since\b"),
+        ("a doc narrating its own edits", @"(?i)\breordered\b|\bused to\b|\bonce already\b"),
     ];
 
     [Fact]
@@ -1034,17 +1048,33 @@ public sealed class DocsTests
             "Free under the shipped timing carries no hard round at all",
             "which is what this session's grid settled",
             "`Surprise` is one, today",
+            "the order of the work is John's, 2026-08-16 and reordered after",
+            "genesis no longer roots on a code that never varied",
+            "the binding world failed and has since lifted",
         };
 
         Assert.All(dated, line => Assert.True(
             Dated.Any(rule => Regex.IsMatch(line, rule.Pattern)),
             $"nothing in the rule set notices this is dated: {line}"));
 
+        // And every rule is tripped by one of them, which the direction above cannot say. A
+        // pattern added without an example beside it is exercised by nothing, passes forever,
+        // and reads exactly like a rule that is working -- and three were added at once here,
+        // which is how a set drifts into decoration one entry at a time.
+        Assert.All(Dated, rule => Assert.True(
+            dated.Any(line => Regex.IsMatch(line, rule.Pattern)),
+            $"no example trips this rule, so nothing exercises it: {rule.What}"));
+
         // And a row that merely mentions a day is not dated, which is what the lookahead is
         // for. Asserted, because a rule that reddens on ordinary prose gets deleted rather
         // than obeyed.
         Assert.DoesNotContain(Dated, rule =>
             Regex.IsMatch("the depth cap is why it is not today's problem", rule.Pattern));
+
+        // Nor is a corpus name that happens to carry digits and dashes, which is the way the
+        // date rule could most easily have been written too wide.
+        Assert.DoesNotContain(Dated, rule =>
+            Regex.IsMatch("`tasks_1-20_v1-2` is enumerable and stays", rule.Pattern));
     }
 
     [Fact]

@@ -210,8 +210,9 @@ gets one home and a cross-reference by number from anywhere else it serves; numb
 renumbered. Forks 1 through 25 are `csharp`'s, and when that code is stripped, point
 `DocsTests` at `csharp` for them rather than weakening it.
 
-The order of the work is John's, 2026-08-16 and reordered 2026-08-18 and 2026-08-19. Nothing
-here is taken out of it, and anything before six that reads as tuning is out of order.
+The order of the work is John's. A number is an IDENTITY other files cite, never renumbered,
+so the list's order is where each one sits. Nothing here is taken out of it, and anything
+before six that reads as tuning is out of order.
 
 - **One, the seam** — a world becomes a set of inputs pushing moments, the brain answers with
   what it did, and `Trial` goes. It carries its own repair: a phase leaving the suite
@@ -219,12 +220,12 @@ here is taken out of it, and anything before six that reads as tuning is out of 
 - **Two, a mechanism for every entry of THE ARCHITECTURE**, however bad, and `Roaming`
   exercising all of them. `DocsTests` holds the first half and `OutstandingTests` the
   second; adhesion and nesting fail it.
-- **And two waits, John's, 2026-08-19** — the conversation harness comes first. A primer
-  moves no counter, so a world that ASKS is what makes reading teach anything at all, and
-  talking to it is the first interactive test of the whole system.
-- **It is an INSTRUMENT rather than a score**, so it is read for which piece bites. The path
-  to a conversation is statements as MOMENTS, the situation store's evidence rule and rung
-  four; the fleet, adhesion, the individual and goals are off it.
+- **Seven, the conversation harness**, and it runs before the rest of two. A primer moves no
+  counter, so a world that ASKS is what makes reading teach anything, and talking to it is
+  the first interactive test of the whole system. John's.
+- **It is an INSTRUMENT rather than a score**, read for which piece bites. The path is
+  statements as MOMENTS, the situation store's evidence rule and rung four; the fleet,
+  adhesion, the individual and goals are off it.
 - **Three, the intentional reds cleared**, which is the stable state to refine from.
 - **Four, audit TRAPS and DO NOT RE-TRY** — a failure class that has earned a check belongs
   in the check, and a revival condition that has expired is a superstition.
@@ -253,7 +254,7 @@ here is taken out of it, and anything before six that reads as tuning is out of 
       learnt. ILP's language-bias problem, what killed the field, and the ladder is finite.
     - **OPEN** — six bits is refused on POWER and eleven names the wrong thing; whether any
       world the naming reaches holds a nameable concept. Fork **34**.
-    - **OPEN** — genesis no longer roots on a code that never varied, and an always-present
+    - **OPEN** — genesis does not root on a code that never varied, and an always-present
       one is still an entry in every table forever. Fork **51**.
   - A concept a thing in its own right
     - **NOW** — `Code`. A commitment's identity is one, and adhesion over a window reaches
@@ -269,7 +270,7 @@ here is taken out of it, and anything before six that reads as tuning is out of 
     - **NOW** — several front ends manufacture symbols from a signal, and each is priced.
     - **OPEN** — nothing makes them attributes of one THING. Rung five names what co-fires,
       which is what a seen ball and a heard *ball* do.
-    - **SETTLED** — the binding world failed as predicted and has since lifted. Fork **25**.
+    - **SETTLED** — the binding world failed and the block is lifted. Fork **25**.
     - **OPEN** — text as an IMAGE keeps ground truth enumerable, so soundness survives where
       a camera kills it. `Senses` names cross two senses, so the gate is open. Fork **107**.
     - **OPEN** — spreading a reading over its range costs most of the score at both front
@@ -406,9 +407,9 @@ here is taken out of it, and anything before six that reads as tuning is out of 
   - Several grains at once
     - **NOW** — subsumption keeps the general rule where both are equally accurate, and it
       reads a category's entailment.
-    - **OPEN** — the gradient collapsed once already: the vote takes the narrowest every
-      round and subsumption the general one every thousandth. A second store needs an
-      evidence rule the first lacked, or it collapses the same way.
+    - **OPEN** — the gradient is fragile: the vote takes the narrowest every round and
+      subsumption the general one every thousandth. A second store needs an
+      evidence rule the first lacked, or it collapses too.
     - **OPEN** — specificity as a gradient across the SITUATION stores too. Rules have that
       gradient; situations have nowhere to keep one — repetition for a general rule,
       assertion for a particular, and the vote ranks repetition only.
@@ -466,7 +467,7 @@ here is taken out of it, and anything before six that reads as tuning is out of 
     - **NOW** — a front end may say what it is looking at, never what to conclude.
       `SeparationTests` fails the build.
     - **OPEN** — the world hands the question already separated, so questionhood is never
-      learnt. A final `?` and rung three say it with nothing new. John's, 2026-08-19.
+      learnt. A final `?` and rung three say it with nothing new. John's.
     - **OPEN** — how hard a fleet searches is a deployment choice, which is a world reaching
       into the brain one level out. Fork **60** carries it, under the machine.
   - What it is told must be settleable
@@ -500,7 +501,7 @@ here is taken out of it, and anything before six that reads as tuning is out of 
     - **OPEN** — prefer the doing whose consequence is least certain, off `Vote.Margin`, which
       needs no body and nothing told. Dies unless it beats a coin on rounds-to-target.
     - **OPEN** — a drive that cannot be sated is a fault in the design and not a risk to
-      manage, so a term must have a point where it stops pulling. John's, 2026-08-18.
+      manage, so a term must have a point where it stops pulling. John's.
     - **NOW** — `Roaming` is acted in and declining leaves the walk the world drew, so the
       watched arm is a chooser rather than a second world.
     - **NOW** — `do(x)` is distinguishable from `x`: `Intervened` derives a code beside each
@@ -578,7 +579,7 @@ here is taken out of it, and anything before six that reads as tuning is out of 
       is a second `IInput`, not a second bench. Fork **113**.
     - **OPEN** — a transcript arrives as ONE moment, so nothing is built from the statements
       and answering is comprehension in a single shot. Statements as MOMENTS removes
-      selecting rather than solving it. John's, 2026-08-19.
+      selecting rather than solving it. John's.
     - **OPEN** — with no outcome slot a commitment may expect any code in the successor, which
       multiplies genesis by the moment's WIDTH. Arms: every unproposed arrived code, against
       one a moment. Fork **114**.

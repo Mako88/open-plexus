@@ -2,65 +2,6 @@ using OpenPlexus.Codes;
 
 namespace OpenPlexus.Machines;
 
-/// <summary>When a machine asks about a moment rather than asserting about it.</summary>
-/// <remarks>
-/// <para>
-/// <b>An arm rather than a setting</b>. Asking costs the one thing a conversation is short of,
-/// which is the patience of whoever is answering, so how often to spend it is a question with a
-/// wrong answer at both ends. A machine that never asks never settles anything and a machine that
-/// asks about every line is one nobody talks to twice.
-/// </para>
-/// <para>
-/// <b>The kill line is pre-registered</b>, and it is about the asks rather than the score.
-/// <see cref="Unsure"/> dies unless it reaches the accuracy <see cref="Always"/> reaches while
-/// asking fewer times, or beats <see cref="Coin"/> at the same number of asks. A rise in accuracy
-/// bought by asking more often is not a finding about curiosity.
-/// </para>
-/// </remarks>
-public enum Curious
-{
-    /// <summary>Ask where the vote is not confident, and claim where it is.</summary>
-    /// <remarks>
-    /// <b>Off <c>Vote.Margin</c>, which needs no body and nothing told</b>. The margin over the
-    /// weight is the same confidence a round already records, so this reads a statistic the
-    /// machine keeps for other reasons rather than adding one.
-    /// </remarks>
-    Unsure,
-
-    /// <summary>Ask where the winning expectation has little evidence behind it.</summary>
-    /// <remarks>
-    /// <para>
-    /// <b>Off <c>Vote.Weight</c>, because a margin measures disagreement and not ignorance</b>.
-    /// An unopposed winner leads the runner-up by its whole weight, so one commitment with two
-    /// observations behind it reads as maximally confident — which is measured here rather than
-    /// argued: <see cref="Unsure"/> asked four hundred times about statements nobody could
-    /// answer and four times about the questions, because every question moment had a single
-    /// advocate and therefore a perfect margin.
-    /// </para>
-    /// <para>
-    /// <b>Weight is how much evidence is behind the winner</b>, so a thin one is the thing a
-    /// question is for. It is the same statistic the vote already keeps.
-    /// </para>
-    /// </remarks>
-    Untested,
-
-    /// <summary>Ask whenever there is anything to ask about.</summary>
-    /// <remarks>
-    /// <b>The ceiling</b>, and it is what a rate has to be read against. Every settlement this
-    /// world can produce is produced here, so it says what the population would be worth if
-    /// nobody minded being interrogated.
-    /// </remarks>
-    Always,
-
-    /// <summary>Ask at a rate, about whatever the vote happened to land on.</summary>
-    /// <remarks>
-    /// <b>The control that says the choosing is doing the work</b>. Run at the rate
-    /// <see cref="Unsure"/> produced, this asks the same number of times and picks the moments
-    /// without reading anything — so a gain that survives here was never about curiosity.
-    /// </remarks>
-    Coin,
-}
-
 /// <summary>What a machine decided to say about a moment.</summary>
 /// <remarks>
 /// <b>A word and an intent rather than an action index</b>, because how a world numbers its
@@ -80,6 +21,19 @@ public readonly record struct Wondered
 /// <summary>A chooser that decides whether to speak, and whether what it says is a question.</summary>
 /// <remarks>
 /// <para>
+/// <b>A rate and no signal</b>, and that is a measurement rather than a shortcut. Two arms read
+/// the vote to decide what was worth asking about and both lost to a coin, by ten times and by
+/// fifty per ask over eight seeds, so what is left is how often to ask. The refutation and what
+/// would bring a signal back are in the plan's table, and <c>ConversingTests</c> holds the
+/// grid.
+/// </para>
+/// <para>
+/// <b>Because curiosity is inverted on a conversation</b>. A machine is unsure exactly where
+/// nobody can answer, which is the statements, and confident on the questions, which are the only
+/// moments a reply can settle. Aiming asks at what the machine does not know aims them away from
+/// what the world can tell it.
+/// </para>
+/// <para>
 /// <b>The population is read and never written</b>. <see cref="Brain.Voting"/> is the same three
 /// read-only calls the failure census is built out of, so a session with a chooser and one
 /// without differ in what is said and in nothing else.
@@ -92,16 +46,13 @@ public readonly record struct Wondered
 public sealed class Curiosity
 {
     private readonly Brain _brain;
-    private readonly Curious _wondering;
-    private readonly double _bar;
+    private readonly double _rate;
     private readonly Random _coins;
     private readonly Func<Code, int?> _naming;
 
     /// <param name="brain">Whose population is read.</param>
-    /// <param name="wondering">Which arm.</param>
-    /// <param name="bar">
-    /// The confidence below which <see cref="Curious.Unsure"/> asks, or the rate at which
-    /// <see cref="Curious.Coin"/> does.
+    /// <param name="rate">
+    /// How often to ask rather than let a moment go — <b>one to ask about everything</b>.
     /// </param>
     /// <param name="seed">The draw, so a run reproduces.</param>
     /// <param name="naming">
@@ -112,15 +63,15 @@ public sealed class Curiosity
     /// rather than a world for the reason <c>Bench</c>'s oracle is: a chooser naming one world
     /// would put that world's vocabulary in front of every other one.
     /// </remarks>
-    public Curiosity(Brain brain, Curious wondering, double bar, int seed, Func<Code, int?> naming)
+    public Curiosity(Brain brain, double rate, int seed, Func<Code, int?> naming)
     {
         ArgumentNullException.ThrowIfNull(brain);
         ArgumentNullException.ThrowIfNull(naming);
-        ArgumentOutOfRangeException.ThrowIfNegative(bar);
+        ArgumentOutOfRangeException.ThrowIfNegative(rate);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(rate, 1.0);
 
         _brain = brain;
-        _wondering = wondering;
-        _bar = bar;
+        _rate = rate;
         _coins = new Random(seed);
         _naming = naming;
     }
@@ -133,9 +84,9 @@ public sealed class Curiosity
 
     /// <summary>How many moments it had nothing to say about.</summary>
     /// <remarks>
-    /// <b>Nothing to say rather than nothing to ask</b>. A moment no commitment fires on has no
-    /// word attached to it, so there is no question to put — which is the shape of the problem
-    /// rather than a decision this makes.
+    /// <b>Nothing to say rather than nothing to ask</b>. A moment carrying no word this world
+    /// numbers has no question to put, which is the shape of the problem rather than a decision
+    /// this makes.
     /// </remarks>
     public long Silences { get; private set; }
 
@@ -151,67 +102,54 @@ public sealed class Curiosity
     /// <param name="felt">The codes the moment arrives as.</param>
     /// <remarks>
     /// <para>
-    /// <b>A claim needs a rule and a question does not</b>, which is the rule that breaks the
-    /// bootstrap lock. Where the population expects something, saying it is a claim and the arm
-    /// decides whether to risk it or check it; where the population expects nothing, there is
-    /// nothing to claim and the only move left is to ask about a word that is in front of it.
+    /// <b>A claim needs a rule and a question does not</b>, which is what breaks the bootstrap
+    /// lock. Where the population expects something, saying it is a claim; where it expects
+    /// nothing there is nothing to claim, and the only move left is to ask about a word in front
+    /// of it. Without that a chooser could only ask about its own expectations, so it would never
+    /// ask, never settle, never mint and never come to have one.
     /// </para>
     /// <para>
-    /// <b>And the blind question is drawn from the moment</b>, rather than from the alphabet. A word the
-    /// human has just used is a far better guess than a word from anywhere in the vocabulary, and
-    /// it costs nothing to prefer — the answer to <i>where is mary</i> is normally a word of the
-    /// story about mary.
+    /// <b>The rate governs both</b>, and siting it anywhere else was a real confound. A control
+    /// forced to ask wherever it has no opinion is not a control, and a quarter of the coin's
+    /// asks were being spent by the harness rather than by the arm.
+    /// </para>
+    /// <para>
+    /// <b>And a blind question is drawn from the moment</b>, rather than from the alphabet. A
+    /// word the human has just used is a better guess than a word from anywhere in the
+    /// vocabulary — the answer to <i>where is mary</i> is normally a word of the story about
+    /// mary.
+    /// </para>
+    /// <para>
+    /// <b>Uniformly over it, which is the arm and not the answer</b>. A run at a terminal asks
+    /// about <i>is</i> and <i>the</i> as readily as about a room, because those are most of what
+    /// a sentence is made of — the same wall <c>Predicting.Salient</c> was built for. Drawing by
+    /// rarity is the arm owed here, and it wants a count over what has been typed.
     /// </para>
     /// </remarks>
     public Wondered Choose(IReadOnlyCollection<Code> felt)
     {
         ArgumentNullException.ThrowIfNull(felt);
 
+        var asking = _coins.NextDouble() < _rate;
+
         var vote = _brain.Voting(felt);
 
-        if (vote.Expects is not { } said || Brain.Meant(said) is not { } word) return Blindly(felt);
-
-        // A weight of nought is reachable and silent: every accuracy starts there, so the first
-        // rounds of any run vote with weights of exactly nought and a lead divided by that is a
-        // NaN. An unweighted vote is not a confident one, which is the reading that makes the
-        // guard a decision rather than a patch.
-        var confidence = vote.Weight > 0 ? vote.Margin / vote.Weight : 0.0;
-
-        var asking = _wondering switch
+        if (vote.Expects is { } said && Brain.Meant(said) is { } word)
         {
-            Curious.Always => true,
-            Curious.Coin => _coins.NextDouble() < _bar,
-            Curious.Untested => vote.Weight < _bar,
-            _ => confidence < _bar,
-        };
+            if (asking) Questions++; else Claims++;
 
-        if (asking) Questions++; else Claims++;
+            return new Wondered { Word = word, Asking = asking };
+        }
 
-        return new Wondered { Word = word, Asking = asking };
-    }
+        if (!asking) return Nothing();
 
-    /// <summary>A question about a word in the moment, where nothing predicted one.</summary>
-    /// <remarks>
-    /// <b>Uniform over the moment, which is the arm and not the answer</b>. A run at a terminal
-    /// asks about <i>is</i> and <i>the</i> as readily as about a room, because those are most of
-    /// what a sentence is made of — the same wall <c>Predicting.Salient</c> was built for, where
-    /// hiding every word in turn spent the demand on the words that carry least. Drawing by
-    /// rarity is the arm owed here, and it wants a count over what has been typed.
-    /// </remarks>
-    private Wondered Blindly(IReadOnlyCollection<Code> felt)
-    {
         var candidates = new List<int>();
 
         foreach (var code in felt)
             if (_naming(code) is { } outcome)
                 candidates.Add(outcome);
 
-        if (candidates.Count == 0)
-        {
-            Silences++;
-
-            return new Wondered { Word = null, Asking = false };
-        }
+        if (candidates.Count == 0) return Nothing();
 
         // Sorted, because the draw has to reach the same word on two machines holding the same
         // moment. A set walks in whatever order it was built in, and a tie-break by dictionary
@@ -222,5 +160,12 @@ public sealed class Curiosity
         Questions++;
 
         return new Wondered { Word = candidates[_coins.Next(candidates.Count)], Asking = true };
+    }
+
+    private Wondered Nothing()
+    {
+        Silences++;
+
+        return new Wondered { Word = null, Asking = false };
     }
 }

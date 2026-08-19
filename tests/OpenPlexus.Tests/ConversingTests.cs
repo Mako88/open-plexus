@@ -126,7 +126,7 @@ public sealed class ConversingTests(ITestOutputHelper output)
     }
 
     private static (Conversing World, Bench Bench, Brain Brain, Curiosity Asking, Human Typing)
-        Made(Curious wondering, int exchanges, double bar = 0.5, int seed = 1, int capacity = 2000)
+        Made(double rate, int exchanges, int seed = 1, int capacity = 2000)
     {
         var printed = new StringBuilder();
         var typing = new Human(printed, exchanges, seed);
@@ -138,7 +138,7 @@ public sealed class ConversingTests(ITestOutputHelper output)
             Printed = new StringWriter(printed),
         });
 
-        var asking = new Curiosity(brain, wondering, bar, seed, world.Naming);
+        var asking = new Curiosity(brain, rate, seed, world.Naming);
 
         var bench = new Bench(
             new Watching<Recited>(
@@ -191,7 +191,7 @@ public sealed class ConversingTests(ITestOutputHelper output)
     {
         const int Exchanges = 400;
 
-        var (world, bench, brain, asking, typing) = Made(Curious.Untested, Exchanges, bar: 1.5);
+        var (world, bench, brain, asking, typing) = Made(rate: 1.0, Exchanges);
 
         var tally = bench.Run(Exchanges * 2, sweep: 200, target: 0.9, window: 50);
 
@@ -235,63 +235,62 @@ public sealed class ConversingTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public void What_a_machine_asks_about_decides_what_it_can_learn()
+    public void How_often_a_machine_asks_barely_changes_what_an_ask_is_worth()
     {
         const int Exchanges = 400;
         const int Seeds = 8;
 
-        // The bars are not comparable across arms and are not meant to be. `Unsure` and `Coin`
-        // read a fraction, `Untested` reads a weight, and `Always` reads nothing at all -- so
-        // one number here would be four different questions sharing a name.
-        var grid = new (Curious Wondering, double Bar)[]
-        {
-            (Curious.Always, 0.0),
-            (Curious.Unsure, 0.5),
-            (Curious.Untested, 0.9),
-            (Curious.Coin, 0.5),
-            (Curious.Coin, 0.25),
-        };
+        // Every rate down from the ceiling, which is what asking about everything is. The two
+        // arms that read the vote to pick their moments are deleted and their row is in the
+        // plan's table -- both lost to a coin here, by ten times and by fifty per ask.
+        double[] rates = [1.0, 0.5, 0.25, 0.1];
 
         output.WriteLine($"{Seeds} seeds, {Exchanges} exchanges each. mean (spread over seeds)");
         output.WriteLine(
-            $"{"arm",-14}{"asked",14}{"told",14}{"right",14}{"per ask",9}{"resident",10}");
+            $"{"rate",-6}{"asked",14}{"told",14}{"right",14}{"per ask",9}{"resident",10}"
+            + $"{"blind",8}");
 
-        var ceiling = 0.0;
+        var worth = new List<double>();
 
-        foreach (var (wondering, bar) in grid)
+        foreach (var rate in rates)
         {
             var asked = new List<double>();
             var told = new List<double>();
             var right = new List<double>();
             var resident = new List<double>();
+            var blind = new List<double>();
 
             for (var seed = 1; seed <= Seeds; seed++)
             {
-                var made = Made(wondering, Exchanges, bar, seed);
+                var made = Made(rate, Exchanges, seed);
                 var tally = made.Bench.Run(Exchanges * 2, sweep: 200, target: 0.9, window: 50);
 
                 asked.Add(made.World.Asked);
                 told.Add(made.World.Told);
                 right.Add(tally.Right);
                 resident.Add(tally.Resident);
+                blind.Add(made.Asking.Blind);
             }
 
-            var named = $"{wondering} {bar:F2}";
+            var perAsk = Mean(asked) == 0 ? 0.0 : Mean(told) / Mean(asked);
 
-            if (wondering is Curious.Always) ceiling = Mean(asked);
+            worth.Add(perAsk);
 
             output.WriteLine(
-                $"{named,-14}{Spread(asked),14}{Spread(told),14}{Spread(right),14}"
-                + $"{(Mean(asked) == 0 ? 0.0 : Mean(told) / Mean(asked)),9:F3}"
-                + $"{Mean(resident),10:F1}");
-
-            // The ceiling asks about every moment it has a word for, so nothing can ask more
-            // often. That is the only ordering asserted: which arm is WORTH its asks wants the
-            // spread read rather than a threshold written before the first run.
-            Assert.True(Mean(asked) <= ceiling,
-                $"{named} asked {Mean(asked):F1} times against a ceiling of {ceiling:F1} — the "
-                + "ceiling is not the ceiling");
+                $"{rate,-6:F2}{Spread(asked),14}{Spread(told),14}{Spread(right),14}{perAsk,9:F3}"
+                + $"{Mean(resident),10:F1}{Mean(blind),8:F0}");
         }
+
+        // Asking less costs asks and not their worth, which is the whole reading. A rate that
+        // bought a better ask would show here as a rise down the column and it does not, so
+        // there is no free lunch in asking less -- there is also no penalty, and a machine
+        // nobody minds talking to is the cheaper one.
+        Assert.All(worth, one => Assert.InRange(one, 0.3, 0.7));
+
+        // And every rate is under the ceiling, which is the one ordering that cannot be an
+        // accident of a seed.
+        for (var at = 1; at < rates.Length; at++)
+            Assert.True(rates[at] < rates[at - 1], "the rates are not in falling order");
 
         static double Mean(IReadOnlyCollection<double> of) => of.Average();
 

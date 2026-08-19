@@ -29,8 +29,7 @@ internal static class Program
         var rounds = Number(args, "--rounds", 400);
         var capacity = Number(args, "--capacity", 2000);
         var seed = Number(args, "--seed", 1);
-        var bar = Fraction(args, "--bar", 0.5);
-        var wondering = Arm(args, "--asking", Curious.Unsure);
+        var rate = Fraction(args, "--asking", 0.25);
 
         var brain = new Brain(new CommittingSettings { Capacity = capacity }, seed);
 
@@ -40,7 +39,7 @@ internal static class Program
             Printed = Console.Out,
         });
 
-        var curiosity = new Curiosity(brain, wondering, bar, seed, world.Naming);
+        var curiosity = new Curiosity(brain, rate, seed, world.Naming);
 
         var bench = new Bench(
             new Watching<Recited>(
@@ -50,8 +49,8 @@ internal static class Program
             brain);
 
         Console.WriteLine(
-            $"talking to a {wondering} machine, {rounds} rounds, capacity {capacity}, seed "
-            + $"{seed}, bar {bar.ToString("F2", CultureInfo.InvariantCulture)}");
+            $"talking, {rounds} rounds, capacity {capacity}, seed {seed}, asking "
+            + $"{rate.ToString("F2", CultureInfo.InvariantCulture)} of the time");
         Console.WriteLine(
             "  a line is a moment. end a line with `?` to ask, leave one blank for a new "
             + $"topic, type `{Conversing.Over}` to stop.");
@@ -108,11 +107,6 @@ internal static class Program
     private static double Fraction(string[] args, string named, double fallback) =>
         Given(args, named) is { } value
             ? double.Parse(value, CultureInfo.InvariantCulture)
-            : fallback;
-
-    private static Curious Arm(string[] args, string named, Curious fallback) =>
-        Given(args, named) is { } value
-            ? Enum.Parse<Curious>(value, ignoreCase: true)
             : fallback;
 
     private static string? Given(string[] args, string named)

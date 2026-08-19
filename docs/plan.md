@@ -126,11 +126,11 @@ FORBIDS things, and several of them are already measured.
 
 - **Twenty used phones on one wifi running the brain**, one stronger machine carrying the
   body — camera at a frame or two a second, audio, temperature, motion.
-- **And the phones are last rather than first, which is John's ordering.** They do not exist
-  yet and will not be bought until this is worth showing somebody, so the hardware is a
-  conclusion of the prototype rather than a precondition for it.
-- **First is one process on one box**, and the only sense is English. Talking to it is the
-  first interactive test of the whole system and needs no camera, phone or wifi.
+- **And the phones are last rather than first, which is John's ordering.** They will not be
+  bought until this is worth showing somebody, so the hardware is a conclusion of the prototype
+  rather than a precondition for it.
+- **First is one process on one box**, the only sense English, and talking to it is the first
+  interactive test of the system — no camera or wifi.
 - **Then the phone as the body and the containers as the brain**, video and sensors in, if
   one machine can hold enough containers to be a fleet. That is the arrangement that says
   whether twenty of anything is needed before twenty of anything is bought.
@@ -148,11 +148,9 @@ FORBIDS things, and several of them are already measured.
 - **And what prices a camera is the front end's vocabulary**, at residents times codes times
   a hundred bytes rather than anything about the population. That is the number to take
   before a sensor is plumbed.
-- **And one input machine feeding twenty holders is the identical case**, not the shared
-  one. Every holder is told the same moment and the same settlement, so naming converges —
-  the divergence measured was between machines seeing DIFFERENT streams.
-- **So a camera per phone is the arrangement to avoid**, and it is the arrangement nobody
-  proposed. What breaks naming is many eyes, not many brains.
+- **And one input machine feeding twenty holders is the identical case.** Every holder is told
+  the same moment and settlement, so naming converges — what breaks it is many eyes rather than
+  many brains, and a camera per phone is the arrangement to avoid.
 - **A sensor is a world and a world is a stream**, so nothing here is a new kind of input —
   what is missing is the plumbing, not a mechanism.
 - **And every ground-truth instrument goes dark.** Soundness, overshoot and hard-round
@@ -164,10 +162,9 @@ FORBIDS things, and several of them are already measured.
 - **So a primer before a test is expected rather than a cheat** — the language before the
   play, the room before the question. What is forbidden is the learner being able to tell
   that a boundary happened.
-- **John's curriculum proposal**: teach it English, then set it a text and examine it, which
-  is the shape the first conversation takes.
-- **And mixing the two is worse than either teaching alone**, so that curriculum costs rather
-  than pays as built. The function-word rules crowd out the population the questions needed.
+- **John's curriculum proposal**: teach it English, then examine it — and mixing the two is
+  worse than either alone, the function-word rules crowding out the population the questions
+  needed.
 - **And the first conversation demands unification rather than sequence**, which inverts what
   the ordering assumed. Binding the question's actor to a statement's actor is rung four, and
   no dose of recency reaches it.
@@ -476,8 +473,8 @@ before six that reads as tuning is out of order.
     - **OPEN** — the store's update rule is still the experimenter's, so what is falsifiable
       is *this statement changes what is known* and not *my store was right*. Fork **104**.
     - **NOW** — a world that ASKS, so the machine obtains its settlements rather than being
-      handed them. A claim needs a rule and everything else is a question, which is what
-      breaks the bootstrap: without a blind ask it never asks, settles or mints. John's.
+      handed them. A claim needs a rule and everything else is a question, which breaks the
+      bootstrap: without a blind ask it never asks, settles or mints. John's.
     - **OPEN** — on a read corpus the OBJECTIVE is the wall and no gate reaches it: the
       informative words are the unpredictable ones and the predictable ones are `to` and
       `the`.
@@ -496,9 +493,9 @@ before six that reads as tuning is out of order.
       entailment cap of one. Fork **115**.
     - **OPEN** — a goal is a SET of codes wanted present, so a goal and a prediction are one
       type once what is expected is a set. What is missing is which set, never how to say it.
-    - **OPEN** — curiosity is INVERTED on a conversation. The machine is unsure exactly where
-      nobody can answer, so `Vote.Margin` and `Vote.Weight` lose to a coin per ask by 9 and 37
-      times over eight seeds. One shape is owed: the blind ask bypasses the arm. Fork **118**.
+    - **NOW** — asking is a RATE with no signal in it, every arm that read the vote having lost.
+      What predicts whether a reply CAN settle is open, and it is not what the machine is unsure
+      about.
     - **OPEN** — a drive that cannot be sated is a fault in the design and not a risk to
       manage, so a term must have a point where it stops pulling. John's.
     - **NOW** — `Roaming` is acted in and declining leaves the walk the world drew, so the
@@ -667,6 +664,7 @@ before six that reads as tuning is out of order.
 | A front end putting a word's POSITION in the moment | Beside the code it is never absent, reaching every moment and no scope; FUSED in, it costs the identity — an input is an attribute, never the concept | Never. Order derives its own code: rung three |
 | Marking the question-story coincidence — `Named`, `Anonymous`, `Either` | Rung four's cheap tests, and they answered: what blocks it is admission, not cost | A derived code over `Bind`'s groups that cannot say *this one is in two of them* |
 | Carrying the DECIDER's identity into the next moment, so a scope roots on it | No score moved, the table grew by half, and on a cyclic world the identity SEPARATED — costing `Rhythm` the moment that holds repair still | Siting it as MEMORY rather than metacognition, and a control whose codes never vary |
+| Curiosity read off the vote — `Unsure` on the margin, `Untested` on the weight | Both lose to a coin per ask, tenfold and fiftyfold over eight seeds: a conversation leaves the machine unsure exactly where nobody can answer | A signal saying whether a reply CAN settle, not whether the machine is sure |
 | `Joining.Recent` — a word banded by how far back it was said | Half what narrowing the view buys, and the front end picks the bands | A band the learner mints. Fork 92 |
 
 ---

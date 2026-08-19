@@ -131,11 +131,11 @@ FORBIDS things, and several of them are already measured.
   rather than a precondition for it.
 - **First is one process on one box**, the only sense English, and talking to it is the first
   interactive test of the system — no camera or wifi.
-- **Then the phone as the body and the containers as the brain**, video and sensors in, if
-  one machine can hold enough containers to be a fleet. That is the arrangement that says
-  whether twenty of anything is needed before twenty of anything is bought.
+- **Then the phone as the body and the containers as the brain**, video and sensors in, if one
+  machine can hold enough containers to be a fleet. That is what says whether twenty of anything
+  is needed before twenty are bought.
 - **And a text conversation as a second body**, so one brain is judged on symbols and on a
-  stream of the world without being two brains.
+  stream without being two brains.
 - **The constraints were all written for this**, so it is a demonstration rather than a
   benchmark. No shared memory, late messages, a cluster vanishing mid-thought.
 - **So the fleet was never the risk**, and what text teaches this learner is answered where
@@ -272,9 +272,9 @@ before six that reads as tuning is out of order.
     - **OPEN** — the tiled patch is the arranged world's cell, so it is told where the parts
       are. Does the advantage survive a grid that does not divide the world's. Fork **44**,
       with **38**.
-    - **OPEN** — the interface costs most of the score, and the front end's resolution is a
-      hard floor: a fixed projection can split what is separable at some resolution and can
-      never invent a direction. How the projection is AIMED beat both, rung five uninvolved.
+    - **OPEN** — the interface costs most of the score and the front end's resolution is a hard
+      floor: a fixed projection splits what is separable at some resolution and never invents a
+      direction. How the projection is AIMED beat both, rung five uninvolved.
     - **OPEN** — quantisation boundary noise is the interface risk and repair AMPLIFIES it:
       two identical worlds either side of a band emit unrelated codes, so specialising on the
       artifact mints it. Counting degrades gracefully here and repairing does not.
@@ -299,12 +299,11 @@ before six that reads as tuning is out of order.
       **116**, and the revival row is the shape of the answer.
   - Concept and label independent
     - **NOW** — rung five, and it goes UP: mint a code for a shared sub-scope and rewrite in
-      terms of it, gated by two bars. Its trigger is REDUNDANCY, so no failure can summon it,
-      and the code is reusable inside a scope that abstracts again. `Abstracting` says why.
-    - **OPEN** — the recursion is scarce on both benches and blocked differently. Naming a
-      `Motif` scope leaves it too short to carry a name, the cue's length being the axis;
-      `Latent`'s three-code scopes fire 0.2 times each, so repair's third code is a
-      coincidence and depth is never tested. Fork **112**.
+      terms of it, gated by two bars. Its trigger is REDUNDANCY, so no failure summons it, and
+      the code is reusable inside a scope that abstracts again. `Abstracting` says why.
+    - **OPEN** — the recursion is scarce on both benches and blocked differently. A named
+      `Motif` scope is left too short to carry a name, the cue's length being the axis;
+      `Latent`'s three-code scopes fire 0.2 times each, so depth is never tested. Fork **112**.
     - **NOW** — concept-before-label is measured, and alternation groups things with no word
       for them yet.
     - **OPEN** — what rung five names is a SET, never a variable, so the two rungs are not
@@ -323,10 +322,10 @@ before six that reads as tuning is out of order.
       can see. Fork **80**.
     - **OPEN** — should the separation bar be charged by what a scope's codes STAND FOR
       rather than by how many there are. Fork **71**.
-    - **OPEN** — a category is the set of codes that are ALTERNATIVES, derived from moments
-      alone. Open on the individual, which substitutability never reaches. `csharp` refuted
-      a SIMILARITY code as the coarse form — a hub at one end, an index at the other, nothing
-      between — so **83**, **84** and **85** want a told alphabet. Fork **97**.
+    - **OPEN** — a category is the set of codes that are ALTERNATIVES, from moments alone. Open
+      on the individual, which substitutability never reaches. `csharp` refuted a SIMILARITY
+      code as the coarse form, a hub at one end and an index at the other, so **83**, **84** and
+      **85** want a told alphabet. Fork **97**.
     - **OPEN** — a name over ALTERNATIVES is derivable and not admitted, rung five being the
       wrong SHAPE: it names what CO-FIRES, and alternatives never do.
   - Understanding deepens without limit
@@ -338,7 +337,7 @@ before six that reads as tuning is out of order.
       clears any bar.
     - **NOW** — and Z is what the HITS had; backwards it mints a child reliably wrong, and a
       code commoner in the MISSES is the condition for a NEGATED one. A random-Z arm runs
-      beside it: if discriminative-Z does not beat that, the bet is dead.
+      beside it, and the bet is dead if discriminative-Z does not beat it.
     - **NOW** — the ladder's admission is decidable and already computed: the language
       extends only when nothing in it separates failures from hits. A rung is admitted for
       ONE commitment, and where two clear, the SHORTER description chooses.
@@ -386,6 +385,9 @@ before six that reads as tuning is out of order.
       FORMED, so matching, the tally, repair and the wire are untouched. No dial, and inert where none is reported.
     - **SETTLED** — rung three reads real English, and its gain tracks the front end's
       SELECTIVITY rather than the task: largest under `Chained`, nil under a bag. Fork **109**.
+    - **OPEN** — rung three is blind on a word said TWICE, `Order` dropping what it cannot place
+      once. A thing that MOVES repeats the room it returns to, so order is blind on the one word
+      that says where it is. Placing a repeat at its LATEST is the arm. Fork **119**.
     - **OPEN** — a referent is a THIRD store rather than the same one: *Mary's bedroom*
       survives leaving the room and *Mary is in the bedroom* does not, so one store gets one
       lifetime wrong whichever it takes.
@@ -443,9 +445,9 @@ before six that reads as tuning is out of order.
     - **OPEN** — the ladder's admission asks whether repair found a separating code, and on a
       wide alphabet memorising always does. What separates *nothing separates* from *nothing
       GENERAL separates*. Fork **86**.
-    - **NOW** — a SHRUG is an outcome, so an ask costs something and where to ask is learnt.
-      At the ceiling the machine declines 44% of statements against 9% of questions, wired
-      nowhere. What stays open is a guess entering the moment it is scored on. Fork **117**.
+    - **NOW** — a SHRUG is an outcome, so an ask costs something and where to ask is LEARNT.
+      The machine declines a statement far more often than a question and was told neither.
+      Open is a guess entering the moment it is scored on. Fork **117**.
     - **SETTLED** — the front end intersecting the question with EACH statement answers task
       one where the bag sits near the marginal, and one hop is all it reaches. Fork **88**.
     - **OPEN** — whether reading real English is predictive enough to teach this learner.
@@ -454,15 +456,14 @@ before six that reads as tuning is out of order.
       single capacity sizes both. Fork **101**.
     - **BLOCKED** — the exam tier above bAbI is unpriced, and blocked until the components
       pass. Fork **90**.
-    - **OPEN** — it is a near-perfect READER and a hopeless SELECTOR, and a front end that
-      hands it the right statement answers a whole task at a twentieth of the bag's
-      population. Selecting IS reading a commitment backwards, so fork **115** carries it
-      and the entailment cap bounds it.
+    - **OPEN** — it is a near-perfect READER and a hopeless SELECTOR, a front end handing it
+      the right statement answering a whole task at a twentieth of the bag's population.
+      Selecting IS reading a commitment backwards, so fork **115** carries it.
   - Told, never architected
     - **NOW** — a front end may say what it is looking at, never what to conclude.
       `SeparationTests` fails the build.
-    - **OPEN** — the world hands the question already separated, so questionhood is never
-      learnt. A final `?` and rung three say it with nothing new. John's.
+    - **NOW** — a final `?` is all a world says, on the conversation, so questionhood is the
+      learner's. The corpora still hand it separated. John's.
     - **OPEN** — how hard a fleet searches is a deployment choice, which is a world reaching
       into the brain one level out. Fork **60** carries it, under the machine.
   - What it is told must be settleable
@@ -507,10 +508,10 @@ before six that reads as tuning is out of order.
     - **OPEN** — and nothing ranks a chooser there, a house having nothing to want. Twins are
       the tier still unbuilt and are rung four's; an isolating world is still built freely and
       goes when its question shuts, only a constructed world proving a ceiling.
-    - **OPEN** — TextWorld's shape is built here and watched before acted in; Crafter puts
-      two unbuilt subsystems in front of the measurement. Open on twins. `csharp` disqualified
-      SURVIVAL as a score and refuted absolute actions under an unrotated view, so an acting
-      world owes both. Fork **103**.
+    - **OPEN** — TextWorld's shape is built here and watched before acted in; Crafter puts two
+      unbuilt subsystems in front of the measurement. Open on twins. `csharp` disqualified
+      SURVIVAL and refuted absolute actions unrotated, so an acting world owes both. Fork
+      **103**.
 - **WHAT THE MACHINE MUST SURVIVE** — C1 to C4 are under THE DESTINATION and do not move;
   these are the questions they leave open.
   - The constraints hold under lateness and loss
@@ -536,9 +537,9 @@ before six that reads as tuning is out of order.
     - **OPEN** — slots of R identical holders let a round finish on either one. Open on what
       R buys and what it costs. Fork **62**.
   - A fleet learns what one machine learns
-    - **NOW** — `Posted` and `Cycle`: asks, answers and settlements over real sockets, with
-      the learning loop still existing exactly once. THE WALK IS GONE and forks 1, 5, 6, 11,
-      18, 20, 21, 22 and 24 went with it; `csharp` keeps their code and their numbers.
+    - **NOW** — `Posted` and `Cycle`: asks, answers and settlements over real sockets, the
+      learning loop still existing exactly once. THE WALK IS GONE and forks 1, 5, 6, 11, 18,
+      20, 21, 22 and 24 went with it; `csharp` keeps their code and numbers.
     - **BROKEN** — worlds with no runner, their `*Run` files being the walk's. Each wants a
       `Bench` or a deletion, and `OutstandingTests` prints the debt.
     - **NOW** — the vote's arithmetic composes and a whole learner runs over it. Fork **52**.
@@ -553,8 +554,8 @@ before six that reads as tuning is out of order.
     - **OPEN** — rung five's evidence is the population, so splitting the population splits
       the agreement. Whether shipping name frequencies recovers it exactly. Fork **81**.
     - **OPEN** — every node predicting its own output while the real wave verifies behind it.
-      What it saves is a hop, so where it pays is deployment. `csharp`'s adaptive version
-      wrote most where it helped least, so WHAT to spend on is the open half. Fork **57**.
+      It saves a hop, so where it pays is deployment. `csharp`'s adaptive version wrote most
+      where it helped least, so WHAT to spend on is the open half. Fork **57**.
     - **NOW** — replicas DRIFT, because the completeness condition ends a round on one of
       them and the other may take the next moment before the last settlement. Order rather
       than content, so a failover replica is a similar population and not the same one.
@@ -588,10 +589,9 @@ before six that reads as tuning is out of order.
     - **SETTLED** — a fixed seed reproduces a run exactly, across sockets too; `Receive`
       folds arrivals in delivery order. Fork **12**.
   - The table fits and the clock allows
-    - **OPEN** — the TABLE is what blows up, not the commitments, needing an entry per code
-      seen while firing. It spills to SQLite on the owning node, rehydrated if it becomes a
-      candidate again — and it is repair's candidate set, so a spill necessarily changes what
-      fires. Fork **31**.
+    - **OPEN** — the TABLE is what blows up rather than the commitments, needing an entry per
+      code seen while firing. It spills to SQLite on the owning node and rehydrates as a
+      candidate — and it is repair's candidate set, so a spill changes what fires. Fork **31**.
     - **OPEN** — matching and settling are nine tenths of the clock on a narrow world whose
       table never grows. Where they go on a WIDE one, and what ends the run. Fork **49**.
     - **OPEN** — a child fires only where its parent does and matching IGNORES that, going

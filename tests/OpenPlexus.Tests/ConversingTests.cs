@@ -40,7 +40,8 @@ public sealed class ConversingTests(ITestOutputHelper output)
     /// prompt — so this reads the terminal the way a person does rather than being told out of
     /// band which read is which.
     /// </remarks>
-    private sealed class Human(StringBuilder printed, int exchanges, int seed) : TextReader
+    private sealed class Human(StringBuilder printed, int exchanges, int seed, int moves = 1)
+        : TextReader
     {
         private readonly Random _draws = new(seed);
 
@@ -98,38 +99,47 @@ public sealed class ConversingTests(ITestOutputHelper output)
                 case 0:
                     _answer = null;
 
+                    // A topic runs for `moves` exchanges and then starts over. At one that is
+                    // the world's own boundary every time and nothing is ever in two rooms; at
+                    // more, the same person moves and the bag holds every room they have been
+                    // in -- which is the one thing only order can separate.
+                    if (_moved > 0) { _step = 2; return Moving(); }
+
+                    _asking = Cast[_draws.Next(Cast.Length)];
+
                     return string.Empty;
 
                 case 1:
-                    var who = Cast[_draws.Next(Cast.Length)];
-                    var where = Places[_draws.Next(Places.Length)];
-
-                    _asking = who;
-                    _answer = null;
-
-                    // Where the answer is remembered, so the question below can be answered
-                    // without parsing back what this line said.
-                    _known = where;
-
-                    return $"{who} is in the {where}";
+                    return Moving();
 
                 default:
                     _step = 0;
                     _at++;
+                    _moved = (_moved + 1) % moves;
                     _answer = _known;
 
                     return $"where is {_asking}?";
             }
         }
 
+        /// <summary>Putting the person somewhere, which may be somewhere they have been.</summary>
+        private string Moving()
+        {
+            _known = Places[_draws.Next(Places.Length)];
+            _answer = null;
+
+            return $"{_asking} is in the {_known}";
+        }
+
         private string _known = string.Empty;
+        private int _moved;
     }
 
     private static (Conversing World, Bench Bench, Brain Brain, Curiosity Asking, Human Typing)
-        Made(double rate, int exchanges, int seed = 1, int capacity = 2000)
+        Made(double rate, int exchanges, int seed = 1, int capacity = 2000, int moves = 1)
     {
         var printed = new StringBuilder();
-        var typing = new Human(printed, exchanges, seed);
+        var typing = new Human(printed, exchanges, seed, moves);
         var brain = new Brain(new CommittingSettings { Capacity = capacity }, seed);
 
         var world = new Conversing(new ConversingSettings
@@ -298,15 +308,15 @@ public sealed class ConversingTests(ITestOutputHelper output)
                 blind.Add(made.Asking.Blind);
             }
 
-            var perAsk = Mean(asked) == 0 ? 0.0 : Mean(told) / Mean(asked);
+            var perAsk = Average(asked) == 0 ? 0.0 : Average(told) / Average(asked);
 
             worth.Add(perAsk);
-            learnt.Add((rate, Mean(duck), Mean(miss)));
+            learnt.Add((rate, Average(duck), Average(miss)));
 
             output.WriteLine(
                 $"{rate,-6:F2}{Spread(asked),14}{Spread(told),14}{Spread(shrugged),14}"
-                + $"{perAsk,9:F3}{Mean(duck),12:F3}{Mean(miss),9:F3}{Mean(sure),8:F3}"
-                + $"{Mean(blind),8:F0}{Mean(resident),10:F1}");
+                + $"{perAsk,9:F3}{Average(duck),12:F3}{Average(miss),9:F3}{Average(sure),8:F3}"
+                + $"{Average(blind),8:F0}{Average(resident),10:F1}");
         }
 
         // The two skip columns are what a shrug being an outcome bought, and the ceiling is
@@ -326,17 +336,132 @@ public sealed class ConversingTests(ITestOutputHelper output)
         // were run for before any of this.
         Assert.All(worth, one => Assert.InRange(one, 0.3, 0.9));
 
-        static double Mean(IReadOnlyCollection<double> of) => of.Average();
-
-        static string Spread(IReadOnlyCollection<double> of)
-        {
-            var mean = of.Average();
-            var error = of.Count < 2
-                ? 0.0
-                : Math.Sqrt(of.Sum(one => (one - mean) * (one - mean)) / (of.Count - 1))
-                    / Math.Sqrt(of.Count);
-
-            return $"{mean,8:F1} ±{error,-4:F1}";
-        }
+        static double Average(IReadOnlyCollection<double> of) => of.Average();
     }
+
+    [Fact]
+    public void A_thing_that_moves_puts_two_rooms_in_the_bag_and_only_order_separates_them()
+    {
+        const int Exchanges = 400;
+        const int Seeds = 8;
+
+        // How many times the same person moves before the topic starts over. At one the world
+        // draws a boundary every exchange and nobody is ever in two rooms; above it the bag
+        // holds every room they have been in, which is the plan's own example and the one thing
+        // a scope cannot say -- a scope is a SET, so what is left to separate the rooms is the
+        // precedences rung three derives at the join.
+        int[] moves = [1, 2, 4, 8];
+
+        output.WriteLine($"{Seeds} seeds, {Exchanges} exchanges each, asking at the ceiling");
+        output.WriteLine(
+            $"{"moves",-7}{"told",14}{"right",8}{"blind",8}{"resident",10}{"minted",9}"
+            + $"{"wanting",9}");
+
+        var right = new List<double>();
+
+        foreach (var move in moves)
+        {
+            var sure = new List<double>();
+            var told = new List<double>();
+            var blind = new List<double>();
+            var resident = new List<double>();
+            var minted = new List<double>();
+            var wanting = new List<double>();
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var made = Made(rate: 1.0, Exchanges, seed, moves: move);
+                var tally = made.Bench.Run(Exchanges * 2, sweep: 200, target: 0.9, window: 50);
+
+                told.Add(made.World.Told);
+                sure.Add(made.World.Told == 0
+                    ? 0.0
+                    : made.World.Confirmed / (double)made.World.Told);
+                blind.Add(made.Asking.Blind);
+                resident.Add(tally.Resident);
+                minted.Add(tally.Minted);
+                wanting.Add(tally.Wanting);
+            }
+
+            right.Add(sure.Average());
+
+            output.WriteLine(
+                $"{move,-7}{Spread(told),14}{sure.Average(),8:F3}{blind.Average(),8:F0}"
+                + $"{resident.Average(),10:F1}{minted.Average(),9:F1}{wanting.Average(),9:F3}");
+        }
+
+        // Every arm answers something, which is the only thing asserted. What a move costs is
+        // read off the column rather than pinned to a threshold nobody has measured yet, and a
+        // prediction written into a wiring check fails two ways and reads the same.
+        Assert.All(right, one => Assert.InRange(one, 0.0, 1.0));
+        Assert.True(right[0] > 0.5,
+            $"the standing case scored {right[0]:F3}, so the comparison has no floor under it");
+    }
+
+    [Fact]
+    public void Rung_three_goes_blind_on_exactly_the_word_a_moving_thing_repeats()
+    {
+        // The mechanism under the column above, asserted rather than argued. `Joined.Order`
+        // places a word by which statement it was in and then DROPS every word it placed
+        // twice, because a word in two statements has no one position -- which is right, and
+        // which means a precedence exists only over words said once in the moment.
+        //
+        // A thing that moves repeats its own name in every statement and repeats a room the
+        // moment it goes back to one. So the words order can separate are the rooms visited
+        // once, and the word it cannot is the room visited twice: order is blind on exactly
+        // the case it was wanted for.
+        var front = new Joined(Joining.Bagged);
+
+        var visited = new[] { "garden", "office", "kitchen", "kitchen" };
+
+        // Newest first, which is what `Recited` promises.
+        var said = visited
+            .Reverse()
+            .Select(where => (IReadOnlyList<Code>)
+                [.. new[] { "mary", "is", "in", "the", where }.Select(Babi.Of)])
+            .ToList();
+
+        var placed = front.Order(new Recited
+        {
+            Said = said,
+            Asked = [.. new[] { "where", "is", "mary" }.Select(Babi.Of)],
+        });
+
+        Assert.NotNull(placed);
+
+        // Said once, so each has a position and a precedence can say which came after which.
+        Assert.Contains(Babi.Of("garden"), placed);
+        Assert.Contains(Babi.Of("office"), placed);
+
+        // Said twice, so it has none -- and it is the room mary is actually in.
+        Assert.DoesNotContain(Babi.Of("kitchen"), placed);
+
+        // As are the words every statement carries, which is the same rule doing the same
+        // thing and is why a bag of function words costs nothing here.
+        foreach (var word in new[] { "mary", "is", "in", "the" })
+            Assert.DoesNotContain(Babi.Of(word), placed);
+
+        output.WriteLine(
+            $"{visited.Length} statements, {placed.Count} words placed: "
+            + string.Join(" ", placed.OrderBy(one => one.Value).Select(one => one.Key)));
+    }
+
+    /// <summary>A mean over seeds, with the standard error of it.</summary>
+    /// <remarks>
+    /// <b>One place, because two grids read the same column</b>. A second copy is a second
+    /// thing to get wrong, and `DuplicationTests` is what said so.
+    /// </remarks>
+    private static string Spread(IReadOnlyCollection<double> of)
+    {
+        var mean = of.Average();
+        var error = of.Count < 2
+            ? 0.0
+            : Math.Sqrt(of.Sum(one => (one - mean) * (one - mean)) / (of.Count - 1))
+                / Math.Sqrt(of.Count);
+
+        return $"{mean,8:F1} ±{error,-4:F1}";
+    }
+
+    /// <summary>The mean alone, where the spread is printed in another column.</summary>
+    private static double Average(IReadOnlyCollection<double> of) => of.Average();
 }

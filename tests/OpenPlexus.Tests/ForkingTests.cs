@@ -272,8 +272,8 @@ public sealed class ForkingTests(ITestOutputHelper output)
     /// <b>The arm is wired and what it claims to remove is what falls.</b>
     /// </summary>
     /// <remarks>
-    /// <b>It asserts on collisions rather than on a score, because that is the event the rule
-    /// is about.</b> How much of the world was FOUND is printed beside it and asserted on by
+    /// <b>It asserts on collisions rather than on a score.</b> Because that is the event the rule
+    /// is about. How much of the world was FOUND is printed beside it and asserted on by
     /// nothing — this repo's rule is that an accuracy is reported next to a count of the
     /// world's own rules held, and the grid that carries the score has residents and sound
     /// rules but not that. A parent refused its own spent codes cannot arrive at its own earlier

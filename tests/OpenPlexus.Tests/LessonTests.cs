@@ -916,9 +916,14 @@ public sealed class LessonTests(ITestOutputHelper output)
                 + $"against {resident[(named, Admitting.Anything)]}, so the churn it was named "
                 + "for has gone by some other road");
 
-            // And the ladder's trigger fires at last. Nought means the language never admits
-            // being short; anything above it is the admission rule working where it could not
-            // before, including on a lesson a conjunction cannot answer at all.
+            // And the ladder's trigger fires at last, on a population old enough to be asked.
+            // Nought means the language never admits being short; anything above it is the
+            // admission rule working where it could not before, including on a lesson a
+            // conjunction cannot answer at all.
+            //
+            // A parent below the floor on EITHER side is refused as too young rather than
+            // counted as a ceiling, which is what makes this number about the language. Before
+            // that it read 1.000 at one telling, where nothing had been said twice.
             Assert.Equal(0.0, wanting[(named, Admitting.Anything)]);
 
             Assert.True(wanting[(named, Admitting.Testable)] > 0.1,

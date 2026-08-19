@@ -1330,14 +1330,32 @@ public sealed class Population
         }
     }
 
-    /// <summary>Whether a commitment has missed enough times to be worth repairing.</summary>
+    /// <summary>Whether a commitment has enough of a record to be worth repairing.</summary>
     /// <remarks>
+    /// <para>
     /// <b>Written once and read by two callers, which is the point.</b> The chain that
     /// DECIDES and the pass that COUNTS have to ask the identical question or the census
     /// describes a machine that is not running — the same drift <c>Learned.Grade</c> was
     /// written once to avoid.
+    /// </para>
+    /// <para>
+    /// <b>And BOTH arms of the proportion, which is the floor's own argument finished.</b>
+    /// Below the floor no test of a proportion has any power, and a commitment that has never
+    /// been right has no proportion at all — there is nothing for a separating code to be
+    /// commoner IN.
+    /// </para>
+    /// <para>
+    /// <b>And under <see cref="Admitting.Testable"/> the hit side wants the whole floor</b>,
+    /// because a conjunctive child keeps a SUBSET of the parent's hits. A parent with fewer
+    /// than the floor cannot make a judgeable child by any condition at all, so refusing it is
+    /// a fact about the parent's age and not about the scope language. Counting it as the
+    /// language failing to separate is the ladder's trigger firing on a young population,
+    /// which is most of the reading before anything has been said twice.
+    /// </para>
     /// </remarks>
-    private bool PastFloor(Commitment one) => one.Misses >= _dials.Floor;
+    private bool PastFloor(Commitment one) =>
+        one.Misses >= _dials.Floor
+        && one.Hits >= (_dials.Admitting == Admitting.Testable ? _dials.Floor : 1);
 
     /// <inheritdoc cref="PastFloor"/>
     /// <summary>Whether a commitment has any of its repair budget left.</summary>

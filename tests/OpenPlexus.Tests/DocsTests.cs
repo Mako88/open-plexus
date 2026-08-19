@@ -66,8 +66,8 @@ public sealed class DocsTests
     /// doc read in pages is the pile of docs it replaced, wearing one filename.
     /// </para>
     /// <para>
-    /// <b>And the per-item cap is why this was needed, which is a correction to the comment
-    /// above it.</b> Capping the item and not the doc fixed the right fault — an item becoming
+    /// <b>And the per-item cap is why this was needed.</b> Which is a correction to the comment
+    /// above it. Capping the item and not the doc fixed the right fault — an item becoming
     /// an essay — and gave up the only thing that bounded the total. Both budgets were green
     /// at nearly twenty-five thousand words, because twelve new ideas cost twelve lines and
     /// nothing ever said stop. The session that measured this had read the doc in pages all

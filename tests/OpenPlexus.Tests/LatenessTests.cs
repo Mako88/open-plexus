@@ -45,8 +45,8 @@ public sealed class LatenessTests(ITestOutputHelper output)
     /// Six hundred, and the number is the finding rather than a convenience.
     /// </summary>
     /// <remarks>
-    /// <b>Lateness costs wall clock per round and not per message, which is why this is not
-    /// three thousand.</b> A round's deliveries all go out at once and the round waits on
+    /// <b>Lateness costs wall clock per round and not per message.</b> Which is why this is not
+    /// three thousand. A round's deliveries all go out at once and the round waits on
     /// its SLOWEST, so a fifth of messages delayed 25ms means most ROUNDS pay 25ms — twice,
     /// once for the vote and once for the settlement. Three thousand rounds ran past two
     /// minutes at <c>asked=3, heard=3</c>: every gathering closed and the clock was the only
@@ -61,8 +61,8 @@ public sealed class LatenessTests(ITestOutputHelper output)
     /// A fifth of deliveries held a long way back.
     /// </summary>
     /// <remarks>
-    /// <b>A small share delayed a lot, which is <see cref="Lateness"/>'s own argument and
-    /// the shape that actually stresses settling.</b> Delaying everything a little measures
+    /// <b>A small share delayed a lot.</b> Which is <see cref="Lateness"/>'s own argument and
+    /// the shape that actually stresses settling. Delaying everything a little measures
     /// the scheduler; what a real network adds is a few messages arriving LONG after their
     /// siblings, and that is the case a gathering has to survive.
     /// </remarks>

@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -377,21 +377,115 @@ public sealed class MonkTests(ITestOutputHelper output)
         // requirement -- and this suite already had one of those refuted tonight.
     }
 
+    /// <summary>
+    /// The three arms `DialTests` holds hand-set, on worlds that are not the conversation.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Their entries name a bar</b>, and a drawn lesson does not clear it. Each says it
+    /// leaves when a generated world has put its two arms against each other, and the worry it
+    /// names is a controller choosing on ONE world's evidence. <c>Lesson.Drawn</c> varies the
+    /// words and not the shape, and the learner is word-blind — three of four claiming arms
+    /// read identically written against drawn — so it puts a spread under the conversation
+    /// rather than adding a second world.
+    /// </para>
+    /// <para>
+    /// <b>These two are that second world.</b> The multiplexer's true rules ARE conjunctions
+    /// and it cannot contain its own answer; Monk-1 is a published symbolic benchmark. Neither
+    /// is told, neither has a vocabulary, and nothing in either is a statement — so an arm
+    /// that only pays where somebody is talking shows up here as nothing.
+    /// </para>
+    /// <para>
+    /// <b>The kill line, written before the grid ran</b>: an arm that wins on the conversation
+    /// and loses on a world whose rules are conjunctions is a setting for that conversation
+    /// rather than a default for the brain.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_hand_set_arms_read_on_worlds_that_are_not_a_conversation()
+    {
+        const int Seeds = 3;
+
+        var arms = new (string Named, CommittingSettings Dials)[]
+        {
+            ("shipped ", new CommittingSettings()),
+            ("wholly  ", new CommittingSettings { Rooting = Rooting.Wholly }),
+            ("credited", new CommittingSettings { Crediting = Crediting.Birth }),
+            ("testable", new CommittingSettings { Admitting = Admitting.Testable }),
+        };
+
+        output.WriteLine($"{Seeds} seeds, 20,000 rounds, one arm off the shipped brain");
+        output.WriteLine("world        arm         drawn             held      repaired");
+
+        var scored = new Dictionary<(string World, string Arm), double>();
+        var repairs = new Dictionary<(string World, string Arm), double>();
+
+        foreach (var (world, run) in new (string Named, Func<int, CommittingSettings, Tally> Run)[]
+        {
+            ("plex-3     ", (seed, dials) => Plexed(3, seed, dials)),
+            ("monk-1     ", (seed, dials) => Monked(Puzzle.One, seed, dials)),
+        })
+        {
+            foreach (var (named, dials) in arms)
+            {
+                var drawn = new List<double>();
+                var held = new List<double>();
+                var repaired = new List<double>();
+
+                for (var seed = 1; seed <= Seeds; seed++)
+                {
+                    var tally = run(seed, dials);
+
+                    drawn.Add(tally.Recent);
+                    held.Add(tally.Resident);
+                    repaired.Add(tally.Repaired);
+                }
+
+                scored[(world.Trim(), named.Trim())] = drawn.Average();
+                repairs[(world.Trim(), named.Trim())] = repaired.Average();
+
+                output.WriteLine(
+                    $"{world,-13}{named,-12}{Sweep.Spread(drawn),18}{held.Average(),9:F1}"
+                    + $"{repaired.Average(),10:F1}");
+            }
+        }
+
+        // No bar on any score, and that is deliberate rather than a gap. Which way these go
+        // has never been measured off the conversation, so a threshold written before the
+        // first reading would be a prediction dressed as a requirement -- a fault this file
+        // has already had refuted once.
+        //
+        // The wiring is asserted on the REPAIR count rather than on the score, and that is the
+        // correction this grid needed. An address-two multiplexer reads 1.000 for every arm,
+        // so a check on the score there fails at a ceiling and says nothing about whether the
+        // arm ran -- which is this repo's own trap about a grid of identical rows being a
+        // verdict on the world.
+        foreach (var world in new[] { "plex-3", "monk-1" })
+            Assert.True(
+                new[] { "wholly", "credited", "testable" }
+                    .Any(arm => Math.Abs(repairs[(world, arm)] - repairs[(world, "shipped")])
+                        > 0.5),
+                $"on {world} every arm repaired exactly as often as the shipped brain, so "
+                + "none of the three is wired to this run at all");
+    }
+
     /// <summary>One Monk run, reported in the terms every world shares.</summary>
     /// <param name="puzzle">Which of the three.</param>
     /// <param name="seed">The world's generator and the brain's.</param>
-    private static Tally Monked(Puzzle puzzle, int seed) =>
+    /// <param name="dials">The brain, or the shipped one where an arm is not being read.</param>
+    private static Tally Monked(Puzzle puzzle, int seed, CommittingSettings? dials = null) =>
         new MonkRun(
             new MonkSettings { Puzzle = puzzle, Withheld = 132 },
-            new Brain(new CommittingSettings(), seed),
+            new Brain(dials ?? new CommittingSettings(), seed),
             seed).Run(20_000).Tally;
 
     /// <summary>The control from a world whose true rules ARE conjunctions.</summary>
     /// <param name="address">Address bits.</param>
     /// <param name="seed">The world's generator and the brain's.</param>
-    private static Tally Plexed(int address, int seed) =>
+    /// <param name="dials">The brain, or the shipped one where an arm is not being read.</param>
+    private static Tally Plexed(int address, int seed, CommittingSettings? dials = null) =>
         new MultiplexerRun(
             new MultiplexerSettings { Address = address },
-            new Brain(new CommittingSettings(), seed),
+            new Brain(dials ?? new CommittingSettings(), seed),
             seed).Run(20_000).Tally;
 }

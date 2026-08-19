@@ -206,6 +206,10 @@ public sealed class ConversingTests(ITestOutputHelper output)
             $"the human  : {typing.Confirmed} confirmed, {typing.Corrected} corrected, "
             + $"{typing.Shrugged} shrugged");
         output.WriteLine(
+            $"answerable : {world.Confirmed} of {world.Told} guesses confirmed, "
+            + $"{(world.Told == 0 ? 0.0 : world.Confirmed / (double)world.Told):F3}, against "
+            + $"{asking.Blind} blind asks");
+        output.WriteLine(
             $"settling   : {tally.Right} right, {tally.Wrong} wrong, {tally.Silent} nothing "
             + $"fired, {tally.Abstained} settled nothing");
         output.WriteLine(
@@ -253,7 +257,7 @@ public sealed class ConversingTests(ITestOutputHelper output)
         output.WriteLine($"{Seeds} seeds, {Exchanges} exchanges each. mean (spread over seeds)");
         output.WriteLine(
             $"{"rate",-6}{"asked",14}{"told",14}{"shrugged",14}{"per ask",9}"
-            + $"{"skips stmt",12}{"skips q",9}{"resident",10}");
+            + $"{"skips stmt",12}{"skips q",9}{"right",8}{"blind",8}{"resident",10}");
 
         var worth = new List<double>();
         var learnt = new List<(double Rate, double Statements, double Questions)>();
@@ -267,6 +271,8 @@ public sealed class ConversingTests(ITestOutputHelper output)
             var shrugged = new List<double>();
             var duck = new List<double>();
             var miss = new List<double>();
+            var sure = new List<double>();
+            var blind = new List<double>();
 
             for (var seed = 1; seed <= Seeds; seed++)
             {
@@ -284,6 +290,12 @@ public sealed class ConversingTests(ITestOutputHelper output)
                 // No counter is needed for it and one would be a second way to be wrong.
                 duck.Add((Exchanges - made.World.Shrugged) / (double)Exchanges);
                 miss.Add((Exchanges - made.World.Told) / (double)Exchanges);
+
+                // Accuracy on the rounds a reply could settle, which the trailing one cannot
+                // say: it counts every round where the machine correctly expected that nobody
+                // knew, and half of these moments are ones nobody can answer.
+                sure.Add(made.World.Told == 0 ? 0.0 : made.World.Confirmed / (double)made.World.Told);
+                blind.Add(made.Asking.Blind);
             }
 
             var perAsk = Mean(asked) == 0 ? 0.0 : Mean(told) / Mean(asked);
@@ -293,7 +305,8 @@ public sealed class ConversingTests(ITestOutputHelper output)
 
             output.WriteLine(
                 $"{rate,-6:F2}{Spread(asked),14}{Spread(told),14}{Spread(shrugged),14}"
-                + $"{perAsk,9:F3}{Mean(duck),12:F3}{Mean(miss),9:F3}{Mean(resident),10:F1}");
+                + $"{perAsk,9:F3}{Mean(duck),12:F3}{Mean(miss),9:F3}{Mean(sure),8:F3}"
+                + $"{Mean(blind),8:F0}{Mean(resident),10:F1}");
         }
 
         // The two skip columns are what a shrug being an outcome bought, and the ceiling is

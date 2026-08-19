@@ -167,6 +167,28 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     /// </remarks>
     public long Told { get; private set; }
 
+    /// <summary>How many of its asks were answered with the word it had guessed.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Accuracy on the answerable rounds, taken where it can be taken</b>. A trailing accuracy
+    /// over the whole run counts every round where the machine correctly expected that nobody
+    /// knew, and half the moments here are ones nobody can answer — so a skewed column raises it
+    /// for free, which is this repo's own trap.
+    /// </para>
+    /// <para>
+    /// <b>A confirmation is the guess being right, exactly</b>, which is why this can live on the
+    /// world at all. The world never sees a vote; it sees which word it was asked to put and
+    /// whether the human said yes to it, and those are the same thing.
+    /// </para>
+    /// <para>
+    /// <b>And a blind ask is in here too</b>, which is the caveat rather than a defect. A
+    /// question about a word nothing predicted is a draw and not a guess, so a run whose asks
+    /// are mostly blind reads this low for a reason that is not the population's — read it
+    /// beside <c>Curiosity.Blind</c>.
+    /// </para>
+    /// </remarks>
+    public long Confirmed { get; private set; }
+
     /// <summary>How many of its asks got <see cref="Nothing"/> back.</summary>
     /// <remarks>
     /// <b>The cost of asking</b>, and it is a settlement rather than a waste. A machine that
@@ -347,7 +369,12 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
         // Nobody knew, which is a settlement rather than the absence of one.
         if (words.Count == 0) return Nothing;
 
-        if (string.Equals(words[0], "yes", StringComparison.Ordinal)) return Heard(word);
+        if (string.Equals(words[0], "yes", StringComparison.Ordinal))
+        {
+            Confirmed++;
+
+            return Heard(word);
+        }
 
         // And a refusal is neither. `No` says the answer is not this word and says nothing about
         // what it is, and the counters here are monotone with no way to record a negative -- so

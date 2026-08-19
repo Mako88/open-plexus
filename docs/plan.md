@@ -317,8 +317,8 @@ before six that reads as tuning is out of order.
       no scope. Revives if naming ever looks inside a scope. Fork **36**.
     - **OPEN** — whether rung five buys anything a better-aimed projection does not, patch
       tokens having raised the floor while abstracting nothing. Fork **42**.
-    - **OPEN** — two clean rules disagreeing about one code name the redundant one neither
-      can see. Fork **80**.
+    - **OPEN** — two clean rules disagreeing about one code name the redundant one neither can
+      see. Fork **80**.
     - **OPEN** — should the separation bar be charged by what a scope's codes STAND FOR rather
       than by how many. Fork **71**.
     - **OPEN** — a category is the set of codes that are ALTERNATIVES, from moments alone. Open
@@ -384,15 +384,15 @@ before six that reads as tuning is out of order.
       FORMED, so matching, the tally, repair and the wire are untouched. No dial, and inert where none is reported.
     - **SETTLED** — rung three reads real English, and its gain tracks the front end's
       SELECTIVITY rather than the task: largest under `Chained`, nil under a bag. Fork **109**.
-    - **OPEN** — rung three is blind on a word said TWICE, `Order` dropping what it cannot place
-      once, so a thing that MOVES is not tracked. Placing a repeat at its LATEST removes the
-      collapse and owes every text world a baseline. Fork **119**.
+    - **OPEN** — rung three is blind on a word said TWICE, so a thing that MOVES is not tracked.
+      Placing a repeat at its LATEST recovers most of that and beats no shortcut: no arm clears a
+      RECENCY bar needing no learning, on either world. John's. Fork **119**.
     - **OPEN** — a referent is a THIRD store: *Mary's bedroom* survives leaving the room and
       *Mary is in the bedroom* does not, so one store gets a lifetime wrong whichever it takes.
     - **OPEN** — nothing SCORES the update, so what retracts is the experimenter's rule. Fork
       **104**.
-    - **OPEN** — does a band the learner MINTS differ from one handed over. Fork **92**.
-    - **OPEN** — does overwriting dissolve the selection rather than help it. Open on
+    - **OPEN** — does a band the learner MINTS differ from a handed one. Fork **92**.
+    - **OPEN** — does overwriting dissolve the selection rather than help it, on
       `Distinguished`. Fork **94**.
     - **OPEN** — the key that moved last is not worth following: it leads where one walker
       makes it the only candidate and loses at four. Fork **95**.
@@ -407,13 +407,13 @@ before six that reads as tuning is out of order.
       particular, and the vote ranks repetition only.
     - **OPEN** — whether compression is self-regulating. No signal yet. Fork **23**.
     - **OPEN** — project each scope code to its COARSER form when counting pairs. Test the
-      rewrite first: a name no scope can be said in is a word with no referent. Fork **83**.
+      rewrite first: a name no scope can say is a word with no referent. Fork **83**.
     - **OPEN** — `IQuantizer` must answer *what is the coarser form of this one*, which is
       the first thing a world tells the brain about its alphabet. Fork **84**.
     - **OPEN** — a coarse name entering a scope as a new claim is redundant where the moment
-      carries the category. Open where no moment does. Fork **85**.
-    - **OPEN** — three stores rather than two, and the missing operator mints an INDIVIDUAL,
-      which no rung covers. Fork **93**.
+      carries the category. Open where none does. Fork **85**.
+    - **OPEN** — three stores rather than two, the missing operator minting an INDIVIDUAL that
+      no rung covers. Fork **93**.
   - Malleability is the record
     - **NOW** — an accuracy-weighted vote, plus a recency-weighted local estimate that never
       merges. This one works.

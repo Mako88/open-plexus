@@ -40,14 +40,14 @@ public sealed class ConversingTests(ITestOutputHelper output)
     /// prompt — so this reads the terminal the way a person does rather than being told out of
     /// band which read is which.
     /// </remarks>
-    private sealed class Human(StringBuilder printed, int exchanges, int seed, int moves = 1)
+    private sealed class Human(
+        StringBuilder printed, int exchanges, int seed, int moves = 1, bool crowded = false)
         : TextReader
     {
         private readonly Random _draws = new(seed);
+        private readonly Queue<(string Line, string? Answer)> _topic = new();
 
         private string? _answer;
-        private string _asking = string.Empty;
-        private int _step;
         private int _at;
 
         /// <summary>How many times it was asked something nobody could answer.</summary>
@@ -58,6 +58,21 @@ public sealed class ConversingTests(ITestOutputHelper output)
 
         /// <summary>How many times it corrected one.</summary>
         public int Corrected { get; private set; }
+
+        /// <summary>Questions put.</summary>
+        public int Questions { get; private set; }
+
+        /// <summary>
+        /// How often the answer is the room mentioned LAST, which needs no learning at all.
+        /// </summary>
+        /// <remarks>
+        /// <b>The ceiling a front-end arm has to beat, and it costs milliseconds</b>. John's
+        /// question: is <c>Latest</c> tracking a thing that moves, or is it scoring a world where
+        /// the freshest room is always the answer? Where one person moves alone it is always the
+        /// answer and the arm can be read as having learnt nothing. This is the number that says
+        /// which, and taking it after the grid rather than before it was the mistake.
+        /// </remarks>
+        public int Recency { get; private set; }
 
         public override string? ReadLine()
         {
@@ -92,46 +107,74 @@ public sealed class ConversingTests(ITestOutputHelper output)
 
         private string? Saying()
         {
-            if (_at >= exchanges) return null;
-
-            switch (_step++)
+            if (_topic.Count == 0)
             {
-                case 0:
-                    _answer = null;
+                if (_at >= exchanges) return null;
 
-                    // A topic runs for `moves` exchanges and then starts over. At one that is
-                    // the world's own boundary every time and nothing is ever in two rooms; at
-                    // more, the same person moves and the bag holds every room they have been
-                    // in -- which is the one thing only order can separate.
-                    if (_moved > 0) { _step = 2; return Moving(); }
-
-                    _asking = Cast[_draws.Next(Cast.Length)];
-
-                    return string.Empty;
-
-                case 1:
-                    return Moving();
-
-                default:
-                    _step = 0;
-                    _at++;
-                    _moved = (_moved + 1) % moves;
-                    _answer = _known;
-
-                    return $"where is {_asking}?";
+                Exchange();
             }
+
+            var (line, answer) = _topic.Dequeue();
+
+            _answer = answer;
+
+            return line;
         }
 
-        /// <summary>Putting the person somewhere, which may be somewhere they have been.</summary>
-        private string Moving()
+        /// <summary>One exchange: a placement, then a question about somebody placed.</summary>
+        /// <remarks>
+        /// <para>
+        /// <b>One statement and one question</b>, which is the shape every earlier row was taken
+        /// on. Emitting a topic's placements in a block and asking once at the end is a
+        /// different world — far fewer questions a round, and the question no longer sits
+        /// between the moves — so crowding has to be the only thing that changes.
+        /// </para>
+        /// <para>
+        /// <b>Crowded is what breaks the recency shortcut</b>. With one person moving alone the
+        /// freshest room is always where they are, so an arm reading the last mention cannot be
+        /// told from one that tracks anything. With several moving, the question is about
+        /// whoever it is about and the answer is often not the last room said.
+        /// </para>
+        /// </remarks>
+        private void Exchange()
         {
-            _known = Places[_draws.Next(Places.Length)];
-            _answer = null;
+            // A topic starts over every `moves` exchanges, which is the corpus's story boundary
+            // typed by hand. At one that is every exchange and nobody is ever in two rooms.
+            if (_moved == 0)
+            {
+                _where.Clear();
+                _placed.Clear();
+                _only = Cast[_draws.Next(Cast.Length)];
 
-            return $"{_asking} is in the {_known}";
+                _topic.Enqueue((string.Empty, null));
+            }
+
+            var who = crowded ? Cast[_draws.Next(Cast.Length)] : _only;
+            var room = Places[_draws.Next(Places.Length)];
+
+            _where[who] = room;
+            _last = room;
+
+            if (!_placed.Contains(who)) _placed.Add(who);
+
+            _topic.Enqueue(($"{who} is in the {room}", null));
+
+            var asked = crowded ? _placed[_draws.Next(_placed.Count)] : _only;
+            var answer = _where[asked];
+
+            Questions++;
+            if (string.Equals(answer, _last, StringComparison.Ordinal)) Recency++;
+
+            _topic.Enqueue(($"where is {asked}?", answer));
+
+            _at++;
+            _moved = (_moved + 1) % moves;
         }
 
-        private string _known = string.Empty;
+        private readonly Dictionary<string, string> _where = new(StringComparer.Ordinal);
+        private readonly List<string> _placed = [];
+        private string _only = string.Empty;
+        private string _last = string.Empty;
         private int _moved;
     }
 
@@ -244,10 +287,10 @@ public sealed class ConversingTests(ITestOutputHelper output)
 
     private static (Conversing World, Bench Bench, Brain Brain, Curiosity Asking, Human Typing)
         Made(double rate, int exchanges, int seed = 1, int capacity = 2000, int moves = 1,
-            Placing placing = Placing.Once, bool wrapped = false)
+            Placing placing = Placing.Once, bool wrapped = false, bool crowded = false)
     {
         var printed = new StringBuilder();
-        var typing = new Human(printed, exchanges, seed, moves);
+        var typing = new Human(printed, exchanges, seed, moves, crowded);
         var brain = new Brain(new CommittingSettings { Capacity = capacity }, seed);
 
         var world = new Conversing(new ConversingSettings
@@ -455,110 +498,107 @@ public sealed class ConversingTests(ITestOutputHelper output)
         const int Exchanges = 400;
         const int Seeds = 8;
 
-        // How many times the same person moves before the topic starts over. At one the world
-        // draws a boundary every exchange and nobody is ever in two rooms; above it the bag
-        // holds every room they have been in, which is the plan's own example and the one thing
-        // a scope cannot say -- a scope is a SET, so what is left to separate the rooms is the
-        // precedences rung three derives at the join.
-        int[] moves = [1, 4, 8];
+        // How many placements a topic holds before it starts over. At one, nobody is ever in
+        // two rooms and no treatment of a repeat can differ from any other.
+        int[] moves = [1, 8];
 
         var placings = new[]
         {
-            (Placing.Once, false), (Placing.Once, true), (Placing.Latest, true),
-            (Placing.Every, true), (Placing.Ended, true),
+            (Placing.Once, false), (Placing.Latest, true), (Placing.Every, true),
         };
 
         output.WriteLine($"{Seeds} seeds, {Exchanges} exchanges each, asking at the ceiling");
         output.WriteLine(
-            $"{"moves",-7}{"placing",-16}{"told",14}{"right",8}{"codes",8}{"resident",10}"
-            + $"{"minted",9}{"wanting",9}");
+            $"{"moves",-7}{"world",-9}{"placing",-9}{"recency",9}{"right",8}{"vs base",9}"
+            + $"{"codes",8}{"resident",10}{"wanting",9}");
 
-        var right = new Dictionary<(int Moves, Placing Placing, bool Wrapped), double>();
-        var held = new Dictionary<(int Moves, Placing Placing, bool Wrapped), double>();
+        var right = new Dictionary<(int Moves, bool Crowded, Placing Placing), double>();
+        var recency = new Dictionary<(int Moves, bool Crowded), double>();
 
         foreach (var move in moves)
         {
-            foreach (var (placing, wrapped) in placings)
+            foreach (var crowd in new[] { false, true })
             {
-                var sure = new List<double>();
-                var told = new List<double>();
-                var codes = new List<double>();
-                var resident = new List<double>();
-                var minted = new List<double>();
-                var wanting = new List<double>();
-
-                for (var seed = 1; seed <= Seeds; seed++)
+                foreach (var (placing, wrapped) in placings)
                 {
-                    var made = Made(
-                        rate: 1.0, Exchanges, seed, moves: move, placing: placing,
-                        wrapped: wrapped);
+                    var sure = new List<double>();
+                    var fresh = new List<double>();
+                    var codes = new List<double>();
+                    var resident = new List<double>();
+                    var wanting = new List<double>();
 
-                    var tally = made.Bench.Run(
-                        Exchanges * 2, sweep: 200, target: 0.9, window: 50);
+                    for (var seed = 1; seed <= Seeds; seed++)
+                    {
+                        var made = Made(
+                            rate: 1.0, Exchanges, seed, moves: move, placing: placing,
+                            wrapped: wrapped, crowded: crowd);
 
-                    told.Add(made.World.Told);
-                    sure.Add(made.World.Told == 0
-                        ? 0.0
-                        : made.World.Confirmed / (double)made.World.Told);
-                    codes.Add(tally.Codes);
-                    resident.Add(tally.Resident);
-                    minted.Add(tally.Minted);
-                    wanting.Add(tally.Wanting);
+                        var tally = made.Bench.Run(
+                            Exchanges * 2, sweep: 200, target: 0.9, window: 50);
+
+                        sure.Add(made.World.Told == 0
+                            ? 0.0
+                            : made.World.Confirmed / (double)made.World.Told);
+                        fresh.Add(made.Typing.Questions == 0
+                            ? 0.0
+                            : made.Typing.Recency / (double)made.Typing.Questions);
+                        codes.Add(tally.Codes);
+                        resident.Add(tally.Resident);
+                        wanting.Add(tally.Wanting);
+                    }
+
+                    right[(move, crowd, placing)] = sure.Average();
+                    recency[(move, crowd)] = fresh.Average();
+
+                    output.WriteLine(
+                        $"{move,-7}{(crowd ? "crowded" : "alone"),-9}{placing,-9}"
+                        + $"{fresh.Average(),9:F3}{sure.Average(),8:F3}"
+                        + $"{sure.Average() - fresh.Average(),9:F3}{codes.Average(),8:F1}"
+                        + $"{resident.Average(),10:F1}{wanting.Average(),9:F3}");
                 }
-
-                right[(move, placing, wrapped)] = sure.Average();
-                held[(move, placing, wrapped)] = resident.Average();
-
-                output.WriteLine(
-                    $"{move,-7}{$"{placing}{(wrapped ? "" : " (real)")}",-16}{Spread(told),14}"
-                    + $"{sure.Average(),8:F3}{codes.Average(),8:F1}{resident.Average(),10:F1}"
-                    + $"{minted.Average(),9:F1}{wanting.Average(),9:F3}");
             }
         }
 
-        // The control that makes every other row readable. `Once` through the wrapper derives
-        // the precedences by hand and `Once` through `Joined` derives them the way the library
-        // does, so the two must agree exactly -- otherwise the arms below differ from the
-        // default by a reimplementation nobody compared rather than by the rule being changed.
-        foreach (var move in moves)
-        {
-            Assert.Equal(right[(move, Placing.Once, false)], right[(move, Placing.Once, true)], 6);
-            Assert.Equal(held[(move, Placing.Once, false)], held[(move, Placing.Once, true)], 6);
-        }
+        // Where nothing is ever said twice, no treatment of a repeat can differ from any other.
+        // Any gap at one placement is a second change nobody declared.
+        foreach (var crowd in new[] { false, true })
+            foreach (var (placing, _) in placings)
+                Assert.Equal(right[(1, crowd, Placing.Once)], right[(1, crowd, placing)], 6);
 
-        // And where nothing is ever said twice, no treatment of a repeat can differ from any
-        // other. Any gap at one move is a second change nobody declared. `Ended` is out of it
-        // and has to be: its marker follows the last word whether or not anything repeated, so
-        // it is not a treatment of a repeat and does not claim to be.
-        foreach (var placing in new[] { Placing.Once, Placing.Latest, Placing.Every })
-            Assert.Equal(right[(1, Placing.Once, false)], right[(1, placing, true)], 6);
+        // John's control, and it should have been taken before the grid rather than after it.
+        // Where one person moves alone the answer is ALWAYS the freshest room, so an arm reading
+        // the last mention cannot be told from one that tracks anything. A crowded topic breaks
+        // that, and the two numbers have to be far apart or the comparison below says nothing.
+        Assert.True(recency[(8, false)] > 0.95,
+            $"one mover: the freshest room is the answer {recency[(8, false)]:F3} of the time, "
+            + "so this world stopped being the degenerate case the crowded one is read against");
 
-        // Dropping a repeat collapses on a thing that moves. The margin is far inside the
-        // measured gap, which is what stops it being a threshold written before the first run.
-        Assert.True(right[(8, Placing.Once, false)] < 0.6,
-            $"dropping a repeat scored {right[(8, Placing.Once, false)]:F3} over eight moves, "
-            + "so the thing these arms exist to fix has stopped happening");
+        Assert.True(recency[(8, true)] < 0.7,
+            $"crowded: the freshest room is still the answer {recency[(8, true)]:F3} of the "
+            + "time, so the shortcut was not broken and nothing below separates the arms");
 
-        Assert.True(right[(8, Placing.Latest, true)] > right[(8, Placing.Once, false)] + 0.2,
-            $"keeping the last mention scored {right[(8, Placing.Latest, true)]:F3} against "
-            + $"{right[(8, Placing.Once, false)]:F3} — the arm has stopped paying");
+        // `Latest` still beats `Once` where a thing moves alone, which is the earlier reading
+        // and is unchanged. What that reading was missing is the row above it.
+        Assert.True(right[(8, false, Placing.Latest)] > right[(8, false, Placing.Once)] + 0.2,
+            $"keeping the last mention scored {right[(8, false, Placing.Latest)]:F3} against "
+            + $"{right[(8, false, Placing.Once)]:F3} for dropping it");
 
-        // John's question, and the answer is no. Keeping EVERY mention preserves strictly more
-        // of what was said and reads WORSE than dropping the repeat entirely, so the collapse
-        // is not what was costing anything. More order codes give repair more to grab and what
-        // it grabs is coincidence -- `wanting` goes to nought while the accuracy falls, which
-        // is the ladder always finding a separating code and the code being noise.
-        Assert.True(right[(8, Placing.Every, true)] < right[(8, Placing.Once, false)],
-            $"keeping every mention scored {right[(8, Placing.Every, true)]:F3} against "
-            + $"{right[(8, Placing.Once, false)]:F3} for dropping it — it has stopped being "
-            + "worse, which is the finding this row carries");
-
-        // And the marker meant to rescue it bought nothing, which is the other refutation. If
-        // what `Every` lacked were a positive code for *nothing follows this*, this row would
-        // move. It does not, so being unmarked was never the problem.
-        Assert.True(Math.Abs(right[(8, Placing.Ended, true)] - right[(8, Placing.Every, true)]) < 0.05,
-            $"the end marker moved the score from {right[(8, Placing.Every, true)]:F3} to "
-            + $"{right[(8, Placing.Ended, true)]:F3}, so it has started paying");
+        // And no arm beats the shortcut, in either world. This is the finding, and it is why
+        // the baseline had to be taken: `Latest` closing the gap to a rule that needs no
+        // learning is a different claim from `Latest` beating a ceiling, and only the second
+        // would have been worth the front end being rebuilt for.
+        //
+        // It goes red if an arm ever clears the bar, which is the right way round. That would
+        // be the first evidence on this branch that anything is TRACKING a thing rather than
+        // reading how recently it was mentioned, and it should stop a session rather than pass
+        // quietly.
+        foreach (var crowd in new[] { false, true })
+            foreach (var placing in new[] { Placing.Once, Placing.Latest, Placing.Every })
+                Assert.True(right[(8, crowd, placing)] <= recency[(8, crowd)],
+                    $"{placing} on the {(crowd ? "crowded" : "alone")} world scored "
+                    + $"{right[(8, crowd, placing)]:F3} against a no-learning recency bar of "
+                    + $"{recency[(8, crowd)]:F3}. Something has started beating the shortcut — "
+                    + "read the row, take the finding, and rewrite this assertion");
     }
 
     [Fact]

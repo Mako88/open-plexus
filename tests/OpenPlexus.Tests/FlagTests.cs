@@ -50,8 +50,8 @@ public sealed class FlagTests(ITestOutputHelper output)
     /// revival row. Nothing leaves this list by being renamed.
     /// </remarks>
     /// <remarks>
-    /// <b>Sorted by what the evidence already says, because "turn everything on"
-    /// is three different jobs and only one of them is easy.</b> Checked against
+    /// <b>Sorted by what the evidence already says.</b> Because "turn everything on"
+    /// is three different jobs and only one of them is easy. Checked against
     /// the refutation table on 2026-08-04: NONE of these is a refuted loser. Every
     /// arm the table refuted was already deleted from the code, and what is left
     /// there is doc comments the table itself cites.

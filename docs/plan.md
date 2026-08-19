@@ -581,8 +581,10 @@ before six that reads as tuning is out of order.
       leaves every code always-present, so genesis roots on nothing. Fork **120**.
     - **NOW** — an assertion may mint its WHOLE scope, so a conjunction is stated rather than
       discovered by failing, and a fact costs fewer tellings. John's. `Rooting`.
-    - **OPEN** — and it does not reach ONE telling. The rule is minted after two and believed
-      after eight, so what the tellings buy is the VOTE rather than the mint. Fork **121**.
+    - **NOW** — a mint is CREDITED with the round that made it, being right about it by
+      construction, and a correct rule is then believed a telling sooner. `Crediting`.
+    - **OPEN** — one telling still fails, and now on the CLAIM. The rarest word so far is a tie
+      on first hearing, so a statement claims its first word. Fork **121**, and **123** is it.
     - **OPEN** — rarest is one split of a statement into scope and claim, and the brain does not
       choose it. What picks the claim with no experimenter. Fork **123**.
     - **NOW** — a contradicted belief is REPLACED by being outvoted rather than retracted, far

@@ -26,12 +26,18 @@ public sealed class LessonTests(ITestOutputHelper output)
     private static (Tally Tally, Tutor Tutor, Conversing World) Ran(
         Lesson lesson, Carrying carrying, int seed, int passes, int capacity = 2000,
         Asserting asserting = Asserting.Nothing, int tellings = 1, int revising = 0,
-        Rooting rooting = Rooting.Singly)
+        Rooting rooting = Rooting.Singly, Crediting crediting = Crediting.Nothing)
     {
         var tutor = new Tutor(lesson, TextWriter.Null, passes, tellings, revising);
 
         var brain = new Brain(
-            new CommittingSettings { Capacity = capacity, Rooting = rooting }, seed);
+            new CommittingSettings
+            {
+                Capacity = capacity,
+                Rooting = rooting,
+                Crediting = crediting,
+            },
+            seed);
 
         var world = new Conversing(new ConversingSettings
         {
@@ -411,5 +417,72 @@ public sealed class LessonTests(ITestOutputHelper output)
         Assert.True(wide[1] <= bar,
             $"one telling read {wide[1]:F3} on the wide arm, so a fact now costs a single "
             + "telling and the reading this test is named for has moved");
+    }
+
+    [Fact]
+    public void A_mint_credited_with_the_round_that_made_it_is_believed_a_telling_sooner()
+    {
+        const int Seeds = 3;
+
+        int[] tellings = [1, 2, 3, 8];
+
+        // Genesis proposes a scope drawn from the live moment expecting what actually arrived,
+        // so a mint is right about the round it was born on. `Population.Settle` has already
+        // run by then, so it is never told — and an accuracy starting at nought against a vote
+        // that is a maximum over accuracies means a correct rule sits mute until the same thing
+        // is said twice.
+        var lesson = Lesson.Creatures;
+        var bar = new Tutor(lesson, TextWriter.Null).Marginal / (double)lesson.Exam.Count;
+
+        output.WriteLine($"{Seeds} seeds, one examination pass, marginal {bar:F3}, wide scopes");
+        output.WriteLine($"{"tellings",-10}{"blank",9}{"credited",10}");
+
+        var blank = new Dictionary<int, double>();
+        var credited = new Dictionary<int, double>();
+
+        foreach (var many in tellings)
+        {
+            var one = new List<double>();
+            var other = new List<double>();
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                one.Add(Right(
+                    Ran(lesson, Carrying.Never, seed, passes: 1,
+                        asserting: Asserting.Withheld, tellings: many,
+                        rooting: Rooting.Wholly).Tutor,
+                    0));
+
+                other.Add(Right(
+                    Ran(lesson, Carrying.Never, seed, passes: 1,
+                        asserting: Asserting.Withheld, tellings: many,
+                        rooting: Rooting.Wholly, crediting: Crediting.Birth).Tutor,
+                    0));
+            }
+
+            blank[many] = one.Average();
+            credited[many] = other.Average();
+
+            output.WriteLine($"{many,-10}{one.Average(),9:F3}{other.Average(),10:F3}");
+        }
+
+        // A telling sooner, and it is the vote rather than the mint that moved. Both arms hold
+        // the same population at two tellings; only one of them believes it.
+        Assert.True(credited[2] > blank[2],
+            $"at two tellings the credited arm read {credited[2]:F3} and the blank one "
+            + $"{blank[2]:F3}, so crediting a mint with its own round is buying nothing");
+
+        Assert.All(tellings, many => Assert.True(credited[many] >= blank[many],
+            $"crediting cost something at {many} telling(s): {credited[many]:F3} against "
+            + $"{blank[many]:F3}"));
+
+        // And ONE telling still fails, for a reason that is neither the vote nor the gate. The
+        // claim is the statement's rarest word SO FAR, and on first hearing every word of the
+        // conversation has been said once — so the tie goes to the earliest and the statement
+        // claims its first word rather than its last. What picks the claim is fork 123, and it
+        // is what one-shot is now waiting on.
+        Assert.True(credited[1] <= bar,
+            $"one telling read {credited[1]:F3}, so a fact now costs a single telling and this "
+            + "reading has moved");
     }
 }

@@ -30,8 +30,8 @@ namespace OpenPlexus.Tests;
 /// number here was taken under, at the same budget.
 /// </para>
 /// <para>
-/// <b>It is the opposite half of the search from the step length, which is why it is worth
-/// trying after that failed.</b> A two-code step made each attempt reach DEEPER and lost
+/// <b>It is the opposite half of the search from the step length.</b> Which is why it is worth
+/// trying after that failed. A two-code step made each attempt reach DEEPER and lost
 /// coverage by overshooting the world's minimum sound depth; this makes each attempt reach
 /// somewhere ELSE at the same depth. The chain's length does not change, so the failure that
 /// closed fork 74 does not carry over.

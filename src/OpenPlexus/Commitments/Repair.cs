@@ -61,6 +61,34 @@ public enum Rooting
     Wholly,
 }
 
+/// <summary>Whether a minted commitment is credited with the round that minted it.</summary>
+/// <remarks>
+/// <para>
+/// <b>Genesis mints a rule on a round it was demonstrably right about</b>, and hands it a blank
+/// record. The scope was live, the outcome arrived, and the commitment says exactly that — but
+/// <see cref="Population.Settle"/> has already run by the time it exists, so it is never told.
+/// </para>
+/// <para>
+/// <b>And a blank record is not neutral here.</b> An accuracy starts at nought and the vote is
+/// a maximum over accuracies, so a fresh commitment loses every vote until it has fired again —
+/// which on a conversation means waiting for the statement to be repeated. A rule that is
+/// already correct sits mute for as long as it takes to hear the same thing twice.
+/// </para>
+/// <para>
+/// <b>What it risks is every one-code mint arriving at a perfect accuracy together</b>, which
+/// flattens the vote among them and hands the tie to code order. That is why it is an arm and
+/// not a repair.
+/// </para>
+/// </remarks>
+public enum Crediting
+{
+    /// <summary>Nothing, so a mint starts at nought and must fire again to matter.</summary>
+    Nothing,
+
+    /// <summary>The round that minted it counts as a hit, because it was one.</summary>
+    Birth,
+}
+
 /// <summary>Whether a commitment may vote before it has been tested.</summary>
 /// <remarks>
 /// <para>
@@ -628,6 +656,13 @@ public sealed record CommittingSettings
     /// what the wide arm is for and where it is dead weight.
     /// </remarks>
     public Rooting Rooting { get; init; } = Rooting.Singly;
+
+    /// <summary>Whether a mint is credited with the round that minted it.</summary>
+    /// <remarks>
+    /// <b>Nothing is the control and is every earlier reading.</b> See <see cref="Crediting"/>
+    /// for what a blank record costs and what crediting risks.
+    /// </remarks>
+    public Crediting Crediting { get; init; } = Crediting.Nothing;
 
     /// <summary>How fast the local estimate forgets, in 0..1.</summary>
     /// <remarks>

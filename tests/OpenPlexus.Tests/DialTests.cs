@@ -85,6 +85,14 @@ public sealed class DialTests
     /// </summary>
     private static readonly Dictionary<string, string> HandSet = new(StringComparer.Ordinal)
     {
+        ["Crediting"] =
+            "whether a mint is credited with the round that made it, and it is an "
+            + "ARM for the same reason `Rooting` is -- two values, nothing between "
+            + "them, and one world's evidence so far. `LessonTests` measures it "
+            + "never costing and buying a telling on the conversation; what it "
+            + "risks is every one-code mint arriving at a perfect accuracy at once, "
+            + "which only a world with a crowded outcome space can show",
+
         ["Rooting"] =
             "how wide a scope genesis may mint, and it is an ARM rather than a "
             + "level -- there is no third value between one code and the whole "
@@ -570,7 +578,11 @@ public sealed class DialTests
         // nothing between them, and it has been run on one world. A controller chosen on one
         // world's evidence is the fault this file exists for; the entry leaves when a generated
         // world has put the two arms against each other.
-        Assert.Equal(15, HandSet.Count);
+        //
+        // And to sixteen for `Crediting`, which is the same rise for the same reason and is
+        // written down as one. Both left the same session and both are waiting on a generated
+        // world rather than on an argument.
+        Assert.Equal(16, HandSet.Count);
     }
 
     /// <summary>

@@ -91,8 +91,8 @@ public sealed class DocsTests
     /// words.</b> A ratchet that only ever falls says a new idea can only be afforded by
     /// deleting an old one, which is a doc-wide cap deciding what the project may think
     /// about. That is not what it is for. The three conditions are his: <b>the existing
-    /// items are reasonable, the new one duplicates nothing, and the doc is still in a
-    /// state you would load whole.</b>
+    /// items are reasonable.</b> The new one duplicates nothing, and the doc is still in a
+    /// state you would load whole.
     /// </para>
     /// <para>
     /// <b>The third condition is the only one that is not a judgement call, and it is also
@@ -311,7 +311,12 @@ public sealed class DocsTests
     // it has failed enough times. `Rooting` lets an assertion mint its whole scope, and the
     // three leaves are that, the reading that it still does not reach one telling, and the
     // fork that renumbered behind it.
-    private const int Whole = 11_204;
+    //
+    // And 11,236 is the twenty-first raise, thirty-two words for the two leaves that came out
+    // of chasing one-shot learning to its actual blocker. Crediting a mint with the round that
+    // made it is one; the other says one telling still fails, and it fails on the CLAIM rather
+    // than on the vote or the gate -- the rarest word so far is a tie on first hearing.
+    private const int Whole = 11_236;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.
@@ -505,8 +510,8 @@ public sealed class DocsTests
             .ToHashSet(StringComparer.Ordinal);
 
     /// <summary>
-    /// What a route leaf may open with. <b>A closed set, because the point of a status
-    /// token is that a reader can sort by it without reading the clause.</b>
+    /// What a route leaf may open with. <b>A closed set.</b> Because the point of a status
+    /// token is that a reader can sort by it without reading the clause.
     /// </summary>
     /// <remarks>
     /// <b>`Broken` arrived when `open defects` went.</b> That section was retired because

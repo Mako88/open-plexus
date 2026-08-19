@@ -33,9 +33,18 @@ internal static class Program
     private static int Main(string[] args)
     {
         var capacity = Number(args, "--capacity", 2000);
+        // The three arms that were measured to win on the conversation, shipped rather than
+        // left off. A statement withholds what it claims so a wide scope can fire on a question
+        // that names the same things; genesis mints that scope in one shot rather than finding
+        // it by failing; and a mint is credited with the round that made it, so a correct rule
+        // is believed without waiting to hear the same thing twice. No generated world has
+        // weighed in on any of them -- see `DialTests`.
         var rooting = Given(args, "--rooting") is { } wide
             ? Enum.Parse<Rooting>(wide, ignoreCase: true)
-            : Rooting.Singly;
+            : Rooting.Wholly;
+        var crediting = Given(args, "--crediting") is { } paid
+            ? Enum.Parse<Crediting>(paid, ignoreCase: true)
+            : Crediting.Birth;
         var seed = Number(args, "--seed", 1);
         var rate = Fraction(args, "--asking", 0.25);
         var passes = Number(args, "--passes", 3);
@@ -52,7 +61,7 @@ internal static class Program
         // `--asking 1.0` where the reply is scripted and the settlements are the point.
         var asserting = Given(args, "--asserting") is { } claim
             ? Enum.Parse<Asserting>(claim, ignoreCase: true)
-            : Asserting.Rarest;
+            : Asserting.Withheld;
         var lesson = Taught(args);
 
         // The control, and it is the only thing that says whether the telling taught anything.
@@ -61,7 +70,7 @@ internal static class Program
         if (lesson is not null && Given(args, "--told") == "no")
             lesson = lesson with { Statements = [] };
 
-        var brain = new Brain(new CommittingSettings { Capacity = capacity, Rooting = rooting }, seed);
+        var brain = new Brain(new CommittingSettings { Capacity = capacity, Rooting = rooting, Crediting = crediting }, seed);
 
         // The tutor owns the writer, because seeing the prompt is how it knows a reply is
         // wanted. A session with nobody scripted prints straight at the console.
@@ -91,7 +100,8 @@ internal static class Program
             + $"{rate.ToString("F2", CultureInfo.InvariantCulture)} of the time, carrying "
             + $"{carrying.ToString().ToLowerInvariant()}, asserting "
             + $"{asserting.ToString().ToLowerInvariant()}, rooting "
-            + $"{rooting.ToString().ToLowerInvariant()}");
+            + $"{rooting.ToString().ToLowerInvariant()}, crediting "
+            + $"{crediting.ToString().ToLowerInvariant()}");
 
         if (lesson is null || tutor is null)
         {

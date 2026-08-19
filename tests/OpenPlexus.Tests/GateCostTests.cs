@@ -18,8 +18,8 @@ namespace OpenPlexus.Tests;
 /// disagreement count, and only one of them is a reason to build the query in fork 56.
 /// </para>
 /// <para>
-/// <b>And it under-repairs rather than over-repairing, which is why the title of this file
-/// is not the question it was opened with.</b> <c>Repair</c> mints once a round, so the gate
+/// <b>And it under-repairs rather than over-repairing.</b> Which is why the title of this file
+/// is not the question it was opened with. <c>Repair</c> mints once a round, so the gate
 /// never controlled how MANY repairs happen — only which commitment gets the one attempt.
 /// Admitting covered commitments puts low-accuracy generals at the front of a list ordered
 /// by accuracy ascending and they consume it. The gate aims repair; it does not limit it.

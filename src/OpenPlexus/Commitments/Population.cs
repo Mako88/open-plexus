@@ -1015,6 +1015,7 @@ public sealed class Population
             if (!Add(proposed)) continue;
 
             Born(proposed, Birth.Genesis);
+            Credit(proposed, moment);
             minted++;
         }
 
@@ -1029,11 +1030,26 @@ public sealed class Population
             if ((Places is null || Places(whole)) && Add(whole))
             {
                 Born(whole, Birth.Genesis);
+                Credit(whole, moment);
                 minted++;
             }
         }
 
         return minted;
+    }
+
+    /// <summary>Tells a fresh mint about the round that minted it, where the arm asks.</summary>
+    /// <param name="minted">What genesis just proposed.</param>
+    /// <param name="moment">What was live, which its scope is a subset of.</param>
+    /// <remarks>
+    /// <b>A hit rather than a firing</b>, and it is one by construction: genesis only ever
+    /// proposes a scope drawn from the live moment expecting what actually arrived, so the
+    /// commitment is right about the round it was born on. See <see cref="Crediting"/>.
+    /// </remarks>
+    private void Credit(Commitment minted, IReadOnlySet<Code> moment)
+    {
+        if (_dials.Crediting is Crediting.Birth)
+            minted.Settle(Verdict.Hit, moment, _dials.Recency);
     }
 
     /// <summary>

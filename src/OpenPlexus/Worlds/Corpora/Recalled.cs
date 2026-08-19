@@ -148,8 +148,8 @@ public enum Predicting
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE FAIR FORM OF <see cref="Masked"/>, and it exists because the naive form
-    /// failed for a reason that is not about co-occurrence.</b> Hiding every word in turn
+    /// <b>THE FAIR FORM OF <see cref="Masked"/>.</b> And it exists because the naive form
+    /// failed for a reason that is not about co-occurrence. Hiding every word in turn
     /// spends most of the demand on <i>the</i>, <i>to</i> and <i>back</i>, which is where a
     /// bag of words predicts best and carries least — so the population fills with the
     /// skeleton of English and answers a question with a preposition. Refuting an idea in
@@ -526,8 +526,8 @@ public sealed class Recalled : IWorld<Recited>, IWithholds<Recited>
     /// What always giving the commonest answer would score ON THE EXAMINATION.
     /// </summary>
     /// <remarks>
-    /// <b>Taken over the withheld set and never over the drawn one, which is the only way
-    /// four objectives share a bar.</b> Each arm draws a different stream — masked moments,
+    /// <b>Taken over the withheld set and never over the drawn one.</b> Which is the only way
+    /// four objectives share a bar. Each arm draws a different stream — masked moments,
     /// next-word moments, questions — so a marginal read off what an arm SAW would be four
     /// different numbers, and every score would be measured against its own arm's skew.
     /// The examination is identical for all of them, so its marginal is too.

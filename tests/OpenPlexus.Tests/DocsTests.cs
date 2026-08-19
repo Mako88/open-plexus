@@ -326,7 +326,14 @@ public sealed class DocsTests
     // owes. Background codes were let into a wide genesis scope and it lost; the row says by
     // how much and what would bring it back, and a row without one is a superstition. Fork
     // 114 closed in the same pass and paid part of it back.
-    private const int Whole = 11_294;
+    //
+    // And 11,326 is the twenty-fourth raise, thirty-two words for the leaf that says a round
+    // has no step putting what fired back into the moment. It is measured rather than
+    // asserted: on a lesson where half the answers are stated and half follow from two
+    // statements, the stated half reads 1.000 from one telling and the implied half 0.000 at
+    // one, five and twenty. It is written as its own leaf because the horizon beside it is a
+    // different thing -- that one is across occasions and this one is within a round.
+    private const int Whole = 11_326;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

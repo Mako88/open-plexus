@@ -39,8 +39,8 @@ public static class Wired
     /// is the flake that would get blamed on the bus.
     /// </para>
     /// <para>
-    /// <b>And asking the operating system twice can get the same answer twice, which is the
-    /// fault this set exists for.</b> The port is RELEASED before it is used — it has to be,
+    /// <b>And asking the operating system twice can get the same answer twice.</b> Which is the
+    /// fault this set exists for. The port is RELEASED before it is used — it has to be,
     /// or the <c>HttpListener</c> that wants it could not bind — so between one call and the
     /// next it is free and the kernel is entitled to offer it again. A fleet asks for five in
     /// a row, and two of them being one port is a machine that fails to open with a message

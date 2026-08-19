@@ -96,8 +96,8 @@ public sealed record Learned
     /// and a deep enough scope may never do so.
     /// </para>
     /// <para>
-    /// <b>And it is nought where the census did not run, which is not the same as no such
-    /// rule being held.</b> The commonest outcome is read off what arrived, so a run that was
+    /// <b>And it is nought where the census did not run.</b> Which is not the same as no such
+    /// rule being held. The commonest outcome is read off what arrived, so a run that was
     /// never censused has nothing to split by — this repo's own trap about a check that is
     /// wired and unable to fire, avoided by saying so here rather than by a number that looks
     /// like a finding.

@@ -200,7 +200,10 @@ internal static class Program
                 ? Lesson.Creatures
                 : string.Equals(named, "corrected", StringComparison.OrdinalIgnoreCase)
                     ? Lesson.Corrected
-                    : throw new ArgumentException($"no lesson called `{named}`", nameof(args));
+                    : string.Equals(named, "chained", StringComparison.OrdinalIgnoreCase)
+                        ? Lesson.Chained
+                        : throw new ArgumentException(
+                            $"no lesson called `{named}`", nameof(args));
 
     /// <summary>How much of the topic a moment holds.</summary>
     /// <remarks>

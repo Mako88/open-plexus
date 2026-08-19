@@ -184,8 +184,8 @@ public static class Unifying
     /// <param name="name">Which variable this call is filling.</param>
     /// <param name="tried">Candidate values considered, accumulated across the search.</param>
     /// <remarks>
-    /// <b>In name order rather than by smallest candidate set, and said out loud because
-    /// it is a ceiling on the reading.</b> Choosing the most constrained variable first is
+    /// <b>In name order rather than by smallest candidate set.</b> And said out loud because
+    /// it is a ceiling on the reading. Choosing the most constrained variable first is
     /// the standard saving and it would make this cheaper than it is measured to be. The
     /// probe wants the cost of the rung rather than the cost of one implementation of it,
     /// so the number reported is an upper bound, and a real matcher may beat it.

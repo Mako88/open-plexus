@@ -152,6 +152,58 @@ public sealed record Lesson
             }),
         ],
     };
+
+    /// <summary>Four creatures whose loudness is never stated and follows from two facts.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Whether it can reach a conclusion nobody told it</b>, which is the question the score
+    /// on <see cref="Creatures"/> cannot answer. Every fact there is stated outright, so a
+    /// perfect reading is a lookup with a good index. Here the sound of each creature is stated
+    /// and the loudness of each SOUND is stated, and the loudness of the CREATURE is not — it
+    /// follows from the two and appears in no statement beside the thing it is about.
+    /// </para>
+    /// <para>
+    /// <b>Half the exam is stated and half is not, so the run controls itself.</b> Four
+    /// questions ask what a statement says and four ask what two statements imply. One number
+    /// over eight would read the same for a machine that chains and one that cannot, and the
+    /// split says which — a half is one hop, and anything above it is two.
+    /// </para>
+    /// <para>
+    /// <b>And every answer is distinct</b>, so the marginal is an eighth and a machine saying
+    /// one word every time cannot climb.
+    /// </para>
+    /// </remarks>
+    public static Lesson Chained { get; } = new()
+    {
+        About = "four creatures, their sounds, and how loud each SOUND is",
+
+        Statements =
+        [
+            "the cat sound is meow.",
+            "the meow loudness is faint.",
+            "the dog sound is bark.",
+            "the bark loudness is harsh.",
+            "the bird sound is tweet.",
+            "the tweet loudness is shrill.",
+            "the snake sound is hiss.",
+            "the hiss loudness is soft.",
+        ],
+
+        Exam =
+        [
+            // Stated outright, which is the control half.
+            new Quiz { Question = "what is the cat sound?", Answer = "meow" },
+            new Quiz { Question = "what is the dog sound?", Answer = "bark" },
+            new Quiz { Question = "what is the bird sound?", Answer = "tweet" },
+            new Quiz { Question = "what is the snake sound?", Answer = "hiss" },
+
+            // Never stated, and reachable only by putting two statements together.
+            new Quiz { Question = "what is the cat loudness?", Answer = "faint" },
+            new Quiz { Question = "what is the dog loudness?", Answer = "harsh" },
+            new Quiz { Question = "what is the bird loudness?", Answer = "shrill" },
+            new Quiz { Question = "what is the snake loudness?", Answer = "soft" },
+        ],
+    };
 }
 
 /// <summary>

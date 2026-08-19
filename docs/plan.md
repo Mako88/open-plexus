@@ -438,6 +438,8 @@ before six that reads as tuning is out of order.
       and withheld sentences the exam.
     - **OPEN** — what it converts is unread, and English's alphabet is far wider than anything
       here has run on. Fork **89**.
+    - **OPEN** — a round is fold, fire, vote, and nothing puts what fired BACK in the moment,
+      so a conclusion needing two statements is unreachable at any repetition. Fork **28**.
     - **OPEN** — the horizon is K occasions, K=1. Fork **28**.
     - **OPEN** — entailment depth and the horizon are capped at one; both come off when blame
       diffusion has a number. Fork **32**.

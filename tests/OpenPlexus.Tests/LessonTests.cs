@@ -605,4 +605,87 @@ public sealed class LessonTests(ITestOutputHelper output)
         // twenty tellings — see the test above, which holds that reading.
         Assert.Equal(lesson.Exam.Count, right[1]);
     }
+
+    [Fact]
+    public void A_conclusion_that_follows_from_two_statements_is_never_reached()
+    {
+        const int Seeds = 3;
+
+        int[] tellings = [1, 5, 20];
+
+        // John's question, and the one a perfect score on `Creatures` cannot answer: can it
+        // reach something nobody told it. Every fact there is stated outright, so answering
+        // them all is a lookup with a good index.
+        var lesson = Lesson.Chained;
+        var half = lesson.Exam.Count / 2;
+
+        // The two halves as their own examinations, so the split is measured rather than
+        // inferred from a total that both contribute to.
+        var stated = lesson with { Exam = [.. lesson.Exam.Take(half)] };
+        var implied = lesson with { Exam = [.. lesson.Exam.Skip(half)] };
+
+        var bar = new Tutor(lesson, TextWriter.Null).Recency / (double)lesson.Exam.Count;
+        var marginal = new Tutor(lesson, TextWriter.Null).Marginal / (double)lesson.Exam.Count;
+
+        output.WriteLine($"{Seeds} seeds, one examination pass, {half} questions a half");
+        output.WriteLine($"bars: recency {bar:F3}, marginal {marginal:F3}");
+        output.WriteLine($"{"tellings",-10}{"stated",9}{"implied",9}{"wanting",9}{"repaired",10}");
+
+        var told = new Dictionary<int, double>();
+        var reached = new Dictionary<int, double>();
+
+        foreach (var many in tellings)
+        {
+            var one = new List<double>();
+            var two = new List<double>();
+            var wanting = new List<double>();
+            var repaired = new List<double>();
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var direct = Ran(
+                    stated, Carrying.Never, seed, passes: 1, asserting: Asserting.Everything,
+                    tellings: many, rooting: Rooting.Wholly, crediting: Crediting.Birth);
+
+                var hops = Ran(
+                    implied, Carrying.Never, seed, passes: 1, asserting: Asserting.Everything,
+                    tellings: many, rooting: Rooting.Wholly, crediting: Crediting.Birth);
+
+                one.Add(Right(direct.Tutor, 0));
+                two.Add(Right(hops.Tutor, 0));
+                wanting.Add(hops.Tally.Wanting);
+                repaired.Add(hops.Tally.Repaired);
+            }
+
+            told[many] = one.Average();
+            reached[many] = two.Average();
+
+            output.WriteLine(
+                $"{many,-10}{one.Average(),9:F3}{two.Average(),9:F3}{wanting.Average(),9:F3}"
+                + $"{repaired.Average(),10:F1}");
+        }
+
+        // What a statement says is answered from one telling, which is the control half and
+        // says the machinery is working.
+        Assert.True(told[1] > 0.9,
+            $"the stated half read {told[1]:F3} at one telling, so the control is broken and "
+            + "nothing below it can be interpreted");
+
+        // And what two statements IMPLY is never reached, at any amount of repetition. A round
+        // is three calls -- fold the minted names in, collect every commitment whose scope is a
+        // subset of the moment, vote -- and no step puts what fired back into the moment and
+        // fires again. So a conclusion needing two facts is reachable only where both are
+        // already in front of the machine, and here neither statement holds the question's
+        // words together.
+        //
+        // This closes the day something chains. Forks 28 and 32.
+        Assert.All(tellings, many => Assert.True(reached[many] <= marginal,
+            $"the implied half read {reached[many]:F3} at {many} telling(s) against a marginal "
+            + $"of {marginal:F3}. Something is chaining, which is a result rather than a "
+            + "regression -- say what, and re-take this reading"));
+
+        // And repetition does not creep towards it either, which is what says the ceiling is
+        // structural rather than a matter of evidence.
+        Assert.Equal(reached[1], reached[20]);
+    }
 }

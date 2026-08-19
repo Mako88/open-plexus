@@ -24,8 +24,8 @@ namespace OpenPlexus.Tests;
 /// turned out to be wrong.
 /// </para>
 /// <para>
-/// <b>It asks the question the runner will ask, which is a substring test against the fully
-/// qualified name.</b> Nothing here interprets what a shard is FOR; it evaluates the filter
+/// <b>It asks the question the runner will ask.</b> Which is a substring test against the fully
+/// qualified name. Nothing here interprets what a shard is FOR; it evaluates the filter
 /// the workflow hands <c>dotnet test</c> against the classes the assembly actually has, so a
 /// shard that selects nothing and a class that no shard selects are the same finding read
 /// from two ends.

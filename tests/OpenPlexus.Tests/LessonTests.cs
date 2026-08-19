@@ -27,19 +27,12 @@ public sealed class LessonTests(ITestOutputHelper output)
         Lesson lesson, Carrying carrying, int seed, int passes, int capacity = 2000,
         Asserting asserting = Asserting.Nothing, int tellings = 1, int revising = 0,
         Rooting rooting = Rooting.Singly, Crediting crediting = Crediting.Nothing,
-        Replying replying = Replying.Word)
+        Replying replying = Replying.Word, Admitting admitting = Admitting.Anything)
     {
         var tutor = new Tutor(
             lesson, TextWriter.Null, passes, tellings, revising, replying: replying);
 
-        var brain = new Brain(
-            new CommittingSettings
-            {
-                Capacity = capacity,
-                Rooting = rooting,
-                Crediting = crediting,
-            },
-            seed);
+        var brain = new Brain(Committing(capacity, rooting, crediting, admitting), seed);
 
         var world = new Conversing(new ConversingSettings
         {
@@ -68,6 +61,20 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         return (tally, tutor, world);
     }
+
+    /// <summary>The four arms this file compares, as the brain's own numbers.</summary>
+    /// <remarks>
+    /// <b>Named rather than written out at each call</b>, because they arrived together and are
+    /// measured together — a test that spelt them out per arm would drift one from another.
+    /// </remarks>
+    private static CommittingSettings Committing(
+        int capacity, Rooting rooting, Crediting crediting, Admitting admitting) => new()
+        {
+            Capacity = capacity,
+            Rooting = rooting,
+            Crediting = crediting,
+            Admitting = admitting,
+        };
 
     /// <summary>The join between what a chooser decided and how this world numbers its doings.</summary>
     private static int? Speaking(Wondered said) =>
@@ -849,5 +856,74 @@ public sealed class LessonTests(ITestOutputHelper output)
         Assert.True(told.Average() <= put.Average(),
             $"the sentence arm answered {told.Average():F1} times having put {put.Average():F1} "
             + "questions");
+    }
+
+    [Fact]
+    public void A_repair_that_cannot_be_judged_is_most_of_the_population_and_all_of_the_churn()
+    {
+        const int Tellings = 20;
+
+        // Fork 86, and it is the one that killed ILP arriving here. The ladder extends only
+        // when nothing in the current language separates the failures from the hits, and that
+        // is the whole of what makes the bias EARNED rather than declared. Something always
+        // separated: `wanting` read nought on a lesson whose answers a conjunction cannot
+        // reach at all, so the trigger never fired where it was most needed.
+        //
+        // The second half of the bar needs no new number. A conjunctive child keeps the
+        // parent's firings its condition was present in, so a condition present in fewer of
+        // them than `Floor` mints a rule that can never clear the floor itself — one nothing
+        // will ever be able to refute, which is what memorising is.
+        var worlds = new[] { ("creatures", Lesson.Creatures), ("chained", Lesson.Chained) };
+
+        output.WriteLine($"told {Tellings} times, one examination pass");
+        output.WriteLine($"{"lesson",-11}{"admitting",-11}{"right",8}{"resident",10}{"wanting",9}");
+
+        var right = new Dictionary<(string, Admitting), double>();
+        var resident = new Dictionary<(string, Admitting), double>();
+        var wanting = new Dictionary<(string, Admitting), double>();
+
+        foreach (var (named, lesson) in worlds)
+        {
+            foreach (var admitting in new[] { Admitting.Anything, Admitting.Testable })
+            {
+                var one = Ran(
+                    lesson, Carrying.Never, seed: 1, passes: 1, asserting: Asserting.Everything,
+                    tellings: Tellings, rooting: Rooting.Wholly, crediting: Crediting.Birth,
+                    admitting: admitting);
+
+                right[(named, admitting)] = Right(one.Tutor, 0);
+                resident[(named, admitting)] = one.Tally.Resident;
+                wanting[(named, admitting)] = one.Tally.Wanting;
+
+                output.WriteLine(
+                    $"{named,-11}{admitting.ToString().ToLowerInvariant(),-11}"
+                    + $"{Right(one.Tutor, 0),8:F3}{one.Tally.Resident,10}{one.Tally.Wanting,9:F3}");
+            }
+        }
+
+        foreach (var (named, _) in worlds)
+        {
+            // It costs the score nothing on either world, which is what makes the rest of it
+            // worth having rather than a trade.
+            Assert.Equal(right[(named, Admitting.Anything)], right[(named, Admitting.Testable)]);
+
+            // And it is most of the population. What the churn was buying is rules too small
+            // for anything ever to judge.
+            Assert.True(
+                resident[(named, Admitting.Testable)] * 3
+                    < resident[(named, Admitting.Anything)],
+                $"on {named} the bar left {resident[(named, Admitting.Testable)]} residents "
+                + $"against {resident[(named, Admitting.Anything)]}, so the churn it was named "
+                + "for has gone by some other road");
+
+            // And the ladder's trigger fires at last. Nought means the language never admits
+            // being short; anything above it is the admission rule working where it could not
+            // before, including on a lesson a conjunction cannot answer at all.
+            Assert.Equal(0.0, wanting[(named, Admitting.Anything)]);
+
+            Assert.True(wanting[(named, Admitting.Testable)] > 0.1,
+                $"on {named} the trigger read {wanting[(named, Admitting.Testable)]:F3}, so the "
+                + "language still never says it is short");
+        }
     }
 }

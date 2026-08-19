@@ -45,6 +45,9 @@ internal static class Program
         var crediting = Given(args, "--crediting") is { } paid
             ? Enum.Parse<Crediting>(paid, ignoreCase: true)
             : Crediting.Birth;
+        var admitting = Given(args, "--admitting") is { } bar
+            ? Enum.Parse<Admitting>(bar, ignoreCase: true)
+            : Admitting.Testable;
         var seed = Number(args, "--seed", 1);
         var rate = Fraction(args, "--asking", 0.25);
         var passes = Number(args, "--passes", 3);
@@ -73,7 +76,15 @@ internal static class Program
         if (lesson is not null && Given(args, "--told") == "no")
             lesson = lesson with { Statements = [] };
 
-        var brain = new Brain(new CommittingSettings { Capacity = capacity, Rooting = rooting, Crediting = crediting }, seed);
+        var brain = new Brain(
+            new CommittingSettings
+            {
+                Capacity = capacity,
+                Rooting = rooting,
+                Crediting = crediting,
+                Admitting = admitting,
+            },
+            seed);
 
         // The tutor owns the writer, because seeing the prompt is how it knows a reply is
         // wanted. A session with nobody scripted prints straight at the console.
@@ -112,7 +123,8 @@ internal static class Program
             + $"{carrying.ToString().ToLowerInvariant()}, asserting "
             + $"{asserting.ToString().ToLowerInvariant()}, rooting "
             + $"{rooting.ToString().ToLowerInvariant()}, crediting "
-            + $"{crediting.ToString().ToLowerInvariant()}");
+            + $"{crediting.ToString().ToLowerInvariant()}, admitting "
+            + $"{admitting.ToString().ToLowerInvariant()}");
 
         if (lesson is null || tutor is null)
         {

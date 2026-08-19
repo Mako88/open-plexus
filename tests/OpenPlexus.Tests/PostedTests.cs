@@ -145,8 +145,8 @@ public sealed class PostedTests(ITestOutputHelper output)
     /// the publish underneath the sentence that fixed them.
     /// </para>
     /// <para>
-    /// <b>And the announcement is the worst place for it, which is why it is the one timed
-    /// here.</b> Coming up is the one moment when most posts fail, because the peers are
+    /// <b>And the announcement is the worst place for it.</b> Which is why it is the one timed
+    /// here. Coming up is the one moment when most posts fail, because the peers are
     /// coming up too — so a serial announce multiplies whatever a missing machine costs by
     /// the size of the fleet. Twenty phones where two are off is the arrangement this is for.
     /// </para>

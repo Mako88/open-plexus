@@ -85,6 +85,13 @@ public sealed class DialTests
     /// </summary>
     private static readonly Dictionary<string, string> HandSet = new(StringComparer.Ordinal)
     {
+        ["Admitting"] =
+            "what a separating condition must do besides separate, and it is an "
+            + "ARM for the same reason `Rooting` and `Crediting` are. `LessonTests` "
+            + "measures it costing no score on two lessons, leaving a sixth of the "
+            + "population, and making the ladder's trigger fire where it never had; "
+            + "no generated world has weighed in, and the entry leaves when one has",
+
         ["Crediting"] =
             "whether a mint is credited with the round that made it, and it is an "
             + "ARM for the same reason `Rooting` is -- two values, nothing between "
@@ -582,7 +589,11 @@ public sealed class DialTests
         // And to sixteen for `Crediting`, which is the same rise for the same reason and is
         // written down as one. Both left the same session and both are waiting on a generated
         // world rather than on an argument.
-        Assert.Equal(16, HandSet.Count);
+        //
+        // And to seventeen for `Admitting`, the same rise for the same reason. It is fork 86's
+        // answer and it wins on the conversation by every column at once, which is the shape
+        // that most deserves a second world before it becomes a default anywhere but the host.
+        Assert.Equal(17, HandSet.Count);
     }
 
     /// <summary>

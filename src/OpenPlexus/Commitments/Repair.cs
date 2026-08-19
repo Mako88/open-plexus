@@ -17,6 +17,40 @@ public enum Choosing
     Present,
 }
 
+/// <summary>What a separating condition must do besides separate.</summary>
+/// <remarks>
+/// <para>
+/// <b>Fork 86, and it is the one that killed ILP wearing this design's clothes.</b> The ladder
+/// extends only when nothing in the current language separates the failures from the hits, and
+/// that is the whole of what makes the bias EARNED rather than declared. On a wide alphabet
+/// something always separates — a code present in exactly the failures and nowhere else is a
+/// perfect discriminator and a perfect memorisation, and the admission rule cannot tell them
+/// apart. Measured: on a lesson whose answers are unreachable by conjunction at all,
+/// <c>Tally.Wanting</c> reads nought while repair churns.
+/// </para>
+/// <para>
+/// <b>So the second half of the bar is that the CHILD must be judgeable</b>, and it needs no
+/// new number. <see cref="CommittingSettings.Floor"/> already means <i>enough firings for a
+/// proportion to have any power</i>; a conjunctive child keeps the parent's firings the
+/// condition was present in, so a condition present in fewer of them than the floor mints a
+/// rule that can never itself be tested. Admitting one is admitting a rule nothing can ever
+/// refute, which is what memorising IS.
+/// </para>
+/// <para>
+/// <b>And what it costs is repairs</b>, which is the reading rather than a worry. A language
+/// that stops separating says so, and a machine that repairs less may well score less — those
+/// are the two halves of the same arm and both are printed.
+/// </para>
+/// </remarks>
+public enum Admitting
+{
+    /// <summary>Anything that clears the separation bar, which is every earlier reading.</summary>
+    Anything,
+
+    /// <summary>And the child it makes must be able to clear the floor itself.</summary>
+    Testable,
+}
+
 /// <summary>What counts as surprising enough to mint on.</summary>
 /// <remarks>
 /// <b>Two rules that both do something, exactly as <see cref="Choosing"/> is.</b> A
@@ -650,6 +684,13 @@ public sealed record CommittingSettings
     /// </remarks>
     public Surprising Surprising { get; init; } = Surprising.Unaccounted;
 
+    /// <summary>What a separating condition must do besides separate.</summary>
+    /// <remarks>
+    /// <b>Anything is the control and is every earlier reading.</b> See <see cref="Admitting"/>
+    /// for why a condition that separates perfectly can still be a memorisation.
+    /// </remarks>
+    public Admitting Admitting { get; init; } = Admitting.Anything;
+
     /// <summary>How wide a scope genesis may mint.</summary>
     /// <remarks>
     /// <b>Singly is the control and is every earlier reading.</b> See <see cref="Rooting"/> for
@@ -919,6 +960,13 @@ public static class Conditions
             candidates++;
 
             if (refuse?.Contains(code) == true) continue;
+
+            // And the child has to be judgeable, where the arm asks. A conjunctive child keeps
+            // the parent's firings this code was present in, so fewer of those than the floor
+            // is a rule that can never clear the floor itself -- one nothing will ever be able
+            // to refute, which is what memorising is. Counted among the candidates first, for
+            // the same reason the refusal is: the search that reached it is the same search.
+            if (dials.Admitting == Admitting.Testable && seen.InHits < dials.Floor) continue;
 
             var z = Divergence(seen.InHits, parent.Hits, seen.InMisses, parent.Misses);
 

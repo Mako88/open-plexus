@@ -11,8 +11,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The gate asks something no count can answer, so it is a round trip and not a
-/// merge.</b> <c>Mending.Uncovered</c> needs to know whether anything firing narrows this
+/// <b>The gate asks something no count can answer.</b> So it is a round trip and not a
+/// merge. <c>Mending.Uncovered</c> needs to know whether anything firing narrows this
 /// commitment, and <c>Narrows</c> is a structural test between two scopes. What comes back
 /// is a boolean, which is why asking keeps C1 where reading a population would not.
 /// </para>

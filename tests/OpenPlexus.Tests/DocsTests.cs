@@ -363,7 +363,12 @@ public sealed class DocsTests
     // ask, then a fixed examination -- and it stays until it is exhausted. `Roaming` is kept
     // rather than retired because it is where a sound, a look and a sentence can be one moment,
     // and a parked world rots, so its reason is written beside it.
-    private const int Whole = 11_631;
+    //
+    // And 11,660 is the thirtieth raise, twenty-nine words for fork 86 closing and 126 closing
+    // behind it. A separating condition must now leave a child that can clear the floor itself,
+    // or it is a rule nothing could ever refute -- which costs no score on two lessons, leaves
+    // a sixth of the population, and makes the ladder's trigger fire where it never had.
+    private const int Whole = 11_660;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

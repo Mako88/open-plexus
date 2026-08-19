@@ -400,8 +400,8 @@ public sealed class PopulationTests(ITestOutputHelper output)
     /// charging a clean record for its significance is inert here before it is built.
     /// </para>
     /// <para>
-    /// <b>So the revival condition is a number rather than a hope, and this is what would
-    /// spot it.</b> The day a world's commonest outcome passes the boundary below, or the day
+    /// <b>So the revival condition is a number rather than a hope.</b> And this is what would
+    /// spot it. The day a world's commonest outcome passes the boundary below, or the day
     /// the floor drops far enough to move the boundary under a world already here, that gate
     /// stops being inert. The plan's widening rows cite this test for it.
     /// </para>

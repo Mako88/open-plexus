@@ -106,8 +106,8 @@ public sealed class PrimerTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>FORK 91 CLOSED AGAINST bAbI, and this asks the same question of a corpus
-    /// that is not templated.</b> <c>Which_word_is_worth_predicting</c> found the
+    /// <b>FORK 91 CLOSED AGAINST bAbI.</b> And this asks the same question of a corpus
+    /// that is not templated. <c>Which_word_is_worth_predicting</c> found the
     /// wall: a PERFECT predictor of the informative words in bAbI scores 0.215
     /// against a blind draw over six rooms of 0.167, because the rooms are drawn at
     /// random over a template and nothing in <i>Mary went to the</i> carries where

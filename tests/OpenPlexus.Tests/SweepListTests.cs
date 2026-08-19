@@ -10,8 +10,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A workflow is the one artifact with no local check, and it was wrong twice in one
-/// day.</b> A sweep carrying <c>kind=sweep</c> and named in no list is skipped by the suite
+/// <b>A workflow is the one artifact with no local check.</b> And it was wrong twice in one
+/// day. A sweep carrying <c>kind=sweep</c> and named in no list is skipped by the suite
 /// by trait and unreachable by dispatch — a grid that exists and cannot be taken, which
 /// reads as a measurement waiting to be run rather than as a defect. And a class listed
 /// TWICE is two runners doing one job, invisible from the dispatch notice because the notice

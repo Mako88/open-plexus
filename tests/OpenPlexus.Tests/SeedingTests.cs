@@ -11,8 +11,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Repair chooses well and builds true rules that pay nothing, so what it is handed is
-/// the suspect.</b> Genesis mints <c>{c} → arrived</c> and its whole reachable space is
+/// <b>Repair chooses well and builds true rules that pay nothing.</b> So what it is handed is
+/// the suspect. Genesis mints <c>{c} → arrived</c> and its whole reachable space is
 /// the vocabulary times the outcomes — twenty-four rules at six bits, of which it mints
 /// seventeen and then stops for the rest of the run. Repair can only specialise what is
 /// there, so a seed never minted is a rule never reachable, forever.

@@ -167,8 +167,8 @@ public sealed class LatenessTests(ITestOutputHelper output)
     /// which is what <i>lateness is survivable</i> turns out to mean here.
     /// </para>
     /// <para>
-    /// <b>So this cannot show what it looks like it shows, and that is the half worth
-    /// writing down.</b> C2 says messages are late, jittered AND OUT OF ORDER. Because a
+    /// <b>So this cannot show what it looks like it shows.</b> And that is the half worth
+    /// writing down. C2 says messages are late, jittered AND OUT OF ORDER. Because a
     /// round is a barrier, no message from one round can arrive during the next — so the
     /// simulator's reordering never reaches the learner, and out-of-order delivery is not
     /// tested here by anything. What is tested is lateness, which is the half a barrier is

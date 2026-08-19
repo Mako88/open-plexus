@@ -449,9 +449,8 @@ before six that reads as tuning is out of order.
     - **OPEN** — the horizon is K occasions, K=1. Fork **28**.
     - **OPEN** — entailment depth and the horizon are capped at one; both come off when blame
       diffusion has a number. Fork **32**.
-    - **OPEN** — the ladder's admission asks whether repair found a separating code, and on a
-      wide alphabet memorising always does. What separates *nothing separates* from *nothing
-      GENERAL separates*. Fork **86**.
+    - **NOW** — a separating condition must also leave a child that can clear the floor itself,
+      or it is a rule nothing could ever refute. The trigger fires at last. Fork **86**.
     - **NOW** — a SHRUG is an outcome, so an ask costs something and where to ask is LEARNT.
       The machine declines a statement far more often than a question and was told neither.
       Open is a guess entering the moment it is scored on. Fork **117**.
@@ -597,8 +596,8 @@ before six that reads as tuning is out of order.
       one cannot be advanced past a sentence still arriving.
     - **OPEN** — claiming, width and crediting are all load-bearing and unweighed on any
       generated world. Fork **124**.
-    - **OPEN** — claiming every word makes a rule WRONG on its own sentence's other claims, so
-      repair churns for ever while minting saturates. Fork **126**.
+    - **SETTLED** — claiming every word makes a rule wrong on its own sentence's other claims,
+      and the churn that bought was children too small to judge. Fork **126**, by **86**.
     - **OPEN** — rarest is one split of a statement into scope and claim, and the brain does not
       choose it. What picks the claim with no experimenter. Fork **123**.
     - **NOW** — a contradicted belief is REPLACED by being outvoted rather than retracted, on

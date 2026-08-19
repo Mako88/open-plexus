@@ -587,6 +587,99 @@ public sealed class LessonTests(ITestOutputHelper output)
             + "rather than the free cut the written lesson read as");
     }
 
+    /// <summary>
+    /// Whether the link a two-statement conclusion needs is HELD and unseated, or never
+    /// formed at all.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Fork 125 has been refuted seven times</b> — three shapes of a second hop inside the
+    /// brain and four of a front end that selects — and every one of them read nought on the
+    /// implied half. What none of them could say is WHICH half was broken, because a score of
+    /// nought looks the same whether the rule is missing or present and outvoted.
+    /// </para>
+    /// <para>
+    /// <b>Coverage can say, and it could not before this session.</b> The question is whether
+    /// any commitment expects <i>faint</i> with <i>cat</i> and <i>loudness</i> both in its
+    /// scope. If one does, the seven refutations were about the seat and the vote work reaches
+    /// them. If none does, they were about the link never forming, and no vote will help.
+    /// </para>
+    /// <para>
+    /// <b>Read at the settings the implied half is measured at</b>, which is twenty tellings
+    /// with every word claimed, the whole-moment root and credited mints. Anything else and
+    /// the cell says something about a combination.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_a_two_statement_conclusion_is_held_and_unseated_or_never_formed()
+    {
+        const int Seeds = 3;
+
+        var lesson = Lesson.Chained;
+        var implied = lesson.Exam.Skip(lesson.Exam.Count / 2).ToList();
+
+        output.WriteLine($"{Seeds} seeds, 20 tellings, claiming everything, wholly rooted");
+        output.WriteLine("seed  answered  held");
+
+        var answered = new List<double>();
+        var held = new List<double>();
+
+        for (var seed = 1; seed <= Seeds; seed++)
+        {
+            var ran = Ran(
+                lesson with { Exam = implied }, Carrying.Never, seed, passes: 1,
+                asserting: Asserting.Everything, tellings: 20, rooting: Rooting.Wholly,
+                crediting: Crediting.Birth);
+
+            var there = 0;
+
+            foreach (var quiz in implied)
+            {
+                var words = Babi.Words(quiz.Question);
+
+                // `what is the cat loudness` -- the thing and the property, which is every
+                // code a rule for this question could root on.
+                var subject = Babi.Of(words[3]);
+                var attribute = Babi.Of(words[4]);
+
+                var outcome = ran.World.Vocabulary
+                    .Select((word, at) => (Word: word, At: at))
+                    .Where(one => string.Equals(one.Word, quiz.Answer, StringComparison.Ordinal))
+                    .Select(one => (int?)one.At)
+                    .FirstOrDefault();
+
+                if (outcome is not { } said) continue;
+
+                if (ran.Brain.Held.All.Any(one =>
+                    one.Expects == Brain.Says(said)
+                    && one.Scope.Contains(subject)
+                    && one.Scope.Contains(attribute)))
+                    there++;
+            }
+
+            answered.Add(Right(ran.Tutor, pass: 0));
+            held.Add(there / (double)implied.Count);
+
+            output.WriteLine($"{seed,-6}{answered[^1],-10:F3}{held[^1]:F3}");
+        }
+
+        output.WriteLine(
+            $"{Environment.NewLine}answered {Sweep.Spread(answered)}, "
+            + $"held {Sweep.Spread(held)}");
+
+        // No bar either way, because which of the two it is has never been read and a
+        // threshold written before the first reading would be a prediction dressed as a
+        // requirement. What is asserted is that the two numbers are not the same number --
+        // if they were, coverage would be reporting the score by another name and could
+        // separate nothing.
+        Assert.True(
+            Math.Abs(answered.Average() - held.Average()) > 0.0001
+            || answered.Average() == 0.0,
+            "what is answered and what is held read alike on the implied half, so this "
+            + "instrument is measuring the score rather than the population and cannot say "
+            + "which half of fork 125 is broken");
+    }
+
     [Fact]
     public void A_drawn_lesson_states_every_truth_it_examines_and_no_word_twice()
     {

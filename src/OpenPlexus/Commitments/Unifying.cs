@@ -81,8 +81,8 @@ public static class Unifying
     /// </summary>
     /// <param name="moment">What is live.</param>
     /// <remarks>
-    /// <b>Built once a round and not once a commitment, which is where the honest
-    /// accounting of this rung starts.</b> The cheap matcher reads the moment as a set and
+    /// <b>Built once a round and not once a commitment.</b> Which is where the honest
+    /// accounting of this rung starts. The cheap matcher reads the moment as a set and
     /// pays nothing to prepare it; a variable has to enumerate what could fill it, and
     /// enumerating means grouping. So the rung costs one pass over the moment before any
     /// commitment is looked at, and the probe reports it separately for that reason.

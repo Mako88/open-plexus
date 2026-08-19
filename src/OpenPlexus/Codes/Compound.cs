@@ -24,8 +24,8 @@ namespace OpenPlexus.Codes;
 /// several modalities that had to be torn apart, and nothing here does that yet.
 /// </para>
 /// <para>
-/// <b>Groups are offset per front end, because a group number only means
-/// something inside the thing that said it.</b> Two front ends both calling
+/// <b>Groups are offset per front end.</b> Because a group number only means
+/// something inside the thing that said it. Two front ends both calling
 /// something "object 0" mean different objects, and merging them unchanged would
 /// assert the binding <see cref="Worlds.Binding"/> exists to withhold — the same
 /// fault a chunk spanning two groups makes, from the other end.

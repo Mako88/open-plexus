@@ -6,8 +6,8 @@ namespace OpenPlexus.Machines;
 
 /// <summary>A trial on the multiplexer, plus what only that world can say.</summary>
 /// <remarks>
-/// <b>Soundness and the answer key are world facts, so they are asked for here rather
-/// than carried in <see cref="Tally"/>.</b> A shared report that grew a field per
+/// <b>Soundness and the answer key are world facts.</b> So they are asked for here rather
+/// than carried in <see cref="Tally"/>. A shared report that grew a field per
 /// world would put every world's vocabulary in front of every other one.
 /// </remarks>
 public sealed record Learned
@@ -84,8 +84,8 @@ public sealed record Learned
     /// useless kind.
     /// </para>
     /// <para>
-    /// <b>Named for what it bounds rather than for what it counts, so it cannot be read as
-    /// <c>Census.Paying</c>.</b> That one is a SHARE of the hard rounds actually carried;
+    /// <b>Named for what it bounds rather than for what it counts.</b> So it cannot be read as
+    /// <c>Census.Paying</c>. That one is a SHARE of the hard rounds actually carried;
     /// this is a COUNT of the world's rules that could in principle carry one, and a grid
     /// carrying both under one word would be two different questions in one column.
     /// </para>

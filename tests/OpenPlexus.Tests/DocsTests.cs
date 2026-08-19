@@ -357,7 +357,13 @@ public sealed class DocsTests
     // about it; it bought nothing over eight passes and taught the machine to stop asking. The
     // revival condition is the useful half — recording a refusal pays only once something
     // AVOIDS what it was refused, and no chooser here does.
-    private const int Whole = 11_567;
+    //
+    // And 11,631 is the twenty-ninth raise, sixty-four words for John switching the first north
+    // star. The CONVERSATION is the spine world -- a block told, a window where the machine may
+    // ask, then a fixed examination -- and it stays until it is exhausted. `Roaming` is kept
+    // rather than retired because it is where a sound, a look and a sentence can be one moment,
+    // and a parked world rots, so its reason is written beside it.
+    private const int Whole = 11_631;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

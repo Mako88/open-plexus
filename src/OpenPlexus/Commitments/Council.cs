@@ -226,8 +226,8 @@ public sealed class Alone : ICouncil
     /// What the last ask's firing has to say, with nothing of the commitments in it.
     /// </summary>
     /// <remarks>
-    /// <b>The half of a vote a machine may compute alone, and the reason a holder is a
-    /// thin thing.</b> <c>Machines.Holder</c> answers a vote with this and a settlement
+    /// <b>The half of a vote a machine may compute alone.</b> And the reason a holder is a
+    /// thin thing. <c>Machines.Holder</c> answers a vote with this and a settlement
     /// with <see cref="Tell"/>, so every phase of a round lives here and exactly here
     /// whether there is one machine or twenty — which is what stops a fleet growing a
     /// second copy of the learning loop.

@@ -326,6 +326,12 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// when either of the world's arms shows it.
     /// </para>
     /// <para>
+    /// <b>The spine is the CONVERSATION and `Roaming` is kept for the modalities</b> —
+    /// John's, and it moves what this check is about rather than what it counts. An entry is
+    /// reached when either spine world shows it, so the conversation growing into `Roaming`'s
+    /// entries is what closes this rather than a second guard.
+    /// </para>
+    /// <para>
     /// <b>Two are unreached, and the two close by different roads.</b>
     /// Adhesion never runs, <c>Alternating</c> being derived offline and nothing setting
     /// <c>Population.Sorts</c> — the plan carries that as an open question about when a front
@@ -349,7 +355,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
             $"{unreached.Count} of THE ARCHITECTURE's {ExercisedTests.Asked} entries have a "
             + "mechanism the spine world never reaches:\n  "
             + string.Join("\n  ", unreached)
-            + "\nPhase two is `Roaming` exercising all of them, so each is phase-two work and "
+            + "\nPhase two is a SPINE WORLD exercising all of them, so each is phase-two work and "
             + "comes before rung four. This test is red on purpose and closes on the "
             + "mechanism being reached, not on this file.");
     }

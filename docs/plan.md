@@ -131,6 +131,10 @@ FORBIDS things, and several of them are already measured.
   rather than a precondition for it.
 - **First is one process on one box**, the only sense English, and talking to it is the first
   interactive test of the system — no camera or wifi.
+- **And the CONVERSATION is that world**, John's: a block told, a window where
+  the machine may ask, then a fixed examination. It stays until it is exhausted.
+- **`Roaming` is kept for the modalities rather than retired**, being the world where a sound,
+  a look and a sentence can be one moment. A parked world rots, so that is its reason.
 - **Then the phone as the body and the containers as the brain**, video and sensors in, if one
   machine can hold enough containers to be a fleet. That is what says whether twenty of anything
   is needed before twenty are bought.
@@ -211,7 +215,7 @@ before six that reads as tuning is out of order.
 - **One, the seam** — a world becomes a set of inputs pushing moments, the brain answers with
   what it did, and `Trial` goes. It carries its own repair: a phase leaving the suite
   unreadable makes the next one blind, so one ends when the reds are the three that are named.
-- **Two, a mechanism for every entry of THE ARCHITECTURE**, however bad, and `Roaming`
+- **Two, a mechanism for every entry of THE ARCHITECTURE**, however bad, and a spine world
   exercising all of them. `DocsTests` holds the first half and `OutstandingTests` the
   second; adhesion and nesting fail it.
 - **Seven, the conversation harness**, and it is built. `Conversing` is one moment a typed

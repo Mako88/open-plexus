@@ -11,8 +11,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Two arms can peak at different budgets, and this repo's own traps list says compare
-/// peak to peak.</b> <see cref="BudgetingTests"/> measured sixty-four against a budget that
+/// <b>Two arms can peak at different budgets.</b> And this repo's own traps list says compare
+/// peak to peak. <see cref="BudgetingTests"/> measured sixty-four against a budget that
 /// cannot bind, and the ordering inverted: the free end holds 125.8 sound rules to 68.7,
 /// mints the most names, carries 0.92 of the hard rounds to 0.79 — and its trailing accuracy
 /// on an even world falls. Both readings are ENDS. Nothing between them has ever been run,

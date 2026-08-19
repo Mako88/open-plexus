@@ -27,7 +27,8 @@ public sealed class LessonTests(ITestOutputHelper output)
         Lesson lesson, Carrying carrying, int seed, int passes, int capacity = 2000,
         Asserting asserting = Asserting.Nothing, int tellings = 1, int revising = 0,
         Rooting rooting = Rooting.Singly, Crediting crediting = Crediting.Nothing,
-        Replying replying = Replying.Word, Admitting admitting = Admitting.Anything)
+        Replying replying = Replying.Word, Admitting admitting = Admitting.Anything,
+        Joining joining = Joining.Bagged)
     {
         var tutor = new Tutor(
             lesson, TextWriter.Null, passes, tellings, revising, replying: replying);
@@ -46,7 +47,7 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         // Named, because the front end is the next arm this file will want and a bench holding
         // it inline is a wiring nobody can vary.
-        var front = new Joined(Joining.Bagged);
+        var front = new Joined(joining);
 
         var watching = new Watching<Recited>(
             world, front, acting: felt => Speaking(curiosity.Choose(felt)));
@@ -664,6 +665,21 @@ public sealed class LessonTests(ITestOutputHelper output)
                 two.Add(Right(hops.Tutor, 0));
                 wanting.Add(hops.Tally.Wanting);
                 repaired.Add(hops.Tally.Repaired);
+
+                // And every front end this repo has, on the arm that carries the story to the
+                // question. A SELECTING front end is the one relevance mechanism here -- it is
+                // what reads a second statement at the key the first supplied -- so if anything
+                // available reaches a conclusion, that is where it would show.
+                foreach (var reading in new[]
+                {
+                    Joining.Bagged, Joining.Chained, Joining.Distinguished, Joining.Resolved,
+                })
+                    two.Add(Right(
+                        Ran(implied, Carrying.Statements, seed, passes: 1,
+                            asserting: Asserting.Everything, tellings: many,
+                            rooting: Rooting.Wholly, crediting: Crediting.Birth,
+                            joining: reading).Tutor,
+                        0));
             }
 
             told[many] = one.Average();
@@ -931,4 +947,5 @@ public sealed class LessonTests(ITestOutputHelper output)
                 + "language still never says it is short");
         }
     }
+
 }

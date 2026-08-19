@@ -368,7 +368,13 @@ public sealed class DocsTests
     // behind it. A separating condition must now leave a child that can clear the floor itself,
     // or it is a rule nothing could ever refute -- which costs no score on two lessons, leaves
     // a sixth of the population, and makes the ladder's trigger fire where it never had.
-    private const int Whole = 11_660;
+    //
+    // And 11,703 is the thirty-first raise, forty-three words for a refuted row. A question
+    // carrying the topic while statements stayed bare was fork 125's cheapest shape -- bare
+    // statements so genesis can root, a carried story so a SELECTING front end has something
+    // to walk. Nought on the implied half under every front end this repo has, and worse on
+    // the stated half than carrying nothing.
+    private const int Whole = 11_703;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

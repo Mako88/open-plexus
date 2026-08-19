@@ -80,8 +80,8 @@ public sealed record ReturningSettings
     /// appearance cannot.
     /// </para>
     /// <para>
-    /// <b>And it is an axis rather than a third arm, because it has to be read against
-    /// both.</b> Against the anonymous twinned cell it says whether a relation recovers
+    /// <b>And it is an axis rather than a third arm.</b> Because it has to be read against
+    /// both. Against the anonymous twinned cell it says whether a relation recovers
     /// what appearance lost; against the tagged one it says how much of a handed index it
     /// recovers. One number without the other two is a score with nothing to mean.
     /// </para>

@@ -56,8 +56,8 @@ public sealed record ComposedSettings
 /// One scene: three moments, two objects, and an index each.
 /// </summary>
 /// <remarks>
-/// <b><see cref="Values"/> is indexed by attribute and then by object, and that
-/// pairing is what the walk has to recover.</b> No moment contains it, because no
+/// <b><see cref="Values"/> is indexed by attribute and then by object.</b> And that
+/// pairing is what the walk has to recover. No moment contains it, because no
 /// moment contains two attributes.
 /// </remarks>
 public sealed record Episode

@@ -58,6 +58,9 @@ internal static class Program
             ? Enum.Parse<Replying>(how, ignoreCase: true)
             : Replying.Word;
         var carrying = Carried(args);
+        var joining = Given(args, "--joining") is { } read
+            ? Enum.Parse<Joining>(read, ignoreCase: true)
+            : Joining.Bagged;
         // Claiming by default, because a statement that claims nothing cannot teach anything
         // and a session at a terminal is mostly statements.
         //
@@ -104,7 +107,7 @@ internal static class Program
         var bench = new Bench(
             new Watching<Recited>(
                 world,
-                new Joined(Joining.Bagged),
+                new Joined(joining),
                 acting: felt => Speaking(curiosity.Choose(felt))),
             brain);
 
@@ -124,7 +127,8 @@ internal static class Program
             + $"{asserting.ToString().ToLowerInvariant()}, rooting "
             + $"{rooting.ToString().ToLowerInvariant()}, crediting "
             + $"{crediting.ToString().ToLowerInvariant()}, admitting "
-            + $"{admitting.ToString().ToLowerInvariant()}");
+            + $"{admitting.ToString().ToLowerInvariant()}, joining "
+            + $"{joining.ToString().ToLowerInvariant()}");
 
         if (lesson is null || tutor is null)
         {

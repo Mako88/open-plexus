@@ -444,8 +444,8 @@ before six that reads as tuning is out of order.
       here has run on. Fork **89**.
     - **OPEN** — a round is fold, fire, vote, and nothing puts what fired BACK in the moment,
       so a conclusion needing two statements is unreachable at any repetition. Fork **28**.
-    - **OPEN** — and the loop is not what is missing: three shapes of it are refuted. What the
-      question does not NAME cannot trigger the link that reaches it. Fork **125**.
+    - **OPEN** — and neither the loop nor a selecting front end reaches it: seven shapes are
+      refuted. What the question does not NAME cannot trigger the link. Fork **125**.
     - **OPEN** — the horizon is K occasions, K=1. Fork **28**.
     - **OPEN** — entailment depth and the horizon are capped at one; both come off when blame
       diffusion has a number. Fork **32**.
@@ -697,6 +697,7 @@ before six that reads as tuning is out of order.
 | Keeping every mention of a repeated word, and marking the last | Worse than dropping the repeat where a thing moves, and a marker for *nothing follows this* moved it nothing. More precedences give repair more to grab, so `wanting` falls to nought while the score does | A rung that can say a NEGATIVE — fork 30 |
 | Claiming only a sentence's LEAST-said words, so the two claiming rules become one comparison | Worse on both axes, needing ten times the telling to reach what claiming every word reached at once | The population cost of claiming every word binding, which is a corpus rather than a lesson |
 | A refusal settling on a reserved outcome rather than the round abstaining | Nought over eight passes either way, and counting it taught the machine to stop asking | A CHOOSER that reads one. Recording a refusal buys nothing while nothing avoids what it refused |
+| A question carrying the topic while statements stay bare, so a SELECTING front end has something to walk | Nought on the implied half under every front end, and worse on the stated half than carrying nothing at all | A relevance mechanism the front end does not have. No arrangement of what exists reaches a second fact |
 | A second hop in three shapes: every conclusion made live, the winner's alone, and only rules that USED one voting | Nought on the implied half in all three, and the run's own accuracy fell each time | RELEVANCE, or a sub-question — a question not NAMING the intermediate cannot trigger the link to it |
 | `Joining.Recent` — a word banded by how far back it was said | Half what narrowing the view buys, and the front end picks the bands | A band the learner mints. Fork 92 |
 | Background admitted to a WIDE genesis scope, a code in every moment being unable to change when the rule fires | A third of what the varied filter reaches at three tellings and three quarters at ten | A world where the varied gate refuses a code a conjunction needed |

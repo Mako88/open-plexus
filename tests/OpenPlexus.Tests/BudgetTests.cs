@@ -48,8 +48,8 @@ namespace OpenPlexus.Tests;
 /// only bind where that parent gets blamed at all.</b> Re-taken, this grid is fork 67.
 /// </para>
 /// <para>
-/// <b>And re-taken, the condition does not replace the count — it trades the same way the
-/// count did.</b> On the even eleven-bit world the shipped count ungated holds the best
+/// <b>And re-taken.</b> The condition does not replace the count — it trades the same way the
+/// count did. On the even eleven-bit world the shipped count ungated holds the best
 /// trailing accuracy of the six cells, and adding the condition costs it while buying
 /// coverage and unsound rules together. Under skew the sign flips: free plus the condition
 /// carries far more of the hard rounds at the count's own accuracy. <b>No cell leads on both

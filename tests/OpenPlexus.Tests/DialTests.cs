@@ -313,8 +313,8 @@ public sealed class DialTests
     /// What a dial is allowed to move: the RANKING, the PRICE, or both.
     /// </summary>
     /// <remarks>
-    /// <b>One weight doing two jobs is this design's recurring fault, and this is
-    /// the cheap detector for it.</b> An edge weight both ranks a partner and
+    /// <b>One weight doing two jobs is this design's recurring fault.</b> And this is
+    /// the cheap detector for it. An edge weight both ranks a partner and
     /// prices the hop to it, so a change meaning to improve one has twice now
     /// silently wrecked the other — `Pricing.Sender` moves the ranking while
     /// meaning to move the price, and `Doubt` applied to both destroyed the

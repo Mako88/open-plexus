@@ -16,6 +16,14 @@ public sealed record ConversingSettings
     /// <summary>Where the machine's words are written.</summary>
     public required TextWriter Printed { get; init; }
 
+    /// <summary>How much of the topic a moment holds.</summary>
+    /// <remarks>
+    /// <b>An arm rather than a setting</b>, because what a moment holds is the whole of what
+    /// this world can be asked. It is a fact about what was shown and not about how to think,
+    /// which is the line a world's own dials stay on.
+    /// </remarks>
+    public Carrying Carrying { get; init; } = Carrying.Always;
+
     /// <summary>Words the outcome alphabet starts with.</summary>
     /// <remarks>
     /// <para>
@@ -30,6 +38,47 @@ public sealed record ConversingSettings
     /// </para>
     /// </remarks>
     public IReadOnlyList<string> Words { get; init; } = [];
+}
+
+/// <summary>What of the topic so far a moment holds, beside the sentence it is.</summary>
+/// <remarks>
+/// <para>
+/// <b>John's, and it is the question of whether anything is remembered.</b> Under
+/// <see cref="Always"/> a question arrives with the story attached, so answering it is a lookup
+/// over what is in front of the machine and nothing has to have persisted. Under the other two
+/// the story is gone by the time the question is put, and what is left is whatever reading the
+/// statements changed.
+/// </para>
+/// <para>
+/// <b>The population is the only thing that crosses a moment</b>, which is what makes the
+/// reading interpretable. <see cref="Codes.Joining.Resolved"/> looks like a memory and is
+/// recomputed from the story inside the moment, so it dies with the history rather than
+/// surviving it.
+/// </para>
+/// </remarks>
+public enum Carrying
+{
+    /// <summary>Every moment holds the topic so far.</summary>
+    /// <remarks>
+    /// <b>The control, and every earlier reading on this world is here.</b> A question re-hands
+    /// the whole story, so the machine is never asked to have remembered anything.
+    /// </remarks>
+    Always,
+
+    /// <summary>A statement holds the topic so far and a question holds only itself.</summary>
+    /// <remarks>
+    /// <b>John's shape.</b> The telling accumulates, so a statement is read against what came
+    /// before it; the examination arrives bare, so nothing in it says where anybody is.
+    /// </remarks>
+    Statements,
+
+    /// <summary>Every moment holds only its own sentence.</summary>
+    /// <remarks>
+    /// <b>The far end, and the honest form of one statement one moment.</b> Nothing ever sees
+    /// two sentences at once, so every relation across them has to be something the population
+    /// came to hold.
+    /// </remarks>
+    Never,
 }
 
 /// <summary>
@@ -89,6 +138,10 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     // newest first; building it that way round would be an insert at the front of a list for
     // every line typed.
     private readonly List<IReadOnlyList<Code>> _said = [];
+
+    // What is left of the last typed line. A line may hold several sentences and each is its
+    // own moment, so the reading of a line and the pushing of a moment are not one call.
+    private readonly Queue<string> _sentences = new();
 
     private Recited? _pending;
     private int? _settled;
@@ -440,61 +493,132 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
         };
     }
 
-    /// <summary>The next line, as a moment.</summary>
+    /// <summary>The next sentence, as a moment.</summary>
     /// <remarks>
+    /// <para>
+    /// <b>A sentence is a moment and a typed line may hold several</b>. John's, and it is what
+    /// lets a paragraph be pasted in: what arrives is one moment a sentence, in the order they
+    /// were written, so each one is read against whatever the ones before it left behind.
+    /// A line with no stop in it is one sentence and reaches the machine exactly as it did
+    /// before.
+    /// </para>
     /// <para>
     /// <b>A blank line starts a new topic</b>, which is the corpus's story boundary typed by
     /// hand. Nothing about the machine changes at one; what changes is which words the world says
     /// are in front of it.
     /// </para>
     /// <para>
-    /// <b>A line ending in a question mark is a question</b>, and everything else is a statement.
-    /// That is the whole grammar, and it is a fact about the signal rather than a conclusion —
-    /// the same licence a corpus has to say which of its lines were asked.
+    /// <b>A sentence ending in a question mark is a question</b>, and everything else is a
+    /// statement. That is the whole grammar, and it is a fact about the signal rather than a
+    /// conclusion — the same licence a corpus has to say which of its lines were asked.
+    /// </para>
+    /// <para>
+    /// <b>And what a moment carries beside its own words is <see cref="Carrying"/></b>, so the
+    /// question of whether anything was remembered is asked here and answered by a reading.
     /// </para>
     /// </remarks>
     private Recited Read()
     {
         while (true)
         {
-            var line = _settings.Typed.ReadLine();
-
-            if (line is null || string.Equals(line.Trim(), Over, StringComparison.Ordinal))
+            if (_sentences.Count == 0)
             {
-                Ended = true;
+                var line = _settings.Typed.ReadLine();
 
-                // Nothing said, rather than the last thing said again. A world with nobody
-                // typing at it has no moment to push, and repeating one would have the machine
-                // answering a question it has already been settled on.
-                return new Recited { Said = [], Asked = [] };
-            }
+                if (line is null || string.Equals(line.Trim(), Over, StringComparison.Ordinal))
+                {
+                    Ended = true;
 
-            var text = line.Trim();
+                    // Nothing said, rather than the last thing said again. A world with nobody
+                    // typing at it has no moment to push, and repeating one would have the
+                    // machine answering a question it has already been settled on.
+                    return new Recited { Said = [], Asked = [] };
+                }
 
-            if (text.Length == 0)
-            {
-                _said.Clear();
-                _settings.Printed.WriteLine("  (new topic)");
+                var text = line.Trim();
+
+                if (text.Length == 0)
+                {
+                    _said.Clear();
+                    _settings.Printed.WriteLine("  (new topic)");
+                    continue;
+                }
+
+                foreach (var sentence in Sentences(text)) _sentences.Enqueue(sentence);
+
                 continue;
             }
 
-            var words = Babi.Words(text);
+            var one = _sentences.Dequeue();
+            var words = Babi.Words(one);
 
             if (words.Count == 0) continue;
 
             foreach (var word in words) Heard(word);
 
             var coded = Said(words);
-            var asking = text.EndsWith('?');
+            var asking = one.EndsWith('?');
 
             if (!asking) _said.Add(coded);
 
             var before = new List<IReadOnlyList<Code>>();
 
-            for (var one = _said.Count - 1; one >= 0; one--) before.Add(_said[one]);
+            // The topic so far where this arm hands it over, and the sentence alone where it
+            // does not. `_said` accumulates either way, so the arms differ in what a moment
+            // holds and in nothing else -- a world that stopped accumulating would be two
+            // worlds wearing one name.
+            if (Carries(asking))
+                for (var back = _said.Count - 1; back >= 0; back--) before.Add(_said[back]);
+            else if (!asking)
+                before.Add(coded);
 
             return new Recited { Said = before, Asked = asking ? coded : [] };
         }
+    }
+
+    /// <summary>Whether this moment is handed the topic in front of it.</summary>
+    private bool Carries(bool asking) => _settings.Carrying switch
+    {
+        Carrying.Always => true,
+        Carrying.Statements => !asking,
+        _ => false,
+    };
+
+    /// <summary>One typed line, cut into the sentences it holds.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A stop, a question mark or an exclamation ends one</b>, and the mark stays on the end
+    /// of what it closed so that questionhood is still read off the text. That is the whole
+    /// rule, and it is the same licence the final <c>?</c> already carried — a fact about how
+    /// the signal was written rather than anything about what it means.
+    /// </para>
+    /// <para>
+    /// <b>Trailing text with no mark on it is a sentence too</b>, because most lines typed at a
+    /// terminal end without one. Dropping it would silently swallow the commonest thing a
+    /// person types.
+    /// </para>
+    /// </remarks>
+    private static IReadOnlyList<string> Sentences(string text)
+    {
+        var found = new List<string>();
+        var from = 0;
+
+        for (var at = 0; at < text.Length; at++)
+        {
+            if (text[at] is not ('.' or '?' or '!')) continue;
+
+            var one = text[from..(at + 1)].Trim();
+
+            if (one.Length > 0) found.Add(one);
+
+            from = at + 1;
+        }
+
+        var last = text[from..].Trim();
+
+        if (last.Length > 0) found.Add(last);
+
+        return found;
     }
 
     /// <summary>Which outcome a code stands for, or nothing where it stands for none.</summary>

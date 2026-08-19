@@ -21,22 +21,41 @@ namespace OpenPlexus.Talk;
 /// <b>Run it with <c>dotnet run --project src/OpenPlexus.Talk</c></b>. Type statements, type
 /// questions, leave a line blank to start a new topic, and type <c>.quit</c> to stop.
 /// </para>
+/// <para>
+/// <b>Or hand it a lesson with <c>--lesson creatures</c></b> and a scripted person tells the
+/// topic once and then examines, which is the same interface driven by something repeatable.
+/// The no-learning bars are printed BEFORE the run, because every wrong turn on this world came
+/// from reading a score before the bar it had to beat.
+/// </para>
 /// </remarks>
 internal static class Program
 {
     private static int Main(string[] args)
     {
-        var rounds = Number(args, "--rounds", 400);
         var capacity = Number(args, "--capacity", 2000);
         var seed = Number(args, "--seed", 1);
         var rate = Fraction(args, "--asking", 0.25);
+        var passes = Number(args, "--passes", 3);
+        var carrying = Carried(args);
+        var lesson = Taught(args);
+
+        // The control, and it is the only thing that says whether the telling taught anything.
+        // A machine examined over and over learns the examination by being corrected on it, so
+        // an accuracy with no un-told arm beside it cannot be read as comprehension.
+        if (lesson is not null && Given(args, "--told") == "no")
+            lesson = lesson with { Statements = [] };
 
         var brain = new Brain(new CommittingSettings { Capacity = capacity }, seed);
 
+        // The tutor owns the writer, because seeing the prompt is how it knows a reply is
+        // wanted. A session with nobody scripted prints straight at the console.
+        var tutor = lesson is null ? null : new Tutor(lesson, Console.Out, passes);
+
         var world = new Conversing(new ConversingSettings
         {
-            Typed = Console.In,
-            Printed = Console.Out,
+            Typed = tutor ?? Console.In,
+            Printed = tutor?.Printed ?? Console.Out,
+            Carrying = carrying,
         });
 
         var curiosity = new Curiosity(brain, rate, seed, world.Naming);
@@ -48,15 +67,36 @@ internal static class Program
                 acting: felt => Speaking(curiosity.Choose(felt))),
             brain);
 
+        var rounds = tutor?.Moments ?? Number(args, "--rounds", 400);
+
         Console.WriteLine(
             $"talking, {rounds} rounds, capacity {capacity}, seed {seed}, asking "
-            + $"{rate.ToString("F2", CultureInfo.InvariantCulture)} of the time");
-        Console.WriteLine(
-            "  a line is a moment. end a line with `?` to ask, leave one blank for a new "
-            + $"topic, type `{Conversing.Over}` to stop.");
-        Console.WriteLine(
-            "  the machine says `. word` to claim and `? word` to ask. answer an ask with "
-            + "yes, no, or the word.");
+            + $"{rate.ToString("F2", CultureInfo.InvariantCulture)} of the time, carrying "
+            + $"{carrying.ToString().ToLowerInvariant()}");
+
+        if (lesson is null || tutor is null)
+        {
+            Console.WriteLine(
+                "  a sentence is a moment. end one with `?` to ask, leave a line blank for a "
+                + $"new topic, type `{Conversing.Over}` to stop.");
+            Console.WriteLine(
+                "  the machine says `. word` to claim and `? word` to ask. answer an ask with "
+                + "yes, no, or the word.");
+        }
+        else
+        {
+            Console.WriteLine(
+                $"  lesson: {lesson.About} — {lesson.Statements.Count} statements told once, "
+                + $"then {lesson.Exam.Count} questions {passes} times over.");
+
+            // Before anything is run, which is the whole point of printing them here. A score
+            // at or under either of these is a reading about the lesson and not about the
+            // machine.
+            Console.WriteLine(
+                $"  bars   : recency {Share(tutor.Recency, lesson.Exam.Count)}, marginal "
+                + $"{Share(tutor.Marginal, lesson.Exam.Count)} — both need no learning.");
+        }
+
         Console.WriteLine();
 
         var tally = bench.Run(rounds, sweep: 200, target: 0.9, window: 50);
@@ -78,6 +118,20 @@ internal static class Program
             $"vocabulary : {world.Vocabulary.Count} words — "
             + string.Join(" ", world.Vocabulary));
 
+        if (tutor is not null)
+        {
+            // One row a pass, because the first pass and the rest answer different questions.
+            // The first says whether being TOLD the statements taught anything; the rest say
+            // what being CORRECTED teaches, and averaging the two hides both.
+            for (var pass = 0; pass < passes; pass++)
+                Console.WriteLine(
+                    $"pass {pass + 1,-6} : {tutor.Confirmed[pass]} of {tutor.Put[pass]} right, "
+                    + $"{Share(tutor.Confirmed[pass], tutor.Put[pass])}");
+
+            Console.WriteLine(
+                $"the tutor  : {tutor.Corrected} corrected, {tutor.Shrugged} shrugged at");
+        }
+
         // What the ladder could not do, which is the reading this harness exists for. A high
         // share here is the admission rule firing on typed English: the machine was blamed and
         // nothing in the scope language told the misses from the hits.
@@ -98,6 +152,24 @@ internal static class Program
         said.Word is not { } word
             ? null
             : said.Asking ? Conversing.Asks(word) : Conversing.Asserts(word);
+
+    /// <summary>Which lesson to be told, or nothing to be typed at.</summary>
+    private static Lesson? Taught(string[] args) =>
+        Given(args, "--lesson") is not { } named
+            ? null
+            : string.Equals(named, "creatures", StringComparison.OrdinalIgnoreCase)
+                ? Lesson.Creatures
+                : throw new ArgumentException($"no lesson called `{named}`", nameof(args));
+
+    /// <summary>How much of the topic a moment holds.</summary>
+    private static Carrying Carried(string[] args) =>
+        Given(args, "--carrying") is not { } named
+            ? Carrying.Always
+            : Enum.Parse<Carrying>(named, ignoreCase: true);
+
+    private static string Share(int of, int over) => over == 0
+        ? "0.000"
+        : (of / (double)over).ToString("F3", CultureInfo.InvariantCulture);
 
     private static int Number(string[] args, string named, int fallback) =>
         Given(args, named) is { } value

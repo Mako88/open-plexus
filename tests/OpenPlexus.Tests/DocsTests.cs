@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace OpenPlexus.Tests;
@@ -290,7 +290,7 @@ public sealed class DocsTests
     // The second line is what to leave alone, which is the half a direction change usually
     // loses. Naming the three on the path names the six that are not, and a session reading
     // only the ordering above would have finished adhesion first for a phase's sake.
-    private const int Whole = 10_982;
+    private const int Whole = 10_980;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

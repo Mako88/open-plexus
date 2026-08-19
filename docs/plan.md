@@ -129,9 +129,8 @@ FORBIDS things, and several of them are already measured.
 - **And the phones are last rather than first, which is John's ordering.** They do not exist
   yet and will not be bought until this is worth showing somebody, so the hardware is a
   conclusion of the prototype rather than a precondition for it.
-- **First is Docker containers on one box**, the body a separate process, and the only sense
-  is English. Talking to it is the first interactive test of the whole system, and it needs
-  no camera, no phone and no wifi — the fleet is already the thing being exercised.
+- **First is one process on one box**, and the only sense is English. Talking to it is the
+  first interactive test of the whole system and needs no camera, phone or wifi.
 - **Then the phone as the body and the containers as the brain**, video and sensors in, if
   one machine can hold enough containers to be a fleet. That is the arrangement that says
   whether twenty of anything is needed before twenty of anything is bought.
@@ -139,8 +138,7 @@ FORBIDS things, and several of them are already measured.
   stream of the world without being two brains.
 - **The constraints were all written for this**, so it is a demonstration rather than a
   benchmark. No shared memory, late messages, a cluster vanishing mid-thought.
-- **So the containers are not the thing that was unproven**, and the fleet was never the
-  risk. What text teaches this learner is answered in one process on one box, which is where
+- **So the fleet was never the risk**, and what text teaches this learner is answered where
   it should have been asked.
 - **And twenty is already the measured edge.** Placement by minimum code is capped by a
   world's distinct roots, so fleet size and the front end's vocabulary are one number.
@@ -220,12 +218,9 @@ before six that reads as tuning is out of order.
 - **Two, a mechanism for every entry of THE ARCHITECTURE**, however bad, and `Roaming`
   exercising all of them. `DocsTests` holds the first half and `OutstandingTests` the
   second; adhesion and nesting fail it.
-- **Seven, the conversation harness**, and it runs before the rest of two. A primer moves no
-  counter, so a world that ASKS is what makes reading teach anything, and talking to it is
-  the first interactive test of the whole system. John's.
-- **It is an INSTRUMENT rather than a score**, read for which piece bites. The path is
-  statements as MOMENTS, the situation store's evidence rule and rung four; the fleet,
-  adhesion, the individual and goals are off it.
+- **Seven, the conversation harness**, and it is built. `Conversing` is one moment a typed
+  line and the machine asks for the settlements it wants; what is left of the path is the
+  situation store's evidence rule and rung four.
 - **Three, the intentional reds cleared**, which is the stable state to refine from.
 - **Four, audit TRAPS and DO NOT RE-TRY** — a failure class that has earned a check belongs
   in the check, and a revival condition that has expired is a superstition.
@@ -451,6 +446,9 @@ before six that reads as tuning is out of order.
     - **OPEN** — the ladder's admission asks whether repair found a separating code, and on a
       wide alphabet memorising always does. What separates *nothing separates* from *nothing
       GENERAL separates*. Fork **86**.
+    - **OPEN** — asking cannot be LEARNT while it is free: an unsettled round costs nothing, so
+      a wasted ask and a silence score alike and nothing pushes a scope towards asking where it
+      pays. Nor may a guess enter the moment it is then scored on. Fork **117**.
     - **SETTLED** — the front end intersecting the question with EACH statement answers task
       one where the bag sits near the marginal, and one hop is all it reaches. Fork **88**.
     - **OPEN** — whether reading real English is predictive enough to teach this learner.
@@ -477,9 +475,9 @@ before six that reads as tuning is out of order.
       anything, and testing the MECHANISM wants an effect a conjunction can reach.
     - **OPEN** — the store's update rule is still the experimenter's, so what is falsifiable
       is *this statement changes what is known* and not *my store was right*. Fork **104**.
-    - **OPEN** — a primer moves no counter, a round the world cannot settle taking no score,
-      no genesis and no repair. A world that asks is one way to fix that and an action with
-      a consequence is another; what is missing is any of them.
+    - **NOW** — a world that ASKS, so the machine obtains its settlements rather than being
+      handed them. A claim needs a rule and everything else is a question, which is what
+      breaks the bootstrap: without a blind ask it never asks, settles or mints. John's.
     - **OPEN** — on a read corpus the OBJECTIVE is the wall and no gate reaches it: the
       informative words are the unpredictable ones and the predictable ones are `to` and
       `the`.
@@ -498,8 +496,9 @@ before six that reads as tuning is out of order.
       entailment cap of one. Fork **115**.
     - **OPEN** — a goal is a SET of codes wanted present, so a goal and a prediction are one
       type once what is expected is a set. What is missing is which set, never how to say it.
-    - **OPEN** — prefer the doing whose consequence is least certain, off `Vote.Margin`, which
-      needs no body and nothing told. Dies unless it beats a coin on rounds-to-target.
+    - **OPEN** — curiosity is INVERTED on a conversation. The machine is unsure exactly where
+      nobody can answer, so `Vote.Margin` and `Vote.Weight` lose to a coin per ask by 9 and 37
+      times over eight seeds. One shape is owed: the blind ask bypasses the arm. Fork **118**.
     - **OPEN** — a drive that cannot be sated is a fault in the design and not a risk to
       manage, so a term must have a point where it stops pulling. John's.
     - **NOW** — `Roaming` is acted in and declining leaves the walk the world drew, so the
@@ -577,9 +576,9 @@ before six that reads as tuning is out of order.
       `Bench` is the loop. `Trial` is gone; `Alone` stays, being the substrate seam.
     - **OPEN** — `IWorld.Next` is still a pull behind `Watching`. A sense on its own schedule
       is a second `IInput`, not a second bench. Fork **113**.
-    - **OPEN** — a transcript arrives as ONE moment, so nothing is built from the statements
-      and answering is comprehension in a single shot. Statements as MOMENTS removes
-      selecting rather than solving it. John's.
+    - **NOW** — statements as MOMENTS, on the conversation. A typed line is one moment and the
+      question is the next from the same source, so nothing is comprehended in a single shot.
+      The corpora still arrive whole. John's.
     - **OPEN** — with no outcome slot a commitment may expect any code in the successor, which
       multiplies genesis by the moment's WIDTH. Arms: every unproposed arrived code, against
       one a moment. Fork **114**.

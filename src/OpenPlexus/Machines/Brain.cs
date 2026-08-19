@@ -117,6 +117,41 @@ public sealed class Brain
         return new Code(Followed, (ulong)outcome);
     }
 
+    /// <summary>Which outcome a code says followed, or nothing where it says something else.</summary>
+    /// <param name="said">A code a commitment expects.</param>
+    /// <remarks>
+    /// <b>The inverse of <see cref="Says"/>, and it has to be able to refuse</b>. Every code in
+    /// a moment is a candidate for what a commitment expects, so a reader that assumed the
+    /// answer would read a word of the story as an outcome index and be confidently wrong.
+    /// </remarks>
+    public static int? Meant(Code said) =>
+        said.Modality == Followed ? (int)said.Value : null;
+
+    /// <summary>What this brain would say about a moment, without taking it.</summary>
+    /// <param name="felt">The codes a moment would arrive as.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>Read-only</b>, and it is the same three calls the failure census is built out of. It
+    /// moves no counter, mints nothing and settles nothing, so asking twice and asking once are
+    /// the same question.
+    /// </para>
+    /// <para>
+    /// <b>What this machine holds rather than what a fleet would say</b>. A council's answer is
+    /// a scatter and a gather, and taking one here would put a wire under a caller that has no
+    /// idea it is asking anybody. A chooser in one process is reading the whole population; a
+    /// chooser over a fleet is reading its own share and the difference is a measurement rather
+    /// than a bug.
+    /// </para>
+    /// </remarks>
+    public Vote Voting(IReadOnlyCollection<Code> felt)
+    {
+        ArgumentNullException.ThrowIfNull(felt);
+
+        var moment = Held.Moment(felt as IReadOnlySet<Code> ?? new HashSet<Code>(felt));
+
+        return Held.Predict(Held.Firing(moment));
+    }
+
     /// <summary>Takes one moment, says what it expects, and settles what the source said.</summary>
     /// <param name="moment">What a source pushed.</param>
     /// <param name="sweeping">Whether to subsume, abstract and cull on this one.</param>

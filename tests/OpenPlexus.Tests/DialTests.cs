@@ -816,8 +816,8 @@ public sealed class DialTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>This list may only shrink, and an entry is cleared by deleting the dial rather
-    /// than by improving its reason.</b> That is the whole difference between this and the
+    /// <b>This list may only shrink.</b> And an entry is cleared by deleting the dial rather
+    /// than by improving its reason. That is the whole difference between this and the
     /// check it replaced. Nothing new may be added — a mechanism arriving today ships on.
     /// </para>
     /// <para>

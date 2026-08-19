@@ -58,8 +58,8 @@ public sealed record MonkSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The cheapest language-ceiling probe there is, and the plan has called it a day's
-/// work since the ladder was written.</b> Step eight is <i>the rung the failures
+/// <b>The cheapest language-ceiling probe there is.</b> And the plan has called it a day's
+/// work since the ladder was written. Step eight is <i>the rung the failures
 /// demand, and never the rung that sounds next</i> — and no failure has asked yet,
 /// because on the one world that can say, twelve one-code rules cover everything held
 /// out. This is a world built so a failure can ask.

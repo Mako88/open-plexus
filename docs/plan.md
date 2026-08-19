@@ -587,8 +587,8 @@ before six that reads as tuning is out of order.
       discovered by failing, and a fact costs fewer tellings. John's. `Rooting`.
     - **NOW** — a mint is CREDITED with the round that made it, being right about it by
       construction, and a correct rule is then believed a telling sooner. `Crediting`.
-    - **NOW** — a statement claims EVERY word in turn, one moment each, so nothing picks one.
-      Told once, it answers an exam never sat. John's. Forks **121** and **123**.
+    - **BROKEN** — a statement claims EVERY word in turn and told once it answers an exam never
+      sat, but the tutor answers moments nobody asked. Every reading here waits on that.
     - **OPEN** — claiming, width and crediting are all load-bearing and unweighed on any
       generated world. Fork **124**.
     - **OPEN** — claiming every word makes a rule WRONG on its own sentence's other claims, so

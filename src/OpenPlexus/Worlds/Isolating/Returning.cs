@@ -33,8 +33,8 @@ public sealed record ReturningSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The cell the whole world exists for, and without it every score here is a kind's
-    /// rather than an individual's.</b> A thing that looks unlike everything else can be
+    /// <b>The cell the whole world exists for.</b> And without it every score here is a kind's
+    /// rather than an individual's. A thing that looks unlike everything else can be
     /// re-found by its appearance, and a rule keyed on appearance is a narrow CATEGORY that
     /// this design already builds. Two things that look the same and are not is where a
     /// category runs out and a referent is the only thing left.

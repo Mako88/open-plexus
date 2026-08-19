@@ -37,8 +37,8 @@ public sealed record CifarSettings
     /// ones are, and <see cref="Cifar.Next"/> never reaches them.
     /// </para>
     /// <para>
-    /// <b>Taken after the drawn ones in the fixed file order, so the split is a
-    /// position and not a sample.</b> A withheld set chosen by the world's own generator
+    /// <b>Taken after the drawn ones in the fixed file order.</b> So the split is a
+    /// position and not a sample. A withheld set chosen by the world's own generator
     /// would move with the seed, and two seeds would then be scored against two
     /// different questions — which is the shape of thing <see cref="Seeds"/> exists
     /// about.

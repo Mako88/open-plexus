@@ -118,8 +118,8 @@ public readonly record struct Recited
 /// ordered sentence, so anything above a half is binding and nothing else.</item>
 /// </list>
 /// <para>
-/// <b>So the middle rung is fork 88 arriving with something left over, and that is the
-/// point of the design.</b> Intersecting the question with each statement is settled: it
+/// <b>So the middle rung is fork 88 arriving with something left over.</b> And that is the
+/// point of the design. Intersecting the question with each statement is settled: it
 /// answers bAbI's first task where the bag sits near the marginal. Here it is worth exactly
 /// one half and not one, so the two mechanisms are separated by a world instead of by an
 /// argument — a run that lands on 0.5 has selected and not bound, and a run that lands on

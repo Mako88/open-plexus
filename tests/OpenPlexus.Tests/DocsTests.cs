@@ -290,7 +290,20 @@ public sealed class DocsTests
     // The second line is what to leave alone, which is the half a direction change usually
     // loses. Naming the three on the path names the six that are not, and a session reading
     // only the ordering above would have finished adhesion first for a phase's sake.
-    private const int Whole = 10_996;
+    // And 11,142 is the nineteenth raise, a hundred and forty-six words for John's session on
+    // 2026-08-19 -- the one that asked whether feeding sentences puts commitments in the brain.
+    // It did not, and the six leaves are what came out of finding out. Two are NOW: a typed
+    // sentence is a moment rather than a typed line, and a statement claims its rarest word so
+    // that being told is falsifiable at all. Four are open and three of them are John's -- what
+    // a moment carries beside its own sentence, what picks a statement's claim without an
+    // experimenter, whether an outvote is enough where a monotone counter cannot retract, and
+    // one brain process with worlds attached over a stream.
+    //
+    // The raise is taken rather than paid for by compaction, and that is the judgement. The
+    // leaves it would have come out of are the ones printed by the length check, and every one
+    // of them is already a sentence a clause short of unreadable -- so the words would have
+    // been bought by losing content, which is the one thing a guard may never cost.
+    private const int Whole = 11_142;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -36,7 +36,12 @@ internal static class Program
         var seed = Number(args, "--seed", 1);
         var rate = Fraction(args, "--asking", 0.25);
         var passes = Number(args, "--passes", 3);
+        var tellings = Number(args, "--tellings", 1);
+        var clarifying = Number(args, "--clarifying", 0);
         var carrying = Carried(args);
+        var asserting = Given(args, "--asserting") is { } claim
+            ? Enum.Parse<Asserting>(claim, ignoreCase: true)
+            : Asserting.Nothing;
         var lesson = Taught(args);
 
         // The control, and it is the only thing that says whether the telling taught anything.
@@ -49,13 +54,14 @@ internal static class Program
 
         // The tutor owns the writer, because seeing the prompt is how it knows a reply is
         // wanted. A session with nobody scripted prints straight at the console.
-        var tutor = lesson is null ? null : new Tutor(lesson, Console.Out, passes);
+        var tutor = lesson is null ? null : new Tutor(lesson, Console.Out, passes, tellings, clarifying, Console.In);
 
         var world = new Conversing(new ConversingSettings
         {
             Typed = tutor ?? Console.In,
             Printed = tutor?.Printed ?? Console.Out,
             Carrying = carrying,
+            Asserting = asserting,
         });
 
         var curiosity = new Curiosity(brain, rate, seed, world.Naming);
@@ -72,7 +78,8 @@ internal static class Program
         Console.WriteLine(
             $"talking, {rounds} rounds, capacity {capacity}, seed {seed}, asking "
             + $"{rate.ToString("F2", CultureInfo.InvariantCulture)} of the time, carrying "
-            + $"{carrying.ToString().ToLowerInvariant()}");
+            + $"{carrying.ToString().ToLowerInvariant()}, asserting "
+            + $"{asserting.ToString().ToLowerInvariant()}");
 
         if (lesson is null || tutor is null)
         {
@@ -86,8 +93,13 @@ internal static class Program
         else
         {
             Console.WriteLine(
-                $"  lesson: {lesson.About} — {lesson.Statements.Count} statements told once, "
-                + $"then {lesson.Exam.Count} questions {passes} times over.");
+                $"  lesson: {lesson.About} — {lesson.Statements.Count} statements told {tellings} "
+                + $"times, then {lesson.Exam.Count} questions {passes} times over.");
+
+            if (clarifying > 0)
+                Console.WriteLine(
+                    $"  and {clarifying} moments in between are yours — answer what it asks, "
+                    + $"say what you like, `{Tutor.Done}` to move on.");
 
             // Before anything is run, which is the whole point of printing them here. A score
             // at or under either of these is a reading about the lesson and not about the

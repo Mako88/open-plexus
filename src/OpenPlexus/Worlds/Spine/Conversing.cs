@@ -24,6 +24,13 @@ public sealed record ConversingSettings
     /// </remarks>
     public Carrying Carrying { get; init; } = Carrying.Always;
 
+    /// <summary>What a told statement claims, so that being told can be wrong.</summary>
+    /// <remarks>
+    /// <b>An arm, and John's.</b> A statement that settles nothing takes no score, no genesis
+    /// and no repair, so telling one moves no counter at all.
+    /// </remarks>
+    public Asserting Asserting { get; init; } = Asserting.Nothing;
+
     /// <summary>Words the outcome alphabet starts with.</summary>
     /// <remarks>
     /// <para>
@@ -79,6 +86,46 @@ public enum Carrying
     /// came to hold.
     /// </remarks>
     Never,
+}
+
+/// <summary>What a statement asserts, which is what makes being told falsifiable.</summary>
+/// <remarks>
+/// <para>
+/// <b>What it is told must be falsifiable</b>, which is the architecture's own line and the one
+/// a conversation had no answer to. Told and configured are indistinguishable from the inside,
+/// so a fact the machine cannot fail on was installed rather than taught — and a statement that
+/// settles nothing is exactly that, measured against its own control in <c>LessonTests</c>.
+/// </para>
+/// <para>
+/// <b>And the answer word stays in the moment</b>, which is settled here rather than open.
+/// <i>meow</i> is a word of the statement and <i>the answer is meow</i> is an outcome, and the
+/// one-code commitment joining them is what genesis is for. What the statement does NOT hand
+/// over is which of its words the next one will be about.
+/// </para>
+/// </remarks>
+public enum Asserting
+{
+    /// <summary>Nothing, so a statement can only settle where the machine asked.</summary>
+    /// <remarks>
+    /// <b>The control, and every earlier reading is here.</b> A statement is a round that takes
+    /// no score, which is what makes the telling free and also what makes it worthless.
+    /// </remarks>
+    Nothing,
+
+    /// <summary>Its rarest word so far, which is what the statement is taken to claim.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Rarest rather than every word in turn</b>, which is <c>Predicting.Salient</c>'s rule
+    /// and it is here for that rule's reason. Claiming every word spends most of the demand on
+    /// <i>the</i> and <i>is</i>, where a bag predicts best and carries least.
+    /// </para>
+    /// <para>
+    /// <b>And frequency is a count rather than a stop list.</b> No parser, tagger or written
+    /// word set goes near it — it is how often this conversation has said a word, ties to the
+    /// earliest. Counted as it goes, because a world cannot read ahead.
+    /// </para>
+    /// </remarks>
+    Rarest,
 }
 
 /// <summary>
@@ -145,6 +192,15 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
 
     private Recited? _pending;
     private int? _settled;
+
+    // What the statement now pending claims, where this world claims anything. Kept beside the
+    // moment rather than folded into `_settled`, because a reply and a claim arrive at different
+    // times and a statement that was asked about would otherwise settle twice.
+    private int? _asserted;
+
+    // How often each word has been said, which is what `Asserting.Rarest` reads. Counted as the
+    // conversation goes, because a world cannot read ahead.
+    private readonly Dictionary<string, int> _often = new(StringComparer.Ordinal);
     private Spoke _did;
 
     /// <summary>What the machine did with the last moment it was shown.</summary>
@@ -466,9 +522,13 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
 
         _pending = null;
 
-        var outcome = _settled;
+        // A statement's own claim, where it made one, and the reply otherwise. A claim wins
+        // because a reply to an ask about a statement is a shrug, and a shrug arriving after a
+        // claim would settle the round on `nobody knew` and throw the telling away.
+        var outcome = _asserted ?? _settled;
 
         _settled = null;
+        _asserted = null;
 
         var spoke = _did switch
         {
@@ -559,7 +619,14 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
             var coded = Said(words);
             var asking = one.EndsWith('?');
 
-            if (!asking) _said.Add(coded);
+            if (!asking)
+            {
+                _said.Add(coded);
+
+                foreach (var word in words) _often[word] = _often.GetValueOrDefault(word) + 1;
+
+                _asserted = _settings.Asserting is Asserting.Rarest ? Claimed(words) : null;
+            }
 
             var before = new List<IReadOnlyList<Code>>();
 
@@ -583,6 +650,25 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
         Carrying.Statements => !asking,
         _ => false,
     };
+
+    /// <summary>Which of a statement's words it is taken to claim.</summary>
+    /// <remarks>
+    /// <b>The one this conversation has said least often</b>, ties to the earliest, which is
+    /// arbitrary and fixed. A statement of one word claims nothing, because a claim with its
+    /// whole scope removed is a claim about nothing being present.
+    /// </remarks>
+    private int? Claimed(IReadOnlyList<string> words)
+    {
+        if (words.Count < 2) return null;
+
+        var rarest = words
+            .Select((word, at) => (word, at))
+            .OrderBy(one => _often.GetValueOrDefault(one.word, 0))
+            .ThenBy(one => one.at)
+            .First().word;
+
+        return _index.TryGetValue(rarest, out var at) ? at : null;
+    }
 
     /// <summary>One typed line, cut into the sentences it holds.</summary>
     /// <remarks>

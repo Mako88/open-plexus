@@ -140,6 +140,9 @@ public sealed class Tutor : TextReader
 {
     private readonly Lesson _lesson;
     private readonly int _passes;
+    private readonly int _tellings;
+    private readonly int _clarifying;
+    private readonly TextReader? _person;
     private readonly Watched _printed;
     private readonly int[] _put;
     private readonly int[] _confirmed;
@@ -148,6 +151,11 @@ public sealed class Tutor : TextReader
     private int _told;
     private int _at;
     private int _pass;
+    private int _clarified;
+
+    // Whether the keyboard is the person's rather than the script's. While it is, every read
+    // goes straight through -- a line to say, and the answer to whatever the machine asks.
+    private bool _theirs;
 
     // Which pass the question on the table was PUT on, which is not always the current one. A
     // pass rolls over as its last question is handed out, so a reply arriving after that would
@@ -157,14 +165,39 @@ public sealed class Tutor : TextReader
     /// <param name="lesson">The topic and the questions.</param>
     /// <param name="printed">Where the machine's words should end up.</param>
     /// <param name="passes">How many times the examination is put.</param>
-    public Tutor(Lesson lesson, TextWriter printed, int passes = 1)
+    /// <param name="tellings">
+    /// How many times the statements are told before the examination — <b>repetition, and it
+    /// is an axis rather than a setting</b>. Being told once and being told twenty times are
+    /// different amounts of evidence for the same claim, and which of them a machine needs is
+    /// the reading.
+    /// </param>
+    /// <param name="clarifying">
+    /// How many moments the person gets between the telling and the examination —
+    /// <b>John's, and it is where the back and forth happens</b>. The machine's questions are
+    /// not scriptable, so this is the window a person answers them in and adds whatever the
+    /// answers make them want to add.
+    /// </param>
+    /// <param name="person">Whose keyboard the clarifying window reads.</param>
+    public Tutor(
+        Lesson lesson, TextWriter printed, int passes = 1, int tellings = 1,
+        int clarifying = 0, TextReader? person = null)
     {
         ArgumentNullException.ThrowIfNull(lesson);
         ArgumentNullException.ThrowIfNull(printed);
         ArgumentOutOfRangeException.ThrowIfLessThan(passes, 1);
+        ArgumentOutOfRangeException.ThrowIfNegative(tellings);
+        ArgumentOutOfRangeException.ThrowIfNegative(clarifying);
+
+        if (clarifying > 0 && person is null)
+            throw new ArgumentNullException(nameof(person),
+                "a clarifying window with nobody at the keyboard would read end-of-stream and "
+                + "close on its first line, which is a window that reads as having run");
 
         _lesson = lesson;
         _passes = passes;
+        _tellings = tellings;
+        _clarifying = clarifying;
+        _person = person;
         _printed = new Watched(printed);
         _put = new int[passes];
         _confirmed = new int[passes];
@@ -174,7 +207,11 @@ public sealed class Tutor : TextReader
     public TextWriter Printed => _printed;
 
     /// <summary>How many moments the whole lesson is, which is how long a run has to be.</summary>
-    public int Moments => _lesson.Statements.Count + (_lesson.Exam.Count * _passes);
+    public int Moments =>
+        (_lesson.Statements.Count * _tellings) + _clarifying + (_lesson.Exam.Count * _passes);
+
+    /// <summary>What closes the clarifying window early, typed on a line of its own.</summary>
+    public const string Done = ".done";
 
     /// <summary>How many times it was asked about something nobody could answer.</summary>
     public int Shrugged { get; private set; }
@@ -288,6 +325,10 @@ public sealed class Tutor : TextReader
     /// <summary>What to say back to <c>? word</c>.</summary>
     private string Replying(string guessed)
     {
+        // Their question to answer, not the script's. A machine that asked during the window
+        // is asking the person, and what they say is the settlement.
+        if (_theirs) return _person!.ReadLine() ?? string.Empty;
+
         if (_answer is null)
         {
             Shrugged++;
@@ -310,11 +351,42 @@ public sealed class Tutor : TextReader
     /// <summary>The next thing the lesson has to say, or nothing where it is finished.</summary>
     private string? Saying()
     {
-        if (_told < _lesson.Statements.Count)
+        if (_told < _lesson.Statements.Count * _tellings)
         {
             _answer = null;
 
-            return _lesson.Statements[_told++];
+            return _lesson.Statements[_told++ % _lesson.Statements.Count];
+        }
+
+        if (_clarified < _clarifying)
+        {
+            if (!_theirs)
+            {
+                _theirs = true;
+
+                _printed.WriteLine();
+                _printed.WriteLine(
+                    $"  (your turn — up to {_clarifying} more lines, `{Done}` to move on to the "
+                    + "questions)");
+            }
+
+            var line = _person!.ReadLine();
+
+            if (line is not null && !string.Equals(line.Trim(), Done, StringComparison.Ordinal))
+            {
+                _clarified++;
+                _answer = null;
+
+                return line;
+            }
+
+            // Closed, either by the person or by the stream ending. The budget is spent so the
+            // window cannot re-open, and the run's spare rounds go by empty.
+            _clarified = _clarifying;
+            _theirs = false;
+
+            _printed.WriteLine("  (the questions)");
+            _printed.WriteLine();
         }
 
         if (_pass >= _passes) return null;

@@ -24,9 +24,10 @@ namespace OpenPlexus.Tests;
 public sealed class LessonTests(ITestOutputHelper output)
 {
     private static (Tally Tally, Tutor Tutor, Conversing World) Ran(
-        Lesson lesson, Carrying carrying, int seed, int passes, int capacity = 2000)
+        Lesson lesson, Carrying carrying, int seed, int passes, int capacity = 2000,
+        Asserting asserting = Asserting.Nothing, int tellings = 1)
     {
-        var tutor = new Tutor(lesson, TextWriter.Null, passes);
+        var tutor = new Tutor(lesson, TextWriter.Null, passes, tellings);
 
         var brain = new Brain(new CommittingSettings { Capacity = capacity }, seed);
 
@@ -35,6 +36,7 @@ public sealed class LessonTests(ITestOutputHelper output)
             Typed = tutor,
             Printed = tutor.Printed,
             Carrying = carrying,
+            Asserting = asserting,
         });
 
         var curiosity = new Curiosity(brain, rate: 1.0, seed, world.Naming);
@@ -141,7 +143,7 @@ public sealed class LessonTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public void Being_told_the_statements_teaches_the_machine_nothing()
+    public void A_statement_claiming_nothing_teaches_nothing_however_often_it_is_told()
     {
         const int Passes = 20;
         const int Seeds = 4;
@@ -190,14 +192,85 @@ public sealed class LessonTests(ITestOutputHelper output)
             $"the last pass reads {told[^1]:F3} against a recency bar of {bar:F3}, so nothing "
             + "here is above a rule that needs no learning at all");
 
-        // And the telling buys none of it, which is the finding. A statement carries no
-        // settlement, so a round spent being told one moves no counter and the machine that
-        // heard the statements is exactly the machine that did not.
-        //
-        // This fails the day being told changes something, which is the point of asserting it.
+        // And the telling buys none of it, which is the finding this arm exists to hold. A
+        // statement that claims nothing carries no settlement, so a round spent being told one
+        // moves no counter and the machine that heard the statements is exactly the machine
+        // that did not. `Asserting.Rarest` is the arm that changes it, below.
         Assert.True(told.Sum() <= without.Sum() + 0.5,
             $"told totalled {told.Sum():F3} over the passes and untold {without.Sum():F3}. "
             + "The statements have started to teach something, which is a result rather than "
             + "a regression — re-take this reading and say what changed.");
+    }
+
+    [Fact]
+    public void A_statement_claiming_its_rarest_word_teaches_the_examination_before_it_is_sat()
+    {
+        const int Seeds = 3;
+
+        int[] tellings = [1, 5, 8, 10, 20];
+
+        var lesson = Lesson.Creatures;
+        var untold = lesson with { Statements = [] };
+
+        // The bars first, and neither of them moves with how often the lesson is told.
+        var bar = new Tutor(lesson, TextWriter.Null).Recency / (double)lesson.Exam.Count;
+        var marginal = new Tutor(lesson, TextWriter.Null).Marginal / (double)lesson.Exam.Count;
+
+        output.WriteLine($"{Seeds} seeds, one examination pass, never sat before");
+        output.WriteLine($"bars: recency {bar:F3}, marginal {marginal:F3}");
+        output.WriteLine($"{"tellings",-10}{"told",8}{"untold",8}{"minted",8}{"repaired",10}");
+
+        var reached = new Dictionary<int, double>();
+        var without = new Dictionary<int, double>();
+
+        foreach (var many in tellings)
+        {
+            var told = new List<double>();
+            var none = new List<double>();
+            var minted = new List<double>();
+            var repaired = new List<double>();
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var one = Ran(
+                    lesson, Carrying.Never, seed, passes: 1,
+                    asserting: Asserting.Rarest, tellings: many);
+
+                var other = Ran(
+                    untold, Carrying.Never, seed, passes: 1,
+                    asserting: Asserting.Rarest, tellings: many);
+
+                told.Add(Right(one.Tutor, 0));
+                none.Add(Right(other.Tutor, 0));
+                minted.Add(one.Tally.Minted);
+                repaired.Add(one.Tally.Repaired);
+            }
+
+            reached[many] = told.Average();
+            without[many] = none.Average();
+
+            output.WriteLine(
+                $"{many,-10}{told.Average(),8:F3}{none.Average(),8:F3}{minted.Average(),8:F1}"
+                + $"{repaired.Average(),10:F1}");
+        }
+
+        // Told enough times, the examination is answered the first time it is put — so what
+        // the machine holds came from being told rather than from being corrected. That is
+        // the whole difference from the arm above.
+        Assert.True(reached[20] > 0.9,
+            $"twenty tellings reached {reached[20]:F3} on an examination never sat before");
+
+        // And the control stays at the floor, which is what says the statements are what did
+        // it. The same run with them DELETED sees the identical number of questions.
+        Assert.True(without[20] <= marginal,
+            $"the untold arm reached {without[20]:F3} with no statements at all, so something "
+            + "other than the telling is answering");
+
+        // Once is not enough and repetition is what earns it, which is John's. The gate is the
+        // repair floor rather than the lesson: a rule rooted on one word must miss twenty times
+        // before it may be narrowed, and the rows show the repairs arriving with the score.
+        Assert.True(reached[1] <= marginal,
+            $"one telling reached {reached[1]:F3}, so the repetition is buying nothing and the "
+            + "threshold this test is named for has moved");
     }
 }

@@ -572,9 +572,19 @@ before six that reads as tuning is out of order.
       `Bench` is the loop. `Trial` is gone; `Alone` stays, being the substrate seam.
     - **OPEN** — `IWorld.Next` is still a pull behind `Watching`. A sense on its own schedule
       is a second `IInput`, not a second bench. Fork **113**.
-    - **NOW** — statements as MOMENTS, on the conversation. A typed line is one moment and the
-      question is the next from the same source, so nothing is comprehended in a single shot.
-      The corpora still arrive whole. John's.
+    - **NOW** — statements as MOMENTS, on the conversation. A typed SENTENCE is one moment, so
+      a pasted paragraph arrives one at a time. The corpora still arrive whole. John's.
+    - **NOW** — a statement CLAIMS its rarest word, so being told is falsifiable, mints, and
+      answers an exam never sat. Delete the statements and nothing is learnt. John's.
+    - **NOW** — and REPETITION earns it, at the repair gate's floor rather than the lesson's.
+    - **OPEN** — what a moment carries beside its own sentence. A question re-handing the story
+      leaves every code always-present, so genesis roots on nothing. Fork **120**.
+    - **OPEN** — rarest is one split of a statement into scope and claim, and the brain does not
+      choose it. What picks the claim with no experimenter. Fork **121**.
+    - **OPEN** — a conflicting statement cannot retract, the counters being monotone, so a
+      belief leaves by being outvoted. Whether that suffices. John's. Fork **122**.
+    - **OPEN** — one brain process, worlds attached over a stream: fork **113**'s shape as a
+      HOST. Blocked on cost, a pipe making every grid a round-trip. John's.
     - **OPEN** — with no outcome slot a commitment may expect any code in the successor, which
       multiplies genesis by the moment's WIDTH. Arms: every unproposed arrived code, against
       one a moment. Fork **114**.

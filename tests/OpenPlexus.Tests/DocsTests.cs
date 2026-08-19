@@ -266,7 +266,20 @@ public sealed class DocsTests
     // above it says a loser is deleted and leaves one, so refusing the words would leave the
     // repo with a deletion and no record of why -- and the next session would build it again.
     // The row carries the number that says where it could pay and why that is not enough.
-    private const int Whole = 10_789;
+    //
+    // And 10,893 is the sixteenth raise, a hundred and four words for a design conversation
+    // with John on 2026-08-19 that the doc had no home for. Its content is that SELECTING was
+    // never a mechanism: a transcript arrives as one moment, so nothing is ever built from
+    // the statements and the machine is asked to comprehend in a single shot. Statements as
+    // moments removes the problem, and what is left of it is reading a commitment backwards,
+    // which fork 115 already carries.
+    //
+    // Two more came out of the same conversation. Questionhood is handed over by the world
+    // rather than learnt, and a final `?` with rung three would say it. And the world that
+    // holds repair still does it with a one-code moment, which any brain-side code breaks --
+    // one already did, this session. A control whose codes never vary would hold on
+    // principle rather than by accident.
+    private const int Whole = 10_893;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

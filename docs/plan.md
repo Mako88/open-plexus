@@ -377,6 +377,8 @@ out of it, and anything before six that reads as tuning is out of order.
       carriers overshot. The revival row is in DO NOT RE-TRY. Fork **74**.
     - **OPEN** — nothing stops a chain at a sound depth. What signal INSIDE the machine says
       stop here. Fork **75**.
+    - **OPEN** — the world holding repair still does it with a one-code moment, which any
+      brain-side code breaks. A world whose codes never VARY would hold it on principle.
     - **OPEN** — a budget buys re-derivations. Does quantity buy the uncovered rounds, or
       only more population. Fork **76**.
   - Which aspects are temporal
@@ -403,7 +405,7 @@ out of it, and anything before six that reads as tuning is out of order.
       evidence rule the first lacked, or it collapses the same way.
     - **OPEN** — specificity as a gradient across the SITUATION stores too. Rules have that
       gradient; situations have nowhere to keep one — repetition for a general rule,
-      assertion for a particular.
+      assertion for a particular, and the vote ranks repetition only.
     - **OPEN** — whether compression is self-regulating. On no signal found yet. Fork **23**.
     - **OPEN** — project each scope code to its COARSER form when counting pairs. Test the
       rewrite first: a name no scope can be said in is a word with no referent. Fork **83**.
@@ -452,10 +454,13 @@ out of it, and anything before six that reads as tuning is out of order.
       pass. Fork **90**.
     - **OPEN** — it is a near-perfect READER and a hopeless SELECTOR, and a front end that
       hands it the right statement answers a whole task at a twentieth of the bag's
-      population. What SELECTS without being handed the question's own words is unbuilt.
+      population. Selecting IS reading a commitment backwards, so fork **115** carries it
+      and the entailment cap bounds it.
   - Told, never architected
     - **NOW** — a front end may say what it is looking at, never what to conclude.
       `SeparationTests` fails the build.
+    - **OPEN** — the world hands the question already separated, so questionhood is never
+      learnt. A final `?` and rung three say it with nothing new. John's, 2026-08-19.
     - **OPEN** — how hard a fleet searches is a deployment choice, which is a world reaching
       into the brain one level out. Fork **60** carries it, under the machine.
   - What it is told must be settleable
@@ -565,6 +570,9 @@ out of it, and anything before six that reads as tuning is out of order.
       `Bench` is the loop. `Trial` is gone; `Alone` stays, being the substrate seam.
     - **OPEN** — `IWorld.Next` is still a pull behind `Watching`. A sense on its own schedule
       is a second `IInput`, not a second bench. Fork **113**.
+    - **OPEN** — a transcript arrives as ONE moment, so nothing is built from the statements
+      and answering is comprehension in a single shot. Statements as MOMENTS removes
+      selecting rather than solving it. John's, 2026-08-19.
     - **OPEN** — with no outcome slot a commitment may expect any code in the successor, which
       multiplies genesis by the moment's WIDTH. Arms: every unproposed arrived code, against
       one a moment. Fork **114**.
@@ -652,7 +660,7 @@ out of it, and anything before six that reads as tuning is out of order.
 | `Chunk`'s whole-moment rule ported to rung five | Two vocabularies: `Narrows` is syntactic, so a scope keeping the members and its children taking the name stand in no relation. Unsound rose on every seed that moved | A subsumption test read at the UNFOLDED grain |
 | A front end putting a word's POSITION in the moment | Beside the code it is never absent, reaching every moment and no scope; FUSED in, it costs the identity — an input is an attribute, never the concept | Never. Order derives its own code: rung three |
 | Marking the question-story coincidence — `Named`, `Anonymous`, `Either` | Rung four's cheap tests, and they answered: what blocks it is admission, not cost | A derived code over `Bind`'s groups that cannot say *this one is in two of them* |
-| Carrying the DECIDER's identity into the next moment, so a scope roots on it | Scopes rooted on one, no score moved, the table grew by half, and every moment gained a code — costing `Rhythm` the one-code moment that holds repair still | A meta candidate for repair that does not widen every world's moment |
+| Carrying the DECIDER's identity into the next moment, so a scope roots on it | No score moved, the table grew by half, and on a cyclic world the identity SEPARATED — costing `Rhythm` the moment that holds repair still | Siting it as MEMORY rather than metacognition, and a control whose codes never vary |
 | `Joining.Recent` — a word banded by how far back it was said | Half what narrowing the view buys, and the front end picks the bands | A band the learner mints. Fork 92 |
 
 ---

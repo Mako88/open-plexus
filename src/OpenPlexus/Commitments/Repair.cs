@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 
 namespace OpenPlexus.Commitments;
 
@@ -121,45 +121,6 @@ public enum Crediting
 
     /// <summary>The round that minted it counts as a hit, because it was one.</summary>
     Birth,
-}
-
-/// <summary>Whether a commitment may vote before it has been tested.</summary>
-/// <remarks>
-/// <para>
-/// <b>A rule that has been right once weighs one</b>, and the vote raises that to a
-/// power. <see cref="Commitment.Accuracy"/> averages over a commitment's first
-/// firings rather than running Widrow-Hoff from zero, and that is deliberate — from zero,
-/// a rule right once reads a tenth right and is indistinguishable from a refuted one, so
-/// it loses every vote it should win. The consequence is the mirror image: it reads
-/// PERFECT, and beats a rule right ninety-five times in a hundred.
-/// </para>
-/// <para>
-/// <b>So the vote consults commitments that have no statistics</b>, ranks them above ones
-/// that do, and it has done since the branch began. Every fresh repair child arrives
-/// at full weight, decides rounds it has no standing to decide, and only becomes honest
-/// after the population has already moved. Nothing separates a provisional weight from an
-/// earned one anywhere in this machine.
-/// </para>
-/// <para>
-/// <b>And the bar needs no new number</b>, which is the only reason this is buildable.
-/// <see cref="CommittingSettings.Floor"/> already means <i>enough firings to judge a
-/// proportion by</i> — subsumption and culling both refuse to weigh a commitment below it.
-/// The vote is the one reader that never asked.
-/// </para>
-/// <para>
-/// <b>What it risks is silence</b>, and that must be read beside the score. A population
-/// whose experienced members do not cover a moment says nothing at all, and a silent arm
-/// scores well on the few rounds it answers — this repo's own trap about a fallback being
-/// a control arm nobody meant to run. <c>Tally.Silent</c> is where that shows.
-/// </para>
-/// </remarks>
-public enum Speaking
-{
-    /// <summary>Anything that fires votes. What has always run.</summary>
-    Anyone,
-
-    /// <summary>Only a commitment past the floor votes.</summary>
-    Experienced,
 }
 
 /// <summary>
@@ -863,8 +824,6 @@ public sealed record CommittingSettings
     /// <inheritdoc cref="Commitments.Forking"/>
     public Forking Forking { get; init; } = Forking.Distinct;
 
-    /// <inheritdoc cref="Commitments.Speaking"/>
-    public Speaking Speaking { get; init; } = Speaking.Anyone;
 }
 
 /// <summary>

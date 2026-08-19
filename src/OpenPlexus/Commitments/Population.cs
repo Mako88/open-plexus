@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 using OpenPlexus.Codes;
 
@@ -779,14 +779,6 @@ public sealed class Population
 
         foreach (var commitment in firing)
         {
-            // A provisional weight is not an earned one, and only this reader ever
-            // conflated them. Below the floor an accuracy is an average over a handful of
-            // firings, so a commitment right once carries a perfect one -- and subsumption
-            // and culling both already refuse to weigh anything down here. Skipped rather
-            // than discounted, because a discount is a number and the floor is not.
-            if (_dials.Speaking == Speaking.Experienced && commitment.Seen < _dials.Floor)
-                continue;
-
             // Accuracy itself, with no power over it. A power was applied here, and it was
             // the workaround for a summed vote's shape: a sum over N advocates scales with N
             // however steeply each is weighted, so raising it only made a crowd need more

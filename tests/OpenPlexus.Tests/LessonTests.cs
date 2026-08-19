@@ -51,7 +51,7 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         var watching = new Watching<Recited>(
             world, front,
-            acting: Chooses.From(felt => Speaking(curiosity.Choose(felt)), curiosity.Cleared));
+            acting: Chooses.From(felt => Doing(curiosity.Choose(felt)), curiosity.Cleared));
 
         // Budgeted for the widest statement, because `Asserting.Everything` makes a sentence
         // one moment a word. A run stopping at the moment count would end before the exam.
@@ -79,7 +79,7 @@ public sealed class LessonTests(ITestOutputHelper output)
         };
 
     /// <summary>The join between what a chooser decided and how this world numbers its doings.</summary>
-    private static int? Speaking(Wondered said) =>
+    private static int? Doing(Wondered said) =>
         said.Word is not { } word
             ? null
             : said.Asking ? Conversing.Asks(word) : Conversing.Asserts(word);
@@ -160,7 +160,8 @@ public sealed class LessonTests(ITestOutputHelper output)
     /// right refusal: three grids each with their own seed loop is three chances for one
     /// grid's worlds to differ from the grid it is read against.
     /// </remarks>
-    private static (List<double> Right, List<double> Found, List<double> Resident) Over(
+    private static (List<double> Right, List<double> Found, List<double> Resident,
+        List<double> Silent) Over(
         int seeds, uint purpose, bool written, Carrying carrying, Asserting asserting,
         int tellings, Crediting crediting = Crediting.Nothing,
         Rooting rooting = Rooting.Singly, Admitting admitting = Admitting.Anything)
@@ -168,6 +169,7 @@ public sealed class LessonTests(ITestOutputHelper output)
         var right = new List<double>();
         var found = new List<double>();
         var resident = new List<double>();
+        var silent = new List<double>();
 
         for (var index = 0; index < seeds; index++)
         {
@@ -188,9 +190,13 @@ public sealed class LessonTests(ITestOutputHelper output)
             right.Add(Right(ran.Tutor, pass: 0));
             found.Add(Found(ran.Brain, ran.World, lesson));
             resident.Add(ran.Tally.Resident);
+
+            // Beside the score, because a population whose voters do not cover a moment says
+            // nothing at all -- and a silent arm scores well on the few rounds it answers.
+            silent.Add(ran.Tally.Rounds == 0 ? 0.0 : ran.Tally.Silent / (double)ran.Tally.Rounds);
         }
 
-        return (right, found, resident);
+        return (right, found, resident, silent);
     }
 
     /// <summary>What share of one pass's questions were answered right.</summary>
@@ -243,7 +249,7 @@ public sealed class LessonTests(ITestOutputHelper output)
             Asserting.Nothing, Asserting.Rarest, Asserting.Withheld, Asserting.Everything,
         })
         {
-            var (right, found, resident) = Over(
+            var (right, found, resident, silent) = Over(
                 Seeds, Purpose, written, Carrying.Never, asserting, many);
 
             var measured = new Measured { Arm = asserting.ToString(), Values = [.. right] };
@@ -332,7 +338,7 @@ public sealed class LessonTests(ITestOutputHelper output)
         foreach (var written in new[] { true, false })
         foreach (var carrying in new[] { Carrying.Always, Carrying.Statements, Carrying.Never })
         {
-            var (right, found, resident) = Over(
+            var (right, found, resident, silent) = Over(
                 Seeds, Purpose, written, carrying, Asserting.Withheld, Tellings);
 
             scored[(written, carrying)] = right.Average();
@@ -389,10 +395,10 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         foreach (var many in tellings)
         {
-            var (one, _, _) = Over(
+            var (one, _, _, _) = Over(
                 Seeds, Purpose, written: false, Carrying.Never, Asserting.Withheld, many);
 
-            var (other, found, _) = Over(
+            var (other, found, _, _) = Over(
                 Seeds, Purpose, written: false, Carrying.Never, Asserting.Withheld, many,
                 Crediting.Birth);
 
@@ -458,7 +464,7 @@ public sealed class LessonTests(ITestOutputHelper output)
                 ("wholly ", Rooting.Wholly),
             })
             {
-                var (right, found, resident) = Over(
+                var (right, found, resident, silent) = Over(
                     Seeds, Purpose, written: false, Carrying.Never, Asserting.Withheld, many,
                     rooting: rooting);
 
@@ -491,7 +497,7 @@ public sealed class LessonTests(ITestOutputHelper output)
         foreach (var rooting in new[] { Rooting.Singly, Rooting.Wholly })
         foreach (var admitting in new[] { Admitting.Anything, Admitting.Testable })
         {
-            var (right, found, resident) = Over(
+            var (right, found, resident, silent) = Over(
                 Seeds, Purpose, written: false, Carrying.Never, Asserting.Withheld, 8,
                 rooting: rooting, admitting: admitting);
 
@@ -544,7 +550,7 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         foreach (var admitting in new[] { Admitting.Anything, Admitting.Testable })
         {
-            var (right, found, resident) = Over(
+            var (right, found, resident, silent) = Over(
                 4, Purpose, written: false, Carrying.Never, Asserting.Everything, Told,
                 Crediting.Birth, Rooting.Wholly, admitting);
 
@@ -1343,7 +1349,7 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         var watching = new Watching<Recited>(
             world, new Joined(Joining.Bagged),
-            acting: Chooses.From(felt => Speaking(curiosity.Choose(felt)), curiosity.Cleared));
+            acting: Chooses.From(felt => Doing(curiosity.Choose(felt)), curiosity.Cleared));
 
         new Bench(watching, brain)
             .Run(tutor.Moments * tutor.Longest, sweep: 200, target: 0.9, window: 50);

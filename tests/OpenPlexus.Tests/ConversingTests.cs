@@ -420,14 +420,14 @@ public sealed class ConversingTests(ITestOutputHelper output)
                 world,
                 wrapped ? new Placed(joined, placing) : joined,
                 acting: Chooses.From(
-                    felt => Speaking(asking.Choose(felt)), asking.Cleared)),
+                    felt => Doing(asking.Choose(felt)), asking.Cleared)),
             brain);
 
         return (world, bench, brain, asking, typing);
     }
 
     /// <summary>The join between what a chooser decided and how this world numbers its doings.</summary>
-    private static int? Speaking(Wondered said) =>
+    private static int? Doing(Wondered said) =>
         said.Word is not { } word
             ? null
             : said.Asking ? Conversing.Asks(word) : Conversing.Asserts(word);

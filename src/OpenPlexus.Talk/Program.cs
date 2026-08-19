@@ -109,7 +109,7 @@ internal static class Program
                 world,
                 new Joined(joining),
                 acting: Chooses.From(
-                    felt => Speaking(curiosity.Choose(felt)), curiosity.Cleared)),
+                    felt => Doing(curiosity.Choose(felt)), curiosity.Cleared)),
             brain);
 
         // Budgeted for the widest statement, because `Asserting.Everything` makes a sentence
@@ -210,7 +210,7 @@ internal static class Program
     /// hands back a word and an intent; how a world numbers its doings is that world's business,
     /// and this is where the two meet.
     /// </remarks>
-    private static int? Speaking(Wondered said) =>
+    private static int? Doing(Wondered said) =>
         said.Word is not { } word
             ? null
             : said.Asking ? Conversing.Asks(word) : Conversing.Asserts(word);

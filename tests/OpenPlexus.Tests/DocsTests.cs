@@ -401,7 +401,11 @@ public sealed class DocsTests
     // cannot clear the floor, so it blocks repair exactly while nothing can clear one yet.
     // Free at saturation and most of the examination before it, which is not what *costs no
     // score* says and is not a thing any reading taken at one telling count could have said.
-    private const int Whole = 11_962;
+    //
+    // And 11,975 is the thirty-sixth raise, thirteen words for a refutation row rewritten. The
+    // vote gate is deleted and its row now says what killed it rather than what once did: it
+    // silences the right rule instead of reseating a wrong one.
+    private const int Whole = 11_975;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

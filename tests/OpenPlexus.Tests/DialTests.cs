@@ -249,20 +249,6 @@ public sealed class DialTests
             + "independent evidence falls exponentially in DEPTH and the bar "
             + "becomes a cap set by the size of the world",
 
-        ["Speaking"] =
-            "whether a commitment may vote before it has been tested, and a "
-            + "mechanism against its own absence because there is no second way "
-            + "to not refuse. It needs NO NEW NUMBER, which is the only reason it "
-            + "was buildable: `Floor` already means enough firings to judge a "
-            + "proportion by, and subsumption and culling both refuse to weigh "
-            + "anything beneath it while the vote never asked. AND IT IS INERT, "
-            + "which is the finding. Untested rules DO decide wrong rounds -- "
-            + "about a sixth of them at eleven bits -- and refusing them a vote "
-            + "moves no metric on any world, because those rounds are uncovered "
-            + "anyway and the seat passes to a different wrong rule. Smallest "
-            + "exactly where the failure is total, so it is not the cause there "
-            + "either. Not a level; nothing to hunt",
-
         ["Coarsening"] =
             "fork 85, and the half of it that survived. WHETHER subsumption may "
             + "read a member's entailment of its category. NOT A LEVEL: whether "
@@ -601,7 +587,14 @@ public sealed class DialTests
         // And to seventeen for `Admitting`, the same rise for the same reason. It is fork 86's
         // answer and it wins on the conversation by every column at once, which is the shape
         // that most deserves a second world before it becomes a default anywhere but the host.
-        Assert.Equal(17, HandSet.Count);
+        //
+        // And down to sixteen, because `Speaking` is deleted. Its revival row asked for a
+        // world where the right rule is present and merely outvoted; a drawn lesson at eight
+        // tellings is one, coverage says every truth is held, and refusing the untested a vote
+        // took the score from 1.000 to 0.125 while silence went from a thirtieth of the rounds
+        // to a quarter. It does not reseat a wrong rule, it silences the right one -- a fact
+        // stated a handful of times cannot make a rule that clears a floor of twenty.
+        Assert.Equal(16, HandSet.Count);
     }
 
     /// <summary>
@@ -759,13 +752,6 @@ public sealed class DialTests
             + "a property spelt the same. What it is waiting for is `Arranged` or `Roaming`, "
             + "which nothing stops beyond nobody having done it -- and the sharper lesson is "
             + "that a name-matching census cannot tell a dial from its homonym",
-
-        ["Speaking"] =
-            "`Multiplexer` ONLY, and this one IS owed. Whether an untested commitment may "
-            + "vote is not a question about any world's vocabulary, so nothing stops it "
-            + "being taken on `Arranged` or `Roaming` beyond nobody having done it. Its own "
-            + "reason already says the finding is that excluding them moves no metric -- a "
-            + "null result on one world, which is the weakest thing a grid can say",
 
     };
 

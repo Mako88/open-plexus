@@ -1,4 +1,4 @@
-# The measurements, one runner each, on request.
+﻿# The measurements, one runner each, on request.
 #
 # WHY THIS EXISTS: `tests.yml` excludes `kind=sweep` for a good reason -- a sweep
 # asserts nothing, it prints a grid, and several hundred runs of twenty thousand
@@ -147,7 +147,7 @@ jobs:
             "RecalledTests.What_one_selected_statement_converts_across_the_exam",
             "SensesTests.Whether_the_cross_modal_question",
             "SeparableTests",
-            "SpeakingTests","SplitNamingTests","SplitRepairTests","SplitTests"
+            "SplitNamingTests","SplitRepairTests","SplitTests"
           ]'
 
           if [ -z "$ONLY" ]; then

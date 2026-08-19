@@ -73,11 +73,17 @@ public sealed class ConversingTests(ITestOutputHelper output)
     /// is naming it and being told yes — which is what makes a second doing worth anything and
     /// is also why the score under it is lower for every arm.
     /// </para>
+    /// <para>
+    /// <b>Not <see cref="Worlds.Replying"/></b>, which is a different axis with a name that
+    /// nearly fits: that one is how a person phrases an answer they KNOW, in a word or in a
+    /// sentence. This is what happens when they do not confirm at all. Two ideas under one name
+    /// is a fault this repo has paid for once already.
+    /// </para>
     /// </remarks>
-    private enum Replying
+    private enum Correcting
     {
         /// <summary>A wrong guess is answered with the answer.</summary>
-        Corrects,
+        Dictates,
 
         /// <summary>A wrong guess is answered <i>no</i>, and the answer is never dictated.</summary>
         Refuses,
@@ -95,7 +101,7 @@ public sealed class ConversingTests(ITestOutputHelper output)
     /// </remarks>
     private sealed class Human(
         StringBuilder printed, int exchanges, int seed, int moves = 1,
-        Telling telling = Telling.Alone, Replying replying = Replying.Corrects)
+        Telling telling = Telling.Alone, Correcting correcting = Correcting.Dictates)
         : TextReader
     {
         private readonly Random _draws = new(seed);
@@ -162,7 +168,7 @@ public sealed class ConversingTests(ITestOutputHelper output)
                 return "yes";
             }
 
-            if (replying is Replying.Refuses)
+            if (correcting is Correcting.Refuses)
             {
                 Refused++;
 
@@ -391,11 +397,11 @@ public sealed class ConversingTests(ITestOutputHelper output)
     private static (Conversing World, Bench Bench, Brain Brain, Curiosity Asking, Human Typing)
         Made(double rate, int exchanges, int seed = 1, int capacity = 2000, int moves = 1,
             Placing placing = Placing.Once, bool wrapped = false,
-            Telling telling = Telling.Alone, Replying replying = Replying.Corrects,
+            Telling telling = Telling.Alone, Correcting correcting = Correcting.Dictates,
             int budget = 3)
     {
         var printed = new StringBuilder();
-        var typing = new Human(printed, exchanges, seed, moves, telling, replying);
+        var typing = new Human(printed, exchanges, seed, moves, telling, correcting);
         var brain = new Brain(new CommittingSettings { Capacity = capacity }, seed);
 
         var world = new Conversing(new ConversingSettings
@@ -804,13 +810,13 @@ public sealed class ConversingTests(ITestOutputHelper output)
     {
         const int Exchanges = 300;
 
-        var settled = new Dictionary<(Replying, int), (double Gain, double Error)>();
+        var settled = new Dictionary<(Correcting, int), (double Gain, double Error)>();
 
         output.WriteLine("8 seeds, 300 exchanges each, asking at the ceiling");
         output.WriteLine(
             "reply     budget       asked          settled        per exchange  refused");
 
-        foreach (var replying in new[] { Replying.Corrects, Replying.Refuses })
+        foreach (var correcting in new[] { Correcting.Dictates, Correcting.Refuses })
         {
             foreach (var budget in new[] { 1, 2, 3, 5 })
             {
@@ -822,7 +828,7 @@ public sealed class ConversingTests(ITestOutputHelper output)
                 for (var seed = 1; seed <= 8; seed++)
                 {
                     var made = Made(
-                        rate: 1.0, Exchanges, seed, replying: replying, budget: budget);
+                        rate: 1.0, Exchanges, seed, correcting: correcting, budget: budget);
 
                     made.Bench.Run(Exchanges * 2, sweep: 200, target: 0.9, window: 50);
 
@@ -836,10 +842,10 @@ public sealed class ConversingTests(ITestOutputHelper output)
                     refused.Add(made.Typing.Refused);
                 }
 
-                settled[(replying, budget)] = (each.Average(), Deviation(each));
+                settled[(correcting, budget)] = (each.Average(), Deviation(each));
 
                 output.WriteLine(
-                    $"{replying,-10}{budget,-6}{Error(asked),16}{Error(got),16}"
+                    $"{correcting,-10}{budget,-6}{Error(asked),16}{Error(got),16}"
                     + $"{Error(each),16}{refused.Average(),8:F0}");
             }
         }
@@ -850,13 +856,13 @@ public sealed class ConversingTests(ITestOutputHelper output)
         // reading, not merely close. Anything else means the loop ran where nothing refused it.
         foreach (var budget in new[] { 2, 3, 5 })
             Assert.Equal(
-                settled[(Replying.Corrects, 1)].Gain, settled[(Replying.Corrects, budget)].Gain,
+                settled[(Correcting.Dictates, 1)].Gain, settled[(Correcting.Dictates, budget)].Gain,
                 precision: 10);
 
         // And where the answer is never dictated, asking again is the only route to a
         // settlement the first ask did not reach.
-        var (one, oneError) = settled[(Replying.Refuses, 1)];
-        var (three, threeError) = settled[(Replying.Refuses, 3)];
+        var (one, oneError) = settled[(Correcting.Refuses, 1)];
+        var (three, threeError) = settled[(Correcting.Refuses, 3)];
 
         var gap = three - one;
         var error = Math.Sqrt((oneError * oneError) + (threeError * threeError));

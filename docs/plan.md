@@ -231,26 +231,26 @@ before six that reads as tuning is out of order.
 - **WHAT IT MUST DO** — one entry a line of THE ARCHITECTURE, in that order, and a guard
   holds the two in step.
   - Understand concepts
-    - **NOW** — a commitment fires when its scope is a subset of the moment, and is then
-      right or wrong about something SPECIFIC. That is the entire difference from a count.
+    - **NOW** — a commitment fires when its scope is a subset of the moment, and is then right
+      or wrong about something SPECIFIC. That is the whole difference from a count.
     - **NOW** — its identity is a `Code`, the same type a front end emits, so one can sit
       inside another's scope — which makes metacognition, chaining and abstraction
       expressible with no new machinery.
-    - **NOW** — everything else about it is in the XML comments and the compiler enforces
-      them: genesis and its gate, the vote and its weighting, settlement, blame and repair
-      all live beside the code in `Commitments`.
+    - **NOW** — everything else is in the XML comments and the compiler enforces them: genesis
+      and its gate, the vote and its weighting, settlement, blame and repair all live beside the
+      code in `Commitments`.
     - **OPEN** — nothing here answers what a concept IS beyond a code that fires.
     - **OPEN** — the scaling exponent: how observations-to-target grows with the relevant bits
       is what predicts whether this reaches perception. UNMEASURED.
     - **OPEN** — the scope language is the CEILING: whatever a scope cannot say cannot be
       learnt. ILP's language-bias problem, what killed the field, and the ladder is finite.
-    - **OPEN** — six bits is refused on POWER and eleven names the wrong thing; whether any
-      world the naming reaches holds a nameable concept. Fork **34**.
-    - **OPEN** — genesis does not root on a code that never varied, and an always-present
-      one is still an entry in every table forever. Fork **51**.
+    - **OPEN** — six bits is refused on POWER and eleven names the wrong thing; whether any world
+      the naming reaches holds a nameable concept. Fork **34**.
+    - **OPEN** — genesis does not root on a code that never varied, and an always-present one is
+      still an entry in every table forever. Fork **51**.
   - A concept a thing in its own right
-    - **NOW** — `Code`. A commitment's identity is one, and adhesion over a window reaches
-      one group a persistent SOURCE. Derived offline, so no run reaches it.
+    - **NOW** — `Code`. A commitment's identity is one, and adhesion over a window reaches one
+      group a persistent SOURCE. Derived offline, so no run reaches it.
     - **OPEN** — nothing tracks a source through a CHANGE, so a thing that moves is a new one
       and adhesion never reaches an individual. Fork **106**.
     - **OPEN** — minting an INDIVIDUAL is unbuilt. Where a thing never moves a source and a
@@ -260,13 +260,13 @@ before six that reads as tuning is out of order.
       seen twice.
   - Every input an attribute of it
     - **NOW** — several front ends manufacture symbols from a signal, and each is priced.
-    - **OPEN** — nothing makes them attributes of one THING. Rung five names what co-fires,
-      which is what a seen ball and a heard *ball* do.
+    - **OPEN** — nothing makes them attributes of one THING. Rung five names what co-fires, as a
+      seen ball and a heard *ball* do.
     - **SETTLED** — the binding world failed and the block is lifted. Fork **25**.
     - **OPEN** — text as an IMAGE keeps ground truth enumerable, so soundness survives where a
       camera kills it. `Senses` names cross two senses. Fork **107**.
-    - **OPEN** — spreading a reading over its range costs most of the score at both front
-      ends. Fork **38**.
+    - **OPEN** — spreading a reading over its range costs most of the score at both front ends.
+      Fork **38**.
     - **OPEN** — under ten dimensions there are too few distinct wirings for a projection to
       expand into. Fork **39**.
     - **OPEN** — the tiled patch is the arranged world's cell, so it is told where the parts
@@ -330,21 +330,20 @@ before six that reads as tuning is out of order.
   - Understanding deepens without limit
     - **NOW** — repair. Specialisation on failure, gated, adding a narrower rule and never
       editing the old. Rung one of the ladder, conjunction, and the only rung there is.
-    - **NOW** — the gate is the whole difference from overfitting: twenty misses before a
-      repair is allowed, and Z must clear a two-proportion SEPARATION bar between its rate in
-      the misses and in the hits, corrected for candidates considered. Uncorrected, noise
-      clears any bar.
+    - **NOW** — the gate is the whole difference from overfitting: twenty misses before a repair
+      is allowed, and Z must clear a two-proportion SEPARATION bar between its rate in the misses
+      and in the hits, corrected for candidates. Uncorrected, noise clears any bar.
     - **NOW** — and Z is what the HITS had; backwards it mints a child reliably wrong, and a
       code commoner in the MISSES is the condition for a NEGATED one. A random-Z arm runs
       beside it, and the bet is dead if discriminative-Z does not beat it.
-    - **NOW** — the ladder's admission is decidable and already computed: the language
-      extends only when nothing in it separates failures from hits. A rung is admitted for
-      ONE commitment, and where two clear, the SHORTER description chooses.
-    - **OPEN** — it only ever NARROWS, rungs one to four making a scope smaller and nothing
-      broadening but rung five. A specialise-only machine is arbitrarily accurate and
-      conceptless, and the ladder's ORDER is a bias over when a construct is tried.
-    - **OPEN** — a total is a lifetime, which C4 refuses, and the earned rate meant to replace
-      it reads as free on `Arranged` rather than as a budget.
+    - **NOW** — the ladder's admission is decidable and computed: the language extends only when
+      nothing in it separates failures from hits. A rung is admitted for ONE commitment, and
+      where two clear, the SHORTER description chooses.
+    - **OPEN** — it only ever NARROWS, rungs one to four making a scope smaller and nothing but
+      rung five broadening. A specialise-only machine is arbitrarily accurate and conceptless,
+      and the ladder's ORDER is a bias over when a construct is tried.
+    - **OPEN** — a total is a lifetime, which C4 refuses, and the earned rate replacing it reads
+      as free on `Arranged` rather than as a budget.
     - **OPEN** — the curve is `Curved`, that rate capped by the parent's hits, and it is wired
       rather than measured. Its grid is `Arranged`'s. Fork **110**.
     - **OPEN** — a fresh child starts BLIND and re-earns its statistics, a floor every rung of
@@ -354,8 +353,8 @@ before six that reads as tuning is out of order.
       must be bounded to codes seen in this commitment's own hits. Fork **30**.
     - **OPEN** — emit *Z was absent* as its own code at settlement, so rung two needs no new
       matcher. Bounded to the commitment's own hits. Fork **64**.
-    - **OPEN** — `Mending.Uncovered` is a gate plus every-round repair, and the gate alone is
-      far worse than no gate at all. Fork **37**.
+    - **OPEN** — `Mending.Uncovered` is a gate plus every-round repair, and the gate alone is far
+      worse than none. Fork **37**.
     - **OPEN** — a per-COMMITMENT signal separating *needs specialising* from *is being
       outvoted*. Fork **45**.
     - **OPEN** — a blinded repair gate costs on the multiplexer. Open on any other world.
@@ -379,14 +378,17 @@ before six that reads as tuning is out of order.
     - **OPEN** — a budget buys re-derivations. Does quantity buy the uncovered rounds or only
       more population. Fork **76**.
   - Which aspects are temporal
-    - **NOW** — a forward store beside the population, retracting where the counters cannot.
-    - **NOW** — rung three, sequence. A precedence is a CODE derived where the moment is
-      FORMED, so matching, the tally, repair and the wire are untouched. No dial, and inert where none is reported.
+    - **NOW** — a forward store beside the population, retracting where counters cannot.
+    - **NOW** — rung three, sequence. A precedence is a CODE derived where the moment is FORMED,
+      so matching, the tally, repair and the wire are untouched. No dial, inert where no order
+      is reported.
     - **SETTLED** — rung three reads real English, and its gain tracks the front end's
       SELECTIVITY rather than the task: largest under `Chained`, nil under a bag. Fork **109**.
     - **OPEN** — rung three is blind on a word said TWICE, so a thing that MOVES is not tracked.
-      Placing a repeat at its LATEST recovers most of that and beats no shortcut: no arm clears a
-      RECENCY bar needing no learning, on either world. John's. Fork **119**.
+      Placing a repeat at its LATEST recovers a RECENCY bar needing no learning and never clears
+      it, so a front end reaches the shortcut and not past it. John's. Fork **119**.
+    - **NOW** — and a question NAMING which thing it is about clears it, by every placing alike.
+      John's, and the first reading here that is not a recency proxy.
     - **OPEN** — a referent is a THIRD store: *Mary's bedroom* survives leaving the room and
       *Mary is in the bedroom* does not, so one store gets a lifetime wrong whichever it takes.
     - **OPEN** — nothing SCORES the update, so what retracts is the experimenter's rule. Fork
@@ -397,8 +399,8 @@ before six that reads as tuning is out of order.
     - **OPEN** — the key that moved last is not worth following: it leads where one walker
       makes it the only candidate and loses at four. Fork **95**.
   - Several grains at once
-    - **NOW** — subsumption keeps the general rule where both are equally accurate, and it
-      reads a category's entailment.
+    - **NOW** — subsumption keeps the general rule where both are equally accurate, and reads a
+      category's entailment.
     - **OPEN** — the gradient is fragile: the vote takes the narrowest every round and
       subsumption the general one every thousandth. A second store needs an evidence rule the
       first lacked or it collapses too.
@@ -415,12 +417,12 @@ before six that reads as tuning is out of order.
     - **OPEN** — three stores rather than two, the missing operator minting an INDIVIDUAL that
       no rung covers. Fork **93**.
   - Malleability is the record
-    - **NOW** — an accuracy-weighted vote, plus a recency-weighted local estimate that never
+    - **NOW** — an accuracy-weighted vote plus a recency-weighted local estimate that never
       merges. This one works.
     - **SETTLED** — the local decaying estimate earns its keep: level with a lifetime average
       where the world holds still, ahead where the target moves. Fork **27**.
-    - **NOW** — `Rhythm` is run: the one world whose ANSWER moves, and the one where a scope
-      cannot grow, so repair and every rung above it are held still.
+    - **NOW** — `Rhythm` is run: the one world whose ANSWER moves and where a scope cannot grow,
+      so repair and every rung above it are held still.
     - **OPEN** — more unsound commitments resident than sound ones while the score holds: is
       the vote robust to them, or are they why it stops short. Fork **35**.
     - **OPEN** — the live problem is which rule gets the seat, and two arms at it have
@@ -433,8 +435,8 @@ before six that reads as tuning is out of order.
       the whole of what a conflict is. Fork **99**.
   - Learns by being wrong
     - **NOW** — commitment, settlement, blame capped at one hop, repair, and abstention so a
-      round that could not settle costs nothing. Reading is an objective at last: a sentence
-      a story, and withheld sentences the exam.
+      round that could not settle costs nothing. Reading is an objective: a sentence a story,
+      and withheld sentences the exam.
     - **OPEN** — what it converts is unread, and English's alphabet is far wider than
       anything here has run on. Fork **89**.
     - **OPEN** — the horizon is K occasions, K=1. Fork **28**.
@@ -458,15 +460,15 @@ before six that reads as tuning is out of order.
       the right statement answering a whole task at a twentieth of the bag's population.
       Selecting IS reading a commitment backwards, so fork **115** carries it.
   - Told, never architected
-    - **NOW** — a front end may say what it is looking at, never what to conclude.
+    - **NOW** — a front end may say what it is looking at, never what to conclude, and
       `SeparationTests` fails the build.
     - **NOW** — a final `?` is all a world says, on the conversation, so questionhood is the
       learner's. The corpora still hand it separated. John's.
     - **OPEN** — how hard a fleet searches is a deployment choice, which is a world reaching
       into the brain one level out. Fork **60** carries it, under the machine.
   - What it is told must be settleable
-    - **NOW** — `Roaming` asks what the statement it is telling DID, so a told statement
-      carries a settlement and can be wrong.
+    - **NOW** — `Roaming` asks what the statement it is telling DID, so a told statement carries
+      a settlement and can be wrong.
     - **OPEN** — no arm reaches its marginal, so it prices rung four rather than ranking
       anything, and testing the MECHANISM wants an effect a conjunction can reach.
     - **OPEN** — the store's update rule is still the experimenter's, so what is falsifiable
@@ -478,13 +480,13 @@ before six that reads as tuning is out of order.
       informative words are the unpredictable ones and the predictable ones are `to` and
       `the`.
     - **NOW** — OSTENSION is the signal rather than a shortcut around unsupervised reading.
-      Being told which word the question is about is information no amount of co-occurrence
-      contains, and it is the pointing-and-naming shape.
+      Which word the question is about is information no co-occurrence contains, and it is the
+      pointing-and-naming shape.
   - Original thought
-    - **NOW** — `IActed` is the verb, and what was done rides in the moment as a code, so a
-      scope names it and expects the consequence.
-    - **NOW** — the chooser is `Drives`, reading a population and preferring by felt bands.
-      It loses to both controls as built.
+    - **NOW** — `IActed` is the verb and what was done rides in the moment as a code, so a scope
+      names it and expects the consequence.
+    - **NOW** — the chooser is `Drives`, reading a population and preferring by felt bands, and
+      it loses to both controls.
     - **OPEN** — ranking by its own expectation wins by making the world CONSTANT, so the
       preference wants a term a dead body fails. The goal is unbuilt. Fork **111**.
     - **OPEN** — a commitment read BACKWARDS is a plan: want a code, take the scopes that
@@ -498,9 +500,9 @@ before six that reads as tuning is out of order.
     - **OPEN** — a drive that cannot be sated is a fault in the design and not a risk to
       manage, so a term must have a point where it stops pulling. John's.
     - **NOW** — `Roaming` is acted in and declining leaves the walk the world drew, so the
-      watched arm is a chooser rather than a second world.
-    - **NOW** — `do(x)` is distinguishable from `x`: `Intervened` derives a code beside each
-      one the learner was handed, on rung three's seam. Repair takes it on 193 of 318 scopes.
+      watched arm is a chooser and not a second world.
+    - **NOW** — `do(x)` is distinguishable from `x`: `Intervened` derives a code beside each one
+      the learner was handed, on rung three's seam.
     - **OPEN** — and no world here holds a common cause, so nothing says those claims are
       better.
     - **OPEN** — and nothing ranks a chooser there, a house having nothing to want. Twins are

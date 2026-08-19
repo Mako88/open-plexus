@@ -30,6 +30,34 @@ public sealed class ConversingTests(ITestOutputHelper output)
 
     private static readonly string[] Places = ["kitchen", "garden", "office", "bedroom"];
 
+    private static readonly string[] Colours = ["red", "blue", "green", "yellow"];
+
+    /// <summary>What a topic is about, which is what decides whether recency can answer it.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Three worlds rather than three dials</b>. Which thing a topic moves around is a fact
+    /// about the problem, so it accumulates as a world does and goes when its question shuts.
+    /// </para>
+    /// <para>
+    /// <b>And <see cref="Props"/> is John's</b>. Two balls of different colours in two rooms, and
+    /// the question names the colour — so the room mentioned last belongs to the OTHER ball, and
+    /// the only thing pairing a colour with its room is that they shared a statement. That makes
+    /// the recency bar wrong by construction rather than usually wrong, which
+    /// <see cref="Crowded"/> only manages on average.
+    /// </para>
+    /// </remarks>
+    private enum Telling
+    {
+        /// <summary>One person moving, so the freshest room is always where they are.</summary>
+        Alone,
+
+        /// <summary>Several people moving, so the freshest room is usually somebody else's.</summary>
+        Crowded,
+
+        /// <summary>Coloured balls, so the question names which one and the last room is another's.</summary>
+        Props,
+    }
+
     /// <summary>
     /// Somebody at a terminal, who answers a question about a question and shrugs at everything
     /// else.
@@ -41,7 +69,8 @@ public sealed class ConversingTests(ITestOutputHelper output)
     /// band which read is which.
     /// </remarks>
     private sealed class Human(
-        StringBuilder printed, int exchanges, int seed, int moves = 1, bool crowded = false)
+        StringBuilder printed, int exchanges, int seed, int moves = 1,
+        Telling telling = Telling.Alone)
         : TextReader
     {
         private readonly Random _draws = new(seed);
@@ -149,23 +178,57 @@ public sealed class ConversingTests(ITestOutputHelper output)
                 _topic.Enqueue((string.Empty, null));
             }
 
-            var who = crowded ? Cast[_draws.Next(Cast.Length)] : _only;
+            var who = telling switch
+            {
+                Telling.Alone => _only,
+                Telling.Crowded => Cast[_draws.Next(Cast.Length)],
+                _ => Colours[_draws.Next(Colours.Length)],
+            };
+
             var room = Places[_draws.Next(Places.Length)];
 
             _where[who] = room;
             _last = room;
 
-            if (!_placed.Contains(who)) _placed.Add(who);
+            // Newest last, and moved to the end when it is placed again -- otherwise `_placed`
+            // records who was FIRST seen last, and the ball this world means to exclude is not
+            // the one at the end.
+            _placed.Remove(who);
+            _placed.Add(who);
 
-            _topic.Enqueue(($"{who} is in the {room}", null));
+            _topic.Enqueue((
+                telling is Telling.Props
+                    ? $"the {who} ball is in the {room}"
+                    : $"{who} is in the {room}",
+                null));
 
-            var asked = crowded ? _placed[_draws.Next(_placed.Count)] : _only;
+            // Uniformly over whoever is placed, EXCEPT on John's world, where the question is
+            // deliberately about something that was put somewhere earlier. Drawing uniformly
+            // there made it the crowded world with different nouns -- the recency bar came back
+            // at the same 0.587, because what the bar measures does not care which words are
+            // used. Naming an earlier ball is the whole of what makes it a different question.
+            //
+            // It is still right by coincidence about a quarter of the time, since the ball asked
+            // about may happen to be in the room the newest one went to. That floor is the rooms
+            // rather than the design.
+            var asked = telling switch
+            {
+                Telling.Alone => _only,
+                Telling.Crowded => _placed[_draws.Next(_placed.Count)],
+                _ => _placed.Count > 1
+                    ? _placed[_draws.Next(_placed.Count - 1)]
+                    : _placed[0],
+            };
             var answer = _where[asked];
 
             Questions++;
             if (string.Equals(answer, _last, StringComparison.Ordinal)) Recency++;
 
-            _topic.Enqueue(($"where is {asked}?", answer));
+            _topic.Enqueue((
+                telling is Telling.Props
+                    ? $"where is the {asked} ball?"
+                    : $"where is {asked}?",
+                answer));
 
             _at++;
             _moved = (_moved + 1) % moves;
@@ -287,10 +350,11 @@ public sealed class ConversingTests(ITestOutputHelper output)
 
     private static (Conversing World, Bench Bench, Brain Brain, Curiosity Asking, Human Typing)
         Made(double rate, int exchanges, int seed = 1, int capacity = 2000, int moves = 1,
-            Placing placing = Placing.Once, bool wrapped = false, bool crowded = false)
+            Placing placing = Placing.Once, bool wrapped = false,
+            Telling telling = Telling.Alone)
     {
         var printed = new StringBuilder();
-        var typing = new Human(printed, exchanges, seed, moves, crowded);
+        var typing = new Human(printed, exchanges, seed, moves, telling);
         var brain = new Brain(new CommittingSettings { Capacity = capacity }, seed);
 
         var world = new Conversing(new ConversingSettings
@@ -497,108 +561,111 @@ public sealed class ConversingTests(ITestOutputHelper output)
     {
         const int Exchanges = 400;
         const int Seeds = 8;
-
-        // How many placements a topic holds before it starts over. At one, nobody is ever in
-        // two rooms and no treatment of a repeat can differ from any other.
-        int[] moves = [1, 8];
+        const int Moves = 8;
 
         var placings = new[]
         {
             (Placing.Once, false), (Placing.Latest, true), (Placing.Every, true),
         };
 
-        output.WriteLine($"{Seeds} seeds, {Exchanges} exchanges each, asking at the ceiling");
         output.WriteLine(
-            $"{"moves",-7}{"world",-9}{"placing",-9}{"recency",9}{"right",8}{"vs base",9}"
-            + $"{"codes",8}{"resident",10}{"wanting",9}");
+            $"{Seeds} seeds, {Exchanges} exchanges each, asking at the ceiling, topics of "
+            + $"{Moves}");
+        output.WriteLine(
+            $"{"world",-9}{"placing",-9}{"recency",9}{"right",16}{"vs base",16}{"codes",8}"
+            + $"{"resident",10}");
 
-        var right = new Dictionary<(int Moves, bool Crowded, Placing Placing), double>();
-        var recency = new Dictionary<(int Moves, bool Crowded), double>();
+        var right = new Dictionary<(Telling Telling, Placing Placing), double>();
+        var over = new Dictionary<(Telling Telling, Placing Placing), (double Gap, double Error)>();
+        var recency = new Dictionary<Telling, double>();
 
-        foreach (var move in moves)
+        foreach (var telling in new[] { Telling.Alone, Telling.Crowded, Telling.Props })
         {
-            foreach (var crowd in new[] { false, true })
+            foreach (var (placing, wrapped) in placings)
             {
-                foreach (var (placing, wrapped) in placings)
+                var sure = new List<double>();
+                var fresh = new List<double>();
+                var codes = new List<double>();
+                var resident = new List<double>();
+                var wanting = new List<double>();
+
+                for (var seed = 1; seed <= Seeds; seed++)
                 {
-                    var sure = new List<double>();
-                    var fresh = new List<double>();
-                    var codes = new List<double>();
-                    var resident = new List<double>();
-                    var wanting = new List<double>();
+                    var made = Made(
+                        rate: 1.0, Exchanges, seed, moves: Moves, placing: placing,
+                        wrapped: wrapped, telling: telling);
 
-                    for (var seed = 1; seed <= Seeds; seed++)
-                    {
-                        var made = Made(
-                            rate: 1.0, Exchanges, seed, moves: move, placing: placing,
-                            wrapped: wrapped, crowded: crowd);
+                    var tally = made.Bench.Run(
+                        Exchanges * 2, sweep: 200, target: 0.9, window: 50);
 
-                        var tally = made.Bench.Run(
-                            Exchanges * 2, sweep: 200, target: 0.9, window: 50);
-
-                        sure.Add(made.World.Told == 0
-                            ? 0.0
-                            : made.World.Confirmed / (double)made.World.Told);
-                        fresh.Add(made.Typing.Questions == 0
-                            ? 0.0
-                            : made.Typing.Recency / (double)made.Typing.Questions);
-                        codes.Add(tally.Codes);
-                        resident.Add(tally.Resident);
-                        wanting.Add(tally.Wanting);
-                    }
-
-                    right[(move, crowd, placing)] = sure.Average();
-                    recency[(move, crowd)] = fresh.Average();
-
-                    output.WriteLine(
-                        $"{move,-7}{(crowd ? "crowded" : "alone"),-9}{placing,-9}"
-                        + $"{fresh.Average(),9:F3}{sure.Average(),8:F3}"
-                        + $"{sure.Average() - fresh.Average(),9:F3}{codes.Average(),8:F1}"
-                        + $"{resident.Average(),10:F1}{wanting.Average(),9:F3}");
+                    sure.Add(made.World.Told == 0
+                        ? 0.0
+                        : made.World.Confirmed / (double)made.World.Told);
+                    fresh.Add(made.Typing.Questions == 0
+                        ? 0.0
+                        : made.Typing.Recency / (double)made.Typing.Questions);
+                    codes.Add(tally.Codes);
+                    resident.Add(tally.Resident);
+                    wanting.Add(tally.Wanting);
                 }
+
+                right[(telling, placing)] = sure.Average();
+                recency[telling] = fresh.Average();
+
+                // The gap a seed at a time rather than the difference of two means, because a
+                // spread on the difference is what says whether an ordering is real and a
+                // spread on each half separately does not.
+                var gaps = sure.Zip(fresh, (one, bar) => one - bar).ToList();
+
+                over[(telling, placing)] = (gaps.Average(), Deviation(gaps));
+
+                output.WriteLine(
+                    $"{telling,-9}{placing,-9}{fresh.Average(),9:F3}{Error(sure),16}"
+                    + $"{Error(gaps),16}{codes.Average(),8:F1}{resident.Average(),10:F1}");
             }
         }
 
-        // Where nothing is ever said twice, no treatment of a repeat can differ from any other.
-        // Any gap at one placement is a second change nobody declared.
-        foreach (var crowd in new[] { false, true })
+        // The bars have to be far apart or nothing below separates anything. Alone, the freshest
+        // room is always the answer; on John's world the question names WHICH ball, so the room
+        // said last belongs to another one.
+        Assert.True(recency[Telling.Alone] > 0.95,
+            $"alone: the freshest room answers {recency[Telling.Alone]:F3} of the questions, so "
+            + "this world stopped being the degenerate case the others are read against");
+
+        Assert.True(recency[Telling.Props] < 0.45,
+            $"props: the freshest room still answers {recency[Telling.Props]:F3}, so the "
+            + "shortcut was not broken by naming which ball");
+
+        // `Latest` still beats `Once` where a thing moves alone, which is the earlier reading.
+        Assert.True(right[(Telling.Alone, Placing.Latest)] > right[(Telling.Alone, Placing.Once)],
+            $"keeping the last mention scored {right[(Telling.Alone, Placing.Latest)]:F3} "
+            + $"against {right[(Telling.Alone, Placing.Once)]:F3} for dropping it");
+
+        // Where recency IS the answer, no arm beats it. A front end can recover the shortcut and
+        // it cannot get past it, which is what the first two worlds are for.
+        foreach (var telling in new[] { Telling.Alone, Telling.Crowded })
             foreach (var (placing, _) in placings)
-                Assert.Equal(right[(1, crowd, Placing.Once)], right[(1, crowd, placing)], 6);
+                Assert.True(over[(telling, placing)].Gap < 0,
+                    $"{placing} on {telling} cleared the recency bar by "
+                    + $"{over[(telling, placing)].Gap:F3}. Read the row and take the finding");
 
-        // John's control, and it should have been taken before the grid rather than after it.
-        // Where one person moves alone the answer is ALWAYS the freshest room, so an arm reading
-        // the last mention cannot be told from one that tracks anything. A crowded topic breaks
-        // that, and the two numbers have to be far apart or the comparison below says nothing.
-        Assert.True(recency[(8, false)] > 0.95,
-            $"one mover: the freshest room is the answer {recency[(8, false)]:F3} of the time, "
-            + "so this world stopped being the degenerate case the crowded one is read against");
+        // And where it is NOT, every arm beats it by several standard errors. That is the first
+        // evidence on this branch of anything using more than how recently a word was said: on
+        // John's world the question names WHICH ball, so the freshest room belongs to another
+        // one and a machine reading recency alone cannot get here.
+        foreach (var (placing, _) in placings)
+        {
+            var (gap, error) = over[(Telling.Props, placing)];
 
-        Assert.True(recency[(8, true)] < 0.7,
-            $"crowded: the freshest room is still the answer {recency[(8, true)]:F3} of the "
-            + "time, so the shortcut was not broken and nothing below separates the arms");
+            Assert.True(gap - (3.0 * error) > 0.0,
+                $"{placing} on John's world cleared the recency bar by {gap:F3} ±{error:F3}, "
+                + "which is inside three standard errors. The one thing here that is not a "
+                + "recency proxy has stopped working");
+        }
 
-        // `Latest` still beats `Once` where a thing moves alone, which is the earlier reading
-        // and is unchanged. What that reading was missing is the row above it.
-        Assert.True(right[(8, false, Placing.Latest)] > right[(8, false, Placing.Once)] + 0.2,
-            $"keeping the last mention scored {right[(8, false, Placing.Latest)]:F3} against "
-            + $"{right[(8, false, Placing.Once)]:F3} for dropping it");
-
-        // And no arm beats the shortcut, in either world. This is the finding, and it is why
-        // the baseline had to be taken: `Latest` closing the gap to a rule that needs no
-        // learning is a different claim from `Latest` beating a ceiling, and only the second
-        // would have been worth the front end being rebuilt for.
-        //
-        // It goes red if an arm ever clears the bar, which is the right way round. That would
-        // be the first evidence on this branch that anything is TRACKING a thing rather than
-        // reading how recently it was mentioned, and it should stop a session rather than pass
-        // quietly.
-        foreach (var crowd in new[] { false, true })
-            foreach (var placing in new[] { Placing.Once, Placing.Latest, Placing.Every })
-                Assert.True(right[(8, crowd, placing)] <= recency[(8, crowd)],
-                    $"{placing} on the {(crowd ? "crowded" : "alone")} world scored "
-                    + $"{right[(8, crowd, placing)]:F3} against a no-learning recency bar of "
-                    + $"{recency[(8, crowd)]:F3}. Something has started beating the shortcut — "
-                    + "read the row, take the finding, and rewrite this assertion");
+        // What is NOT asserted is an ordering among those three. They sit within about one
+        // standard error of each other, so which repeat the front end keeps is not what is
+        // doing the work -- and a grid that ranked them here would be ranking noise.
     }
 
     [Fact]
@@ -663,6 +730,27 @@ public sealed class ConversingTests(ITestOutputHelper output)
                 / Math.Sqrt(of.Count);
 
         return $"{mean,8:F1} ±{error,-4:F1}";
+    }
+
+    /// <summary>The standard error of a mean.</summary>
+    private static double Deviation(IReadOnlyCollection<double> of)
+    {
+        if (of.Count < 2) return 0.0;
+
+        var mean = of.Average();
+
+        return Math.Sqrt(of.Sum(one => (one - mean) * (one - mean)) / (of.Count - 1))
+            / Math.Sqrt(of.Count);
+    }
+
+    /// <summary>A mean and its standard error, at three figures.</summary>
+    /// <remarks>
+    /// <b>Separate from <c>Spread</c> because a count and a rate want different widths</b>, and a
+    /// rate printed to one decimal says nothing at all.
+    /// </remarks>
+    private static string Error(IReadOnlyCollection<double> of)
+    {
+        return $"{of.Average(),7:F3} ±{Deviation(of),-6:F3}";
     }
 
     /// <summary>The mean alone, where the spread is printed in another column.</summary>

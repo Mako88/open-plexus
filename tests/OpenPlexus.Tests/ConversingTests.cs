@@ -135,34 +135,54 @@ public sealed class ConversingTests(ITestOutputHelper output)
         private int _moved;
     }
 
-    /// <summary>
-    /// The same front end, placing a repeated word at its LATEST mention rather than dropping it.
-    /// </summary>
+    /// <summary>How a front end treats a word said more than once in one moment.</summary>
     /// <remarks>
     /// <para>
-    /// <b>Fork 119's arm, taken here before it is taken anywhere</b>. <c>Joined.Order</c> drops
-    /// every word it placed twice, which is correct — a word in two statements has no one
-    /// position — and is why order is blind on the room a moving thing returns to. Keeping the
-    /// last mention says <i>where it is now</i>, which is the question being asked.
+    /// <b>Fork 119's arms, taken here before any of them is taken anywhere</b>. <c>Joined</c> is
+    /// shared by every text world, so a dial on it moves <c>Recalled</c>, <c>Roaming</c> and
+    /// <c>Handing</c> at once. This is the cheap reading first.
     /// </para>
     /// <para>
-    /// <b>A wrapper rather than a dial, and that is deliberate</b>. <c>Joined</c> is shared by
-    /// every text world, so a dial on it moves <c>Recalled</c>, <c>Roaming</c> and
-    /// <c>Handing</c> at once and owes them all a baseline. This is the cheap reading first: if
-    /// the arm cannot win where the effect must be largest, nothing else needs disturbing.
-    /// </para>
-    /// <para>
-    /// <b>And it places every word, function words included</b>, which the dropping rule was
-    /// also getting for free. That is the one change and it is not free — <c>Sequenced</c>
-    /// already refuses a code preceding itself, so the guard for it was written before the arm
-    /// was.
+    /// <b>And a precedence is a POSITIVE code</b>, which is what the last two arms are about.
+    /// John's question: a word said twice is two facts, so why collapse it. The answer this grid
+    /// exists to test is that keeping every mention preserves more and reaches less — with
+    /// <i>mary in the kitchen</i> then <i>mary in the garden</i>, <c>the</c> precedes both rooms,
+    /// and what marks the garden is that NOTHING follows it. That is a negative, and negation is
+    /// rung two and unbuilt. Fork <b>30</b>.
     /// </para>
     /// </remarks>
-    private sealed class Freshest(Joined through) : IQuantizer<Recited>
+    private enum Placing
     {
-        public byte Modality => through.Modality;
+        /// <summary>Drop it, which is what `Joined` does today.</summary>
+        Once,
 
-        public IReadOnlyCollection<Code> Codify(Recited observation) => through.Codify(observation);
+        /// <summary>Keep the last mention, which turns *most recent* into a positive fact.</summary>
+        Latest,
+
+        /// <summary>Keep every mention, so the moment holds the whole order it was said in.</summary>
+        Every,
+
+        /// <summary>Every mention, and a marker after the last, so *newest* is positive again.</summary>
+        Ended,
+    }
+
+    /// <summary>
+    /// The same front end with one of <see cref="Placing"/>'s treatments of a repeated word.
+    /// </summary>
+    /// <remarks>
+    /// <b>The precedences ride in on `Codify` and `Order` says nothing</b>, which is not a trick
+    /// so much as the only way to ask the question. `IQuantizer.Order` returns ONE position a
+    /// code, so a word at two positions is not expressible through that interface at all — which
+    /// is itself part of the answer, since John's proposal needs the interface widened rather
+    /// than the rule changed. Deriving them here asks what the codes would be worth before
+    /// anything is widened for them.
+    /// </remarks>
+    private sealed class Placed(Joined through, Placing placing) : IQuantizer<Recited>
+    {
+        /// <summary>What follows the last thing said, so being last is a code and not an absence.</summary>
+        private static readonly Code End = Kinds.Named(49, "end-of-moment");
+
+        public byte Modality => through.Modality;
 
         public IReadOnlySet<Code>? Fleeting(Recited observation) =>
             ((IQuantizer<Recited>)through).Fleeting(observation);
@@ -172,24 +192,59 @@ public sealed class ConversingTests(ITestOutputHelper output)
         public IReadOnlyDictionary<Code, int>? Bind(Recited observation) =>
             ((IQuantizer<Recited>)through).Bind(observation);
 
-        public IReadOnlyDictionary<Code, int>? Order(Recited observation)
-        {
-            var placed = new Dictionary<Code, int>();
-            var at = 0;
+        /// <summary>Nothing, because the precedences are already in the moment.</summary>
+        public IReadOnlyDictionary<Code, int>? Order(Recited observation) => null;
 
-            // `Said` is newest first, so this walks it backwards to go oldest first and lets the
-            // last write win. Every word therefore holds the position of its LAST mention.
+        public IReadOnlyCollection<Code> Codify(Recited observation)
+        {
+            var said = new HashSet<Code>(through.Codify(observation));
+
+            foreach (var code in Precedences(observation)) said.Add(code);
+
+            return said;
+        }
+
+        private IEnumerable<Code> Precedences(Recited observation)
+        {
+            // `Said` is newest first, so this walks it backwards to read oldest first. One slot
+            // a word, which is what makes a repeat expressible at all.
+            var slots = new List<Code>();
+
             for (var one = observation.Said.Count - 1; one >= 0; one--)
                 foreach (var word in observation.Said[one])
-                    placed[word] = at++;
+                    slots.Add(word);
 
-            return placed.Count > 1 ? placed : null;
+            if (slots.Count < 2) return [];
+
+            if (placing is Placing.Every or Placing.Ended) return Running(slots);
+
+            var placed = new Dictionary<Code, int>();
+            var twice = new HashSet<Code>();
+
+            for (var at = 0; at < slots.Count; at++)
+                if (!placed.TryAdd(slots[at], at)) twice.Add(slots[at]);
+
+            if (placing is Placing.Once) foreach (var word in twice) placed.Remove(word);
+            else foreach (var at in Enumerable.Range(0, slots.Count)) placed[slots[at]] = at;
+
+            // The real derivation rather than a copy of it, so an arm cannot differ from the
+            // default by a reimplementation nobody compared.
+            return placed.Count > 1 ? Sequenced.From(placed) : [];
+        }
+
+        private IEnumerable<Code> Running(IReadOnlyList<Code> slots)
+        {
+            for (var at = 0; at < slots.Count - 1; at++)
+                if (slots[at] != slots[at + 1])
+                    yield return Sequenced.Of(slots[at], slots[at + 1]);
+
+            if (placing is Placing.Ended) yield return Sequenced.Of(slots[^1], End);
         }
     }
 
     private static (Conversing World, Bench Bench, Brain Brain, Curiosity Asking, Human Typing)
         Made(double rate, int exchanges, int seed = 1, int capacity = 2000, int moves = 1,
-            bool freshest = false)
+            Placing placing = Placing.Once, bool wrapped = false)
     {
         var printed = new StringBuilder();
         var typing = new Human(printed, exchanges, seed, moves);
@@ -208,7 +263,7 @@ public sealed class ConversingTests(ITestOutputHelper output)
         var bench = new Bench(
             new Watching<Recited>(
                 world,
-                freshest ? new Freshest(joined) : joined,
+                wrapped ? new Placed(joined, placing) : joined,
                 acting: felt => Speaking(asking.Choose(felt))),
             brain);
 
@@ -395,7 +450,7 @@ public sealed class ConversingTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public void A_thing_that_moves_puts_two_rooms_in_the_bag_and_only_order_separates_them()
+    public void What_a_front_end_does_with_a_word_said_twice_decides_whether_a_thing_can_be_tracked()
     {
         const int Exchanges = 400;
         const int Seeds = 8;
@@ -405,72 +460,105 @@ public sealed class ConversingTests(ITestOutputHelper output)
         // holds every room they have been in, which is the plan's own example and the one thing
         // a scope cannot say -- a scope is a SET, so what is left to separate the rooms is the
         // precedences rung three derives at the join.
-        int[] moves = [1, 2, 4, 8];
+        int[] moves = [1, 4, 8];
+
+        var placings = new[]
+        {
+            (Placing.Once, false), (Placing.Once, true), (Placing.Latest, true),
+            (Placing.Every, true), (Placing.Ended, true),
+        };
 
         output.WriteLine($"{Seeds} seeds, {Exchanges} exchanges each, asking at the ceiling");
         output.WriteLine(
-            $"{"moves",-7}{"placing",-8}{"told",14}{"right",8}{"blind",8}{"resident",10}"
+            $"{"moves",-7}{"placing",-16}{"told",14}{"right",8}{"codes",8}{"resident",10}"
             + $"{"minted",9}{"wanting",9}");
 
-        var right = new Dictionary<(int Moves, bool Freshest), double>();
-        var held = new Dictionary<(int Moves, bool Freshest), double>();
+        var right = new Dictionary<(int Moves, Placing Placing, bool Wrapped), double>();
+        var held = new Dictionary<(int Moves, Placing Placing, bool Wrapped), double>();
 
-        foreach (var (move, freshest) in moves.SelectMany(
-            one => new[] { (one, false), (one, true) }))
+        foreach (var move in moves)
         {
-            var sure = new List<double>();
-            var told = new List<double>();
-            var blind = new List<double>();
-            var resident = new List<double>();
-            var minted = new List<double>();
-            var wanting = new List<double>();
-
-            for (var seed = 1; seed <= Seeds; seed++)
+            foreach (var (placing, wrapped) in placings)
             {
-                var made = Made(rate: 1.0, Exchanges, seed, moves: move, freshest: freshest);
-                var tally = made.Bench.Run(Exchanges * 2, sweep: 200, target: 0.9, window: 50);
+                var sure = new List<double>();
+                var told = new List<double>();
+                var codes = new List<double>();
+                var resident = new List<double>();
+                var minted = new List<double>();
+                var wanting = new List<double>();
 
-                told.Add(made.World.Told);
-                sure.Add(made.World.Told == 0
-                    ? 0.0
-                    : made.World.Confirmed / (double)made.World.Told);
-                blind.Add(made.Asking.Blind);
-                resident.Add(tally.Resident);
-                minted.Add(tally.Minted);
-                wanting.Add(tally.Wanting);
+                for (var seed = 1; seed <= Seeds; seed++)
+                {
+                    var made = Made(
+                        rate: 1.0, Exchanges, seed, moves: move, placing: placing,
+                        wrapped: wrapped);
+
+                    var tally = made.Bench.Run(
+                        Exchanges * 2, sweep: 200, target: 0.9, window: 50);
+
+                    told.Add(made.World.Told);
+                    sure.Add(made.World.Told == 0
+                        ? 0.0
+                        : made.World.Confirmed / (double)made.World.Told);
+                    codes.Add(tally.Codes);
+                    resident.Add(tally.Resident);
+                    minted.Add(tally.Minted);
+                    wanting.Add(tally.Wanting);
+                }
+
+                right[(move, placing, wrapped)] = sure.Average();
+                held[(move, placing, wrapped)] = resident.Average();
+
+                output.WriteLine(
+                    $"{move,-7}{$"{placing}{(wrapped ? "" : " (real)")}",-16}{Spread(told),14}"
+                    + $"{sure.Average(),8:F3}{codes.Average(),8:F1}{resident.Average(),10:F1}"
+                    + $"{minted.Average(),9:F1}{wanting.Average(),9:F3}");
             }
-
-            right[(move, freshest)] = sure.Average();
-            held[(move, freshest)] = resident.Average();
-
-            output.WriteLine(
-                $"{move,-7}{(freshest ? "latest" : "once"),-8}{Spread(told),14}"
-                + $"{sure.Average(),8:F3}{blind.Average(),8:F0}{resident.Average(),10:F1}"
-                + $"{minted.Average(),9:F1}{wanting.Average(),9:F3}");
         }
 
-        // The control, and it is what makes the rest of the column readable. At one move
-        // nothing is ever said twice, so the two placings have nothing to differ about and
-        // must not -- `Joining.Bagged` reads every statement, which is exactly what the
-        // wrapper reads, so the arm changes the treatment of a repeat and nothing else. Any
-        // gap here is a second change nobody declared.
-        Assert.Equal(right[(1, false)], right[(1, true)], 6);
-        Assert.Equal(held[(1, false)], held[(1, true)], 6);
+        // The control that makes every other row readable. `Once` through the wrapper derives
+        // the precedences by hand and `Once` through `Joined` derives them the way the library
+        // does, so the two must agree exactly -- otherwise the arms below differ from the
+        // default by a reimplementation nobody compared rather than by the rule being changed.
+        foreach (var move in moves)
+        {
+            Assert.Equal(right[(move, Placing.Once, false)], right[(move, Placing.Once, true)], 6);
+            Assert.Equal(held[(move, Placing.Once, false)], held[(move, Placing.Once, true)], 6);
+        }
 
-        // And a standing thing is tracked, so the comparison has a floor under it.
-        Assert.True(right[(1, false)] > 0.5,
-            $"the standing case scored {right[(1, false)]:F3}");
+        // And where nothing is ever said twice, no treatment of a repeat can differ from any
+        // other. Any gap at one move is a second change nobody declared. `Ended` is out of it
+        // and has to be: its marker follows the last word whether or not anything repeated, so
+        // it is not a treatment of a repeat and does not claim to be.
+        foreach (var placing in new[] { Placing.Once, Placing.Latest, Placing.Every })
+            Assert.Equal(right[(1, Placing.Once, false)], right[(1, placing, true)], 6);
 
-        // Dropping a repeat collapses on a thing that moves and keeping the last mention does
-        // not. The margin asserted is far inside the measured gap, which is what stops this
-        // being a threshold written before the first run.
-        Assert.True(right[(8, false)] < 0.6,
-            $"dropping a repeat scored {right[(8, false)]:F3} over eight moves, so the thing "
-            + "this arm exists to fix has stopped happening");
+        // Dropping a repeat collapses on a thing that moves. The margin is far inside the
+        // measured gap, which is what stops it being a threshold written before the first run.
+        Assert.True(right[(8, Placing.Once, false)] < 0.6,
+            $"dropping a repeat scored {right[(8, Placing.Once, false)]:F3} over eight moves, "
+            + "so the thing these arms exist to fix has stopped happening");
 
-        Assert.True(right[(8, true)] > right[(8, false)] + 0.2,
-            $"keeping the last mention scored {right[(8, true)]:F3} against "
-            + $"{right[(8, false)]:F3} — the arm has stopped paying");
+        Assert.True(right[(8, Placing.Latest, true)] > right[(8, Placing.Once, false)] + 0.2,
+            $"keeping the last mention scored {right[(8, Placing.Latest, true)]:F3} against "
+            + $"{right[(8, Placing.Once, false)]:F3} — the arm has stopped paying");
+
+        // John's question, and the answer is no. Keeping EVERY mention preserves strictly more
+        // of what was said and reads WORSE than dropping the repeat entirely, so the collapse
+        // is not what was costing anything. More order codes give repair more to grab and what
+        // it grabs is coincidence -- `wanting` goes to nought while the accuracy falls, which
+        // is the ladder always finding a separating code and the code being noise.
+        Assert.True(right[(8, Placing.Every, true)] < right[(8, Placing.Once, false)],
+            $"keeping every mention scored {right[(8, Placing.Every, true)]:F3} against "
+            + $"{right[(8, Placing.Once, false)]:F3} for dropping it — it has stopped being "
+            + "worse, which is the finding this row carries");
+
+        // And the marker meant to rescue it bought nothing, which is the other refutation. If
+        // what `Every` lacked were a positive code for *nothing follows this*, this row would
+        // move. It does not, so being unmarked was never the problem.
+        Assert.True(Math.Abs(right[(8, Placing.Ended, true)] - right[(8, Placing.Every, true)]) < 0.05,
+            $"the end marker moved the score from {right[(8, Placing.Every, true)]:F3} to "
+            + $"{right[(8, Placing.Ended, true)]:F3}, so it has started paying");
     }
 
     [Fact]

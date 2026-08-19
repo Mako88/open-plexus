@@ -153,6 +153,8 @@ public sealed class LessonTests(ITestOutputHelper output)
     /// <param name="asserting">What a told statement claims.</param>
     /// <param name="tellings">How many times the lesson is told.</param>
     /// <param name="crediting">Whether a mint is credited with the round that made it.</param>
+    /// <param name="rooting">What genesis mints a scope over.</param>
+    /// <param name="admitting">What a separating condition must do besides separate.</param>
     /// <remarks>
     /// <b>Extracted because <c>DuplicationTests</c> refused the second copy</b>, which is the
     /// right refusal: three grids each with their own seed loop is three chances for one
@@ -160,7 +162,8 @@ public sealed class LessonTests(ITestOutputHelper output)
     /// </remarks>
     private static (List<double> Right, List<double> Found, List<double> Resident) Over(
         int seeds, uint purpose, bool written, Carrying carrying, Asserting asserting,
-        int tellings, Crediting crediting = Crediting.Nothing)
+        int tellings, Crediting crediting = Crediting.Nothing,
+        Rooting rooting = Rooting.Singly, Admitting admitting = Admitting.Anything)
     {
         var right = new List<double>();
         var found = new List<double>();
@@ -180,7 +183,7 @@ public sealed class LessonTests(ITestOutputHelper output)
 
             var ran = Ran(
                 lesson, carrying, seed, passes: 1, asserting: asserting, tellings: tellings,
-                crediting: crediting);
+                rooting: rooting, crediting: crediting, admitting: admitting);
 
             right.Add(Right(ran.Tutor, pass: 0));
             found.Add(Found(ran.Brain, ran.World, lesson));
@@ -408,6 +411,123 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         // And ahead somewhere, or the arms are one arm and the dial is decoration.
         Assert.Contains(tellings, many => credited[many] > blank[many]);
+    }
+
+    /// <summary>
+    /// The three hand-set brain arms, on the generated world their entries are waiting for.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Their own exit condition, said in <c>DialTests</c></b>: each is an arm rather than a
+    /// default because it has one world's evidence, and each entry leaves when a generated
+    /// world has put its two arms against each other. That world now exists, so this is the
+    /// reading the entries asked for rather than an argument for shipping them.
+    /// </para>
+    /// <para>
+    /// <b>Each arm is read where its OWN reading was taken</b>, and getting that wrong once
+    /// cost this grid a wrong diagnosis. The admission bar was measured at twenty tellings
+    /// with the whole-moment root, credited mints and every word claimed; put at eight
+    /// tellings on the shipped root it reads ruinous, which is a fact about that combination
+    /// and not a refutation of anything. A fixture inherits every dial it does not pin.
+    /// </para>
+    /// <para>
+    /// <b>The kill lines, written before the grid ran</b>: the admission bar dies as a default
+    /// if it costs score on drawn lessons or stops leaving the ladder's trigger something to
+    /// fire on; the whole-moment root dies if it stops reaching further in fewer tellings.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_three_hand_set_arms_read_on_lessons_that_are_drawn()
+    {
+        const int Seeds = 8;
+        const uint Purpose = 0x0C1A_4DED;
+
+        int[] tellings = [2, 3, 8];
+
+        output.WriteLine($"{Seeds} drawn lessons, 4 things and 3 properties");
+        output.WriteLine("told  arm                right             found             resident");
+
+        var scored = new Dictionary<(int Told, string Arm), double>();
+        var residents = new Dictionary<(int Told, string Arm), double>();
+
+        foreach (var many in tellings)
+        {
+            foreach (var (arm, rooting) in new[]
+            {
+                ("shipped", Rooting.Singly),
+                ("wholly ", Rooting.Wholly),
+            })
+            {
+                var (right, found, resident) = Over(
+                    Seeds, Purpose, written: false, Carrying.Never, Asserting.Withheld, many,
+                    rooting: rooting);
+
+                scored[(many, arm.Trim())] = right.Average();
+                residents[(many, arm.Trim())] = resident.Average();
+
+                output.WriteLine(
+                    $"{many,-6}{arm,-19}{Sweep.Spread(right),18}{Sweep.Spread(found),18}"
+                    + $"{resident.Average(),9:F1}");
+            }
+        }
+
+        // The whole-moment root reaches further in fewer tellings, which is the conjunction
+        // being STATED rather than found by failing.
+        Assert.True(scored[(3, "wholly")] > scored[(3, "shipped")],
+            $"at three tellings the wide root read {scored[(3, "wholly")]:F3} and the shipped "
+            + $"one {scored[(3, "shipped")]:F3}, so minting the statement as one scope buys "
+            + "nothing on a lesson that is drawn");
+
+        // And the admission bar, at the settings its own reading was taken at rather than at
+        // this grid's. Twenty tellings, the whole-moment root, credited mints, every word
+        // claimed -- move any of those and the cell says something about the combination.
+        const int Told = 20;
+
+        output.WriteLine(
+            $"{Environment.NewLine}the admission bar at {Told} tellings, wholly rooted, "
+            + "credited, claiming everything");
+        output.WriteLine("arm       right             found             resident");
+
+        var bar = new Dictionary<Admitting,
+            (double Right, double Error, double Found, double Resident)>();
+
+        foreach (var admitting in new[] { Admitting.Anything, Admitting.Testable })
+        {
+            var (right, found, resident) = Over(
+                4, Purpose, written: false, Carrying.Never, Asserting.Everything, Told,
+                Crediting.Birth, Rooting.Wholly, admitting);
+
+            var measured = new Measured { Arm = $"{admitting}", Values = [.. right] };
+
+            bar[admitting] =
+                (measured.Mean, measured.StdErr, found.Average(), resident.Average());
+
+            output.WriteLine(
+                $"{admitting,-10}{Sweep.Spread(right),18}{Sweep.Spread(found),18}"
+                + $"{resident.Average(),9:F1}");
+        }
+
+        // It holds every rule the lesson states, which is the strong half and the one a score
+        // cannot say. The bar throws most of the population away and loses none of the world.
+        Assert.Equal(bar[Admitting.Anything].Found, bar[Admitting.Testable].Found);
+
+        Assert.True(bar[Admitting.Testable].Resident * 2 < bar[Admitting.Anything].Resident,
+            $"the bar left {bar[Admitting.Testable].Resident:F1} residents against "
+            + $"{bar[Admitting.Anything].Resident:F1} on drawn lessons, so the churn it was "
+            + "named for has gone by some other road");
+
+        // And what it costs the score is inside three standard errors of nothing. On the
+        // written lesson it was equal to the digit; on drawn ones there is a spread, and this
+        // asserts what a spread allows rather than what one text happened to show.
+        var cost = bar[Admitting.Anything].Right - bar[Admitting.Testable].Right;
+
+        var spread = Math.Sqrt((bar[Admitting.Anything].Error * bar[Admitting.Anything].Error)
+            + (bar[Admitting.Testable].Error * bar[Admitting.Testable].Error));
+
+        Assert.True(cost - (3.0 * spread) < 0.0,
+            $"the bar cost {cost:F3} ±{spread:F3} of the examination on drawn lessons, which "
+            + "is outside three standard errors. It costs score after all, so it is a trade "
+            + "rather than the free cut the written lesson read as");
     }
 
     [Fact]

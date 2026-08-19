@@ -395,7 +395,13 @@ public sealed class DocsTests
     // those readings was about the single hand-written text -- and a drawn lesson knows every
     // truth it states, which is what lets the second entry say the gap is the seat rather
     // than the search.
-    private const int Whole = 11_912;
+    //
+    // And 11,962 is the thirty-fifth raise, fifty words for why fork 86's bar does not ship.
+    // What it costs is a function of how young the population is: it refuses a child that
+    // cannot clear the floor, so it blocks repair exactly while nothing can clear one yet.
+    // Free at saturation and most of the examination before it, which is not what *costs no
+    // score* says and is not a thing any reading taken at one telling count could have said.
+    private const int Whole = 11_962;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -86,27 +86,35 @@ public sealed class DialTests
     private static readonly Dictionary<string, string> HandSet = new(StringComparer.Ordinal)
     {
         ["Admitting"] =
-            "what a separating condition must do besides separate, and it is an "
-            + "ARM for the same reason `Rooting` and `Crediting` are. `LessonTests` "
-            + "measures it costing no score on two lessons, leaving a sixth of the "
-            + "population, and making the ladder's trigger fire where it never had; "
-            + "no generated world has weighed in, and the entry leaves when one has",
+            "what a separating condition must do besides separate, and the reason "
+            + "it is an ARM has changed rather than gone. Two generated worlds have "
+            + "weighed in and it is ahead on Monk-1 for a tenth fewer repairs; what "
+            + "stops it shipping is that COSTING NO SCORE is a corner rather than a "
+            + "property. `LessonTests` crosses it with `Rooting` and it costs most "
+            + "of the examination under both roots at eight tellings, because a bar "
+            + "refusing a child that cannot clear the floor blocks repair exactly "
+            + "while the population is young. It is free at saturation. The entry "
+            + "leaves when the bar is priced against how young a population is",
 
         ["Crediting"] =
-            "whether a mint is credited with the round that made it, and it is an "
-            + "ARM for the same reason `Rooting` is -- two values, nothing between "
-            + "them, and one world's evidence so far. `LessonTests` measures it "
-            + "never costing and buying a telling on the conversation; what it "
-            + "risks is every one-code mint arriving at a perfect accuracy at once, "
-            + "which only a world with a crowded outcome space can show",
+            "whether a mint is credited with the round that made it, and the reason "
+            + "it is an ARM has changed. It reproduces on drawn lessons, leading "
+            + "while the arms are still apart; on the multiplexer and on Monk-1 it "
+            + "moves nothing at all, because crediting a mint is about a statement "
+            + "being TOLD and neither world tells anything. So it has two worlds' "
+            + "evidence and neither can see it. The entry leaves on a world with a "
+            + "crowded outcome space, where every one-code mint arriving at a "
+            + "perfect accuracy together is what it risks",
 
         ["Rooting"] =
             "how wide a scope genesis may mint, and it is an ARM rather than a "
             + "level -- there is no third value between one code and the whole "
-            + "moment. `LessonTests` runs both against each other on the "
-            + "conversation and the wide one wins there; nothing has put it to a "
-            + "generated world yet, and until something does, a controller would be "
-            + "choosing between two arms on one world's evidence",
+            + "moment. The wide one wins on the conversation and on drawn lessons, "
+            + "reaching at three tellings what one code a commitment does not reach "
+            + "at eight; on the multiplexer and on Monk-1 it moves nothing, a whole "
+            + "moment being a scope worth minting only where the moment is a "
+            + "statement. The entry leaves on a world that is not told and where a "
+            + "moment is still worth minting whole",
 
         // ---- Arrived with the commitment branch ----------------------------
 

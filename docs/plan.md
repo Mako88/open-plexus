@@ -454,6 +454,9 @@ before six that reads as tuning is out of order.
       diffusion has a number. Fork **32**.
     - **NOW** — a separating condition must also leave a child that can clear the floor itself,
       or it is a rule nothing could ever refute. The trigger fires at last. Fork **86**.
+    - **OPEN** — and what that bar COSTS is a function of how young the population is, free at
+      saturation and most of the examination before it, because it blocks repair while nothing
+      can clear the floor yet. Unpriced, and it is why the bar does not ship. Fork **86**.
     - **NOW** — a SHRUG is an outcome, so an ask costs something and where to ask is LEARNT.
       The machine declines a statement far more often than a question and was told neither.
       Open is a guess entering the moment it is scored on. Fork **117**.

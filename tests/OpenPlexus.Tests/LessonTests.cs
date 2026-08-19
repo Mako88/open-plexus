@@ -478,6 +478,57 @@ public sealed class LessonTests(ITestOutputHelper output)
             + $"one {scored[(3, "shipped")]:F3}, so minting the statement as one scope buys "
             + "nothing on a lesson that is drawn");
 
+        // The two of them CROSSED, which is the cell every reading of either has assumed away.
+        // The admission bar's reading was always taken beside the whole-moment root and the
+        // root's beside the shipped bar, so neither says what happens when only one of them
+        // ships -- and one of them shipping alone is exactly what a default change does.
+        output.WriteLine(
+            $"{Environment.NewLine}the two crossed, 8 tellings, withheld claiming");
+        output.WriteLine("root      bar        right             found             resident");
+
+        var crossed = new Dictionary<(Rooting, Admitting), double>();
+
+        foreach (var rooting in new[] { Rooting.Singly, Rooting.Wholly })
+        foreach (var admitting in new[] { Admitting.Anything, Admitting.Testable })
+        {
+            var (right, found, resident) = Over(
+                Seeds, Purpose, written: false, Carrying.Never, Asserting.Withheld, 8,
+                rooting: rooting, admitting: admitting);
+
+            crossed[(rooting, admitting)] = right.Average();
+
+            output.WriteLine(
+                $"{rooting,-10}{admitting,-11}{Sweep.Spread(right),18}"
+                + $"{Sweep.Spread(found),18}{resident.Average(),9:F1}");
+        }
+
+        // The bar costs most of the examination under BOTH roots here, and its no-cost
+        // reading was taken at twenty tellings with every word claimed and mints credited.
+        // What that means is that the cost is a function of how YOUNG the population is: the
+        // bar refuses a child that cannot clear the floor, and before enough tellings nothing
+        // clears it, so repair is blocked exactly while the population is still being built.
+        //
+        // So the bar is free at saturation and expensive before it, which is not what *costs
+        // no score on two lessons* says. That is the reason it does not ship as a default, and
+        // it is a reason no reading taken beside one root and one telling count could give.
+        Assert.All(
+            new[] { Rooting.Singly, Rooting.Wholly },
+            rooting => Assert.True(
+                crossed[(rooting, Admitting.Testable)]
+                    < crossed[(rooting, Admitting.Anything)],
+                $"under the {rooting} root the admission bar cost nothing at eight tellings, "
+                + "so it has stopped being a function of how young the population is and can "
+                + "be read on its own"));
+
+        // And it costs far less under the whole-moment root, so the two dials are not
+        // independent either. A bar measured beside one root says nothing about the brain that
+        // would result from shipping only the bar.
+        Assert.True(
+            crossed[(Rooting.Wholly, Admitting.Testable)]
+                > crossed[(Rooting.Singly, Admitting.Testable)] * 2.0,
+            "the bar reads alike under both roots, so there is no interaction to keep it from "
+            + "shipping alone");
+
         // And the admission bar, at the settings its own reading was taken at rather than at
         // this grid's. Twenty tellings, the whole-moment root, credited mints, every word
         // claimed -- move any of those and the cell says something about the combination.

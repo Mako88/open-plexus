@@ -20,8 +20,8 @@ namespace OpenPlexus.Codes;
 /// counting, which means the front end.</b>
 /// </para>
 /// <para>
-/// <b>The move: say the same observation coarsely as well as finely, and put both
-/// in the occasion.</b> Two states that differ finely still share their coarse
+/// <b>The move: say the same observation coarsely as well as finely</b>, and put both
+/// in the occasion. Two states that differ finely still share their coarse
 /// code, so they meet in the graph without anything having to decide they are
 /// similar. <b>The hierarchy IS the similarity</b>, and no metric, no distance and
 /// no comparison is needed anywhere.
@@ -78,8 +78,8 @@ public static class Grains
     /// <param name="value">Which band the observation fell in, at the finest grain.</param>
     /// <param name="bands">How many bands the finest grain has.</param>
     /// <param name="grains">
-    /// How many readings to emit. <b>One is the finest alone, which is every
-    /// measurement taken before this existed</b> — so a caller that does not ask
+    /// How many readings to emit. <b>One is the finest alone</b>, which is every
+    /// measurement taken before this existed — so a caller that does not ask
     /// gets exactly the old behaviour.
     /// </param>
     public static IEnumerable<Code> Of(byte modality, int value, int bands, int grains)

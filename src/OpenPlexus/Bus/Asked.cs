@@ -110,8 +110,8 @@ public readonly record struct Tabled
 /// where the third outcome reads zero because nothing in one process can die.
 /// </para>
 /// <para>
-/// <b>Its depth is one round trip and that is fork 56'S PRICE, not a claim about
-/// blocking.</b> Every holder is asked at once and every answer travels on its own, so the
+/// <b>Its depth is one round trip and that is fork 56'S PRICE</b>, not a claim about
+/// blocking. Every holder is asked at once and every answer travels on its own, so the
 /// scatter and the gather are one hop each however the bytes are carried.
 /// </para>
 /// </remarks>
@@ -230,8 +230,8 @@ public sealed record Answer
 
     /// <summary>What it added, for a <see cref="Wanted.Settle"/>.</summary>
     /// <remarks>
-    /// <b>Three counts and not a commitment, which is the same rule as everything else
-    /// here.</b> A reader learns how many rules a machine minted and never what any of them
+    /// <b>Three counts and not a commitment</b>, which is the same rule as everything else
+    /// here. A reader learns how many rules a machine minted and never what any of them
     /// is. Without it a fleet's <c>Minted</c>, <c>Repaired</c> and <c>Subsumed</c> would all
     /// read nought while the machines behind it were learning — the shape of failure where
     /// a mechanism works and nothing can see that it did.

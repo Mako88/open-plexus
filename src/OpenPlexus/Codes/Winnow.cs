@@ -18,8 +18,8 @@ namespace OpenPlexus.Codes;
 /// nothing to fit.
 /// </para>
 /// <para>
-/// <b>This is the fruit fly's olfactory circuit, and it is an LSH scheme —
-/// Dasgupta, Stevens and Navlakha, <i>Science</i> 2017.</b> Fifty receptor types
+/// <b>This is the fruit fly's olfactory circuit</b>, and it is an LSH scheme —
+/// Dasgupta, Stevens and Navlakha, <i>Science</i> 2017. Fifty receptor types
 /// project to two thousand Kenyon cells over sparse random connections, and one
 /// inhibitory neuron then silences all but the strongest few per cent. The tag is
 /// the set that survived. Their result is that this is locality-sensitive
@@ -27,8 +27,8 @@ namespace OpenPlexus.Codes;
 /// of the randomness rather than out of any training.
 /// </para>
 /// <para>
-/// <b>It expands where textbook LSH contracts, and that is the part worth
-/// copying.</b> Classical LSH projects down into a short dense code; this
+/// <b>It expands where textbook LSH contracts</b>, and that is the part worth
+/// copying. Classical LSH projects down into a short dense code; this
 /// projects UP and then throws most of it away. The expansion is what preserves
 /// similarity on little data — and a sparse set of fired codes is exactly what
 /// this architecture already eats, so the fly's output form needs no adapting at
@@ -213,8 +213,8 @@ public sealed class Winnow
     /// The sparse random connections, built once from the arithmetic alone.
     /// </summary>
     /// <remarks>
-    /// <b>REJECTION RATHER THAN A SHUFFLE, because a shuffle needs a generator and
-    /// the point is to need nothing.</b> Each draw is a mix of the cell, the
+    /// <b>REJECTION RATHER THAN A SHUFFLE</b>, because a shuffle needs a generator and
+    /// the point is to need nothing. Each draw is a mix of the cell, the
     /// sample slot and a retry counter, taken modulo the inputs; a collision with
     /// an input this cell already has is redrawn. <b>The retry is part of the
     /// definition</b> — two machines collide identically and redraw identically,
@@ -287,8 +287,8 @@ public sealed class Winnow
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The honest version of the constructor's guard, and the only one that can
-    /// see a collapse.</b> That check compares the sheet against C(inputs,
+    /// <b>The honest version of the constructor's guard</b>, and the only one that can
+    /// see a collapse. That check compares the sheet against C(inputs,
     /// samples) — the width the caller DECLARED — and real data routinely varies in
     /// far fewer dimensions than it has numbers. Fifty inputs whose variation is
     /// really three-dimensional pass the arithmetic and still emit a handful of

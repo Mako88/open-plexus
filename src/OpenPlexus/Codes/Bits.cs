@@ -7,8 +7,8 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The simplest translation there is, and it lives here rather than in a
-/// world.</b> A world that minted its own codes would be deciding what the brain
+/// <b>The simplest translation there is</b>, and it lives here rather than in a
+/// world. A world that minted its own codes would be deciding what the brain
 /// perceives, which is the mixing this arrangement exists to prevent — so even the
 /// trivial pipe is a pipe.
 /// </para>

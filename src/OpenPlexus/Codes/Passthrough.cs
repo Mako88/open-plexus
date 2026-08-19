@@ -13,8 +13,8 @@ namespace OpenPlexus.Codes;
 /// no-op is a first-class member of the family rather than a gap in it.
 /// </para>
 /// <para>
-/// <b>And it is brain-side like every other quantiser, which is the whole point
-/// of writing it down once.</b> While each world owned a private nested copy,
+/// <b>And it is brain-side like every other quantiser</b>, which is the whole point
+/// of writing it down once. While each world owned a private nested copy,
 /// "this world does not quantise" was indistinguishable from "nobody has got to
 /// this world yet" — and <see cref="Winnow"/> could be built, documented and
 /// measured without ever reaching a world, because there was no shared place a

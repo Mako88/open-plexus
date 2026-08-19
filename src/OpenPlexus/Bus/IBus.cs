@@ -46,8 +46,8 @@ public interface IReceiveAnswers
 public interface IBus
 {
     /// <summary>
-    /// A holder becomes askable. <b>Disposing the handle is a death, and a death here is
-    /// silence rather than an event.</b>
+    /// A holder becomes askable. <b>Disposing the handle is a death</b>, and a death here is
+    /// silence rather than an event.
     /// </summary>
     /// <remarks>
     /// <para>

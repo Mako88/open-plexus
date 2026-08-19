@@ -17,8 +17,8 @@ namespace OpenPlexus.Codes;
 /// other's arm</b>, so a body wanting both mounts both.
 /// </para>
 /// <para>
-/// <b>It takes the part of the frame it reads, which is why there is no
-/// splitter.</b> A body hands over everything it sensed and each front end
+/// <b>It takes the part of the frame it reads</b>, which is why there is no
+/// splitter. A body hands over everything it sensed and each front end
 /// selects its own stream — see <see cref="Compound{TFrame}"/>. The selector is
 /// the whole of what a router would have been.
 /// </para>

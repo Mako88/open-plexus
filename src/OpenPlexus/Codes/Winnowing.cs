@@ -21,8 +21,8 @@ public sealed class Winnowing : IQuantizer<IReadOnlyList<double>>
 {
     /// <summary>How many cells the projection expands into, per dimension read.</summary>
     /// <remarks>
-    /// <b>A constant of the design and not of a run, exactly as the projection itself
-    /// is.</b> Making it a dial would invite fitting the front end to a world, which
+    /// <b>A constant of the design and not of a run</b>, exactly as the projection itself
+    /// is. Making it a dial would invite fitting the front end to a world, which
     /// is the codebook the red-ball property forbids arriving by the back door.
     /// </remarks>
     private const int Expansion = 40;

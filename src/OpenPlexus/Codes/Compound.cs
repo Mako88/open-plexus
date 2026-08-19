@@ -3,8 +3,8 @@ using System.Collections.Immutable;
 namespace OpenPlexus.Codes;
 
 /// <summary>
-/// Several front ends reading one frame — <b>the shape a body has, and the
-/// reason a sensor is not a machine.</b>
+/// Several front ends reading one frame — <b>the shape a body has</b>, and the
+/// reason a sensor is not a machine.
 /// </summary>
 /// <remarks>
 /// <para>

@@ -40,8 +40,8 @@ public interface IQuantizer<in TObservation>
     /// quantiser and changes no existing measurement.
     /// </para>
     /// <para>
-    /// <b>And nothing reads it since the walk went, which makes it a channel with no
-    /// far end.</b> The walk's occasion was the only consumer; a commitment's scope is a
+    /// <b>And nothing reads it since the walk went</b>, which makes it a channel with no
+    /// far end. The walk's occasion was the only consumer; a commitment's scope is a
     /// SET of codes and has nowhere to put a group. It stays only until something
     /// decides between wiring it to rung four's binding and deleting it — and a front-end
     /// ability nothing can act on is the shape this repo keeps finding read as built.

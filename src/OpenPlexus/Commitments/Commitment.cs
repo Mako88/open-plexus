@@ -58,8 +58,8 @@ public sealed class Commitment
 {
     /// <summary>The modality a commitment's own identity lives in.</summary>
     /// <remarks>
-    /// <b>A commitment is identified by a <see cref="Code"/>, which is the cheapest
-    /// decision in the design.</b> It is the same type a front end emits, so a
+    /// <b>A commitment is identified by a <see cref="Code"/></b>, which is the cheapest
+    /// decision in the design. It is the same type a front end emits, so a
     /// commitment can appear inside another commitment's scope — and metacognition,
     /// chaining and abstraction then need no new machinery at all. A handle or an
     /// index would special-case all three later and want a second routing scheme for
@@ -180,8 +180,8 @@ public sealed class Commitment
     /// nothing in <see cref="Separations"/> or the counters could have produced.
     /// </para>
     /// <para>
-    /// <b>Linear counting over a single word, which is exact where it matters and
-    /// saturates where it does not.</b> Each occasion sets one bit; the count is
+    /// <b>Linear counting over a single word</b>, which is exact where it matters and
+    /// saturates where it does not. Each occasion sets one bit; the count is
     /// recovered from how many bits are still clear. At one, two and three occasions it
     /// reads 1.0, 2.0 and 3.1 — the regime the whole question lives in — and above about
     /// two hundred it stops rising, which costs nothing because a proportion tested on

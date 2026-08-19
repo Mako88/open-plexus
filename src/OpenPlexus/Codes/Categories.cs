@@ -39,8 +39,8 @@ public sealed class Categories
     /// what a grid using this is measuring.
     /// </param>
     /// <remarks>
-    /// <b>A code belongs to at most one category, and the first group to claim it keeps
-    /// it.</b> <see cref="Alternating.From"/> returns disjoint groups by construction, so
+    /// <b>A code belongs to at most one category</b>, and the first group to claim it keeps
+    /// it. <see cref="Alternating.From"/> returns disjoint groups by construction, so
     /// this only fires on a hand-written table — and a code with two coarser forms would
     /// make <see cref="Coarser"/> a choice rather than a lookup, which is a decision hiding
     /// in what was meant to be an alphabet.
@@ -70,8 +70,8 @@ public sealed class Categories
     /// <summary>The category this code is a member of, or nothing.</summary>
     /// <param name="code">The code to ask about.</param>
     /// <remarks>
-    /// <b>A category's own code has no coarser form, and that is load-bearing rather than an
-    /// omission.</b> It is what makes the entailment one-directional, so nothing here can
+    /// <b>A category's own code has no coarser form</b>, and that is load-bearing rather than an
+    /// omission. It is what makes the entailment one-directional, so nothing here can
     /// come to say that a category is a member of itself — and a rewrite that could would
     /// walk a scope up until it said nothing at all.
     /// </remarks>

@@ -58,8 +58,8 @@ public static class Alternating
     /// reason a fitted quantiser is refused.
     /// </para>
     /// <para>
-    /// <b>A member must clear both clauses against every member already in, never against
-    /// the first alone.</b> A chain of pairwise-similar codes reaches arbitrarily far, which
+    /// <b>A member must clear both clauses against every member already in</b>, never against
+    /// the first alone. A chain of pairwise-similar codes reaches arbitrarily far, which
     /// is single-link clustering's own failure and would return one group holding the whole
     /// alphabet.
     /// </para>
@@ -95,8 +95,8 @@ public static class Alternating
     /// <param name="moments">What was seen, in the order it was seen.</param>
     /// <param name="adhesion">
     /// How many times more often than chance two codes must turn up near each other in TIME.
-    /// <b>A ratio against what independent codes would have done, so it is not a level about
-    /// this world</b> — the same shape rung five's independence bar has, and the reason a
+    /// <b>A ratio against what independent codes would have done</b>, so it is not a level about
+    /// this world — the same shape rung five's independence bar has, and the reason a
     /// share of shared company would not do here.
     /// </param>
     /// <param name="floor">
@@ -108,22 +108,22 @@ public static class Alternating
     /// </param>
     /// <remarks>
     /// <para>
-    /// <b>Exclusion stays in the moment and company moves to the window, which is the whole
-    /// construction.</b> Widening the exclusion would refuse exactly the codes this is for —
+    /// <b>Exclusion stays in the moment and company moves to the window</b>, which is the whole
+    /// construction. Widening the exclusion would refuse exactly the codes this is for —
     /// a thing seen twice running shows two of its own looks in adjacent moments, so they
     /// co-occur in any window and would fail the clause that makes them alternatives.
     /// </para>
     /// <para>
-    /// <b>And the test is adhesion rather than shared company, because shared company is
-    /// exactly what twins have.</b> Two twins wear one look, so their landmarks keep the same
+    /// <b>And the test is adhesion rather than shared company</b>, because shared company is
+    /// exactly what twins have. Two twins wear one look, so their landmarks keep the same
     /// company however wide the window is — that is <see cref="From"/>'s measured limit. What
     /// runs give is that a thing's OWN codes turn up beside each other far more often than
     /// chance and a twin's never do, which is a statement about a pair rather than about the
     /// company either keeps.
     /// </para>
     /// <para>
-    /// <b>So a uniform stream must return nothing, and that is the control rather than a
-    /// failure.</b> Where sightings are drawn independently, every pair adheres at chance, so
+    /// <b>So a uniform stream must return nothing</b>, and that is the control rather than a
+    /// failure. Where sightings are drawn independently, every pair adheres at chance, so
     /// this refuses everything <see cref="From"/> would have found. The two are not
     /// substitutes: one reads space and one reads time.
     /// </para>
@@ -201,8 +201,8 @@ public static class Alternating
     /// reason a fitted quantiser is refused.
     /// </para>
     /// <para>
-    /// <b>A member must clear both clauses against every member already in, never against
-    /// the first alone.</b> A chain of pairwise-similar codes reaches arbitrarily far, which
+    /// <b>A member must clear both clauses against every member already in</b>, never against
+    /// the first alone. A chain of pairwise-similar codes reaches arbitrarily far, which
     /// is single-link clustering's own failure and would return one group holding the whole
     /// alphabet.
     /// </para>

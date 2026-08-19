@@ -28,8 +28,8 @@ internal sealed class Leaves(Action going) : IDisposable
 /// Putting something in a table under its address, and taking it out again.
 /// </summary>
 /// <remarks>
-/// <b>Extracted because the duplication budget refused the second copy, and it was
-/// right.</b> Both buses gained the same two subscriptions in one edit and wrote them the
+/// <b>Extracted because the duplication budget refused the second copy</b>, and it was
+/// right. Both buses gained the same two subscriptions in one edit and wrote them the
 /// same way twice — which is the shape that drifts: one bus removing on departure and the
 /// other not would be a holder that answers after it has left, on one transport only, and
 /// nothing would say so.

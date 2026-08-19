@@ -14,16 +14,16 @@ namespace OpenPlexus.Codes;
 /// that carries them. Every one of those is in the hottest path in the project.
 /// </para>
 /// <para>
-/// <b>So the order is derived into a code instead, and nothing downstream changes at
-/// all.</b> Matching, the tally, the discriminative gate, naming, subsumption and the wire
+/// <b>So the order is derived into a code instead</b>, and nothing downstream changes at
+/// all. Matching, the tally, the discriminative gate, naming, subsumption and the wire
 /// all read a set of codes, and a precedence IS one — so it is matched by the same subset
 /// test and chosen by the same repair. <b>It is the trick
 /// <see cref="Commitments.Unifying.Any"/> uses for a variable</b>, and the shape John's own
 /// rung-two proposal takes where it needs no new machinery.
 /// </para>
 /// <para>
-/// <b>And it is the learner that derives it, which is the seam this sits the right side
-/// of.</b> The front end reports order through
+/// <b>And it is the learner that derives it</b>, which is the seam this sits the right side
+/// of. The front end reports order through
 /// <see cref="IQuantizer{TObservation}.Order"/>, which is a fact about the signal on the
 /// licence <see cref="Coded.Sequence"/> already carries. Turning that into <i>these two
 /// stood this way round</i> is a derivation, and a front end doing it would be deciding
@@ -35,8 +35,8 @@ namespace OpenPlexus.Codes;
 /// number being reproduced — which is what this repo's own rules forbid twice over: an arm
 /// only lives while it is compared, and a better brain beats intact numbers. The transitive
 /// closure LOST its comparison on cost and is deleted with a revival row; with one arm left
-/// there is nothing to switch. <b>It is inert wherever a front end reports no order, which
-/// is a fact about the sense rather than a setting on the brain.</b>
+/// there is nothing to switch. <b>It is inert wherever a front end reports no order</b>, which
+/// is a fact about the sense rather than a setting on the brain.
 /// </para>
 /// </remarks>
 public static class Sequenced
@@ -55,8 +55,8 @@ public static class Sequenced
     /// <param name="first">What came first.</param>
     /// <param name="second">What came after it.</param>
     /// <remarks>
-    /// <b>Derived from the pair and order-sensitive, so two machines reach the same code
-    /// with nothing to ask</b> — the property every code here has. <see cref="Hashing"/>
+    /// <b>Derived from the pair and order-sensitive</b>, so two machines reach the same code
+    /// with nothing to ask — the property every code here has. <see cref="Hashing"/>
     /// rather than <see cref="object.GetHashCode"/>, which is randomised per process, so a
     /// codebook resting on it would mean two machines quietly disagreeing about what a
     /// precedence IS.
@@ -88,8 +88,8 @@ public static class Sequenced
     /// <param name="order">What position each code was at, from the front end.</param>
     /// <remarks>
     /// <para>
-    /// <b>By distinct position and not by list index, which is where the first version was
-    /// wrong.</b> A front end may report several codes at ONE position —
+    /// <b>By distinct position and not by list index</b>, which is where the first version was
+    /// wrong. A front end may report several codes at ONE position —
     /// the deleted <c>SnakeSense</c> put the action at nought and its whole view at one —
     /// and walking a sorted list pairwise would emit <i>this view code came before that
     /// one</i>, which the front end never said and which is false. Positions are grouped

@@ -20,8 +20,8 @@ namespace OpenPlexus.Bus;
 /// is both the realistic shape and the one that actually stresses settling.
 /// </para>
 /// <para>
-/// <b>The delay is INSIDE the dispatched task, so the in-flight count still
-/// covers it</b> and <see cref="HybridBus.WhenIdle"/> keeps meaning what it
+/// <b>The delay is INSIDE the dispatched task</b>, so the in-flight count still
+/// covers it and <see cref="HybridBus.WhenIdle"/> keeps meaning what it
 /// means. A late message is late, not uncounted.
 /// </para>
 /// </remarks>

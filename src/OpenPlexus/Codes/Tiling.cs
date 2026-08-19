@@ -23,7 +23,7 @@ namespace OpenPlexus.Codes;
 /// arrangement world can.
 /// </para>
 /// <para>
-/// <b>And it says both things, which is John's proposal arriving where it pays.</b>
+/// <b>And it says both things</b>, which is John's proposal arriving where it pays.
 /// The plan asks for a front end emitting SEVERAL codes per reading so that near
 /// readings overlap and the shared part becomes nameable. Here the two readings that
 /// need to overlap are the same part in two places: each winner is emitted bare — <i>a
@@ -93,7 +93,7 @@ public sealed class Tiling : IQuantizer<IReadOnlyList<double>>
 
     /// <summary>How many distinct things one patch's codebook has said.</summary>
     /// <remarks>
-    /// <b>Per patch rather than per reading, which is the number that matters here.</b>
+    /// <b>Per patch rather than per reading</b>, which is the number that matters here.
     /// A tiled front end collapses when it cannot tell two PARTS apart, and that shows
     /// up as a tag count near the number of distinct patches a world contains — which
     /// is small and knowable, unlike the number of distinct pictures.

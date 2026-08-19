@@ -1339,7 +1339,7 @@ public sealed class Population
     /// written once to avoid.
     /// </para>
     /// <para>
-    /// <b>And BOTH arms of the proportion, which is the floor's own argument finished.</b>
+    /// <b>And BOTH arms of the proportion</b>, which is the floor's own argument finished.
     /// Below the floor no test of a proportion has any power, and a commitment that has never
     /// been right has no proportion at all — there is nothing for a separating code to be
     /// commoner IN.

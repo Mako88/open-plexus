@@ -18,14 +18,14 @@ namespace OpenPlexus.Commitments;
 /// distance between a propositional learner and a relational one.
 /// </para>
 /// <para>
-/// <b>And an entry is still a <see cref="Code"/>, which is the one thing worth keeping
-/// from the cheap matcher.</b> A scope stays an array of codes, so identity, ordering,
+/// <b>And an entry is still a <see cref="Code"/></b>, which is the one thing worth keeping
+/// from the cheap matcher. A scope stays an array of codes, so identity, ordering,
 /// subsumption and everything that reads a scope carry over unchanged. What varies is
 /// carried in the modality, exactly as <see cref="Naming.Meant"/> carries a name.
 /// </para>
 /// <para>
-/// <b>One entry naming a variable constrains nothing, which is why the cost is not
-/// obvious.</b> <i>Whichever word</i> alone is satisfied by any moment holding a word at
+/// <b>One entry naming a variable constrains nothing</b>, which is why the cost is not
+/// obvious. <i>Whichever word</i> alone is satisfied by any moment holding a word at
 /// all. It is the REPETITION that says something — <i>whichever word was asked about,
 /// and that same word was told</i> — so the shape whose cost matters is a join, and a
 /// join is what has no index.
@@ -134,7 +134,7 @@ public static class Unifying
     /// therefore the fact that decides whether this rung keeps the index or loses it.
     /// </para>
     /// <para>
-    /// <b>The first consistent filling wins, which is a decision and not a detail.</b> A
+    /// <b>The first consistent filling wins</b>, which is a decision and not a detail. A
     /// variable scope can be satisfied several ways in one moment, and each way is a
     /// different grounded expectation. Taking the first in code order keeps the matcher
     /// decidable and order-independent; what a vote should do with the others is the

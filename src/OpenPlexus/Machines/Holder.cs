@@ -15,8 +15,8 @@ namespace OpenPlexus.Machines;
 /// the plan always said could: a count, and an expectation with a weight already computed.
 /// </para>
 /// <para>
-/// <b>It answers and never asks, which is what keeps C1 STRUCTURAL RATHER THAN
-/// CAREFUL.</b> Nothing on this class can read another holder's population, because
+/// <b>It answers and never asks</b>, which is what keeps C1 STRUCTURAL RATHER THAN
+/// CAREFUL. Nothing on this class can read another holder's population, because
 /// nothing on this class reaches off the machine at all — it is handed an
 /// <see cref="Ask"/> and it posts an <see cref="Answer"/>. A holder that wanted to know
 /// what its neighbours held would have to become an <see cref="Asker"/>, which is a
@@ -37,8 +37,8 @@ public sealed class Holder : IReceiveAsks
 
     /// <summary>Which slot this holder is in.</summary>
     /// <remarks>
-    /// <b>Handed in like <see cref="Population.Places"/> and never announced, which is fork
-    /// 62's one design decision.</b> A holder does not learn its partition from the wire and
+    /// <b>Handed in like <see cref="Population.Places"/> and never announced</b>, which is fork
+    /// 62's one design decision. A holder does not learn its partition from the wire and
     /// could not — the bus does not know what a population is, let alone that two of them
     /// are copies. It is told once, by whoever composed the fleet, and the only thing it
     /// does with it is decide which row of a swept table is its own.
@@ -117,7 +117,7 @@ public sealed class Holder : IReceiveAsks
     /// the whole point of asking.
     /// </para>
     /// <para>
-    /// <b>And asking notes the moment, which is not a side effect so much as the point.</b>
+    /// <b>And asking notes the moment</b>, which is not a side effect so much as the point.
     /// A code is counted live in the very moment genesis may be asked about it — see
     /// <c>Population.Witness</c> — and on a fleet the vote is the only thing that carries a
     /// moment to a holder before the settlement does. A holder that only noted what it was

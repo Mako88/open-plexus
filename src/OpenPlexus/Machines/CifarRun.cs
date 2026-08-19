@@ -33,7 +33,7 @@ namespace OpenPlexus.Machines;
 /// on the arrangement.
 /// </para>
 /// <para>
-/// <b>And the two arms are not interchangeable here, which is itself the finding.</b>
+/// <b>And the two arms are not interchangeable here</b>, which is itself the finding.
 /// <see cref="Banded{TFrame}"/> gives every dimension its own block of modalities, and
 /// a modality is one byte — so a reading wider than about fifty dimensions cannot be
 /// addressed at all, once what the other worlds already claim is set aside. An
@@ -64,7 +64,7 @@ public sealed class CifarRun : IDisposable
     /// The modality the banded arm's first pixel rides on.
     /// </summary>
     /// <remarks>
-    /// <b>148 because that is where the free run is, and the run is short.</b> The
+    /// <b>148 because that is where the free run is</b>, and the run is short. The
     /// worlds below it have claimed 20-22, 40-41, 50-55, 70, 100-101 and a block from
     /// 140 for moisture; the learner has 200-203 and 210-211, and relations sit at
     /// 255. What is left contiguous is 148 to 199 — fifty-two modalities, which at two

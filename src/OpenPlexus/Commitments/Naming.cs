@@ -98,8 +98,8 @@ public sealed class Naming
     /// </summary>
     /// <param name="moment">What is live.</param>
     /// <remarks>
-    /// <b>Run to a fixed point, because a name may stand for a set containing
-    /// names.</b> That is the whole of the bootstrapping: a name reached this round
+    /// <b>Run to a fixed point</b>, because a name may stand for a set containing
+    /// names. That is the whole of the bootstrapping: a name reached this round
     /// can complete a larger one in the same moment, which is how a second level ever
     /// comes to exist rather than being declared.
     /// </remarks>

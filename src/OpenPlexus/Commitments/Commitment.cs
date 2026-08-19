@@ -349,8 +349,8 @@ public sealed class Commitment
     /// <param name="from">The commitment being rewritten.</param>
     /// <remarks>
     /// <para>
-    /// <b>The one place evidence moves, and it is not an exception to never editing
-    /// a commitment.</b> Rung five does not change what is claimed — it changes how
+    /// <b>The one place evidence moves</b>, and it is not an exception to never editing
+    /// a commitment. Rung five does not change what is claimed — it changes how
     /// the claim is written, by putting a name where its members were. The two entail
     /// exactly the same moments, which <c>Unfold</c> is what checks.
     /// </para>
@@ -396,8 +396,8 @@ public sealed class Commitment
     /// <param name="expects">The code that should follow.</param>
     /// <remarks>
     /// <para>
-    /// <b>Derived from the scope itself, and not from the parent plus the condition
-    /// added.</b> Both satisfy the rule that two machines must agree without
+    /// <b>Derived from the scope itself</b>, and not from the parent plus the condition
+    /// added. Both satisfy the rule that two machines must agree without
     /// speaking, but parent-plus-condition gives the SAME scope two names when two
     /// nodes reach it by adding the same pair of codes in a different order — and
     /// the plan's own sibling problem is bad enough without a commitment being able

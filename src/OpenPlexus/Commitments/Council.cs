@@ -7,7 +7,7 @@ namespace OpenPlexus.Commitments;
 /// <summary>Where a run's wall clock went, by phase, in milliseconds.</summary>
 /// <remarks>
 /// <para>
-/// <b>No report has ever carried a cost, and this project's own trap list says so.</b>
+/// <b>No report has ever carried a cost</b>, and this project's own trap list says so.
 /// <i>A cost can be in memory while every instrument watches time</i> — and the truth was
 /// worse than that: nothing watched EITHER. A run that was memory-bound and a run that was
 /// spending its life in a quadratic sweep report the same everything.
@@ -19,7 +19,7 @@ namespace OpenPlexus.Commitments;
 /// population — and those want three completely different answers.
 /// </para>
 /// <para>
-/// <b>And it is a measurement rather than a check, so nothing may assert on it.</b> A
+/// <b>And it is a measurement rather than a check</b>, so nothing may assert on it. A
 /// duration is not reproducible under a fixed seed, and a threshold on one would fail the
 /// build on a busy machine — which is how a timing number becomes a thing that must not
 /// change. <c>Tally.Separations</c> beside it IS reproducible, and is the one to bar.
@@ -48,8 +48,8 @@ public sealed record Spent
     /// <param name="other">The other clock, which is not compared.</param>
     /// <remarks>
     /// <para>
-    /// <b>The rule above was written and broken in one commit, and only the compiler was
-    /// enforcing anything.</b> <i>Nothing may assert on it</i> is three lines up, and
+    /// <b>The rule above was written and broken in one commit</b>, and only the compiler was
+    /// enforcing anything. <i>Nothing may assert on it</i> is three lines up, and
     /// this record went inside <see cref="Machines.Tally"/> — whose generated equality
     /// asserts on every field it has. So the three <i>a fixed seed reproduces a run
     /// exactly</i> tests began comparing a wall clock, and went red on a machine doing
@@ -82,8 +82,8 @@ public sealed record Spent
 
 /// <summary>What one round of learning added, from whoever did it.</summary>
 /// <remarks>
-/// <b>Three counts rather than three return values, because on a fleet they come back
-/// together.</b> A holder settles, sweeps, covers and repairs on one telling — that is the
+/// <b>Three counts rather than three return values</b>, because on a fleet they come back
+/// together. A holder settles, sweeps, covers and repairs on one telling — that is the
 /// whole point of pushing the settlement rather than driving each phase from the asker — so
 /// what it did arrives as one answer. In one process the same record is filled in by four
 /// consecutive calls, which is what keeps the two arrangements comparable.
@@ -106,7 +106,7 @@ public readonly record struct Learnt
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The seam is two calls wide, and which two is the finding rather than a choice.</b>
+/// <b>The seam is two calls wide</b>, and which two is the finding rather than a choice.
 /// Every operator on <see cref="Population"/> decides local except two: the vote reads what
 /// everything that fired advocates, and <see cref="Population.Abstract"/> reads how often
 /// scopes recur across the whole population. Settling, covering and repairing are each a
@@ -184,8 +184,8 @@ public interface ICouncil
 /// The council of one — <b>everything this project has ever measured, behind the seam.</b>
 /// </summary>
 /// <remarks>
-/// <b>It must reproduce every recorded number exactly, which is why the order here looks
-/// fussy.</b> Settle, then sweep, then repair every round, then cover, then repair after a
+/// <b>It must reproduce every recorded number exactly</b>, which is why the order here looks
+/// fussy. Settle, then sweep, then repair every round, then cover, then repair after a
 /// failure: the sweep sits between the settlement and the repair because it always has, and
 /// a sweep round that culls before a child is minted is not the same run as one that culls
 /// after. <c>DeterminismTests</c> is what says so.
@@ -295,7 +295,7 @@ public sealed class Alone : ICouncil
     /// What the OTHER holders counted, or nothing where this machine is alone.
     /// </param>
     /// <remarks>
-    /// <b>One extra argument and not an extra method body, which is the whole point.</b>
+    /// <b>One extra argument and not an extra method body</b>, which is the whole point.
     /// Abstraction is the only operator here whose statistic is the whole population's, so
     /// it is the only thing a holder cannot decide by itself — and it is one parameter deep
     /// rather than a second arrangement of the round. The interface does not carry it

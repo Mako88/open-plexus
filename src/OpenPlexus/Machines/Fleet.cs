@@ -20,7 +20,7 @@ namespace OpenPlexus.Machines;
 /// third exchange for any of it.
 /// </para>
 /// <para>
-/// <b>And a third one on a sweep round, which is one round in a thousand.</b> Abstraction
+/// <b>And a third one on a sweep round</b>, which is one round in a thousand. Abstraction
 /// is the only operator in <see cref="Population"/> whose statistic is the whole
 /// population's, so it is the only thing a holder cannot decide by itself — measured in
 /// <c>SplitNamingTests</c>, where three shards holding thirty-six eligible scopes each name

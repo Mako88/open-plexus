@@ -30,14 +30,14 @@ everything moves; nothing here does.**
 
 ### The bet
 
-- **Understand rather than perform** — answer *what would the world look like if I
-  did X*, which a sequence model cannot be.
+- **Understand rather than perform** — answer *what would the world look like if I did X*,
+  which a sequence model cannot be.
 - **A count is never wrong; a commitment is.** A cell that mispredicts becomes a
   different number. A commitment that mispredicts is wrong about SOMETHING, and which
   something is the whole of what can be learnt.
-- **The counting does not go away, it moves under the prediction.** Repair asks which
-  code separates misses from hits, which is `together / seen` indexed by commitment
-  rather than by node.
+- **The counting does not go away, it moves under the prediction.** Repair asks which code
+  separates misses from hits, which is `together / seen` indexed by commitment and not by
+  node.
 - **The representation is the residue of repaired failures**, not a thing designed up
   front. Distinctions get minted to tell two conflated cases apart.
 
@@ -137,28 +137,27 @@ FORBIDS things, and several of them are already measured.
 - **And a text conversation as a second body**, so one brain is judged on symbols and on a
   stream without being two brains.
 - **The constraints were all written for this**, so it is a demonstration rather than a
-  benchmark. No shared memory, late messages, a cluster vanishing mid-thought.
+  benchmark: no shared memory, late messages, a cluster vanishing mid-thought.
 - **So the fleet was never the risk**, and what text teaches this learner is answered where
   it should have been asked.
-- **And twenty is already the measured edge.** Placement by minimum code is capped by a
-  world's distinct roots, so fleet size and the front end's vocabulary are one number.
+- **And twenty is already the measured edge.** Placement by minimum code is capped by a world's
+  distinct roots, so fleet size and the front end's vocabulary are one number.
 - **So what the footprint reading is about changes with the rung.** Containers share one
-  machine's memory, so the whole fleet's brain is the number that matters there; on phones
-  it is one holder's share. Both come off the same reading.
-- **And what prices a camera is the front end's vocabulary**, at residents times codes times
-  a hundred bytes rather than anything about the population. That is the number to take
-  before a sensor is plumbed.
+  machine's memory, so the fleet's whole brain is what matters there and on phones it is one
+  holder's share. Both come off the same reading.
+- **And what prices a camera is the front end's vocabulary**, at residents times codes times a
+  hundred bytes rather than anything about the population. Take it before a sensor is plumbed.
 - **And one input machine feeding twenty holders is the identical case.** Every holder is told
   the same moment and settlement, so naming converges — what breaks it is many eyes rather than
   many brains, and a camera per phone is the arrangement to avoid.
 - **A sensor is a world and a world is a stream**, so nothing here is a new kind of input —
   what is missing is the plumbing, not a mechanism.
-- **And every ground-truth instrument goes dark.** Soundness, overshoot and hard-round
-  coverage all need a world that can be enumerated, so the generated worlds never leave.
-- **So the probe is the one instrument that crosses.** Ask what the codes carry against what
-  the raw reading carries, per sensor, BEFORE building anything on that sensor.
-- **And a curriculum is allowed, and C4 is not about it.** *No episode boundary* constrains
-  the LEARNER; what an experimenter feeds and in what order is outside the machine.
+- **And every ground-truth instrument goes dark.** Soundness, overshoot and hard-round coverage
+  all need an enumerable world, so the generated worlds never leave.
+- **So the probe is the one instrument that crosses.** Ask what the codes carry against what the
+  raw reading carries, per sensor, BEFORE building on that sensor.
+- **And a curriculum is allowed, and C4 is not about it.** *No episode boundary* constrains the
+  LEARNER; what an experimenter feeds, and in what order, is outside the machine.
 - **So a primer before a test is expected rather than a cheat** — the language before the
   play, the room before the question. What is forbidden is the learner being able to tell
   that a boundary happened.
@@ -169,26 +168,26 @@ FORBIDS things, and several of them are already measured.
   the ordering assumed. Binding the question's actor to a statement's actor is rung four, and
   no dose of recency reaches it.
 - **And the exam is already chosen.** Twenty tasks each isolating one prerequisite, written
-  elsewhere with published baselines, and built so surface matching fails. A school
-  comprehension test would read nothing until the components pass.
+  elsewhere with published baselines, built so surface matching fails. A school comprehension
+  test would read nothing until the components pass.
 
 ### What the field already knows
 
 - **Borrow the problem, not the mechanism.** This is not a new idea and pretending otherwise
-  would waste months.
+  wastes months.
 - **DreamCoder** (Ellis et al., 2021) — grows its own library under MDL pressure and
   BOOTSTRAPS: learns `filter`, uses it to learn `max`, then `sort`. The existence proof for
-  representation-as-residue.
+  representation as residue.
 - **Popper / Learning From Failures** (Cropper & Morel, 2021) — generate, test, **constrain**.
   This design's core loop, already formalised, and GENERATE is the half this plan kept
   forgetting.
 - **XCS** (Wilson) — accuracy-based fitness, because strength-based systems delete low-reward
-  rules still correct in their niche. Its covering, prediction array and subsumption are all
-  taken here; its recency-weighted accuracy is the one thing deliberately not.
+  rules still correct in their niche. Its covering, prediction array and subsumption are taken
+  here; its recency-weighted accuracy is the one thing deliberately not.
 - **The Monk's problems** (UCI) — the classic symbolic benchmark, external baselines, small.
-  Monk-3 carries deliberate noise, which tests the repair gate and nothing else; **Monk-2 is a
+  Monk-3 carries deliberate noise, testing the repair gate and nothing else; **Monk-2 is a
   counting concept a conjunctive scope CANNOT express**, a language-ceiling probe with a
-  published number attached.
+  published number.
 - **Why none of it scaled**: noise sensitivity, hand-specified language bias, and no way to
   learn from probabilistic or sensory background knowledge. **And the failure was at the
   interface with perception** rather than in the logic — the one place this project is unusually
@@ -437,11 +436,11 @@ before six that reads as tuning is out of order.
     - **NOW** — commitment, settlement, blame capped at one hop, repair, and abstention so a
       round that could not settle costs nothing. Reading is an objective: a sentence a story,
       and withheld sentences the exam.
-    - **OPEN** — what it converts is unread, and English's alphabet is far wider than
-      anything here has run on. Fork **89**.
+    - **OPEN** — what it converts is unread, and English's alphabet is far wider than anything
+      here has run on. Fork **89**.
     - **OPEN** — the horizon is K occasions, K=1. Fork **28**.
-    - **OPEN** — entailment depth capped at one and the horizon at one; both come off when
-      blame diffusion has a number. Fork **32**.
+    - **OPEN** — entailment depth and the horizon are capped at one; both come off when blame
+      diffusion has a number. Fork **32**.
     - **OPEN** — the ladder's admission asks whether repair found a separating code, and on a
       wide alphabet memorising always does. What separates *nothing separates* from *nothing
       GENERAL separates*. Fork **86**.
@@ -450,12 +449,11 @@ before six that reads as tuning is out of order.
       Open is a guess entering the moment it is scored on. Fork **117**.
     - **SETTLED** — the front end intersecting the question with EACH statement answers task
       one where the bag sits near the marginal, and one hop is all it reaches. Fork **88**.
-    - **OPEN** — whether reading real English is predictive enough to teach this learner.
-      bAbI is disqualified as a primer, its held-out half being all re-reading. Fork **100**.
-    - **OPEN** — two English objectives read one corpus at wildly different rates, so no
-      single capacity sizes both. Fork **101**.
-    - **BLOCKED** — the exam tier above bAbI is unpriced, and blocked until the components
-      pass. Fork **90**.
+    - **OPEN** — whether reading real English is predictive enough to teach this learner. bAbI
+      is disqualified as a primer, its held-out half being re-reading. Fork **100**.
+    - **OPEN** — two English objectives read one corpus at wildly different rates, so no single
+      capacity sizes both. Fork **101**.
+    - **BLOCKED** — the exam tier above bAbI is unpriced until the components pass. Fork **90**.
     - **OPEN** — it is a near-perfect READER and a hopeless SELECTOR, a front end handing it
       the right statement answering a whole task at a twentieth of the bag's population.
       Selecting IS reading a commitment backwards, so fork **115** carries it.
@@ -592,32 +590,35 @@ before six that reads as tuning is out of order.
     - **OPEN** — the TABLE is what blows up rather than the commitments, needing an entry per
       code seen while firing. It spills to SQLite on the owning node and rehydrates as a
       candidate — and it is repair's candidate set, so a spill changes what fires. Fork **31**.
-    - **OPEN** — matching and settling are nine tenths of the clock on a narrow world whose
-      table never grows. Where they go on a WIDE one, and what ends the run. Fork **49**.
+    - **OPEN** — matching and settling are nine tenths of the clock on a narrow world whose table
+      never grows. Where they go on a WIDE one. Fork **49**.
     - **OPEN** — a child fires only where its parent does and matching IGNORES that, going
-      through the code index instead. Rete's own problem, with the wrinkle that culling
-      orphans a child and an orphan that stops firing reads as nothing.
+      through the code index. Rete's own problem, with the wrinkle that culling orphans a child
+      and an orphan that stops firing reads as nothing.
     - **BROKEN** — four `EncodedTests` fail on a file never built: the graph is cut one `Gemm`
-      early to drop a 1000-way classifier, which needs `onnx`, which the runner has not got.
-    - **BROKEN** — `BudgetTests` crosses two settings and pins neither timing nor budget, so
-      it changed arms silently; being a sweep, CI never looked.
+      early to drop a 1000-way classifier, needing `onnx`, which the runner lacks.
+    - **BROKEN** — `BudgetTests` crosses two settings and pins neither timing nor budget, so it
+      changed arms silently; being a sweep, CI never looked.
   - Withholding is real and the gap is readable
-    - **SETTLED** — a generated world holds assignments back without the learner being able
-      to tell, the draw rejecting rather than picking. Fork **48**.
+    - **SETTLED** — a generated world holds assignments back without the learner being able to
+      tell, the draw rejecting rather than picking. Fork **48**.
     - **OPEN** — the held-out gap against RECURRENCE, the number saying how big a bag a world
       needs. Fork **41**.
-    - **OPEN** — a withheld observation becomes a PAIR under settlement by successor, the
-      moment and the one after it. Every generated world owes it.
+    - **OPEN** — a withheld observation becomes a PAIR under settlement by successor, the moment
+      and the one after it. Every generated world owes it.
   - A score says how often and never which
-    - **NOW** — a transcript is an instrument and the cheapest one here. A population
-      answering everything with the commonest word and one that has learnt the task read
-      identically until the words are printed.
+    - **NOW** — a transcript is an instrument and the cheapest one here. A population answering
+      everything with the commonest word and one that has learnt the task read identically until
+      the words are printed.
     - **NOW** — a held-out question can be word for word one already asked, the corpus being
       templated over a small cast. So an unseen score is read beside a count of its twins
       rather than on its own.
+    - **OPEN** — a STANDARD story told once and a fixed question set, so an adjustment is read
+      against one thing. John's. Hand-written and tiny beats a found text, which gives neither
+      enumerable ground truth nor a computable RECENCY bar; the exam stays bAbI's.
   - What a rule learner is worth beside a probe
     - **OPEN** — given symbols worth having, how close a conjunctive rule learner comes to a
-      linear probe on the same vectors. The grid is a sweep. Fork **43**.
+      linear probe on the same vectors. Fork **43**.
 
 ## DO NOT RE-TRY
 

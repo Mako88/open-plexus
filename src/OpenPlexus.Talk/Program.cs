@@ -98,7 +98,9 @@ internal static class Program
         // examination; the spare rounds after the lesson go by empty and are reported.
         var rounds = tutor is null
             ? Number(args, "--rounds", 400)
-            : asserting is Asserting.Everything ? tutor.Moments * tutor.Longest : tutor.Moments;
+            : asserting is Asserting.Everything
+                ? tutor.Moments * tutor.Longest
+                : tutor.Moments;
 
         Console.WriteLine(
             $"talking, {rounds} rounds, capacity {capacity}, seed {seed}, asking "

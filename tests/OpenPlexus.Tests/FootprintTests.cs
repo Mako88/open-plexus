@@ -242,8 +242,8 @@ public sealed class FootprintTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A commitment's table is bounded by the front end's vocabulary, which is the number
-    /// the north star actually turns on.</b>
+    /// <b>A commitment's table is bounded by the front end's vocabulary.</b> Which is the number
+    /// the north star actually turns on.
     /// </summary>
     /// <remarks>
     /// <para>

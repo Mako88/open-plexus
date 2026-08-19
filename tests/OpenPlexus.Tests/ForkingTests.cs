@@ -87,8 +87,8 @@ public sealed class ForkingTests(ITestOutputHelper output)
     /// <b>THE READING: two arms, three worlds, and the ungameable columns.</b>
     /// </summary>
     /// <remarks>
-    /// <b>The collision count is what says the mechanism ran, and it goes beside the score
-    /// rather than instead of it.</b> Two arms landing together is ambiguous between <i>a
+    /// <b>The collision count is what says the mechanism ran.</b> And it goes beside the score
+    /// rather than instead of it. Two arms landing together is ambiguous between <i>a
     /// distinct child is worth nothing</i> and <i>a parent rarely had a second candidate past
     /// the bar</i>, and only a count of what was BUILT tells those apart — the lesson a
     /// two-code step cost this bench a grid to learn.

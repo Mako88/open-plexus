@@ -689,4 +689,48 @@ public sealed class LessonTests(ITestOutputHelper output)
         Assert.Equal(reached[1], reached[20]);
     }
 
+    [Fact]
+    public void Claiming_every_word_costs_a_population_that_grows_with_every_telling()
+    {
+        int[] tellings = [1, 3, 5, 10];
+
+        // What one-shot is bought with, and it is the number that decides whether any of this
+        // survives a corpus. A statement claims every word in turn, so each telling is as many
+        // moments as the sentence has words — and every one of them may mint.
+        var lesson = Lesson.Creatures;
+
+        output.WriteLine($"{"tellings",-10}{"right",8}{"resident",10}{"minted",9}");
+
+        var resident = new Dictionary<int, double>();
+
+        foreach (var many in tellings)
+        {
+            var one = Ran(
+                lesson, Carrying.Never, seed: 1, passes: 1, asserting: Asserting.Everything,
+                tellings: many, rooting: Rooting.Wholly, crediting: Crediting.Birth);
+
+            resident[many] = one.Tally.Resident;
+
+            output.WriteLine(
+                $"{many,-10}{Right(one.Tutor, 0),8:F3}{one.Tally.Resident,10}"
+                + $"{one.Tally.Minted,9}");
+        }
+
+        // It is right from the first telling and keeps growing anyway, and the two columns say
+        // which half grows. Minting SATURATES -- genesis has proposed everything the lesson can
+        // propose -- while the resident count keeps climbing, so what grows is repair.
+        //
+        // And the reason is the claiming rule itself. A statement claims every word in turn, so
+        // the rule learnt from one of its claims is WRONG on the others: `cat and sound predict
+        // meow` fires on the round claiming `the` and misses. Every telling manufactures the
+        // same failures again, repair specialises again, and nothing ever settles. That is the
+        // shape that does not survive a corpus, and it is a cost of one-shot rather than of
+        // this lesson.
+        Assert.True(resident[10] > 3 * resident[1],
+            $"the population grew from {resident[1]} to {resident[10]} over ten tellings, so "
+            + "the churn this test is named for has stopped — say what removed it");
+
+        // And the arm that claimed fewer words is refuted rather than open: it read 0.167 told
+        // once against 1.000 and did not reach 1.000 until ten tellings. See the plan's row.
+    }
 }

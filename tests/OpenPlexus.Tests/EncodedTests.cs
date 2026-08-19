@@ -243,14 +243,14 @@ public sealed class EncodedTests(ITestOutputHelper output)
     /// day the arm was built and nothing passed it one.
     /// </para>
     /// <para>
-    /// <b>The arms share a world, a seed and a front end, so the only difference is what
-    /// reads the codes.</b> Both are scored on the same withheld images, which the world
+    /// <b>The arms share a world.</b> A seed and a front end, so the only difference is what
+    /// reads the codes. Both are scored on the same withheld images, which the world
     /// never draws — and the probe is fit on the distinct pictures the run was drawing from
     /// rather than on its draws, so it is if anything the easier side of the comparison.
     /// </para>
     /// <para>
-    /// <b>And it asserts nothing, because the first attempt to make it a check was a
-    /// prediction in a check's clothes.</b> Written as a suite test with a bar at six tenths
+    /// <b>And it asserts nothing.</b> Because the first attempt to make it a check was a
+    /// prediction in a check's clothes. Written as a suite test with a bar at six tenths
     /// it read 0.32 — and the run behind that was five hundred rounds holding eleven and a
     /// half thousand commitments, which is a population that has not finished being born.
     /// A grid decides what the bar is, and the bar comes afterwards.

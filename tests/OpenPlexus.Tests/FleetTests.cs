@@ -232,8 +232,8 @@ public sealed class FleetTests(ITestOutputHelper output)
     /// repair gate can only refuse a repair another commitment on THIS machine covers.
     /// </para>
     /// <para>
-    /// <b>So a gap is not a defect and neither is a lead, and that is why there is no
-    /// bar.</b> A threshold written before the first reading is a prediction dressed as a
+    /// <b>So a gap is not a defect and neither is a lead.</b> And that is why there is no
+    /// bar. A threshold written before the first reading is a prediction dressed as a
     /// requirement. The grid is the finding, and the number to read is the last tenth's
     /// accuracy against the same brain in one process.
     /// </para>

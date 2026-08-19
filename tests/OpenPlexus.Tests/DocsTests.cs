@@ -340,7 +340,13 @@ public sealed class DocsTests
     // run's own accuracy. The row is long because three shapes died rather than one, and a row
     // whose revival condition does not say which shapes were tried would send the next session
     // straight back down the same three.
-    private const int Whole = 11_414;
+    //
+    // And 11,502 is the twenty-sixth raise, eighty-eight words for a second refuted row and the
+    // leaf beside it. Claiming only a sentence's least-said words was meant to unify two
+    // claiming rules and cost less; it cost more of what mattered and is deleted. The leaf is
+    // what the run that refuted it showed instead: claiming every word makes a rule wrong on
+    // its own sentence's other claims, so repair churns for ever while minting saturates.
+    private const int Whole = 11_502;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -677,11 +677,10 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
 
                 foreach (var word in words) _often[word] = _often.GetValueOrDefault(word) + 1;
 
-                // Every word in turn, which is one moment each and no word picked at all.
-                if (_settings.Asserting is Asserting.Everything && words.Count > 1)
+                // One moment a claim, where the arm claims more than one word of a sentence.
+                if (Claims(words) is { Count: > 0 } claims)
                 {
-                    for (var where = 0; where < words.Count; where++)
-                        _claims.Enqueue((words, where));
+                    foreach (var where in claims) _claims.Enqueue((words, where));
 
                     continue;
                 }
@@ -730,6 +729,21 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
         Carrying.Statements => !asking,
         _ => false,
     };
+
+    /// <summary>Which of a statement's words each get a moment, where several do.</summary>
+    /// <remarks>
+    /// <b>Empty where one word is claimed or none is</b>, which leaves the sentence a single
+    /// moment and the arm reading it exactly as it did before this existed.
+    /// </remarks>
+    private IReadOnlyList<int> Claims(IReadOnlyList<string> words)
+    {
+        if (words.Count < 2) return [];
+
+        if (_settings.Asserting is Asserting.Everything)
+            return [.. Enumerable.Range(0, words.Count)];
+
+        return [];
+    }
 
     /// <summary>Where in a statement the word it is taken to claim sits.</summary>
     /// <remarks>

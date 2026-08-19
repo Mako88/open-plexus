@@ -591,6 +591,8 @@ before six that reads as tuning is out of order.
       Told once, it answers an exam never sat. John's. Forks **121** and **123**.
     - **OPEN** — claiming, width and crediting are all load-bearing and unweighed on any
       generated world. Fork **124**.
+    - **OPEN** — claiming every word makes a rule WRONG on its own sentence's other claims, so
+      repair churns for ever while minting saturates. Fork **126**.
     - **OPEN** — rarest is one split of a statement into scope and claim, and the brain does not
       choose it. What picks the claim with no experimenter. Fork **123**.
     - **NOW** — a contradicted belief is REPLACED by being outvoted rather than retracted, on
@@ -688,6 +690,7 @@ before six that reads as tuning is out of order.
 | Carrying the DECIDER's identity into the next moment, so a scope roots on it | No score moved, the table grew by half, and on a cyclic world the identity SEPARATED — costing `Rhythm` the moment that holds repair still | Siting it as MEMORY rather than metacognition, and a control whose codes never vary |
 | Curiosity read off the vote — `Unsure` on the margin, `Untested` on the weight | Both lose to a coin per ask, tenfold and fiftyfold over eight seeds: a conversation leaves the machine unsure exactly where nobody can answer | A signal saying whether a reply CAN settle, not whether the machine is sure |
 | Keeping every mention of a repeated word, and marking the last | Worse than dropping the repeat where a thing moves, and a marker for *nothing follows this* moved it nothing. More precedences give repair more to grab, so `wanting` falls to nought while the score does | A rung that can say a NEGATIVE — fork 30 |
+| Claiming only a sentence's LEAST-said words, so the two claiming rules become one comparison | Worse on both axes, needing ten times the telling to reach what claiming every word reached at once | The population cost of claiming every word binding, which is a corpus rather than a lesson |
 | A second hop in three shapes: every conclusion made live, the winner's alone, and only rules that USED one voting | Nought on the implied half in all three, and the run's own accuracy fell each time | RELEVANCE, or a sub-question — a question not NAMING the intermediate cannot trigger the link to it |
 | `Joining.Recent` — a word banded by how far back it was said | Half what narrowing the view buys, and the front end picks the bands | A band the learner mints. Fork 92 |
 | Background admitted to a WIDE genesis scope, a code in every moment being unable to change when the rule fires | A third of what the varied filter reaches at three tellings and three quarters at ten | A world where the varied gate refuses a code a conjunction needed |

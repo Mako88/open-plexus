@@ -843,8 +843,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// over it is tracking rather than reading the transcript off.
     /// </para>
     /// <para>
-    /// <b>And the vocabulary is tiny whatever the walk's length, which is the property that
-    /// makes the bag arm mean something.</b> Six rooms, four things and a handful of
+    /// <b>And the vocabulary is tiny whatever the walk's length.</b> Which is the property that
+    /// makes the bag arm mean something. Six rooms, four things and a handful of
     /// function words, so a bagged moment is the same size after 120 statements as after
     /// four — every word is present and none of them says WHEN. A bag here cannot be near
     /// the marginal by accident.

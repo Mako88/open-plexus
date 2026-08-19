@@ -138,8 +138,8 @@ public sealed class PostedTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The third time this fan-out defect has been found in one file, and the first time
-    /// anything checks for it.</b> <c>Posted</c>'s own header has always said a fan-out is
+    /// <b>The third time this fan-out defect has been found in one file.</b> And the first time
+    /// anything checks for it. <c>Posted</c>'s own header has always said a fan-out is
     /// posts in flight rather than round trips end to end; it was false of both fan-outs
     /// until something timed the learning path, and it stayed false of the announcement and
     /// the publish underneath the sentence that fixed them.

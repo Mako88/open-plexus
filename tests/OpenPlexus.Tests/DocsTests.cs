@@ -333,7 +333,14 @@ public sealed class DocsTests
     // statements, the stated half reads 1.000 from one telling and the implied half 0.000 at
     // one, five and twenty. It is written as its own leaf because the horizon beside it is a
     // different thing -- that one is across occasions and this one is within a round.
-    private const int Whole = 11_326;
+    //
+    // And 11,414 is the twenty-fifth raise, eighty-eight words for a refuted row and the leaf
+    // beside it. A second hop -- conclusions made live so one rule can meet another -- was
+    // built in three shapes and every one read nought on the implied half while costing the
+    // run's own accuracy. The row is long because three shapes died rather than one, and a row
+    // whose revival condition does not say which shapes were tried would send the next session
+    // straight back down the same three.
+    private const int Whole = 11_414;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

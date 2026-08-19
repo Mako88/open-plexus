@@ -440,6 +440,8 @@ before six that reads as tuning is out of order.
       here has run on. Fork **89**.
     - **OPEN** — a round is fold, fire, vote, and nothing puts what fired BACK in the moment,
       so a conclusion needing two statements is unreachable at any repetition. Fork **28**.
+    - **OPEN** — and the loop is not what is missing: three shapes of it are refuted. What the
+      question does not NAME cannot trigger the link that reaches it. Fork **125**.
     - **OPEN** — the horizon is K occasions, K=1. Fork **28**.
     - **OPEN** — entailment depth and the horizon are capped at one; both come off when blame
       diffusion has a number. Fork **32**.
@@ -686,6 +688,7 @@ before six that reads as tuning is out of order.
 | Carrying the DECIDER's identity into the next moment, so a scope roots on it | No score moved, the table grew by half, and on a cyclic world the identity SEPARATED — costing `Rhythm` the moment that holds repair still | Siting it as MEMORY rather than metacognition, and a control whose codes never vary |
 | Curiosity read off the vote — `Unsure` on the margin, `Untested` on the weight | Both lose to a coin per ask, tenfold and fiftyfold over eight seeds: a conversation leaves the machine unsure exactly where nobody can answer | A signal saying whether a reply CAN settle, not whether the machine is sure |
 | Keeping every mention of a repeated word, and marking the last | Worse than dropping the repeat where a thing moves, and a marker for *nothing follows this* moved it nothing. More precedences give repair more to grab, so `wanting` falls to nought while the score does | A rung that can say a NEGATIVE — fork 30 |
+| A second hop in three shapes: every conclusion made live, the winner's alone, and only rules that USED one voting | Nought on the implied half in all three, and the run's own accuracy fell each time | RELEVANCE, or a sub-question — a question not NAMING the intermediate cannot trigger the link to it |
 | `Joining.Recent` — a word banded by how far back it was said | Half what narrowing the view buys, and the front end picks the bands | A band the learner mints. Fork 92 |
 | Background admitted to a WIDE genesis scope, a code in every moment being unable to change when the rule fires | A third of what the varied filter reaches at three tellings and three quarters at ten | A world where the varied gate refuses a code a conjunction needed |
 

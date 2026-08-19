@@ -380,8 +380,8 @@ public sealed class PopulationTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A perfect record at the miss floor is already significant, so a gate reading one
-    /// has nothing left to refuse.</b>
+    /// <b>A perfect record at the miss floor is already significant.</b> So a gate reading one
+    /// has nothing left to refuse.
     /// </summary>
     /// <remarks>
     /// <para>

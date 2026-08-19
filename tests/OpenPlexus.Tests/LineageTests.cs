@@ -135,8 +135,8 @@ public sealed class LineageTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The ladder says a minority lineage is never offered to repair, and that is an
-    /// observation rather than a mechanism.</b> <see cref="Repairing.AfterFailure"/> runs
+    /// <b>The ladder says a minority lineage is never offered to repair.</b> And that is an
+    /// observation rather than a mechanism. <see cref="Repairing.AfterFailure"/> runs
     /// <see cref="Population.Repair"/> only on a round the VOTE got wrong; under skew nearly
     /// every such round is a minority-outcome round, and on one of those a
     /// minority-expecting commitment expected CORRECTLY and cannot be a culprit. So the

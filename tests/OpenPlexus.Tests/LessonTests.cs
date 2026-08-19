@@ -688,4 +688,5 @@ public sealed class LessonTests(ITestOutputHelper output)
         // structural rather than a matter of evidence.
         Assert.Equal(reached[1], reached[20]);
     }
+
 }

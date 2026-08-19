@@ -9,7 +9,7 @@ namespace OpenPlexus.Tests;
 
 /// <summary>
 /// What would ever PROPOSE a scope naming no argument — <b>the half fork 33's price did
-/// not touch, and the only thing still standing between rung four and a run.</b>
+/// not touch.</b> And the only thing still standing between rung four and a run.
 /// </summary>
 /// <remarks>
 /// <para>

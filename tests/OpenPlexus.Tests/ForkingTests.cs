@@ -17,8 +17,8 @@ namespace OpenPlexus.Tests;
 /// fifty times the births at every majority rung, which is that fact counted.
 /// </para>
 /// <para>
-/// <b>So the budget has always been a re-derivation limit, which is already a finding here
-/// and has never been acted on.</b> A parent under two hundred and fifty-six spends nearly
+/// <b>So the budget has always been a re-derivation limit.</b> Which is already a finding here
+/// and has never been acted on. A parent under two hundred and fifty-six spends nearly
 /// all of it arriving where it already is. What has not been tried is spending those attempts
 /// somewhere else.
 /// </para>
@@ -176,8 +176,8 @@ public sealed class ForkingTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Fork 66 was closed with the answer *a re-derivation limit*, and that answer was
-    /// conditional on a mechanism nobody had changed.</b> Under the rule that ships a parent
+    /// <b>Fork 66 was closed with the answer *a re-derivation limit*.</b> And that answer was
+    /// conditional on a mechanism nobody had changed. Under the rule that ships a parent
     /// proposes the same child until its table drifts, so two hundred and fifty-six attempts
     /// buy two or three distinct children and the number cannot cap a search it is not
     /// running. Refuse a parent its spent codes and every attempt buys a NEW child, so the

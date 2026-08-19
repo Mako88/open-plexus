@@ -109,8 +109,8 @@ public interface IBus
     /// behind a wire that lost this one message does not change that by a bit.
     /// </para>
     /// <para>
-    /// <b>So it needs no politeness and no clock, which is what the asymmetry above was
-    /// right about and what it left unfinished.</b> A holder that crashed sends nothing, and
+    /// <b>So it needs no politeness and no clock.</b> Which is what the asymmetry above was
+    /// right about and what it left unfinished. A holder that crashed sends nothing, and
     /// a refused connection is that arriving by a faster road than a timeout — the sender's
     /// own failure to hand over, observed by the sender. The asker counting for itself was
     /// the right instinct; what it could count was the numerator, and this is the term that

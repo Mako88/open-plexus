@@ -565,4 +565,44 @@ public sealed class LessonTests(ITestOutputHelper output)
         Assert.True(reached[(Rooting.Wholly, Crediting.Nothing)] <= bar,
             "a blank record reaches one telling, so crediting is not needed and it should go");
     }
+
+    [Fact]
+    public void Told_once_and_contradicted_once_it_holds_the_correction_and_keeps_the_rest()
+    {
+        const int Seeds = 3;
+
+        // The two halves of John's ask, put together. A fact told once is held; a fact
+        // contradicted once is replaced; and nothing else moves either time.
+        var lesson = Lesson.Corrected;
+        var changed = lesson.Revisions.Count;
+
+        output.WriteLine($"{Seeds} seeds, told once, one examination pass");
+        output.WriteLine($"{"revising",-10}{"right",8}{"of",8}");
+
+        var right = new Dictionary<int, double>();
+
+        foreach (var many in new[] { 0, 1 })
+        {
+            var scored = new List<double>();
+
+            for (var seed = 1; seed <= Seeds; seed++)
+                scored.Add(Ran(
+                    lesson, Carrying.Never, seed, passes: 1, asserting: Asserting.Everything,
+                    tellings: 1, revising: many, rooting: Rooting.Wholly,
+                    crediting: Crediting.Birth).Tutor.Confirmed[0]);
+
+            right[many] = scored.Average();
+
+            output.WriteLine($"{many,-10}{scored.Average(),8:F1}{lesson.Exam.Count,8}");
+        }
+
+        // Never contradicted, it answers the nine it was told and misses the three it was not,
+        // which is exact rather than approximate.
+        Assert.Equal(lesson.Exam.Count - changed, right[0]);
+
+        // Contradicted ONCE, all three flip and none of the nine moves. Under the arm that
+        // picks a statement's claim by a corpus count this took five contradictions against
+        // twenty tellings — see the test above, which holds that reading.
+        Assert.Equal(lesson.Exam.Count, right[1]);
+    }
 }

@@ -225,8 +225,8 @@ public sealed class LineageTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The reading so far is an even world and a skewed one, which is two points and a
-    /// story joining them.</b> If blame starvation is really what stops the lineages, then
+    /// <b>The reading so far is an even world and a skewed one.</b> Which is two points and a
+    /// story joining them. If blame starvation is really what stops the lineages, then
     /// the minority's share of blame should fall smoothly as the world tilts, hard-round
     /// coverage should fall with it, and the arm that does not consult the vote should be
     /// flat across the whole range. Three curves with one shape is a mechanism; a step

@@ -151,8 +151,8 @@ public sealed class LatenessTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The arm is asserted to have run before anything else is read, and that ordering is
-    /// the point rather than tidiness.</b> A jitter arm that delayed nothing is a control
+    /// <b>The arm is asserted to have run before anything else is read.</b> And that ordering is
+    /// the point rather than tidiness. A jitter arm that delayed nothing is a control
     /// wearing the arm's name — this repo has shipped that exact failure, which is why
     /// <see cref="HybridBus.Delayed"/> is counted at all. A green test here with
     /// <c>Delayed</c> at nought would be the strongest possible evidence for a claim it

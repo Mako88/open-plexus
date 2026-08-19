@@ -589,8 +589,8 @@ before six that reads as tuning is out of order.
       generated world. Fork **124**.
     - **OPEN** — rarest is one split of a statement into scope and claim, and the brain does not
       choose it. What picks the claim with no experimenter. Fork **123**.
-    - **NOW** — a contradicted belief is REPLACED by being outvoted rather than retracted, far
-      more cheaply than installing. Uncontradicted facts do not move. John's.
+    - **NOW** — a contradicted belief is REPLACED by being outvoted rather than retracted, on
+      ONE contradiction, and uncontradicted facts do not move. John's.
     - **OPEN** — one brain process, worlds attached over a stream: fork **113**'s shape as a
       HOST. Blocked on cost, a pipe making every grid a round-trip. John's.
     - **OPEN** — with no outcome slot a commitment may expect any code in the successor, which

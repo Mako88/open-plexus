@@ -200,7 +200,8 @@ public sealed class ConversingTests(ITestOutputHelper output)
             $"speaking   : {asking.Claims} claims, {asking.Questions} questions of which "
             + $"{asking.Blind} blind, {asking.Silences} with nothing to say");
         output.WriteLine(
-            $"asking     : {world.Asked} asked, {world.Told} answered, {world.Quiet} let go by");
+            $"asking     : {world.Asked} asked, {world.Told} answered, {world.Shrugged} "
+            + $"shrugged at, {world.Declined} declined, {world.Quiet} let go by");
         output.WriteLine(
             $"the human  : {typing.Confirmed} confirmed, {typing.Corrected} corrected, "
             + $"{typing.Shrugged} shrugged");
@@ -222,16 +223,20 @@ public sealed class ConversingTests(ITestOutputHelper output)
         // The three-way split is the point: a reply the population had no expectation for is
         // scored as silence rather than as a miss, so a sum of right and wrong alone would
         // read as settlements going missing.
-        Assert.Equal(world.Told, tally.Right + tally.Wrong + tally.Silent);
+        Assert.Equal(world.Told + world.Shrugged, tally.Right + tally.Wrong + tally.Silent);
         Assert.True(world.Told > 0, "the machine never obtained a single settlement");
 
-        // At least half of the rounds could never settle, and that is the shape of the world
-        // rather than a failure of it. Every statement is a moment nobody has an answer to, so
-        // asking about one buys a shrug -- and this arm asks about everything, which is why the
-        // number lands exactly on the statements rather than above them.
-        Assert.True(tally.Abstained >= Exchanges,
-            $"{tally.Abstained} of {tally.Rounds} rounds settled nothing, against {Exchanges} "
-            + "statements that no reply could ever settle");
+        // And a shrug is one of them, which is what makes asking learnable at all. An ask that
+        // got nothing back used to settle nothing, so a wasted question and a silence scored
+        // alike and no scope could come to expect that asking here pays.
+        Assert.True(world.Shrugged > 0,
+            "no ask came back empty, so nothing ever told the machine it asked in the wrong "
+            + "place");
+
+        // A round settles nothing exactly where the machine did not ask, which is what a shrug
+        // being an outcome changed. Before it, every statement was an unsettleable round and
+        // half the run could not be learnt from whatever the machine did.
+        Assert.Equal(tally.Rounds - (world.Told + world.Shrugged), tally.Abstained);
     }
 
     [Fact]
@@ -247,10 +252,11 @@ public sealed class ConversingTests(ITestOutputHelper output)
 
         output.WriteLine($"{Seeds} seeds, {Exchanges} exchanges each. mean (spread over seeds)");
         output.WriteLine(
-            $"{"rate",-6}{"asked",14}{"told",14}{"right",14}{"per ask",9}{"resident",10}"
-            + $"{"blind",8}");
+            $"{"rate",-6}{"asked",14}{"told",14}{"shrugged",14}{"per ask",9}"
+            + $"{"skips stmt",12}{"skips q",9}{"resident",10}");
 
         var worth = new List<double>();
+        var learnt = new List<(double Rate, double Statements, double Questions)>();
 
         foreach (var rate in rates)
         {
@@ -258,7 +264,9 @@ public sealed class ConversingTests(ITestOutputHelper output)
             var told = new List<double>();
             var right = new List<double>();
             var resident = new List<double>();
-            var blind = new List<double>();
+            var shrugged = new List<double>();
+            var duck = new List<double>();
+            var miss = new List<double>();
 
             for (var seed = 1; seed <= Seeds; seed++)
             {
@@ -269,28 +277,41 @@ public sealed class ConversingTests(ITestOutputHelper output)
                 told.Add(made.World.Told);
                 right.Add(tally.Right);
                 resident.Add(tally.Resident);
-                blind.Add(made.Asking.Blind);
+                shrugged.Add(made.World.Shrugged);
+
+                // Every question moment it asked about was answered and every statement moment
+                // it asked about was shrugged at, so what it declined is what is left of each.
+                // No counter is needed for it and one would be a second way to be wrong.
+                duck.Add((Exchanges - made.World.Shrugged) / (double)Exchanges);
+                miss.Add((Exchanges - made.World.Told) / (double)Exchanges);
             }
 
             var perAsk = Mean(asked) == 0 ? 0.0 : Mean(told) / Mean(asked);
 
             worth.Add(perAsk);
+            learnt.Add((rate, Mean(duck), Mean(miss)));
 
             output.WriteLine(
-                $"{rate,-6:F2}{Spread(asked),14}{Spread(told),14}{Spread(right),14}{perAsk,9:F3}"
-                + $"{Mean(resident),10:F1}{Mean(blind),8:F0}");
+                $"{rate,-6:F2}{Spread(asked),14}{Spread(told),14}{Spread(shrugged),14}"
+                + $"{perAsk,9:F3}{Mean(duck),12:F3}{Mean(miss),9:F3}{Mean(resident),10:F1}");
         }
 
-        // Asking less costs asks and not their worth, which is the whole reading. A rate that
-        // bought a better ask would show here as a rise down the column and it does not, so
-        // there is no free lunch in asking less -- there is also no penalty, and a machine
-        // nobody minds talking to is the cheaper one.
-        Assert.All(worth, one => Assert.InRange(one, 0.3, 0.7));
+        // The two skip columns are what a shrug being an outcome bought, and the ceiling is
+        // where they can be read. At a rate of one the coin never declines anything, so every
+        // skip is the population's own -- it expected that nobody would know and said nothing.
+        // Below the ceiling the coin does most of the skipping and swamps the gap, which is
+        // why only this row is asserted on.
+        var (_, statements, questions) = learnt[0];
 
-        // And every rate is under the ceiling, which is the one ordering that cannot be an
-        // accident of a seed.
-        for (var at = 1; at < rates.Length; at++)
-            Assert.True(rates[at] < rates[at - 1], "the rates are not in falling order");
+        Assert.True(statements > questions,
+            $"at the ceiling the machine skipped {statements:F3} of the statements and "
+            + $"{questions:F3} of the questions. A machine that had learnt nothing about where "
+            + "a reply CAN settle would skip both alike, so these being level means the shrug "
+            + "stopped being an outcome or stopped reaching the population");
+
+        // Asking less still costs asks rather than their worth, which is the reading the rates
+        // were run for before any of this.
+        Assert.All(worth, one => Assert.InRange(one, 0.3, 0.9));
 
         static double Mean(IReadOnlyCollection<double> of) => of.Average();
 

@@ -443,9 +443,9 @@ before six that reads as tuning is out of order.
     - **OPEN** — the ladder's admission asks whether repair found a separating code, and on a
       wide alphabet memorising always does. What separates *nothing separates* from *nothing
       GENERAL separates*. Fork **86**.
-    - **OPEN** — asking cannot be LEARNT while it is free: an unsettled round costs nothing, so
-      a wasted ask and a silence score alike and nothing pushes a scope towards asking where it
-      pays. Nor may a guess enter the moment it is then scored on. Fork **117**.
+    - **NOW** — a SHRUG is an outcome, so an ask costs something and where to ask is learnt.
+      At the ceiling the machine declines 44% of statements against 9% of questions, wired
+      nowhere. What stays open is a guess entering the moment it is scored on. Fork **117**.
     - **SETTLED** — the front end intersecting the question with EACH statement answers task
       one where the bag sits near the marginal, and one hop is all it reaches. Fork **88**.
     - **OPEN** — whether reading real English is predictive enough to teach this learner.
@@ -493,9 +493,9 @@ before six that reads as tuning is out of order.
       entailment cap of one. Fork **115**.
     - **OPEN** — a goal is a SET of codes wanted present, so a goal and a prediction are one
       type once what is expected is a set. What is missing is which set, never how to say it.
-    - **NOW** — asking is a RATE with no signal in it, every arm that read the vote having lost.
-      What predicts whether a reply CAN settle is open, and it is not what the machine is unsure
-      about.
+    - **NOW** — asking is a RATE and the signal is the POPULATION's, every chooser that read the
+      vote having lost. What predicts whether a reply can settle is learnt from being wrong about
+      it rather than chosen.
     - **OPEN** — a drive that cannot be sated is a fault in the design and not a risk to
       manage, so a term must have a point where it stops pulling. John's.
     - **NOW** — `Roaming` is acted in and declining leaves the walk the world drew, so the

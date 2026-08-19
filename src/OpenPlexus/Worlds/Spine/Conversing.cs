@@ -112,12 +112,38 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
         Question,
     }
 
+    /// <summary>The outcome meaning nobody knew.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A shrug is an arrival and not a silence</b>, which is what makes it settleable. C2
+    /// forbids a miss decided by a deadline because late and absent cannot be told apart; a
+    /// human who was asked and said they did not know has said something, and the machine was
+    /// there when they said it.
+    /// </para>
+    /// <para>
+    /// <b>And it is what makes asking learnable</b>. An ask that got nothing used to settle
+    /// nothing, so a wasted question and a silence scored alike and no scope could ever come to
+    /// expect that asking here pays. With this the machine is wrong about something when it
+    /// asks a question nobody can answer, which is the whole of what it eats.
+    /// </para>
+    /// <para>
+    /// <b>Nought, and no typed word ever reaches it</b>. It is seeded before anything is heard
+    /// and is kept out of the word index, so nothing the human types names it and a blind
+    /// question can never be about it.
+    /// </para>
+    /// </remarks>
+    public const int Nothing = 0;
+
     /// <param name="settings">Where the conversation is read from and printed to.</param>
     public Conversing(ConversingSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
 
         _settings = settings;
+
+        // First, so it is outcome nought whatever else arrives. It goes into the vocabulary and
+        // into neither map, which is what keeps it unreachable from anything typed.
+        _vocabulary.Add("(nobody knew)");
 
         foreach (var word in settings.Words) Heard(word);
     }
@@ -140,6 +166,17 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     /// round the machine spent its one chance to learn on and got nothing back.
     /// </remarks>
     public long Told { get; private set; }
+
+    /// <summary>How many of its asks got <see cref="Nothing"/> back.</summary>
+    /// <remarks>
+    /// <b>The cost of asking</b>, and it is a settlement rather than a waste. A machine that
+    /// keeps asking questions nobody can answer is a machine being told, over and over, that it
+    /// is asking in the wrong place.
+    /// </remarks>
+    public long Shrugged { get; private set; }
+
+    /// <summary>How many times it expected that nobody would know, and said nothing.</summary>
+    public long Declined { get; private set; }
 
     /// <summary>How many lines the machine let go by without saying anything.</summary>
     /// <remarks>
@@ -234,6 +271,18 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
 
         var word = _vocabulary[chosen / 2];
 
+        // The machine expecting that nobody knows is the machine deciding not to ask, and it is
+        // the point of making a shrug an outcome. A question about `(nobody knew)` is not a
+        // question, so this is the one place a doing turns back into staying quiet -- learnt
+        // rather than wired, because what put it there was being wrong on the statements.
+        if (chosen / 2 == Nothing)
+        {
+            Declined++;
+            Quiet++;
+
+            return;
+        }
+
         if (chosen % 2 == 0)
         {
             _did = Spoke.Claim;
@@ -268,7 +317,8 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
 
         _settled = Answering(told, word);
 
-        if (_settled is not null) Told++;
+        if (_settled == Nothing) Shrugged++;
+        else if (_settled is not null) Told++;
     }
 
     /// <summary>What a reply to <c>? word</c> settles on.</summary>
@@ -294,9 +344,14 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     {
         var words = Babi.Words(told);
 
-        if (words.Count == 0) return null;
+        // Nobody knew, which is a settlement rather than the absence of one.
+        if (words.Count == 0) return Nothing;
 
         if (string.Equals(words[0], "yes", StringComparison.Ordinal)) return Heard(word);
+
+        // And a refusal is neither. `No` says the answer is not this word and says nothing about
+        // what it is, and the counters here are monotone with no way to record a negative -- so
+        // recording one would be inventing evidence. Fork **30** is where that is answered.
         if (string.Equals(words[0], "no", StringComparison.Ordinal)) return null;
 
         return Heard(words[0]);

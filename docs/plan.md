@@ -431,6 +431,9 @@ before six that reads as tuning is out of order.
     - **OPEN** — the live problem is which rule gets the seat, and two arms at it have
       failed. Almost none of the population is read, so a gate changing what is HELD cannot
       reach what decides — read the revival rows before a third.
+    - **OPEN** — and the gap IS the seat, now that a lesson can be enumerated: every claiming
+      arm holds a rule for every truth stated and they answer wildly different shares of the
+      examination.
     - **OPEN** — `Alternating` is derived offline, and re-deriving orphans every scope holding
       a category, its name being its members. Add-only, as `Naming` is.
     - **OPEN** — mutual exclusion is unbuilt, so a belief can be wrong and never CONTRADICTED.
@@ -602,8 +605,8 @@ before six that reads as tuning is out of order.
       Told once, it answers an exam never sat. John's. Forks **121** and **123**.
     - **NOW** — and a source owing moments is drained before a new line is read, so a scripted
       one cannot be advanced past a sentence still arriving.
-    - **OPEN** — claiming, width and crediting are all load-bearing and unweighed on any
-      generated world. Fork **124**.
+    - **SETTLED** — claiming, width and crediting all reproduce on drawn lessons, so none of
+      those readings was about the one hand-written text. Fork **124**.
     - **SETTLED** — claiming every word makes a rule wrong on its own sentence's other claims,
       and the churn that bought was children too small to judge. Fork **126**, by **86**.
     - **OPEN** — rarest is one split of a statement into scope and claim, and the brain does not

@@ -389,7 +389,13 @@ public sealed class DocsTests
     // Nought over eight seeds in two shapes, and the reason is what the words buy -- the
     // chooser had already refused to repeat what it said, so the fact was acted on before the
     // code arrived.
-    private const int Whole = 11_870;
+    //
+    // And 11,912 is the thirty-fourth raise, forty-two words for one entry closing and one
+    // sharpening. Claiming, width and crediting all reproduce on drawn lessons, so none of
+    // those readings was about the single hand-written text -- and a drawn lesson knows every
+    // truth it states, which is what lets the second entry say the gap is the seat rather
+    // than the search.
+    private const int Whole = 11_912;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

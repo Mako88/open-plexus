@@ -1,7 +1,25 @@
-using System.Text;
+﻿using System.Text;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
+
+/// <summary>One thing a lesson states: what it is about, and the word that answers it.</summary>
+/// <remarks>
+/// <b>The world's truth rather than the exam's</b>, and the two are different sets. An exam
+/// asks about some of what was told; this is all of it, so a population can be asked how much
+/// of the world it found rather than only how many questions it got right.
+/// </remarks>
+public readonly record struct Fact
+{
+    /// <summary>Which thing the fact is about.</summary>
+    public required string Subject { get; init; }
+
+    /// <summary>Which property of it.</summary>
+    public required string Attribute { get; init; }
+
+    /// <summary>The word that is true of the two together.</summary>
+    public required string Answer { get; init; }
+}
 
 /// <summary>One examination question and the answer the lesson says it has.</summary>
 public readonly record struct Quiz
@@ -57,6 +75,194 @@ public sealed record Lesson
     /// much correction that takes is the reading rather than the design.
     /// </remarks>
     public IReadOnlyList<string> Revisions { get; init; } = [];
+
+    /// <summary>
+    /// Every truth this lesson states, as the subject and property it is about and the word
+    /// that answers it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Read out of the statements rather than kept beside them</b>, so there is no answer
+    /// key to drift. A key written by hand is a second copy of the lesson and the two go out
+    /// of step silently — an answer key in the wrong alphabet scores nought and looks like a
+    /// verdict, which is a trap this repo has already paid for.
+    /// </para>
+    /// <para>
+    /// <b>What it makes possible is COVERAGE</b>, which no reading on this world has had. An
+    /// accuracy says how many questions were answered and nothing about how much of the world
+    /// was found, and the two come apart exactly where a population is memorising.
+    /// </para>
+    /// <para>
+    /// <b>A category line states no fact and is left out</b>, which the shape decides rather
+    /// than a list of exceptions. <i>The cat covering is fur</i> puts <c>is</c> in the middle;
+    /// <i>the cat is an animal</i> puts it earlier, and says which group a thing is in rather
+    /// than what is true of it.
+    /// </para>
+    /// <para>
+    /// <b>And a revision replaces rather than joins</b>, because that is what being corrected
+    /// means. A lesson told that the cat food is bread holds one fact about the cat food, and
+    /// counting both would make a machine that learnt the correction look half right.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyList<Fact> Facts
+    {
+        get
+        {
+            var held = new Dictionary<(string, string), string>();
+            var order = new List<(string Subject, string Attribute)>();
+
+            foreach (var line in Statements.Concat(Revisions))
+            {
+                var words = Babi.Words(line);
+
+                // `the X Y is Z`, and nothing else. A shorter line is a category and a longer
+                // one is a sentence this lesson shape does not make.
+                if (words.Count != 5) continue;
+                if (!string.Equals(words[0], "the", StringComparison.Ordinal)) continue;
+                if (!string.Equals(words[3], "is", StringComparison.Ordinal)) continue;
+
+                var about = (words[1], words[2]);
+
+                if (!held.ContainsKey(about)) order.Add(about);
+
+                held[about] = words[4];
+            }
+
+            return
+            [
+                .. order.Select(one => new Fact
+                {
+                    Subject = one.Subject,
+                    Attribute = one.Attribute,
+                    Answer = held[(one.Subject, one.Attribute)],
+                }),
+            ];
+        }
+    }
+
+    /// <summary>A lesson of the same shape with every word drawn, so the world moves.</summary>
+    /// <param name="subjects">How many things the lesson is about.</param>
+    /// <param name="attributes">How many properties each of them has.</param>
+    /// <param name="seed">The draw, so a run reproduces.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>What a hand-written lesson cannot say</b> is whether a result is about the lesson.
+    /// One text held still is what an adjustment is read against, and it is also a single
+    /// sample: an arm that wins on four creatures and three properties may be winning on that
+    /// text. Drawing the words puts a spread under every reading that had none.
+    /// </para>
+    /// <para>
+    /// <b>And the size is what the arms are actually about.</b> Claiming every word of a
+    /// statement costs a population that grows with the telling, so how it scales is a fact
+    /// about the number of subjects and properties rather than about English — and twelve
+    /// facts is one point on that curve with nothing either side of it.
+    /// </para>
+    /// <para>
+    /// <b>Nonsense words on purpose, and pronounceable on purpose.</b> A word is one hash
+    /// here, so drawn syllables and English are the same input to the learner; a transcript is
+    /// read by a person, and <i>the vok mig is dus</i> can be followed while a hash cannot.
+    /// Nothing is drawn twice, so no value is also a subject and no accidental link exists
+    /// that the lesson did not state.
+    /// </para>
+    /// <para>
+    /// <b>The category line is drawn too and still answers nothing</b>, which keeps the
+    /// distractor the hand-written lesson has. One word in every subject's statements and in
+    /// no answer is a rule that covers the whole lesson and is right about nothing.
+    /// </para>
+    /// <para>
+    /// <b>Blocked by subject, as the written one is</b>, so the arms are comparable. A
+    /// question about the first subject has every other subject's statements in front of it,
+    /// which is what keeps the no-learning bar low.
+    /// </para>
+    /// </remarks>
+    public static Lesson Drawn(int subjects, int attributes, int seed)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(subjects, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(attributes, 1);
+
+        var draw = new Random(seed);
+
+        // One pool drawn without replacement, which is what stops a value also being a
+        // subject. A link the lesson never stated would be a link the learner could find, and
+        // a world whose ground truth is not what it says is not ground truth.
+        var pool = Words(draw, 1 + subjects + attributes + (subjects * attributes));
+        var at = 0;
+
+        var category = pool[at++];
+        var named = pool.Skip(at).Take(subjects).ToList();
+
+        at += subjects;
+
+        var properties = pool.Skip(at).Take(attributes).ToList();
+
+        at += attributes;
+
+        var statements = new List<string>();
+        var exam = new List<Quiz>();
+
+        foreach (var subject in named)
+        {
+            statements.Add($"the {subject} is a {category}.");
+
+            foreach (var property in properties)
+            {
+                var answer = pool[at++];
+
+                statements.Add($"the {subject} {property} is {answer}.");
+                exam.Add(new Quiz
+                {
+                    Question = $"what is the {subject} {property}?",
+                    Answer = answer,
+                });
+            }
+        }
+
+        // Shuffled, because the exam order of the written lesson is not its telling order and
+        // asking in the order told would put every question beside the statement that answers
+        // it. That is a recency bar this world exists to sit under.
+        for (var one = exam.Count - 1; one > 0; one--)
+        {
+            var other = draw.Next(one + 1);
+
+            (exam[one], exam[other]) = (exam[other], exam[one]);
+        }
+
+        return new Lesson
+        {
+            About = $"{subjects} drawn things and {attributes} properties of each",
+            Statements = statements,
+            Exam = exam,
+        };
+    }
+
+    /// <summary>Distinct pronounceable nonsense words, drawn without replacement.</summary>
+    /// <param name="draw">The draw.</param>
+    /// <param name="many">How many are wanted.</param>
+    /// <remarks>
+    /// <b>Rejection rather than repair</b>, so the draw is what decides and a collision costs
+    /// a redraw rather than a suffix. A word patched to be unique would put a systematic
+    /// pattern in exactly the words that collided.
+    /// </remarks>
+    private static IReadOnlyList<string> Words(Random draw, int many)
+    {
+        const string Consonants = "bdfgklmnprstvz";
+        const string Vowels = "aeiou";
+
+        var found = new List<string>();
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+
+        while (found.Count < many)
+        {
+            var word = string.Concat(
+                Consonants[draw.Next(Consonants.Length)],
+                Vowels[draw.Next(Vowels.Length)],
+                Consonants[draw.Next(Consonants.Length)]);
+
+            if (seen.Add(word)) found.Add(word);
+        }
+
+        return found;
+    }
 
     /// <summary>Four creatures and three properties each, with a category over them.</summary>
     /// <remarks>

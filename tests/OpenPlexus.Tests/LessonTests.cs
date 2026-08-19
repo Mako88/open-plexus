@@ -23,7 +23,7 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class LessonTests(ITestOutputHelper output)
 {
-    private static (Tally Tally, Tutor Tutor, Conversing World) Ran(
+    private static (Tally Tally, Tutor Tutor, Conversing World, Brain Brain) Ran(
         Lesson lesson, Carrying carrying, int seed, int passes, int capacity = 2000,
         Asserting asserting = Asserting.Nothing, int tellings = 1, int revising = 0,
         Rooting rooting = Rooting.Singly, Crediting crediting = Crediting.Nothing,
@@ -61,7 +61,7 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         var tally = new Bench(watching, brain).Run(rounds, sweep: 200, target: 0.9, window: 50);
 
-        return (tally, tutor, world);
+        return (tally, tutor, world, brain);
     }
 
     /// <summary>The four arms this file compares, as the brain's own numbers.</summary>
@@ -84,9 +84,385 @@ public sealed class LessonTests(ITestOutputHelper output)
             ? null
             : said.Asking ? Conversing.Asks(word) : Conversing.Asserts(word);
 
+    /// <summary>What share of the lesson's truths the population actually holds.</summary>
+    /// <param name="brain">Whose population is read.</param>
+    /// <param name="world">The conversation, for the outcome each word was numbered as.</param>
+    /// <param name="lesson">The world's whole truth, whether or not it was examined.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>An accuracy says how many questions were answered</b> and this says how much was
+    /// found, and the two come apart exactly where a population is memorising. Reporting
+    /// only the first is this repo's own trap: on a world with known ground truth, report how
+    /// much of it was found.
+    /// </para>
+    /// <para>
+    /// <b>A fact is held where SOME commitment says it</b>, rather than where the vote does.
+    /// Whether the right rule wins its round is what the accuracy already measures; this asks
+    /// the prior question of whether the rule is there at all, and the two failures want
+    /// separating — a population that never found the rule and one that found it and is
+    /// outvoted read alike on a score.
+    /// </para>
+    /// <para>
+    /// <b>The scope must NAME both halves and may name more.</b> A rule keyed on the subject
+    /// and the property is the one the lesson states; a narrower one that also names the
+    /// category is a specialisation of it and still says the fact. A rule naming only the
+    /// subject says something the lesson does not.
+    /// </para>
+    /// </remarks>
+    private static double Found(Brain brain, Conversing world, Lesson lesson)
+    {
+        var facts = lesson.Facts;
+
+        if (facts.Count == 0) return 0.0;
+
+        var held = 0;
+
+        foreach (var fact in facts)
+        {
+            var subject = Babi.Of(fact.Subject);
+            var attribute = Babi.Of(fact.Attribute);
+
+            // The word as this world numbered it, which is the only place the answer alphabet
+            // lives. A word the conversation never heard has no outcome and no rule can expect
+            // it, which reads as the fact not being found -- and it is not.
+            var answer = world.Vocabulary
+                .Select((word, at) => (Word: word, At: at))
+                .Where(one => string.Equals(one.Word, fact.Answer, StringComparison.Ordinal))
+                .Select(one => (int?)one.At)
+                .FirstOrDefault();
+
+            if (answer is not { } outcome) continue;
+
+            var says = Brain.Says(outcome);
+
+            if (brain.Held.All.Any(one =>
+                one.Expects == says
+                && one.Scope.Contains(subject)
+                && one.Scope.Contains(attribute)))
+                held++;
+        }
+
+        return held / (double)facts.Count;
+    }
+
+    /// <summary>One arm read over several lessons, as the numbers every grid here wants.</summary>
+    /// <param name="seeds">How many lessons and brains.</param>
+    /// <param name="purpose">This grid's own mixer, so two grids do not share eight worlds.</param>
+    /// <param name="written">The hand-written lesson rather than a drawn one.</param>
+    /// <param name="carrying">How much of the topic a moment holds.</param>
+    /// <param name="asserting">What a told statement claims.</param>
+    /// <param name="tellings">How many times the lesson is told.</param>
+    /// <param name="crediting">Whether a mint is credited with the round that made it.</param>
+    /// <remarks>
+    /// <b>Extracted because <c>DuplicationTests</c> refused the second copy</b>, which is the
+    /// right refusal: three grids each with their own seed loop is three chances for one
+    /// grid's worlds to differ from the grid it is read against.
+    /// </remarks>
+    private static (List<double> Right, List<double> Found, List<double> Resident) Over(
+        int seeds, uint purpose, bool written, Carrying carrying, Asserting asserting,
+        int tellings, Crediting crediting = Crediting.Nothing)
+    {
+        var right = new List<double>();
+        var found = new List<double>();
+        var resident = new List<double>();
+
+        for (var index = 0; index < seeds; index++)
+        {
+            // Mixed rather than counted, because .NET gives near-neighbour seeds streams that
+            // agree far more than chance allows -- and that agreement comes straight off the
+            // standard error, making every arm look more separated than it is. The mixing is a
+            // pure function of the index, so the arms stay paired.
+            var seed = Worlds.Seeds.Apart(index, purpose);
+
+            var lesson = written
+                ? Lesson.Creatures
+                : Lesson.Drawn(subjects: 4, attributes: 3, seed);
+
+            var ran = Ran(
+                lesson, carrying, seed, passes: 1, asserting: asserting, tellings: tellings,
+                crediting: crediting);
+
+            right.Add(Right(ran.Tutor, pass: 0));
+            found.Add(Found(ran.Brain, ran.World, lesson));
+            resident.Add(ran.Tally.Resident);
+        }
+
+        return (right, found, resident);
+    }
+
     /// <summary>What share of one pass's questions were answered right.</summary>
     private static double Right(Tutor tutor, int pass) =>
         tutor.Put[pass] == 0 ? 0.0 : tutor.Confirmed[pass] / (double)tutor.Put[pass];
+
+    /// <summary>
+    /// What a statement claims, re-taken on a world that moves and with coverage beside the
+    /// score.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Every reading that put claiming in the code</b> was taken on one hand-written text.
+    /// One text is what an adjustment is read against and it is also a single sample, so an
+    /// arm that wins on four creatures and three properties may be winning on that lesson.
+    /// Drawing the words puts a spread under it.
+    /// </para>
+    /// <para>
+    /// <b>And coverage is the reading none of them had.</b> An accuracy says how many
+    /// questions were answered; this says how much of the world was found, and the two come
+    /// apart exactly where a population is memorising. A drawn lesson knows every truth it
+    /// states, which is what makes the second number possible at all.
+    /// </para>
+    /// <para>
+    /// <b>The kill line, written before the grid ran</b>: claiming every word that does not
+    /// beat claiming nothing on a drawn lesson means the reading that put it in the code was
+    /// about the hand-written text.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_a_statement_claims_read_on_a_lesson_that_is_drawn_rather_than_written()
+    {
+        const int Seeds = 8;
+
+        // This grid's own, so its seeds do not coincide with another grid's and two readings
+        // taken on the same eight worlds are not read as two samples.
+        const uint Purpose = 0x0C1A_1DED;
+
+        var scored = new Dictionary<Asserting, (double Mean, double Error)>();
+        var covered = new Dictionary<Asserting, double>();
+
+        output.WriteLine($"{Seeds} drawn lessons, 4 things and 3 properties, told once");
+        output.WriteLine(
+            "told lesson   claiming      right             found             resident");
+
+        foreach (var many in new[] { 1, 8 })
+        foreach (var written in new[] { true, false })
+        foreach (var asserting in new[]
+        {
+            Asserting.Nothing, Asserting.Rarest, Asserting.Withheld, Asserting.Everything,
+        })
+        {
+            var (right, found, resident) = Over(
+                Seeds, Purpose, written, Carrying.Never, asserting, many);
+
+            var measured = new Measured { Arm = asserting.ToString(), Values = [.. right] };
+
+            if (!written && many == 8)
+            {
+                scored[asserting] = (measured.Mean, measured.StdErr);
+                covered[asserting] = found.Average();
+            }
+
+            output.WriteLine(
+                $"{many,-4}{(written ? "written" : "drawn  "),-9}{asserting,-11}"
+                + $"{Sweep.Spread(right),18}{Sweep.Spread(found),18}"
+                + $"{resident.Average(),9:F1}");
+        }
+
+        // The kill line. Every reading that put claiming in the code was taken on one text,
+        // and a drawn lesson is where that stops being a single sample.
+        var (nothing, nothingError) = scored[Asserting.Nothing];
+        var (everything, everythingError) = scored[Asserting.Everything];
+
+        var gap = everything - nothing;
+        var error = Math.Sqrt((nothingError * nothingError)
+            + (everythingError * everythingError));
+
+        Assert.True(gap - (3.0 * error) > 0.0,
+            $"claiming every word answered {everything:F3} of the examination against "
+            + $"{nothing:F3} for claiming nothing, a gap of {gap:F3} ±{error:F3} -- inside "
+            + "three standard errors. The reading that put claiming in the code was about the "
+            + "hand-written lesson rather than about the mechanism");
+
+        // And claiming nothing finds nothing, which is the same statement one level down. A
+        // statement that settles nothing takes no score, no genesis and no repair, so this is
+        // nought by construction and is asserted because a nought nobody checks reads the same
+        // as a mechanism that stopped running.
+        Assert.Equal(0.0, covered[Asserting.Nothing]);
+
+        // The reading coverage is here for, and it is not one a score can make. Every arm that
+        // claims anything holds a rule for EVERY fact the lesson states, and they answer
+        // wildly different shares of the examination -- so what separates them at this many
+        // tellings is which rule wins its round rather than which rules were found. The arm
+        // that scores best does it with an order of magnitude more population, which is a vote
+        // advantage and not a discovery one.
+        foreach (var asserting in new[]
+        {
+            Asserting.Rarest, Asserting.Withheld, Asserting.Everything,
+        })
+            Assert.Equal(1.0, covered[asserting]);
+
+        Assert.True(scored[Asserting.Rarest].Mean < scored[Asserting.Everything].Mean,
+            $"claiming the rarest word answered {scored[Asserting.Rarest].Mean:F3} and "
+            + $"claiming every word {scored[Asserting.Everything].Mean:F3} while both hold "
+            + "every rule the lesson states. These being level would mean the population is "
+            + "what separates the arms, and it is not");
+    }
+
+    /// <summary>What a moment carries, re-taken on a world that moves.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The same worry one axis over.</b> Width was measured on the single text claiming
+    /// was, so the same question applies: is the ordering a fact about the mechanism, or about
+    /// four creatures and three properties.
+    /// </para>
+    /// <para>
+    /// <b>Read at the claiming arm that learns and stays small.</b> Claiming every word wins
+    /// the examination with an order of magnitude more population, which would put this axis
+    /// under a ceiling — every cell answering everything says nothing about width.
+    /// </para>
+    /// <para>
+    /// <b>The kill line, written before the grid ran</b>: a width ordering that does not
+    /// reproduce on drawn lessons was about the text.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_a_moment_carries_read_on_a_lesson_that_is_drawn_rather_than_written()
+    {
+        const int Seeds = 8;
+        const uint Purpose = 0x0C1A_2DED;
+        const int Tellings = 8;
+
+        var scored = new Dictionary<(bool Written, Carrying Carrying), double>();
+
+        output.WriteLine($"{Seeds} lessons, 4 things and 3 properties, told {Tellings} times");
+        output.WriteLine("lesson   carrying    right             found             resident");
+
+        foreach (var written in new[] { true, false })
+        foreach (var carrying in new[] { Carrying.Always, Carrying.Statements, Carrying.Never })
+        {
+            var (right, found, resident) = Over(
+                Seeds, Purpose, written, carrying, Asserting.Withheld, Tellings);
+
+            scored[(written, carrying)] = right.Average();
+
+            output.WriteLine(
+                $"{(written ? "written" : "drawn  "),-9}{carrying,-12}"
+                + $"{Sweep.Spread(right),18}{Sweep.Spread(found),18}{resident.Average(),9:F1}");
+        }
+
+        // The width ordering, matched cell for cell against the written lesson. Asserting that
+        // the two AGREE rather than which way round they go is what keeps this a check on the
+        // world rather than a prediction written into a wiring test.
+        foreach (var (one, other) in new[]
+        {
+            (Carrying.Always, Carrying.Statements),
+            (Carrying.Statements, Carrying.Never),
+            (Carrying.Always, Carrying.Never),
+        })
+            Assert.True(
+                scored[(true, one)].CompareTo(scored[(true, other)])
+                    == scored[(false, one)].CompareTo(scored[(false, other)]),
+                $"{one} against {other} orders one way on the written lesson and another on "
+                + "eight drawn ones, so the width reading was about the text rather than "
+                + "about what a moment carries");
+    }
+
+    /// <summary>Whether crediting a mint with its own round pays on a world that moves.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Read where the arms are still apart.</b> Believing a rule a telling sooner is worth
+    /// nothing once there have been enough tellings for both arms to believe it, so a grid at
+    /// the width reading's eight tellings returns the same number in every cell — a check
+    /// that cannot fail, which reads exactly like one that passes.
+    /// </para>
+    /// <para>
+    /// <b>The kill line, written before the grid ran</b>: a credited arm that does not lead at
+    /// the tellings where the two are apart means the written lesson was what the reading was
+    /// about.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_crediting_a_mint_pays_on_a_lesson_that_is_drawn_rather_than_written()
+    {
+        const int Seeds = 8;
+        const uint Purpose = 0x0C1A_3DED;
+
+        int[] tellings = [1, 2, 3, 8];
+
+        var blank = new Dictionary<int, double>();
+        var credited = new Dictionary<int, double>();
+
+        output.WriteLine($"{Seeds} drawn lessons, 4 things and 3 properties");
+        output.WriteLine("told   blank             credited          found");
+
+        foreach (var many in tellings)
+        {
+            var (one, _, _) = Over(
+                Seeds, Purpose, written: false, Carrying.Never, Asserting.Withheld, many);
+
+            var (other, found, _) = Over(
+                Seeds, Purpose, written: false, Carrying.Never, Asserting.Withheld, many,
+                Crediting.Birth);
+
+            blank[many] = one.Average();
+            credited[many] = other.Average();
+
+            output.WriteLine(
+                $"{many,-7}{Sweep.Spread(one),18}{Sweep.Spread(other),18}"
+                + $"{Sweep.Spread(found),18}");
+        }
+
+        // Never behind, which is the weak half and the one that holds everywhere.
+        Assert.All(tellings, many => Assert.True(credited[many] >= blank[many],
+            $"at {many} telling(s) the credited arm read {credited[many]:F3} and the blank "
+            + $"one {blank[many]:F3}, so believing a rule sooner cost something"));
+
+        // And ahead somewhere, or the arms are one arm and the dial is decoration.
+        Assert.Contains(tellings, many => credited[many] > blank[many]);
+    }
+
+    [Fact]
+    public void A_drawn_lesson_states_every_truth_it_examines_and_no_word_twice()
+    {
+        var lesson = Lesson.Drawn(subjects: 4, attributes: 3, seed: 1);
+
+        output.WriteLine(lesson.About);
+
+        foreach (var line in lesson.Statements) output.WriteLine($"  {line}");
+
+        output.WriteLine(string.Empty);
+
+        foreach (var quiz in lesson.Exam)
+            output.WriteLine($"  {quiz.Question} -> {quiz.Answer}");
+
+        // One fact a subject-property pair, and the category lines state none. A generator
+        // whose count drifted from its shape would put a grid under a world nobody described.
+        Assert.Equal(4 * 3, lesson.Facts.Count);
+        Assert.Equal((4 * 3) + 4, lesson.Statements.Count);
+
+        // Every question is answered by a fact the lesson stated, which is what makes it an
+        // examination rather than a guess. An answer key in the wrong alphabet scores nought
+        // and looks like a verdict.
+        var truths = lesson.Facts
+            .ToDictionary(one => (one.Subject, one.Attribute), one => one.Answer);
+
+        foreach (var quiz in lesson.Exam)
+        {
+            var words = Babi.Words(quiz.Question);
+
+            Assert.Equal(quiz.Answer, truths[(words[3], words[4])]);
+        }
+
+        // And nothing is drawn twice, which is what stops a link the lesson never stated. A
+        // value that was also a subject would let a rule reach an answer through a word that
+        // happens to be spelt the same, and no reading could tell that from learning.
+        var used = lesson.Statements
+            .SelectMany(Babi.Words)
+            .Where(word => word is not ("the" or "is" or "a"))
+            .ToList();
+
+        Assert.Equal(1 + 4 + 3 + (4 * 3), used.Distinct(StringComparer.Ordinal).Count());
+
+        // Two seeds draw two lessons, or the world is not moving and the spread under every
+        // reading is the spread of one text measured twice.
+        Assert.NotEqual(
+            lesson.Statements,
+            Lesson.Drawn(subjects: 4, attributes: 3, seed: 2).Statements);
+
+        // And one seed draws one lesson, twice.
+        Assert.Equal(
+            lesson.Statements,
+            Lesson.Drawn(subjects: 4, attributes: 3, seed: 1).Statements);
+    }
 
     [Fact]
     public void A_paragraph_typed_at_once_arrives_one_sentence_a_moment()
@@ -145,7 +521,7 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         for (var seed = 1; seed <= Seeds; seed++)
         {
-            var (tally, tutor, _) = Ran(Lesson.Creatures, Carrying.Always, seed, Passes);
+            var (tally, tutor, _, _) = Ran(Lesson.Creatures, Carrying.Always, seed, Passes);
 
             output.WriteLine(
                 $"seed {seed}: {tally.Minted} minted, {tally.Resident} resident, last pass "

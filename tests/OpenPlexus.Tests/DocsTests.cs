@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 
 namespace OpenPlexus.Tests;
@@ -255,7 +255,18 @@ public sealed class DocsTests
     // a `Committed` code is a dictionary key and never enters a moment, so nothing can root
     // on one anywhere. Correcting a leaf that reads as built is the one thing this budget
     // must never price out, a doc whose claims outrun its code being worse than a long one.
-    private const int Whole = 10_721;
+    //
+    // And 10,789 is the fifteenth raise, eighty words for a refutation row and the
+    // two leaves around it. Carrying a decider's identity into the next moment was built,
+    // measured and deleted in one session: it reached the architecture line nothing else
+    // reaches, moved no score, grew the table by half, and cost `Rhythm` the one-code moment
+    // that makes it this suite's only repair-held-still control.
+    //
+    // A revival row is the one kind of content this budget must never price out. The rule
+    // above it says a loser is deleted and leaves one, so refusing the words would leave the
+    // repo with a deletion and no record of why -- and the next session would build it again.
+    // The row carries the number that says where it could pay and why that is not enough.
+    private const int Whole = 10_789;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

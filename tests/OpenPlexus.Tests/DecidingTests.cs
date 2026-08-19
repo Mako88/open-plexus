@@ -7,27 +7,31 @@ using Xunit.Abstractions;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// A commitment inside another commitment's scope — <b>and what decides whether it can pay,
-/// which is the world's property.</b>
+/// How concentrated the commitments that DECIDE are — <b>a question <see cref="Vote.By"/>
+/// raised and nothing had answered.</b>
 /// </summary>
 /// <param name="output">Where the rows go.</param>
 /// <remarks>
 /// <para>
-/// <b>The identity that enters a moment is the one whose claim HELD</b>, and it is the
-/// DECIDER rather than everything that fired. C1 settles that rather than the width: a
-/// holder knows only its own firings, so a moment carrying them would carry different codes
-/// on every machine — and only identical evidence converges on a name.
-/// <see cref="Vote.By"/> is the fleet's verdict and is one code everywhere.
+/// <b>Its own remark puts it as a fork in the road.</b> Either the deciders are the same
+/// handful whatever the population does, or two runs differing by a sixth in residents and
+/// returning identical withheld scores is a coincidence worth the same surprise. Every other
+/// instrument here counts the POPULATION, and under the vote an expectation is worth its best
+/// advocate and no more — so a population can be reshuffled at length while the same few
+/// answer every question, and nothing would show it.
 /// </para>
 /// <para>
-/// <b>An identity's recurrence is how often a scope holding it fires</b>, which
-/// is what these two worlds are read for. A world answered by a handful of rules puts
-/// the same identity in moment after moment; a world answered by hundreds puts a nearly
-/// fresh one each round, and a code that cannot recur is a table row and no more — which is
-/// this repo's own <c>Fleeting</c> finding arriving from the other side.
+/// <b>The answer is the world's rather than the machine's</b>, which is what neither arm of
+/// that fork expected. A world a handful of rules reach puts the same advocate in front of
+/// round after round; a world reached by hundreds puts a nearly fresh one each time.
+/// </para>
+/// <para>
+/// <b>And it is what priced nesting out.</b> A commitment's identity in a moment is a code a
+/// scope can root on, and a scope holding one fires as often as that identity recurs — so the
+/// spine world was the worst possible place to build it. See the plan's revival row.
 /// </para>
 /// </remarks>
-public sealed class NestingTests(ITestOutputHelper output)
+public sealed class DecidingTests(ITestOutputHelper output)
 {
     /// <summary>The spine world, translated as its own grids translate it.</summary>
     /// <param name="seed">What draws the houses and the walks.</param>
@@ -69,46 +73,6 @@ public sealed class NestingTests(ITestOutputHelper output)
         }
 
         return [.. deciders.Values.OrderDescending()];
-    }
-
-    /// <summary>
-    /// <b>A scope roots on a commitment's identity</b>, which is the architecture line
-    /// having a mechanism rather than a property of the type.
-    /// </summary>
-    /// <remarks>
-    /// <b>Read on the population and never on a score</b>, because the score does not move.
-    /// The claim being made is that the meta level is REACHABLE, and a reading that waited
-    /// for it to pay would be asserting something this world has already been measured not
-    /// to give — see the concentration below for why.
-    /// </remarks>
-    [Fact]
-    public void A_scope_roots_on_a_commitment_that_held()
-    {
-        var nesting = 0;
-        var resident = 0;
-
-        foreach (var seed in new[] { 1, 2, 3 })
-        {
-            var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed);
-
-            var tally = new Bench(Roams(seed), brain)
-                .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
-
-            var rooted = brain.Held.All.Count(one => one.Scope.Any(Commitment.Names));
-
-            output.WriteLine(
-                $"seed {seed} | held {tally.Resident} | repaired {tally.Repaired} "
-                + $"| rooting on an identity {rooted} | table {tally.Separations}");
-
-            nesting += rooted;
-            resident += tally.Resident;
-        }
-
-        Assert.True(nesting > 0,
-            $"{resident} commitments were held over three seeds and not one scope holds "
-            + "another commitment's identity, so nesting is a property of `Code` and not a "
-            + "mechanism. Delete the carry-over in `Brain` with a revival row, and put the "
-            + "architecture entry back to having no mechanism under it.");
     }
 
     /// <summary>

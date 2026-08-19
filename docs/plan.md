@@ -218,7 +218,7 @@ out of it, and anything before six that reads as tuning is out of order.
   unreadable makes the next one blind, so one ends when the reds are the three that are named.
 - **Two, a mechanism for every entry of THE ARCHITECTURE**, however bad, and `Roaming`
   exercising all of them. `DocsTests` holds the first half and `OutstandingTests` the
-  second; adhesion fails it.
+  second; adhesion and nesting fail it.
 - **Three, the intentional reds cleared**, which is the stable state to refine from.
 - **Four, audit TRAPS and DO NOT RE-TRY** — a failure class that has earned a check belongs
   in the check, and a revival condition that has expired is a superstition.
@@ -285,8 +285,8 @@ out of it, and anything before six that reads as tuning is out of order.
     - **OPEN** — the multiplexer does not test the bet, its inputs being symbols already, so
       step one measures the learner and the front end not at all.
   - Relations are concepts too
-    - **NOW** — a commitment IS a relation, and the one that HELD enters the next moment, so
-      a scope roots on it.
+    - **NOW** — a commitment IS a relation and is scored as one. Nesting is expressible on
+      that rather than reached, and the build that reached it is in DO NOT RE-TRY.
     - **SETTLED** — unification costs its candidate set rather than a subset test's price,
       and what blocks rung four is admission rather than cost. Fork **33**.
     - **SETTLED** — roles are carried by ORDER rather than unification; rung three reaches
@@ -296,8 +296,8 @@ out of it, and anything before six that reads as tuning is out of order.
       values never co-occur. Open on the build. Fork **102**, gated by fork **97**.
     - **SETTLED** — a second hop pays where a second fact is needed and is damage where one
       suffices, so the depth is the task's rather than the mechanism's. Fork **96**.
-    - **OPEN** — nesting costs half the table and moves no score where the DECIDER is
-      diffuse. Open where it is concentrated. Fork **116**.
+    - **OPEN** — what puts a commitment in a moment without widening every world's. Fork
+      **116**, and the revival row is the shape of the answer.
   - Concept and label independent
     - **NOW** — rung five, and it goes UP: mint a code for a shared sub-scope and rewrite in
       terms of it, gated by two bars. Its trigger is REDUNDANCY, so no failure can summon it,
@@ -425,8 +425,8 @@ out of it, and anything before six that reads as tuning is out of order.
     - **OPEN** — the live problem is which rule gets the seat, and two arms at it have
       failed. Almost none of the population is read, so a gate changing what is HELD cannot
       reach what decides — read the revival rows before a third.
-    - **OPEN** — `Alternating` sits on `DeadCodeTests`'s unwired list, the derivation being
-      run offline. Wiring it needs one question answered: when does a front end RE-DERIVE.
+    - **OPEN** — `Alternating` is derived offline, and re-deriving orphans every scope
+      holding a category, its name being its members. Add-only, as `Naming` is.
     - **OPEN** — mutual exclusion is unbuilt, so a belief can be wrong and never
       CONTRADICTED. A miss says *I expected Y and got Z*; nothing says Y and Z cannot both
       hold, which is the whole of what a conflict is. Fork **99**.
@@ -652,6 +652,7 @@ out of it, and anything before six that reads as tuning is out of order.
 | `Chunk`'s whole-moment rule ported to rung five | Two vocabularies: `Narrows` is syntactic, so a scope keeping the members and its children taking the name stand in no relation. Unsound rose on every seed that moved | A subsumption test read at the UNFOLDED grain |
 | A front end putting a word's POSITION in the moment | Beside the code it is never absent, reaching every moment and no scope; FUSED in, it costs the identity — an input is an attribute, never the concept | Never. Order derives its own code: rung three |
 | Marking the question-story coincidence — `Named`, `Anonymous`, `Either` | Rung four's cheap tests, and they answered: what blocks it is admission, not cost | A derived code over `Bind`'s groups that cannot say *this one is in two of them* |
+| Carrying the DECIDER's identity into the next moment, so a scope roots on it | Scopes rooted on one, no score moved, the table grew by half, and every moment gained a code — costing `Rhythm` the one-code moment that holds repair still | A meta candidate for repair that does not widen every world's moment |
 | `Joining.Recent` — a word banded by how far back it was said | Half what narrowing the view buys, and the front end picks the bands | A band the learner mints. Fork 92 |
 
 ---

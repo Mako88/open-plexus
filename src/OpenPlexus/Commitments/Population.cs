@@ -1006,14 +1006,7 @@ public sealed class Population
             // chooser being wired would fill the population with them. Repair may still
             // choose one, and that is exactly where a causal claim belongs: a scope takes
             // the provenance where the plain code fails to separate the misses from the hits.
-            // And a commitment's identity sits on that line for the third time. `the rule
-            // that held last time was R` with no idea what R was about is a rule about the
-            // machine rather than about the world, and one arrives on nearly every round
-            // once anything is predicting at all -- so rooting on them would mint a lineage
-            // per decider and call it a self-model. Repair may still choose one, and a scope
-            // taking the identity where a plain code fails to separate the misses from the
-            // hits is the meta level arriving where it is earned.
-            if (Sequenced.Names(code) || Intervened.Names(code) || Commitment.Names(code)) continue;
+            if (Sequenced.Names(code) || Intervened.Names(code)) continue;
 
             var proposed = new Commitment([code], arrived);
 

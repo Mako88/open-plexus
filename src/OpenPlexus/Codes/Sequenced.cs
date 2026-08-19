@@ -1,8 +1,8 @@
 namespace OpenPlexus.Codes;
 
 /// <summary>
-/// What came immediately before what, as a code — <b>rung three, and it is a code rather
-/// than a matcher, which is the whole of why it is small.</b>
+/// What came immediately before what, as a code — <b>rung three.</b> And it is a code rather
+/// than a matcher, which is the whole of why it is small.
 /// </summary>
 /// <remarks>
 /// <para>

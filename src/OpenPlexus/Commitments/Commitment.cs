@@ -164,8 +164,8 @@ public sealed class Commitment
     /// first number is not.
     /// </para>
     /// <para>
-    /// <b>The only measure of generality here that is not built from accuracy, and what
-    /// it was built for is refuted.</b> Every repair gate tried — the vote being wrong, a
+    /// <b>The only measure of generality here that is not built from accuracy.</b> And what
+    /// it was built for is refuted. Every repair gate tried — the vote being wrong, a
     /// failure nothing covers, forking having paid — is computed from observed accuracy
     /// or observed failure, and the story was that on a world drawing with replacement
     /// all of them are fooled by children standing on one repeated moment. Subsuming on

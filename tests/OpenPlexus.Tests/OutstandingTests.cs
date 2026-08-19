@@ -1,8 +1,5 @@
 using System.Text.RegularExpressions;
 using OpenPlexus.Codes;
-using OpenPlexus.Commitments;
-using OpenPlexus.Machines;
-using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
@@ -308,78 +305,6 @@ public sealed class OutstandingTests(ITestOutputHelper output)
             + "place it exists. Build it — a third factor from the body's own variables — or "
             + "drop it with a revival row saying what would bring it back, and take the leaf "
             + "out of the plan. This test is red on purpose and reads the plan, not a list.");
-    }
-
-    /// <summary>
-    /// <b>The tutor answers questions nobody put</b>, and every one-shot reading on the
-    /// conversation was taken while it did.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>A tutor holds the answer to the question it just put and never spends it</b>, so a
-    /// machine that asks again on a later moment is handed the same answer. On the lesson told
-    /// once, forty-one replies are given to thirty-six questions — five settlements attached to
-    /// moments nobody asked anything about.
-    /// </para>
-    /// <para>
-    /// <b>And spending it collapses the reading it was propping up</b>, which is why this is an
-    /// entry rather than a fix already made. The examination goes from every question right to
-    /// none, and the machine begins declining to speak at all. The cause of the collapse is not
-    /// understood, so the fix is the work rather than the deletion.
-    /// </para>
-    /// <para>
-    /// <b>What it costs until then is every number on this world.</b> One telling teaching an
-    /// unsat exam, a contradiction replacing a belief, the width and crediting arms — all of
-    /// them were measured through this, and none can be read until it is closed. The check is
-    /// the arithmetic and not a judgement: a tutor may not answer more times than it asked.
-    /// </para>
-    /// </remarks>
-    /// <summary>The join between what a chooser decided and how this world numbers its doings.</summary>
-    private static int? Speaking(Wondered said) =>
-        said.Word is not { } word
-            ? null
-            : said.Asking ? Conversing.Asks(word) : Conversing.Asserts(word);
-
-    [Fact]
-    public void The_tutor_never_answers_more_questions_than_it_put()
-    {
-        var lesson = Lesson.Creatures;
-        var tutor = new Tutor(lesson, TextWriter.Null, passes: 3, tellings: 1);
-
-        var brain = new Brain(
-            new CommittingSettings
-            {
-                Capacity = 2000,
-                Rooting = Rooting.Wholly,
-                Crediting = Crediting.Birth,
-            },
-            seed: 1);
-
-        var world = new Conversing(new ConversingSettings
-        {
-            Typed = tutor,
-            Printed = tutor.Printed,
-            Carrying = Carrying.Never,
-            Asserting = Asserting.Everything,
-        });
-
-        var curiosity = new Curiosity(brain, rate: 1.0, seed: 1, world.Naming);
-
-        var watching = new Watching<Recited>(
-            world, new Joined(Joining.Bagged), acting: felt => Speaking(curiosity.Choose(felt)));
-
-        new Bench(watching, brain)
-            .Run(tutor.Moments * tutor.Longest, sweep: 200, target: 0.9, window: 50);
-
-        var put = tutor.Put.Sum();
-
-        output.WriteLine($"{put} questions put, {world.Told} answered, {world.Shrugged} shrugged");
-
-        Assert.True(world.Told <= put,
-            $"the tutor answered {world.Told} times having put {put} questions, so "
-            + $"{world.Told - put} settlement(s) are attached to moments nobody asked anything "
-            + "about. Spend the answer when it is given, then re-take every reading in "
-            + "`LessonTests` — they were all measured through this.");
     }
 
     /// <summary>

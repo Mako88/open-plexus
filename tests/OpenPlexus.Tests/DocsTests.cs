@@ -346,7 +346,12 @@ public sealed class DocsTests
     // claiming rules and cost less; it cost more of what mattered and is deleted. The leaf is
     // what the run that refuted it showed instead: claiming every word makes a rule wrong on
     // its own sentence's other claims, so repair churns for ever while minting saturates.
-    private const int Whole = 11_502;
+    //
+    // And 11,520 is the twenty-seventh raise, eighteen words for the rule a leak turned out to
+    // need: a source owing moments is drained before a new line is read. It is one line and it
+    // is worth one, because reading early advanced a scripted source past a sentence still
+    // arriving and put an examination's answer live for moments nobody asked about.
+    private const int Whole = 11_520;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

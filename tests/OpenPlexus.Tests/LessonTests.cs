@@ -733,4 +733,55 @@ public sealed class LessonTests(ITestOutputHelper output)
         // And the arm that claimed fewer words is refuted rather than open: it read 0.167 told
         // once against 1.000 and did not reach 1.000 until ten tellings. See the plan's row.
     }
+
+    [Fact]
+    public void The_tutor_never_answers_more_questions_than_it_put()
+    {
+        // A conservation law over the harness rather than a claim about the brain, and it
+        // caught what several sessions of readings did not. A tutor holds the answer to the
+        // question it has just put; if a moment arrives that nobody asked anything about, that
+        // answer is live for it and a settlement lands where no question was.
+        //
+        // What put one there was reading a new line while a statement still owed moments: one
+        // sentence is several under `Asserting.Everything`, so pulling early advanced the
+        // source before its own sentence had finished arriving. `Conversing.Read` drains what
+        // is owed first, and this is what says it still does.
+        var lesson = Lesson.Creatures;
+        var tutor = new Tutor(lesson, TextWriter.Null, passes: 3, tellings: 1);
+
+        var brain = new Brain(
+            new CommittingSettings
+            {
+                Capacity = 2000,
+                Rooting = Rooting.Wholly,
+                Crediting = Crediting.Birth,
+            },
+            seed: 1);
+
+        var world = new Conversing(new ConversingSettings
+        {
+            Typed = tutor,
+            Printed = tutor.Printed,
+            Carrying = Carrying.Never,
+            Asserting = Asserting.Everything,
+        });
+
+        var curiosity = new Curiosity(brain, rate: 1.0, seed: 1, world.Naming);
+
+        var watching = new Watching<Recited>(
+            world, new Joined(Joining.Bagged), acting: felt => Speaking(curiosity.Choose(felt)));
+
+        new Bench(watching, brain)
+            .Run(tutor.Moments * tutor.Longest, sweep: 200, target: 0.9, window: 50);
+
+        var put = tutor.Put.Sum();
+
+        output.WriteLine($"{put} questions put, {world.Told} answered, {world.Shrugged} shrugged");
+
+        Assert.True(world.Told <= put,
+            $"the tutor answered {world.Told} times having put {put} questions, so "
+            + $"{world.Told - put} settlement(s) are attached to moments nobody asked anything "
+            + "about. Every reading in this file is measured through the tutor, so none of "
+            + "them can be read until this holds again.");
+    }
 }

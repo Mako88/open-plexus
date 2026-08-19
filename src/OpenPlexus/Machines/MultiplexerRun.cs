@@ -30,8 +30,8 @@ public sealed record Learned
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Nothing in the machine knows when a scope is deep enough, and until this there
-    /// was no number for it.</b> The mean scope of the carriers says how deep the rules
+    /// <b>Nothing in the machine knows when a scope is deep enough.</b> And until this there
+    /// was no number for it. The mean scope of the carriers says how deep the rules
     /// that pay are; it cannot say whether that depth was NEEDED. This asks the world
     /// directly: drop one code, is the remainder still true? A rule where some drop leaves
     /// a truth is a rule that fires on fewer moments than a rule it already contains.

@@ -55,8 +55,8 @@ public sealed class Banded<TFrame> : IQuantizer<TFrame>
     /// </exception>
     /// <remarks>
     /// <para>
-    /// <b>The width is taken so the block can be checked, and that check was the
-    /// whole reason for adding it.</b> A modality is ONE BYTE and a dimension owns
+    /// <b>The width is taken so the block can be checked.</b> And that check was the
+    /// whole reason for adding it. A modality is ONE BYTE and a dimension owns
     /// <see cref="Spans"/> of them, so a reading of 128 dimensions at two spans runs
     /// out — and the arithmetic that assigns them is an unchecked cast, so it WRAPPED
     /// rather than failed. Dimension 0 and dimension 128 came out with identical

@@ -620,6 +620,23 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     {
         while (true)
         {
+            // A statement mid-expansion FIRST, where one sentence is several moments. Reading a
+            // new line while claims are still owed advances the source before its own sentence
+            // has finished arriving -- and on a scripted source that means the next question is
+            // put while the previous statement is still being shown, so its answer is live for
+            // moments nobody asked anything about. That is a leak rather than an ordering
+            // preference, and it is what `OutstandingTests` caught by arithmetic.
+            if (_claims.Count > 0)
+            {
+                var (said, at) = _claims.Dequeue();
+
+                _asserted = _index[said[at]];
+
+                return Moment(
+                    Said([.. said.Where((_, where) => where != at)]), asking: false,
+                    coded: null);
+            }
+
             if (_sentences.Count == 0)
             {
                 var line = _settings.Typed.ReadLine();
@@ -646,19 +663,6 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
                 foreach (var sentence in Sentences(text)) _sentences.Enqueue(sentence);
 
                 continue;
-            }
-
-            // A statement mid-expansion, where one sentence is several moments. Its words were
-            // heard and counted when the sentence arrived, so only the claim moves here.
-            if (_claims.Count > 0)
-            {
-                var (said, at) = _claims.Dequeue();
-
-                _asserted = _index[said[at]];
-
-                return Moment(
-                    Said([.. said.Where((_, where) => where != at)]), asking: false,
-                    coded: null);
             }
 
             var one = _sentences.Dequeue();

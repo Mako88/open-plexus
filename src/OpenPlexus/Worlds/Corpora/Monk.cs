@@ -72,8 +72,8 @@ public sealed record MonkSettings
 /// toward is a number rather than a guess.
 /// </para>
 /// <para>
-/// <b>And the bar is not a half, which is the trap this world sets for anybody reading
-/// its score.</b> <see cref="Puzzle.Two"/> is 142 positive of 432, so ALWAYS SAYING NO
+/// <b>And the bar is not a half.</b> Which is the trap this world sets for anybody reading
+/// its score. <see cref="Puzzle.Two"/> is 142 positive of 432, so ALWAYS SAYING NO
 /// SCORES 0.6713. A run reporting 0.68 on it has learnt approximately nothing and looks
 /// like it has learnt a great deal — the fallback-as-control-arm trap, with the
 /// arithmetic already done for it. <see cref="Chance"/> is that number, reported beside

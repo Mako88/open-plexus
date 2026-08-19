@@ -763,8 +763,8 @@ public sealed class DialTests
     /// check you can talk your way around.
     /// </para>
     /// <para>
-    /// <b>And the stronger rule is also the simpler one, because a dial is only ever one of
-    /// two things.</b> Either it is a NEW ability, in which case it is on — there is no
+    /// <b>And the stronger rule is also the simpler one.</b> Because a dial is only ever one of
+    /// two things. Either it is a NEW ability, in which case it is on — there is no
     /// other reason to have built it — and it is kept while it is being made to work, or
     /// deleted when it will not. Or it REPLACES something, in which case both arms are live
     /// while they are compared, and afterwards the winner is the code and the loser is

@@ -1,8 +1,8 @@
 ﻿namespace OpenPlexus.Tests;
 
 /// <summary>
-/// <b>A fact that checks nothing is a measurement, and a measurement belongs to
-/// <c>sweeps.yml</c> RATHER THAN TO EVERY PUSH.</b>
+/// <b>A fact that checks nothing is a measurement.</b> And a measurement belongs to
+/// <c>sweeps.yml</c> RATHER THAN TO EVERY PUSH.
 /// </summary>
 /// <remarks>
 /// <para>

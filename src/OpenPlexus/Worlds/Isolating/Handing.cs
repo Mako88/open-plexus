@@ -49,8 +49,8 @@ public sealed record HandingSettings
 /// giver — that is a role, and a role is what has to be learnt.
 /// </para>
 /// <para>
-/// <b>AND <see cref="Bagged"/> is one property call, so the arm that loses it is the
-/// control rather than a different world.</b> Every <see cref="Joining"/> arm, every
+/// <b>AND <see cref="Bagged"/> is one property call.</b> So the arm that loses it is the
+/// control rather than a different world. Every <see cref="Joining"/> arm, every
 /// ceiling and the withheld exam apply unchanged through it, so a reading here stands
 /// beside <see cref="Roaming"/>'s rather than starting a second scale.
 /// </para>

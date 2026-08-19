@@ -389,8 +389,8 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
     /// <param name="scene">What is where.</param>
     /// <remarks>
     /// <para>
-    /// <b>The same glyph in every cell it ever appears in, which is the recurrence the
-    /// world exists to offer.</b> A front end that manufactures a reusable symbol per
+    /// <b>The same glyph in every cell it ever appears in.</b> Which is the recurrence the
+    /// world exists to offer. A front end that manufactures a reusable symbol per
     /// part will emit something in common between two scenes holding the same shape
     /// somewhere; one that codes the picture as a whole will not. Nothing here makes
     /// either happen — it makes the difference VISIBLE, which is the job of a world.
@@ -429,8 +429,8 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
     /// <param name="cell">How many pixels across the patch is.</param>
     /// <remarks>
     /// <para>
-    /// <b>Said as a predicate over the patch rather than as a bitmap, so the shapes
-    /// survive the resolution dial.</b> A hand-drawn three-by-three would have to be
+    /// <b>Said as a predicate over the patch rather than as a bitmap.</b> So the shapes
+    /// survive the resolution dial. A hand-drawn three-by-three would have to be
     /// redrawn at every <see cref="ArrangedSettings.Cell"/>, and a shape that changed
     /// when the world got sharper would make the resolution arm a comparison between
     /// two different problems.

@@ -501,8 +501,8 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// what gets minted rather than by changing what gets read.
     /// </para>
     /// <para>
-    /// <b>Which is the difference between a better readout and a better search, and no
-    /// score can tell them apart.</b> If a rule that wins on the skewed world wins by
+    /// <b>Which is the difference between a better readout and a better search.</b> And no
+    /// score can tell them apart. If a rule that wins on the skewed world wins by
     /// lowering <see cref="Census.Uncovered"/>, then what it improved was coverage and
     /// calling it a vote rule describes where it is implemented rather than what it does.
     /// </para>

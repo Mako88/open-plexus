@@ -351,7 +351,13 @@ public sealed class DocsTests
     // need: a source owing moments is drained before a new line is read. It is one line and it
     // is worth one, because reading early advanced a scripted source past a sentence still
     // arriving and put an examination's answer live for moments nobody asked about.
-    private const int Whole = 11_520;
+    //
+    // And 11,567 is the twenty-eighth raise, forty-seven words for a refuted row. A refusal was
+    // made to settle on a reserved outcome so that whatever proposed the guess would be wrong
+    // about it; it bought nothing over eight passes and taught the machine to stop asking. The
+    // revival condition is the useful half — recording a refusal pays only once something
+    // AVOIDS what it was refused, and no chooser here does.
+    private const int Whole = 11_567;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

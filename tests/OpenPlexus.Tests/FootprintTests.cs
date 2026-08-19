@@ -24,8 +24,8 @@ namespace OpenPlexus.Tests;
 /// This is the one that can come back and say no.
 /// </para>
 /// <para>
-/// <b>The slope is the reading and the intercept is noise, which is why it is measured at
-/// three sizes.</b> A managed heap in a test host holds the runner, the world, the
+/// <b>The slope is the reading and the intercept is noise.</b> Which is why it is measured at
+/// three sizes. A managed heap in a test host holds the runner, the world, the
 /// framework and whatever the last test left behind, so one delta is a number about this
 /// process. What a population costs is how the delta GROWS with what it holds, and that
 /// subtracts the process it was measured in.

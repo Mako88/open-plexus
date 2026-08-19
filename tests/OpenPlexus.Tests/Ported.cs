@@ -69,8 +69,8 @@ public sealed class Ported : IAsyncDisposable
 
     /// <summary>What has been lost since the fleet finished coming up.</summary>
     /// <remarks>
-    /// <b>The coming-up losses are real and are not a fault, which is why they are
-    /// subtracted rather than fixed.</b> A machine announces itself to every peer as it
+    /// <b>The coming-up losses are real and are not a fault.</b> Which is why they are
+    /// subtracted rather than fixed. A machine announces itself to every peer as it
     /// opens, and a peer that is not listening yet cannot take it — so a fleet of N always
     /// loses exactly N(N-1)/2 announcements, deterministically, and the announce-back is
     /// what makes the roster converge anyway. What matters is whether anything is lost

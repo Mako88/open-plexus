@@ -42,8 +42,8 @@ public sealed class OverlapTests(ITestOutputHelper output)
     /// A world that draws from a stream two machines share, or from one they do not.
     /// </summary>
     /// <remarks>
-    /// <b>Indexed by round and never by a counter, which is the only way the shared half
-    /// is actually shared.</b> Two machines advancing their own pointer into a common
+    /// <b>Indexed by round and never by a counter.</b> Which is the only way the shared half
+    /// is actually shared. Two machines advancing their own pointer into a common
     /// stream take DIFFERENT elements of it the moment their coins disagree once, so a
     /// shared stream consumed that way is two private streams with extra steps. Reading
     /// position <c>t</c> at round <c>t</c> means a round either of them takes from the

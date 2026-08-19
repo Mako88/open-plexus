@@ -56,8 +56,8 @@ public sealed class SweepListTests
 
     /// <summary>Every test method carrying the sweep trait, fully qualified.</summary>
     /// <remarks>
-    /// <b>Read off the attribute data rather than the attribute, because xUnit's
-    /// <c>TraitAttribute</c> keeps its two strings and exposes neither.</b> What the runner
+    /// <b>Read off the attribute data rather than the attribute.</b> Because xUnit's
+    /// <c>TraitAttribute</c> keeps its two strings and exposes neither. What the runner
     /// reads is the constructor arguments, so this reads the same thing.
     /// </remarks>
     private static List<string> Measurements() =>

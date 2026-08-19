@@ -846,8 +846,8 @@ public sealed class DialTests
     /// while it is compared</i>, and <i>a better brain beats intact numbers</i>.
     /// </para>
     /// <para>
-    /// <b>So the check is the trace rather than the intent, which is the only part a build
-    /// can read.</b> A refuted mechanism is named in DO NOT RE-TRY with what would revive it;
+    /// <b>So the check is the trace rather than the intent.</b> Which is the only part a build
+    /// can read. A refuted mechanism is named in DO NOT RE-TRY with what would revive it;
     /// a mechanism switched off to protect a baseline is named nowhere, because there is
     /// nothing to say. The second is what this fails on.
     /// </para>

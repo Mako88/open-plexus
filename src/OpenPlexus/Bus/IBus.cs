@@ -59,8 +59,8 @@ public interface IBus
     /// needed one would work only for the departures that were polite.
     /// </para>
     /// <para>
-    /// <b>And what the asker could see for itself was the numerator, which is where fork 53
-    /// sat for a month.</b> Counting the answers that came back tells a fleet it is missing
+    /// <b>And what the asker could see for itself was the numerator.</b> Which is where fork 53
+    /// sat for a month. Counting the answers that came back tells a fleet it is missing
     /// somebody and never lets it stop waiting; the term that does is
     /// <see cref="Unreached"/>, which is the same silence observed one step earlier and from
     /// the sending end, where politeness is not required.

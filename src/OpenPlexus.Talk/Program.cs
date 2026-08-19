@@ -51,6 +51,9 @@ internal static class Program
         var tellings = Number(args, "--tellings", 1);
         var clarifying = Number(args, "--clarifying", 0);
         var revising = Number(args, "--revising", 0);
+        var replying = Given(args, "--replying") is { } how
+            ? Enum.Parse<Replying>(how, ignoreCase: true)
+            : Replying.Word;
         var carrying = Carried(args);
         // Claiming by default, because a statement that claims nothing cannot teach anything
         // and a session at a terminal is mostly statements.
@@ -74,7 +77,8 @@ internal static class Program
 
         // The tutor owns the writer, because seeing the prompt is how it knows a reply is
         // wanted. A session with nobody scripted prints straight at the console.
-        var tutor = lesson is null ? null : new Tutor(lesson, Console.Out, passes, tellings, revising, clarifying, Console.In);
+        var tutor = lesson is null ? null : new Tutor(
+            lesson, Console.Out, passes, tellings, revising, clarifying, Console.In, replying);
 
         var world = new Conversing(new ConversingSettings
         {
@@ -98,7 +102,7 @@ internal static class Program
         // examination; the spare rounds after the lesson go by empty and are reported.
         var rounds = tutor is null
             ? Number(args, "--rounds", 400)
-            : asserting is Asserting.Everything
+            : asserting is Asserting.Everything || replying is Replying.Sentence
                 ? tutor.Moments * tutor.Longest
                 : tutor.Moments;
 

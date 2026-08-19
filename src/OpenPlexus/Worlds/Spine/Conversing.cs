@@ -505,9 +505,23 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     /// Fork <b>30</b> is where that is answered and it is a rung rather than a world.
     /// </para>
     /// <para>
-    /// <b>Anything else is taken as the answer</b>, so a human who knows may simply say it. The
-    /// first word only, exactly as a corpus answer is read — a reply longer than an outcome can
-    /// hold is wrong out loud rather than wrong quietly.
+    /// <b>Anything else is taken as the answer, and a whole sentence is allowed</b>. A person
+    /// asked <i>is it fur</i> answers <i>the cat covering is fur</i> as readily as <i>fur</i>,
+    /// and reading only the first word of that settles the round on <i>the</i>.
+    /// </para>
+    /// <para>
+    /// <b>So the answer is the reply's last word the QUESTION did not already say.</b> Both
+    /// halves of that are about how a reply is read rather than about what text means:
+    /// subtracting the question's words is arithmetic over two sets, the licence
+    /// <see cref="Codes.Joined"/> already carries, and taking the last of what is left sits
+    /// beside <i>yes means the guess was right</i> — a convention of this harness, which never
+    /// reaches the learner as a claim about English.
+    /// </para>
+    /// <para>
+    /// <b>And a reply is a fact as well as an answer</b>, which is the half that used to be
+    /// thrown away. Somebody who says <i>the cat covering is fur</i> has told the machine
+    /// something, so the sentence is queued and arrives as its own moment exactly as a typed
+    /// statement would.
     /// </para>
     /// </remarks>
     private int? Answering(string told, string word)
@@ -529,7 +543,33 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
         // recording one would be inventing evidence. Fork **30** is where that is answered.
         if (string.Equals(words[0], "no", StringComparison.Ordinal)) return null;
 
-        return Heard(words[0]);
+        // Told as well as answered, where there was a sentence to tell. Queued rather than
+        // pushed, so it arrives through the one path that makes moments.
+        if (words.Count > 1)
+            foreach (var sentence in Sentences(told))
+                _sentences.Enqueue(sentence);
+
+        return Heard(Answered(words));
+    }
+
+    /// <summary>Which word of a reply is the answer to the question on the table.</summary>
+    /// <param name="words">The reply, as words.</param>
+    /// <remarks>
+    /// <b>The last one the question did not already say</b>, and the last word where it said
+    /// all of them. A one-word reply shares nothing with the question and reaches this
+    /// unchanged, which is what keeps every earlier reading on this world comparable.
+    /// </remarks>
+    private string Answered(IReadOnlyList<string> words)
+    {
+        if (_pending is not { Asked: { Count: > 0 } asked }) return words[^1];
+
+        var said = new HashSet<Code>(asked);
+
+        for (var at = words.Count - 1; at >= 0; at--)
+            if (!said.Contains(Babi.Of(words[at])))
+                return words[at];
+
+        return words[^1];
     }
 
     /// <inheritdoc/>

@@ -206,6 +206,20 @@ public sealed record Lesson
     };
 }
 
+/// <summary>How a person answers a question they know the answer to.</summary>
+/// <remarks>
+/// <b>A person mostly does not answer in one word</b>, and a harness understanding only one is
+/// a harness nobody can talk to. This says whether the two are worth the same.
+/// </remarks>
+public enum Replying
+{
+    /// <summary>The answer word alone, which every earlier reading was taken on.</summary>
+    Word,
+
+    /// <summary>The whole statement the answer came from.</summary>
+    Sentence,
+}
+
 /// <summary>
 /// The human side of a scripted conversation — tells a <see cref="Lesson"/>, answers what it
 /// was asked about where it knows, and then examines.
@@ -242,6 +256,7 @@ public sealed class Tutor : TextReader
     private readonly int _tellings;
     private readonly int _revising;
     private readonly int _clarifying;
+    private readonly Replying _replying;
     private readonly TextReader? _person;
     private readonly Watched _printed;
     private readonly int[] _put;
@@ -280,9 +295,11 @@ public sealed class Tutor : TextReader
     /// answers make them want to add.
     /// </param>
     /// <param name="person">Whose keyboard the clarifying window reads.</param>
+    /// <param name="replying">Whether a correction is one word or the whole statement.</param>
     public Tutor(
         Lesson lesson, TextWriter printed, int passes = 1, int tellings = 1,
-        int revising = 0, int clarifying = 0, TextReader? person = null)
+        int revising = 0, int clarifying = 0, TextReader? person = null,
+        Replying replying = Replying.Word)
     {
         ArgumentNullException.ThrowIfNull(lesson);
         ArgumentNullException.ThrowIfNull(printed);
@@ -302,6 +319,7 @@ public sealed class Tutor : TextReader
         _revising = revising;
         _clarifying = clarifying;
         _person = person;
+        _replying = replying;
         _printed = new Watched(printed);
         _put = new int[passes];
         _confirmed = new int[passes];
@@ -425,7 +443,7 @@ public sealed class Tutor : TextReader
         var tail = _printed.Line;
 
         return tail.StartsWith("  ? ", StringComparison.Ordinal)
-            ? Replying(tail[4..].Trim())
+            ? Replied(tail[4..].Trim())
             : Saying();
     }
 
@@ -438,7 +456,7 @@ public sealed class Tutor : TextReader
     }
 
     /// <summary>What to say back to <c>? word</c>.</summary>
-    private string Replying(string guessed)
+    private string Replied(string guessed)
     {
         // Their question to answer, not the script's. A machine that asked during the window
         // is asking the person, and what they say is the settlement.
@@ -451,7 +469,14 @@ public sealed class Tutor : TextReader
             return string.Empty;
         }
 
-        if (string.Equals(guessed, _answer, StringComparison.Ordinal))
+        var answer = _answer;
+
+        // Spent once, because an answer given as a SENTENCE becomes statements of its own and
+        // the machine asks about those too. Left standing, the examination's answer would be
+        // given again to a moment nobody put a question about.
+        _answer = null;
+
+        if (string.Equals(guessed, answer, StringComparison.Ordinal))
         {
             _confirmed[_asking]++;
 
@@ -460,7 +485,21 @@ public sealed class Tutor : TextReader
 
         Corrected++;
 
-        return _answer;
+        return _replying is Replying.Sentence ? Sentenced(answer) : answer;
+    }
+
+    /// <summary>The statement an answer came from, or the answer alone where none holds it.</summary>
+    /// <remarks>
+    /// <b>Revisions first, because a contradicted fact is answered from the sentence that
+    /// contradicted it</b> rather than from the one it replaced.
+    /// </remarks>
+    private string Sentenced(string answer)
+    {
+        foreach (var one in _lesson.Revisions.Concat(_lesson.Statements))
+            if (Babi.Words(one).Contains(answer, StringComparer.Ordinal))
+                return one;
+
+        return answer;
     }
 
     /// <summary>The next thing the lesson has to say, or nothing where it is finished.</summary>

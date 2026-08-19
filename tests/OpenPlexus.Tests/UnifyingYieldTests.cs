@@ -13,8 +13,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A scope handed in by an experimenter is architecture, which is the one thing this
-/// design may not do.</b> The matcher is priced and cheap; what nothing here can do is
+/// <b>A scope handed in by an experimenter is architecture.</b> Which is the one thing this
+/// design may not do. The matcher is priced and cheap; what nothing here can do is
 /// arrive at <i>whichever word</i> on its own. So the operator has to be summoned by
 /// something the population already contains, and the obvious candidate is the one rung
 /// five is already summoned by: REDUNDANCY.

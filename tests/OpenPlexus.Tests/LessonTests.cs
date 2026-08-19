@@ -26,9 +26,11 @@ public sealed class LessonTests(ITestOutputHelper output)
     private static (Tally Tally, Tutor Tutor, Conversing World) Ran(
         Lesson lesson, Carrying carrying, int seed, int passes, int capacity = 2000,
         Asserting asserting = Asserting.Nothing, int tellings = 1, int revising = 0,
-        Rooting rooting = Rooting.Singly, Crediting crediting = Crediting.Nothing)
+        Rooting rooting = Rooting.Singly, Crediting crediting = Crediting.Nothing,
+        Replying replying = Replying.Word)
     {
-        var tutor = new Tutor(lesson, TextWriter.Null, passes, tellings, revising);
+        var tutor = new Tutor(
+            lesson, TextWriter.Null, passes, tellings, revising, replying: replying);
 
         var brain = new Brain(
             new CommittingSettings
@@ -783,5 +785,69 @@ public sealed class LessonTests(ITestOutputHelper output)
             + $"{world.Told - put} settlement(s) are attached to moments nobody asked anything "
             + "about. Every reading in this file is measured through the tutor, so none of "
             + "them can be read until this holds again.");
+    }
+
+    [Fact]
+    public void An_answer_given_as_a_sentence_is_worth_what_the_word_alone_is()
+    {
+        const int Passes = 6;
+        const int Seeds = 3;
+
+        // John's, and it is what a person actually does. Asked `is it fur`, somebody answers
+        // `the cat covering is fur` as readily as `fur` — and reading the first word of that
+        // settles the round on `the`. The answer is now the reply's last word the question did
+        // not already say, and the whole reply is told as a statement besides.
+        //
+        // Measured where the machine is WRONG often enough to be corrected, since a machine
+        // that is right every time is never given a sentence at all.
+        var lesson = Lesson.Creatures;
+
+        output.WriteLine($"{Seeds} seeds, told once, corrections through a blank record");
+        output.WriteLine($"{"pass",-6}{"word",9}{"sentence",10}");
+
+        var word = new double[Passes];
+        var sentence = new double[Passes];
+        var told = new List<double>();
+        var put = new List<double>();
+
+        for (var seed = 1; seed <= Seeds; seed++)
+        {
+            var one = Ran(
+                lesson, Carrying.Never, seed, passes: Passes, asserting: Asserting.Everything,
+                tellings: 1, rooting: Rooting.Wholly);
+
+            var other = Ran(
+                lesson, Carrying.Never, seed, passes: Passes, asserting: Asserting.Everything,
+                tellings: 1, rooting: Rooting.Wholly, replying: Replying.Sentence);
+
+            told.Add(other.World.Told);
+            put.Add(other.Tutor.Put.Sum());
+
+            for (var pass = 0; pass < Passes; pass++)
+            {
+                word[pass] += Right(one.Tutor, pass) / Seeds;
+                sentence[pass] += Right(other.Tutor, pass) / Seeds;
+            }
+        }
+
+        for (var pass = 0; pass < Passes; pass++)
+            output.WriteLine($"{pass + 1,-6}{word[pass],9:F3}{sentence[pass],10:F3}");
+
+        output.WriteLine($"sentence arm: {told.Average():F1} answered of {put.Average():F1} put");
+
+        // The same place by the same pass, so understanding a sentence costs the reading
+        // nothing. It was worth nothing at all before: the first word of `the cat covering is
+        // fur` is `the`.
+        Assert.Equal(word[^1], sentence[^1]);
+
+        Assert.True(sentence[^1] > 0.9,
+            $"neither arm reached the examination, the last pass reading {sentence[^1]:F3}, so "
+            + "this compares two failures rather than two answers");
+
+        // And the conservation law holds through it, which is the thing that has to be checked
+        // every time a reply grows a moment of its own.
+        Assert.True(told.Average() <= put.Average(),
+            $"the sentence arm answered {told.Average():F1} times having put {put.Average():F1} "
+            + "questions");
     }
 }

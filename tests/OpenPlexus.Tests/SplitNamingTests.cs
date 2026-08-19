@@ -73,8 +73,8 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     /// this world was. It is not a fact about splitting as such, and the plan says so now.
     /// </para>
     /// <para>
-    /// <b>And the timing is pinned beside it, because the two failures are opposite and one
-    /// number cannot dodge both.</b> Under <see cref="Repairing.EveryRound"/> a budget of 64
+    /// <b>And the timing is pinned beside it.</b> Because the two failures are opposite and one
+    /// number cannot dodge both. Under <see cref="Repairing.EveryRound"/> a budget of 64
     /// leaves the WHOLE population naming nothing, so the baseline assertion goes red; 256
     /// gives every third enough to name alone, so the precondition goes red instead. What
     /// this file needs is a population rich enough to name and shards too poor to — and that
@@ -82,8 +82,8 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     /// it was the only one of the three still green.
     /// </para>
     /// <para>
-    /// <b>So the two files pin the same pair, and they measure one mechanism on two sides of
-    /// a socket.</b> A window that differed between them would make the in-process reading
+    /// <b>So the two files pin the same pair.</b> And they measure one mechanism on two sides of
+    /// a socket. A window that differed between them would make the in-process reading
     /// and the wire reading incomparable, which is the whole point of having both.
     /// </para>
     /// </remarks>

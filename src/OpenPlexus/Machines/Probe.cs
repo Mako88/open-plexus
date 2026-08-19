@@ -18,8 +18,8 @@ public sealed record Probed
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>This is a control arm and not a competitor, and without it the encoder
-/// measurement cannot be read.</b> The open defect asks whether the ceiling is the
+/// <b>This is a control arm and not a competitor</b>, and without it the encoder
+/// measurement cannot be read. The open defect asks whether the ceiling is the
 /// front end or the learner behind it. A commitment population scoring 0.6 on CLIP
 /// features answers neither question on its own: 0.6 could be an excellent front end
 /// under a weak learner or the reverse, and the two are indistinguishable from one
@@ -58,8 +58,8 @@ public static class Probe
     /// <param name="seed">The shuffle's generator.</param>
     /// <exception cref="ArgumentException">A set is empty or the widths disagree.</exception>
     /// <remarks>
-    /// <b>The shuffle is seeded and the walk is ordered, so two runs of this agree
-    /// exactly.</b> A yardstick that moved between readings of it would put its own
+    /// <b>The shuffle is seeded and the walk is ordered</b>, so two runs of this agree
+    /// exactly. A yardstick that moved between readings of it would put its own
     /// spread into every comparison it was used for, and fork 12 is what that costs.
     /// </remarks>
     public static Probed Fit(
@@ -155,8 +155,8 @@ public static class Probe
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The interface was the cost, and it was two thirds of the slowest test in the
-    /// suite.</b> The fit is 30 passes over every reading against every outcome, so a
+    /// <b>The interface was the cost</b>, and it was two thirds of the slowest test in the
+    /// suite. The fit is 30 passes over every reading against every outcome, so a
     /// 3,072-wide raw CIFAR probe indexes a reading about two billion times — and every
     /// one of those went through <see cref="IReadOnlyList{T}"/>, which is a virtual call
     /// the JIT cannot inline, cannot elide a bounds check on, and cannot hoist anything

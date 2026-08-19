@@ -405,7 +405,13 @@ public sealed class DocsTests
     // And 11,975 is the thirty-sixth raise, thirteen words for a refutation row rewritten. The
     // vote gate is deleted and its row now says what killed it rather than what once did: it
     // silences the right rule instead of reseating a wrong one.
-    private const int Whole = 11_975;
+    //
+    // And 12,024 is the thirty-seventh raise, forty-nine words for the seat entries rewritten
+    // around what coverage showed. The gap between what a population HOLDS and what it answers
+    // is the seat exactly, so the axis is time rather than the vote rule: more tellings close
+    // it unaided, and what is wanted is a correct young rule outranking a wrong old one
+    // sooner. That names the next arm, which is what a route entry is for.
+    private const int Whole = 12_024;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

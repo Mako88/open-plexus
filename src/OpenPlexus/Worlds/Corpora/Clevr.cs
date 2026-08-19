@@ -202,8 +202,8 @@ public sealed class Clevr : IWorld<Coded>, IWithholds<Coded>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Without it the question is not askable, and that was measured the hard
-    /// way.</b> <i>The large metal thing</i> names one object of one scene and
+    /// <b>Without it the question is not askable</b>, and that was measured the hard
+    /// way. <i>The large metal thing</i> names one object of one scene and
     /// several hundred objects of the corpus, so a conjunction with no scene in it
     /// found the object meant about as often as picking one at random — which read
     /// as the architecture failing and was the harness never having asked the

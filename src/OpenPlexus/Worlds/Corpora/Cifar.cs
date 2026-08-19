@@ -81,8 +81,8 @@ public sealed record CifarSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The first world here that was not already symbols, and that is the whole
-/// point.</b> bAbI ships words, CLEVR ships a scene graph with every object's colour
+/// <b>The first world here that was not already symbols</b>, and that is the whole
+/// point. bAbI ships words, CLEVR ships a scene graph with every object's colour
 /// and shape already separated, CLUTRR ships the relation as a column. Each of those
 /// hands over the front end this architecture claims to replace, so nothing measured
 /// on them has said anything about the interface. This ships photons.

@@ -78,7 +78,7 @@ public sealed record Sentence
     /// The line as the corpus wrote it, without its number or its answer column.
     /// </summary>
     /// <remarks>
-    /// <b>Kept so an answer can be read back in English, which nothing could do before.</b>
+    /// <b>Kept so an answer can be read back in English</b>, which nothing could do before.
     /// A word becomes <see cref="Babi.Of"/>'s hash and a hash goes nowhere back, so a run
     /// that answered a question correctly could report a number and never the question. It
     /// is shown to nobody and to nothing that learns — see <see cref="Recalled"/>, which

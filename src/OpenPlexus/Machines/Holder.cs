@@ -142,15 +142,15 @@ public sealed class Holder : IReceiveAsks
     /// a holder that cannot be left holding a settlement for a moment it has forgotten.
     /// </para>
     /// <para>
-    /// <b>AND THE ROUND ITSELF IS <see cref="Alone"/>'S, which is the one thing this file
-    /// must not reimplement.</b> Settle, sweep, repair, cover, repair — in that order,
+    /// <b>AND THE ROUND ITSELF IS <see cref="Alone"/>'S</b>, which is the one thing this file
+    /// must not reimplement. Settle, sweep, repair, cover, repair — in that order,
     /// because the order is what makes a distributed run comparable with the hundred runs
     /// taken in one process. Two copies of a learning loop is the duplication that could
     /// silently start learning two different things, and it would arrive here.
     /// </para>
     /// <para>
-    /// <b>A duplicate telling would be counted twice, and that is a named limit rather
-    /// than a handled case.</b> TCP does not deliver a message twice within a connection,
+    /// <b>A duplicate telling would be counted twice</b>, and that is a named limit rather
+    /// than a handled case. TCP does not deliver a message twice within a connection,
     /// so <see cref="Posted"/> cannot show it; <see cref="HybridBus"/> can, and nothing
     /// here would notice. A monotone counter cannot retract, so what it would cost is a
     /// commitment believing itself more experienced than it is.

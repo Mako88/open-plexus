@@ -33,8 +33,8 @@ public sealed class MonkRun
     /// <param name="brain">The one brain, already configured.</param>
     /// <param name="seed">The world's own generator.</param>
     /// <param name="census">
-    /// Whether to partition the wrong rounds by cause — <b>the second world that can, and
-    /// the one whose language ceiling is known in advance.</b>
+    /// Whether to partition the wrong rounds by cause — <b>the second world that can</b>, and
+    /// the one whose language ceiling is known in advance.
     /// </param>
     /// <remarks>
     /// <b>Which makes this the only place the census can be read against a known

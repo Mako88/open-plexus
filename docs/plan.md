@@ -428,12 +428,15 @@ before six that reads as tuning is out of order.
       so repair and every rung above it are held still.
     - **OPEN** — more unsound commitments resident than sound ones while the score holds: is
       the vote robust to them, or are they why it stops short. Fork **35**.
-    - **OPEN** — the live problem is which rule gets the seat, and two arms at it have
-      failed. Almost none of the population is read, so a gate changing what is HELD cannot
-      reach what decides — read the revival rows before a third.
-    - **OPEN** — and the gap IS the seat, now that a lesson can be enumerated: every claiming
-      arm holds a rule for every truth stated and they answer wildly different shares of the
-      examination.
+    - **OPEN** — the live problem is which rule gets the seat, and three arms at it have
+      failed. A gate changing what is HELD cannot reach what decides, and one refusing a young
+      rule its vote silences the machine rather than reseating it.
+    - **NOW** — and the gap IS the seat, measured: every claiming arm holds a rule for every
+      truth an enumerable lesson states while answering wildly different shares of it.
+    - **OPEN** — so the axis is TIME, not the vote rule. More tellings close the gap on their
+      own, so what is wanted is a correct young rule outranking a wrong old one sooner without
+      a lucky young one winning. `Crediting` is one point on it and the vote gate was the
+      opposite direction.
     - **OPEN** — `Alternating` is derived offline, and re-deriving orphans every scope holding
       a category, its name being its members. Add-only, as `Naming` is.
     - **OPEN** — mutual exclusion is unbuilt, so a belief can be wrong and never CONTRADICTED.

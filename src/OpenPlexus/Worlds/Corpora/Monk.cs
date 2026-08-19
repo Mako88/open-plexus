@@ -44,8 +44,8 @@ public sealed record MonkSettings
     /// How many of the 432 to load, score and never draw.
     /// </summary>
     /// <remarks>
-    /// <b>Taken from the end of a fixed enumeration, so the split is a position and not
-    /// a sample</b> — the same reason <see cref="Cifar"/> does it that way. A withheld
+    /// <b>Taken from the end of a fixed enumeration</b>, so the split is a position and not
+    /// a sample — the same reason <see cref="Cifar"/> does it that way. A withheld
     /// set chosen by the world's own generator would move with the seed, and two seeds
     /// would then be scored against two different questions.
     /// </remarks>

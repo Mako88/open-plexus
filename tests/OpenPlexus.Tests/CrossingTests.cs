@@ -34,6 +34,16 @@ public sealed class CrossingTests(ITestOutputHelper output)
     /// </remarks>
     private const int Rounds = 2_000;
 
+    /// <summary>How often the run subsumes, abstracts and culls.</summary>
+    /// <remarks>
+    /// <b>Named here because rung five is asked once of it</b>, so the count of names a run
+    /// can mint is bounded by <see cref="Rounds"/> over this and by nothing about the
+    /// population. Lowering it is not an isolated arm: one interval drives subsumption,
+    /// culling and abstraction together, which is the trap about a comparison that moves two
+    /// things at once.
+    /// </remarks>
+    private const int Sweep = 500;
+
     private static CrossingSettings Clean(
         int words = 16, int facts = 4, int stride = 4, int asked = 64, bool scrambled = false) =>
         new()
@@ -188,7 +198,7 @@ public sealed class CrossingTests(ITestOutputHelper output)
         var chance = 1.0 / (world.Words + world.Facts);
 
         var read = new CrossingRun(world, brain, seed: 1)
-            .Run(rounds: Rounds, sweep: 500, target: 0.9, window: 2000);
+            .Run(rounds: Rounds, sweep: Sweep, target: 0.9, window: 2000);
 
         var crossing = Assert.IsType<Examined>(read.Learnt.Unseen);
         var placed = Assert.IsType<Examined>(read.Placed);
@@ -269,5 +279,15 @@ public sealed class CrossingTests(ITestOutputHelper output)
             "rung five was never asked on a world built to make it fire, so the crossing's "
             + "nought is about when the rung is offered a population rather than about what "
             + "it does with one");
+
+        // And the bound, which is the reading rather than a prediction. The rung is asked
+        // once a sweep, so a run of this many rounds can ask it this many times whatever the
+        // population holds -- and on this world it speaks on nearly every ask, with hundreds
+        // of eligible scopes and tens of thousands of candidate pairs behind each one. The
+        // gate is not what is stopping it; the clock is.
+        Assert.True(naming.Asked <= (Rounds / Sweep) + 1,
+            $"rung five was asked {naming.Asked} times over {Rounds / Sweep} sweeps, so it is "
+            + "no longer asked once of each. Something has changed about when the rung runs "
+            + "and the account of why its yield is small here is stale");
     }
 }

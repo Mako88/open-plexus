@@ -4,7 +4,7 @@ namespace OpenPlexus.Codes;
 
 /// <summary>
 /// A real reading said as a band per dimension — <b><see cref="Grains"/> as a
-/// front end, and the half of step 8 that generalises along ONE axis.</b>
+/// front end</b>, and the half of step 8 that generalises along ONE axis.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -13,8 +13,8 @@ namespace OpenPlexus.Codes;
 /// say it again more coarsely, so the hierarchy IS the similarity — but it is a
 /// hierarchy per DIMENSION, and two readings differing a little in every
 /// dimension share no band at any grain. <see cref="Winnow"/> reads the
-/// dimensions TOGETHER. <b>They are two halves of one step and neither is the
-/// other's arm</b>, so a body wanting both mounts both.
+/// dimensions TOGETHER. <b>They are two halves of one step</b> and neither is the
+/// other's arm, so a body wanting both mounts both.
 /// </para>
 /// <para>
 /// <b>It takes the part of the frame it reads</b>, which is why there is no

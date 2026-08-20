@@ -55,8 +55,8 @@ public static class Unifying
     /// </summary>
     /// <param name="modality">What kind of code may fill it.</param>
     /// <param name="name">
-    /// Which variable this is. <b>Two entries carrying the same name must be filled by the
-    /// same value</b>, and that is the whole of what unification adds.
+    /// Which variable this is. <b>Two entries carrying the same name</b> must be filled by the
+    /// same value, and that is the whole of what unification adds.
     /// </param>
     /// <remarks>
     /// <b>The modality rides in the high half and the name in the low one</b>, so a pattern

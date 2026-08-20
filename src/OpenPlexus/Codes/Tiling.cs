@@ -39,8 +39,8 @@ namespace OpenPlexus.Codes;
 /// otherwise is how the ladder's order becomes a bias nobody declared.
 /// </para>
 /// <para>
-/// <b>The geometry is <see cref="Winnowing.Sheet"/>'s, so the two arms differ in
-/// exactly one place.</b> A tiled front end with its own expansion ratio would be a
+/// <b>The geometry is <see cref="Winnowing.Sheet"/>'s</b>, so the two arms differ in
+/// exactly one place. A tiled front end with its own expansion ratio would be a
 /// comparison between two projections as much as between two ways of cutting a picture
 /// up, which is the fault the whole seam exists to prevent.
 /// </para>

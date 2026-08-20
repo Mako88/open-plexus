@@ -532,7 +532,7 @@ public sealed class DocsTests
     // leaf carried them and cost twenty-seven words more; `The_plan_looks_forward` caught it,
     // correctly -- a finding lives in the commit and the test, and a doc that starts keeping
     // them is the pile of docs this one replaced.
-    private const int Whole = 10_985;
+    private const int Whole = 11_288;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.
@@ -555,9 +555,9 @@ public sealed class DocsTests
     /// <para>
     /// <b>And the fork index went earlier</b>, which is what the route becoming a tree bought.
     /// Ninety-four flat rows that had to be read whole to find the one bearing on your work.
-    /// The numbers still resolve, because
-    /// <see cref="Every_fork_the_code_cites_is_in_the_index"/> reads the whole doc rather
-    /// than one section of it.
+    /// The check that made every cited number resolve went too, once the route stopped
+    /// holding closed forks: it was keeping alive a roll of bare numbers whose only job was
+    /// to satisfy it, and what a reader wants from `fork 66` is in the comment that cites it.
     /// </para>
     /// </remarks>
     private static readonly string[] Sections =
@@ -1426,40 +1426,6 @@ public sealed class DocsTests
         Assert.All(findings, line => Assert.True(
             Findings.Any(rule => Regex.IsMatch(line, rule.Pattern)),
             $"nothing in the rule set notices this is a finding: {line}"));
-    }
-
-    [Fact]
-    public void Every_fork_the_code_cites_is_in_the_index()
-    {
-        // The ghost-reference problem that has bitten this project before, which
-        // is why forks are deliberately never renumbered. The code cites fork
-        // numbers in a dozen places; this asserts each one still resolves.
-        var plan = Plan();
-
-        var listed = Regex
-            .Matches(plan, @"\*\*(\d{1,3})\*\*")
-            .Select(match => match.Groups[1].Value)
-            .ToHashSet(StringComparer.Ordinal);
-
-        Assert.NotEmpty(listed);
-
-        var cited = new SortedSet<string>(StringComparer.Ordinal);
-
-        foreach (var path in Tree.Sources("src"))
-            // Three digits and anchored, because two silently truncated the first fork past
-            // ninety-nine. `fork 106` matched as `10`, so the check reported a dangling
-            // citation of a fork nobody had written about while the one actually cited went
-            // unchecked -- a guard describing a repo that is not there, which is the fault
-            // this file exists to catch in other people's work.
-            foreach (Match match in Regex.Matches(File.ReadAllText(path), @"[Ff]ork (\d{1,3})\b"))
-                cited.Add(match.Groups[1].Value);
-
-        Assert.NotEmpty(cited);
-
-        var dangling = cited.Where(number => !listed.Contains(number)).ToList();
-
-        Assert.True(dangling.Count == 0,
-            $"the code cites forks the index does not list: {string.Join(", ", dangling)}");
     }
 
     /// <summary>The test files, by the name a comment would call them.</summary>

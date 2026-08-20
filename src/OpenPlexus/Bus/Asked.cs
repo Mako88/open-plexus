@@ -103,7 +103,7 @@ public readonly record struct Tabled
 /// out, answers come back as their own messages, and nothing here holds a clock.
 /// </para>
 /// <para>
-/// <b>And it is what lets a death be silence instead of a timeout.</b> C3 says a holder
+/// <b>And it is what lets a death be silence</b> instead of a timeout. C3 says a holder
 /// vanishing mid-thought is normal; under a push it simply never answers, and a vote taken
 /// over whoever did answer can come back with nothing at all. That silence is what
 /// <c>Abstain</c> has been waiting for since it was written — see the plan's open defect,

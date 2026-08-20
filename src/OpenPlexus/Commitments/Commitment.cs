@@ -156,7 +156,7 @@ public sealed class Commitment
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A firing is not an observation when the world draws the same thing twice.</b>
+    /// <b>A firing is not an observation</b> when the world draws the same thing twice.
     /// <see cref="Fired"/> counts how often a commitment was answered;
     /// this counts how much of what it was answered about was DIFFERENT. Where a world
     /// redraws from a bag the two come apart by exactly the recurrence — and every
@@ -172,8 +172,8 @@ public sealed class Commitment
     /// THIS instead of on firings said otherwise; see the revival row in the plan.
     /// </para>
     /// <para>
-    /// <b>It is kept as an instrument because it settled something no other number
-    /// could.</b> On <see cref="Worlds.Arranged"/> a subsumption rule weighing advantage
+    /// <b>It is kept as an instrument</b> because it settled something no other number
+    /// could. On <see cref="Worlds.Arranged"/> a subsumption rule weighing advantage
     /// against THIS deleted an ordinary 83% of children — the same share as the rules
     /// that weigh it against firings — and landed on the identical withheld score, seed
     /// for seed. The children that sink that world are not memorised. That is a negative

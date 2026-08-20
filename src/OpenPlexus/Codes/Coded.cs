@@ -25,7 +25,7 @@
 /// cannot exercise one.
 /// </para>
 /// <para>
-/// <b>The optional three are not passthrough and that is why they are here.</b>
+/// <b>The optional three are not passthrough</b> and that is why they are here.
 /// Grouping, order and fleetingness are things ONLY a front end can know — see
 /// <see cref="IQuantizer{TObservation}.Bind"/> — and four worlds do know them. A
 /// world saying <i>these codes were one object</i> is stating a fact about its

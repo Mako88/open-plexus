@@ -117,7 +117,7 @@ public interface IBus
     /// lets the denominator come down.
     /// </para>
     /// <para>
-    /// <b>And the hole left is the departure that happens after the ask arrives.</b> Which is
+    /// <b>And the hole left</b> is the departure that happens after the ask arrives. Which is
     /// fork 62 and is not on this bus at all. A holder that took the question and died
     /// is owed forever, correctly — late and absent are one thing under C2 and nothing but a
     /// deadline separates them. What closes it is a partition into slots of R identical

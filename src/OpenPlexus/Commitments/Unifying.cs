@@ -9,7 +9,7 @@ namespace OpenPlexus.Commitments;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Rungs one to three keep a subset test and this one does not.</b>
+/// <b>Rungs one to three keep a subset test</b> and this one does not.
 /// <see cref="Commitment.Fires"/> asks whether every code of a scope is in the moment,
 /// which is a membership test per code and nothing else. An entry saying <i>whichever
 /// code of this modality, and the SAME one wherever this entry repeats</i> cannot be
@@ -31,7 +31,7 @@ namespace OpenPlexus.Commitments;
 /// join is what has no index.
 /// </para>
 /// <para>
-/// <b>Which is the half the front end has to supply and on text does not.</b>
+/// <b>Which is the half the front end has to supply</b> and on text does not.
 /// <see cref="Codes.Joined"/> unions the question's words into the story's bag under one
 /// modality, so <i>asked</i> and <i>told</i> are the same code and a repeated entry
 /// binds against nothing. A front end computing that join with the identity thrown away was

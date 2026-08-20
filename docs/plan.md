@@ -31,18 +31,21 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them.
-- **ACTIVE, text as an image** — `Crossing` pushes the two senses in one moment and what is
-  left is the binding, which wants rung five over co-firing patches. Fork **107**.
+- **ACTIVE, why rung five does not fire** — it is the only operator that BROADENS, so a
+  machine where it never mints is specialise-only and conceptless by this doc's own line.
+  `Crossing` is a world built to make it fire and it barely does.
+- **Then the crossing itself**, which falls out of that one: a name over the co-firing shape
+  and symbol is what carries a fact back to a drawing. Fork **107**.
 - **A beginner language course as the primer.** John's. Ostensive by construction, one
   referent across video, audio and text, ordered for a learner with no language. Fork **132**.
+- **Mutual exclusion**, so a belief can be CONTRADICTED rather than only outvoted. A miss says
+  what arrived, and nothing yet says the two cannot both hold. Fork **99**.
 - **A weighed adhesion**, which no arm has built, with PPMI over `ByLikeness`'s counts beside
   it. One of the three likeness readings leaves with a revival row. Fork **131**.
 - **What add-only costs** — a group that fills gradually mints at every size it passes
   through, and the closure sightings are what a patience rule would read. Fork **130**.
 - **Likeness read off the POPULATION** rather than the moment: two codes are alike where the
   commitments naming them EXPECT the same things. Fork **129**.
-- **Mutual exclusion**, so a belief can be CONTRADICTED rather than only outvoted. A miss says
-  what arrived, and nothing yet says the two cannot both hold. Fork **99**.
 - **Audit TRAPS and DO NOT RE-TRY** — a failure class that has earned a check belongs in the
   check, and a revival condition that has expired is a superstition.
 - **Split `Population`** and any other class holding several mechanisms at once.
@@ -150,6 +153,16 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 
 John's, and it is a stepping stone rather than the goal above. Written down because it
 FORBIDS things, and several of them are already measured.
+
+- **What it is, John's**, and it is stated so it can be FAILED at this scale. A machine that
+  holds a basic conversation in English, is told a block of information, and shows it
+  understood by answering on it. Not everything an LLM does.
+- **And an LLM replacement is what it becomes when SCALED**, rather than what is being built
+  here. A target nobody can run cannot refuse anything, so it would be a direction wearing a
+  target's clothes.
+- **And a picture is the second sense it must take**, so the machine is told in words and
+  shown a thing. A crossing is what makes two senses one thing, and every sense after this is
+  the same problem rather than a cheaper one.
 
 - **Twenty used phones on one wifi running the brain**, one stronger machine carrying the
   body — camera at a frame or two a second, audio, temperature, motion.
@@ -464,6 +477,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **NOW** — a front end may say what it is looking at, never what to conclude, and
       `SeparationTests` fails the build. A final `?` is all a world says, so questionhood is
       the learner's. John's.
+    - **OPEN** — the conversation reads questionhood off the text and the CORPORA still hand
+      it separated, so one path obeys the rule and the other does not.
     - **OPEN** — how hard a fleet searches is a deployment choice, which is a world reaching
       into the brain one level out. Fork **60** carries it, under the machine.
   - What it is told must be settleable
@@ -543,6 +558,10 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       the loop, and `Brain.Receive` refuses a moment not advancing its source. A typed
       SENTENCE is one moment, a statement claims every word in turn, and an assertion mints
       its WHOLE scope. John's.
+    - **OPEN** — a typed sentence is one moment and the CORPORA still arrive whole, which is
+      the same rule broken on the other path.
+    - **OPEN** — a moment not advancing its source is refused and nothing reads the refusals
+      as a rate, so the door is built and the backpressure reading is not.
     - **OPEN** — a commitment is settled by the SUCCESSOR moment from the same source, so
       absence is established by arrival rather than by a clock. C2 forbids the deadline.
     - **OPEN** — and a settlement must CARRY the moment it settles, which `Holder` already
@@ -625,6 +644,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | `Weighing.Summing` — an expectation worth its advocates added up | Led on none of ten worlds once the vote stopped steering the search, and a sum splits inexactly | A world where a crowd outweighs one always-right rule |
 | `Weighing.Lifting` — divide the best advocate by its answer's base rate | Beat `Strongest` nowhere in ten worlds, and trails worst where skew gives the divisor something to do | A world where an unusual answer on thin evidence is right |
 | `Sharpness` — accuracy raised to a power before the vote | A workaround for a sum's shape: it cannot move the argmax of a maximum, and the sum is gone | Never under a maximum; only a summed vote returns it |
+| `Tiling`'s placed half where the thing MOVES | The bare half alone reads a moved word far higher and runs four times faster, and a placed code cannot sit in a scope sound over position | A world whose thing never moves, which is the seat it keeps |
 | `Stepping.Pair`, fork **74** — winner and runner-up in one repair | Coverage falls 2 to 4 standard errors on three worlds, accuracy with it, and the carriers overshoot the minimum sound depth | A machine knowing when a scope is deep enough — fork 75 |
 | `Widening` — making a scope shorter, on all three arms | Both arms lose the withheld set on `Arranged`, whose one-code truths are where shortening should have helped; a drop usually makes a sound scope unsound, and the gate against that is inert under `Floor` | Judging a drop before it is resident: fork **64**'s absence code |
 | `Joining.Situated` — displacement keyed on the commonest N words of the corpus | The motion verbs straddle the names, so no rank keeps names as keys and drops verbs | A corpus whose function words are separable by frequency. `Distinguished` takes its background from the story and needs no rank |

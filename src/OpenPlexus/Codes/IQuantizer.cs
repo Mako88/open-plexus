@@ -1,4 +1,4 @@
-namespace OpenPlexus.Codes;
+﻿namespace OpenPlexus.Codes;
 
 /// <summary>
 /// Turns one raw observation into the codes present in it.
@@ -11,8 +11,8 @@ namespace OpenPlexus.Codes;
 /// than a JPEG.
 /// </para>
 /// <para>
-/// <b>Which is why a quantiser is built from the shared seed and never fitted
-/// to data.</b> Two quantisers fitted on different samples of one stream agree
+/// <b>Which is why a quantiser is built from the shared seed</b> and never fitted
+/// to data. Two quantisers fitted on different samples of one stream agree
 /// about under 0.12 of items, and no amount of walking recovers that — two
 /// machines would file the same red ball under different codes.
 /// </para>
@@ -51,7 +51,7 @@ public interface IQuantizer<in TObservation>
 
     /// <summary>
     /// What order those codes came in, when this front end can say. <b>Null by
-    /// default, which is every front end for which nothing came first.</b>
+    /// default</b>, which is every front end for which nothing came first.
     /// </summary>
     /// <remarks>
     /// <b>The order is a front-end job for the same reason segmentation is.</b>

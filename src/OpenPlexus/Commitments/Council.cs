@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Diagnostics;
 using OpenPlexus.Codes;
 
@@ -43,7 +43,7 @@ public sealed record Spent
     public required double Repair { get; init; }
 
     /// <summary>
-    /// <b>Two runs that differ only in how long they took are the same run.</b>
+    /// <b>Two runs that differ only in how long they took</b> are the same run.
     /// </summary>
     /// <param name="other">The other clock, which is not compared.</param>
     /// <remarks>

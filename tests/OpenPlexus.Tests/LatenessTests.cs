@@ -13,8 +13,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Every distributed number in this project is over TCP, and TCP does not reorder within
-/// a connection.</b> <c>FleetTests</c> says so in its own remarks and is right: green there
+/// <b>Every distributed number in this project is over TCP</b>, and TCP does not reorder within
+/// a connection. <c>FleetTests</c> says so in its own remarks and is right: green there
 /// means the bytes, the routing and the arithmetic are correct, and says nothing whatever
 /// about lateness. C2 says messages are late, jittered and out of order, and the whole
 /// design rests on that being survivable — <b>which nothing had checked with a learner

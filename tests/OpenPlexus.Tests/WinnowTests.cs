@@ -1,11 +1,11 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// The random-projection front end — <b>step 8's other half, and the first thing
-/// here that reads a NUMBER rather than a symbol.</b>
+/// The random-projection front end — <b>step 8's other half</b>, and the first thing
+/// here that reads a NUMBER rather than a symbol.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -13,8 +13,8 @@ namespace OpenPlexus.Tests;
 /// Everything else in this file is wiring: the tag is the right size, the same
 /// reading gives the same tag, a different reading gives a different one. Those
 /// would all pass for an ordinary hash, which is precisely what would be useless
-/// — <b>a hash that scattered near inputs would be a front end doing the opposite
-/// of its job</b>, and the refutation table's whole point is that a likeness has
+/// — <b>a hash that scattered near inputs</b> would be a front end doing the opposite
+/// of its job, and the refutation table's whole point is that a likeness has
 /// to come from outside the counting.
 /// </para>
 /// <para>

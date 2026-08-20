@@ -185,7 +185,7 @@ public sealed class CrossingTests(ITestOutputHelper output)
 
         output.WriteLine(
             $"{world.Words} words, {world.Facts} facts, chance {chance:F3}, "
-            + $"{brain.Held.All.Count()} commitments");
+            + $"patch {CrossingRun.Patch}");
 
         output.WriteLine($"{"exam",-12}{"asked",8}{"answered",10}{"accuracy",10}");
         output.WriteLine(
@@ -201,5 +201,38 @@ public sealed class CrossingTests(ITestOutputHelper output)
             $"the drawn stream scored {read.Learnt.Recent:F3} against a blind draw of "
             + $"{chance:F3}, so the world is not reaching the learner and the exams below "
             + "say nothing");
+
+        // WHAT THE POPULATION ACTUALLY BUILT, because a nought on the crossing is a
+        // restatement until something says which link is missing. Three counts answer it:
+        // rules keyed on the drawing that expect a word, rules keyed on a word that expect a
+        // fact, and rules whose scope spans both senses at once. The third is what binding
+        // looks like from inside a population, and rung five renaming over it is what would
+        // carry a fact back to a drawing.
+        var held = brain.Held.All.ToList();
+
+        var reading = held.Count(one =>
+            one.Scope.Any(code => code.Modality == Crossing.Shape)
+            && one.Expects.Modality != Crossing.Shape);
+
+        var telling = held.Count(one =>
+            one.Scope.Any(code => code.Modality == Crossing.Symbol)
+            && one.Expects.Modality != Crossing.Shape);
+
+        var spanning = held.Count(one =>
+            one.Scope.Any(code => code.Modality == Crossing.Shape)
+            && one.Scope.Any(code => code.Modality == Crossing.Symbol));
+
+        var renamed = brain.Held.Births.Values.Count(birth => birth == Birth.Renamed);
+
+        output.WriteLine(
+            $"{held.Count} held: {reading} keyed on the drawing, {telling} on the word, "
+            + $"{spanning} spanning both, {renamed} rewritten over a minted name");
+
+        // A population holding nothing keyed on the drawing means the shape sense reached
+        // no rule at all, and then both exams are readings about the front end. The two
+        // numbers above are unreadable without this one.
+        Assert.True(reading > 0,
+            "no commitment is keyed on a drawn word, so the shape sense reached no rule and "
+            + "neither exam is about binding");
     }
 }

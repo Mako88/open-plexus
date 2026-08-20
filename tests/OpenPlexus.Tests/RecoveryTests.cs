@@ -7,7 +7,7 @@ namespace OpenPlexus.Tests;
 
 /// <summary>
 /// What it costs to recover when the world moves under the learner — <b>fork 27's direct
-/// test, and the one step-one requirement whose world was built and never measured.</b>
+/// test</b>, and the one step-one requirement whose world was built and never measured.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -38,8 +38,8 @@ public sealed class RecoveryTests(ITestOutputHelper output)
 {
     /// <summary>How long the world holds still before it moves.</summary>
     /// <remarks>
-    /// <b>Long enough that the target is held before the flip, or this measures learning
-    /// rather than recovery.</b> Six bits reaches the target well inside this on every seed
+    /// <b>Long enough that the target is held before the flip</b>, or this measures learning
+    /// rather than recovery. Six bits reaches the target well inside this on every seed
     /// the scaling grid reads, so what happens after the flip is a fall from a height the
     /// run had actually reached.
     /// </remarks>

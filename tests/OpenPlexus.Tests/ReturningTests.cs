@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -744,5 +744,173 @@ public sealed class ReturningTests(ITestOutputHelper output)
             $"the drifting cell lifted {lift[0.02]:+0.000;-0.000} over no category, so "
             + "continuity is tracking a thing through a move and what this file calls a "
             + "place is an individual");
+    }
+
+    /// <summary>The groups as a thing two derivations can be compared on.</summary>
+    /// <param name="found">What came back.</param>
+    /// <remarks>
+    /// A group is a set and the list of them is a set too, so neither order may count. Two
+    /// derivations that reached the same grouping by different roads have to read equal here
+    /// or the comparison below is about the walk rather than about the counts.
+    /// </remarks>
+    private static string Shape(IReadOnlyList<IReadOnlySet<Code>> found) =>
+        string.Join(
+            " | ",
+            found
+                .Select(one => string.Join(",", one.Order().Select(code => $"{code.Modality}:{code.Value}")))
+                .Order());
+
+    /// <summary>
+    /// A derivation read while the stream runs reaches what one read off a list reaches.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The plan's entry against this derivation is that it is taken offline, and that
+    /// re-taking it orphans every scope holding a category, a category's name being its
+    /// members. Deriving it online is the half of that which is not about the store, and this
+    /// is the check that the move cost nothing: the same counts, reached one moment at a
+    /// time, group identically.
+    /// </para>
+    /// <para>
+    /// It cannot be satisfied by the two agreeing about nothing. Both sides are asserted to
+    /// have found the world first, so an implementation returning no groups at all fails here
+    /// rather than passing for free.
+    /// </para>
+    /// <para>
+    /// The space clause needs no ending and the time clause does. What a moment shares is
+    /// known when it arrives; whether two codes turn up near each other cannot be known until
+    /// the moments after have come, so the last window of a list is the one place the two
+    /// ways of driving the counts can differ, and saying the list has ended is what closes it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_derivation_read_while_the_stream_runs_reaches_what_a_list_reaches()
+    {
+        const double Adhesion = 1.5;
+
+        var stream = Watched(World(twinned: true, tagged: false, placed: true, wandering: 0.8), seed: 1);
+
+        var live = new Alternating(span: 1);
+
+        foreach (var moment in stream) live.Watch(moment);
+
+        // Read before the ending is declared, because that is the state a brain is always in
+        // and the space clause has to be readable there.
+        var runningSpace = live.BySpace(company: 0.5, floor: 20);
+
+        live.Settle();
+
+        var space = live.BySpace(company: 0.5, floor: 20);
+        var time = live.ByTime(Adhesion, floor: 20);
+
+        var listSpace = Alternating.From(stream, company: 0.5, floor: 20);
+        var listTime = Alternating.Over(stream, Adhesion, floor: 20, span: 1);
+
+        output.WriteLine(
+            $"{stream.Count} moments folded one at a time, {live.Moments} counted");
+        output.WriteLine(
+            $"space: {space.Count} groups live against {listSpace.Count} from a list");
+        output.WriteLine(
+            $"time:  {time.Count} groups live against {listTime.Count} from a list");
+
+        // The world first, so neither side can agree by finding nothing.
+        Assert.True(On(listTime, 25).Count == 8 && On(listTime, 25).All(one => one.Count == 4),
+            "the list derivation did not find the world, so there is nothing to agree about");
+
+        Assert.Equal(Shape(listSpace), Shape(space));
+        Assert.Equal(Shape(listTime), Shape(time));
+
+        // And the space clause never needed the ending, which is the sharper half: it is
+        // already an online derivation and always was.
+        Assert.Equal(Shape(listSpace), Shape(runningSpace));
+    }
+
+    /// <summary>
+    /// How many sightings a live derivation needs before it holds the world.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The equality above says a live derivation reaches what a list reaches and says nothing
+    /// about when. A store that may never edit a group has to know how long to wait before
+    /// minting one, and that is a number rather than a judgement: the sighting at which the
+    /// groups stop moving.
+    /// </para>
+    /// <para>
+    /// Read at prefixes rather than at the end, and the reading is the first prefix whose
+    /// grouping is the one the whole stream reaches. A prefix that reaches it and then loses
+    /// it again is the thing worth knowing, so the closing point is taken as the first
+    /// prefix from which every later prefix agrees.
+    /// </para>
+    /// <para>
+    /// It carries no bar. What this costs has never been measured and a threshold written
+    /// before the first reading would be the answer rather than the finding.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_a_live_derivation_costs_before_it_holds_the_world()
+    {
+        const double Adhesion = 1.5;
+        const int Step = 250;
+
+        var stream = Watched(
+            World(twinned: true, tagged: false, placed: true, wandering: 0.8),
+            seed: 1,
+            sightings: 8000);
+
+        var whole = Alternating.Over(stream, Adhesion, floor: 20, span: 1);
+
+        // Read per modality rather than whole, because a single yes-or-no cannot say WHICH
+        // half is still moving -- and the two halves of this world are known to close at
+        // different rates, the appearances being twelve groups and the places eight.
+        var modalities = whole.SelectMany(one => one.Select(code => code.Modality))
+            .Distinct().Order().ToList();
+
+        var target = modalities.ToDictionary(one => one, one => Shape(On(whole, one)));
+
+        var live = new Alternating(span: 1);
+        var reached = new List<(int At, Dictionary<byte, bool> Same)>();
+
+        for (var at = 0; at < stream.Count; at++)
+        {
+            live.Watch(stream[at]);
+
+            if ((at + 1) % Step != 0) continue;
+
+            var groups = live.ByTime(Adhesion, floor: 20);
+
+            reached.Add((
+                at + 1,
+                modalities.ToDictionary(one => one, one => Shape(On(groups, one)) == target[one])));
+        }
+
+        output.WriteLine(
+            $"the whole stream: {string.Join(", ", modalities.Select(one => $"{one} in {On(whole, one).Count} groups"))}");
+        output.WriteLine(
+            "sightings | " + string.Join(" | ", modalities.Select(one => $"modality {one}")));
+
+        foreach (var one in reached)
+            output.WriteLine(
+                $"{one.At,9} | "
+                + string.Join(" | ", modalities.Select(mod => $"{(one.Same[mod] ? "same" : "moving"),10}")));
+
+        // The first prefix from which nothing moves again, per modality, so a prefix that
+        // happens to agree and then diverges is not read as having closed.
+        var settled = modalities.ToDictionary(
+            mod => mod,
+            mod =>
+            {
+                var at = reached.FindIndex(one =>
+                    reached.Skip(reached.IndexOf(one)).All(later => later.Same[mod]));
+
+                return at < 0 ? -1 : reached[at].At;
+            });
+
+        foreach (var one in modalities)
+            output.WriteLine(
+                settled[one] < 0
+                    ? $"modality {one} never held still"
+                    : $"modality {one} holds from {settled[one]} of {stream.Count} sightings");
+
+        Assert.DoesNotContain(settled, one => one.Value < 0);
     }
 }

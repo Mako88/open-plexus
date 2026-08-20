@@ -420,7 +420,14 @@ public sealed class DocsTests
     // neither tried is likeness read off the POPULATION -- two codes alike where the
     // commitments naming them expect the same things, which never asks whether they
     // co-occurred. Four tries, two designs, one target, and that is worth the words.
-    private const int Whole = 12_124;
+    // And 12,155 is the thirty-ninth raise, thirty-one words for the derivation going live.
+    // `Alternating` was taken offline and the entry against it said that re-taking it orphans
+    // every scope holding a category. Half of that is now built and the finding sits with it:
+    // one moment at a time over monotone counts, reaching what a list reaches, with the places
+    // closing at 1,250 sightings and the looks at 3,750. The half that is left is the store,
+    // and it is a new item rather than a rewording -- a category's name IS its members, so a
+    // group that grows is a new category beside the old and never an edit to it.
+    private const int Whole = 12_155;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

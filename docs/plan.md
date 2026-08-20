@@ -444,8 +444,10 @@ before six that reads as tuning is out of order.
       own, so what is wanted is a correct young rule outranking a wrong old one sooner without
       a lucky young one winning. `Crediting` is one point on it and the vote gate was the
       opposite direction.
-    - **OPEN** — `Alternating` is derived offline, and re-deriving orphans every scope holding
-      a category, its name being its members. Add-only, as `Naming` is.
+    - **NOW** — `Alternating` is live over monotone counts and reaches what a list reaches.
+      Places close at 1,250 sightings and looks at 3,750.
+    - **OPEN** — the store is the other half: a category's name IS its members, so a group
+      that grows is a NEW one beside the old. Add-only, as `Naming` is.
     - **OPEN** — mutual exclusion is unbuilt, so a belief can be wrong and never CONTRADICTED.
       A miss says *I expected Y and got Z* and nothing says the two cannot both hold, which is
       the whole of what a conflict is. Fork **99**.

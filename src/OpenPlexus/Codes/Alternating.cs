@@ -1,4 +1,4 @@
-namespace OpenPlexus.Codes;
+﻿namespace OpenPlexus.Codes;
 
 /// <summary>
 /// Codes that are ALTERNATIVES, found in what was seen rather than handed over — <b>fork
@@ -33,8 +33,189 @@ namespace OpenPlexus.Codes;
 /// being wrong is how the gate finds out.
 /// </para>
 /// </remarks>
-public static class Alternating
+public sealed class Alternating
 {
+    private readonly Dictionary<Code, int> _seen = [];
+    private readonly Dictionary<Code, HashSet<Code>> _withs = [];
+    private readonly Dictionary<(Code Mine, Code Theirs), int> _near = [];
+    private readonly List<IReadOnlySet<Code>> _held = [];
+    private readonly int _span;
+
+    private int _next;
+    private long _moments;
+    private bool _settled;
+
+    /// <param name="span">
+    /// How many moments either side count as near, for <see cref="ByTime"/>. Fixed at
+    /// construction because it decides how far back a moment has to be held, and a window
+    /// widened part way through a stream would leave the earlier counts answering a narrower
+    /// question than the later ones.
+    /// </param>
+    /// <remarks>
+    /// <para>
+    /// The derivation held open, so a brain may read it while it runs. The plan's entry is
+    /// that deriving offline orphans every scope holding a category, and a live derivation is
+    /// the half of that answer which is not about the store. <see cref="From"/> and
+    /// <see cref="Over"/> are this object driven over a whole stream, so there is one
+    /// implementation and every batch reading is unchanged by construction.
+    /// </para>
+    /// <para>
+    /// Every count here is monotone. How often a code was seen and how often two turned up
+    /// near each other are G-Counters, and what a code shared a moment with is a grow-only
+    /// set, so two machines watching different streams merge with no coordinator. That is C1
+    /// rather than a convenience, and it is why the accumulator is counts and the grouping is
+    /// a pure function of them.
+    /// </para>
+    /// <para>
+    /// What it costs is memory, and the cost is in the company rather than in the pairs. A
+    /// code's company is every code it ever shared a moment with, which on a wide alphabet
+    /// approaches the alphabet. Nothing here bounds it and no reading has priced it.
+    /// </para>
+    /// <para>
+    /// A moment handed over is kept by reference for as long as the window needs it, so a
+    /// caller that mutates a set it has already given up changes counts taken before the edit.
+    /// </para>
+    /// </remarks>
+    public Alternating(int span = 1)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(span);
+
+        _span = span;
+    }
+
+    /// <summary>How many moments have been folded in.</summary>
+    public long Moments => _moments;
+
+    /// <summary>Folds one moment into the counts.</summary>
+    /// <param name="moment">What was seen at once.</param>
+    /// <remarks>
+    /// The exclusion clause and the company are facts about this moment alone and are taken
+    /// here. Adhesion is not: a moment cannot be scored against the moments after it until
+    /// they arrive, so it is held until its forward window is complete and folded then. That
+    /// lag is the whole difference between reading time online and reading it from a list,
+    /// and it is one window deep.
+    /// </remarks>
+    public void Watch(IReadOnlySet<Code> moment)
+    {
+        ArgumentNullException.ThrowIfNull(moment);
+
+        if (_settled)
+            throw new InvalidOperationException("a settled stream takes no more moments");
+
+        _moments++;
+
+        foreach (var one in moment)
+        {
+            _seen[one] = _seen.GetValueOrDefault(one) + 1;
+
+            if (!_withs.TryGetValue(one, out var kept)) _withs[one] = kept = [];
+
+            foreach (var other in moment) if (!other.Equals(one)) kept.Add(other);
+        }
+
+        _held.Add(moment);
+
+        // A moment is ready once every moment that could be near it has arrived, and it is
+        // never revisited after -- so what is held is the window and not the stream.
+        while (_held.Count - _next > _span) Fold(_held.Count - 1);
+
+        while (_next > _span)
+        {
+            _held.RemoveAt(0);
+            _next--;
+        }
+    }
+
+    /// <summary>Says no more moments are coming, so the last of them get their short window.</summary>
+    /// <remarks>
+    /// The experimenter's and never the learner's, and it exists so a run over a list reaches
+    /// the counts a run over a list always did. A brain is never settled, which is what C4
+    /// says; what it changes is the last few moments of a stream and nothing else.
+    /// </remarks>
+    public void Settle()
+    {
+        if (_settled) return;
+
+        while (_next < _held.Count) Fold(_held.Count - 1);
+
+        _settled = true;
+    }
+
+    /// <summary>Folds the next held moment against the window it now has.</summary>
+    /// <param name="last">The furthest moment that may count as near, which the tail truncates.</param>
+    private void Fold(int last)
+    {
+        var at = _next++;
+
+        // Counted once a moment an other, not once a neighbour. A code appearing in both
+        // moments either side of this one is one piece of evidence about adjacency, and
+        // counting it twice would let a long run of one thing manufacture its own
+        // significance.
+        var window = new HashSet<Code>();
+
+        for (var step = Math.Max(0, at - _span); step <= Math.Min(last, at + _span); step++)
+            if (step != at) window.UnionWith(_held[step]);
+
+        foreach (var one in _held[at])
+            foreach (var other in window)
+                if (!other.Equals(one))
+                {
+                    _near.TryGetValue((one, other), out var already);
+                    _near[(one, other)] = already + 1;
+                }
+    }
+
+    /// <summary>The groups read off what shares a moment, as <see cref="From"/> reads them.</summary>
+    /// <param name="company">
+    /// <inheritdoc cref="From" path="/param[@name='company']"/>
+    /// </param>
+    /// <param name="floor">
+    /// <inheritdoc cref="From" path="/param[@name='floor']"/>
+    /// </param>
+    public IReadOnlyList<IReadOnlySet<Code>> BySpace(double company, int floor)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
+
+        return Grouped(
+            _seen, floor, _withs,
+            (mine, theirs, group) => Shared(_withs[mine], _withs[theirs], group) >= company);
+    }
+
+    /// <summary>The groups read off what turns up near in time, as <see cref="Over"/> reads them.</summary>
+    /// <param name="adhesion">
+    /// <inheritdoc cref="Over" path="/param[@name='adhesion']"/>
+    /// </param>
+    /// <param name="floor">
+    /// <inheritdoc cref="From" path="/param[@name='floor']"/>
+    /// </param>
+    /// <remarks>
+    /// Read before the stream is settled, this answers on the moments whose window is
+    /// complete and on no others. What it reads is a prefix of what a settled run holds,
+    /// which is what makes an unsettled reading early rather than wrong.
+    /// </remarks>
+    public IReadOnlyList<IReadOnlySet<Code>> ByTime(double adhesion, int floor)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
+
+        // Chance is the product of the two marginals over the window's own width, so what is
+        // being asked is whether the pair turns up beside each other more than two codes of
+        // those frequencies would have. Without the width the bar would be a claim about how
+        // wide the window is rather than about the stream.
+        var total = (double)_moments;
+        var width = (2 * _span) + 1.0;
+
+        return Grouped(
+            _seen, floor, _withs,
+            (mine, theirs, _) =>
+            {
+                _near.TryGetValue((mine, theirs), out var beside);
+
+                var expected = _seen[mine] / total * (_seen[theirs] / total) * width * total;
+
+                return expected > 0.0 && beside / expected >= adhesion;
+            });
+    }
+
     /// <summary>
     /// The groups of alternatives in a stream of moments.
     /// </summary>
@@ -68,24 +249,12 @@ public static class Alternating
         IEnumerable<IReadOnlySet<Code>> moments, double company, int floor)
     {
         ArgumentNullException.ThrowIfNull(moments);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
 
-        var seen = new Dictionary<Code, int>();
-        var withs = new Dictionary<Code, HashSet<Code>>();
+        var watching = new Alternating();
 
-        foreach (var moment in moments)
-            foreach (var one in moment)
-            {
-                seen[one] = seen.GetValueOrDefault(one) + 1;
+        foreach (var moment in moments) watching.Watch(moment);
 
-                if (!withs.TryGetValue(one, out var kept)) withs[one] = kept = [];
-
-                foreach (var other in moment) if (!other.Equals(one)) kept.Add(other);
-            }
-
-        return Grouped(
-            seen, floor, withs,
-            (mine, theirs, group) => Shared(withs[mine], withs[theirs], group) >= company);
+        return watching.BySpace(company, floor);
     }
 
     /// <summary>
@@ -132,60 +301,18 @@ public static class Alternating
         IEnumerable<IReadOnlySet<Code>> moments, double adhesion, int floor, int span)
     {
         ArgumentNullException.ThrowIfNull(moments);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(span);
 
-        var stream = moments.ToList();
+        var watching = new Alternating(span);
 
-        var seen = new Dictionary<Code, int>();
-        var withs = new Dictionary<Code, HashSet<Code>>();
-        var near = new Dictionary<(Code Mine, Code Theirs), int>();
+        foreach (var moment in moments) watching.Watch(moment);
 
-        for (var at = 0; at < stream.Count; at++)
-            foreach (var one in stream[at])
-            {
-                seen[one] = seen.GetValueOrDefault(one) + 1;
+        // The list has ended, so the last moments get the short window a list always gave
+        // them. A brain never reaches this call, which is the one difference between the two
+        // ways of driving the same counts.
+        watching.Settle();
 
-                if (!withs.TryGetValue(one, out var kept)) withs[one] = kept = [];
-
-                foreach (var other in stream[at]) if (!other.Equals(one)) kept.Add(other);
-
-                // Counted once a moment an other, not once a neighbour. A code appearing in
-                // both moments either side of this one is one piece of evidence about
-                // adjacency, and counting it twice would let a long run of one thing
-                // manufacture its own significance.
-                var window = new HashSet<Code>();
-
-                for (var step = Math.Max(0, at - span);
-                    step <= Math.Min(stream.Count - 1, at + span);
-                    step++)
-                    if (step != at) window.UnionWith(stream[step]);
-
-                foreach (var other in window)
-                    if (!other.Equals(one))
-                    {
-                        near.TryGetValue((one, other), out var already);
-                        near[(one, other)] = already + 1;
-                    }
-            }
-
-        // Chance is the product of the two marginals over the window's own width, so what is
-        // being asked is whether the pair turns up beside each other more than two codes of
-        // those frequencies would have. Without the width the bar would be a claim about how
-        // wide the window is rather than about the stream.
-        var total = (double)stream.Count;
-        var width = (2 * span) + 1.0;
-
-        return Grouped(
-            seen, floor, withs,
-            (mine, theirs, _) =>
-            {
-                near.TryGetValue((mine, theirs), out var beside);
-
-                var expected = seen[mine] / total * (seen[theirs] / total) * width * total;
-
-                return expected > 0.0 && beside / expected >= adhesion;
-            });
+        return watching.ByTime(adhesion, floor);
     }
 
     /// <summary>The greedy grouping both derivations share.</summary>

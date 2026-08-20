@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -461,6 +461,146 @@ public sealed class ArrangedTests(ITestOutputHelper output)
 
             Assert.NotEmpty(could.Alone);
         }
+    }
+
+    /// <summary>
+    /// The whole-moment root, on a world that is not a conversation.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The reading <c>DialTests</c> says this entry is waiting for.</b> How wide a scope
+    /// genesis may mint arrived as an arm with two values and has been run on the spine world
+    /// and nowhere else, where the wide one wins every column at every telling count. A
+    /// controller chosen on one world's evidence is the fault that file exists for.
+    /// </para>
+    /// <para>
+    /// <b>And the risk is named in the dial's own remark</b> rather than found here. A
+    /// whole-moment scope fires only where every one of its codes is present, so it pays where
+    /// a later moment is a superset — a question naming what a statement named — and is dead
+    /// weight everywhere else. A conversation is the friendliest case there is for that and
+    /// this world is not one.
+    /// </para>
+    /// <para>
+    /// <b>The kill line, written before the grid ran</b>: the wide root dies as a default if it
+    /// loses the withheld exam here, or if it buys population without buying sound rules. It
+    /// survives on a draw, because a dial that pays on one world and costs nothing on another
+    /// is a dial with one arm.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_whole_moment_root_read_on_a_world_that_is_not_a_conversation()
+    {
+        const int Seeds = 3;
+
+        var grid =
+            (from seed in Enumerable.Range(1, Seeds)
+             from rooting in new[] { Rooting.Singly, Rooting.Wholly }
+             select (seed, rooting)).ToArray();
+
+        var arms = Fixture.Abreast(
+            [.. grid.Select<(int Seed, Rooting Rooting), Func<(Reached Could, Grounded Got, HashSet<Code> Alone)>>(
+                one => () =>
+                {
+                    var run = new ArrangedRun(
+                        Small,
+                        new Brain(new CommittingSettings { Rooting = one.Rooting }, one.Seed),
+                        Looking.Whole,
+                        one.Seed);
+
+                    var could = run.Reachable(depth: 1);
+                    var got = run.Run(20_000);
+
+                    return (could, got, Fixture.Alone(run.Held));
+                })]);
+
+        output.WriteLine(
+            $"{"root",-8}{"unseen",9}{"ceiling",9}{"found",8}{"resident",10}{"sound",8}"
+            + $"{"unsound",9}{"scope",8}{"minted",9}");
+
+        var unseen = new Dictionary<Rooting, List<double>>
+        {
+            [Rooting.Singly] = [], [Rooting.Wholly] = [],
+        };
+
+        var sound = new Dictionary<Rooting, List<double>>
+        {
+            [Rooting.Singly] = [], [Rooting.Wholly] = [],
+        };
+
+        var resident = new Dictionary<Rooting, List<double>>
+        {
+            [Rooting.Singly] = [], [Rooting.Wholly] = [],
+        };
+
+        var minted = new Dictionary<Rooting, List<double>>
+        {
+            [Rooting.Singly] = [], [Rooting.Wholly] = [],
+        };
+
+        for (var at = 0; at < grid.Length; at++)
+        {
+            var (seed, rooting) = grid[at];
+            var (could, got, alone) = arms[at];
+
+            unseen[rooting].Add(got.Tally.Unseen!.Accuracy);
+            sound[rooting].Add(got.Rules.Sound);
+            resident[rooting].Add(got.Tally.Resident);
+            minted[rooting].Add(got.Tally.Minted);
+
+            output.WriteLine(
+                $"{rooting,-8}{got.Tally.Unseen!.Accuracy,9:F3}{could.CoversUnseen,9:F3}"
+                + $"{could.Alone.Count(alone.Contains),8}{got.Tally.Resident,10}"
+                + $"{got.Rules.Sound,8}{got.Rules.Unsound,9}{got.Rules.Scope,8:F2}"
+                + $"{got.Tally.Minted,9}");
+
+            // The same partition the gate grid asserts, held under both roots. An unsound rule
+            // survives by having a parent subsumption declined or by having none at all, and a
+            // wide root minting a scope with no parent is exactly where that could stop
+            // holding.
+            Assert.Equal(got.Rules.Unsound, got.Rules.Narrowed + got.Rules.Rootless);
+        }
+
+        output.WriteLine(
+            $"singly {unseen[Rooting.Singly].Average():F3} unseen, "
+            + $"{sound[Rooting.Singly].Average():F1} sound, "
+            + $"{resident[Rooting.Singly].Average():F1} resident");
+
+        output.WriteLine(
+            $"wholly {unseen[Rooting.Wholly].Average():F3} unseen, "
+            + $"{sound[Rooting.Wholly].Average():F1} sound, "
+            + $"{resident[Rooting.Wholly].Average():F1} resident");
+
+        // The arm ran, which a draw does not say by itself. A whole-moment scope is one extra
+        // mint on every genesis round, so a wide arm that minted what the narrow one minted did
+        // not do anything -- and a mechanism that could not fire reads exactly like one that
+        // fired and changed nothing. Asserted as a difference rather than as a direction.
+        Assert.NotEqual(minted[Rooting.Singly].Average(), minted[Rooting.Wholly].Average(), 1);
+
+        var wide = new Measured
+        {
+            Arm = "wholly", Values = [.. unseen[Rooting.Wholly]],
+        };
+
+        var narrow = new Measured
+        {
+            Arm = "singly", Values = [.. unseen[Rooting.Singly]],
+        };
+
+        // Read against the seed spread rather than against a tolerance somebody chose, because
+        // the thing being decided is a default and a draw is what lets it ship. One seed is not
+        // a comparison and a fixed slack is a second dial nobody declared.
+        var spread = Math.Sqrt((wide.StdErr * wide.StdErr) + (narrow.StdErr * narrow.StdErr));
+
+        output.WriteLine($"the two are {wide.Mean - narrow.Mean:F3} apart, spread {spread:F3}");
+
+        // The kill line. A default is being decided on this, so what is asserted is the thing
+        // that would stop it rather than the thing that would confirm it -- the wide root has
+        // already won on the spine world, and this world is where it could lose.
+        Assert.True(wide.Mean >= narrow.Mean - spread,
+            $"the wide root reads {wide.Mean:F3} on the withheld exam against {narrow.Mean:F3} "
+            + $"for the shipped one, more than the {spread:F3} spread apart, so minting the "
+            + "whole moment costs score on a world that is not a conversation and the dial "
+            + "keeps both arms");
     }
 
     [Fact]

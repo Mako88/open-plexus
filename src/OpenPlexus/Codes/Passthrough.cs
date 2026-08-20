@@ -1,4 +1,4 @@
-namespace OpenPlexus.Codes;
+﻿namespace OpenPlexus.Codes;
 
 /// <summary>
 /// The front end for a world that is already coded — <b>it quantises nothing,</b> and
@@ -28,7 +28,7 @@ namespace OpenPlexus.Codes;
 /// asks for and the least interesting.
 /// </para>
 /// </remarks>
-public sealed class Passthrough : IQuantizer<Coded>
+public sealed class Passthrough : IQuantizer<Coded>, IQuantizer<Worlds.Crossed>
 {
     /// <summary>
     /// <b>Zero, and it is never read.</b>
@@ -58,4 +58,12 @@ public sealed class Passthrough : IQuantizer<Coded>
 
     /// <inheritdoc/>
     public IReadOnlySet<Code>? Forced(Coded observation) => observation.Assigned;
+
+    /// <summary>The spoken half of a crossing moment, which is already codes.</summary>
+    /// <remarks>
+    /// <b>The same no-op through a second door.</b> A crossing moment carries one sense the
+    /// world constructed and one it drew, so the constructed half wants exactly what this
+    /// class already is and the drawn half wants <see cref="Tiling"/>.
+    /// </remarks>
+    public IReadOnlyCollection<Code> Codify(Worlds.Crossed observation) => observation.Said;
 }

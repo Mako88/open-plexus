@@ -85,6 +85,7 @@ jobs:
         run: |
           all='[
             "AbstainTests","AskedTests","BudgetCurveTests",
+            "CrossingTests.What_the_crossing_and_the_position",
             "BabiTests.What_the_two_likeness_readings",
             "ArrangingTests.What_an_unbounded_repair_budget",
             "ArrangingTests.The_gap_between_what",

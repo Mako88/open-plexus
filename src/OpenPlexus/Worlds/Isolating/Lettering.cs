@@ -1,4 +1,4 @@
-namespace OpenPlexus.Worlds;
+﻿namespace OpenPlexus.Worlds;
 
 /// <summary>
 /// A word drawn as pixels — <b>fork 107, and the one crossing that keeps ground truth
@@ -33,6 +33,31 @@ namespace OpenPlexus.Worlds;
 /// </remarks>
 public static class Lettering
 {
+    /// <summary>
+    /// Sixty-four three-letter words this can draw. <b>Ordered, and the order is fixed.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>Owned by the thing that draws them</b>, so a world and a ceiling reading are never
+    /// two lists that drifted apart. A reading taken on the first sixteen and a world built
+    /// on the first sixteen are then the same sixteen by construction rather than by
+    /// somebody checking.
+    /// <para>
+    /// <b>Three letters each</b>, so a drawn word leaves room to move in both directions on a
+    /// canvas this size — see <see cref="Room"/>.
+    /// </para>
+    /// </remarks>
+    public static readonly IReadOnlyList<string> Vocabulary =
+    [
+        "CAT", "DOG", "BOX", "CUP", "HAT", "PEN", "BED", "SUN",
+        "MAP", "JAR", "KEY", "FAN", "RUG", "NET", "POT", "WEB",
+        "ARM", "BAG", "BAT", "BUS", "CAR", "COW", "CUT", "DAM",
+        "DEN", "DIG", "DOT", "EAR", "EGG", "ELM", "EYE", "FIG",
+        "FIN", "FOG", "FOX", "GAS", "GEM", "GUM", "GUN", "HEN",
+        "HIP", "HUT", "ICE", "INK", "IVY", "LEG", "LID", "LIP",
+        "LOG", "MUD", "NUT", "OAK", "OAR", "OIL", "OWL", "PAD",
+        "PIG", "PIN", "PIT", "RAM", "RAT", "RIB", "ROD", "ROW",
+    ];
+
     /// <summary>How many pixels across one glyph is.</summary>
     public const int Wide = 5;
 

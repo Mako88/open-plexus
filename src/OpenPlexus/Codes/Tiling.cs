@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 namespace OpenPlexus.Codes;
 
@@ -45,7 +45,7 @@ namespace OpenPlexus.Codes;
 /// up, which is the fault the whole seam exists to prevent.
 /// </para>
 /// </remarks>
-public sealed class Tiling : IQuantizer<IReadOnlyList<double>>
+public sealed class Tiling : IQuantizer<IReadOnlyList<double>>, IQuantizer<Worlds.Crossed>
 {
     private readonly Winnow _winnow;
     private readonly int _side;
@@ -146,4 +146,13 @@ public sealed class Tiling : IQuantizer<IReadOnlyList<double>>
         // on how often a part recurred rather than on how much was said.
         return codes.Distinct().ToList();
     }
+
+    /// <summary>The drawn half of a crossing moment, and nothing where none was drawn.</summary>
+    /// <remarks>
+    /// <b>A front end reads its own field and takes what it knows</b>, which is why a body
+    /// needs no router — see <see cref="Compound{TFrame}"/>. A moment that is words alone is
+    /// a moment this sense has nothing to say about, and saying nothing is what it does.
+    /// </remarks>
+    public IReadOnlyCollection<Code> Codify(Worlds.Crossed observation) =>
+        observation.Shape is null ? [] : Codify(observation.Shape);
 }

@@ -44,32 +44,16 @@ public sealed class LetteringTests(ITestOutputHelper output)
     /// <summary>How many pixels apart the drawn offsets are.</summary>
     private const int Stride = 2;
 
-    /// <summary>Three letters each, so a drawn word leaves room to move in both directions.</summary>
-    private static readonly string[] Words =
-    [
-        "CAT", "DOG", "BOX", "CUP", "HAT", "PEN", "BED", "SUN",
-        "MAP", "JAR", "KEY", "FAN", "RUG", "NET", "POT", "WEB",
-    ];
-
     /// <summary>
-    /// Forty-eight more, for the vocabulary sweep alone.
+    /// The first sixteen of <see cref="Lettering.Vocabulary"/>, which the probe is read on.
     /// </summary>
     /// <remarks>
-    /// <b>Kept apart from <see cref="Words"/> rather than appended to it</b>, because the
-    /// probe reading above is scored against a chance of one in sixteen and folding these in
-    /// would move that number while looking like a longer list. The sweep reads
-    /// <see cref="Words"/> first and these after, so its prefix at sixteen is the identical
-    /// vocabulary the ceiling was taken on.
+    /// <b>A prefix rather than a list of its own</b>, so the sweep below reads the identical
+    /// sixteen at its sixteen-word row. Two lists that had to be kept in step would drift the
+    /// first time either was edited, and a chance of one in sixteen is what the probe's score
+    /// is read against.
     /// </remarks>
-    private static readonly string[] More =
-    [
-        "ARM", "BAG", "BAT", "BUS", "CAR", "COW", "CUT", "DAM",
-        "DEN", "DIG", "DOT", "EAR", "EGG", "ELM", "EYE", "FIG",
-        "FIN", "FOG", "FOX", "GAS", "GEM", "GUM", "GUN", "HEN",
-        "HIP", "HUT", "ICE", "INK", "IVY", "LEG", "LID", "LIP",
-        "LOG", "MUD", "NUT", "OAK", "OAR", "OIL", "OWL", "PAD",
-        "PIG", "PIN", "PIT", "RAM", "RAT", "RIB", "ROD", "ROW",
-    ];
+    private static readonly string[] Words = [.. Lettering.Vocabulary.Take(16)];
 
     /// <summary>Every drawing of every word, and which of them are withheld.</summary>
     /// <param name="seed">The split's generator, which is not a front end's.</param>
@@ -354,7 +338,7 @@ public sealed class LetteringTests(ITestOutputHelper output)
     {
         const int Tile = 4;
 
-        var bare = Bare(Drawings(seed: 1, [.. Words, .. More]), Tile);
+        var bare = Bare(Drawings(seed: 1, Lettering.Vocabulary), Tile);
 
         output.WriteLine($"{Tile} pixels a patch, every offset drawn");
         output.WriteLine($"{"words",-8}{"named",8}{"share",8}{"least",8}{"own",8}");

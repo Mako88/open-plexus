@@ -297,6 +297,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["SensesRun"] = Harness,
         ["TendingRun"] = Harness,
         ["ClutrrRun"] = Harness,
+        ["CrossingRun"] = Harness,
 
         // A chooser is composed rather than constructed, which is `Composed`'s reason one
         // layer in. `Watching` takes what to act with as a delegate on purpose -- a random

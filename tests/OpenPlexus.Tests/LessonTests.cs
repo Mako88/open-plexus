@@ -155,21 +155,28 @@ public sealed class LessonTests(ITestOutputHelper output)
     /// <param name="crediting">Whether a mint is credited with the round that made it.</param>
     /// <param name="rooting">What genesis mints a scope over.</param>
     /// <param name="admitting">What a separating condition must do besides separate.</param>
+    /// <param name="passes">
+    /// How many times the examination is sat. <b>At nought the run stops before the
+    /// questions</b>, which is what a probe reading the population the paper has not taught
+    /// yet asks for; the score is nought there and means nothing.
+    /// </param>
     /// <remarks>
     /// <b>Extracted because <c>DuplicationTests</c> refused the second copy</b>, which is the
     /// right refusal: three grids each with their own seed loop is three chances for one
     /// grid's worlds to differ from the grid it is read against.
     /// </remarks>
     private static (List<double> Right, List<double> Found, List<double> Resident,
-        List<double> Silent) Over(
+        List<double> Silent, List<Seats> Seated) Over(
         int seeds, uint purpose, bool written, Carrying carrying, Asserting asserting,
         int tellings, Crediting crediting = Crediting.Nothing,
-        Rooting rooting = Rooting.Singly, Admitting admitting = Admitting.Anything)
+        Rooting rooting = Rooting.Singly, Admitting admitting = Admitting.Anything,
+        int passes = 1)
     {
         var right = new List<double>();
         var found = new List<double>();
         var resident = new List<double>();
         var silent = new List<double>();
+        var seated = new List<Seats>();
 
         for (var index = 0; index < seeds; index++)
         {
@@ -184,19 +191,182 @@ public sealed class LessonTests(ITestOutputHelper output)
                 : Lesson.Drawn(subjects: 4, attributes: 3, seed);
 
             var ran = Ran(
-                lesson, carrying, seed, passes: 1, asserting: asserting, tellings: tellings,
+                lesson, carrying, seed, passes, asserting: asserting, tellings: tellings,
                 rooting: rooting, crediting: crediting, admitting: admitting);
 
-            right.Add(Right(ran.Tutor, pass: 0));
+            right.Add(passes == 0 ? 0.0 : Right(ran.Tutor, pass: 0));
             found.Add(Found(ran.Brain, ran.World, lesson));
             resident.Add(ran.Tally.Resident);
 
             // Beside the score, because a population whose voters do not cover a moment says
             // nothing at all -- and a silent arm scores well on the few rounds it answers.
             silent.Add(ran.Tally.Rounds == 0 ? 0.0 : ran.Tally.Silent / (double)ran.Tally.Rounds);
+
+            // Taken here rather than in a second seed loop, because two loops over `Apart` is
+            // two chances for one grid's eight lessons to stop being the grid it is read
+            // against. It costs a front-end pass per question and nothing else.
+            seated.Add(Seating(ran.Brain, ran.World, lesson, joining: Joining.Bagged));
         }
 
-        return (right, found, resident, silent);
+        return (right, found, resident, silent, seated);
+    }
+
+    /// <summary>How one arm's examination split, as shares of the questions put.</summary>
+    /// <remarks>
+    /// <b>Four shares of one partition</b>, so they sum to one and a sum that does not is the
+    /// halves counting different events. See <see cref="Seating"/> for what separates them.
+    /// </remarks>
+    private readonly record struct Seats
+    {
+        /// <summary>The vote answered with the word the examination wanted.</summary>
+        public required double Right { get; init; }
+
+        /// <summary>Nothing that fired expected that word.</summary>
+        public required double Absent { get; init; }
+
+        /// <summary>Something did, and something else weighed more.</summary>
+        public required double Outranked { get; init; }
+
+        /// <summary>Something did, at the winner's weight exactly, and lost on code order.</summary>
+        public required double Tied { get; init; }
+
+        /// <summary>
+        /// Of the tied questions, the share where the right rule said MORE.
+        /// </summary>
+        /// <remarks>
+        /// <b>Whether specificity would break the tie the right way</b>, which is the one
+        /// thing that separates a fixable tie from a coin. A tie is two rules at the same
+        /// accuracy, so nothing in either record tells them apart and only the scopes can:
+        /// the rule naming both halves of the question says something the rule naming one
+        /// half does not. At a half this is chance and the idea is dead before it is built.
+        /// </remarks>
+        public required double Specific { get; init; }
+
+        /// <summary>
+        /// Of the tied questions, the share where the right rule had MORE advocates.
+        /// </summary>
+        /// <remarks>
+        /// <b>The other thing that can tell two tied rules apart</b>, and the only other one
+        /// there is. A tie means the best advocate on each side is equally accurate; what is
+        /// left is how many commitments say the same thing, and on a question naming two words
+        /// of a statement the right answer is the one both of them point at.
+        /// </remarks>
+        public required double Crowd { get; init; }
+    }
+
+    /// <summary>Why each of a lesson's questions went the way it did, asked offline.</summary>
+    /// <param name="brain">The brain the run finished with.</param>
+    /// <param name="world">The conversation, which is where the answer alphabet lives.</param>
+    /// <param name="lesson">The lesson, for its examination.</param>
+    /// <param name="joining">The front end the run read the questions through.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>Offline and read-only</b>, so it disturbs no recorded number.
+    /// <see cref="Population.Moment"/>, <see cref="Population.Firing"/>,
+    /// <see cref="Population.Predict"/> and <see cref="Population.Weigh"/> all read and none
+    /// of them writes, and the question moment is rebuilt the way
+    /// <c>Machines.Watching</c> builds one.
+    /// </para>
+    /// <para>
+    /// <b>A question carries nothing beside itself here.</b> That is <c>Carrying.Never</c>
+    /// exactly, and it is the arm every grid in this file reads, so a moment with an empty
+    /// story is the moment the run actually saw. A carrying arm would want the story
+    /// accumulated as the world accumulates it, which is state a probe does not hold.
+    /// </para>
+    /// </remarks>
+    private static Seats Seating(
+        Brain brain, Conversing world, Lesson lesson, Joining joining)
+    {
+        if (lesson.Exam.Count == 0)
+            return new Seats
+            {
+                Right = 0.0, Absent = 0.0, Outranked = 0.0, Tied = 0.0, Specific = 0.0,
+                Crowd = 0.0,
+            };
+
+        var front = new Joined(joining);
+        var held = brain.Held;
+
+        double right = 0.0, absent = 0.0, outranked = 0.0, tied = 0.0;
+        double specific = 0.0, crowd = 0.0;
+
+        foreach (var quiz in lesson.Exam)
+        {
+            var asked = Babi.Words(quiz.Question).Select(Babi.Of).ToList();
+
+            var raw = (IReadOnlySet<Code>)new HashSet<Code>(
+                front.Codify(new Recited { Said = [], Asked = asked }));
+
+            var firing = held.Firing(held.Moment(raw));
+            var vote = held.Predict(firing);
+
+            // The word as this world numbered it. A word the conversation never heard has no
+            // outcome, so no rule can expect it and nothing that fired can have advocated it.
+            if (world.Naming(Babi.Of(quiz.Answer)) is not { } outcome)
+            {
+                absent++;
+                continue;
+            }
+
+            // The longest scope behind an expectation, which is how much of the question a
+            // rule had to name before it would speak at all. Taken off the firing set rather
+            // than off the vote, because a weight is all that crosses the seam and this is a
+            // reading about what is behind one.
+            int Longest(Code expects) => firing
+                .Where(one => one.Expects == expects)
+                .Select(one => one.Scope.Length)
+                .DefaultIfEmpty(0)
+                .Max();
+
+            // How many commitments say it, which is the only other thing behind a weight. A
+            // count rather than a sum of weights: `Weighing.Summing` is refuted and this is not
+            // it, because nothing here outweighs anything -- it separates two sides that the
+            // maximum has already declared equal.
+            int Many(Code expects) => firing.Count(one => one.Expects == expects);
+
+            var says = Brain.Says(outcome);
+
+            if (vote.Expects == says)
+            {
+                right++;
+                continue;
+            }
+
+            var advocate = held.Weigh(firing).Each
+                .Where(one => one.Expects == says)
+                .Select(one => (double?)one.Weight)
+                .FirstOrDefault();
+
+            if (advocate is not { } weight)
+            {
+                absent++;
+            }
+            else if (weight < vote.Weight)
+            {
+                outranked++;
+            }
+            else
+            {
+                tied++;
+
+                if (vote.Expects is not { } won) continue;
+
+                if (Longest(says) > Longest(won)) specific++;
+                if (Many(says) > Many(won)) crowd++;
+            }
+        }
+
+        var of = (double)lesson.Exam.Count;
+
+        return new Seats
+        {
+            Right = right / of,
+            Absent = absent / of,
+            Outranked = outranked / of,
+            Tied = tied / of,
+            Specific = tied == 0.0 ? 0.0 : specific / tied,
+            Crowd = tied == 0.0 ? 0.0 : crowd / tied,
+        };
     }
 
     /// <summary>What share of one pass's questions were answered right.</summary>
@@ -249,7 +419,7 @@ public sealed class LessonTests(ITestOutputHelper output)
             Asserting.Nothing, Asserting.Rarest, Asserting.Withheld, Asserting.Everything,
         })
         {
-            var (right, found, resident, silent) = Over(
+            var (right, found, resident, silent, _) = Over(
                 Seeds, Purpose, written, Carrying.Never, asserting, many);
 
             var measured = new Measured { Arm = asserting.ToString(), Values = [.. right] };
@@ -306,6 +476,166 @@ public sealed class LessonTests(ITestOutputHelper output)
             + "what separates the arms, and it is not");
     }
 
+    /// <summary>Why a question the population holds a rule for is answered wrong.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Coverage says the rule is there and a score says it lost.</b> Between those two
+    /// readings sit three different failures, and every arm at the seat so far has been aimed
+    /// without knowing which one it was hitting. This asks each question offline against the
+    /// population a run finished with, and splits a wrong answer three ways.
+    /// </para>
+    /// <para>
+    /// <b>Absent is not a vote problem at all.</b> Nothing that fired expects the right
+    /// answer, so either no rule for it is resident or the one that is does not match the
+    /// question's moment. A vote rule cannot reach that and a front end or a rung can.
+    /// </para>
+    /// <para>
+    /// <b>Outranked is the seat as it has been described</b> — a rule expecting the right
+    /// answer fired and something weighing more took the round. Accuracy, age, and how fast a
+    /// young rule earns its evidence all live there.
+    /// </para>
+    /// <para>
+    /// <b>Tied is the one nobody has looked for.</b> The vote is a maximum over accuracies and
+    /// an accuracy saturates at one, so rules arrive at the ceiling together and
+    /// <see cref="Population.Decide"/> breaks the tie by code order. A right rule losing that
+    /// way is losing to a hash, and what would fix it is not what fixes the other two.
+    /// </para>
+    /// <para>
+    /// <b>What would drop it</b>: absent taking most of the wrong answers means the seat is
+    /// the wrong name for this and the work belongs at the front end. That is a reading either
+    /// way, which is why the instrument is worth its minute.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Why_a_question_whose_rule_is_held_is_answered_wrong()
+    {
+        const int Seeds = 8;
+
+        // This grid's own mixer, so its eight lessons are not another grid's eight read twice.
+        const uint Purpose = 0x0C1A_3DED;
+
+        output.WriteLine($"{Seeds} drawn lessons, 4 things and 3 properties");
+        output.WriteLine(
+            $"{"told",-6}{"claiming",-12}{"sat",9}{"right",9}{"absent",9}{"outranked",11}"
+            + $"{"tied",9}{"specific",10}{"crowd",8}");
+
+        var split = new Dictionary<(int Told, Asserting Claiming), Seats>();
+        var sat = new Dictionary<(int Told, Asserting Claiming), double>();
+
+        foreach (var many in new[] { 1, 8 })
+        foreach (var asserting in new[]
+        {
+            Asserting.Rarest, Asserting.Withheld, Asserting.Everything,
+        })
+        {
+            var (scored, _, _, _, _) = Over(
+                Seeds, Purpose, written: false, Carrying.Never, asserting, many);
+
+            // Read on a run that STOPS before the questions, which is the whole reason for the
+            // second call. A settled question mints and repairs like any other round, so the
+            // population a run finishes with has been taught by the paper it is being asked
+            // about -- and the first version of this read 1.000 where the machine scored 0.750.
+            var (_, _, _, _, seated) = Over(
+                Seeds, Purpose, written: false, Carrying.Never, asserting, many, passes: 0);
+
+            var seats = new Seats
+            {
+                Right = seated.Average(one => one.Right),
+                Absent = seated.Average(one => one.Absent),
+                Outranked = seated.Average(one => one.Outranked),
+                Tied = seated.Average(one => one.Tied),
+
+                // Weighed by how many ties each lesson had, so a lesson with one tie does not
+                // count as much as a lesson with six. A plain mean over the seeds would be a
+                // mean of proportions with different denominators.
+                Specific = seated.Sum(one => one.Tied) == 0.0
+                    ? 0.0
+                    : seated.Sum(one => one.Tied * one.Specific) / seated.Sum(one => one.Tied),
+
+                Crowd = seated.Sum(one => one.Tied) == 0.0
+                    ? 0.0
+                    : seated.Sum(one => one.Tied * one.Crowd) / seated.Sum(one => one.Tied),
+            };
+
+            split[(many, asserting)] = seats;
+            sat[(many, asserting)] = scored.Average();
+
+            output.WriteLine(
+                $"{many,-6}{asserting.ToString().ToLowerInvariant(),-12}"
+                + $"{scored.Average(),9:F3}{seats.Right,9:F3}"
+                + $"{seats.Absent,9:F3}{seats.Outranked,11:F3}{seats.Tied,9:F3}"
+                + $"{seats.Specific,10:F3}{seats.Crowd,8:F3}");
+        }
+
+        // The four shares are one partition of the examination. A statistic whose halves count
+        // different events announces itself by exceeding one, and this repo has a line about it.
+        foreach (var seats in split.Values)
+            Assert.Equal(
+                1.0, seats.Right + seats.Absent + seats.Outranked + seats.Tied, 3);
+
+        // The control on the instrument rather than on the machine. The probe answers every
+        // question against the population as it stood when the first one was put, and the score
+        // is what the machine got as it went -- so the probe reads at or under the score
+        // wherever the examination teaches, and a probe ABOVE it is reading a later machine.
+        foreach (var (at, seats) in split)
+            output.WriteLine(
+                $"told {at.Told}, {at.Claiming.ToString().ToLowerInvariant()}: sat "
+                + $"{sat[at]:F3}, probe {seats.Right:F3}");
+
+        // The kill line, written before the grid ran. If a wrong answer is usually one where
+        // nothing expecting the right word even fired, the seat is the wrong name for this and
+        // no vote rule reaches it.
+        var wrong = split.Values.Sum(one => 1.0 - one.Right);
+        var absent = split.Values.Sum(one => one.Absent);
+
+        output.WriteLine($"absent {absent:F3} of {wrong:F3} wrong");
+
+        Assert.True(absent < wrong / 2.0,
+            $"{absent:F3} of {wrong:F3} wrong answers had nothing expecting the right word "
+            + "fire at all, so most of what is called the seat is a rule that never reached "
+            + "the moment. The work is at the front end rather than at the vote");
+
+        // Once the lesson has been told enough, every wrong answer is a right rule OUTRANKED.
+        // Nothing is missing and nothing ties, so what is left is a ranking failure exactly --
+        // which is the thing the seat has always been described as and had never been shown.
+        foreach (var asserting in new[]
+        {
+            Asserting.Rarest, Asserting.Withheld, Asserting.Everything,
+        })
+        {
+            var seats = split[(8, asserting)];
+
+            Assert.Equal(0.0, seats.Absent);
+            Assert.Equal(0.0, seats.Tied);
+            Assert.Equal(1.0 - seats.Right, seats.Outranked, 3);
+        }
+
+        // And told ONCE it is a different failure wearing the same score. Half of what claiming
+        // the rarest word gets wrong is a tie, and a tie is not a ranking failure -- it is the
+        // vote being handed two rules it has no way to tell apart.
+        Assert.True(split[(1, Asserting.Rarest)].Tied > split[(1, Asserting.Rarest)].Right,
+            $"tied is {split[(1, Asserting.Rarest)].Tied:F3} against "
+            + $"{split[(1, Asserting.Rarest)].Right:F3} right, so the one-telling loss has "
+            + "stopped being a tie and the two ages are one failure after all");
+
+        // The negative that kills both obvious tie-breaks before either is built. In every tied
+        // question the right rule and the winner have the same weight, the same scope length
+        // and the same number of advocates -- so specificity, which is what a production system
+        // resolves a conflict by, separates none of them, and neither does a crowd. Genesis
+        // roots on ONE code, so at this age every rule in the population is one code expecting
+        // one thing, and two of them are the same object to anything the vote can read.
+        foreach (var (at, seats) in split)
+        {
+            Assert.Equal(0.0, seats.Specific);
+            Assert.Equal(0.0, seats.Crowd);
+
+            output.WriteLine(
+                $"told {at.Told}, {at.Claiming.ToString().ToLowerInvariant()}: of "
+                + $"{seats.Tied:F3} tied, {seats.Specific:F3} separable by scope and "
+                + $"{seats.Crowd:F3} by advocates");
+        }
+    }
+
     /// <summary>What a moment carries, re-taken on a world that moves.</summary>
     /// <remarks>
     /// <para>
@@ -338,7 +668,7 @@ public sealed class LessonTests(ITestOutputHelper output)
         foreach (var written in new[] { true, false })
         foreach (var carrying in new[] { Carrying.Always, Carrying.Statements, Carrying.Never })
         {
-            var (right, found, resident, silent) = Over(
+            var (right, found, resident, silent, _) = Over(
                 Seeds, Purpose, written, carrying, Asserting.Withheld, Tellings);
 
             scored[(written, carrying)] = right.Average();
@@ -395,10 +725,10 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         foreach (var many in tellings)
         {
-            var (one, _, _, _) = Over(
+            var (one, _, _, _, _) = Over(
                 Seeds, Purpose, written: false, Carrying.Never, Asserting.Withheld, many);
 
-            var (other, found, _, _) = Over(
+            var (other, found, _, _, _) = Over(
                 Seeds, Purpose, written: false, Carrying.Never, Asserting.Withheld, many,
                 Crediting.Birth);
 
@@ -464,7 +794,7 @@ public sealed class LessonTests(ITestOutputHelper output)
                 ("wholly ", Rooting.Wholly),
             })
             {
-                var (right, found, resident, silent) = Over(
+                var (right, found, resident, silent, _) = Over(
                     Seeds, Purpose, written: false, Carrying.Never, Asserting.Withheld, many,
                     rooting: rooting);
 
@@ -497,7 +827,7 @@ public sealed class LessonTests(ITestOutputHelper output)
         foreach (var rooting in new[] { Rooting.Singly, Rooting.Wholly })
         foreach (var admitting in new[] { Admitting.Anything, Admitting.Testable })
         {
-            var (right, found, resident, silent) = Over(
+            var (right, found, resident, silent, _) = Over(
                 Seeds, Purpose, written: false, Carrying.Never, Asserting.Withheld, 8,
                 rooting: rooting, admitting: admitting);
 
@@ -550,7 +880,7 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         foreach (var admitting in new[] { Admitting.Anything, Admitting.Testable })
         {
-            var (right, found, resident, silent) = Over(
+            var (right, found, resident, silent, _) = Over(
                 4, Purpose, written: false, Carrying.Never, Asserting.Everything, Told,
                 Crediting.Birth, Rooting.Wholly, admitting);
 

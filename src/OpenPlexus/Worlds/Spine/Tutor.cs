@@ -486,7 +486,12 @@ public sealed class Tutor : TextReader
 
     /// <param name="lesson">The topic and the questions.</param>
     /// <param name="printed">Where the machine's words should end up.</param>
-    /// <param name="passes">How many times the examination is put.</param>
+    /// <param name="passes">
+    /// How many times the examination is put. <b>Nought is a lesson with no paper after it</b>,
+    /// which is what a reading on the population BEFORE the questions asks for — a settled
+    /// question mints and repairs exactly as a statement does, so a run that has sat the exam
+    /// has been taught by it.
+    /// </param>
     /// <param name="tellings">
     /// How many times the statements are told before the examination — <b>repetition, and it
     /// is an axis rather than a setting</b>. Being told once and being told twenty times are
@@ -509,7 +514,7 @@ public sealed class Tutor : TextReader
     {
         ArgumentNullException.ThrowIfNull(lesson);
         ArgumentNullException.ThrowIfNull(printed);
-        ArgumentOutOfRangeException.ThrowIfLessThan(passes, 1);
+        ArgumentOutOfRangeException.ThrowIfNegative(passes);
         ArgumentOutOfRangeException.ThrowIfNegative(tellings);
         ArgumentOutOfRangeException.ThrowIfNegative(revising);
         ArgumentOutOfRangeException.ThrowIfNegative(clarifying);

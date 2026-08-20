@@ -442,9 +442,6 @@ before six that reads as tuning is out of order.
       so repair and every rung above it are held still.
     - **OPEN** — more unsound commitments resident than sound ones while the score holds: is
       the vote robust to them, or are they why it stops short. Fork **35**.
-    - **OPEN** — the live problem is which rule gets the seat, and three arms at it have
-      failed. A gate changing what is HELD cannot reach what decides, and one refusing a young
-      rule its vote silences the machine rather than reseating it.
     - **NOW** — and the seat splits three ways, so it is two failures rather than one. Told
       once the right rule TIES; told enough it is OUTRANKED; it is never ABSENT. `Seating`.
     - **NOW** — and no tie-break exists. Both sides of a tie are one weight, one scope length
@@ -898,6 +895,9 @@ them. **A class earning a check moves out of here into the check.**
 - **The instrument that kills a story is usually built for something else**, so ask which grid
   already holds the number before running a new one. And ask which half of generate-and-test a
   proposal touches: where no right rule was present, a rule about who WINS cannot reach it.
+- **A gate on what is HELD cannot reach what DECIDES**, which is the dual of the line above and
+  cost the seat three arms. Culling, subsumption and repair all change the population; which
+  rule takes the round is the vote's alone.
 
 ---
 

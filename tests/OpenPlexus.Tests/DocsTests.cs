@@ -504,7 +504,14 @@ public sealed class DocsTests
     // signature is a weight of nought, which needs no threshold because it is the best
     // advocate's own accuracy. Three leaves: that it declines, that declining is free where
     // there is evidence, and what is still open about the cell where there is none.
-    private const int Whole = 12_470;
+    // And down two to 12,468, correcting a leaf written in the same session. It asked whether
+    // a machine that ASKS turns a decline into a question, which is `Untested` on the weight
+    // wearing different words -- refuted in the table below, losing fiftyfold to a coin per
+    // ask. The revival row asks for a signal saying whether a reply CAN settle, and whether
+    // the machine is sure is not that. This repo's own trap list warns that a row names an
+    // axis in the mechanism's words rather than the comparison's, which is how a search
+    // misses it; the leaf now names the refutation so the next session cannot walk into it.
+    private const int Whole = 12_468;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

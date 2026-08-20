@@ -462,7 +462,7 @@ before six that reads as tuning is out of order.
     - **NOW** — and it is free where there is evidence: level on the paper at eight tellings
       while going quiet on three times the rounds, so each round given up was already lost.
     - **OPEN** — told once it declines everything, forfeiting a score UNDER the marginal. What
-      a second world says, and whether a machine that ASKS turns that silence into a question.
+      a SECOND WORLD says. Asking on a decline is `Untested` renamed and is refuted.
     - **NOW** — `Alternating` is live and its store add-only, so a front end fills its OWN
       vocabulary, reaching every group the experimenter's holds for no score.
     - **OPEN** — it costs 4.7x the rules. Nothing waits for a group to hold still, and the

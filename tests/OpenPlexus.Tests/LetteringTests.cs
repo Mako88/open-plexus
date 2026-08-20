@@ -51,15 +51,38 @@ public sealed class LetteringTests(ITestOutputHelper output)
         "MAP", "JAR", "KEY", "FAN", "RUG", "NET", "POT", "WEB",
     ];
 
+    /// <summary>
+    /// Forty-eight more, for the vocabulary sweep alone.
+    /// </summary>
+    /// <remarks>
+    /// <b>Kept apart from <see cref="Words"/> rather than appended to it</b>, because the
+    /// probe reading above is scored against a chance of one in sixteen and folding these in
+    /// would move that number while looking like a longer list. The sweep reads
+    /// <see cref="Words"/> first and these after, so its prefix at sixteen is the identical
+    /// vocabulary the ceiling was taken on.
+    /// </remarks>
+    private static readonly string[] More =
+    [
+        "ARM", "BAG", "BAT", "BUS", "CAR", "COW", "CUT", "DAM",
+        "DEN", "DIG", "DOT", "EAR", "EGG", "ELM", "EYE", "FIG",
+        "FIN", "FOG", "FOX", "GAS", "GEM", "GUM", "GUN", "HEN",
+        "HIP", "HUT", "ICE", "INK", "IVY", "LEG", "LID", "LIP",
+        "LOG", "MUD", "NUT", "OAK", "OAR", "OIL", "OWL", "PAD",
+        "PIG", "PIN", "PIT", "RAM", "RAT", "RIB", "ROD", "ROW",
+    ];
+
     /// <summary>Every drawing of every word, and which of them are withheld.</summary>
     /// <param name="seed">The split's generator, which is not a front end's.</param>
+    /// <param name="words">Which words to draw. <see cref="Words"/> where none is given.</param>
     /// <remarks>
     /// <b>Drawn once and shared by every arm</b>, so two front ends are read on the identical
     /// rasters and the identical split. Redrawing per arm would put the split's own spread
     /// into a comparison that is supposed to be about the arms.
     /// </remarks>
-    private static List<(IReadOnlyList<double> Pixels, int Word, bool Shown)> Drawings(int seed)
+    private static List<(IReadOnlyList<double> Pixels, int Word, bool Shown)> Drawings(
+        int seed, IReadOnlyList<string>? words = null)
     {
+        var these = words ?? Words;
         var (room, drop) = Lettering.Room(3);
         var coins = new Random(seed);
         var every = new List<(IReadOnlyList<double>, int, bool)>();
@@ -70,11 +93,11 @@ public sealed class LetteringTests(ITestOutputHelper output)
         // here, while four reads 0.584 against 0.539. A codebook read over more patches needs
         // more sightings to fill, so the cheap grid understates the small ones and the gate
         // below is taken on the best cell rather than on the shape of the column.
-        for (var word = 0; word < Words.Length; word++)
+        for (var word = 0; word < these.Count; word++)
             for (var across = 0; across <= room; across += Stride)
                 for (var down = 0; down <= drop; down += Stride)
                     every.Add((
-                        Lettering.Draw(Words[word], across, down),
+                        Lettering.Draw(these[word], across, down),
                         word,
                         coins.NextDouble() >= 0.25));
 
@@ -223,7 +246,7 @@ public sealed class LetteringTests(ITestOutputHelper output)
     /// </para>
     /// <para>
     /// <b>The DEPTH is the reading</b>, rather than whether one exists. Repair grows a scope
-    /// one code at a time from a gate wanting twenty misses first, so a sound scope tens of
+    /// one code at a time behind a gate wanting twenty misses first, so a sound scope tens of
     /// codes long is unreachable however sound it is. What blocks a rung can be its cost
     /// rather than its language, and the two are indistinguishable from a score.
     /// </para>
@@ -242,105 +265,38 @@ public sealed class LetteringTests(ITestOutputHelper output)
     [Fact]
     public void What_a_conjunction_can_name_of_a_word_that_arrived_as_pixels()
     {
-        const byte Patch = 110;
-
         var every = Drawings(seed: 1);
 
         output.WriteLine($"{Words.Length} words, {every.Count} drawings, bare codes only");
         output.WriteLine(
             $"{"tiling",-10}{"bare",8}{"always",8}{"at 1",7}{"at 2",7}{"at 8",7}"
-            + $"{"at any",8}{"least",7}{"common",8}");
+            + $"{"at any",8}{"least",7}{"own",8}");
 
         var named = new Dictionary<int, int>();
-        var least = new Dictionary<int, int>();
         var specific = new Dictionary<int, double>();
 
         foreach (var tile in new[] { 3, 4, 6, 8 })
         {
-            var (cells, _, _) = Winnowing.Sheet(tile * tile);
-            var tiling = new Tiling(Patch, Lettering.Side, tile);
+            var bare = Bare(every, tile);
+            var read = Naming(bare, Words.Length);
 
-            // The bare half of each drawing, which is the part independent of where it sat.
-            var bare = every
-                .Select(one => (
-                    Codes: tiling
-                        .Codify(one.Pixels)
-                        .Where(code => code.Value < (ulong)cells)
-                        .Select(code => code.Value)
-                        .ToHashSet(),
-                    one.Word))
-                .ToList();
-
-            var vocabulary = bare.SelectMany(one => one.Codes).ToHashSet().Count;
-            var depths = new List<int>();
-            var always = 0.0;
-
-            // What EVERY word has in every drawing, which is the control on the account of
-            // why a patch size fails. If the codes that survive an offset are the ones
-            // nobody is distinguished by, the always-set and this set are the same size --
-            // and that is a measurement rather than a story about blank patches.
-            HashSet<ulong>? common = null;
-
-            for (var word = 0; word < Words.Length; word++)
-            {
-                var mine = bare.Where(one => one.Word == word).Select(one => one.Codes).ToList();
-                var theirs = bare.Where(one => one.Word != word).Select(one => one.Codes).ToList();
-
-                // Present in every drawing of this word, which is the only place a sound
-                // conjunction for it can come from.
-                var kept = mine.Skip(1).Aggregate(
-                    new HashSet<ulong>(mine[0]),
-                    (standing, one) => { standing.IntersectWith(one); return standing; });
-
-                always += kept.Count;
-
-                if (common is null) common = [.. kept];
-                else common.IntersectWith(kept);
-
-                // Which of the other words' drawings each candidate still admits. A
-                // conjunction fires where every one of its codes is present, so a pair
-                // admits exactly the drawings both of its codes admit.
-                var through = kept.ToDictionary(
-                    code => code,
-                    code => theirs
-                        .Select((one, at) => (one, at))
-                        .Where(pair => pair.one.Contains(code))
-                        .Select(pair => pair.at)
-                        .ToHashSet());
-
-                // The exact answer, and it is what turns a greedy nought into a statement. A
-                // conjunction of EVERY always-present code is the deepest sound scope this
-                // word has, so if that one still admits another word's drawing then no
-                // conjunction over bare codes separates it at any depth whatsoever.
-                if (through.Count == 0
-                    || through.Values.Aggregate(
-                        new HashSet<int>(through.Values.First()),
-                        (standing, admits) =>
-                        {
-                            standing.IntersectWith(admits);
-                            return standing;
-                        }).Count > 0) continue;
-
-                depths.Add(Separates(through));
-            }
-
-            named[tile] = depths.Count;
-            specific[tile] = (always / Words.Length) - common!.Count;
-            least[tile] = depths.Count == 0 ? 0 : depths.Order().ElementAt(depths.Count / 2);
+            named[tile] = read.Depths.Count;
+            specific[tile] = read.Own;
 
             output.WriteLine(
-                $"{"tiling " + tile,-10}{vocabulary,8}{always / Words.Length,8:F1}"
-                + $"{depths.Count(depth => depth <= 1),7}"
-                + $"{depths.Count(depth => depth <= 2),7}"
-                + $"{depths.Count(depth => depth <= 8),7}"
-                + $"{depths.Count,8}{least[tile],7}{common!.Count,8}");
+                $"{"tiling " + tile,-10}{bare.SelectMany(one => one.Codes).ToHashSet().Count,8}"
+                + $"{read.Always,8:F1}"
+                + $"{read.Depths.Count(depth => depth <= 1),7}"
+                + $"{read.Depths.Count(depth => depth <= 2),7}"
+                + $"{read.Depths.Count(depth => depth <= 8),7}"
+                + $"{read.Depths.Count,8}{read.Least,7}{read.Own,8:F1}");
         }
 
         var best = named.MaxBy(one => one.Value);
 
         output.WriteLine(
             $"the best tiling names {best.Value} of {Words.Length} words soundly, at "
-            + $"{best.Key} pixels a patch and a median of {least[best.Key]} codes a scope");
+            + $"{best.Key} pixels a patch");
 
         Assert.True(best.Value > 0,
             "the conjunction of every always-present bare code still admits another word's "
@@ -351,29 +307,193 @@ public sealed class LetteringTests(ITestOutputHelper output)
 
         // And the mechanism, as one quantity rather than as a story. What a conjunction has
         // to work with is the codes that survive the offset AND are not shared by every
-        // word, which is `always` less `common`. The first draft of this asserted that a
-        // failing size is one where the survivors are universal; the 3-pixel row refused it
-        // at 0.70, because that size fails the other way -- its codebook holds 81 parts over
-        // the whole world, so a part is common to too many words while being universal to
-        // none. Two accounts, one column, and this is the column.
-        var own = named.Keys.ToDictionary(tile => tile, tile => specific[tile]);
-
-        output.WriteLine(
-            "word-specific codes surviving the offset: "
-            + string.Join(", ", own.Select(one => $"{one.Key} at {one.Value:F1}")));
-
-        Assert.True(own[best.Key] == own.Values.Max(),
-            $"the patch size that names words does not hold the most word-specific codes "
+        // word, which is the `own` column. The first draft of this asserted that a failing
+        // size is one where the survivors are universal; the 3-pixel row refused it, because
+        // that size fails the other way -- its codebook holds 81 parts over the whole world,
+        // so a part is common to too many words while being universal to none. Two accounts,
+        // one column, and this is the column.
+        Assert.True(specific[best.Key] == specific.Values.Max(),
+            "the patch size that names words does not hold the most word-specific codes "
             + "through the offset, so what a conjunction has to work with is not what "
             + "decides whether a size works, and the account here is wrong");
 
         foreach (var (tile, count) in named)
             if (count == 0)
-                Assert.True(own[tile] < own[best.Key] / 4.0,
-                    $"a {tile}-pixel patch names no word while leaving {own[tile]:F1} "
-                    + $"word-specific codes through the offset, against {own[best.Key]:F1} "
-                    + "for the size that works. That is close enough that the column is not "
-                    + "what separates them");
+                Assert.True(specific[tile] < specific[best.Key] / 4.0,
+                    $"a {tile}-pixel patch names no word while leaving {specific[tile]:F1} "
+                    + $"word-specific codes through the offset, against "
+                    + $"{specific[best.Key]:F1} for the size that works. That is close enough "
+                    + "that the column is not what separates them");
+    }
+
+    /// <summary>
+    /// <b>How far a conjunction's reach survives a bigger vocabulary</b>, at the one patch
+    /// size that reaches anything.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The number that decides how big the crossing's world may be.</b> Nine words in
+    /// sixteen is a share of THESE words until something says how it moves. A soundness
+    /// condition gets strictly harder as words are added, because every new word is another
+    /// drawing a scope must not admit.
+    /// </para>
+    /// <para>
+    /// <b>Four pixels a patch and nothing else</b>, since the reading above says the other
+    /// three separate nothing at any depth. Sweeping a size that names nought would be four
+    /// rows of nought wearing a curve.
+    /// </para>
+    /// <para>
+    /// <b>The drop condition was the count rising or holding flat</b>, written before the
+    /// grid ran, and the blocking one was the count FALLING as words are added. The second is
+    /// what happened, so what this fixes is the SIZE of the world rather than whether there
+    /// is one — and the assertions hold the reading rather than the guess.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void How_far_a_conjunction_reaches_as_the_vocabulary_grows()
+    {
+        const int Tile = 4;
+
+        var bare = Bare(Drawings(seed: 1, [.. Words, .. More]), Tile);
+
+        output.WriteLine($"{Tile} pixels a patch, every offset drawn");
+        output.WriteLine($"{"words",-8}{"named",8}{"share",8}{"least",8}{"own",8}");
+
+        var reach = new Dictionary<int, int>();
+        var deep = new Dictionary<int, int>();
+
+        foreach (var words in new[] { 2, 4, 8, 16, 32, 64 })
+        {
+            // The first `words` of the list, which is a prefix and never a choice. Picking
+            // the words that separate is the experimenter putting the answer in, and this
+            // file's whole standing rests on the split being about position and not words.
+            var read = Naming(bare.Where(one => one.Word < words).ToList(), words);
+
+            reach[words] = read.Depths.Count;
+            deep[words] = read.Least;
+
+            output.WriteLine(
+                $"{words,-8}{read.Depths.Count,8}{(double)read.Depths.Count / words,8:F2}"
+                + $"{read.Least,8}{read.Own,8:F1}");
+        }
+
+        // THE READING, and the blocking condition written above is the one that fired. The
+        // count rises to thirty-two words and turns over by sixty-four while the depth needed
+        // climbs the whole way, so a conjunction over bare tiling codes does not scale with a
+        // vocabulary. What that changes is the SIZE of the world rather than whether there is
+        // one: sixteen words is a crossing a conjunction can carry most of, and a world built
+        // on a hundred would read a front end's ceiling as a learner's failure to bind.
+        //
+        // Asserted rather than printed, so a front end that fixes this cannot do it quietly.
+        // Either half going green is news and the record above has to be re-read.
+        Assert.True(reach[64] < reach[32],
+            $"a conjunction names {reach[64]} of sixty-four words against {reach[32]} of "
+            + "thirty-two, so the count no longer turns over. The front end has changed and "
+            + "the account of why fork 107's world is sixteen words wide is stale");
+
+        Assert.True(deep[64] > deep[16],
+            $"a sound scope needs {deep[64]} codes at sixty-four words and {deep[16]} at "
+            + "sixteen, so depth no longer climbs with the vocabulary. That was the other "
+            + "half of why this does not scale, and it is the half repair pays for");
+    }
+
+    /// <summary>Every drawing as the codes that survive being moved.</summary>
+    /// <param name="every">The drawings, with the word each is of.</param>
+    /// <param name="tile">How many pixels across one patch is.</param>
+    /// <remarks>
+    /// <b>The bare half of <see cref="Tiling"/> and never the placed half.</b> A placed code
+    /// pins a patch, so a word drawn two pixels along emits none of the ones it emitted
+    /// before — and a conjunction over placed codes could only ever be sound for a word that
+    /// never moved.
+    /// </remarks>
+    private static List<(HashSet<ulong> Codes, int Word)> Bare(
+        List<(IReadOnlyList<double> Pixels, int Word, bool Shown)> every, int tile)
+    {
+        const byte Patch = 110;
+
+        var (cells, _, _) = Winnowing.Sheet(tile * tile);
+        var tiling = new Tiling(Patch, Lettering.Side, tile);
+
+        return every
+            .Select(one => (
+                Codes: tiling
+                    .Codify(one.Pixels)
+                    .Where(code => code.Value < (ulong)cells)
+                    .Select(code => code.Value)
+                    .ToHashSet(),
+                one.Word))
+            .ToList();
+    }
+
+    /// <summary>
+    /// How much of a vocabulary a sound conjunction can name, and how deep it has to be.
+    /// </summary>
+    /// <param name="bare">Every drawing, as the codes that survive an offset.</param>
+    /// <param name="words">How many words the vocabulary holds.</param>
+    /// <returns>
+    /// The depth each separable word needed, the median of those, how many codes survive an
+    /// offset for the average word, and how many of those it does not share with every word.
+    /// </returns>
+    private static (List<int> Depths, int Least, double Always, double Own) Naming(
+        List<(HashSet<ulong> Codes, int Word)> bare, int words)
+    {
+        var depths = new List<int>();
+        var always = 0.0;
+
+        // What EVERY word has in every drawing, which is the control on the account of why a
+        // patch size fails. If the codes that survive an offset are the ones nobody is
+        // distinguished by, this set and the always-set are the same size -- and that is a
+        // measurement rather than a story about blank patches.
+        HashSet<ulong>? common = null;
+
+        for (var word = 0; word < words; word++)
+        {
+            var mine = bare.Where(one => one.Word == word).Select(one => one.Codes).ToList();
+            var theirs = bare.Where(one => one.Word != word).Select(one => one.Codes).ToList();
+
+            // Present in every drawing of this word, which is the only place a sound
+            // conjunction for it can come from.
+            var kept = mine.Skip(1).Aggregate(
+                new HashSet<ulong>(mine[0]),
+                (standing, one) => { standing.IntersectWith(one); return standing; });
+
+            always += kept.Count;
+
+            if (common is null) common = [.. kept];
+            else common.IntersectWith(kept);
+
+            // Which of the other words' drawings each candidate still admits. A conjunction
+            // fires where every one of its codes is present, so a pair admits exactly the
+            // drawings both of its codes admit.
+            var through = kept.ToDictionary(
+                code => code,
+                code => theirs
+                    .Select((one, at) => (one, at))
+                    .Where(pair => pair.one.Contains(code))
+                    .Select(pair => pair.at)
+                    .ToHashSet());
+
+            // The exact answer, and it is what turns a greedy nought into a statement. A
+            // conjunction of EVERY always-present code is the deepest sound scope this word
+            // has, so if that one still admits another word's drawing then no conjunction
+            // over bare codes separates it at any depth whatsoever.
+            if (through.Count == 0
+                || through.Values.Aggregate(
+                    new HashSet<int>(through.Values.First()),
+                    (standing, admits) =>
+                    {
+                        standing.IntersectWith(admits);
+                        return standing;
+                    }).Count > 0) continue;
+
+            depths.Add(Separates(through));
+        }
+
+        return (
+            depths,
+            depths.Count == 0 ? 0 : depths.Order().ElementAt(depths.Count / 2),
+            always / words,
+            (always / words) - common!.Count);
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -11,8 +11,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The census says the count is what limits this machine and that the condition has
-/// never run.</b> <see cref="CommittingSettings.Budget"/> refuses between half and nine
+/// <b>The census says the count is what limits this machine</b> and that the condition has
+/// never run. <see cref="CommittingSettings.Budget"/> refuses between half and nine
 /// tenths of every repair candidate, worst exactly where nothing is learnt; and
 /// <see cref="Mending"/> ships <see cref="Mending.Ungated"/>, so the two gates that ask
 /// about a PARENT rather than about a tally read nought on every world. The dial census
@@ -44,8 +44,8 @@ namespace OpenPlexus.Tests;
 /// <b>Which is exactly the condition that made the budget read as inert.</b> So the verdict is
 /// suspect in a specific direction. Under the old timing the lineages that would have
 /// spent a loosened budget were never blamed, so nothing was waiting on either the count or
-/// the condition. <b>A gate asking whether a parent still has failures no child covers can
-/// only bind where that parent gets blamed at all.</b> Re-taken, this grid is fork 67.
+/// the condition. <b>A gate asking whether a parent still has failures no child covers</b> can
+/// only bind where that parent gets blamed at all. Re-taken, this grid is fork 67.
 /// </para>
 /// <para>
 /// <b>And re-taken.</b> The condition does not replace the count — it trades the same way the

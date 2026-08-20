@@ -111,8 +111,8 @@ public sealed class MonkTests(ITestOutputHelper output)
     /// it can only memorise, one robot at a time.
     /// </para>
     /// <para>
-    /// <b>And the shortest sound rule of any kind is depth three, which is checkable by
-    /// hand.</b> The twenty of them are the twenty ways to choose three of six attributes
+    /// <b>And the shortest sound rule of any kind is depth three</b>, which is checkable by
+    /// hand. The twenty of them are the twenty ways to choose three of six attributes
     /// and pin all three to their first value: that forces the count to at least three,
     /// so the answer is NO whatever the other three do. Twenty is <c>C(6,3)</c>, and a
     /// count that came out as anything else would mean the concept had been mis-encoded.
@@ -228,13 +228,13 @@ public sealed class MonkTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The learner against the ceiling, on all three, with the bar beside every
-    /// score.</b>
+    /// <b>The learner against the ceiling, on all three</b>, with the bar beside every
+    /// score.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>No threshold, because a bar written before the first run is a prediction
-    /// dressed as a check.</b> What this asserts is only what the enumeration above has
+    /// <b>No threshold</b>, because a bar written before the first run is a prediction
+    /// dressed as a check. What this asserts is only what the enumeration above has
     /// already decided — that the basis differs — and what it PRINTS is the grid the
     /// finding gets read off.
     /// </para>

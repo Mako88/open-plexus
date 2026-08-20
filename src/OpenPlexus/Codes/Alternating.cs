@@ -1,4 +1,4 @@
-﻿namespace OpenPlexus.Codes;
+namespace OpenPlexus.Codes;
 
 /// <summary>
 /// Codes that are ALTERNATIVES, found in what was seen rather than handed over — <b>fork

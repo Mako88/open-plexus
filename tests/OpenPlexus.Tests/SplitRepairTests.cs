@@ -65,8 +65,8 @@ public sealed class SplitRepairTests(ITestOutputHelper output)
     /// <param name="dials">The gate's numbers, for the miss floor.</param>
     /// <param name="place">Which holder a commitment sits on.</param>
     /// <remarks>
-    /// <b>The whole population is this same function with every commitment on one holder,
-    /// which is why there is no separate baseline path.</b> Two loops differing only in a
+    /// <b>The whole population is this same function</b> with every commitment on one holder,
+    /// which is why there is no separate baseline path. Two loops differing only in a
     /// placement rule is two places for the filters to drift, and the clone budget refused
     /// the second copy the moment it was written — which is what that budget is for.
     /// </remarks>

@@ -15,8 +15,8 @@ namespace OpenPlexus.Codes;
 /// reached for.
 /// </para>
 /// <para>
-/// <b>So it is held by the front end and read by the population, which is the seam fork 84
-/// already drew.</b> What the coarser form of a code is is a fact about how a stream is
+/// <b>So it is held by the front end</b> and read by the population, which is the seam fork 84
+/// already drew. What the coarser form of a code is is a fact about how a stream is
 /// being read, and the brain is told it in the same way it is told an alphabet. What the
 /// brain does with it — whether a coarse code may enter a scope, and on what evidence — is
 /// the brain's, and is <c>Population.Recast</c>.

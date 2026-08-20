@@ -23,8 +23,8 @@ namespace OpenPlexus.Machines;
 /// entailment depth is always one, and rungs three and four have nothing to bite on.
 /// </para>
 /// <para>
-/// <b>So a mediocre score here is a fact about a fixed projection on thumbnails and
-/// not a verdict on the architecture</b> — and saying so before the number arrives is
+/// <b>So a mediocre score here</b> is a fact about a fixed projection on thumbnails and
+/// not a verdict on the architecture — and saying so before the number arrives is
 /// the only time saying it is worth anything. A ten-way label per image has no parts
 /// and no arrangement, so it cannot tell a front end that manufactures REUSABLE
 /// symbols from one that emits a holistic blob per picture; both separate ten classes

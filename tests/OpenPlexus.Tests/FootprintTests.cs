@@ -44,8 +44,8 @@ public sealed class FootprintTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A bar written before the first reading is usually a prediction dressed as a
-    /// requirement, and this one is not mine to predict.</b> It comes from outside the
+    /// <b>A bar written before the first reading</b> is usually a prediction dressed as a
+    /// requirement, and this one is not mine to predict. It comes from outside the
     /// measurement entirely — <b>John's number, 2026-08-11</b>, and he is the one who knows
     /// what the hardware is: used Android handsets with one to two gigabytes total, of which
     /// the operating system and everything else take their share, leaving something between
@@ -100,8 +100,8 @@ public sealed class FootprintTests(ITestOutputHelper output)
     /// <param name="rounds">How long it ran.</param>
     /// <param name="address">Address bits, which is what sets the alphabet's size.</param>
     /// <remarks>
-    /// <b>In its own frame so the brain and the run go out of scope, and the population
-    /// comes back by itself.</b> Everything else this builds is garbage by the time the
+    /// <b>In its own frame</b> so the brain and the run go out of scope, and the population
+    /// comes back by itself. Everything else this builds is garbage by the time the
     /// caller collects, which is what makes the delta a reading about commitments.
     /// </remarks>
     private static Population Grown(long rounds, int address = Wide)
@@ -196,8 +196,8 @@ public sealed class FootprintTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>What a commitment costs does not grow with how long the run was — the table does,
-    /// and that is where the memory is.</b>
+    /// <b>What a commitment costs does not grow</b> with how long the run was — the table does,
+    /// and that is where the memory is.
     /// </summary>
     /// <remarks>
     /// <para>

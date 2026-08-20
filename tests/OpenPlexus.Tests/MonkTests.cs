@@ -107,8 +107,8 @@ public sealed class MonkTests(ITestOutputHelper output)
     /// There is no sound conjunction predicting the concept at depth one, two, three,
     /// four or five. Every one of the 142 minimal sound rules that says YES pins all six
     /// attributes — which is a single instance, and a single instance covers no other.
-    /// <b>So a population cannot generalise on the positive side of this concept at all;
-    /// it can only memorise, one robot at a time.</b>
+    /// <b>So a population cannot generalise</b> on the positive side of this concept at all;
+    /// it can only memorise, one robot at a time.
     /// </para>
     /// <para>
     /// <b>And the shortest sound rule of any kind is depth three, which is checkable by

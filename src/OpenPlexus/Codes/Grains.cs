@@ -38,8 +38,8 @@ namespace OpenPlexus.Codes;
 /// <b>Why this is not a fitted codebook.</b> Nothing is learnt, nothing is
 /// sampled, and two machines handed the same observation drop the same bits — so
 /// the red-ball property holds exactly as it does for a hash. <b>What a fitted
-/// quantiser buys is spending codes where the data is; what this buys is spending
-/// codes at more than one SCALE</b>, which is the half that generalisation needs
+/// quantiser buys is spending codes where the data is;</b> what this buys is spending
+/// codes at more than one SCALE, which is the half that generalisation needs
 /// and the half that does not require seeing the data first.
 /// </para>
 /// <para>

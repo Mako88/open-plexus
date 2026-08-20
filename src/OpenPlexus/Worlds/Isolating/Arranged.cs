@@ -126,8 +126,8 @@ public readonly record struct Layout
 /// only the first leads anywhere.
 /// </para>
 /// <para>
-/// <b>So the one hard constraint is that a bag of parts must score chance, and here it
-/// is a theorem rather than a hope.</b> Swapping which cell holds the first marker and
+/// <b>So the one hard constraint</b> is that a bag of parts must score chance, and here it
+/// is a theorem rather than a hope. Swapping which cell holds the first marker and
 /// which holds the second leaves the multiset of shapes untouched, flips the answer,
 /// and lands on a scene the world draws exactly as often. That map is an involution on
 /// the whole space, so what is present carries no information about the outcome AT ALL

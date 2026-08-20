@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Codes;
+using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;

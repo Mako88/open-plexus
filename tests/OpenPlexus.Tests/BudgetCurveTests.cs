@@ -19,8 +19,8 @@ namespace OpenPlexus.Tests;
 /// so a trade recorded as a choice may only be a dial read at two points.
 /// </para>
 /// <para>
-/// <b>And the free end is reached by a number rather than by the other enum, which is what
-/// makes this one axis.</b> <see cref="Budgeting.Children"/> is a free budget on every world
+/// <b>And the free end</b> is reached by a number rather than by the other enum, which is what
+/// makes this one axis. <see cref="Budgeting.Children"/> is a free budget on every world
 /// here — a child adds one code, so distinct children are capped by the vocabulary at
 /// twenty-two against sixty-four — so it never refuses, and neither does
 /// <see cref="Budgeting.Attempts"/> at <see cref="Unlimited"/>. Sweeping the COUNT keeps

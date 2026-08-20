@@ -13,8 +13,8 @@ namespace OpenPlexus.Codes;
 /// A projection chosen to suit the data is a fitted codebook, which the red-ball
 /// property forbids outright — two machines fitted on different samples agree
 /// about under 0.12 of items. So the projection cannot adapt. <b>What CAN adapt
-/// is which of its outputs survive, decided per observation and decided the same
-/// way on every machine.</b> Nothing is remembered between readings, so there is
+/// is which of its outputs survive,</b> decided per observation and decided the same
+/// way on every machine. Nothing is remembered between readings, so there is
 /// nothing to fit.
 /// </para>
 /// <para>
@@ -45,8 +45,8 @@ namespace OpenPlexus.Codes;
 /// along one axis at a time, this generalises across them.
 /// </para>
 /// <para>
-/// <b>The projection is a constant of the design and not of a run, which is why
-/// no seed is taken.</b> A seed parameter would let two machines be handed
+/// <b>The projection is a constant</b> of the design and not of a run, which is why
+/// no seed is taken. A seed parameter would let two machines be handed
 /// different ones, and the red-ball property would be gone without anything
 /// failing — the codes would simply mean different things in two places. Making
 /// it impossible to pass is stronger than documenting that nobody should.

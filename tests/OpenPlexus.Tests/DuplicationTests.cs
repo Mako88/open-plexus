@@ -74,8 +74,8 @@ public sealed class DuplicationTests
     /// of the change: a world says what it is looking at and nothing else.
     /// </para>
     /// <para>
-    /// <b>Counting those four lines as a clone would make the architecture fail the
-    /// build, and no extraction can fix it</b> — a shared base class would leave
+    /// <b>Counting those four lines</b> as a clone would make the architecture fail the
+    /// build, and no extraction can fix it — a shared base class would leave
     /// the same four parameter lines behind, because the signature is what is
     /// shared. So this is a fix to what counts as a statement, NOT a raised window:
     /// <see cref="Window"/> is untouched at six, and the moment two constructors

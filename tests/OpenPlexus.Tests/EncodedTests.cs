@@ -230,8 +230,8 @@ public sealed class EncodedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The population and the probe on the identical vectors — fork 43, whose number has
-    /// only ever been a commit message.</b>
+    /// <b>The population and the probe on the identical vectors — fork 43,</b> whose number has
+    /// only ever been a commit message.
     /// </summary>
     /// <remarks>
     /// <para>

@@ -37,8 +37,8 @@ public sealed record Learned
     /// a truth is a rule that fires on fewer moments than a rule it already contains.
     /// </para>
     /// <para>
-    /// <b>And it is a property of the population rather than of a lineage, which is why it
-    /// needs no new plumbing.</b> Whether the parent it descended from was itself sound is
+    /// <b>And it is a property</b> of the population rather than of a lineage, which is why it
+    /// needs no new plumbing. Whether the parent it descended from was itself sound is
     /// a question about a history the brain does not keep; whether what it holds NOW is
     /// longer than it had to be is decidable from the scope and the world's enumeration.
     /// </para>

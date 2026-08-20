@@ -95,8 +95,8 @@ public sealed class DocsTests
     /// state you would load whole.
     /// </para>
     /// <para>
-    /// <b>The third condition is the only one that is not a judgement call, and it is also
-    /// the one this check cannot make.</b> So a raise is a deliberate edit to this constant
+    /// <b>The third condition is the only one</b> that is not a judgement call, and it is also
+    /// the one this check cannot make. So a raise is a deliberate edit to this constant
     /// and reads as one in a diff — the escape hatch is a NUMBER somebody had to type,
     /// rather than prose. Compaction still lowers it every pass; what is refused is a raise
     /// that pays for a rewording.

@@ -22,8 +22,8 @@ public sealed record RhythmSettings
     /// How often a moment shows something the cycle did not call for, in 0..1.
     /// </summary>
     /// <remarks>
-    /// <b>This is the only thing in any world here that a prediction can be
-    /// wrong about for a good reason.</b> A perfect model of this stream scores
+    /// <b>This is the only thing</b> in any world here that a prediction can be
+    /// wrong about for a good reason. A perfect model of this stream scores
     /// exactly one minus this and cannot do better, which is what makes the
     /// ceiling a number rather than an aspiration.
     /// </remarks>

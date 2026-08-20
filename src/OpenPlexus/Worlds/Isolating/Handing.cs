@@ -34,8 +34,8 @@ public sealed record HandingSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A sentence is a sequence and every text arm here reads it as a set, which is where
-/// the binding dies.</b> <i>mary gave the book to john</i> and <i>john gave the book to
+/// <b>A sentence is a sequence</b> and every text arm here reads it as a set, which is where
+/// the binding dies. <i>mary gave the book to john</i> and <i>john gave the book to
 /// mary</i> hold the same words, so no scope over a bag can tell them apart however the
 /// bag is coded — and that is not a limitation of the learner, it is the front end
 /// destroying the answer one call before anything could use it.

@@ -251,8 +251,8 @@ public sealed class Clevr : IWorld<Coded>, IWithholds<Coded>
     /// What the corpus calls each attribute, and which modality it becomes.
     /// </summary>
     /// <remarks>
-    /// <b>The four keys are the object's own JSON fields and the four
-    /// <c>filter_</c> and <c>query_</c> functions are named after them</b>, so one
+    /// <b>The four keys are the object's own JSON fields</b> and the four
+    /// <c>filter_</c> and <c>query_</c> functions are named after them, so one
     /// table serves the scenes and the programs both.
     /// </remarks>
     private static readonly (string Name, byte Modality)[] Attributes =

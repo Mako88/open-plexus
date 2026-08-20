@@ -171,8 +171,8 @@ public sealed class ForkingTests(ITestOutputHelper output)
 
 
     /// <summary>
-    /// <b>WHAT `Budget` means once a parent's attempts buy distinct children — the first
-    /// time this number has ever been a search limit.</b>
+    /// <b>WHAT `Budget` means once a parent's attempts buy distinct children —</b> the first
+    /// time this number has ever been a search limit.
     /// </summary>
     /// <remarks>
     /// <para>

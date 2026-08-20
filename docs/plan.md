@@ -461,9 +461,9 @@ before six that reads as tuning is out of order.
       nought is no advocate ever having been right, and it declines. John's. `Deciding`.
     - **NOW** — and it is free where there is evidence: level on the paper at eight tellings
       while going quiet on three times the rounds, so each round given up was already lost.
-    - **OPEN** — told once it declines everything, forfeiting a score UNDER the marginal, and
-      the second world is a NULL: five rounds in thirty thousand at an unmoved accuracy. The
-      axis is how YOUNG a population is rather than which world it is. Asking on a decline is
+    - **NOW** — and its home is a young POPULATION rather than a world, so told once it
+      declines everything. Shortening a run multiplies what it gives up a hundredfold where
+      widening a moment does not, and those rounds score at a coin. Asking on a decline is
       `Untested` renamed and is refuted.
     - **NOW** — `Alternating` is live and its store add-only, so a front end fills its OWN
       vocabulary, reaching every group the experimenter's holds for no score.

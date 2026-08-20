@@ -1,4 +1,5 @@
-﻿using OpenPlexus.Machines;
+﻿using OpenPlexus.Codes;
+using OpenPlexus.Machines;
 using OpenPlexus.Commitments;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -307,6 +308,251 @@ public sealed class StepOneTests(ITestOutputHelper output)
             $"declining now goes quiet on {silent[Deciding.Grounded].Average():F5} of this "
             + "world's rounds, so the comparison above has stopped being a null and is worth "
             + "reading as a comparison");
+    }
+
+    /// <summary>
+    /// Declining to answer read against how YOUNG the population is, on the same world.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The axis the second-world reading left behind.</b>
+    /// <see cref="What_declining_to_answer_buys_on_a_world_that_tells_it_nothing"/> came back
+    /// a null — a few rounds in thirty thousand at an unmoved accuracy — and the account of
+    /// why is that a weight of nought is an advocate never settled, so declining fires while
+    /// the population is young. That is a claim about WHEN, and it was argued rather than
+    /// measured.
+    /// </para>
+    /// <para>
+    /// <b>So the world is held still and the length is the axis</b>, which is what makes this
+    /// a control rather than a second world. Hunting for a world young for its whole length
+    /// would move the world and the age together, and this repo has a line about a comparison
+    /// that moves two things at once. The longest cell reproduces the known null in the same
+    /// instrument.
+    /// </para>
+    /// <para>
+    /// <b>And the width is the arm beside it</b>, because youth had a second candidate. A
+    /// population is young while its rules are unsettled, so a world whose scopes rarely fire
+    /// twice would leave one young however long the run. The multiplexer's address bits are
+    /// that dial — two is a six-bit world whose moments recur constantly and four is a
+    /// twenty-bit one where most of a moment is never seen again.
+    /// </para>
+    /// <para>
+    /// <b>The width is a null and the ratio says so.</b> Widening the world moves the rate a
+    /// fifth where shortening the run moves it fifty-fold, and the reason is that the address
+    /// bits widen what is SEEN while a weight is earned against what FOLLOWS. This world's
+    /// outcome alphabet is one bit at every width, so a rule gets a second firing almost at
+    /// once whatever the input does.
+    /// </para>
+    /// <para>
+    /// <b>Which is why the comparison is a ratio rather than two levels.</b> Either axis alone
+    /// is a rate on one world and says nothing; that one moves it far harder than the other is
+    /// a fact about which kind of youth the mechanism reads.
+    /// </para>
+    /// <para>
+    /// <b>What would drop it</b>, written before the grid ran: declining not rising as the run
+    /// shortens. Then youth is not what makes it fire and the null on this world is about the
+    /// world after all.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_declining_to_answer_buys_while_the_population_is_still_young()
+    {
+        int[] widths = [2, 4];
+        int[] lengths = [300, 3000, 30_000];
+        int[] seeds = [1, 2, 3];
+
+        var given = new Dictionary<(int Width, int Length), double>();
+        var precise = new Dictionary<(int Width, int Length, Deciding Arm), double>();
+
+        output.WriteLine(
+            $"{"bits",-6}{"rounds",-8}{"given up",10}{"anyway right",14}{"grounded right",16}");
+
+        foreach (var width in widths)
+        foreach (var length in lengths)
+        {
+            var silences = new Dictionary<Deciding, double>();
+
+            foreach (var arm in new[] { Deciding.Anyway, Deciding.Grounded })
+            {
+                var quiet = new List<double>();
+                var right = new List<double>();
+
+                foreach (var seed in seeds)
+                {
+                    var ran = new MultiplexerRun(
+                        new MultiplexerSettings { Address = width },
+                        new Brain(new CommittingSettings { Deciding = arm }, seed),
+                        seed).Run(length);
+
+                    var spoke = ran.Tally.Right + ran.Tally.Wrong;
+
+                    quiet.Add(
+                        ran.Tally.Rounds == 0
+                            ? 0.0
+                            : ran.Tally.Silent / (double)ran.Tally.Rounds);
+
+                    right.Add(spoke == 0 ? 0.0 : ran.Tally.Right / (double)spoke);
+                }
+
+                silences[arm] = quiet.Average();
+                precise[(width, length, arm)] = right.Average();
+            }
+
+            // Net of the arm that never declines, so what is counted is what declining GAVE
+            // UP rather than what the population had nothing to say about. The two are
+            // different events and a sum of them would be a statistic whose halves count
+            // different things.
+            given[(width, length)] = silences[Deciding.Grounded] - silences[Deciding.Anyway];
+
+            output.WriteLine(
+                $"{width * 2 + (1 << width),-6}{length,-8}{given[(width, length)],10:F4}"
+                + $"{precise[(width, length, Deciding.Anyway)],14:F3}"
+                + $"{precise[(width, length, Deciding.Grounded)],16:F3}");
+        }
+
+        // Rates rather than differences, because the cells are four decimal places apart and a
+        // subtraction there is a spread rather than a reading.
+        var byLength = widths
+            .Select(one => given[(one, lengths[^1])] == 0.0
+                ? 0.0
+                : given[(one, lengths[0])] / given[(one, lengths[^1])])
+            .ToList();
+
+        var byWidth = lengths
+            .Select(one => given[(widths[0], one)] == 0.0
+                ? 0.0
+                : given[(widths[^1], one)] / given[(widths[0], one)])
+            .ToList();
+
+        output.WriteLine(
+            $"shortening the run multiplies what is given up by {byLength.Average():F1}, "
+            + $"widening the world by {byWidth.Average():F1}");
+
+        // The kill line, and it is the whole reading. The account being tested says the
+        // mechanism fires while the population is young, so a short run must give up more
+        // than a long one -- on every width, since one cell out of three is a spread.
+        foreach (var width in widths)
+            Assert.True(given[(width, lengths[0])] > given[(width, lengths[^1])],
+                $"at {width * 2 + (1 << width)} bits a {lengths[0]}-round run gave up "
+                + $"{given[(width, lengths[0])]:F4} against {given[(width, lengths[^1])]:F4} "
+                + $"for {lengths[^1]} rounds, so run length is not what leaves a population "
+                + "young enough for the mechanism to fire");
+
+        // And which kind of youth it reads, which is what neither rate says alone. A weight is
+        // earned against what FOLLOWS, and this world's outcome alphabet is one bit however
+        // wide its input is -- so the axis that moves it should be the one that changes how
+        // many times a rule is settled, and not the one that changes what a moment holds.
+        Assert.True(byLength.Average() > byWidth.Average(),
+            $"widening the world multiplied what is given up by {byWidth.Average():F1} against "
+            + $"{byLength.Average():F1} for shortening the run, so the mechanism reads how "
+            + "wide a moment is rather than how often a rule has been settled");
+    }
+
+    /// <summary>
+    /// What the rounds declining gives up were worth, scored directly rather than by
+    /// difference.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The length grid reads precision by subtraction and cannot separate two cases.</b>
+    /// Declining removing rounds it was losing and declining removing a fair sample both
+    /// leave the precision where it was, and at three decimals over a few rounds in a
+    /// hundred neither is distinguishable from the other. So the declined rounds are scored
+    /// on their own.
+    /// </para>
+    /// <para>
+    /// <b>One run and one arm, which is what makes it paired.</b>
+    /// <see cref="Population.Decide"/> refuses a vote whose best weight is nought, so a run
+    /// under <see cref="Deciding.Anyway"/> carries the same rounds with the answer still
+    /// attached — a weight of nought and an expectation is exactly a round the shipped arm
+    /// would have declined. Nothing has to be assumed about whether two runs stay in step.
+    /// </para>
+    /// <para>
+    /// <b>Read where the population is young</b>, since that is where the length grid says
+    /// the mechanism fires at all.
+    /// </para>
+    /// <para>
+    /// <b>What would drop it</b>: the declined rounds scoring at or above the kept ones. Then
+    /// declining is giving up rounds as good as the ones it keeps, and silence is buying
+    /// nothing however honest it looks.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task The_rounds_declining_gives_up_are_the_ones_it_was_already_losing()
+    {
+        const int Young = 300;
+
+        // Fifty rather than three, and the count is why. The length grid prices this world's
+        // decline rate under a hundredth of its rounds, so three seeds leave five rounds to
+        // read and five rounds cannot rank anything. Three hundred rounds a seed is cheap
+        // enough that the seeds are the thing to spend on.
+        const int Seeds = 50;
+
+        long declinedRight = 0, declined = 0, keptRight = 0, kept = 0;
+
+        foreach (var seed in Enumerable.Range(1, Seeds))
+        {
+            var world = new Watching<IReadOnlyList<int>>(
+                new Multiplexer(new MultiplexerSettings { Address = 2 }, seed),
+                new Bits(Multiplexer.Bit));
+
+            // `Anyway` is the arm on purpose, and it is the whole construction. The shipped
+            // arm returns nothing on these rounds, so a run under it could not say what the
+            // answer would have been.
+            var brain = new Brain(
+                new CommittingSettings { Deciding = Deciding.Anyway }, seed);
+
+            for (var round = 0; round < Young; round++)
+            {
+                if (world.Push() is not { } moment) break;
+
+                var answer = await brain.ReceiveAsync(
+                    moment, sweeping: round > 0 && round % 1000 == 0);
+
+                if (!answer.Took || moment.Followed is not { } outcome) continue;
+
+                if (answer.Vote.Expects is not { } said) continue;
+
+                var hit = said == outcome;
+
+                if (answer.Vote.Weight <= 0.0)
+                {
+                    declined++;
+                    if (hit) declinedRight++;
+                }
+                else
+                {
+                    kept++;
+                    if (hit) keptRight++;
+                }
+            }
+        }
+
+        var onDeclined = declined == 0 ? 0.0 : declinedRight / (double)declined;
+        var onKept = kept == 0 ? 0.0 : keptRight / (double)kept;
+
+        // The spread goes beside it, because the whole reading is whether the declined rounds
+        // are a coin and a share on a hundred-odd rounds is not readable without one. A
+        // binomial standard error at the worst case, which is the half this is being compared
+        // against.
+        var spread = declined == 0 ? 0.0 : Math.Sqrt(0.25 / declined);
+
+        output.WriteLine(
+            $"declined {declinedRight}/{declined} = {onDeclined:F3} +/- {spread:F3}, "
+            + $"kept {keptRight}/{kept} = {onKept:F3}");
+
+        // The arm ran. A reading over no declined rounds cannot rank anything, and this repo
+        // has a line about a check that cannot fire reading like one that passes.
+        Assert.True(declined > 0,
+            $"no round in {Young} had a weight of nought, so the shipped arm declines nothing "
+            + "here and there is nothing to score");
+
+        // The kill line, written before the run. Silence is only worth having if what it
+        // gives up is worse than what it keeps.
+        Assert.True(onDeclined < onKept,
+            $"the rounds declining gives up scored {onDeclined:F3} against {onKept:F3} for "
+            + "the ones it keeps, so it is not removing the rounds it was losing and the "
+            + "honesty is costing rather than free");
     }
 
     [Fact]

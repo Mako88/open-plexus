@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 namespace OpenPlexus.Codes;
 
@@ -8,8 +8,8 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The plan asks for "a hash spending its bits where the data is without
-/// being fitted".</b> That reads as a contradiction until the adaptivity moves.
+/// <b>The plan asks for a hash spending its bits where the data is</b>, without
+/// being fitted. That reads as a contradiction until the adaptivity moves.
 /// A projection chosen to suit the data is a fitted codebook, which the red-ball
 /// property forbids outright — two machines fitted on different samples agree
 /// about under 0.12 of items. So the projection cannot adapt. <b>What CAN adapt
@@ -32,7 +32,7 @@ namespace OpenPlexus.Codes;
 /// projects UP and then throws most of it away. The expansion is what preserves
 /// similarity on little data — and a sparse set of fired codes is exactly what
 /// this architecture already eats, so the fly's output form needs no adapting at
-/// all. <b>A dense code would have to be unpacked into codes; this IS codes.</b>
+/// all. <b>A dense code would have to be unpacked into codes</b>; this IS codes.
 /// </para>
 /// <para>
 /// <b>What it is for, and why <see cref="Grains"/> IS NOT ENOUGH.</b> Grains take
@@ -41,7 +41,7 @@ namespace OpenPlexus.Codes;
 /// readings that differ a little in every dimension share no band at any grain.
 /// This reads the dimensions TOGETHER: a cell fires on a weighted sum of several,
 /// so a small move anywhere leaves most winners standing. <b>They are the two
-/// halves of one step and neither is the other's arm</b> — grains generalise
+/// halves of one step</b> and neither is the other's arm — grains generalise
 /// along one axis at a time, this generalises across them.
 /// </para>
 /// <para>

@@ -137,44 +137,26 @@ public sealed class LetteringTests(ITestOutputHelper output)
             + $"{pixels.Accuracy,10:F3}{pixels.Tested,9}");
 
         var coded = new Dictionary<int, Probed>();
+        var without = new Dictionary<int, Probed>();
 
         foreach (var tile in new[] { 3, 4, 6, 8 })
         {
             // One codebook for every patch and every drawing, which is what makes a code MEAN
             // a part wherever it turns up. Built fresh per tile size because the codebook is
             // the thing being sized.
-            var tiling = new Tiling(Patch, Lettering.Side, tile);
-            var features = new Dictionary<Code, int>();
-            var said = new List<(IReadOnlyCollection<Code> Codes, int Word, bool Shown)>();
+            var whole = Reading(every, new Tiling(Patch, Lettering.Side, tile));
+            var half = Reading(every, new Tiling(Patch, Lettering.Side, tile, placed: false));
 
-            foreach (var (raster, word, shown) in every)
-            {
-                var codes = tiling.Codify(raster);
-
-                foreach (var code in codes)
-                    if (!features.ContainsKey(code)) features[code] = features.Count;
-
-                said.Add((codes, word, shown));
-            }
-
-            var fitting = new List<(IReadOnlyList<double>, int)>();
-            var scoring = new List<(IReadOnlyList<double>, int)>();
-
-            foreach (var (codes, word, shown) in said)
-            {
-                // An indicator per code, which is what a commitment's scope reads. Anything
-                // richer would hand this side something the population never had.
-                var indicator = new double[features.Count];
-                foreach (var code in codes) indicator[features[code]] = 1.0;
-
-                (shown ? fitting : scoring).Add((indicator, word));
-            }
-
-            coded[tile] = Probe.Fit(fitting, scoring, Words.Length);
+            coded[tile] = whole.Read;
+            without[tile] = half.Read;
 
             output.WriteLine(
-                $"{"tiling " + tile,-16}{features.Count,10}"
-                + $"{coded[tile].Accuracy,10:F3}{coded[tile].Tested,9}");
+                $"{"tiling " + tile,-16}{whole.Features,10}"
+                + $"{whole.Read.Accuracy,10:F3}{whole.Read.Tested,9}");
+
+            output.WriteLine(
+                $"{"  bare only",-16}{half.Features,10}"
+                + $"{half.Read.Accuracy,10:F3}{half.Read.Tested,9}");
         }
 
         // The instrument first, and it is not a formality. Sixteen words drawn at one place
@@ -208,6 +190,64 @@ public sealed class LetteringTests(ITestOutputHelper output)
             $"a shared codebook read {best.Value.Accuracy:F3} against {pixels.Accuracy:F3} "
             + "for the pixel addresses under it, so the front end is not what carries a moved "
             + "word and the account of why patches pay is wrong");
+
+        // And what the PLACED half is worth, which the conjunction reading below makes worth
+        // asking. A placed code pins a patch, so it cannot sit in a sound scope for a word
+        // that moves -- measured dead weight for a rule learner. Whether a probe agrees is a
+        // different question, and the two halves of one front end need not.
+        output.WriteLine(
+            $"at {best.Key} pixels a patch the bare half alone reads "
+            + $"{without[best.Key].Accuracy:F3} against {best.Value.Accuracy:F3} for both, "
+            + $"on {without[best.Key].Tested} withheld drawings");
+
+        Assert.True(without[best.Key].Accuracy > best.Value.Accuracy + 0.2,
+            $"the bare half alone read {without[best.Key].Accuracy:F3} against "
+            + $"{best.Value.Accuracy:F3} for both halves, so saying a winner a second time "
+            + "with its patch is no longer costing this reading. `Tiling`'s placed arm is "
+            + "why `CrossingRun` turns it off, and that reason has gone");
+    }
+
+
+    /// <summary>What a probe makes of one tiling's codes, with or without the placed half.</summary>
+    /// <param name="every">Every drawing, with the word it is of and whether it was shown.</param>
+    /// <param name="tiling">The front end, built once and read over every drawing.</param>
+    /// <remarks>
+    /// <b>The placed half is the arm</b>, and the conjunction reading below is why it is worth
+    /// asking. A placed code cannot sit in a sound scope for a word that moves, so it is
+    /// measured dead weight for a rule learner — what this says is whether it is dead weight
+    /// for a probe too, or whether the two halves disagree about it.
+    /// </remarks>
+    private static (Probed Read, int Features) Reading(
+        List<(IReadOnlyList<double> Pixels, int Word, bool Shown)> every,
+        Tiling tiling)
+    {
+        var features = new Dictionary<Code, int>();
+        var said = new List<(IReadOnlyCollection<Code> Codes, int Word, bool Shown)>();
+
+        foreach (var (raster, word, shown) in every)
+        {
+            var codes = tiling.Codify(raster).ToList();
+
+            foreach (var code in codes)
+                if (!features.ContainsKey(code)) features[code] = features.Count;
+
+            said.Add((codes, word, shown));
+        }
+
+        var fitting = new List<(IReadOnlyList<double>, int)>();
+        var scoring = new List<(IReadOnlyList<double>, int)>();
+
+        foreach (var (codes, word, shown) in said)
+        {
+            // An indicator per code, which is what a commitment's scope reads. Anything
+            // richer would hand this side something the population never had.
+            var indicator = new double[features.Count];
+            foreach (var code in codes) indicator[features[code]] = 1.0;
+
+            (shown ? fitting : scoring).Add((indicator, word));
+        }
+
+        return (Probe.Fit(fitting, scoring, Words.Length), features.Count);
     }
 
     /// <summary>

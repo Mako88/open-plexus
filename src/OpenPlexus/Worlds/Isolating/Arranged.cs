@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 namespace OpenPlexus.Worlds;
 
@@ -134,8 +134,8 @@ public readonly record struct Layout
 /// — see <see cref="Swapped"/>, which the tests enumerate rather than sample.
 /// </para>
 /// <para>
-/// <b>And it is generated, which restores soundness by enumeration on a world made of
-/// photons.</b> <see cref="Layouts"/> is the entire space, so a commitment can be asked
+/// <b>And it is generated</b>, which restores soundness by enumeration on a world made of
+/// photons. <see cref="Layouts"/> is the entire space, so a commitment can be asked
 /// whether it is TRUE — coded through whatever front end is in use, checked against
 /// every scene it fires on — rather than whether it agrees with a basis somebody chose.
 /// That is the instrument step four had to do without, and the reason the grid is small.
@@ -160,8 +160,8 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
 
     /// <summary>How many shapes the answer depends on.</summary>
     /// <remarks>
-    /// <b>Private, because nothing outside has any business knowing which shapes the
-    /// answer is about.</b> A front end told that would have been handed the problem,
+    /// <b>Private</b>, because nothing outside has any business knowing which shapes the
+    /// answer is about. A front end told that would have been handed the problem,
     /// and a test told it would be marking its own paper.
     /// </remarks>
     private const int Markers = 2;
@@ -487,8 +487,8 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
 
     /// <summary>Every way the clutter can be placed, ignoring where the markers went.</summary>
     /// <remarks>
-    /// <b>Over slots rather than over cells, so the count is the same for every
-    /// arrangement.</b> <see cref="Compose"/> maps a slot onto whichever cell is free,
+    /// <b>Over slots rather than over cells</b>, so the count is the same for every
+    /// arrangement. <see cref="Compose"/> maps a slot onto whichever cell is free,
     /// which is what makes the draw uniform over scenes and the two markers
     /// interchangeable — a clutter enumerated against real cells would admit more
     /// configurations for some arrangements than others.

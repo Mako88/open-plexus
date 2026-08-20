@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Machines;
@@ -33,6 +33,13 @@ public sealed record Crossings
 /// end that cannot carry the question. The size is the join's to choose and it is chosen
 /// here rather than in the world.
 /// </para>
+/// <para>
+/// <b>And the bare half alone, which is the same reading's other half.</b> A placed code
+/// pins a patch, so on a world whose word MOVES it cannot sit in a scope that is sound over
+/// position — and a probe over both halves reads far below the same probe over the bare half
+/// alone, because the placed codes are twenty-five times the features and every one of them
+/// is a position the next drawing does not use.
+/// </para>
 /// </remarks>
 public sealed class CrossingRun
 {
@@ -54,7 +61,7 @@ public sealed class CrossingRun
 
         var body = new Compound<Crossed>(
         [
-            new Tiling(Crossing.Shape, Lettering.Side, Patch),
+            new Tiling(Crossing.Shape, Lettering.Side, Patch, placed: false),
             new Passthrough(),
         ]);
 

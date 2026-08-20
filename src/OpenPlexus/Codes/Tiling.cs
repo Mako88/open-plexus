@@ -53,13 +53,35 @@ public sealed class Tiling : IQuantizer<IReadOnlyList<double>>, IQuantizer<World
     private readonly int _across;
     private readonly ulong _cells;
 
+    /// <summary>Whether a winner is said again with its patch.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>An arm, and `LetteringTests` is where it is compared.</b> On a world whose thing
+    /// MOVES the placed half cannot help: a word two pixels along emits none of the placed
+    /// codes it emitted before, so no placed code can sit in a scope that is sound over
+    /// position. What the reading adds is that it does not merely fail to help — a probe
+    /// over both halves reads far below the same probe over the bare half alone, because the
+    /// placed codes are twenty-five times as many features and every one of them is a
+    /// position the withheld drawing does not use.
+    /// </para>
+    /// <para>
+    /// <b>Defaulted to saying both</b>, so every reading taken before this existed is the
+    /// reading it was. An arranged world whose cells never move is where the placed half was
+    /// built for, and it stays the default until something measures it there too.
+    /// </para>
+    /// </remarks>
+    private readonly bool _placed;
+
     /// <param name="modality">The modality these codes ride on.</param>
     /// <param name="side">How many pixels across the square reading is.</param>
     /// <param name="tile">How many pixels across one patch is. Must divide the side.</param>
+    /// <param name="placed">
+    /// Whether to say a winner a second time with the patch it sat in.
+    /// </param>
     /// <exception cref="ArgumentOutOfRangeException">
     /// The patch does not divide the reading, or is too small to project from.
     /// </exception>
-    public Tiling(byte modality, int side, int tile)
+    public Tiling(byte modality, int side, int tile, bool placed = true)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(side, 2);
         ArgumentOutOfRangeException.ThrowIfLessThan(tile, 2);
@@ -81,6 +103,7 @@ public sealed class Tiling : IQuantizer<IReadOnlyList<double>>, IQuantizer<World
         _tile = tile;
         _across = side / tile;
         _cells = (ulong)cells;
+        _placed = placed;
 
         Modality = modality;
     }
@@ -136,7 +159,9 @@ public sealed class Tiling : IQuantizer<IReadOnlyList<double>>, IQuantizer<World
             foreach (var code in _winnow.Of(patch))
             {
                 codes.Add(code);
-                codes.Add(new Code(Modality, ((ulong)(at + 1) * _cells) + code.Value));
+
+                if (_placed)
+                    codes.Add(new Code(Modality, ((ulong)(at + 1) * _cells) + code.Value));
             }
         }
 

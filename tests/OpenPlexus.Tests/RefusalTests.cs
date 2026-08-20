@@ -11,15 +11,15 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The census says the missing rules are conjunctions and repair is the only thing
-/// that makes them.</b> Genesis is one code wide, so its whole reachable space is the
+/// <b>The census says the missing rules are conjunctions</b> and repair is the only thing
+/// that makes them. Genesis is one code wide, so its whole reachable space is the
 /// vocabulary times the outcomes and it saturates in the opening few hundred rounds.
 /// Everything after that is repair, and on the worlds where coverage is worst repair runs
 /// at a fifth the rate it does where coverage is fine. Nothing said why.
 /// </para>
 /// <para>
-/// <b>Five gates stand between a wrong commitment and a child, and only the last was ever
-/// counted.</b> <c>Blamed</c> and <c>Unseparated</c> are per-ROUND and speak only for
+/// <b>Five gates stand between a wrong commitment and a child</b>, and only the last was ever
+/// counted. <c>Blamed</c> and <c>Unseparated</c> are per-ROUND and speak only for
 /// candidates that survived everything else — so a run whose gates refuse almost
 /// everything reports the same <c>Wanting</c> as a run whose language is too weak, and
 /// those are opposite diagnoses. The ladder's own trigger has been reading a number
@@ -41,8 +41,8 @@ public sealed class RefusalTests(ITestOutputHelper output)
             census: true).Run(Rounds);
 
     /// <summary>
-    /// <b>The five refusals add up to every candidate, which is what makes the shares
-    /// readable.</b>
+    /// <b>The five refusals add up to every candidate</b>, which is what makes the shares
+    /// readable.
     /// </summary>
     /// <remarks>
     /// <b>A partition that does not partition is a pie chart of a different pie.</b> Each

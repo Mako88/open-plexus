@@ -14,8 +14,8 @@ public sealed record GradedSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>And high is the easy end, which is the opposite of what it was written
-    /// down as.</b> Crowded against the line, every reading falls in one of the two
+    /// <b>And high is the easy end,</b> which is the opposite of what it was written
+    /// down as. Crowded against the line, every reading falls in one of the two
     /// bands either side of it, so a banded front end emits what is almost a bit and
     /// the interface costs nearly nothing.
     /// </para>

@@ -271,8 +271,8 @@ public sealed record Quizzed
 /// that is the whole of the question this world asks.
 /// </para>
 /// <para>
-/// <b>And what it measures when it fails is worth more than what it measures when it
-/// passes.</b> <c>Tally.Wanting</c> is the share of blamed rounds nothing in the scope
+/// <b>And what it measures</b> when it fails is worth more than what it measures when it
+/// passes. <c>Tally.Wanting</c> is the share of blamed rounds nothing in the scope
 /// language separates, computed every round since the branch began. A high reading here
 /// is the ladder's own admission rule firing on text, which is the signal the design
 /// exists for — and it is a different finding from a low score.

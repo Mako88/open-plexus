@@ -120,8 +120,8 @@ public enum Examining
 /// is missing here.
 /// </para>
 /// <para>
-/// <b>Built rather than ported, which is this repo's own rule — borrow the problem, not
-/// the mechanism.</b> A benchmark varies its parser, its vocabulary, its quest length and
+/// <b>Built rather than ported, which is this repo's own rule —</b> borrow the problem, not
+/// the mechanism. A benchmark varies its parser, its vocabulary, its quest length and
 /// its room count at once, and a number off it cannot be attributed to any of them. What
 /// is wanted is the property, one axis at a time, with the state small enough to enumerate
 /// — which is the same reason <see cref="Multiplexer"/> earns its keep and no corpus can.

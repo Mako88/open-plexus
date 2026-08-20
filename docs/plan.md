@@ -169,6 +169,8 @@ FORBIDS things, and several of them are already measured.
 - **John's curriculum proposal**: teach it English, then examine it — and mixing the two is
   worse than either alone, the function-word rules crowding out the population the questions
   needed.
+- **And a beginner language course is that primer**, John's: one referent through video, audio
+  and text, ordered for a learner with no language. Ostension by construction. Fork **132**.
 - **And the first conversation demands unification rather than sequence**, which inverts what
   the ordering assumed. Binding the question's actor to a statement's actor is rung four, and
   no dose of recency reaches it.
@@ -244,8 +246,8 @@ before six that reads as tuning is out of order.
       and its gate, the vote and its weighting, settlement, blame and repair all live beside the
       code in `Commitments`.
     - **OPEN** — nothing here answers what a concept IS beyond a code that fires.
-    - **NOW** — the exponent is polynomial ON SYMBOLS: 2,003, 3,468 and 7,920 rounds at 6,
-      11 and 20 bits, so cost tracks a scope's DEPTH.
+    - **NOW** — the exponent is polynomial ON SYMBOLS and tracks a scope's DEPTH: 3.95x the
+      rounds for 16,384x the space.
     - **OPEN** — the POPULATION is where it grows: 19, 797 and 1,824 sound rules.
     - **OPEN** — the scope language is the CEILING: whatever a scope cannot say cannot be
       learnt. ILP's language-bias problem, what killed the field, and the ladder is finite.
@@ -269,7 +271,7 @@ before six that reads as tuning is out of order.
       seen ball and a heard *ball* do.
     - **SETTLED** — the binding world failed and the block is lifted. Fork **25**.
     - **OPEN** — text as an IMAGE keeps ground truth enumerable, so soundness survives where a
-      camera kills it. `Senses` names cross two senses. Fork **107**.
+      camera kills it. `Senses` names cross two senses, and it GATES every sensor. Fork **107**.
     - **OPEN** — spreading a reading over its range costs most of the score at both front ends.
       Fork **38**.
     - **OPEN** — under ten dimensions there are too few distinct wirings for a projection to
@@ -310,8 +312,8 @@ before six that reads as tuning is out of order.
       `Latent`'s three-code scopes fire 0.2 times each, so depth is never tested. Fork **112**.
     - **NOW** — concept-before-label is measured, and alternation groups things with no word
       for them yet. Four groups on bAbI, all word classes.
-    - **NOW** — `ByLikeness` beats `BySpace` on text at every threshold: three pure classes
-      on three tasks against two, one and nought.
+    - **NOW** — `ByLikeness` beats `BySpace` on every bAbI task at every threshold, and PPMI
+      over its counts is the arm nobody has run.
     - **OPEN** — but `ByTime` is what `Returning` needs, so no reading wins both. A weighed
       adhesion is unbuilt. Fork **131**.
     - **OPEN** — what rung five names is a SET, never a variable, so the two rungs are not
@@ -332,8 +334,8 @@ before six that reads as tuning is out of order.
       than by how many. Fork **71**.
     - **OPEN** — a category is the set of codes that are ALTERNATIVES, from moments alone. Open
       on the individual, which substitutability never reaches. `csharp` refuted a SIMILARITY
-      code as the coarse form, a hub at one end and an index at the other, so **83**, **84** and
-      **85** want a told alphabet. Fork **97**.
+      code as the coarse form, a hub at one end and an index at the other. **83** to **85**
+      want an alphabet and `Deriving` fills one. Fork **97**.
     - **OPEN** — a name over ALTERNATIVES is derivable and not admitted, rung five being the
       wrong SHAPE: it names what CO-FIRES, and alternatives never do.
     - **OPEN** — so likeness read off the POPULATION rather than the moment: two codes are

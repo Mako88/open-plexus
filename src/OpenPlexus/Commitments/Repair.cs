@@ -1102,10 +1102,32 @@ public static class Conditions
     /// <param name="inMisses">Firings that missed with the code present.</param>
     /// <param name="misses">Firings that missed.</param>
     /// <remarks>
+    /// <para>
     /// <b>The pooled two-proportion z, one-sided.</b> One-sided because the question
     /// is not whether the shares differ — it is whether the code was there when the
     /// commitment was RIGHT, and a code that leads the other way is evidence for a
     /// rung this design has not built.
+    /// </para>
+    /// <para>
+    /// <b>And this is why no frequency weight belongs here</b>, which is worth saying beside
+    /// the arithmetic because the proposal is a natural one and keeps arriving. A rare word
+    /// looks important because it DISCRIMINATES, and rarity is a proxy for that; this reads
+    /// discrimination directly, off the code's own hits and misses. Weighting the bar by how
+    /// rare a code is would put an estimate on top of the measurement it estimates.
+    /// </para>
+    /// <para>
+    /// <b>The curve the proposal is reaching for is already here</b>, and it is a confidence
+    /// cliff rather than a frequency one. Luhn's is the classical shape — resolving power
+    /// rising with rarity, peaking, then falling — and its lower cutoff exists to throw away
+    /// what is too rare to be sure about. That cutoff is what a significance test does
+    /// without anybody drawing it, so the drop-off arrives for the right reason.
+    /// </para>
+    /// <para>
+    /// <b>Where rarity does belong is search ORDER</b>, never admission. Repair ranks
+    /// candidates under a budget, and a prior that tries the discriminating ones first can
+    /// only find a good condition sooner — it can never let a bad one through, because this
+    /// still decides. Unbuilt, and it is the safe half of the idea.
+    /// </para>
     /// </remarks>
     public static double Divergence(long inHits, long hits, long inMisses, long misses)
     {

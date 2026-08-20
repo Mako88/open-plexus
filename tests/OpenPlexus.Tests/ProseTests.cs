@@ -119,7 +119,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 358;
+    private const int Shouted = 348;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>

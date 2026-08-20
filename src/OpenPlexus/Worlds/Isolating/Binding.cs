@@ -133,8 +133,8 @@ public sealed record Scene
 
     /// <summary>
     /// The contentless index for each object, or empty when the world does not
-    /// hand them out. <b>Fresh every scene, so it names an occasion of an object
-    /// rather than a kind of object.</b>
+    /// hand them out. <b>Fresh every scene,</b> so it names an occasion of an object
+    /// rather than a kind of object.
     /// </summary>
     public IReadOnlyList<Code> Tags { get; init; } = [];
 

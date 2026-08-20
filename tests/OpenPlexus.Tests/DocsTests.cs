@@ -450,7 +450,19 @@ public sealed class DocsTests
     // reading recovers nothing at all on the richest of the three. What is left open is that
     // `ByTime` is what a moving world needs and a weighed adhesion does not exist, so the
     // OPEN is a smaller question than the one it replaces rather than the same one reworded.
-    private const int Whole = 12_225;
+    // And 12,261 is the forty-third raise, thirty-six words from a design conversation, which
+    // is the condition this budget names rather than an exception to it. Two items are new:
+    // a beginner language course as the primer, John's, being one referent through video,
+    // audio and text ordered for a learner with no language -- ostension by construction and
+    // the teacher signal this design trades corpus scale for. And fork 107 gating every
+    // sensor, text as an image being the one crossing that keeps the ground-truth
+    // instruments alive, so it is a bridge rather than one more modality.
+    //
+    // Paid down where it could be. The exponent and the likeness readings state their shape
+    // and leave their numbers in the guards that now hold them, and the rule about where
+    // rarity belongs went to `Repair.Divergence` rather than here, a mechanism living beside
+    // its code being what this doc says it is for.
+    private const int Whole = 12_261;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

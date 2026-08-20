@@ -127,7 +127,7 @@ public sealed record ReturningSettings
 
     /// <summary>
     /// How often a thing that is met has MOVED since it was last met — <b>the control that
-    /// says whether continuity recovers a thing or a place it happens to sit in.</b>
+    /// says whether continuity recovers</b> a thing or a place it happens to sit in.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -180,8 +180,8 @@ public sealed record ReturningSettings
 /// a moment at a time.
 /// </para>
 /// <para>
-/// <b>What is not built here, deliberately, is the continuity that would let a learner
-/// recover the gap.</b> Company, trajectory, a room that changes slowly — each is a way an
+/// <b>What is not built here, deliberately,</b> is the continuity that would let a learner
+/// recover the gap. Company, trajectory, a room that changes slowly — each is a way an
 /// individual could be pinned by its relations rather than its looks, and each is an arm to
 /// run once the gap is measured. Measuring the gap first is what stops the first mechanism
 /// tried from being scored against no baseline at all.

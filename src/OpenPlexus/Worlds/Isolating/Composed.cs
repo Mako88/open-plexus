@@ -126,8 +126,8 @@ public sealed record Episode
 /// kind for a memoriser to fall back on either.
 /// </para>
 /// <para>
-/// <b>The answer is open rather than a forced choice, and that is not the
-/// binding world's shape.</b> There the question was which of the two shapes
+/// <b>The answer is open rather than a forced choice,</b> and that is not the
+/// binding world's shape. There the question was which of the two shapes
 /// present belonged to the colour, because a forced choice isolates binding from
 /// recognition. Here a forced choice would break the sharpest control: grouping
 /// means <c>A₀</c> pairs only with <c>tag₀</c>, so between <c>C₀</c> and

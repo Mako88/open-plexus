@@ -24,8 +24,8 @@ namespace OpenPlexus.Tests;
 /// which is the oldest line on this repo's trap list wearing the plan's own words.
 /// </para>
 /// <para>
-/// <b>And the source is a world rather than a network, which is the honest place for
-/// it.</b> A world that sometimes does not say what followed is not a simulation of a dead
+/// <b>And the source is a world rather than a network,</b> which is the honest place for
+/// it. A world that sometimes does not say what followed is not a simulation of a dead
 /// machine — most moments in any real stream are followed by nothing anybody observes, and
 /// a world saying so is a world saying what it is looking at. The distributed case arrives
 /// on top of this rather than instead of it.

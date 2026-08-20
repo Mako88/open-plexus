@@ -35,8 +35,8 @@ public sealed record ArrangedSettings
     /// <summary>One arrangement in this many is never drawn. Nought withholds nothing.</summary>
     /// <remarks>
     /// <para>
-    /// <b>The sharpest instrument this world has, and it is aimed at the thing a
-    /// score cannot see.</b> A learner that stores one rule per arrangement is
+    /// <b>The sharpest instrument this world has,</b> and it is aimed at the thing a
+    /// score cannot see. A learner that stores one rule per arrangement is
     /// arbitrarily accurate on what it has been shown and holds no notion of LEFT OF.
     /// Arrangements it was never shown are where the two come apart.
     /// </para>
@@ -444,8 +444,8 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
     /// sense can tell from background. The wedge is the block with that fixed.
     /// </para>
     /// <para>
-    /// <b>It cost nothing to find and would have cost a great deal to discover from a
-    /// score</b>, because the whole-image arm reads a picture that is never uniform and
+    /// <b>It cost nothing to find</b> and would have cost a great deal to discover from a
+    /// score, because the whole-image arm reads a picture that is never uniform and
     /// separates the world perfectly — the collision only bites a front end that looks
     /// at one part at a time, which is exactly the arm this world exists to try.
     /// </para>

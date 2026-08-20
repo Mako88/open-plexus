@@ -517,7 +517,7 @@ public sealed class DocsTests
     // and that phase is a rounding error on a long run. So the axis declining lives on is how
     // YOUNG a population is rather than which world it is -- the conversation is not a
     // friendlier world for it, it is a shorter one.
-    private const int Whole = 12_493;
+    private const int Whole = 12_398;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

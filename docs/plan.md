@@ -442,26 +442,20 @@ before six that reads as tuning is out of order.
       so repair and every rung above it are held still.
     - **OPEN** — more unsound commitments resident than sound ones while the score holds: is
       the vote robust to them, or are they why it stops short. Fork **35**.
-    - **NOW** — and the seat splits three ways, so it is two failures rather than one. Told
-      once the right rule TIES; told enough it is OUTRANKED; it is never ABSENT. `Seating`.
-    - **NOW** — and no tie-break exists. Both sides of a tie are one weight, one scope length
-      and one advocate, so specificity separates none of them and neither does a crowd.
-    - **NOW** — the wide root SHIPS, closing the OUTRANKING under withheld claiming. Its
+    - **NOW** — and the seat is two failures rather than one. Told once the right rule TIES;
+      told enough it is OUTRANKED; it is never ABSENT. `Seating`.
+    - **NOW** — the wide root SHIPS and closes the outranking under withheld claiming. Its
       blocker was `blind.Sound` standing in for what repair produced, and `Births` records the
-      operator per commitment so the assertion now says what it meant.
-    - **NOW** — and crediting CONVERTS a tie into an outranking for the same score, the newest
-      mint being strongest because the older ones have missed since. Recency is not
-      correctness, so it does not ship.
+      operator per commitment so the assertion says what it meant.
+    - **NOW** — and no tie-break exists: both sides are one weight, one scope length and one
+      advocate, so neither specificity nor a crowd separates them, and crediting converts a
+      tie into an outranking only by recency. So the machine SAYS SO instead, a weight of
+      nought being no advocate ever having been right. John's. `Deciding`.
+    - **NOW** — and declining is free where there is evidence and its home is a young
+      POPULATION, so told once it declines everything and gives up rounds scoring at a coin.
+      Asking on a decline is `Untested` renamed and is refuted.
     - **NOW** — and the three together answer a paper never sat, told once, on drawn lessons
       rather than on the one written text. The wide root, credited mints, every word claimed.
-    - **NOW** — and nothing separates two blank rules, so the machine SAYS SO. A weight of
-      nought is no advocate ever having been right, and it declines. John's. `Deciding`.
-    - **NOW** — and it is free where there is evidence: level on the paper at eight tellings
-      while going quiet on three times the rounds, so each round given up was already lost.
-    - **NOW** — and its home is a young POPULATION rather than a world, so told once it
-      declines everything. Shortening a run multiplies what it gives up a hundredfold where
-      widening a moment does not, and those rounds score at a coin. Asking on a decline is
-      `Untested` renamed and is refuted.
     - **NOW** — `Alternating` is live and its store add-only, so a front end fills its OWN
       vocabulary, reaching every group the experimenter's holds for no score.
     - **OPEN** — it costs 4.7x the rules. Nothing waits for a group to hold still, and the

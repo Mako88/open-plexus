@@ -435,7 +435,16 @@ public sealed class DocsTests
     // 3.95, so it tracks the depth of a scope rather than the space -- and the second item
     // is where the cost went instead, the population going 19, 797 and 1,824 sound rules.
     // A reading that turns an OPEN into a NOW and a guard is what the budget is for.
-    private const int Whole = 12_182;
+    // And 12,219 is the forty-first raise, thirty-seven words for two statistics that were in
+    // this repo at once for one idea. `Alternating.BySpace` takes the share of company two
+    // codes share as a SET, so a partner seen once weighs what a partner seen a thousand
+    // times weighs. Fork 98's statistic in `RecalledTests` takes the cosine of the COUNTED
+    // company, and it is the one that priced a category at five points under the bag -- so
+    // the reading that pays was taken on an object the shipped mechanism is not. On bAbI they
+    // disagree: weighing the counts drops `is` out of the places and loses the `to` against
+    // `where` group entirely. That is an item rather than a finding, because neither
+    // threshold is calibrated against the other and the ranking wants a sweep.
+    private const int Whole = 12_219;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

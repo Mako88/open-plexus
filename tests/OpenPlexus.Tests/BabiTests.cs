@@ -253,26 +253,11 @@ public sealed class BabiTests(ITestOutputHelper output)
     [Fact]
     public void Whether_shared_company_recovers_a_word_class_on_real_english()
     {
-        var babi = new Babi(World(task: 1));
-
-        // One line is one moment, and the answer is left out because it is not said in the
-        // line -- a code that only ever arrives as an answer keeps no company at all.
-        var moments = babi.Lines
-            .Select(line => (IReadOnlySet<Code>)new HashSet<Code>(line.Words))
-            .ToList();
-
-        // Built from the lines rather than from `Alphabet`, which is the ANSWER vocabulary
-        // and holds six words here. A map that covers the answers only would print most of
-        // the groups as question marks and read as a derivation that found nothing.
-        var word = babi.Lines
-            .Where(line => line.Text is not null)
-            .SelectMany(line => Babi.Words(line.Text!))
-            .Distinct()
-            .ToDictionary(Babi.Of, one => one);
+        var (moments, word) = Read(task: 1);
 
         var groups = Alternating.From(moments, company: 0.5, floor: 20);
 
-        output.WriteLine($"{moments.Count} lines, {babi.Alphabet.Count} words in the alphabet");
+        output.WriteLine($"{moments.Count} lines, {word.Count} words said in them");
 
         foreach (var group in groups.OrderByDescending(one => one.Count))
             output.WriteLine(
@@ -321,5 +306,96 @@ public sealed class BabiTests(ITestOutputHelper output)
         Assert.False(forNames.SetEquals(forPlaces),
             "the names and the places came back as one group, so what was recovered is that "
             + "every content word keeps the same company rather than two classes");
+    }
+
+    /// <summary>
+    /// Whether weighing company by how often a partner turned up finds what a bare set of it
+    /// finds.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Two statistics for one idea were in this repo at once and only one of them shipped.
+    /// <see cref="Alternating.BySpace"/> takes the share of company two codes share, as a set,
+    /// so a partner seen once weighs what a partner seen a thousand times weighs. The
+    /// statistic in <c>RecalledTests</c> takes the cosine of the counted company, and it is
+    /// the one that priced a category at five points under the bag.
+    /// </para>
+    /// <para>
+    /// So the reading that pays was taken on an object the shipped mechanism is not, and this
+    /// is the comparison that says whether that matters. Both are now readings on one
+    /// accumulator over one set of counts, differing in the one thing.
+    /// </para>
+    /// <para>
+    /// What it decides: one of the two goes. Where they agree the counts are carrying nothing
+    /// on this corpus and the simpler reading stays; where the weighed one finds more, it
+    /// becomes the derivation and the bare set leaves with a revival row.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_weighing_company_finds_what_a_bare_set_of_it_finds()
+    {
+        var (moments, word) = Read(task: 1);
+
+        var watching = new Alternating();
+
+        foreach (var moment in moments) watching.Watch(moment);
+
+        // One accumulator and one set of counts, so the only thing that differs between the
+        // two rows is whether a partner's count is read or discarded.
+        var bare = watching.BySpace(company: 0.5, floor: 20);
+        var weighed = watching.ByLikeness(alike: 0.9, floor: 20);
+
+        static string Said(IReadOnlySet<Code> group, IReadOnlyDictionary<Code, string> word) =>
+            string.Join(" ", group.Select(code => word.GetValueOrDefault(code, "?")).Order());
+
+        foreach (var (label, groups) in new (string, IReadOnlyList<IReadOnlySet<Code>>)[]
+            { ("a set of company", bare), ("company weighed", weighed) })
+        {
+            output.WriteLine($"{label}: {groups.Count} groups");
+
+            foreach (var group in groups.OrderByDescending(one => one.Count))
+                output.WriteLine($"  {group.Count,2}  {Said(group, word)}");
+        }
+
+        // Reported rather than barred, because what the counts are worth on this corpus has
+        // never been measured and a threshold written before the first reading would be the
+        // answer rather than the finding. What is asserted is that both found SOMETHING, so a
+        // row of agreement cannot be two derivations agreeing about nothing.
+        Assert.NotEmpty(bare);
+        Assert.NotEmpty(weighed);
+
+        var same = bare.Select(one => Said(one, word)).Order().SequenceEqual(
+            weighed.Select(one => Said(one, word)).Order());
+
+        output.WriteLine(
+            same
+                ? "the two agree exactly, so the counts carry nothing here"
+                : "the two differ, so discarding the counts is a decision and not a detail");
+    }
+
+    /// <summary>One task as a stream of moments, and what word each code is.</summary>
+    /// <param name="task">Which task to read.</param>
+    /// <remarks>
+    /// <para>
+    /// One line is one moment, and the answer is left out because it is not said in the line
+    /// — a code that only ever arrives as an answer keeps no company at all.
+    /// </para>
+    /// <para>
+    /// The naming is built from the lines rather than from <c>Alphabet</c>, which is the
+    /// ANSWER vocabulary and holds six words here. A map covering the answers alone prints
+    /// most of a grouping as question marks, which reads as a derivation that found nothing.
+    /// </para>
+    /// </remarks>
+    private static (List<IReadOnlySet<Code>> Moments, Dictionary<Code, string> Word) Read(int task)
+    {
+        var babi = new Babi(World(task));
+
+        return (
+            [.. babi.Lines.Select(line => (IReadOnlySet<Code>)new HashSet<Code>(line.Words))],
+            babi.Lines
+                .Where(line => line.Text is not null)
+                .SelectMany(line => Babi.Words(line.Text!))
+                .Distinct()
+                .ToDictionary(Babi.Of, one => one));
     }
 }

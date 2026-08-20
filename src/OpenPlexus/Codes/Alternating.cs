@@ -36,7 +36,7 @@ namespace OpenPlexus.Codes;
 public sealed class Alternating
 {
     private readonly Dictionary<Code, int> _seen = [];
-    private readonly Dictionary<Code, HashSet<Code>> _withs = [];
+    private readonly Dictionary<Code, Dictionary<Code, int>> _withs = [];
     private readonly Dictionary<(Code Mine, Code Theirs), int> _near = [];
     private readonly List<IReadOnlySet<Code>> _held = [];
     private readonly int _span;
@@ -110,7 +110,9 @@ public sealed class Alternating
 
             if (!_withs.TryGetValue(one, out var kept)) _withs[one] = kept = [];
 
-            foreach (var other in moment) if (!other.Equals(one)) kept.Add(other);
+            foreach (var other in moment)
+                if (!other.Equals(one))
+                    kept[other] = kept.GetValueOrDefault(other) + 1;
         }
 
         _held.Add(moment);
@@ -178,7 +180,70 @@ public sealed class Alternating
 
         return Grouped(
             _seen, floor, _withs,
-            (mine, theirs, group) => Shared(_withs[mine], _withs[theirs], group) >= company);
+            (mine, theirs, group) =>
+                Shared(_withs[mine].Keys.ToHashSet(), _withs[theirs].Keys.ToHashSet(), group)
+                >= company);
+    }
+
+    /// <summary>
+    /// The groups read off company WEIGHED by how often each partner turned up.
+    /// </summary>
+    /// <param name="alike">
+    /// How alike two codes' company must be, as the cosine of their count vectors. A scale-free
+    /// number, so it says the same thing on a corpus and on a generated world where a share of
+    /// a set does not.
+    /// </param>
+    /// <param name="floor">
+    /// <inheritdoc cref="From" path="/param[@name='floor']"/>
+    /// </param>
+    /// <remarks>
+    /// <para>
+    /// An arm against <see cref="BySpace"/> and never an addition. The two ask the same
+    /// question of the same counts and differ in one thing: whether a partner seen once counts
+    /// for as much as a partner seen a thousand times. Discarding the counts is what
+    /// <see cref="BySpace"/> does, and it is the older and weaker half of the pair.
+    /// </para>
+    /// <para>
+    /// It is here because the repo had already measured this shape and not in this class. The
+    /// statistic in <c>RecalledTests</c> that priced a category at five points under the bag
+    /// is a cosine over counted company, so the reading that pays was taken on an object
+    /// <see cref="BySpace"/> is not. One of the two goes when they are compared.
+    /// </para>
+    /// <para>
+    /// The exclusion clause is untouched and the grouping is the same walk, which is what makes
+    /// this a comparison rather than two mechanisms.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyList<IReadOnlySet<Code>> ByLikeness(double alike, int floor)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
+
+        return Grouped(
+            _seen, floor, _withs,
+            (mine, theirs, _) => Likeness(_withs[mine], _withs[theirs]) >= alike);
+    }
+
+    /// <summary>The cosine of two codes' company, counted.</summary>
+    /// <param name="mine">One code's company and how often each partner turned up.</param>
+    /// <param name="theirs">The other's.</param>
+    /// <remarks>
+    /// Group members are not excluded here, where <see cref="Shared"/> excludes them. A cosine
+    /// is dominated by the partners that turn up most and alternatives are by construction
+    /// absent from each other's company, so the dimensions they would occupy are nought on
+    /// both sides and contribute nothing either way.
+    /// </remarks>
+    private static double Likeness(
+        IReadOnlyDictionary<Code, int> mine, IReadOnlyDictionary<Code, int> theirs)
+    {
+        var dot = 0.0;
+
+        foreach (var (code, count) in mine)
+            if (theirs.TryGetValue(code, out var had)) dot += count * (double)had;
+
+        var left = Math.Sqrt(mine.Values.Sum(count => count * (double)count));
+        var right = Math.Sqrt(theirs.Values.Sum(count => count * (double)count));
+
+        return left == 0.0 || right == 0.0 ? 0.0 : dot / (left * right);
     }
 
     /// <summary>The groups read off what turns up near in time, as <see cref="Over"/> reads them.</summary>
@@ -343,7 +408,7 @@ public sealed class Alternating
     private static IReadOnlyList<IReadOnlySet<Code>> Grouped(
         Dictionary<Code, int> seen,
         int floor,
-        Dictionary<Code, HashSet<Code>> withs,
+        Dictionary<Code, Dictionary<Code, int>> withs,
         Func<Code, Code, IReadOnlySet<Code>, bool> keeps)
     {
         var codes = seen.Where(one => one.Value >= floor).Select(one => one.Key).Order().ToList();
@@ -362,7 +427,7 @@ public sealed class Alternating
                 if (taken.Contains(other) || group.Contains(other)) continue;
 
                 if (group.All(member =>
-                    !withs[member].Contains(other) && keeps(member, other, group)))
+                    !withs[member].ContainsKey(other) && keeps(member, other, group)))
                     group.Add(other);
             }
 

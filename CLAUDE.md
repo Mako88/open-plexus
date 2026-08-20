@@ -1,7 +1,10 @@
-# Working in this repo
+﻿# Working in this repo
 
 Read `docs/plan.md` first. It is the only doc and it holds nothing finished; findings live in
 the commit that produced them and in the test that asserts them, never here and never there.
+Its `THE ORDER` section is what to work on and in what order, and it is the only list that
+says so. A `NOW` leaf is the mechanism decided for one requirement; every other leaf is an
+idea nobody has run. What a built thing DOES is in the code and is never written down twice.
 
 ## How a session runs
 
@@ -26,8 +29,10 @@ pay; if it does not pay, revert it and take the other. Do not stop to ask which.
 - you are truly blocked;
 - context is filling and it is time to write the handoff.
 
-Stopping is a normal ending rather than a failure. Compact `docs/plan.md` on the way out, and
-leave the handoff in the last commit message and in the final reply.
+Stopping is a normal ending rather than a failure. Strike from `THE ORDER` whatever got done,
+compact the rest of `docs/plan.md`, and leave the handoff in the last commit message and in
+the final reply. The handoff says where the branch is and what went wrong; it does not carry a
+second copy of the ordering, because that is what `THE ORDER` is for.
 
 Everything below still applies while the monitor runs: the guards every commit, an arm only
 living while it is compared, and no dead code left behind.
@@ -59,7 +64,8 @@ Three of them are worth knowing by what they catch:
   test's clothes, which runs on every push and checks nothing.
 - `ProseTests` ratchets how much of the prose here is shouted. See *How to write here*.
 
-**`OutstandingTests` is red on purpose and it is the top priority** — John's, 2026-08-13. The
+**`OutstandingTests` is red on purpose and it is the top priority** — John's, 2026-08-13, and
+`THE ORDER` says so at the top rather than in a phase list of its own. The
 outstanding work is written as tests that fail until it is done, so a session cannot reach
 green without doing it. Do not delete them, do not weaken them, and do not read them as a
 regression. Each computes the state rather than asserting a constant, so none can be satisfied

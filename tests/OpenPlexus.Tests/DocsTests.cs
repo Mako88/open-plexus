@@ -532,7 +532,7 @@ public sealed class DocsTests
     // leaf carried them and cost twenty-seven words more; `The_plan_looks_forward` caught it,
     // correctly -- a finding lives in the commit and the test, and a doc that starts keeping
     // them is the pile of docs this one replaced.
-    private const int Whole = 12_432;
+    private const int Whole = 10_961;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.
@@ -567,6 +567,13 @@ public sealed class DocsTests
         // invariants, the first target, and what the field already knows. None of it moves.
         // `THE ROUTE` is where everything moves, and it is the only section a normal session
         // edits.
+        //
+        // `THE ORDER` is John's, and it is first because it is the one thing a session acts
+        // on: what is being worked on, in what order, with a finished item STRUCK rather
+        // than marked done. The ordering used to live in the route's preamble beside the
+        // phases it had outgrown, and a second copy of it lived in each handoff commit --
+        // two lists that disagreed about whether the intentional reds came first.
+        "THE ORDER",
         "THE DESTINATION",
         "THE ROUTE",
 
@@ -895,6 +902,110 @@ public sealed class DocsTests
         if (entry is not null && !built) without.Add(entry);
 
         return without;
+    }
+
+    [Fact]
+    public void No_entry_carries_more_than_one_decided_mechanism()
+    {
+        // John's rule about what this doc is for, made mechanical. A `NOW` is the mechanism
+        // DECIDED for an entry, so there is one of it; what a built thing actually does is
+        // in the code, where the compiler enforces every reference and nothing can drift.
+        //
+        // The route had sixty-five of them against twenty-five entries, and the surplus was
+        // readings -- what a run scored, which world an arm won on, what a dial cost. A
+        // finding written here goes stale in silence, and this is the check that says so.
+        var route = Nested(Section("THE ROUTE"));
+
+        var crowded = new List<string>();
+
+        string? entry = null;
+        var decided = 0;
+
+        foreach (var bullet in route)
+        {
+            if (bullet.Depth == 1)
+            {
+                if (decided > 1) crowded.Add($"{entry} carries {decided}");
+
+                entry = bullet.Text;
+                decided = 0;
+                continue;
+            }
+
+            if (bullet.Depth >= 2
+                && bullet.Text.StartsWith("**NOW**", StringComparison.Ordinal)) decided++;
+        }
+
+        if (decided > 1) crowded.Add($"{entry} carries {decided}");
+
+        Assert.True(crowded.Count == 0,
+            $"{crowded.Count} entry/entries carry more than one NOW leaf, so the route is "
+            + "describing what is built rather than what is decided:\n  "
+            + string.Join("\n  ", crowded)
+            + "\nOne NOW an entry. Everything else it said belongs in the XML comment "
+            + "beside the mechanism, or in the commit that measured it.");
+    }
+
+    [Fact]
+    public void The_order_names_only_work_the_route_still_holds_open()
+    {
+        // John's: `THE ORDER` is the source of truth for what is next, and a list nobody
+        // strikes reads as a plan while being a record. So an item leaves when its work
+        // leaves -- which is checkable, because every item names the fork it is, and a
+        // fork that has closed is no longer OPEN in the route.
+        //
+        // This is what makes the end-of-session strike mechanical rather than a habit. A
+        // session that finishes fork 107 and forgets the list cannot reach green.
+        var order = string.Join("\n", Section("THE ORDER"));
+
+        var named = Regex
+            .Matches(order, @"[Ff]ork \*\*(\d{1,3})\*\*")
+            .Select(match => match.Groups[1].Value)
+            .ToList();
+
+        Assert.NotEmpty(named);
+
+        var live = Live();
+
+        var closed = named.Where(number => !live.Contains(number)).ToList();
+
+        Assert.True(closed.Count == 0,
+            $"`THE ORDER` names fork(s) the route no longer holds open: "
+            + string.Join(", ", closed)
+            + ". Either the work is done and the item should be STRUCK, or the route lost a "
+            + "leaf it still needs.");
+    }
+
+    /// <summary>The forks the route still holds open, as a set of numbers.</summary>
+    /// <remarks>
+    /// <b>`BLOCKED` counts as live and `DEAD` does not</b>, because blocked is work waiting
+    /// on other work and dead is work refuted. A closed fork's number stays listed in the
+    /// route's preamble so the code's citations still resolve, which is why this reads the
+    /// LEAVES rather than the whole section.
+    /// </remarks>
+    private static HashSet<string> Live() =>
+        Leaves()
+            .Where(leaf => leaf.StartsWith("**OPEN**", StringComparison.Ordinal)
+                || leaf.StartsWith("**BLOCKED**", StringComparison.Ordinal)
+                || leaf.StartsWith("**BROKEN**", StringComparison.Ordinal))
+            .SelectMany(leaf => Regex
+                .Matches(leaf, @"\*\*(\d{1,3})\*\*")
+                .Select(match => match.Groups[1].Value))
+            .ToHashSet(StringComparer.Ordinal);
+
+    [Fact]
+    public void The_order_check_can_still_fail()
+    {
+        // THE COMPANION. Without it the check above passes for an `ORDER` naming no forks
+        // at all, and for a `Live` that returns every number in the doc -- both of which
+        // read exactly like a list somebody is keeping up to date.
+        var live = Live();
+
+        Assert.NotEmpty(live);
+        Assert.DoesNotContain("12", live);
+
+        Assert.NotEmpty(Regex.Matches(
+            string.Join("\n", Section("THE ORDER")), @"[Ff]ork \*\*(\d{1,3})\*\*"));
     }
 
     [Fact]

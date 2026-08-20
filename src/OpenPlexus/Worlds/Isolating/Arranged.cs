@@ -274,8 +274,8 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
 
     /// <summary>One scene, drawn uniformly from the arrangements the world shows.</summary>
     /// <remarks>
-    /// <b>Uniform over the whole drawn space, which is what makes the involution an
-    /// argument.</b> An arrangement is picked uniformly and its clutter is picked
+    /// <b>Uniform over the whole drawn space</b>, which is what makes the involution an
+    /// argument. An arrangement is picked uniformly and its clutter is picked
     /// uniformly, and every arrangement admits the same number of clutterings — so
     /// every drawn scene is equally likely, and a scene and its swap therefore arrive
     /// equally often.

@@ -17,7 +17,7 @@
 /// graph can derive is made of co-occurrence, and in a body co-occurrence records
 /// the policy that produced it — so a walk wide enough to stop being silent
 /// converges on whatever was done most. <b>A likeness has to come from OUTSIDE the
-/// counting, which means the front end.</b>
+/// counting</b>, which means the front end.
 /// </para>
 /// <para>
 /// <b>The move: say the same observation coarsely as well as finely</b>, and put both

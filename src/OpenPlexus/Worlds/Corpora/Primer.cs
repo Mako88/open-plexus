@@ -29,7 +29,7 @@ public sealed record PrimerSettings
 /// that nought is a VOCABULARY problem or a TASK problem.
 /// </para>
 /// <para>
-/// <b>It is shown in the SAME RUN with no reset, which C4 requires anyway.</b>
+/// <b>It is shown in the SAME RUN with no reset</b>, which C4 requires anyway.
 /// There is no train-then-test here; the English is simply what the system saw
 /// before the task, the way anything else it has seen is.
 /// </para>

@@ -85,8 +85,8 @@ public sealed record Tally
 
     /// <summary>Moments the brain would not take.</summary>
     /// <remarks>
-    /// <b>Reported beside the score, because silence drifts an arm toward the random
-    /// bar.</b> A run whose every moment was refused reports the rounds it asked for and
+    /// <b>Silence drifts an arm toward the random bar</b>, so it is reported beside the
+    /// score. A run whose every moment was refused reports the rounds it asked for and
     /// nothing learnt, which reads as a mechanism that failed rather than as a stream the
     /// brain had already answered. Two trials sharing a <see cref="Stamp.Source"/> is how
     /// that happens.

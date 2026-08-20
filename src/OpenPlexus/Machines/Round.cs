@@ -132,8 +132,8 @@ public sealed class Round
     /// `Drives.Improving` before it.
     /// </para>
     /// <para>
-    /// <b>Relative rather than absolute, because the absolute one is not comparable
-    /// between runs.</b> A weight is an accuracy, and it was once an accuracy raised to a
+    /// <b>Relative rather than absolute</b>, because the absolute one is not comparable
+    /// between runs. A weight is an accuracy, and it was once an accuracy raised to a
     /// power — which collapsed every weight toward nought and its margins with them, so two
     /// settings reported different numbers for identical behaviour. The lead as a share of
     /// the winner is in nought to one either way, which is why it survived the dial.

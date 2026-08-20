@@ -14,8 +14,8 @@ namespace OpenPlexus.Codes;
 /// identity.
 /// </para>
 /// <para>
-/// <b>IT IS NOT <see cref="Passthrough"/>, and the difference is which side of the
-/// line the modality sits on.</b> Passthrough takes codes a world already minted;
+/// <b>IT IS NOT <see cref="Passthrough"/>,</b> and the difference is which side of the
+/// line the modality sits on. Passthrough takes codes a world already minted;
 /// this takes a NUMBER and mints the code itself, so the world hands over a fact
 /// about its state and the brain decides what code carries it.
 /// </para>

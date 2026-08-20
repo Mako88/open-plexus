@@ -1,8 +1,8 @@
 namespace OpenPlexus.Codes;
 
 /// <summary>
-/// One observation said at SEVERAL GRAINS at once — <b>step 8's middle, and the
-/// only likeness a walk can use that the graph did not compute.</b>
+/// One observation said at SEVERAL GRAINS at once — <b>step 8's middle,</b> and the
+/// only likeness a walk can use that the graph did not compute.
 /// </summary>
 /// <remarks>
 /// <para>

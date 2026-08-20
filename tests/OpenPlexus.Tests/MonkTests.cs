@@ -99,8 +99,8 @@ public sealed class MonkTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The finding: on the second puzzle the only sound way to say yes is to name an
-    /// instance.</b>
+    /// <b>The finding</b>: on the second puzzle the only sound way to say yes is to name an
+    /// instance.
     /// </summary>
     /// <remarks>
     /// <para>

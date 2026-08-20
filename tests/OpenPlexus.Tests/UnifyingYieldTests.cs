@@ -40,8 +40,8 @@ namespace OpenPlexus.Tests;
 /// gate exactly as genesis does, and how many siblings a hole covers is not one.
 /// </para>
 /// <para>
-/// <b>What is, is fork 97 arriving where nobody put it: the values a hole covers must be
-/// ALTERNATIVES.</b> A hole over codes that never co-occur is a variable; a hole over codes
+/// <b>What is, is fork 97 arriving where nobody put it:</b> the values a hole covers must be
+/// ALTERNATIVES. A hole over codes that never co-occur is a variable; a hole over codes
 /// that do is a coincidence of position. That is a fact about the MOMENTS rather than about
 /// the rules, which is why nothing in the population could have supplied it — and it is the
 /// same definition of a category John proposed for a different operator entirely.

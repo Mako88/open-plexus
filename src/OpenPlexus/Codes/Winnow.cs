@@ -4,7 +4,7 @@ namespace OpenPlexus.Codes;
 
 /// <summary>
 /// A real-valued reading said as a SPARSE SET OF WINNERS — <b>step 8's other
-/// half, and the front end for a signal that is not already a symbol.</b>
+/// half,</b> and the front end for a signal that is not already a symbol.
 /// </summary>
 /// <remarks>
 /// <para>

@@ -18,8 +18,8 @@ namespace OpenPlexus.Codes;
 /// "this world does not quantise" was indistinguishable from "nobody has got to
 /// this world yet" — and <see cref="Winnow"/> could be built, documented and
 /// measured without ever reaching a world, because there was no shared place a
-/// front end was supposed to be. <b>One name for the no-op makes the worlds that
-/// SHOULD have a real one visible by subtraction.</b>
+/// front end was supposed to be. <b>One name for the no-op makes</b> the worlds that
+/// SHOULD have a real one visible by subtraction.
 /// </para>
 /// <para>
 /// <b>THE RED-BALL PROPERTY HOLDS TRIVIALLY.</b> Nothing is fitted because nothing

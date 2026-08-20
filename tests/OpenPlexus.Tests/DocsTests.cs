@@ -15,8 +15,8 @@ namespace OpenPlexus.Tests;
 /// deleted; git holds them.
 /// </para>
 /// <para>
-/// <b>What every piece does now lives in the XML comments beside the code, and
-/// the COMPILER enforces those.</b> `GenerateDocumentationFile` is on, so a
+/// <b>What every piece does now lives</b> in the XML comments beside the code, and
+/// the COMPILER enforces those. `GenerateDocumentationFile` is on, so a
 /// `param` naming an argument that does not exist (CS1572/1573) or a `cref`
 /// pointing at a deleted type (CS1574) fails the build. That check cannot go
 /// stale, which no markdown file can promise. It found five ghost references to

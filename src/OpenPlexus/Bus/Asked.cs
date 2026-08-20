@@ -14,8 +14,8 @@ namespace OpenPlexus.Bus;
 /// mechanism that is local or population-wide by accident.
 /// </para>
 /// <para>
-/// <b>And what is wanted travels with the question rather than being inferred from which
-/// field is filled.</b> A reader that guessed would read an empty moment as <i>counts</i>
+/// <b>And what is wanted travels</b> with the question rather than being inferred from which
+/// field is filled. A reader that guessed would read an empty moment as <i>counts</i>
 /// and a holder that fired nothing as the same thing, which is exactly the
 /// silence-versus-absence conflation <see cref="Weights.Silent"/> exists to refuse.
 /// </para>

@@ -70,8 +70,8 @@ public sealed class FootprintTests(ITestOutputHelper output)
     /// <summary>What a trained population costs, and what it holds to cost it.</summary>
     /// <param name="rounds">How long it ran.</param>
     /// <remarks>
-    /// <b>The scaffolding is dropped before the second reading and the population is not,
-    /// which is the whole trick.</b> A brain holds its population, a run holds its world and
+    /// <b>The scaffolding is dropped</b> before the second reading and the population is not,
+    /// which is the whole trick. A brain holds its population, a run holds its world and
     /// a trial holds both, so measuring with any of them alive would weigh the harness. What
     /// is kept alive across the collection is the population and nothing else, which is
     /// exactly what a holder keeps between rounds.

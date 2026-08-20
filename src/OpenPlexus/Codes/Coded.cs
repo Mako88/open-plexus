@@ -2,8 +2,8 @@ namespace OpenPlexus.Codes;
 
 /// <summary>
 /// A world's output when the world's output is already codes — <b>the shape a
-/// constructed world hands over, and the reason it needs no quantiser of its
-/// own.</b>
+/// constructed world hands over,</b> and the reason it needs no quantiser of its
+/// own.
 /// </summary>
 /// <remarks>
 /// <para>

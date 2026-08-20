@@ -50,8 +50,8 @@ public sealed class Ported : IAsyncDisposable
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The one number that separates a run whose answer is wrong from a run whose
-    /// evidence never arrived.</b> A gathering waits for a denominator and nothing here
+    /// <b>The one number that separates</b> a run whose answer is wrong from a run whose
+    /// evidence never arrived. A gathering waits for a denominator and nothing here
     /// decides a missing holder by a clock, so a lost message can stop a run forever on a
     /// fleet where every machine is alive and idle — and the only reading that says so is
     /// this one.

@@ -266,8 +266,8 @@ public sealed class RhythmTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The only non-stationary world here, and the one place <i>malleability is the
-    /// record</i> can be right or wrong.</b> Nothing in this design decays, so a count that
+    /// <b>The only non-stationary world here,</b> and the one place <i>malleability is the
+    /// record</i> can be right or wrong. Nothing in this design decays, so a count that
     /// stopped rising still stands at whatever it reached — which only costs anything where
     /// the answer MOVES. Every other world keeps its rules for the whole run.
     /// </para>

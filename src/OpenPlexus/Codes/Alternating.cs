@@ -26,8 +26,8 @@ namespace OpenPlexus.Codes;
 /// and minting one is what collapses a rule per appearance into a rule.
 /// </para>
 /// <para>
-/// <b>What it cannot do, said before anything reads it: it cannot separate two things that
-/// are substitutable.</b> Twins wear one look by construction, so every statistic over the
+/// <b>What it cannot do, said before anything reads it:</b> it cannot separate two things that
+/// are substitutable. Twins wear one look by construction, so every statistic over the
 /// moments is the same for both and a proposal covering both is what this returns. That is
 /// not a fault to repair here — it is exactly what a PAYING gate is for, and the proposal
 /// being wrong is how the gate finds out.
@@ -293,8 +293,8 @@ public sealed class Alternating
     /// </param>
     /// <param name="floor">
     /// How many times a code must have been seen before it may join a group. <b>Because a
-    /// code seen once has never co-occurred with anything and keeps whatever company it
-    /// arrived in</b>, so it clears both clauses trivially and would group with everything.
+    /// code seen</b> once has never co-occurred with anything and keeps whatever company it
+    /// arrived in, so it clears both clauses trivially and would group with everything.
     /// </param>
     /// <remarks>
     /// <para>
@@ -571,8 +571,8 @@ public sealed class Deriving<TObservation>(
 /// </summary>
 /// <typeparam name="TObservation">What the world hands over.</typeparam>
 /// <remarks>
-/// <b>A decorator, so the categories are an axis on every world rather than a feature of
-/// one.</b> <see cref="Joined"/> carries its own because it was built before this existed
+/// <b>A decorator</b>, so the categories are an axis on every world rather than a feature of
+/// one. <see cref="Joined"/> carries its own because it was built before this existed
 /// and its arms cross with the categories; anything reaching a world that is already coded
 /// needs the fold without the text machinery around it.
 /// </remarks>

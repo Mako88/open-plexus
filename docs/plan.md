@@ -445,12 +445,13 @@ before six that reads as tuning is out of order.
     - **OPEN** — the live problem is which rule gets the seat, and three arms at it have
       failed. A gate changing what is HELD cannot reach what decides, and one refusing a young
       rule its vote silences the machine rather than reseating it.
-    - **NOW** — and the gap IS the seat, measured: every claiming arm holds a rule for every
-      truth an enumerable lesson states while answering wildly different shares of it.
-    - **OPEN** — so the axis is TIME, not the vote rule. More tellings close the gap on their
-      own, so what is wanted is a correct young rule outranking a wrong old one sooner without
-      a lucky young one winning. `Crediting` is one point on it and the vote gate was the
-      opposite direction.
+    - **NOW** — and the seat splits three ways, so it is two failures rather than one. Told
+      once the right rule TIES; told enough it is OUTRANKED; it is never ABSENT. `Seating`.
+    - **NOW** — and no tie-break exists. Both sides of a tie are one weight, one scope length
+      and one advocate, so specificity separates none of them and neither does a crowd.
+    - **OPEN** — the wide root closes the OUTRANKING under withheld claiming alone, and leaves
+      the tie exactly, a blank record tying whatever its scope. What separates two blank rules
+      is unanswered, and `Crediting` moves them to a shared ceiling rather than apart.
     - **NOW** — `Alternating` is live and its store add-only, so a front end fills its OWN
       vocabulary, reaching every group the experimenter's holds for no score.
     - **OPEN** — it costs 4.7x the rules. Nothing waits for a group to hold still, and the
@@ -763,6 +764,8 @@ them. **A class earning a check moves out of here into the check.**
 - **A timed-out job reports as cancelled and not as failed**, and one makes the whole run read
   cancelled. Where cancellation is the NORMAL outcome an overrun is disguised as the concurrency
   group working, which is how a `[checkpoint]` can look cancelled by a push it is immune to.
+- **A check may race the signal it waits on.** `Everyone` closes when every SLOT has spoken,
+  so a replica's echo is still in flight. Wait for a counter, never read one.
 
 ### A check that cannot fire reads exactly like a check that passes
 

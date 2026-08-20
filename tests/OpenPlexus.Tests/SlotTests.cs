@@ -1,4 +1,4 @@
-using OpenPlexus.Bus;
+﻿using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -137,8 +137,20 @@ public sealed class SlotTests(ITestOutputHelper output)
         // says the replicas are real. A fleet declared with two machines a slot where one
         // never speaks passes every death test by being lucky about which machine died.
         Assert.Equal(2, gathering.Heard);
-        Assert.Equal(1, gathering.Echoed);
         Assert.Equal(0, gathering.Unreached);
+
+        // WAITED FOR RATHER THAN READ, because the round does not wait for it. `Everyone`
+        // completes when every SLOT has spoken once, and the echo is the second replica of a
+        // slot that has already spoken -- so the answer that proves the replicas exist is by
+        // construction still in flight when the round it belongs to finishes. Reading it on
+        // the next line passed on this machine and went red once on a runner, which is a check
+        // whose truth depends on a race it does not control.
+        Assert.True(
+            await Wired.UntilAsync(() => gathering.Echoed == 1),
+            $"the second replica never echoed: {gathering.Heard} of {gathering.Asked} "
+            + $"answered, {gathering.Echoed} echoed, {gathering.Unreached} written off. A "
+            + "fleet declared with two machines a slot where one never answers is a fleet of "
+            + "one wearing redundancy's name");
 
         // AND IT IS NOT WHOLE, because one machine that was asked did not answer. Finishing
         // the round is not permitted to cost the instrument that says so.

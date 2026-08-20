@@ -462,7 +462,18 @@ public sealed class DocsTests
     // and leave their numbers in the guards that now hold them, and the rule about where
     // rarity belongs went to `Repair.Divergence` rather than here, a mechanism living beside
     // its code being what this doc says it is for.
-    private const int Whole = 12_261;
+    // And 12,312 is the forty-fourth raise, fifty-one words, and both items are refutations
+    // rather than questions. The seat had one leaf saying the gap was measured and one saying
+    // the axis was TIME; it now has three, because splitting a wrong answer into absent,
+    // outranked and tied says the two ages are two failures and that neither specificity nor
+    // a crowd separates a tied pair. An OPEN that names which of two failures is unanswered
+    // is a smaller question than one that named neither.
+    //
+    // The rest is a trap with no check behind it, which is where this doc says those live. A
+    // check that races the signal it waits on passed on this machine for the life of the
+    // branch and went red once on a runner, and no existing entry covers it -- the nearest is
+    // about a cost differing by platform, which is a reading rather than a correctness bug.
+    private const int Whole = 12_312;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -511,7 +511,13 @@ public sealed class DocsTests
     // the machine is sure is not that. This repo's own trap list warns that a row names an
     // axis in the mechanism's words rather than the comparison's, which is how a search
     // misses it; the leaf now names the refutation so the next session cannot walk into it.
-    private const int Whole = 12_468;
+    // And 12,493 is the forty-sixth raise, twenty-five words, for a second world that came
+    // back a NULL and said something anyway. The multiplexer declines five rounds in thirty
+    // thousand at an unmoved accuracy, because a weight of nought is an advocate never settled
+    // and that phase is a rounding error on a long run. So the axis declining lives on is how
+    // YOUNG a population is rather than which world it is -- the conversation is not a
+    // friendlier world for it, it is a shorter one.
+    private const int Whole = 12_493;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

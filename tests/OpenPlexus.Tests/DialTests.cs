@@ -124,8 +124,13 @@ public sealed class DialTests
             + "going quiet on three times the rounds, so every round it gives up "
             + "was one already being lost. Told once every accuracy is nought, so "
             + "it declines the whole paper and forfeits a score UNDER the marginal. "
-            + "The entry leaves on a second world, which wants one that asks "
-            + "questions",
+            + "The second world is taken and it is a NULL: the multiplexer "
+            + "declines five rounds in thirty thousand at an unmoved accuracy, "
+            + "because a weight of nought is an advocate never settled and that "
+            + "phase is a rounding error on a long run. So the axis is how YOUNG "
+            + "a population is rather than which world it is, and the entry "
+            + "leaves on a world young for the length of it that is not a "
+            + "conversation",
 
         // ---- Arrived with the commitment branch ----------------------------
 

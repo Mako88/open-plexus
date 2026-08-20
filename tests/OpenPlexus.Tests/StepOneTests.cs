@@ -204,6 +204,111 @@ public sealed class StepOneTests(ITestOutputHelper output)
             + "has stopped being a null and is worth reading as a comparison");
     }
 
+    /// <summary>
+    /// Declining to answer, on the second world its entry asks for.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The conversation is where it was measured</b>, and it is not a fair second world.
+    /// There the reading was the paper's own mark, where a declined question and a wrong one
+    /// are both unconfirmed, so silence could only cost. Here the trailing accuracy is taken
+    /// over rounds the vote SPOKE on, so precision and coverage come apart and can be read
+    /// against each other directly.
+    /// </para>
+    /// <para>
+    /// <b>And this world tells the machine nothing</b>, which is the other half of why it is
+    /// worth taking. A conversation hands over statements and a multiplexer hands over
+    /// nothing; if declining only paid where something was TOLD, it would be a fact about
+    /// being taught rather than about the vote.
+    /// </para>
+    /// <para>
+    /// <b>What would drop it</b>: the trailing accuracy falling, which would mean the rounds
+    /// it gives up are rounds it was getting right. And it dies as an arm rather than as a
+    /// default if silence does not move at all, because then nothing ran.
+    /// </para>
+    /// <para>
+    /// <b>And the answer is a NULL, said as one.</b> It declines a few rounds in thirty
+    /// thousand and the accuracy is unmoved, so this world confirms the arm costs nothing and
+    /// cannot say more than that. The level is barred rather than described, so the day the
+    /// multiplexer starts declining enough for the comparison to mean something, this goes red
+    /// and says so.
+    /// </para>
+    /// <para>
+    /// <b>Which is a reading about WHEN the mechanism matters rather than where.</b> Declining
+    /// fires while the population is young, because a weight of nought is an advocate that has
+    /// never been settled — and on a thirty-thousand-round run the young phase is a rounding
+    /// error, while a lesson told once is young for the whole of it. The conversation is not a
+    /// friendlier world for this; it is a shorter one.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_declining_to_answer_buys_on_a_world_that_tells_it_nothing()
+    {
+        var recent = new Dictionary<Deciding, List<double>>
+        {
+            [Deciding.Anyway] = [], [Deciding.Grounded] = [],
+        };
+
+        var silent = new Dictionary<Deciding, List<double>>
+        {
+            [Deciding.Anyway] = [], [Deciding.Grounded] = [],
+        };
+
+        output.WriteLine($"{"deciding",-10}{"seed",-6}{"recent",9}{"silent",11}{"sound",8}");
+
+        foreach (var deciding in new[] { Deciding.Anyway, Deciding.Grounded })
+        foreach (var seed in new[] { 1, 2, 3 })
+        {
+            var ran = new MultiplexerRun(
+                new MultiplexerSettings { Address = 2 },
+                new Brain(new CommittingSettings { Deciding = deciding }, seed),
+                seed).Run(Rounds);
+
+            var quiet = ran.Tally.Rounds == 0
+                ? 0.0
+                : ran.Tally.Silent / (double)ran.Tally.Rounds;
+
+            recent[deciding].Add(ran.Recent);
+            silent[deciding].Add(quiet);
+
+            output.WriteLine(
+                $"{deciding.ToString().ToLowerInvariant(),-10}{seed,-6}{ran.Recent,9:F3}"
+                + $"{quiet,11:F5}{ran.Sound,8}");
+        }
+
+        output.WriteLine(
+            $"anyway {recent[Deciding.Anyway].Average():F3} recent, "
+            + $"{silent[Deciding.Anyway].Average():F5} silent");
+
+        output.WriteLine(
+            $"grounded {recent[Deciding.Grounded].Average():F3} recent, "
+            + $"{silent[Deciding.Grounded].Average():F5} silent");
+
+        // The arm ran, asserted before anything is read off it. A default decided on two arms
+        // that behaved identically would be a dial nobody turned.
+        Assert.True(
+            silent[Deciding.Grounded].Average() > silent[Deciding.Anyway].Average(),
+            "declining went quiet on no more rounds than answering anyway did, so nothing "
+            + "ran and the accuracies beside it say nothing");
+
+        // The kill line. What it still says has to be at least as often right, or the rounds
+        // it gives up are rounds it was getting right.
+        Assert.True(
+            recent[Deciding.Grounded].Average() >= recent[Deciding.Anyway].Average(),
+            $"declining read {recent[Deciding.Grounded].Average():F3} over the rounds it "
+            + $"spoke on against {recent[Deciding.Anyway].Average():F3} for answering "
+            + "anyway, so it is giving up rounds it was getting right");
+
+        // And the null is asserted as a null, which is the same move as the rung-five grid
+        // below and for the same reason. A comparison where one arm is five rounds in thirty
+        // thousand cannot fire, and a check that cannot fire reads exactly like a check that
+        // passes. What this world establishes is that the arm costs nothing here.
+        Assert.True(silent[Deciding.Grounded].Average() < 0.01,
+            $"declining now goes quiet on {silent[Deciding.Grounded].Average():F5} of this "
+            + "world's rounds, so the comparison above has stopped being a null and is worth "
+            + "reading as a comparison");
+    }
+
     [Fact]
     public void The_arm_that_cannot_choose_overfits_instead()
     {

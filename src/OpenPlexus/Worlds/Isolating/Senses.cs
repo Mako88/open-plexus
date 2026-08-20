@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
 
@@ -67,8 +67,8 @@ public sealed record SensesSettings
     /// How many distinct irrelevant codes there are to draw from.
     /// </summary>
     /// <remarks>
-    /// <b>The sharp end of the dial, because the two extremes test opposite
-    /// claims.</b> A large pool makes each irrelevant code RARE, so the graph
+    /// <b>The sharp end of the dial</b>, because the two extremes test opposite
+    /// claims. A large pool makes each irrelevant code RARE, so the graph
     /// grows wide and every clutter partner is thin — that tests whether cost
     /// stays affordable. A small pool makes them UBIQUITOUS, which manufactures
     /// exactly the ever-present background the forward weighting exists to
@@ -92,8 +92,8 @@ public sealed record SensesSettings
     /// than more. More nodes was the wrong axis.
     /// </para>
     /// <para>
-    /// <b>And <see cref="Pool"/> alone cannot make that shape, because its two
-    /// extremes are opposite and both UNIFORM.</b> A small pool makes every
+    /// <b>And <see cref="Pool"/> alone cannot make that shape</b>, because its two
+    /// extremes are opposite and both UNIFORM. A small pool makes every
     /// irrelevant code ubiquitous; a large one makes every one rare. Zipf is the
     /// distribution that holds BOTH AT ONCE — a handful of codes at nearly every
     /// moment and a long thin tail behind them — so the ever-present background and
@@ -256,8 +256,8 @@ public sealed class Senses : IWorld<Coded>, IWithholds<Coded>
     /// one.
     /// </summary>
     /// <remarks>
-    /// <b>The table rather than a closed form, because the closed form is only
-    /// approximate.</b> Inverse transform on a continuous approximation would give
+    /// <b>The table rather than a closed form</b>, because the closed form is only
+    /// approximate. Inverse transform on a continuous approximation would give
     /// a distribution close to Zipf and identical on no machine — fork 12 wants a
     /// seed to reproduce a run exactly, and a table plus a binary search does that
     /// for the cost of one array the size of the pool.

@@ -1,11 +1,11 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Commitments;
 
 /// <summary>
-/// A scope entry that names no argument, and the matcher it forces — <b>rung four,
-/// priced before the ladder's escalation policy rather than after it. Fork 33.</b>
+/// A scope entry that names no argument, and the matcher it forces — <b>rung four</b>,
+/// priced before the ladder's escalation policy rather than after it. Fork 33.
 /// </summary>
 /// <remarks>
 /// <para>

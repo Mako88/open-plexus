@@ -31,8 +31,8 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them.
-- **ACTIVE, text as an image** — the world that pushes one word as a symbol and as a shape in
-  one moment, then the binding. It GATES every sensor. Fork **107**.
+- **ACTIVE, text as an image** — `Crossing` pushes the two senses in one moment and what is
+  left is the binding, which wants rung five over co-firing patches. Fork **107**.
 - **A beginner language course as the primer.** John's. Ostensive by construction, one
   referent across video, audio and text, ordered for a learner with no language. Fork **132**.
 - **A weighed adhesion**, which no arm has built, with PPMI over `ByLikeness`'s counts beside
@@ -282,9 +282,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — nothing makes them attributes of one THING. Rung five names what co-fires,
       as a seen ball and a heard *ball* do.
     - **OPEN** — text as an IMAGE keeps ground truth enumerable, so soundness survives where
-      a camera kills it, and it GATES every sensor. `Lettering` draws a word and the front
-      end's ceiling is taken, so what is unbuilt is the world pushing both senses. Fork
-      **107**.
+      a camera kills it, and it GATES every sensor. The world and both its ceilings are
+      built, so what is unbuilt is a name over the co-firing shape and symbol. Fork **107**.
     - **OPEN** — spreading a reading over its range costs most of the score at both front
       ends. Fork **38**.
     - **OPEN** — under ten dimensions there are too few distinct wirings for a projection to

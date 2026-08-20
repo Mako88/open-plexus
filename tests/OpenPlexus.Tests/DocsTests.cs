@@ -532,7 +532,7 @@ public sealed class DocsTests
     // leaf carried them and cost twenty-seven words more; `The_plan_looks_forward` caught it,
     // correctly -- a finding lives in the commit and the test, and a doc that starts keeping
     // them is the pile of docs this one replaced.
-    private const int Whole = 10_986;
+    private const int Whole = 10_985;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

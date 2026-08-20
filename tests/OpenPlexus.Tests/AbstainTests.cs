@@ -20,7 +20,7 @@ namespace OpenPlexus.Tests;
 /// machines with any number of deaths.
 /// </para>
 /// <para>
-/// <b>So a check that could not fire was reading as a mechanism nobody had needed yet</b>,
+/// <b>So a check that could not fire</b> was reading as a mechanism nobody had needed yet,
 /// which is the oldest line on this repo's trap list wearing the plan's own words.
 /// </para>
 /// <para>

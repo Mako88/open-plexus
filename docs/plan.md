@@ -245,8 +245,8 @@ before six that reads as tuning is out of order.
       code in `Commitments`.
     - **OPEN** — nothing here answers what a concept IS beyond a code that fires.
     - **NOW** — the exponent is polynomial ON SYMBOLS: 2,003, 3,468 and 7,920 rounds at 6,
-      11 and 20 bits, so cost tracks a scope's DEPTH and not the input space.
-    - **OPEN** — and the POPULATION is where it grows instead: 19, 797 and 1,824 sound rules.
+      11 and 20 bits, so cost tracks a scope's DEPTH.
+    - **OPEN** — the POPULATION is where it grows: 19, 797 and 1,824 sound rules.
     - **OPEN** — the scope language is the CEILING: whatever a scope cannot say cannot be
       learnt. ILP's language-bias problem, what killed the field, and the ladder is finite.
     - **OPEN** — six bits is refused on POWER and eleven names the wrong thing; whether any world
@@ -309,7 +309,7 @@ before six that reads as tuning is out of order.
       `Motif` scope is left too short to carry a name, the cue's length being the axis;
       `Latent`'s three-code scopes fire 0.2 times each, so depth is never tested. Fork **112**.
     - **NOW** — concept-before-label is measured, and alternation groups things with no word
-      for them yet.
+      for them yet. Four groups on bAbI, all word classes.
     - **OPEN** — what rung five names is a SET, never a variable, so the two rungs are not
       independent: a code carrying position AND value together makes the shared thing
       unnameable.

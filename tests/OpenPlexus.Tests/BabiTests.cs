@@ -1,3 +1,4 @@
+using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
@@ -221,4 +222,104 @@ public sealed class BabiTests(ITestOutputHelper output)
     // revival condition is unchanged and now load-bearing: something has to make a
     // carried edge worth its ROW, because there is no longer a way to decline it.
 
+
+    /// <summary>
+    /// Whether counting company recovers a word class on real English, with nothing learnt.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The oldest result in distributional semantics, asked of this front end's codes: two
+    /// words are alike where they keep the same company, and a word class is what that
+    /// recovers. It is what an embedding gives a sequence model for free, and the reason to
+    /// ask it here is that nothing in this repo has ever run <see cref="Alternating"/> on
+    /// text — every reading it has is from a generated world whose statistics are clean.
+    /// </para>
+    /// <para>
+    /// Task one is the cleanest case the corpus has. A line is <i>mary moved to the
+    /// bathroom</i>, so a name never shares a line with a name and a place never with a
+    /// place, which is the exclusion clause satisfied by the grammar rather than by luck.
+    /// Both classes keep the same company by construction. If shared company recovers a word
+    /// class anywhere it recovers it here, and a null result here is a null result for the
+    /// idea rather than for the corpus.
+    /// </para>
+    /// <para>
+    /// What would drop it, written before it was run: the two classes coming back mixed with
+    /// each other or with the function words. The company of <i>the</i> and <i>to</i> is
+    /// every content word in the corpus, so an unweighted overlap has an obvious way to
+    /// decide that everything is alike — and the answer to that is to weight company by how
+    /// surprising it is, which is not built.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_shared_company_recovers_a_word_class_on_real_english()
+    {
+        var babi = new Babi(World(task: 1));
+
+        // One line is one moment, and the answer is left out because it is not said in the
+        // line -- a code that only ever arrives as an answer keeps no company at all.
+        var moments = babi.Lines
+            .Select(line => (IReadOnlySet<Code>)new HashSet<Code>(line.Words))
+            .ToList();
+
+        // Built from the lines rather than from `Alphabet`, which is the ANSWER vocabulary
+        // and holds six words here. A map that covers the answers only would print most of
+        // the groups as question marks and read as a derivation that found nothing.
+        var word = babi.Lines
+            .Where(line => line.Text is not null)
+            .SelectMany(line => Babi.Words(line.Text!))
+            .Distinct()
+            .ToDictionary(Babi.Of, one => one);
+
+        var groups = Alternating.From(moments, company: 0.5, floor: 20);
+
+        output.WriteLine($"{moments.Count} lines, {babi.Alphabet.Count} words in the alphabet");
+
+        foreach (var group in groups.OrderByDescending(one => one.Count))
+            output.WriteLine(
+                $"  {group.Count,2}  "
+                + string.Join(" ", group.Select(code => word.GetValueOrDefault(code, "?")).Order()));
+
+        var names = new[] { "mary", "john", "sandra", "daniel" };
+        var places = new[] { "kitchen", "bedroom", "bathroom", "hallway", "garden", "office" };
+
+        var held = groups
+            .Select(group => group.Select(code => word.GetValueOrDefault(code, "?")).ToHashSet())
+            .ToList();
+
+        var forNames = held.OrderByDescending(one => one.Count(names.Contains)).FirstOrDefault() ?? [];
+        var forPlaces = held.OrderByDescending(one => one.Count(places.Contains)).FirstOrDefault() ?? [];
+
+        output.WriteLine(
+            $"names: {forNames.Count(names.Contains)} of {names.Length} in one group of "
+            + $"{forNames.Count} | places: {forPlaces.Count(places.Contains)} of {places.Length} "
+            + $"in one group of {forPlaces.Count}");
+
+        Assert.True(forNames.Count(names.Contains) >= 3,
+            $"the best group held {forNames.Count(names.Contains)} of the four names, so shared "
+            + "company does not recover a word class on real English and the likeness half of "
+            + "this design needs company WEIGHTED by how surprising it is");
+
+        Assert.True(forPlaces.Count(places.Contains) >= 4,
+            $"the best group held {forPlaces.Count(places.Contains)} of the six places");
+
+        // And they must be DIFFERENT groups, because one group holding both is not two word
+        // classes recovered -- it is the derivation deciding that everything is alike, which
+        // is exactly what unweighted company is expected to do where the function words reach
+        // every line.
+        // And a guard written AFTER the reading rather than a bar written before it, in the
+        // shape `ScalingTests` uses. What came back was four groups and every one of them a
+        // word class: the four names exactly, the four motion verbs exactly, the six places
+        // with `is` among them, and `to` against `where` -- which are the statement and
+        // question markers, alternatives that never share a line and keep the same company.
+        // `the` reached no group at all, being in every line and so co-occurring with
+        // everything, which is the exclusion clause refusing a background word without
+        // anything having to weight it.
+        Assert.True(forNames.All(names.Contains),
+            $"the names group came back as {string.Join(" ", forNames.Order())}, which is not "
+            + "only names -- it held exactly the four when this was written");
+
+        Assert.False(forNames.SetEquals(forPlaces),
+            "the names and the places came back as one group, so what was recovered is that "
+            + "every content word keeps the same company rather than two classes");
+    }
 }

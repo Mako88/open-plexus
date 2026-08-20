@@ -123,7 +123,12 @@ public sealed class CheckingTests
     /// comma or a format specifier; a method call is followed by <c>(</c> and an indexer by
     /// <c>[</c>.
     /// </remarks>
-    private static readonly string[] Counts = ["Names.Count", ".Named}", ".Named,", ".Named:"];
+    // The leading dot is load-bearing rather than tidiness. `Names.Count` bare also matches
+    // any local whose name ENDS in `Names`, and `forNames.Count(...)` in `BabiTests` is a
+    // LINQ count over a group of words with no naming store anywhere near it. Every real
+    // reading of the store is written `held.Names.Count`, so the dot keeps all of them and
+    // drops a class of false positive that costs the guard its credibility.
+    private static readonly string[] Counts = [".Names.Count", ".Named}", ".Named,", ".Named:"];
 
     /// <summary>What makes a naming count readable.</summary>
     /// <remarks>

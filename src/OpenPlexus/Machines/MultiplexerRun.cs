@@ -98,8 +98,8 @@ public sealed record Learned
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A true rule expecting the commonest outcome fires only where guessing already
-    /// works</b>, however accurate it is and however sound. So <see cref="Found"/> counts two
+    /// <b>A true rule expecting the commonest outcome</b> fires only where guessing already
+    /// works, however accurate it is and however sound. So <see cref="Found"/> counts two
     /// unlike things at once, and two levers have now moved it a long way with
     /// <c>Census.Paying</c> flat — thirteen of sixteen against six under skew, and no more
     /// hard rounds carried. Neither reading could say whether the rules arriving were the

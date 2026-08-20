@@ -1,4 +1,4 @@
-namespace OpenPlexus.Machines;
+﻿namespace OpenPlexus.Machines;
 
 /// <summary>What a linear probe got, and how much it was shown.</summary>
 public sealed record Probed
@@ -163,8 +163,8 @@ public static class Probe
     /// out of. Copied once into <see cref="double"/>[] it is ordinary array indexing.
     /// </para>
     /// <para>
-    /// <b>And it is a copy rather than a cleverer loop because the arithmetic must not
-    /// move.</b> The same values are added in the same order, so every score this probe
+    /// <b>And it is a copy rather than a cleverer loop</b> because the arithmetic must not
+    /// move. The same values are added in the same order, so every score this probe
     /// has ever reported is reproduced to the last bit — which is the only kind of
     /// speed-up a yardstick is allowed to have. Vectorising the dot product would be
     /// faster still and would re-associate the sum, and a probe that changed its answer

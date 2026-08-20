@@ -59,7 +59,7 @@ public static class Unifying
     /// same value, and that is the whole of what unification adds.
     /// </param>
     /// <remarks>
-    /// <b>The modality rides in the high half and the name in the low one</b>, so a pattern
+    /// <b>The modality rides in the high half</b> and the name in the low one, so a pattern
     /// is derived from what it says rather than counted out — two machines reaching the
     /// same scope write the same entry with nothing to ask, which is the property every
     /// code here has.

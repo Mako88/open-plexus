@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 
 namespace OpenPlexus.Machines;
@@ -88,8 +88,8 @@ public sealed class Round
 
     /// <summary>Narrower commitments a general one took the place of.</summary>
     /// <remarks>
-    /// <b>The mechanism that was written up as never firing on evidence that could not
-    /// say.</b> <c>Judged.Narrowed</c> counts unsound residents a resident SOUND one
+    /// <b>The mechanism that was written up as never firing</b>, on evidence that could not
+    /// say. <c>Judged.Narrowed</c> counts unsound residents a resident SOUND one
     /// covers, which is a fact about what is left rather than about whether subsumption
     /// runs — and reading its nought as the clause being unreachable cost a commit that
     /// had to be corrected. This is the count that answers the question asked, and it is

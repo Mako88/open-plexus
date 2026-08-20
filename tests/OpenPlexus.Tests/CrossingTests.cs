@@ -218,6 +218,8 @@ public sealed class CrossingTests(ITestOutputHelper output)
             $"{"sweep",-7}{"drawn",8}{"position",10}{"crossing",10}{"held",8}{"span",7}"
             + $"{"named",7}{"asked",7}{"spoke",7}");
 
+        var reached = new Dictionary<int, double>();
+
         foreach (var sweep in new[] { Sweep, Sweep / 5 })
         {
             var brain = new Brain(new CommittingSettings { Capacity = 4000 }, seed: 1);
@@ -239,6 +241,8 @@ public sealed class CrossingTests(ITestOutputHelper output)
                 && one.Scope.Any(code => code.Modality == Crossing.Symbol));
 
             var renamed = brain.Held.Births.Values.Count(birth => birth == Birth.Renamed);
+
+            reached[sweep] = crossing.Accuracy;
 
             output.WriteLine(
                 $"{sweep,-7}{read.Learnt.Recent,8:F3}{placed.Accuracy,10:F3}"
@@ -277,5 +281,21 @@ public sealed class CrossingTests(ITestOutputHelper output)
                 + "at that cadence, so it is no longer asked once of each. Something has "
                 + "changed about when the rung runs and this screen is measuring that");
         }
+
+        // What the screen decided, and it decided against the dial. Five times the asks and
+        // five times the proposals move the crossing not at all -- and not the position exam,
+        // the held count or the scopes spanning both senses either, which come back identical.
+        // So the ask rate is not what holds this, rung five's own interval need not be built,
+        // and the confound the two rows carry never has to be split.
+        //
+        // What it says instead is sharper than what it was asked. The rung is asked, answers,
+        // and the answer is INERT: fifteen proposals rewrote seven commitments out of nearly
+        // four thousand. A name rewrites the scopes holding both its members, and a population
+        // of long scopes over a drawn word has almost none.
+        Assert.True(reached[Sweep / 5] <= reached[Sweep],
+            $"asking rung five five times as often took the crossing from "
+            + $"{reached[Sweep]:F3} to {reached[Sweep / 5]:F3}, so the ask rate DOES move it "
+            + "and the screen's verdict is stale. The confound now has to be split, which is "
+            + "what rung five's own interval would buy");
     }
 }

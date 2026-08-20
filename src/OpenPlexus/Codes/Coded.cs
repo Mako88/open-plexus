@@ -15,7 +15,7 @@
 /// nowhere for a real quantiser to live either.
 /// </para>
 /// <para>
-/// <b>A world with no signal is a legitimate world and also a limit</b> — John,
+/// <b>A world with no signal is a legitimate world</b>, and also a limit — John,
 /// 2026-08-05. <see cref="Worlds.Motif"/>'s task is compression of token sets
 /// and <see cref="Worlds.Senses"/>'s is the sight–sound pairing; rendering either
 /// as pixels would measure a different thing. So feeding codes straight in stays

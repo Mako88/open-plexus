@@ -1,11 +1,11 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
 
 /// <summary>One world pushing moments, at whatever will take them.</summary>
 /// <remarks>
 /// <para>
-/// <b>One world and one stream, and a moment carries every modality at once.</b> A camera, a
+/// <b>One world and one stream</b>, and a moment carries every modality at once. A camera, a
 /// microphone and a thermometer on one world are three front ends and ONE moment — which is
 /// what lets a scope span them, and it is the link this design exists to make.
 /// <see cref="Codes.Compound{TFrame}"/> is where they merge.

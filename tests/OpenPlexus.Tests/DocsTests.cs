@@ -43,7 +43,7 @@ public sealed class DocsTests
     /// one</b> — see the test that reads it.
     /// </summary>
     /// <remarks>
-    /// <b>Raised from 45 on 2026-08-11, and by what it cost rather than by feel.</b> John's
+    /// <b>Raised from 45 on 2026-08-11</b>, and by what it cost rather than by feel. John's
     /// rule for this budget is that it must stop a doc growing without ever stopping
     /// information getting written down, and that day it did the second thing: a fork row
     /// carrying a closed finding and a new design decision would not fit, so <i>R scales

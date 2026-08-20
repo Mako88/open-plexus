@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -28,7 +28,7 @@ namespace OpenPlexus.Tests;
 /// reading because that assertion holds.
 /// </para>
 /// <para>
-/// <b>No socket here on purpose, and the limit is stated rather than discovered.</b> What
+/// <b>No socket here on purpose</b>, and the limit is stated rather than discovered. What
 /// this file exercises is the ARITHMETIC of a distributed vote and none of its transport.
 /// A green run says the fold composes; it says nothing whatever about C2, because nothing
 /// here is late, and nothing about C3, because nothing here dies. Reading it as <i>the

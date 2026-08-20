@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace OpenPlexus.Tests;
 
@@ -67,7 +67,7 @@ public sealed class StaleClaimTests
     /// started working, which is the opposite of what a trap is for. What has to stay
     /// true is the sections a reader consults to decide what to BUILD.
     /// <para>
-    /// <b>And `the route` replaced the fork index here, which is not a rename.</b> The index
+    /// <b>And `the route` replaced the fork index here</b>, which is not a rename. The index
     /// was a flat table and this list held it because that is where an <i>unwired</i> claim
     /// used to live. The route now holds them — <i>nothing tracks a source through a
     /// change</i>, <i>the walk still learns nowhere but at home</i> — and it holds them

@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Commitments;
@@ -8,7 +8,7 @@ namespace OpenPlexus.Commitments;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Rung five, and it is the only part of the ladder that goes up.</b> Rungs one to
+/// <b>Rung five</b>, and it is the only part of the ladder that goes up. Rungs one to
 /// four make a commitment narrower; nothing else anywhere makes anything more
 /// general, and a machine built only from them can be arbitrarily accurate and hold
 /// no concept at all — every multiplexer rule learnt and no representation of *the

@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Globalization;
 using OpenPlexus.Codes;
 
@@ -25,7 +25,7 @@ public sealed record BabiSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Off is the control, and it is a harsher world than it looks.</b> The
+    /// <b>Off is the control</b>, and it is a harsher world than it looks. The
     /// corpus resets its sentence ids to mark a new story, and C4 forbids
     /// treating that as an episode boundary — nothing here may stop, retrain or
     /// clear. So with this off, <i>Lily is a frog</i> in one story and <i>Lily is

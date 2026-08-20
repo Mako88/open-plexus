@@ -1,4 +1,4 @@
-namespace OpenPlexus.Bus;
+﻿namespace OpenPlexus.Bus;
 
 /// <summary>
 /// Something that holds commitments and can be asked what it makes of them —
@@ -98,7 +98,7 @@ public interface IBus
 
     /// <summary>
     /// One holder was never handed one ask, so no answer to that ask is owed from it —
-    /// <b>fork 53, and it is the walk's write-off rather than a new idea.</b>
+    /// <b>fork 53</b>, and it is the walk's write-off rather than a new idea.
     /// </summary>
     /// <remarks>
     /// <para>

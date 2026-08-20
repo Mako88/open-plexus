@@ -17,7 +17,7 @@ namespace OpenPlexus.Tests;
 /// not arrive fails here rather than on twenty phones.
 /// </para>
 /// <para>
-/// <b>And they are not a test of C2, which is the thing that will be assumed.</b> TCP does
+/// <b>And they are not a test of C2</b>, which is the thing that will be assumed. TCP does
 /// not reorder within a connection, so this exercises LESS adversity than the simulator
 /// does. Green here means the bytes and the routing are right; the ordering constraint is
 /// measured where it is injected on purpose.

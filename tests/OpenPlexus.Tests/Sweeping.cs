@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 using OpenPlexus.Worlds;
 
@@ -8,7 +8,7 @@ namespace OpenPlexus.Tests;
 /// One arm of a sweep, measured over seeds.
 /// </summary>
 /// <remarks>
-/// <b>The spread is not optional here, and that is the point of the class.</b>
+/// <b>The spread is not optional here</b>, and that is the point of the class.
 /// Every sweep in this project's history that reported a bare mean has had to be
 /// retracted or hedged later — "chain loses to repeat" at 30 seeds survived to
 /// 200 as "indistinguishable", and a fork-21 table went into the docs with

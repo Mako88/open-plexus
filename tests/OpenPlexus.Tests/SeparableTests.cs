@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -20,7 +20,7 @@ namespace OpenPlexus.Tests;
 /// recover, because they all consult the same broken instrument.
 /// </para>
 /// <para>
-/// <b>And skew is predicted to do exactly that, which is why this exists.</b> On a world
+/// <b>And skew is predicted to do exactly that</b>, which is why this exists. On a world
 /// whose answer is one four times in five, a rule saying <i>expect one</i> is right about
 /// eighty-five percent of the time whatever it conditions on — because when its own
 /// reasoning does not apply, the base rate carries it anyway. A true rule is right a
@@ -28,7 +28,7 @@ namespace OpenPlexus.Tests;
 /// forty on the balanced world.
 /// </para>
 /// <para>
-/// <b>If the gap collapses, the defect is upstream of every arm tried tonight.</b> Six
+/// <b>If the gap collapses the defect is upstream</b> of every arm tried tonight. Six
 /// budget cells, three vote rules and two genesis gates were all measured on a world
 /// where the fitness signal itself may not carry the distinction they were being asked to
 /// make.

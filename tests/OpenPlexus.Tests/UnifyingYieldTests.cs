@@ -20,7 +20,7 @@ namespace OpenPlexus.Tests;
 /// five is already summoned by: REDUNDANCY.
 /// </para>
 /// <para>
-/// <b>And it is anti-unification, which is the dual of repair and not a new idea.</b>
+/// <b>And it is anti-unification</b>, which is the dual of repair and not a new idea.
 /// Where several commitments expect the same thing and differ in exactly one position of
 /// their scope, the thing they share is a rule with a hole in it — <i>whoever was asked
 /// about</i> rather than <i>mary</i>, <i>john</i>, <i>sandra</i> and <i>daniel</i>
@@ -34,7 +34,7 @@ namespace OpenPlexus.Tests;
 /// a count, and this file takes it.
 /// </para>
 /// <para>
-/// <b>And the trigger is abundant and mostly noise, which is why the second test exists.</b>
+/// <b>And the trigger is abundant and mostly noise</b>, which is why the second test exists.
 /// A hole punched on every sibling group is WORSE than the rules it replaces about nine
 /// times in ten — it fires roughly twice as often and pays for it. So the operator needs a
 /// gate exactly as genesis does, and how many siblings a hole covers is not one.

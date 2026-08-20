@@ -1,4 +1,4 @@
-namespace OpenPlexus.Codes;
+﻿namespace OpenPlexus.Codes;
 
 /// <summary>Where a moment came from, and which one it is from there.</summary>
 /// <remarks>
@@ -18,7 +18,7 @@ public readonly record struct Stamp
 {
     /// <summary>The source a lone input pushes on.</summary>
     /// <remarks>
-    /// <b>One rather than nought, so an unset source is not a valid one.</b> A default
+    /// <b>One rather than nought</b>, so an unset source is not a valid one. A default
     /// <see langword="byte"/> is nought, and an input that forgot to say which stream it was
     /// would then silently share one with whichever other input did the same.
     /// </remarks>

@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -27,7 +27,7 @@ namespace OpenPlexus.Tests;
 /// into the lifetime one is <see cref="CommittingSettings.Recency"/> at near zero.
 /// </para>
 /// <para>
-/// <b>So the grid is two worlds by two arms, and the stationary half is not decoration.</b>
+/// <b>So the grid is two worlds by two arms</b>, and the stationary half is not decoration.
 /// A difference on the switching world alone is the finding; the same difference on both is
 /// the dial doing something else entirely, and this repo has paid for reading one cell of a
 /// two-by-two as though it were the whole of it. Measure one mechanism ON from a known
@@ -61,7 +61,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
 
     /// <summary>The local estimate turned off, as near as a rate can be turned off.</summary>
     /// <remarks>
-    /// <b>Not zero, because zero is a different mechanism and not a slower one.</b> At
+    /// <b>Not zero</b>, because zero is a different mechanism and not a slower one. At
     /// exactly nought the estimate never moves off whatever it was initialised to, which is
     /// an arm about initialisation. Near zero it is the lifetime average the G-Counters
     /// already carry, which is the arm fork 27 actually names.

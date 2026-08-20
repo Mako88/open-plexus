@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -19,7 +19,7 @@ namespace OpenPlexus.Tests;
 /// exactly as the plan says it should.
 /// </para>
 /// <para>
-/// <b>But the gate in front of it is not per-commitment, and that is the crack.</b>
+/// <b>The gate in front of it is not per-commitment</b>, and that is the crack.
 /// <c>Mending.Uncovered</c> refuses to repair a commitment when any OTHER firing
 /// commitment already narrows it, and asks that of <c>firing</c> — which under sharding is
 /// only what this holder happens to hold. A holder cannot see that somebody else already

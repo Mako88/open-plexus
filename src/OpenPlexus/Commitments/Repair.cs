@@ -20,7 +20,7 @@ public enum Choosing
 /// <summary>What a separating condition must do besides separate.</summary>
 /// <remarks>
 /// <para>
-/// <b>Fork 86, and it is the one that killed ILP wearing this design's clothes.</b> The ladder
+/// <b>Fork 86</b>, and it is the one that killed ILP wearing this design's clothes. The ladder
 /// extends only when nothing in the current language separates the failures from the hits, and
 /// that is the whole of what makes the bias EARNED rather than declared. On a wide alphabet
 /// something always separates — a code present in exactly the failures and nowhere else is a
@@ -73,7 +73,7 @@ public enum Surprising
 /// would put the arm in the code forever as a way of not minting properly.
 /// </para>
 /// <para>
-/// <b>John's, and the observation behind it is that a conjunction is currently DISCOVERED.</b>
+/// <b>John's</b>, and the observation behind it is that a conjunction is currently DISCOVERED.
 /// Genesis mints one code a commitment, so <i>this and that predict the other</i> is reachable
 /// only by narrowing a one-code rule after it has failed enough times to clear the repair
 /// floor — which is a price paid to find out something a told statement said outright. An

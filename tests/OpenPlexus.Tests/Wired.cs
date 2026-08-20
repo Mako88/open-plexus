@@ -1,4 +1,4 @@
-namespace OpenPlexus.Tests;
+﻿namespace OpenPlexus.Tests;
 
 /// <summary>
 /// What a test needs when the messages have to cross a real socket.
@@ -48,7 +48,7 @@ public static class Wired
     /// fleet.
     /// </para>
     /// <para>
-    /// <b>The set is never emptied, which is deliberate and is the other half.</b> A fleet
+    /// <b>The set is never emptied</b>, which is deliberate and is the other half. A fleet
     /// that has been torn down may still hold its prefix for a moment, so a port coming free
     /// is not the same event as a port becoming bindable — and remembering it for the life of
     /// the process costs a few dozen integers.

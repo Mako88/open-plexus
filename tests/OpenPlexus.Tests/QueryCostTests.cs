@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -17,13 +17,13 @@ namespace OpenPlexus.Tests;
 /// is a boolean, which is why asking keeps C1 where reading a population would not.
 /// </para>
 /// <para>
-/// <b>And a round trip is the expensive unit, which is the one thing already measured.</b>
+/// <b>And a round trip is the expensive unit</b>, which is the one thing already measured.
 /// <c>LatencyTests</c> put a hop at a hundred milliseconds between two houses. A query per
 /// candidate per round at that price is not a detail — it decides whether this gate can
 /// exist off a LAN at all, and the count is the whole question.
 /// </para>
 /// <para>
-/// <b>The question is which part is cacheable, and the two halves are not alike.</b>
+/// <b>The question is which part is cacheable</b>, and the two halves are not alike.
 /// <i>Does anybody anywhere hold a specialisation of my scope</i> changes only when
 /// somebody mints one. <i>Did it fire this round</i> changes every round. If most
 /// candidates have no specialisation anywhere, the first answer is a permanent no and the

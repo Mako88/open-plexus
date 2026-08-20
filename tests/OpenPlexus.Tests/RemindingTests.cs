@@ -1,10 +1,10 @@
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
 
 /// <summary>
 /// The rules that could not be made into checks, printed beside the ones that could —
-/// <b>John's, and it is the same move the guards are, for the half that will not mechanise.</b>
+/// <b>John's, and it is the same move the guards are</b>, for the half that will not mechanise.
 /// </summary>
 /// <remarks>
 /// <para>

@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -69,7 +69,7 @@ public sealed class RefusalTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The same reading with seeds under it, because one seed will happily invert.</b>
+    /// <b>The same reading with seeds under it</b>, because one seed will happily invert.
     /// </summary>
     /// <remarks>
     /// <b>The shares are large enough that the single-seed row would probably hold,</b> which

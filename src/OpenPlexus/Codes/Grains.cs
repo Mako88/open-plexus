@@ -1,4 +1,4 @@
-namespace OpenPlexus.Codes;
+﻿namespace OpenPlexus.Codes;
 
 /// <summary>
 /// One observation said at SEVERAL GRAINS at once — <b>step 8's middle,</b> and the
@@ -59,7 +59,7 @@ public static class Grains
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A modality per grain, or a coarse code and a fine one collide.</b> Band
+    /// <b>A modality per grain</b>, or a coarse code and a fine one collide. Band
     /// 1 of 2 and band 1 of 8 are different claims about the world, and one code
     /// meaning two things is this design's recurring fault at its most literal.
     /// </para>

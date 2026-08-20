@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 namespace OpenPlexus.Codes;
 
@@ -42,7 +42,7 @@ public sealed class Bits : IQuantizer<IReadOnlyList<int>>
     /// One more than the largest value a position may hold. <b>Two, which is a bit.</b>
     /// </param>
     /// <remarks>
-    /// <b>One code a reading, and a second coarser one was built and deleted.</b> Emitting
+    /// <b>One code a reading</b>, and a second coarser one was built and deleted. Emitting
     /// the position with its value thrown away made the shared part of <i>bit three is
     /// zero</i> and <i>bit three is one</i> into a code — and it reached no scope, because
     /// genesis refuses a code that has never been absent and repair refuses one that

@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -277,7 +277,7 @@ public sealed class RhythmTests(ITestOutputHelper output)
     /// the same period and violation rate.
     /// </para>
     /// <para>
-    /// <b>How often it turns is the axis, and one period would have read as noise.</b> At two
+    /// <b>How often it turns is the axis</b>, and one period would have read as noise. At two
     /// thousand rounds a turn the arms are apart by less than a seed spread, which is a
     /// finding — the population is back before the next turn arrives — and it is not a
     /// comparison. Shortening the period until the recovery no longer fits inside it is what

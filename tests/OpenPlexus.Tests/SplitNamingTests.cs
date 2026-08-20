@@ -105,7 +105,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     /// is the row this file already carried, arriving from a direction nobody watched.
     /// </para>
     /// <para>
-    /// <b>And it is not a thin window, which is worth knowing before the next hunt.</b> Four
+    /// <b>And it is not a thin window</b>, which is worth knowing before the next hunt. Four
     /// seeds in twelve satisfy the precondition at this budget and timing — 4, 8, 9 and 10 —
     /// so a red here means finding another rather than re-tuning the pair. The assertions
     /// below say which half failed.

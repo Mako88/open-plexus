@@ -57,7 +57,7 @@ public sealed class Ported : IAsyncDisposable
     /// this one.
     /// </para>
     /// <para>
-    /// <b>And it is the lost answer that does it now, rather than any lost message.</b> Fork
+    /// <b>And it is the lost answer that does it now</b>, rather than any lost message. Fork
     /// 53 writes off an ask that failed to leave, so the outbound half no longer strands a
     /// round; what is left is an answer that was sent and did not arrive, which is
     /// indistinguishable from a slow one and is the case nothing may decide. The two are one

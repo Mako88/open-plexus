@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace OpenPlexus.Tests;
@@ -33,7 +33,7 @@ public sealed class SweepListTests
 {
     /// <summary>Every entry of the <c>all</c> array in the workflow, in file order.</summary>
     /// <remarks>
-    /// <b>Read as text rather than as YAML, and that is a deliberate limit.</b> The array
+    /// <b>Read as text rather than as YAML</b>, and that is a deliberate limit. The array
     /// sits inside a shell script inside a <c>run:</c> block, so a YAML parser reaches a
     /// string and has to be told where to look anyway. What this cannot survive is the list
     /// being rewritten in another shape — which would fail loudly here, since no entry would

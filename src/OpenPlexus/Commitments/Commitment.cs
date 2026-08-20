@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 using OpenPlexus.Codes;
 
@@ -71,7 +71,7 @@ public sealed class Commitment
     /// How many buckets the distinct-occasion register has.
     /// </summary>
     /// <remarks>
-    /// <b>One word per commitment, and the width is the word rather than a choice.</b>
+    /// <b>One word per commitment</b>, and the width is the word rather than a choice.
     /// An exact set of the occasions a commitment has fired in is commitments times
     /// distinct moments — the same product that already makes
     /// <see cref="Separations"/> the thing that blows up, arriving a second time for a

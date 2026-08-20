@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace OpenPlexus.Tests;
@@ -82,7 +82,7 @@ public sealed class ShardTests
     /// <param name="filter">The expression the workflow hands the runner.</param>
     /// <param name="name">A class's fully qualified name.</param>
     /// <remarks>
-    /// <b>One joiner an expression, and a mixed one is refused rather than guessed at.</b>
+    /// <b>One joiner an expression</b>, and a mixed one is refused rather than guessed at.
     /// <c>dotnet test</c> gives <c>&amp;</c> and <c>|</c> a precedence and nothing in this
     /// matrix has ever relied on it; a filter that mixed them would be read here by whatever
     /// this function happened to do first, which is how a check comes to disagree with the
@@ -153,7 +153,7 @@ public sealed class ShardTests
     }
 
     /// <summary>
-    /// <b>And no shard is empty, which is the same mistake read from the other end.</b>
+    /// <b>And no shard is empty</b>, which is the same mistake read from the other end.
     /// </summary>
     /// <remarks>
     /// A shard naming a class that has been renamed or deleted starts a runner, builds the

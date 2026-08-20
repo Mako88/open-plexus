@@ -736,6 +736,124 @@ public sealed class LessonTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>
+    /// Where the wide root stops paying on a first telling, told once.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The obvious account is wrong</b>, and this is the control that says so. Genesis may
+    /// not root on a code that has never been absent, and on a first hearing every word is
+    /// new, so the wide root looked as though it could have nothing eligible to mint a
+    /// conjunction over. It mints under every claiming arm, six to twenty-three of them.
+    /// </para>
+    /// <para>
+    /// <b>So the scopes are there and the score does not move</b>, which puts the blocker
+    /// after genesis rather than inside it. A wide scope that does not FIRE on the question
+    /// and one that fires and ties are different failures, and this counts both.
+    /// </para>
+    /// <para>
+    /// <b>And they fire, which refutes the second account too.</b> A scope holding the answer
+    /// word would be mute on a question that does not name it, and half of them are a subset
+    /// of some question anyway. So the wide root at one telling is neither a genesis problem
+    /// nor a matching one: the scopes exist, they reach the paper, and the score does not move.
+    /// </para>
+    /// <para>
+    /// <b>Which leaves the vote, where the split already put it.</b> A scope minted on a first
+    /// telling has a blank record whatever its width, and `Seating` reads half of what
+    /// claiming the rarest word gets wrong as a TIE. Two accounts died here and the reading
+    /// they were aimed at did not move.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Where_the_wide_root_stops_paying_when_a_lesson_is_told_once()
+    {
+        const int Seeds = 4;
+        const uint Purpose = 0x0C1A_5DED;
+
+        output.WriteLine($"{Seeds} drawn lessons, told once, the wide root throughout");
+        output.WriteLine($"{"claiming",-12}{"wide mints",12}{"firing",9}{"resident",10}");
+
+        var wide = new Dictionary<Asserting, double>();
+        var firing = new Dictionary<Asserting, double>();
+
+        foreach (var asserting in new[]
+        {
+            Asserting.Rarest, Asserting.Withheld, Asserting.Everything,
+        })
+        {
+            var minted = new List<double>();
+            var fires = new List<double>();
+            var resident = new List<double>();
+
+            for (var index = 0; index < Seeds; index++)
+            {
+                var seed = Worlds.Seeds.Apart(index, Purpose);
+                var lesson = Lesson.Drawn(subjects: 4, attributes: 3, seed);
+
+                var ran = Ran(
+                    lesson, Carrying.Never, seed, passes: 1, asserting: asserting, tellings: 1,
+                    rooting: Rooting.Wholly);
+
+                // Born of genesis and wider than one code, which is the wide root's mint and
+                // nothing else. A repair's child is also wider than one code, so the birth is
+                // what separates them -- and reading it off the scope length alone would count
+                // repair's work as the root's.
+                var births = ran.Brain.Held.Births;
+
+                var wides = ran.Brain.Held.All
+                    .Where(one =>
+                        one.Scope.Length > 1
+                        && births.TryGetValue(one.Identity, out var how)
+                        && how is Birth.Genesis)
+                    .ToList();
+
+                minted.Add(wides.Count);
+
+                // And how many of them the examination can reach, which is the half a count of
+                // mints cannot say. A scope holding the answer word is a scope no question
+                // naming the subject alone is a superset of, so it is minted and mute.
+                var asked = lesson.Exam
+                    .Select(quiz => (IReadOnlySet<Code>)new HashSet<Code>(
+                        new Joined(Joining.Bagged).Codify(new Recited
+                        {
+                            Said = [],
+                            Asked = [.. Babi.Words(quiz.Question).Select(Babi.Of)],
+                        })))
+                    .ToList();
+
+                fires.Add(wides.Count(one => asked.Any(one.Fires)));
+
+                resident.Add(ran.Tally.Resident);
+            }
+
+            wide[asserting] = minted.Average();
+            firing[asserting] = fires.Average();
+
+            output.WriteLine(
+                $"{asserting.ToString().ToLowerInvariant(),-12}{minted.Average(),12:F1}"
+                + $"{fires.Average(),9:F1}{resident.Average(),10:F1}");
+        }
+
+        // The refutation, and it is what this test is now for. Every arm mints wide scopes on
+        // a first telling, so the varied gate is not the blocker and the account naming it was
+        // wrong.
+        Assert.All(
+            new[] { Asserting.Rarest, Asserting.Withheld, Asserting.Everything },
+            asserting => Assert.True(wide[asserting] > 0.0,
+                $"{asserting} minted no wide scope at all on a first telling"));
+
+        // And the second refutation. A wide scope holding the answer word would be mute on a
+        // question that does not name it, and about half of them reach a question anyway. So
+        // neither genesis nor matching is what keeps the wide root from paying at one telling
+        // -- the scopes are minted, they fire, and the score does not move.
+        Assert.All(
+            new[] { Asserting.Rarest, Asserting.Withheld, Asserting.Everything },
+            asserting => Assert.True(firing[asserting] > 0.0,
+                $"{asserting} minted {wide[asserting]:F1} wide scopes and not one of them "
+                + "fires on the examination, so a scope the paper cannot reach IS the "
+                + "blocker after all"));
+    }
+
     /// <summary>What a moment carries, re-taken on a world that moves.</summary>
     /// <remarks>
     /// <para>

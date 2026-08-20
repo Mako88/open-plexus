@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 namespace OpenPlexus.Codes;
 
@@ -8,8 +8,8 @@ namespace OpenPlexus.Codes;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>This is not a stepping stone to <see cref="Winnow"/> and must not be
-/// written up as one.</b> Grains take a reading that has already been banded and
+/// <b>This is not a stepping stone to <see cref="Winnow"/></b> and must not be
+/// written up as one. Grains take a reading that has already been banded and
 /// say it again more coarsely, so the hierarchy IS the similarity — but it is a
 /// hierarchy per DIMENSION, and two readings differing a little in every
 /// dimension share no band at any grain. <see cref="Winnow"/> reads the

@@ -1,4 +1,4 @@
-namespace OpenPlexus.Codes;
+﻿namespace OpenPlexus.Codes;
 
 /// <summary>
 /// A world's output when the world's output is already codes — <b>the shape a
@@ -15,12 +15,12 @@ namespace OpenPlexus.Codes;
 /// nowhere for a real quantiser to live either.
 /// </para>
 /// <para>
-/// <b>A world with no signal is a legitimate world and also a limit — John,
-/// 2026-08-05.</b> <see cref="Worlds.Motif"/>'s task is compression of token sets
+/// <b>A world with no signal is a legitimate world and also a limit</b> — John,
+/// 2026-08-05. <see cref="Worlds.Motif"/>'s task is compression of token sets
 /// and <see cref="Worlds.Senses"/>'s is the sight–sound pairing; rendering either
 /// as pixels would measure a different thing. So feeding codes straight in stays
-/// available on purpose. <b>What it costs is that such a world can never tell
-/// anybody whether the quantisers work</b>, which is worth knowing before the
+/// available on purpose. <b>What it costs</b> is that such a world can never tell
+/// anybody whether the quantisers work, which is worth knowing before the
 /// payoff of a quantiser is estimated from a suite where five of nine worlds
 /// cannot exercise one.
 /// </para>

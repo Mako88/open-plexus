@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 
@@ -41,7 +41,7 @@ public enum Wanted
     /// is about a mechanism that is local or population-wide by accident.
     /// </para>
     /// <para>
-    /// <b>And it carries the moment again rather than naming the vote it settles.</b> A
+    /// <b>And it carries the moment again</b> rather than naming the vote it settles. A
     /// holder that had to remember what it fired on would be holding state keyed by an ask
     /// that C2 permits never to be followed up, and a settlement arriving for a forgotten
     /// vote would be a round that silently taught nobody. Re-matching costs the match

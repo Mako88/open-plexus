@@ -44,6 +44,13 @@ public sealed class LetteringTests(ITestOutputHelper output)
     /// <summary>How many pixels apart the drawn offsets are.</summary>
     private const int Stride = 2;
 
+    /// <summary>The modality the drawn word's codes ride on.</summary>
+    /// <remarks>
+    /// <b>One number for every reading in this file</b>, so two of them cannot end up
+    /// comparing front ends that differ in something nobody meant to vary.
+    /// </remarks>
+    private const byte Patch = 110;
+
     /// <summary>
     /// The first sixteen of <see cref="Lettering.Vocabulary"/>, which the probe is read on.
     /// </summary>
@@ -94,7 +101,6 @@ public sealed class LetteringTests(ITestOutputHelper output)
     [Fact]
     public void What_a_front_end_leaves_of_a_word_that_arrived_as_pixels()
     {
-        const byte Patch = 110;
 
         var every = Drawings(seed: 1);
         var chance = 1.0 / Words.Length;
@@ -425,26 +431,20 @@ public sealed class LetteringTests(ITestOutputHelper output)
     /// <param name="every">The drawings, with the word each is of.</param>
     /// <param name="tile">How many pixels across one patch is.</param>
     /// <remarks>
-    /// <b>The bare half of <see cref="Tiling"/> and never the placed half.</b> A placed code
-    /// pins a patch, so a word drawn two pixels along emits none of the ones it emitted
-    /// before — and a conjunction over placed codes could only ever be sound for a word that
-    /// never moved.
+    /// <b>The front end's own arm rather than a filter written here.</b> A placed code pins a
+    /// patch, so a word drawn two pixels along emits none of the ones it emitted before, and
+    /// a conjunction over them could only ever be sound for a word that never moved. Asking
+    /// <see cref="Tiling"/> for the bare half is what stops this reading and the probe's
+    /// disagreeing about what bare means.
     /// </remarks>
     private static List<(HashSet<ulong> Codes, int Word)> Bare(
         List<(IReadOnlyList<double> Pixels, int Word, bool Shown)> every, int tile)
     {
-        const byte Patch = 110;
-
-        var (cells, _, _) = Winnowing.Sheet(tile * tile);
-        var tiling = new Tiling(Patch, Lettering.Side, tile);
+        var tiling = new Tiling(Patch, Lettering.Side, tile, placed: false);
 
         return every
             .Select(one => (
-                Codes: tiling
-                    .Codify(one.Pixels)
-                    .Where(code => code.Value < (ulong)cells)
-                    .Select(code => code.Value)
-                    .ToHashSet(),
+                Codes: tiling.Codify(one.Pixels).Select(code => code.Value).ToHashSet(),
                 one.Word))
             .ToList();
     }

@@ -1,4 +1,4 @@
-
+﻿
 namespace OpenPlexus.Bus;
 
 /// <summary>
@@ -6,8 +6,8 @@ namespace OpenPlexus.Bus;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Every measurement in this project has run in one process with in-memory
-/// delivery.</b> C2 says messages are late, jittered and out of order, and the
+/// <b>Every measurement in this project has run in one process</b>, with in-memory
+/// delivery. C2 says messages are late, jittered and out of order, and the
 /// whole design rests on that being survivable — but nothing had ever checked it.
 /// Thread-pool dispatch already reorders; what it never produces is a message
 /// arriving LONG after its siblings, which is the case a real network adds and
@@ -100,8 +100,8 @@ public sealed class HybridBus : IBus
 
     /// <inheritdoc/>
     /// <remarks>
-    /// <b>Nearly unreachable here, and that is a fact about one process rather than about
-    /// the mechanism.</b> A holder that has unsubscribed is not in the table, so it is never
+    /// <b>Nearly unreachable here</b>, and that is a fact about one process rather than about
+    /// the mechanism. A holder that has unsubscribed is not in the table, so it is never
     /// in the roster and never owed anything; what is left is a holder that took the ask and
     /// threw, which is the local spelling of a refused connection. Every other way to lose a
     /// question needs a wire, so <see cref="Posted"/> is where fork 53 is measured.

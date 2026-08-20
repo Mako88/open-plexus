@@ -101,8 +101,8 @@ public sealed class Round
 
     /// <summary>Commitments minted by genesis.</summary>
     /// <remarks>
-    /// <b>Reported because a gate that does nothing and a gate that does everything
-    /// look alike from the score.</b> The resident count is what survives culling and
+    /// <b>Reported because a gate</b> that does nothing and a gate that does everything
+    /// look alike from the score. The resident count is what survives culling and
     /// says nothing about the rate this ran at — and the rate is the whole question,
     /// since minting on every failure enumerates the <c>code → outcome</c> space.
     /// </remarks>

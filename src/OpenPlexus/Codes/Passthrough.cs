@@ -1,8 +1,8 @@
 namespace OpenPlexus.Codes;
 
 /// <summary>
-/// The front end for a world that is already coded — <b>it quantises nothing, and
-/// it is here so that not quantising is a CHOICE the pattern can express.</b>
+/// The front end for a world that is already coded — <b>it quantises nothing,</b> and
+/// it is here so that not quantising is a CHOICE the pattern can express.
 /// </summary>
 /// <remarks>
 /// <para>

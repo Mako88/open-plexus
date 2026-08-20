@@ -39,8 +39,8 @@ public sealed class ShapeTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Every one of these is about WHAT IS BEING SHOWN or WHERE IT RUNS, never
-    /// about how the walk behaves.</b> The world's own settings; the dials as one
+    /// <b>Every one of these is about WHAT</b> IS BEING SHOWN or WHERE IT RUNS, never
+    /// about how the walk behaves. The world's own settings; the dials as one
     /// object; the seed; the cluster topology; the bus's lateness; and data to
     /// read. A new name here needs an argument, which is the point.
     /// </para>

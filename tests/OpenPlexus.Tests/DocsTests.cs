@@ -427,7 +427,15 @@ public sealed class DocsTests
     // closing at 1,250 sightings and the looks at 3,750. The half that is left is the store,
     // and it is a new item rather than a rewording -- a category's name IS its members, so a
     // group that grows is a new category beside the old and never an edit to it.
-    private const int Whole = 12_155;
+    // And 12,182 is the fortieth raise, twenty-seven words for the scaling exponent, which
+    // was the one entry here reading UNMEASURED while naming itself the number that predicts
+    // whether any of this reaches perception. It is measured: 2,003, 3,468 and 7,920 rounds
+    // to target at six, eleven and twenty bits, eight seeds, every seed reaching at every
+    // width. The input space grows sixteen thousand fold across that and the cost grows
+    // 3.95, so it tracks the depth of a scope rather than the space -- and the second item
+    // is where the cost went instead, the population going 19, 797 and 1,824 sound rules.
+    // A reading that turns an OPEN into a NOW and a guard is what the budget is for.
+    private const int Whole = 12_182;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

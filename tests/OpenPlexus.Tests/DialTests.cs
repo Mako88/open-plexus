@@ -602,8 +602,8 @@ public sealed class DialTests
     /// never been compared, whatever its reason says.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THE WEAKEST POSSIBLE FORM OF <i>an arm only lives while it is compared</i>, AND
-    /// THINGS STILL FAIL IT.</b> This does not ask whether an arm won, or on how many
+    /// <b>THE WEAKEST POSSIBLE FORM</b> OF <i>an arm only lives while it is compared</i>, AND
+    /// THINGS STILL FAIL IT. This does not ask whether an arm won, or on how many
     /// worlds, or against what — only whether any test anywhere ever names it. `Fanout` has
     /// two arms and neither has ever been written down outside its own declaration, so it
     /// has been a choice nobody has ever made for the life of the branch.

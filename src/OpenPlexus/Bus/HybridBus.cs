@@ -137,8 +137,8 @@ public sealed class HybridBus : IBus
     /// Answers put on the return path, across every gathering.
     /// </summary>
     /// <remarks>
-    /// <b>Counted separately from <see cref="Messages"/> so an answer that never arrives can
-    /// be distinguished from one that was never sent.</b> A gathering that never completes
+    /// <b>Counted separately from <see cref="Messages"/> so an answer</b> that never arrives can
+    /// be distinguished from one that was never sent. A gathering that never completes
     /// looks the same from the asker either way, and only one of the two is the bus's fault.
     /// </remarks>
     public long Answers

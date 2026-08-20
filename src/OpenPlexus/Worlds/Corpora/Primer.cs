@@ -25,8 +25,8 @@ public sealed record PrimerSettings
 /// <i>yes</i>, <i>no</i>, <i>maybe</i>, the counting words — never appear as words
 /// anywhere in the corpus, only in the answer column. An answer here is a code the
 /// walk ARRIVED at, and a code enters the graph only by being observed, so there
-/// is no node to arrive at. <b>The question this world exists to settle is whether
-/// that nought is a VOCABULARY problem or a TASK problem.</b>
+/// is no node to arrive at. <b>The question this world exists</b> to settle is whether
+/// that nought is a VOCABULARY problem or a TASK problem.
 /// </para>
 /// <para>
 /// <b>It is shown in the SAME RUN with no reset, which C4 requires anyway.</b>

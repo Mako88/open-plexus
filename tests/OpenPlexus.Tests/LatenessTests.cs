@@ -159,8 +159,8 @@ public sealed class LatenessTests(ITestOutputHelper output)
     /// never examined.
     /// </para>
     /// <para>
-    /// <b>And identical is a stronger result than <i>STILL LEARNS</i>, with a mechanism
-    /// behind it rather than a hope.</b> <see cref="Fleet.AskAsync"/> awaits
+    /// <b>And identical is a stronger result than <i>STILL LEARNS</i>,</b> with a mechanism
+    /// behind it rather than a hope. <see cref="Fleet.AskAsync"/> awaits
     /// <c>gathering.Everyone</c> before it decides anything, so nothing in a round is read
     /// until every holder has answered — <b>a round is a BARRIER</b>, and within one, arrival
     /// order cannot reach the outcome. Delay therefore moves the clock and nothing else,

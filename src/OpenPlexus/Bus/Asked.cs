@@ -34,8 +34,8 @@ public enum Wanted
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>It is here rather than in a message of its own because the accounting is the
-    /// same accounting.</b> A settlement goes to every holder at once and each says what
+    /// <b>It is here rather</b> than in a message of its own because the accounting is the
+    /// same accounting. A settlement goes to every holder at once and each says what
     /// it did with it, which is scatter and gather — and a second payload pair would be a
     /// second place for <i>how many did I tell</i> to be tracked. The plan's own trap list
     /// is about a mechanism that is local or population-wide by accident.

@@ -244,8 +244,9 @@ before six that reads as tuning is out of order.
       and its gate, the vote and its weighting, settlement, blame and repair all live beside the
       code in `Commitments`.
     - **OPEN** — nothing here answers what a concept IS beyond a code that fires.
-    - **OPEN** — the scaling exponent: how observations-to-target grows with the relevant bits
-      is what predicts whether this reaches perception. UNMEASURED.
+    - **NOW** — the exponent is polynomial ON SYMBOLS: 2,003, 3,468 and 7,920 rounds at 6,
+      11 and 20 bits, so cost tracks a scope's DEPTH and not the input space.
+    - **OPEN** — and the POPULATION is where it grows instead: 19, 797 and 1,824 sound rules.
     - **OPEN** — the scope language is the CEILING: whatever a scope cannot say cannot be
       learnt. ILP's language-bias problem, what killed the field, and the ladder is finite.
     - **OPEN** — six bits is refused on POWER and eleven names the wrong thing; whether any world

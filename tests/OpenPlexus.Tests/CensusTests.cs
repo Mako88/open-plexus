@@ -536,8 +536,8 @@ public sealed class CensusTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>`census` is a constructor parameter on a world run and the dial guard is right
-    /// to ask about it.</b> A world may say what it is looking at and never what to
+    /// <b>`census` is a constructor parameter</b> on a world run and the dial guard is right
+    /// to ask about it. A world may say what it is looking at and never what to
     /// conclude, and this one hands over the world's own soundness check — an answer key,
     /// which is exactly the thing that may not reach a learner. What makes it admissible
     /// is that the key goes to the HARNESS and not to the brain, and that is a claim about

@@ -35,8 +35,8 @@ namespace OpenPlexus.Machines;
 /// a machine that was never given a question cannot answer it.
 /// </para>
 /// <para>
-/// <b>And the round a holder dies inside is reached by slots and by nothing else — fork
-/// 62.</b> A holder that took the question and went before answering is indistinguishable
+/// <b>And the round a holder dies inside</b> is reached by slots and by nothing else — fork
+/// 62. A holder that took the question and went before answering is indistinguishable
 /// from a slow one under C2, and nothing but a deadline separates them — <i>a miss decided
 /// by a deadline</i> carries a revival row saying never. So no observation ends that wait,
 /// and what ends it instead is not needing the machine: a slot holding R identical

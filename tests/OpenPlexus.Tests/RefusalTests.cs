@@ -72,8 +72,8 @@ public sealed class RefusalTests(ITestOutputHelper output)
     /// <b>The same reading with seeds under it, because one seed will happily invert.</b>
     /// </summary>
     /// <remarks>
-    /// <b>The shares are large enough that the single-seed row would probably hold, which
-    /// is not a reason not to count.</b> This repo has a trap saying error bars come
+    /// <b>The shares are large enough that the single-seed row would probably hold,</b> which
+    /// is not a reason not to count. This repo has a trap saying error bars come
     /// before ordering every time, and a budget refusing nine candidates in ten is exactly
     /// the sort of number that gets quoted for months.
     /// </remarks>

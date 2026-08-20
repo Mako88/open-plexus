@@ -39,8 +39,8 @@ public sealed class CheckingTests
     /// <summary>How a measurement announces itself: it PRINTS.</summary>
     /// <remarks>
     /// <para>
-    /// <b>The first version of this flagged every fact with no assertion and was wrong on
-    /// its first run.</b> <c>ClusterTests.Two_nodes_that_are_partners_can_fire_at_once</c>
+    /// <b>The first version of this flagged every fact</b> with no assertion and was wrong on
+    /// its first run. <c>ClusterTests.Two_nodes_that_are_partners_can_fire_at_once</c>
     /// asserts nothing and is a perfectly good test: it fires sixty-four deliveries at a
     /// mutual pair and fails by DEADLOCKING, which its <c>WaitAsync</c> turns into a thrown
     /// timeout. A test whose failure mode is an exception can fail, so the rule <i>no

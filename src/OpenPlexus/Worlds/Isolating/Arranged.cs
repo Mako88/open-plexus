@@ -79,8 +79,8 @@ public readonly record struct Layout
 
     /// <summary>Whether the world ever draws this, or holds its arrangement back.</summary>
     /// <remarks>
-    /// <b>On the scene rather than on a second list, because everything that reads the
-    /// space needs both halves.</b> Soundness wants every scene and does not care;
+    /// <b>On the scene rather than on a second list,</b> because everything that reads the
+    /// space needs both halves. Soundness wants every scene and does not care;
     /// a yardstick has to be fitted on one half and scored on the other, or it is not a
     /// held-out number at all. Two methods returning two lists would let those drift.
     /// </remarks>

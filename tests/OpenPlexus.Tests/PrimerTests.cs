@@ -10,7 +10,7 @@ namespace OpenPlexus.Tests;
 /// <remarks>
 /// <para>
 /// <b>JOHN'S ASK, 2026-08-04: give it basic English first, then re-run what
-/// failed, in the same run with no reset.</b> The reasoning was exactly right —
+/// failed,</b> in the same run with no reset. The reasoning was exactly right —
 /// six bAbI tasks score nought because <i>yes</i>, <i>no</i>, <i>maybe</i> and the
 /// counting words never occur as words, so there is no node to arrive at. Show it
 /// English and the node exists.
@@ -159,8 +159,8 @@ public sealed class PrimerTests(ITestOutputHelper output)
     /// wrong about, where on bAbI there was provably nothing.
     /// </para>
     /// <para>
-    /// <b>And the second finding was not looked for: bAbI's held-out half holds
-    /// almost no company its training half did not.</b> Every scored context on task
+    /// <b>And the second finding was not looked for:</b> bAbI's held-out half holds
+    /// almost no company its training half did not. Every scored context on task
     /// one was already met — the corpus has some two thousand distinct contexts and
     /// no more. Reading it twice is re-reading it. That is a disqualification from
     /// being a primer independent of any score, and it is asserted.

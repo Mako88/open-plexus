@@ -108,8 +108,8 @@ public sealed record Sentence
 /// intermediate, which is exactly the senses world's shape on somebody else's
 /// data, while <i>single supporting fact</i> asks where somebody is <b>now</b> and
 /// a co-occurrence count has no notion of now. <b>The per-task profile is the
-/// result, and an average over twenty would hide the only interesting thing
-/// here.</b>
+/// result,</b> and an average over twenty would hide the only interesting thing
+/// here.
 /// </para>
 /// <para>
 /// <b>Nothing is engineered per task.</b> The corpus README asks specifically that

@@ -52,6 +52,26 @@ public sealed class ScalingTests(ITestOutputHelper output)
         // And the narrowest world has to get there, or the measurement is of a
         // learner that does not work rather than of how cost grows.
         Assert.True(seen[0].Learned.Reached > 0, "six bits never held the target");
+
+        // And the curve now carries a bar, because the grid below has been run: eight seeds
+        // put rounds-to-target at 2,003, 3,468 and 7,920 for six, eleven and twenty bits,
+        // every seed reaching at every width. The remark above says a threshold written
+        // BEFORE the first reading would be the answer rather than the finding, and that is
+        // still true -- this one is written after it, which is the opposite thing.
+        //
+        // What it guards is the shape rather than the value. Twenty bits is 1,048,576 assignments
+        // against six bits' 64, so a learner whose cost tracked the input space would be
+        // sixteen thousand times slower and the measured factor is 3.95. Eight is loose
+        // enough that no ordinary regression trips it and tight enough that nothing
+        // exponential survives it. What a scope's depth costs is the thing being asserted,
+        // the depth going three, four, five across these widths.
+        Assert.True(
+            seen[2].Learned.Reached > 0 && seen[2].Learned.Reached < 8 * seen[0].Learned.Reached,
+            $"twenty bits held the target at {seen[2].Learned.Reached} rounds against six "
+            + $"bits' {seen[0].Learned.Reached}, which is more than eight times. The measured "
+            + "factor is 3.95 over eight seeds, and a jump past eight means cost has started "
+            + "tracking the input space rather than the depth of a scope -- which is the one "
+            + "way this design fails to reach perception however well anything else works.");
     }
 
     [Fact]

@@ -12,8 +12,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>`SplitTests` folded the moment once and handed the same set to every holder, which
-/// is not what a deployment does.</b> That file split a population's COMMITMENTS and left
+/// <b>`SplitTests` folded the moment</b> once and handed the same set to every holder, which
+/// is not what a deployment does. That file split a population's COMMITMENTS and left
 /// its <see cref="Naming"/> whole, so every shard fired against an identical moment by
 /// construction. The bit-identical result it reports is therefore a fact about the
 /// arithmetic and not about two machines — and reading it as the latter would be a

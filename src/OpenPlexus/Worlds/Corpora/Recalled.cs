@@ -257,8 +257,8 @@ public sealed record Quizzed
 /// so <i>can this learn from text at all</i> has been an argument rather than a number.
 /// </para>
 /// <para>
-/// <b>A moment is words and an outcome is an index, which is what keeps one brain one
-/// brain.</b> The answer is a position in this task's answer alphabet rather than a word
+/// <b>A moment is words and an outcome is an index,</b> which is what keeps one brain one
+/// brain. The answer is a position in this task's answer alphabet rather than a word
 /// code, so <see cref="Machines.Brain.Says"/> maps it exactly as it maps a multiplexer
 /// bit — and a compound answer is one string and therefore one outcome, which is how the
 /// two structurally unanswerable tasks stop being a special case here.
@@ -552,8 +552,8 @@ public sealed class Recalled : IWorld<Recited>, IWithholds<Recited>
 
     /// <inheritdoc/>
     /// <remarks>
-    /// <b>The questions of whole stories this world never tells, and it is the same set
-    /// under every objective.</b> Holding back a question alone would work for
+    /// <b>The questions of whole stories this world never tells,</b> and it is the same set
+    /// under every objective. Holding back a question alone would work for
     /// <see cref="Predicting.Asked"/>, which never draws a statement, and would leak
     /// outright for every other arm — the masked stream would carry the very sentence the
     /// examination is about. So a whole story goes, and the exam does not move when the

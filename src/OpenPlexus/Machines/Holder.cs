@@ -69,8 +69,8 @@ public sealed class Holder : IReceiveAsks
 
     /// <summary>How many asks this holder has answered.</summary>
     /// <remarks>
-    /// <b>Reported because a holder that was never asked and one that answered perfectly
-    /// look alike from the merge.</b> A gathering counts what came back; only the holder
+    /// <b>Reported because a holder</b> that was never asked and one that answered perfectly
+    /// look alike from the merge. A gathering counts what came back; only the holder
     /// can say whether it was reached at all, and the difference is which end of the wire
     /// a silence happened at.
     /// </remarks>

@@ -473,7 +473,19 @@ public sealed class DocsTests
     // check that races the signal it waits on passed on this machine for the life of the
     // branch and went red once on a runner, and no existing entry covers it -- the nearest is
     // about a cost differing by platform, which is a reading rather than a correctness bug.
-    private const int Whole = 12_312;
+    // And 12,400 is the forty-fifth raise, eighty-eight words, and it buys two findings and a
+    // named blocker. Crediting a mint with the round that made it converts a TIE into an
+    // OUTRANKING for the identical score, because the newest mint is the strongest and the
+    // older ones have missed since -- so it breaks the tie by recency, and recency is not
+    // correctness. And the three arms together answer a paper never sat, told once, on eight
+    // drawn lessons rather than on the one hand-written text that reading came from.
+    //
+    // The blocker is why neither default moves and it is work rather than an opinion. The wide
+    // root hands genesis a sound multiplexer rule, and `blind.Sound` reading nought is what
+    // says repair rather than genesis did the learning -- the single most load-bearing
+    // assertion in step one. Re-taking it faithfully wants sound-by-BIRTH, which no instrument
+    // reports, and re-taking it any other way would trade a sharp claim for a weak one.
+    private const int Whole = 12_400;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

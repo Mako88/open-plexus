@@ -449,9 +449,16 @@ before six that reads as tuning is out of order.
       once the right rule TIES; told enough it is OUTRANKED; it is never ABSENT. `Seating`.
     - **NOW** — and no tie-break exists. Both sides of a tie are one weight, one scope length
       and one advocate, so specificity separates none of them and neither does a crowd.
-    - **OPEN** — the wide root closes the OUTRANKING under withheld claiming alone, and leaves
-      the tie exactly, a blank record tying whatever its scope. What separates two blank rules
-      is unanswered, and `Crediting` moves them to a shared ceiling rather than apart.
+    - **OPEN** — the wide root closes the OUTRANKING under withheld claiming alone and leaves
+      every tie tied, a blank record tying whatever its scope.
+    - **NOW** — and crediting CONVERTS a tie into an outranking for the same score, the newest
+      mint being the strongest because the older ones have missed since. It breaks the tie by
+      recency, which is not correctness.
+    - **NOW** — and the three together answer a paper never sat, told once, on drawn lessons
+      rather than on the one written text. The wide root, credited mints, every word claimed.
+    - **OPEN** — so neither ships, because the wide root hands genesis a sound multiplexer rule
+      and `blind.Sound` is what says repair did the learning. That instrument owes a
+      sound-by-BIRTH split before either default may move.
     - **NOW** — `Alternating` is live and its store add-only, so a front end fills its OWN
       vocabulary, reaching every group the experimenter's holds for no score.
     - **OPEN** — it costs 4.7x the rules. Nothing waits for a group to hold still, and the

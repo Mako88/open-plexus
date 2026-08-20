@@ -522,13 +522,17 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         output.WriteLine($"{Seeds} drawn lessons, 4 things and 3 properties");
         output.WriteLine(
-            $"{"root",-8}{"told",-6}{"claiming",-12}{"sat",9}{"right",9}{"absent",9}"
-            + $"{"outranked",11}{"tied",9}{"specific",10}{"crowd",8}");
+            $"{"root",-8}{"credit",-9}{"told",-6}{"claiming",-12}{"sat",9}{"right",9}"
+            + $"{"absent",9}{"outranked",11}{"tied",9}{"specific",10}{"crowd",8}");
 
-        var split = new Dictionary<(Rooting Root, int Told, Asserting Claiming), Seats>();
-        var sat = new Dictionary<(Rooting Root, int Told, Asserting Claiming), double>();
+        var split =
+            new Dictionary<(Rooting Root, Crediting Credit, int Told, Asserting Claiming), Seats>();
+
+        var sat =
+            new Dictionary<(Rooting Root, Crediting Credit, int Told, Asserting Claiming), double>();
 
         foreach (var rooting in new[] { Rooting.Singly, Rooting.Wholly })
+        foreach (var crediting in new[] { Crediting.Nothing, Crediting.Birth })
         foreach (var many in new[] { 1, 8 })
         foreach (var asserting in new[]
         {
@@ -537,7 +541,7 @@ public sealed class LessonTests(ITestOutputHelper output)
         {
             var (scored, _, _, _, _) = Over(
                 Seeds, Purpose, written: false, Carrying.Never, asserting, many,
-                rooting: rooting);
+                rooting: rooting, crediting: crediting);
 
             // Read on a run that STOPS before the questions, which is the whole reason for the
             // second call. A settled question mints and repairs like any other round, so the
@@ -545,7 +549,7 @@ public sealed class LessonTests(ITestOutputHelper output)
             // about -- and the first version of this read 1.000 where the machine scored 0.750.
             var (_, _, _, _, seated) = Over(
                 Seeds, Purpose, written: false, Carrying.Never, asserting, many,
-                rooting: rooting, passes: 0);
+                rooting: rooting, crediting: crediting, passes: 0);
 
             var seats = new Seats
             {
@@ -566,11 +570,12 @@ public sealed class LessonTests(ITestOutputHelper output)
                     : seated.Sum(one => one.Tied * one.Crowd) / seated.Sum(one => one.Tied),
             };
 
-            split[(rooting, many, asserting)] = seats;
-            sat[(rooting, many, asserting)] = scored.Average();
+            split[(rooting, crediting, many, asserting)] = seats;
+            sat[(rooting, crediting, many, asserting)] = scored.Average();
 
             output.WriteLine(
-                $"{rooting.ToString().ToLowerInvariant(),-8}{many,-6}"
+                $"{rooting.ToString().ToLowerInvariant(),-8}"
+                + $"{crediting.ToString().ToLowerInvariant(),-9}{many,-6}"
                 + $"{asserting.ToString().ToLowerInvariant(),-12}"
                 + $"{scored.Average(),9:F3}{seats.Right,9:F3}"
                 + $"{seats.Absent,9:F3}{seats.Outranked,11:F3}{seats.Tied,9:F3}"
@@ -589,7 +594,8 @@ public sealed class LessonTests(ITestOutputHelper output)
         // wherever the examination teaches, and a probe ABOVE it is reading a later machine.
         foreach (var (at, seats) in split)
             output.WriteLine(
-                $"{at.Root.ToString().ToLowerInvariant()}, told {at.Told}, "
+                $"{at.Root.ToString().ToLowerInvariant()}, "
+                + $"{at.Credit.ToString().ToLowerInvariant()}, told {at.Told}, "
                 + $"{at.Claiming.ToString().ToLowerInvariant()}: sat {sat[at]:F3}, probe "
                 + $"{seats.Right:F3}");
 
@@ -614,7 +620,7 @@ public sealed class LessonTests(ITestOutputHelper output)
             Asserting.Rarest, Asserting.Withheld, Asserting.Everything,
         })
         {
-            var seats = split[(Rooting.Singly, 8, asserting)];
+            var seats = split[(Rooting.Singly, Crediting.Nothing, 8, asserting)];
 
             Assert.Equal(0.0, seats.Absent);
             Assert.Equal(0.0, seats.Tied);
@@ -624,10 +630,10 @@ public sealed class LessonTests(ITestOutputHelper output)
         // And told ONCE it is a different failure wearing the same score. Half of what claiming
         // the rarest word gets wrong is a tie, and a tie is not a ranking failure -- it is the
         // vote being handed two rules it has no way to tell apart.
-        var once = split[(Rooting.Singly, 1, Asserting.Rarest)];
+        var blank = split[(Rooting.Singly, Crediting.Nothing, 1, Asserting.Rarest)];
 
-        Assert.True(once.Tied > once.Right,
-            $"tied is {once.Tied:F3} against {once.Right:F3} right, so the one-telling loss "
+        Assert.True(blank.Tied > blank.Right,
+            $"tied is {blank.Tied:F3} against {blank.Right:F3} right, so the one-telling loss "
             + "has stopped being a tie and the two ages are one failure after all");
 
         // And the two ages are two failures, which is what the wide root says by closing only
@@ -651,8 +657,8 @@ public sealed class LessonTests(ITestOutputHelper output)
         })
         foreach (var many in new[] { 1, 8 })
         {
-            var narrow = split[(Rooting.Singly, many, asserting)];
-            var wide = split[(Rooting.Wholly, many, asserting)];
+            var narrow = split[(Rooting.Singly, Crediting.Nothing, many, asserting)];
+            var wide = split[(Rooting.Wholly, Crediting.Nothing, many, asserting)];
 
             output.WriteLine(
                 $"told {many}, {asserting.ToString().ToLowerInvariant()}: singly "
@@ -662,8 +668,8 @@ public sealed class LessonTests(ITestOutputHelper output)
         }
 
         Assert.True(
-            split[(Rooting.Wholly, 8, Asserting.Withheld)].Right
-                > split[(Rooting.Singly, 8, Asserting.Withheld)].Right,
+            split[(Rooting.Wholly, Crediting.Nothing, 8, Asserting.Withheld)].Right
+                > split[(Rooting.Singly, Crediting.Nothing, 8, Asserting.Withheld)].Right,
             "the wide root answers no more of the examination than the shipped one where the "
             + "shipped one is outranked, so minting the whole moment reaches none of the "
             + "outranking either and nothing built here touches the seat");
@@ -676,9 +682,41 @@ public sealed class LessonTests(ITestOutputHelper output)
             Asserting.Rarest, Asserting.Withheld, Asserting.Everything,
         })
             Assert.Equal(
-                split[(Rooting.Singly, 1, asserting)].Tied,
-                split[(Rooting.Wholly, 1, asserting)].Tied,
+                split[(Rooting.Singly, Crediting.Nothing, 1, asserting)].Tied,
+                split[(Rooting.Wholly, Crediting.Nothing, 1, asserting)].Tied,
                 3);
+
+        // Crediting CONVERTS a tie into an outranking and answers no more of the paper. A mint
+        // told about the round that made it arrives at a perfect accuracy, and rules minted
+        // earlier have fired and missed since -- so the newest is the strongest and the tie
+        // breaks by RECENCY. That is not correctness, and the score says so: the same
+        // questions come back right and the failures have changed their name.
+        //
+        // Its own remark predicted the other half of this, that every one-code mint would
+        // arrive at a perfect accuracy TOGETHER and hand the tie to code order. What actually
+        // happens is that they do not arrive together, because the population is being built
+        // while it is being told.
+        foreach (var asserting in new[] { Asserting.Rarest, Asserting.Withheld })
+        {
+            var uncredited = split[(Rooting.Singly, Crediting.Nothing, 1, asserting)];
+            var credited = split[(Rooting.Singly, Crediting.Birth, 1, asserting)];
+
+            Assert.Equal(0.0, credited.Tied);
+            Assert.Equal(uncredited.Tied, credited.Outranked, 3);
+            Assert.Equal(uncredited.Right, credited.Right, 3);
+        }
+
+        // And what pays is the THREE together, on drawn lessons rather than on the one written
+        // text that reading was taken on. Claiming every word in turn, the whole moment as one
+        // scope, and a mint credited with its own round: told once and never examined, it
+        // answers the paper. Any two of them reach a fraction of it, and the table above is
+        // where that can be read cell by cell.
+        var once = split[(Rooting.Wholly, Crediting.Birth, 1, Asserting.Everything)];
+
+        Assert.True(once.Right > 0.9,
+            $"told once, the three arms together answered {once.Right:F3} of an examination "
+            + "never sat, so the reading that put one-shot in the code was about the "
+            + "hand-written lesson rather than about the mechanisms");
 
         // The negative that kills both obvious tie-breaks before either is built. In every tied
         // question the right rule and the winner have the same weight, the same scope length

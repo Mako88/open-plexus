@@ -594,6 +594,20 @@ public sealed class DialTests
         // took the score from 1.000 to 0.125 while silence went from a thirtieth of the rounds
         // to a quarter. It does not reseat a wrong rule, it silences the right one -- a fact
         // stated a handful of times cannot make a rule that clears a floor of twenty.
+        //
+        // And `Rooting` and `Crediting` have had the reading their entries asked for, and both
+        // STAY. A generated world has now put each pair against the other -- drawn lessons and
+        // `Arranged` for the root, drawn lessons for the credit -- and what came back is an
+        // interaction rather than two defaults. The wide root pays under withheld claiming and
+        // nowhere else; crediting turns a tie into an outranking for the identical score; the
+        // three arms together answer a paper never sat, told once.
+        //
+        // What stops them shipping is named work rather than a preference. Flipping the root
+        // was tried and reverted in one session: it hands genesis a sound multiplexer rule, so
+        // `StepOneTests`' `blind.Sound` -- the assertion that says REPAIR did the learning
+        // rather than genesis -- goes from nought to one. Re-taking that faithfully wants
+        // sound-by-BIRTH, which nothing reports. A guard must not cost information, and
+        // weakening that one to afford a default would.
         Assert.Equal(16, HandSet.Count);
     }
 

@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
 
@@ -7,14 +7,14 @@ public sealed record HandingSettings
 {
     /// <summary>How many people are in the room.</summary>
     /// <remarks>
-    /// <b>The answer alphabet, so it is the marginal's denominator and the first ceiling's
-    /// value.</b> Two people would make a coin-flip and the whole ladder one step high;
+    /// <b>The answer alphabet</b>, so it is the marginal's denominator and the first ceiling's
+    /// value. Two people would make a coin-flip and the whole ladder one step high;
     /// what the world is for is the DISTANCE between guessing at the marginal, guessing
     /// inside the right sentence, and reading it, so there has to be room between them.
     /// </remarks>
     /// <remarks>
-    /// <b>And it is the number of things too, which is a constraint rather than a
-    /// shorthand.</b> One sentence a thing, one person giving in each and one receiving,
+    /// <b>And it is the number of things too</b>, which is a constraint rather than a
+    /// shorthand. One sentence a thing, one person giving in each and one receiving,
     /// means the sentences use every person exactly twice — and THAT is what makes the
     /// story's word set identical in every draw. Fewer things than people would leave
     /// somebody out of some stories and not others, and how often a word appears is exactly
@@ -77,8 +77,8 @@ public readonly record struct Recited
 
     /// <summary>The same moment with the order thrown away.</summary>
     /// <remarks>
-    /// <b>What every existing text arm reads, and the ceiling it imposes is the marginal
-    /// exactly.</b> <see cref="Handing"/> draws its givers and its takers as permutations,
+    /// <b>What every existing text arm reads</b>, and the ceiling it imposes is the marginal
+    /// exactly. <see cref="Handing"/> draws its givers and its takers as permutations,
     /// so the set of words in a story is the SAME SET in every draw — which makes the first
     /// rung of the ladder provable by construction rather than measured and argued over.
     /// </remarks>
@@ -103,7 +103,7 @@ public readonly record struct Recited
 /// thing, however either of them is named. This world is that sentence and nothing else.
 /// </para>
 /// <para>
-/// <b>The ladder has three rungs and all three ceilings are exact by construction.</b> That is
+/// <b>The ladder has three rungs</b> and all three ceilings are exact by construction. That is
 /// the whole reason to generate a world rather than read one.
 /// </para>
 /// <list type="number">

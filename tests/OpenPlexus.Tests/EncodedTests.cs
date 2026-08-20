@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -11,8 +11,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The open defect this exists for: is the ceiling the front end or the learner
-/// behind it.</b> A fixed random projection is the project's bet and a frozen trained
+/// <b>The open defect this exists for</b>: is the ceiling the front end or the learner
+/// behind it. A fixed random projection is the project's bet and a frozen trained
 /// encoder is what it has to lose to before the bet means anything. Both are legal
 /// under the red-ball property — one derives its wiring from arithmetic and the other
 /// from a published file of constants, and neither is fitted to the data in front of it.
@@ -48,7 +48,7 @@ public sealed class EncodedTests(ITestOutputHelper output)
     /// Readings paired with the outcomes that followed them.
     /// </summary>
     /// <remarks>
-    /// <b>The readings and the outcomes travel together and the order is the join</b>, so a
+    /// <b>The readings and the outcomes travel together</b> and the order is the join, so a
     /// front end that returned its answers in a different order than it was asked would
     /// mislabel every one of them rather than fail.
     /// </remarks>
@@ -96,8 +96,8 @@ public sealed class EncodedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The same picture encodes to the same numbers, or none of this is a front
-    /// end.</b>
+    /// <b>The same picture encodes to the same numbers</b>, or none of this is a front
+    /// end.
     /// </summary>
     /// <remarks>
     /// The red-ball property is the whole reason a frozen encoder is admissible here.
@@ -143,8 +143,8 @@ public sealed class EncodedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The banded ceiling applies to an embedding too, and it is the same
-    /// ceiling.</b>
+    /// <b>The banded ceiling applies to an embedding too</b>, and it is the same
+    /// ceiling.
     /// </summary>
     /// <remarks>
     /// A modality is one byte and a dimension owns a block of them, so 512 numbers is
@@ -235,8 +235,8 @@ public sealed class EncodedTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The most load-bearing reading in this project was a claim rather than a
-    /// record.</b> <i>Given symbols worth having, the commitment machinery is competitive</i>
+    /// <b>The most load-bearing reading in this project</b> was a claim rather than a
+    /// record. <i>Given symbols worth having, the commitment machinery is competitive</i>
     /// is what separates <i>a fixed projection cannot manufacture the symbols</i> from
     /// <i>a conjunctive rule learner cannot do perception</i> — and no test has ever run a
     /// population on encoder vectors at all. <c>CifarRun</c> has taken an encoder since the
@@ -256,7 +256,7 @@ public sealed class EncodedTests(ITestOutputHelper output)
     /// A grid decides what the bar is, and the bar comes afterwards.
     /// </para>
     /// <para>
-    /// <b>And it is a sweep for the cost rather than for the size of the answer.</b> Five
+    /// <b>And it is a sweep for the cost</b> rather than for the size of the answer. Five
     /// hundred rounds took ten minutes and the encoding was a minute of it — an embedding is
     /// an order more codes a moment and matching is what this machine's clock is made of, so
     /// the arm that answers fork 43 is a runner's work and cannot sit in the suite.

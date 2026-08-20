@@ -135,8 +135,8 @@ public enum Predicting
     /// Masked statements and asked questions, interleaved in the order written.
     /// </summary>
     /// <remarks>
-    /// <b>John's curriculum, which is the one arm that is not a choice between the
-    /// others.</b> Read the language, then answer about it — and C4 permits it, because a
+    /// <b>John's curriculum</b>, which is the one arm that is not a choice between the
+    /// others. Read the language, then answer about it — and C4 permits it, because a
     /// boundary the experimenter knows about is not a boundary the learner can detect. Here
     /// there is not even a boundary to detect: the two kinds of moment arrive interleaved,
     /// exactly as the corpus wrote them.
@@ -172,14 +172,14 @@ public enum Predicting
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Which words were the question is a fact about the signal and not a conclusion</b>,
+/// <b>Which words were the question is a fact about the signal</b> and not a conclusion,
 /// so a world is allowed to say it — the same licence <see cref="Codes.Coded.Groups"/>
 /// carries for <i>these codes were one object</i>. What nothing here says is what to make
 /// of the split, which is the front end's business and then the learner's.
 /// </para>
 /// <para>
-/// <b>And unioning them at the world would have thrown it away before anybody could
-/// choose.</b> A bag of words is what a scope sees, and a bag cannot be asked whether the
+/// <b>And unioning them at the world would have thrown it away</b> before anybody could
+/// choose. A bag of words is what a scope sees, and a bag cannot be asked whether the
 /// question named something the story named — so the one structural fact this task turns
 /// on would have been destroyed by the world, one call before the translation that wants
 /// it.
@@ -192,8 +192,8 @@ public readonly record struct Asking
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Kept apart and ordered, because a bag cannot be asked which sentence a word came
-    /// from.</b> A world saying <i>these words were one sentence, and it was the latest</i>
+    /// <b>Kept apart and ordered</b>, because a bag cannot be asked which sentence a word came
+    /// from. A world saying <i>these words were one sentence, and it was the latest</i>
     /// is stating a fact about its signal — the same licence
     /// <see cref="Codes.Coded.Groups"/> and <see cref="Codes.Coded.Sequence"/> already
     /// carry. What to make of the order is the front end's, and every arm that wants none
@@ -264,7 +264,7 @@ public sealed record Quizzed
 /// two structurally unanswerable tasks stop being a special case here.
 /// </para>
 /// <para>
-/// <b>The answer word is in the moment and that is the point rather than a leak.</b>
+/// <b>The answer word is in the moment</b> and that is the point rather than a leak.
 /// <i>kitchen</i> is a word of the story and <i>the answer is kitchen</i> is an outcome,
 /// and the one-code commitment joining them is exactly what genesis is for. What the
 /// text does NOT hand over is which of the two places in the bag is the current one, and
@@ -538,8 +538,8 @@ public sealed class Recalled : IWorld<Recited>, IWithholds<Recited>
 
     /// <inheritdoc/>
     /// <remarks>
-    /// <b>In the order written and wrapping, so the stream is the file read over and
-    /// over.</b> Drawing at random would be a different world — the corpus puts a
+    /// <b>In the order written and wrapping</b>, so the stream is the file read over and
+    /// over. Drawing at random would be a different world — the corpus puts a
     /// question after the statements that answer it, and reordering that is the one
     /// property a story has.
     /// </remarks>

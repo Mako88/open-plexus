@@ -41,7 +41,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     /// Rounds, <b>and the five hundred past the last sweep are the point</b> of the number.
     /// </summary>
     /// <remarks>
-    /// <b>A run ending on a sweep round is read at its most exhausted</b>. This file's whole
+    /// <b>A run ending on a sweep round</b> is read at its most exhausted. This file's whole
     /// subject is what a trained population would name NEXT. At twenty thousand exactly,
     /// three seeds in eight have nothing left to say — so the assertions here stood on seed
     /// one happening to be one of the five that did, which is the single-seed ordering this
@@ -60,14 +60,14 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>This file's precondition is that a shard alone names nothing, and a search dial
-    /// buys past it.</b> Every reading here is about what SPLITTING costs rung five, so it
+    /// <b>This file's precondition is that a shard alone names nothing</b>, and a search dial
+    /// buys past it. Every reading here is about what SPLITTING costs rung five, so it
     /// needs a population a third of which cannot certify a redundancy by itself. Raise the
     /// repair budget and each third holds enough eligible scopes to clear the gate unaided —
     /// three holders naming three things where the fixture requires three naming none.
     /// </para>
     /// <para>
-    /// <b>So the claim is conditional on shard size and was never written that way.</b>
+    /// <b>So the claim is conditional on shard size</b> and was never written that way.
     /// <i>Splitting a population does not remove a redundancy, it removes the ability to
     /// certify one</i> is true of shards too small to reach the gate's counts, which is what
     /// this world was. It is not a fact about splitting as such, and the plan says so now.
@@ -98,7 +98,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The precondition is a property of one run and every search dial moves it.</b>
+    /// <b>The precondition is a property of one run</b> and every search dial moves it.
     /// Seed one satisfied <i>whole names, no third names alone</i> until the vote rule
     /// changed — and under <see cref="Repairing.AfterFailure"/> the vote decides what repair
     /// may run on, so a readout change is a search change and the window moved with it. That

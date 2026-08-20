@@ -62,14 +62,14 @@ public sealed record HomeostatSettings
     /// something to be conditional on.
     /// </para>
     /// <para>
-    /// <b>IT IS THE <see cref="Codes.IQuantizer{TObservation}.Bind"/> split again,
-    /// and the same caveat applies word for word.</b> Comparison is pre-attentive
+    /// <b>IT IS THE <see cref="Codes.IQuantizer{TObservation}.Bind"/> split again</b>,
+    /// and the same caveat applies word for word. Comparison is pre-attentive
     /// here exactly as segmentation is there — Ashby's units deviate against each
     /// other by their physics, not by deliberation. So the front end supplies the
     /// ORDERING and the learner must still work out what an ordering MEANS: nothing
     /// says rank nought is the urgent end rather than the safe one, and nothing
     /// connects <c>Act:2</c> to <c>Need+2</c>. <b>This tests whether a learner can
-    /// USE an ordinal, not whether it can DISCOVER ordering</b>, and it must not
+    /// USE an ordinal</b>, not whether it can DISCOVER ordering, and it must not
     /// be written up as if it were the whole problem.
     /// </para>
     /// <para>
@@ -347,8 +347,8 @@ public sealed class Homeostat : IActed<Bodily>
     /// <b>Nought is the lowest</b>, which is the one this world's task is about.
     /// </summary>
     /// <remarks>
-    /// <b>TIES BREAK ON THE INDEX, so the ordering is a permutation and never a
-    /// near-miss.</b> Two variables at the same value would otherwise both claim a
+    /// <b>TIES BREAK ON THE INDEX</b>, so the ordering is a permutation and never a
+    /// near-miss. Two variables at the same value would otherwise both claim a
     /// position and the front end would emit a rank no variable held — a state the
     /// graph would learn about and that the body can never be in again.
     /// </remarks>
@@ -403,8 +403,8 @@ public sealed class Homeostat : IActed<Bodily>
     /// How long doing nothing lasts, in steps.
     /// </summary>
     /// <remarks>
-    /// <b>Computed, and it is the number that makes idling a failure rather than
-    /// a strategy.</b> The fastest-falling variable reaches the floor first.
+    /// <b>Computed</b>, and it is the number that makes idling a failure rather than
+    /// a strategy. The fastest-falling variable reaches the floor first.
     /// </remarks>
     public int Idling => (int)Math.Ceiling((1.0 - _settings.Floor) / Falls(_settings.Needs - 1));
 }

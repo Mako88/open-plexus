@@ -119,7 +119,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 263;
+    private const int Shouted = 239;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>
@@ -140,8 +140,13 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// left standing in capitals. Neither was looked for. It reached 63 when `Trial` was
     /// rewritten as `Bench`, which is the same road: prose that goes takes its debt with it.
     /// </para>
+    /// <para>
+    /// And it falls to 56 the same way again, on a pass that cut twenty-four bold sentences
+    /// back to their lead and was not looking for these at all. Three passes now, same
+    /// direction, which is what says the two debts come off together.
+    /// </para>
     /// </remarks>
-    private const int Opened = 59;
+    private const int Opened = 56;
 
     /// <summary>
     /// The commit the decay schedule counts from. <b>John's, 2026-08-13.</b>

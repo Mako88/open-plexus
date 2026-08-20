@@ -32,6 +32,7 @@ public sealed class Categories
 {
     private readonly List<IReadOnlySet<Code>> _groups = [];
     private readonly Dictionary<Code, Code> _coarser = [];
+    private readonly HashSet<Code> _known = [];
 
     /// <param name="groups">
     /// Sets of codes that are alternatives. <b>Derived by <see cref="Alternating.From"/> or
@@ -39,26 +40,64 @@ public sealed class Categories
     /// what a grid using this is measuring.
     /// </param>
     /// <remarks>
-    /// <b>A code belongs to at most one category</b>, and the first group to claim it keeps
-    /// it. <see cref="Alternating.From"/> returns disjoint groups by construction, so
-    /// this only fires on a hand-written table — and a code with two coarser forms would
-    /// make <see cref="Coarser"/> a choice rather than a lookup, which is a decision hiding
-    /// in what was meant to be an alphabet.
+    /// <b>A code has at most one coarser form</b>, and the first group to claim it keeps it,
+    /// because a code with two would make <see cref="Coarser"/> a choice rather than a lookup
+    /// — a decision hiding in what was meant to be an alphabet. It was written when that
+    /// could only fire on a hand-written table, <see cref="Alternating.From"/> returning
+    /// disjoint groups by construction. <see cref="Learn"/> makes it ordinary: a group that
+    /// grows arrives beside the group it grew out of, and its members are already claimed.
     /// </remarks>
     public Categories(IEnumerable<IReadOnlySet<Code>> groups)
     {
         ArgumentNullException.ThrowIfNull(groups);
 
-        foreach (var group in groups)
-        {
-            if (group.Count < 2) continue;
+        foreach (var group in groups) Learn(group);
+    }
 
-            var category = Joined.Category(group);
+    /// <summary>Takes a group of alternatives, and never gives one back.</summary>
+    /// <param name="group">The codes that are alternatives.</param>
+    /// <returns>Whether it was one this did not already carry.</returns>
+    /// <remarks>
+    /// <para>
+    /// Add-only, and it is the same rule repair runs under one level up. A category's name IS
+    /// its members, so a group that has grown is a different code from the group it grew out
+    /// of — editing the group in place would rename it and orphan every scope that had been
+    /// written over the old name. So the wider group arrives BESIDE the narrower one and both
+    /// stay, in the way a repair adds a narrower commitment and never edits its parent.
+    /// </para>
+    /// <para>
+    /// Both are then in the moment, because <see cref="Folded"/> reads every group it holds.
+    /// So a scope may be written over either and the ordinary evidence decides between them,
+    /// which is where a decision about which name is right belongs — subsumption already
+    /// keeps the general one where the two are equally accurate.
+    /// </para>
+    /// <para>
+    /// What it costs is vocabulary. A group that fills gradually mints a category at every
+    /// size it passes through, so a run reports how many categories it holds beside whatever
+    /// else it reports. That count is the arm's own refutation if it grows without paying.
+    /// </para>
+    /// <para>
+    /// A member keeps the first category to claim it, which is what
+    /// <see cref="Coarser"/> being a lookup rather than a choice requires. The earliest is the
+    /// one with the most evidence behind it by the time anything asks, and the wider name is
+    /// still reachable because the moment carries it.
+    /// </para>
+    /// </remarks>
+    public bool Learn(IReadOnlySet<Code> group)
+    {
+        ArgumentNullException.ThrowIfNull(group);
 
-            _groups.Add(group);
+        if (group.Count < 2) return false;
 
-            foreach (var member in group) _coarser.TryAdd(member, category);
-        }
+        var category = Joined.Category(group);
+
+        if (!_known.Add(category)) return false;
+
+        _groups.Add(group);
+
+        foreach (var member in group) _coarser.TryAdd(member, category);
+
+        return true;
     }
 
     /// <summary>How many categories are carried.</summary>

@@ -90,9 +90,16 @@ public sealed class ReturningTests(ITestOutputHelper output)
     /// groups would agree — but a rewrite reading a vocabulary the front end is not folding
     /// mints rules that can never fire, and nothing downstream would report it.
     /// </remarks>
+    /// <param name="deriving">
+    /// Whether the front end fills <paramref name="categories"/> as it goes rather than
+    /// reading one already full. <b>A third axis</b>, and the one that says whether a
+    /// vocabulary has to be an experimenter's: it crosses the first because a vocabulary can
+    /// be handed over full, filled live, or absent.
+    /// </param>
     private (double Exam, int Held) Cell(
         ReturningSettings settings, string label,
-        Categories? categories = null, Coarsening coarsening = Coarsening.Never, int seed = 1)
+        Categories? categories = null, Coarsening coarsening = Coarsening.Never, int seed = 1,
+        bool deriving = false)
     {
         var world = new Returning(settings, seed: seed);
 
@@ -101,9 +108,17 @@ public sealed class ReturningTests(ITestOutputHelper output)
 
         brain.Held.Sorts = categories;
 
+        // The derivation goes UNDER the fold, so what it counts is what the world sent and
+        // never a category it put there itself. The same object both times, which is what
+        // the remark above is about.
         IQuantizer<Coded> front = categories is null
             ? new Passthrough()
-            : new Sorted<Coded>(new Passthrough(), categories);
+            : new Sorted<Coded>(
+                deriving
+                    ? new Deriving<Coded>(
+                        new Passthrough(), categories, adhesion: 1.5, floor: 20, every: 250)
+                    : new Passthrough(),
+                categories);
 
         var tally = new Bench(new Watching<Coded>(world, front), brain)
             .Run(Rounds, sweep: 1000, target: 0.95, window: 2000);
@@ -113,7 +128,8 @@ public sealed class ReturningTests(ITestOutputHelper output)
         output.WriteLine(
             $"{label,-34}| exam {exam:F3} | own {tally.Recent:F3} "
             + $"| appearance reaches {world.Appearance:F2} "
-            + $"| held {brain.Held.Count,4}");
+            + $"| held {brain.Held.Count,4}"
+            + $"| categories {categories?.Count ?? 0,3}");
 
         return (exam, brain.Held.Count);
     }
@@ -912,5 +928,117 @@ public sealed class ReturningTests(ITestOutputHelper output)
                     : $"modality {one} holds from {settled[one]} of {stream.Count} sightings");
 
         Assert.DoesNotContain(settled, one => one.Value < 0);
+    }
+
+    /// <summary>
+    /// Whether a vocabulary the front end fills as it goes reaches what one derived off the
+    /// stream beforehand reaches.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Every category reading in this file so far was taken on a vocabulary derived over a
+    /// separate stream and handed in full before the run started. That is an experimenter's
+    /// object, and the honest version of it is a front end that finds its own groups from
+    /// what it emits, puts them in a store that only ever grows, and is never renamed.
+    /// </para>
+    /// <para>
+    /// The bar is the offline vocabulary, and it is a containment rather than a score. A live
+    /// derivation sees five times the sightings the offline one does, so it must find at
+    /// least what the offline one found — a group it fails to reach is a group the cadence or
+    /// the growth rule lost, and no accuracy could tell that from a group the population
+    /// failed to use.
+    /// </para>
+    /// <para>
+    /// And the count of categories is the other half, because add-only has an obvious way to
+    /// look good. A group that fills gradually mints a category at every size it passes
+    /// through, so a live store holding many times the offline one has bought its containment
+    /// with vocabulary. Both numbers or neither.
+    /// </para>
+    /// <para>
+    /// It derives from the examination moments too, and that is deliberate rather than a
+    /// leak. The front end never sees an answer; what it counts is which codes turned up near
+    /// which, which is exactly the unsupervised structure a live brain would be reading from
+    /// its own stream. C4 constrains the learner and a boundary it cannot detect is one it
+    /// does not have.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_a_vocabulary_filled_while_the_stream_runs_reaches_the_one_handed_over()
+    {
+        const double Adhesion = 1.5;
+        const int Seeds = 8;
+
+        var missed = new List<int>();
+        var swell = new List<double>();
+        var rules = new List<double>();
+
+        // Kept per row rather than pooled, because three of the cells sit at 1.000 both ways
+        // and folding them in drags any real difference toward nought while shrinking the
+        // spread that would have said so.
+        var gap = new Dictionary<double, List<double>>();
+
+        // Two rows, because the first cell this was read on sits at 1.000 both ways and a
+        // score at its ceiling cannot rank anything. Where the things drift, appearance stops
+        // answering and the exam has somewhere to move.
+        foreach (var drifting in new[] { 0.0, 0.02 })
+        foreach (var seed in Enumerable.Range(1, Seeds))
+        {
+            var running = World(
+                twinned: true, tagged: false, placed: true, wandering: 0.8, drifting: drifting);
+
+            var offline = new Categories(
+                Alternating.Over(Watched(running, seed), Adhesion, floor: 20, span: 1));
+
+            var live = new Categories([]);
+
+            var handed = Cell(
+                running, $"drift {drifting}, seed {seed}, handed over", offline,
+                Coarsening.Judged, seed);
+
+            var filled = Cell(
+                running, "  filled while it ran", live, Coarsening.Judged, seed, deriving: true);
+
+            // Containment on the GROUPS rather than on the count, because two stores of one
+            // size need not hold the same thing and a count cannot say.
+            var reached = live.Groups.Select(one => Shape([one])).ToHashSet();
+            var wanted = offline.Groups.Select(one => Shape([one])).ToList();
+            var lost = wanted.Count(one => !reached.Contains(one));
+
+            missed.Add(lost);
+            swell.Add(offline.Count == 0 ? 0.0 : live.Count / (double)offline.Count);
+            if (!gap.TryGetValue(drifting, out var row)) gap[drifting] = row = [];
+
+            row.Add(filled.Exam - handed.Exam);
+            rules.Add(handed.Held == 0 ? 0.0 : filled.Held / (double)handed.Held);
+
+            output.WriteLine(
+                $"  offline {offline.Count} groups, live {live.Count}, "
+                + $"{lost} of the offline groups never reached, "
+                + $"exam {filled.Exam - handed.Exam:+0.000;-0.000}");
+        }
+
+        output.WriteLine(
+            $"missed {Sweep.Spread(missed.Select(one => (double)one).ToList(), "F1")} | "
+            + $"vocabulary {Sweep.Spread(swell, "F2")}x | population {Sweep.Spread(rules, "F2")}x");
+
+        foreach (var (drifting, row) in gap.OrderBy(one => one.Key))
+            output.WriteLine($"drift {drifting}: exam {Sweep.Spread(row, "F3")} filled over handed");
+
+        // THE BAR, and it was written before the run. A live derivation that cannot reach
+        // what an offline one reached over a fifth of the sightings has lost groups to the
+        // cadence or to the growth rule, and the arm dies rather than being tuned.
+        Assert.True(missed.Sum() == 0,
+            $"{missed.Sum()} of the offline groups were never reached live across {Seeds} "
+            + "seeds, so filling the store as the stream runs finds less than deriving off it "
+            + "afterwards does -- and a vocabulary that is worse than the experimenter's is "
+            + "the thing this arm exists to not be");
+
+        // And the other half, because containment bought with vocabulary is not containment.
+        // No bar on the ratio: what add-only costs has never been measured and a threshold
+        // written before the first reading would be the answer rather than the finding.
+        Assert.True(swell.Average() >= 1.0,
+            $"the live store held {swell.Average():F2}x the offline one while reaching all of "
+            + "it, which is fewer groups for the same content and means the two are not "
+            + "counting the same thing");
     }
 }

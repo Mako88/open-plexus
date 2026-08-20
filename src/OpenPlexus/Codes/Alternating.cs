@@ -406,6 +406,101 @@ public sealed class Alternating
 }
 
 /// <summary>
+/// Another front end, deriving its own vocabulary of alternatives from what it emits.
+/// </summary>
+/// <typeparam name="TObservation">What the world hands over.</typeparam>
+/// <remarks>
+/// <para>
+/// <b>The half of the answer the store could not give.</b> A vocabulary derived once over a
+/// stream and handed in is an experimenter's, and the plan's entry against it is that
+/// re-deriving orphans every scope written over a category. This derives while the stream
+/// runs and puts what it finds into a <see cref="Categories"/> that only ever grows, so
+/// nothing is ever renamed and no scope is ever orphaned.
+/// </para>
+/// <para>
+/// <b>It derives and never folds</b>, which is why it is a second decorator rather than a
+/// setting on <see cref="Sorted{TObservation}"/>. Deriving a vocabulary and reading one are
+/// two axes, and a grid crossing them is what says which of the two a cell is measuring —
+/// a handed vocabulary that is also folded would move both at once.
+/// </para>
+/// <para>
+/// <b>So the two compose over one store</b>, the derivation underneath and the fold above:
+/// <c>new Sorted(new Deriving(inner, held, ...), held)</c>. The same object both times, since
+/// a category the front end folds and one the brain may rewrite over have to be the same code.
+/// </para>
+/// <para>
+/// <b>The codes it watches are the inner ones</b> and never the folded ones. A category
+/// entering the moment would then be company for its own members and evidence for the next
+/// derivation, which is a name reached by inference being written back as a partner — the
+/// arrangement that broke two controls on <c>Rhythm</c>.
+/// </para>
+/// </remarks>
+/// <param name="inner">The front end this wraps.</param>
+/// <param name="held">The vocabulary to fill, which is the one the fold and the brain read.</param>
+/// <param name="adhesion">
+/// <inheritdoc cref="Alternating.Over" path="/param[@name='adhesion']"/>
+/// </param>
+/// <param name="floor">
+/// <inheritdoc cref="Alternating.From" path="/param[@name='floor']"/>
+/// </param>
+/// <param name="every">
+/// How many observations between derivations. <b>A cost rather than a bar</b> — the grouping
+/// is a pure function of the counts, so this decides how soon a group is noticed and never
+/// which groups exist. It is stated because a periodic sweep whose cadence is implicit runs
+/// at whatever rate its condition does, which is a trap this repo has already paid for.
+/// </param>
+/// <param name="span">
+/// <inheritdoc cref="Alternating(int)" path="/param[@name='span']"/>
+/// </param>
+public sealed class Deriving<TObservation>(
+    IQuantizer<TObservation> inner,
+    Categories held,
+    double adhesion,
+    int floor,
+    int every,
+    int span = 1)
+    : IQuantizer<TObservation>
+{
+    private readonly Alternating _watching = new(span);
+
+    private long _seen;
+
+    /// <summary>How many groups have been learnt.</summary>
+    public int Learnt => held.Count;
+
+    /// <inheritdoc/>
+    public byte Modality => inner.Modality;
+
+    /// <inheritdoc/>
+    public IReadOnlyCollection<Code> Codify(TObservation observation)
+    {
+        var codes = inner.Codify(observation);
+
+        _watching.Watch(new HashSet<Code>(codes));
+
+        // Counted here rather than inside the derivation, so the cadence is a rate over
+        // observations and not over whatever else might have been true.
+        if (++_seen % every == 0)
+            foreach (var group in _watching.ByTime(adhesion, floor))
+                held.Learn(group);
+
+        return codes;
+    }
+
+    /// <inheritdoc/>
+    public IReadOnlyDictionary<Code, int>? Bind(TObservation observation) => inner.Bind(observation);
+
+    /// <inheritdoc/>
+    public IReadOnlyDictionary<Code, int>? Order(TObservation observation) => inner.Order(observation);
+
+    /// <inheritdoc/>
+    public IReadOnlySet<Code>? Fleeting(TObservation observation) => inner.Fleeting(observation);
+
+    /// <inheritdoc/>
+    public IReadOnlySet<Code>? Forced(TObservation observation) => inner.Forced(observation);
+}
+
+/// <summary>
 /// Another front end, with a code added for every category any of whose members is in the
 /// moment — <b>the ANY fold, which is what makes a category not a name.</b>
 /// </summary>

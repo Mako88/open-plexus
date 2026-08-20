@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using OpenPlexus.Bus;
 using OpenPlexus.Codes;
@@ -138,6 +138,12 @@ public sealed class AskedTests(ITestOutputHelper output)
             // parent a different child per attempt and the population it leaves has
             // nothing in common with the one these counts were written against.
             Forking = Forking.Repeated,
+
+            // And the root, for the same reason and one dial further out. This file's baseline
+            // is what the WHOLE population names, and genesis minting the moment as a scope
+            // leaves it with nothing left to name -- so the number every merge is read against
+            // disappears. What splitting costs is the question; the root is not.
+            Rooting = Rooting.Singly,
         };
         var brain = new Brain(dials, Subject);
 

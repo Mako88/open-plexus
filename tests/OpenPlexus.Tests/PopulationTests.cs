@@ -341,6 +341,36 @@ public sealed class PopulationTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// <b>And the wide root mints the same ones</b>, and the whole moment beside them.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The arm above pins the narrow root, so this is what says the pin is a pin rather than
+    /// a synonym for the default. Both roots mint one commitment a live code; the wide one
+    /// adds a single scope over all of them, which is the conjunction a told statement states
+    /// rather than one discovered by failing.
+    /// </para>
+    /// <para>
+    /// <b>And a second call mints nothing under either.</b> The whole-moment scope is one
+    /// commitment with one identity, so proposing it again reaches a shape already held —
+    /// which is what makes it dead weight on a world whose moments never repeat and free on
+    /// one where they do.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_wide_root_mints_a_scope_over_the_whole_moment_beside_the_single_codes()
+    {
+        var held = Varied(new CommittingSettings { Rooting = Rooting.Wholly }, 1, 2, 3);
+
+        Assert.Equal(4, held.Genesis(Moment(1, 2, 3), Says(1), []));
+        Assert.Equal(4, held.Count);
+        Assert.Equal(0, held.Genesis(Moment(1, 2, 3), Says(1), []));
+
+        Assert.Equal(3, held.All.Count(one => one.Scope.Length == 1));
+        Assert.Single(held.All, one => one.Scope.Length == 3);
+    }
+
+    /// <summary>
     /// <b>A failure the population already had an account of is not surprising.</b>
     /// </summary>
     /// <remarks>
@@ -354,7 +384,8 @@ public sealed class PopulationTests(ITestOutputHelper output)
     {
         foreach (var rule in new[] { Surprising.Unaccounted, Surprising.AnyFailure })
         {
-            var held = Varied(new CommittingSettings { Surprising = rule }, 1, 2, 3);
+            var held = Varied(
+                new CommittingSettings { Surprising = rule, Rooting = Rooting.Singly }, 1, 2, 3);
 
             // ONE COMMITMENT THAT PROPOSES OUTCOME 1, and a moment where it fires.
             held.Add(One(1, 1));
@@ -480,5 +511,14 @@ public sealed class PopulationTests(ITestOutputHelper output)
         return held;
     }
 
-    private static Population Varied(params ulong[] codes) => Varied(new CommittingSettings(), codes);
+    /// <summary>A population that has seen these codes and seen them absent.</summary>
+    /// <param name="codes">What to witness.</param>
+    /// <remarks>
+    /// <b>The root is PINNED rather than inherited</b>, because two tests here count what
+    /// genesis mints and the wide root mints one more. A fixture inheriting a dial it counts
+    /// is a moving default rewriting an experiment nobody edited, which is a trap this repo
+    /// keeps a line for.
+    /// </remarks>
+    private static Population Varied(params ulong[] codes) =>
+        Varied(new CommittingSettings { Rooting = Rooting.Singly }, codes);
 }

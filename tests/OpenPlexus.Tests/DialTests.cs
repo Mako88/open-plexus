@@ -97,24 +97,24 @@ public sealed class DialTests
             + "leaves when the bar is priced against how young a population is",
 
         ["Crediting"] =
-            "whether a mint is credited with the round that made it, and the reason "
-            + "it is an ARM has changed. It reproduces on drawn lessons, leading "
-            + "while the arms are still apart; on the multiplexer and on Monk-1 it "
-            + "moves nothing at all, because crediting a mint is about a statement "
-            + "being TOLD and neither world tells anything. So it has two worlds' "
-            + "evidence and neither can see it. The entry leaves on a world with a "
-            + "crowded outcome space, where every one-code mint arriving at a "
-            + "perfect accuracy together is what it risks",
+            "whether a mint is credited with the round that made it, and it has had "
+            + "its generated world. What came back is not a win: it CONVERTS a tie "
+            + "into an outranking for the identical score, the newest mint being "
+            + "the strongest because the older ones have fired and missed since. It "
+            + "breaks a tie by recency, which is not correctness, and the risk its "
+            + "own remark named -- every mint arriving at the ceiling together -- "
+            + "does not happen, because the population is built while it is told. "
+            + "The entry leaves when something separates two blank rules",
 
         ["Rooting"] =
             "how wide a scope genesis may mint, and it is an ARM rather than a "
             + "level -- there is no third value between one code and the whole "
-            + "moment. The wide one wins on the conversation and on drawn lessons, "
+            + "moment. The wide one is now the DEFAULT: it wins on drawn lessons, "
             + "reaching at three tellings what one code a commitment does not reach "
-            + "at eight; on the multiplexer and on Monk-1 it moves nothing, a whole "
-            + "moment being a scope worth minting only where the moment is a "
-            + "statement. The entry leaves on a world that is not told and where a "
-            + "moment is still worth minting whole",
+            + "at eight, and is a draw on `Arranged` seed for seed. `Singly` stays "
+            + "as the control, because the wide arm mints everything it mints and "
+            + "one scope besides -- three grids pin it to keep a baseline that "
+            + "scope removes. The entry leaves when nothing needs the baseline",
 
         // ---- Arrived with the commitment branch ----------------------------
 
@@ -602,12 +602,24 @@ public sealed class DialTests
         // nowhere else; crediting turns a tie into an outranking for the identical score; the
         // three arms together answer a paper never sat, told once.
         //
-        // What stops them shipping is named work rather than a preference. Flipping the root
-        // was tried and reverted in one session: it hands genesis a sound multiplexer rule, so
-        // `StepOneTests`' `blind.Sound` -- the assertion that says REPAIR did the learning
-        // rather than genesis -- goes from nought to one. Re-taking that faithfully wants
-        // sound-by-BIRTH, which nothing reports. A guard must not cost information, and
-        // weakening that one to afford a default would.
+        // What stopped the root shipping was named work rather than a preference, and the work
+        // is done. Flipping it hands genesis a sound multiplexer rule, so `StepOneTests`'
+        // `blind.Sound` -- the assertion that says REPAIR did the learning rather than genesis
+        // -- went from nought to one. `Population.Births` records the operator per commitment
+        // and the assertion now says what it always meant, so the root is the default and
+        // `Rooting` leaves this budget.
+        //
+        // And the count does NOT fall with it, which is the honest bookkeeping. `Rooting` is
+        // still a dial nothing drives; what changed is which arm is the default. `Singly` is
+        // not deleted because `Wholly` mints everything it mints and one scope besides -- so
+        // the narrow arm is the control that says what the extra scope costs, and three grids
+        // pin it by name to keep a baseline that scope removes. An arm pinned in three grids
+        // is compared rather than parked.
+        //
+        // `Crediting` stays and its entry is rewritten. It has had its generated world and
+        // what came back is not a win: it CONVERTS a tie into an outranking for the identical
+        // score, the newest mint being the strongest because the older ones have missed since.
+        // Breaking a tie by recency is not breaking it by correctness.
         Assert.Equal(16, HandSet.Count);
     }
 

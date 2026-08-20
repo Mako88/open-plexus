@@ -480,12 +480,19 @@ public sealed class DocsTests
     // correctness. And the three arms together answer a paper never sat, told once, on eight
     // drawn lessons rather than on the one hand-written text that reading came from.
     //
-    // The blocker is why neither default moves and it is work rather than an opinion. The wide
-    // root hands genesis a sound multiplexer rule, and `blind.Sound` reading nought is what
-    // says repair rather than genesis did the learning -- the single most load-bearing
-    // assertion in step one. Re-taking it faithfully wants sound-by-BIRTH, which no instrument
-    // reports, and re-taking it any other way would trade a sharp claim for a weak one.
-    private const int Whole = 12_400;
+    // The blocker was why neither default moved and it was work rather than an opinion. The
+    // wide root hands genesis a sound multiplexer rule, and `blind.Sound` reading nought is
+    // what says repair rather than genesis did the learning -- the single most load-bearing
+    // assertion in step one. Re-taking it faithfully wanted sound-by-BIRTH, and re-taking it
+    // any other way would have traded a sharp claim for a weak one.
+    //
+    // And 12,431 is the forty-sixth raise, thirty-one words, for that blocker being built and
+    // the root shipping. `Population.Births` records the operator per commitment, so the
+    // assertion now says what it always meant: random-Z learns nothing sound, and the sound
+    // rules the blind arm holds were handed to it by genesis. Lineage attribution was tried
+    // first and is not sharp enough -- repair grows children to the width of the moment, so
+    // the whole-moment scope shares its entry with them.
+    private const int Whole = 12_431;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -132,6 +132,13 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
             // precondition is a population with something left to name, and every dial
             // deciding what repair builds moves it.
             Forking = Forking.Repeated,
+
+            // And the root, which is the same reason one dial further out. Genesis minting the
+            // whole moment beside the single codes puts a scope in the population that no
+            // repair built, and the whole population then names nothing left to name -- so the
+            // baseline this file measures every split against goes away. What is being asked
+            // here is what SPLITTING costs, and the root is not that question.
+            Rooting = Rooting.Singly,
         };
         var brain = new Brain(dials, Subject);
 

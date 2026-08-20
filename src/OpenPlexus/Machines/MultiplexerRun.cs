@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 
@@ -17,6 +17,28 @@ public sealed record Learned
 
     /// <summary>Experienced commitments that are true of the world, in any basis.</summary>
     public required int Sound { get; init; }
+
+    /// <summary>
+    /// Of those, how many belong to a shape REPAIR has ever produced.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>What <see cref="Sound"/> was standing in for</b>, and the two are the same number
+    /// only while genesis mints one code at a time. A one-code scope cannot be true of this
+    /// world, so under that root every sound rule came from repair and counting the
+    /// population answered a question about the operator. Let genesis mint a wider scope and
+    /// the two come apart — the whole moment decides the multiplexer, so genesis hands over a
+    /// sound rule having learnt nothing.
+    /// </para>
+    /// <para>
+    /// <b>Attributed per commitment</b>, by
+    /// <see cref="Commitments.Population.Births"/>. Lineage attribution was tried first and is
+    /// not sharp enough: a lineage is keyed by expectation and DEPTH, and repair grows children
+    /// to the width of the moment — so the whole-moment scope genesis minted shares its entry
+    /// with repair's own children and reads as repair's work.
+    /// </para>
+    /// </remarks>
+    public required int SoundByRepair { get; init; }
 
     /// <summary>Experienced commitments that are not.</summary>
     public required int Unsound { get; init; }
@@ -195,13 +217,21 @@ public sealed record Learned
         ArgumentNullException.ThrowIfNull(checkable);
         ArgumentNullException.ThrowIfNull(sound);
 
+        var births = held.Births;
+
         var experienced = held.All
             .Where(one => one.Seen >= floor)
-            .Select(one => (Scope: held.Names.Unfold(one.Scope), one.Expects))
+            .Select(one => (
+                Scope: held.Names.Unfold(one.Scope),
+                one.Expects,
+                Repaired: births.TryGetValue(one.Identity, out var how)
+                    && how is Commitments.Birth.Repaired))
             .ToList();
 
         var decidable = experienced.Where(one => checkable(one.Scope)).ToList();
         var true_ = decidable.Count(one => sound(one.Scope, one.Expects));
+
+        var repaired = decidable.Count(one => one.Repaired && sound(one.Scope, one.Expects));
 
         // One drop at a time and not every subset, which is the cheap half and the only half
         // that matters. If any shorter sound rule is contained at all then some single drop
@@ -226,6 +256,7 @@ public sealed record Learned
         {
             Tally = tally,
             Sound = true_,
+            SoundByRepair = repaired,
             Overshot = overshot,
             Unsound = decidable.Count - true_,
             Unchecked = experienced.Count - decidable.Count,

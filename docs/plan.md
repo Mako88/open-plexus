@@ -456,9 +456,11 @@ before six that reads as tuning is out of order.
       recency, which is not correctness.
     - **NOW** — and the three together answer a paper never sat, told once, on drawn lessons
       rather than on the one written text. The wide root, credited mints, every word claimed.
-    - **OPEN** — so neither ships, because the wide root hands genesis a sound multiplexer rule
-      and `blind.Sound` is what says repair did the learning. That instrument owes a
-      sound-by-BIRTH split before either default may move.
+    - **NOW** — the wide root SHIPS, its blocker built. `blind.Sound` was standing in for what
+      repair produced, which is exact now that `Births` records the operator per commitment:
+      random-Z still learns nothing sound, and the sound rules it holds were genesis's.
+    - **OPEN** — crediting does not ship, having no reading that is not recency. Whether
+      anything separates two blank rules is the seat's remaining half.
     - **NOW** — `Alternating` is live and its store add-only, so a front end fills its OWN
       vocabulary, reaching every group the experimenter's holds for no score.
     - **OPEN** — it costs 4.7x the rules. Nothing waits for a group to hold still, and the

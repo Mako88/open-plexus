@@ -1,4 +1,4 @@
-using OpenPlexus.Machines;
+﻿using OpenPlexus.Machines;
 using OpenPlexus.Commitments;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -89,18 +89,119 @@ public sealed class StepOneTests(ITestOutputHelper output)
             var blind = Run(address: 2, choosing: Choosing.Present, seed);
 
             output.WriteLine(
-                $"seed={seed} gated={gated.Recent:F3}/{gated.Sound} "
-                + $"blind={blind.Recent:F3}/{blind.Sound}");
+                $"seed={seed} gated={gated.Recent:F3}/{gated.Sound}/{gated.SoundByRepair} "
+                + $"blind={blind.Recent:F3}/{blind.Sound}/{blind.SoundByRepair}");
 
             if (gated.Recent > blind.Recent) beaten++;
 
             // AND THE SHARPER STATEMENT: the blind arm never learns a rule that is
-            // TRUE. It is not merely behind on score -- it holds nothing sound at
-            // all, at any budget, while minting far more than the gated arm does.
-            Assert.Equal(0, blind.Sound);
+            // TRUE. It is not merely behind on score -- REPAIR gives it nothing sound
+            // at all, at any budget, while minting far more than the gated arm does.
+            //
+            // Read off what repair produced rather than off the population, which is
+            // what this always meant. A one-code scope cannot be true of this world, so
+            // while genesis mints one code at a time the two are the same number and
+            // counting the population answered a question about the operator. They come
+            // apart the moment genesis may mint a wider scope: the whole moment decides
+            // the multiplexer, so a wide root hands over a sound rule having learnt
+            // nothing, and this assertion would read as repair working.
+            Assert.Equal(0, blind.SoundByRepair);
         }
 
         Assert.Equal(5, beaten);
+    }
+
+    /// <summary>
+    /// <b>What the wide root costs rung five</b>, which is the only rung that broadens.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Two files had to pin the narrow root to keep their baseline, because under the wide one
+    /// the whole population names nothing at all — and that is a reading rather than a fixture
+    /// problem. Rung five's trigger is REDUNDANCY: it looks for a sub-scope several
+    /// commitments share and rewrites them in terms of it. Genesis minting the conjunction
+    /// outright is one commitment where repair would have built a family, so there may be no
+    /// family left to share anything.
+    /// </para>
+    /// <para>
+    /// <b>Which would be a cost worth refusing a default over.</b> A specialise-only machine
+    /// is arbitrarily accurate and conceptless, and rung five is the whole of the answer to
+    /// that — so a root that pays on the conversation and starves the one broadening operator
+    /// is not a trade this project may take quietly.
+    /// </para>
+    /// <para>
+    /// <b>The kill line, written before the grid ran</b>: the wide root dies as a default if
+    /// it names fewer than the narrow one does.
+    /// </para>
+    /// <para>
+    /// <b>And the answer is a NULL</b>, which is said here rather than left to be read as a
+    /// pass. Rung five names about a third of a name a run on this world, under either
+    /// root, so what the grid establishes is that the wide root does not starve it HERE and
+    /// nothing more. The two files that had to pin the narrow root build their populations on
+    /// a sparse repair budget precisely to leave something nameable, and that is where the
+    /// reading with teeth would be taken — against <c>SplitNamingTests</c>' own dials rather
+    /// than against a world where the operator barely fires.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_the_wide_root_costs_the_one_rung_that_broadens()
+    {
+        var named = new Dictionary<Rooting, List<int>>
+        {
+            [Rooting.Singly] = [], [Rooting.Wholly] = [],
+        };
+
+        var stacked = new Dictionary<Rooting, List<int>>
+        {
+            [Rooting.Singly] = [], [Rooting.Wholly] = [],
+        };
+
+        // The denominator beside the count, which `CheckingTests` bars printing without. An
+        // absolute name count is capped by the sweep calendar as much as by the gate, so two
+        // cells reporting the same number can be reporting it for opposite reasons.
+        output.WriteLine(
+            $"{"root",-8}{"seed",-6}{"named",8}{"stacked",9}{"eligible",10}"
+            + $"{"per",12}{"sound",8}");
+
+        foreach (var rooting in new[] { Rooting.Singly, Rooting.Wholly })
+        foreach (var seed in new[] { 1, 2, 3 })
+        {
+            var ran = new MultiplexerRun(
+                new MultiplexerSettings { Address = 2 },
+                new Brain(new CommittingSettings { Rooting = rooting }, seed),
+                seed).Run(Rounds);
+
+            named[rooting].Add(ran.Named);
+            stacked[rooting].Add(ran.Stacked);
+
+            output.WriteLine(
+                $"{rooting.ToString().ToLowerInvariant(),-8}{seed,-6}{ran.Named,8}"
+                + $"{ran.Stacked,9}{ran.Tally.Eligible,10}{ran.Tally.PerEligible,12:F3}"
+                + $"{ran.Sound,8}");
+        }
+
+        output.WriteLine(
+            $"singly named {named[Rooting.Singly].Average():F1}, wholly "
+            + $"{named[Rooting.Wholly].Average():F1}");
+
+        // The kill line. A default is being decided on this, so what is asserted is the thing
+        // that would stop it.
+        Assert.True(
+            named[Rooting.Wholly].Average() >= named[Rooting.Singly].Average(),
+            $"the wide root named {named[Rooting.Wholly].Average():F1} against "
+            + $"{named[Rooting.Singly].Average():F1} for the narrow one, so stating the "
+            + "conjunction starves the one operator that broadens and the root may not ship");
+
+        // And the null is asserted as a null. A comparison where both arms are near nought is
+        // a check that cannot fire, and this repo has a line about one of those reading exactly
+        // like a check that passes -- so the level is barred rather than described, and this
+        // goes red the day the multiplexer starts naming enough for the line above to mean
+        // something. That is the day to take the reading somewhere it has teeth.
+        Assert.True(
+            named[Rooting.Singly].Average() < 1.0 && stacked[Rooting.Singly].Average() == 0.0,
+            $"rung five now names {named[Rooting.Singly].Average():F1} and stacks "
+            + $"{stacked[Rooting.Singly].Average():F1} on this world, so the comparison above "
+            + "has stopped being a null and is worth reading as a comparison");
     }
 
     [Fact]
@@ -137,7 +238,7 @@ public sealed class StepOneTests(ITestOutputHelper output)
         // against 378, where the bar below was written when the gated arm held about
         // thirty. Repair's choice of condition passes its own kill condition by more
         // under a search than it did under a re-derivation.
-        Assert.Equal(0, blind.Sound);
+        Assert.Equal(0, blind.SoundByRepair);
         Assert.True(gated.Sound > 20, $"only {gated.Sound} sound commitments");
     }
 

@@ -657,7 +657,7 @@ public sealed record CommittingSettings
     /// <b>Singly is the control and is every earlier reading.</b> See <see cref="Rooting"/> for
     /// what the wide arm is for and where it is dead weight.
     /// </remarks>
-    public Rooting Rooting { get; init; } = Rooting.Singly;
+    public Rooting Rooting { get; init; } = Rooting.Wholly;
 
     /// <summary>Whether a mint is credited with the round that minted it.</summary>
     /// <remarks>

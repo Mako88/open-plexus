@@ -454,6 +454,9 @@ public sealed class Population
     /// <inheritdoc cref="Lifetime"/>
     private readonly Dictionary<(Code Expects, int Depth), Lifetime> _lineage = [];
 
+    /// <inheritdoc cref="Births"/>
+    private readonly Dictionary<Code, Birth> _born = [];
+
     /// <summary>
     /// Which holder a commitment sits on, or nothing while everything is in one place.
     /// </summary>
@@ -612,11 +615,33 @@ public sealed class Population
     /// </remarks>
     public IReadOnlyDictionary<(Code Expects, int Depth), Lifetime> Lineages => _lineage;
 
+    /// <summary>Which operator minted each commitment now held.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>What <see cref="Lineages"/> cannot say</b>, and the difference decides a default. A
+    /// lineage is keyed by expectation and DEPTH, so a scope genesis minted whole and a child
+    /// repair grew to the same length are one entry — and asking whether repair produced a
+    /// given rule gets the answer <i>something of that shape came from repair</i>, which on
+    /// the multiplexer is the wrong answer to the right question.
+    /// </para>
+    /// <para>
+    /// <b>Held only for what is held</b>, so it is dropped when a commitment is. It is an
+    /// instrument rather than a mechanism: nothing in a round reads it, and a run that never
+    /// asks pays one dictionary write a mint.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyDictionary<Code, Birth> Births
+    {
+        get { lock (_gate) return new Dictionary<Code, Birth>(_born); }
+    }
+
     /// <summary>Notes that a commitment of this shape entered.</summary>
     /// <param name="commitment">What was added.</param>
     /// <param name="how">Which operator added it.</param>
     private void Born(Commitment commitment, Birth how)
     {
+        _born[commitment.Identity] = how;
+
         ref var life = ref CollectionsMarshal.GetValueRefOrAddDefault(
             _lineage, (commitment.Expects, commitment.Scope.Length), out _);
 
@@ -1749,6 +1774,12 @@ public sealed class Population
     private void Remove(Commitment commitment, Loss loss)
     {
         if (!_byName.Remove(commitment.Identity)) return;
+
+        // Bounded by what is held rather than by what has ever been held, which is the whole
+        // reason this is dropped here. A run mints tens of thousands against a capacity of a
+        // few thousand, so a ledger keeping every identity it ever saw would be an instrument
+        // costing more memory than the population it reports on.
+        _born.Remove(commitment.Identity);
 
         ref var life = ref CollectionsMarshal.GetValueRefOrAddDefault(
             _lineage, (commitment.Expects, commitment.Scope.Length), out _);

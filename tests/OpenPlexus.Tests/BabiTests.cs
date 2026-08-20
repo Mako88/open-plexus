@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
@@ -407,6 +407,12 @@ public sealed class BabiTests(ITestOutputHelper output)
             ["verbs"] = ["went", "moved", "journeyed", "travelled"],
         };
 
+        // The best each reading reached on each task, which is what the remark says decides
+        // it. Collected rather than eyeballed, because this file printed both readings for
+        // the life of the branch and asserted neither -- so the claim that one beats the
+        // other lived in a commit message and in nobody's build.
+        var best = new Dictionary<string, int>(StringComparer.Ordinal);
+
         foreach (var task in new[] { 1, 2, 3 })
         {
             var (moments, word) = Read(task);
@@ -451,6 +457,10 @@ public sealed class BabiTests(ITestOutputHelper output)
                         covered.GetValueOrDefault(touched[0].Key), group.Count);
                 }
 
+                var reach = key.Sum(one => covered.GetValueOrDefault(one.Key));
+
+                best[label] = Math.Max(best.GetValueOrDefault(label), reach);
+
                 output.WriteLine(
                     $" {label} | {at,-5:F2} | {groups.Count,6} | {judged,6} | {pure,4} | "
                     + string.Join(" ", key.Select(one =>
@@ -458,9 +468,22 @@ public sealed class BabiTests(ITestOutputHelper output)
             }
         }
 
-        // NO BAR. What either reading is worth across its range has never been measured, and
-        // a threshold written before the first grid would be the answer rather than the
-        // finding. The row that decides is the best PURE one of each reading.
+        // NO BAR ON A THRESHOLD, because what either reading is worth across its range was
+        // never measured and a number written before the first grid would be the answer
+        // rather than the finding. What IS asserted is the comparison the remark says
+        // decides it: the best pure row of each reading, and which of the two is higher.
+        //
+        // It is the reading rather than a prediction -- the weighed one reaches every class
+        // of the key and the set one reaches no place at any threshold on any task. Putting
+        // it here is what stops the claim living in a commit message alone.
+        output.WriteLine(
+            $"best covered: weighed {best["weighed"]}, a set {best["a set  "]}");
+
+        Assert.True(best["weighed"] > best["a set  "],
+            $"the weighed reading covers {best["weighed"]} of the key at its best row and "
+            + $"the bare set covers {best["a set  "]}, so the set is no longer the loser "
+            + "here. Fork 131 rests on weighed company taking text, and that is what this "
+            + "asserts -- re-read it before the fork's framing is trusted again");
     }
 
     /// <summary>One task as a stream of moments, and what word each code is.</summary>

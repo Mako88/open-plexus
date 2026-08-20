@@ -492,7 +492,12 @@ public sealed class DocsTests
     // rules the blind arm holds were handed to it by genesis. Lineage attribution was tried
     // first and is not sharp enough -- repair grows children to the width of the moment, so
     // the whole-moment scope shares its entry with them.
-    private const int Whole = 12_431;
+    // And down to 12,407, which is a fall and is written as one. The seat had grown to eight
+    // leaves in a session and four of them said one thing between them; what is left says the
+    // root ships, what crediting does instead, what the three do together, and which half is
+    // still open. A budget falling because an item was compacted rather than deleted is the
+    // only kind of fall this doc wants.
+    private const int Whole = 12_407;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

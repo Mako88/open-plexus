@@ -449,18 +449,16 @@ before six that reads as tuning is out of order.
       once the right rule TIES; told enough it is OUTRANKED; it is never ABSENT. `Seating`.
     - **NOW** — and no tie-break exists. Both sides of a tie are one weight, one scope length
       and one advocate, so specificity separates none of them and neither does a crowd.
-    - **OPEN** — the wide root closes the OUTRANKING under withheld claiming alone and leaves
-      every tie tied, a blank record tying whatever its scope.
+    - **NOW** — the wide root SHIPS, closing the OUTRANKING under withheld claiming. Its
+      blocker was `blind.Sound` standing in for what repair produced, and `Births` records the
+      operator per commitment so the assertion now says what it meant.
     - **NOW** — and crediting CONVERTS a tie into an outranking for the same score, the newest
-      mint being the strongest because the older ones have missed since. It breaks the tie by
-      recency, which is not correctness.
+      mint being strongest because the older ones have missed since. Recency is not
+      correctness, so it does not ship.
     - **NOW** — and the three together answer a paper never sat, told once, on drawn lessons
       rather than on the one written text. The wide root, credited mints, every word claimed.
-    - **NOW** — the wide root SHIPS, its blocker built. `blind.Sound` was standing in for what
-      repair produced, which is exact now that `Births` records the operator per commitment:
-      random-Z still learns nothing sound, and the sound rules it holds were genesis's.
-    - **OPEN** — crediting does not ship, having no reading that is not recency. Whether
-      anything separates two blank rules is the seat's remaining half.
+    - **OPEN** — so what separates two blank rules is the seat's remaining half, and neither
+      genesis nor matching is in the way: the scopes are minted, they fire, the score holds.
     - **NOW** — `Alternating` is live and its store add-only, so a front end fills its OWN
       vocabulary, reaching every group the experimenter's holds for no score.
     - **OPEN** — it costs 4.7x the rules. Nothing waits for a group to hold still, and the

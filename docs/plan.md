@@ -271,7 +271,8 @@ before six that reads as tuning is out of order.
       seen ball and a heard *ball* do.
     - **SETTLED** — the binding world failed and the block is lifted. Fork **25**.
     - **OPEN** — text as an IMAGE keeps ground truth enumerable, so soundness survives where a
-      camera kills it. `Senses` names cross two senses, and it GATES every sensor. Fork **107**.
+      camera kills it, and it GATES every sensor. `Lettering` draws a word and the front end's
+      ceiling is taken, so what is unbuilt is the world pushing both senses. Fork **107**.
     - **OPEN** — spreading a reading over its range costs most of the score at both front ends.
       Fork **38**.
     - **OPEN** — under ten dimensions there are too few distinct wirings for a projection to

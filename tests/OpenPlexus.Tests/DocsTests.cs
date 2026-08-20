@@ -525,7 +525,14 @@ public sealed class DocsTests
     // from the watched case; `Curiosity` reads the same vote, so on a world the machine ACTS
     // in a moment with nothing grounded has no claim to make and a third of the asks go. The
     // session is seventy-seven words down on where it started even so.
-    private const int Whole = 12_416;
+    // And 12,432 is the forty-eighth raise, sixteen words, for fork 107's ceiling being taken.
+    // A word drawn as pixels is the one crossing that keeps ground truth enumerable and the
+    // front end had never been priced on it, so the leaf could not say whether the fork was
+    // blocked there. It is not, and `LetteringTests` holds the numbers. The first draft of the
+    // leaf carried them and cost twenty-seven words more; `The_plan_looks_forward` caught it,
+    // correctly -- a finding lives in the commit and the test, and a doc that starts keeping
+    // them is the pile of docs this one replaced.
+    private const int Whole = 12_432;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

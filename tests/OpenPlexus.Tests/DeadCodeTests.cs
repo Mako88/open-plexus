@@ -64,7 +64,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     /// shown to whoever reads the output and free to be wrong forever. Each now has
     /// a test comparing it to something.</item>
     /// </list>
-    /// <b>The list being empty is not the point and should not become one.</b> A
+    /// <b>The list being empty is not the point</b> and should not become one. A
     /// written reason is a perfectly good outcome — "nobody has got to it yet"
     /// included. What is not allowed is silence, and what this file buys is that
     /// the next unwired mechanism arrives ALONE rather than among sixteen.
@@ -280,8 +280,8 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
 
     /// <summary>Public types the library never names, each with its reason.</summary>
     /// <remarks>
-    /// <b>Ten entry points and one orphan, which is the whole value of the
-    /// check.</b> A world's run exists for a harness to call, so a test IS its
+    /// <b>Ten entry points and one orphan</b>, which is the whole value of the
+    /// check. A world's run exists for a harness to call, so a test IS its
     /// caller and the library never naming it is correct. `Winnow` is not that: it
     /// is a mechanism, and a mechanism the library has never heard of is wired to
     /// nothing however thoroughly its own tests exercise it.
@@ -476,6 +476,17 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "population over it before those three were established would have produced a "
             + "number nobody could attribute. `HandingTests` is its caller.",
 
+        ["Lettering"] = "A SENSOR PRICED BEFORE ONE IS BUILT ON IT, which is fork 107's "
+            + "own instruction: the crossing that keeps ground truth enumerable is a word "
+            + "SEEN against a word read, and a front end has a ceiling computable with no "
+            + "learning. Something in `src` drawing words would mean the world had been "
+            + "built, when what the measurement is FOR is deciding whether it can be. "
+            + "`LetteringTests` reads it: sixteen words at one place probe at 1.000, the "
+            + "same words moved probe at 0.006 on their own pixels, and a shared codebook "
+            + "recovers 0.539 of them -- so the codes carry which word was drawn and the "
+            + "fork is not blocked at the front end. The day a world pushes these moments "
+            + "is the day it comes off.",
+
         ["Alternating"] = "A DERIVATION MEASURED BEFORE IT IS ADMITTED, on the same "
             + "footing as `Unifying`. It finds the groups of codes that are alternatives, "
             + "which is what a category would be minted over -- and something in `src` "
@@ -512,7 +523,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     /// <summary>Why a world's run is not named by the library.</summary>
     /// <summary>
     /// Everything still on this file's lists for the STRANDED reason — <b>the outstanding
-    /// item, in one place, so `OutstandingTests` and this file cannot disagree about it.</b>
+    /// item, in one place</b>, so `OutstandingTests` and this file cannot disagree about it.
     /// </summary>
     /// <remarks>
     /// <b>Derived rather than listed, which is the whole value.</b> An entry leaves by being
@@ -549,8 +560,8 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     /// Why a role in a deployment is not named by the library it is deployed from.
     /// </summary>
     /// <remarks>
-    /// <b>THE SAME REASON `Posted` carries, one layer up, and it replaced a better-known
-    /// one.</b> These two used to say <i>fork 52's transport is built and the learner is
+    /// <b>THE SAME REASON `Posted` carries, one layer up</b>, and it replaced a better-known
+    /// one. These two used to say <i>fork 52's transport is built and the learner is
     /// not on it</i>, which was the honest state and is exactly what this list is for.
     /// The learner is on it now, and what is left is not a gap: a library that constructed
     /// its own holders would be a library that had decided how many machines there are.
@@ -567,8 +578,8 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     /// What using a member actually looks like, as against merely spelling it.
     /// </summary>
     /// <remarks>
-    /// <b>A bare word is not a use, and the companion check caught me assuming it
-    /// was.</b> <c>Better</c>, <c>Same</c>, <c>Symbol</c> and <c>Thing</c> are
+    /// <b>A bare word is not a use</b>, and the companion check caught me assuming it
+    /// was. <c>Better</c>, <c>Same</c>, <c>Symbol</c> and <c>Thing</c> are
     /// ordinary words appearing as unrelated identifiers all over the tree, so
     /// matching the name alone reports a dead member as live — <b>a check that
     /// produces false PASSES</b>, which is the one failure this file exists to

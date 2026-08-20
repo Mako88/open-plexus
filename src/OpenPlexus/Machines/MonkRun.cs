@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Machines;
@@ -37,8 +37,8 @@ public sealed class MonkRun
     /// the one whose language ceiling is known in advance.
     /// </param>
     /// <remarks>
-    /// <b>Which makes this the only place the census can be read against a known
-    /// ceiling.</b> On <see cref="Puzzle.Two"/> a conjunction cannot soundly say yes
+    /// <b>Which makes this the only place the census can be read</b> against a known
+    /// ceiling. On <see cref="Puzzle.Two"/> a conjunction cannot soundly say yes
     /// short of a whole instance, so an uncovered bucket there is the SCOPE LANGUAGE
     /// failing rather than covering failing — and on the multiplexer the same number
     /// means the opposite, because every rule it needs is expressible. Two worlds

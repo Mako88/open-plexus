@@ -112,7 +112,7 @@ public sealed record Learned
     /// carrying both under one word would be two different questions in one column.
     /// </para>
     /// <para>
-    /// <b>It is an upper bound on what could pay and never a count of what did</b>, which is
+    /// <b>It is an upper bound on what could pay</b> and never a count of what did, which is
     /// the whole reason it sits beside <c>Census.Carried</c> rather than replacing it. A rule
     /// expecting the rare outcome still has to FIRE on a round the rare outcome arrives on,
     /// and a deep enough scope may never do so.

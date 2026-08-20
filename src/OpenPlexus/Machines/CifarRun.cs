@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Machines;
@@ -16,7 +16,7 @@ namespace OpenPlexus.Machines;
 /// is also only half of what this design claims.
 /// </para>
 /// <para>
-/// <b>And the half it leaves out is the half the goal is written in.</b> <i>Understand
+/// <b>And the half it leaves out</b> is the half the goal is written in. <i>Understand
 /// rather than perform — what would the world look like if I did X.</i> A draw from
 /// CIFAR is single-shot and independent: no action, no intervention, no sequence, no
 /// counterfactual. Settlement is trivial at K=1, <c>Abstain</c> cannot fire,
@@ -41,8 +41,8 @@ namespace OpenPlexus.Machines;
 /// <see cref="Winnowing"/> rides every code on ONE modality and has no such ceiling.
 /// </para>
 /// <para>
-/// <b>So "winnow beats bands on images" is the wrong shape of claim to go looking
-/// for.</b> At the widths where both fit, the score is a fair comparison. Above them
+/// <b>So "winnow beats bands on images" is the wrong shape of claim</b> to go looking
+/// for. At the widths where both fit, the score is a fair comparison. Above them
 /// there is no contest to run, because one of the two front ends cannot be pointed at
 /// the problem. That is a structural difference and worth more than a number.
 /// </para>
@@ -68,8 +68,8 @@ public sealed class CifarRun : IDisposable
     /// worlds below it have claimed 20-22, 40-41, 50-55, 70, 100-101 and a block from
     /// 140 for moisture; the learner has 200-203 and 210-211, and relations sit at
     /// 255. What is left contiguous is 148 to 199 — fifty-two modalities, which at two
-    /// spans is twenty-six dimensions. <b>A five-by-five thumbnail is the largest
-    /// picture this front end can be shown</b>, and saying so is the point.
+    /// spans is twenty-six dimensions. <b>A five-by-five thumbnail</b> is the largest
+    /// picture this front end can be shown, and saying so is the point.
     /// </remarks>
     public const byte Pixel = 148;
 

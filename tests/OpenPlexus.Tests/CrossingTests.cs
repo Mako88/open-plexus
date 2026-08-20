@@ -168,7 +168,8 @@ public sealed class CrossingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>What the crossing scores, and the position exam beside it.</b>
+    /// <b>What the crossing scores, and the position exam beside it</b>, at two sweep
+    /// cadences.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -183,10 +184,23 @@ public sealed class CrossingTests(ITestOutputHelper output)
     /// </para>
     /// <para>
     /// <b>A sweep, because the moment is the widest this repo has run.</b> A tiled canvas
-    /// says thirty-six patches twice over, and genesis mints across a moment — two hundred
-    /// rounds took three minutes and left eighteen thousand commitments, and twenty thousand
-    /// rounds crashed the test host outright. That cost is fork 31 and fork 49 arriving
-    /// together on a real world, and it belongs on a runner rather than in the suite.
+    /// says thirty-six patches, and genesis mints across a moment — two hundred rounds took
+    /// three minutes with the placed half in, and twenty thousand crashed the test host.
+    /// That cost is fork 31 and fork 49 arriving together on a real world.
+    /// </para>
+    /// <para>
+    /// <b>And two cadences, a SCREEN rather than an arm.</b> `Bench` already says an
+    /// absolute name count is bounded by the sweep calendar rather than by the gate, and on
+    /// this world that bound is what decides the run — four asks over two thousand rounds,
+    /// with tens of thousands of candidate pairs never looked at. One interval drives
+    /// subsumption, culling and abstraction together, so a difference between these two
+    /// rows has three possible causes and is not a finding about any of them.
+    /// </para>
+    /// <para>
+    /// <b>What it is FOR</b> is deciding whether a dial is worth building. If the crossing
+    /// stays at nought while the names rise, the ask rate is not what holds it and rung
+    /// five's own interval need not be built. If the crossing moves, the confound has to be
+    /// split and that is what the dial would be for.
     /// </para>
     /// </remarks>
     [Trait(Sweeps.Kind, Sweeps.Name)]
@@ -194,100 +208,74 @@ public sealed class CrossingTests(ITestOutputHelper output)
     public void What_the_crossing_and_the_position_exams_come_to()
     {
         var world = Clean();
-        var brain = new Brain(new CommittingSettings { Capacity = 4000 }, seed: 1);
         var chance = 1.0 / (world.Words + world.Facts);
-
-        var read = new CrossingRun(world, brain, seed: 1)
-            .Run(rounds: Rounds, sweep: Sweep, target: 0.9, window: 2000);
-
-        var crossing = Assert.IsType<Examined>(read.Learnt.Unseen);
-        var placed = Assert.IsType<Examined>(read.Placed);
 
         output.WriteLine(
             $"{world.Words} words, {world.Facts} facts, chance {chance:F3}, "
-            + $"patch {CrossingRun.Patch}");
-
-        output.WriteLine($"{"exam",-12}{"asked",8}{"answered",10}{"accuracy",10}");
-        output.WriteLine(
-            $"{"drawn",-12}{"",8}{"",10}{read.Learnt.Recent,10:F3}");
-        output.WriteLine(
-            $"{"position",-12}{placed.Asked,8}{placed.Answered,10}{placed.Accuracy,10:F3}");
-        output.WriteLine(
-            $"{"crossing",-12}{crossing.Asked,8}{crossing.Answered,10}{crossing.Accuracy,10:F3}");
-
-        // The instrument first. A stream the learner never got anywhere on makes both exams
-        // readings about that, and every number under it would be about the fault.
-        Assert.True(read.Learnt.Recent > 2.0 * chance,
-            $"the drawn stream scored {read.Learnt.Recent:F3} against a blind draw of "
-            + $"{chance:F3}, so the world is not reaching the learner and the exams below "
-            + "say nothing");
-
-        // WHAT THE POPULATION ACTUALLY BUILT, because a nought on the crossing is a
-        // restatement until something says which link is missing. Three counts answer it:
-        // rules keyed on the drawing that expect a word, rules keyed on a word that expect a
-        // fact, and rules whose scope spans both senses at once. The third is what binding
-        // looks like from inside a population, and rung five renaming over it is what would
-        // carry a fact back to a drawing.
-        var held = brain.Held.All.ToList();
-
-        var reading = held.Count(one =>
-            one.Scope.Any(code => code.Modality == Crossing.Shape)
-            && one.Expects.Modality != Crossing.Shape);
-
-        var telling = held.Count(one =>
-            one.Scope.Any(code => code.Modality == Crossing.Symbol)
-            && one.Expects.Modality != Crossing.Shape);
-
-        var spanning = held.Count(one =>
-            one.Scope.Any(code => code.Modality == Crossing.Shape)
-            && one.Scope.Any(code => code.Modality == Crossing.Symbol));
-
-        var renamed = brain.Held.Births.Values.Count(birth => birth == Birth.Renamed);
+            + $"patch {CrossingRun.Patch}, {Rounds} rounds");
 
         output.WriteLine(
-            $"{held.Count} held: {reading} keyed on the drawing, {telling} on the word, "
-            + $"{spanning} spanning both, {renamed} rewritten over a minted name");
+            $"{"sweep",-7}{"drawn",8}{"position",10}{"crossing",10}{"held",8}{"span",7}"
+            + $"{"named",7}{"asked",7}{"spoke",7}");
 
-        // A population holding nothing keyed on the drawing means the shape sense reached
-        // no rule at all, and then both exams are readings about the front end. The two
-        // numbers above are unreadable without this one.
-        Assert.True(reading > 0,
-            "no commitment is keyed on a drawn word, so the shape sense reached no rule and "
-            + "neither exam is about binding");
+        foreach (var sweep in new[] { Sweep, Sweep / 5 })
+        {
+            var brain = new Brain(new CommittingSettings { Capacity = 4000 }, seed: 1);
 
-        // And why rung five does or does not fire, which is the whole of what a nought on
-        // the crossing turns into once the population is known to hold scopes spanning both
-        // senses. The gate charges every ask to the first bar that stopped it, so this says
-        // whether the rung is never ASKED, asked and finding nothing to repay, or finding a
-        // pair and refusing it on the correction. Those are three different repairs.
-        var naming = brain.Held;
+            var read = new CrossingRun(world, brain, seed: 1)
+                .Run(rounds: Rounds, sweep: sweep, target: 0.9, window: 2000);
 
-        output.WriteLine(
-            $"rung five: {naming.Asked} asked, {naming.Spoke} spoke, "
-            + $"{naming.AtScarce} scarce, {naming.AtUnpaired} unpaired, {naming.AtRare} rare, "
-            + $"{naming.AtIndependent} independent, {naming.AtUncertain} uncertain");
+            var crossing = Assert.IsType<Examined>(read.Learnt.Unseen);
+            var placed = Assert.IsType<Examined>(read.Placed);
 
-        if (naming.Lately is { } lately)
+            var held = brain.Held.All.ToList();
+
+            var reading = held.Count(one =>
+                one.Scope.Any(code => code.Modality == Crossing.Shape)
+                && one.Expects.Modality != Crossing.Shape);
+
+            var spanning = held.Count(one =>
+                one.Scope.Any(code => code.Modality == Crossing.Shape)
+                && one.Scope.Any(code => code.Modality == Crossing.Symbol));
+
+            var renamed = brain.Held.Births.Values.Count(birth => birth == Birth.Renamed);
+
             output.WriteLine(
-                $"  last ask: {lately.Scopes} scopes, {lately.Candidates} candidates, "
-                + $"strongest {lately.Strongest}");
+                $"{sweep,-7}{read.Learnt.Recent,8:F3}{placed.Accuracy,10:F3}"
+                + $"{crossing.Accuracy,10:F3}{held.Count,8}{spanning,7}{renamed,7}"
+                + $"{brain.Held.Asked,7}{brain.Held.Spoke,7}");
 
-        // A rung nothing ever asks and a rung asked and refused are different faults with
-        // different repairs, and a count of names cannot tell them apart. This is what makes
-        // the difference readable, so it is asserted rather than printed.
-        Assert.True(naming.Asked > 0,
-            "rung five was never asked on a world built to make it fire, so the crossing's "
-            + "nought is about when the rung is offered a population rather than about what "
-            + "it does with one");
+            output.WriteLine(
+                $"  refused: {brain.Held.AtScarce} scarce, {brain.Held.AtUnpaired} unpaired, "
+                + $"{brain.Held.AtRare} rare, {brain.Held.AtIndependent} independent, "
+                + $"{brain.Held.AtUncertain} uncertain");
 
-        // And the bound, which is the reading rather than a prediction. The rung is asked
-        // once a sweep, so a run of this many rounds can ask it this many times whatever the
-        // population holds -- and on this world it speaks on nearly every ask, with hundreds
-        // of eligible scopes and tens of thousands of candidate pairs behind each one. The
-        // gate is not what is stopping it; the clock is.
-        Assert.True(naming.Asked <= (Rounds / Sweep) + 1,
-            $"rung five was asked {naming.Asked} times over {Rounds / Sweep} sweeps, so it is "
-            + "no longer asked once of each. Something has changed about when the rung runs "
-            + "and the account of why its yield is small here is stale");
+            if (brain.Held.Lately is { } lately)
+                output.WriteLine(
+                    $"  last ask: {lately.Scopes} scopes, {lately.Candidates} candidates");
+
+            // The instrument, taken on every row. A stream the learner never got anywhere on
+            // makes both exams readings about that, and every number beside them would be
+            // about the fault.
+            Assert.True(read.Learnt.Recent > 2.0 * chance,
+                $"at a sweep of {sweep} the drawn stream scored {read.Learnt.Recent:F3} "
+                + $"against a blind draw of {chance:F3}, so the world is not reaching the "
+                + "learner and the exams beside it say nothing");
+
+            // A population holding nothing keyed on a drawn word means the shape sense
+            // reached no rule at all, and then neither exam is about binding.
+            Assert.True(reading > 0,
+                $"at a sweep of {sweep} no commitment is keyed on a drawn word, so the shape "
+                + "sense reached no rule and neither exam is about binding");
+
+            // And the bound this screen exists for. The rung is asked once a sweep, so a run
+            // can ask it this many times whatever the population holds -- which is `Bench`'s
+            // own line about an absolute name count, arriving where it decides a result
+            // rather than where it qualifies one.
+            Assert.True(brain.Held.Asked <= (Rounds / sweep) + 1,
+                $"rung five was asked {brain.Held.Asked} times over {Rounds / sweep} sweeps "
+                + "at that cadence, so it is no longer asked once of each. Something has "
+                + "changed about when the rung runs and this screen is measuring that");
+        }
     }
 }

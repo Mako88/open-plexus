@@ -28,12 +28,14 @@ public sealed class LessonTests(ITestOutputHelper output)
         Asserting asserting = Asserting.Nothing, int tellings = 1, int revising = 0,
         Rooting rooting = Rooting.Singly, Crediting crediting = Crediting.Nothing,
         Replying replying = Replying.Word, Admitting admitting = Admitting.Anything,
-        Joining joining = Joining.Bagged)
+        Joining joining = Joining.Bagged, Deciding deciding = Deciding.Grounded)
     {
         var tutor = new Tutor(
             lesson, TextWriter.Null, passes, tellings, revising, replying: replying);
 
-        var brain = new Brain(Committing(capacity, rooting, crediting, admitting), seed);
+        var brain = new Brain(
+            Committing(capacity, rooting, crediting, admitting) with { Deciding = deciding },
+            seed);
 
         var world = new Conversing(new ConversingSettings
         {
@@ -155,6 +157,7 @@ public sealed class LessonTests(ITestOutputHelper output)
     /// <param name="crediting">Whether a mint is credited with the round that made it.</param>
     /// <param name="rooting">What genesis mints a scope over.</param>
     /// <param name="admitting">What a separating condition must do besides separate.</param>
+    /// <param name="deciding">Whether the machine answers with nothing behind the answer.</param>
     /// <param name="passes">
     /// How many times the examination is sat. <b>At nought the run stops before the
     /// questions</b>, which is what a probe reading the population the paper has not taught
@@ -170,7 +173,7 @@ public sealed class LessonTests(ITestOutputHelper output)
         int seeds, uint purpose, bool written, Carrying carrying, Asserting asserting,
         int tellings, Crediting crediting = Crediting.Nothing,
         Rooting rooting = Rooting.Singly, Admitting admitting = Admitting.Anything,
-        int passes = 1)
+        int passes = 1, Deciding deciding = Deciding.Grounded)
     {
         var right = new List<double>();
         var found = new List<double>();
@@ -192,7 +195,8 @@ public sealed class LessonTests(ITestOutputHelper output)
 
             var ran = Ran(
                 lesson, carrying, seed, passes, asserting: asserting, tellings: tellings,
-                rooting: rooting, crediting: crediting, admitting: admitting);
+                rooting: rooting, crediting: crediting, admitting: admitting,
+                deciding: deciding);
 
             right.Add(passes == 0 ? 0.0 : Right(ran.Tutor, pass: 0));
             found.Add(Found(ran.Brain, ran.World, lesson));
@@ -539,9 +543,14 @@ public sealed class LessonTests(ITestOutputHelper output)
             Asserting.Rarest, Asserting.Withheld, Asserting.Everything,
         })
         {
+            // `Deciding.Anyway` is PINNED, because this file's question is what the ranking
+            // says and the shipped arm decides whether to say it at all. A probe splitting a
+            // wrong answer by cause cannot read a round the machine declined -- and a fixture
+            // inheriting a dial it counts is a moving default rewriting an experiment nobody
+            // edited. What declining buys has its own grid.
             var (scored, _, _, _, _) = Over(
                 Seeds, Purpose, written: false, Carrying.Never, asserting, many,
-                rooting: rooting, crediting: crediting);
+                rooting: rooting, crediting: crediting, deciding: Deciding.Anyway);
 
             // Read on a run that STOPS before the questions, which is the whole reason for the
             // second call. A settled question mints and repairs like any other round, so the
@@ -549,7 +558,8 @@ public sealed class LessonTests(ITestOutputHelper output)
             // about -- and the first version of this read 1.000 where the machine scored 0.750.
             var (_, _, _, _, seated) = Over(
                 Seeds, Purpose, written: false, Carrying.Never, asserting, many,
-                rooting: rooting, crediting: crediting, passes: 0);
+                rooting: rooting, crediting: crediting, passes: 0,
+                deciding: Deciding.Anyway);
 
             var seats = new Seats
             {
@@ -852,6 +862,121 @@ public sealed class LessonTests(ITestOutputHelper output)
                 $"{asserting} minted {wide[asserting]:F1} wide scopes and not one of them "
                 + "fires on the examination, so a scope the paper cannot reach IS the "
                 + "blocker after all"));
+    }
+
+    /// <summary>
+    /// What declining to answer buys, when nothing behind the answer has been right.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>John's, and it answers the tie rather than breaking it.</b> The seat's remaining
+    /// half was what separates two blank rules, and the honest answer is that nothing does and
+    /// the machine should say so. A weight of nought means the best advocate has never been
+    /// right about what it advocates, so the ranking under it is code order and the answer
+    /// comes out of a hash.
+    /// </para>
+    /// <para>
+    /// <b>Read on the paper's own mark</b>, which is the strictest test there is. A declined
+    /// question and a wrong one are both unconfirmed, so this number can only FALL when the
+    /// machine goes quiet — there is no way for silence to flatter it. Declining being level
+    /// on it means every round given up was a round already being lost.
+    /// </para>
+    /// <para>
+    /// <b>And it is read where evidence exists</b>, which the first attempt got wrong. Told
+    /// once with no crediting every accuracy in the population is nought, so every weight is
+    /// nought and the arm declines the whole paper — a cell where the comparison cannot say
+    /// anything, and where the score it gives up was the chance bar anyway.
+    /// </para>
+    /// <para>
+    /// <b>The kill line, written before the grid ran</b>: declining dies if it costs score on
+    /// the paper's own mark. Silence that gives up a right answer is not honesty.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_declining_to_answer_buys_when_nothing_behind_the_answer_has_been_right()
+    {
+        const int Seeds = 8;
+        const uint Purpose = 0x0C1A_6DED;
+
+        int[] tellings = [1, 8];
+
+        // The bar before any arm is read, which is this file's discipline. A score at or under
+        // the commonest answer is a reading about the lesson rather than about the machine.
+        var bar = Enumerable.Range(0, Seeds)
+            .Select(index => Worlds.Seeds.Apart(index, Purpose))
+            .Select(seed => Lesson.Drawn(subjects: 4, attributes: 3, seed))
+            .Average(lesson => new Tutor(lesson, TextWriter.Null).Marginal
+                / (double)lesson.Exam.Count);
+
+        output.WriteLine($"{Seeds} drawn lessons, claiming the rarest word, marginal {bar:F3}");
+        output.WriteLine(
+            $"{"told",-6}{"deciding",-10}{"right",8}{"silent",9}{"resident",10}");
+
+        var marked = new Dictionary<(int Told, Deciding How), double>();
+        var silent = new Dictionary<(int Told, Deciding How), double>();
+
+        foreach (var many in tellings)
+        foreach (var deciding in new[] { Deciding.Anyway, Deciding.Grounded })
+        {
+            var right = new List<double>();
+            var quiet = new List<double>();
+            var resident = new List<double>();
+
+            for (var index = 0; index < Seeds; index++)
+            {
+                var seed = Worlds.Seeds.Apart(index, Purpose);
+                var lesson = Lesson.Drawn(subjects: 4, attributes: 3, seed);
+
+                var ran = Ran(
+                    lesson, Carrying.Never, seed, passes: 1, asserting: Asserting.Rarest,
+                    tellings: many, deciding: deciding);
+
+                right.Add(Right(ran.Tutor, pass: 0));
+                resident.Add(ran.Tally.Resident);
+
+                // The population's own count of rounds it said nothing on, which is the whole
+                // run rather than the paper. It is the mechanism firing rather than the score,
+                // and it is here so a level score cannot be a dial that never ran.
+                quiet.Add(ran.Tally.Rounds == 0
+                    ? 0.0
+                    : ran.Tally.Silent / (double)ran.Tally.Rounds);
+            }
+
+            marked[(many, deciding)] = right.Average();
+            silent[(many, deciding)] = quiet.Average();
+
+            output.WriteLine(
+                $"{many,-6}{deciding.ToString().ToLowerInvariant(),-10}{right.Average(),8:F3}"
+                + $"{quiet.Average(),9:F3}{resident.Average(),10:F1}");
+        }
+
+        // The arm ran, and a level score with this unmoved would be a dial that did nothing.
+        Assert.All(
+            tellings,
+            many => Assert.True(
+                silent[(many, Deciding.Grounded)] > silent[(many, Deciding.Anyway)],
+                $"told {many}, declining went quiet on no more rounds than answering anyway "
+                + "did, so the arm never fired and the scores beside it say nothing"));
+
+        // The kill line, on the paper's own mark, where silence can only lose. Told enough
+        // that the population has evidence, giving up the rounds it has none for costs
+        // nothing -- every one of them was a round already being lost.
+        Assert.True(
+            marked[(8, Deciding.Grounded)] >= marked[(8, Deciding.Anyway)],
+            $"declining scored {marked[(8, Deciding.Grounded)]:F3} against "
+            + $"{marked[(8, Deciding.Anyway)]:F3} for answering anyway, so the rounds it gave "
+            + "up were rounds it was getting right and the silence costs real answers");
+
+        // And told ONCE it gives up something worse than the commonest answer. Every accuracy
+        // in the population is still nought there, so every weight is nought and the arm
+        // declines the whole paper -- and what that forfeits scores UNDER the marginal, which
+        // is what says the forfeited answers were a coin rather than knowledge. Stated as a
+        // bar rather than as a comparison, because two arms either side of chance are not
+        // being ranked against each other.
+        Assert.True(marked[(1, Deciding.Anyway)] <= bar,
+            $"told once, answering anyway scored {marked[(1, Deciding.Anyway)]:F3} against a "
+            + $"marginal of {bar:F3}, so it is above chance and declining the whole paper "
+            + "gives up something the machine knew");
     }
 
     /// <summary>What a moment carries, re-taken on a world that moves.</summary>

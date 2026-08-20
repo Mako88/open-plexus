@@ -767,7 +767,7 @@ public sealed class Population
     {
         if (firing.IsDefaultOrEmpty) return default;
 
-        return Decide([Weigh(firing)]);
+        return Decide([Weigh(firing)], _dials.Deciding);
     }
 
 
@@ -853,6 +853,12 @@ public sealed class Population
     /// arithmetic.</b>
     /// </summary>
     /// <param name="heard">What each holder said. Order is not read.</param>
+    /// <param name="deciding">
+    /// Whether to answer with nothing behind the answer. <b>It defaults to the shipped arm</b>,
+    /// so a caller with no dials in reach -- <c>Machines.Asker</c> is the one -- gets the same
+    /// machine the one-process path gets. The control is reachable only by asking for it, which
+    /// is what keeps a fleet and a bench from quietly deciding differently.
+    /// </param>
     /// <remarks>
     /// <para>
     /// <b>Static and holding nothing, because the merger is not a participant.</b> Whoever
@@ -876,7 +882,8 @@ public sealed class Population
     /// approximately. A maximum of maxima is a maximum exactly, at any number of holders.
     /// </para>
     /// </remarks>
-    public static Vote Decide(IReadOnlyCollection<Weights> heard)
+    public static Vote Decide(
+        IReadOnlyCollection<Weights> heard, Deciding deciding = Deciding.Grounded)
     {
         ArgumentNullException.ThrowIfNull(heard);
 
@@ -923,6 +930,13 @@ public sealed class Population
         // moment is before anything has been settled -- breaks the same way on
         // every machine rather than however the dictionary was walked.
         var ranked = weights.OrderByDescending(one => one.Value).ThenBy(one => one.Key).ToList();
+
+        // Nothing that fired has ever been right about what it advocates, so the ranking below
+        // is a tie broken by code order and the answer would come out of a hash. Saying nothing
+        // is the honest outcome, and it costs the round nothing -- settlement tallies whatever
+        // fired, and a silent vote does not match what arrived, so the round is still a failure
+        // and genesis and repair still run on it.
+        if (deciding is Deciding.Grounded && ranked[0].Value <= 0.0) return default;
 
         return new Vote
         {

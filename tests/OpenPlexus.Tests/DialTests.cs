@@ -116,6 +116,17 @@ public sealed class DialTests
             + "one scope besides -- three grids pin it to keep a baseline that "
             + "scope removes. The entry leaves when nothing needs the baseline",
 
+        ["Deciding"] =
+            "whether the machine answers with nothing behind the answer, and it is "
+            + "an ARM rather than a level -- a weight of nought is a signature and "
+            + "there is no threshold in it. `Grounded` SHIPS: told enough that the "
+            + "population has evidence it scores level with answering anyway while "
+            + "going quiet on three times the rounds, so every round it gives up "
+            + "was one already being lost. Told once every accuracy is nought, so "
+            + "it declines the whole paper and forfeits a score UNDER the marginal. "
+            + "The entry leaves on a second world, which wants one that asks "
+            + "questions",
+
         // ---- Arrived with the commitment branch ----------------------------
 
         ["Recency"] =
@@ -620,7 +631,19 @@ public sealed class DialTests
         // what came back is not a win: it CONVERTS a tie into an outranking for the identical
         // score, the newest mint being the strongest because the older ones have missed since.
         // Breaking a tie by recency is not breaking it by correctness.
-        Assert.Equal(16, HandSet.Count);
+        //
+        // And up to seventeen for `Deciding`, which is a rise and is written as one. John's,
+        // mid-session, and it answers the seat's remaining half rather than adding to it: the
+        // machine had no way to tell two blank rules apart and was breaking the tie by code
+        // order, so it asserted an answer out of a hash and was then corrected on a guess. It
+        // says nothing instead. That is not `Speaking`, which is refuted twice above --
+        // `Speaking` refused one rule its vote so a different rule won, and this silences the
+        // round with nobody winning in anybody's place.
+        //
+        // It ships ON, and the entry is here because it has one world. What it wants is a
+        // world that ASKS, where declining is the difference between a question and a guess
+        // rather than a mark on a paper.
+        Assert.Equal(17, HandSet.Count);
     }
 
     /// <summary>

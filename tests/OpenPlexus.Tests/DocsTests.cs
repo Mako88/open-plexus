@@ -497,7 +497,14 @@ public sealed class DocsTests
     // root ships, what crediting does instead, what the three do together, and which half is
     // still open. A budget falling because an item was compacted rather than deleted is the
     // only kind of fall this doc wants.
-    private const int Whole = 12_407;
+    // And 12,470 is the forty-fifth raise, sixty-three words, and it closes the seat rather
+    // than adding to it. John's, mid-session: if it has not learnt enough to decide between two
+    // things, it should acknowledge that. The vote was breaking a tie by CODE ORDER, so the
+    // machine asserted an answer out of a hash and was then corrected on a guess -- and the
+    // signature is a weight of nought, which needs no threshold because it is the best
+    // advocate's own accuracy. Three leaves: that it declines, that declining is free where
+    // there is evidence, and what is still open about the cell where there is none.
+    private const int Whole = 12_470;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

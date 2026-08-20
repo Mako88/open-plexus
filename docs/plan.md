@@ -457,8 +457,12 @@ before six that reads as tuning is out of order.
       correctness, so it does not ship.
     - **NOW** — and the three together answer a paper never sat, told once, on drawn lessons
       rather than on the one written text. The wide root, credited mints, every word claimed.
-    - **OPEN** — so what separates two blank rules is the seat's remaining half, and neither
-      genesis nor matching is in the way: the scopes are minted, they fire, the score holds.
+    - **NOW** — and nothing separates two blank rules, so the machine SAYS SO. A weight of
+      nought is no advocate ever having been right, and it declines. John's. `Deciding`.
+    - **NOW** — and it is free where there is evidence: level on the paper at eight tellings
+      while going quiet on three times the rounds, so each round given up was already lost.
+    - **OPEN** — told once it declines everything, forfeiting a score UNDER the marginal. What
+      a second world says, and whether a machine that ASKS turns that silence into a question.
     - **NOW** — `Alternating` is live and its store add-only, so a front end fills its OWN
       vocabulary, reaching every group the experimenter's holds for no score.
     - **OPEN** — it costs 4.7x the rules. Nothing waits for a group to hold still, and the
@@ -627,10 +631,10 @@ before six that reads as tuning is out of order.
     - **NOW** — and REPETITION earns it, at the repair gate's floor rather than the lesson's.
     - **OPEN** — what a moment carries beside its own sentence. A question re-handing the story
       leaves every code always-present, so genesis roots on nothing. Fork **120**.
-    - **NOW** — an assertion may mint its WHOLE scope, so a conjunction is stated rather than
-      discovered by failing, and a fact costs fewer tellings. John's. `Rooting`.
+    - **NOW** — an assertion mints its WHOLE scope, so a conjunction is stated rather than
+      discovered by failing, and a fact costs fewer tellings. John's, and it ships.
     - **NOW** — a mint is CREDITED with the round that made it, being right about it by
-      construction, and a correct rule is then believed a telling sooner. `Crediting`.
+      construction. What it buys is under *malleability*, and not a telling.
     - **NOW** — a statement claims EVERY word in turn, one moment each, so nothing picks one.
       Told once, it answers an exam never sat. John's. Forks **121** and **123**.
     - **NOW** — and a source owing moments is drained before a new line is read, so a scripted

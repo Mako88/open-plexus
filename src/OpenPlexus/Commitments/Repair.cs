@@ -95,6 +95,43 @@ public enum Rooting
     Wholly,
 }
 
+/// <summary>Whether the machine answers when nothing behind the answer has been right.</summary>
+/// <remarks>
+/// <para>
+/// <b>John's, and it answers a tie</b> rather than breaking one. The vote ranks
+/// expectations by weight and breaks a tie by code order, so on a first telling — where every
+/// accuracy is still nought — the machine answers from a hash and is then corrected on a guess
+/// it had no basis for. <c>LessonTests</c> reads half of what claiming the rarest word gets
+/// wrong as exactly that.
+/// </para>
+/// <para>
+/// <b>The signature is a weight of nought and it needs no number.</b> A weight IS the best
+/// advocate's accuracy, so nought means nothing that fired has ever been right about what it
+/// is advocating. That is not a thin margin between two well-evidenced answers; it is no
+/// evidence at all, and it is the one condition here that is a fact rather than a level.
+/// </para>
+/// <para>
+/// <b>And it costs the learning nothing</b>, which is what makes it cheap. Settlement tallies
+/// everything that fired whatever the vote said, and <c>Brain</c> computes <i>wrong</i> as the
+/// vote not matching what arrived — so a silent vote is a failed round, genesis still runs and
+/// repair still runs. What stops is the assertion, not the learning.
+/// </para>
+/// <para>
+/// <b>It is not <c>Speaking</c>, which is refuted twice in the plan.</b> That refused an
+/// untested commitment its VOTE, so a different and better-tested rule won instead — silencing
+/// the right rule to reseat a wrong one. This silences the ROUND. Nobody wins in anybody's
+/// place, and no rule is refused anything.
+/// </para>
+/// </remarks>
+public enum Deciding
+{
+    /// <summary>Answer whatever the ranking put first, however little is behind it.</summary>
+    Anyway,
+
+    /// <summary>Say nothing where the winning weight is nought.</summary>
+    Grounded,
+}
+
 /// <summary>Whether a minted commitment is credited with the round that minted it.</summary>
 /// <remarks>
 /// <para>
@@ -665,6 +702,14 @@ public sealed record CommittingSettings
     /// for what a blank record costs and what crediting risks.
     /// </remarks>
     public Crediting Crediting { get; init; } = Crediting.Nothing;
+
+    /// <summary>Whether the machine answers with nothing behind the answer.</summary>
+    /// <remarks>
+    /// <b>Grounded ships and Anyway is the control</b>, which is every reading taken before
+    /// this existed. See <see cref="Deciding"/> for why a weight of nought is a signature
+    /// rather than a level.
+    /// </remarks>
+    public Deciding Deciding { get; init; } = Deciding.Grounded;
 
     /// <summary>How fast the local estimate forgets, in 0..1.</summary>
     /// <remarks>

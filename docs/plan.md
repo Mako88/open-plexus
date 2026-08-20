@@ -232,7 +232,8 @@ FORBIDS things, and several of them are already measured.
 
 What is unbuilt, untried or broken, against the requirement it serves. A branch is what must
 hold, an entry is one requirement, and a leaf is one line opening with exactly one of
-**NOW**, **OPEN**, **DEAD**, **BLOCKED**, **BROKEN** or **SETTLED**.
+**NOW**, **OPEN**, **BLOCKED** or **BROKEN**. A refuted arm is a row in `DO NOT RE-TRY`
+rather than a leaf, and a question that closes is a finding that belongs in its commit.
 
 - **A NOW is the mechanism DECIDED for that entry**, and there is at most one. What a built
   thing DOES is in the code, where the compiler enforces it, so it is never described here.

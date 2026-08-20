@@ -30,8 +30,8 @@ namespace OpenPlexus.Tests;
 /// a mechanism depends on the budget beside it.
 /// </para>
 /// <para>
-/// <b>And the reason to ask now is that the gate turned out to be nearly inert
-/// somewhere.</b> <c>GateCostTests</c> blinds the gate on <c>Arranged</c> and moves repair
+/// <b>And the reason to ask now</b> is that the gate turned out to be nearly inert
+/// somewhere. <c>GateCostTests</c> blinds the gate on <c>Arranged</c> and moves repair
 /// by four tenths of a percent, against thirty on the multiplexer — so whatever makes
 /// <c>Uncovered</c> behave differently on that world, it is not mostly the thing it is
 /// named after. That is a documented finding resting on a conflation, which is worth more
@@ -67,7 +67,7 @@ public sealed class MendingTests(ITestOutputHelper output)
     /// <param name="seeds">How many seeds each arm is run over.</param>
     /// <param name="of">What one arm on one seed is worth — the run and the metric together.</param>
     /// <remarks>
-    /// <b>Ordered so each row differs from the one above it in exactly one thing.</b>
+    /// <b>Ordered</b>, so each row differs from the one above it in exactly one thing.
     /// Row one to row two adds the gate; row two to row three moves repair off the failure
     /// branch; row three to row four adds the did-forking-ever-pay test. Every separation
     /// printed is against the first row, so the reading is cumulative and the differences
@@ -188,8 +188,8 @@ public sealed class MendingTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Unreachable rather than refused, which is the difference that makes this worth
-    /// doing.</b> One enum decided both axes and no value of it landed on <i>ungated,
+    /// <b>Unreachable rather than refused</b>, which is the difference that makes this worth
+    /// doing. One enum decided both axes and no value of it landed on <i>ungated,
     /// every round</i> or <i>improving, after a failure</i> — so those two are not arms
     /// somebody tried and dropped, they are corners of a two-by-two that could not be
     /// spelled. <see cref="Fixture.Reachable"/> holds them apart from

@@ -532,7 +532,7 @@ public sealed class DocsTests
     // leaf carried them and cost twenty-seven words more; `The_plan_looks_forward` caught it,
     // correctly -- a finding lives in the commit and the test, and a doc that starts keeping
     // them is the pile of docs this one replaced.
-    private const int Whole = 10_961;
+    private const int Whole = 10_986;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.
@@ -737,24 +737,22 @@ public sealed class DocsTests
     /// token is that a reader can sort by it without reading the clause.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// <b>`Broken` arrived when `open defects` went.</b> That section was retired because
     /// handoffs and a green CI carry what it used to, but a defect and an open question are
     /// different urgencies and `OPEN` flattens them — one wants investigating and the other
     /// wants fixing. The distinction cost one token rather than a section.
+    /// </para>
+    /// <para>
+    /// <b>`Dead` and `Settled` came back out</b>, because the route holds what is decided and
+    /// what is untried and neither of those is either. A refuted arm belongs in
+    /// `DO NOT RE-TRY` with the row that says what would revive it; a question that closed is
+    /// a finding, and its home is the commit that closed it. Leaving the two tokens legal
+    /// left the door open for a session to write a finding down and have a guard bless it.
+    /// </para>
     /// </remarks>
     private static readonly string[] Statuses =
-        ["NOW", "OPEN", "DEAD", "BLOCKED", "BROKEN", "SETTLED"];
-
-    /// <summary>Whether a line says what would bring an arm back.</summary>
-    /// <remarks>
-    /// <b>Syntactic like the findings rules, and for the same reason</b> — the check is
-    /// worth having only if nobody has to argue about whether a sentence counts. Naming the
-    /// `DO NOT RE-TRY` row that holds the condition is allowed, because that row is itself
-    /// guarded by <see cref="Every_refuted_row_says_what_would_revive_it"/>.
-    /// </remarks>
-    private static bool Revivable(string text) =>
-        Regex.IsMatch(text, @"(?i)\brevive[sd]?\b|\brevival\b")
-        || text.Contains("DO NOT RE-TRY", StringComparison.Ordinal);
+        ["NOW", "OPEN", "BLOCKED", "BROKEN"];
 
     /// <summary>The route's leaves — the fork-bearing lines, whatever branch they hang off.</summary>
     private static List<string> Leaves() =>
@@ -1034,24 +1032,6 @@ public sealed class DocsTests
     }
 
     [Fact]
-    public void Every_dead_leaf_carries_a_revival_condition()
-    {
-        // The same rule `do not re-try` is held to, through the door the tree opens. A
-        // refutation is conditional on its configuration, and a leaf saying only that
-        // something failed is a superstition -- this repo has already had to revive two
-        // arms whose reason for being dead had quietly expired.
-        var mute = Leaves()
-            .Where(leaf => leaf.StartsWith("**DEAD**", StringComparison.Ordinal))
-            .Where(leaf => !Revivable(leaf))
-            .ToList();
-
-        Assert.True(mute.Count == 0,
-            $"{mute.Count} dead leaf/leaves say what failed and not what would bring it "
-            + "back. Say what revives it, or name the `DO NOT RE-TRY` row that does:\n  "
-            + string.Join("\n  ", mute.Take(10).Select(Opening)));
-    }
-
-    [Fact]
     public void The_route_checks_can_still_fail()
     {
         // The companion the three above need, and for the reason every other companion in
@@ -1094,9 +1074,6 @@ public sealed class DocsTests
         Assert.Empty(Unbuilt([(1, "carried"), (2, "**OPEN** — a question"),
             (2, "**NOW** — a mechanism")]));
 
-        Assert.True(Revivable("**DEAD** — refuted, and it revives when a world holds still"));
-        Assert.True(Revivable("**DEAD** — refuted; the row is in DO NOT RE-TRY"));
-        Assert.False(Revivable("**DEAD** — built, measured and deleted"));
     }
 
     /// <summary>

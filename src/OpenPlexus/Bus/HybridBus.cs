@@ -68,8 +68,8 @@ public sealed class HybridBus : IBus
 
     /// <summary>How many deliveries were actually held back.</summary>
     /// <remarks>
-    /// <b>Reported, because a jitter arm that delayed nothing is a control
-    /// wearing the arm's name</b> — the failure this project keeps having.
+    /// <b>Reported</b>, because a jitter arm that delayed nothing is a control
+    /// wearing the arm's name — the failure this project keeps having.
     /// </remarks>
     public long Delayed => Interlocked.Read(ref _delayed);
 

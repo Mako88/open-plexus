@@ -1,4 +1,4 @@
-namespace OpenPlexus.Codes;
+﻿namespace OpenPlexus.Codes;
 
 /// <summary>
 /// <see cref="Winnow"/> as a translation, so it can stand where a band can.
@@ -11,8 +11,8 @@ namespace OpenPlexus.Codes;
 /// nothing else at all.
 /// </para>
 /// <para>
-/// <b>A reading below about ten dimensions has too few distinct wirings to expand
-/// into.</b> Six numbers sampled six at a time have exactly one, so every cell would
+/// <b>A reading below about ten dimensions</b> has too few distinct wirings to expand
+/// into. Six numbers sampled six at a time have exactly one, so every cell would
 /// fire identically and the tag would separate nothing — <see cref="Sheet"/> caps the
 /// sheet at what actually exists rather than producing that quietly.
 /// </para>

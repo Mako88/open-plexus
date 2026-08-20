@@ -1,8 +1,8 @@
-namespace OpenPlexus.Codes;
+﻿namespace OpenPlexus.Codes;
 
 /// <summary>
-/// A discrete reading said as one code — <b>the identity quantiser, for a stream
-/// whose values have no similarity structure at all.</b>
+/// A discrete reading said as one code — <b>the identity quantiser</b>, for a stream
+/// whose values have no similarity structure at all.
 /// </summary>
 /// <remarks>
 /// <para>

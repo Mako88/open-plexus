@@ -29,7 +29,7 @@ public enum Choosing
 /// <c>Tally.Wanting</c> reads nought while repair churns.
 /// </para>
 /// <para>
-/// <b>So the second half of the bar is that the CHILD must be judgeable</b>, and it needs no
+/// <b>So the second half of the bar</b> is that the CHILD must be judgeable, and it needs no
 /// new number. <see cref="CommittingSettings.Floor"/> already means <i>enough firings for a
 /// proportion to have any power</i>; a conjunctive child keeps the parent's firings the
 /// condition was present in, so a condition present in fewer of them than the floor mints a

@@ -244,5 +244,30 @@ public sealed class CrossingTests(ITestOutputHelper output)
         Assert.True(reading > 0,
             "no commitment is keyed on a drawn word, so the shape sense reached no rule and "
             + "neither exam is about binding");
+
+        // And why rung five does or does not fire, which is the whole of what a nought on
+        // the crossing turns into once the population is known to hold scopes spanning both
+        // senses. The gate charges every ask to the first bar that stopped it, so this says
+        // whether the rung is never ASKED, asked and finding nothing to repay, or finding a
+        // pair and refusing it on the correction. Those are three different repairs.
+        var naming = brain.Held;
+
+        output.WriteLine(
+            $"rung five: {naming.Asked} asked, {naming.Spoke} spoke, "
+            + $"{naming.AtScarce} scarce, {naming.AtUnpaired} unpaired, {naming.AtRare} rare, "
+            + $"{naming.AtIndependent} independent, {naming.AtUncertain} uncertain");
+
+        if (naming.Lately is { } lately)
+            output.WriteLine(
+                $"  last ask: {lately.Scopes} scopes, {lately.Candidates} candidates, "
+                + $"strongest {lately.Strongest}");
+
+        // A rung nothing ever asks and a rung asked and refused are different faults with
+        // different repairs, and a count of names cannot tell them apart. This is what makes
+        // the difference readable, so it is asserted rather than printed.
+        Assert.True(naming.Asked > 0,
+            "rung five was never asked on a world built to make it fire, so the crossing's "
+            + "nought is about when the rung is offered a population rather than about what "
+            + "it does with one");
     }
 }

@@ -1,4 +1,4 @@
-namespace OpenPlexus.Codes;
+﻿namespace OpenPlexus.Codes;
 
 /// <summary>
 /// Codes that are ALTERNATIVES, found in what was seen rather than handed over — <b>fork
@@ -323,8 +323,8 @@ public sealed class Alternating
     }
 
     /// <summary>
-    /// The same question asked of a stream that has an ORDER — <b>fork 106, John's, and the
-    /// one clause a bag of moments cannot carry.</b>
+    /// The same question asked of a stream that has an ORDER — <b>fork 106, John's</b>, and the
+    /// one clause a bag of moments cannot carry.
     /// </summary>
     /// <param name="moments">What was seen, in the order it was seen.</param>
     /// <param name="adhesion">

@@ -444,7 +444,13 @@ public sealed class DocsTests
     // disagree: weighing the counts drops `is` out of the places and loses the `to` against
     // `where` group entirely. That is an item rather than a finding, because neither
     // threshold is calibrated against the other and the ranking wants a sweep.
-    private const int Whole = 12_219;
+    // And 12,225 is the forty-second raise, six words, for the item above turning from a
+    // question into a refutation. Weighing company beats a set of it on every bAbI task at
+    // every threshold -- three pure classes against two, one and nought -- and the set
+    // reading recovers nothing at all on the richest of the three. What is left open is that
+    // `ByTime` is what a moving world needs and a weighed adhesion does not exist, so the
+    // OPEN is a smaller question than the one it replaces rather than the same one reworded.
+    private const int Whole = 12_225;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

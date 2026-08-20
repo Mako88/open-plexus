@@ -373,6 +373,96 @@ public sealed class BabiTests(ITestOutputHelper output)
                 : "the two differ, so discarding the counts is a decision and not a detail");
     }
 
+    /// <summary>
+    /// What each likeness reading recovers across the whole range of its threshold.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The comparison the head-to-head could not make. Reading the two at 0.5 and 0.9 says
+    /// they differ and cannot say which is better, because a share of a set and a cosine are
+    /// not the same scale and two hand-picked points move two things at once. Sweeping both
+    /// puts each reading at its own best and compares those.
+    /// </para>
+    /// <para>
+    /// Scored against a key, which is allowed here and nowhere else. Nothing the derivation
+    /// sees is told the key; it exists to score what came back, in the way
+    /// <c>RecalledTests</c> scores its own groups. A derivation handed the classes would be
+    /// pricing a mechanism that does not exist.
+    /// </para>
+    /// <para>
+    /// Purity is the column that decides. A group holding two of the key's classes is a
+    /// category that claims something false the moment a scope is rewritten over it, and
+    /// recovery bought with mixing is not recovery — so the reading to keep is the one whose
+    /// best PURE row covers most of the key, and the loser leaves with a revival row.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_the_two_likeness_readings_recover_at_every_threshold()
+    {
+        var key = new Dictionary<string, string[]>
+        {
+            ["names"] = ["mary", "john", "sandra", "daniel"],
+            ["places"] = ["kitchen", "bedroom", "bathroom", "hallway", "garden", "office"],
+            ["verbs"] = ["went", "moved", "journeyed", "travelled"],
+        };
+
+        foreach (var task in new[] { 1, 2, 3 })
+        {
+            var (moments, word) = Read(task);
+
+            var watching = new Alternating();
+
+            foreach (var moment in moments) watching.Watch(moment);
+
+            output.WriteLine($"task {task}, {moments.Count} lines, {word.Count} words said");
+            output.WriteLine(" reading | at    | groups | judged | pure | covered");
+
+            foreach (var (label, at, groups) in
+                new[] { 0.3, 0.4, 0.5, 0.6, 0.7 }
+                    .Select(one => ("a set  ", one, watching.BySpace(one, floor: 20)))
+                    .Concat(new[] { 0.7, 0.8, 0.9, 0.95, 0.99 }
+                        .Select(one => ("weighed", one, watching.ByLikeness(one, floor: 20)))))
+            {
+                var said = groups
+                    .Select(group => group
+                        .Select(code => word.GetValueOrDefault(code, "?")).ToHashSet())
+                    .ToList();
+
+                // A group is judged where it touches the key at all and pure where everything
+                // in it comes from one class. Untouched groups are neither: the key does not
+                // cover the function words, and counting them as impure would score the key.
+                var judged = 0;
+                var pure = 0;
+                var covered = new Dictionary<string, int>();
+
+                foreach (var group in said)
+                {
+                    var touched = key.Where(one => group.Any(one.Value.Contains)).ToList();
+
+                    if (touched.Count == 0) continue;
+
+                    judged++;
+
+                    if (touched.Count > 1 || !group.All(touched[0].Value.Contains)) continue;
+
+                    pure++;
+                    covered[touched[0].Key] = Math.Max(
+                        covered.GetValueOrDefault(touched[0].Key), group.Count);
+                }
+
+                output.WriteLine(
+                    $" {label} | {at,-5:F2} | {groups.Count,6} | {judged,6} | {pure,4} | "
+                    + string.Join(" ", key.Select(one =>
+                        $"{one.Key} {covered.GetValueOrDefault(one.Key)}/{one.Value.Length}")));
+            }
+        }
+
+        // NO BAR. What either reading is worth across its range has never been measured, and
+        // a threshold written before the first grid would be the answer rather than the
+        // finding. The row that decides is the best PURE one of each reading.
+    }
+
     /// <summary>One task as a stream of moments, and what word each code is.</summary>
     /// <param name="task">Which task to read.</param>
     /// <remarks>

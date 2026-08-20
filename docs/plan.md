@@ -310,9 +310,10 @@ before six that reads as tuning is out of order.
       `Latent`'s three-code scopes fire 0.2 times each, so depth is never tested. Fork **112**.
     - **NOW** — concept-before-label is measured, and alternation groups things with no word
       for them yet. Four groups on bAbI, all word classes.
-    - **OPEN** — `BySpace` throws the counts away and `ByLikeness` keeps them, and what
-      priced a category was read on the second. Weighing drops an impurity and a group,
-      and neither threshold is calibrated. Fork **131**.
+    - **NOW** — `ByLikeness` beats `BySpace` on text at every threshold: three pure classes
+      on three tasks against two, one and nought.
+    - **OPEN** — but `ByTime` is what `Returning` needs, so no reading wins both. A weighed
+      adhesion is unbuilt. Fork **131**.
     - **OPEN** — what rung five names is a SET, never a variable, so the two rungs are not
       independent: a code carrying position AND value together makes the shared thing
       unnameable.

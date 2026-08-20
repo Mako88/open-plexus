@@ -1,4 +1,4 @@
-using OpenPlexus.Bus;
+﻿using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -175,7 +175,7 @@ public sealed class LatenessTests(ITestOutputHelper output)
     /// exposed to.
     /// </para>
     /// <para>
-    /// <b>And the cost is wall clock per round, which a barrier makes inevitable.</b> A round
+    /// <b>And the cost is wall clock per round</b>, which a barrier makes inevitable. A round
     /// waits on its slowest delivery, so one late message costs the whole round — the fleet
     /// is paced by its unluckiest holder, twice a round. That is the price of the property
     /// above rather than a defect, and it is what fork 62's slots would buy back.

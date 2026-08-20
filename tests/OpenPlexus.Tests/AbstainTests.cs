@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -118,7 +118,7 @@ public sealed class AbstainTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The verdict fires in a run, at about the rate the world was told to withhold.</b>
+    /// <b>The verdict fires in a run</b>, at about the rate the world was told to withhold.
     /// </summary>
     /// <remarks>
     /// <b>The rate is the check rather than the mere presence of a count.</b> A single

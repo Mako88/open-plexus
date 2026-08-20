@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -27,7 +27,7 @@ namespace OpenPlexus.Tests;
 /// separately. Repair walks specific-to-general nowhere; this is the step that would.
 /// </para>
 /// <para>
-/// <b>So the question before the build is whether there is anything to fire on.</b> A
+/// <b>So the question before the build</b> is whether there is anything to fire on. A
 /// population holding no two commitments that differ in one position gives the operator
 /// nothing, and rung four would then be blocked by the SHAPE of what is learnt rather
 /// than by the operator being unbuilt — a different problem with a different fix. That is
@@ -71,14 +71,14 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
     /// </summary>
     /// <param name="all">The population to read.</param>
     /// <remarks>
-    /// <b>Keyed on the scope with one position blanked, which is the hole itself.</b> Two
+    /// <b>Keyed on the scope with one position blanked</b>, which is the hole itself. Two
     /// commitments land in the same group exactly when one variable would cover both, so
     /// a group of size N is a proposal to replace N rules with one — and the size is what
     /// says whether the replacement is worth making rather than a rename.
     /// </remarks>
     /// <param name="anchored">
     /// Whether to count only groups whose members keep a real code beside the hole.
-    /// <b>The instrument check, and it is the same one twice already caught today.</b> A
+    /// <b>The instrument check</b>, and it is the same one twice already caught today. A
     /// scope of ONE code with that code blanked becomes <i>whichever code of this kind,
     /// expect Y</i> — which fires on every moment holding any word at all and is a rule
     /// about nothing. Counting those as siblings would make the trigger look abundant on

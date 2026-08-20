@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
@@ -200,7 +200,7 @@ public readonly record struct Asking
     /// of it flattens this in one call.
     /// </para>
     /// <para>
-    /// <b>Newest first so that a position means the same thing in every story.</b> Counting
+    /// <b>Newest first</b>, so that a position means the same thing in every story. Counting
     /// from the start would make <i>the second statement</i> a different distance from the
     /// question in a two-line story and a nine-line one, so a code minted on it would name
     /// two unrelated things.

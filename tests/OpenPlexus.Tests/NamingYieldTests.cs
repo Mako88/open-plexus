@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -13,7 +13,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The finding this file exists to explain is that more material mints fewer names.</b>
+/// <b>The finding this file exists to explain</b>: more material mints fewer names.
 /// <see cref="BudgetCurveTests"/> reads the repair budget across the curve and rung five's
 /// count falls as the budget rises, while <c>Tally.Eligible</c> — the scopes it is offered —
 /// rises with it. That is the opposite of what a redundancy detector should do, and every
@@ -29,7 +29,7 @@ namespace OpenPlexus.Tests;
 /// unprovable.
 /// </para>
 /// <para>
-/// <b>The hypothesis under test, written down before the grid so it can be wrong.</b> The
+/// <b>The hypothesis under test</b>, written down before the grid so it can be wrong. The
 /// gate ends on a tail divided among the candidates, so it tightens from both sides as a
 /// population grows: more eligible scopes drawn from more lineages dilute any one pair's
 /// SHARE, which is what z is computed on, and more distinct pairs multiply the correction
@@ -328,7 +328,7 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     /// <param name="share">What fraction of them each of the two codes appears in.</param>
     /// <param name="together">How many scopes hold BOTH, which is the redundancy itself.</param>
     /// <remarks>
-    /// <b>The reuse is the point and it is what a bigger budget buys.</b> Repair adds one
+    /// <b>The reuse is the point</b>, and it is what a bigger budget buys. Repair adds one
     /// code from a vocabulary of twenty-two, so a population that grows is a population
     /// re-deriving the same codes in more combinations — each code's own share holds up
     /// while any PARTICULAR pair's share falls. Growing a population whose extra scopes used
@@ -671,7 +671,7 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The graded arm is wired at the front end and inert behind it.</b> A grid of
+    /// <b>The graded arm is wired at the front end</b> and inert behind it. A grid of
     /// nearly-identical rows could not have told that apart from a null result. Naming counts
     /// pairs over SCOPES, so a code that never enters a scope can never enter a name — and
     /// nothing in this machine can put this one in one.
@@ -744,7 +744,7 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A coarse code changes what can be named and nothing about what is true.</b>
+    /// <b>A coarse code changes what can be named</b> and nothing about what is true.
     /// </summary>
     /// <remarks>
     /// <para>

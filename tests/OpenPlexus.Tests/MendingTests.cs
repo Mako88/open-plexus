@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -184,7 +184,7 @@ public sealed class MendingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The two cells nothing has ever run — the whole grid, at last.</b>
+    /// <b>The two cells nothing has ever run</b> — the whole grid, at last.
     /// </summary>
     /// <remarks>
     /// <para>

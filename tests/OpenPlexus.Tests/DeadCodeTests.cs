@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using OpenPlexus.Codes;
@@ -8,7 +8,7 @@ namespace OpenPlexus.Tests;
 
 /// <summary>
 /// Every public member is either CALLED, or named here with the reason it is
-/// not — <b>a budget, like the dials and the doc and the clones and the row.</b>
+/// not — <b>a budget</b>, like the dials and the doc and the clones and the row.
 /// </summary>
 /// <remarks>
 /// <para>

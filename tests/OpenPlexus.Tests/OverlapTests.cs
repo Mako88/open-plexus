@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -20,7 +20,7 @@ namespace OpenPlexus.Tests;
 /// whole question is where between those the mechanism stops agreeing with itself.
 /// </para>
 /// <para>
-/// <b>So the overlap is the dial and it is the world's, not the brain's.</b> Each machine
+/// <b>So the overlap is the dial and it is the world's</b>, not the brain's. Each machine
 /// draws each round either from a stream both can see or from one only it can, and the
 /// share decides which. Nothing about the learner changes across the sweep, which is what
 /// makes the column readable.

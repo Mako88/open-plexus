@@ -11,7 +11,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A message that does not come back identical is fork 12 spread across machines.</b>
+/// <b>A message that does not come back identical is fork 12</b>, spread across machines.
 /// A reading is a quantised number, so a double differing in its last bit codes
 /// differently at a band boundary and becomes a DIFFERENT OBSERVATION. That fault has
 /// cost this project twice from inside one process; over a wire it would be worse,
@@ -26,7 +26,7 @@ namespace OpenPlexus.Tests;
 public sealed class WireTests(ITestOutputHelper output)
 {
     /// <summary>
-    /// <b>The values a format gets wrong, rather than the ones it gets right.</b>
+    /// <b>The values a format gets wrong</b>, rather than the ones it gets right.
     /// </summary>
     /// <remarks>
     /// Fifteen significant figures is the default for a lot of serialisers and it loses
@@ -79,8 +79,8 @@ public sealed class WireTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>And the one either side of a band edge, which is where it would actually
-    /// bite.</b>
+    /// <b>And the one either side of a band edge</b>, which is where it would actually
+    /// bite.
     /// </summary>
     /// <remarks>
     /// A quantiser turns a reading into a code by comparing against an edge. Two readings
@@ -108,8 +108,8 @@ public sealed class WireTests(ITestOutputHelper output)
 
     /// <summary>A code is two numbers and both of them are exact.</summary>
     /// <remarks>
-    /// <b>The value is a <see cref="ulong"/> and JSON numbers are doubles in a lot of
-    /// readers</b>, which silently loses precision above 2^53 — and a code's value is a
+    /// <b>The value is a <see cref="ulong"/> and JSON numbers are doubles</b> in a lot of
+    /// readers, which silently loses precision above 2^53 — and a code's value is a
     /// hash, so the high bits are the ones carrying the identity.
     /// </remarks>
     [Fact]
@@ -124,13 +124,13 @@ public sealed class WireTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Every property of every message reaches the wire, and this is the check that
-    /// does not rot.</b>
+    /// <b>Every property of every message reaches the wire</b>, and this is the check that
+    /// does not rot.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A round trip that compares bytes to bytes proves stability and not
-    /// losslessness.</b> A field the serialiser cannot see is missing from BOTH sides and
+    /// <b>A round trip comparing bytes to bytes proves stability</b> and not
+    /// losslessness. A field the serialiser cannot see is missing from BOTH sides and
     /// the two agree perfectly — which is precisely how the walk's edge kind behaved: a
     /// struct whose whole state was private, written as <c>{}</c>, read back as a relation
     /// no machine ever named, with nothing thrown and nothing unequal. <b>That type is gone
@@ -138,13 +138,13 @@ public sealed class WireTests(ITestOutputHelper output)
     /// written for.
     /// </para>
     /// <para>
-    /// <b>So the property is asked of the type rather than of one value.</b> Every public
+    /// <b>So the property is asked of the type</b> rather than of one value. Every public
     /// property must appear in the written form. A message that grows a field later is
     /// covered without this test being edited, which is the difference between a budget
     /// and a list somebody has to remember to update.
     /// </para>
     /// <para>
-    /// <b>And the list is the whole ask and answer tree rather than the two top types.</b>
+    /// <b>And the list is the whole ask and answer tree</b> rather than the two top types.
     /// A nested payload is where a private table or a tuple key hides — <see cref="Counts"/>
     /// is what rung five reads off another machine, and a holder that shipped it as
     /// <c>{}</c> would name nothing and report no error.
@@ -326,7 +326,7 @@ public sealed class WireTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Silence is a thing a holder says, and it has to survive the trip.</b>
+    /// <b>Silence is a thing a holder says</b>, and it has to survive the trip.
     /// </summary>
     /// <remarks>
     /// A holder that fired nothing has been HEARD FROM; a holder that died has not, and the

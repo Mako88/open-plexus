@@ -177,7 +177,7 @@ public sealed class MonkTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Every rule the key calls true is true, and a contradiction is not.</b>
+    /// <b>Every rule the key calls true is true</b>, and a contradiction is not.
     /// </summary>
     /// <remarks>
     /// The second half is the one that matters: a scope pinning one attribute to two
@@ -281,7 +281,7 @@ public sealed class MonkTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Whether the failures are asking for a rung — fork 50, as a number.</b>
+    /// <b>Whether the failures are asking for a rung</b> — fork 50, as a number.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -302,7 +302,7 @@ public sealed class MonkTests(ITestOutputHelper output)
     /// entirely, where the true rules ARE conjunctions and this should be near nought.
     /// </para>
     /// <para>
-    /// <b>And if the number is flat across all four, the rung is not what is missing.</b>
+    /// <b>A number flat across all four says the rung is not what is missing.</b>
     /// That is the outcome worth most: it would say `Monk-2`'s ceiling is the floor, the
     /// budget or the gates refusing to repair rather than the language failing to describe,
     /// and every argument for rung two so far has been an argument.

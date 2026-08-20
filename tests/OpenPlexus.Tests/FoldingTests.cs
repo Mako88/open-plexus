@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -21,7 +21,7 @@ namespace OpenPlexus.Tests;
 /// list already carries, running in the other direction.
 /// </para>
 /// <para>
-/// <b>Because a moment is folded before anything fires, and folding needs the names.</b>
+/// <b>Because a moment is folded before anything fires</b>, and folding needs the names.
 /// <see cref="Naming.Fold"/> adds every minted name whose members are all present, and
 /// runs to a fixed point because a name may stand for a set containing names. A holder
 /// folds with the names IT has minted. Two holders that abstracted on different evidence

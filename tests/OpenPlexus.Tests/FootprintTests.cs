@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -209,7 +209,7 @@ public sealed class FootprintTests(ITestOutputHelper output)
     /// ever weighed.
     /// </para>
     /// <para>
-    /// <b>No bar on the direction, because this is the first reading of it.</b> What is
+    /// <b>No bar on the direction</b>, because this is the first reading of it. What is
     /// asserted is that the two run lengths are comparable at all — the same world, the same
     /// seed, the same dials — and the ratio is printed. A threshold here would be deciding
     /// the answer in the file that asks the question.

@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -184,7 +184,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
     /// same dial becomes what its documentation always claimed.
     /// </para>
     /// <para>
-    /// <b>And it does not bind at its shipped value, which is why the levels here are small.</b>
+    /// <b>And it does not bind at its shipped value</b>, which is why the levels here are small.
     /// A child adds one code, so a parent's distinct children are capped by the vocabulary —
     /// twenty-two at eleven bits, against a budget of two hundred and fifty-six. Every level
     /// above the vocabulary is the same arm, and the interesting range is the one nobody could

@@ -126,7 +126,7 @@ public sealed class PushbackTests(ITestOutputHelper output)
     ];
 
     /// <summary>
-    /// <b>The list is printed every run, which is the only thing that makes it work.</b>
+    /// <b>The list is printed every run</b>, which is the only thing that makes it work.
     /// </summary>
     /// <remarks>
     /// The failure this addresses is not not-knowing, it is not-consulting — the same one

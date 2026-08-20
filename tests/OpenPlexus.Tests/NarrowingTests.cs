@@ -33,7 +33,7 @@ namespace OpenPlexus.Tests;
 /// with depth, the narrowing is earned and fork 68 is answered no.
 /// </para>
 /// <para>
-/// <b>The mean is over commitments and not over firings, which matters at depth.</b> A rung
+/// <b>The mean is over commitments and not over firings</b>, which matters at depth. A rung
 /// holding many rules that each fire twice would otherwise read as a rung nobody uses, when
 /// what it is is a rung spread thin — and those want opposite conclusions.
 /// </para>
@@ -121,7 +121,7 @@ public sealed class NarrowingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The overshoot reading fires, and it is not the same number at both widths.</b>
+    /// <b>The overshoot reading fires</b>, and it is not the same number at both widths.
     /// </summary>
     /// <remarks>
     /// <para>

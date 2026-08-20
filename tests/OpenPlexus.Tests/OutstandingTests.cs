@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using OpenPlexus.Codes;
 using Xunit.Abstractions;
 
@@ -248,7 +248,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>`Drives` is the last idea owed off `csharp`, and that branch is not coming back.</b>
+    /// <b>`Drives` is the last idea owed off `csharp`</b>, and that branch is not coming back.
     /// </summary>
     /// <remarks>
     /// <para>

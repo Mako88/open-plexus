@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -28,8 +28,8 @@ namespace OpenPlexus.Tests;
 /// against, and the number of candidates the bar is corrected for.
 /// </para>
 /// <para>
-/// <b>So the question is not whether two holders agree, it is whether either one still
-/// speaks.</b> The description-length bar wants a pair in three scopes and the gate wants
+/// <b>So the question is whether either holder still speaks</b>, rather than whether the
+/// two agree. The description-length bar wants a pair in three scopes and the gate wants
 /// three scopes to exist at all. A twelfth of a population may hold neither, and rung five
 /// would then not diverge across machines — it would go silent on all of them, which reads
 /// from any score exactly like a mechanism that was never load-bearing.
@@ -38,10 +38,10 @@ namespace OpenPlexus.Tests;
 public sealed class SplitNamingTests(ITestOutputHelper output)
 {
     /// <summary>
-    /// Rounds, <b>and the five hundred past the last sweep are the point of the number.</b>
+    /// Rounds, <b>and the five hundred past the last sweep are the point</b> of the number.
     /// </summary>
     /// <remarks>
-    /// <b>A run ending on a sweep round is read at its most exhausted.</b> This file's whole
+    /// <b>A run ending on a sweep round is read at its most exhausted</b>. This file's whole
     /// subject is what a trained population would name NEXT. At twenty thousand exactly,
     /// three seeds in eight have nothing left to say — so the assertions here stood on seed
     /// one happening to be one of the five that did, which is the single-seed ordering this

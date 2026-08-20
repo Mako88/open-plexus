@@ -393,7 +393,7 @@ public sealed class PopulationTests(ITestOutputHelper output)
     /// the ungated arm on all four cells of its grid, and widening went with it.
     /// </para>
     /// <para>
-    /// <b>The reason is arithmetic rather than a world, which is why the check stays.</b> A
+    /// <b>The reason is arithmetic rather than a world</b>, which is why the check stays. A
     /// perfect record over n firings clears a one-sided bar at <c>alpha</c> for every base
     /// rate below roughly <c>n / (n + 2.71)</c>. At the shipped floor of twenty that is 0.88,
     /// and the most skewed world on this bench draws four in five — so ANY future gate

@@ -1,4 +1,4 @@
-using OpenPlexus.Bus;
+﻿using OpenPlexus.Bus;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 
@@ -284,7 +284,7 @@ public sealed class Ported : IAsyncDisposable
     /// <param name="which">Which holder goes quiet.</param>
     /// <remarks>
     /// <para>
-    /// <b>The other kind of death, and it is the one no write-off can reach.</b>
+    /// <b>The other kind of death</b>, and it is the one no write-off can reach.
     /// <see cref="KillAsync"/> closes the door, so a post is refused and the sender WATCHES
     /// the question fail to leave — which is fork 53 and is exact. This drops the
     /// subscription and leaves the listener up: the ask is accepted, acknowledged, routed
@@ -293,7 +293,7 @@ public sealed class Ported : IAsyncDisposable
     /// a deadline could separate and only a slot can survive.
     /// </para>
     /// <para>
-    /// <b>And it is deterministic, which is why it is this and not a raced kill.</b> Killing
+    /// <b>And it is deterministic</b>, which is why it is this and not a raced kill. Killing
     /// a machine mid-round means winning a race against a socket to make the test say
     /// anything at all — so the round it lands in would vary run to run and a green suite
     /// would be evidence about scheduling. A holder that never answers is that same

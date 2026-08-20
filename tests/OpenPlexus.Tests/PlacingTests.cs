@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -19,7 +19,7 @@ namespace OpenPlexus.Tests;
 /// repaired with <c>x</c> are one scope reached from two roots.
 /// </para>
 /// <para>
-/// <b>John's is the minimum code of the sorted scope, and it buys both.</b> A scope is
+/// <b>John's is the minimum code of the sorted scope</b>, and it buys both. A scope is
 /// already canonicalised as a sorted set, so the minimum is free; identical scopes have
 /// identical minima and land together, and a lineage rooted at that minimum stays together.
 /// What it cannot buy is spread, and that is the number this file exists for.
@@ -66,7 +66,7 @@ public sealed class PlacingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>What placing by the minimum code costs in spread — a grid, and no bar.</b>
+    /// <b>What placing by the minimum code costs in spread</b> — a grid, and no bar.
     /// </summary>
     /// <remarks>
     /// <b>Measured before the change rather than after it, which is the point.</b> Fork 3

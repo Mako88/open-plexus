@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using Xunit.Abstractions;
@@ -29,7 +29,7 @@ public sealed class PostedTests(ITestOutputHelper output)
     private static string Free() => Wired.Free();
 
     /// <summary>
-    /// <b>No two machines are offered the same port, and they can all hold it at once.</b>
+    /// <b>No two machines are offered the same port</b>, and they can all hold it at once.
     /// </summary>
     /// <remarks>
     /// <para>

@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Tests;
@@ -255,7 +255,7 @@ public sealed class MultiplexerTests(Xunit.Abstractions.ITestOutputHelper output
     /// for one. Only how often the answer is one may differ.
     /// </para>
     /// <para>
-    /// <b>It arrived here with the vote arm it was built for, and outlived it.</b> The
+    /// <b>It arrived here with the vote arm it was built for</b>, and outlived it. The
     /// base-rate divisor is deleted; the world property it needed is a fact about the world
     /// and every skewed grid on this bench still rests on it.
     /// </para>

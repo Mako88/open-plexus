@@ -9,7 +9,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Separate buses and separate ports is what makes a test distributed at all.</b> Two
+/// <b>Separate buses and separate ports</b> is what makes a test distributed at all. Two
 /// holders on one bus would share a dictionary, which is the arrangement every measurement
 /// in this project has been taken under and the one <see cref="Posted"/> exists to stop
 /// being the only one.
@@ -22,7 +22,7 @@ namespace OpenPlexus.Tests;
 /// whatever order the fleet came up in.
 /// </para>
 /// <para>
-/// <b>Shared because two files now bring a fleet up and the copies would drift.</b>
+/// <b>Shared</b>, because two files now bring a fleet up and the copies would drift.
 /// <c>AskedTests</c> puts one exchange on a socket and <c>FleetTests</c> runs a whole
 /// learner over one; a difference in how the fleet is composed would show up as a
 /// difference the wire appeared to cause, which is exactly what <c>Fixture.Sharded</c>

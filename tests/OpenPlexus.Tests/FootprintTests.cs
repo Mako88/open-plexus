@@ -6,13 +6,13 @@ using Xunit.Abstractions;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// What a population costs to HOLD — <b>the first byte count in this project, and the only
-/// instrument that can refute the north star.</b>
+/// What a population costs to HOLD — <b>the first byte count in this project</b>, and the only
+/// instrument that can refute the north star.
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Every instrument here watches time or counts rows, and the traps list already names
-/// that shape.</b> A cost can sit in memory while every reading watches the clock; a run
+/// <b>Every instrument here watches time or counts rows</b>, and the traps list already names
+/// that shape. A cost can sit in memory while every reading watches the clock; a run
 /// that gets slower is noticed within a session and a run that gets fatter is noticed when
 /// it will not start. Residents, tables, scopes and names have all been counted since the
 /// branch began, and not one of them is in bytes.
@@ -140,8 +140,8 @@ public sealed class FootprintTests(ITestOutputHelper output)
     /// holder's share fits on the machine the north star names.
     /// </para>
     /// <para>
-    /// <b>And the table is expected to dominate, which is fork 51 in bytes for the first
-    /// time.</b> A commitment is a scope, an expectation and three counters; its
+    /// <b>And the table is expected to dominate</b>, which is fork 51 in bytes for the first
+    /// time. A commitment is a scope, an expectation and three counters; its
     /// <c>Separations</c> is one entry per code it has ever been asked about, and an
     /// always-present code is an entry in every table forever. So the ratio worth reading is
     /// bytes per ENTRY, and bytes per commitment is that times however many entries a

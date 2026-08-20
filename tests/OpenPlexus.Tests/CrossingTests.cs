@@ -24,6 +24,16 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class CrossingTests(ITestOutputHelper output)
 {
+    /// <summary>How many rounds the measurement runs for.</summary>
+    /// <remarks>
+    /// <b>Sized to a runner and not to a target.</b> Two hundred rounds took three minutes
+    /// on this front end, so twenty thousand is five hours — and a runner reports that as
+    /// cancelled rather than as overrun, which is the trap about a timeout wearing the
+    /// concurrency group's clothes. Two thousand is half an hour and it is what the cost
+    /// allows; raise it when the moment gets narrower rather than when patience does.
+    /// </remarks>
+    private const int Rounds = 2_000;
+
     private static CrossingSettings Clean(
         int words = 16, int facts = 4, int stride = 4, int asked = 64, bool scrambled = false) =>
         new()
@@ -178,7 +188,7 @@ public sealed class CrossingTests(ITestOutputHelper output)
         var chance = 1.0 / (world.Words + world.Facts);
 
         var read = new CrossingRun(world, brain, seed: 1)
-            .Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
+            .Run(rounds: Rounds, sweep: 500, target: 0.9, window: 2000);
 
         var crossing = Assert.IsType<Examined>(read.Learnt.Unseen);
         var placed = Assert.IsType<Examined>(read.Placed);

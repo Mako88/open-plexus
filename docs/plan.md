@@ -451,11 +451,12 @@ before six that reads as tuning is out of order.
       advocate, so neither specificity nor a crowd separates them, and crediting converts a
       tie into an outranking only by recency. So the machine SAYS SO instead, a weight of
       nought being no advocate ever having been right. John's. `Deciding`.
-    - **NOW** — and declining is free where there is evidence and its home is a young
-      POPULATION, so told once it declines everything and gives up rounds scoring at a coin.
-      Asking on a decline is `Untested` renamed and is refuted.
+    - **NOW** — and its home is a young POPULATION, so told once it declines everything and
+      gives up rounds scoring at a coin. Asking on a decline is `Untested` renamed and refuted.
+    - **NOW** — and it is free on a WATCHED world and costs a third of the asks on an acted
+      one, the chooser reading the same vote.
     - **NOW** — and the three together answer a paper never sat, told once, on drawn lessons
-      rather than on the one written text. The wide root, credited mints, every word claimed.
+      rather than the one written text. The wide root, credited mints, every word claimed.
     - **NOW** — `Alternating` is live and its store add-only, so a front end fills its OWN
       vocabulary, reaching every group the experimenter's holds for no score.
     - **OPEN** — it costs 4.7x the rules. Nothing waits for a group to hold still, and the

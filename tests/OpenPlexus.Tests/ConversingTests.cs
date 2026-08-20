@@ -810,9 +810,19 @@ public sealed class ConversingTests(ITestOutputHelper output)
     {
         const int Exchanges = 300;
 
+        // Twenty-four rather than eight, and the reason is a finding rather than a preference.
+        // `Deciding.Grounded` reaches the CHOOSER as well as the assertion -- `Curiosity`
+        // branches on what the population expects, so where nothing is grounded there is no
+        // claim to make and the machine falls to a blind ask or to silence. How young a
+        // population is varies by seed, so the arm's spread rose with it while the effect
+        // stayed where it was: three doings still settle twice what one does. Eight seeds put
+        // that inside three standard errors, which is a small sample hiding a real effect
+        // rather than the bar being wrong, so the bar is untouched and the sample is not.
+        const int Seeds = 24;
+
         var settled = new Dictionary<(Correcting, int), (double Gain, double Error)>();
 
-        output.WriteLine("8 seeds, 300 exchanges each, asking at the ceiling");
+        output.WriteLine($"{Seeds} seeds, {Exchanges} exchanges each, asking at the ceiling");
         output.WriteLine(
             "reply     budget       asked          settled        per exchange  refused");
 
@@ -825,7 +835,7 @@ public sealed class ConversingTests(ITestOutputHelper output)
                 var each = new List<double>();
                 var refused = new List<double>();
 
-                for (var seed = 1; seed <= 8; seed++)
+                for (var seed = 1; seed <= Seeds; seed++)
                 {
                     var made = Made(
                         rate: 1.0, Exchanges, seed, correcting: correcting, budget: budget);

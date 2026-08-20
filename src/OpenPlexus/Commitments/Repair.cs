@@ -111,10 +111,25 @@ public enum Rooting
 /// evidence at all, and it is the one condition here that is a fact rather than a level.
 /// </para>
 /// <para>
-/// <b>And it costs the learning nothing</b>, which is what makes it cheap. Settlement tallies
+/// <b>And on a world that is WATCHED it costs the learning nothing.</b> Settlement tallies
 /// everything that fired whatever the vote said, and <c>Brain</c> computes <i>wrong</i> as the
 /// vote not matching what arrived — so a silent vote is a failed round, genesis still runs and
-/// repair still runs. What stops is the assertion, not the learning.
+/// repair still runs. What stops is the assertion.
+/// </para>
+/// <para>
+/// <b>And an ACTED world costs more than that</b>, which is a correction rather
+/// than a caveat: this said the learning was untouched full stop, and that was written from the
+/// watched case alone. <see cref="Machines.Curiosity"/> asks <see cref="Machines.Brain.Voting"/>
+/// what the population expects and branches on the answer, so a moment with nothing grounded
+/// has no claim to make and the machine falls to a blind ask or to silence. Declining removes
+/// DOINGS there, and a doing is how a settlement is obtained — a third of the asks on
+/// <c>Conversing</c>, which is learning rather than assertion.
+/// </para>
+/// <para>
+/// <b>It is coherent rather than a fault</b>, and it ships. Claiming a groundless guess in a
+/// conversation is the thing this exists to stop, and a chooser that declines to claim where
+/// nothing is grounded is the same rule one seam out. What was wrong was the remark, which
+/// let a dial named for the assertion reach the chooser unrecorded.
 /// </para>
 /// <para>
 /// <b>It is not <c>Speaking</c>, which is refuted twice in the plan.</b> That refused an
@@ -146,7 +161,7 @@ public enum Deciding
 /// already correct sits mute for as long as it takes to hear the same thing twice.
 /// </para>
 /// <para>
-/// <b>What it risks is every one-code mint arriving at a perfect accuracy together</b>, which
+/// <b>What it risks is every one-code mint arriving at a perfect accuracy</b> together, which
 /// flattens the vote among them and hands the tie to code order. That is why it is an arm and
 /// not a repair.
 /// </para>

@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Worlds;
@@ -801,7 +801,13 @@ public sealed class Bench
                     }
                 }
 
-                if (!firing.IsDefaultOrEmpty && vote.Expects != arrived)
+                // The loop's own rule for a wrong round, written the same way it is written
+                // in `Round.StepAsync` rather than in terms that happen to agree with it.
+                // Testing `firing` was one case short from the day `Deciding.Grounded`
+                // shipped: a declined vote has fired commitments and no expectation, so it
+                // read as an expectation that differed from what arrived and was counted
+                // wrong here while the loop counted it silent.
+                if (vote.Expects is { } said && said != arrived)
                 {
                     // Who actually decided it, and whether they had earned the right.
                     // `Vote.By` names the best advocate for the side that won, so this

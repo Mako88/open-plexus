@@ -505,6 +505,12 @@ public sealed class LessonTests(ITestOutputHelper output)
     /// the wrong name for this and the work belongs at the front end. That is a reading either
     /// way, which is why the instrument is worth its minute.
     /// </para>
+    /// <para>
+    /// <b>And the two roots are read side by side</b> because that is what says whether the
+    /// two ages are one failure. They are not: minting the whole moment as a scope closes the
+    /// outranking at eight tellings under withheld claiming and leaves every other cell where
+    /// it was, the tie at one telling included.
+    /// </para>
     /// </remarks>
     [Fact]
     public void Why_a_question_whose_rule_is_held_is_answered_wrong()
@@ -516,12 +522,13 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         output.WriteLine($"{Seeds} drawn lessons, 4 things and 3 properties");
         output.WriteLine(
-            $"{"told",-6}{"claiming",-12}{"sat",9}{"right",9}{"absent",9}{"outranked",11}"
-            + $"{"tied",9}{"specific",10}{"crowd",8}");
+            $"{"root",-8}{"told",-6}{"claiming",-12}{"sat",9}{"right",9}{"absent",9}"
+            + $"{"outranked",11}{"tied",9}{"specific",10}{"crowd",8}");
 
-        var split = new Dictionary<(int Told, Asserting Claiming), Seats>();
-        var sat = new Dictionary<(int Told, Asserting Claiming), double>();
+        var split = new Dictionary<(Rooting Root, int Told, Asserting Claiming), Seats>();
+        var sat = new Dictionary<(Rooting Root, int Told, Asserting Claiming), double>();
 
+        foreach (var rooting in new[] { Rooting.Singly, Rooting.Wholly })
         foreach (var many in new[] { 1, 8 })
         foreach (var asserting in new[]
         {
@@ -529,14 +536,16 @@ public sealed class LessonTests(ITestOutputHelper output)
         })
         {
             var (scored, _, _, _, _) = Over(
-                Seeds, Purpose, written: false, Carrying.Never, asserting, many);
+                Seeds, Purpose, written: false, Carrying.Never, asserting, many,
+                rooting: rooting);
 
             // Read on a run that STOPS before the questions, which is the whole reason for the
             // second call. A settled question mints and repairs like any other round, so the
             // population a run finishes with has been taught by the paper it is being asked
             // about -- and the first version of this read 1.000 where the machine scored 0.750.
             var (_, _, _, _, seated) = Over(
-                Seeds, Purpose, written: false, Carrying.Never, asserting, many, passes: 0);
+                Seeds, Purpose, written: false, Carrying.Never, asserting, many,
+                rooting: rooting, passes: 0);
 
             var seats = new Seats
             {
@@ -557,11 +566,12 @@ public sealed class LessonTests(ITestOutputHelper output)
                     : seated.Sum(one => one.Tied * one.Crowd) / seated.Sum(one => one.Tied),
             };
 
-            split[(many, asserting)] = seats;
-            sat[(many, asserting)] = scored.Average();
+            split[(rooting, many, asserting)] = seats;
+            sat[(rooting, many, asserting)] = scored.Average();
 
             output.WriteLine(
-                $"{many,-6}{asserting.ToString().ToLowerInvariant(),-12}"
+                $"{rooting.ToString().ToLowerInvariant(),-8}{many,-6}"
+                + $"{asserting.ToString().ToLowerInvariant(),-12}"
                 + $"{scored.Average(),9:F3}{seats.Right,9:F3}"
                 + $"{seats.Absent,9:F3}{seats.Outranked,11:F3}{seats.Tied,9:F3}"
                 + $"{seats.Specific,10:F3}{seats.Crowd,8:F3}");
@@ -579,8 +589,9 @@ public sealed class LessonTests(ITestOutputHelper output)
         // wherever the examination teaches, and a probe ABOVE it is reading a later machine.
         foreach (var (at, seats) in split)
             output.WriteLine(
-                $"told {at.Told}, {at.Claiming.ToString().ToLowerInvariant()}: sat "
-                + $"{sat[at]:F3}, probe {seats.Right:F3}");
+                $"{at.Root.ToString().ToLowerInvariant()}, told {at.Told}, "
+                + $"{at.Claiming.ToString().ToLowerInvariant()}: sat {sat[at]:F3}, probe "
+                + $"{seats.Right:F3}");
 
         // The kill line, written before the grid ran. If a wrong answer is usually one where
         // nothing expecting the right word even fired, the seat is the wrong name for this and
@@ -603,7 +614,7 @@ public sealed class LessonTests(ITestOutputHelper output)
             Asserting.Rarest, Asserting.Withheld, Asserting.Everything,
         })
         {
-            var seats = split[(8, asserting)];
+            var seats = split[(Rooting.Singly, 8, asserting)];
 
             Assert.Equal(0.0, seats.Absent);
             Assert.Equal(0.0, seats.Tied);
@@ -613,10 +624,61 @@ public sealed class LessonTests(ITestOutputHelper output)
         // And told ONCE it is a different failure wearing the same score. Half of what claiming
         // the rarest word gets wrong is a tie, and a tie is not a ranking failure -- it is the
         // vote being handed two rules it has no way to tell apart.
-        Assert.True(split[(1, Asserting.Rarest)].Tied > split[(1, Asserting.Rarest)].Right,
-            $"tied is {split[(1, Asserting.Rarest)].Tied:F3} against "
-            + $"{split[(1, Asserting.Rarest)].Right:F3} right, so the one-telling loss has "
-            + "stopped being a tie and the two ages are one failure after all");
+        var once = split[(Rooting.Singly, 1, Asserting.Rarest)];
+
+        Assert.True(once.Tied > once.Right,
+            $"tied is {once.Tied:F3} against {once.Right:F3} right, so the one-telling loss "
+            + "has stopped being a tie and the two ages are one failure after all");
+
+        // And the two ages are two failures, which is what the wide root says by closing only
+        // one of them. Minting the whole moment as a scope takes the outranking at eight
+        // tellings to nought under WITHHELD claiming and moves nothing anywhere else -- not at
+        // one telling, and not at eight under the other two claiming arms.
+        //
+        // Both halves of that have a mechanism. It pays under withheld because that arm leaves
+        // the claim out of the scope, so the wide mint is exactly the question's words and
+        // fires on it; under the other arms the claim is IN the scope, and a scope holding the
+        // answer cannot fire on a question that does not name it. And it does nothing at one
+        // telling because a wide mint starts blank exactly as a narrow one does, so it joins
+        // the tie rather than breaking it -- crediting is the dial that would change that and
+        // this grid holds it off.
+        //
+        // So the wide root is an interaction with what a statement claims rather than a main
+        // effect, and the tie at one telling is still unanswered by anything built.
+        foreach (var asserting in new[]
+        {
+            Asserting.Rarest, Asserting.Withheld, Asserting.Everything,
+        })
+        foreach (var many in new[] { 1, 8 })
+        {
+            var narrow = split[(Rooting.Singly, many, asserting)];
+            var wide = split[(Rooting.Wholly, many, asserting)];
+
+            output.WriteLine(
+                $"told {many}, {asserting.ToString().ToLowerInvariant()}: singly "
+                + $"{narrow.Right:F3} right ({narrow.Outranked:F3} outranked, "
+                + $"{narrow.Tied:F3} tied), wholly {wide.Right:F3} right "
+                + $"({wide.Outranked:F3} outranked, {wide.Tied:F3} tied)");
+        }
+
+        Assert.True(
+            split[(Rooting.Wholly, 8, Asserting.Withheld)].Right
+                > split[(Rooting.Singly, 8, Asserting.Withheld)].Right,
+            "the wide root answers no more of the examination than the shipped one where the "
+            + "shipped one is outranked, so minting the whole moment reaches none of the "
+            + "outranking either and nothing built here touches the seat");
+
+        // And the negative beside it, because a mechanism that fixes one cell and is read as
+        // fixing the failure is how a story outruns its evidence. The tie is where the loss is
+        // at one telling and the wide root leaves every tied question tied.
+        foreach (var asserting in new[]
+        {
+            Asserting.Rarest, Asserting.Withheld, Asserting.Everything,
+        })
+            Assert.Equal(
+                split[(Rooting.Singly, 1, asserting)].Tied,
+                split[(Rooting.Wholly, 1, asserting)].Tied,
+                3);
 
         // The negative that kills both obvious tie-breaks before either is built. In every tied
         // question the right rule and the winner have the same weight, the same scope length

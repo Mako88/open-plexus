@@ -560,7 +560,11 @@ public sealed class DocsTests
     // brain as its own project, so the boundary is the compiler's; and a holder host with a
     // harness that takes peers, which is the first run on two processes. The doc is still one
     // a session loads whole, which is the condition that matters.
-    private const int Whole = 11_626;
+    // And 11,682 is the fifty-fourth raise, fifty-four words, for a finding rather than a plan:
+    // the brain names a world in six places, so it cannot become its own project until they
+    // go. Five are one fork and the sixth is not, and the entry says which is which because a
+    // session that reads only the count will fix the wrong half.
+    private const int Whole = 11_680;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

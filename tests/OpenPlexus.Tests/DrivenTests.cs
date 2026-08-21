@@ -452,6 +452,97 @@ public sealed class DrivenTests(ITestOutputHelper output)
             + "something while it is exact.");
     }
 
+    /// <summary>Where the brain names a world today, and it may only shrink.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Five of the six are one shape.</b> A front end is typed on the record its world
+    /// hands over, so <c>Joined</c> knows what a sentence is and <c>Tiling</c> knows what a
+    /// crossed observation is. Either those records are seam vocabulary and belong beside
+    /// <see cref="OpenPlexus.Codes.Coded"/>, or a front end typed on one world's record is a
+    /// translation for that world and belongs at the join. That is a fork rather than a
+    /// defect, and it is John's.
+    /// </para>
+    /// <para>
+    /// <b>The sixth is not a fork.</b> <c>Bodied</c> reads <c>Homeostat.Act</c> and calls
+    /// <c>Homeostat.Attending</c>, so a front end inside the brain is calling a world's
+    /// static members for a modality and a code. Whichever way the fork above goes, that one
+    /// is the arrow this file is about.
+    /// </para>
+    /// </remarks>
+    private static readonly IReadOnlySet<string> Trespassing =
+        new HashSet<string>(StringComparer.Ordinal)
+        {
+            "Bodied names Bodily",
+            "Bodied names Homeostat",
+            "Joined names Asking",
+            "Joined names Recited",
+            "Passthrough names Crossed",
+            "Tiling names Crossed",
+        };
+
+    /// <summary>Where the worlds live.</summary>
+    private static string Worlds =>
+        Path.Combine(Tree.Repo(), "src", "OpenPlexus", "Worlds");
+
+    /// <summary>
+    /// <b>No part of the brain names a world.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The other direction, which nothing checked.</b> <c>SeparationTests</c> fails the
+    /// build when a world names a brain type, because that is how a world came to decide how
+    /// the brain thought. The reverse is the same fault with the arrow turned round: a brain
+    /// that knows a world exists cannot be the one brain every world is shown to.
+    /// </para>
+    /// <para>
+    /// <b>And it is what a project boundary would enforce for nothing.</b> A brain in its own
+    /// assembly cannot reference the worlds, because the worlds reference it. Until that
+    /// split lands this is the check that says so, and the list below is the work it costs.
+    /// </para>
+    /// <para>
+    /// <b>Read off the compiled code for the reason this whole file is.</b> The textual
+    /// version reports four more: <c>Unifying</c> holds a field called <c>Binding</c>,
+    /// <c>Curiosity</c> holds one called <c>Asking</c>, and <c>Joined</c> reads a property
+    /// called <c>Question</c> — three world types spelt like three members, and none of them
+    /// a dependency.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void And_no_part_of_the_brain_names_a_world()
+    {
+        var inside = Names(Inside, within: true);
+        var worlds = Names(Worlds, within: true);
+
+        Assert.NotEmpty(worlds);
+
+        var trespass = new SortedSet<string>(StringComparer.Ordinal);
+
+        foreach (var type in Composed().SelectMany(one => one.GetTypes()))
+        {
+            if (!inside.Contains(Spelt(type))) continue;
+
+            foreach (var used in Uses(type))
+                if (worlds.Contains(Spelt(used)))
+                    trespass.Add($"{Spelt(type)} names {Spelt(used)}");
+        }
+
+        foreach (var one in trespass) output.WriteLine($"  {one}");
+
+        var arrived = trespass.Except(Trespassing, StringComparer.Ordinal).ToList();
+        var gone = Trespassing.Except(trespass, StringComparer.Ordinal).ToList();
+
+        Assert.True(arrived.Count == 0,
+            $"{arrived.Count} new place(s) where the brain names a world: "
+            + $"{string.Join(", ", arrived)}. A world is shown to the brain and the brain does "
+            + "not know one exists. Move what is shared to the seam, or move the mechanism to "
+            + "the join.");
+
+        Assert.True(gone.Count == 0,
+            $"{gone.Count} place(s) listed as trespassing and no longer doing so: "
+            + $"{string.Join(", ", gone)}. Take each entry off `Trespassing`, which only means "
+            + "something while it is exact.");
+    }
+
     /// <summary>
     /// <b>The line is where it says it is</b>, so a red cannot be closed by moving a file.
     /// </summary>

@@ -1148,6 +1148,30 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// fact about the transcript rather than a hint about the answer.
     /// </para>
     /// </remarks>
+    /// <summary>One watched run of the house, into a brain built on the dials given.</summary>
+    /// <param name="dials">What the brain is set to. The arm under test lives here.</param>
+    /// <param name="seed">What draws the house and the brain.</param>
+    /// <remarks>
+    /// <b>Watched rather than acted in</b>, which is what the naming questions want. What a
+    /// name is worth is about the population, and a chooser puts a second thing in motion.
+    /// Shared by the two readings above so neither can drift into measuring a different run —
+    /// `DuplicationTests` refused the second copy, correctly.
+    /// </remarks>
+    private static (Tally Tally, Brain Brain) Watched(CommittingSettings dials, int seed)
+    {
+        var brain = new Brain(dials, seed);
+
+        var tally = new Bench(
+            new Watching<Recited>(
+                new Roaming(World(120, people: 4), seed),
+                new Joined(Joining.Resolved, resolution: 3, freshest: true),
+                acting: Chooses.From(_ => null)),
+            brain)
+            .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
+
+        return (tally, brain);
+    }
+
     /// <summary>
     /// What rung five's names DO on the spine world, before anything asks what they buy.
     /// </summary>
@@ -1203,19 +1227,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
         for (var seed = 1; seed <= Seeds; seed++)
         {
-            // Watched rather than acted in, which is the arm this question wants. What a name
-            // is worth is about the population, and a chooser adds a second thing moving.
-            var world = new Roaming(World(120, people: 4), seed);
-
-            var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed);
-
-            var tally = new Bench(
-                new Watching<Recited>(
-                    world,
-                    new Joined(Joining.Resolved, resolution: 3, freshest: true),
-                    acting: Chooses.From(_ => null)),
-                brain)
-                .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
+            var (tally, brain) = Watched(
+                new CommittingSettings { Capacity = 20_000 }, seed);
 
             var held = brain.Held.All.ToList();
             var names = brain.Held.Names;
@@ -1336,6 +1349,126 @@ public sealed class RoamingTests(ITestOutputHelper output)
             var misses = of.Sum(one => one.Misses);
 
             return hits + misses == 0 ? 0.0 : hits / (double)(hits + misses);
+        }
+    }
+
+    /// <summary>
+    /// What the machine loses when the one operator that broadens is switched off.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The control rung five has never had</b>, on the two worlds that mint. Every other
+    /// mechanism here was measured against its own absence before it shipped; this one has
+    /// been unconditional since it was built, so nothing anywhere says what the machine would
+    /// do without it.
+    /// </para>
+    /// <para>
+    /// <b>The spine carries the comparison and the multiplexer is beside it.</b> `Roaming`
+    /// scores well under its ceiling, so a loss has room to show; eleven bits mints three
+    /// times as many names and its outcome columns are AT CEILING, so it can only speak on
+    /// the structural ones. Two worlds, and it is said which is which rather than both being
+    /// read as votes.
+    /// </para>
+    /// <para>
+    /// <b>What kills the rung</b>, written before the run: `Never` matching `Named` on both
+    /// worlds. Then naming buys nothing measurable, the machine is specialise-only in effect,
+    /// and the doc's own line applies — <i>a specialise-only machine is arbitrarily accurate
+    /// and conceptless</i>. That would not be a dial dying; it would be the hierarchy claim
+    /// wanting a different mechanism.
+    /// </para>
+    /// <para>
+    /// <b>And what would make the reading unreadable</b> is the arms differing in anything
+    /// but naming. The sweep still subsumes and still culls under `Never`, so the calendar is
+    /// held still; the counts below are printed so a run where they came apart says so.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_switching_the_broadening_operator_off_costs()
+    {
+        const int Seeds = 5;
+
+        var arms = new[] { Broadening.Named, Broadening.Never };
+
+        var spine = arms.ToDictionary(
+            arm => arm,
+            arm => Enumerable.Range(1, Seeds).Select(seed => Spine(arm, seed)).ToList());
+
+        output.WriteLine($"=== Roaming, {Seeds} seeds, 10,000 rounds ===");
+        output.WriteLine(
+            "arm     |           exam |            own |       resident |        repairs | names");
+
+        foreach (var arm in arms)
+        {
+            var read = spine[arm];
+
+            output.WriteLine(
+                $"{arm,-8}| {Sweep.Spread([.. read.Select(one => one.Exam)]),14} "
+                + $"| {Sweep.Spread([.. read.Select(one => one.Own)]),14} "
+                + $"| {Sweep.Spread([.. read.Select(one => (double)one.Resident)], "F1"),14} "
+                + $"| {Sweep.Spread([.. read.Select(one => (double)one.Repaired)], "F1"),14} "
+                + $"| {read.Average(one => one.Named),5:F1}");
+        }
+
+        output.WriteLine("");
+        output.WriteLine($"=== eleven bits, {Seeds} seeds, 20,000 rounds ===");
+        output.WriteLine(
+            "arm     |         recent |          sound |        unsound |          found | names");
+
+        var bits = arms.ToDictionary(
+            arm => arm,
+            arm => Enumerable.Range(1, Seeds).Select(seed => Bits(arm, seed)).ToList());
+
+        foreach (var arm in arms)
+        {
+            var read = bits[arm];
+
+            output.WriteLine(
+                $"{arm,-8}| {Sweep.Spread([.. read.Select(one => one.Learnt.Recent)]),14} "
+                + $"| {Sweep.Spread([.. read.Select(one => (double)one.Learnt.Sound)], "F1"),14} "
+                + $"| {Sweep.Spread([.. read.Select(one => (double)one.Learnt.Unsound)], "F1"),14} "
+                + $"| {Sweep.Spread([.. read.Select(one => (double)one.Learnt.Found)], "F1"),14} "
+                + $"| {read.Average(one => one.Learnt.Named),5:F1}");
+        }
+
+        // The arm did what it says. `Never` naming anything is the whole of the control, and
+        // a run where it minted would be measuring the sweep calendar instead.
+        Assert.Equal(0, spine[Broadening.Never].Sum(one => one.Named));
+        Assert.Equal(0, bits[Broadening.Never].Sum(one => one.Learnt.Named));
+
+        // And the shipped arm still does, which is the other half. A control against an arm
+        // that had stopped firing would read level and say nothing.
+        Assert.True(spine[Broadening.Named].Sum(one => one.Named) > 0,
+            "the shipped arm minted nothing on the spine, so this grid is comparing two "
+            + "silences and the reading is about the world");
+
+        // No bar on what it costs. That is the reading, and the kill condition above is
+        // written in prose rather than as an assertion because a threshold chosen before the
+        // first run of a control is the answer put in front of the question.
+        return;
+
+        static (double Exam, double Own, int Resident, long Repaired, int Named) Spine(
+            Broadening arm, int seed)
+        {
+            var (tally, _) = Watched(
+                new CommittingSettings { Capacity = 20_000, Broadening = arm }, seed);
+
+            return (
+                tally.Unseen?.Accuracy ?? 0.0,
+                tally.Recent,
+                tally.Resident,
+                tally.Repaired,
+                tally.Named);
+        }
+
+        static (Learned Learnt, int Seed) Bits(Broadening arm, int seed)
+        {
+            var brain = new Brain(new CommittingSettings { Broadening = arm }, seed);
+
+            return (
+                new MultiplexerRun(new MultiplexerSettings { Address = 3 }, brain, seed)
+                    .Run(20_000),
+                seed);
         }
     }
 

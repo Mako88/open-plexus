@@ -294,6 +294,57 @@ public sealed class Recurrence
 }
 
 /// <summary>
+/// Whether the one operator that BROADENS runs at all.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>The control rung five has never had.</b> Every other mechanism here was measured
+/// against its own absence before it shipped; this one has been unconditional since it was
+/// built, so no reading anywhere says what the machine would do without it. An arm only
+/// lives while it is compared, and this one has never been.
+/// </para>
+/// <para>
+/// <b>And the plan says what turns on it.</b> Rungs one to four only ever make a scope
+/// smaller, so a machine where naming buys nothing is specialise-only — <i>arbitrarily
+/// accurate and conceptless</i> in the doc's own words, and the hierarchy claim goes with
+/// it. That is a large enough consequence to be worth one hand-set knob.
+/// </para>
+/// <para>
+/// <b>What made it worth building now</b> is <c>RoamingTests</c>'s matched reading. Named
+/// scopes are level or behind plain ones pinning the same amount, and ahead only at a length
+/// plain scopes barely reach — so a name buys REACH rather than accuracy. Whether reach is
+/// worth anything is exactly what an absence answers and a matched table cannot.
+/// </para>
+/// </remarks>
+public enum Broadening
+{
+    /// <summary>A shared sub-scope gets a name and the scopes holding it are rewritten.</summary>
+    /// <remarks>
+    /// What ships, and what every reading in this repo was taken under. The gate in front of
+    /// it is unchanged: two bars, one mint an ask, and the sweep calendar deciding when it is
+    /// asked at all.
+    /// </remarks>
+    Named,
+
+    /// <summary>
+    /// Nothing is named, so every scope stays spelled in the codes the front end emitted.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The absence, and it is a control rather than a setting anybody would ship. Repair,
+    /// subsumption, culling and the vote are untouched — what goes is the one operator that
+    /// makes a scope SHORTER, so the population can only ever narrow.
+    /// </para>
+    /// <para>
+    /// <b>It costs the sweep nothing else</b>, which is what makes the comparison clean.
+    /// Subsumption and culling still run on their own calendar, so a difference between the
+    /// arms cannot be the sweep happening less often.
+    /// </para>
+    /// </remarks>
+    Never,
+}
+
+/// <summary>
 /// Which of rung five's bars stopped it, or none at all.
 /// </summary>
 /// <remarks>

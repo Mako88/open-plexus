@@ -323,7 +323,13 @@ public sealed class Alone : ICouncil
         if (sweeping)
         {
             subsumed = _held.Subsume();
-            _held.Abstract(heard);
+
+            // The one operator that broadens, and the only place it is asked. Under
+            // `Never` the sweep still subsumes and still culls, so the arms differ in
+            // naming and in nothing else -- a control that also changed the calendar
+            // would be two things moving.
+            if (_held.Dials.Broadening == Broadening.Named) _held.Abstract(heard);
+
             _held.Cull();
 
             at = Mark(ref _sweeping, at);

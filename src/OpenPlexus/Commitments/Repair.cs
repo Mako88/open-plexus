@@ -884,6 +884,9 @@ public sealed record CommittingSettings
     /// <inheritdoc cref="Commitments.Forking"/>
     public Forking Forking { get; init; } = Forking.Distinct;
 
+    /// <inheritdoc cref="Commitments.Broadening"/>
+    public Broadening Broadening { get; init; } = Broadening.Named;
+
 }
 
 /// <summary>

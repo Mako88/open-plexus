@@ -308,6 +308,17 @@ public sealed class DialTests
             + "construction -- promiscuous while the population accounts for nothing "
             + "and quiet once it does -- so there is no level here to aim at",
 
+        ["Broadening"] =
+            "whether the one operator that BROADENS runs at all, and not a level: the arms "
+            + "are a mechanism and its absence, so there is no quantity a controller could "
+            + "hunt. It is the control rung five has never had. Every other mechanism here "
+            + "was measured against its own absence before it shipped and this one has been "
+            + "unconditional since it was built, so nothing anywhere says what the machine "
+            + "would do without it. What turns on it is the doc's own line -- rungs one to "
+            + "four only ever make a scope smaller, so a machine where naming buys nothing "
+            + "is specialise-only, arbitrarily accurate and conceptless, and the hierarchy "
+            + "claim wants a different mechanism",
+
         // ---- arrived from the worlds, 2026-08-04 ---------------------------
         //
         // none of these is new. Every one was already a dial, passed to a `*Run`
@@ -648,6 +659,13 @@ public sealed class DialTests
         // It ships ON, and the entry is here because it has one world. What it wants is a
         // world that ASKS, where declining is the difference between a question and a guess
         // rather than a mark on a paper.
+        // And eighteen for `Broadening`, which is a rise and is written as one. What buys it
+        // is that the knob is a mechanism against its absence rather than a preference
+        // between two builds: rung five has shipped unconditional since it was written, so
+        // no reading in this repo says what the machine does without it. `RoamingTests` is
+        // what made it worth taking -- named scopes are level or behind plain ones pinning
+        // the same amount, and ahead only at a length plain scopes barely reach.
+        //
         // And it went to eighteen for `Preferring` and back to seventeen inside a session,
         // which is the budget working rather than a wobble. Rung five ranks its one mint by
         // argmax z, a COUPLING, while the bar in front of it counts what a name repays --
@@ -657,7 +675,7 @@ public sealed class DialTests
         // The knob was spent knowingly and recovered the same way. A dial exists to hold a
         // comparison open; when every arm but the default has a revival row, what is left is
         // the code and this budget is what says so.
-        Assert.Equal(17, HandSet.Count);
+        Assert.Equal(18, HandSet.Count);
     }
 
     /// <summary>

@@ -369,7 +369,7 @@ public sealed record Lesson
     /// follows from the two and appears in no statement beside the thing it is about.
     /// </para>
     /// <para>
-    /// <b>Half the exam is stated and half is not, so the run controls itself.</b> Four
+    /// <b>Half the exam is stated and half is not</b>, so the run controls itself. Four
     /// questions ask what a statement says and four ask what two statements imply. One number
     /// over eight would read the same for a machine that chains and one that cannot, and the
     /// split says which — a half is one hop, and anything above it is two.
@@ -541,7 +541,7 @@ public sealed class Tutor : TextReader
 
     /// <summary>The most words any one statement has.</summary>
     /// <remarks>
-    /// <b>What a run has to budget for where a statement is several moments.</b>
+    /// <b>What a run has to budget for</b> where a statement is several moments.
     /// <see cref="Asserting.Everything"/> makes a sentence one moment a word, so a round count
     /// taken off <see cref="Moments"/> alone would stop the run before the examination.
     /// </remarks>
@@ -701,8 +701,8 @@ public sealed class Tutor : TextReader
 
     /// <summary>The statement an answer came from, or the answer alone where none holds it.</summary>
     /// <remarks>
-    /// <b>Revisions first, because a contradicted fact is answered from the sentence that
-    /// contradicted it</b> rather than from the one it replaced.
+    /// <b>Revisions first</b>, because a contradicted fact is answered from the sentence that
+    /// contradicted it rather than from the one it replaced.
     /// </remarks>
     private string Sentenced(string answer)
     {

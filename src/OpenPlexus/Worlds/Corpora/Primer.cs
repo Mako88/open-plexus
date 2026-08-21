@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Globalization;
 
 namespace OpenPlexus.Worlds;
@@ -20,8 +20,8 @@ public sealed record PrimerSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>John's ask, 2026-08-04, and it tests a ceiling rather than chasing a
-/// score.</b> Six bAbI tasks come back at exactly nought because their answers —
+/// <b>John's ask, 2026-08-04</b>, and it tests a ceiling rather than chasing a
+/// score. Six bAbI tasks come back at exactly nought because their answers —
 /// <i>yes</i>, <i>no</i>, <i>maybe</i>, the counting words — never appear as words
 /// anywhere in the corpus, only in the answer column. An answer here is a code the
 /// walk ARRIVED at, and a code enters the graph only by being observed, so there
@@ -70,8 +70,8 @@ public sealed class Primer
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>NO STORY CODE, and that is a property of the data rather than a
-    /// choice.</b> Tatoeba sentences are unrelated to one another, so there is no
+    /// <b>No story code</b>, and that is a property of the data rather than a
+    /// choice. Tatoeba sentences are unrelated to one another, so there is no
     /// telling to name — and <see cref="Sentence.Story"/> stays at nought with
     /// nothing in <see cref="Sentence.Words"/> naming it, which is what makes the
     /// fleeting code come back null.
@@ -163,8 +163,8 @@ public sealed class Primer
     /// The sentence column of one export line, or null if the line is not one.
     /// </summary>
     /// <remarks>
-    /// <b>SEPARATE FROM <see cref="Read"/> because a second reader wants the words
-    /// rather than the codes.</b> The instrument that prices what English predicts
+    /// <b>Separate from <see cref="Read"/></b> because a second reader wants the words
+    /// rather than the codes. The instrument that prices what English predicts
     /// works in words, and a copy of this parse living beside it is exactly the
     /// drift <c>DuplicationTests</c> exists to stop.
     /// </remarks>

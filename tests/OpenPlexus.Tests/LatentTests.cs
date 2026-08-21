@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -266,5 +266,53 @@ public sealed class LatentTests(ITestOutputHelper output)
             + "here and this reading has changed");
 
         Assert.Equal(0, tally.Stackable);
+    }
+
+    /// <summary>
+    /// Which bar refuses the naming gate here, given that the material exists.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The gate is offered hundreds of scopes and almost never speaks</b>, which the arm
+    /// grid in <c>NamingYieldTests</c> turned up as a side effect: both ranking arms come
+    /// back identical on this world to every decimal, because there is nearly nothing to
+    /// rank. A count of silences says which of five completely different things happened
+    /// only if it is partitioned, and on this world it never has been.
+    /// </para>
+    /// <para>
+    /// <b>It is a different question from the one above</b> and shares its run. That one
+    /// asks why the scopes are too short-lived to stack; this asks why the pairs they do
+    /// contribute are refused. Both can be true and they want opposite work — the first is
+    /// repair's, the second is the statistic's.
+    /// </para>
+    /// <para>
+    /// <b>The bar is that it is not <see cref="Refused.Scarce"/></b>, which is the one
+    /// refusal that would make the reading uninteresting. Scarce means fewer than three
+    /// eligible scopes existed, and this world holds hundreds — so a run landing there would
+    /// say the material never reached the gate and every column beside it is about that.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Which_bar_refuses_the_gate_where_the_material_is_there()
+    {
+        foreach (var seed in new[] { 1, 2, 3 })
+        {
+            var (_, tally, brain) = Learnt(World(noise: 0.1), seed);
+
+            var held = brain.Held;
+
+            output.WriteLine(
+                $"seed {seed} | {tally.Eligible,4} eligible | {held.Asked,3} asked, "
+                + $"{held.Spoke,2} spoke | scarce {held.AtScarce,3}, unpaired "
+                + $"{held.AtUnpaired,3}, rare {held.AtRare,3}, independent "
+                + $"{held.AtIndependent,3}, uncertain {held.AtUncertain,3}");
+
+            if (held.Lately is { } lately)
+                output.WriteLine(
+                    $"         last ask: {lately.Scopes} scopes, {lately.Candidates} "
+                    + $"candidates, {lately.Repaying} repaying, peak z {lately.Strongest:F2}");
+
+            Assert.Equal(0, held.AtScarce);
+        }
     }
 }

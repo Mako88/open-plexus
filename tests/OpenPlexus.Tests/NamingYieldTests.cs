@@ -1454,8 +1454,32 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
             bits[Preferring.Coupled].Select(one => one.Asked),
             bits[Preferring.Saving].Select(one => one.Asked));
 
-        // No bar on what it buys. Which arm wins is the reading and a threshold written
-        // before it would be the answer put in front of the question.
+        // WHAT THE GRID SAID, and the pre-registered cost is what decided it. Eleven bits,
+        // eight mixed seeds, twenty thousand rounds:
+        //
+        //   arm              recent            sound          unsound      stacked   rewritten
+        //   Coupled  0.993 +/-0.001   277.1 +/-14.6    273.5 +/-18.7   5.8 +/-0.5   432 +/-29
+        //   Saving   0.995 +/-0.001   321.8 +/-23.3    263.5 +/-11.9   3.6 +/-0.4   569 +/-38
+        //
+        // `Saving` rewrites 32% more, which is the arm working. It loses stacking at 3.4
+        // standard errors, which is the cost written down before the run. It gains sound
+        // rules at 1.6, which is not a result. And `found` is 15.6 of 16.0 truths on both
+        // arms to the decimal, with `recent` at 0.993 against 0.995 -- so the outcome
+        // columns are AT CEILING here and could not have shown a win either way.
+        //
+        // So the arm is decided on the structural columns, and there it trades depth for
+        // breadth. Depth is what rung five exists for.
+        //
+        // The bar is the cost rather than the benefit, because the benefit was unmeasurable
+        // on this world and the cost was not.
+        Assert.True(
+            bits[Preferring.Saving].Average(one => (double)one.Learnt.Stacked)
+                < bits[Preferring.Coupled].Average(one => (double)one.Learnt.Stacked),
+            "`Saving` no longer stacks less than `Coupled`, so the mechanism that decided "
+            + "this arm has changed: naming the pair the most scopes hold was refuted for "
+            + "eating rung five's own trigger, and if that has stopped happening the "
+            + "refutation is stale rather than merely old");
+
         return;
 
         (Learned Learnt, long Rewritten, long Asked, long Spoke) Bits(Preferring arm, int seed)

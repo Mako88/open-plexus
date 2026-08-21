@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 namespace OpenPlexus.Worlds;
 
@@ -109,7 +109,7 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
 
     /// <summary>The modality the answer rides on.</summary>
     /// <remarks>
-    /// <b>101, which is the brain's own, and this file may not say so out loud.</b> The
+    /// <b>101, which is the brain's own</b>, and this file may not say so out loud. The
     /// outcome alphabet is shared across every world — a brain that learnt a different
     /// one per world would not be one brain — and <c>SeparationTests</c> fails the build
     /// if a world names a brain type, so the number is written here and that same test
@@ -225,8 +225,8 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
     /// </summary>
     /// <param name="scope">The codes that must be present.</param>
     /// <remarks>
-    /// <b><see cref="Multiplexer"/> Has to refuse scopes with too many free bits and
-    /// this one never does.</b> There are 432 instances however few attributes a scope
+    /// <b><see cref="Multiplexer"/> has to refuse scopes with too many free bits</b> and
+    /// this one never does. There are 432 instances however few attributes a scope
     /// pins, so enumeration is a walk of the whole bag rather than an exponential in
     /// what was left open. Every rule a run holds is checkable here, so
     /// <c>Learned.Unchecked</c> is nought by construction and a soundness count on this
@@ -326,8 +326,8 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
 
     /// <summary>Every conjunction the scope language can express, as pinned-or-free.</summary>
     /// <remarks>
-    /// <b>2,880 of them, which is why the answer key here is complete rather than
-    /// sampled.</b> An attribute is pinned to one of its values or left free, and it can
+    /// <b>2,880 of them</b>, which is why the answer key here is complete rather than
+    /// sampled. An attribute is pinned to one of its values or left free, and it can
     /// never be pinned twice — two values of one attribute never co-occur, so such a
     /// scope fires on nothing and is not part of the language in any useful sense.
     /// </remarks>

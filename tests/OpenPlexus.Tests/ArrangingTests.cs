@@ -159,12 +159,12 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>What distinct children cost where the world's rules are one code — fork 76's
-    /// falsifier.</b>
+    /// <b>What distinct children cost where the world's rules are one code</b> — fork 76's
+    /// falsifier.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The case for refusing a parent its spent codes is entirely about quantity.</b>
+    /// <b>The case for refusing a parent its spent codes</b> is entirely about quantity.
     /// Reaching everything a parent is right about takes many children, and a budget spent
     /// re-deriving one child buys none of them. This world's truths are ONE CODE, so there is
     /// nothing for a child to cover and this doc already carries the row that here any repair
@@ -177,7 +177,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     /// the account rather than for the mechanism.
     /// </para>
     /// <para>
-    /// <b>And it asks for ten seeds because the last falsifier run here could not speak.</b>
+    /// <b>And it asks for ten seeds</b> because the last falsifier run here could not speak.
     /// A two-code step read 0.755 against 0.702 with a spread of 0.053, which carries nothing
     /// either way — and reporting a direction off a grid that wide is how a noisy reading
     /// becomes a finding.

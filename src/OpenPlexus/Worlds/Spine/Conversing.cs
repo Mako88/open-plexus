@@ -154,7 +154,7 @@ public enum Asserting
     /// <summary>Its rarest word so far, left out of the moment as well as claimed.</summary>
     /// <remarks>
     /// <para>
-    /// <b>What a WIDE scope needs, and it is the difference between the two claiming arms.</b>
+    /// <b>What a WIDE scope needs</b>, and it is the difference between the two claiming arms.
     /// A commitment over the whole moment fires only where every one of its codes is present,
     /// so a moment still holding the claimed word mints a rule that can never fire on a
     /// question — the question does not say the answer.
@@ -561,12 +561,12 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     /// Fork <b>30</b> is where that is answered and it is a rung rather than a world.
     /// </para>
     /// <para>
-    /// <b>Anything else is taken as the answer, and a whole sentence is allowed</b>. A person
+    /// <b>Anything else is taken as the answer</b>, and a whole sentence is allowed. A person
     /// asked <i>is it fur</i> answers <i>the cat covering is fur</i> as readily as <i>fur</i>,
     /// and reading only the first word of that settles the round on <i>the</i>.
     /// </para>
     /// <para>
-    /// <b>So the answer is the reply's last word the QUESTION did not already say.</b> Both
+    /// <b>So the answer is the reply's last word</b> the QUESTION did not already say. Both
     /// halves of that are about how a reply is read rather than about what text means:
     /// subtracting the question's words is arithmetic over two sets, the licence
     /// <see cref="Codes.Joined"/> already carries, and taking the last of what is left sits

@@ -115,6 +115,20 @@ public static class Sweep
     /// </summary>
     private const uint Purpose = 0x5EED_0001;
 
+    /// <summary>The standard error of a column, for a grid that puts a bar on one.</summary>
+    /// <param name="read">One value a seed.</param>
+    /// <remarks>
+    /// <see cref="Spread"/>'s own arithmetic, reached rather than re-derived, because a bar
+    /// read against a spread computed twice is a bar against whichever definition its author
+    /// assumed. That is one of this repo's own traps and it has fired here before.
+    /// </remarks>
+    public static double Error(IReadOnlyList<double> read)
+    {
+        ArgumentNullException.ThrowIfNull(read);
+
+        return new Measured { Arm = string.Empty, Values = [.. read] }.StdErr;
+    }
+
     /// <summary>
     /// A column of per-seed readings as <c>mean +/- standard error</c>, for the grids that
     /// print themselves rather than going through <see cref="Table"/>.

@@ -1442,9 +1442,68 @@ public sealed class RoamingTests(ITestOutputHelper output)
             "the shipped arm minted nothing on the spine, so this grid is comparing two "
             + "silences and the reading is about the world");
 
-        // No bar on what it costs. That is the reading, and the kill condition above is
-        // written in prose rather than as an assertion because a threshold chosen before the
-        // first run of a control is the answer put in front of the question.
+        // WHAT THE CONTROL SAID, five seeds, and the pre-registered kill did not merely fire
+        // -- the absence WINS on one of the two worlds.
+        //
+        //   Roaming            exam             own         resident         repairs  names
+        //   Named    0.373 +/-0.007  0.364 +/-0.005   985.2 +/-42.4  1398.0 +/-57.6    8.2
+        //   Never    0.372 +/-0.007  0.363 +/-0.005   953.6 +/-36.5  1365.6 +/-50.3    0.0
+        //
+        //   11 bits          recent           sound          unsound           found  names
+        //   Named    0.990 +/-0.002  266.8 +/-15.1   285.8 +/-20.7   15.4 +/-0.2      18.6
+        //   Never    0.997 +/-0.001   58.2 +/-3.1    119.2 +/-8.8    15.4 +/-0.2       0.0
+        //
+        // On the spine every column is inside noise. Switching off the one operator that
+        // broadens costs nothing on the world where the score has the most room to move.
+        //
+        // On eleven bits it is worse than level. Naming holds 4.6 times the sound rules and
+        // 2.4 times the unsound ones, FINDS EXACTLY THE SAME 15.4 truths, and scores 3.1
+        // standard errors BEHIND its own absence. `Found` against `Sound` is what separates
+        // those: the extra sound rules are re-spellings of truths the machine already had,
+        // not truths it would otherwise have missed.
+        //
+        // And the mechanism for the inflation is not the rewrite, which is population-neutral
+        // -- one scope out, one shorter scope in. It is that a minted name is a CODE in the
+        // moment, so genesis may root on it and repair may add it, and the alphabet growing
+        // grows everything downstream of it. Rung five pays for a wider vocabulary in
+        // population and is repaid in nothing.
+        //
+        // So the reading is about the SHAPE of the rung rather than about its gate, its
+        // ranking or its cadence -- three sessions have now moved those and none of them
+        // moved this. The plan says the same thing from the other end and said it first: a
+        // name over ALTERNATIVES is what a category wants, rung five names what CO-FIRES, and
+        // alternatives never co-occur. This is that argument with a number under it.
+        //
+        // Nothing here says delete the rung. The refutation table's own row is that a ladder
+        // which only discriminates is conceptless, and the answer to that is rung five OR the
+        // hierarchy claim goes -- so what this refutes is the BUILD, and fork 129 is the
+        // unrun idea about the shape.
+
+        // And the two bars the reading now carries, so it goes red the day the rung starts
+        // paying. Naming finding MORE of the world's true rules than its absence would put
+        // its yield somewhere other than in re-spellings, which is the whole of the finding.
+        Assert.True(
+            bits[Broadening.Named].Average(one => (double)one.Learnt.Found)
+                <= bits[Broadening.Never].Average(one => (double)one.Learnt.Found),
+            "naming now finds more of the world's true rules than its absence does, so the "
+            + "reading that put rung five's entire yield in re-spellings is stale");
+
+        // And the spine's exam being level rather than merely close, read against the
+        // control's own spread rather than a number chosen here. A lead inside one standard
+        // error is what `level` means and what this run found.
+        var lead = spine[Broadening.Named].Average(one => one.Exam)
+            - spine[Broadening.Never].Average(one => one.Exam);
+
+        var spread = Sweep.Error([.. spine[Broadening.Never].Select(one => one.Exam)]);
+
+        output.WriteLine("");
+        output.WriteLine($"spine lead {lead:F4} against a control spread of {spread:F4}");
+
+        Assert.True(lead <= spread,
+            $"naming leads its absence by {lead:F4} on the spine exam against a control "
+            + $"spread of {spread:F4}, so the rung has started paying on the world with the "
+            + "most room and this reading is stale");
+
         return;
 
         static (double Exam, double Own, int Resident, long Repaired, int Named) Spine(

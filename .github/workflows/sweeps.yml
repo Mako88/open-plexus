@@ -106,6 +106,7 @@ jobs:
             "NamingYieldTests.How_long_the_sound_rules",
             "NamingYieldTests.What_bounds_rung_fives_yield",
             "NamingYieldTests.And_a_real_populations_best_pair",
+            "RoamingTests.What_rung_fives_names_do",
             "RecoveryTests.What_a_moving_target",
             "RecoveryTests.Whether_what_recovery_waits_for",
             "RecoveryTests.Whether_a_subsumption",

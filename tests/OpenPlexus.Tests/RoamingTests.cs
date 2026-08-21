@@ -1148,6 +1148,169 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// fact about the transcript rather than a hint about the answer.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// What rung five's names DO on the spine world, before anything asks what they buy.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The ceiling taken first, which is cheaper than an arm.</b> Turning the rung off
+    /// wants a dial, and a dial wants two worlds and a grid; whether a name is ever USED
+    /// wants a run and no new machinery. A name nothing fires on is decorative whatever a
+    /// grid would say, and then the arm is not worth building.
+    /// </para>
+    /// <para>
+    /// <b>Every rung-five reading here has been on an isolating world</b> — the
+    /// multiplexer, whose outcome columns are at ceiling whatever the rung does, and
+    /// <see cref="Worlds.Latent"/>, where the gate speaks under once in twenty asks. This is
+    /// the first taken where the score has room to move.
+    /// </para>
+    /// <para>
+    /// <b>A name is a code of its own modality</b>, so a scope standing on one is found by
+    /// looking rather than by remembering what was minted. That matters because a rewritten
+    /// scope can be culled or subsumed afterwards, and a count of MINTS says nothing about
+    /// what is still resident at the end.
+    /// </para>
+    /// <para>
+    /// <b>And the whole of the reading is the matched table</b>, which is why the raw one is
+    /// printed beside it rather than instead of it. A scope standing on a name is narrower
+    /// than its code count says, the name standing for a pair — and narrow rules are more
+    /// accurate almost by construction, which is the memorising this design is otherwise
+    /// careful about. So a raw named-against-plain gap is what specificity alone produces,
+    /// and matching on the UNFOLDED length is what holds specificity still.
+    /// </para>
+    /// <para>
+    /// <b>What would say the rung is decorative here</b>: named scopes resident and never
+    /// firing. Then no vote has seen one, the mint changed the population's spelling and
+    /// nothing else, and an on-off arm would be measuring nothing.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_rung_fives_names_do_on_the_spine_world()
+    {
+        // Over seeds, because one seed is not a comparison and this repo's traps list says it
+        // will happily invert. The first take of this ran on seed one and read named against
+        // plain at 0.729 to 0.244, which is a length distribution rather than a finding.
+        const int Seeds = 5;
+
+        var raw = new List<(int Fired, double Named, double Plain)>();
+
+        var matched =
+            new Dictionary<int, (List<double> Named, List<double> Plain, int On, int Of)>();
+
+        var minted = new List<int>();
+        var stacked = new List<int>();
+
+        for (var seed = 1; seed <= Seeds; seed++)
+        {
+            // Watched rather than acted in, which is the arm this question wants. What a name
+            // is worth is about the population, and a chooser adds a second thing moving.
+            var world = new Roaming(World(120, people: 4), seed);
+
+            var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed);
+
+            var tally = new Bench(
+                new Watching<Recited>(
+                    world,
+                    new Joined(Joining.Resolved, resolution: 3, freshest: true),
+                    acting: Chooses.From(_ => null)),
+                brain)
+                .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
+
+            var held = brain.Held.All.ToList();
+            var names = brain.Held.Names;
+
+            var standing = held
+                .Where(one => one.Scope.Any(code => code.Modality == Naming.Meant))
+                .ToList();
+
+            var bare = held.Except(standing).ToList();
+
+            minted.Add(tally.Named);
+            stacked.Add(tally.Stacked);
+            raw.Add((standing.Count(one => one.Seen > 0), Rate(standing), Rate(bare)));
+
+            output.WriteLine(
+                $"seed {seed} | {tally.Named,2} names over {tally.Eligible,4} eligible, "
+                + $"{tally.Stackable,3} stackable, {tally.Stacked} stacked | "
+                + $"{held.Count,5} resident, {standing.Count,4} on a name | "
+                + $"raw {Rate(standing):F3} named to {Rate(bare):F3} plain | "
+                + $"exam {tally.Unseen?.Accuracy ?? 0.0:F3}");
+
+            foreach (var group in held.GroupBy(one => names.Unfold(one.Scope).Length))
+            {
+                var named = group
+                    .Where(one => one.Scope.Any(code => code.Modality == Naming.Meant))
+                    .ToList();
+
+                var plain = group.Except(named).ToList();
+
+                if (!matched.TryGetValue(group.Key, out var cell))
+                    matched[group.Key] = cell = ([], [], 0, 0);
+
+                if (named.Count > 0) cell.Named.Add(Rate(named));
+                if (plain.Count > 0) cell.Plain.Add(Rate(plain));
+
+                matched[group.Key] = cell with
+                {
+                    On = cell.On + named.Count,
+                    Of = cell.Of + plain.Count,
+                };
+            }
+        }
+
+        output.WriteLine("");
+        output.WriteLine(
+            $"raw, {Seeds} seeds | named {Sweep.Spread([.. raw.Select(one => one.Named)])} "
+            + $"| plain {Sweep.Spread([.. raw.Select(one => one.Plain)])}");
+
+        output.WriteLine("");
+        output.WriteLine(
+            "unfolded | named scopes         accuracy | plain scopes         accuracy");
+
+        foreach (var (length, cell) in matched.OrderBy(one => one.Key))
+            output.WriteLine(
+                $"{length,8} | {cell.On,6} "
+                + $"{(cell.Named.Count == 0 ? "-" : Sweep.Spread(cell.Named)),22} "
+                + $"| {cell.Of,6} "
+                + $"{(cell.Plain.Count == 0 ? "-" : Sweep.Spread(cell.Plain)),22}");
+
+        // The instrument. A run that minted nothing makes every column above a reading about
+        // the sweep calendar rather than about what a name does.
+        Assert.True(minted.Sum() > 0,
+            "rung five minted nothing on any seed, so this world is not offering it material "
+            + "and the reading is about the world");
+
+        // And the ceiling this exists to take. A resident scope that never fires has never
+        // reached a vote, so a population whose named scopes are all like that has spent the
+        // rung on spelling.
+        Assert.True(raw.Sum(one => one.Fired) > 0,
+            "scopes stand on a minted name and not one has ever fired, so no vote has seen a "
+            + "name and rung five is decorative on the spine. An on-off arm would be "
+            + "measuring nothing");
+
+        // And the recursion, which is fork 112 asked on a third bench. `Motif` leaves a named
+        // scope too short to carry a name and `Latent`'s deep scopes never reach the floor;
+        // this world has the material, scopes long enough to survive naming in the hundreds,
+        // so a nought here is a third mechanism rather than either of those.
+        Assert.True(stacked.Sum() == 0,
+            $"{stacked.Sum()} names stand on a name here, so the recursion HAS started on the "
+            + "spine and fork 112's reading is stale rather than merely old");
+
+        // No bar on the matched table. What naming is worth once specificity is held still is
+        // the reading, and a threshold written before it would be the answer put in front of
+        // the question.
+        return;
+
+        static double Rate(List<Commitment> of)
+        {
+            var hits = of.Sum(one => one.Hits);
+            var misses = of.Sum(one => one.Misses);
+
+            return hits + misses == 0 ? 0.0 : hits / (double)(hits + misses);
+        }
+    }
+
     [Fact]
     public void What_the_effect_question_is_worth_before_anything_learns()
     {

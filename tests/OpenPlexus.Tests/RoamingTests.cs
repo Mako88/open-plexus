@@ -1553,6 +1553,112 @@ public sealed class RoamingTests(ITestOutputHelper output)
         }
     }
 
+    // Positive pointwise mutual information over the company table, which is the known
+    // correction for the reading beside it. A cosine over RAW counts is dominated by how
+    // often a code appears, so a common one looks alike to everything and a null can be
+    // a fact about the measure rather than about the population. This divides each cell
+    // by what independence would have made it, which is the same shape the naming gate's
+    // z uses and which the plan already names for fork 131.
+    static Dictionary<Code, Dictionary<Code, double>> Pointwise(
+        Dictionary<Code, Dictionary<Code, double>> raw)
+    {
+        var down = new Dictionary<Code, double>();
+        var whole = 0.0;
+
+        foreach (var (_, over) in raw)
+            foreach (var (mate, weight) in over)
+            {
+                down.TryGetValue(mate, out var so_far);
+                down[mate] = so_far + weight;
+                whole += weight;
+            }
+
+        var found = new Dictionary<Code, Dictionary<Code, double>>();
+
+        foreach (var (code, over) in raw)
+        {
+            var along = over.Values.Sum();
+
+            if (along <= 0.0) continue;
+
+            var lifted = new Dictionary<Code, double>();
+
+            foreach (var (mate, weight) in over)
+            {
+                var expected = along * down[mate] / whole;
+
+                if (expected <= 0.0) continue;
+
+                var value = Math.Log(weight / expected);
+
+                // POSITIVE only, which is what the P in PPMI is. A cell rarer than
+                // independence says the two avoid each other, and a vector of those is a
+                // different claim from a vector of what they share.
+                if (value > 0.0) lifted[mate] = value;
+            }
+
+            if (lifted.Count > 0) found[code] = lifted;
+        }
+
+        return found;
+    }
+
+    static double Cosine(Dictionary<Code, double> left, Dictionary<Code, double> right)
+    {
+        var over = 0.0;
+
+        foreach (var (code, weight) in left)
+            if (right.TryGetValue(code, out var also)) over += weight * also;
+
+        var one = Math.Sqrt(left.Values.Sum(value => value * value));
+        var two = Math.Sqrt(right.Values.Sum(value => value * value));
+
+        return one == 0.0 || two == 0.0 ? 0.0 : over / (one * two);
+    }
+
+    /// <summary>
+    /// One seed's within-set and across-set likeness, appended to what is being collected.
+    /// </summary>
+    /// <param name="profiles">Each code's profile, however it was read.</param>
+    /// <param name="sets">The answer key: which codes are alternatives to which.</param>
+    /// <param name="into">Within-set means, by set name.</param>
+    /// <param name="other">Across-set means.</param>
+    /// <remarks>
+    /// <b>Shared by the population reading and the moment one</b>, which is what makes them
+    /// comparable: the two differ in what a profile IS and in nothing else.
+    /// `DuplicationTests` refused the second copy, correctly, and the arithmetic being in one
+    /// place is worth more than the refusal — a within-set mean computed two ways is two
+    /// definitions for one column.
+    /// </remarks>
+    private static void Compare(
+        Dictionary<Code, Dictionary<Code, double>> profiles,
+        (string What, IReadOnlyList<Code> Codes)[] sets,
+        Dictionary<string, List<double>> into,
+        List<double> other)
+    {
+        foreach (var (what, codes) in sets)
+        {
+            var have = codes.Where(profiles.ContainsKey).ToList();
+
+            var pairs = have
+                .SelectMany((left, at) => have.Skip(at + 1)
+                    .Select(right => Cosine(profiles[left], profiles[right])))
+                .ToList();
+
+            if (pairs.Count > 0) into[what].Add(pairs.Average());
+        }
+
+        var mixed = new List<double>();
+
+        for (var left = 0; left < sets.Length; left++)
+            for (var right = left + 1; right < sets.Length; right++)
+                foreach (var one in sets[left].Codes.Where(profiles.ContainsKey))
+                    foreach (var two in sets[right].Codes.Where(profiles.ContainsKey))
+                        mixed.Add(Cosine(profiles[one], profiles[two]));
+
+        if (mixed.Count > 0) other.Add(mixed.Average());
+    }
+
     /// <summary>
     /// Whether the population separates ALTERNATIVES at all — <b>fork 129's ceiling, taken
     /// before any of its mechanism is built.</b>
@@ -1620,6 +1726,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
         var acrossContext = new List<double>();
         var byMates = new Dictionary<string, List<double>>();
         var acrossMates = new List<double>();
+        var byPointwise = new Dictionary<string, List<double>>();
+        var acrossPointwise = new List<double>();
 
         for (var seed = 1; seed <= Seeds; seed++)
         {
@@ -1642,6 +1750,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 byHits.TryAdd(what, []);
                 byContext.TryAdd(what, []);
                 byMates.TryAdd(what, []);
+                byPointwise.TryAdd(what, []);
             }
 
             // One profile a code, and the two directions are the whole question. FORWARD is
@@ -1713,39 +1822,22 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 return found;
             }
 
-            foreach (var (weigh, reading, into, other) in
-                new (Func<Commitment, double> Weigh, Reading Reading,
+            foreach (var (weigh, reading, pointwise, into, other) in
+                new (Func<Commitment, double> Weigh, Reading Reading, bool Pointwise,
                     Dictionary<string, List<double>> Into, List<double> Other)[]
                 {
-                    (_ => 1.0, Reading.Expects, within, across),
-                    (one => one.Hits, Reading.Expects, byHits, acrossHits),
-                    (one => one.Hits, Reading.ExpectedBy, byContext, acrossContext),
-                    (_ => 1.0, Reading.Beside, byMates, acrossMates),
+                    (_ => 1.0, Reading.Expects, false, within, across),
+                    (one => one.Hits, Reading.Expects, false, byHits, acrossHits),
+                    (one => one.Hits, Reading.ExpectedBy, false, byContext, acrossContext),
+                    (_ => 1.0, Reading.Beside, false, byMates, acrossMates),
+                    (_ => 1.0, Reading.Beside, true, byPointwise, acrossPointwise),
                 })
             {
                 var profiles = Profiles(weigh, reading);
 
-                foreach (var (what, codes) in sets)
-                {
-                    var have = codes.Where(profiles.ContainsKey).ToList();
+                if (pointwise) profiles = Pointwise(profiles);
 
-                    var pairs = have
-                        .SelectMany((left, at) => have.Skip(at + 1)
-                            .Select(right => Cosine(profiles[left], profiles[right])))
-                        .ToList();
-
-                    if (pairs.Count > 0) into[what].Add(pairs.Average());
-                }
-
-                var mixed = new List<double>();
-
-                for (var left = 0; left < sets.Length; left++)
-                    for (var right = left + 1; right < sets.Length; right++)
-                        foreach (var one in sets[left].Codes.Where(profiles.ContainsKey))
-                            foreach (var two in sets[right].Codes.Where(profiles.ContainsKey))
-                                mixed.Add(Cosine(profiles[one], profiles[two]));
-
-                if (mixed.Count > 0) other.Add(mixed.Average());
+                Compare(profiles, sets, into, other);
             }
         }
 
@@ -1759,6 +1851,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 ("expects/hit", byHits, acrossHits),
                 ("expected-by", byContext, acrossContext),
                 ("beside", byMates, acrossMates),
+                ("beside/ppmi", byPointwise, acrossPointwise),
             })
         {
             output.WriteLine(
@@ -1778,18 +1871,154 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // in front of its question.
         return;
 
-        static double Cosine(Dictionary<Code, double> left, Dictionary<Code, double> right)
+    }
+
+    /// <summary>
+    /// The same question asked of the MOMENTS rather than of the population.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The distinction the reading beside this one conflated.</b> Fork 129 says to read
+    /// likeness off the population rather than off the moment, and every row over there does.
+    /// But a scope is not a sample of a code's company — it is what repair BUILT, so a scope
+    /// holding a room word exists because it predicted something, and the company in scopes
+    /// is a heavily selected sample of the company in moments.
+    /// </para>
+    /// <para>
+    /// <b>And company in a moment is not co-occurrence of the pair</b>, which is the thing the
+    /// plan's objection is about. Two room words never appear together, and both appear beside
+    /// the same verbs and the same names — so a SECOND-order statistic over moments can
+    /// separate them while a first-order one cannot. That is what distributional semantics is
+    /// and it is the setup this fork's idea comes from.
+    /// </para>
+    /// <para>
+    /// <b>No learner, so it is a fact about the world's transcripts.</b> The world is pushed
+    /// through the front end and nothing else, which makes this a ceiling on ANY mechanism
+    /// reading company: if the signal is absent here it is absent everywhere downstream, and
+    /// if it is present here then what is missing is the mechanism rather than the signal.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_the_moments_separate_alternatives_by_the_company_they_keep()
+    {
+        // Two seeds and ten thousand moments, which is far more than the reading needs. The
+        // separation is two thirds of the scale against a spread in the thousandths, so this
+        // is sized to stay in the suite rather than to resolve anything.
+        const int Seeds = 2;
+        const int Moments = 10_000;
+
+        var raw = new Dictionary<string, List<double>>();
+        var lifted = new Dictionary<string, List<double>>();
+        var acrossRaw = new List<double>();
+        var acrossLifted = new List<double>();
+
+        for (var seed = 1; seed <= Seeds; seed++)
         {
-            var over = 0.0;
+            var world = new Roaming(World(120, people: 4), seed);
+            var front = new Joined(Joining.Resolved, resolution: 3, freshest: true);
 
-            foreach (var (code, weight) in left)
-                if (right.TryGetValue(code, out var also)) over += weight * also;
+            var together = new Dictionary<Code, Dictionary<Code, double>>();
 
-            var one = Math.Sqrt(left.Values.Sum(value => value * value));
-            var two = Math.Sqrt(right.Values.Sum(value => value * value));
+            for (var at = 0; at < Moments; at++)
+            {
+                var codes = front.Codify(world.Next().Seen).Distinct().ToList();
 
-            return one == 0.0 || two == 0.0 ? 0.0 : over / (one * two);
+                foreach (var code in codes)
+                {
+                    if (!together.TryGetValue(code, out var beside))
+                        together[code] = beside = [];
+
+                    foreach (var mate in codes)
+                    {
+                        if (mate == code) continue;
+
+                        beside.TryGetValue(mate, out var so_far);
+                        beside[mate] = so_far + 1.0;
+                    }
+                }
+            }
+
+            var sets = new (string What, IReadOnlyList<Code> Codes)[]
+            {
+                ("rooms", world.Named),
+                ("things", world.Called),
+                ("people", world.Walking),
+            };
+
+            foreach (var (what, _) in sets)
+            {
+                raw.TryAdd(what, []);
+                lifted.TryAdd(what, []);
+            }
+
+            foreach (var (profiles, into, other) in
+                new (Dictionary<Code, Dictionary<Code, double>> Profiles,
+                    Dictionary<string, List<double>> Into, List<double> Other)[]
+                {
+                    (together, raw, acrossRaw),
+                    (Pointwise(together), lifted, acrossLifted),
+                })
+            {
+                Compare(profiles, sets, into, other);
+            }
         }
+
+        output.WriteLine(
+            $"cosine over the company a code keeps IN A MOMENT, {Seeds} seeds, "
+            + $"{Moments} moments, no learner");
+
+        output.WriteLine("weighting | rooms          | things         | people         | across");
+
+        foreach (var (what, into, other) in
+            new (string What, Dictionary<string, List<double>> Into, List<double> Other)[]
+            {
+                ("counts", raw, acrossRaw),
+                ("ppmi", lifted, acrossLifted),
+            })
+        {
+            output.WriteLine(
+                $"{what,-10}| {Sweep.Spread(into["rooms"]),14} "
+                + $"| {Sweep.Spread(into["things"]),14} "
+                + $"| {Sweep.Spread(into["people"]),14} "
+                + $"| {Sweep.Spread(other),14}");
+        }
+
+        // The instrument. A front end emitting nothing makes every column above a reading
+        // about the encoding rather than about the transcripts.
+        Assert.NotEmpty(acrossRaw);
+        Assert.NotEmpty(raw["rooms"]);
+
+        // AND THE BAR, because this one is not a null. Under PPMI a room word is 0.986 alike
+        // to another room word and 0.302 alike to a thing or a person -- two thirds of the
+        // scale, against spreads in the thousandths.
+        //
+        // Under raw counts it is flat at 0.993 against 0.965, which is the frequency
+        // domination PPMI exists to remove: a common code shares company with everything, so
+        // a cosine over counts says every pair is alike and means nothing by it.
+        //
+        // So the signal is in the MOMENTS and the population destroys it. Fork 129 says to
+        // read likeness off the population RATHER than the moment, and the reading beside
+        // this one is that fork getting nothing from four statistics. A scope is what repair
+        // built rather than a sample of what a code keeps company with.
+        //
+        // And *alternatives never co-occur* is about FIRST-order co-occurrence, which is
+        // what rung five reads. Two room words never appear together and both appear beside
+        // the same verbs and the same names, so the second-order statistic never needs them
+        // to meet. That is the whole of what this changes.
+        foreach (var (what, within) in lifted)
+            Assert.True(within.Average() > acrossLifted.Average() + 0.2,
+                $"{what} are {within.Average():F3} alike to each other against "
+                + $"{acrossLifted.Average():F3} across the sets, so the company a code keeps "
+                + "in a moment no longer separates alternatives and the reading that put the "
+                + "signal there rather than in the population is stale");
+
+        // And the raw row being flat, which is what says the correction is load-bearing
+        // rather than decorative. A pass here with the bar above red would mean PPMI stopped
+        // mattering; a pass with it green means both halves still hold.
+        Assert.True(
+            raw["rooms"].Average() - acrossRaw.Average() < 0.2,
+            "a cosine over raw counts now separates the sets too, so frequency domination is "
+            + "no longer what flattens it and PPMI is doing less than this reading says");
     }
 
     [Fact]

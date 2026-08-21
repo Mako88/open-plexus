@@ -8,8 +8,8 @@ using Xunit.Abstractions;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// Where rung five's yield goes as its material grows — <b>a partition of the silences,
-/// which is the half of this mechanism nothing has ever reported.</b>
+/// Where rung five's yield goes as its material grows — <b>a partition of the silences</b>,
+/// which is the half of this mechanism nothing has ever reported.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -20,8 +20,8 @@ namespace OpenPlexus.Tests;
 /// instrument on it so far has been a count of the times it SPOKE.
 /// </para>
 /// <para>
-/// <b>And a count of silences would be no better, because five different things end in
-/// one.</b> <see cref="Abstracting.Propose"/> charges each ask to the first bar that stopped
+/// <b>And a count of silences would be no better</b>, because five different things end in
+/// one. <see cref="Abstracting.Propose"/> charges each ask to the first bar that stopped
 /// it: too few scopes, no pair, no pair recurring, a pair no commoner than chance, or a
 /// pair that cannot be certified once the search is corrected for. The first three are the
 /// population being thin. The last two are the STATISTIC, and they point in opposite
@@ -711,8 +711,8 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     /// condition. Widening only removes codes. There is no third door.
     /// </para>
     /// <para>
-    /// <b>So the property that makes it nameable is the property every operator refuses it
-    /// for</b>, and that is a fact about where naming looks rather than about the front end.
+    /// <b>So the property that makes it nameable</b> is the property every operator refuses it
+    /// for, and that is a fact about where naming looks rather than about the front end.
     /// The plan has always said a minted name is <i>over co-firing codes</i>; the
     /// implementation counts co-occurring SCOPE MEMBERS. Those are different sets, and the
     /// difference is the whole of fork 34.

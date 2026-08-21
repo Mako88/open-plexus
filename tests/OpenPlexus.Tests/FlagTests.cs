@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
@@ -15,15 +15,15 @@ namespace OpenPlexus.Tests;
 /// for weeks: unit-tested, measured as an arm, and wired into exactly one world.
 /// </para>
 /// <para>
-/// <b>A toggle between two named alternatives is fine. An on/off flag is not.</b>
+/// <b>A toggle between two named alternatives is fine.</b> An on/off flag is not.
 /// <see cref="Mending"/> chooses which failures a repair may run on;
 /// <see cref="Repairing"/> chooses when it runs. Both ends do something, and the
 /// comparison is between two real behaviours. A <c>bool</c> compares a behaviour against its
 /// own absence, which means the absence is a permanent resident of the code.
 /// </para>
 /// <para>
-/// <b>So the lifecycle is: build it, measure it against its neighbour, delete the
-/// loser.</b> That is the rule this project already applies to arms — see the
+/// <b>So the lifecycle is</b>: build it, measure it against its neighbour, delete the
+/// loser. That is the rule this project already applies to arms — see the
 /// revival table, and <c>Attending.Marked</c>, which was collapsed the same day
 /// this was written. What changes here is that a flag no longer gets to sit in the
 /// middle of that lifecycle indefinitely, which is where all six of the ones below
@@ -44,8 +44,8 @@ public sealed class FlagTests(ITestOutputHelper output)
     /// deleted as the loser.
     /// </summary>
     /// <remarks>
-    /// <b>THIS LIST MAY ONLY SHRINK, and every exit from it is one of exactly two
-    /// doors.</b> Either the thing wins and becomes unconditional — the flag goes
+    /// <b>This list may only shrink</b>, and every exit from it is one of exactly two
+    /// doors. Either the thing wins and becomes unconditional — the flag goes
     /// and the behaviour stays — or it loses and the whole mechanism goes with a
     /// revival row. Nothing leaves this list by being renamed.
     /// </remarks>

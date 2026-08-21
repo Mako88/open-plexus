@@ -9,8 +9,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S CALL, 2026-08-03: the docs got too big to load, so they stopped
-/// being read.</b> `architecture.md` reached 1,646 lines and `design.md` 756, and
+/// <b>John's call, 2026-08-03</b>: the docs got too big to load, so they stopped
+/// being read. `architecture.md` reached 1,646 lines and `design.md` 756, and
 /// a doc nobody opens is worse than no doc because it still gets cited. Both were
 /// deleted; git holds them.
 /// </para>
@@ -74,8 +74,8 @@ public sealed class DocsTests
     /// day without once noticing it was the failure.
     /// </para>
     /// <para>
-    /// <b>And it costs no information, which is the objection that retired the old doc-wide
-    /// cap.</b> That objection was written when there was nowhere else to put things. There is
+    /// <b>And it costs no information</b>, which is the objection that retired the old doc-wide
+    /// cap. That objection was written when there was nowhere else to put things. There is
     /// now: a finding belongs to the commit that produced it and the test that asserts it, a
     /// mechanism to the XML comment the compiler enforces, a trap with a check to the check.
     /// A doc-wide cap does not delete information — it evicts it to the home that keeps it
@@ -87,8 +87,8 @@ public sealed class DocsTests
     /// doc can never grow back past its own best by ACCIDENT.
     /// </para>
     /// <para>
-    /// <b>And it may be raised for something genuinely new — John, 2026-08-13, in those
-    /// words.</b> A ratchet that only ever falls says a new idea can only be afforded by
+    /// <b>And it may be raised for something genuinely new</b> — John, 2026-08-13, in those
+    /// words. A ratchet that only ever falls says a new idea can only be afforded by
     /// deleting an old one, which is a doc-wide cap deciding what the project may think
     /// about. That is not what it is for. The three conditions are his: <b>the existing
     /// items are reasonable.</b> The new one duplicates nothing, and the doc is still in a

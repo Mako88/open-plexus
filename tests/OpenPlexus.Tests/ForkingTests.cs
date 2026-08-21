@@ -23,7 +23,7 @@ namespace OpenPlexus.Tests;
 /// somewhere else.
 /// </para>
 /// <para>
-/// <b>And quantity is the one account of the uncovered rounds the evidence confirms.</b> A
+/// <b>And quantity is the one account the evidence confirms</b>, of the uncovered rounds. A
 /// child fires only where its added code is present, so covering what a parent is right about
 /// takes MANY children, and <c>uncovered</c> falls monotonically as the budget rises. If the
 /// attempts bought distinct children the search would be twenty to fifty times what every
@@ -51,7 +51,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
 
     /// <summary>The budget every reading in this file was taken under.</summary>
     /// <remarks>
-    /// <b>Pinned because the default moved under these grids the moment they decided it.</b>
+    /// <b>Pinned because the default moved under these grids</b> the moment they decided it.
     /// A fixture inherits every dial it does not pin, so a default moving rewrites an
     /// experiment nobody edited — this repo's own trap, made live by the very comparison
     /// these grids were run to settle. Both readings here are <c>Repeated</c> against
@@ -269,7 +269,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The arm is wired and what it claims to remove is what falls.</b>
+    /// <b>The arm is wired</b>, and what it claims to remove is what falls.
     /// </summary>
     /// <remarks>
     /// <b>It asserts on collisions rather than on a score.</b> Because that is the event the rule

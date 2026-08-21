@@ -89,13 +89,19 @@ public sealed class PushbackTests(ITestOutputHelper output)
                 + "naming gate speak 0.5 times in twenty asks, so both arms come back "
                 + "identical to every decimal printed -- the bar reads two worlds and one "
                 + "of them cannot tell the arms apart. A world that constructs is not the "
-                + "same as a world that discriminates.",
+                + "same as a world that discriminates. AND THE AUDIT CAME BACK CLEAN, which "
+                + "is worth as much as the hole. Across all fourteen dials, every one except "
+                + "the two already on the waiting list has an arm PAIR run on two worlds or "
+                + "more, so no shipped default rests on a credit like Latent's and no "
+                + "baseline is in doubt. The hole is real and nothing is currently in it.",
             Settles: "Match on the enum TYPE rather than the property name, then read the "
                 + "diff. If nothing else moves, this was one collision and not a method "
-                + "problem. The second half wants a different check and it is computable: "
-                + "a world counts for a dial only where the two arms produce a DIFFERENT "
-                + "reading on it. That is what the grids already print, so what is missing "
-                + "is somewhere for a grid to record it rather than a measurement."),
+                + "problem. The inert half wants a world to count only where the arms "
+                + "produced a DIFFERENT reading on it, which the grids already print -- what "
+                + "is missing is somewhere for a grid to record it. And it wants that rather "
+                + "than another static pass: the one written for the audit credited a dial "
+                + "off a `see cref` in prose, which is this same text-matching fault one "
+                + "level out."),
 
         new(
             With: "Winnow, against rung two",

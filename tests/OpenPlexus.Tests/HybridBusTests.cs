@@ -1,4 +1,4 @@
-using OpenPlexus.Bus;
+﻿using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 
@@ -9,7 +9,7 @@ namespace OpenPlexus.Tests;
 /// which never left is written off, and that a failure surfaces.
 /// </summary>
 /// <remarks>
-/// <b>What the walk's deletion took out of this file was the addressed send.</b> An
+/// <b>What the walk's deletion took out of this file</b> was the addressed send. An
 /// envelope named one cluster, so half of these tests were about the bus picking the right
 /// entry out of a dictionary. An ask is a BROADCAST — every holder gets it — so the routing
 /// question is gone and what is left is the concurrency, which was always the part worth

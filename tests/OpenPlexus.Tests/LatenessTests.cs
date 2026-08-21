@@ -29,8 +29,8 @@ namespace OpenPlexus.Tests;
 /// <i>the constraints were all written for this</i> a claim with nothing behind it.
 /// </para>
 /// <para>
-/// <b>A simulated constraint can be harsher than the real one, and here that is the
-/// point.</b> This repo's trap list carries that sentence as a warning about reading a
+/// <b>A simulated constraint can be harsher than the real one</b>, and here that is the
+/// point. This repo's trap list carries that sentence as a warning about reading a
 /// green <c>HybridBus</c> run as evidence about a network. Read the other way round it is
 /// the design: the simulator is where C2 is exercised, and the socket is where it is
 /// exercised that the bytes are right.
@@ -75,7 +75,7 @@ public sealed class LatenessTests(ITestOutputHelper output)
     /// <param name="late">Lateness to inject, or nothing for the control.</param>
     /// <param name="seed">The world's generator and every holder's.</param>
     /// <remarks>
-    /// <b>ONE BUS RATHER THAN N sockets, which is the whole reason this can be asked.</b>
+    /// <b>ONE BUS RATHER THAN N sockets</b>, which is the whole reason this can be asked.
     /// Delay injected into <see cref="Posted"/> would be delay injected into an HTTP client,
     /// which is a different thing to measure and slower by orders of magnitude. Here the
     /// transport is a dictionary and a dispatcher, so the ONLY difference between the two

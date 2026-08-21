@@ -7,7 +7,7 @@ namespace OpenPlexus.Tests;
 
 /// <summary>
 /// <c>Mending</c> is a two-by-two read as a list — <b>and the comparison every finding
-/// about it rests on moves both axes at once.</b>
+/// about it rests on</b> moves both axes at once.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -19,8 +19,8 @@ namespace OpenPlexus.Tests;
 /// in both, and no measurement of them can say which half did anything.
 /// </para>
 /// <para>
-/// <b><c>Mending.Neglected</c> is the cell that separates them and has never been
-/// read as one.</b> It waits for the failure like <c>Outvoted</c> and takes the gate like
+/// <b><c>Mending.Neglected</c> is the cell that separates them</b> and has never been
+/// read as one. It waits for the failure like <c>Outvoted</c> and takes the gate like
 /// <c>Uncovered</c>, so <c>Outvoted</c> against it isolates the GATE and it against
 /// <c>Uncovered</c> isolates WHEN. The fourth cell — every round with no gate — is not a
 /// setting today and WAS one: <c>Mending.Earned</c> sat exactly there, before the failure

@@ -11,8 +11,8 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Repair tests whether the added code separates and never whether it was worth
-/// adding.</b> The gate runs a two-proportion test on Z's rate in the misses against its
+/// <b>Repair tests whether the added code separates</b>, never whether it was worth
+/// adding. The gate runs a two-proportion test on Z's rate in the misses against its
 /// rate in the hits, corrected for the candidates considered — so <i>is this a real
 /// discriminator</i> is answered and <i>did the rule pay too much for it</i> is not asked
 /// anywhere. Every condition roughly halves where a commitment can fire, and nothing reads
@@ -141,7 +141,7 @@ public sealed class NarrowingTests(ITestOutputHelper output)
     /// question and carries error bars there.
     /// </para>
     /// <para>
-    /// <b>What it would mean for the two to be equal is worth saying first.</b> Repair
+    /// <b>What it would mean for the two to be equal</b> is worth saying first. Repair
     /// refuses a parent under <c>Floor</c> misses and a sound rule on a clean world never
     /// misses, so a chain that only ever narrows what is still wrong cannot pass a sound
     /// depth by that route — it can only arrive at one along a lineage that was never sound.

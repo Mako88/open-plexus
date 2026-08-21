@@ -12,7 +12,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>That file measured the two ends and called the middle the deployment case.</b>
+/// <b>That file measured the two ends</b> and called the middle the deployment case.
 /// Identical streams converge exactly and disjoint ones share almost nothing, which
 /// between them establish that naming is deterministic in the EVIDENCE — and say nothing
 /// about how much evidence two machines need in common. Twenty phones on one wifi share
@@ -26,7 +26,7 @@ namespace OpenPlexus.Tests;
 /// makes the column readable.
 /// </para>
 /// <para>
-/// <b>And the ends are run as part of the sweep rather than cited from elsewhere.</b> An
+/// <b>And the ends are run as part of the sweep</b> rather than cited from elsewhere. An
 /// overlap of one has to reproduce <c>FoldingTests</c>' converged row and an overlap of
 /// nought its diverged one — if they do not, this world is not the one that file measured
 /// and the middle of the curve means nothing.

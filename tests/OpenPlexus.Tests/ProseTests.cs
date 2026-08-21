@@ -177,12 +177,17 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// boundary.
     /// </para>
     /// <para>
+    /// And 23, fifteen more off the list. Of 15, 11 closed at punctuation and 4 at a clause
+    /// boundary. The debt is now small enough that a whole-tree pass fits in one sitting,
+    /// which is what the schedule was for.
+    /// </para>
+    /// <para>
     /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
     /// is the tight one — <see cref="Scheduled"/> is what stops it sitting still, and this is
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 38;
+    private const int Shouted = 23;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>

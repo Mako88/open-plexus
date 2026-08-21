@@ -302,7 +302,7 @@ public sealed class MonkTests(ITestOutputHelper output)
     /// entirely, where the true rules ARE conjunctions and this should be near nought.
     /// </para>
     /// <para>
-    /// <b>A number flat across all four says the rung is not what is missing.</b>
+    /// <b>A number flat across all four</b> says the rung is not what is missing.
     /// That is the outcome worth most: it would say `Monk-2`'s ceiling is the floor, the
     /// budget or the gates refusing to repair rather than the language failing to describe,
     /// and every argument for rung two so far has been an argument.

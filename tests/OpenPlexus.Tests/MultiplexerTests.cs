@@ -248,8 +248,8 @@ public sealed class MultiplexerTests(Xunit.Abstractions.ITestOutputHelper output
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The true rule set is asserted identical, which is the half that makes it a
-    /// control.</b> A world that skewed its outcomes by changing what is true of it would
+    /// <b>The true rule set is asserted identical</b>, which is the half that makes it a
+    /// control. A world that skewed its outcomes by changing what is true of it would
     /// move two things at once, and every comparison against it would be unreadable — this
     /// repo's own trap about a setting that decides two independent things while being named
     /// for one. Only how often the answer is one may differ.

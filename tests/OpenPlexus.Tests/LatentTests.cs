@@ -11,8 +11,8 @@ namespace OpenPlexus.Tests;
 /// minted over.</b>
 /// </summary>
 /// <remarks>
-/// <b>Every channel reports one hidden state, so they co-occur constantly and none
-/// of them causes any other.</b> The thing that would explain them has no code and
+/// <b>Every channel reports one hidden state</b>, so they co-occur constantly and none
+/// of them causes any other. The thing that would explain them has no code and
 /// no walk can reach it. That is the shape `Thought.Grouped` was built for and
 /// which no other world here has.
 /// </remarks>

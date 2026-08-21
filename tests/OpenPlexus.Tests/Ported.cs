@@ -98,8 +98,8 @@ public sealed class Ported : IAsyncDisposable
     /// <param name="holding">What each holder holds, already built.</param>
     /// <param name="slotOf">
     /// Which slot the holder at an index is in, or nothing where the fleet is not
-    /// partitioned — <b>fork 62, handed in from here because this is what composes the
-    /// fleet.</b>
+    /// partitioned — <b>fork 62</b>, handed in from here because this is what composes the
+    /// fleet.
     /// </param>
     public static async Task<Ported> OpenAsync(
         IReadOnlyList<Population> holding, Func<int, string>? slotOf = null)
@@ -242,8 +242,8 @@ public sealed class Ported : IAsyncDisposable
     /// <param name="seed">The control arm's generator, the same on every machine.</param>
     /// <remarks>
     /// <para>
-    /// <b>The replicas cost nothing to keep in sync and that is why this is only a
-    /// placement.</b> Every machine is told the same moment and the same settlement, and
+    /// <b>The replicas cost nothing to keep in sync</b>, and that is why this is only a
+    /// placement. Every machine is told the same moment and the same settlement, and
     /// <see cref="Population.Places"/> is a fact about a commitment rather than about who
     /// asked — so two machines given one <c>slot</c> mint the same children from the same
     /// stream and stay identical with no message between them. There is nothing here that

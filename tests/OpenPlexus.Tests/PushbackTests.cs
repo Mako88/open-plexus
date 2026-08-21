@@ -15,7 +15,7 @@ namespace OpenPlexus.Tests;
 /// written down instead.
 /// </para>
 /// <para>
-/// <b>It is not a list of work and that is the whole distinction.</b>
+/// <b>It is not a list of work</b>, and that is the whole distinction.
 /// <see cref="OutstandingTests"/> is work somebody has decided to do, so it is RED. This is
 /// work nobody has decided to do, because there is a disagreement about whether it should be
 /// done at all — so it is GREEN and it PRINTS. An entry here is a claim that something

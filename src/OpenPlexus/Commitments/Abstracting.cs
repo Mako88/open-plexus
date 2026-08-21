@@ -327,6 +327,28 @@ public enum Broadening
     Named,
 
     /// <summary>
+    /// A name is minted and rewrites scopes, and genesis may not ROOT on it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The half of <see cref="Named"/> that the control could not separate from the other
+    /// half. Two things happen when a name is minted: the scopes holding its members are
+    /// rewritten, which is population-neutral, and the name enters the moment as a code,
+    /// which lets genesis mint over it every round. The second is what tripled the
+    /// population on eleven bits while finding no truth the machine did not already have.
+    /// </para>
+    /// <para>
+    /// <b>Refused as a ROOT rather than everywhere</b>, which is the shape
+    /// <see cref="Population.Genesis"/> already uses for a precedence and an intervention.
+    /// A rewritten scope still fires, because the name is still in the moment and matching
+    /// is a subset test; repair may still add a name, so the recursion is untouched and a
+    /// name can still stand on a name. What goes is the one-code commitment over a name,
+    /// which is genesis walking a vocabulary the machine invented for itself.
+    /// </para>
+    /// </remarks>
+    Unrooted,
+
+    /// <summary>
     /// Nothing is named, so every scope stays spelled in the codes the front end emitted.
     /// </summary>
     /// <remarks>

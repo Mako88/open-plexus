@@ -1234,7 +1234,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
             var names = brain.Held.Names;
 
             var standing = held
-                .Where(one => one.Scope.Any(code => code.Modality == Naming.Meant))
+                .Where(one => one.Scope.Any(Naming.Names))
                 .ToList();
 
             var bare = held.Except(standing).ToList();
@@ -1253,7 +1253,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
             foreach (var group in held.GroupBy(one => names.Unfold(one.Scope).Length))
             {
                 var named = group
-                    .Where(one => one.Scope.Any(code => code.Modality == Naming.Meant))
+                    .Where(one => one.Scope.Any(Naming.Names))
                     .ToList();
 
                 var plain = group.Except(named).ToList();
@@ -1388,7 +1388,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
     {
         const int Seeds = 5;
 
-        var arms = new[] { Broadening.Named, Broadening.Never };
+        var arms = new[] { Broadening.Named, Broadening.Unrooted, Broadening.Never };
 
         var spine = arms.ToDictionary(
             arm => arm,
@@ -1436,6 +1436,13 @@ public sealed class RoamingTests(ITestOutputHelper output)
         Assert.Equal(0, spine[Broadening.Never].Sum(one => one.Named));
         Assert.Equal(0, bits[Broadening.Never].Sum(one => one.Learnt.Named));
 
+        // And `Unrooted` still names, which is what makes it the middle arm rather than a
+        // second control. It differs from `Named` in what genesis may reach for and in
+        // nothing else, so a run where it stopped minting would be `Never` by another road.
+        Assert.True(spine[Broadening.Unrooted].Sum(one => one.Named) > 0,
+            "the unrooted arm minted nothing, so it is a second copy of the control rather "
+            + "than the middle arm and the split it exists for has not happened");
+
         // And the shipped arm still does, which is the other half. A control against an arm
         // that had stopped firing would read level and say nothing.
         Assert.True(spine[Broadening.Named].Sum(one => one.Named) > 0,
@@ -1478,6 +1485,21 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // which only discriminates is conceptless, and the answer to that is rung five OR the
         // hierarchy claim goes -- so what this refutes is the BUILD, and fork 129 is the
         // unrun idea about the shape.
+
+        // And the third arm splits what the control bundled. Two things happen when a name
+        // is minted: the scopes holding its members are rewritten, which is
+        // population-neutral, and the name enters the moment as a code genesis may root on.
+        // `Never` removed both at once, so the reading above cannot say which of them the
+        // machine was paying for. `Unrooted` keeps the rewrite and refuses the root.
+        //
+        // It matters beyond this rung. Fork 129 changes WHICH codes are named and keeps the
+        // delivery, so a minted category would enter the moment and be rooted on exactly as
+        // a minted pair is. If the delivery is the fault then 129 inherits it whatever its
+        // statistic does, and that is much cheaper to learn here than there.
+        //
+        // What would say the delivery is innocent: `Unrooted` landing on `Named`'s numbers.
+        // Then the inflation was not the root and the whole of the cost is somewhere the
+        // rewrite put it.
 
         // And the two bars the reading now carries, so it goes red the day the rung starts
         // paying. Naming finding MORE of the world's true rules than its absence would put

@@ -317,7 +317,11 @@ public sealed class DialTests
             + "would do without it. What turns on it is the doc's own line -- rungs one to "
             + "four only ever make a scope smaller, so a machine where naming buys nothing "
             + "is specialise-only, arbitrarily accurate and conceptless, and the hierarchy "
-            + "claim wants a different mechanism",
+            + "claim wants a different mechanism. And a third arm because the first reading "
+            + "bundled two things: a mint rewrites scopes, which is population-neutral, and "
+            + "puts a name in the moment for genesis to root on, which is not. `Unrooted` "
+            + "keeps the rewrite and refuses the root, and it is the arm that says which of "
+            + "them the machine was paying for",
 
         // ---- arrived from the worlds, 2026-08-04 ---------------------------
         //

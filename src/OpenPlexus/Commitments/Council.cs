@@ -328,7 +328,7 @@ public sealed class Alone : ICouncil
             // `Never` the sweep still subsumes and still culls, so the arms differ in
             // naming and in nothing else -- a control that also changed the calendar
             // would be two things moving.
-            if (_held.Dials.Broadening == Broadening.Named) _held.Abstract(heard);
+            if (_held.Dials.Broadening != Broadening.Never) _held.Abstract(heard);
 
             _held.Cull();
 

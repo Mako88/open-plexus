@@ -93,6 +93,17 @@ public sealed class Naming
     /// <param name="code">The code to ask about.</param>
     public bool Knows(Code code) => _means.ContainsKey(code);
 
+    /// <summary>Whether a code is a minted name rather than one a front end emitted.</summary>
+    /// <param name="code">The code to ask about.</param>
+    /// <remarks>
+    /// <b>The same shape <see cref="Codes.Sequenced.Names"/> and
+    /// <see cref="Codes.Intervened.Names"/> have</b>, and here for the same reason: the
+    /// operators need to tell a derived code from a world's own without holding the
+    /// vocabulary that derived it. It reads the modality, so it answers for a name this
+    /// population never minted — which is what a fleet needs.
+    /// </remarks>
+    public static bool Names(Code code) => code.Modality == Meant;
+
     /// <summary>
     /// The moment with every name whose members are all present added to it.
     /// </summary>

@@ -82,10 +82,20 @@ public sealed class PushbackTests(ITestOutputHelper output)
             Claim: "It attributes worlds by matching the dial's NAME in a test file, which "
                 + "just produced a false pass: Choosing read as two worlds because the "
                 + "walk's run result had a property spelt the same. Every other dial on "
-                + "that check is attributed the same way and none has been re-verified.",
+                + "that check is attributed the same way and none has been re-verified. "
+                + "And a second failure mode turned up building Preferring, which the "
+                + "attribution fix would not catch: the world was attributed correctly and "
+                + "is INERT for that dial. Latent holds 313 eligible scopes and lets the "
+                + "naming gate speak 0.5 times in twenty asks, so both arms come back "
+                + "identical to every decimal printed -- the bar reads two worlds and one "
+                + "of them cannot tell the arms apart. A world that constructs is not the "
+                + "same as a world that discriminates.",
             Settles: "Match on the enum TYPE rather than the property name, then read the "
                 + "diff. If nothing else moves, this was one collision and not a method "
-                + "problem."),
+                + "problem. The second half wants a different check and it is computable: "
+                + "a world counts for a dial only where the two arms produce a DIFFERENT "
+                + "reading on it. That is what the grids already print, so what is missing "
+                + "is somewhere for a grid to record it rather than a measurement."),
 
         new(
             With: "Winnow, against rung two",

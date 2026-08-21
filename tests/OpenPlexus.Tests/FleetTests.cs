@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -281,8 +281,8 @@ public sealed class FleetTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Whether the fleet's advantage is the repair gate turned down, and not the wire
-    /// at all.</b>
+    /// <b>Whether the fleet's advantage is the repair gate turned down</b>, and not the wire
+    /// at all.
     /// </summary>
     /// <remarks>
     /// <para>

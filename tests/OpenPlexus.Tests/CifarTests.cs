@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -10,8 +10,8 @@ namespace OpenPlexus.Tests;
 /// The first world here whose readings were never symbols.
 /// </summary>
 /// <remarks>
-/// <b>bAbI ships words, CLEVR ships a scene graph, clutrr ships the relation as a
-/// column.</b> Each hands over the front end this architecture claims to replace, so
+/// <b>bAbI ships words</b>, CLEVR ships a scene graph, clutrr ships the relation as a
+/// column. Each hands over the front end this architecture claims to replace, so
 /// no score on any of them has said anything about the interface. This ships photons,
 /// and what a front end can do with them is the whole question.
 /// </remarks>
@@ -109,8 +109,8 @@ public sealed class CifarTests(ITestOutputHelper output)
     /// <remarks>
     /// <see cref="Banded{TFrame}"/> gives every dimension its own block of modalities
     /// and a modality is one byte, so what is left unclaimed by the other worlds is
-    /// twenty-six dimensions at two spans. <b>A five-by-five thumbnail is the largest
-    /// picture the banded front end can be shown</b> — not the largest it does well
+    /// twenty-six dimensions at two spans. <b>A five-by-five thumbnail</b> is the largest
+    /// picture the banded front end can be shown — not the largest it does well
     /// on, the largest it can ADDRESS. <see cref="Winnowing"/> rides every code on one
     /// modality and has no such limit.
     /// </remarks>

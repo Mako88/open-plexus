@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -7,7 +7,7 @@ namespace OpenPlexus.Tests;
 
 /// <summary>
 /// Whether repair's CHOICE of condition beats drawing one at random — <b>the plan's own
-/// stated kill condition for the bet, on the world where repair fails.</b>
+/// stated kill condition for the bet</b>, on the world where repair fails.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -18,8 +18,8 @@ namespace OpenPlexus.Tests;
 /// skewed one did not exist to ask.
 /// </para>
 /// <para>
-/// <b>And every selection rule tried tonight has failed, which is why this is the
-/// question now.</b> The budget, two correctness gates, generalisation and an experience
+/// <b>And every selection rule tried tonight has failed</b>, which is why this is the
+/// question now. The budget, two correctness gates, generalisation and an experience
 /// bar all change WHICH resident rule gets the seat, and none of them moves the number
 /// that matters. Three fifths to all of every failure is a round with no true rule
 /// present at all, so the pool is what is wrong rather than the choosing from it — and

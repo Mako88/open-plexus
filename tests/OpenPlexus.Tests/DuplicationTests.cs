@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Tests;
@@ -15,8 +15,8 @@ namespace OpenPlexus.Tests;
 /// does twice.
 /// </para>
 /// <para>
-/// <b>Duplication here is not a style complaint, it is how a measurement goes
-/// wrong.</b> The copies drift: one world's tally counts silence and another's
+/// <b>Duplication here is not a style complaint</b>: it is how a measurement goes
+/// wrong. The copies drift: one world's tally counts silence and another's
 /// does not, one world's stride is 1000 and another's is not, and nothing fails
 /// because the copies share no code path. The numbers then stop being comparable
 /// and nothing says so.
@@ -50,8 +50,8 @@ public sealed class DuplicationTests
     /// detector that reports those reports nothing anyone will read.
     /// </para>
     /// <para>
-    /// <b>Argument guards are in here on purpose, and it is the one judgement
-    /// call.</b> <c>ArgumentNullException.ThrowIfNull</c> is what the language
+    /// <b>Argument guards are in here on purpose</b>, and it is the one judgement
+    /// call. <c>ArgumentNullException.ThrowIfNull</c> is what the language
     /// makes you write, not something anyone chose — every well-guarded entry
     /// point in the project opens with the same two or three lines, and counting
     /// those would mean the only way to pass is to guard less.

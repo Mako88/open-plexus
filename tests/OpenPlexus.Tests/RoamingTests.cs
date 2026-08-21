@@ -2021,6 +2021,236 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + "no longer what flattens it and PPMI is doing less than this reading says");
     }
 
+    /// <summary>
+    /// How present a CATEGORY would be, if one were minted over a set of alternatives.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The delivery question, asked before any delivery is built.</b> The reading beside
+    /// this one says the alternatives are recoverable from the moments. What a mechanism would
+    /// then DO with them is a separate question, and the obvious answer — fold a category code
+    /// into the moment whenever any member fires, the way a name folds in when all its members
+    /// do — has a refutation waiting for it.
+    /// </para>
+    /// <para>
+    /// <b>Genesis rooting on a code that has never varied is refuted at 7.4 standard errors</b>
+    /// and the plan carries the row. A category over alternatives is exactly the shape that
+    /// risks it: the members substitute for one another, so if the world names one of them
+    /// every moment then the category is in every moment and separates nothing.
+    /// </para>
+    /// <para>
+    /// <b>So it is measured rather than argued.</b> A category present in nearly every moment
+    /// cannot be a root and its delivery has to be something other than a code — the coarser
+    /// form a scope projects to, which is where forks 83 to 85 already sit. A category present
+    /// in half of them varies and a code is available.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void How_often_a_category_over_alternatives_would_be_in_the_moment()
+    {
+        const int Moments = 10_000;
+
+        var world = new Roaming(World(120, people: 4), seed: 1);
+        var front = new Joined(Joining.Resolved, resolution: 3, freshest: true);
+
+        var sets = new (string What, IReadOnlyList<Code> Codes)[]
+        {
+            ("rooms", world.Named),
+            ("things", world.Called),
+            ("people", world.Walking),
+        };
+
+        var present = sets.ToDictionary(one => one.What, _ => 0);
+        var members = sets.ToDictionary(one => one.What, _ => 0);
+
+        for (var at = 0; at < Moments; at++)
+        {
+            var codes = front.Codify(world.Next().Seen).ToHashSet();
+
+            foreach (var (what, of) in sets)
+            {
+                var held = of.Count(codes.Contains);
+
+                if (held == 0) continue;
+
+                present[what]++;
+                members[what] += held;
+            }
+        }
+
+        output.WriteLine($"{Moments} moments, no learner");
+        output.WriteLine("category | in the moment | members when present");
+
+        foreach (var (what, _) in sets)
+            output.WriteLine(
+                $"{what,-9}| {present[what] / (double)Moments,13:F3} "
+                + $"| {(present[what] == 0 ? 0.0 : members[what] / (double)present[what]),20:F2}");
+
+        // The instrument. A set the world never emits says nothing about a category over it.
+        Assert.All(sets, one => Assert.True(present[one.What] > 0,
+            $"{one.What} never reached a moment, so this world is not emitting the set and "
+            + "the reading is about the front end"));
+
+        // No bar on the rate. What it has to be for a code to work is a fact about the
+        // delivery nobody has designed yet, and a threshold here would be that design
+        // asserted rather than chosen.
+    }
+
+    /// <summary>
+    /// Whether the SHIPPED grouping recovers the alternatives, against the answer key.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The reading above is a hand-built table and this is the object that would ship.</b>
+    /// <see cref="Codes.Alternating"/> already accumulates a code's company over moments —
+    /// the same counts, kept by the class the plan says nothing wires — and
+    /// <see cref="Codes.Alternating.ByLikeness"/> groups on a cosine over them. So the
+    /// question is not whether the machinery exists. It is whether its statistic finds what
+    /// the transcripts hold.
+    /// </para>
+    /// <para>
+    /// <b>Scored against the sets the world names</b>, and a group is credited to whichever
+    /// set most of it belongs to. Purity is how much of a group is that set and reach is how
+    /// much of the set the groups between them found — the two directions of the same
+    /// question, because a grouper that puts every code in one bag scores perfectly on the
+    /// second and a grouper that never joins anything scores perfectly on the first.
+    /// </para>
+    /// <para>
+    /// <b>The threshold is swept rather than chosen</b>, because a cosine bar picked here
+    /// would be this reading deciding its own answer. What the sweep is for is whether ANY
+    /// bar separates the sets, which is a property of the statistic rather than of the number.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_the_shipped_grouping_recovers_the_alternatives()
+    {
+        const int Moments = 10_000;
+
+        var world = new Roaming(World(120, people: 4), seed: 1);
+        var front = new Joined(Joining.Resolved, resolution: 3, freshest: true);
+
+        var alternating = new Alternating();
+
+        for (var at = 0; at < Moments; at++)
+            alternating.Watch(front.Codify(world.Next().Seen).ToHashSet());
+
+        // A second stream on the same seed, for the diagnosis below. The grouper's own tables
+        // are private, so whether a pair ever met is re-derived from an identical run rather
+        // than read out of it.
+        var watching = new Roaming(World(120, people: 4), seed: 1);
+        var beside = new Joined(Joining.Resolved, resolution: 3, freshest: true);
+
+        alternating.Settle();
+
+        var sets = new (string What, IReadOnlySet<Code> Codes)[]
+        {
+            ("rooms", world.Named.ToHashSet()),
+            ("things", world.Called.ToHashSet()),
+            ("people", world.Walking.ToHashSet()),
+        };
+
+        var known = sets.SelectMany(one => one.Codes).ToHashSet();
+
+        output.WriteLine($"{Moments} moments, {alternating.Moments} watched");
+        output.WriteLine("alike | groups | biggest | purity | reach");
+
+        var best = 0.0;
+
+        foreach (var alike in new[] { 0.5, 0.7, 0.8, 0.9, 0.95, 0.99 })
+        {
+            var groups = alternating.ByLikeness(alike, floor: 20)
+                .Where(group => group.Any(known.Contains))
+                .ToList();
+
+            if (groups.Count == 0)
+            {
+                output.WriteLine($"{alike,5:F2} |      0 |       - |      - |     -");
+                continue;
+            }
+
+            var scored = groups
+                .Select(group =>
+                {
+                    var mine = group.Where(known.Contains).ToList();
+
+                    var (what, held) = sets
+                        .Select(one => (one.What, Held: mine.Count(one.Codes.Contains)))
+                        .OrderByDescending(one => one.Held)
+                        .First();
+
+                    return (What: what, Held: held, Of: mine.Count);
+                })
+                .Where(one => one.Held > 0)
+                .ToList();
+
+            var purity = scored.Count == 0
+                ? 0.0
+                : scored.Sum(one => one.Held) / (double)scored.Sum(one => one.Of);
+
+            var reach = scored
+                .GroupBy(one => one.What)
+                .Sum(group => group.Max(one => one.Held))
+                / (double)known.Count;
+
+            best = Math.Max(best, purity * reach);
+
+            output.WriteLine(
+                $"{alike,5:F2} | {groups.Count,6} | {groups.Max(one => one.Count),7} "
+                + $"| {purity,6:F3} | {reach,5:F3}");
+        }
+
+        output.WriteLine("");
+        output.WriteLine($"best purity times reach: {best:F3}");
+
+        // And where it went, because a nought at every bar is not a reading about the
+        // threshold. `Grouped` admits a code to a group only where it has NEVER ONCE
+        // co-occurred with every member -- the *alternatives never co-occur* objection
+        // written as an absolute -- so this counts how many of the answer key's own pairs
+        // that clause refuses.
+        var together = 0;
+        var pairs = 0;
+
+        foreach (var (_, codes) in sets)
+        {
+            var of = codes.ToList();
+
+            for (var left = 0; left < of.Count; left++)
+                for (var right = left + 1; right < of.Count; right++)
+                {
+                    pairs++;
+
+                    if (Beside(of[left], of[right])) together++;
+                }
+        }
+
+        output.WriteLine(
+            $"{together} of {pairs} within-set pairs have co-occurred at least once");
+
+        Assert.True(alternating.Moments == Moments,
+            $"{alternating.Moments} moments reached the grouper of {Moments} pushed, so this "
+            + "is a reading about the wiring rather than about the statistic");
+
+        // The bar the diagnosis rests on. A moment here spans three sentences, so two room
+        // words land in one window constantly even though a person is in ONE room -- and the
+        // exclusion reads a window as an assertion. If these pairs ever stop co-occurring the
+        // clause is no longer what empties the table and the reading above wants re-taking.
+        Assert.Equal(pairs, together);
+
+        return;
+
+        bool Beside(Code one, Code two)
+        {
+            for (var at = 0; at < Moments; at++)
+            {
+                var codes = beside.Codify(watching.Next().Seen).ToHashSet();
+
+                if (codes.Contains(one) && codes.Contains(two)) return true;
+            }
+
+            return false;
+        }
+    }
+
     [Fact]
     public void What_the_effect_question_is_worth_before_anything_learns()
     {

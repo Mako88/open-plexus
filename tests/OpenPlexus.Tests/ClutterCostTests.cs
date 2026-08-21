@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -67,8 +67,8 @@ public sealed class ClutterCostTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Nothing is ever rooted on background, which is the invariant and not a
-    /// score.</b>
+    /// <b>Nothing is ever rooted on background</b>, which is the invariant and not a
+    /// score.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -121,8 +121,8 @@ public sealed class ClutterCostTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>And the world is unchanged underneath it, which is what makes the grid
-    /// readable.</b>
+    /// <b>And the world is unchanged underneath it</b>, which is what makes the grid
+    /// readable.
     /// </summary>
     /// <remarks>
     /// Clutter takes nothing from the generator and the answer function ignores it, so

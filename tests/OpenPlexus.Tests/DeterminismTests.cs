@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 
@@ -41,8 +41,8 @@ public sealed class DeterminismTests
     /// <b>A wall clock is not part of a run's identity</b>, and for two days it was.
     /// </summary>
     /// <remarks>
-    /// <b>THE THREE <i>a fixed seed reproduces a run exactly</i> tests went red on a
-    /// correct machine</b> the moment <see cref="Spent"/> joined <see cref="Tally"/>,
+    /// <b>The three <i>a fixed seed reproduces a run exactly</i> tests</b> went red on a
+    /// correct machine the moment <see cref="Spent"/> joined <see cref="Tally"/>,
     /// because a record compares every field it has and milliseconds do not repeat.
     /// Every other number in those reports was identical to the digit. See
     /// <see cref="Spent.Equals(Spent)"/> for why the fix is there rather than here.

@@ -169,12 +169,16 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// is per span.
     /// </para>
     /// <para>
+    /// And 45, ten more off the alphabetical list. Of 10, 8 closed at punctuation and 2 at a
+    /// clause boundary, and one shouted lead came off with them.
+    /// </para>
+    /// <para>
     /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
     /// is the tight one — <see cref="Scheduled"/> is what stops it sitting still, and this is
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 53;
+    private const int Shouted = 45;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>
@@ -213,7 +217,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// as a finding.
     /// </para>
     /// </remarks>
-    private const int Opened = 48;
+    private const int Opened = 47;
 
     /// <summary>
     /// The commit the decay schedule counts from. <b>John's, 2026-08-13.</b>

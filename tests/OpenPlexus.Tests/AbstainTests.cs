@@ -145,8 +145,8 @@ public sealed class AbstainTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>And the control: with the dial off, nothing abstains and the run is the old
-    /// run.</b>
+    /// <b>And the control</b>: with the dial off, nothing abstains and the run is the old
+    /// run.
     /// </summary>
     /// <remarks>
     /// <b>Bit-identical and not merely similar, which is what the short-circuit buys.</b>
@@ -178,8 +178,8 @@ public sealed class AbstainTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The design claims an unsettled round is free, which is not the same as
-    /// harmless.</b> It costs a commitment nothing, and it costs the RUN an observation —
+    /// <b>The design claims an unsettled round is free</b>, which is not the same as
+    /// harmless. It costs a commitment nothing, and it costs the RUN an observation —
     /// so a world quiet a third of the time should look like a shorter run rather than a
     /// worse one, and anything beyond that would be the verdict doing damage the primitive
     /// says it cannot.

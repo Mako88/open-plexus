@@ -157,12 +157,18 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// which is about twenty minutes of the wait beside a grid.
     /// </para>
     /// <para>
+    /// And 63, ten taken across six files, none of which was among the worst. Below a
+    /// hundred the pass is no longer a sweep of a file — the spans are scattered one and two
+    /// to a file, so a pass is a walk of the whole tree's list and the per-file shape this
+    /// entry describes above has stopped applying.
+    /// </para>
+    /// <para>
     /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
     /// is the tight one — <see cref="Scheduled"/> is what stops it sitting still, and this is
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 73;
+    private const int Shouted = 63;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>

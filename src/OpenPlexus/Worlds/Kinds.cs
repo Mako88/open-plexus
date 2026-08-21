@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
 
@@ -63,8 +63,8 @@ public static class Kinds
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The worlds built here number their concepts and the worlds read off
-    /// disk do not.</b> An external corpus hands over <i>cylinder</i> and
+    /// <b>The worlds built here number their concepts</b>, and the worlds read off
+    /// disk do not. An external corpus hands over <i>cylinder</i> and
     /// <i>bathroom</i>, so there is no concept number to stride by and something
     /// has to turn a name into a code.
     /// </para>

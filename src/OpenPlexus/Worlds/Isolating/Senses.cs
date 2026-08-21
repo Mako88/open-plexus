@@ -74,7 +74,7 @@ public sealed record SensesSettings
     /// exactly the ever-present background the forward weighting exists to
     /// refuse: <c>together(here, other) / seen(other)</c> should score a code
     /// present at every moment as a weak partner however often it co-occurs.
-    /// <b>That claim has never been tested at a size where it could fail.</b>
+    /// <b>That claim has never been tested</b> at a size where it could fail.
     /// </remarks>
     public int Pool { get; init; }
 
@@ -465,7 +465,7 @@ public sealed class Senses : IWorld<Coded>, IWithholds<Coded>
 
     /// <summary>Which irrelevant code turns up, uniform or skewed.</summary>
     /// <remarks>
-    /// <b>The uniform branch is the ORIGINAL CALL and not an equivalent of it.</b>
+    /// <b>The uniform branch is the ORIGINAL CALL</b>, not an equivalent of it.
     /// A Zipf table with a zero exponent draws uniformly too, but off
     /// <see cref="Random.NextDouble"/> rather than <see cref="Random.Next(int)"/> —
     /// so every clutter measurement already taken would shift under a change that

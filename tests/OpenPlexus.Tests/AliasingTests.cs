@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
@@ -8,7 +8,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The budget for a failure class that had already happened and said nothing.</b>
+/// <b>The budget for a failure class</b> that had already happened and said nothing.
 /// <see cref="Banded{TFrame}"/> gives each dimension a block of modalities and assigns
 /// them with <c>(byte)(first + which * spans)</c> — an unchecked cast. Past 256 it
 /// WRAPPED, so on a reading of 192 dimensions the codes for dimension 0 and dimension
@@ -22,7 +22,7 @@ namespace OpenPlexus.Tests;
 /// here to read a picture would have walked straight into it.
 /// </para>
 /// <para>
-/// <b>So the guard lives on the type and this is what keeps it there.</b> A silent
+/// <b>So the guard lives on the type</b>, and this is what keeps it there. A silent
 /// collision is the worst shape a bug can have in this design: every downstream number
 /// stays plausible, and the learner is simply wrong about what it saw.
 /// </para>

@@ -107,8 +107,8 @@ public enum Examining
 
 /// <summary>
 /// A house, people walking round it, and things that get picked up and put down —
-/// <b>TextWorld's shape, generated here rather than ported, so the ground truth can be
-/// enumerated.</b>
+/// <b>TextWorld's shape, generated rather than ported</b>, so the ground truth can be
+/// enumerated.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -243,8 +243,8 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>, IActed<Recit
         _settings.Examining == Examining.Effect ? 2 : _settings.Rooms;
 
     /// <summary>
-    /// The code for each room's word, in outcome order — <b>so a ceiling can be computed
-    /// from the transcript rather than from the state.</b>
+    /// The code for each room's word, in outcome order — <b>so a ceiling comes off the transcript</b>
+    /// rather than off the state.
     /// </summary>
     /// <remarks>
     /// <b>What it said and never what to conclude</b>, which is the line a world stays on.

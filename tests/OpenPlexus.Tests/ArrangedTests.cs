@@ -12,7 +12,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>A world scoreable by a bag of parts is CIFAR with better pictures.</b> The whole
+/// <b>A world scoreable by a bag of parts</b> is CIFAR with better pictures. The whole
 /// reason this world exists is that a ten-way label has no arrangement, so no score on
 /// one can tell a front end that manufactures reusable symbols from one that emits a
 /// holistic blob. If the parts alone carry the answer here, the exercise repeats and

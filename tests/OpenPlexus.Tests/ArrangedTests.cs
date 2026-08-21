@@ -19,7 +19,7 @@ namespace OpenPlexus.Tests;
 /// nobody finds out until a number has already been written up.
 /// </para>
 /// <para>
-/// <b>So it is checked the only way that settles it: over the whole space.</b> A
+/// <b>So it is checked the only way that settles it</b>: over the whole space. A
 /// sampled version of this test would pass on a world that leaked a little, and a
 /// little is all it takes — the leak becomes the score, and the score becomes the
 /// finding.

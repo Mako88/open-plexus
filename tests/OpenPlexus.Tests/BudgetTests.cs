@@ -6,8 +6,8 @@ using Xunit.Abstractions;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// A fixed fork count against a correctness condition — <b>John's rule, and the plan's
-/// own note about `Budget`, which turn out to be the same proposal.</b>
+/// A fixed fork count against a correctness condition — <b>John's rule</b>, and the plan's
+/// own note about `Budget`, which turn out to be the same proposal.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -33,8 +33,8 @@ namespace OpenPlexus.Tests;
 /// residents and unsound, which are what it would cost.
 /// </para>
 /// <para>
-/// <b>Every number this file has ever recorded was taken under a timing it no longer
-/// runs.</b> And that is not a change anybody made here. These cells name
+/// <b>Every number this file has ever recorded</b> was taken under a timing it no longer
+/// runs. And that is not a change anybody made here. These cells name
 /// <see cref="CommittingSettings.Budget"/> and <see cref="Mending"/> and pin nothing else,
 /// so the arms inherited <see cref="Repairing.AfterFailure"/> when it was the default and
 /// inherit <see cref="Repairing.EveryRound"/> now. The recorded verdict — a free budget is

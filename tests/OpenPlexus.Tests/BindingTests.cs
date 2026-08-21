@@ -1,4 +1,4 @@
-using OpenPlexus.Worlds;
+﻿using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Tests;
 
@@ -8,16 +8,16 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>PRE-REGISTERED, 2026-08-03, BEFORE THE FIRST EXECUTION: the unbound arm
-/// scores EXACTLY AT CHANCE.</b> Not poorly — at chance, because the two
+/// <b>Pre-registered, 2026-08-03, before the first execution</b>: the unbound arm
+/// scores EXACTLY AT CHANCE. Not poorly — at chance, because the two
 /// situations it is asked to tell apart are literally the same input. If it
 /// scored meaningfully above chance, the model of this architecture written in
 /// the handoff would be wrong and the four borrowings planned on top of it would
 /// need revisiting before any of them was built.
 /// </para>
 /// <para>
-/// <b>Measured, 16 seeds, stamina 12: 0.5240 ± 0.0268 against a chance of
-/// 0.5000</b> — nine tenths of a standard error — while the control arm, which
+/// <b>Measured, 16 seeds, stamina 12</b>: 0.5240 ± 0.0268 against a chance of
+/// 0.5000 — nine tenths of a standard error — while the control arm, which
 /// differs only in a fact the counts can hold, scores 0.9167 ± 0.0095. Nearly
 /// fourteen standard errors apart, on identical input.
 /// </para>

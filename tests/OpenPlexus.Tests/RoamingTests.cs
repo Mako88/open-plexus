@@ -1553,6 +1553,245 @@ public sealed class RoamingTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>
+    /// Whether the population separates ALTERNATIVES at all — <b>fork 129's ceiling, taken
+    /// before any of its mechanism is built.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The idea is that two codes are alike where the commitments naming them EXPECT the same
+    /// things. It never asks whether they co-occurred, which is the one thing alternatives
+    /// never do — and which is why rung five, naming what CO-FIRES, is the wrong shape for a
+    /// category.
+    /// </para>
+    /// <para>
+    /// <b>A ceiling rather than an arm</b>, which is the cheapest thing that can kill the
+    /// fork. If a learnt population does not already separate room words from thing words by
+    /// what their commitments expect, then the statistic has no signal to find and no gate
+    /// built on it can help. Nothing here mints anything or changes what any run does.
+    /// </para>
+    /// <para>
+    /// <b>The world supplies the answer key and no learner sees it.</b>
+    /// <see cref="Worlds.Roaming.Named"/>, <see cref="Worlds.Roaming.Called"/> and
+    /// <see cref="Worlds.Roaming.Walking"/> are the vocabulary the world emitted, which is a
+    /// fact about the transcript rather than a hint about an answer — the standing every
+    /// instrument here has. The three sets are alternatives BY CONSTRUCTION: a person is in
+    /// one room, so the room words substitute for one another and never co-occur as an
+    /// answer.
+    /// </para>
+    /// <para>
+    /// <b>What kills the fork</b>: within-set likeness landing on across-set likeness. Then
+    /// what a commitment expects carries nothing about which codes are alternatives, and
+    /// reading likeness off the population is a different way of finding the same nothing the
+    /// moment gave.
+    /// </para>
+    /// <para>
+    /// <b>And it is weighted two ways</b> because the profile is a choice and not a given.
+    /// By residency, every commitment naming a code counts once; by hits, a commitment counts
+    /// for what actually followed it. The second is what <i>expects</i> should mean, and the
+    /// first is what a population that has not settled yet can offer. A fork whose signal
+    /// only appears under one of them is a fork about the weighting.
+    /// </para>
+    /// </remarks>
+    /// <summary>Which way round a code's profile is read.</summary>
+    private enum Reading
+    {
+        /// <summary>The outcomes the commitments naming a code expect. Fork 129 as written.</summary>
+        Expects,
+
+        /// <summary>The scope codes of the commitments that expect it. Its dual.</summary>
+        ExpectedBy,
+
+        /// <summary>The other codes in the scopes it appears in. The distributional one.</summary>
+        Beside,
+    }
+
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_the_population_separates_alternatives_by_what_they_expect()
+    {
+        const int Seeds = 5;
+
+        var within = new Dictionary<string, List<double>>();
+        var across = new List<double>();
+        var byHits = new Dictionary<string, List<double>>();
+        var acrossHits = new List<double>();
+        var byContext = new Dictionary<string, List<double>>();
+        var acrossContext = new List<double>();
+        var byMates = new Dictionary<string, List<double>>();
+        var acrossMates = new List<double>();
+
+        for (var seed = 1; seed <= Seeds; seed++)
+        {
+            var world = new Roaming(World(120, people: 4), seed);
+
+            var (_, brain) = Watched(new CommittingSettings { Capacity = 20_000 }, seed);
+
+            var held = brain.Held.All.ToList();
+
+            var sets = new (string What, IReadOnlyList<Code> Codes)[]
+            {
+                ("rooms", world.Named),
+                ("things", world.Called),
+                ("people", world.Walking),
+            };
+
+            foreach (var (what, _) in sets)
+            {
+                within.TryAdd(what, []);
+                byHits.TryAdd(what, []);
+                byContext.TryAdd(what, []);
+                byMates.TryAdd(what, []);
+            }
+
+            // One profile a code, and the two directions are the whole question. FORWARD is
+            // the fork as written: over the outcomes the commitments naming a code expect.
+            // BACKWARD is its dual: over the scope codes of the commitments that expect it.
+            //
+            // A code no commitment reaches has no profile and is left out rather than
+            // counted as a vector of noughts, which would read as alike to every other
+            // empty one.
+            Dictionary<Code, Dictionary<Code, double>> Profiles(
+                Func<Commitment, double> weigh, Reading reading)
+            {
+                var found = new Dictionary<Code, Dictionary<Code, double>>();
+
+                foreach (var one in held)
+                {
+                    var weight = weigh(one);
+
+                    if (weight <= 0.0) continue;
+
+                    // The third direction, and it is the distributional one. A code's profile
+                    // is the OTHER codes in the scopes it appears in -- its company rather
+                    // than its consequence. It is what the linguistics analogy actually says,
+                    // and it does not ask whether two codes co-occurred: two words with the
+                    // same neighbours are alike however rarely they meet.
+                    if (reading == Reading.Beside)
+                    {
+                        foreach (var code in one.Scope)
+                        {
+                            if (!found.TryGetValue(code, out var beside))
+                                found[code] = beside = [];
+
+                            foreach (var mate in one.Scope)
+                            {
+                                if (mate == code) continue;
+
+                                beside.TryGetValue(mate, out var held_so_far);
+                                beside[mate] = held_so_far + weight;
+                            }
+                        }
+
+                        continue;
+                    }
+
+                    if (reading == Reading.Expects)
+                    {
+                        foreach (var code in one.Scope)
+                        {
+                            if (!found.TryGetValue(code, out var over))
+                                found[code] = over = [];
+
+                            over.TryGetValue(one.Expects, out var so_far);
+                            over[one.Expects] = so_far + weight;
+                        }
+
+                        continue;
+                    }
+
+                    if (!found.TryGetValue(one.Expects, out var by))
+                        found[one.Expects] = by = [];
+
+                    foreach (var code in one.Scope)
+                    {
+                        by.TryGetValue(code, out var so_far);
+                        by[code] = so_far + weight;
+                    }
+                }
+
+                return found;
+            }
+
+            foreach (var (weigh, reading, into, other) in
+                new (Func<Commitment, double> Weigh, Reading Reading,
+                    Dictionary<string, List<double>> Into, List<double> Other)[]
+                {
+                    (_ => 1.0, Reading.Expects, within, across),
+                    (one => one.Hits, Reading.Expects, byHits, acrossHits),
+                    (one => one.Hits, Reading.ExpectedBy, byContext, acrossContext),
+                    (_ => 1.0, Reading.Beside, byMates, acrossMates),
+                })
+            {
+                var profiles = Profiles(weigh, reading);
+
+                foreach (var (what, codes) in sets)
+                {
+                    var have = codes.Where(profiles.ContainsKey).ToList();
+
+                    var pairs = have
+                        .SelectMany((left, at) => have.Skip(at + 1)
+                            .Select(right => Cosine(profiles[left], profiles[right])))
+                        .ToList();
+
+                    if (pairs.Count > 0) into[what].Add(pairs.Average());
+                }
+
+                var mixed = new List<double>();
+
+                for (var left = 0; left < sets.Length; left++)
+                    for (var right = left + 1; right < sets.Length; right++)
+                        foreach (var one in sets[left].Codes.Where(profiles.ContainsKey))
+                            foreach (var two in sets[right].Codes.Where(profiles.ContainsKey))
+                                mixed.Add(Cosine(profiles[one], profiles[two]));
+
+                if (mixed.Count > 0) other.Add(mixed.Average());
+            }
+        }
+
+        output.WriteLine($"cosine over what the commitments naming a code expect, {Seeds} seeds");
+        output.WriteLine("direction   | rooms          | things         | people         | across");
+
+        foreach (var (what, into, other) in
+            new (string What, Dictionary<string, List<double>> Into, List<double> Other)[]
+            {
+                ("expects", within, across),
+                ("expects/hit", byHits, acrossHits),
+                ("expected-by", byContext, acrossContext),
+                ("beside", byMates, acrossMates),
+            })
+        {
+            output.WriteLine(
+                $"{what,-12}| {Sweep.Spread(into["rooms"]),14} "
+                + $"| {Sweep.Spread(into["things"]),14} "
+                + $"| {Sweep.Spread(into["people"]),14} "
+                + $"| {Sweep.Spread(other),14}");
+        }
+
+        // The instrument. A run where no set had two codes with profiles has nothing to
+        // compare and every column above is about that.
+        Assert.NotEmpty(across);
+        Assert.NotEmpty(within["rooms"]);
+
+        // No bar on the gap. Whether the population separates alternatives is the reading,
+        // and a threshold written before the first take of it would be the fork's answer put
+        // in front of its question.
+        return;
+
+        static double Cosine(Dictionary<Code, double> left, Dictionary<Code, double> right)
+        {
+            var over = 0.0;
+
+            foreach (var (code, weight) in left)
+                if (right.TryGetValue(code, out var also)) over += weight * also;
+
+            var one = Math.Sqrt(left.Values.Sum(value => value * value));
+            var two = Math.Sqrt(right.Values.Sum(value => value * value));
+
+            return one == 0.0 || two == 0.0 ? 0.0 : over / (one * two);
+        }
+    }
+
     [Fact]
     public void What_the_effect_question_is_worth_before_anything_learns()
     {

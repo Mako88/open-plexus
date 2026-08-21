@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -17,7 +17,7 @@ namespace OpenPlexus.Tests;
 /// line between that and deciding what to conclude is a judgement.
 /// </para>
 /// <para>
-/// <b>So this measures what a judgement cannot: whether the answer is already there.</b> A
+/// <b>So this measures what a judgement cannot</b>: whether the answer is already there. A
 /// front end selects statements and hands over a moment; if that moment CONTAINS the answer, a
 /// learner has only to name something in front of it, and a score is a reading about the
 /// selection rather than about the population. The share is arithmetic over two sets, needs no

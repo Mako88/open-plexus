@@ -1016,13 +1016,6 @@ public sealed class Population
             // agency rather than about the world, and the moment carries one for every pair.
             if (Sequenced.Names(code) || Intervened.Names(code)) continue;
 
-            // And a MINTED NAME under the arm that asks whether it should be one. It is the
-            // machine's own vocabulary rather than the world's, so rooting on it is genesis
-            // walking a space the machine invented -- which is what the whole-alphabet
-            // refutation says about minting on every failure, one door along. Refused as a
-            // root only: the name is still in the moment, so a rewritten scope still fires,
-            // and repair may still add one.
-            if (_dials.Broadening == Broadening.Unrooted && Naming.Names(code)) continue;
 
             // And the second gate asks which code rather than whether at all. A code that
             // has never once been absent separates nothing and cannot ever win a repair,

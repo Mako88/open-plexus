@@ -163,12 +163,18 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// entry describes above has stopped applying.
     /// </para>
     /// <para>
+    /// And 53, ten taken alphabetically off the whole-tree list rather than by picking files.
+    /// Of 10, 7 closed at punctuation and 3 at a clause boundary. Taking them in the order
+    /// the list prints costs nothing over choosing, which is what says the judgement really
+    /// is per span.
+    /// </para>
+    /// <para>
     /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
     /// is the tight one — <see cref="Scheduled"/> is what stops it sitting still, and this is
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 63;
+    private const int Shouted = 53;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>

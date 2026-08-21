@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -6,8 +6,8 @@ using Xunit.Abstractions;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// The repair budget swept between its two measured ends — <b>the middle of a curve whose
-/// endpoints disagree about what the run is for.</b>
+/// The repair budget swept between its two measured ends — <b>the middle of a curve</b> whose
+/// endpoints disagree about what the run is for.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -28,7 +28,7 @@ namespace OpenPlexus.Tests;
 /// at once.
 /// </para>
 /// <para>
-/// <b>The prediction is written down first and it is specific enough to be wrong.</b> If
+/// <b>The prediction is written down first</b>, and it is specific enough to be wrong. If
 /// hard-round coverage and sound rules rise monotonically in the budget while trailing
 /// accuracy on the even world falls monotonically, the trade is real, no number ranks it, and
 /// the choice is John's. If instead there is an interior budget carrying the free end's

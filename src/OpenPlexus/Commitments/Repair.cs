@@ -983,6 +983,17 @@ public static class Conditions
 
             if (refuse?.Contains(code) == true) continue;
 
+            // A MINTED NAME under the arm that asks whether repair should reach for one, and
+            // counted before it is refused for the same reason the line above is: a bar that
+            // loosened when the arm changed would be two things moving, and the whole of this
+            // arm is which code may be CHOSEN.
+            //
+            // This is where a name reaches the population, which the arm's first shape got
+            // wrong. Genesis was the suspect and genesis never roots on one -- every one-code
+            // scope over a name comes from the REWRITE rather than from covering, so
+            // excluding it there changed not one number on either world.
+            if (dials.Broadening == Broadening.Unrooted && Naming.Names(code)) continue;
+
             // And the child has to be judgeable, where the arm asks. A conjunctive child keeps
             // the parent's firings this code was present in, so fewer of those than the floor
             // is a rule that can never clear the floor itself -- one nothing will ever be able

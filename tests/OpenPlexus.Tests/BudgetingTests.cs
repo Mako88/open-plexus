@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -31,7 +31,7 @@ namespace OpenPlexus.Tests;
 /// assumed.
 /// </para>
 /// <para>
-/// <b>And the answer is that it has never bound on children at all</b>, which is arithmetic
+/// <b>And the answer is that it never bound on children</b>, which is arithmetic
 /// once it is said out loud. A child adds one code, so a parent's distinct children are
 /// bounded by the vocabulary — twelve codes at six bits and twenty-two at eleven, against a
 /// budget of sixty-four. <c>exhausted</c> is exactly nought in every cell under
@@ -170,7 +170,7 @@ public sealed class BudgetingTests(ITestOutputHelper output)
     /// together forever and the two arms are one arm.
     /// </para>
     /// <para>
-    /// <b>So the arm is free under one forking rule and a synonym under the other</b>, and
+    /// <b>So the arm is free under one forking rule</b>, and a synonym under the other, and
     /// there is no third thing it could be. That is not a fact about a world or about a
     /// budget's level, which is why no grid was owed after all and why this is a check
     /// rather than a sweep.

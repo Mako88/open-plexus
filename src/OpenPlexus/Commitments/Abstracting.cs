@@ -327,7 +327,7 @@ public enum Broadening
     Named,
 
     /// <summary>
-    /// A name is minted and rewrites scopes, and genesis may not ROOT on it.
+    /// A name is minted and rewrites scopes, and repair may not REACH for it.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -338,12 +338,17 @@ public enum Broadening
     /// population on eleven bits while finding no truth the machine did not already have.
     /// </para>
     /// <para>
-    /// <b>Refused as a ROOT rather than everywhere</b>, which is the shape
-    /// <see cref="Population.Genesis"/> already uses for a precedence and an intervention.
-    /// A rewritten scope still fires, because the name is still in the moment and matching
-    /// is a subset test; repair may still add a name, so the recursion is untouched and a
-    /// name can still stand on a name. What goes is the one-code commitment over a name,
-    /// which is genesis walking a vocabulary the machine invented for itself.
+    /// <b>Refused to REPAIR rather than everywhere.</b> A rewritten scope still fires,
+    /// because the name is still in the moment and matching is a subset test, and rung five
+    /// may still rewrite over a name, so the recursion is untouched. What goes is repair
+    /// reaching into a vocabulary the machine invented for itself when it looks for a code
+    /// to specialise on.
+    /// </para>
+    /// <para>
+    /// <b>And genesis was the first suspect and is innocent</b>, which is carried because the
+    /// obvious repair for this reading is to try it there. Genesis never roots on a name:
+    /// every one-code scope over one comes from the rewrite rather than from covering, so
+    /// refusing it as a root changed not one number on either world.
     /// </para>
     /// </remarks>
     Unrooted,

@@ -11,7 +11,7 @@ namespace OpenPlexus.Tests;
 /// The findings then live in the commit that produced them, which is this repo's rule.
 /// </para>
 /// <para>
-/// <b>And they took the suite past its forty-five minute ceiling in one session.</b>
+/// <b>And they took the suite past its forty-five minute ceiling</b> in one session.
 /// Between them they are several hundred runs of twenty and thirty thousand rounds, all
 /// serial because `Parallelism` requires it — so leaving them in the default filter
 /// spends most of an hour of somebody else's machine producing output nobody reads, and

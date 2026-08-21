@@ -5,8 +5,8 @@ namespace OpenPlexus.Tests;
 
 /// <summary>
 /// The dispatch list in <c>sweeps.yml</c>, checked against the measurements that actually
-/// carry the trait — <b>the budget for the one failure class this repo had named and not
-/// paid for.</b>
+/// carry the trait — <b>the budget for the one failure class</b> this repo had named and
+/// not paid for.
 /// </summary>
 /// <remarks>
 /// <para>

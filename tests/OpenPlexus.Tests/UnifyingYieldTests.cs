@@ -66,8 +66,8 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
     private const int Populations = 8;
 
     /// <summary>
-    /// Sibling groups, and how big they get — <b>commitments expecting one thing and
-    /// differing in exactly one position of an otherwise identical scope.</b>
+    /// Sibling groups, and how big they get — <b>commitments expecting one thing</b> and
+    /// differing in exactly one position of an otherwise identical scope.
     /// </summary>
     /// <param name="all">The population to read.</param>
     /// <remarks>
@@ -199,8 +199,8 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
     /// nothing that survives however cheap the matcher is.
     /// </para>
     /// <para>
-    /// <b>On the multiplexer, because the concept is known and rung five provably missed
-    /// it.</b> <i>These positions are the address, whatever they say</i> is a hole in a
+    /// <b>On the multiplexer</b>, because the concept is known and rung five provably missed
+    /// it. <i>These positions are the address, whatever they say</i> is a hole in a
     /// scope and not a set of codes, and not one minted name in 258 grouped the address.
     /// So this is the same target approached by the operator whose shape actually fits it,
     /// which is what makes the comparison worth taking rather than a repeat.

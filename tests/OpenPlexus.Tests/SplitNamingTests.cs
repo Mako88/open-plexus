@@ -56,7 +56,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
 
     /// <summary>
     /// How much repair this world's population is built from — <b>pinned here rather than
-    /// inherited, because it decides whether this file's question exists at all.</b>
+    /// inherited</b>, because it decides whether this file's question exists at all.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -93,8 +93,8 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     private const Repairing Waiting = Repairing.AfterFailure;
 
     /// <summary>
-    /// The seed the window is read on — <b>a fixture constant, and it moved when a dial
-    /// nothing here names moved.</b>
+    /// The seed the window is read on — <b>a fixture constant</b>, and it moved when a dial
+    /// nothing here names moved.
     /// </summary>
     /// <remarks>
     /// <para>

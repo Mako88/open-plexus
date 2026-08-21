@@ -5,7 +5,7 @@
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Written once because two files now open ports and the copies would drift.</b>
+/// <b>Written once because two files now open ports</b> and the copies would drift.
 /// <c>PostedTests</c> put the thinking path on a wire and <c>AskedTests</c> puts the
 /// learning path on one; a port picker and a hang detector in both is two places for the
 /// bound to differ, and a flake blamed on the bus is the outcome.
@@ -107,7 +107,7 @@ public static class Wired
     /// <param name="done">What is being waited for.</param>
     /// <returns>Whether it ever became true.</returns>
     /// <remarks>
-    /// <b>IT RETURNS RATHER THAN THROWS, so the caller says what the failure MEANS.</b> A
+    /// <b>It returns rather than throws</b>, so the caller says what the failure means. A
     /// timeout here is <i>the envelope never arrived</i> in one file and <i>the holder that
     /// died answered anyway</i> in another, and a shared exception message could say
     /// neither.

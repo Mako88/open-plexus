@@ -31,11 +31,9 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them.
-- **ACTIVE, a guard against a mechanism no run reaches.** John's. `DeadCodeTests` counts a
-  test as a caller, so `src` may hold a mechanism the brain never executes and every guard
-  stays green. Seven do, `Unifying` and `Alternating` among them.
-- **Then whatever it turns red**, which is the point of it: until it is green, no claim that
-  the architecture is wired can be believed, `ExercisedTests` included.
+- **ACTIVE, the five `DrivenTests` says no run reaches.** Four of nine closed. The category
+  machinery — `Alternating`, `Deriving`, `Meeting`, `Sorted` — and `Unifying` close on the
+  items below.
 - **Then a likeness bar that travels**, read against shuffled moments rather than a level,
   so no world hands a threshold in. It is what blocks the categories.
 - **Then the categories the brain derives**, into `Population.Sorts`, which nothing but a
@@ -675,6 +673,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | Background admitted to a WIDE genesis scope, a code in every moment being unable to change when the rule fires | A third of what the varied filter reaches at three tellings and three quarters at ten | A world where the varied gate refuses a code a conjunction needed |
 | `Preferring.Saving` — naming the certified pair the most scopes hold | Stacking falls 3.4 standard errors on eleven bits, the outcome columns at ceiling on both arms. A name over a two-code scope leaves it one code and out of the eligible set | A world whose eligible scopes are mostly three codes or longer |
 | `Preferring.Surviving` — the same over scopes that survive naming | Inside a standard error of the row above on every column: the deepest certified pair is the widest on 80 asks of 80 | A world where those come apart, which `NamingYieldTests` asserts against |
+| `Marked` — a discrete reading said as one code | Nothing ever called it, in `src` or in a test | A world handing over a raw index the brain must name, which `Passthrough` cannot take |
 | A refusal as a CODE in the moment, fork **127** | Level on both shapes for a larger population, the chooser already refusing to repeat itself, so the fact was acted on before the code arrived | The exclusion having to SURVIVE the moment, which is a store's job rather than a code's |
 
 ---

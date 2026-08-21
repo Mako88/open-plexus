@@ -2101,7 +2101,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The reading above is a hand-built table and this is the object that would ship.</b>
+    /// <b>The reading above is a hand-built table</b> and this is the object that would ship.
     /// <see cref="Codes.Alternating"/> already accumulates a code's company over moments —
     /// the same counts, kept by the class the plan says nothing wires — and
     /// <see cref="Codes.Alternating.ByLikeness"/> groups on a cosine over them. So the

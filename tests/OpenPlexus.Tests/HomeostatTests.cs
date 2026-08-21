@@ -150,47 +150,6 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     private static IChooses Blindly(Homeostat body, Random draw) =>
         Chooses.From(_ => draw.Next(body.Doings));
 
-    /// <summary>
-    /// <b>How much this body wants an outcome</b>, read off what it feels and nothing else.
-    /// </summary>
-    /// <param name="expects">The outcome a commitment expects to follow.</param>
-    /// <param name="felt">What the front end said about the state being acted in.</param>
-    /// <remarks>
-    /// <para>
-    /// <b>The outcome here is which variable is lowest</b>, so an action is wanted by how well
-    /// off the variable it leaves at the bottom is. Attending to the worst variable raises it
-    /// and hands the bottom to a better one, so a body that prefers a high bottom is a body
-    /// that regulates — and nothing about regulating is written down, it falls out of the
-    /// preference.
-    /// </para>
-    /// <para>
-    /// <b>And it reads the felt bands rather than <see cref="Homeostat.At"/></b>, which is the
-    /// whole difference between this and the oracle. The band is what the front end emitted;
-    /// the value is what the world holds. A drive on the second would be a reward handed in
-    /// wearing a preference's name.
-    /// </para>
-    /// <para>
-    /// <b>An outcome the body cannot feel is wanted least</b>, rather than treated as absent.
-    /// A missing band means the expectation names no variable this state reported, and
-    /// ranking it with the rest would let a claim about nothing win a round.
-    /// </para>
-    /// </remarks>
-    private static double Wants(Code expects, IReadOnlyCollection<Code> felt)
-    {
-        // The outcome's own number, recovered the way it was made. `Brain.Says` is the one
-        // place an outcome becomes a code, so reading it back here rather than by arithmetic
-        // on the modality keeps the two ends of the mapping together.
-        foreach (var code in felt)
-        {
-            if (Homeostat.Sensed(code) is not int which) continue;
-            if (Brain.Says(which) != expects) continue;
-
-            return code.Value;
-        }
-
-        return double.NegativeInfinity;
-    }
-
     /// <summary>How much of a run a body stayed inside its bounds.</summary>
     /// <param name="body">The world.</param>
     /// <param name="choosing">What to do about each state.</param>
@@ -323,7 +282,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     /// </para>
     /// <para>
     /// <b>It did not land on the floor, it landed through it.</b> Regulated 0.001 against the
-    /// uniform draw's 0.238 and the oracle's 1.000, on 19,994 rounds of 20,000 where a
+    /// uniform draw's 0.238 and the oracle's 1.000, on 19,993 rounds of 20,000 where a
     /// commitment named the action — so the fallback is not what ran and the chooser is worse
     /// than choosing at random by two orders.
     /// </para>
@@ -364,78 +323,35 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     [Fact]
     public void Whether_a_chooser_reading_a_population_holds_the_body_better_than_drawing()
     {
-        var spent = default(Drives);
-
-        // One instrument for all three, sampled at one point in the round, and every arm
-        // inside a trial that learns. The alternative was to score this arm on `tally.Recent`
-        // and the controls on `Held` -- a statistic whose halves count different things, which
-        // is one of this repo's named traps and reads as a comparison. `Held` cannot carry the
-        // learner because it does not settle anything, so a `Drives` inside it would read an
-        // empty population every round and BE its own fallback.
-        double Regulated(
-            string arm, Func<Homeostat, Brain, IChooses> choosing)
+        Regulated Ran(string arm, Regulating regulating)
         {
-            var body = new Homeostat(World());
             var brain = new Brain(new CommittingSettings { Capacity = 2000 }, 1);
-            var chosen = choosing(body, brain);
+            var run = new HomeostatRun(World(), brain, regulating, Feeling.Acted, seed: 1);
 
-            var viable = 0;
-            var steps = 0;
-
-            var trial = new Bench(
-                new Watching<Bodily>(
-                    body,
-                    new Bodied(Feeling.Acted),
-                    acting: Chooses.From(felt =>
-                    {
-                        // Sampled before the step, and identically for every arm. Which side
-                        // of the action it is read on shifts all three together, so the
-                        // ordering is the arms' and not the sampling point's.
-                        steps++;
-                        if (body.Viable) viable++;
-
-                        return chosen.Choose(felt);
-                    })),
-                brain);
-
-            var tally = trial.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000);
+            var came = run.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000);
 
             output.WriteLine(
-                $"{arm,-8} | regulated {viable / (double)steps:F3} | predicted {tally.Recent:F3} "
-                + $"| chance {trial.Chance:F3} | held {brain.Held.Count,4}");
+                $"{arm,-8} | regulated {came.Viable:F3} | predicted {came.Tally.Recent:F3} "
+                + $"| chance {run.Chance:F3} | held {brain.Held.Count,4}");
 
-            return viable / (double)steps;
+            return came;
         }
 
-        var byDrives = Regulated("drives", (body, brain) =>
-        {
-            var draw = new Random(1);
-
-            spent = new Drives(
-                brain.Held,
-                code => code.Modality == Homeostat.Act ? Homeostat.Attended(code) : null,
-                Wants,
-                () => draw.Next(body.Doings));
-
-            return Chooses.From(spent.Choose);
-        });
-
-        var byAim = Regulated("aimed", (body, _) => Aimed(body));
-        var byLuck = Regulated("uniform", (body, _) => Blindly(body, new Random(1)));
-
-        var drives = spent!;
+        var byDrives = Ran("drives", Regulating.Driven);
+        var byAim = Ran("aimed", Regulating.Aimed);
+        var byLuck = Ran("uniform", Regulating.Uniform);
 
         output.WriteLine(
-            $"drives told {drives.Told} of {drives.Told + drives.Untold}, "
-            + $"untold {drives.Untold} | aimed {byAim:F3} | uniform {byLuck:F3} "
-            + $"| drives {byDrives:F3}");
+            $"drives told {byDrives.Told} of {byDrives.Told + byDrives.Untold}, "
+            + $"untold {byDrives.Untold} | aimed {byAim.Viable:F3} "
+            + $"| uniform {byLuck.Viable:F3} | drives {byDrives.Viable:F3}");
 
         // No bar on the score, because what a population-reading chooser is worth on this body
         // has never been measured and a threshold written before the first reading would be the
         // answer rather than the finding. What IS asserted is that the mechanism ran: a chooser
         // told nothing every round is the fallback wearing its name, and that reading would be
         // indistinguishable from the uniform control no matter what the score said.
-        Assert.True(drives.Told > 0,
+        Assert.True(byDrives.Told > 0,
             $"the population named an action on none of {Rounds} rounds, so every choice was "
             + "the fallback and this arm is its own control");
     }
@@ -519,26 +435,24 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         foreach (var uniform in new[] { true, false })
         foreach (var feeling in new[] { Feeling.Blind, Feeling.Acted })
         {
-            var body = new Homeostat(World());
-            var draw = new Random(1);
             var brain = new Brain(new CommittingSettings { Capacity = 2000 }, 1);
 
-            var trial = new Bench(
-                new Watching<Bodily>(
-                    body,
-                    new Bodied(feeling),
-                    acting: uniform ? Blindly(body, draw) : Aimed(body)),
-                brain);
+            var run = new HomeostatRun(
+                World(),
+                brain,
+                uniform ? Regulating.Uniform : Regulating.Aimed,
+                feeling,
+                seed: 1);
 
-            var tally = trial.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000);
+            var came = run.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000);
 
-            scored[$"{(uniform ? "uniform" : "aimed  ")} {feeling}"] = tally.Recent;
+            scored[$"{(uniform ? "uniform" : "aimed  ")} {feeling}"] = came.Tally.Recent;
 
             output.WriteLine(
-                $"{(uniform ? "uniform" : "aimed  ")} {feeling,-6} | drawn {tally.Recent:F3} "
-                + $"| chance {trial.Chance:F3} | viable {(body.Viable ? "yes" : "no ")} "
-                + $"| held {brain.Held.Count,4} | silent {tally.Silent} "
-                + $"| repaired {tally.Repaired}");
+                $"{(uniform ? "uniform" : "aimed  ")} {feeling,-6} "
+                + $"| drawn {came.Tally.Recent:F3} | chance {run.Chance:F3} "
+                + $"| viable {(came.Standing ? "yes" : "no ")} | held {brain.Held.Count,4} "
+                + $"| silent {came.Tally.Silent} | repaired {came.Tally.Repaired}");
         }
 
         // Under a uniform chooser the action is the one thing the bands cannot supply, so the
@@ -550,12 +464,15 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         // and the run is silent for its whole length -- so the acted arm is not merely ahead
         // there, it is the only arm with a population at all. This asserts the silence rather
         // than the gap, because the gap is a score and the silence is the mechanism.
-        var quiet = new Homeostat(World());
+        var blind = new HomeostatRun(
+            World(),
+            new Brain(new CommittingSettings { Capacity = 2000 }, 1),
+            Regulating.Aimed,
+            Feeling.Blind,
+            seed: 1);
 
-        var blind = new Bench(
-            new Watching<Bodily>(quiet, new Bodied(Feeling.Blind), acting: Aimed(quiet)),
-            new Brain(new CommittingSettings { Capacity = 2000 }, 1));
-
-        Assert.Equal(Rounds, blind.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000).Silent);
+        Assert.Equal(
+            Rounds,
+            blind.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000).Tally.Silent);
     }
 }

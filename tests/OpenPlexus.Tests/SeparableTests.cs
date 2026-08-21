@@ -9,7 +9,7 @@ namespace OpenPlexus.Tests;
 
 /// <summary>
 /// Whether accuracy can tell a true rule from a false one — <b>the signal every other
-/// mechanism here is built on, measured for the first time.</b>
+/// mechanism here is built on</b>, measured for the first time.
 /// </summary>
 /// <remarks>
 /// <para>

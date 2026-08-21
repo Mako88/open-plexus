@@ -18,8 +18,8 @@ namespace OpenPlexus.Tests;
 /// CLEVR, so two measurements that looked comparable were not.
 /// </para>
 /// <para>
-/// <b>Why it went unnoticed for so long, which is the lesson rather than the
-/// bug.</b> Every budget in this suite guards the CODE — dead members, clones, doc
+/// <b>Why it went unnoticed for so long</b>, which is the lesson rather than the
+/// bug. Every budget in this suite guards the CODE — dead members, clones, doc
 /// words, dial count. None of them guarded the SHAPE. So a dial could be added to a
 /// world's constructor forever and no check could see it, including
 /// <see cref="DialTests"/>, whose entire job is noticing dials arrive: it
@@ -45,8 +45,8 @@ public sealed class ShapeTests(ITestOutputHelper output)
     /// read. A new name here needs an argument, which is the point.
     /// </para>
     /// <para>
-    /// <b><c>brain</c> is the handing-in this check exists to enforce, arriving as
-    /// something it did not recognise.</b> <i>Brain dials are built once and handed in;
+    /// <b><c>brain</c> is the handing-in this check exists to enforce</b>, arriving as
+    /// something it did not recognise. <i>Brain dials are built once and handed in;
     /// a world turns only its own.</i> A runner taking the whole brain as ONE object is
     /// that rule kept — the dials are assembled outside and the world cannot reach a
     /// single one of them. Taking a settings record instead would be the fault, so the
@@ -65,7 +65,19 @@ public sealed class ShapeTests(ITestOutputHelper output)
     private static readonly HashSet<string> Allowed = new(StringComparer.Ordinal)
     {
         "world", "settings", "dials", "seed", "clusters", "replicas", "late", "primer",
-        "brain", "looking", "fronting", "through",
+        "brain", "looking", "fronting", "through", "feeling",
+
+        // Which of three arms is being compared, which is a fact about the experiment and
+        // not about either side of the seam. `Regulating` names an oracle reading the
+        // world, a uniform draw, and a chooser reading the population -- so it selects
+        // among controls as much as among mechanisms, and a run measuring one arm against
+        // the other two has to be able to say which it is running.
+        //
+        // And it cannot reach a brain dial, which is the property that makes it safe here
+        // rather than the argument that it feels experimental. Every arm is built at the
+        // join out of the same handed-in brain, so no setting on `CommittingSettings`
+        // moves with it and no two arms are two brains.
+        "arm",
 
         // An instrument switch rather than a dial, and the difference is decidable: a
         // dial changes what the run DOES and this changes only whether a reading is

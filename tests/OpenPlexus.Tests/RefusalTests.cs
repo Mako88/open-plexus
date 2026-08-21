@@ -6,8 +6,8 @@ using Xunit.Abstractions;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// Where a repair dies — <b>the half of the diagnosis the census pointed at and could not
-/// see.</b>
+/// Where a repair dies — <b>the half of the diagnosis</b> the census pointed at and could not
+/// see.
 /// </summary>
 /// <remarks>
 /// <para>

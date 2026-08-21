@@ -19,7 +19,7 @@ namespace OpenPlexus.Tests;
 /// could say which.
 /// </para>
 /// <para>
-/// <b>A rule nobody checks is a rule that lasts until the next world.</b> This one
+/// <b>A rule nobody checks</b> is a rule that lasts until the next world. This one
 /// arrived in the code within an hour of being agreed and had already been broken:
 /// the graded world's runner owned the choice of front end, the band count and the
 /// projection geometry — three brain-side decisions living inside a world.

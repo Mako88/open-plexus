@@ -176,7 +176,7 @@ public sealed class WithheldTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Fork 48: the one world where depth is needed can hold something back now.</b>
+    /// <b>Fork 48: the one world where depth is needed</b> can hold something back now.
     /// </summary>
     /// <remarks>
     /// <para>

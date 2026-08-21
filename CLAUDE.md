@@ -217,7 +217,7 @@ These are the parts worth more than the code.
   information; now ask me about it; now take a quiz on it* is a straightforward real-world
   task, and a run that reads badly on it is the machine's fault. A world edited until the
   score moves is a benchmark measuring the edit.
-- **A front end handing over the answer is that fault one seam over.** `CeilingTests` prices
+- **A front end handing over the answer** is that fault one seam over. `CeilingTests` prices
   every arm on how often the answer is already in the moment it produces, before anything has
   learnt. An arm may raise that and must never do it silently.
 - **A control beats an argument.** Before shipping an explanation that names a mechanism, run

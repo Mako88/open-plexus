@@ -554,7 +554,7 @@ public sealed class DocsTests
     // actually executes -- so no claim that the architecture is wired can be believed,
     // `ExercisedTests` included. Seven are in that state today. The four items under it are
     // the ones that were already there, reordered behind it.
-    private const int Whole = 11_512;
+    private const int Whole = 11_511;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -190,7 +190,7 @@ public sealed class RhythmTests(ITestOutputHelper output)
     /// control, rather than an exact distance nobody has a prediction for.
     /// </para>
     /// <para>
-    /// <b>And a score ABOVE the reachable ceiling would mean the bar is wrong</b>, which is
+    /// <b>And a score ABOVE the reachable ceiling</b> would mean the bar is wrong, which is
     /// the assertion underneath. A bar computed with no learning is only worth having while
     /// something would notice it being exceeded.
     /// </para>
@@ -236,7 +236,7 @@ public sealed class RhythmTests(ITestOutputHelper output)
     /// still, which is the control every arm on the vote has been missing.
     /// </para>
     /// <para>
-    /// <b>And it is the ladder's admission signal read where the answer is known.</b> Fork 86
+    /// <b>And it is the ladder's admission signal</b> read where the answer is known. Fork 86
     /// asks what separates <i>nothing separates</i> from <i>nothing GENERAL separates</i>;
     /// here nothing separates because there is nothing to separate WITH, so a trigger that
     /// does not saturate is a trigger reading something other than what it claims.

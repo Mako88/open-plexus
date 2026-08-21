@@ -560,7 +560,7 @@ public sealed class DocsTests
     // brain as its own project, so the boundary is the compiler's; and a holder host with a
     // harness that takes peers, which is the first run on two processes. The doc is still one
     // a session loads whole, which is the condition that matters.
-    private const int Whole = 11_631;
+    private const int Whole = 11_626;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

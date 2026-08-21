@@ -34,9 +34,8 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **ACTIVE, the twenty-five `DrivenTests` says no run reaches.** The fleet is twenty of them
   and the brain is what it is part of, so it closes with the two below. The category machinery
   — `Alternating`, `Deriving`, `Meeting`, `Sorted` — and `Unifying` close later on.
-- **A census the brain reports.** John's. Every mechanism counts its own executions and a
-  guard fails on a count of nought, so wired-and-unable-to-fire stops reading as built.
-  `Surprise` and `Abstain` were both, for the life of the branch.
+- **A census the brain reports**, John's, and `FiringTests` is half of it. Nine counters are
+  quiet on three generated worlds; a wider run set and a report past `Tally` are what is left.
 - **`OpenPlexus.Brain` as its own project**, learner `internal`, so the boundary is the
   compiler's rather than a folder's. `Brain.Held` becoming a reported census is its own arc
   and is what shrinks the surface.

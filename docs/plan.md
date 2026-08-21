@@ -39,10 +39,14 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **`OpenPlexus.Brain` as its own project**, learner `internal`, so the boundary is the
   compiler's rather than a folder's. `Brain.Held` becoming a reported census is its own arc
   and is what shrinks the surface.
-- **And the brain names a world in six places**, which blocks that split. Five are a front end
-  typed on its world's record: either those records are seam vocabulary or such a front end
-  belongs at the join, and that is John's fork. The sixth is `Bodied` calling `Homeostat`'s
-  statics, which is nobody's.
+- **Grow `Coded` into an ordered list of groups**, and fold `Recited`, `Asking` and `Bodily`
+  into it. They are copies ten to twelve of the type whose own doc records the first nine. It
+  stops the brain naming a world, and it is what makes one input serve two worlds.
+- **And `Bodied` mints through `Homeostat`'s statics**, a front end asking a world for a
+  modality and a code, which goes with `Homeostat.Feels` returning codes at all.
+- **The compound eye.** John's: one moment carrying several representations of one signal
+  rather than a dial choosing between them. `Compound` already merges quantisers, so the arm
+  is a composition; `CeilingTests` and the population cost are what decide it.
 - **A holder host and a harness that takes peers**, which is the first two-process run and
   what `Ported` has been standing in for. John's end state is this repeated twenty times.
 - **Then a likeness bar that travels**, read against shuffled moments rather than a level,

@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
 
@@ -35,8 +35,8 @@ public sealed record RhythmSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The only non-stationary thing in any world here, and supersession has
-    /// nothing to say without it.</b> Nothing in this design decays, so a count that
+    /// <b>The only non-stationary thing in any world here</b>, and supersession has
+    /// nothing to say without it. Nothing in this design decays, so a count that
     /// stopped rising still stands at whatever it reached — which is only a defect
     /// where the answer CHANGES. Every world here keeps its rules for the whole run,
     /// so the machinery for preferring what is still true had no way to be right or
@@ -147,8 +147,8 @@ public sealed class Rhythm : IWorld<Coded>
     /// nothing about order, lands here.
     /// </para>
     /// <para>
-    /// <b>Exact rather than <c>Ceiling / Period</c>, which was the same number rounded
-    /// down.</b> A cycle symbol also arrives as somebody else's violation, so its share is
+    /// <b>Exact rather than <c>Ceiling / Period</c></b>, which was the same number rounded
+    /// down. A cycle symbol also arrives as somebody else's violation, so its share is
     /// the times the cycle called for it plus the times a violation happened to draw it —
     /// and a control the reading rests on may not be approximate in the direction that
     /// flatters the learner.
@@ -177,8 +177,8 @@ public sealed class Rhythm : IWorld<Coded>
     /// and every successor is equally good.
     /// </para>
     /// <para>
-    /// <b>So the distance between this and <see cref="Ceiling"/> is what one symbol of
-    /// memory costs</b>, which is a fact about the observation and not about the learner.
+    /// <b>So the distance between this and <see cref="Ceiling"/></b> is what one symbol of
+    /// memory costs, which is a fact about the observation and not about the learner.
     /// A world whose cycle repeated a symbol would put a second gap under this one, and
     /// that gap is what rung three would have to earn.
     /// </para>
@@ -221,8 +221,8 @@ public sealed class Rhythm : IWorld<Coded>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>One code in the moment, so repair, rung three and rung five are all inert
-    /// here</b> — which is what this world is worth to the rest of the suite. A scope
+    /// <b>One code in the moment</b>, so repair, rung three and rung five are all inert
+    /// here — which is what this world is worth to the rest of the suite. A scope
     /// cannot be made longer where there is nothing to add, so what a run of this measures
     /// is genesis, the vote and the local decaying estimate with every other mechanism held
     /// still. Nothing else here can hold them still.

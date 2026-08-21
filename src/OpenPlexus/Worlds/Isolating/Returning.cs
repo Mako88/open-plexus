@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
 
@@ -40,7 +40,7 @@ public sealed record ReturningSettings
     /// category runs out and a referent is the only thing left.
     /// </para>
     /// <para>
-    /// <b>So the untagged arm must fall to the pair's base rate here, by construction.</b>
+    /// <b>So the untagged arm must fall to the pair's base rate here</b>, by construction.
     /// That is not a failure to be repaired — it is the measurement. What an individual is
     /// WORTH is the distance from it to the arm that is handed one.
     /// </para>
@@ -97,8 +97,8 @@ public sealed record ReturningSettings
     public bool Placed { get; init; }
 
     /// <summary>
-    /// How often the next sighting is the SAME thing as the last — <b>fork 106, and the one
-    /// thing this world withheld that a category could have used.</b>
+    /// How often the next sighting is the SAME thing as the last — <b>fork 106</b>, and the one
+    /// thing this world withheld that a category could have used.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -109,7 +109,7 @@ public sealed record ReturningSettings
     /// the stream rather than about any moment in it.
     /// </para>
     /// <para>
-    /// <b>And nought is the uniform draw every reading before this was taken under</b>, so
+    /// <b>And nought is the uniform draw</b> every reading before this was taken under, so
     /// the world is unchanged where this is not set and the two are one axis rather than two
     /// worlds. What it does NOT do is make a thing easier to answer about: the hidden
     /// attribute, the looks and the landmarks are drawn exactly as they were, and a learner
@@ -165,7 +165,7 @@ public sealed record ReturningSettings
 /// Rung five names what CO-FIRES, and a basket at two moments never co-occurs with itself.
 /// </para>
 /// <para>
-/// <b>So the problem is posed as a prediction and never as a judgement of identity.</b>
+/// <b>So the problem is posed as a prediction</b> and never as a judgement of identity.
 /// Asking the learner <i>is this the same one</i> would need an answer channel about
 /// identity, which is the conclusion being handed over in a different envelope. Instead a
 /// thing has an attribute that is never shown, and predicting it is possible exactly to the

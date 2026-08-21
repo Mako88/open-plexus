@@ -10,13 +10,13 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>These are supposed to be failing. Do not delete them and do not weaken them.</b> Each
+/// <b>These are supposed to be failing.</b> Do not delete them and do not weaken them. Each
 /// one closes by the work being done, and every one of them computes the state rather than
 /// asserting a constant — so none can be satisfied by editing this file. If you have arrived
 /// at a red suite and this is what is red, this file is the priority and not a regression.
 /// </para>
 /// <para>
-/// <b>The idea is already this repo's and it is recorded as having worked.</b>
+/// <b>The idea is already this repo's</b> and it is recorded as having worked.
 /// <see cref="ShapeTests"/> says of its own list: <i>it began as fifteen dials across seven
 /// worlds and was a to-do list that failed the build, which is the only kind that gets
 /// done.</i> It reached nought on the day it was written. What is new here is doing that
@@ -103,7 +103,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// is a SET of codes with nowhere to put a group, a lifetime or an intervention.
     /// </para>
     /// <para>
-    /// <b>A channel with no far end is the shape this repo keeps finding read as built</b> —
+    /// <b>A channel with no far end</b> is the shape this repo keeps finding read as built —
     /// <c>Surprise</c> and <c>Abstain</c> were both found wired and unable to fire, and
     /// <i>promiscuous on purpose</i> meant exhaustive for the life of the repo. Three world
     /// dials feed these and would go with them: <c>Binding.Segmented</c>,
@@ -256,7 +256,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// prediction control and the onset/offset rule became <see cref="RemindingTests"/>
     /// entries because there is nothing here to attach them to, and <c>Chunk</c>'s rule was
     /// built, measured and REFUTED. <c>Drives</c> is the one still owed: <b>a third factor
-    /// computed from the body's own variables rather than a reward handed in.</b>
+    /// from the body's own variables</b>, rather than a reward handed in.
     /// </para>
     /// <para>
     /// <b>Borrow the source of the signal and not the mechanism</b> — <c>csharp</c>'s own
@@ -286,7 +286,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// when <c>Bench</c> had always driven it.
     /// </para>
     /// <para>
-    /// <b>An idea ends by being built or by being dropped with a revival row</b>, and this one
+    /// <b>An idea ends by being built or dropped</b>, with a revival row, and this one
     /// was built. What it is worth is a separate question and the plan carries it: the chooser
     /// loses to both of its controls, and fork 111 is what that opened.
     /// </para>

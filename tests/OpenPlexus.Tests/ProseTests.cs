@@ -120,12 +120,18 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// where the cut point is a word rather than a mark. None needed the claim moved.
     /// </para>
     /// <para>
+    /// And 148 is three commits' worth taken at once, which is what a session doing other work
+    /// owes rather than what a pass achieves. Of 21, 12 closed at punctuation and 9 at a clause
+    /// boundary; 2 of those needed the claim moved, both of them a <i>so X, and Y</i> where the
+    /// lead a reader scans for was the second half. The ratio holds a fifth time.
+    /// </para>
+    /// <para>
     /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
     /// is the tight one — <see cref="Scheduled"/> is what stops it sitting still, and this is
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 168;
+    private const int Shouted = 148;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>

@@ -11,7 +11,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The plan carried this as an open defect and blamed the wrong thing.</b> <i>`Abstain`
+/// <b>The plan carried this as an open defect</b> and blamed the wrong thing. <i>`Abstain`
 /// is unarmed in any run — nothing in one process can die, so C3's third outcome is
 /// exercised only by unit tests.</i> Distribution was never the wall.
 /// <see cref="Commitment.Settle"/> has always handled the verdict correctly and
@@ -121,7 +121,7 @@ public sealed class AbstainTests(ITestOutputHelper output)
     /// <b>The verdict fires in a run</b>, at about the rate the world was told to withhold.
     /// </summary>
     /// <remarks>
-    /// <b>The rate is the check rather than the mere presence of a count.</b> A single
+    /// <b>The rate is the check</b> rather than the mere presence of a count. A single
     /// abstain anywhere would satisfy <i>it can fire</i> and would not say the dial was
     /// connected to the thing it names — this repo has a line about a dial declared,
     /// documented, passed everywhere and connected to nothing.

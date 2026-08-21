@@ -308,8 +308,8 @@ public enum Refused
 /// What moves is which pair is named.
 /// </para>
 /// <para>
-/// <b>The two arms disagree because the gate's bar and its ranking measure different
-/// things.</b> The description-length bar counts what a name repays; the z it then ranks on
+/// <b>The two arms disagree</b> because the gate's bar and its ranking measure different
+/// things. The description-length bar counts what a name repays; the z it then ranks on
 /// is a coupling. <c>NamingYieldTests</c> holds a table where those pull opposite ways and a
 /// run where the shipped arm mints over 9.4 scopes with 25.1 certifiable.
 /// </para>

@@ -23,8 +23,8 @@ namespace OpenPlexus.Tests;
 /// as it is written down where it can be counted.
 /// </para>
 /// <para>
-/// <b>The lesson from fork 23 is that the hard part is the SIGNAL, not the
-/// controller.</b> Stamina got one because it had feedback available — did the
+/// <b>The lesson from fork 23</b> is that the hard part is the SIGNAL, not the
+/// controller. Stamina got one because it had feedback available — did the
 /// walk reach what it was narrowing to. Reflection's threshold has no such
 /// signal: <c>Hunger</c> was inverted and <c>Thwarted</c> was the right shape and
 /// swung too little. So "add a controller" nearly always decomposes into "find
@@ -673,7 +673,7 @@ public sealed class DialTests
 
     /// <summary>
     /// Every arm of every dial is set by something — <b>an arm nothing ever selects has
-    /// never been compared, whatever its reason says.</b>
+    /// never been compared</b>, whatever its reason says.
     /// </summary>
     /// <remarks>
     /// <b>THE WEAKEST POSSIBLE FORM</b> OF <i>an arm only lives while it is compared</i>, AND
@@ -850,13 +850,13 @@ public sealed class DialTests
     /// gone. <b>Neither road ends at a dial whose default does nothing.</b>
     /// </para>
     /// <para>
-    /// <b>So a dial that would ship off is a dial that should not exist</b>, and the fix is
+    /// <b>So a dial that would ship off should not exist</b>, and the fix is
     /// to delete the mechanism with a revival row rather than to explain the default. The
     /// code is not lost — it is in the history, and the revival row is what says when to go
     /// and get it.
     /// </para>
     /// <para>
-    /// <b>And deletion is not the only move available: adjusting a losing arm is allowed.</b>
+    /// <b>Deletion is not the only move available</b>: adjusting a losing arm is allowed.
     /// A mechanism that lost as built may be worth one more shape before it goes, and this
     /// repo has read that as <i>delete immediately</i> more than once. What is not allowed
     /// is leaving it switched off while nobody decides.
@@ -917,8 +917,8 @@ public sealed class DialTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>There are exactly two honest reasons to ship `Never`, and one of them leaves a
-    /// trace.</b> Either the mechanism LOST its comparison — in which case this repo's own
+    /// <b>There are exactly two honest reasons to ship `Never`</b>, and one of them leaves
+    /// a trace. Either the mechanism LOST its comparison — in which case this repo's own
     /// rule says the loser is deleted and leaves a revival row — or it is the first thing of
     /// its kind and must be on. What is forbidden is the third: built, better, and left off
     /// so that the numbers already recorded do not have to be re-taken. <i>An arm only lives

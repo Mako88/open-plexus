@@ -363,4 +363,43 @@ public sealed class OutstandingTests(ITestOutputHelper output)
             + "comes before rung four. This test is red on purpose and closes on the "
             + "mechanism being reached, not on this file.");
     }
+
+    /// <summary>
+    /// <b>Every mechanism in the brain is reached by something that drives it.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The reading is <see cref="DrivenTests"/>'s and the assertion is here</b>, which is
+    /// the arrangement the entry above already uses. That file says the unreached set has not
+    /// changed and goes red the day a mechanism arrives dead; this one says the set is not
+    /// empty, and it is the deadline.
+    /// </para>
+    /// <para>
+    /// <b>Twenty-five today, in three groups.</b> The fleet is twenty of them and closes with
+    /// a holder host and a harness that takes peers, because `Ported` is a test fixture and
+    /// nothing in `src` brings a fleet up. The category machinery is four and closes behind the
+    /// likeness bar. Rung four's matcher is the last, and it closes behind the categories.
+    /// </para>
+    /// <para>
+    /// <b>And it says whether a reading can be believed.</b> A
+    /// mechanism no run reaches was measured by a test calling it directly, so its number is
+    /// about the call rather than about the machine.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Every_mechanism_in_the_brain_is_reached_by_something_that_drives_it()
+    {
+        var unreached = DrivenTests.Unreached();
+
+        output.WriteLine(
+            unreached.Count == 0
+                ? "every mechanism in the brain is reached by something that drives it"
+                : $"{unreached.Count} reached by nothing: {string.Join(", ", unreached)}");
+
+        Assert.True(unreached.Count == 0,
+            $"{unreached.Count} mechanism(s) under `Brain/` that no world, runner or harness "
+            + $"reaches: {string.Join(", ", unreached)}. Each is wired into a run or deleted "
+            + "with a revival row, and `DrivenTests.Waiting` carries what closes each group. "
+            + "This test is red on purpose and closes on that work, not on this file.");
+    }
 }

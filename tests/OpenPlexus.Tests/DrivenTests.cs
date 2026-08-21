@@ -20,10 +20,17 @@ namespace OpenPlexus.Tests;
 /// </para>
 /// <para>
 /// <b>The line is what the guard is.</b> Inside <c>Brain/</c> is the thing being tuned: the
-/// front ends, the learner, and the choosers that read a population. Outside it is what drives
-/// one — a world, a runner, the fleet and its transport, and the terminal harness in
-/// <c>OpenPlexus.Talk</c>. A red here says a piece of the brain is executed by nothing, and it
-/// closes by being wired into a run or deleted with a revival row.
+/// front ends, the learner, the choosers that read a population, and the fleet — holders,
+/// the asker and the bus they speak over. Outside it is what drives one: a world, a runner,
+/// and the terminal harness in <c>OpenPlexus.Talk</c>. A red here says a piece of the brain is
+/// executed by nothing, and it closes by being wired into a run or deleted with a revival row.
+/// </para>
+/// <para>
+/// <b>The fleet is the brain</b>, which is John's call and moved the line. A brain is one
+/// thing that runs on one machine or twenty, and which it is comes in through
+/// <see cref="OpenPlexus.Machines.Brain"/>'s substrate argument — <c>Alone</c> or
+/// <c>Fleet</c>, with nothing above the seam asking which. So the transport is not a third
+/// party the brain is deployed into; it is how the brain talks to itself.
 /// </para>
 /// <para>
 /// <b>And moving a file out of <c>Brain/</c> is not a third door.</b> Where the line falls is
@@ -79,6 +86,78 @@ public sealed class DrivenTests(ITestOutputHelper output)
     private static string Bare(string source) =>
         Regex.Replace(
             Regex.Replace(source, @"/\*.*?\*/", " ", RegexOptions.Singleline), @"//.*", " ");
+
+    /// <summary>Why the fleet is reached by nothing that ships.</summary>
+    /// <remarks>
+    /// <b>The deployment is the missing half</b>, and this is the guard finding it rather than
+    /// a hole in the guard. <c>Posted</c> crosses a socket and <c>Ported</c> brings a fleet up
+    /// on real ports, but <c>Ported</c> is a test fixture — no program in <c>src</c> runs a
+    /// holder, and none composes an asker over peers. So the whole transport is reachable only
+    /// from the suite, which is exactly what this file refuses to call wired.
+    /// </remarks>
+    private const string Undeployed =
+        "nothing that ships runs a holder or composes a fleet. `Ported` does both and is a "
+        + "test fixture. Closes with a holder host and a harness that takes peers.";
+
+    /// <summary>Why the category machinery is reached by nothing.</summary>
+    private const string Uncategorised =
+        "`Population.Sorts` is set in one place in the repo and it is a test, so no brain has "
+        + "ever held a category. Closes with the likeness bar and the categories, in that "
+        + "order, and `THE ORDER` carries both.";
+
+    /// <summary>Why rung four's matcher is reached by nothing.</summary>
+    private const string Unproposed =
+        "the matcher is priced and nothing proposes a scope for it to match. "
+        + "`UnifyingYieldTests` says what would: a hole is a variable only where the values it "
+        + "covers are alternatives, which is a category. So it closes behind the entry above.";
+
+    /// <summary>
+    /// Brain mechanisms no run reaches today, each with what closes it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The list is exact rather than a ceiling</b>, which is what makes it a ratchet in both
+    /// directions. A mechanism arriving dead fails this file on the day it lands; a mechanism
+    /// that gets wired fails it too, until the entry comes off. Neither is a judgement call and
+    /// neither can be quietly absorbed.
+    /// </para>
+    /// <para>
+    /// <b>And the work itself is <see cref="OutstandingTests"/>'s</b>, which is the arrangement
+    /// this repo already uses for a reading and its deadline. This file says the set has not
+    /// changed; that one says the set is not empty, and stays red until it is.
+    /// </para>
+    /// </remarks>
+    private static readonly IReadOnlyDictionary<string, string> Waiting =
+        new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["Answer"] = Undeployed,
+            ["Ask"] = Undeployed,
+            ["Asker"] = Undeployed,
+            ["BroadcastId"] = Undeployed,
+            ["Fleet"] = Undeployed,
+            ["Gathering"] = Undeployed,
+            ["Holder"] = Undeployed,
+            ["HybridBus"] = Undeployed,
+            ["IBus"] = Undeployed,
+            ["IReceiveAnswers"] = Undeployed,
+            ["IReceiveAsks"] = Undeployed,
+            ["Joins"] = Undeployed,
+            ["Lateness"] = Undeployed,
+            ["Leaves"] = Undeployed,
+            ["MachineAddress"] = Undeployed,
+            ["Peer"] = Undeployed,
+            ["Posted"] = Undeployed,
+            ["Tabled"] = Undeployed,
+            ["Wanted"] = Undeployed,
+            ["Wire"] = Undeployed,
+
+            ["Alternating"] = Uncategorised,
+            ["Deriving"] = Uncategorised,
+            ["Meeting"] = Uncategorised,
+            ["Sorted"] = Uncategorised,
+
+            ["Unifying"] = Unproposed,
+        };
 
     /// <summary>The assemblies a deployment is composed out of.</summary>
     /// <remarks>
@@ -295,10 +374,18 @@ public sealed class DrivenTests(ITestOutputHelper output)
         }
     }
 
-    /// <summary>Every brain type that nothing outside the brain reaches.</summary>
-    /// <param name="inside">The names declared under <c>Brain/</c>.</param>
-    private static IReadOnlyList<Type> Unreached(IReadOnlySet<string> inside)
+    /// <summary>
+    /// Every brain mechanism nothing outside the brain reaches, by name.
+    /// </summary>
+    /// <remarks>
+    /// <b>Exposed rather than reimplemented</b>, so this file and
+    /// <see cref="OutstandingTests"/> cannot disagree about what they are counting. One of
+    /// this repo's own traps is a statistic whose two readers each got whichever definition
+    /// they assumed.
+    /// </remarks>
+    internal static IReadOnlyList<string> Unreached()
     {
+        var inside = Names(Inside, within: true);
         var composed = Composed();
         var all = composed.SelectMany(one => one.GetTypes()).ToList();
 
@@ -321,34 +408,48 @@ public sealed class DrivenTests(ITestOutputHelper output)
         return all
             .Where(one => one.DeclaringType is null && IsBrain(one))
             .Where(one => !reached.Contains(one))
-            .OrderBy(one => one.Name, StringComparer.Ordinal)
+            .Select(Spelt)
+            .Order(StringComparer.Ordinal)
             .ToList();
     }
 
     /// <summary>
-    /// <b>Nothing in the brain is executed by nothing.</b>
+    /// <b>The unreached set is exactly the one that is known about.</b>
     /// </summary>
+    /// <remarks>
+    /// <b>The set rather than the count</b>, because one mechanism going dead while another
+    /// gets wired would leave a total that had not moved. What the work itself costs is
+    /// <see cref="OutstandingTests"/>'s to say, and this stays green while the set holds still.
+    /// </remarks>
     [Fact]
-    public void Every_mechanism_in_the_brain_is_reached_by_something_that_drives_it()
+    public void The_brain_holds_exactly_the_unreached_mechanisms_it_is_known_to()
     {
-        var inside = Names(Inside, within: true);
+        var unreached = Unreached();
 
-        Assert.NotEmpty(inside);
+        var arrived = unreached
+            .Except(Waiting.Keys, StringComparer.Ordinal)
+            .Order(StringComparer.Ordinal)
+            .ToList();
 
-        var unreached = Unreached(inside);
+        var closed = Waiting.Keys
+            .Except(unreached, StringComparer.Ordinal)
+            .Order(StringComparer.Ordinal)
+            .ToList();
 
         output.WriteLine(
-            $"{inside.Count} types declared under Brain/, {unreached.Count} reached by nothing "
-            + "outside it"
-            + (unreached.Count == 0
-                ? string.Empty
-                : ":\n  " + string.Join("\n  ", unreached.Select(Spelt))));
+            $"{unreached.Count} under Brain/ reached by nothing outside it, {Waiting.Count} "
+            + "of them known:" + Environment.NewLine + "  "
+            + string.Join(Environment.NewLine + "  ", unreached));
 
-        Assert.True(unreached.Count == 0,
-            $"{unreached.Count} mechanism(s) under `Brain/` that no world, runner, fleet or "
-            + "harness reaches, so no run executes them: "
-            + $"{string.Join(", ", unreached.Select(Spelt))}. Wire each into a run, or delete "
-            + "it and leave a revival row.");
+        Assert.True(arrived.Count == 0,
+            $"{arrived.Count} mechanism(s) under `Brain/` that no world, runner or harness "
+            + $"reaches, so no run executes them: {string.Join(", ", arrived)}. Wire each into "
+            + "a run, or delete it and leave a revival row.");
+
+        Assert.True(closed.Count == 0,
+            $"{closed.Count} mechanism(s) reached now and still listed as waiting: "
+            + $"{string.Join(", ", closed)}. Take each entry off `Waiting`, which only means "
+            + "something while it is exact.");
     }
 
     /// <summary>
@@ -365,23 +466,30 @@ public sealed class DrivenTests(ITestOutputHelper output)
         var inside = Names(Inside, within: true);
         var outside = Names(Inside, within: false);
 
-        // The thing being tuned: a front end, the learner, a chooser that reads a population.
+        Assert.NotEmpty(inside);
+        Assert.NotEmpty(outside);
+
+        // The thing being tuned: a front end, the learner, a chooser that reads a population,
+        // and the fleet the brain is itself made of when it is made of more than one machine.
         Assert.Contains("Population", inside);
         Assert.Contains("Commitment", inside);
         Assert.Contains("Code", inside);
         Assert.Contains("Brain", inside);
         Assert.Contains("Drives", inside);
+        Assert.Contains("Fleet", inside);
+        Assert.Contains("Holder", inside);
+        Assert.Contains("Asker", inside);
+        Assert.Contains("IBus", inside);
 
-        // And what drives it. A world is a problem, a runner is the join, the fleet is a
-        // deployment, and none of the three is the thing being measured.
+        // And what drives it. A world is a problem and a runner is the join, and neither is
+        // the thing being measured.
         Assert.Contains("Multiplexer", outside);
         Assert.Contains("MultiplexerRun", outside);
-        Assert.Contains("Fleet", outside);
         Assert.Contains("Round", outside);
-        Assert.Contains("HybridBus", outside);
+        Assert.Contains("Bench", outside);
 
         Assert.DoesNotContain("Population", outside);
-        Assert.DoesNotContain("Fleet", inside);
+        Assert.DoesNotContain("Multiplexer", inside);
 
         // And no name is on both sides, which is what lets a folder stand in for a namespace.
         // Two things sharing one spelling is how `Sorted` came out reachable through a

@@ -554,7 +554,13 @@ public sealed class DocsTests
     // actually executes -- so no claim that the architecture is wired can be believed,
     // `ExercisedTests` included. Seven are in that state today. The four items under it are
     // the ones that were already there, reordered behind it.
-    private const int Whole = 11_511;
+    // And 11,631 is the fifty-third raise, a hundred and twenty words, for three arcs agreed
+    // with John on 2026-08-21 and duplicating nothing already here. A census the brain reports,
+    // so a mechanism that is wired and cannot fire goes red rather than reading as built; the
+    // brain as its own project, so the boundary is the compiler's; and a holder host with a
+    // harness that takes peers, which is the first run on two processes. The doc is still one
+    // a session loads whole, which is the condition that matters.
+    private const int Whole = 11_631;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -1289,17 +1289,45 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + "name and rung five is decorative on the spine. An on-off arm would be "
             + "measuring nothing");
 
-        // And the recursion, which is fork 112 asked on a third bench. `Motif` leaves a named
-        // scope too short to carry a name and `Latent`'s deep scopes never reach the floor;
-        // this world has the material, scopes long enough to survive naming in the hundreds,
-        // so a nought here is a third mechanism rather than either of those.
-        Assert.True(stacked.Sum() == 0,
-            $"{stacked.Sum()} names stand on a name here, so the recursion HAS started on the "
-            + "spine and fork 112's reading is stale rather than merely old");
+        // And the recursion, which is fork 112 asked on a third bench and answered the other
+        // way. This bar was written expecting nought -- `Motif` leaves a named scope too
+        // short to carry a name and `Latent`'s deep scopes never reach the floor -- and it
+        // fired: one name stands on a name on two seeds of five. So the spine is not blocked
+        // the way either isolating world is, it is thin, and thin has a different cause from
+        // blocked.
+        Assert.True(stacked.Sum() > 0,
+            "no name stands on a name on any seed, so the recursion has stopped happening on "
+            + "the spine. It ran at one on two seeds of five when this was written, and a "
+            + "nought here is the third blockage fork 112 expected rather than the thinness "
+            + "that was found");
 
-        // No bar on the matched table. What naming is worth once specificity is held still is
-        // the reading, and a threshold written before it would be the answer put in front of
-        // the question.
+        // WHAT THE MATCHED TABLE SAID, five seeds, and it is the whole of the reading:
+        //
+        //   unfolded   named  accuracy         plain  accuracy         apart
+        //   1              0  -                  316  0.168 +/-0.000       -
+        //   2             14  0.662 +/-0.046    1465  0.574 +/-0.007    +1.9
+        //   3            202  0.674 +/-0.025    2202  0.742 +/-0.022    -2.0
+        //   4            232  0.791 +/-0.026     358  0.729 +/-0.026    +1.7
+        //   5             23  0.928 +/-0.028      82  0.531 +/-0.109    +3.5
+        //   6              0  -                   10  0.215 +/-0.134       -
+        //
+        // The raw gap is 0.701 to 0.241 and none of it survives. Named scopes sit at three
+        // and four; the plain group carries 316 one-code scopes at 0.168 and 1465 two-code
+        // at 0.574, so the three-fold is the length distribution and nothing else.
+        //
+        // And matched, naming is a wash where the evidence is. It is two standard errors
+        // WORSE at three, where most of both groups live, and 1.7 better at four. The 3.5 at
+        // five is 23 scopes against 82 with a spread of 0.109 on the comparison, which is the
+        // cell to re-read rather than the cell to believe.
+        //
+        // So a name buys reach rather than accuracy: it is how a scope gets to length five at
+        // all, and at a length a plain scope also reaches it is level or behind. Whether
+        // reach is worth anything is what an on-off arm would answer, and this says the arm
+        // is worth building -- which is what it was for.
+        //
+        // No bar on the table. A threshold written before the first reading of it would be
+        // the answer put in front of the question, and the two bars above are on the
+        // instrument rather than on the result.
         return;
 
         static double Rate(List<Commitment> of)

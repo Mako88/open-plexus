@@ -137,4 +137,49 @@ public sealed class SweepListTests
             "listed in sweeps.yml and matching no test carrying the sweep trait: "
             + string.Join(", ", stale));
     }
+    /// <summary>
+    /// A sweep that trips a bar fails its run — <b>the budget for a failure class</b>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A grid is dispatched by hand and read by a person, so nothing else looks at whether it
+    /// went red. That made one shell detail load-bearing: the measure step pipes
+    /// <c>dotnet test</c> into <c>tee</c>, a step runs under <c>bash -e</c> which does not set
+    /// <c>pipefail</c>, and the exit code of a pipeline is its LAST command's. <c>tee</c>
+    /// always succeeds.
+    /// </para>
+    /// <para>
+    /// So every assertion in every sweep was wired and unable to fire, for as long as the
+    /// step has existed. It was found by a grid whose bar tripped, printed its message, and
+    /// came back <c>success</c> — the reading was believed only because the log was read by
+    /// hand rather than by its colour.
+    /// </para>
+    /// <para>
+    /// <b>A new kind of mistake earns a check rather than a fix</b>, and this is the check.
+    /// It reads the workflow rather than the run, so it costs nothing and cannot rot: a
+    /// measure step that pipes and does not set <c>pipefail</c> fails the build here.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_sweep_that_trips_a_bar_cannot_report_success()
+    {
+        var workflow = File.ReadAllText(
+            Path.Combine(Tree.Repo(), ".github", "workflows", "sweeps.yml"));
+
+        var measuring = workflow
+            .Split("- name:", StringSplitOptions.None)
+            .Single(one => one.TrimStart().StartsWith("Measure", StringComparison.Ordinal));
+
+        // Only where it pipes, because a step that does not pipe carries the exit code
+        // already and demanding the line anyway would be cargo rather than a check.
+        var pipes = measuring.Contains("| tee", StringComparison.Ordinal);
+
+        Assert.True(
+            !pipes || measuring.Contains("set -o pipefail", StringComparison.Ordinal),
+            "the measure step in `sweeps.yml` pipes `dotnet test` into `tee` and does not "
+            + "`set -o pipefail`, so the run takes tee's exit code and a sweep whose "
+            + "assertion fires reports success. Every bar in every grid is wired and unable "
+            + "to fire while that line is missing");
+    }
 }
+

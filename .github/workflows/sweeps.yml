@@ -232,8 +232,15 @@ jobs:
       # at any quieter verbosity this step reports a pass and prints not one number
       # -- a green tick standing where the measurement should be, which is worse
       # than a failure because nobody goes looking.
+      # `pipefail` OR THE ASSERTIONS CANNOT FAIL. A step runs under `bash -e`, which
+      # does not set it, so the exit code of `dotnet test | tee` is tee's and tee
+      # always succeeds. Every sweep that ever tripped a bar reported `success` --
+      # found when a grid printed `2 names stand on a name here` from a red assertion
+      # and the run came back green. That is this repo's oldest fault, a check wired
+      # and unable to fire, in the one place nothing else looks.
       - name: Measure
         run: |
+          set -o pipefail
           dotnet test --configuration Debug --nologo --no-build \
             --filter "kind=sweep&FullyQualifiedName~${{ matrix.sweep }}" \
             --verbosity quiet --logger "console;verbosity=detailed" \

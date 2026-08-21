@@ -52,6 +52,17 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     /// <summary>Matched to <see cref="BudgetCurveTests"/>, so the rows are comparable.</summary>
     private const int Seeds = 8;
 
+    /// <summary>What mixes a seed index, so near neighbours do not share a stream.</summary>
+    /// <remarks>
+    /// <see cref="Sweep.Spread"/>'s own file says why and holds the measurement: .NET's seeded
+    /// <see cref="Random"/> gives 1, 2, 3 streams that agree far more than chance allows, and
+    /// a standard error taken across them inherits that agreement. Its own constant is private
+    /// and the grids here do not go through <c>ArmAsync</c>, so the value is repeated rather
+    /// than reached — a different constant would be a different draw, which is fine, and the
+    /// same one keeps these rows comparable with the sweeps that do go through it.
+    /// </remarks>
+    private const uint Purpose = 0x5EED_0001;
+
     /// <inheritdoc cref="BudgetCurveTests"/>
     private const int Unlimited = int.MaxValue;
 
@@ -1346,16 +1357,37 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_ranking_a_name_on_savings_buys_over_ranking_it_on_coupling()
     {
-        // The arm, on two worlds, because one world's grid is a verdict on the world. Both
-        // hold scopes long enough to carry a pair and both mint: the multiplexer at eleven
-        // bits has ground truth so soundness is readable, and `Latent` under noise is where
-        // repair grows scopes over channels that always co-occur, which is the shape this
-        // ranking is about.
+        // The arm, on two worlds, because one world's grid is a verdict on the world. The
+        // multiplexer at eleven bits has ground truth so soundness is readable, and `Latent`
+        // under noise is where repair grows scopes over channels that always co-occur.
+        //
+        // And `Latent` turns out to say nothing, which is worth carrying rather than
+        // swapping out. It holds 313 eligible scopes and the gate speaks 0.5 times in twenty
+        // asks, so there is almost nothing for a ranking to rank -- both arms come back
+        // identical to every decimal printed. That is a reading about the world and about
+        // the gate's refusals on it, and the multiplexer is what carries the comparison.
         //
         // What would kill `Saving`: rewriting more and moving no outcome column on either
         // world. A name that shortens more scopes and leaves the score, the soundness and
         // the stacking where they were has bought population churn and nothing else, and it
         // goes with a revival row.
+        //
+        // And the arm has a cost written down before the first reading, because `Stackable`'s
+        // own remark describes it. Naming a pair that is the WHOLE of a scope takes that
+        // commitment out of the eligible set forever -- two codes become one name, and a
+        // one-code scope contributes no pair. So a ranking reaching for the pair held by the
+        // most scopes eats rung five's own trigger faster than one reaching for a rare tight
+        // pair, and `Stacked` is where that would show.
+        //
+        // Which is why the outcome columns and the material ones are both here. `Saving`
+        // leading on soundness and losing on stacking is a real result and a different one
+        // from either arm simply winning.
+        //
+        // And the seeds are MIXED rather than counted. `Sweep.ArmAsync` does this and says
+        // why: .NET's seeded `Random` gives near-neighbour seeds streams that agree with each
+        // other more than chance allows, and a standard error computed across 1..8 takes that
+        // agreement straight off the spread. The first take of this grid used raw seeds, so
+        // its columns were paired correctly and its errors were too small to read.
         //
         // And the refusal counts are read on every row rather than assumed. Both bars sit in
         // front of the ranking, so the two arms should speak on the same asks -- a refusal
@@ -1366,30 +1398,31 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         // Run once and read many times. Each cell is a full learning run, so recomputing one
         // for an assertion would double the grid's cost to say something the same rows
         // already carry.
+        var drawn = Enumerable.Range(1, Seeds)
+            .Select(one => Worlds.Seeds.Apart(one, Purpose))
+            .ToList();
+
         var bits = arms.ToDictionary(
             arm => arm,
-            arm => Enumerable.Range(1, Seeds).Select(seed => Bits(arm, seed)).ToList());
+            arm => drawn.Select(seed => Bits(arm, seed)).ToList());
 
         output.WriteLine($"=== eleven bits, {Seeds} seeds, {Rounds} rounds ===");
         output.WriteLine(
-            "arm     |  recent |  sound | unsound |  found | truths | names | stacked "
-            + "| rewritten | asked | spoke");
+            "arm     |         recent |            sound |          unsound "
+            + "|         stacked |          rewritten | found | names");
 
         foreach (var arm in arms)
         {
             var read = bits[arm];
 
             output.WriteLine(
-                $"{arm,-8}| {read.Average(one => one.Learnt.Recent),7:F3} "
-                + $"| {read.Average(one => one.Learnt.Sound),6:F1} "
-                + $"| {read.Average(one => one.Learnt.Unsound),7:F1} "
-                + $"| {read.Average(one => one.Learnt.Found),6:F1} "
-                + $"| {read.Average(one => one.Learnt.Truths),6:F1} "
-                + $"| {read.Average(one => one.Learnt.Named),5:F1} "
-                + $"| {read.Average(one => one.Learnt.Stacked),7:F1} "
-                + $"| {read.Average(one => one.Rewritten),9:F1} "
-                + $"| {read.Average(one => one.Asked),5:F1} "
-                + $"| {read.Average(one => one.Spoke),5:F1}");
+                $"{arm,-8}| {Sweep.Spread([.. read.Select(one => one.Learnt.Recent)]),14} "
+                + $"| {Sweep.Spread([.. read.Select(one => (double)one.Learnt.Sound)], "F1"),16} "
+                + $"| {Sweep.Spread([.. read.Select(one => (double)one.Learnt.Unsound)], "F1"),16} "
+                + $"| {Sweep.Spread([.. read.Select(one => (double)one.Learnt.Stacked)], "F1"),15} "
+                + $"| {Sweep.Spread([.. read.Select(one => (double)one.Rewritten)], "F1"),18} "
+                + $"| {read.Average(one => one.Learnt.Found),5:F1} "
+                + $"| {read.Average(one => one.Learnt.Named),5:F1}");
         }
 
         output.WriteLine("");
@@ -1400,9 +1433,7 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
 
         foreach (var arm in arms)
         {
-            var read = Enumerable.Range(1, Seeds)
-                .Select(seed => Causes(arm, seed))
-                .ToList();
+            var read = drawn.Select(seed => Causes(arm, seed)).ToList();
 
             output.WriteLine(
                 $"{arm,-8}| {read.Average(one => one.Tally.Recent),7:F3} "

@@ -178,8 +178,8 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// </para>
     /// <para>
     /// And 23, fifteen more off the list. Of 15, 11 closed at punctuation and 4 at a clause
-    /// boundary. The debt is now small enough that a whole-tree pass fits in one sitting,
-    /// which is what the schedule was for.
+    /// boundary. And 18, five more, cut to pay what the schedule asked of the commit that put
+    /// the brain in a folder of its own.
     /// </para>
     /// <para>
     /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
@@ -187,7 +187,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 23;
+    private const int Shouted = 18;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>

@@ -45,7 +45,7 @@ public sealed class RefusalTests(ITestOutputHelper output)
     /// readable.
     /// </summary>
     /// <remarks>
-    /// <b>A partition that does not partition is a pie chart of a different pie.</b> Each
+    /// <b>A partition that does not partition</b> is a pie chart of a different pie. Each
     /// wrong commitment is charged to the FIRST gate that refused it, so the five counts
     /// and the search must total the candidates exactly — and if a sixth gate is ever
     /// added to <c>Repair</c> without being counted here, this is what goes red.

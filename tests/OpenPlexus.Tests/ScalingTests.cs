@@ -10,7 +10,7 @@ namespace OpenPlexus.Tests;
 /// any of this reaches perception.
 /// </summary>
 /// <remarks>
-/// <b>A final accuracy says how well a width was learnt and not what it cost.</b> Six
+/// <b>A final accuracy says how well a width was learnt</b> and not what it cost. Six
 /// bits, eleven and twenty differ in the number of relevant bits by one each time, so
 /// how rounds-to-target grows across them is the exponent — and an exponent found
 /// cheaply on a generated world is worth far more than the same discovery made

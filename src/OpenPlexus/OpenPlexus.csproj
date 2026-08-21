@@ -35,7 +35,7 @@
          file, same numbers, every machine, forever.
 
          NOTHING ELSE IN THE LIBRARY MAY TOUCH IT. It is reachable only from
-         `Codes/Encoded.cs`, so a machine without the encoders fetched runs every
+         `Brain/Codes/Encoded.cs`, so a machine without the encoders fetched runs every
          other world exactly as before. -->
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.28.0" />
     <PackageReference Include="SimpleHttpClient" Version="5.1.0" />

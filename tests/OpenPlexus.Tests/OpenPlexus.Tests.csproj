@@ -39,8 +39,15 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <!-- The terminal harness is referenced because it DRIVES the library.
+       `DrivenTests` asks whether anything outside `Brain/` reaches each mechanism
+       inside it, and `OpenPlexus.Talk` composes a deployment nothing else does:
+       the chooser that decides whether to speak is reached from there and from
+       nowhere else in the tree. Without this the guard reads that as dead and asks
+       for it to be deleted, which is a check inventing work. -->
   <ItemGroup>
     <ProjectReference Include="..\..\src\OpenPlexus\OpenPlexus.csproj" />
+    <ProjectReference Include="..\..\src\OpenPlexus.Talk\OpenPlexus.Talk.csproj" />
   </ItemGroup>
 
 </Project>

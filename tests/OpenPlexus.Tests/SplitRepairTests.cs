@@ -8,7 +8,7 @@ namespace OpenPlexus.Tests;
 
 /// <summary>
 /// What sharding does to repair — <b>the same question as rung five's, with the opposite
-/// answer, and the difference is the interesting part.</b>
+/// answer</b>, and the difference is the interesting part.
 /// </summary>
 /// <remarks>
 /// <para>

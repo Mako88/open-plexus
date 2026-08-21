@@ -23,8 +23,8 @@ namespace OpenPlexus.Tests;
 /// command every commit, so these print into that same output.
 /// </para>
 /// <para>
-/// <b>And it asserts rather than only printing, which <c>CheckingTests</c> requires and
-/// which is also the right shape.</b> A list nobody maintains is worse than none: it goes
+/// <b>And it asserts rather than only printing</b>, which <c>CheckingTests</c> requires and
+/// which is also the right shape. A list nobody maintains is worse than none: it goes
 /// stale, gets skimmed, and becomes furniture. The bars below keep it a list somebody has
 /// to keep — short enough to read, every entry saying what to DO rather than what to
 /// believe, and none of them a rule that could have been a check.

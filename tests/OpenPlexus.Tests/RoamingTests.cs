@@ -2033,8 +2033,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// do — has a refutation waiting for it.
     /// </para>
     /// <para>
-    /// <b>Genesis rooting on a code that has never varied is refuted at 7.4 standard errors</b>
-    /// and the plan carries the row. A category over alternatives is exactly the shape that
+    /// <b>Genesis rooting on a code that has never varied is refuted</b> at 7.4 standard
+    /// errors and the plan carries the row. A category over alternatives is exactly the shape that
     /// risks it: the members substitute for one another, so if the world names one of them
     /// every moment then the category is in every moment and separates nothing.
     /// </para>

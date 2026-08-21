@@ -149,16 +149,20 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     public void No_front_end_channel_is_read_by_nothing()
     {
         // Where a reader would be, rather than where a forward would be -- and scoping it
-        // this way is what makes the check mean something. Everything in `Codes/` either
+        // this way is what makes the check mean something. Everything in `Brain/Codes/` either
         // DECLARES these or passes them straight through: `Compound` merges what its senses
         // said, `Alternating` hands its inner one's answer back, and a front end returning
         // its own field is not a consumer. A reader is something that ACTS on the channel,
         // and that lives where the learner is.
         //
         // And it replaced a list of filenames to ignore, which was the fragile version: a
-        // new forwarder in `Codes/` would have turned this green while nothing had changed,
+        // new forwarder in `Brain/Codes/` would have turned this green while nothing had changed,
         // and an unrelated `.Bind(` anywhere in `src` would have done the same.
-        var sources = new[] { "Commitments", "Machines" }
+        var sources = new[]
+            {
+                Path.Combine("Brain", "Commitments"),
+                "Machines",
+            }
             .SelectMany(where => Directory.GetFiles(
                 Path.Combine(Tree.Repo(), "src", "OpenPlexus", where),
                 "*.cs",
@@ -178,7 +182,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
 
         Assert.True(unread.Count == 0,
             $"{string.Join(", ", unread)} on `IQuantizer` are implemented everywhere and read "
-            + "nowhere in `Commitments/` or `Machines/`. Wire one to something that ACTS on "
+            + "nowhere in `Brain/Commitments/` or `Machines/`. Wire one to something that ACTS on "
             + "it, or delete it together with the world dials that feed it. This test is red "
             + "on purpose.");
     }

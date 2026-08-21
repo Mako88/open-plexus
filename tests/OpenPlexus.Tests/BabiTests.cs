@@ -331,6 +331,82 @@ public sealed class BabiTests(ITestOutputHelper output)
     /// becomes the derivation and the bare set leaves with a revival row.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// What a likeness bar means on one vocabulary and not on another.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The statistic works on both worlds and the THRESHOLD does not travel</b>, which is
+    /// a different problem from the one it looks like. <c>RoamingTests</c> recovers that
+    /// world's three sets under <see cref="Codes.Alternating.ByCompany"/> at any bar from
+    /// 0.50 to 0.90. Here the same call finds nothing at 0.50 and recovers cleaner word
+    /// classes than the shipped statistic does at 0.10.
+    /// </para>
+    /// <para>
+    /// <b>Because a cosine bar is not comparable across alphabets.</b> This corpus says about
+    /// twenty words, so a code's company is a short sparse vector and two members of a class
+    /// share few surprising partners; <c>Roaming</c> says far more, so the vectors are longer
+    /// and the same relationship reads higher. The number is a fact about the vocabulary and
+    /// the grouping is a fact about the world.
+    /// </para>
+    /// <para>
+    /// <b>So this is the reading a mechanism has to answer</b>, and it is why nothing is
+    /// wired yet. A bar handed in per world is a world reaching into the brain, which this
+    /// repo refuses; what is wanted is a rule that reads the same on any alphabet, and the
+    /// obvious shape is the one the naming gate already uses — a bar corrected for how many
+    /// pairs were looked at rather than a level chosen for a corpus.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_a_likeness_bar_means_on_one_vocabulary_and_not_another()
+    {
+        var (moments, word) = Read(task: 1);
+
+        var watching = new Alternating();
+
+        foreach (var moment in moments) watching.Watch(moment);
+
+        var names = new[] { "mary", "john", "sandra", "daniel" };
+        var places = new[] { "kitchen", "bedroom", "bathroom", "hallway", "garden", "office" };
+
+        output.WriteLine($"{moments.Count} lines, {word.Count} words said in them");
+        output.WriteLine("alike | groups | names | places | biggest group");
+
+        var best = 0;
+
+        foreach (var alike in new[] { 0.50, 0.40, 0.30, 0.20, 0.10 })
+        {
+            var groups = watching.ByCompany(alike, floor: 20)
+                .Select(group => group.Select(code => word.GetValueOrDefault(code, "?")).ToHashSet())
+                .ToList();
+
+            var held = groups.Count == 0
+                ? 0
+                : groups.Max(one => one.Count(names.Contains))
+                    + groups.Max(one => one.Count(places.Contains));
+
+            best = Math.Max(best, held);
+
+            output.WriteLine(
+                $"{alike,5:F2} | {groups.Count,6} "
+                + $"| {(groups.Count == 0 ? 0 : groups.Max(one => one.Count(names.Contains))),5} "
+                + $"| {(groups.Count == 0 ? 0 : groups.Max(one => one.Count(places.Contains))),6} "
+                + $"| {(groups.Count == 0 ? "-" : string.Join(" ", groups.OrderByDescending(one => one.Count).First().Order()))}");
+        }
+
+        // The bar, and it is on the statistic rather than on the number. Weighing company by
+        // how surprising it is recovers this corpus's word classes at SOME bar, so a run
+        // where no bar reaches them says the statistic fails on real English rather than
+        // that the threshold is awkward.
+        Assert.True(best >= 8,
+            $"the best bar recovered {best} of the four names and six places between them, so "
+            + "weighing company by surprise does not find a word class on real English at any "
+            + "threshold and the reading that says the number is the problem is wrong");
+
+        // And no bar on WHICH threshold. That it differs from the one another world wants is
+        // the finding; choosing one here would be this file deciding a mechanism's dial.
+    }
+
     [Fact]
     public void Whether_weighing_company_finds_what_a_bare_set_of_it_finds()
     {

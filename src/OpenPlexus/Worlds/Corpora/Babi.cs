@@ -236,8 +236,8 @@ public sealed class Babi
     }
 
     /// <summary>
-    /// Everything that ends a word. <b>The comma is in here because it is what
-    /// joins a compound answer</b> — <c>milk,football</c> is two answers and has
+    /// Everything that ends a word. <b>The comma is in here</b> because it is what
+    /// joins a compound answer — <c>milk,football</c> is two answers and has
     /// to parse as two.
     /// </summary>
     private static readonly char[] Breaks =

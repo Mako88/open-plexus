@@ -91,7 +91,7 @@ public readonly record struct Recited
 
 /// <summary>
 /// People handing things to people, and a question about who ended up with one —
-/// <b>a world built so that a bag of words cannot beat the marginal.</b> That is a fact about
+/// <b>a world built so that a bag of words cannot win</b>. That is a fact about
 /// the world rather than a finding about a run.
 /// </summary>
 /// <remarks>
@@ -184,8 +184,8 @@ public sealed class Handing : IWorld<Recited>, IWithholds<Recited>
     public int Outcomes => _settings.People;
 
     /// <summary>
-    /// The code for each person's word, in outcome order — <b>so a ceiling can be computed
-    /// from the transcript rather than from the state.</b>
+    /// The code for each person's word, in outcome order — <b>so a ceiling comes off the transcript</b>
+    /// rather than off the state.
     /// </summary>
     /// <remarks>
     /// <b>What it said and never what to conclude</b>, which is

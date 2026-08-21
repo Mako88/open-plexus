@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Globalization;
 using System.Text.Json;
 using OpenPlexus.Codes;
@@ -394,7 +394,7 @@ public sealed class Clevr : IWorld<Coded>, IWithholds<Coded>
 
     /// <summary>The index standing for one object of one scene.</summary>
     /// <remarks>
-    /// <b>Scene and slot both, or object 0 of every scene would be one node</b> —
+    /// <b>Scene and slot both</b>, or object 0 of every scene would be one node —
     /// which is a hub joining every scene to every other and the exact opposite of
     /// what an index is for.
     /// </remarks>

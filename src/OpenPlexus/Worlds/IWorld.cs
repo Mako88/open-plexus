@@ -18,7 +18,7 @@ public readonly record struct Turn<TSeen>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A NUMBER RATHER THAN A <c>Code</c>, so a world never mints one.</b> The
+    /// <b>A number rather than a <c>Code</c></b>, so a world never mints one. The
     /// outcome coding is shared across every world, because a brain that learnt a
     /// different alphabet per world would not be one brain.
     /// </para>
@@ -199,8 +199,8 @@ public interface IWithholds<TSeen>
     /// Observations this world will never draw.
     /// </summary>
     /// <remarks>
-    /// <b>Fixed at construction and never touched by <see cref="IWorld{TSeen}.Next"/>,
-    /// which is what makes the number mean anything.</b> A held-out set the world could
+    /// <b>Fixed at construction and never touched by <see cref="IWorld{TSeen}.Next"/></b>,
+    /// which is what makes the number mean anything. A held-out set the world could
     /// wander into would measure the same thing the trailing accuracy does, more slowly.
     /// </remarks>
     IReadOnlyList<Turn<TSeen>> Withheld { get; }

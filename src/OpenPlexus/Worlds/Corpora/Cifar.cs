@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 namespace OpenPlexus.Worlds;
 
@@ -68,8 +68,8 @@ public sealed record CifarSettings
 
     /// <summary>Whether the three channels are averaged into one.</summary>
     /// <remarks>
-    /// <b>On by default because colour triples the width for this world's hardest
-    /// classes.</b> It is a real part of the problem and it is the first thing to turn
+    /// <b>On by default</b>, because colour triples the width for this world's hardest
+    /// classes. It is a real part of the problem and it is the first thing to turn
     /// off when the code count can afford it — which is exactly what makes it a dial
     /// on the world rather than a decision baked into the reader.
     /// </remarks>

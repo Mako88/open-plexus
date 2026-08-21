@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
 
@@ -88,8 +88,8 @@ public sealed record BindingSettings
     /// a world that hands out no indexes.
     /// </para>
     /// <para>
-    /// <b>It changes nothing the world emits, and it answered the one quantity that
-    /// grew without bound.</b> The same codes arrive in the same order; the walk's
+    /// <b>It changes nothing the world emits</b>, and it answered the one quantity that
+    /// grew without bound. The same codes arrive in the same order; the walk's
     /// rendezvous stopped writing the reverse edge, so an attribute's row no longer
     /// gained a permanent entry per scene. It rides
     /// <see cref="Codes.IQuantizer{TObservation}.Fleeting"/>, <b>which has had no
@@ -163,8 +163,8 @@ public sealed record Scene
 /// information was destroyed before anything the graph does got a chance to run.
 /// </para>
 /// <para>
-/// <b>That is the binding problem, and this world is its smallest honest
-/// statement.</b> The prediction registered before the first run is not "poorly"
+/// <b>That is the binding problem</b>, and this world is its smallest honest
+/// statement. The prediction registered before the first run is not "poorly"
 /// but <b>exactly at chance</b>: the two situations are literally the same input,
 /// so the system cannot do better than a coin, and a result meaningfully above
 /// chance would mean the model of this architecture is wrong.

@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
 
@@ -100,8 +100,8 @@ public sealed record Episode
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The honest test of the binding result, and it exists because that world is
-/// memorisable.</b> There, the index is grouped with the shape being asked
+/// <b>The honest test of the binding result</b>, and it exists because that world is
+/// memorisable. There, the index is grouped with the shape being asked
 /// about, so the occasion under question wrote the answer down directly and a
 /// lookup table scores perfectly. What it showed is that the binding can be
 /// <i>represented</i>. This asks whether it can be <i>composed</i>.

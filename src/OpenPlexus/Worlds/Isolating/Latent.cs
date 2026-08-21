@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
@@ -76,7 +76,7 @@ public sealed record LatentSettings
 /// to show the compression would not have cost anything.
 /// </para>
 /// <para>
-/// <b>And it is honest about what a hub would buy and what it would cost.</b> A
+/// <b>And it is honest about what a hub would buy</b>, and what it would cost. A
 /// posited node makes the answer TWO hops where it was one, so a walk must afford
 /// the extra step; what it saves is the fan-out, since a channel points at one hub
 /// rather than at every sibling. Both directions are reported and neither is

@@ -316,8 +316,8 @@ public sealed class Homeostat : IActed<Bodily>
     /// not read as a float.
     /// </para>
     /// <para>
-    /// <b>And, where the body can say so, where each one stands against the
-    /// others.</b> A band cannot express <i>lowest</i>, which is the one fact this
+    /// <b>And, where the body can say so</b>, where each one stands against the
+    /// others. A band cannot express <i>lowest</i>, which is the one fact this
     /// world turns on — see <see cref="HomeostatSettings.Ranked"/>. The ranks are
     /// EXTRA codes rather than replacements, so the arm is additive and the graph
     /// holds the absolute fact and the relational one at once.

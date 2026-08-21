@@ -141,7 +141,7 @@ public readonly record struct Layout
 /// That is the instrument step four had to do without, and the reason the grid is small.
 /// </para>
 /// <para>
-/// <b>What it still does not test is the other half of the goal.</b> A scene is
+/// <b>What it still does not test</b> is the other half of the goal. A scene is
 /// single-shot and independent: no action, no intervention, no sequence. Settlement is
 /// trivial, <c>Abstain</c> cannot fire, and entailment depth is always one. This is the
 /// front end and the scope language, measured together and honestly, and nothing more.

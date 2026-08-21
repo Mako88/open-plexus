@@ -123,8 +123,8 @@ public sealed class Round
     /// <summary>How much of the winner's weight its lead accounted for, on average.</summary>
     /// <remarks>
     /// <para>
-    /// <b>The plan calls this already instrumented and it was computed and read by
-    /// nobody.</b> <i>The margin between first and second is a confidence, free. A
+    /// <b>The plan calls this already instrumented</b>, and it was computed and read by
+    /// nobody. <i>The margin between first and second is a confidence, free. A
     /// persistently thin margin is the two-conflated-cases signal, already
     /// instrumented.</i> <see cref="Vote.Margin"/> has been calculated every round for
     /// the life of the branch and nothing in the library has ever looked at it — one

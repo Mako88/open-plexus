@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
@@ -45,7 +45,7 @@ public readonly record struct Sample
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The world the project's actual bet needs, and the one `csharp` NEVER HAD.</b>
+/// <b>The world the project's actual bet needs</b>, and the one `csharp` NEVER HAD.
 /// Its claim is that this family of systems died at the interface with perception and
 /// that a substrate manufacturing its own symbols repairs it. Every measurement so far
 /// has been on cues that were ALREADY symbols, so it has said nothing about that at

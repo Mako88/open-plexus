@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Commitments;
@@ -322,6 +322,48 @@ public readonly record struct Proposed
     public required int Repaying { get; init; }
 
     /// <summary>
+    /// Eligible scopes holding the pair that WON — <b>what a mint would shorten</b>, and
+    /// nought where nothing was proposed.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The description-length bar's own quantity, reported rather than ranked on.</b> A
+    /// name costs two entries to say what it means and saves one in every scope holding the
+    /// pair, so this is what a mint repays. <see cref="Abstracting.Propose"/> tests it
+    /// against three and then never looks at it again — the winner is chosen on
+    /// <see cref="Strongest"/>, which is a coupling statistic — so a proposal that clears
+    /// every bar can still have almost nothing to rewrite.
+    /// </para>
+    /// <para>
+    /// <b>A floor on the rewrite rather than the count of it.</b>
+    /// <see cref="Population.Abstract"/> rewrites every scope holding both members and this
+    /// counts only the ELIGIBLE ones, which is the smaller set — an inexperienced scope or a
+    /// one-code scope is rewritten and never counted. So a small number here is evidence and
+    /// a large one is a floor.
+    /// </para>
+    /// </remarks>
+    public required int Shortens { get; init; }
+
+    /// <summary>
+    /// The most any certifiable pair would have shortened — <b>the counterfactual the
+    /// argmax passed over</b>, and nought where nothing could have been named.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>What a gate ranking on savings would have taken</b>, computed over exactly the
+    /// candidates this one searched and against the same corrected bar, so the two are
+    /// comparable by construction. It is <see cref="Shortens"/> where the widest certifiable
+    /// pair is also the most strongly coupled one.
+    /// </para>
+    /// <para>
+    /// <b>An instrument and never a gate.</b> Nothing reads this to decide anything — a
+    /// value that ever chose a pair would have made the ranking arm ship switched on with no
+    /// arm beside it, which is the one thing <c>DialTests</c> exists to refuse.
+    /// </para>
+    /// </remarks>
+    public required int Available { get; init; }
+
+    /// <summary>
     /// The best z among the repaying pairs, whatever its sign — <b>and not the best among
     /// the pairs that WON</b>, which is what the selection loop reports.
     /// </summary>
@@ -441,8 +483,15 @@ public static class Abstracting
 
         (Code, Code)? best = null;
         var strongest = double.NegativeInfinity;
+        var shortens = 0;
         var repaying = 0;
         var candidates = 0;
+
+        // Kept so the counterfactual can be taken after the loop rather than during it. The
+        // correction multiplies by the candidates SEARCHED, which is not known until the walk
+        // ends, so asking mid-walk whether a pair clears the bar would test a moving bar. Only
+        // the repaying ones are kept, the rest being unnameable at any ranking.
+        var repaid = new List<(double Z, int Seen)>();
 
         // Ordered, because the winner was otherwise whichever tie the dictionary reached
         // first. Two pairs with the same z resolved by hash order, which is stable within
@@ -488,6 +537,8 @@ public static class Abstracting
                 : ((seen / (double)scopes) - expected)
                     / Math.Sqrt(expected * (1.0 - expected) / scopes);
 
+            repaid.Add((z, seen));
+
             // Strict, so a tie goes to the pair the ordering reached first rather than to
             // the last one written. Starting below nought rather than at it is what lets
             // the reading carry a negative peak; the choice below still needs a positive
@@ -495,6 +546,7 @@ public static class Abstracting
             if (z <= strongest) continue;
 
             strongest = z;
+            shortens = seen;
             best = pair;
         }
 
@@ -520,11 +572,22 @@ public static class Abstracting
         // that is the failure this whole gate exists against.
         var corrected = Normal.Tail(strongest) * candidates;
 
+        // The counterfactual, against the same bar the winner cleared. What a gate ranking
+        // on savings would have named, so the cost of ranking on coupling is one subtraction
+        // rather than an argument.
+        var available = repaid
+            .Where(one => Normal.Tail(one.Z) * candidates <= dials.Alpha)
+            .Select(one => one.Seen)
+            .DefaultIfEmpty(0)
+            .Max();
+
         return new Proposed
         {
             Scopes = scopes,
             Candidates = candidates,
             Repaying = repaying,
+            Shortens = shortens,
+            Available = available,
             Strongest = strongest,
             Corrected = corrected,
             Refused = corrected <= dials.Alpha ? Refused.Nothing : Refused.Uncertain,
@@ -541,6 +604,8 @@ public static class Abstracting
             Scopes = scopes,
             Candidates = candidates,
             Repaying = 0,
+            Shortens = 0,
+            Available = 0,
             Strongest = double.NegativeInfinity,
             Corrected = double.NaN,
             Refused = why,

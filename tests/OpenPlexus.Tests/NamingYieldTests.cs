@@ -1159,6 +1159,169 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void The_gate_ranks_by_coupling_and_never_by_what_a_name_would_shorten()
+    {
+        // A control rather than an argument, and it asks the smallest question that can kill
+        // the line: is the gate even CAPABLE of preferring a pair with almost nothing to
+        // rewrite. Two pairs, both clearing every bar, and the winner is the whole reading.
+        //
+        // The wide one is a redundancy in the sense the rung was built for -- four hundred
+        // scopes hold each code and two hundred hold both, so a name for it shortens two
+        // hundred scopes. The narrow one is four scopes that always agree. Naming that
+        // shortens four.
+        //
+        // And both repay, which is what makes this a question about the argmax rather than
+        // about a bar. The description-length bar wants three scopes and each has at least
+        // that, so nothing here is reached by relaxing anything.
+        var counted = Table(
+            2000,
+            [(1, 400), (2, 400), (3, 4), (4, 4)],
+            [(1, 2, 200), (3, 4, 4)]);
+
+        var read = Abstracting.Propose(counted, new CommittingSettings());
+
+        output.WriteLine($"{read.Candidates} candidates, {read.Repaying} repaying, "
+            + $"peak z {read.Strongest:F2}, corrected {read.Corrected:E2}, {read.Refused}");
+
+        // Each one alone, so the reading says what the gate would have concluded about the
+        // loser had it been the only pair on offer. A winner is only interesting where the
+        // runner-up was certifiable too -- otherwise the argmax picked the one thing that
+        // passed and there is no preference to report.
+        var wide = Abstracting.Propose(
+            Table(2000, [(1, 400), (2, 400)], [(1, 2, 200)]), new CommittingSettings());
+
+        var narrow = Abstracting.Propose(
+            Table(2000, [(3, 4), (4, 4)], [(3, 4, 4)]), new CommittingSettings());
+
+        output.WriteLine($"  wide alone:   z {wide.Strongest,6:F2}  {wide.Refused}");
+        output.WriteLine($"  narrow alone: z {narrow.Strongest,6:F2}  {narrow.Refused}");
+
+        Assert.Equal(Refused.Nothing, wide.Refused);
+        Assert.Equal(Refused.Nothing, narrow.Refused);
+
+        // So both are nameable and the gate has to choose. It chooses on z, and z is a
+        // share tested against a product of marginals -- which is a COUPLING statistic. Two
+        // codes that never appear apart score higher the rarer they are, because the
+        // independence they are measured against shrinks with the square of their marginals
+        // while their share shrinks only linearly.
+        Assert.True(narrow.Strongest > wide.Strongest,
+            $"the rare pair scores {narrow.Strongest:F2} and the wide one "
+            + $"{wide.Strongest:F2}, so coupling and redundancy rank the same way here and "
+            + "this control has nothing to isolate");
+
+        // And the mint goes to the pair with the least to rewrite. That is the gate's own
+        // description-length argument inverted: a name costs two entries to say what it
+        // means and saves one in every scope holding it, so what it repays is `seen`, and
+        // `seen` is the one thing the selection never reads.
+        Assert.Equal([Of(3), Of(4)], read.Named);
+
+        // And the reading says so in one number, which is what makes this readable off a
+        // run rather than only off a table written to show it. `Shortens` is the winner's
+        // own scope count, and the loser's is two hundred.
+        Assert.Equal(4, read.Shortens);
+        Assert.Equal(200, wide.Shortens);
+
+        // And the gate can say what it passed over, which is what makes this readable off a
+        // population nobody built. Both pairs clear the corrected bar, so the widest
+        // certifiable one is the two-hundred-scope redundancy the argmax did not take.
+        Assert.Equal(200, read.Available);
+
+        // No bar on a run. Whether a real population holds this shape is the next question
+        // and this control cannot answer it -- what it settles is that the arithmetic
+        // permits a mint that shortens four scopes to beat one that shortens two hundred.
+    }
+
+    [Fact]
+    public void What_a_mint_has_left_to_rewrite_on_a_population_that_learnt_one()
+    {
+        // The control above is arithmetic and this is the thing itself. A table written to
+        // show a preference proves the gate CAN take a pair with nothing to rewrite; whether
+        // a real population hands it that choice is a separate question and this is it.
+        //
+        // And a finished run is the population at its widest, which is the case the dilution
+        // reading says is worst -- more scopes drawn from more lineages, so any one pair's
+        // share is smaller and the correction divides among more candidates. Asking it what
+        // it would name NEXT reads the gate against the material it actually ends up with.
+        //
+        // What would drop this line: `shortens` coming back at a good share of `scopes`.
+        // Then the argmax is not reaching for rare pairs on real material, the control is a
+        // curiosity about the arithmetic, and the inert mint has some other cause.
+        var shortened = new List<int>();
+        var available = new List<int>();
+        var rewrote = new List<int>();
+        var scoped = new List<int>();
+
+        output.WriteLine("seed | eligible | ask | shortens |  widest | rewrote | share");
+
+        for (var seed = 1; seed <= 4; seed++)
+        {
+            var dials = new CommittingSettings();
+            var brain = new Brain(dials, seed);
+
+            new MultiplexerRun(new MultiplexerSettings { Address = Address }, brain, seed)
+                .Run(30_000);
+
+            var eligible = brain.Held.All.Count(one => Recurrence.Eligible(one, dials));
+
+            // Asked until it refuses or twenty times, because one ask is one pair and the
+            // question is about what the gate reaches for rather than about which pair
+            // happened to be first. The cap is a runtime bound and nothing reads it.
+            for (var ask = 1; ask <= 20; ask++)
+            {
+                var said = brain.Held.Abstract();
+
+                if (brain.Held.Lately is not { Refused: Refused.Nothing } spoke) break;
+
+                shortened.Add(spoke.Shortens);
+                available.Add(spoke.Available);
+                rewrote.Add(said);
+                scoped.Add(spoke.Scopes);
+
+                output.WriteLine(
+                    $"{seed,4} | {eligible,8} | {ask,3} | {spoke.Shortens,8} | "
+                    + $"{spoke.Available,6} | {said,7} "
+                    + $"| {spoke.Shortens / (double)spoke.Scopes,5:F3}");
+            }
+        }
+
+        // The instrument, and it is the whole of the bar for now. A population that names
+        // nothing makes every column above a reading about that.
+        Assert.NotEmpty(shortened);
+
+        output.WriteLine("");
+        output.WriteLine(
+            $"{shortened.Count} mints: shortens {shortened.Average():F1} of "
+            + $"{scoped.Average():F0} scopes, rewrote {rewrote.Average():F1}, "
+            + $"at the description-length bar of three on "
+            + $"{shortened.Count(one => one <= 3)} of them");
+
+        output.WriteLine(
+            $"  the widest certifiable pair would have shortened {available.Average():F1}, "
+            + $"and the argmax took it on "
+            + $"{shortened.Where((one, at) => one == available[at]).Count()} of "
+            + $"{shortened.Count}");
+
+        // So the answer transfers off the table and onto a population nobody built for it.
+        // The gate is not sitting at the description-length floor -- five mints of eighty
+        // are -- and it is not taking what the floor was an argument for either. Both
+        // candidates were certified over the same search and against the same corrected
+        // bar; the one that got the mint is the more strongly coupled one.
+        //
+        // No threshold on the size of the gap. What ranking on savings is WORTH is an arm
+        // and this is not it, so a bar chosen to fit the first reading of it would be the
+        // answer written before the question.
+        Assert.True(shortened.Average() < available.Average(),
+            $"a mint shortened {shortened.Average():F1} scopes against a widest certifiable pair at "
+            + $"{available.Average():F1}, so coupling and savings pick the same pair here and "
+            + "there is nothing for a ranking arm to recover");
+
+        Assert.True(
+            shortened.Where((one, at) => one == available[at]).Count() * 2 < shortened.Count,
+            "the argmax took the widest certifiable pair on most asks, so the preference "
+            + "the control isolates is not what a real population hands the gate");
+    }
+
+    [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public async Task Which_bar_takes_rung_fives_yield_as_the_repair_budget_grows()
     {

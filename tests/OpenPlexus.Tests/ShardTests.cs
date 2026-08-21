@@ -9,7 +9,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The suite is split four ways by name and the fourth is everything else.</b> Which is one
+/// <b>The suite is split four ways by name</b>, and the fourth is everything else. Which is one
 /// typo from a test that runs nowhere. Three shards name their classes and the last
 /// excludes exactly those nine names; a class added to one and not excluded from the other
 /// runs twice, and a name misspelt in the exclusion list runs nowhere at all. The second is
@@ -17,7 +17,7 @@ namespace OpenPlexus.Tests;
 /// ever asks it anything.
 /// </para>
 /// <para>
-/// <b>And that is why this exists before the rebalance rather than after it.</b> The fourth
+/// <b>And that is why this exists before the rebalance</b> rather than after it. The fourth
 /// shard runs past the timeout while the other three finish in ten minutes, so the list is
 /// going to be rewritten by somebody who is not looking for this. <c>SweepListTests</c> is
 /// the same check one workflow along, written the same day two entries in <c>sweeps.yml</c>
@@ -60,7 +60,7 @@ public sealed class ShardTests
 
     /// <summary>Every class in this assembly holding a test.</summary>
     /// <remarks>
-    /// <b>By what the runner would collect rather than by what the file is called.</b> A
+    /// <b>By what the runner would collect</b>, rather than by what the file is called. A
     /// class of helpers is not a shard's business and a class of facts is, so the question
     /// asked is whether anything in it carries a fact or a theory — which is the same
     /// question that decides whether leaving it out of every shard costs anything.

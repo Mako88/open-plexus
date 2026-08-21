@@ -10,7 +10,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Every distributed claim this project has made has been measured in one process.</b>
+/// <b>Every distributed claim this project has made</b> has been measured in one process.
 /// <see cref="HybridBus"/> is a dictionary and a <see cref="Task.Delay(int)"/>, so C1, C2
 /// and C3 have been honoured against a simulation of a network. These tests use real
 /// sockets on real ports, so a message that does not serialise, does not route, or does
@@ -33,8 +33,8 @@ public sealed class PostedTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The budget for a failure class that arrived on CI and cannot arrive here on
-    /// demand.</b> <see cref="Wired.Free"/> releases a port before handing it over, because
+    /// <b>The budget for a failure class</b> that arrived on CI and cannot arrive here on
+    /// demand. <see cref="Wired.Free"/> releases a port before handing it over, because
     /// the listener that wants it could not otherwise bind — so between one call and the next
     /// the kernel is entitled to offer the same one again, and a fleet asking for five in a
     /// row got two the same. What it looks like is a machine failing to open with a message
@@ -134,7 +134,7 @@ public sealed class PostedTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>A machine coming up pays the slowest peer and not the sum of them.</b>
+    /// <b>A machine coming up pays the slowest peer</b>, not the sum of them.
     /// </summary>
     /// <remarks>
     /// <para>

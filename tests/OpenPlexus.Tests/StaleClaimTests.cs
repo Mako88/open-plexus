@@ -16,7 +16,7 @@ namespace OpenPlexus.Tests;
 /// described as mounted nowhere, in a doc whose whole purpose is to say what is left.
 /// </para>
 /// <para>
-/// <b>And it is the same fault the plan already names from the other end.</b> <i>A gate
+/// <b>And it is the same fault the plan already names</b>, from the other end. <i>A gate
 /// named in the plan and mounted nowhere makes the word it gates mean something else</i>
 /// — this is that trap's dual, and it is worse, because a reader acts on it by building
 /// something that already exists.
@@ -60,7 +60,7 @@ public sealed class StaleClaimTests
     /// The sections that describe what is TRUE NOW, as against what was once learnt.
     /// </summary>
     /// <remarks>
-    /// <b>`Traps` and `do not re-try` are historical by design and must be left alone.</b>
+    /// <b>`Traps` and `do not re-try` are historical by design</b> and must be left alone.
     /// <i>A guard mounted on one caller is not mounted</i> is a lesson about a fault that
     /// was fixed, and it names the type it was found on — so a check reading it as a
     /// claim about today would demand that a trap be deleted the moment its subject
@@ -153,7 +153,7 @@ public sealed class StaleClaimTests
 
     /// <summary>Every backticked identifier in an item.</summary>
     /// <remarks>
-    /// <b>IDENTIFIERS ONLY, so a backticked phrase is not searched for as a symbol.</b>
+    /// <b>Identifiers only</b>, so a backticked phrase is not searched for as a symbol.
     /// The plan quotes English in backticks as often as it quotes code, and asking the
     /// source whether it calls <c>together / seen</c> would find nothing forever and
     /// certify every claim containing it.

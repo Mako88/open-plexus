@@ -53,8 +53,8 @@ public sealed record Measured
     /// different, however far apart their single readings landed.
     /// </para>
     /// <para>
-    /// <b>Zero spread over many seeds is the opposite case, and returning 0 there
-    /// was wrong.</b> Arms that were measured repeatedly, never varied, and landed
+    /// <b>Zero spread over many seeds is the opposite case</b>, and returning 0 there
+    /// was wrong. Arms that were measured repeatedly, never varied, and landed
     /// on different numbers — 1.0000 against 0.0000 — are <i>perfectly</i>
     /// separated, not indistinguishable. That reading forced at least one test to
     /// assert on bare means with a paragraph explaining why, which is a workaround
@@ -122,8 +122,8 @@ public static class Sweep
     /// <param name="read">One value a seed.</param>
     /// <param name="format">How to render both numbers.</param>
     /// <remarks>
-    /// <b>Here because it was written by hand three times and `DuplicationTests` REFUSED THE
-    /// THIRD.</b> Not every grid fits <see cref="AcrossAsync"/> — some cross two axes, some
+    /// <b>Here because it was written by hand three times</b>, and `DuplicationTests` refused
+    /// the third. Not every grid fits <see cref="AcrossAsync"/> — some cross two axes, some
     /// print a curve along a row — but every one of them still owes a spread, and three
     /// private copies of a standard error is three chances for one grid's bars to mean
     /// something different from the grid it is read against. <see cref="Measured"/> already
@@ -143,8 +143,8 @@ public static class Sweep
     /// Runs one arm across <paramref name="seeds"/> seeds.
     /// </summary>
     /// <remarks>
-    /// <b>The counter is mixed before it reaches the run, and that is not
-    /// cosmetic.</b> This used to hand out 1, 2, 3… directly, and .NET's seeded
+    /// <b>The counter is mixed before it reaches the run</b>, and that is not
+    /// cosmetic. This used to hand out 1, 2, 3… directly, and .NET's seeded
     /// <see cref="Random"/> gives near-neighbour seeds streams that agree with
     /// each other far more than chance allows. <see cref="Measured.StdErr"/> is
     /// computed across exactly these seeds, so that agreement came straight off

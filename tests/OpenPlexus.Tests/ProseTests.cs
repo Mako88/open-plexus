@@ -151,12 +151,18 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// the entry below <see cref="Opened"/> already says about its own half.
     /// </para>
     /// <para>
+    /// And 73, twelve more across four files while a control ran. The rate has held at
+    /// roughly two-thirds closing at punctuation across seven passes and forty files, so a
+    /// pass is a number now: what remains to say about this debt is what it costs a session,
+    /// which is about twenty minutes of the wait beside a grid.
+    /// </para>
+    /// <para>
     /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
     /// is the tight one — <see cref="Scheduled"/> is what stops it sitting still, and this is
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 85;
+    private const int Shouted = 73;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>
@@ -195,7 +201,7 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// as a finding.
     /// </para>
     /// </remarks>
-    private const int Opened = 49;
+    private const int Opened = 48;
 
     /// <summary>
     /// The commit the decay schedule counts from. <b>John's, 2026-08-13.</b>

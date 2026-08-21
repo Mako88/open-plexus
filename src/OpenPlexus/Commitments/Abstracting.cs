@@ -343,78 +343,6 @@ public enum Refused
     Uncertain,
 }
 
-/// <summary>
-/// Which of the certified pairs gets the one mint an ask allows.
-/// </summary>
-/// <remarks>
-/// <para>
-/// <b>A ranking rather than a bar</b>, and both bars sit in front of it untouched. A
-/// candidate reaches this having repaid three scopes and cleared the corrected tail, so
-/// every arm here speaks on exactly the same asks and refuses on exactly the same ones.
-/// What moves is which pair is named.
-/// </para>
-/// <para>
-/// <b>The two arms disagree</b> because the gate's bar and its ranking measure different
-/// things. The description-length bar counts what a name repays; the z it then ranks on
-/// is a coupling. <c>NamingYieldTests</c> holds a table where those pull opposite ways and a
-/// run where the shipped arm mints over 9.4 scopes with 25.1 certifiable.
-/// </para>
-/// </remarks>
-public enum Preferring
-{
-    /// <summary>The most strongly coupled certified pair. What shipped before the arm.</summary>
-    /// <remarks>
-    /// <para>
-    /// The pair with the largest z, which is a share tested against a product of marginals.
-    /// Two codes that never appear apart score higher the RARER they are, their share falling
-    /// linearly with the marginals while the independence they are tested against falls with
-    /// the square — so this reaches for a tight coupling wherever it sits.
-    /// </para>
-    /// <para>
-    /// <c>NamingYieldTests</c> holds both halves of why the arm exists. A hand-built table
-    /// puts a pair in two hundred scopes against four scopes that always agree, and this
-    /// takes the four; on a real population it mints over 9.4 scopes where 25.1 were
-    /// certifiable, taking the widest on 8 asks of 80.
-    /// </para>
-    /// </remarks>
-    Coupled,
-
-    /// <summary>
-    /// The certified pair whose scopes SURVIVE being named, so a name repays without eating
-    /// what would have carried the next one.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// The description-length bar's own quantity, promoted from a bar to the ranking and then
-    /// restricted to the scopes a name leaves standing. A name costs two entries to say what
-    /// it means and saves one in every scope holding the pair, so what it repays is the scope
-    /// count; but a scope of exactly two codes becomes one name and leaves
-    /// <see cref="Recurrence.Eligible"/> forever, so those savings are taken once and cost
-    /// the trigger. This is the argmax of <see cref="Tallied.Deep"/>, which is the rest.
-    /// </para>
-    /// <para>
-    /// And it is not <c>MDL alone</c>, whose revival row says to pair description length with
-    /// beating chance. Both bars stay exactly where they are: a candidate reaches this
-    /// ranking only after repaying three scopes and clearing the corrected tail, so what
-    /// moves is which of the CERTIFIED pairs gets the one mint an ask allows.
-    /// </para>
-    /// <para>
-    /// So the arm cannot change whether the gate speaks, only what it says. A run where every
-    /// refusal count is identical and the names differ is the expected shape, and a refusal
-    /// count that moves is this arm reaching something it was not built to touch.
-    /// </para>
-    /// <para>
-    /// <b>It is `Saving` adjusted rather than a new idea</b>, which is the one more shape a
-    /// losing arm is allowed. Ranking on raw savings lost stacking at 3.4 standard errors on
-    /// eleven bits while gaining nothing an outcome column could show, and the plan's row
-    /// says what refuted it. What lost there was the build: the idea that a name should be
-    /// ranked by what it repays survives, restricted to the repayment that does not consume
-    /// its own material.
-    /// </para>
-    /// </remarks>
-    Surviving,
-}
-
 
 /// <summary>
 /// Everything the naming gate read and what it did with it — <b>the gate's own
@@ -482,6 +410,25 @@ public readonly record struct Proposed
     /// </para>
     /// </remarks>
     public required int Available { get; init; }
+
+    /// <summary>
+    /// How wide the DEEPEST certified pair is — <b>the revival condition for two refuted
+    /// rankings</b>, and nought where nothing could have been named.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A pair's depth is the scopes holding it that SURVIVE being named, since a two-code
+    /// scope becomes one name and leaves <see cref="Recurrence.Eligible"/> forever. Ranking a
+    /// mint on that was built and refuted: it read identically to ranking on raw savings,
+    /// because the deepest certified pair was also the widest on 80 asks of 80.
+    /// </para>
+    /// <para>
+    /// <b>So this equals <see cref="Available"/> wherever the two rankings agree</b>, and the
+    /// day a world separates them is the day those rows are worth re-opening.
+    /// <c>NamingYieldTests</c> asserts the equality rather than remembering it.
+    /// </para>
+    /// </remarks>
+    public required int Deepest { get; init; }
 
     /// <summary>
     /// The best z among the repaying pairs, whatever its sign — <b>and not the best among
@@ -709,27 +656,21 @@ public static class Abstracting
 
         var available = certified.Select(one => one.Seen).DefaultIfEmpty(0).Max();
 
-        // And under `Surviving` the argmax moves to the savings a name does not consume.
-        // Ordered by the pair so a tie resolves the same way the z walk does -- two pairs
-        // holding the same count is the COMMON case here, and a dictionary's walk order
-        // deciding a name is fork 12 by the door this file already found open once.
-        //
-        // A pair whose scopes are all two codes long has `Deep` at nought and is ranked last
-        // rather than refused. It still repaid and still cleared the bar, so refusing it
-        // would be a third gate wearing a ranking's clothes -- and where every candidate is
-        // shallow, naming the shallowest is still better than naming nothing.
-        if (dials.Preferring == Preferring.Surviving && certified.Count > 0)
-        {
-            var taken = certified
-                .OrderByDescending(one => one.Deep)
-                .ThenByDescending(one => one.Seen)
-                .ThenBy(one => one.Pair.Left)
-                .ThenBy(one => one.Pair.Right)
-                .First();
-
-            chosen = taken.Pair;
-            shortens = taken.Seen;
-        }
+        // And how wide the DEEPEST certified pair is, which is the revival condition for two
+        // refuted arms rather than a spare number. Both tried to rank a mint on what a name
+        // repays -- once on the scopes it holds and once on the scopes that survive naming --
+        // and the second was built because the first ate rung five's own trigger. It read
+        // identically, because the deepest certified pair is the widest one on every ask a
+        // real population offered: 80 of 80. A pair held by many scopes is held by many LONG
+        // scopes, so the two rankings are one ranking. The plan's rows say what would revive
+        // them and this is what would say it had happened.
+        var deepest = certified
+            .OrderByDescending(one => one.Deep)
+            .ThenByDescending(one => one.Seen)
+            .ThenBy(one => one.Pair.Left)
+            .ThenBy(one => one.Pair.Right)
+            .Select(one => one.Seen)
+            .FirstOrDefault();
 
         return new Proposed
         {
@@ -738,6 +679,7 @@ public static class Abstracting
             Repaying = repaying,
             Shortens = shortens,
             Available = available,
+            Deepest = deepest,
             Strongest = strongest,
             Corrected = corrected,
             Refused = corrected <= dials.Alpha ? Refused.Nothing : Refused.Uncertain,
@@ -756,6 +698,7 @@ public static class Abstracting
             Repaying = 0,
             Shortens = 0,
             Available = 0,
+            Deepest = 0,
             Strongest = double.NegativeInfinity,
             Corrected = double.NaN,
             Refused = why,

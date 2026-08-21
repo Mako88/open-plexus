@@ -539,7 +539,12 @@ public sealed class DocsTests
     // trigger fastest. A `DO NOT RE-TRY` row is the one kind of finding this doc is for --
     // the next session's search for a better ranking runs straight at it, and a revival
     // condition is what stops it being a superstition.
-    private const int Whole = 11_341;
+    // And 11,387 is the fiftieth raise, forty-six words, for the second half of that row.
+    // The obvious repair for it was built and is refuted too: counting the savings only over
+    // scopes that SURVIVE being named reads identically, because the deepest certified pair
+    // is the widest one on eighty asks of eighty. Two rows rather than one, because a
+    // session that reads only the first will build the second.
+    private const int Whole = 11_387;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

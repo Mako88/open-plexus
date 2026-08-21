@@ -31,9 +31,9 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them.
-- **ACTIVE, why rung five does not fire** — it is the only operator that BROADENS, so a
-  machine where it never mints is specialise-only and conceptless by this doc's own line.
-  `Crossing` is a world built to make it fire and it barely does.
+- **ACTIVE, why a mint changes nothing** — the rung is the only operator that BROADENS, so a
+  machine whose names rewrite almost nothing is specialise-only in effect. It fires and
+  answers; `Preferring` is the live arm and the loser goes.
 - **Then the crossing itself**, which falls out of that one: a name over the co-firing shape
   and symbol is what carries a fact back to a drawing. Fork **107**.
 - **A beginner language course as the primer.** John's. Ostensive by construction, one

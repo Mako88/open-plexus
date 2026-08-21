@@ -31,9 +31,9 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them.
-- **ACTIVE, why a mint changes nothing** — the rung is the only operator that BROADENS, so a
-  machine whose names rewrite almost nothing is specialise-only in effect. It fires and
-  answers; `Preferring` is the live arm and the loser goes.
+- **ACTIVE, a bench where rung five can be shown to help** — the multiplexer's outcome
+  columns are at ceiling whatever the rung does, so no naming arm can win or lose there and
+  three have been read on it. `Crossing` has headroom, and it is fork **107** either way.
 - **Then the crossing itself**, which falls out of that one: a name over the co-firing shape
   and symbol is what carries a fact back to a drawing. Fork **107**.
 - **A beginner language course as the primer.** John's. Ostensive by construction, one
@@ -326,6 +326,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       `Motif` scope is left too short to carry a name, the cue's length being the axis;
       `Latent`'s three-code scopes fire 0.2 times each, so depth is never tested. Fork
       **112**.
+    - **OPEN** — what a mint costs the recursion is the scopes it CONSUMES rather than which
+      pair it picks, and nothing gates on that. Two rankings on it are refuted below.
     - **OPEN** — but `ByTime` is what `Returning` needs, so no reading wins both. A weighed
       adhesion is unbuilt. Fork **131**.
     - **OPEN** — what rung five names is a SET, never a variable, so the two rungs are not

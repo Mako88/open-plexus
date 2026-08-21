@@ -544,7 +544,11 @@ public sealed class DocsTests
     // scopes that SURVIVE being named reads identically, because the deepest certified pair
     // is the widest one on eighty asks of eighty. Two rows rather than one, because a
     // session that reads only the first will build the second.
-    private const int Whole = 11_387;
+    // And 11,428 is the fifty-first raise, forty-one words, for two entries the refutations
+    // above leave standing. `THE ORDER`'s active item moves to finding a bench rung five can
+    // be shown to help on, the multiplexer's outcome columns being at ceiling whatever the
+    // rung does; the leaf beside it says what a mint actually costs the recursion.
+    private const int Whole = 11_428;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

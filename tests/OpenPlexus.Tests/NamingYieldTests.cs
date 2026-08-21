@@ -1226,6 +1226,27 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         // certifiable one is the two-hundred-scope redundancy the argmax did not take.
         Assert.Equal(200, read.Available);
 
+        // And the arm takes the other one, over the identical table and the identical bars.
+        // Both pairs repaid and both cleared the corrected tail on the row above; what moves
+        // is which of the two certified pairs gets the one mint an ask allows.
+        var saving = Abstracting.Propose(
+            counted, new CommittingSettings { Preferring = Preferring.Saving });
+
+        output.WriteLine(
+            $"  under Saving: named {saving.Named?.Length ?? 0} shortening {saving.Shortens}, "
+            + $"{saving.Refused}");
+
+        Assert.Equal([Of(1), Of(2)], saving.Named);
+        Assert.Equal(200, saving.Shortens);
+
+        // And the two arms speak on the same asks, which is what makes the grid readable.
+        // The bars sit in front of the ranking, so a refusal count that ever differs is this
+        // arm reaching something it was not built to touch.
+        Assert.Equal(read.Refused, saving.Refused);
+        Assert.Equal(read.Candidates, saving.Candidates);
+        Assert.Equal(read.Repaying, saving.Repaying);
+        Assert.Equal(read.Strongest, saving.Strongest);
+
         // No bar on a run. Whether a real population holds this shape is the next question
         // and this control cannot answer it -- what it settles is that the arithmetic
         // permits a mint that shortens four scopes to beat one that shortens two hundred.
@@ -1319,6 +1340,122 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
             shortened.Where((one, at) => one == available[at]).Count() * 2 < shortened.Count,
             "the argmax took the widest certifiable pair on most asks, so the preference "
             + "the control isolates is not what a real population hands the gate");
+    }
+
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_ranking_a_name_on_savings_buys_over_ranking_it_on_coupling()
+    {
+        // The arm, on two worlds, because one world's grid is a verdict on the world. Both
+        // hold scopes long enough to carry a pair and both mint: the multiplexer at eleven
+        // bits has ground truth so soundness is readable, and `Latent` under noise is where
+        // repair grows scopes over channels that always co-occur, which is the shape this
+        // ranking is about.
+        //
+        // What would kill `Saving`: rewriting more and moving no outcome column on either
+        // world. A name that shortens more scopes and leaves the score, the soundness and
+        // the stacking where they were has bought population churn and nothing else, and it
+        // goes with a revival row.
+        //
+        // And the refusal counts are read on every row rather than assumed. Both bars sit in
+        // front of the ranking, so the two arms should speak on the same asks -- a refusal
+        // count that moves means this arm reached something it was not built to touch, and
+        // then the grid is not a comparison of rankings at all.
+        var arms = new[] { Preferring.Coupled, Preferring.Saving };
+
+        // Run once and read many times. Each cell is a full learning run, so recomputing one
+        // for an assertion would double the grid's cost to say something the same rows
+        // already carry.
+        var bits = arms.ToDictionary(
+            arm => arm,
+            arm => Enumerable.Range(1, Seeds).Select(seed => Bits(arm, seed)).ToList());
+
+        output.WriteLine($"=== eleven bits, {Seeds} seeds, {Rounds} rounds ===");
+        output.WriteLine(
+            "arm     |  recent |  sound | unsound |  found | truths | names | stacked "
+            + "| rewritten | asked | spoke");
+
+        foreach (var arm in arms)
+        {
+            var read = bits[arm];
+
+            output.WriteLine(
+                $"{arm,-8}| {read.Average(one => one.Learnt.Recent),7:F3} "
+                + $"| {read.Average(one => one.Learnt.Sound),6:F1} "
+                + $"| {read.Average(one => one.Learnt.Unsound),7:F1} "
+                + $"| {read.Average(one => one.Learnt.Found),6:F1} "
+                + $"| {read.Average(one => one.Learnt.Truths),6:F1} "
+                + $"| {read.Average(one => one.Learnt.Named),5:F1} "
+                + $"| {read.Average(one => one.Learnt.Stacked),7:F1} "
+                + $"| {read.Average(one => one.Rewritten),9:F1} "
+                + $"| {read.Average(one => one.Asked),5:F1} "
+                + $"| {read.Average(one => one.Spoke),5:F1}");
+        }
+
+        output.WriteLine("");
+        output.WriteLine($"=== Latent, six channels, twelve causes, noise 0.1, {Seeds} seeds ===");
+        output.WriteLine(
+            "arm     |  recent | resident | repairs | eligible | names | stacked "
+            + "| rewritten | asked | spoke");
+
+        foreach (var arm in arms)
+        {
+            var read = Enumerable.Range(1, Seeds)
+                .Select(seed => Causes(arm, seed))
+                .ToList();
+
+            output.WriteLine(
+                $"{arm,-8}| {read.Average(one => one.Tally.Recent),7:F3} "
+                + $"| {read.Average(one => one.Tally.Resident),8:F1} "
+                + $"| {read.Average(one => one.Tally.Repaired),7:F1} "
+                + $"| {read.Average(one => one.Tally.Eligible),8:F1} "
+                + $"| {read.Average(one => one.Tally.Named),5:F1} "
+                + $"| {read.Average(one => one.Tally.Stacked),7:F1} "
+                + $"| {read.Average(one => one.Rewritten),9:F1} "
+                + $"| {read.Average(one => one.Tally.Asked),5:F1} "
+                + $"| {read.Average(one => one.Tally.Spoke),5:F1}");
+        }
+
+        // The one bar, and it is on the instrument rather than on the result. What separates
+        // the arms has to be the ranking, so a run where they are asked different numbers of
+        // times is measuring the cadence instead and every column beside it is about that.
+        Assert.Equal(
+            bits[Preferring.Coupled].Select(one => one.Asked),
+            bits[Preferring.Saving].Select(one => one.Asked));
+
+        // No bar on what it buys. Which arm wins is the reading and a threshold written
+        // before it would be the answer put in front of the question.
+        return;
+
+        (Learned Learnt, long Rewritten, long Asked, long Spoke) Bits(Preferring arm, int seed)
+        {
+            var brain = new Brain(new CommittingSettings { Preferring = arm }, seed);
+
+            var learnt = new MultiplexerRun(
+                new MultiplexerSettings { Address = Address }, brain, seed).Run(Rounds);
+
+            return (
+                learnt,
+                brain.Held.Lineages.Values.Sum(one => one.Rewritten),
+                brain.Held.Asked,
+                brain.Held.Spoke);
+        }
+
+        (Tally Tally, long Rewritten) Causes(Preferring arm, int seed)
+        {
+            var brain = new Brain(
+                new CommittingSettings { Capacity = 4000, Preferring = arm }, seed);
+
+            var tally = new Bench(
+                new Watching<Coded>(
+                    new Latent(
+                        new LatentSettings { Channels = 6, Causes = 12, Noise = 0.1 }, seed),
+                    new Passthrough()),
+                brain)
+                .Run(Rounds, sweep: 1000, target: 0.9, window: 2000);
+
+            return (tally, brain.Held.Lineages.Values.Sum(one => one.Rewritten));
+        }
     }
 
     [Fact]

@@ -270,6 +270,7 @@ public sealed class Recurrence
 /// </remarks>
 public enum Refused
 {
+
     /// <summary>Nothing refused it, and a name was proposed.</summary>
     Nothing,
 
@@ -295,6 +296,65 @@ public enum Refused
     /// <summary>The strongest pair did not clear the bar once corrected for the search.</summary>
     Uncertain,
 }
+
+/// <summary>
+/// Which of the certified pairs gets the one mint an ask allows.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>A ranking rather than a bar</b>, and both bars sit in front of it untouched. A
+/// candidate reaches this having repaid three scopes and cleared the corrected tail, so
+/// every arm here speaks on exactly the same asks and refuses on exactly the same ones.
+/// What moves is which pair is named.
+/// </para>
+/// <para>
+/// <b>The two arms disagree because the gate's bar and its ranking measure different
+/// things.</b> The description-length bar counts what a name repays; the z it then ranks on
+/// is a coupling. <c>NamingYieldTests</c> holds a table where those pull opposite ways and a
+/// run where the shipped arm mints over 9.4 scopes with 25.1 certifiable.
+/// </para>
+/// </remarks>
+public enum Preferring
+{
+    /// <summary>The most strongly coupled certified pair. What shipped before the arm.</summary>
+    /// <remarks>
+    /// <para>
+    /// The pair with the largest z, which is a share tested against a product of marginals.
+    /// Two codes that never appear apart score higher the RARER they are, their share falling
+    /// linearly with the marginals while the independence they are tested against falls with
+    /// the square — so this reaches for a tight coupling wherever it sits.
+    /// </para>
+    /// <para>
+    /// <c>NamingYieldTests</c> holds both halves of why the arm exists. A hand-built table
+    /// puts a pair in two hundred scopes against four scopes that always agree, and this
+    /// takes the four; on a real population it mints over 9.4 scopes where 25.1 were
+    /// certifiable, taking the widest on 8 asks of 80.
+    /// </para>
+    /// </remarks>
+    Coupled,
+
+    /// <summary>The certified pair holding the most scopes, so a name repays what it costs.</summary>
+    /// <remarks>
+    /// <para>
+    /// The description-length bar's own quantity, promoted from a bar to the ranking. A name
+    /// costs two entries to say what it means and saves one in every scope holding the pair,
+    /// so what it repays is the scope count and this is the argmax of it.
+    /// </para>
+    /// <para>
+    /// And it is not <c>MDL alone</c>, whose revival row says to pair description length with
+    /// beating chance. Both bars stay exactly where they are: a candidate reaches this
+    /// ranking only after repaying three scopes and clearing the corrected tail, so what
+    /// moves is which of the CERTIFIED pairs gets the one mint an ask allows.
+    /// </para>
+    /// <para>
+    /// So the arm cannot change whether the gate speaks, only what it says. A run where every
+    /// refusal count is identical and the names differ is the expected shape, and a refusal
+    /// count that moves is this arm reaching something it was not built to touch.
+    /// </para>
+    /// </remarks>
+    Saving,
+}
+
 
 /// <summary>
 /// Everything the naming gate read and what it did with it — <b>the gate's own
@@ -491,7 +551,7 @@ public static class Abstracting
         // correction multiplies by the candidates SEARCHED, which is not known until the walk
         // ends, so asking mid-walk whether a pair clears the bar would test a moving bar. Only
         // the repaying ones are kept, the rest being unnameable at any ranking.
-        var repaid = new List<(double Z, int Seen)>();
+        var repaid = new List<(double Z, int Seen, (Code Left, Code Right) Pair)>();
 
         // Ordered, because the winner was otherwise whichever tie the dictionary reached
         // first. Two pairs with the same z resolved by hash order, which is stable within
@@ -537,7 +597,7 @@ public static class Abstracting
                 : ((seen / (double)scopes) - expected)
                     / Math.Sqrt(expected * (1.0 - expected) / scopes);
 
-            repaid.Add((z, seen));
+            repaid.Add((z, seen, pair));
 
             // Strict, so a tie goes to the pair the ordering reached first rather than to
             // the last one written. Starting below nought rather than at it is what lets
@@ -560,12 +620,18 @@ public static class Abstracting
         // A pair no commoner than chance is not a redundancy, and the old loop could not
         // say that it had found one. Selection began at nought, so this case and the one
         // above both came back as no candidate at all.
-        if (best is not { } chosen || strongest <= 0.0)
+        if (best is not { } peak || strongest <= 0.0)
             return Nothing(scopes, candidates, Refused.Independent) with
             {
                 Repaying = repaying,
                 Strongest = strongest,
             };
+
+        // What gets the mint, which is the peak until an arm moves it. `Strongest` and
+        // `Corrected` stay the peak's on both arms -- they are what the bar was cleared on,
+        // and reporting the taken pair's z there would say the gate certified something it
+        // never tested.
+        var chosen = peak;
 
         // Corrected for the pairs looked at, exactly as repair's bar is. Taking the
         // best of thousands of candidates clears any fixed bar on chance alone, and
@@ -574,12 +640,29 @@ public static class Abstracting
 
         // The counterfactual, against the same bar the winner cleared. What a gate ranking
         // on savings would have named, so the cost of ranking on coupling is one subtraction
-        // rather than an argument.
-        var available = repaid
+        // rather than an argument. Taken on BOTH arms, so the instrument reads the same
+        // quantity whichever one is running and the two grids are comparable.
+        var certified = repaid
             .Where(one => Normal.Tail(one.Z) * candidates <= dials.Alpha)
-            .Select(one => one.Seen)
-            .DefaultIfEmpty(0)
-            .Max();
+            .ToList();
+
+        var available = certified.Select(one => one.Seen).DefaultIfEmpty(0).Max();
+
+        // And under `Saving` the argmax moves to that quantity. Ordered by the pair so a tie
+        // resolves the same way the z walk does -- two pairs holding the same scope count is
+        // the COMMON case here where two holders merged counts, and a dictionary's walk order
+        // deciding a name is fork 12 by the door this file already found open once.
+        if (dials.Preferring == Preferring.Saving && certified.Count > 0)
+        {
+            var taken = certified
+                .OrderByDescending(one => one.Seen)
+                .ThenBy(one => one.Pair.Left)
+                .ThenBy(one => one.Pair.Right)
+                .First();
+
+            chosen = taken.Pair;
+            shortens = taken.Seen;
+        }
 
         return new Proposed
         {

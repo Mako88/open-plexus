@@ -308,6 +308,17 @@ public sealed class DialTests
             + "construction -- promiscuous while the population accounts for nothing "
             + "and quiet once it does -- so there is no level here to aim at",
 
+        ["Preferring"] =
+            "which of the certified pairs rung five spends its one mint on, and not a level: "
+            + "the arms are two rules, coupling and savings, so there is no quantity a "
+            + "controller could hunt. Both bars sit in front of the ranking untouched, which "
+            + "is what makes the comparison clean -- the arms speak on the same asks and "
+            + "refuse on the same ones, so every column that moves is the ranking. It is here "
+            + "because the shipped arm was found ranking on a statistic its own bar "
+            + "contradicts: the description-length bar counts what a name repays and the z "
+            + "beside it is a COUPLING, which scores higher the rarer a pair is. On a real "
+            + "population that mints over 9.4 scopes where 25.1 were certifiable",
+
         // ---- arrived from the worlds, 2026-08-04 ---------------------------
         //
         // none of these is new. Every one was already a dial, passed to a `*Run`
@@ -648,7 +659,16 @@ public sealed class DialTests
         // It ships ON, and the entry is here because it has one world. What it wants is a
         // world that ASKS, where declining is the difference between a question and a guess
         // rather than a mark on a paper.
-        Assert.Equal(17, HandSet.Count);
+        // And up to eighteen for `Preferring`, which is a rise and is written as one -- the
+        // session before this decided AGAINST an eighteenth by screening rung five's own
+        // interval and finding the ask rate moved nothing, so this one is spent knowingly.
+        // What buys it is that the defect is inside the gate rather than around it: the bar
+        // and the ranking measure different quantities and pull opposite ways, which
+        // `NamingYieldTests` shows on a table and then on a population nobody built for it.
+        //
+        // It is an arm and not an ability, so both run and one goes. What kills `Saving` is
+        // rewriting more scopes and moving no outcome column on either world.
+        Assert.Equal(18, HandSet.Count);
     }
 
     /// <summary>

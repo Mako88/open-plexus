@@ -31,9 +31,9 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them.
-- **ACTIVE, a bench where rung five can be shown to help** — the multiplexer's outcome
-  columns are at ceiling whatever the rung does, so no naming arm can win or lose there and
-  three have been read on it. `Crossing` has headroom, and it is fork **107** either way.
+- **ACTIVE, a name over ALTERNATIVES rather than over what co-fires** — rung five's absence
+  is now a shipped arm and the rung has to beat it. What a category wants is the shape the
+  rung does not have, and likeness off the population is the unrun idea. Fork **129**.
 - **Then the crossing itself**, which falls out of that one: a name over the co-firing shape
   and symbol is what carries a fact back to a drawing. Fork **107**.
 - **A beginner language course as the primer.** John's. Ostensive by construction, one
@@ -44,8 +44,6 @@ that is finished LEAVES, so this is only ever what is still to do.
   it. One of the three likeness readings leaves with a revival row. Fork **131**.
 - **What add-only costs** — a group that fills gradually mints at every size it passes
   through, and the closure sightings are what a patience rule would read. Fork **130**.
-- **Likeness read off the POPULATION** rather than the moment: two codes are alike where the
-  commitments naming them EXPECT the same things. Fork **129**.
 - **Audit TRAPS and DO NOT RE-TRY** — a failure class that has earned a check belongs in the
   check, and a revival condition that has expired is a superstition.
 - **Split `Population`** and any other class holding several mechanisms at once.

@@ -31,12 +31,18 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them.
-- **ACTIVE, wiring the categories the grouper now finds** — `Alternating` recovers a
-  world's alternatives and nothing carries them: `Population.Sorts` is unset, so
-  `Coarsening` is inert everywhere but `Returning`. Fork **129**.
-- **Then what a category is worth**, which the wiring makes askable: subsumption reading a
-  member's entailment is the delivery, and a code in the moment is refused because a
-  category over alternatives is in every one.
+- **ACTIVE, a guard against a mechanism no run reaches.** John's. `DeadCodeTests` counts a
+  test as a caller, so `src` may hold a mechanism the brain never executes and every guard
+  stays green. Seven do, `Unifying` and `Alternating` among them.
+- **Then whatever it turns red**, which is the point of it: until it is green, no claim that
+  the architecture is wired can be believed, `ExercisedTests` included.
+- **Then a likeness bar that travels**, read against shuffled moments rather than a level,
+  so no world hands a threshold in. It is what blocks the categories.
+- **Then the categories the brain derives**, into `Population.Sorts`, which nothing but a
+  test has ever set. Delivery is `Coarsening`; a code in the moment is refused because a
+  category over alternatives is in every one. Fork **129**.
+- **Then which worlds still answer a live question**, measured rather than guessed. An
+  isolating world leaves when its question shuts and fourteen are open.
 - **Then the crossing itself**, which falls out of that one: a name over the co-firing shape
   and symbol is what carries a fact back to a drawing. Fork **107**.
 - **A beginner language course as the primer.** John's. Ostensive by construction, one

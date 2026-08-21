@@ -548,7 +548,13 @@ public sealed class DocsTests
     // above leave standing. `THE ORDER`'s active item moves to finding a bench rung five can
     // be shown to help on, the multiplexer's outcome columns being at ceiling whatever the
     // rung does; the leaf beside it says what a mint actually costs the recursion.
-    private const int Whole = 11_428;
+    // And 11,512 is the fifty-second raise, eighty-four words, for `THE ORDER` being rewritten
+    // around a guard rather than around a mechanism. John's, and the reason is his: while a
+    // mechanism can sit in `src` reached only by tests, nothing can say which of them a run
+    // actually executes -- so no claim that the architecture is wired can be believed,
+    // `ExercisedTests` included. Seven are in that state today. The four items under it are
+    // the ones that were already there, reordered behind it.
+    private const int Whole = 11_512;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -8,12 +8,12 @@ using Xunit.Abstractions;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// The vote taken by several holders instead of one — <b>fork 52, and the half of it
-/// that can be answered without a socket.</b>
+/// The vote taken by several holders instead of one — <b>fork 52</b>, and the half of it
+/// that can be answered without a socket.
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The commitment learner runs in one process, so C1 IS KEPT BY CONVENTION.</b> No
+/// <b>The commitment learner runs in one process</b>, so C1 is kept by convention. No
 /// node has ever had the OPPORTUNITY to read another's data, which is not the same as a
 /// design that forbids it — and a constraint nothing has ever been able to break is a
 /// check that cannot fire. <see cref="Population.Weigh"/> is the narrow seam that makes
@@ -98,16 +98,16 @@ public sealed class SplitTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// Splits what fired between holders the way the ring would — <b>by the identity, so
-    /// the same commitment lands on the same holder every time.</b>
+    /// Splits what fired between holders the way the ring would — <b>by the identity</b>, so
+    /// the same commitment lands on the same holder every time.
     /// </summary>
     /// <param name="firing">What fired, whole.</param>
     /// <param name="held">The population, for the weights.</param>
     /// <param name="holders">How many machines to spread it over.</param>
     /// <param name="missing">A holder that says nothing at all, or -1 for none.</param>
     /// <remarks>
-    /// <b>A missing holder is not a silent one and the parameter is named for the
-    /// difference.</b> A holder that fires nothing returns an empty <see cref="Weights"/> and
+    /// <b>A missing holder is not a silent one</b>, and the parameter is named for the
+    /// difference. A holder that fires nothing returns an empty <see cref="Weights"/> and
     /// has been heard from; this one is never asked, which is what a death looks like from
     /// the outside. <see cref="Population.Decide"/> cannot tell them apart and is not
     /// supposed to — the count of who was asked lives with the asker.

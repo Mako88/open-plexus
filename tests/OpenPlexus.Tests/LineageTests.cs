@@ -21,7 +21,7 @@ namespace OpenPlexus.Tests;
 /// behaviour and answers where in the ladder a minority lineage stops.
 /// </para>
 /// <para>
-/// <b>A seed is one code and a true rule is <c>Address + 1</c>.</b> So something has to survive
+/// <b>A seed is one code</b> and a true rule is <c>Address + 1</c>. So something has to survive
 /// two specialisations at six bits and three at eleven. Whether anything ever reaches
 /// the last rung, and what removes it if it does, is what
 /// <see cref="Population.Lineages"/> was built to say — see <see cref="Lifetime"/> for why
@@ -130,8 +130,8 @@ public sealed class LineageTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Whether what redirects blame is what pays, which is the reading's own kill
-    /// condition.</b>
+    /// <b>Whether what redirects blame is what pays</b>, which is the reading's own kill
+    /// condition.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -143,7 +143,7 @@ public sealed class LineageTests(ITestOutputHelper output)
     /// only rounds repair may run on are the rounds where minority rules are right.
     /// </para>
     /// <para>
-    /// <b>Two arms reached that coupling from opposite ends and neither was built for it.</b>
+    /// <b>Two arms reached that coupling from opposite ends</b>, and neither was built for it.
     /// A vote arm that divided by the answer's base rate made the vote say the rare answer,
     /// so it started being wrong on MAJORITY rounds and the blame landed on minority
     /// lineages; <see cref="Repairing.EveryRound"/> removes the coupling outright. Both
@@ -233,7 +233,7 @@ public sealed class LineageTests(ITestOutputHelper output)
     /// between two cells is a pair of measurements.
     /// </para>
     /// <para>
-    /// <b>And it can come out wrong in a way the two points could not.</b> A threshold — the
+    /// <b>And it can come out wrong</b> in a way the two points could not. A threshold — the
     /// shipped arm holding up to some tilt and then collapsing — would say something is
     /// switching rather than starving, and the explanation would need the switch. What is
     /// predicted is monotone and gradual in both.

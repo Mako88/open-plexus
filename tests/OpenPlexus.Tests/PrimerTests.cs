@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
@@ -115,8 +115,8 @@ public sealed class PrimerTests(ITestOutputHelper output)
     /// any corpus does better — and Tatoeba is real English, already fetched.
     /// </para>
     /// <para>
-    /// <b>The old ceiling cannot cross over, and saying why is half the
-    /// instrument.</b> It groups statements sharing an IDENTICAL bag of company and
+    /// <b>The old ceiling cannot cross over</b>, and saying why is half the
+    /// instrument. It groups statements sharing an IDENTICAL bag of company and
     /// takes the commonest target in each group. bAbI repeats its templates so the
     /// groups are large and the number means something. Real sentences are very
     /// nearly unique, so nearly every group holds ONE member and the ceiling goes to
@@ -134,13 +134,13 @@ public sealed class PrimerTests(ITestOutputHelper output)
     /// proof there is signal, which is the whole question.
     /// </para>
     /// <para>
-    /// <b>AND THE bAbI rows run in the same call, because the English number alone
-    /// says nothing.</b> Two corpora through one instrument is the comparison; one
+    /// <b>And the bAbI rows run in the same call</b>, because the English number alone
+    /// says nothing. Two corpora through one instrument is the comparison; one
     /// corpus through a new instrument is a number with no scale.
     /// </para>
     /// <para>
-    /// <b>The pre-registered kill fired and was not accepted, which is said here
-    /// rather than left out.</b> What was written before the run was <i>English's
+    /// <b>The pre-registered kill fired and was not accepted</b>, which is said here
+    /// rather than left out. What was written before the run was <i>English's
     /// UNGATED row must double its blind draw or the primer route is dead</i>. It
     /// scores 1.2x and does not. The bar named the wrong row and the reason is
     /// checkable: fork 91's finding was that on bAbI <b>selecting informative targets
@@ -151,7 +151,7 @@ public sealed class PrimerTests(ITestOutputHelper output)
     /// stated with its own kill: had the gated row come back near 1x, the route died.
     /// </para>
     /// <para>
-    /// <b>SO THE WALL WAS bAbI'S and not reading's — and that is the whole claim.</b>
+    /// <b>So the wall was bAbI's and not reading's</b> — and that is the whole claim.
     /// 0.042 is thin, and this instrument caps it further by shortlisting five
     /// nominees per companion out of a vocabulary of tens of thousands. Whether the
     /// signal is ENOUGH to teach this learner is settled by running the learner, not

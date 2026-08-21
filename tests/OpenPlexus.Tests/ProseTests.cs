@@ -126,12 +126,18 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// lead a reader scans for was the second half. The ratio holds a fifth time.
     /// </para>
     /// <para>
+    /// And 128 is five files taken ahead of the schedule rather than up to it, which is what a
+    /// session with a sweep in flight can do with the wait. Of 20, 13 closed at punctuation
+    /// and 7 at a clause boundary; none needed the claim moved, and three left a shouted lead
+    /// as the whole of a bold, so <see cref="Opened"/> falls with it for the fourth time.
+    /// </para>
+    /// <para>
     /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
     /// is the tight one — <see cref="Scheduled"/> is what stops it sitting still, and this is
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 148;
+    private const int Shouted = 128;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>
@@ -157,8 +163,14 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// back to their lead and was not looking for these at all. Three passes now, same
     /// direction, which is what says the two debts come off together.
     /// </para>
+    /// <para>
+    /// And 54, on the fourth such pass and by the same road. Two of twenty cuts left a shout
+    /// as the whole of a bold and had to be lowercased to read as a label. Four passes now
+    /// and none of them looking, so the coupling is a property of the cut rather than of any
+    /// one file.
+    /// </para>
     /// </remarks>
-    private const int Opened = 56;
+    private const int Opened = 54;
 
     /// <summary>
     /// The commit the decay schedule counts from. <b>John's, 2026-08-13.</b>

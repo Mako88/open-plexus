@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -323,7 +323,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// the grid refutes is the claim that order is unambiguously worth having.
     /// </para>
     /// <para>
-    /// <b>And order is a fact about English rather than a setting on the brain</b>, which is
+    /// <b>And order is a fact about English</b>, rather than a setting on the brain, which is
     /// why the arm that loses it is the artificial one. <see cref="Unordered"/> exists to be
     /// compared against and not to be shipped; a front end reading a corpus somebody wrote
     /// and reporting no order is the odd choice, not the default.
@@ -457,15 +457,15 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// reads as a refutation.
     /// </para>
     /// <para>
-    /// <b><see cref="Joining.Chained"/> at one hop answers all of task one, at 27 residents
-    /// bagged and 69 ordered.</b> That is the largest held-out score on this branch and the
+    /// <b><see cref="Joining.Chained"/> at one hop answers all of task one</b>, at 27 residents
+    /// bagged and 69 ordered. That is the largest held-out score on this branch and the
     /// smallest population taking one, against 802 for the two-hop chain and 4,929 for the bag.
     /// An earlier handoff called the two-hop chain's 0.800 the largest, which this corrects:
     /// the one-hop cell was already in the tree and had never been run beside it.
     /// </para>
     /// <para>
-    /// <b>And its task two cell is the one-statement bag rather than a reading about the
-    /// hop</b>, which
+    /// <b>And its task two cell is the one-statement bag</b>, rather than a reading about the
+    /// hop, which
     /// <see cref="Whether_addressing_picks_anything_a_span_of_one_would_not"/> is what says
     /// so. Addressing picks the newest statement on 0.485 of task one and on every question of
     /// tasks two and three, because the question there names the prop and the newest statement
@@ -1650,8 +1650,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// exam is short of is the retrieval and not the learning.
     /// </para>
     /// <para>
-    /// <b>Two tasks are answered outright, at a fortieth and a twentieth of the bag's
-    /// population.</b> Task 1 scores 1.000 at 69 residents against the bag's 0.230 at 4,929,
+    /// <b>Two tasks are answered outright</b>, at a fortieth and a twentieth of the bag's
+    /// population. Task 1 scores 1.000 at 69 residents against the bag's 0.230 at 4,929,
     /// and task 12 scores 1.000 at 193 against the bag's 0.215 at 4,574. Addressing leads the
     /// bag on seven of the eight, losing only task 14 by 0.035.
     /// </para>

@@ -12,7 +12,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>bAbI looked like it demanded reasoning and its held-out half was all re-reading.</b>
+/// <b>bAbI looked like it demanded reasoning</b> and its held-out half was all re-reading.
 /// That cost this branch real time, and every score taken on it meant something other than
 /// what it appeared to. So a new world is owed the same interrogation before a learner is
 /// pointed at it, and the interrogation is cheap: the world knows its own state, so what a
@@ -27,7 +27,7 @@ namespace OpenPlexus.Tests;
 /// doing. A perfect tracker is 1.000 by construction.
 /// </para>
 /// <para>
-/// <b>So the world earns its keep only if both shallow rules sit near the marginal.</b> If
+/// <b>So the world earns its keep</b> only if both shallow rules sit near the marginal. If
 /// the opening rule is strong the walk is too short and the transcript answers itself; if
 /// recency is strong the world is asking *what happened last* rather than *where is it
 /// now*, and a situation model would be scored for something a one-line rule does.
@@ -203,8 +203,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
     /// <summary>
     /// What each translation leaves in the room, taken before any learner runs — <b>the
-    /// trap list's own rule, that a front-end arm's ceiling costs milliseconds against a
-    /// runner's hour.</b>
+    /// trap list's own rule</b>, that a front-end arm's ceiling costs milliseconds against a
+    /// runner's hour.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -838,8 +838,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>At 120 steps, which is the cell the ceiling grid chose rather than a round
-    /// number.</b> The opening rule and recency both sit at the marginal there, so anything
+    /// <b>At 120 steps</b>, which is the cell the ceiling grid chose rather than a round
+    /// number. The opening rule and recency both sit at the marginal there, so anything
     /// over it is tracking rather than reading the transcript off.
     /// </para>
     /// <para>

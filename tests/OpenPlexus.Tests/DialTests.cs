@@ -317,7 +317,11 @@ public sealed class DialTests
             + "because the shipped arm was found ranking on a statistic its own bar "
             + "contradicts: the description-length bar counts what a name repays and the z "
             + "beside it is a COUPLING, which scores higher the rarer a pair is. On a real "
-            + "population that mints over 9.4 scopes where 25.1 were certifiable",
+            + "population that mints over 9.4 scopes where 25.1 were certifiable. The first "
+            + "shape of the second arm was refuted and the plan's row carries it: ranking on "
+            + "raw savings lost stacking at 3.4 standard errors, because a name over a "
+            + "two-code scope leaves it one code long and out of the eligible set. "
+            + "`Surviving` is that arm adjusted to the savings a name does not consume",
 
         // ---- arrived from the worlds, 2026-08-04 ---------------------------
         //
@@ -666,8 +670,9 @@ public sealed class DialTests
         // and the ranking measure different quantities and pull opposite ways, which
         // `NamingYieldTests` shows on a table and then on a population nobody built for it.
         //
-        // It is an arm and not an ability, so both run and one goes. What kills `Saving` is
-        // rewriting more scopes and moving no outcome column on either world.
+        // It is an arm and not an ability, so both run and one goes. Its first shape did
+        // exactly that and its row is in the plan; `Surviving` is the one more shape a
+        // losing arm is allowed, and what kills it is the stacking falling again.
         Assert.Equal(18, HandSet.Count);
     }
 

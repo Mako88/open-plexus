@@ -532,7 +532,14 @@ public sealed class DocsTests
     // leaf carried them and cost twenty-seven words more; `The_plan_looks_forward` caught it,
     // correctly -- a finding lives in the commit and the test, and a doc that starts keeping
     // them is the pile of docs this one replaced.
-    private const int Whole = 11_288;
+    // And 11,341 is the forty-ninth raise, fifty-three words, for a refutation row. Ranking
+    // rung five's mint on what a name saves lost stacking at 3.4 standard errors on eleven
+    // bits, and the row says the mechanism: a name over a two-code scope leaves it one code
+    // long and out of the eligible set, so ranking on raw savings eats the rung's own
+    // trigger fastest. A `DO NOT RE-TRY` row is the one kind of finding this doc is for --
+    // the next session's search for a better ranking runs straight at it, and a revival
+    // condition is what stops it being a superstition.
+    private const int Whole = 11_341;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

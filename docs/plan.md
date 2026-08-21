@@ -664,6 +664,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | A second hop in three shapes: every conclusion made live, the winner's alone, and only rules that USED one voting | Nought on the implied half in all three, and the run's own accuracy fell each time | RELEVANCE, or a sub-question — a question not NAMING the intermediate cannot trigger the link to it |
 | `Joining.Recent` — a word banded by how far back it was said | Half what narrowing the view buys, and the front end picks the bands | A band the learner mints. Fork 92 |
 | Background admitted to a WIDE genesis scope, a code in every moment being unable to change when the rule fires | A third of what the varied filter reaches at three tellings and three quarters at ten | A world where the varied gate refuses a code a conjunction needed |
+| `Preferring.Saving` — naming the certified pair the most scopes hold | Stacking falls 3.4 standard errors on eleven bits, the outcome columns at ceiling on both arms. A name over a two-code scope leaves it one code and out of the eligible set | A world whose eligible scopes are mostly three codes or longer |
 | A refusal as a CODE in the moment, fork **127** | Level on both shapes for a larger population, the chooser already refusing to repeat itself, so the fact was acted on before the code arrived | The exclusion having to SURVIVE the moment, which is a store's job rather than a code's |
 
 ---

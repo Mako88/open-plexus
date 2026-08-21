@@ -75,6 +75,13 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     /// <param name="scopes">How many scopes were counted.</param>
     /// <param name="alone">Each code and how many scopes held it.</param>
     /// <param name="together">Each pair and how many scopes held both.</param>
+    /// <param name="deep">
+    /// Each pair and how many of those scopes were long enough to survive being named, where
+    /// a row wants that set apart from <c>Seen</c>.
+    /// <b>Every scope counts as deep where this is not given</b>, which is the reading that
+    /// leaves the arms that do not look at it saying exactly what they said before. A table
+    /// written to separate savings from surviving savings has to say so.
+    /// </param>
     /// <remarks>
     /// <b>Synthetic on purpose, and said so rather than disguised.</b> Three of the six
     /// verdicts want a population shaped in a way no run reaches often, and waiting for a
@@ -85,7 +92,8 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
     private static Recurrence Table(
         int scopes,
         (ulong Code, int Seen)[] alone,
-        (ulong Left, ulong Right, int Seen)[] together) =>
+        (ulong Left, ulong Right, int Seen)[] together,
+        (ulong Left, ulong Right, int Deep)[]? deep = null) =>
         Recurrence.From(new Counts
         {
             Scopes = scopes,
@@ -96,12 +104,16 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
                     Left = Of(one.Code),
                     Right = null,
                     Seen = one.Seen,
+                    Deep = 0,
                 }),
                 .. together.Select(one => new Tallied
                 {
                     Left = Of(one.Left),
                     Right = Of(one.Right),
                     Seen = one.Seen,
+                    Deep = deep?.FirstOrDefault(
+                        row => row.Left == one.Left && row.Right == one.Right).Deep
+                        ?? one.Seen,
                 }),
             ],
         });
@@ -1184,10 +1196,16 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         // And both repay, which is what makes this a question about the argmax rather than
         // about a bar. The description-length bar wants three scopes and each has at least
         // that, so nothing here is reached by relaxing anything.
+        // Three pairs and three rules, so each takes a different one and the control
+        // separates them all at once. The wide pair is held by two hundred scopes and every
+        // one of them is exactly two codes long, so naming it saves two hundred entries and
+        // removes two hundred commitments from the eligible set. The middle pair is held by
+        // fifty scopes that all survive. The rare pair is four scopes that always agree.
         var counted = Table(
             2000,
-            [(1, 400), (2, 400), (3, 4), (4, 4)],
-            [(1, 2, 200), (3, 4, 4)]);
+            [(1, 400), (2, 400), (3, 4), (4, 4), (5, 100), (6, 100)],
+            [(1, 2, 200), (3, 4, 4), (5, 6, 50)],
+            [(1, 2, 0), (3, 4, 4), (5, 6, 50)]);
 
         var read = Abstracting.Propose(counted, new CommittingSettings());
 
@@ -1237,26 +1255,30 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         // certifiable one is the two-hundred-scope redundancy the argmax did not take.
         Assert.Equal(200, read.Available);
 
-        // And the arm takes the other one, over the identical table and the identical bars.
-        // Both pairs repaid and both cleared the corrected tail on the row above; what moves
-        // is which of the two certified pairs gets the one mint an ask allows.
-        var saving = Abstracting.Propose(
-            counted, new CommittingSettings { Preferring = Preferring.Saving });
+        // And the arm takes a third one, over the identical table and the identical bars.
+        // All three repaid and all three cleared the corrected tail; what moves is which of
+        // the certified pairs gets the one mint an ask allows.
+        //
+        // It is neither the coupling winner nor the savings winner, which is the whole point
+        // of the shape. Raw savings takes the two-hundred-scope pair and every one of those
+        // scopes leaves the eligible set with it -- refuted on eleven bits at 3.4 standard
+        // errors of stacking, and the plan's row says so. This takes the fifty that stay.
+        var surviving = Abstracting.Propose(
+            counted, new CommittingSettings { Preferring = Preferring.Surviving });
 
         output.WriteLine(
-            $"  under Saving: named {saving.Named?.Length ?? 0} shortening {saving.Shortens}, "
-            + $"{saving.Refused}");
+            $"  under Surviving: shortening {surviving.Shortens}, {surviving.Refused}");
 
-        Assert.Equal([Of(1), Of(2)], saving.Named);
-        Assert.Equal(200, saving.Shortens);
+        Assert.Equal([Of(5), Of(6)], surviving.Named);
+        Assert.Equal(50, surviving.Shortens);
 
         // And the two arms speak on the same asks, which is what makes the grid readable.
         // The bars sit in front of the ranking, so a refusal count that ever differs is this
         // arm reaching something it was not built to touch.
-        Assert.Equal(read.Refused, saving.Refused);
-        Assert.Equal(read.Candidates, saving.Candidates);
-        Assert.Equal(read.Repaying, saving.Repaying);
-        Assert.Equal(read.Strongest, saving.Strongest);
+        Assert.Equal(read.Refused, surviving.Refused);
+        Assert.Equal(read.Candidates, surviving.Candidates);
+        Assert.Equal(read.Repaying, surviving.Repaying);
+        Assert.Equal(read.Strongest, surviving.Strongest);
 
         // No bar on a run. Whether a real population holds this shape is the next question
         // and this control cannot answer it -- what it settles is that the arithmetic
@@ -1393,7 +1415,7 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         // front of the ranking, so the two arms should speak on the same asks -- a refusal
         // count that moves means this arm reached something it was not built to touch, and
         // then the grid is not a comparison of rankings at all.
-        var arms = new[] { Preferring.Coupled, Preferring.Saving };
+        var arms = new[] { Preferring.Coupled, Preferring.Surviving };
 
         // Run once and read many times. Each cell is a full learning run, so recomputing one
         // for an assertion would double the grid's cost to say something the same rows
@@ -1452,34 +1474,28 @@ public sealed class NamingYieldTests(ITestOutputHelper output)
         // times is measuring the cadence instead and every column beside it is about that.
         Assert.Equal(
             bits[Preferring.Coupled].Select(one => one.Asked),
-            bits[Preferring.Saving].Select(one => one.Asked));
+            bits[Preferring.Surviving].Select(one => one.Asked));
 
-        // WHAT THE GRID SAID, and the pre-registered cost is what decided it. Eleven bits,
-        // eight mixed seeds, twenty thousand rounds:
+        // What the previous arm read here, kept because it is what `Surviving` is answering
+        // and the plan's refutation row is the record. `Saving` ranked on raw savings:
         //
         //   arm              recent            sound          unsound      stacked   rewritten
         //   Coupled  0.993 +/-0.001   277.1 +/-14.6    273.5 +/-18.7   5.8 +/-0.5   432 +/-29
         //   Saving   0.995 +/-0.001   321.8 +/-23.3    263.5 +/-11.9   3.6 +/-0.4   569 +/-38
         //
-        // `Saving` rewrites 32% more, which is the arm working. It loses stacking at 3.4
-        // standard errors, which is the cost written down before the run. It gains sound
-        // rules at 1.6, which is not a result. And `found` is 15.6 of 16.0 truths on both
-        // arms to the decimal, with `recent` at 0.993 against 0.995 -- so the outcome
-        // columns are AT CEILING here and could not have shown a win either way.
+        // It rewrote 32% more, lost stacking at 3.4 standard errors, and gained sound rules
+        // at 1.6. And `found` was 15.6 of 16.0 truths on both arms to the decimal with
+        // `recent` at 0.993 against 0.995, so the outcome columns are AT CEILING here and
+        // could not have shown a win either way. This world decides the arm on its
+        // structural columns and says nothing about the rest.
         //
-        // So the arm is decided on the structural columns, and there it trades depth for
-        // breadth. Depth is what rung five exists for.
+        // So what `Surviving` has to show is the stacking held while the rewrites rise. A
+        // row that reads like `Saving`'s means the restriction did not bite and the idea
+        // goes with the build this time.
         //
-        // The bar is the cost rather than the benefit, because the benefit was unmeasurable
-        // on this world and the cost was not.
-        Assert.True(
-            bits[Preferring.Saving].Average(one => (double)one.Learnt.Stacked)
-                < bits[Preferring.Coupled].Average(one => (double)one.Learnt.Stacked),
-            "`Saving` no longer stacks less than `Coupled`, so the mechanism that decided "
-            + "this arm has changed: naming the pair the most scopes hold was refuted for "
-            + "eating rung five's own trigger, and if that has stopped happening the "
-            + "refutation is stale rather than merely old");
-
+        // No bar on what it buys, and the one above is on the instrument. What the arm is
+        // worth is the reading, and a threshold written before it would be the answer put in
+        // front of the question.
         return;
 
         (Learned Learnt, long Rewritten, long Asked, long Spoke) Bits(Preferring arm, int seed)

@@ -38,6 +38,26 @@ public readonly record struct Tallied
 
     /// <summary>How many scopes it turned up in.</summary>
     public required int Seen { get; init; }
+
+    /// <summary>
+    /// Of those, how many were long enough to SURVIVE being named — <b>what a name leaves
+    /// behind</b>, and nought on a row for one code alone.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A scope of exactly two codes becomes one name and stops contributing a pair, so
+    /// naming it removes that commitment from <see cref="Recurrence.Eligible"/> forever.
+    /// Only a scope of three or more leaves something beside the new name. This counts those,
+    /// which is <see cref="Seen"/> minus the scopes a name would consume.
+    /// </para>
+    /// <para>
+    /// <b>Carried rather than derived, because a receiver cannot recover it.</b> Nothing in
+    /// the pair table says how long the scopes were, so a holder that guessed this from
+    /// <see cref="Seen"/> would be ranking on a different quantity from the one the sender
+    /// counted — the fault <see cref="Counts.Scopes"/> already carries a note about.
+    /// </para>
+    /// </remarks>
+    public required int Deep { get; init; }
 }
 
 /// <summary>A <see cref="Recurrence"/> as bytes, and the only form of it that travels.</summary>
@@ -87,6 +107,7 @@ public sealed class Recurrence
 {
     private readonly Dictionary<Code, int> _alone = [];
     private readonly Dictionary<(Code Left, Code Right), int> _together = [];
+    private readonly Dictionary<(Code Left, Code Right), int> _deep = [];
 
     /// <summary>How many scopes were counted.</summary>
     public int Scopes { get; private set; }
@@ -96,6 +117,9 @@ public sealed class Recurrence
 
     /// <summary>How often each pair appeared together, by pair.</summary>
     internal IReadOnlyDictionary<(Code Left, Code Right), int> Together => _together;
+
+    /// <inheritdoc cref="Tallied.Deep"/>
+    internal IReadOnlyDictionary<(Code Left, Code Right), int> Deep => _deep;
 
     /// <summary>
     /// Whether rung five is offered this commitment at all — <b>its denominator, in one
@@ -156,6 +180,14 @@ public sealed class Recurrence
                     var pair = (scope[left], scope[right]);
                     counted._together.TryGetValue(pair, out var seen);
                     counted._together[pair] = seen + 1;
+
+                    // What survives the naming. A two-code scope becomes one name and leaves
+                    // the eligible set; anything longer keeps a remainder beside the name and
+                    // can be paired again, which is the only route to a name over a name.
+                    if (scope.Length < 3) continue;
+
+                    counted._deep.TryGetValue(pair, out var deep);
+                    counted._deep[pair] = deep + 1;
                 }
         }
 
@@ -189,7 +221,7 @@ public sealed class Recurrence
         var rows = ImmutableArray.CreateBuilder<Tallied>(_alone.Count + _together.Count);
 
         foreach (var code in _alone.Keys.Order())
-            rows.Add(new Tallied { Left = code, Right = null, Seen = _alone[code] });
+            rows.Add(new Tallied { Left = code, Right = null, Seen = _alone[code], Deep = 0 });
 
         foreach (var pair in _together.Keys.OrderBy(one => one.Left).ThenBy(one => one.Right))
             rows.Add(new Tallied
@@ -197,6 +229,7 @@ public sealed class Recurrence
                 Left = pair.Left,
                 Right = pair.Right,
                 Seen = _together[pair],
+                Deep = _deep.GetValueOrDefault(pair),
             });
 
         return new Counts { Scopes = Scopes, Rows = rows.MoveToImmutable() };
@@ -212,8 +245,15 @@ public sealed class Recurrence
 
         foreach (var row in counts.Rows)
         {
-            if (row.Right is { } right) counted._together[(row.Left, right)] = row.Seen;
-            else counted._alone[row.Left] = row.Seen;
+            if (row.Right is { } right)
+            {
+                counted._together[(row.Left, right)] = row.Seen;
+                counted._deep[(row.Left, right)] = row.Deep;
+            }
+            else
+            {
+                counted._alone[row.Left] = row.Seen;
+            }
         }
 
         return counted;
@@ -237,6 +277,12 @@ public sealed class Recurrence
         {
             _alone.TryGetValue(code, out var so_far);
             _alone[code] = so_far + seen;
+        }
+
+        foreach (var (pair, deep) in other._deep)
+        {
+            _deep.TryGetValue(pair, out var held);
+            _deep[pair] = held + deep;
         }
 
         foreach (var (pair, seen) in other._together)
@@ -333,12 +379,18 @@ public enum Preferring
     /// </remarks>
     Coupled,
 
-    /// <summary>The certified pair holding the most scopes, so a name repays what it costs.</summary>
+    /// <summary>
+    /// The certified pair whose scopes SURVIVE being named, so a name repays without eating
+    /// what would have carried the next one.
+    /// </summary>
     /// <remarks>
     /// <para>
-    /// The description-length bar's own quantity, promoted from a bar to the ranking. A name
-    /// costs two entries to say what it means and saves one in every scope holding the pair,
-    /// so what it repays is the scope count and this is the argmax of it.
+    /// The description-length bar's own quantity, promoted from a bar to the ranking and then
+    /// restricted to the scopes a name leaves standing. A name costs two entries to say what
+    /// it means and saves one in every scope holding the pair, so what it repays is the scope
+    /// count; but a scope of exactly two codes becomes one name and leaves
+    /// <see cref="Recurrence.Eligible"/> forever, so those savings are taken once and cost
+    /// the trigger. This is the argmax of <see cref="Tallied.Deep"/>, which is the rest.
     /// </para>
     /// <para>
     /// And it is not <c>MDL alone</c>, whose revival row says to pair description length with
@@ -351,8 +403,16 @@ public enum Preferring
     /// refusal count is identical and the names differ is the expected shape, and a refusal
     /// count that moves is this arm reaching something it was not built to touch.
     /// </para>
+    /// <para>
+    /// <b>It is `Saving` adjusted rather than a new idea</b>, which is the one more shape a
+    /// losing arm is allowed. Ranking on raw savings lost stacking at 3.4 standard errors on
+    /// eleven bits while gaining nothing an outcome column could show, and the plan's row
+    /// says what refuted it. What lost there was the build: the idea that a name should be
+    /// ranked by what it repays survives, restricted to the repayment that does not consume
+    /// its own material.
+    /// </para>
     /// </remarks>
-    Saving,
+    Surviving,
 }
 
 
@@ -538,6 +598,7 @@ public static class Abstracting
 
         var alone = counted.Alone;
         var together = counted.Together;
+        var deep = counted.Deep;
 
         if (together.Count == 0) return Nothing(scopes, 0, Refused.Unpaired);
 
@@ -551,7 +612,7 @@ public static class Abstracting
         // correction multiplies by the candidates SEARCHED, which is not known until the walk
         // ends, so asking mid-walk whether a pair clears the bar would test a moving bar. Only
         // the repaying ones are kept, the rest being unnameable at any ranking.
-        var repaid = new List<(double Z, int Seen, (Code Left, Code Right) Pair)>();
+        var repaid = new List<(double Z, int Seen, int Deep, (Code Left, Code Right) Pair)>();
 
         // Ordered, because the winner was otherwise whichever tie the dictionary reached
         // first. Two pairs with the same z resolved by hash order, which is stable within
@@ -597,7 +658,7 @@ public static class Abstracting
                 : ((seen / (double)scopes) - expected)
                     / Math.Sqrt(expected * (1.0 - expected) / scopes);
 
-            repaid.Add((z, seen, pair));
+            repaid.Add((z, seen, deep.GetValueOrDefault(pair), pair));
 
             // Strict, so a tie goes to the pair the ordering reached first rather than to
             // the last one written. Starting below nought rather than at it is what lets
@@ -648,14 +709,20 @@ public static class Abstracting
 
         var available = certified.Select(one => one.Seen).DefaultIfEmpty(0).Max();
 
-        // And under `Saving` the argmax moves to that quantity. Ordered by the pair so a tie
-        // resolves the same way the z walk does -- two pairs holding the same scope count is
-        // the COMMON case here where two holders merged counts, and a dictionary's walk order
+        // And under `Surviving` the argmax moves to the savings a name does not consume.
+        // Ordered by the pair so a tie resolves the same way the z walk does -- two pairs
+        // holding the same count is the COMMON case here, and a dictionary's walk order
         // deciding a name is fork 12 by the door this file already found open once.
-        if (dials.Preferring == Preferring.Saving && certified.Count > 0)
+        //
+        // A pair whose scopes are all two codes long has `Deep` at nought and is ranked last
+        // rather than refused. It still repaid and still cleared the bar, so refusing it
+        // would be a third gate wearing a ranking's clothes -- and where every candidate is
+        // shallow, naming the shallowest is still better than naming nothing.
+        if (dials.Preferring == Preferring.Surviving && certified.Count > 0)
         {
             var taken = certified
-                .OrderByDescending(one => one.Seen)
+                .OrderByDescending(one => one.Deep)
+                .ThenByDescending(one => one.Seen)
                 .ThenBy(one => one.Pair.Left)
                 .ThenBy(one => one.Pair.Right)
                 .First();

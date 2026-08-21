@@ -211,6 +211,10 @@ public sealed class WireTests(ITestOutputHelper output)
         Left = new Code(1, 2),
         Right = new Code(3, 4),
         Seen = 9,
+
+        // Different from `Seen` on purpose, so a round trip that wrote one into the other
+        // reads as a failure rather than as a pass.
+        Deep = 7,
     };
 
     private static Counts FilledCounts => new() { Scopes = 11, Rows = [FilledTallied] };

@@ -31,9 +31,12 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them.
-- **ACTIVE, a name over ALTERNATIVES rather than over what co-fires** — rung five's absence
-  is now a shipped arm and the rung has to beat it. What a category wants is the shape the
-  rung does not have, and likeness off the population is the unrun idea. Fork **129**.
+- **ACTIVE, wiring the categories the grouper now finds** — `Alternating` recovers a
+  world's alternatives and nothing carries them: `Population.Sorts` is unset, so
+  `Coarsening` is inert everywhere but `Returning`. Fork **129**.
+- **Then what a category is worth**, which the wiring makes askable: subsumption reading a
+  member's entailment is the delivery, and a code in the moment is refused because a
+  category over alternatives is in every one.
 - **Then the crossing itself**, which falls out of that one: a name over the co-firing shape
   and symbol is what carries a fact back to a drawing. Fork **107**.
 - **A beginner language course as the primer.** John's. Ostensive by construction, one

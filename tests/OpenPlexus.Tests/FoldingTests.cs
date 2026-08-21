@@ -29,8 +29,8 @@ namespace OpenPlexus.Tests;
 /// different questions.
 /// </para>
 /// <para>
-/// <b>And the design says this should be fine, which is exactly why it is worth
-/// checking.</b> A name's identity is a hash of its members, so two machines that notice
+/// <b>And the design says this should be fine</b>, which is exactly why it is worth
+/// checking. A name's identity is a hash of its members, so two machines that notice
 /// the same redundancy mint the same code without speaking. That is the claim. What it
 /// does not say is whether they notice the same redundancies at all — fork 29's divergent
 /// siblings, arriving at rung five instead of at repair.

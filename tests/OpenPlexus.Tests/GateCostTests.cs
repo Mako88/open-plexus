@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -25,8 +25,8 @@ namespace OpenPlexus.Tests;
 /// by accuracy ascending and they consume it. The gate aims repair; it does not limit it.
 /// </para>
 /// <para>
-/// <b>One mechanism on from a known baseline, which is why <see cref="Population.Placing"/>
-/// REACHES ONLY THE GATE.</b> Firing, voting and settling are untouched, so a run with a
+/// <b>One mechanism on from a known baseline</b>, which is why <see cref="Population.Placing"/>
+/// REACHES ONLY THE GATE. Firing, voting and settling are untouched, so a run with a
 /// placement differs from one without in the repair gate ALONE. Sharding a world properly
 /// and comparing it against a whole one would move four things at once and the score could
 /// not say which of them did it.
@@ -170,8 +170,8 @@ public sealed class GateCostTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// Four, <b>because a scene world is not a bit world and the same sweep costs an
-    /// order more.</b>
+    /// Four, <b>because a scene world is not a bit world</b> and the same sweep costs an
+    /// order more.
     /// </summary>
     /// <remarks>
     /// <b>Written down because the first version reused twelve and was not costed.</b>

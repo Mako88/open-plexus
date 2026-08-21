@@ -33,6 +33,42 @@
 /// being wrong is how the gate finds out.
 /// </para>
 /// </remarks>
+/// <summary>
+/// What the grouper takes as evidence that two codes do not stand in one another's place.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>An arm, because the two worlds measured disagree.</b> The clause was written as
+/// <see cref="Never"/> — a pair is refused for meeting even once — which is <i>alternatives
+/// never co-occur</i> taken literally, and it is right where a moment is one assertion. On
+/// bAbI a line is a moment and names never share one.
+/// </para>
+/// <para>
+/// <b>And it is wrong where a moment is a WINDOW.</b> On <c>Roaming</c> a moment spans three
+/// sentences, so two room words land in one constantly although a person is in one room, and
+/// the clause refused 27 of 27 within-set pairs: every grouping returned nought at every bar.
+/// </para>
+/// <para>
+/// <b>So neither is the rule and the grid decides.</b> What would settle it is a clause
+/// reading the moment's own shape, which nothing computes — the honest form of that is a
+/// world saying how much of an assertion a moment is, and a world reaching into a mechanism
+/// is what this repo refuses.
+/// </para>
+/// </remarks>
+public enum Meeting
+{
+    /// <summary>A pair that has met even once stands in no group. What shipped.</summary>
+    Never,
+
+    /// <summary>A pair that meets no more often than chance would have it meet.</summary>
+    /// <remarks>
+    /// A strict widening of <see cref="Never"/>: a pair that never met scores nought against
+    /// a positive expectation and still passes. What it adds is the pairs that DO meet, in a
+    /// window, no more often than two unrelated codes would.
+    /// </remarks>
+    Rarely,
+}
+
 public sealed class Alternating
 {
     private readonly Dictionary<Code, int> _seen = [];
@@ -174,7 +210,9 @@ public sealed class Alternating
     /// <param name="floor">
     /// <inheritdoc cref="From" path="/param[@name='floor']"/>
     /// </param>
-    public IReadOnlyList<IReadOnlySet<Code>> BySpace(double company, int floor)
+    /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
+    public IReadOnlyList<IReadOnlySet<Code>> BySpace(
+        double company, int floor, Meeting meeting = Meeting.Never)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
 
@@ -182,7 +220,8 @@ public sealed class Alternating
             _seen, floor, _withs,
             (mine, theirs, group) =>
                 Shared(_withs[mine].Keys.ToHashSet(), _withs[theirs].Keys.ToHashSet(), group)
-                >= company);
+                >= company,
+            meeting);
     }
 
     /// <summary>
@@ -214,13 +253,131 @@ public sealed class Alternating
     /// this a comparison rather than two mechanisms.
     /// </para>
     /// </remarks>
-    public IReadOnlyList<IReadOnlySet<Code>> ByLikeness(double alike, int floor)
+    /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
+    public IReadOnlyList<IReadOnlySet<Code>> ByLikeness(
+        double alike, int floor, Meeting meeting = Meeting.Never)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
 
         return Grouped(
             _seen, floor, _withs,
-            (mine, theirs, _) => Likeness(_withs[mine], _withs[theirs]) >= alike);
+            (mine, theirs, _) => Likeness(_withs[mine], _withs[theirs]) >= alike,
+            meeting);
+    }
+
+    /// <summary>
+    /// Whether two codes meet no more often than independence would have them meet.
+    /// </summary>
+    /// <param name="mine">One code.</param>
+    /// <param name="theirs">The other.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>What the admission clause used to say as an absolute.</b> It refused a pair that
+    /// had co-occurred even ONCE, which is <i>alternatives never co-occur</i> taken
+    /// literally — and a moment is a WINDOW rather than an assertion. On <c>Roaming</c> a
+    /// moment spans three sentences, so two room words land in one constantly although a
+    /// person is in one room, and the clause refused 27 of 27 within-set pairs.
+    /// </para>
+    /// <para>
+    /// <b>So it asks about the RATE instead</b>, which is the same question the naming gate's
+    /// z asks: a pair meets as often as chance would have it, or less. It is a strict
+    /// widening of what was there — a pair that never met scores nought against a positive
+    /// expectation and still passes — so nothing the old clause admitted is refused now.
+    /// </para>
+    /// </remarks>
+    /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
+    private bool Apart(Code mine, Code theirs, Meeting meeting)
+    {
+        var together = _withs.TryGetValue(mine, out var kept)
+            ? kept.GetValueOrDefault(theirs)
+            : 0;
+
+        if (meeting == Meeting.Never) return together == 0;
+
+        // Multiplied out rather than divided, so a code seen nought times cannot divide by
+        // it and the comparison stays in whole numbers where it can.
+        return together * (double)_moments
+            <= _seen.GetValueOrDefault(mine) * (double)_seen.GetValueOrDefault(theirs);
+    }
+
+    /// <summary>
+    /// Groups codes whose company is alike once each partner is weighed by how surprising it
+    /// is — <b>the arm the other two are missing.</b>
+    /// </summary>
+    /// <param name="alike">How alike two profiles must be.</param>
+    /// <param name="floor">How many moments a code must appear in to be grouped at all.</param>
+    /// <remarks>
+    /// <para>
+    /// <see cref="BySpace"/> discards the counts and <see cref="ByLikeness"/> keeps them raw.
+    /// Raw counts are dominated by how often a code appears, so a common partner counts for
+    /// as much as a rare one and every profile looks alike to every other — measured on
+    /// <c>Roaming</c> at 0.993 within the room words against 0.965 across the sets, which is
+    /// no separation at all.
+    /// </para>
+    /// <para>
+    /// <b>Positive pointwise mutual information is the correction</b>, and it is the same
+    /// shape this repo already uses twice: divide what was counted by what independence would
+    /// have made it. The same counts then read 0.983 within against 0.302 across.
+    /// </para>
+    /// </remarks>
+    /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
+    public IReadOnlyList<IReadOnlySet<Code>> ByCompany(
+        double alike, int floor, Meeting meeting = Meeting.Never)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
+
+        var lifted = _withs.Keys.ToDictionary(code => code, Pointwise);
+
+        return Grouped(
+            _seen, floor, _withs,
+            (mine, theirs, _) => Likeness(lifted[mine], lifted[theirs]) >= alike,
+            meeting);
+    }
+
+    /// <summary>One code's company, each partner weighed by how surprising it is.</summary>
+    /// <param name="code">Whose company to weigh.</param>
+    /// <remarks>
+    /// <b>Positive only, which is what the P in PPMI is.</b> A partner rarer than
+    /// independence says the two avoid each other, and a vector of avoidances is a different
+    /// claim from a vector of what they share.
+    /// </remarks>
+    private Dictionary<Code, double> Pointwise(Code code)
+    {
+        var lifted = new Dictionary<Code, double>();
+
+        if (!_withs.TryGetValue(code, out var kept)) return lifted;
+
+        var mine = _seen.GetValueOrDefault(code);
+
+        if (mine == 0) return lifted;
+
+        foreach (var (mate, together) in kept)
+        {
+            var theirs = _seen.GetValueOrDefault(mate);
+
+            if (theirs == 0) continue;
+
+            var value = Math.Log(together * (double)_moments / (mine * (double)theirs));
+
+            if (value > 0.0) lifted[mate] = value;
+        }
+
+        return lifted;
+    }
+
+    /// <summary>The cosine of two codes' company, however each partner is weighed.</summary>
+    private static double Likeness(
+        IReadOnlyDictionary<Code, double> mine, IReadOnlyDictionary<Code, double> theirs)
+    {
+        var dot = 0.0;
+
+        foreach (var (code, weight) in mine)
+            if (theirs.TryGetValue(code, out var had)) dot += weight * had;
+
+        var left = Math.Sqrt(mine.Values.Sum(weight => weight * weight));
+        var right = Math.Sqrt(theirs.Values.Sum(weight => weight * weight));
+
+        return left == 0.0 || right == 0.0 ? 0.0 : dot / (left * right);
     }
 
     /// <summary>The cosine of two codes' company, counted.</summary>
@@ -258,7 +415,9 @@ public sealed class Alternating
     /// complete and on no others. What it reads is a prefix of what a settled run holds,
     /// which is what makes an unsettled reading early rather than wrong.
     /// </remarks>
-    public IReadOnlyList<IReadOnlySet<Code>> ByTime(double adhesion, int floor)
+    /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
+    public IReadOnlyList<IReadOnlySet<Code>> ByTime(
+        double adhesion, int floor, Meeting meeting = Meeting.Never)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
 
@@ -278,7 +437,8 @@ public sealed class Alternating
                 var expected = _seen[mine] / total * (_seen[theirs] / total) * width * total;
 
                 return expected > 0.0 && beside / expected >= adhesion;
-            });
+            },
+            meeting);
     }
 
     /// <summary>
@@ -405,11 +565,13 @@ public sealed class Alternating
     /// same claim in both.
     /// </para>
     /// </remarks>
-    private static IReadOnlyList<IReadOnlySet<Code>> Grouped(
+    /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
+    private IReadOnlyList<IReadOnlySet<Code>> Grouped(
         Dictionary<Code, int> seen,
         int floor,
         Dictionary<Code, Dictionary<Code, int>> withs,
-        Func<Code, Code, IReadOnlySet<Code>, bool> keeps)
+        Func<Code, Code, IReadOnlySet<Code>, bool> keeps,
+        Meeting meeting)
     {
         var codes = seen.Where(one => one.Value >= floor).Select(one => one.Key).Order().ToList();
 
@@ -427,7 +589,7 @@ public sealed class Alternating
                 if (taken.Contains(other) || group.Contains(other)) continue;
 
                 if (group.All(member =>
-                    !withs[member].ContainsKey(other) && keeps(member, other, group)))
+                    Apart(member, other, meeting) && keeps(member, other, group)))
                     group.Add(other);
             }
 

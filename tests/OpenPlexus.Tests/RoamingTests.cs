@@ -2152,19 +2152,29 @@ public sealed class RoamingTests(ITestOutputHelper output)
         var known = sets.SelectMany(one => one.Codes).ToHashSet();
 
         output.WriteLine($"{Moments} moments, {alternating.Moments} watched");
-        output.WriteLine("alike | groups | biggest | purity | reach");
+        output.WriteLine("how          alike | groups | biggest | purity | reach");
 
-        var best = 0.0;
+        var best = new Dictionary<string, double>();
 
-        foreach (var alike in new[] { 0.5, 0.7, 0.8, 0.9, 0.95, 0.99 })
+        foreach (var (how, group_by) in
+            new (string How, Func<double, IReadOnlyList<IReadOnlySet<Code>>> By)[]
+            {
+                ("space/never", one => alternating.BySpace(one, 20, Meeting.Never)),
+                ("count/never", one => alternating.ByLikeness(one, 20, Meeting.Never)),
+                ("ppmi/never", one => alternating.ByCompany(one, 20, Meeting.Never)),
+                ("space/rarely", one => alternating.BySpace(one, 20, Meeting.Rarely)),
+                ("count/rarely", one => alternating.ByLikeness(one, 20, Meeting.Rarely)),
+                ("ppmi/rarely", one => alternating.ByCompany(one, 20, Meeting.Rarely)),
+            })
+        foreach (var alike in new[] { 0.5, 0.8, 0.9, 0.95 })
         {
-            var groups = alternating.ByLikeness(alike, floor: 20)
+            var groups = group_by(alike)
                 .Where(group => group.Any(known.Contains))
                 .ToList();
 
             if (groups.Count == 0)
             {
-                output.WriteLine($"{alike,5:F2} |      0 |       - |      - |     -");
+                output.WriteLine($"{how,-13}{alike,5:F2} |      0 |       - |      - |     -");
                 continue;
             }
 
@@ -2192,15 +2202,17 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 .Sum(group => group.Max(one => one.Held))
                 / (double)known.Count;
 
-            best = Math.Max(best, purity * reach);
+            best[how] = Math.Max(best.GetValueOrDefault(how), purity * reach);
 
             output.WriteLine(
-                $"{alike,5:F2} | {groups.Count,6} | {groups.Max(one => one.Count),7} "
+                $"{how,-13}{alike,5:F2} | {groups.Count,6} | {groups.Max(one => one.Count),7} "
                 + $"| {purity,6:F3} | {reach,5:F3}");
         }
 
         output.WriteLine("");
-        output.WriteLine($"best purity times reach: {best:F3}");
+
+        foreach (var (how, score) in best.OrderByDescending(one => one.Value))
+            output.WriteLine($"{how,-13}| best purity times reach {score:F3}");
 
         // And where it went, because a nought at every bar is not a reading about the
         // threshold. `Grouped` admits a code to a group only where it has NEVER ONCE
@@ -2230,12 +2242,40 @@ public sealed class RoamingTests(ITestOutputHelper output)
             $"{alternating.Moments} moments reached the grouper of {Moments} pushed, so this "
             + "is a reading about the wiring rather than about the statistic");
 
-        // The bar the diagnosis rests on. A moment here spans three sentences, so two room
-        // words land in one window constantly even though a person is in ONE room -- and the
-        // exclusion reads a window as an assertion. If these pairs ever stop co-occurring the
-        // clause is no longer what empties the table and the reading above wants re-taking.
+        // The fact the diagnosis rested on, kept because it is what the clause change was
+        // for. A moment here spans three sentences, so two room words land in one window
+        // constantly even though a person is in ONE room. Under the clause this replaced --
+        // refusing a pair that had co-occurred even once -- every one of these was refused
+        // and every grouping returned nought at every bar.
         Assert.Equal(pairs, together);
 
+        // And the bars, because this is no longer a null. The clause change alone takes the
+        // grouping from NOUGHT at every threshold to three groups at a purity of 1.000 and a
+        // reach of 0.929 -- thirteen of the fourteen codes the world names, in three groups
+        // that are exactly its three sets.
+        //
+        //   how     alike | groups | biggest | purity | reach
+        //   space    0.50 |      3 |      12 |  0.923 | 0.857
+        //   counted  0.90 |      3 |       8 |  1.000 | 0.929
+        //   ppmi     0.50 |      3 |       6 |  1.000 | 0.929
+        //
+        // So the fork's wall was one line. What blocked it was never the statistic being
+        // hard; it was an admission test that refused a pair for meeting once.
+        Assert.True(best["ppmi/rarely"] > 0.8,
+            $"weighing company by how surprising it is recovers {best["ppmi/rarely"]:F3} of the "
+            + "answer key, so the grouping no longer finds the alternatives this world names "
+            + "and the clause change is not what unlocked it");
+
+        // And the older arm loses, which is what its own remark asked for: `BySpace` discards
+        // the counts, and one of the two goes when they are compared. It is kept until a
+        // second world says the same, because one world's grid is a verdict on the world.
+        Assert.True(best.GetValueOrDefault("space/rarely") < best["ppmi/rarely"],
+            $"discarding the counts scores {best.GetValueOrDefault("space/rarely"):F3} against {best["ppmi/rarely"]:F3} "
+            + "for weighing them, so the arm written to lose has stopped losing");
+
+        // No bar separating the two weighted arms. They tie on the peak here, and PPMI is
+        // flat from 0.50 to 0.90 where counting needs 0.90 -- a difference in how much a
+        // threshold matters rather than in what is found. Ranking them wants a second world.
         return;
 
         bool Beside(Code one, Code two)

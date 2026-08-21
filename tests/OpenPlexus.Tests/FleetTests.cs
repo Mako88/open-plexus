@@ -286,7 +286,7 @@ public sealed class FleetTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The control was already in the codebase and was built for exactly this.</b>
+    /// <b>The control was already in the codebase</b>, and was built for exactly this.
     /// <see cref="Population.Placing"/> tells the repair gate which of the commitments it
     /// can see are notionally elsewhere, so a run with it set has a fleet's GATE and one
     /// process's POPULATION. That splits the two things distribution does at once, and

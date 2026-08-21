@@ -130,8 +130,8 @@ public sealed class FootprintTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>What a commitment costs in bytes, and whether a phone could hold a holder's
-    /// share.</b>
+    /// <b>What a commitment costs in bytes</b>, and whether a phone could hold a holder's
+    /// share.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -247,8 +247,8 @@ public sealed class FootprintTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The control the reading above needed, and without it the projection is an
-    /// argument.</b> Bytes per entry is flat and entries a commitment climbs with the run,
+    /// <b>The control the reading above needed</b>, and without it the projection is an
+    /// argument. Bytes per entry is flat and entries a commitment climbs with the run,
     /// so a holder's footprint is residents times entries times a constant. What decides
     /// whether twenty phones carry a CAMERA rather than a multiplexer is what the middle
     /// term is bounded by — and a table with one entry per code it has been asked about can

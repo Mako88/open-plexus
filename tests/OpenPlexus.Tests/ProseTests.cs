@@ -173,12 +173,16 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// clause boundary, and one shouted lead came off with them.
     /// </para>
     /// <para>
+    /// And 38, seven more off the list. Of 7, 5 closed at punctuation and 2 at a clause
+    /// boundary.
+    /// </para>
+    /// <para>
     /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
     /// is the tight one — <see cref="Scheduled"/> is what stops it sitting still, and this is
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 45;
+    private const int Shouted = 38;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>

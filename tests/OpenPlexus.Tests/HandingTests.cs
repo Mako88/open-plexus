@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Worlds;
@@ -458,7 +458,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>And a variable put where the ANSWER goes is refuted by every settlement</b>,
+    /// <b>And a variable put where the ANSWER goes</b> is refuted by every settlement,
     /// which is the half of rung four that naming a condition does not buy.
     /// </summary>
     /// <remarks>

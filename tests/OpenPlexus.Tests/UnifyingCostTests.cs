@@ -8,8 +8,8 @@ using Xunit.Abstractions;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// What a scope naming no argument costs to match — <b>fork 33, and the gate the plan put
-/// in front of rung four rather than behind it.</b>
+/// What a scope naming no argument costs to match — <b>fork 33</b>, and the gate the plan
+/// put in front of rung four rather than behind it.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -20,7 +20,7 @@ namespace OpenPlexus.Tests;
 /// makes matching cheap</i> — and an argument is what this file replaces.
 /// </para>
 /// <para>
-/// <b>And the first finding is about the front end rather than the matcher.</b>
+/// <b>And the first finding is about the front end</b> rather than the matcher.
 /// <c>Joined</c> unions the question's words into the story's bag under one modality, so
 /// <i>the word asked about</i> and <i>the word told</i> are the same code and a repeated
 /// variable binds against nothing at all. A variable needs two places to stand in; on
@@ -30,7 +30,7 @@ namespace OpenPlexus.Tests;
 /// is a cost of zero and means nothing.
 /// </para>
 /// <para>
-/// <b>And the argument is refuted by the second reading rather than by the first.</b> The
+/// <b>And the argument is refuted by the second reading</b> rather than by the first. The
 /// per-match cost is small — a variable costs its candidate set, which is the moment
 /// restricted to one modality, and a refusal costs all of it where a binding stops at the
 /// first that fits. What was supposed to be expensive is the INDEX, and the index turns
@@ -56,8 +56,8 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
     private const long Rounds = 4000;
 
     /// <summary>
-    /// The modality the question's words are repeated under — <b>the instrument, and the
-    /// one thing here that is not in the library.</b>
+    /// The modality the question's words are repeated under — <b>the instrument</b>, and the
+    /// one thing here that is not in the library.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -78,7 +78,7 @@ public sealed class UnifyingCostTests(ITestOutputHelper output)
 
     /// <summary>
     /// The modality the newest statement's words are repeated under — <b>the second place a
-    /// variable can stand, and the one that can DISAGREE.</b>
+    /// variable can stand</b>, and the one that can DISAGREE.
     /// </summary>
     /// <remarks>
     /// <b>Because on this task the question always names somebody the story mentions.</b>

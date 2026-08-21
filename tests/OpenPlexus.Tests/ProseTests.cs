@@ -114,12 +114,18 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// them is instant and deciding where each lead ends is the whole of the work.
     /// </para>
     /// <para>
+    /// And 168 is the schedule's five and nothing more, which is the smallest a pass gets. All
+    /// five came out of <see cref="UnifyingCostTests"/>: three closed at a comma the claim was
+    /// already sitting behind, and two at the clause boundary in front of <i>rather than</i>,
+    /// where the cut point is a word rather than a mark. None needed the claim moved.
+    /// </para>
+    /// <para>
     /// Every pass lowers this to what that pass achieved. It is one of two ceilings now and it
     /// is the tight one — <see cref="Scheduled"/> is what stops it sitting still, and this is
     /// what stops the slack that schedule leaves being spent on new bold sentences.
     /// </para>
     /// </remarks>
-    private const int Shouted = 173;
+    private const int Shouted = 168;
 
     /// <summary>
     /// The most bold spans that may open in capitals. <b>A ratchet, and the target is nought.</b>

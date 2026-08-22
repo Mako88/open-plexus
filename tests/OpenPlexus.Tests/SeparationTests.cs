@@ -55,6 +55,13 @@ public sealed class SeparationTests
 
         Assert.Equal(Brain.Followed, Multiplexer.Said);
 
+        // And the entry that pins NOTHING, which is the same problem one rung out. A scope
+        // naming a variable once is satisfied by any moment holding a code of that kind, so
+        // the rule claims exactly what the same rule without it claims -- and a key that
+        // refused the modality would mark every rule rung four ever builds unsound by
+        // construction. `Monk`'s key read nought for the identical fault.
+        Assert.True(Unifying.Names(new Code(Multiplexer.Whatever, 0)));
+
         // AND `Monk`, whose key was written in its own alphabet first and read zero for
         // it. Every rule the enumeration called true expected a code on a modality the
         // population can never hold, so the soundness count was nought on all three

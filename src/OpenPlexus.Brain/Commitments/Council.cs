@@ -330,6 +330,12 @@ internal sealed class Alone : ICouncil
             // would be two things moving.
             if (_held.Dials.Broadening != Broadening.Never) _held.Abstract(heard);
 
+            // The other operator that broadens, and it decides local where the one above
+            // cannot: its gate is a vocabulary the front end derived and its proposals are
+            // read off this holder's own residents, so a fleet needs nothing on the wire for
+            // it. A holder with no vocabulary proposes nothing.
+            _held.Generalise();
+
             _held.Cull();
 
             at = Mark(ref _sweeping, at);

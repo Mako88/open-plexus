@@ -84,37 +84,12 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
     /// about nothing. Counting those as siblings would make the trigger look abundant on
     /// exactly the population where it has least to say.
     /// </param>
-    private static List<int> Siblings(IReadOnlyList<Commitment> all, bool anchored)
-    {
-        var groups = new Dictionary<string, HashSet<Code>>(StringComparer.Ordinal);
-
-        foreach (var one in all)
-        {
-            if (anchored && one.Scope.Length < 2) continue;
-
-            for (var hole = 0; hole < one.Scope.Length; hole++)
-            {
-                // The hole's modality is part of the key and the value is not. A variable
-                // is *whichever code of this kind*, so two commitments differing in a word
-                // are siblings and two differing in a word against a place are not — the
-                // second pair shares no rule with a hole in it, it just happens to have
-                // the same length.
-                var key = string.Join(
-                    ",",
-                    one.Scope.Select((code, at) => at == hole
-                        ? $"?{code.Modality}"
-                        : $"{code.Modality}:{code.Value}"));
-
-                key = $"{one.Expects.Modality}:{one.Expects.Value}|{hole}|{key}";
-
-                if (!groups.TryGetValue(key, out var members)) groups[key] = members = [];
-
-                members.Add(one.Identity);
-            }
-        }
-
-        return [.. groups.Values.Select(one => one.Count).Where(size => size > 1).OrderDescending()];
-    }
+    private static List<int> Siblings(IReadOnlyList<Commitment> all, bool anchored) =>
+    [
+        .. Generalising.Siblings(all, anchored ? 2 : 1)
+            .Select(group => group.Members.Count)
+            .OrderDescending(),
+    ];
 
     /// <summary>What a population offers the operator, printed as one row.</summary>
     /// <param name="what">Which world the population came from.</param>
@@ -225,7 +200,7 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
         // The groups are keyed per population and never across them. Two commitments from
         // two brains are not siblings however alike their scopes look; a hole is a proposal
         // to replace rules that one population actually holds at once.
-        var proposals = new List<(string Key, List<Commitment> Members)>();
+        var proposals = new List<Generalising.Sibling>();
 
         foreach (var seed in Enumerable.Range(1, Populations))
         {
@@ -233,33 +208,17 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
 
             new MultiplexerRun(new MultiplexerSettings { Address = 3 }, brain, seed).Run(Rounds);
 
-            // The groups again, kept this time rather than counted. Same key as `Siblings`,
-            // and anchored for the same reason — a hole with no context beside it is a rule
-            // about nothing and would drag the parent's score down for a reason that is this
-            // file's rather than the operator's.
-            var groups = new Dictionary<string, List<Commitment>>(StringComparer.Ordinal);
-
-            foreach (var one in brain.Held.All.Where(one => one.Scope.Length > 1))
-            {
-                for (var hole = 0; hole < one.Scope.Length; hole++)
-                {
-                    var key = $"{one.Expects.Modality}:{one.Expects.Value}|{hole}|" + string.Join(
-                        ",",
-                        one.Scope.Select((code, at) => at == hole
-                            ? $"?{code.Modality}"
-                            : $"{code.Modality}:{code.Value}"));
-
-                    if (!groups.TryGetValue(key, out var members)) groups[key] = members = [];
-
-                    members.Add(one);
-                }
-            }
-
-            proposals.AddRange(groups
-                .Where(one => one.Value.Count > 1)
-                .OrderByDescending(one => one.Value.Count)
-                .ThenBy(one => one.Key, StringComparer.Ordinal)
-                .Select(one => (one.Key, one.Value)));
+            // The groups again, kept this time rather than counted, and taken from the
+            // operator rather than rebuilt here -- so a change to what it considers a sibling
+            // moves this reading with it instead of leaving the file scoring a shape the
+            // machine stopped proposing. Anchored, because a hole with no context beside it
+            // is a rule about nothing and would drag the parent's score down for a reason
+            // that is this file's rather than the operator's.
+            //
+            // Kept per population and never across. Two commitments from two brains are not
+            // siblings however alike their scopes look; a hole is a proposal to replace rules
+            // that one population actually holds at once.
+            proposals.AddRange(Generalising.Siblings(brain.Held.All));
         }
 
         IWorld<IReadOnlyList<int>> world =
@@ -312,15 +271,14 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
         double parentFires = 0;
         double childFires = 0;
 
-        foreach (var (key, members) in proposals)
+        foreach (var group in proposals)
         {
-            var hole = int.Parse(key.Split('|')[1]);
+            var members = group.Members;
 
-            var scope = members[0].Scope
-                .Select((code, at) => at == hole ? Unifying.Any(code.Modality, 0) : code)
-                .ToImmutableArray();
+            var holed = Generalising.Rule(group);
 
-            var expects = members[0].Expects;
+            var scope = holed.Scope;
+            var expects = holed.Expects;
 
             var fired = 0;
             var right = 0;
@@ -375,7 +333,7 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
             // one* do. A hole over the first pair is a variable and over the second is a
             // coincidence of position, and the two are told apart by a fact about the
             // moments rather than by anything about the rules.
-            var covered = members.Select(child => child.Scope[hole]).Distinct().ToList();
+            var covered = Generalising.Covered(group);
 
             var exclusive = covered.Count > 1
                 && moments.All(one => covered.Count(one.Moment.Contains) <= 1);
@@ -387,9 +345,7 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
             // The same question a machine could answer: every covered value stands in ONE
             // derived category. A code with no coarser form answers no, which is what makes
             // this a lookup rather than a judgement.
-            var sorted = covered.Count > 1
-                && sorts.Coarser(covered[0]) is { } coarser
-                && covered.All(one => sorts.Coarser(one) == coarser);
+            var sorted = Generalising.Admits(group, sorts);
 
             bySort.TryAdd(sorted, (0, 0));
             bySort[sorted] = (bySort[sorted].Scored + 1,

@@ -100,10 +100,26 @@ internal sealed class Commitment
         Scope = [.. scope.Distinct().Order()];
         Expects = expects;
         Identity = Name(Scope, expects);
+
+        // Taken once, because `Fires` is the hottest line in the project and a scope is
+        // immutable. Rung four is the only thing that puts a variable in one, so this is
+        // false for every commitment on every world that has not reached it -- and what it
+        // guards is a matcher that has to CHOOSE what fills an entry rather than ask whether
+        // it is there.
+        foreach (var code in Scope)
+            if (Unifying.Names(code)) { Varies = true; break; }
     }
 
     /// <summary>Codes that must all be present, in <see cref="Code"/> order.</summary>
     public ImmutableArray<Code> Scope { get; }
+
+    /// <summary>Whether any entry names a variable rather than a code.</summary>
+    /// <remarks>
+    /// <b>What decides which matcher answers this scope.</b> <see cref="Fires"/> is a
+    /// membership test per code and cannot answer an entry that has to be FILLED, so a
+    /// population holding one of these routes it to <see cref="Unifying.Fires"/> instead.
+    /// </remarks>
+    public bool Varies { get; }
 
     /// <summary>The code that should follow when <see cref="Scope"/> is satisfied.</summary>
     public Code Expects { get; }
@@ -215,6 +231,12 @@ internal sealed class Commitment
 
     /// <summary>Whether every code in the scope is present.</summary>
     /// <param name="moment">What is live.</param>
+    /// <remarks>
+    /// <b>Only where <see cref="Varies"/> is false.</b> An entry naming a variable is not in
+    /// any moment, so this would answer no to every scope rung four ever built —
+    /// <c>Population.Firing</c> is where the two matchers are told apart, and it is the one
+    /// caller that reaches a varying scope.
+    /// </remarks>
     public bool Fires(IReadOnlySet<Code> moment)
     {
         ArgumentNullException.ThrowIfNull(moment);

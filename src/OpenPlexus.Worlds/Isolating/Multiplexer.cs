@@ -331,6 +331,23 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// </remarks>
     public const byte Place = 102;
 
+    /// <summary>The modality a scope entry naming a VARIABLE lives in.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The world's copy of a number the learner owns</b>, on exactly the footing
+    /// <see cref="Says"/> is on. An answer key has to be written in the same alphabet as the
+    /// population or it marks the subject wrong, and this world's key is the sharpest
+    /// instrument here — so the two must agree, and <c>SeparationTests</c> is where that is
+    /// asserted rather than hoped.
+    /// </para>
+    /// <para>
+    /// <b>It cannot be read off the learner</b>, which is the rule rather than an
+    /// inconvenience. A world references the brain's alphabet and never its mechanisms, and
+    /// the rung that mints these is a mechanism.
+    /// </para>
+    /// </remarks>
+    public const byte Whatever = 209;
+
     private readonly MultiplexerSettings _settings;
     private readonly Random _rng;
     private readonly HashSet<int>? _kept;
@@ -654,6 +671,18 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
             // the same alphabet as the population. Scoring it unsound would mark the
             // experiment's own subject wrong and read like a learner minting rubbish.
             if (code.Modality == Place) continue;
+
+            // And a scope entry naming a VARIABLE, on the same licence and for the same
+            // reason. One such entry says *whichever code of this kind* and appears once, so
+            // it is satisfied by every round that holds a bit at all and the rule claims
+            // exactly what the same rule without it claims. Refusing it would mark every rule
+            // rung four ever builds unsound by construction, which is an answer key in the
+            // wrong alphabet reading as a verdict about the learner.
+            //
+            // A REPEATED name would constrain, being *the same one in both places*, and this
+            // world has no proposer that builds one. The day something does, this line is
+            // wrong and the enumeration owes it a binding.
+            if (code.Modality == Whatever) continue;
 
             if (code.Modality != Bit) return false;
 

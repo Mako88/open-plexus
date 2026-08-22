@@ -397,19 +397,26 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// empty, and it is the deadline.
     /// </para>
     /// <para>
-    /// <b>One today, and the last two groups came off one road.</b>
-    /// `OpenPlexus.Host` runs a holder and composes an asker over peers, so the transport is
-    /// reached by something that ships rather than by a fixture; eighteen of the fleet's
-    /// twenty closed that way. <c>HybridBus</c> and its dial are apparatus rather than
-    /// mechanism and moved to <see cref="DrivenTests"/>'s instrument list, which asserts the
-    /// suite drives them.
+    /// <b>Nought, and this entry is green.</b> Every group came off the same road: a
+    /// deployment composing the mechanism rather than a fixture calling it.
+    /// `OpenPlexus.Host` runs a holder and an asker over peers, which took eighteen of the
+    /// fleet's twenty; <c>HybridBus</c> and its dial are apparatus and moved to
+    /// <see cref="DrivenTests"/>'s instrument list. `OpenPlexus.Talk` composes a
+    /// <c>Sorted</c> over a <c>Deriving</c> and hands the population the same
+    /// <see cref="Codes.Categories"/>, which took the category machinery.
     /// </para>
     /// <para>
-    /// <b>The category machinery closed the same way.</b> `OpenPlexus.Talk` composes a
-    /// <c>Sorted</c> over a <c>Deriving</c> and hands the population the same
-    /// <see cref="Codes.Categories"/>, so a conversation derives its own alternatives while it
-    /// runs rather than being handed a vocabulary. What is left is rung four's matcher, and
-    /// what it waits on is a PROPOSAL rather than a category.
+    /// <b>And rung four's matcher came off by being PROPOSED to.</b>
+    /// <see cref="Commitments.Generalising"/> reads sibling groups off the residents, gates
+    /// them on that vocabulary and adds the rule with a hole in it, so
+    /// <c>Population.Firing</c> reaches the matcher on the ordinary path. What it is WORTH is
+    /// a separate question and <see cref="GeneralisingTests"/> carries it: nothing, on the one
+    /// world that can gate it, because a single hole is the drop <c>Widening</c> refuted.
+    /// </para>
+    /// <para>
+    /// <b>Green is the point rather than a reason to delete it.</b> A mechanism arriving dead
+    /// fails <see cref="DrivenTests"/> the day it lands, and this is the deadline that says
+    /// the set is empty. It goes red again the moment something is built and left unreached.
     /// </para>
     /// <para>
     /// <b>And it says whether a reading can be believed.</b> A

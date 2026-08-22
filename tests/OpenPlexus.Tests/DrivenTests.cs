@@ -94,20 +94,6 @@ public sealed class DrivenTests(ITestOutputHelper output)
         Regex.Replace(
             Regex.Replace(source, @"/\*.*?\*/", " ", RegexOptions.Singleline), @"//.*", " ");
 
-    /// <summary>Why rung four's matcher is reached by nothing.</summary>
-    /// <remarks>
-    /// <b>The category machinery came off in one commit</b>, which is what left this entry on
-    /// its own. `OpenPlexus.Talk` composes a `Sorted` over a `Deriving` and hands the same
-    /// `Categories` to the population, so a conversation derives its own vocabulary of
-    /// alternatives while it runs — four groups on the creatures lesson, and the wider group
-    /// arriving beside the narrower one is add-only doing exactly what it says.
-    /// </remarks>
-    private const string Unproposed =
-        "the matcher is priced and nothing proposes a scope for it to match. "
-        + "`UnifyingYieldTests` says what would: a hole is a variable only where the values it "
-        + "covers are alternatives, which is a category. A deployment now derives those, so "
-        + "what is left is the proposal.";
-
     /// <summary>
     /// Brain mechanisms no run reaches today, each with what closes it.
     /// </summary>
@@ -125,10 +111,7 @@ public sealed class DrivenTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     private static readonly IReadOnlyDictionary<string, string> Waiting =
-        new Dictionary<string, string>(StringComparer.Ordinal)
-        {
-            ["Unifying"] = Unproposed,
-        };
+        new Dictionary<string, string>(StringComparer.Ordinal);
 
     /// <summary>
     /// The apparatus rather than the machine, each with why a test is its right driver.

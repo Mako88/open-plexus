@@ -143,6 +143,8 @@ internal enum Birth
     /// <summary>The same claim said shorter, after a name was minted.</summary>
     Renamed,
 
+    /// <summary>Rung four punched a hole through a group of siblings.</summary>
+    Holed,
 }
 
 /// <summary>How a commitment stopped being held.</summary>
@@ -199,6 +201,8 @@ internal readonly record struct Lifetime
     /// <inheritdoc cref="Birth.Renamed"/>
     public long Reborn { get; init; }
 
+    /// <inheritdoc cref="Birth.Holed"/>
+    public long Holed { get; init; }
 
     /// <inheritdoc cref="Loss.Subsumed"/>
     public long Subsumed { get; init; }
@@ -246,7 +250,7 @@ internal readonly record struct Lifetime
     public long Searched { get; init; }
 
     /// <summary>Everything that ever entered at this shape.</summary>
-    public long Born => Genesis + Repaired + Reborn;
+    public long Born => Genesis + Repaired + Reborn + Holed;
 
     /// <summary>Everything that ever left it.</summary>
     public long Lost => Subsumed + Culled + Rewritten;
@@ -649,6 +653,7 @@ internal sealed class Population
         {
             Birth.Genesis => life with { Genesis = life.Genesis + 1 },
             Birth.Repaired => life with { Repaired = life.Repaired + 1 },
+            Birth.Holed => life with { Holed = life.Holed + 1 },
             _ => life with { Reborn = life.Reborn + 1 },
         };
     }
@@ -734,13 +739,28 @@ internal sealed class Population
         var seen = new HashSet<Code>();
         var firing = ImmutableArray.CreateBuilder<Commitment>();
 
+        // Built the first time a varying scope is reached and never otherwise, so a world that
+        // has not built a rule with a hole in it pays nothing at all for the rung. A variable
+        // needs the moment ARRANGED by modality, which is a walk of it, and paying that on
+        // every round for a mechanism most runs never reach is the shape this repo keeps
+        // finding.
+        Dictionary<byte, List<ulong>>? indexed = null;
+
         foreach (var code in moment.Order())
         {
             if (!_byCode.TryGetValue(code, out var at)) continue;
 
             foreach (var commitment in at)
-                if (seen.Add(commitment.Identity) && commitment.Fires(moment))
-                    firing.Add(commitment);
+            {
+                if (!seen.Add(commitment.Identity)) continue;
+
+                var fired = commitment.Varies
+                    ? Unifying.Fires(
+                        commitment.Scope, moment, indexed ??= Unifying.Index(moment)).Fired
+                    : commitment.Fires(moment);
+
+                if (fired) firing.Add(commitment);
+            }
         }
 
         firing.Sort((left, right) => left.Identity.CompareTo(right.Identity));
@@ -1713,6 +1733,48 @@ internal sealed class Population
         }
 
         return said;
+    }
+
+    /// <summary>
+    /// Adds a rule with a hole in it wherever the vocabulary says its values are alternatives.
+    /// </summary>
+    /// <returns>How many were added.</returns>
+    /// <remarks>
+    /// <para>
+    /// <b>Inert without <see cref="Sorts"/></b>, which is the control and not an omission.
+    /// <see cref="Generalising"/>'s gate is a fact about which codes shared a moment, and a
+    /// population holds no such thing — so a run with no derived vocabulary proposes nothing
+    /// rather than proposing everything, and the arm with the derivation off is a real control
+    /// on the same code path.
+    /// </para>
+    /// <para>
+    /// <b>Add-only, like every other operator here.</b> The parent is a NEW claim rather than a
+    /// rewrite — it fires on moments none of its siblings did — so it carries no record and
+    /// re-earns one, and subsumption decides what survives beside it on the ordinary evidence.
+    /// </para>
+    /// </remarks>
+    public int Generalise()
+    {
+        if (Sorts is null) return 0;
+
+        var added = 0;
+
+        foreach (var holed in Generalising.Propose(All, Sorts))
+        {
+            var parent = new Commitment(holed.Scope, holed.Expects);
+
+            // Already held is the population having got there first, and it is the ordinary
+            // case once a sweep has run twice: the proposals are a pure function of the
+            // residents, so a group that has not changed proposes the same parent again.
+            if (Holds(parent.Identity)) continue;
+
+            Add(parent);
+            Born(parent, Birth.Holed);
+
+            added++;
+        }
+
+        return added;
     }
 
     /// <summary>Drops the least accurate commitments when there are too many.</summary>

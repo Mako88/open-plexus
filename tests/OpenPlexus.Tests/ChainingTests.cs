@@ -31,6 +31,14 @@ namespace OpenPlexus.Tests;
 /// the population holds anything for such a step to walk.
 /// </para>
 /// <para>
+/// <b>And it searches from the answer, which no run knows.</b> A mechanism has the question
+/// and must produce an outcome, so it would walk this backwards from each CANDIDATE answer
+/// and keep the ones it can justify. That is bounded — one word enters per candidate rather
+/// than the whole vocabulary — and it is more work than this reading does. So the chain
+/// existing is what is established here, and the chain being findable without the answer is
+/// what the mechanism owes.
+/// </para>
+/// <para>
 /// <b>Two instrument faults are recorded rather than quietly fixed.</b> The first column
 /// counted scope codes that some other resident EXPECTS, which compares a front-end code
 /// against an outcome code and is false by construction — a check that cannot fire reading

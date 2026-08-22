@@ -32,11 +32,11 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them.
 - **ACTIVE, the twenty-five `DrivenTests` says no run reaches.** The fleet is twenty of them
-  and the brain is what it is part of, so it closes with the two below. The category machinery
-  — `Alternating`, `Deriving`, `Meeting`, `Sorted` — and `Unifying` close later on.
+  and closes with the holder host below. The category machinery — `Alternating`, `Deriving`,
+  `Meeting`, `Sorted` — and `Unifying` close later on.
 - **`OpenPlexus.Brain` as its own project**, learner `internal`, so the boundary is the
-  compiler's rather than a folder's. No part of the brain names a world now, so what is left
-  is the move. `Brain.Held` becoming a reported census is its own arc and shrinks the surface.
+  compiler's rather than a folder's. No brain type names a world now; what is left is the
+  move, twenty-five world crefs that stop compiling, and what `Brain.Held` exposes.
 - **A holder host and a harness that takes peers**, which is the first two-process run and
   what `Ported` has been standing in for. John's end state is this repeated twenty times.
 - **Then a likeness bar that travels**, read against shuffled moments rather than a level,

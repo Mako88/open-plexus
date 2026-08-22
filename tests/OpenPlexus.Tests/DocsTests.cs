@@ -569,7 +569,7 @@ public sealed class DocsTests
     // entry it replaces: that one said the brain names a world, which is a fault; these say
     // what the record becomes, and that a moment may carry several readings of one signal at
     // once rather than a dial choosing between them.
-    private const int Whole = 11_725;
+    private const int Whole = 11_710;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -577,7 +577,11 @@ public sealed class DocsTests
     // unreached mechanisms, the derivation into a deployment and the vocabulary the join wants
     // -- and one trap moved out into the check that now catches it, which is the exit `TRAPS`
     // names for itself. A refutation row came in, so the fall is smaller than the strikes.
-    private const int Whole = 11_615;
+    // And 11,671 is the fifty-sixth raise, fifty-six words, for a refutation row and nothing
+    // else. Deriving a front end's grouping into a code per pair was built, measured on both
+    // worlds that fill the channel and deleted, so what the row buys is a session not building
+    // it again -- which is the whole of what this table is for, and it duplicates no entry.
+    private const int Whole = 11_671;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

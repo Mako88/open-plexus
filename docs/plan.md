@@ -617,6 +617,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 
 | what | what refuted it | what would revive it |
 |---|---|---|
+| Deriving a front end's grouping into a code per pair inside a thing | Composed nothing on CLEVR while flooding repair's candidate set; on text it cost three lesson readings and an architecture entry for no score | A segmented world with a RUNNER whose answer needs the pairing and whose things are small |
 | Proposing a category's claim as a new commitment | It costs population where reading the entailment costs none: a fresh record must fire before anything may judge it, and genesis already mints the coarse claim from the moment | A vocabulary the brain holds that no moment carries, so nothing else mints it |
 | Strength-based fitness for rules | XCS: it deletes low-reward rules that are still CORRECT in their niche | Never. Score a rule by how well it predicts, not by what it earns |
 | MDL alone as a minting gate | On `csharp`'s `Motif` the pure-noise control minted 715 names | Never alone. Pair it with beating chance |

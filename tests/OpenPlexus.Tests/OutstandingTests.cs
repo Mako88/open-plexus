@@ -98,7 +98,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// <remarks>
     /// <para>
     /// <see cref="IQuantizer{TObservation}.Bind"/>, <see cref="IQuantizer{TObservation}.Fleeting"/>
-    /// and <see cref="IQuantizer{TObservation}.Forced"/> are implemented by every front end
+    /// and <see cref="IQuantizer{TObservation}.Forced"/> were implemented by every front end
     /// and read by nothing. The walk's occasion was their only consumer; a commitment's scope
     /// is a SET of codes with nowhere to put a group, a lifetime or an intervention.
     /// </para>
@@ -111,9 +111,8 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// </para>
     /// <para>
     /// <b>Closes either way, and the two are real alternatives.</b> Wire one to something
-    /// that acts on it — rung four's binding is the obvious home for <c>Bind</c> — or delete
-    /// it with the dials that feed it. <c>Order</c> is the one of the four with a reader and
-    /// is what rung three is made of, so it is not counted here.
+    /// that acts on it, or delete it with the dials that feed it. <c>Order</c> is the one of
+    /// the four with a reader and is what rung three is made of, so it is not counted here.
     /// </para>
     /// <para>
     /// <b>And <c>Forced</c> has come off</b>, by the road this entry named. It was unsayable
@@ -140,9 +139,42 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// codes that could not fire again.
     /// </para>
     /// <para>
-    /// <b>Which leaves <c>Bind</c>, and it has a named home.</b> Rung four's binding is where
-    /// it goes, and it waits on that rung rather than on a decision. <c>Composed</c> waits on
-    /// the same thing, so the two entries close together or not at all.
+    /// <b>Which leaves <c>Bind</c>, and the road that looks obvious is refuted.</b> A
+    /// <c>Belonging</c> was built on <see cref="Codes.Sequenced"/>'s seam — a derived code
+    /// for each pair of codes inside one group, so a red ball beside a blue box stops
+    /// producing the moment a blue ball beside a red box produces. That separation is real
+    /// and it bought nothing on either world it reaches.
+    /// </para>
+    /// <para>
+    /// <b>On CLEVR it flooded repair's candidate set and composed nothing.</b> The withheld
+    /// set answered 0.281 and 0.312 against a 0.358 chance bar, so the null result
+    /// <see cref="ClevrTests.Clevr_reaches_the_commitment_learner"/> records was untouched;
+    /// the told arm's repairs went from 3,169 to 12,776 and the per-scene share of the table
+    /// fell from 93% to 18%. Excluding the codes a front end marks fleeting was the one
+    /// adjustment a losing arm gets, and it made that arm worse: 0.184 on the withheld set
+    /// and 17,812 repairs.
+    /// </para>
+    /// <para>
+    /// <b>On the spine world the channel was not filled at all</b>, which is the finding
+    /// worth keeping. <c>Roaming</c> reads through <c>Joined</c> and that front end has no
+    /// <c>Bind</c>, so the derivation was inert there and the run's time did not move.
+    /// Teaching <c>Joined</c> that a statement is the thing a word belongs to did fill it,
+    /// at three <see cref="LessonTests"/> going red, one entry of
+    /// <see cref="ExercisedTests"/> going from reached to unreached, and the population
+    /// rising from 1,102 to 1,258 with no score to pay for it.
+    /// </para>
+    /// <para>
+    /// <b>So what is untested is rung four's matcher</b>, and it is the road this entry named
+    /// first. What was refuted is deriving the grouping into codes, not constraining a
+    /// variable's filling to a group — and the argument against that one is a cost rather
+    /// than a reading: it puts the front end's group report on the wire beside every moment,
+    /// which is what deriving into codes exists to avoid.
+    /// </para>
+    /// <para>
+    /// <b>And <c>Composed</c> does not close with it</b>, which this entry had wrong. Its
+    /// scene is three moments and its answer arrives in the third, so what it wants is
+    /// settlement by successor rather than a reader for a grouping. The two were tied
+    /// together only by the home that turned out to be untested.
     /// </para>
     /// </remarks>
     [Fact]

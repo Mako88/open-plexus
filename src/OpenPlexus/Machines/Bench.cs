@@ -353,6 +353,23 @@ public sealed record Tally
     public required Examined? Unseen { get; init; }
 
     /// <summary>
+    /// What the front end said, or nothing where the input cannot report.
+    /// </summary>
+    /// <remarks>
+    /// <b>The half of the census the learner's own counters cannot carry.</b> Every number
+    /// above is a commitment mechanism saying it ran, so a front end that emitted nothing and
+    /// a front end that was never asked read identically — and the two derivations the join
+    /// makes, rung three's precedences and the intervention codes, are reported by neither
+    /// side.
+    /// </remarks>
+    public Fronted? Fronted { get; init; }
+
+    /// <summary>
+    /// What the chooser did, or nothing where the world cannot be acted in.
+    /// </summary>
+    public Chosen? Chosen { get; init; }
+
+    /// <summary>
     /// The wrong rounds split by cause, or nothing where the world cannot say what is
     /// true.
     /// </summary>
@@ -947,6 +964,8 @@ public sealed class Bench
             Searched = holding.Sum(held => held.Searched),
             Codes = codes / (double)rounds,
             Unseen = Examine(holding),
+            Fronted = (_world as IReports)?.Fronted,
+            Chosen = (_world as IReports)?.Chosen,
             Census = censusing is null
                 ? null
                 : new Census

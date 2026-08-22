@@ -3,6 +3,97 @@ using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Machines;
 
+/// <summary>
+/// What the front end said, in terms every front end shares.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>The seam's own account rather than each quantiser's.</b> Thirteen front ends would be
+/// thirteen places to instrument and thirteen places to forget; what every one of them has in
+/// common is the four channels of <see cref="Codes.IQuantizer{TObservation}"/> and the two
+/// derivations the join makes out of them. So this counts what crossed the seam, and a front
+/// end wanting to report its own internals reports them itself.
+/// </para>
+/// <para>
+/// <b>Pushed moments only.</b> A withheld observation is read through the same front end and
+/// is not a moment the run had, so counting it here would make an examination look like
+/// perception. A chooser's reading of the state it is about to act on is left out for the
+/// same reason: it is the same moment, asked about twice.
+/// </para>
+/// </remarks>
+public sealed record Fronted
+{
+    /// <summary>Moments read.</summary>
+    /// <remarks>
+    /// <b>The denominator the four below want</b>, and it is not <see cref="Tally.Rounds"/>.
+    /// That one is what the bench asked for; this is what the front end was given, and the
+    /// two come apart the moment a source is allowed to be quiet.
+    /// </remarks>
+    public required long Moments { get; init; }
+
+    /// <summary>Codes the quantiser said were present, added up.</summary>
+    /// <remarks>
+    /// <b>Before the join derives anything</b>, which is what separates it from
+    /// <see cref="Tally.Codes"/>. That one is the moment the brain was handed and this is the
+    /// part of it the signal accounts for, so the difference between them is what rung three
+    /// and the intervention codes cost.
+    /// </remarks>
+    public required long Said { get; init; }
+
+    /// <summary>Precedence codes derived from the order the front end reported.</summary>
+    public required long Ordered { get; init; }
+
+    /// <summary>Intervention codes derived from what the front end said was forced.</summary>
+    public required long Doings { get; init; }
+
+    /// <summary>Codes the front end said name this occasion and cannot recur.</summary>
+    public required long Fleeting { get; init; }
+}
+
+/// <summary>
+/// What the chooser did, or nothing where the world cannot be acted in.
+/// </summary>
+/// <remarks>
+/// <b>Nothing rather than zero</b>, on <see cref="Examined"/>'s rule. A world nobody may act
+/// in reporting nought doings reads exactly like a chooser that never found anything to say,
+/// and those are opposite readings.
+/// </remarks>
+public sealed record Chosen
+{
+    /// <summary>Doings said.</summary>
+    public required long Doings { get; init; }
+
+    /// <summary>Moments the chooser had nothing to say, so the world was told so.</summary>
+    public required long Quiet { get; init; }
+
+    /// <summary>
+    /// Moments the chooser spoke more than once — <b>the conversation, as a number.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>One doing a moment was a real ceiling</b>, and the loop that lifted it is reachable
+    /// only where a world keeps listening. A machine that speaks once cannot ask, hear
+    /// <i>no</i>, and ask again, so every reading of whether asking pays was taken under that
+    /// ceiling — and a run reporting nought here is a run that was still under it.
+    /// </remarks>
+    public required long Again { get; init; }
+}
+
+/// <summary>An input that can say what its own front end and chooser did.</summary>
+/// <remarks>
+/// <b>Asked of the input rather than computed by the bench</b>, because the bench sees a
+/// moment and never the channels it was made of. <see cref="IExamines"/> is the same
+/// arrangement one seam along: a question only some inputs can answer arrives as an interface
+/// some of them implement.
+/// </remarks>
+public interface IReports
+{
+    /// <summary>What its front end said.</summary>
+    Fronted Fronted { get; }
+
+    /// <summary>What its chooser did, or nothing where there is no chooser.</summary>
+    Chosen? Chosen { get; }
+}
+
 /// <summary>A pulled world read through a front end, as one sense.</summary>
 /// <typeparam name="TSeen">Whatever the world natively produces.</typeparam>
 /// <remarks>
@@ -20,13 +111,16 @@ namespace OpenPlexus.Machines;
 /// arrive as a second implementation of <see cref="IInput"/> rather than as a second bench.
 /// </para>
 /// </remarks>
-public sealed class Watching<TSeen> : IInput, IExamines
+public sealed class Watching<TSeen> : IInput, IExamines, IReports
 {
     private readonly IWorld<TSeen> _world;
     private readonly IQuantizer<TSeen> _sensing;
     private readonly IChooses? _acting;
 
     private long _sequence;
+
+    private long _said, _ordered, _doings, _fleeting;
+    private long _chosen, _quiet, _again;
 
     /// <param name="world">The problem.</param>
     /// <param name="sensing">The translation between it and the brain.</param>
@@ -112,6 +206,23 @@ public sealed class Watching<TSeen> : IInput, IExamines
             ];
 
     /// <inheritdoc/>
+    public Fronted Fronted =>
+        new()
+        {
+            Moments = _sequence,
+            Said = _said,
+            Ordered = _ordered,
+            Doings = _doings,
+            Fleeting = _fleeting,
+        };
+
+    /// <inheritdoc/>
+    public Chosen? Chosen =>
+        _acting is null
+            ? null
+            : new Chosen { Doings = _chosen, Quiet = _quiet, Again = _again };
+
+    /// <inheritdoc/>
     /// <remarks>
     /// <b>A pulled world always has something</b>, so this never returns nothing. What a
     /// quiet sense looks like is answered by whatever implements this over a real sensor.
@@ -122,16 +233,19 @@ public sealed class Watching<TSeen> : IInput, IExamines
 
         var turn = _world.Next();
 
+        // Read here and forwarded whole, because it is the world's claim about its own codes
+        // rather than a translation of them. `Sensed` derives precedences and intervention
+        // codes and neither is fleeting -- a derived code is as durable as what it was
+        // derived from.
+        var passing = _sensing.Fleeting(turn.Seen);
+
+        _fleeting += passing?.Count ?? 0;
+
         return new Pushed
         {
             From = new Stamp { Source = Source, Sequence = _sequence++ },
-            Codes = new HashSet<Code>(Sensed(turn.Seen)),
-
-            // Read here and forwarded whole, because it is the world's claim about its own
-            // codes rather than a translation of them. `Sensed` derives precedences and
-            // intervention codes and neither is fleeting -- a derived code is as durable as
-            // what it was derived from.
-            Fleeting = _sensing.Fleeting(turn.Seen),
+            Codes = new HashSet<Code>(Sensed(turn.Seen, telling: true)),
+            Fleeting = passing,
             Followed = turn.Outcome is { } outcome ? Brain.Says(outcome) : null,
         };
     }
@@ -184,6 +298,10 @@ public sealed class Watching<TSeen> : IInput, IExamines
 
         if (said == 0) acted.Do(null);
 
+        _chosen += said;
+        _quiet += said == 0 ? 1 : 0;
+        _again += said > 1 ? 1 : 0;
+
         _acting!.Cleared();
     }
 
@@ -192,6 +310,11 @@ public sealed class Watching<TSeen> : IInput, IExamines
     /// reading</b>, plus whatever rung three derives from the order it reported.
     /// </summary>
     /// <param name="seen">What the world showed.</param>
+    /// <param name="telling">
+    /// Whether this reading is the moment being pushed, so the front-end census counts it.
+    /// <b>An examination and a chooser’s look</b> are the same moment asked about again,
+    /// and counting either would make one moment read as several.
+    /// </param>
     /// <remarks>
     /// <para>
     /// <b>Where the moment is formed and not where it is matched</b>, which is a decision
@@ -208,19 +331,26 @@ public sealed class Watching<TSeen> : IInput, IExamines
     /// is no dial: a front end reporting no order gets exactly the codes it always did.
     /// </para>
     /// </remarks>
-    private IReadOnlyCollection<Code> Sensed(TSeen seen)
+    private IReadOnlyCollection<Code> Sensed(TSeen seen, bool telling = false)
     {
         var said = _sensing.Codify(seen);
 
         var order = _sensing.Order(seen) is { Count: > 1 } reported ? reported : null;
         var forced = _sensing.Forced(seen) is { Count: > 0 } assigned ? assigned : null;
 
+        if (telling) _said += said.Count;
+
         if (order is null && forced is null) return said;
 
         var carried = new HashSet<Code>(said);
 
         if (order is not null)
-            foreach (var precedence in Sequenced.From(order)) carried.Add(precedence);
+            foreach (var precedence in Sequenced.From(order))
+            {
+                carried.Add(precedence);
+
+                if (telling) _ordered++;
+            }
 
         // And what was DONE rather than seen, on the same seam and for the same reason. The
         // channel has reported it since the day it was written and nothing read it, so a
@@ -228,7 +358,12 @@ public sealed class Watching<TSeen> : IInput, IExamines
         // the same scope with their evidence added together -- which is `P(y | x)` standing
         // in for `P(y | do(x))`, and no amount of counting the first yields the second.
         if (forced is not null)
-            foreach (var doing in Intervened.From(forced)) carried.Add(doing);
+            foreach (var doing in Intervened.From(forced))
+            {
+                carried.Add(doing);
+
+                if (telling) _doings++;
+            }
 
         return carried;
     }

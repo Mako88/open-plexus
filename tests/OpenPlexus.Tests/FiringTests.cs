@@ -26,10 +26,11 @@ namespace OpenPlexus.Tests;
 /// is the run's own account of itself.
 /// </para>
 /// <para>
-/// <b>And what the brain does not report is not asked about.</b> <see cref="Tally"/> is the
-/// whole of the census today, so the learner's operators are covered and the front ends and
-/// the choosers are not. Widening the report is what widens this, and a mechanism that wants
-/// to be believed can start by counting itself.
+/// <b>And what the brain does not report is not asked about.</b> <see cref="Tally"/> was the
+/// whole of the census while it held the learner's operators alone, so a front end that
+/// emitted nothing and a front end nobody asked read identically. <see cref="Fronted"/> and
+/// <see cref="Chosen"/> are the other two, and a mechanism that wants to be believed can
+/// start by counting itself.
 /// </para>
 /// <para>
 /// <b>Reflected rather than listed</b>, which is the property that makes it a guard. A
@@ -40,7 +41,7 @@ namespace OpenPlexus.Tests;
 /// <para>
 /// <b>And the runs are generated worlds</b>, because the question is about the brain rather
 /// than about a corpus. Six of them rather than one: sixteen counters are quiet on the
-/// multiplexer alone and eight survive all six, so a single world would have called eight
+/// multiplexer alone and thirteen survive all six, so a single world would have called eight
 /// mechanisms dead that were not. Widening the set further is what turns <i>quiet here</i>
 /// into <i>quiet everywhere</i>, and every entry below is only as strong as the set.
 /// </para>
@@ -118,6 +119,34 @@ public sealed class FiringTests(ITestOutputHelper output)
             ["AtIndependent"] =
                 "a naming gate refusal, the members firing independently of one another. "
                 + "`AtUncertain` and `AtRare` are what refuse here.",
+
+            ["Chosen.Quiet"] =
+                "the chooser had nothing to say about a moment, so the world was told so. The "
+                + "one acted world here draws a doing every round, which is what an arm that "
+                + "always speaks reports.",
+
+            ["Chosen.Again"] =
+                "the chooser spoke twice about one moment. `IActed.Listening` is false on "
+                + "every world but `Conversing`, so the loop that lifted the one-doing ceiling "
+                + "is reachable on the spine world alone and every reading of whether asking "
+                + "pays was taken under that ceiling.",
+
+            ["Fronted.Ordered"] =
+                "rung three's precedences, derived where the moment is formed. Nothing in "
+                + "`Worlds/` sets `Coded.Sequence` and `Joined` reads an order off `Recited` "
+                + "alone, so the only producer on the branch is a corpus and no generated "
+                + "world reaches the rung at all.",
+
+            ["Fronted.Doings"] =
+                "an intervention code, derived from what the front end said was forced. "
+                + "`Coded.Assigned` is set by `Conversing` and by `Roaming` and by nothing "
+                + "else, so the spine worlds move it. The homeostat is acted in and says the "
+                + "doing as an ordinary code out of `Bodied`, which is not this channel.",
+
+            ["Fronted.Fleeting"] =
+                "a code the front end says names this occasion and cannot recur. `Clevr` and "
+                + "`Binding` set `Coded.Passing` and no other world does, so one generated "
+                + "world would move it and neither is driven by a bench.",
 
             ["AtUnpaired"] =
                 "a naming gate refusal, no pair to name at all. `Stackable` moves, so eligible "

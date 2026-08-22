@@ -35,8 +35,13 @@ namespace OpenPlexus.Tests;
 /// satisfied by any moment holding a code of that kind, so a rule with one is the same rule
 /// with that condition removed — which is <c>Widening</c>, already refuted in three shapes.
 /// What makes rung four a rung is a hole that REPEATS: <i>whichever word was asked about, and
-/// that same word was told</i>. Anti-unification over sibling groups cannot propose one,
-/// because siblings differ in exactly one position by construction.
+/// that same word was told</i>.
+/// </para>
+/// <para>
+/// <b>So the second reading follows the repeated hole</b>, link by link, on the world where
+/// it means something. It wants a front end keeping the halves apart, a scope that
+/// came to say one value twice, a sibling group over that shape, and a gate that admits it.
+/// Each link is counted, so the reading names the empty one rather than reporting a nought.
 /// </para>
 /// </remarks>
 public sealed class GeneralisingTests(ITestOutputHelper output)
@@ -163,5 +168,147 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
             + $"{arms[false].Average(one => one.Recent):F3}, so the rung pays here and the "
             + "account above -- that one hole is the drop `Widening` already refuted -- is "
             + "what needs re-reading");
+    }
+
+    /// <summary>What one arm of the join reading left behind.</summary>
+    /// <param name="Recent">The trailing accuracy.</param>
+    /// <param name="Held">How many commitments are resident.</param>
+    /// <param name="Twice">How many of them say one value under two modalities.</param>
+    /// <param name="Groups">How many sibling groups the residents offer.</param>
+    /// <param name="Repeated">How many of those groups would give a hole that repeats.</param>
+    /// <param name="Admitted">How many groups the vocabulary admits.</param>
+    /// <param name="Joined">How many of the admitted ones repeat.</param>
+    /// <param name="Resident">How many residents name a variable in two places.</param>
+    /// <param name="Fired">How often those residents fired and were answered.</param>
+    /// <param name="Sorts">How many categories were derived.</param>
+    private readonly record struct Chained(
+        double Recent, int Held, int Twice, int Groups, int Repeated, int Admitted,
+        int Joined, int Resident, long Fired, int Sorts);
+
+    /// <summary>One arm of the join reading.</summary>
+    /// <param name="joining">How the question and the story are read.</param>
+    private static Chained Join(Joining joining)
+    {
+        var brain = new Brain(new CommittingSettings { Capacity = 2000 }, seed: 1);
+
+        // The newest statement alone, because the join has to be able to FAIL. On this task
+        // the question always names somebody the whole story mentions, so over the whole story
+        // *the word asked about was told* is true of every question ever asked -- which reads
+        // as a variable binding for free and is only the story being wide.
+        var world = new Recalled(new RecalledSettings
+        {
+            Corpus = Tree.Babi(), Task = 1, Span = 1, Withheld = 40,
+            Predicting = Predicting.Asked,
+        });
+
+        var sorts = new Categories([]);
+
+        var front = new Deriving<Coded>(
+            new Joined(joining), sorts, Counting.Company, Meeting.Rarely,
+            floor: 20, every: 2000);
+
+        brain.Held.Sorts = sorts;
+
+        var tally = new Bench(new Watching<Coded>(world, front), brain)
+            .Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
+
+        var all = brain.Held.All;
+
+        var groups = Generalising.Siblings(all);
+        var admitted = groups.Where(one => Generalising.Admits(one, sorts)).ToList();
+
+        var joins = all.Where(one => one.Scope.Count(Unifying.Names) > 1).ToList();
+
+        return new Chained(
+            tally.Recent,
+            all.Count,
+            all.Count(one => one.Scope.GroupBy(code => code.Value).Any(group => group.Count() > 1)),
+            groups.Count,
+            groups.Count(one => one.Holes.Count > 1),
+            admitted.Count,
+            admitted.Count(one => one.Holes.Count > 1),
+            joins.Count,
+            joins.Sum(one => one.Fired),
+            sorts.Count);
+    }
+
+    /// <summary>
+    /// How far the join gets on the world it was designed for, link by link.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><see cref="Joining.Parted"/> is what the whole chain rests on.</b> Every other arm
+    /// unions the question's words into the story's bag, so a moment holds each word once and
+    /// no scope can ever say one value twice — the first link is nought by construction and
+    /// nothing after it can be read. This arm says a question word in its own modality, which
+    /// is the two places a variable can stand in.
+    /// </para>
+    /// <para>
+    /// <b>It reaches the proposal and stops at the gate.</b> The parted arm holds 74 scopes
+    /// saying one value twice and offers ten sibling groups over that shape, and the
+    /// vocabulary admits none of them: the four categories it derives do not cover the values
+    /// the hole would stand for. Whether the gate is even the right one here is open — it was
+    /// measured on single holes, where a hole is a DROP and the covered values being
+    /// alternatives is what says the drop is safe. A repeated hole constrains rather than
+    /// drops, so what it needs admitting on is a different question that owes its own reading.
+    /// </para>
+    /// <para>
+    /// <b>And the first version of this reading was not reproducible</b>, which is worth
+    /// keeping here because it looked exactly like a chaotic learner. Two runs of one seed
+    /// gave 98 admitted proposals and 114, and the number that mattered went 4 and 0 — the
+    /// shuffle drew its null from <c>HashCode.Combine</c>, which the runtime seeds per
+    /// process. <see cref="DeterminismTests.No_code_in_the_library_derives_a_value_from_a_randomised_hash"/>
+    /// is what stops it happening again.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void How_far_a_hole_that_repeats_gets_on_the_world_it_was_designed_for()
+    {
+        var read = new Dictionary<Joining, Chained>();
+
+        foreach (var joining in new[] { Joining.Bagged, Joining.Parted })
+        {
+            read[joining] = Join(joining);
+
+            var one = read[joining];
+
+            output.WriteLine(
+                $"{joining,-7}| recent {one.Recent:F3} | held {one.Held,4} "
+                + $"| saying a value twice {one.Twice,4} | sibling groups {one.Groups,5} "
+                + $"| repeated {one.Repeated,4} | admitted {one.Admitted,4} "
+                + $"| joined {one.Joined,3} | resident joins {one.Resident,3} "
+                + $"| fired {one.Fired,5} | categories {one.Sorts,2}");
+        }
+
+        // The front end's own contribution, and it is the link nothing else could supply. A
+        // bag holds each word once however often it was said, so a scope over one cannot name
+        // a value twice at all -- that is not a small number, it is nought by construction.
+        Assert.Equal(0, read[Joining.Bagged].Twice);
+
+        Assert.True(read[Joining.Parted].Twice > 0,
+            "keeping the halves apart produced no scope saying one value twice, so the front "
+            + "end is not supplying the two places a variable stands in and every link after "
+            + "this one is unreadable");
+
+        // And the proposer reaches the shape, which is the link that says anti-unification
+        // over a VALUE rather than a position was the right generalisation.
+        Assert.True(read[Joining.Parted].Repeated > 0,
+            "no sibling group would give a hole that repeats, so the residents hold the shape "
+            + "and the proposer does not reach it");
+
+        Assert.Equal(0, read[Joining.Bagged].Repeated);
+
+        // And the gate is where it stops, held down so the day it moves is visible. The
+        // vocabulary derives four categories over this stream and none of them covers the
+        // values a join would stand for, so ten proposals of the right shape are refused --
+        // which is an open question about the GATE rather than a fault in any link above it.
+        // It was measured on holes that DROP, where the covered values being alternatives is
+        // what says the drop is safe; a repeated hole constrains instead, and what it should
+        // be admitted on owes its own reading.
+        Assert.Equal(0, read[Joining.Parted].Joined);
+        Assert.Equal(0, read[Joining.Bagged].Joined);
+
+        Assert.Equal(0, read[Joining.Parted].Resident);
+        Assert.Equal(0, read[Joining.Parted].Fired);
     }
 }

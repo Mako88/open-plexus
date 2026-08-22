@@ -202,6 +202,35 @@ public enum Joining
     /// </para>
     /// </remarks>
     Resolved,
+
+    /// <summary>
+    /// The bag, with the question's words said in their OWN modality — <b>the two places a
+    /// variable can stand in</b>, and the front end's whole contribution to rung four.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The halves are kept apart rather than marked.</b> Every other arm unions the
+    /// question's words into the story's bag, so <i>the word asked about was told</i> is true
+    /// of every question ever asked and a repeated variable binds against nothing. Here a
+    /// question word is <see cref="Joined.Wondered"/> and a told word is
+    /// <see cref="Joined.Both"/>, carrying the same VALUE — so a scope naming both says
+    /// <i>this word, asked and told</i>, and the two can disagree.
+    /// </para>
+    /// <para>
+    /// <b>And it says nothing about the coincidence</b>, which is what tells it apart from
+    /// <c>Named</c>, <c>Anonymous</c> and <c>Either</c>. Those emitted a code meaning <i>this
+    /// word is in both halves</i>, and the plan's table refuted all three: what blocks rung
+    /// four is admission rather than cost, so handing the answer over cheaply was not the
+    /// missing piece. This hands over nothing and lets the ladder find the join.
+    /// </para>
+    /// <para>
+    /// <b>What it costs is every rule written over a question word.</b> The bag no longer
+    /// holds one, so a rule that named <i>mary</i> and meant <i>mary was asked about</i> now
+    /// names a code no moment carries. That is the comparison rather than a fault, and
+    /// <c>Bagged</c> is the control it is read against.
+    /// </para>
+    /// </remarks>
+    Parted,
 }
 
 /// <summary>
@@ -260,6 +289,31 @@ public sealed class Joined : IQuantizer<Coded>
     /// </para>
     /// </remarks>
     public const byte Grouped = 43;
+
+    /// <summary>The modality the question's own words are said in.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>What <see cref="Joining.Parted"/> is for</b>, and the front end's whole contribution
+    /// to rung four. A variable needs two places that can DISAGREE, and every other arm here
+    /// unions the question's words into the story's bag — so <i>the word asked about was
+    /// told</i> is true of every question ever asked and a repeated entry binds against
+    /// nothing. <c>UnifyingCostTests</c> measured that as 400 bindings of 400 at one candidate
+    /// tried, which reads as unification being free and is only the union being tautological.
+    /// </para>
+    /// <para>
+    /// <b>The same value under another modality and never another value.</b> That is what
+    /// makes the two halves comparable: a scope holding both entries says <i>this word, asked
+    /// and told</i>, and <see cref="Commitments.Generalising"/> reaches the join by blanking
+    /// the two together.
+    /// </para>
+    /// <para>
+    /// <b>And it is a front end saying what it is looking at.</b> Which words were the question
+    /// is what the world already handed over, and this repeats it rather than concluding
+    /// anything from it. What is forbidden is the front end marking that the two COINCIDE,
+    /// which three arms did and the plan's table refuted.
+    /// </para>
+    /// </remarks>
+    public const byte Wondered = 44;
 
     private readonly Joining _joining;
     private readonly Categories _categories;
@@ -334,7 +388,14 @@ public sealed class Joined : IQuantizer<Coded>
     private IReadOnlyCollection<Code> Codify(Storied observation)
     {
         var read = Read(observation);
-        var said = new HashSet<Code>(observation.Question);
+
+        // The question's words in their own modality where the arm keeps the halves apart,
+        // and in the story's bag everywhere else. Both and never either: a word left in the
+        // bag as well would make *asked and told* true of every question, which is the
+        // tautology the cost reading was taken on and had to be retaken without.
+        var said = _joining == Joining.Parted
+            ? new HashSet<Code>(observation.Question.Select(one => new Code(Wondered, one.Value)))
+            : new HashSet<Code>(observation.Question);
 
         foreach (var at in read.Count == 0 ? Every(observation) : read)
             said.UnionWith(observation.Story[at]);

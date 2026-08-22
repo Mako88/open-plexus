@@ -51,9 +51,15 @@ internal static class Generalising
     public readonly record struct Holed(ImmutableArray<Code> Scope, Code Expects, int Covers);
 
     /// <summary>Commitments one variable would cover, and where the variable goes.</summary>
-    /// <param name="Hole">Which position of the shared scope varies.</param>
+    /// <param name="Holes">
+    /// Which positions of the shared scope the one variable stands in, in order. <b>More than
+    /// one where a value is said twice</b>, which is the hole that REPEATS — <i>whichever word
+    /// was asked about, and that same word was told</i>. One entry naming a variable
+    /// constrains nothing; it is the repetition that says something.
+    /// </param>
     /// <param name="Members">The commitments, which agree everywhere else.</param>
-    public readonly record struct Sibling(int Hole, IReadOnlyList<Commitment> Members);
+    public readonly record struct Sibling(
+        IReadOnlyList<int> Holes, IReadOnlyList<Commitment> Members);
 
     /// <summary>Every group of commitments one variable would cover.</summary>
     /// <param name="all">The residents to read.</param>
@@ -64,11 +70,26 @@ internal static class Generalising
     /// nothing. One is here so an instrument can show what the bar refuses.
     /// </param>
     /// <remarks>
-    /// Keyed on the scope with one position blanked to its modality, which IS the hole. Two
+    /// <para>
+    /// Keyed on the scope with the hole's positions blanked to their modalities. Two
     /// commitments land in one group exactly when one variable would cover both — and the
     /// VALUE is left out of the key while the modality stays in, because a variable is
     /// <i>whichever code of this kind</i>. Two rules differing in a word against a place share
     /// no rule with a hole in it; they happen to have the same length.
+    /// </para>
+    /// <para>
+    /// <b>Grouped by the VALUE a position carries rather than by the position.</b> Which is
+    /// what reaches the shape rung four exists for. A scope holding one value under two
+    /// modalities is one word said twice — asked about, and told — and blanking both leaves a
+    /// variable standing in two places that can DISAGREE. Blanking one leaves a rule that any
+    /// moment holding a code of that kind satisfies, which is the same rule with that
+    /// condition dropped.
+    /// </para>
+    /// <para>
+    /// <b>Something constant always stays.</b> A scope with every position blanked is reached
+    /// by no code in any moment, so <c>Population.Firing</c> would never look at it — an
+    /// all-variable scope wants a scan list, and what one costs is unpriced.
+    /// </para>
     /// </remarks>
     public static IReadOnlyList<Sibling> Siblings(
         IReadOnlyList<Commitment> all, int shortest = 2)
@@ -76,24 +97,38 @@ internal static class Generalising
         ArgumentNullException.ThrowIfNull(all);
 
         var groups = new Dictionary<string, List<Commitment>>(StringComparer.Ordinal);
-        var holes = new Dictionary<string, int>(StringComparer.Ordinal);
+        var holes = new Dictionary<string, IReadOnlyList<int>>(StringComparer.Ordinal);
 
         foreach (var one in all)
         {
             if (one.Scope.Length < shortest) continue;
 
-            for (var hole = 0; hole < one.Scope.Length; hole++)
+            var byValue = new Dictionary<ulong, List<int>>();
+
+            for (var at = 0; at < one.Scope.Length; at++)
             {
-                var key = $"{one.Expects.Modality}:{one.Expects.Value}|{hole}|" + string.Join(
-                    ",",
-                    one.Scope.Select((code, at) => at == hole
-                        ? $"?{code.Modality}"
-                        : $"{code.Modality}:{code.Value}"));
+                if (!byValue.TryGetValue(one.Scope[at].Value, out var positions))
+                    byValue[one.Scope[at].Value] = positions = [];
+
+                positions.Add(at);
+            }
+
+            foreach (var (_, positions) in byValue)
+            {
+                if (positions.Count == one.Scope.Length) continue;
+
+                var key = $"{one.Expects.Modality}:{one.Expects.Value}|"
+                    + $"{string.Join(".", positions)}|"
+                    + string.Join(
+                        ",",
+                        one.Scope.Select((code, at) => positions.Contains(at)
+                            ? $"?{code.Modality}"
+                            : $"{code.Modality}:{code.Value}"));
 
                 if (!groups.TryGetValue(key, out var members))
                 {
                     groups[key] = members = [];
-                    holes[key] = hole;
+                    holes[key] = positions;
                 }
 
                 members.Add(one);
@@ -111,8 +146,13 @@ internal static class Generalising
 
     /// <summary>The values one variable would have to stand for.</summary>
     /// <param name="group">The siblings.</param>
+    /// <remarks>
+    /// <b>Read at the FIRST position the hole stands in</b>, the others carrying the same value
+    /// under a different modality by construction. A repeated hole is one word said twice, so
+    /// asking about the second position would be asking the same question of another spelling.
+    /// </remarks>
     public static IReadOnlyList<Code> Covered(Sibling group) =>
-        [.. group.Members.Select(one => one.Scope[group.Hole]).Distinct()];
+        [.. group.Members.Select(one => one.Scope[group.Holes[0]]).Distinct()];
 
     /// <summary>Whether the vocabulary says those values are alternatives.</summary>
     /// <param name="group">The siblings.</param>
@@ -139,8 +179,11 @@ internal static class Generalising
     {
         var first = group.Members[0];
 
+        // One NAME for every position, which is the whole of what makes this a join. Two
+        // entries carrying the same name have to be filled by the same value, so a scope
+        // holding two says *whichever code of this kind, and that same one over there*.
         return new Holed(
-            [.. first.Scope.Select((code, at) => at == group.Hole
+            [.. first.Scope.Select((code, at) => group.Holes.Contains(at)
                 ? Unifying.Any(code.Modality, 0)
                 : code)],
             first.Expects,

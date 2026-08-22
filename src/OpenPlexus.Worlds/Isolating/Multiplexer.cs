@@ -346,7 +346,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// the rung that mints these is a mechanism.
     /// </para>
     /// </remarks>
-    public const byte Whatever = 209;
+    public const byte Whatever = 212;
 
     private readonly MultiplexerSettings _settings;
     private readonly Random _rng;

@@ -48,7 +48,7 @@ internal static class Unifying
     /// never be confused for one: a moment holding a pattern would make a scope match
     /// itself, and a front end that could emit one would be writing the learner's rules.
     /// </remarks>
-    public const byte Whatever = 209;
+    public const byte Whatever = 212;
 
     /// <summary>
     /// The entry meaning <i>whichever code of this modality, called <paramref name="name"/>.</i>

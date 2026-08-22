@@ -73,6 +73,71 @@ public sealed class SeparationTests
         Assert.Equal(Brain.Followed, Monk.Answered);
     }
 
+    /// <summary>
+    /// <b>No two of the brain's own alphabets share a number.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A modality says which alphabet a code belongs to, and every code the brain derives goes
+    /// into the same moment as every other. Two of them on one number is two ideas sharing a
+    /// spelling, which this repo has already been bitten by twice — <c>Choosing</c> read as
+    /// measured on two worlds, and a modality constant called <c>Sorted</c> making a front-end
+    /// class of that name read as reached.
+    /// </para>
+    /// <para>
+    /// <b>What it cost the third time was an out-of-memory</b>, and it sat latent for as long
+    /// as the mechanism did. <c>Intervened.Did</c> and <c>Unifying.Whatever</c> were both 209,
+    /// so the day a run first reached the unifying matcher every acted-in moment's doing code
+    /// read as a variable and its hash read as the variable's NAME — which asks for an array
+    /// of four billion entries. Nothing could have found it earlier, because a mechanism no
+    /// run reaches cannot collide with anything.
+    /// </para>
+    /// <para>
+    /// <b>A world reusing another world's number is fine</b> and is why this asks only about
+    /// the brain. Two worlds never share a moment. What a world may not do is take one of
+    /// these, and where it deliberately copies one the agreement is asserted above.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_two_of_the_brains_alphabets_share_a_modality()
+    {
+        var taken = new Dictionary<byte, List<string>>();
+
+        foreach (var path in Tree.Sources("src")
+            .Where(one => one.Contains("OpenPlexus.Brain", StringComparison.Ordinal)))
+            foreach (Match hit in Regex.Matches(
+                File.ReadAllText(path),
+                @"public const byte ([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([0-9]+)\s*;"))
+            {
+                // A source ordinal is not a modality, and the one that says so says so in the
+                // remark beside it. Naming it here rather than widening the pattern, because a
+                // pattern loose enough to skip it would skip a real one the day somebody
+                // writes a second.
+                if (hit.Groups[1].Value == "First") continue;
+
+                var number = byte.Parse(
+                    hit.Groups[2].Value, System.Globalization.CultureInfo.InvariantCulture);
+
+                if (!taken.TryGetValue(number, out var names)) taken[number] = names = [];
+
+                names.Add($"{Path.GetFileNameWithoutExtension(path)}.{hit.Groups[1].Value}");
+            }
+
+        var shared = taken
+            .Where(one => one.Value.Count > 1)
+            .OrderBy(one => one.Key)
+            .Select(one => $"{one.Key} is {string.Join(" and ", one.Value)}")
+            .ToList();
+
+        Assert.NotEmpty(taken);
+
+        Assert.True(shared.Count == 0,
+            $"{shared.Count} modality number(s) mean two things: {string.Join("; ", shared)}. "
+            + "Every code the brain derives shares one moment with every other, so a number "
+            + "meaning two things makes one alphabet unreadable as the other -- and nothing "
+            + "says which until a run reaches both.");
+    }
+
     [Fact]
     public void One_brain_can_be_handed_two_different_worlds()
     {

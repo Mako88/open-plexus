@@ -463,8 +463,20 @@ public sealed class Alternating
             {
                 // A generator per code and per draw, so the table is the same whatever order
                 // the alphabet is walked in and whatever else was drawn first.
-                var random = new Random(
-                    HashCode.Combine(Salt, one.Modality, one.Value, draw));
+                //
+                // `Hashing` and never `HashCode.Combine`, which is seeded once per PROCESS.
+                // The first version used it and two runs of one seed derived different
+                // categories -- so the vocabulary was not a function of the stream, and two
+                // machines watching the same moments would have disagreed about what a
+                // category IS. That is the rule `Naming.Name` and `Joined.Category` already
+                // stand on, arriving here by the door it always uses.
+                var random = new Random((int)(Hashing.Mix(
+                    Hashing.Fold(
+                        Hashing.Fold(
+                            Hashing.Fold(Hashing.Fold(Hashing.Basis, Salt), one.Modality),
+                            one.Value),
+                        (ulong)draw))
+                    & 0x7FFFFFFF));
 
                 var company = new Dictionary<Code, int>();
 

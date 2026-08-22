@@ -1,4 +1,5 @@
-﻿using OpenPlexus.Commitments;
+﻿using System.Text.RegularExpressions;
+using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 
@@ -76,5 +77,60 @@ public sealed class DeterminismTests
         Assert.NotEqual(tally, tally with { Rounds = tally.Rounds + 1 });
         Assert.NotEqual(tally, tally with { Right = tally.Right + 1 });
         Assert.NotEqual(tally, tally with { Separations = tally.Separations + 1 });
+    }
+
+    /// <summary>
+    /// <b>Nothing derives a number from a hash the runtime randomises.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <see cref="HashCode"/> and <see cref="object.GetHashCode"/> are seeded once per PROCESS,
+    /// so anything built on them is reproducible within one run and arbitrary across two. Five
+    /// XML comments in <c>src</c> say so and none of them was a check — and a documented
+    /// promise is not a check, which is this repo's own line about its own faults.
+    /// </para>
+    /// <para>
+    /// <b>What it cost was a reading nobody could repeat.</b> <c>Alternating.Shuffled</c> drew
+    /// its null from <c>HashCode.Combine</c>, so the categories a stream derives were a
+    /// function of the process. Two runs of one seed gave 98 admitted proposals and 114, and
+    /// the number that mattered went 4 and 0 — which reads as a run being chaotic and was the
+    /// codebook moving underneath it.
+    /// </para>
+    /// <para>
+    /// <b>Declaring one is fine and CALLING one is not.</b> An override exists so a type can
+    /// go in a dictionary for the length of a process, which is what a hash is for. What is
+    /// refused is a value derived from one outliving the process that made it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_code_in_the_library_derives_a_value_from_a_randomised_hash()
+    {
+        var called = new SortedSet<string>(StringComparer.Ordinal);
+
+        foreach (var path in Tree.Sources("src"))
+        {
+            var source = File.ReadAllText(path);
+            var relative = Path.GetRelativePath(Tree.Repo(), path);
+
+            var lines = source.Split('\n');
+
+            for (var at = 0; at < lines.Length; at++)
+            {
+                // Comments say the rule constantly and must not trip it, which is why this
+                // reads the code rather than the file. The rule is written down in five
+                // remarks that all name the thing they refuse.
+                var line = lines[at].Split("//")[0];
+
+                if (line.Contains("HashCode.Combine", StringComparison.Ordinal)
+                    || Regex.IsMatch(line, @"\.GetHashCode\s*\("))
+                    called.Add($"{relative}:{at + 1}");
+            }
+        }
+
+        Assert.True(called.Count == 0,
+            $"{called.Count} place(s) derive a value from a hash the runtime randomises per "
+            + $"process: {string.Join(", ", called)}. Use `Hashing`, whose fold and mix are "
+            + "this repo's own and identical on every machine forever. An override of "
+            + "`GetHashCode` is not this -- what is refused is CALLING one.");
     }
 }

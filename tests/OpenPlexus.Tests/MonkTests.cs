@@ -654,13 +654,20 @@ public sealed class MonkTests(ITestOutputHelper output)
     /// <param name="puzzle">Which of the three.</param>
     /// <param name="spelling">How an attribute and its value are said.</param>
     /// <param name="seed">The world's generator and the brain's.</param>
+    /// <param name="deriving">
+    /// Whether the front end fills a vocabulary the gate can read. <b>The rung's own
+    /// control</b>, since <c>Population.Generalise</c> proposes nothing without one, so the
+    /// same spelling on the same codes runs with rung four on and off and what parts the two
+    /// is the rung alone.
+    /// </param>
     /// <remarks>
     /// <b>Its own bench rather than <see cref="MonkRun"/></b>, because the gate needs a
     /// vocabulary and the ordinary runner has none. <c>Population.Generalise</c> is inert
     /// without one, so a reading taken through the shipped runner would report nought holed
     /// rules under both spellings and say nothing whatever about the spelling.
     /// </remarks>
-    private static Spelt Spell(Puzzle puzzle, Spelling spelling, int seed)
+    private static Spelt Spell(
+        Puzzle puzzle, Spelling spelling, int seed, bool deriving = true)
     {
         var settings = new MonkSettings
         {
@@ -679,10 +686,15 @@ public sealed class MonkTests(ITestOutputHelper output)
         // Never, because two values of one attribute cannot both hold -- which is the
         // exclusivity the gate is asking about, and it is true of this world by construction
         // under either spelling.
-        var front = new Deriving<IReadOnlyList<int>>(
-            inner, sorts, Counting.Company, Meeting.Never, floor: 20, every: 1000);
+        IQuantizer<IReadOnlyList<int>> front = inner;
 
-        brain.Held.Sorts = sorts;
+        if (deriving)
+        {
+            front = new Deriving<IReadOnlyList<int>>(
+                inner, sorts, Counting.Company, Meeting.Never, floor: 20, every: 1000);
+
+            brain.Held.Sorts = sorts;
+        }
 
         var tally = new Bench(new Watching<IReadOnlyList<int>>(world, front), brain)
             .Run(20_000, sweep: 1000, target: 0.9, window: 2000);
@@ -800,61 +812,45 @@ public sealed class MonkTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>Whether a variable reaches the concept once the attribute leaves the value</b> —
+    /// <b>Whether rung four is worth anything</b> where the concept is a variable twice —
     /// fork 133, on the bench whose baselines are published.
     /// </summary>
     /// <remarks>
     /// <para>
     /// Monk-1 is <c>head = body</c> or <c>jacket is red</c>, and the first disjunct is a
-    /// variable standing in two places — rung four's own shape. Whether it is SAYABLE is a
-    /// fact about the front end rather than about the learner:
-    /// <see cref="Spelling.Fused"/> packs the attribute into the value, so head-round and
-    /// body-round are two different values and no name joins them;
-    /// <see cref="Spelling.Split"/> puts the attribute in the modality and leaves them one
-    /// value under two.
+    /// variable standing in two places. <see cref="Spelling.Fused"/> packs the attribute into
+    /// the value, so head-round and body-round are two different values and no name joins
+    /// them; <see cref="Spelling.Split"/> puts the attribute in the modality and leaves them
+    /// one value under two.
     /// </para>
     /// <para>
-    /// <b>What would drop this arm</b>: a split spelling scoring no higher on the 132 held
-    /// back. A rise in resident count or in holed rules is not the reading —
+    /// <b>Three arms, because two of them move two things at once.</b> The fused and split
+    /// rows differ in every code name, so placement, ordering and every tie-break move with
+    /// them — at eight seeds one Monk-1 seed held nought joins and still read 0.030 apart.
+    /// What isolates the rung is the split spelling with the gate off against the split
+    /// spelling with the gate on: identical codes, identical stream, and
+    /// <c>Population.Generalise</c> proposing nothing without a vocabulary. The fused row
+    /// stays to say what renaming alone is worth.
+    /// </para>
+    /// <para>
+    /// <b>The held-out score is the column</b>, because Monk-1 is answered at 0.95 in sample
+    /// by a population naming instances one at a time. <see cref="Learned.Found"/> cannot be:
+    /// it matches residents against the world's minimal CONJUNCTIONS, and a rule with a hole
+    /// in it is not one at any depth.
+    /// </para>
+    /// <para>
+    /// <b>What would drop the arm</b>: a paired difference no bigger than what renaming alone
+    /// produces. A rise in resident count or in holed rules is not the reading —
     /// <c>GeneralisingTests</c> has already found that a hole which fires more often and buys
     /// nothing is what rung four does by default.
     /// </para>
     /// <para>
-    /// <b>And <see cref="Learned.Found"/> cannot be the column</b>, which is worth writing
-    /// down because it was the obvious one to reach for. That count matches residents against
-    /// the world's minimal CONJUNCTIONS, and a rule with a hole in it is not one of them at
-    /// any depth — so it is flat across the two arms by construction rather than by finding.
+    /// <b>All three puzzles, because the spelling is the world's and not Monk-1's.</b>
+    /// <see cref="Puzzle.Two"/> is the one where a variable cannot help at all, the concept
+    /// being a count, so what it reads is the population the rung costs.
     /// </para>
     /// <para>
-    /// <b>All three puzzles, because the spelling is the world's and not Monk-1's.</b> An arm
-    /// that wins where a variable is the concept and loses where it is not would be a setting
-    /// for one puzzle rather than a spelling for the world. <see cref="Puzzle.Two"/> is the
-    /// one where a variable cannot help at all, the concept being a count, so what it reads
-    /// is the population the spelling costs.
-    /// </para>
-    /// <para>
-    /// <para>
-    /// <b>At eight seeds it buys nothing</b>, and at three it looked like +0.025. Monk-1 is
-    /// 0.830 held-out against the fused arm's 0.829, ahead on four seeds and behind on four;
-    /// Monk-3 is 0.966 against 0.957, which is one seed of eight moving from 0.909 to 0.977
-    /// and seven level; Monk-2 is 0.653 against 0.666, behind on six of eight. Three seeds had
-    /// Monk-1 ahead on all three, which is the small-sample inversion this repo's traps list
-    /// names and had not caught in the act before.
-    /// </para>
-    /// <para>
-    /// <b>And on Monk-2 both arms are below the bar</b>, 0.671 being what always saying no
-    /// scores there, so the one consistent loss is between two arms that fail. The reading is
-    /// no effect rather than a loss.
-    /// </para>
-    /// <para>
-    /// <b>What the arm was never given is the rule it needed</b>, which is fork 134 and why
-    /// this is not yet a deletion. Monk-1's concept is <c>head = body</c> and nothing else,
-    /// and <see cref="The_rule_that_is_only_a_variable_twice_is_reached_and_scanned"/> shows
-    /// the proposer cannot reach it — so what the split arm holds is that truth with a
-    /// condition it does not need, one rule per value of whatever the condition pins. A losing
-    /// arm gets one more shape where what lost was the build rather than the idea.
-    /// </para>
-    /// <b>A sweep</b>, because eight seeds of three puzzles of two arms is forty-eight runs.
+    /// <b>A sweep</b>, because eight seeds of three puzzles of three arms is seventy-two runs.
     /// <see cref="Only_the_split_spelling_lets_a_variable_stand_in_two_places"/> is what the
     /// suite runs, and it holds down the links a single seed can settle.
     /// </para>
@@ -865,21 +861,32 @@ public sealed class MonkTests(ITestOutputHelper output)
     {
         const int Seeds = 8;
 
-        var read = new Dictionary<(Puzzle, Spelling), List<Spelt>>();
+        const string Fused = "fused";
+        const string Off = "split off";
+        const string On = "split on";
+
+        var read = new Dictionary<(Puzzle Puzzle, string Arm), List<Spelt>>();
+
+        var arms = new (string Named, Spelling Spelling, bool Deriving)[]
+        {
+            ("fused    ", Spelling.Fused, true),
+            ("split off", Spelling.Split, false),
+            ("split on ", Spelling.Split, true),
+        };
 
         foreach (var puzzle in new[] { Puzzle.One, Puzzle.Two, Puzzle.Three })
-            foreach (var spelling in new[] { Spelling.Fused, Spelling.Split })
+            foreach (var (named, spelling, deriving) in arms)
             {
                 var runs = new List<Spelt>();
 
                 foreach (var seed in Enumerable.Range(1, Seeds))
                 {
-                    var one = Spell(puzzle, spelling, seed);
+                    var one = Spell(puzzle, spelling, seed, deriving);
 
                     runs.Add(one);
 
                     output.WriteLine(
-                        $"{puzzle,-5} {spelling,-5} seed {seed} | recent {one.Recent:F3} "
+                        $"{puzzle,-5} {named} seed {seed} | recent {one.Recent:F3} "
                         + $"| unseen {one.Unseen:F3} silent {one.Silence:F3} "
                         + $"against {one.Chance:F3} | held {one.Held,4} | sound {one.Sound,4} "
                         + $"| found {one.Found,3} of {one.Truths,3} "
@@ -887,51 +894,59 @@ public sealed class MonkTests(ITestOutputHelper output)
                         + $"| repeated {one.Repeated,3} | admitted {one.Joined,3} "
                         + $"| resident joins {one.Resident,3} | fired {one.Fired,6} "
                         + $"| sound joins {one.Truest,3} shortest {one.Shortest} "
-                + $"| scanned {one.Scanned,3} "
+                        + $"| scanned {one.Scanned,3} "
                         + $"| categories {one.Sorts,2}");
                 }
 
-                read[(puzzle, spelling)] = runs;
+                read[(puzzle, named.Trim())] = runs;
             }
 
         // The front end's own contribution, and it is the link nothing after it can be read
         // without. A fused spelling cannot put one value in two positions at all -- that is
         // nought by construction rather than a small number.
-        Assert.Equal(0, read[(Puzzle.One, Spelling.Fused)].Sum(one => one.Repeated));
+        Assert.Equal(0, read[(Puzzle.One, Fused)].Sum(one => one.Repeated));
 
-        // And the gate has something to read under both, or the two arms are an empty
-        // control against an empty control.
-        foreach (var spelling in new[] { Spelling.Fused, Spelling.Split })
-            Assert.All(read[(Puzzle.One, spelling)], one => Assert.True(one.Sorts > 0,
-                $"the {spelling} arm derived no categories, so rung four proposed nothing "
-                + "and the spelling is not what this row is measuring"));
+        // And the control holds no join at all, which is what makes it one. The same codes on
+        // the same stream with no vocabulary for the gate to read.
+        Assert.Equal(0, read[(Puzzle.One, Off)].Sum(one => one.Resident));
+        Assert.Equal(0, read[(Puzzle.One, Off)].Sum(one => one.Sorts));
 
-        // The two keys have to be the same size or the `Found` columns are scored against
-        // two different questions. The scope language does not move with the spelling --
-        // only the names do -- so this is a statement about the change rather than about
-        // the learner.
-        foreach (var puzzle in new[] { Puzzle.One, Puzzle.Two, Puzzle.Three })
-            Assert.Equal(
-                read[(puzzle, Spelling.Fused)][0].Truths,
-                read[(puzzle, Spelling.Split)][0].Truths);
-
-        // And the exam is answered at all, or the row above is an accuracy over a handful.
-        Assert.All(
-            read[(Puzzle.One, Spelling.Split)],
-            one => Assert.True(one.Silence < 1.0,
-                "the split arm fired on nothing it had not seen, so its unseen accuracy is "
-                + "over an empty set"));
+        Assert.True(read[(Puzzle.One, On)].Sum(one => one.Resident) > 0,
+            "the gated arm holds no rule with a variable in two places, so both split rows "
+            + "are the same run and nothing here is about the rung");
 
         foreach (var puzzle in new[] { Puzzle.One, Puzzle.Two, Puzzle.Three })
+        {
+            var fused = read[(puzzle, Fused)];
+            var off = read[(puzzle, Off)];
+            var on = read[(puzzle, On)];
+
+            // The keys have to be the same size or a column compared across the arms is
+            // scored against two different questions. The scope language does not move with
+            // the spelling; only the names do.
+            Assert.Equal(fused[0].Truths, on[0].Truths);
+
+            // What isolates the rung is `off` against `on`, and the fused row
+            // sits beside them to say what renaming alone costs. Two arms whose codes differ
+            // are two runs of the learner as well as two spellings, since placement, ordering
+            // and every tie-break move with a code's value.
+            var paired = Enumerable.Range(0, Seeds)
+                .Select(at => on[at].Unseen - off[at].Unseen)
+                .ToList();
+
+            var renaming = Enumerable.Range(0, Seeds)
+                .Select(at => off[at].Unseen - fused[at].Unseen)
+                .ToList();
+
             output.WriteLine(
-                $"{puzzle,-5} mean | unseen fused "
-                + $"{read[(puzzle, Spelling.Fused)].Average(one => one.Unseen):F3} "
-                + $"split {read[(puzzle, Spelling.Split)].Average(one => one.Unseen):F3} "
-                + $"| silent fused "
-                + $"{read[(puzzle, Spelling.Fused)].Average(one => one.Silence):F3} "
-                + $"split {read[(puzzle, Spelling.Split)].Average(one => one.Silence):F3} "
-                + $"| held fused {read[(puzzle, Spelling.Fused)].Average(one => one.Held):F0} "
-                + $"split {read[(puzzle, Spelling.Split)].Average(one => one.Held):F0}");
+                $"{puzzle,-5} mean | unseen fused {fused.Average(one => one.Unseen):F3} "
+                + $"off {off.Average(one => one.Unseen):F3} "
+                + $"on {on.Average(one => one.Unseen):F3} "
+                + $"| the rung {new Measured { Arm = "on-off", Values = paired }} "
+                + $"| renaming alone {new Measured { Arm = "off-fused", Values = renaming }} "
+                + $"| held {off.Average(one => one.Held):F0} "
+                + $"to {on.Average(one => one.Held):F0}");
+        }
     }
 
     /// <summary>One Monk run, reported in the terms every world shares.</summary>

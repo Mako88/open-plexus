@@ -34,8 +34,6 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **ACTIVE, the twenty-five `DrivenTests` says no run reaches.** The fleet is twenty of them
   and the brain is what it is part of, so it closes with the two below. The category machinery
   — `Alternating`, `Deriving`, `Meeting`, `Sorted` — and `Unifying` close later on.
-- **A census the brain reports**, John's, and `FiringTests` is half of it. Nine counters are
-  quiet on three generated worlds; a wider run set and a report past `Tally` are what is left.
 - **Price the compound eye before one is built.** John's, and cheap. Compose two front ends
   through `Compound` on the worlds there are and read `Searched`, `Candidates` and
   `CeilingTests` against the one-channel arm. A rise in the ceiling drops it; the search cost

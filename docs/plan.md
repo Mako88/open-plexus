@@ -794,8 +794,6 @@ them. **A class earning a check moves out of here into the check.**
   one process, arbitrary across a merge.
 - **Every equality reading a report asserts on the measurements inside it.** A wall clock
   in a record turns reproducibility red and makes every `NotEqual` beside it pass for free.
-- **A `readonly record struct` holding an `ImmutableArray` compares by the array's identity**,
-  so two separately built keys with identical contents are never equal.
 - **A type can drop most of itself on the wire**, and still write a plausible number. Private
   tables and tuple keys serialise to nothing. Pin a format failure with a check on the
   ANSWER, never a comment.

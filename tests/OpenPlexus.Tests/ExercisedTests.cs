@@ -119,7 +119,13 @@ public sealed class ExercisedTests
     /// world's action channel while leaving the mechanism that is supposed to prefer one
     /// action over another untouched.
     /// </remarks>
-    private static Watched Run(Examining examining, bool acting)
+    /// <param name="rounds">
+    /// How many rounds to run. <b>Nought where a run that did nothing is wanted</b>, which is
+    /// what <see cref="Every_entry_could_have_gone_unreached"/> reads — a bench asked for no
+    /// rounds is the emptiest honest arm there is, and it cannot drift from the shape of a
+    /// real one the way a hand-built <c>Tally</c> would.
+    /// </param>
+    private static Watched Run(Examining examining, bool acting, long rounds = 10_000)
     {
         var world = new Roaming(Fixture.House(examining), seed: 1);
         var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed: 1);
@@ -160,7 +166,7 @@ public sealed class ExercisedTests
                 noted,
                 acting: Chooses.From(acting ? drives.Choose : _ => null)),
             brain)
-            .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
+            .Run(rounds, sweep: 1000, target: 0.9, window: 2000);
 
         return new Watched(
             examining, tally, brain.Held, noted.Emitted, noted.Channels, drives.Told);
@@ -353,6 +359,77 @@ public sealed class ExercisedTests
                 + $"| channels {string.Join(",", arm.Channels.Order())}");
 
         return missed;
+    }
+
+    /// <summary>
+    /// <b>Every entry could have gone unreached</b>, which is the half a reading cannot say
+    /// about itself.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A check that cannot fire reads exactly like a check that passes, and this file has been
+    /// on the wrong side of that. <i>A concept a thing in its own right</i> asked whether
+    /// <c>Population.Sorts</c> was set — which an EMPTY vocabulary satisfies, so handing the
+    /// run a <see cref="Codes.Categories"/> turned it green with every counter in the run
+    /// bit-identical to the control. It took a control to notice, and a control is exactly
+    /// what nobody runs when a reading has gone green.
+    /// </para>
+    /// <para>
+    /// <b>So every entry is asked of a run of ONE round</b>, and all but two have to say no.
+    /// An entry that says yes on one round is satisfied by something the harness handed in
+    /// rather than by the machine doing anything — the vocabulary was assigned before the
+    /// bench started, so the old reading would have read true here with nothing derived.
+    /// </para>
+    /// <para>
+    /// <b>The two are what one round honestly shows</b>, and they are named rather than
+    /// tolerated. A front end really did manufacture symbols in that round, and none of the
+    /// codes it emitted really was in the outcome alphabet. Both are facts about a round
+    /// having happened; a third name arriving here is an entry that has stopped asking about
+    /// a run, and it fails.
+    /// </para>
+    /// <para>
+    /// <b>A bench asked for one round rather than a hand-built report.</b> Every field is the
+    /// one a real arm would carry, so an entry reading a counter this does not have fails to
+    /// compile rather than passing for free — and there is nothing to keep in step. Nought
+    /// rounds would be better and the bench refuses it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Every_entry_could_have_gone_unreached()
+    {
+        // What a single round shows without anything having been learnt, which is the whole
+        // of what may read true below.
+        string[] immediate =
+        [
+            "Every input an attribute of it",
+            "Told, never architected",
+        ];
+
+        var nothing = new[] { Run(Examining.Where, acting: false, rounds: 1) };
+
+        var free = Entries
+            .Where(one => one.Ran(nothing))
+            .Select(one => one.Line)
+            .Except(immediate, StringComparer.Ordinal)
+            .ToList();
+
+        Assert.True(free.Count == 0,
+            $"{free.Count} entr(ies) of THE ARCHITECTURE read as exercised by a run of ONE "
+            + $"round: {string.Join(", ", free)}. Each is satisfied by something the harness "
+            + "handed in rather than by a run doing anything, so it cannot tell a mechanism "
+            + "that fired from one that is merely wired -- which is the fault this whole file "
+            + "exists to catch, arriving inside it.");
+
+        // And the two that may are still true, so the list is a claim about them rather than
+        // a way of not being asked. One that stopped reading true would mean a single round no
+        // longer reaches the front end at all, which is worth failing over.
+        var shown = Entries.Where(one => one.Ran(nothing)).Select(one => one.Line).ToList();
+
+        Assert.True(
+            immediate.All(one => shown.Contains(one, StringComparer.Ordinal)),
+            $"one round shows {string.Join(", ", shown)} against the {immediate.Length} named "
+            + "here, so an entry that used to be reached by the front end alone no longer is "
+            + "-- take it off the list rather than widening this");
     }
 
     /// <summary>How many entries there are to reach, for the message that counts them.</summary>

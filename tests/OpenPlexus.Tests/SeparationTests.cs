@@ -101,18 +101,78 @@ public sealed class SeparationTests
     [Fact]
     public void No_two_of_the_brains_alphabets_share_a_modality()
     {
+        var shared = Sharing(Modalities(brain: true))
+            .Select(one => $"{one.Key} is {string.Join(" and ", one.Value)}")
+            .ToList();
+
+        Assert.NotEmpty(Modalities(brain: true));
+
+        Assert.True(shared.Count == 0,
+            $"{shared.Count} modality number(s) mean two things: {string.Join("; ", shared)}. "
+            + "Every code the brain derives shares one moment with every other, so a number "
+            + "meaning two things makes one alphabet unreadable as the other -- and nothing "
+            + "says which until a run reaches both.");
+    }
+
+    /// <summary>
+    /// <b>No world quietly takes one of the brain's numbers.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The other half of the check above, and the half a world can break on its own. A world's
+    /// codes and the brain's derived ones land in one moment, so a world choosing a number the
+    /// brain already means something by makes its own alphabet unreadable — and a world may
+    /// reuse ANOTHER world's number freely, because two worlds never share a moment.
+    /// </para>
+    /// <para>
+    /// <b>Two are deliberate and both are asserted rather than listed.</b> A world's answer
+    /// key has to be written in the population's alphabet or it marks the subject wrong, which
+    /// is <c>Monk</c>'s whole refutation, and the same goes one rung out for the entry that
+    /// pins nothing. <see cref="Every_world_says_its_outcome_in_the_same_alphabet"/> is where
+    /// the agreement is checked; this only says how many such copies there are, so a third
+    /// arriving by accident fails here and a third arriving on purpose is one line in both.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_world_takes_a_modality_the_brain_already_means_something_by()
+    {
+        var brain = Modalities(brain: true);
+        var worlds = Modalities(brain: false);
+
+        var taken = brain.Keys
+            .Where(worlds.ContainsKey)
+            .Order()
+            .ToList();
+
+        Assert.Equal([Brain.Followed, Unifying.Whatever], taken);
+
+        foreach (var number in taken)
+            Assert.True(
+                brain[number].Count == 1 && worlds[number].Count > 0,
+                $"modality {number} is {string.Join(" and ", brain[number])} on the brain's "
+                + $"side and {string.Join(" and ", worlds[number])} on a world's, which is a "
+                + "copy of one number by more than one name on the side that owns it");
+    }
+
+    /// <summary>Every modality declared on one side of the line, by number.</summary>
+    /// <param name="brain">Whether to read the brain's side or the worlds'.</param>
+    /// <remarks>
+    /// <b>A source ordinal is not a modality</b>, and the one that says so says so in the
+    /// remark beside it. <c>Stamp.First</c> is named here rather than the pattern widened,
+    /// because a pattern loose enough to skip it would skip a real one the day somebody
+    /// writes a second.
+    /// </remarks>
+    private static Dictionary<byte, List<string>> Modalities(bool brain)
+    {
         var taken = new Dictionary<byte, List<string>>();
 
         foreach (var path in Tree.Sources("src")
-            .Where(one => one.Contains("OpenPlexus.Brain", StringComparison.Ordinal)))
+            .Where(one =>
+                one.Contains("OpenPlexus.Brain", StringComparison.Ordinal) == brain))
             foreach (Match hit in Regex.Matches(
                 File.ReadAllText(path),
                 @"public const byte ([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([0-9]+)\s*;"))
             {
-                // A source ordinal is not a modality, and the one that says so says so in the
-                // remark beside it. Naming it here rather than widening the pattern, because a
-                // pattern loose enough to skip it would skip a real one the day somebody
-                // writes a second.
                 if (hit.Groups[1].Value == "First") continue;
 
                 var number = byte.Parse(
@@ -123,20 +183,14 @@ public sealed class SeparationTests
                 names.Add($"{Path.GetFileNameWithoutExtension(path)}.{hit.Groups[1].Value}");
             }
 
-        var shared = taken
-            .Where(one => one.Value.Count > 1)
-            .OrderBy(one => one.Key)
-            .Select(one => $"{one.Key} is {string.Join(" and ", one.Value)}")
-            .ToList();
-
-        Assert.NotEmpty(taken);
-
-        Assert.True(shared.Count == 0,
-            $"{shared.Count} modality number(s) mean two things: {string.Join("; ", shared)}. "
-            + "Every code the brain derives shares one moment with every other, so a number "
-            + "meaning two things makes one alphabet unreadable as the other -- and nothing "
-            + "says which until a run reaches both.");
+        return taken;
     }
+
+    /// <summary>The numbers more than one name claims.</summary>
+    /// <param name="taken">What each number is called.</param>
+    private static IEnumerable<KeyValuePair<byte, List<string>>> Sharing(
+        Dictionary<byte, List<string>> taken) =>
+        taken.Where(one => one.Value.Count > 1).OrderBy(one => one.Key);
 
     [Fact]
     public void One_brain_can_be_handed_two_different_worlds()

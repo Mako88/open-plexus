@@ -573,7 +573,11 @@ public sealed class DocsTests
     // left `THE ORDER` in one session -- the brain's own project, the learner going internal
     // and the holder host -- and the likeness bar shrank to what is left of it, so the doc is
     // seventy-two words shorter than the cap it was carrying.
-    private const int Whole = 11_641;
+    // And 11,615 is the next fall. Four items left `THE ORDER` -- the travelling bar, the
+    // unreached mechanisms, the derivation into a deployment and the vocabulary the join wants
+    // -- and one trap moved out into the check that now catches it, which is the exit `TRAPS`
+    // names for itself. A refutation row came in, so the fall is smaller than the strikes.
+    private const int Whole = 11_615;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

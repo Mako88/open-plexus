@@ -133,4 +133,107 @@ public sealed class DeterminismTests
             + "this repo's own and identical on every machine forever. An override of "
             + "`GetHashCode` is not this -- what is refused is CALLING one.");
     }
+
+    /// <summary>
+    /// <b>No record compared by an array's identity is ever a key.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A record's generated equality compares each member with its own, and
+    /// <see cref="System.Collections.Immutable.ImmutableArray{T}"/> compares by the identity of
+    /// the array it wraps. So two records built separately from identical contents are never
+    /// equal — which is invisible until one is used somewhere equality DECIDES something, and
+    /// then it is a lookup that always misses.
+    /// </para>
+    /// <para>
+    /// <b>Declaring one is fine and keying on one is not.</b> Most of these are reports, read
+    /// once and never compared, and demanding hand-written equality on all of them would be
+    /// eleven rewrites for a fault none of them can have. Three types here already define
+    /// their own because the fault bit them; this says the rest may not reach the position
+    /// where it would.
+    /// </para>
+    /// <para>
+    /// <b>The declared generic positions rather than every comparison.</b> A cast to a
+    /// dictionary key is where the original fault lived and it is where a text check can see
+    /// it; an <c>Assert.Equal</c> over two of these would need the type inferred, and a check
+    /// that half-covers reads exactly like one that covers.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_record_holding_an_immutable_array_is_used_where_equality_decides()
+    {
+        var bare = new SortedSet<string>(StringComparer.Ordinal);
+
+        foreach (var path in Tree.Sources("src"))
+        {
+            var code = Bare(File.ReadAllText(path));
+
+            foreach (Match hit in Regex.Matches(
+                code,
+                @"^(?:internal|public)\s+(?:sealed\s+)?(?:readonly\s+)?record\s+"
+                + @"(?:struct\s+|class\s+)?([A-Za-z_][A-Za-z0-9_]*)",
+                RegexOptions.Multiline))
+            {
+                var after = code[hit.Index..];
+
+                var next = Regex.Match(
+                    after[hit.Length..],
+                    @"^(?:internal|public)\s+(?:sealed\s+|readonly\s+|static\s+|abstract\s+|"
+                    + @"partial\s+)*(?:record|class|interface|enum|struct)\s",
+                    RegexOptions.Multiline);
+
+                var body = next.Success
+                    ? after[hit.Length..(hit.Length + next.Index)]
+                    : after[hit.Length..];
+
+                // Its own equality is the opt-in, and the three types that have one wrote it
+                // because this bit them. A record that says how it compares is saying it knows.
+                if (body.Contains("ImmutableArray<", StringComparison.Ordinal)
+                    && !body.Contains("bool Equals(", StringComparison.Ordinal)
+                    && !body.Contains("override int GetHashCode", StringComparison.Ordinal))
+                    bare.Add(hit.Groups[1].Value);
+            }
+        }
+
+        Assert.NotEmpty(bare);
+
+        var keyed = new SortedSet<string>(StringComparer.Ordinal);
+
+        foreach (var path in Tree.Sources("src").Concat(Tree.Sources("tests")))
+        {
+            var code = Bare(File.ReadAllText(path));
+            var relative = Path.GetRelativePath(Tree.Repo(), path);
+
+            foreach (var name in bare)
+                foreach (var shape in new[]
+                {
+                    $@"Dictionary<\s*{name}\s*,",
+                    $@"HashSet<\s*{name}\s*>",
+                    $@"SortedSet<\s*{name}\s*>",
+                    $@"ConcurrentDictionary<\s*{name}\s*,",
+                    $@"ILookup<\s*{name}\s*,",
+                })
+                    if (Regex.IsMatch(code, shape))
+                        keyed.Add($"{name} in {relative}");
+        }
+
+        Assert.True(keyed.Count == 0,
+            $"{keyed.Count} use(s) of a record that compares by an array's identity where "
+            + $"equality decides: {string.Join(", ", keyed)}. Two of these built separately "
+            + "from identical contents are never equal, so the lookup always misses. Give the "
+            + "type its own `Equals` and `GetHashCode` over the array's CONTENTS, or key on "
+            + "something else.");
+    }
+
+    /// <summary>Source with its comments taken out, so a remark cannot trip a check.</summary>
+    /// <param name="source">The file.</param>
+    private static string Bare(string source) =>
+        Regex.Replace(
+            Regex.Replace(
+                Regex.Replace(source, @"/\*.*?\*/", " ", RegexOptions.Singleline),
+                @"^\s*///.*$",
+                " ",
+                RegexOptions.Multiline),
+            @"//.*",
+            " ");
 }

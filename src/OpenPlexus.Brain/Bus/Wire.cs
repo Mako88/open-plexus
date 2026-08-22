@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenPlexus.Bus;
@@ -36,7 +36,7 @@ namespace OpenPlexus.Bus;
 /// change to make when something measures the wire, which nothing yet does.
 /// </para>
 /// </remarks>
-public static class Wire
+internal static class Wire
 {
     /// <summary>How everything on the wire is written and read.</summary>
     /// <remarks>

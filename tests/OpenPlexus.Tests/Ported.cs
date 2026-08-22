@@ -29,7 +29,7 @@ namespace OpenPlexus.Tests;
 /// already exists to prevent one layer down.
 /// </para>
 /// </remarks>
-public sealed class Ported : IAsyncDisposable
+internal sealed class Ported : IAsyncDisposable
 {
     private readonly List<IDisposable> _handles = [];
     private readonly List<IDisposable> _subscriptions = [];

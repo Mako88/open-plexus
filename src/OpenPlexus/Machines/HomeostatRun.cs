@@ -18,7 +18,7 @@ namespace OpenPlexus.Machines;
 /// would be demanding that one world's setting be measured on another.
 /// </para>
 /// </remarks>
-public enum Regulating
+internal enum Regulating
 {
     /// <summary>Whichever variable is furthest from where it should be.</summary>
     Aimed,
@@ -33,7 +33,7 @@ public enum Regulating
 /// <summary>
 /// What a run of the body came to, plus the two things only this world can say.
 /// </summary>
-public sealed record Regulated
+internal sealed record Regulated
 {
     /// <summary>Every counter the bench reports.</summary>
     public required Tally Tally { get; init; }
@@ -79,7 +79,7 @@ public sealed record Regulated
 /// comparison this world exists to make, taken twice with two rulers.
 /// </para>
 /// </remarks>
-public sealed class HomeostatRun
+internal sealed class HomeostatRun
 {
     private readonly Homeostat _body;
     private readonly Bench _trial;

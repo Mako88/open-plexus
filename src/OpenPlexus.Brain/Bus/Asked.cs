@@ -20,7 +20,7 @@ namespace OpenPlexus.Bus;
 /// silence-versus-absence conflation <see cref="Weights.Silent"/> exists to refuse.
 /// </para>
 /// </remarks>
-public enum Wanted
+internal enum Wanted
 {
     /// <summary>What this holder's commitments advocate about a moment.</summary>
     Vote,
@@ -67,7 +67,7 @@ public enum Wanted
 /// it costs is that every holder receives its own counts back and throws them away.
 /// </para>
 /// </remarks>
-public readonly record struct Tabled
+internal readonly record struct Tabled
 {
     /// <summary>Which holder counted this.</summary>
     public required MachineAddress From { get; init; }
@@ -115,7 +115,7 @@ public readonly record struct Tabled
 /// scatter and the gather are one hop each however the bytes are carried.
 /// </para>
 /// </remarks>
-public sealed record Ask
+internal sealed record Ask
 {
     /// <summary>
     /// Which ask this is, so an answer can be folded into the right gathering.
@@ -208,7 +208,7 @@ public sealed record Ask
 /// the conflation C3 turns into a wrong number.
 /// </para>
 /// </remarks>
-public sealed record Answer
+internal sealed record Answer
 {
     /// <summary>Which ask this answers.</summary>
     public required BroadcastId Broadcast { get; init; }

@@ -10,7 +10,7 @@ namespace OpenPlexus.Machines;
 /// than carried in <see cref="Tally"/>. A shared report that grew a field per
 /// world would put every world's vocabulary in front of every other one.
 /// </remarks>
-public sealed record Learned
+internal sealed record Learned
 {
     /// <summary>What the trial did, in terms every world shares.</summary>
     public required Tally Tally { get; init; }
@@ -287,7 +287,7 @@ public sealed record Learned
 }
 
 /// <summary>Step one, end to end, on the world it is judged on.</summary>
-public sealed class MultiplexerRun
+internal sealed class MultiplexerRun
 {
     private readonly Multiplexer _world;
     private readonly Brain _brain;

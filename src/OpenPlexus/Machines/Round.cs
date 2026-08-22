@@ -26,7 +26,7 @@ namespace OpenPlexus.Machines;
 /// numbers taken the same way.
 /// </para>
 /// </remarks>
-public sealed class Round
+internal sealed class Round
 {
     private readonly Brain _brain;
     private readonly int _sweep;

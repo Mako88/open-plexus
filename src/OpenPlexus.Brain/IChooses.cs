@@ -22,7 +22,7 @@ namespace OpenPlexus.Machines;
 /// number, and which numbers mean what is the world's business.
 /// </para>
 /// </remarks>
-public interface IChooses
+internal interface IChooses
 {
     /// <summary>What to do about the state the world is in, or nothing to say no more.</summary>
     /// <param name="felt">The codes that state reads as.</param>
@@ -51,7 +51,7 @@ public interface IChooses
 }
 
 /// <summary>Choosers built out of something smaller.</summary>
-public static class Chooses
+internal static class Chooses
 {
     /// <summary>A chooser that is one function and remembers nothing.</summary>
     /// <param name="choosing">What to do about the codes in front of it.</param>

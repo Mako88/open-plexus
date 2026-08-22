@@ -1563,15 +1563,31 @@ public sealed class DocsTests
         // compiler is enforcing the XML comments; someone removing
         // GenerateDocumentationFile to quiet a warning would silently take the
         // real doc check with it, and nothing else would notice.
-        var project = File.ReadAllText(
-            Path.Combine(Repo(), "src", "OpenPlexus", "OpenPlexus.csproj"));
+        //
+        // And every project rather than the one it used to read. The library was one
+        // assembly when this was written and is four now, so naming one of them would
+        // let a new project arrive with the contract switched off -- the same shape as
+        // a guard mounted on one caller.
+        var projects = Directory
+            .GetFiles(Path.Combine(Repo(), "src"), "*.csproj", SearchOption.AllDirectories)
+            .Where(one => !one.Contains(
+                $"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}",
+                StringComparison.Ordinal))
+            .ToList();
 
-        Assert.Contains("<GenerateDocumentationFile>true", project, StringComparison.Ordinal);
+        Assert.True(projects.Count >= 4, $"only {projects.Count} project(s) found under src/");
 
-        // And the assembly's own XML file is beside it, which is the same claim
-        // made against the build output rather than against the intent.
-        Assert.True(
-            File.Exists(Path.Combine(AppContext.BaseDirectory, "OpenPlexus.xml")),
-            "the library built without its documentation file");
+        foreach (var project in projects)
+            Assert.Contains(
+                "<GenerateDocumentationFile>true",
+                File.ReadAllText(project),
+                StringComparison.Ordinal);
+
+        // And each assembly's own XML file is beside the test binary, which is the same
+        // claim made against the build output rather than against the intent.
+        foreach (var named in new[] { "OpenPlexus", "OpenPlexus.Brain", "OpenPlexus.Worlds" })
+            Assert.True(
+                File.Exists(Path.Combine(AppContext.BaseDirectory, $"{named}.xml")),
+                $"{named} built without its documentation file");
     }
 }

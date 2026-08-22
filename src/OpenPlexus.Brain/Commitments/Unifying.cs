@@ -39,7 +39,7 @@ namespace OpenPlexus.Commitments;
 /// halves to be tellable apart in the moment.
 /// </para>
 /// </remarks>
-public static class Unifying
+internal static class Unifying
 {
     /// <summary>The modality a scope entry naming no argument lives in.</summary>
     /// <remarks>

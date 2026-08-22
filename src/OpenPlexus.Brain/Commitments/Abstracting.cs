@@ -23,7 +23,7 @@ namespace OpenPlexus.Commitments;
 /// </para>
 /// </remarks>
 /// <summary>One line of a counted table, as it crosses.</summary>
-public readonly record struct Tallied
+internal readonly record struct Tallied
 {
     /// <summary>The code, or the first of the pair.</summary>
     public required Code Left { get; init; }
@@ -61,7 +61,7 @@ public readonly record struct Tallied
 }
 
 /// <summary>A <see cref="Recurrence"/> as bytes, and the only form of it that travels.</summary>
-public sealed record Counts
+internal sealed record Counts
 {
     /// <summary>How many scopes the sender counted.</summary>
     /// <remarks>
@@ -103,7 +103,7 @@ public sealed record Counts
 /// frequency, which is what the constraint has always permitted.
 /// </para>
 /// </remarks>
-public sealed class Recurrence
+internal sealed class Recurrence
 {
     private readonly Dictionary<Code, int> _alone = [];
     private readonly Dictionary<(Code Left, Code Right), int> _together = [];
@@ -316,7 +316,7 @@ public sealed class Recurrence
 /// worth anything is exactly what an absence answers and a matched table cannot.
 /// </para>
 /// </remarks>
-public enum Broadening
+internal enum Broadening
 {
     /// <summary>A shared sub-scope gets a name and the scopes holding it are rewritten.</summary>
     /// <remarks>
@@ -392,7 +392,7 @@ public enum Broadening
 /// direction no name count can show.
 /// </para>
 /// </remarks>
-public enum Refused
+internal enum Refused
 {
 
     /// <summary>Nothing refused it, and a name was proposed.</summary>
@@ -433,7 +433,7 @@ public enum Refused
 /// the learner needs. Nothing here
 /// decides anything; a value that ever gates a mechanism has stopped being an instrument.
 /// </remarks>
-public readonly record struct Proposed
+internal readonly record struct Proposed
 {
     /// <summary>Eligible scopes the counts were taken over.</summary>
     public required int Scopes { get; init; }
@@ -560,7 +560,7 @@ public readonly record struct Proposed
 /// fraction of once, so the depth is there and is never tested.
 /// </para>
 /// </remarks>
-public static class Abstracting
+internal static class Abstracting
 {
     /// <summary>The sub-scope most worth naming, or nothing if none has earned it.</summary>
     /// <param name="held">Every commitment resident.</param>

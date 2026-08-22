@@ -1,4 +1,4 @@
-namespace OpenPlexus.Bus;
+﻿namespace OpenPlexus.Bus;
 
 /// <summary>
 /// Where a machine's asks and answers are sent.
@@ -9,4 +9,4 @@ namespace OpenPlexus.Bus;
 /// nothing can name another machine's commitment — a holder is asked what it makes of a
 /// moment and answers in its own words, which is the only thing anyone is ever told.
 /// </remarks>
-public readonly record struct MachineAddress(string Value);
+internal readonly record struct MachineAddress(string Value);

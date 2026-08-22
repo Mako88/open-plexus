@@ -34,9 +34,6 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **ACTIVE, the twenty-five `DrivenTests` says no run reaches.** The fleet is twenty of them
   and closes with the holder host below. The category machinery — `Alternating`, `Deriving`,
   `Meeting`, `Sorted` — and `Unifying` close later on.
-- **The learner `internal`**, so the boundary is the compiler's rather than a folder's. The
-  assembly landed and `Bench` reads `Population` from outside it, which is the half the move
-  left to decide.
 - **A holder host and a harness that takes peers**, which is the first two-process run and
   what `Ported` has been standing in for. John's end state is this repeated twenty times.
 - **Then a likeness bar that travels**, read against shuffled moments rather than a level,

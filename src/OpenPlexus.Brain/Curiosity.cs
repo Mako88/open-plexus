@@ -9,7 +9,7 @@ namespace OpenPlexus.Machines;
 /// encoding in front of every other one, which is the fault <c>Machines.Bench</c> takes a delegate to
 /// avoid.
 /// </remarks>
-public readonly record struct Wondered
+internal readonly record struct Wondered
 {
     /// <summary>Which outcome it would name, or nothing where it had nothing to say.</summary>
     public required int? Word { get; init; }
@@ -43,7 +43,7 @@ public readonly record struct Wondered
 /// an action index is the join's job.
 /// </para>
 /// </remarks>
-public sealed class Curiosity
+internal sealed class Curiosity
 {
     private readonly Brain _brain;
     private readonly double _rate;

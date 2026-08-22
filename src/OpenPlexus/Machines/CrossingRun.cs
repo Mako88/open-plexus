@@ -9,7 +9,7 @@ namespace OpenPlexus.Machines;
 /// offset fails both, so a crossing score with no position score beside it cannot tell a
 /// learner that failed to bind from a front end that never carried the word.
 /// </remarks>
-public sealed record Crossings
+internal sealed record Crossings
 {
     /// <summary>The whole run, whose <see cref="Tally.Unseen"/> is the crossing exam.</summary>
     public required Tally Learnt { get; init; }
@@ -41,7 +41,7 @@ public sealed record Crossings
 /// is a position the next drawing does not use.
 /// </para>
 /// </remarks>
-public sealed class CrossingRun
+internal sealed class CrossingRun
 {
     /// <summary>How many pixels across one patch is.</summary>
     public const int Patch = 4;

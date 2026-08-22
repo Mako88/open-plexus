@@ -22,7 +22,7 @@ namespace OpenPlexus.Tests;
 /// and is visibly the exception, rather than adding a parameter nobody else passes.
 /// </para>
 /// </remarks>
-public static class Fixture
+internal static class Fixture
 {
     /// <summary>
     /// How long a settling wave is given before the harness calls it a hang —

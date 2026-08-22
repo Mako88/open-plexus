@@ -70,7 +70,7 @@ namespace OpenPlexus.Machines;
 /// It is handed in and <see cref="Untold"/> counts the rounds it decided.
 /// </para>
 /// </remarks>
-public sealed class Drives
+internal sealed class Drives
 {
     private readonly Population _held;
     private readonly Func<Code, int?> _doing;

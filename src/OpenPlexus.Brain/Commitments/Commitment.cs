@@ -5,7 +5,7 @@ using OpenPlexus.Codes;
 namespace OpenPlexus.Commitments;
 
 /// <summary>What a settlement said about one commitment that fired.</summary>
-public enum Verdict
+internal enum Verdict
 {
     /// <summary>What it expected was there.</summary>
     Hit,
@@ -54,7 +54,7 @@ public enum Verdict
 /// use one. Fork 27 is whether the second one earns its keep.
 /// </para>
 /// </remarks>
-public sealed class Commitment
+internal sealed class Commitment
 {
     /// <summary>The modality a commitment's own identity lives in.</summary>
     /// <remarks>
@@ -437,7 +437,7 @@ public sealed class Commitment
 /// the code was ABSENT in each — is the commitment's own hit and miss counts minus
 /// these, so it is never stored.
 /// </remarks>
-public readonly record struct Separation
+internal readonly record struct Separation
 {
     /// <summary>Firings that hit with this code present.</summary>
     public long InHits { get; init; }

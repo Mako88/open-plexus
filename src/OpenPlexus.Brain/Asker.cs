@@ -30,7 +30,7 @@ namespace OpenPlexus.Machines;
 /// better certified than it is.
 /// </para>
 /// </remarks>
-public sealed class Gathering : IDisposable
+internal sealed class Gathering : IDisposable
 {
     private readonly Dictionary<MachineAddress, Answer> _heard = [];
 
@@ -435,7 +435,7 @@ public sealed class Gathering : IDisposable
 /// itself an extra voter without saying so.
 /// </para>
 /// </remarks>
-public sealed class Asker : IReceiveAnswers
+internal sealed class Asker : IReceiveAnswers
 {
     private readonly IBus _bus;
     private readonly Func<MachineAddress, string>? _slots;

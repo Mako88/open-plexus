@@ -1,4 +1,4 @@
-using OpenPlexus.Bus;
+﻿using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 
@@ -29,7 +29,7 @@ namespace OpenPlexus.Machines;
 /// longer vocabulary instead of receiving one it cannot interpret.
 /// </para>
 /// </remarks>
-public sealed class Holder : IReceiveAsks
+internal sealed class Holder : IReceiveAsks
 {
     private readonly Population _held;
     private readonly Alone _round;

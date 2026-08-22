@@ -34,7 +34,7 @@ namespace OpenPlexus.Commitments;
 /// every machine because its identity derives from its members.
 /// </para>
 /// </remarks>
-public sealed class Naming
+internal sealed class Naming
 {
     /// <summary>The modality a minted name lives in.</summary>
     /// <remarks>

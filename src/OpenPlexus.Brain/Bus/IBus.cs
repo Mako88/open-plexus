@@ -10,7 +10,7 @@
 /// gone, and what stayed is the half that was always the whole point: a holder is asked what
 /// it makes of a moment and says so, so a fleet learns what one machine learns.
 /// </remarks>
-public interface IReceiveAsks
+internal interface IReceiveAsks
 {
     MachineAddress Address { get; }
 
@@ -27,7 +27,7 @@ public interface IReceiveAsks
 /// correlated by the ask's own id. <i>Push, never pull</i>: an awaited response body is a
 /// deadline by the back door, and a deadline is what C2 says cannot be trusted.
 /// </remarks>
-public interface IReceiveAnswers
+internal interface IReceiveAnswers
 {
     MachineAddress Address { get; }
 
@@ -43,7 +43,7 @@ public interface IReceiveAnswers
 /// forwarded routes; nothing here owns either. What can vanish mid-round is a holder, and
 /// every write-off below is holder-shaped for that reason.
 /// </remarks>
-public interface IBus
+internal interface IBus
 {
     /// <summary>
     /// A holder becomes askable. <b>Disposing the handle is a death</b>, and a death here is

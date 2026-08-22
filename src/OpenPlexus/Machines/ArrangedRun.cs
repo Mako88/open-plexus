@@ -15,7 +15,7 @@ namespace OpenPlexus.Machines;
 /// ever disagrees with one. That is exact rather than sampled, which is what
 /// <see cref="Cifar"/> could not have at any price.
 /// </remarks>
-public sealed record Grounded
+internal sealed record Grounded
 {
     /// <summary>What the trial did, in terms every world shares.</summary>
     public required Tally Tally { get; init; }
@@ -49,7 +49,7 @@ public sealed record Grounded
 }
 
 /// <summary>What the world says about the rules a run left behind.</summary>
-public sealed record Judged
+internal sealed record Judged
 {
     /// <summary>Experienced commitments that no scene in the world contradicts.</summary>
     public required int Sound { get; init; }
@@ -165,7 +165,7 @@ public sealed record Judged
 /// which is the thing that grid could not ask about.
 /// </para>
 /// </remarks>
-public sealed record Yardstick
+internal sealed record Yardstick
 {
     /// <summary>A linear probe on the raw scene, fitted on drawn and scored on withheld.</summary>
     public required Probed OnPixels { get; init; }
@@ -216,7 +216,7 @@ public sealed record Yardstick
 /// exact confusion in the other direction.
 /// </para>
 /// </remarks>
-public sealed record Reached
+internal sealed record Reached
 {
     /// <summary>The widest scope this enumerated.</summary>
     public required int Depth { get; init; }
@@ -297,7 +297,7 @@ public sealed record Reached
 /// one that reads it patch by patch score the same on it — and only the second can carry
 /// an arrangement. Here they need not.
 /// </remarks>
-public enum Looking
+internal enum Looking
 {
     /// <summary>One projection over every pixel at once.</summary>
     Whole,
@@ -337,7 +337,7 @@ public enum Looking
 /// <see cref="CifarRun"/> already records.
 /// </para>
 /// </remarks>
-public sealed class ArrangedRun
+internal sealed class ArrangedRun
 {
     /// <summary>
     /// The modality this world's pixels ride on.

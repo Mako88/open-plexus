@@ -36,6 +36,17 @@
        softened. -->
   <ItemGroup>
     <ProjectReference Include="..\OpenPlexus.Brain\OpenPlexus.Brain.csproj" />
+    <ProjectReference Include="..\OpenPlexus.Worlds\OpenPlexus.Worlds.csproj" />
+  </ItemGroup>
+
+  <!-- The join has no public surface, and that is the same rule one assembly out. Its types
+       take a `Brain` and read a `Population`, which C# will not let a public member do while
+       those are internal, so the choice is between opening the learner again and closing
+       the join. Nothing outside the composition consumes these: the harness runs them and the
+       tests assert on them. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="OpenPlexus.Talk" />
+    <InternalsVisibleTo Include="OpenPlexus.Tests" />
   </ItemGroup>
 
 </Project>

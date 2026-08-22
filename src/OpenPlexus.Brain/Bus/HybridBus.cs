@@ -31,7 +31,7 @@ namespace OpenPlexus.Bus;
 /// The generator, so a jittered run is as reproducible as thread scheduling
 /// allows — which is not very, and that is C2 rather than a defect.
 /// </param>
-public readonly record struct Lateness(double Share, TimeSpan Delay, int Seed);
+internal readonly record struct Lateness(double Share, TimeSpan Delay, int Seed);
 
 /// <summary>
 /// The bus in one process, with C2 injected rather than assumed.
@@ -44,7 +44,7 @@ public readonly record struct Lateness(double Share, TimeSpan Delay, int Seed);
 /// C2 — <i>a simulated constraint can be harsher than the real one</i>, and here that is the
 /// point rather than the trap.
 /// </remarks>
-public sealed class HybridBus : IBus
+internal sealed class HybridBus : IBus
 {
     /// <inheritdoc cref="Bus.Lateness"/>
     private readonly Lateness? _late;

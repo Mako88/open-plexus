@@ -24,7 +24,7 @@ namespace OpenPlexus.Machines;
 /// nobody meant to run. Both halves or neither.
 /// </para>
 /// </remarks>
-public sealed record Examined
+internal sealed record Examined
 {
     /// <summary>Withheld observations put to the population.</summary>
     public required int Asked { get; init; }
@@ -69,7 +69,7 @@ public sealed record Examined
 /// separately. A shared report that grew a field per world would be the mixing this
 /// arrangement exists to prevent.
 /// </remarks>
-public sealed record Tally
+internal sealed record Tally
 {
     /// <summary>Rounds run.</summary>
     public required long Rounds { get; init; }
@@ -407,7 +407,7 @@ public sealed record Tally
 /// one can cost the other.
 /// </para>
 /// </remarks>
-public sealed record Census
+internal sealed record Census
 {
     /// <summary>Wrong rounds where a SOUND advocate for the right answer fired and lost.</summary>
     /// <remarks>
@@ -610,7 +610,7 @@ public sealed record Census
 /// putting it inside the brain is how the brain starts knowing about worlds.
 /// </para>
 /// </remarks>
-public sealed class Bench
+internal sealed class Bench
 {
     private readonly IInput _world;
     private readonly Brain _brain;

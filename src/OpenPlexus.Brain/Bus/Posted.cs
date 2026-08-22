@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Net;
 using System.Text;
 using OpenPlexus.Codes;
@@ -9,7 +9,7 @@ namespace OpenPlexus.Bus;
 
 /// <summary>Another machine, and where to reach it.</summary>
 /// <param name="Host">Its base address, scheme and all.</param>
-public readonly record struct Peer(string Host);
+internal readonly record struct Peer(string Host);
 
 /// <summary>
 /// The bus, over a wire, between processes that share nothing.
@@ -56,7 +56,7 @@ public readonly record struct Peer(string Host);
 /// <c>AskedTests</c>: nine holders at two and a half times one, rather than at nine.
 /// </para>
 /// </remarks>
-public sealed class Posted : IBus, IAsyncDisposable
+internal sealed class Posted : IBus, IAsyncDisposable
 {
     private readonly Dictionary<MachineAddress, IReceiveAsks> _holders = [];
     private readonly Dictionary<MachineAddress, IReceiveAnswers> _askers = [];

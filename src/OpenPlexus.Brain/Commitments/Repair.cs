@@ -8,7 +8,7 @@ namespace OpenPlexus.Commitments;
 /// absence. A boolean here would put the control arm in the code forever as a
 /// way of not running repair properly; naming both makes it a comparison.
 /// </remarks>
-public enum Choosing
+internal enum Choosing
 {
     /// <summary>The condition that most separates the hits from the misses.</summary>
     Separating,
@@ -42,7 +42,7 @@ public enum Choosing
 /// are the two halves of the same arm and both are printed.
 /// </para>
 /// </remarks>
-public enum Admitting
+internal enum Admitting
 {
     /// <summary>Anything that clears the separation bar, which is every earlier reading.</summary>
     Anything,
@@ -57,7 +57,7 @@ public enum Admitting
 /// boolean would put the arm in the code forever as a way of not running genesis
 /// properly; naming both makes it a comparison.
 /// </remarks>
-public enum Surprising
+internal enum Surprising
 {
     /// <summary>Any failure at all. What ran before anything gated this.</summary>
     AnyFailure,
@@ -86,7 +86,7 @@ public enum Surprising
 /// statement named — and is dead weight everywhere else. Fork <b>63</b>.
 /// </para>
 /// </remarks>
-public enum Rooting
+internal enum Rooting
 {
     /// <summary>One code a commitment, so a conjunction is only ever reached by repair.</summary>
     Singly,
@@ -138,7 +138,7 @@ public enum Rooting
 /// place, and no rule is refused anything.
 /// </para>
 /// </remarks>
-public enum Deciding
+internal enum Deciding
 {
     /// <summary>Answer whatever the ranking put first, however little is behind it.</summary>
     Anyway,
@@ -166,7 +166,7 @@ public enum Deciding
 /// not a repair.
 /// </para>
 /// </remarks>
-public enum Crediting
+internal enum Crediting
 {
     /// <summary>Nothing, so a mint starts at nought and must fire again to matter.</summary>
     Nothing,
@@ -204,7 +204,7 @@ public enum Crediting
 /// before it existed.
 /// </para>
 /// </remarks>
-public enum Coarsening
+internal enum Coarsening
 {
     /// <summary>
     /// A category is a code like any other, so nothing knows a member entails it.
@@ -237,7 +237,7 @@ public enum Coarsening
 /// runs.
 /// </para>
 /// </remarks>
-public enum Subsuming
+internal enum Subsuming
 {
     /// <summary>
     /// The general one must be AT LEAST AS ACCURATE. What ran before anything questioned it.
@@ -309,7 +309,7 @@ public enum Subsuming
 /// grid.
 /// </para>
 /// </remarks>
-public enum Mending
+internal enum Mending
 {
     /// <summary>
     /// Anything that failed and cleared the floor and the budget. What ships.
@@ -403,7 +403,7 @@ public enum Mending
 /// moves with the world was written when the setting was read as a list.
 /// </para>
 /// </remarks>
-public enum Repairing
+internal enum Repairing
 {
     /// <summary>Every round, whatever the vote said. What ships.</summary>
     /// <remarks>
@@ -463,7 +463,7 @@ public enum Repairing
 /// reaches them.
 /// </para>
 /// </remarks>
-public enum Budgeting
+internal enum Budgeting
 {
     /// <summary>Every separation a parent makes spends one. What has always run.</summary>
     Attempts,
@@ -628,7 +628,7 @@ public enum Budgeting
 /// apply to it.
 /// </para>
 /// </remarks>
-public enum Forking
+internal enum Forking
 {
     /// <summary>
     /// The best code in the table, whether or not this parent has already forked on it.
@@ -664,7 +664,7 @@ public enum Forking
 }
 
 /// <summary>Every number the commitment machinery is allowed to have.</summary>
-public sealed record CommittingSettings
+internal sealed record CommittingSettings
 {
     /// <summary>
     /// What has to be true of a failure before genesis mints on it.
@@ -907,7 +907,7 @@ public sealed record CommittingSettings
 /// paid for out of how many candidates were looked at, or it is decorative.
 /// </para>
 /// </remarks>
-public static class Conditions
+internal static class Conditions
 {
     /// <summary>
     /// The code to add to a commitment's scope, or nothing if none has earned it.
@@ -1223,7 +1223,7 @@ public static class Conditions
 /// <b>Written out because the framework does not carry it</b>, and a bar that cannot
 /// be turned into a probability is a bar nobody can argue about.
 /// </remarks>
-public static class Normal
+internal static class Normal
 {
     /// <summary>The chance of exceeding this many standard errors, one-sided.</summary>
     /// <param name="z">How many standard errors.</param>

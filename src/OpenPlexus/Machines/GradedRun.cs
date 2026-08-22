@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Machines;
@@ -9,7 +9,7 @@ namespace OpenPlexus.Machines;
 /// inside a world would let a world choose what the brain perceives; putting it inside
 /// the brain would make the brain know about worlds. It lives at the join.
 /// </remarks>
-public enum Fronting
+internal enum Fronting
 {
     /// <summary>One code per band, per dimension, per grain.</summary>
     Banded,
@@ -24,7 +24,7 @@ public enum Fronting
 /// banded or winnowed codes does not pin anything, so the exact enumeration that made
 /// the multiplexer's score basis-independent has nothing to enumerate over.
 /// </remarks>
-public sealed class GradedRun
+internal sealed class GradedRun
 {
     /// <summary>How finely the banded arm cuts a dimension.</summary>
     public const int Bands = 8;

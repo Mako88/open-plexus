@@ -75,7 +75,7 @@ public sealed class DialTests
             .Where(one => one.PropertyType.IsEnum)
             .Select(one => (one.Name, Kind: one.PropertyType))
             .Concat(typeof(CommittingSettings).Assembly
-                .GetExportedTypes()
+                .GetTypes()
                 .Where(one => one.IsEnum && one.Namespace == "OpenPlexus.Codes")
                 .Select(one => (Name: one.Name, Kind: one)));
 
@@ -805,7 +805,7 @@ public sealed class DialTests
     private static readonly HashSet<string> Worlds =
         [.. Directory
             .GetFiles(
-                Path.Combine(Tree.Repo(), "src", "OpenPlexus", "Worlds"),
+                Path.Combine(Tree.Repo(), "src", "OpenPlexus.Worlds"),
                 "*.cs",
                 SearchOption.AllDirectories)
             .Select(one => Path.GetFileNameWithoutExtension(one))

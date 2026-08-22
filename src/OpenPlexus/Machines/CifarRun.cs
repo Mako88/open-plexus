@@ -47,7 +47,7 @@ namespace OpenPlexus.Machines;
 /// the problem. That is a structural difference and worth more than a number.
 /// </para>
 /// </remarks>
-public sealed class CifarRun : IDisposable
+internal sealed class CifarRun : IDisposable
 {
     /// <summary>How finely the banded arm cuts a dimension.</summary>
     /// <remarks>

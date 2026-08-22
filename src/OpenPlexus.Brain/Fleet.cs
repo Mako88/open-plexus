@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Diagnostics;
 using OpenPlexus.Bus;
 using OpenPlexus.Codes;
@@ -51,7 +51,7 @@ namespace OpenPlexus.Machines;
 /// assembles that, and always did.
 /// </para>
 /// </remarks>
-public sealed class Fleet : ICouncil
+internal sealed class Fleet : ICouncil
 {
     private readonly Asker _asker;
     private readonly CommittingSettings _dials;

@@ -36,4 +36,21 @@
     <PackageReference Include="SimpleHttpClient" Version="5.1.0" />
   </ItemGroup>
 
+  <!-- Who may see the learner, and the list is the rule. `SeparationTests` has said since
+       2026-08-06 that a world may not name a brain type; it said it by walking the filenames
+       of the worlds that existed that day, so every world built after that was outside the
+       list and unchecked. `OpenPlexus.Worlds` is absent here and that is the whole point: a
+       world naming `Population`, `Brain` or `CommittingSettings` does not compile, whatever
+       it is called and whenever it was written.
+
+       The three that are here compose a run rather than being a problem. `OpenPlexus` is the
+       join, and `Bench` reads a population because reading one is what an instrument does;
+       `OpenPlexus.Talk` composes the conversation deployment; `OpenPlexus.Tests` is where
+       every finding is asserted. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="OpenPlexus" />
+    <InternalsVisibleTo Include="OpenPlexus.Talk" />
+    <InternalsVisibleTo Include="OpenPlexus.Tests" />
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,4 @@
-namespace OpenPlexus.Bus;
+﻿namespace OpenPlexus.Bus;
 
 /// <summary>Which broadcast a message belongs to.</summary>
 /// <remarks>
@@ -16,7 +16,7 @@ namespace OpenPlexus.Bus;
 /// anything learns.
 /// </para>
 /// </remarks>
-public readonly record struct BroadcastId(Guid Value)
+internal readonly record struct BroadcastId(Guid Value)
 {
     /// <summary>
     /// A fresh id, minted without asking anyone.

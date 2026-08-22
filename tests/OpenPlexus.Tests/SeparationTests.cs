@@ -25,86 +25,24 @@ namespace OpenPlexus.Tests;
 /// the graded world's runner owned the choice of front end, the band count and the
 /// projection geometry — three brain-side decisions living inside a world.
 /// </para>
+/// <para>
+/// <b>And it is the compiler's rule now.</b> <c>OpenPlexus.Worlds</c> references
+/// <c>OpenPlexus.Brain</c> and nothing else; the learner, the wire and the join are
+/// <c>internal</c> behind a friend list that does not name it. A world naming
+/// <c>Population</c>, <c>Brain</c> or <c>Bench</c> does not compile, whatever it is called
+/// and whenever it was written.
+/// </para>
+/// <para>
+/// <b>The textual half is gone and it had stopped covering.</b> It walked filenames, and the
+/// list was written on 2026-08-06 when <c>Multiplexer</c>, <c>Graded</c> and <c>IWorld</c>
+/// were the only worlds on this branch. Two names were added to it afterwards and the other
+/// twenty-two files never were, so it was reading five of twenty-seven and reporting on all
+/// of them. That is this repo's own trap: a check that cannot fire reads exactly like a
+/// check that passes.
+/// </para>
 /// </remarks>
 public sealed class SeparationTests
 {
-    /// <summary>Everything a world is not allowed to have heard of.</summary>
-    /// <remarks>
-    /// <para>
-    /// <b>The NEW brain only.</b> `csharp`'s walk types are named all over the old
-    /// worlds and go when they go; naming them here would make this check a report on
-    /// work already scheduled rather than a guard on work being done.
-    /// </para>
-    /// <para>
-    /// <b>And two assemblies since the brain became its own project.</b> The mechanisms are
-    /// in <c>OpenPlexus.Brain</c> and the runners that drive them stayed beside the worlds,
-    /// so reading one assembly would let a world name <c>Bench</c> for nothing.
-    /// </para>
-    /// </remarks>
-    private static IEnumerable<string> Brainish() =>
-        new[] { typeof(Commitment).Assembly, typeof(Bench).Assembly }
-            .SelectMany(one => one.GetTypes())
-            .Where(one => one.IsPublic)
-            .Where(one =>
-                one.Namespace == "OpenPlexus.Commitments"
-                || one.Namespace == "OpenPlexus.Machines")
-            .Select(one => one.Name.Split('`')[0])
-            .Distinct(StringComparer.Ordinal);
-
-    private static IEnumerable<KeyValuePair<string, string>> Worlds() =>
-        Tree.Sources("src")
-            .Where(path => path.Contains(
-                $"{Path.DirectorySeparatorChar}Worlds{Path.DirectorySeparatorChar}",
-                StringComparison.Ordinal))
-            .Select(path => new KeyValuePair<string, string>(path, File.ReadAllText(path)));
-
-    [Fact]
-    public void No_world_has_heard_of_the_brain()
-    {
-        var brainish = Brainish().ToList();
-
-        Assert.NotEmpty(brainish);
-
-        var trespass = new List<string>();
-
-        foreach (var (path, text) in Worlds())
-        {
-            // The walk-era worlds are exempt and say so. They name `csharp`'s brain
-            // everywhere and go when it goes -- this guards what is being built now.
-            if (!Path.GetFileName(path).StartsWith("Multiplexer", StringComparison.Ordinal)
-                && !Path.GetFileName(path).StartsWith("Graded", StringComparison.Ordinal)
-                && !Path.GetFileName(path).StartsWith("Cifar", StringComparison.Ordinal)
-                && !Path.GetFileName(path).StartsWith("Arranged", StringComparison.Ordinal)
-                && !Path.GetFileName(path).StartsWith("IWorld", StringComparison.Ordinal))
-                continue;
-
-            foreach (var name in brainish)
-                if (Regex.IsMatch(text, @"\b" + Regex.Escape(name) + @"\b"))
-                    trespass.Add($"{Path.GetFileName(path)} names {name}");
-        }
-
-        Assert.True(trespass.Count == 0,
-            $"{trespass.Count} place(s) where a world reaches into the brain. Move the "
-            + "decision to the join, or turn it into something the world outputs:\n  "
-            + string.Join("\n  ", trespass));
-    }
-
-    [Fact]
-    public void And_the_check_can_still_fail()
-    {
-        // The companion, and without it this passes for a type list that came back
-        // empty -- which is exactly how a separation rule rots into a comment.
-        var brainish = Brainish().ToList();
-
-        Assert.Contains("Population", brainish);
-        Assert.Contains("CommittingSettings", brainish);
-        Assert.Contains("Brain", brainish);
-        Assert.Contains("Bench", brainish);
-
-        Assert.DoesNotContain("Multiplexer", brainish);
-        Assert.DoesNotContain("Graded", brainish);
-    }
-
     [Fact]
     public void Every_world_says_its_outcome_in_the_same_alphabet()
     {
@@ -255,7 +193,12 @@ public sealed class SeparationTests
         {
             var named = string.Join(".", parts.Take(take));
 
-            var type = new[] { typeof(Bench).Assembly, typeof(Commitment).Assembly }
+            var type = new[]
+                {
+                    typeof(Bench).Assembly,
+                    typeof(Commitment).Assembly,
+                    typeof(Multiplexer).Assembly,
+                }
                 .SelectMany(one => one.GetTypes())
                 .FirstOrDefault(one => one.FullName?.Split('`')[0] == named);
 

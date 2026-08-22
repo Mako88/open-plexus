@@ -1,7 +1,7 @@
 ﻿namespace OpenPlexus.Machines;
 
 /// <summary>What a linear probe got, and how much it was shown.</summary>
-public sealed record Probed
+internal sealed record Probed
 {
     /// <summary>Observations it was fitted on.</summary>
     public required int Trained { get; init; }
@@ -45,7 +45,7 @@ public sealed record Probed
 /// bar for reasons that have nothing to do with the features.
 /// </para>
 /// </remarks>
-public static class Probe
+internal static class Probe
 {
     /// <summary>
     /// Fits a softmax classifier on one set of readings and scores it on another.

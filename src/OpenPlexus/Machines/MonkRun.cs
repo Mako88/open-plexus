@@ -22,7 +22,7 @@ namespace OpenPlexus.Machines;
 /// has not generalised, and for once those are not the same number.
 /// </para>
 /// </remarks>
-public sealed class MonkRun
+internal sealed class MonkRun
 {
     private readonly Monk _world;
     private readonly Puzzle _puzzle;

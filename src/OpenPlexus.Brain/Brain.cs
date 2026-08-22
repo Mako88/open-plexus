@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 
 namespace OpenPlexus.Machines;
@@ -16,7 +16,7 @@ namespace OpenPlexus.Machines;
 /// round trips where the wire has one.
 /// </para>
 /// </remarks>
-public readonly record struct Response
+internal readonly record struct Response
 {
     /// <summary>Which moment this answers.</summary>
     public required Stamp To { get; init; }
@@ -59,7 +59,7 @@ public readonly record struct Response
 /// once. Nothing outside asks whether it is alone.
 /// </para>
 /// </remarks>
-public sealed class Brain
+internal sealed class Brain
 {
     /// <summary>The modality every world's outcome is said in.</summary>
     /// <remarks>

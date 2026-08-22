@@ -25,7 +25,7 @@ namespace OpenPlexus.Commitments;
 /// change. <c>Tally.Separations</c> beside it IS reproducible, and is the one to bar.
 /// </para>
 /// </remarks>
-public sealed record Spent
+internal sealed record Spent
 {
     /// <summary>Gathering what fired and taking the vote.</summary>
     public required double Firing { get; init; }
@@ -88,7 +88,7 @@ public sealed record Spent
 /// what it did arrives as one answer. In one process the same record is filled in by four
 /// consecutive calls, which is what keeps the two arrangements comparable.
 /// </remarks>
-public readonly record struct Learnt
+internal readonly record struct Learnt
 {
     /// <summary>Commitments minted by genesis.</summary>
     public required long Minted { get; init; }
@@ -129,7 +129,7 @@ public readonly record struct Learnt
 /// different things.
 /// </para>
 /// </remarks>
-public interface ICouncil
+internal interface ICouncil
 {
     /// <summary>Where the wall clock went, by phase.</summary>
     /// <remarks>
@@ -190,7 +190,7 @@ public interface ICouncil
 /// a sweep round that culls before a child is minted is not the same run as one that culls
 /// after. <c>DeterminismTests</c> is what says so.
 /// </remarks>
-public sealed class Alone : ICouncil
+internal sealed class Alone : ICouncil
 {
     private readonly Population _held;
 

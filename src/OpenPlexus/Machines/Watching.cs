@@ -21,7 +21,7 @@ namespace OpenPlexus.Machines;
 /// same reason: it is the same moment, asked about twice.
 /// </para>
 /// </remarks>
-public sealed record Fronted
+internal sealed record Fronted
 {
     /// <summary>Moments read.</summary>
     /// <remarks>
@@ -58,7 +58,7 @@ public sealed record Fronted
 /// in reporting nought doings reads exactly like a chooser that never found anything to say,
 /// and those are opposite readings.
 /// </remarks>
-public sealed record Chosen
+internal sealed record Chosen
 {
     /// <summary>Doings said.</summary>
     public required long Doings { get; init; }
@@ -85,7 +85,7 @@ public sealed record Chosen
 /// arrangement one seam along: a question only some inputs can answer arrives as an interface
 /// some of them implement.
 /// </remarks>
-public interface IReports
+internal interface IReports
 {
     /// <summary>What its front end said.</summary>
     Fronted Fronted { get; }
@@ -111,7 +111,7 @@ public interface IReports
 /// arrive as a second implementation of <see cref="IInput"/> rather than as a second bench.
 /// </para>
 /// </remarks>
-public sealed class Watching<TSeen> : IInput, IExamines, IReports
+internal sealed class Watching<TSeen> : IInput, IExamines, IReports
 {
     private readonly IWorld<TSeen> _world;
     private readonly IQuantizer<TSeen> _sensing;

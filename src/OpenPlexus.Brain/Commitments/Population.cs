@@ -5,7 +5,7 @@ using OpenPlexus.Codes;
 namespace OpenPlexus.Commitments;
 
 /// <summary>What the commitments that fired say should follow, and how strongly.</summary>
-public readonly record struct Vote
+internal readonly record struct Vote
 {
     /// <summary>What was predicted, or nothing if nothing fired.</summary>
     public Code? Expects { get; init; }
@@ -59,7 +59,7 @@ public readonly record struct Vote
 /// the speaker's own accuracy, and the name of its best advocate. A reader learns what is
 /// claimed and never what the claimant is made of.
 /// </remarks>
-public readonly record struct Weighted
+internal readonly record struct Weighted
 {
     /// <summary>What is expected to follow.</summary>
     public required Code Expects { get; init; }
@@ -91,7 +91,7 @@ public readonly record struct Weighted
 /// third time.
 /// </para>
 /// </remarks>
-public readonly record struct Weights
+internal readonly record struct Weights
 {
     /// <summary>What the holder's commitments advocate, ordered by expectation.</summary>
     public required ImmutableArray<Weighted> Each { get; init; }
@@ -132,7 +132,7 @@ internal sealed class Forks
 /// a two-code scope can arrive from repair or from a rename — and a ledger that guessed
 /// would report the operator it expected instead of the one that ran.
 /// </remarks>
-public enum Birth
+internal enum Birth
 {
     /// <summary>Genesis minted it on a surprise.</summary>
     Genesis,
@@ -147,7 +147,7 @@ public enum Birth
 
 /// <summary>How a commitment stopped being held.</summary>
 /// <inheritdoc cref="Birth"/>
-public enum Loss
+internal enum Loss
 {
     /// <summary>A general commitment took its place.</summary>
     Subsumed,
@@ -188,7 +188,7 @@ public enum Loss
 /// rather than quietly under-reporting a death.
 /// </para>
 /// </remarks>
-public readonly record struct Lifetime
+internal readonly record struct Lifetime
 {
     /// <inheritdoc cref="Birth.Genesis"/>
     public long Genesis { get; init; }
@@ -269,7 +269,7 @@ public readonly record struct Lifetime
 /// 12 has already cost this project twice.
 /// </para>
 /// </remarks>
-public sealed class Population
+internal sealed class Population
 {
     private readonly CommittingSettings _dials;
     private readonly Random _blind;

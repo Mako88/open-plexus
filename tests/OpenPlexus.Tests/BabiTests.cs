@@ -505,7 +505,9 @@ public sealed class BabiTests(ITestOutputHelper output)
                     .Select(one => ("a set  ", one, watching.BySpace(one, floor: 20)))
                     .Concat(new[] { 0.7, 0.8, 0.9, 0.95, 0.99 }
                         .Select(one => ("weighed", one, watching.ByLikeness(one, floor: 20))))
-                    .Concat([("chance ", double.NaN, watching.ByChance(Counting.Company, floor: 20))]))
+                    .Concat([
+                        ("chance ", double.NaN, watching.ByChance(Counting.Company, floor: 20)),
+                        ("lifted ", double.NaN, watching.ByChance(Counting.Weighed, floor: 20))]))
             {
                 var said = groups
                     .Select(group => group
@@ -555,7 +557,8 @@ public sealed class BabiTests(ITestOutputHelper output)
         // it here is what stops the claim living in a commit message alone.
         output.WriteLine(
             $"best covered: weighed {best["weighed"]}, a set {best["a set  "]}, "
-            + $"chance {best.GetValueOrDefault("chance ")}");
+            + $"chance {best.GetValueOrDefault("chance ")}, "
+            + $"lifted {best.GetValueOrDefault("lifted ")}");
 
         // And the shuffled bar is one row rather than five, because it picks no level. What
         // it is being read against is the BEST of the five hand-picked ones, which is the

@@ -2179,6 +2179,14 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 // `Returning`'s runs say about a moving thing.
                 ("time/never", _ => alternating.ByChance(Counting.Time, 20, Meeting.Never)),
                 ("time/rarely", _ => alternating.ByChance(Counting.Time, 20, Meeting.Rarely)),
+
+                // And the same bar over company WEIGHED, which is here because the raw one
+                // gets stricter as evidence accumulates -- both codes' shuffles converge on
+                // the alphabet's marginal, so their cosine goes to one and nothing observed
+                // can beat it. This world is ten thousand moments deep, so whether the reading
+                // above was taken past that point is exactly what these two rows say.
+                ("weighed/never", _ => alternating.ByChance(Counting.Weighed, 20, Meeting.Never)),
+                ("weighed/rarely", _ => alternating.ByChance(Counting.Weighed, 20, Meeting.Rarely)),
             })
         foreach (var alike in new[] { 0.5, 0.8, 0.9, 0.95 })
         {

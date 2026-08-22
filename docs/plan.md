@@ -37,11 +37,9 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **`OpenPlexus.Brain` as its own project**, learner `internal`, so the boundary is the
   compiler's rather than a folder's. `Brain.Held` becoming a reported census is its own arc
   and is what shrinks the surface.
-- **Grow `Coded` into an ordered list of groups**, and fold `Recited`, `Asking` and `Bodily`
-  into it. They are copies ten to twelve of the type whose own doc records the first nine, and
-  folding them is what makes one input serve two worlds.
-- **And `Bodied` mints through `Homeostat`'s statics**, which goes with `Homeostat.Feels`
-  returning codes at all.
+- **Fold `Recited` and `Asking` into `Coded`**, which `Bodily` already did. They are copies
+  eleven and twelve of the type whose own doc records the first nine, and folding them is what
+  makes one input serve two worlds and what unblocks the split above.
 - **A holder host and a harness that takes peers**, which is the first two-process run and
   what `Ported` has been standing in for. John's end state is this repeated twenty times.
 - **Then a likeness bar that travels**, read against shuffled moments rather than a level,
@@ -684,6 +682,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | `Preferring.Saving` — naming the certified pair the most scopes hold | Stacking falls 3.4 standard errors on eleven bits, the outcome columns at ceiling on both arms. A name over a two-code scope leaves it one code and out of the eligible set | A world whose eligible scopes are mostly three codes or longer |
 | `Preferring.Surviving` — the same over scopes that survive naming | Inside a standard error of the row above on every column: the deepest certified pair is the widest on 80 asks of 80 | A world where those come apart, which `NamingYieldTests` asserts against |
 | `Marked` — a discrete reading said as one code | Nothing ever called it, in `src` or in a test | A world handing over a raw index the brain must name, which `Passthrough` cannot take |
+| `Feeling.Intervened` -- a body's doing MARKED as one | Identical in five of six cells and inside noise in the sixth, for a tenth more population. Every doing here is forced, so the derived name and the plain one are perfectly correlated | A body acted on by something else, so an action has an observational counterpart |
 | A compound eye, several readings of ONE sense at once | The moment is a union, so the ceiling is: every pair raises it over its best channel, and the withheld score lands BETWEEN the channels on three tasks and seeds | DISJOINT alphabets, a second SENSE and `Crossing`'s case: no union reaches an outcome in one modality |
 | A refusal as a CODE in the moment, fork **127** | Level on both shapes for a larger population, the chooser already refusing to repeat itself, so the fact was acted on before the code arrived | The exclusion having to SURVIVE the moment, which is a store's job rather than a code's |
 

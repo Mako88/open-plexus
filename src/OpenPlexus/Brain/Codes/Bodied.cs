@@ -78,4 +78,5 @@ public sealed class Bodied(Feeling feeling) : IQuantizer<Coded>
 
         return [.. observation.Codes.Where(one => !done.Contains(one))];
     }
+
 }

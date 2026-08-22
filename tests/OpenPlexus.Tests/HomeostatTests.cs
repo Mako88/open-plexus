@@ -436,23 +436,25 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         var scored = new Dictionary<string, double>(StringComparer.Ordinal);
 
         foreach (var uniform in new[] { true, false })
-        foreach (var feeling in new[] { Feeling.Blind, Feeling.Acted })
+        foreach (var feeling in Enum.GetValues<Feeling>())
+        foreach (var seed in new[] { 1, 2, 3 })
         {
-            var brain = new Brain(new CommittingSettings { Capacity = 2000 }, 1);
+            var brain = new Brain(new CommittingSettings { Capacity = 2000 }, seed);
 
             var run = new HomeostatRun(
                 World(),
                 brain,
                 uniform ? Regulating.Uniform : Regulating.Aimed,
                 feeling,
-                seed: 1);
+                seed);
 
             var came = run.Run(rounds: Rounds, sweep: 500, target: 0.9, window: 1000);
 
-            scored[$"{(uniform ? "uniform" : "aimed  ")} {feeling}"] = came.Tally.Recent;
+            if (seed == 1) scored[$"{(uniform ? "uniform" : "aimed  ")} {feeling}"] =
+                came.Tally.Recent;
 
             output.WriteLine(
-                $"{(uniform ? "uniform" : "aimed  ")} {feeling,-6} "
+                $"{(uniform ? "uniform" : "aimed  ")} {feeling,-11} s{seed} "
                 + $"| drawn {came.Tally.Recent:F3} | chance {run.Chance:F3} "
                 + $"| viable {(came.Standing ? "yes" : "no ")} | held {brain.Held.Count,4} "
                 + $"| silent {came.Tally.Silent} | repaired {came.Tally.Repaired}");

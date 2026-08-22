@@ -80,6 +80,27 @@ public sealed record ClevrSettings
     /// </para>
     /// </remarks>
     public int Withheld { get; init; }
+
+    /// <summary>Which of the stride's positions the held-back questions are taken at.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The only axis this world varies on</b>, and it exists because it had none. The
+    /// corpus is read from the front of one file in one order and nothing here is drawn, so
+    /// two runs of this world are the same run — a spread taken across brain seeds came back
+    /// at exactly nought on every column, which is a yardstick that admits any gain at all.
+    /// </para>
+    /// <para>
+    /// <b>Which questions are held back is the experimenter's</b>, so this is where a seed
+    /// belongs. It moves the stride's phase and nothing else: the same count comes out, about
+    /// the same scenes, and what changes is which question of each run of <c>stride</c> is
+    /// the one nobody is shown.
+    /// </para>
+    /// <para>
+    /// <b>Nought reproduces every number taken before it existed</b>, which is what makes it
+    /// safe to add to a world with recorded readings.
+    /// </para>
+    /// </remarks>
+    public int Phase { get; init; }
 }
 
 /// <summary>One CLEVR scene, as codes.</summary>
@@ -364,7 +385,9 @@ public sealed class Clevr : IWorld<Coded>, IWithholds<Coded>
         {
             foreach (var question in About(scene.Scene))
             {
-                if (stride > 0 && at % stride == 0 && _kept.Count < settings.Withheld)
+                if (stride > 0
+                    && at % stride == ((settings.Phase % stride) + stride) % stride
+                    && _kept.Count < settings.Withheld)
                     _kept.Add(Posed(scene, question));
                 else _turns.Add((scene, question));
 

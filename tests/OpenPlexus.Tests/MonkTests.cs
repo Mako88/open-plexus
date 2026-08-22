@@ -281,6 +281,77 @@ public sealed class MonkTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// What the genesis gate costs where the world's whole rule set is enumerable.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Fork 135's third world</b>, and the one where coverage is checkable rather than
+    /// inferred. <c>Surprising.Unaccounted</c> stops genesis whenever anything that fired
+    /// expected what arrived, and an outvoted advocate being right by luck is enough — so
+    /// proposals dry up while most of the world is unfound. Here <c>Found</c> against
+    /// <c>Truths</c> says exactly how much.
+    /// </para>
+    /// <para>
+    /// <b>What the two gates really are.</b> Genesis only runs at all where the VOTE missed,
+    /// so <c>AnyFailure</c> is <i>the decider had no account of this</i> and
+    /// <c>Unaccounted</c> is <i>nobody holding anything had one</i>. The plan's own trap says
+    /// a gate on what is HELD cannot reach what DECIDES, and this is that line pointed at
+    /// genesis rather than at the seat.
+    /// </para>
+    /// <para>
+    /// <b>What would drop the arm</b>, said before the run: <c>AnyFailure</c> finding no more
+    /// of the world's rules than <c>Unaccounted</c> on any puzzle, or costing withheld
+    /// accuracy on one where the language is not the ceiling. <see cref="Puzzle.Two"/> is a
+    /// counting concept a conjunction cannot say, so more rules found there is memorising and
+    /// is not evidence either way.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_the_genesis_gate_costs_where_the_rule_set_is_enumerable()
+    {
+        foreach (var puzzle in new[] { Puzzle.One, Puzzle.Two, Puzzle.Three })
+        {
+            foreach (var gate in new[] { Surprising.Unaccounted, Surprising.AnyFailure })
+            {
+                var unseen = new List<double>();
+                var found = new List<double>();
+
+                foreach (var seed in new[] { 1, 2, 3, 4, 5, 6, 7, 8 })
+                {
+                    var run = new MonkRun(
+                        new MonkSettings { Puzzle = puzzle, Withheld = 132 },
+                        new Brain(new CommittingSettings { Surprising = gate }, seed),
+                        seed);
+
+                    var got = run.Run(20_000);
+
+                    unseen.Add(got.Tally.Unseen?.Accuracy ?? 0.0);
+                    found.Add(got.Found);
+
+                    output.WriteLine(
+                        $"  {puzzle,-5} {gate,-12} seed {seed} | withheld "
+                        + $"{got.Tally.Unseen?.Accuracy ?? 0.0:F3} against {run.Chance:F3} "
+                        + $"| drawn {got.Recent:F3} | found {got.Found}/{got.Truths} "
+                        + $"| sound {got.Sound} unsound {got.Unsound} "
+                        + $"| resident {got.Resident} minted {got.Tally.Minted}");
+                }
+
+                output.WriteLine(
+                    $"  {puzzle,-5} {gate,-12} MEAN withheld "
+                    + $"{new Measured { Arm = "withheld", Values = unseen }} | found "
+                    + $"{new Measured { Arm = "found", Values = found }}");
+            }
+
+            output.WriteLine("");
+        }
+
+        // The bars are asserted in the fact above. This prints what the gate did to a world
+        // whose whole rule set can be counted.
+        Assert.True(true);
+    }
+
+    /// <summary>
     /// <b>Whether the failures are asking for a rung</b> — fork 50, as a number.
     /// </summary>
     /// <remarks>

@@ -314,10 +314,11 @@ public sealed class ClevrTests(ITestOutputHelper output)
     /// because a run of this world is a minute and a half.
     /// </para>
     /// <para>
-    /// <b>And the spread here is the BRAIN's alone</b>, which is a ceiling on what this can
-    /// say. This world has no seed: the corpus is read off disk in one order, so four runs
-    /// differ in placement and tie-breaks and in nothing about the scenes. A spread taken
-    /// that way understates, so a gap inside it is not evidence of no gap.
+    /// <b>And the spread is over which questions are held back</b>, which is the only axis
+    /// this world has. The first version of this sweep varied the BRAIN's seed and came back
+    /// with four bit-identical rows: the corpus is read off disk in one order and nothing in
+    /// a run of it is drawn, so a spread taken that way is exactly nought and admits any gain
+    /// at all. <see cref="ClevrSettings.Phase"/> moves the held-out stride instead.
     /// </para>
     /// <para>
     /// <b>And this is the world where it could COST rather than pay.</b> The corpus segments
@@ -338,13 +339,13 @@ public sealed class ClevrTests(ITestOutputHelper output)
 
             foreach (var seed in new[] { 1, 2, 3, 4 })
             {
-                var run = Learnt(fleeting: true, spanning: spanning, seed: seed);
+                var run = Learnt(fleeting: true, spanning: spanning, phase: seed);
 
                 drawn.Add(run.Tally.Recent);
                 unseen.Add(run.Composed);
 
                 output.WriteLine(
-                    $"  {spanning,-8} seed {seed} | drawn {run.Tally.Recent:F3} | withheld "
+                    $"  {spanning,-8} phase {seed} | drawn {run.Tally.Recent:F3} | withheld "
                     + $"{run.Composed:F3} of {run.Unseen.Answered} answered | held "
                     + $"{run.Tally.Resident}, {run.Tally.Minted} minted, {run.Tally.Repaired} "
                     + "repairs");
@@ -362,14 +363,14 @@ public sealed class ClevrTests(ITestOutputHelper output)
 
     /// <param name="fleeting">Whether the world says its per-scene indexes cannot recur.</param>
     /// <param name="spanning">Whether a scope may be about more than one of the objects.</param>
-    /// <param name="seed">The seed for the world and the brain.</param>
-    private static Run Learnt(bool fleeting, Spanning spanning = Spanning.Thing, int seed = 1)
+    /// <param name="phase">Which questions are held back — this world's one axis.</param>
+    private static Run Learnt(bool fleeting, Spanning spanning = Spanning.Thing, int phase = 0)
     {
         var world = new Clevr(
-            World(scenes: Scenes, fleeting: fleeting) with { Withheld = 300 });
+            World(scenes: Scenes, fleeting: fleeting) with { Withheld = 300, Phase = phase });
 
         var brain = new Brain(
-            new CommittingSettings { Capacity = 4000, Spanning = spanning }, seed);
+            new CommittingSettings { Capacity = 4000, Spanning = spanning }, seed: 1);
 
         var tally = new Bench(new Watching<Coded>(world, new Passthrough<Coded>(one => one)), brain)
             .Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);

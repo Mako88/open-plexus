@@ -37,6 +37,28 @@ namespace OpenPlexus.Tests;
 /// than argued; the accuracy is what that identity looks like from the far end of
 /// the system.
 /// </para>
+/// <para>
+/// <b>And the prediction stands</b>, with the reason it was always conditional. An occasion
+/// is a SET of co-occurring codes and no conjunction over one can separate the two scenes —
+/// which is a claim about what the codes carry rather than about what a front end may say
+/// beside them. <see cref="Codes.IQuantizer{TObservation}.Bind"/> is the front end saying
+/// which codes are one object, and it had no reader on this branch until
+/// <see cref="Commitments.Spanning"/>.
+/// </para>
+/// <para>
+/// <b>Read, the unbound arm goes to 0.9938 +-0.0036</b> against a control at 0.5050 +-0.0109
+/// on the withheld set, holding every one of the 144 rules the world has where the control
+/// holds none — and the control is the bigger population, so it is not more search. Ignored,
+/// the two are equal to the digit. The world emits the identical stream either way and
+/// <see cref="The_two_arms_of_the_grouping_still_see_the_identical_input"/> asserts it.
+/// </para>
+/// <para>
+/// <b>That is representability rather than composition</b>, and the distinction is the
+/// world's own. The grouping IS the binding expressed as data, so a front end that segments
+/// has told the machine the answer in the one form the codes cannot carry; what this says is
+/// that the machine can act on it. <see cref="ComposedTests"/> is the world built to ask
+/// whether it composes, and that one reads at chance.
+/// </para>
 /// </remarks>
 public sealed class BindingTests(ITestOutputHelper output)
 {

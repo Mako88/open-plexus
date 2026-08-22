@@ -434,17 +434,30 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     /// sound singles is held and the unseen set FALLS, 0.800 +-0.024 to 0.733 +-0.023.
     /// </para>
     /// <para>
-    /// <b>Finding every rule and answering worse is the whole finding.</b> Unsound residents
-    /// roughly double on the tiled arm while sound ones fall, and the vote weighs accuracy
-    /// with no floor — so what the extra proposals buy is seats for rules that have not been
-    /// tested yet. That is the refuted <c>Speaking</c> arm's territory approached from the
-    /// other side: the problem is not which rules are HELD but which take the round.
+    /// <b>Finding every rule and answering worse is the whole finding.</b> On the tiled arm
+    /// unsound residents roughly double and SOUND ones fall — 743 to 1,129 becomes 389 to 954
+    /// — while the population grows by about three hundred. So the extra proposals arrive and
+    /// sound rules leave, and the run answers worse holding every rule it needs.
     /// </para>
     /// <para>
-    /// <b>So the gate is not a mistake and neither is ungating it.</b> What separates the
-    /// worlds is whether capacity binds, and on this one it binds exactly — 2,000 of 2,000 on
-    /// both arms of the whole front end. A seat rule is what fork 135 wants, and flipping the
-    /// default without one would trade three worlds' coverage for this one's answers.
+    /// <b>Two readings fit that and this grid does not separate them.</b> Either the vote is
+    /// seating rules nothing has tested, which is the refuted <c>Speaking</c> arm's territory
+    /// from the other side; or culling is evicting sound rules to make room, which is a
+    /// capacity story and not a seat story. The first was written down here as the answer
+    /// before the second was noticed, which is an explanation being arithmetically true and
+    /// still not the cause.
+    /// </para>
+    /// <para>
+    /// <b>What would separate them is a count of what LEFT.</b> <c>Loss</c> already partitions
+    /// that and no arm of this grid reads it; a run where the sound rules were culled and one
+    /// where they were outvoted look identical in every column printed here. That is fork
+    /// 135's next instrument and it is cheaper than either mechanism it would choose between.
+    /// </para>
+    /// <para>
+    /// <b>So the gate is not a mistake and neither is ungating it.</b> Three worlds say the
+    /// gate costs coverage for nothing; this one says ungating costs answers. Flipping the
+    /// default before knowing which of the two readings above is true would be trading three
+    /// worlds' coverage for this one's answers on a guess about why.
     /// </para>
     /// </remarks>
     [Fact]

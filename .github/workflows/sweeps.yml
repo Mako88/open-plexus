@@ -93,6 +93,7 @@ jobs:
             "ArrangingTests.And_the_other_half",
             "ArrangingTests.Whether_the_gap_is_a_fact",
             "ArrangingTests.Whether_the_gate_that_was_load_bearing",
+            "ArrangingTests.Whether_subsumption_is_what_ungated",
             "ArrangingTests.Whether_distinct_children_are_damage",
             "BudgetTests","ChoosingTests","FleetTests","FoldingTests",
             "EncodedTests.The_population_reaches_most",

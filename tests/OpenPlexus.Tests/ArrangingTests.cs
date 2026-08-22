@@ -415,6 +415,93 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// Whether subsumption is what ungated genesis costs.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The arm the loss ledger named</b>, on the one front end where ungating loses. There
+    /// culling is nought and repair does more at every depth, so the sound rules that vanish
+    /// are neither evicted for space nor never built — subsumption goes from 38 deletions at
+    /// depth two to 1,618 while repair goes from 233 to 1,604, which is one narrower rule
+    /// deleted for every one made.
+    /// </para>
+    /// <para>
+    /// <b>Why the two should interact.</b> Genesis puts down 230 roots ungated against 28,
+    /// so there are eight times the general parents; <see cref="Subsuming.Weaker"/> keeps the
+    /// general one wherever it is at least as accurate, and a child that has fired a handful
+    /// of times rarely clears that. So the price of ungating is children deleted by parents
+    /// whose whole advantage is a bigger sample.
+    /// </para>
+    /// <para>
+    /// <b>What would drop it</b>, said before the run: the ungated arm under
+    /// <see cref="Subsuming.Insignificant"/> reading no better on the unseen set than under
+    /// <see cref="Subsuming.Weaker"/>. That would mean the deletions were not the cost, and
+    /// fork 135 goes back to the vote — which is the reading the ledger has already refused
+    /// once and would then be the only one left.
+    /// </para>
+    /// <para>
+    /// <b>And the population is the column to watch beside it.</b> Demanding significance
+    /// keeps far more residents — 228 against 116 at eleven bits, on the reading that dial
+    /// carries — so an arm that scores better while holding twice as much has bought the score
+    /// with memory and is not the answer. The gate's whole complaint is a churn.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_subsumption_is_what_ungated_genesis_costs()
+    {
+        var could = new ArrangedRun(
+            Small, new Brain(new CommittingSettings(), seed: 1), Looking.Tiled, seed: 1)
+            .Reachable(depth: 1);
+
+        output.WriteLine(
+            $"tiled: ceiling {could.CoversUnseen:F3} on the unseen, from {could.Alone.Length} "
+            + $"codes sound alone, {could.Least} of them enough");
+
+        var grid =
+            from gate in new[] { Surprising.Unaccounted, Surprising.AnyFailure }
+            from subsuming in new[] { Subsuming.Weaker, Subsuming.Insignificant }
+            select (gate, subsuming);
+
+        foreach (var (gate, subsuming) in grid)
+        {
+            var unseen = new List<double>();
+
+            foreach (var seed in new[] { 1, 2, 3, 4, 5 })
+            {
+                var run = new ArrangedRun(
+                    Small,
+                    new Brain(
+                        new CommittingSettings { Surprising = gate, Subsuming = subsuming },
+                        seed),
+                    Looking.Tiled,
+                    seed);
+
+                var got = run.Run(20_000);
+
+                var alone = Fixture.Alone(run.Held);
+
+                unseen.Add(got.Tally.Unseen!.Accuracy);
+
+                output.WriteLine(
+                    $"  {gate,-11} {subsuming,-13} seed {seed} | unseen "
+                    + $"{got.Tally.Unseen.Accuracy:F3} drawn {got.Tally.Recent:F3} | "
+                    + $"{could.Alone.Count(alone.Contains)}/{could.Alone.Length} sound "
+                    + $"singles held, {got.Tally.Resident} resident "
+                    + $"({got.Tally.Minted} minted, {got.Tally.Subsumed} subsumed) | "
+                    + $"sound {got.Rules.Sound} unsound {got.Rules.Unsound}");
+            }
+
+            output.WriteLine(
+                $"  {gate,-11} {subsuming,-13} MEAN "
+                + $"{new Measured { Arm = "unseen", Values = unseen }}");
+        }
+
+        // The bar is the ceiling printed above and this grid is read against it by a person.
+        Assert.True(true);
+    }
+
+    /// <summary>
     /// Whether the gate that was load-bearing on photographs is one here.
     /// </summary>
     /// <remarks>
@@ -440,18 +527,27 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     /// sound rules leave, and the run answers worse holding every rule it needs.
     /// </para>
     /// <para>
-    /// <b>Two readings fit that and this grid does not separate them.</b> Either the vote is
-    /// seating rules nothing has tested, which is the refuted <c>Speaking</c> arm's territory
-    /// from the other side; or culling is evicting sound rules to make room, which is a
-    /// capacity story and not a seat story. The first was written down here as the answer
-    /// before the second was noticed, which is an explanation being arithmetically true and
-    /// still not the cause.
+    /// <b>Three readings fitted that and the ledger names a fourth.</b> The guesses were the
+    /// vote seating untested rules, culling evicting sound ones to make room, and repair
+    /// never building them from a larger parent set on one budget. The <c>Loss</c> column by
+    /// depth refuses all three: culling is NOUGHT in every cell of the tiled arm under both
+    /// gates, and repair does more at every depth ungated — 1,604 against 233 at depth two
+    /// and 1,880 against 518 at depth three.
     /// </para>
     /// <para>
-    /// <b>What would separate them is a count of what LEFT.</b> <c>Loss</c> already partitions
-    /// that and no arm of this grid reads it; a run where the sound rules were culled and one
-    /// where they were outvoted look identical in every column printed here. That is fork
-    /// 135's next instrument and it is cheaper than either mechanism it would choose between.
+    /// <b>Subsumption is what removes them.</b> At depth two it goes from 38 to 1,618 while
+    /// repair goes from 233 to 1,604 — from deleting one narrower rule in six to deleting one
+    /// for every one built. Genesis puts down 230 roots instead of 28, so there are far more
+    /// general parents about, and the design's one preference for generality keeps each of
+    /// them wherever a child is not measurably better.
+    /// </para>
+    /// <para>
+    /// <b>Which is the shipped arm doing exactly what it says</b>, at a rate nothing sized.
+    /// <see cref="Subsuming.Weaker"/> requires the general rule to be AT LEAST AS accurate,
+    /// and a child that has fired a handful of times rarely clears that — so the cost of
+    /// ungating genesis is paid in children deleted by parents whose advantage is a sample
+    /// size. <see cref="Subsuming.Insignificant"/> is the arm that demands the child be
+    /// significantly worse before it goes, and pairing the two is what fork 135 asks next.
     /// </para>
     /// <para>
     /// <b>So the gate is not a mistake and neither is ungating it.</b> Three worlds say the

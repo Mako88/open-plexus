@@ -75,22 +75,45 @@ public enum Meeting
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>An arm, and the two are not substitutes.</b> One reads what a code keeps company with
-/// inside a moment and one reads what it turns up beside across moments, which is the
-/// distinction <see cref="Alternating.Over"/> already draws between space and time. A twin
+/// <b>An arm, and the readings are not substitutes.</b> Two of them read what a code keeps
+/// company with inside a moment and one reads what it turns up beside across moments, which is
+/// the distinction <see cref="Alternating.Over"/> already draws between space and time. A twin
 /// wears its sibling's look, so company cannot part the two; a uniform stream adheres at
 /// chance everywhere, so time finds nothing a bag of moments would have.
 /// </para>
 /// <para>
-/// <b>What is shared is that neither takes a level.</b> A bar somebody picked while looking
-/// at one world is that world reaching into a mechanism, and this enum says which counts the
-/// bar travels over rather than how high it sits.
+/// <b>What is shared is that none of them takes a level.</b> A bar somebody picked while
+/// looking at one world is that world reaching into a mechanism, and this enum says which
+/// counts the bar travels over rather than how high it sits.
 /// </para>
 /// </remarks>
 public enum Counting
 {
     /// <summary>What a code shares a MOMENT with, against a shuffle of the same counts.</summary>
     Company,
+
+    /// <summary>
+    /// The same company, each partner weighed by how SURPRISING it is — <b>and the null does
+    /// not converge, which is why it is here.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><see cref="Company"/> gets stricter without bound as evidence accumulates.</b> A
+    /// shuffled vector is a multinomial over the alphabet's marginal, so as a code's company
+    /// mass grows it converges ON that marginal — and two codes whose shuffles have both
+    /// converged have a cosine of one, which nothing observed can beat. On bAbI's parted
+    /// vocabulary the grouping covers twelve codes at five hundred moments and eight at twenty
+    /// thousand, falling as the counts improve, where a level at 0.9 holds nineteen throughout.
+    /// A test that refuses more the more it is told is broken rather than conservative.
+    /// </para>
+    /// <para>
+    /// <b>Positive pointwise mutual information is what the shuffle was trying to remove.</b>
+    /// It divides what was counted by what independence would have made it, so what the
+    /// marginal explains is gone before the cosine is taken rather than after — and a shuffled
+    /// vector, being the marginal, weighs nothing at all.
+    /// </para>
+    /// </remarks>
+    Weighed,
 
     /// <summary>What a code turns up BESIDE, against what independence would have made it.</summary>
     Time,
@@ -351,15 +374,28 @@ public sealed class Alternating
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
 
-        return counting == Counting.Company ? Alike(floor, meeting) : Near(floor, meeting);
+        return counting switch
+        {
+            Counting.Company => Alike(floor, meeting, weighed: false),
+            Counting.Weighed => Alike(floor, meeting, weighed: true),
+            _ => Near(floor, meeting),
+        };
     }
 
     /// <summary>The company reading, where the null is sampled.</summary>
     /// <param name="floor">How often a code must have been seen to be grouped.</param>
+    /// <param name="weighed">
+    /// Whether each partner is weighed by how surprising it is before the cosine is taken.
+    /// <b>The same shuffle either way</b>, so the two arms differ in the statistic and in
+    /// nothing else — a shuffle drawn differently would move both the observed side and the
+    /// null and leave nobody able to say which.
+    /// </param>
     /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
-    private IReadOnlyList<IReadOnlySet<Code>> Alike(int floor, Meeting meeting)
+    private IReadOnlyList<IReadOnlySet<Code>> Alike(int floor, Meeting meeting, bool weighed)
     {
         var shuffled = Shuffled(floor);
+
+        if (weighed) return Lifted(shuffled, floor, meeting);
 
         return Grouped(
             _seen, floor, _withs,
@@ -370,6 +406,41 @@ public sealed class Alternating
                 for (var draw = 0; draw < Draws; draw++)
                     if (Likeness(shuffled[mine][draw], shuffled[theirs][draw]) >= observed)
                         return false;
+
+                return true;
+            },
+            meeting);
+    }
+
+    /// <summary>The same shuffle, with every partner weighed before the cosine is taken.</summary>
+    /// <param name="shuffled">Each eligible code's company as chance would have written it.</param>
+    /// <param name="floor">How often a code must have been seen to be grouped.</param>
+    /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
+    /// <remarks>
+    /// <b>The null is lifted by the same arithmetic as the observation</b>, which is the whole
+    /// of what makes this a comparison. Weighing only the observed side would divide out the
+    /// marginal on one half of the test and leave it on the other, so a pair would clear the
+    /// bar for being weighed rather than for being alike.
+    /// </remarks>
+    private IReadOnlyList<IReadOnlySet<Code>> Lifted(
+        Dictionary<Code, Dictionary<Code, int>[]> shuffled, int floor, Meeting meeting)
+    {
+        var observed = _withs.Keys.ToDictionary(code => code, Pointwise);
+
+        var drawn = shuffled.ToDictionary(
+            one => one.Key,
+            one => one.Value
+                .Select(table => Weigh(table, _seen.GetValueOrDefault(one.Key)))
+                .ToArray());
+
+        return Grouped(
+            _seen, floor, _withs,
+            (mine, theirs, _) =>
+            {
+                var alike = Likeness(observed[mine], observed[theirs]);
+
+                for (var draw = 0; draw < Draws; draw++)
+                    if (Likeness(drawn[mine][draw], drawn[theirs][draw]) >= alike) return false;
 
                 return true;
             },
@@ -589,13 +660,20 @@ public sealed class Alternating
     /// independence says the two avoid each other, and a vector of avoidances is a different
     /// claim from a vector of what they share.
     /// </remarks>
-    private Dictionary<Code, double> Pointwise(Code code)
+    private Dictionary<Code, double> Pointwise(Code code) =>
+        Weigh(_withs.GetValueOrDefault(code) ?? [], _seen.GetValueOrDefault(code));
+
+    /// <summary>One company table, each partner weighed by how surprising it is.</summary>
+    /// <param name="kept">What turned up with it, and how often.</param>
+    /// <param name="mine">How often the code itself was seen.</param>
+    /// <remarks>
+    /// <b>Taking the table rather than the code</b>, so a SHUFFLED table is weighed by the same
+    /// arithmetic as an observed one. The marginals stay the real ones either way, because a
+    /// shuffle redraws which codes kept company and never how often any of them was seen.
+    /// </remarks>
+    private Dictionary<Code, double> Weigh(IReadOnlyDictionary<Code, int> kept, int mine)
     {
         var lifted = new Dictionary<Code, double>();
-
-        if (!_withs.TryGetValue(code, out var kept)) return lifted;
-
-        var mine = _seen.GetValueOrDefault(code);
 
         if (mine == 0) return lifted;
 

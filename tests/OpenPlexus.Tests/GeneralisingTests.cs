@@ -39,9 +39,10 @@ namespace OpenPlexus.Tests;
 /// </para>
 /// <para>
 /// <b>So the second reading follows the repeated hole</b>, link by link, on the world where
-/// it means something. It wants a front end keeping the halves apart, a scope that
-/// came to say one value twice, a sibling group over that shape, and a gate that admits it.
-/// Each link is counted, so the reading names the empty one rather than reporting a nought.
+/// it means something. It wants a front end keeping the halves apart, a scope that came to say
+/// one value twice, a sibling group over that shape, a gate that admits it, and a resident
+/// that fires. Each link is counted, so the reading names the empty one rather than reporting
+/// a nought — which is how the two that were empty got found.
 /// </para>
 /// </remarks>
 public sealed class GeneralisingTests(ITestOutputHelper output)
@@ -230,7 +231,13 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
 
     /// <summary>One arm of the join reading.</summary>
     /// <param name="joining">How the question and the story are read.</param>
-    private static Chained Join(Joining joining)
+    /// <param name="deriving">
+    /// Whether the front end fills a vocabulary the gate can read. <b>The rung's own
+    /// control</b>, since <see cref="Population.Generalise"/> proposes nothing without one —
+    /// so the same front end, the same moments and the same rounds run with the rung on and
+    /// off, and what parts them is rung four alone.
+    /// </param>
+    private static Chained Join(Joining joining, bool deriving = true)
     {
         var brain = new Brain(new CommittingSettings { Capacity = 2000 }, seed: 1);
 
@@ -248,10 +255,15 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
 
         var kept = new Kept(new Joined(joining));
 
-        var front = new Deriving<Coded>(
-            kept, sorts, Counting.Company, Meeting.Rarely, floor: 20, every: 2000);
+        IQuantizer<Coded> front = kept;
 
-        brain.Held.Sorts = sorts;
+        if (deriving)
+        {
+            front = new Deriving<Coded>(
+                kept, sorts, Counting.Weighed, Meeting.Rarely, floor: 20, every: 2000);
+
+            brain.Held.Sorts = sorts;
+        }
 
         var tally = new Bench(new Watching<Coded>(world, front), brain)
             .Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
@@ -299,21 +311,29 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
     /// is the two places a variable can stand in.
     /// </para>
     /// <para>
-    /// <b>It reaches the proposal and stops at the vocabulary.</b> The parted arm holds 74
-    /// scopes saying one value twice and offers ten sibling groups over that shape, and every
-    /// one of the ten covers values that NEVER met in any moment — which is the gate's own
-    /// definition of a category, asked of the stream. So the clause is satisfied and the
-    /// lookup still refuses: the four categories the derivation produced do not hold those
-    /// values, and one derivation taken at the end of the stream instead of ten along it
-    /// produces two and holds them no better.
+    /// <b>Every link holds and the rung runs.</b> The parted arm holds 79 scopes saying one
+    /// value twice, offers thirteen sibling groups over that shape, and every one of the
+    /// thirteen covers values that NEVER met in any moment — the gate's own definition of a
+    /// category, asked of the stream. The vocabulary admits eight, sixteen rules with a
+    /// variable in two places are resident, and they were answered 7,097 times. That is the
+    /// thing rungs one to three cannot say at all, said by a run.
     /// </para>
     /// <para>
-    /// <b>Which makes it the derivation's question rather than the gate's.</b> The values are
-    /// the corpus's four people; they never co-occur and they keep near-identical company, and
-    /// <c>ByChance</c> on this vocabulary returns two groups of function words instead. A
-    /// hand-picked cosine at 0.9 over the same counts reaches three of the four on both sides,
-    /// so the travelling bar under-groups exactly where the join needs it — a third vocabulary
-    /// against the two its own reading ties on.
+    /// <b>Two things had to change first, and neither was the rung.</b> The
+    /// derivation's bar had to be weighed: raw counts against a shuffled null get stricter
+    /// without bound as evidence accumulates, so this vocabulary's grouping fell from twelve
+    /// codes at five hundred moments to eight at twenty thousand. Weighing the same counts
+    /// takes it the other way — two, two, seventeen, nineteen — and nineteen is what a
+    /// hand-picked 0.9 reaches at every length. And the gate had to stop asking
+    /// <see cref="Categories.Coarser"/>, which is a lookup built for the fold: a member keeps
+    /// the first group to claim it, so two values one derived group holds together can report
+    /// different coarser forms.
+    /// </para>
+    /// <para>
+    /// <b>What the rung is worth here is nothing, at one seed.</b> 0.688 against a control's
+    /// 0.687 for 320 more rules, the control being the same front end on the same rounds with
+    /// no vocabulary for the gate to read. Being able to say a thing and being paid for saying
+    /// it are two questions, and this file has now answered the first.
     /// </para>
     /// <para>
     /// <b>And the first version of this reading was not reproducible</b>, which is worth
@@ -327,16 +347,21 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
     [Fact]
     public void How_far_a_hole_that_repeats_gets_on_the_world_it_was_designed_for()
     {
-        var read = new Dictionary<Joining, Chained>();
+        var read = new Dictionary<string, Chained>(StringComparer.Ordinal);
 
-        foreach (var joining in new[] { Joining.Bagged, Joining.Parted })
+        foreach (var (label, joining, deriving) in new (string, Joining, bool)[]
         {
-            read[joining] = Join(joining);
+            ("control", Joining.Parted, false),
+            ("bagged ", Joining.Bagged, true),
+            ("parted ", Joining.Parted, true),
+        })
+        {
+            read[label] = Join(joining, deriving);
 
-            var one = read[joining];
+            var one = read[label];
 
             output.WriteLine(
-                $"{joining,-7}| recent {one.Recent:F3} | held {one.Held,4} "
+                $"{label,-7}| recent {one.Recent:F3} | held {one.Held,4} "
                 + $"| saying a value twice {one.Twice,4} | sibling groups {one.Groups,5} "
                 + $"| repeated {one.Repeated,4} | admitted {one.Admitted,4} "
                 + $"| joined {one.Joined,3} | resident joins {one.Resident,3} "
@@ -347,32 +372,45 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
         // The front end's own contribution, and it is the link nothing else could supply. A
         // bag holds each word once however often it was said, so a scope over one cannot name
         // a value twice at all -- that is not a small number, it is nought by construction.
-        Assert.Equal(0, read[Joining.Bagged].Twice);
+        Assert.Equal(0, read["bagged "].Twice);
 
-        Assert.True(read[Joining.Parted].Twice > 0,
+        Assert.True(read["parted "].Twice > 0,
             "keeping the halves apart produced no scope saying one value twice, so the front "
             + "end is not supplying the two places a variable stands in and every link after "
             + "this one is unreadable");
 
         // And the proposer reaches the shape, which is the link that says anti-unification
         // over a VALUE rather than a position was the right generalisation.
-        Assert.True(read[Joining.Parted].Repeated > 0,
+        Assert.True(read["parted "].Repeated > 0,
             "no sibling group would give a hole that repeats, so the residents hold the shape "
             + "and the proposer does not reach it");
 
-        Assert.Equal(0, read[Joining.Bagged].Repeated);
+        Assert.Equal(0, read["bagged "].Repeated);
 
         // And the clause the gate is written to test is satisfied by every one of them, which
-        // is what says the refusal is the vocabulary rather than the rule. This is the line
-        // that decides which of two very different fixes is owed: a different gate, or a
-        // derivation that reaches the alternatives it is looking at.
-        Assert.Equal(read[Joining.Parted].Repeated, read[Joining.Parted].Apart);
+        // is what said the earlier refusal was the vocabulary rather than the rule.
+        Assert.Equal(read["parted "].Repeated, read["parted "].Apart);
 
-        // And it refuses them anyway, held down so the day it moves is visible.
-        Assert.Equal(0, read[Joining.Parted].Joined);
-        Assert.Equal(0, read[Joining.Bagged].Joined);
+        // And the vocabulary admits them, which it did not until the bar was weighed and the
+        // gate stopped asking a lookup built for the fold.
+        Assert.True(read["parted "].Joined > 0,
+            "the vocabulary admitted no repeated hole, so the categories it derives do not "
+            + "cover the values the join stands for");
 
-        Assert.Equal(0, read[Joining.Parted].Resident);
-        Assert.Equal(0, read[Joining.Parted].Fired);
+        Assert.Equal(0, read["bagged "].Joined);
+
+        // And a rule with a variable in TWO places is resident and has been answered, which is
+        // rung four doing the thing rungs one to three cannot do at all. The matcher is reached
+        // on the ordinary path -- `Population.Firing` -- rather than by anything in this file.
+        Assert.True(read["parted "].Resident > 0,
+            "no rule with a variable in two places is resident, so the proposal was admitted "
+            + "and never added -- the sweep runs after the last proposal, or culling takes them");
+
+        Assert.True(read["parted "].Fired > 0,
+            $"{read["parted "].Resident} rules with a variable in two places are resident and "
+            + "none was ever answered, so the join is held and unable to fire");
+
+        // And the control holds none of them, which is what makes the three rows a comparison.
+        Assert.Equal(0, read["control"].Resident);
     }
 }

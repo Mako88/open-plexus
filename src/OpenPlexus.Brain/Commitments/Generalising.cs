@@ -25,8 +25,8 @@ namespace OpenPlexus.Commitments;
 /// <para>
 /// <b>And that is a fact about the MOMENTS.</b> Which is why nothing in a population could
 /// supply it: a commitment holds counts about its own firings and never about which codes
-/// shared a moment. <see cref="Population.Sorts"/> is the vocabulary that can answer it, and asking
-/// costs one dictionary hit: do the covered values share a coarser form.
+/// shared a moment. <see cref="Population.Sorts"/> is the vocabulary that can answer it, and
+/// what it is asked is whether some one derived group holds every covered value.
 /// <c>UnifyingYieldTests</c> holds the reading that says the lookup answers exactly what the
 /// moments answer.
 /// </para>
@@ -158,9 +158,19 @@ internal static class Generalising
     /// <param name="group">The siblings.</param>
     /// <param name="sorts">The vocabulary of alternatives.</param>
     /// <remarks>
-    /// <b>The gate, and it is one lookup.</b> A code with no coarser form answers no, so a
-    /// vocabulary that has not reached this part of the alphabet refuses rather than guessing
-    /// — which is what makes an empty <see cref="Categories"/> a control and not a failure.
+    /// <para>
+    /// <b>The gate.</b> A vocabulary that has not reached this part of the alphabet refuses
+    /// rather than guessing, which is what makes an empty <see cref="Categories"/> a control
+    /// and not a failure.
+    /// </para>
+    /// <para>
+    /// <b>Some ONE group holds them all.</b> Rather than every one of them sharing a coarser
+    /// form: the first version asked <see cref="Categories.Coarser"/>, which is a lookup
+    /// built for the fold: a member keeps the FIRST group to claim it, so a group that grew
+    /// arrives beside the one it grew out of and its later members answer with the narrower
+    /// name. Two values that a derived group holds together can therefore report different
+    /// coarser forms, and the gate refused them for a fact about arrival order.
+    /// </para>
     /// </remarks>
     public static bool Admits(Sibling group, Categories sorts)
     {
@@ -169,8 +179,7 @@ internal static class Generalising
         var covered = Covered(group);
 
         return covered.Count > 1
-            && sorts.Coarser(covered[0]) is { } coarser
-            && covered.All(one => sorts.Coarser(one) == coarser);
+            && sorts.Groups.Any(one => covered.All(one.Contains));
     }
 
     /// <summary>The rule with a hole in it that a group of siblings proposes.</summary>

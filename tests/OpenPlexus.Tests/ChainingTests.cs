@@ -330,18 +330,10 @@ public sealed class ChainingTests(ITestOutputHelper output)
             var slotted = new List<double>();
             var picked = 0;
 
-            for (var seed = 1; seed <= Seeds; seed++)
+            foreach (var (all, world, _, goal, asked) in Asking(implied, tellings, Seeds))
             {
-                var learnt = Ran(implied, Carrying.Never, tellings, seed);
-                var all = learnt.Held.All.ToList();
-
-                foreach (var quiz in implied.Exam)
                 {
-                    if (Wanted(learnt.World, quiz.Answer) is not { } goal) continue;
-
-                    var asked = Babi.Words(quiz.Question).Select(Babi.Of).ToHashSet();
-
-                    var fires = all.Where(one => Fires(one, asked, learnt.World)).ToList();
+                    var fires = all.Where(one => Fires(one, asked, world)).ToList();
 
                     // What one hop makes available, as word indices. This is the flood and the
                     // backward step at once, which is the point of the paragraph above.
@@ -368,9 +360,9 @@ public sealed class ChainingTests(ITestOutputHelper output)
 
                     foreach (var one in all)
                     {
-                        if (Fires(one, asked, learnt.World)) continue;
+                        if (Fires(one, asked, world)) continue;
 
-                        var missing = Missing(one, asked, learnt.World);
+                        var missing = Missing(one, asked, world);
 
                         if (missing.Count == 0 || !missing.All(concluded.ContainsKey)) continue;
 
@@ -467,7 +459,7 @@ public sealed class ChainingTests(ITestOutputHelper output)
                         // them. An ORACLE reading, taken off the lesson rather than off
                         // anything derived, so it is a ceiling on what fork 129 could buy.
                         var alternatives = implied.Exam
-                            .Select(one => Wanted(learnt.World, one.Answer))
+                            .Select(one => Wanted(world, one.Answer))
                             .Where(one => one is not null)
                             .Select(one => one!.Value)
                             .ToHashSet();
@@ -558,30 +550,25 @@ public sealed class ChainingTests(ITestOutputHelper output)
             var rule = new List<double>();
             var opportunity = new List<double>();
 
-            for (var seed = 1; seed <= Seeds; seed++)
+            foreach (var (all, world, _, goal, asked) in
+                Asking(implied, tellings, Seeds).Where(one => one.Quiz == quiz))
             {
-                var learnt = Ran(implied, Carrying.Never, tellings, seed);
-                var all = learnt.Held.All.ToList();
-                var asked = Babi.Words(quiz.Question).Select(Babi.Of).ToHashSet();
-
-                if (Wanted(learnt.World, quiz.Answer) is not { } goal) continue;
-
                 // The best premise: whatever fires on the question and concludes a word some
                 // rule expecting the answer is missing.
                 var wants = all
                     .Where(one => one.Expects == goal)
-                    .SelectMany(one => Missing(one, asked, learnt.World))
+                    .SelectMany(one => Missing(one, asked, world))
                     .ToHashSet();
 
                 var supplying = all
-                    .Where(one => Fires(one, asked, learnt.World))
+                    .Where(one => Fires(one, asked, world))
                     .Where(one => Brain.Meant(one.Expects) is { } word && wants.Contains(word))
                     .OrderByDescending(one => one.Accuracy)
                     .ToList();
 
                 var concluding = all
                     .Where(one => one.Expects == goal)
-                    .Where(one => Missing(one, asked, learnt.World).Count > 0)
+                    .Where(one => Missing(one, asked, world).Count > 0)
                     .OrderByDescending(one => one.Accuracy)
                     .ToList();
 
@@ -612,6 +599,192 @@ public sealed class ChainingTests(ITestOutputHelper output)
                   + "chain was carried by a rule nothing had contradicted yet"
                 : $"the weakest link holds at {premises[20]:F3}, so the premise is not what "
                   + "the repeated telling took away and the collapse is elsewhere");
+    }
+
+    /// <summary>
+    /// What being able to put ONE word in its own next moment would buy — <b>the ceiling on a
+    /// thought channel.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>John's, and the reading above is what makes it specific.</b> The rule that supplies
+    /// <c>meow</c> as a certainty needs <c>sound</c>, the question never says <c>sound</c>,
+    /// and nothing can conclude it — grounding it needs <c>meow</c>, which is what was being
+    /// grounded. So the word has to be SUPPLIED rather than inferred, and a machine that can
+    /// place a code in its own next moment is what supplies it.
+    /// </para>
+    /// <para>
+    /// <b>A hypothesis rather than a conclusion, which is what keeps it settleable.</b> The
+    /// machine is not told that the cat has a sound; it puts <c>sound</c> in front of itself
+    /// to see what fires, and what fires is scored the ordinary way. A word placed that turns
+    /// out to lead nowhere costs a round, and the plan's rule is that being told must be
+    /// falsifiable — so being told by yourself must be too.
+    /// </para>
+    /// <para>
+    /// <b>One word and one step.</b> That is what the numbers ask for: the chain is three
+    /// links and two of them are already certainties, so what the channel has to reach is
+    /// the one leaf nothing grounds. Allowing more would price a search rather than this.
+    /// </para>
+    /// <para>
+    /// <b>And the ceiling cannot price it, which is the reading.</b> A placed word taken as
+    /// TRUE grounds the answer at 1.000 on every question and grounds five rivals with it, so
+    /// a machine that may assume a word can assume its way to anything. A placed word worth
+    /// what the population already says is inference under another name and reads 0.500 and
+    /// 0.303, which is the vague premise again. Neither takes first place once.
+    /// </para>
+    /// <para>
+    /// <b>So what a placement is worth is EMPIRICAL.</b> It is not a prior a population can
+    /// supply, and no reading over a finished run can say it: the value of putting a word in
+    /// front of yourself is whether the chain it opens goes on to settle, which is learnt
+    /// over rounds. That is a mechanism with a score rather than a search with a weight, and
+    /// it is why this file stops here.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_placing_one_word_in_its_own_next_moment_would_buy()
+    {
+        const int Seeds = 3;
+
+        var lesson = Lesson.Chained;
+        var implied = lesson with { Exam = [.. lesson.Exam.Skip(lesson.Exam.Count / 2)] };
+
+        output.WriteLine($"{Seeds} seeds, {implied.Exam.Count} implied questions");
+        output.WriteLine(
+            $"{"placing",-12}{"tellings",10}{"grounded",10}{"rivals",8}{"weight",8}{"first",7}");
+
+        var grounded = new Dictionary<(string, int), int>();
+
+        foreach (var believed in new[] { true, false })
+        foreach (var tellings in new[] { 1, 20 })
+        {
+            var reached = 0;
+            var first = 0;
+            var weights = new List<double>();
+            var rivals = new List<double>();
+
+            foreach (var (all, world, _, goal, asked) in Asking(implied, tellings, Seeds))
+            {
+                {
+                    // Every outcome, weighted by the best chain that grounds it when the
+                    // machine may place ONE word of its own. The rival outcomes get the same
+                    // licence, which is what makes this a comparison rather than a favour.
+                    var best = new Dictionary<Code, double>();
+
+                    foreach (var one in all)
+                    {
+                        var weight = Grounded(one, asked, world, all, 1, believed);
+
+                        if (weight <= 0.0) continue;
+
+                        best[one.Expects] =
+                            best.TryGetValue(one.Expects, out var so_far)
+                                ? Math.Max(so_far, weight)
+                                : weight;
+                    }
+
+                    if (!best.TryGetValue(goal, out var mine)) continue;
+
+                    reached++;
+                    weights.Add(mine);
+
+                    var top = best.Values.Max();
+                    var tied = best.Count(one => one.Value >= top - 1e-9);
+
+                    // How many OTHER outcomes the same licence grounds just as well, which is
+                    // the half a weight on the right answer cannot say. A placement that
+                    // reaches the answer and every rival has reached nothing.
+                    rivals.Add(tied);
+
+                    if (mine >= top - 1e-9 && tied == 1) first++;
+                }
+            }
+
+            grounded[(believed ? "believed" : "inferred", tellings)] = reached;
+
+            output.WriteLine(
+                $"{(believed ? "believed" : "inferred"),-12}{tellings,10}{reached,10}"
+                + $"{(rivals.Count == 0 ? 0.0 : rivals.Average()),8:F1}"
+                + $"{(weights.Count == 0 ? 0.0 : weights.Average()),8:F3}{first,7}");
+        }
+
+        Assert.True(grounded.Count == 4, $"{grounded.Count} of 4 arms reported");
+    }
+
+    /// <summary>
+    /// What a commitment is worth once grounded, allowing a number of words to be PLACED.
+    /// </summary>
+    /// <param name="one">The commitment.</param>
+    /// <param name="asked">What the question itself says.</param>
+    /// <param name="world">The conversation, for the word a code stands for.</param>
+    /// <param name="all">Every resident.</param>
+    /// <param name="placed">
+    /// How many missing words the machine may supply itself, PER PATH. The word that has to be
+    /// placed is a step down rather than at the top — the certain rule supplying <c>meow</c>
+    /// is the one missing <c>sound</c> — so a budget spent only at the root prices nothing.
+    /// </param>
+    /// <param name="believed">
+    /// Whether a placed word is taken as true. <b>The whole question, and both answers are
+    /// bad.</b> Believed, the machine may assume its way to anything; not believed, a
+    /// placement is worth what some rule already says and is inference by another name.
+    /// </param>
+    /// <param name="depth">How many steps of inference are left.</param>
+    /// <remarks>
+    /// <b>A chain is worth its weakest link.</b> A placed word is worth one where it is
+    /// believed, because the machine put it there rather than concluding it. What the
+    /// placement costs is a round if the chain leads nowhere, which is a settlement.
+    /// </remarks>
+    private static double Grounded(
+        Commitment one,
+        IReadOnlySet<Code> asked,
+        Conversing world,
+        IReadOnlyList<Commitment> all,
+        int placed,
+        bool believed,
+        int depth = 2)
+    {
+        var missing = Missing(one, asked, world);
+
+        if (missing.Count == 0) return one.Accuracy;
+
+        if (depth <= 0 || missing.Count > placed + depth) return 0.0;
+
+        var worth = one.Accuracy;
+        var spare = placed;
+
+        foreach (var word in missing)
+        {
+            var supplied = all
+                .Where(other => other.Expects == Brain.Says(word))
+                .Select(other =>
+                    Grounded(other, asked, world, all, spare, believed, depth - 1))
+                .DefaultIfEmpty(0.0)
+                .Max();
+
+            // Placing it against inferring it, rather than inferring it wherever that is
+            // possible at all. The first version took any inference over a placement and so
+            // walked the vague premise every time -- a search that prefers a rule believed a
+            // quarter of the time to a word it could simply put there.
+            var put = believed && spare > 0 ? 1.0 : 0.0;
+
+            if (put > supplied)
+            {
+                spare--;
+                worth = Math.Min(worth, put);
+                continue;
+            }
+
+            if (supplied > 0.0)
+            {
+                worth = Math.Min(worth, supplied);
+                continue;
+            }
+
+            if (spare <= 0) return 0.0;
+
+            spare--;
+        }
+
+        return worth;
     }
 
     /// <summary>Every word in a commitment's scope the question does not say.</summary>
@@ -668,6 +841,52 @@ public sealed class ChainingTests(ITestOutputHelper output)
         return missing.All(word =>
             all.Any(other =>
                 other.Expects == Brain.Says(word) && Fires(other, asked, world)));
+    }
+
+    /// <summary>One question put to one run, with everything a reading needs.</summary>
+    /// <param name="Held">Every resident at the end of that run.</param>
+    /// <param name="World">The conversation, for the word a code stands for.</param>
+    /// <param name="Quiz">The question, for a reading that wants only one of them.</param>
+    /// <param name="Goal">The outcome code the right answer is.</param>
+    /// <param name="Asked">What the question itself says, as codes.</param>
+    private readonly record struct Put(
+        IReadOnlyList<Commitment> Held,
+        Conversing World,
+        Quiz Quiz,
+        Code Goal,
+        IReadOnlySet<Code> Asked);
+
+    /// <summary>
+    /// Every implied question of every seed, run and set up — <b>one place, because three
+    /// readings wanted the same six lines.</b>
+    /// </summary>
+    /// <param name="implied">The lesson, examined on its implied half.</param>
+    /// <param name="tellings">How many times it is told.</param>
+    /// <param name="seeds">How many seeds.</param>
+    /// <remarks>
+    /// <b>A run a seed rather than a run a question</b>, which is what the loop order buys. A
+    /// question is put to the population the whole lesson left behind, so re-running per
+    /// question would cost four runs to read four questions of one.
+    /// </remarks>
+    private static IEnumerable<Put> Asking(Lesson implied, int tellings, int seeds)
+    {
+        for (var seed = 1; seed <= seeds; seed++)
+        {
+            var learnt = Ran(implied, Carrying.Never, tellings, seed);
+            var all = learnt.Held.All.ToList();
+
+            foreach (var quiz in implied.Exam)
+            {
+                if (Wanted(learnt.World, quiz.Answer) is not { } goal) continue;
+
+                yield return new Put(
+                    all,
+                    learnt.World,
+                    quiz,
+                    goal,
+                    Babi.Words(quiz.Question).Select(Babi.Of).ToHashSet());
+            }
+        }
     }
 
     /// <summary>The outcome code for a word, where the world came to know it.</summary>

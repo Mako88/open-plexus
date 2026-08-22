@@ -314,8 +314,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
   - Relations are concepts too
     - **NOW** — a commitment IS a relation and is scored as one, so nesting is expressible
       on that rather than reached.
-    - **OPEN** — anti-unification as rung four's admission, gated by a hole whose covered
-      values never co-occur. Built and firing; open on what it is worth. Fork **102**.
+    - **OPEN** — anti-unification is built, firing and worth nothing on three worlds, and
+      negative where its shape IS the concept. Open on whether it goes. Fork **102**.
     - **OPEN** — what puts a commitment in a moment without widening every world's. Fork
       **116**, and the revival row is the shape of the answer.
   - Concept and label independent

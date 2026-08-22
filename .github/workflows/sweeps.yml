@@ -154,6 +154,7 @@ jobs:
             "RecalledTests.What_one_selected_statement_converts_across_the_exam",
             "SensesTests.Whether_the_cross_modal_question",
             "ClevrTests.What_reading_the_grouping_costs",
+            "ClevrTests.Whether_the_grouping_is_what_makes_ungated",
             "SeparableTests",
             "SplitNamingTests","SplitRepairTests","SplitTests"
           ]'

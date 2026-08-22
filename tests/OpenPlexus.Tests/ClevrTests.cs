@@ -378,16 +378,97 @@ public sealed class ClevrTests(ITestOutputHelper output)
         Assert.True(true);
     }
 
+    /// <summary>
+    /// Whether the grouping is what makes ungated genesis affordable.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The binding grid's loose end</b>, taken on a second world because one world's
+    /// coincidence is not an interaction. There, ungated genesis with the grouping read held
+    /// 1,598 residents and found every rule the world has; ungated genesis with the same
+    /// grouping ignored held 2,328 and found none of them. So the arm that floods and the arm
+    /// that does not differ in whether a proposal is about a THING.
+    /// </para>
+    /// <para>
+    /// <b>Why it would be true.</b> Genesis proposes one commitment per live code, so a wide
+    /// moment is a wide proposal set and ungating it walks the code-to-outcome space — which
+    /// is the refutation `AnyFailure` carries. A front end saying which codes are one thing
+    /// turns that into one proposal per thing, and the count of things does not grow with the
+    /// alphabet.
+    /// </para>
+    /// <para>
+    /// <b>What would drop it</b>, said before the run: the two ungated arms holding
+    /// populations of the same size. That is the whole claim — if reading the grouping does
+    /// not change what ungating COSTS, then the binding world's pairing was about the binding
+    /// world and fork 135 is back to needing a seat rule alone.
+    /// </para>
+    /// <para>
+    /// <b>And this world cannot settle it on accuracy</b>, only on cost. Its withheld set sits
+    /// on the weighted chance bar under every arm measured so far, so what this grid reads is
+    /// the population and the mint rate; a score that moved would be the more interesting
+    /// outcome and is not the one being looked for.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_the_grouping_is_what_makes_ungated_genesis_affordable()
+    {
+        var grid =
+            from spanning in new[] { Spanning.Anything, Spanning.Thing }
+            from gate in new[] { Surprising.Unaccounted, Surprising.AnyFailure }
+            select (spanning, gate);
+
+        foreach (var (spanning, gate) in grid)
+        {
+            var held = new List<double>();
+            var minted = new List<double>();
+
+            foreach (var phase in new[] { 0, 1, 2 })
+            {
+                var run = Learnt(fleeting: true, spanning: spanning, phase: phase, gate: gate);
+
+                held.Add(run.Tally.Resident);
+                minted.Add(run.Tally.Minted);
+
+                output.WriteLine(
+                    $"  {spanning,-8} {gate,-12} phase {phase} | held {run.Tally.Resident} "
+                    + $"| minted {run.Tally.Minted} | repairs {run.Tally.Repaired} "
+                    + $"| drawn {run.Tally.Recent:F3} | withheld {run.Composed:F3} of "
+                    + $"{run.Unseen.Answered}");
+            }
+
+            output.WriteLine(
+                $"  {spanning,-8} {gate,-12} MEAN held "
+                + $"{new Measured { Arm = "held", Values = held }} | minted "
+                + $"{new Measured { Arm = "minted", Values = minted }}");
+        }
+
+        // The bar is `Clevr.Chance` and it is asserted in the fact above. This one prints what
+        // ungating costs with the grouping read and with it ignored.
+        Assert.True(true);
+    }
+
     /// <param name="fleeting">Whether the world says its per-scene indexes cannot recur.</param>
     /// <param name="spanning">Whether a scope may be about more than one of the objects.</param>
     /// <param name="phase">Which questions are held back — this world's one axis.</param>
-    private static Run Learnt(bool fleeting, Spanning spanning = Spanning.Thing, int phase = 0)
+    /// <param name="gate">What it takes for genesis to run at all.</param>
+    private static Run Learnt(
+        bool fleeting,
+        Spanning spanning = Spanning.Thing,
+        int phase = 0,
+        Surprising gate = Surprising.Unaccounted)
     {
         var world = new Clevr(
             World(scenes: Scenes, fleeting: fleeting) with { Withheld = 300, Phase = phase });
 
         var brain = new Brain(
-            new CommittingSettings { Capacity = 4000, Spanning = spanning }, seed: 1);
+            new CommittingSettings
+            {
+                Capacity = 4000,
+                Spanning = spanning,
+                Surprising = gate,
+            },
+            seed: 1);
 
         var tally = new Bench(new Watching<Coded>(world, new Passthrough<Coded>(one => one)), brain)
             .Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);

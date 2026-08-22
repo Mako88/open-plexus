@@ -281,7 +281,10 @@ public sealed class BindingTests(ITestOutputHelper output)
     [Fact]
     public void What_reading_the_grouping_is_worth_where_the_codes_cannot_say()
     {
-        int[] seeds = [1, 2, 3, 4];
+        // EIGHT, because the shipped pairing's lead is the narrowest thing this grid
+        // reports and four seeds cannot separate two from three standard errors. The arm
+        // against its control at the ungated end is wide enough that seeds do not decide it.
+        int[] seeds = [1, 2, 3, 4, 5, 6, 7, 8];
 
         var arms =
             new (string Arm, bool Bound, bool Segmented, Spanning Spanning, Surprising Gate)[]
@@ -372,6 +375,30 @@ public sealed class BindingTests(ITestOutputHelper output)
         Assert.True(read.Mean - gated.Mean > 0.3,
             $"{read} against {gated}: the gate used to cost this world most of its score, and "
             + "a gap this small means the gate stopped mattering. Take the reading again.");
+
+        // And what the shipped pairing is worth, which is a much smaller number and is here
+        // so that nobody reads the figure above as the default's score. `Surprising.Unaccounted`
+        // is what ships, and under it the arm leads its control by four standard errors rather
+        // than forty. The dial ships on that and the rest is conditional on a gate that does
+        // not.
+        //
+        // Four seeds read this at 2.1 and eight read it at 4.4, which is the reason the seed
+        // count went up rather than an argument for the number. A small sample hides a real
+        // effect as readily as it invents one, and this grid's other arms are wide enough
+        // that nobody would have looked.
+        var shipped = measured["unbound, read        "];
+        var beside = measured["unbound, ignored     "];
+        var narrow = Math.Sqrt(
+            (shipped.StdErr * shipped.StdErr) + (beside.StdErr * beside.StdErr));
+
+        output.WriteLine(
+            $"at the shipped gate: {shipped.Mean - beside.Mean:F4} ahead, "
+            + $"{(shipped.Mean - beside.Mean) / narrow:F1} pooled standard errors");
+
+        Assert.True(shipped.Mean > beside.Mean,
+            $"{shipped} does not lead {beside}, so the dial's shipped setting is behind its "
+            + "own control and the reading that put it there was taken at a gate nothing "
+            + "uses. Take the pairing back to John.");
 
         // And ungated genesis buys nothing on its own, which is what makes the line above an
         // interaction rather than two mechanisms added up. The control mints far more and

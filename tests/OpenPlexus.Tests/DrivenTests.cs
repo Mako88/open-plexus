@@ -94,18 +94,6 @@ public sealed class DrivenTests(ITestOutputHelper output)
         Regex.Replace(
             Regex.Replace(source, @"/\*.*?\*/", " ", RegexOptions.Singleline), @"//.*", " ");
 
-    /// <summary>Why the fleet is reached by nothing that ships.</summary>
-    /// <remarks>
-    /// <b>The deployment is the missing half</b>, and this is the guard finding it rather than
-    /// a hole in the guard. <c>Posted</c> crosses a socket and <c>Ported</c> brings a fleet up
-    /// on real ports, but <c>Ported</c> is a test fixture — no program in <c>src</c> runs a
-    /// holder, and none composes an asker over peers. So the whole transport is reachable only
-    /// from the suite, which is exactly what this file refuses to call wired.
-    /// </remarks>
-    private const string Undeployed =
-        "nothing that ships runs a holder or composes a fleet. `Ported` does both and is a "
-        + "test fixture. Closes with a holder host and a harness that takes peers.";
-
     /// <summary>Why the category machinery is reached by nothing.</summary>
     private const string Uncategorised =
         "`Population.Sorts` is set in one place in the repo and it is a test, so no brain has "
@@ -137,33 +125,47 @@ public sealed class DrivenTests(ITestOutputHelper output)
     private static readonly IReadOnlyDictionary<string, string> Waiting =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            ["Answer"] = Undeployed,
-            ["Ask"] = Undeployed,
-            ["Asker"] = Undeployed,
-            ["BroadcastId"] = Undeployed,
-            ["Fleet"] = Undeployed,
-            ["Gathering"] = Undeployed,
-            ["Holder"] = Undeployed,
-            ["HybridBus"] = Undeployed,
-            ["IBus"] = Undeployed,
-            ["IReceiveAnswers"] = Undeployed,
-            ["IReceiveAsks"] = Undeployed,
-            ["Joins"] = Undeployed,
-            ["Lateness"] = Undeployed,
-            ["Leaves"] = Undeployed,
-            ["MachineAddress"] = Undeployed,
-            ["Peer"] = Undeployed,
-            ["Posted"] = Undeployed,
-            ["Tabled"] = Undeployed,
-            ["Wanted"] = Undeployed,
-            ["Wire"] = Undeployed,
-
             ["Alternating"] = Uncategorised,
             ["Deriving"] = Uncategorised,
             ["Meeting"] = Uncategorised,
             ["Sorted"] = Uncategorised,
 
             ["Unifying"] = Unproposed,
+        };
+
+    /// <summary>
+    /// The apparatus rather than the machine, each with why a test is its right driver.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A simulated wire is an instrument</b>, so nothing that ships may run one. The whole
+    /// point of <c>HybridBus</c> is to be harsher than TCP — it reorders on purpose, where the
+    /// real transport does not — and a deployment that composed one would be shipping a fault
+    /// injector. Its driver is a test because a test is the only honest caller it has.
+    /// </para>
+    /// <para>
+    /// <b>And it is what the fleet's own entry could not close.</b> The holder host closed
+    /// eighteen of the twenty; these two are the remainder, and they are the remainder because
+    /// they are not mechanisms. Leaving them on <c>Waiting</c> would have made an entry that
+    /// could never close, which the outstanding list refuses.
+    /// </para>
+    /// <para>
+    /// <b>The exemption costs something</b>, which is
+    /// <see cref="Every_instrument_is_driven_by_the_suite"/>. A name here that the suite
+    /// stopped driving fails that, so this is a claim about who calls it rather than a way of
+    /// not being asked.
+    /// </para>
+    /// </remarks>
+    private static readonly IReadOnlyDictionary<string, string> Instruments =
+        new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["HybridBus"] =
+                "an in-process bus that reorders on purpose, so a deployment running one "
+                + "would be shipping a simulated fault. `Wire` is what says the distributed "
+                + "claim is more than a claim, and this is the harsher half of it.",
+
+            ["Lateness"] =
+                "how late and how often, which is `HybridBus`'s dial and travels with it.",
         };
 
     /// <summary>The assemblies a deployment is composed out of.</summary>
@@ -173,14 +175,18 @@ public sealed class DrivenTests(ITestOutputHelper output)
     /// deployment, and the chooser it wires is reached from there and from nowhere else.
     /// </para>
     /// <para>
-    /// <b>And there are four of them.</b> The
+    /// <b>And there are five of them.</b> The
     /// mechanisms are in <c>OpenPlexus.Brain</c> and everything that drives one is in the
-    /// join, the worlds or the harness, so naming one assembly here would ask whether the
-    /// brain reaches itself and answer that nothing reaches anything.
+    /// join, the worlds or one of the two harnesses, so naming one assembly here would ask
+    /// whether the brain reaches itself and answer that nothing reaches anything.
     /// </para>
     /// </remarks>
     private static IReadOnlyList<Assembly> Composed() =>
-        [.. Tree.Library(), Assembly.Load("OpenPlexus.Talk")];
+    [
+        .. Tree.Library(),
+        Assembly.Load("OpenPlexus.Host"),
+        Assembly.Load("OpenPlexus.Talk"),
+    ];
 
     /// <summary>The outermost type a type is declared in, which is the one with a file.</summary>
     private static Type Outermost(Type type)
@@ -401,31 +407,77 @@ public sealed class DrivenTests(ITestOutputHelper output)
     internal static IReadOnlyList<string> Unreached()
     {
         var inside = Names(Inside, within: true);
-        var composed = Composed();
+        var reached = Reached(Composed());
+
+        // Types rather than the names read off the source, because a name is declared by a
+        // NESTED type too and a nested one is reached through whatever holds it. Walking the
+        // text here would report `Posted.Roster` as a mechanism nothing drives.
+        return
+        [
+            .. Composed()
+                .SelectMany(one => one.GetTypes())
+                .Where(one => one.DeclaringType is null && inside.Contains(Spelt(one)))
+                .Select(Spelt)
+                .Distinct(StringComparer.Ordinal)
+                .Where(one => !reached.Contains(one))
+                .Where(one => !Instruments.ContainsKey(one))
+                .Order(StringComparer.Ordinal),
+        ];
+    }
+
+    /// <summary>Brain names some assembly in a list reaches, by walking what each type uses.</summary>
+    /// <param name="composed">The assemblies to walk.</param>
+    private static IReadOnlySet<string> Reached(IReadOnlyList<Assembly> composed)
+    {
+        var inside = Names(Inside, within: true);
         var all = composed.SelectMany(one => one.GetTypes()).ToList();
 
         bool IsBrain(Type type) => inside.Contains(Spelt(type));
 
         var seen = all.Where(one => !IsBrain(one)).ToHashSet();
         var queue = new Queue<Type>(seen);
-        var reached = new HashSet<Type>();
+        var reached = new HashSet<string>(StringComparer.Ordinal);
 
         while (queue.Count > 0)
             foreach (var used in Uses(queue.Dequeue()))
             {
                 if (!composed.Contains(used.Assembly) || !seen.Add(used)) continue;
 
-                if (IsBrain(used)) reached.Add(Outermost(used));
+                if (IsBrain(used)) reached.Add(Spelt(used));
 
                 queue.Enqueue(used);
             }
 
-        return all
-            .Where(one => one.DeclaringType is null && IsBrain(one))
-            .Where(one => !reached.Contains(one))
-            .Select(Spelt)
+        return reached;
+    }
+
+    /// <summary>
+    /// <b>Every instrument is driven by the suite</b>, which is what makes the exemption
+    /// above cost something.
+    /// </summary>
+    /// <remarks>
+    /// <b>An exemption nobody checks is a deletion.</b> Taking a name off the unreached set
+    /// because it is an instrument says a test drives it, and this is where that is asserted
+    /// — so an instrument that goes dead fails here rather than sitting on a list saying it
+    /// is fine.
+    /// </remarks>
+    [Fact]
+    public void Every_instrument_is_driven_by_the_suite()
+    {
+        var driven = Reached([.. Composed(), typeof(DrivenTests).Assembly]);
+
+        var idle = Instruments.Keys
+            .Where(one => !driven.Contains(one))
             .Order(StringComparer.Ordinal)
             .ToList();
+
+        foreach (var one in Instruments.Keys.Order(StringComparer.Ordinal))
+            output.WriteLine($"  {one}: {(driven.Contains(one) ? "driven" : "idle")}");
+
+        Assert.True(idle.Count == 0,
+            $"{idle.Count} instrument(s) nothing drives, the suite included: "
+            + $"{string.Join(", ", idle)}. An instrument whose last caller went is dead "
+            + "code with a reason attached, and the reason is what makes it invisible.");
     }
 
     /// <summary>

@@ -49,6 +49,7 @@
        every finding is asserted. -->
   <ItemGroup>
     <InternalsVisibleTo Include="OpenPlexus" />
+    <InternalsVisibleTo Include="OpenPlexus.Host" />
     <InternalsVisibleTo Include="OpenPlexus.Talk" />
     <InternalsVisibleTo Include="OpenPlexus.Tests" />
   </ItemGroup>

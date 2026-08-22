@@ -45,6 +45,7 @@
        the join. Nothing outside the composition consumes these: the harness runs them and the
        tests assert on them. -->
   <ItemGroup>
+    <InternalsVisibleTo Include="OpenPlexus.Host" />
     <InternalsVisibleTo Include="OpenPlexus.Talk" />
     <InternalsVisibleTo Include="OpenPlexus.Tests" />
   </ItemGroup>

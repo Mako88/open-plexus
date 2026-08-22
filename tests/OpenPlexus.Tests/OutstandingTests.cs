@@ -375,10 +375,15 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// empty, and it is the deadline.
     /// </para>
     /// <para>
-    /// <b>Twenty-five today, in three groups.</b> The fleet is twenty of them and closes with
-    /// a holder host and a harness that takes peers, because `Ported` is a test fixture and
-    /// nothing in `src` brings a fleet up. The category machinery is four and closes behind the
-    /// likeness bar. Rung four's matcher is the last, and it closes behind the categories.
+    /// <b>Five today, and the fleet's twenty came off in one commit.</b>
+    /// `OpenPlexus.Host` runs a holder and composes an asker over peers, so the transport is
+    /// reached by something that ships rather than by a fixture. Eighteen of the twenty closed
+    /// that way; <c>HybridBus</c> and its dial are apparatus rather than mechanism and moved to
+    /// <see cref="DrivenTests"/>'s instrument list, which asserts the suite drives them.
+    /// </para>
+    /// <para>
+    /// <b>What is left is the category machinery and rung four's matcher.</b> The four close
+    /// behind the likeness bar, and the matcher behind the four.
     /// </para>
     /// <para>
     /// <b>And it says whether a reading can be believed.</b> A

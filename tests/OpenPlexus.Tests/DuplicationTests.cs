@@ -110,8 +110,12 @@ public sealed class DuplicationTests
     /// </summary>
     private static IReadOnlyList<string> Clones(IReadOnlyList<string> files)
     {
+        // Keyed by the path from the repo root rather than by the filename, because two
+        // projects may hold a file of the same name -- `OpenPlexus.Host` and
+        // `OpenPlexus.Talk` each have a `Program.cs`, and the short key threw rather than
+        // reporting anything. A key that can collide is a check that stops at the collision.
         var reduced = files.ToDictionary(
-            path => Path.GetFileName(path) ?? path,
+            path => Path.GetRelativePath(Tree.Repo(), path),
             path => Statements(File.ReadAllLines(path)),
             StringComparer.Ordinal);
 

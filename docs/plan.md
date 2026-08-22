@@ -31,11 +31,9 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them.
-- **ACTIVE, the twenty-five `DrivenTests` says no run reaches.** The fleet is twenty of them
-  and closes with the holder host below. The category machinery — `Alternating`, `Deriving`,
-  `Meeting`, `Sorted` — and `Unifying` close later on.
-- **A holder host and a harness that takes peers**, which is the first two-process run and
-  what `Ported` has been standing in for. John's end state is this repeated twenty times.
+- **ACTIVE, the five `DrivenTests` says no run reaches.** The category machinery —
+  `Alternating`, `Deriving`, `Meeting`, `Sorted` — and `Unifying` behind it, so both close
+  behind the likeness bar below.
 - **Then a likeness bar that travels**, read against shuffled moments rather than a level,
   so no world hands a threshold in. It is what blocks the categories.
 - **Then the categories the brain derives**, into `Population.Sorts`, which nothing but a

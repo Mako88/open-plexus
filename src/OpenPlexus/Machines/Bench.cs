@@ -74,6 +74,17 @@ internal sealed record Tally
     /// <summary>Rounds run.</summary>
     public required long Rounds { get; init; }
 
+    /// <summary>How many populations the reader of this could see.</summary>
+    /// <remarks>
+    /// <b>Nought means the population is on other machines</b>, which is a different fact from
+    /// a population that is empty and reads identically in every count below. A harness driving
+    /// a fleet over sockets holds no population at all: the residents, the tables and the names
+    /// are the holders' and are asked for over the wire. Reported rather than inferred, because
+    /// silence beside a score is this repo's rule and a column of noughts is the loudest
+    /// silence there is.
+    /// </remarks>
+    public required int Holding { get; init; }
+
     /// <summary>Predictions that matched what followed.</summary>
     public required long Right { get; init; }
 
@@ -963,7 +974,15 @@ internal sealed class Bench
             AtImproving = holding.Sum(held => held.AtImproving),
             Searched = holding.Sum(held => held.Searched),
             Codes = codes / (double)rounds,
-            Unseen = Examine(holding),
+            Holding = holding.Count,
+
+            // Absent rather than nought where nothing local can be asked, which is the
+            // distinction this method already makes one layer in: a world that CAN withhold
+            // while withholding nothing reports absent, because an empty examination answers
+            // nothing and every count comes back nought -- reading as a population that
+            // generalises to nothing rather than as a question nobody could put. A fleet
+            // harness holds no population, so it is the same trap arriving by the other door.
+            Unseen = holding.Count == 0 ? null : Examine(holding),
             Fronted = (_world as IReports)?.Fronted,
             Chosen = (_world as IReports)?.Chosen,
             Census = censusing is null

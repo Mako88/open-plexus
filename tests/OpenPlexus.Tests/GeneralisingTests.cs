@@ -240,9 +240,14 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
     /// says whether the refusal is the GATE or the derivation that fills it.
     /// </param>
     /// <param name="Sorts">How many categories were derived.</param>
+    /// <param name="Scanned">
+    /// How many residents no code in any moment reaches. <b>What the scan list is worth
+    /// here</b>, a join whose every entry names a variable being the only thing that goes in
+    /// it — so nought says the list has no reader on this world and its cost is Monk's alone.
+    /// </param>
     private readonly record struct Chained(
         double Recent, int Held, int Twice, int Groups, int Repeated, int Admitted,
-        int Joined, int Resident, long Fired, int Apart, int Sorts);
+        int Joined, int Resident, long Fired, int Apart, int Sorts, int Scanned);
 
     /// <summary>A front end that keeps every moment it emitted.</summary>
     /// <param name="inner">The translation being watched.</param>
@@ -341,7 +346,8 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
             joins.Count,
             joins.Sum(one => one.Fired),
             repeated.Count(one => Apart(Generalising.Covered(one), kept.Moments)),
-            sorts.Count);
+            sorts.Count,
+            brain.Held.Scanning);
     }
 
     /// <summary>Whether no moment ever held two of these codes at once.</summary>
@@ -419,7 +425,7 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
                 + $"| repeated {one.Repeated,4} | admitted {one.Admitted,4} "
                 + $"| joined {one.Joined,3} | resident joins {one.Resident,3} "
                 + $"| fired {one.Fired,5} | of the repeated, never met {one.Apart,3} "
-                + $"| categories {one.Sorts,2}");
+                + $"| scanned {one.Scanned,3} | categories {one.Sorts,2}");
         }
 
         // The front end's own contribution, and it is the link nothing else could supply. A

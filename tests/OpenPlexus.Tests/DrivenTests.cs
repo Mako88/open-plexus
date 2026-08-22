@@ -455,25 +455,28 @@ public sealed class DrivenTests(ITestOutputHelper output)
     /// <summary>Where the brain names a world today, and it may only shrink.</summary>
     /// <remarks>
     /// <para>
-    /// <b>Five of the six are one shape.</b> A front end is typed on the record its world
-    /// hands over, so <c>Joined</c> knows what a sentence is and <c>Tiling</c> knows what a
-    /// crossed observation is. Either those records are seam vocabulary and belong beside
-    /// <see cref="OpenPlexus.Codes.Coded"/>, or a front end typed on one world's record is a
-    /// translation for that world and belongs at the join. That is a fork rather than a
-    /// defect, and it is John's.
+    /// <b>Empty, and it went in three roads.</b> Six front ends each named the record its
+    /// world handed over, so a piece of the brain knew what a sentence, a body and a crossed
+    /// observation were. What emptied it was one answer per road rather than one rule.
     /// </para>
     /// <para>
-    /// <b>The sixth is not a fork.</b> <c>Bodied</c> reads <c>Homeostat.Act</c> and calls
-    /// <c>Homeostat.Attending</c>, so a front end inside the brain is calling a world's
-    /// static members for a modality and a code. Whichever way the fork above goes, that one
-    /// is the arrow this file is about.
+    /// <b>Three records folded into <see cref="OpenPlexus.Codes.Coded"/></b>, being copies
+    /// ten to twelve of a type that already carried what they carried. One took a projection
+    /// instead: a frame a body reads several ways is whoever composed the body's business,
+    /// and <c>Tiling</c> and <c>Passthrough</c> take the part they read as a delegate on
+    /// <see cref="OpenPlexus.Codes.Banded{TFrame}"/>'s pattern. And one was a front end
+    /// calling a world's statics for a modality and a code, which is the world minting its
+    /// codes one seam late.
+    /// </para>
+    /// <para>
+    /// <b>It stays empty rather than going away</b>, because the check is the cheap half of
+    /// the project boundary and the boundary is not built yet. A brain in its own assembly
+    /// cannot reference the worlds; until then this says so.
     /// </para>
     /// </remarks>
     private static readonly IReadOnlySet<string> Trespassing =
         new HashSet<string>(StringComparer.Ordinal)
         {
-            "Passthrough names Crossed",
-            "Tiling names Crossed",
         };
 
     /// <summary>Where the worlds live.</summary>

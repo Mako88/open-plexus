@@ -290,7 +290,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
         // transferable. It has to do both, and the bare code has to be literally the
         // shared part of the placed ones or rung five has nothing to reach for.
         var world = new Arranged(Small, seed: 1);
-        var sensing = new Tiling(ArrangedRun.Patch, world.Pixels, 3);
+        var sensing = new Tiling<IReadOnlyList<double>>(one => one, ArrangedRun.Patch, world.Pixels, 3);
 
         Assert.Equal(9, sensing.Patches);
 

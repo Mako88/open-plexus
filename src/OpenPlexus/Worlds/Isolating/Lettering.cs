@@ -69,7 +69,7 @@ public static class Lettering
 
     /// <summary>How many pixels across the square canvas is.</summary>
     /// <remarks>
-    /// <b>Square because <see cref="Codes.Tiling"/> reads a square</b>, and divisible by
+    /// <b>Square because <see cref="Codes.Tiling{TFrame}"/> reads a square</b>, and divisible by
     /// two, three, four, six, eight and twelve so a patch size is a dial rather than a
     /// constraint. A three-letter word is seventeen across, which leaves the offset room to
     /// move in both directions.

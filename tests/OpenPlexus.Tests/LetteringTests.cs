@@ -150,8 +150,8 @@ public sealed class LetteringTests(ITestOutputHelper output)
             // One codebook for every patch and every drawing, which is what makes a code MEAN
             // a part wherever it turns up. Built fresh per tile size because the codebook is
             // the thing being sized.
-            var whole = Reading(every, new Tiling(Patch, Lettering.Side, tile));
-            var half = Reading(every, new Tiling(Patch, Lettering.Side, tile, placed: false));
+            var whole = Reading(every, new Tiling<IReadOnlyList<double>>(one => one, Patch, Lettering.Side, tile));
+            var half = Reading(every, new Tiling<IReadOnlyList<double>>(one => one, Patch, Lettering.Side, tile, placed: false));
 
             coded[tile] = whole.Read;
             without[tile] = half.Read;
@@ -225,7 +225,7 @@ public sealed class LetteringTests(ITestOutputHelper output)
     /// </remarks>
     private static (Probed Read, int Features) Reading(
         List<(IReadOnlyList<double> Pixels, int Word, bool Shown)> every,
-        Tiling tiling)
+        Tiling<IReadOnlyList<double>> tiling)
     {
         var features = new Dictionary<Code, int>();
         var said = new List<(IReadOnlyCollection<Code> Codes, int Word, bool Shown)>();
@@ -271,7 +271,7 @@ public sealed class LetteringTests(ITestOutputHelper output)
     /// <para>
     /// <b>Bare codes only, because a placed one pins a patch.</b> A word that moves lands its
     /// parts in different patches, so a placed code cannot be in every drawing of it. The
-    /// bare half of <see cref="Tiling"/> is what survives the offset, and this asks whether
+    /// bare half of <see cref="Tiling{TFrame}"/> is what survives the offset, and this asks whether
     /// the bare half alone is enough to separate sixteen words.
     /// </para>
     /// <para>
@@ -434,13 +434,13 @@ public sealed class LetteringTests(ITestOutputHelper output)
     /// <b>The front end's own arm rather than a filter written here.</b> A placed code pins a
     /// patch, so a word drawn two pixels along emits none of the ones it emitted before, and
     /// a conjunction over them could only ever be sound for a word that never moved. Asking
-    /// <see cref="Tiling"/> for the bare half is what stops this reading and the probe's
+    /// <see cref="Tiling{TFrame}"/> for the bare half is what stops this reading and the probe's
     /// disagreeing about what bare means.
     /// </remarks>
     private static List<(HashSet<ulong> Codes, int Word)> Bare(
         List<(IReadOnlyList<double> Pixels, int Word, bool Shown)> every, int tile)
     {
-        var tiling = new Tiling(Patch, Lettering.Side, tile, placed: false);
+        var tiling = new Tiling<IReadOnlyList<double>>(one => one, Patch, Lettering.Side, tile, placed: false);
 
         return every
             .Select(one => (

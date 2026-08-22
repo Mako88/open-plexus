@@ -28,8 +28,23 @@
 /// asks for and the least interesting.
 /// </para>
 /// </remarks>
-public sealed class Passthrough : IQuantizer<Coded>, IQuantizer<Worlds.Crossed>
+public sealed class Passthrough<TFrame> : IQuantizer<TFrame>
 {
+    private readonly Func<TFrame, Coded> _reading;
+
+    /// <param name="reading">
+    /// The already-coded part of a frame — <b>a projection rather than a field</b>, on
+    /// <see cref="Banded{TFrame}"/>'s pattern. A world whose whole moment is codes hands
+    /// itself over; a body reading one frame several ways gives each sense the part it knows,
+    /// and what a frame IS belongs to whoever composed the body rather than to the brain.
+    /// </param>
+    public Passthrough(Func<TFrame, Coded> reading)
+    {
+        ArgumentNullException.ThrowIfNull(reading);
+
+        _reading = reading;
+    }
+
     /// <summary>
     /// <b>Zero, and it is never read.</b>
     /// </summary>
@@ -41,7 +56,7 @@ public sealed class Passthrough : IQuantizer<Coded>, IQuantizer<Worlds.Crossed>
     public byte Modality => 0;
 
     /// <inheritdoc/>
-    public IReadOnlyCollection<Code> Codify(Coded observation) => observation.Codes;
+    public IReadOnlyCollection<Code> Codify(TFrame frame) => _reading(frame).Codes;
 
     /// <inheritdoc/>
     /// <remarks>
@@ -51,8 +66,10 @@ public sealed class Passthrough : IQuantizer<Coded>, IQuantizer<Worlds.Crossed>
     /// first would assert a binding the world never claimed. That is the whole reason a
     /// moment carries a list of parts rather than this dictionary.
     /// </remarks>
-    public IReadOnlyDictionary<Code, int>? Bind(Coded observation)
+    public IReadOnlyDictionary<Code, int>? Bind(TFrame frame)
     {
+        var observation = _reading(frame);
+
         if (observation.Groups is not { Count: > 0 } parts) return null;
 
         var one = new Dictionary<Code, int>();
@@ -68,16 +85,8 @@ public sealed class Passthrough : IQuantizer<Coded>, IQuantizer<Worlds.Crossed>
     }
 
     /// <inheritdoc/>
-    public IReadOnlySet<Code>? Fleeting(Coded observation) => observation.Passing;
+    public IReadOnlySet<Code>? Fleeting(TFrame frame) => _reading(frame).Passing;
 
     /// <inheritdoc/>
-    public IReadOnlySet<Code>? Forced(Coded observation) => observation.Assigned;
-
-    /// <summary>The spoken half of a crossing moment, which is already codes.</summary>
-    /// <remarks>
-    /// <b>The same no-op through a second door.</b> A crossing moment carries one sense the
-    /// world constructed and one it drew, so the constructed half wants exactly what this
-    /// class already is and the drawn half wants <see cref="Tiling"/>.
-    /// </remarks>
-    public IReadOnlyCollection<Code> Codify(Worlds.Crossed observation) => observation.Said;
+    public IReadOnlySet<Code>? Forced(TFrame frame) => _reading(frame).Assigned;
 }

@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 
@@ -393,7 +393,7 @@ public sealed class ArrangedRun
 
         if (looking == Looking.Tiled)
         {
-            var tiling = new Tiling(Patch, World.Pixels, world.Cell);
+            var tiling = new Tiling<IReadOnlyList<double>>(one => one, Patch, World.Pixels, world.Cell);
 
             _sensing = tiling;
             _watching = () => (tiling.Distinct, tiling.Emitted);

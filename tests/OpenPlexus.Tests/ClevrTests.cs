@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -302,7 +302,7 @@ public sealed class ClevrTests(ITestOutputHelper output)
 
         var brain = new Brain(new CommittingSettings { Capacity = 4000 }, seed: 1);
 
-        var tally = new Bench(new Watching<Coded>(world, new Passthrough()), brain)
+        var tally = new Bench(new Watching<Coded>(world, new Passthrough<Coded>(one => one)), brain)
             .Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
 
         // An object index and a scene index are minted fresh every scene, so every row they

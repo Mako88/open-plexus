@@ -150,7 +150,7 @@ public sealed class RhythmTests(ITestOutputHelper output)
     /// <param name="seed">What draws the cycle, the violations and the brain.</param>
     /// <param name="rounds">How many moments.</param>
     /// <remarks>
-    /// <see cref="Passthrough"/>, because a moment here is already a code and rendering it
+    /// <see cref="Passthrough{TFrame}"/>, because a moment here is already a code and rendering it
     /// as a signal first would put a second thing between the mechanism and the reading.
     /// </remarks>
     private static (Rhythm World, Tally Tally, int Held) Learnt(
@@ -159,7 +159,7 @@ public sealed class RhythmTests(ITestOutputHelper output)
         var world = new Rhythm(settings, seed);
         var brain = new Brain(new CommittingSettings { Capacity = 4000 }, seed);
 
-        var tally = new Bench(new Watching<Coded>(world, new Passthrough()), brain)
+        var tally = new Bench(new Watching<Coded>(world, new Passthrough<Coded>(one => one)), brain)
             .Run(rounds, sweep: 1000, target: 0.9, window: 2000);
 
         return (world, tally, brain.Held.Count);

@@ -35,11 +35,8 @@ that is finished LEAVES, so this is only ever what is still to do.
   and the brain is what it is part of, so it closes with the two below. The category machinery
   — `Alternating`, `Deriving`, `Meeting`, `Sorted` — and `Unifying` close later on.
 - **`OpenPlexus.Brain` as its own project**, learner `internal`, so the boundary is the
-  compiler's rather than a folder's. `Brain.Held` becoming a reported census is its own arc
-  and is what shrinks the surface.
-- **Split `Crossed` into two inputs**, being two modalities welded into one record where
-  `Compound` is what puts two senses in one moment. It is the last place the brain names a
-  world and it is what unblocks the split above.
+  compiler's rather than a folder's. No part of the brain names a world now, so what is left
+  is the move. `Brain.Held` becoming a reported census is its own arc and shrinks the surface.
 - **A holder host and a harness that takes peers**, which is the first two-process run and
   what `Ported` has been standing in for. John's end state is this repeated twenty times.
 - **Then a likeness bar that travels**, read against shuffled moments rather than a level,

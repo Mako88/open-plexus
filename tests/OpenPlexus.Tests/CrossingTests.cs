@@ -148,8 +148,8 @@ public sealed class CrossingTests(ITestOutputHelper output)
 
         var body = new Compound<Crossed>(
         [
-            new Tiling(Crossing.Shape, Lettering.Side, CrossingRun.Patch),
-            new Passthrough(),
+            new Tiling<Crossed>(one => one.Shape, Crossing.Shape, Lettering.Side, CrossingRun.Patch),
+            new Passthrough<Crossed>(one => Coded.Of(one.Said)),
         ]);
 
         var together = 0;

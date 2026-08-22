@@ -61,8 +61,8 @@ public sealed class CrossingRun
 
         var body = new Compound<Crossed>(
         [
-            new Tiling(Crossing.Shape, Lettering.Side, Patch, placed: false),
-            new Passthrough(),
+            new Tiling<Crossed>(one => one.Shape, Crossing.Shape, Lettering.Side, Patch, placed: false),
+            new Passthrough<Crossed>(one => Coded.Of(one.Said)),
         ]);
 
         _trial = new Bench(new Watching<Crossed>(made, body), brain);

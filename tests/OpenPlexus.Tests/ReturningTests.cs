@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -112,12 +112,12 @@ public sealed class ReturningTests(ITestOutputHelper output)
         // never a category it put there itself. The same object both times, which is what
         // the remark above is about.
         IQuantizer<Coded> front = categories is null
-            ? new Passthrough()
+            ? new Passthrough<Coded>(one => one)
             : new Sorted<Coded>(
                 deriving
                     ? new Deriving<Coded>(
-                        new Passthrough(), categories, adhesion: 1.5, floor: 20, every: 250)
-                    : new Passthrough(),
+                        new Passthrough<Coded>(one => one), categories, adhesion: 1.5, floor: 20, every: 250)
+                    : new Passthrough<Coded>(one => one),
                 categories);
 
         var tally = new Bench(new Watching<Coded>(world, front), brain)

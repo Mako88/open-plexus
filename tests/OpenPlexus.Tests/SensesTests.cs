@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -211,7 +211,7 @@ public sealed class SensesTests(ITestOutputHelper output)
         var world = new Senses(Clean(), seed: 1);
         var brain = new Brain(new CommittingSettings { Capacity = 4000 }, seed: 1);
 
-        new Bench(new Watching<Coded>(world, new Passthrough()), brain)
+        new Bench(new Watching<Coded>(world, new Passthrough<Coded>(one => one)), brain)
             .Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
 
         var all = brain.Held.All.ToList();
@@ -236,7 +236,7 @@ public sealed class SensesTests(ITestOutputHelper output)
         var world = new Senses(Clean() with { Withheld = 200 }, seed: 1);
         var brain = new Brain(new CommittingSettings { Capacity = 4000 }, seed: 1);
 
-        var tally = new Bench(new Watching<Coded>(world, new Passthrough()), brain)
+        var tally = new Bench(new Watching<Coded>(world, new Passthrough<Coded>(one => one)), brain)
             .Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
 
         var unseen = Assert.IsType<Examined>(tally.Unseen);
@@ -295,7 +295,7 @@ public sealed class SensesTests(ITestOutputHelper output)
                     var brain = new Brain(new CommittingSettings { Capacity = 4000 }, seed: 1);
 
                     var tally = new Bench(
-                        new Watching<Coded>(world, new Passthrough()),
+                        new Watching<Coded>(world, new Passthrough<Coded>(one => one)),
                         brain)
                         .Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);
 

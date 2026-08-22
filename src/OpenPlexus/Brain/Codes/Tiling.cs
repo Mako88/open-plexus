@@ -45,7 +45,7 @@ namespace OpenPlexus.Codes;
 /// up, which is the fault the whole seam exists to prevent.
 /// </para>
 /// </remarks>
-public sealed class Tiling : IQuantizer<IReadOnlyList<double>>, IQuantizer<Worlds.Crossed>
+public sealed class Tiling<TFrame> : IQuantizer<TFrame>
 {
     private readonly Winnow _winnow;
     private readonly int _side;
@@ -72,6 +72,15 @@ public sealed class Tiling : IQuantizer<IReadOnlyList<double>>, IQuantizer<World
     /// </remarks>
     private readonly bool _placed;
 
+    private readonly Func<TFrame, IReadOnlyList<double>?> _reading;
+
+    /// <param name="reading">
+    /// The square of numbers inside a frame, or nothing where this frame holds none —
+    /// <b>a projection rather than a field</b>, on <see cref="Banded{TFrame}"/>'s pattern.
+    /// A body reads one frame several ways and each sense takes the part it knows, so what a
+    /// frame IS belongs to whoever composed the body. A front end naming a world's record
+    /// would be the brain knowing which world it is looking at.
+    /// </param>
     /// <param name="modality">The modality these codes ride on.</param>
     /// <param name="side">How many pixels across the square reading is.</param>
     /// <param name="tile">How many pixels across one patch is. Must divide the side.</param>
@@ -81,8 +90,15 @@ public sealed class Tiling : IQuantizer<IReadOnlyList<double>>, IQuantizer<World
     /// <exception cref="ArgumentOutOfRangeException">
     /// The patch does not divide the reading, or is too small to project from.
     /// </exception>
-    public Tiling(byte modality, int side, int tile, bool placed = true)
+    public Tiling(
+        Func<TFrame, IReadOnlyList<double>?> reading,
+        byte modality,
+        int side,
+        int tile,
+        bool placed = true)
     {
+        ArgumentNullException.ThrowIfNull(reading);
+
         ArgumentOutOfRangeException.ThrowIfLessThan(side, 2);
         ArgumentOutOfRangeException.ThrowIfLessThan(tile, 2);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(tile, side);
@@ -99,6 +115,7 @@ public sealed class Tiling : IQuantizer<IReadOnlyList<double>>, IQuantizer<World
         var (cells, reach, winners) = Winnowing.Sheet(tile * tile);
 
         _winnow = new Winnow(modality, tile * tile, cells, reach, winners);
+        _reading = reading;
         _side = side;
         _tile = tile;
         _across = side / tile;
@@ -134,9 +151,12 @@ public sealed class Tiling : IQuantizer<IReadOnlyList<double>>, IQuantizer<World
     /// residue of every placed one — which is what lets a scope name the part without
     /// naming the place.
     /// </remarks>
-    public IReadOnlyCollection<Code> Codify(IReadOnlyList<double> observation)
+    public IReadOnlyCollection<Code> Codify(TFrame frame)
     {
-        ArgumentNullException.ThrowIfNull(observation);
+        // A frame this sense has nothing in is a frame it says nothing about, which is why a
+        // body needs no router -- see `Compound`. A moment that is words alone is not this
+        // sense's moment.
+        if (_reading(frame) is not { } observation) return [];
 
         if (observation.Count != _side * _side)
             throw new ArgumentException(
@@ -172,12 +192,4 @@ public sealed class Tiling : IQuantizer<IReadOnlyList<double>>, IQuantizer<World
         return codes.Distinct().ToList();
     }
 
-    /// <summary>The drawn half of a crossing moment, and nothing where none was drawn.</summary>
-    /// <remarks>
-    /// <b>A front end reads its own field and takes what it knows</b>, which is why a body
-    /// needs no router — see <see cref="Compound{TFrame}"/>. A moment that is words alone is
-    /// a moment this sense has nothing to say about, and saying nothing is what it does.
-    /// </remarks>
-    public IReadOnlyCollection<Code> Codify(Worlds.Crossed observation) =>
-        observation.Shape is null ? [] : Codify(observation.Shape);
 }

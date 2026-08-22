@@ -591,9 +591,10 @@ public sealed class DocsTests
     // concept, and what the rung reaches there is that truth with a condition it does not
     // need. It duplicates no entry and the leaf it sits beside came in shorter.
     // And 11,706 is the next fall, in the same session that took the raise. The fork closed
-    // by being built: `Population.Scanning` reaches a scope no code names, so the leaf went
-    // and 134 joined the closed list. A raise spent on a question that is answered inside a
-    // day is the budget doing what it is for.
+    // by being built: a scan list reached a scope no code names, so the leaf went and 134
+    // joined the closed list. A raise spent on a question that is answered inside a day is the
+    // budget doing what it is for. The list itself went with the arm it was built for, which
+    // is why nothing of that name is here to point at.
     // And 11,739 is the fifty-ninth raise, thirty-three words, for a trap with no check. An
     // arm that changes a code's VALUE moves placement, ordering and every tie-break under it,
     // so it is two runs of the learner as well as two arms -- found by a Monk-1 seed whose

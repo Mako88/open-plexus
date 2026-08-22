@@ -40,7 +40,17 @@ public sealed class CeilingTests(ITestOutputHelper output)
     /// <summary>How often the answer is already in the moment, for one arm.</summary>
     /// <param name="joining">Which arm reads the story.</param>
     /// <param name="task">Which bAbI task.</param>
-    private static (double Present, int Asked) Ceiling(Joining joining, int task)
+    private static (double Present, int Asked) Ceiling(Joining joining, int task) =>
+        Ceiling(new Joined(joining), task);
+
+    /// <summary>The same, for a front end that is not one arm.</summary>
+    /// <param name="sensing">The translation between the story and the brain.</param>
+    /// <param name="task">Which bAbI task.</param>
+    /// <remarks>
+    /// <b>A front end rather than an enum value</b>, so a composition can be priced by the
+    /// instrument that prices the arms. Nothing here knows how the moment was made.
+    /// </remarks>
+    private static (double Present, int Asked) Ceiling(IQuantizer<Recited> sensing, int task)
     {
         var world = new Recalled(new RecalledSettings
         {
@@ -52,7 +62,7 @@ public sealed class CeilingTests(ITestOutputHelper output)
             Withheld = 20,
         });
 
-        var watching = new Watching<Recited>(world, new Joined(joining));
+        var watching = new Watching<Recited>(world, sensing);
 
         var exam = watching.Exam;
 
@@ -107,6 +117,77 @@ public sealed class CeilingTests(ITestOutputHelper output)
         // And the check can still fail: a front end that handed over the answer every time
         // would read one here, and nothing below it could be read as learning at all.
         Assert.All(priced, one => Assert.InRange(Ceiling(one, Task).Present, 0.0, 1.0));
+    }
+
+    /// <summary>
+    /// <b>What a compound of two readings of ONE sense costs</b>, before anything has learnt.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A moment is a union, so an answer-present set is a union.</b> Each channel reads
+    /// the same signal and emits into the same alphabet, so the answer is in the compound
+    /// moment whenever it was in either channel's — which makes the ceiling of a compound at
+    /// least the highest of its channels, and higher wherever they hand it over on different
+    /// occasions. That is arithmetic and not a measurement, and this is where it is asserted.
+    /// </para>
+    /// <para>
+    /// <b>And what it prices is the proposal rather than the type.</b>
+    /// <see cref="Compound{TFrame}"/> exists for a body with several SENSES, where the
+    /// channels emit into disjoint modalities and the outcome lives in one — so a second
+    /// sense cannot add the answer and this reading does not touch it. What it refuses is
+    /// several readings of one sense, where the alphabets are shared.
+    /// </para>
+    /// <para>
+    /// <b>Which is the bag by a longer road.</b> <see cref="Joining.Bagged"/> is the control
+    /// that hands everything over and reads 1.000 here; adding channels walks toward it
+    /// monotonically, and three selecting arms reach the bag's width at a fraction of its
+    /// ceiling. The refutation is in the commit that deleted the arm.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_compound_of_one_sense_never_lowers_the_ceiling_and_usually_raises_it()
+    {
+        const int Task = 2;
+
+        // The three arms that SELECT. The bag hands the answer over every time, so a pair
+        // holding it is 1.000 whatever the other channel does and says nothing about
+        // composition.
+        var selecting = new[] { Joining.Distinguished, Joining.Chained, Joining.Resolved };
+
+        var alone = selecting.ToDictionary(one => one, one => Ceiling(one, Task).Present);
+
+        output.WriteLine($"bAbI task {Task}, twenty stories withheld");
+        output.WriteLine($"{"channels",-34}{"answer present",16}");
+
+        foreach (var one in selecting)
+            output.WriteLine($"{one.ToString().ToLowerInvariant(),-34}{alone[one],16:F3}");
+
+        var raised = 0;
+
+        for (var first = 0; first < selecting.Length; first++)
+            for (var second = first + 1; second < selecting.Length; second++)
+            {
+                var pair = new[] { selecting[first], selecting[second] };
+
+                var present = Ceiling(
+                    new Compound<Recited>(pair.Select(one => new Joined(one))), Task).Present;
+
+                var best = pair.Max(one => alone[one]);
+
+                output.WriteLine($"{string.Join('+', pair),-34}{present,16:F3}");
+
+                Assert.True(present >= best,
+                    $"{string.Join('+', pair)} hands the answer over {present:F3} of the time "
+                    + $"and its best channel alone reaches {best:F3}. A moment is a union, so "
+                    + "this cannot happen -- something is dropping codes at the merge.");
+
+                if (present > best) raised++;
+            }
+
+        // And the check can fire. Two channels that hand the answer over on exactly the same
+        // occasions would raise nothing, so a reading where none of the three pairs rose
+        // would mean the arms are the same selection under three names.
+        Assert.Equal(3, raised);
     }
 
     [Fact]

@@ -34,10 +34,6 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **ACTIVE, the twenty-five `DrivenTests` says no run reaches.** The fleet is twenty of them
   and the brain is what it is part of, so it closes with the two below. The category machinery
   — `Alternating`, `Deriving`, `Meeting`, `Sorted` — and `Unifying` close later on.
-- **Price the compound eye before one is built.** John's, and cheap. Compose two front ends
-  through `Compound` on the worlds there are and read `Searched`, `Candidates` and
-  `CeilingTests` against the one-channel arm. A rise in the ceiling drops it; the search cost
-  sets how sparse a channel must be, since the constraints refuse dropping one by payoff.
 - **`OpenPlexus.Brain` as its own project**, learner `internal`, so the boundary is the
   compiler's rather than a folder's. `Brain.Held` becoming a reported census is its own arc
   and is what shrinks the surface.
@@ -688,6 +684,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | `Preferring.Saving` — naming the certified pair the most scopes hold | Stacking falls 3.4 standard errors on eleven bits, the outcome columns at ceiling on both arms. A name over a two-code scope leaves it one code and out of the eligible set | A world whose eligible scopes are mostly three codes or longer |
 | `Preferring.Surviving` — the same over scopes that survive naming | Inside a standard error of the row above on every column: the deepest certified pair is the widest on 80 asks of 80 | A world where those come apart, which `NamingYieldTests` asserts against |
 | `Marked` — a discrete reading said as one code | Nothing ever called it, in `src` or in a test | A world handing over a raw index the brain must name, which `Passthrough` cannot take |
+| A compound eye, several readings of ONE sense at once | The moment is a union, so the ceiling is: every pair raises it over its best channel, and the withheld score lands BETWEEN the channels on three tasks and seeds | DISJOINT alphabets, a second SENSE and `Crossing`'s case: no union reaches an outcome in one modality |
 | A refusal as a CODE in the moment, fork **127** | Level on both shapes for a larger population, the chooser already refusing to repeat itself, so the fact was acted on before the code arrived | The exclusion having to SURVIVE the moment, which is a store's job rather than a code's |
 
 ---

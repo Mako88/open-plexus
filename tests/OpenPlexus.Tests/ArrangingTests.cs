@@ -507,6 +507,24 @@ public sealed class ArrangingTests(ITestOutputHelper output)
                         + $"singles held, {got.Tally.Resident} resident "
                         + $"({got.Tally.Minted} minted) | "
                         + $"sound {got.Rules.Sound} unsound {got.Rules.Unsound}");
+
+                    // WHAT LEFT, BY DEPTH, and it is the column that decides between three
+                    // readings of the line above. A run whose sound rules were CULLED and one
+                    // that never BUILT them look identical in every count printed here: both
+                    // hold fewer at depth. Culled rising at the deep lengths says the first,
+                    // `Repaired` falling there says the second, and neither moving says the
+                    // vote is seating what was already held.
+                    foreach (var depth in run.Held.Lineages
+                                 .GroupBy(one => one.Key.Depth)
+                                 .OrderBy(one => one.Key))
+                    {
+                        output.WriteLine(
+                            $"      depth {depth.Key} | genesis "
+                            + $"{depth.Sum(one => one.Value.Genesis),6} repaired "
+                            + $"{depth.Sum(one => one.Value.Repaired),6} | culled "
+                            + $"{depth.Sum(one => one.Value.Culled),6} subsumed "
+                            + $"{depth.Sum(one => one.Value.Subsumed),6}");
+                    }
                 }
 
                 var mean = unseen.Average();

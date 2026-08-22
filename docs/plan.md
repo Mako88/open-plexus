@@ -35,8 +35,8 @@ that is finished LEAVES, so this is only ever what is still to do.
   and closes with the holder host below. The category machinery — `Alternating`, `Deriving`,
   `Meeting`, `Sorted` — and `Unifying` close later on.
 - **`OpenPlexus.Brain` as its own project**, learner `internal`, so the boundary is the
-  compiler's rather than a folder's. No brain type names a world now; what is left is the
-  move, twenty-five world crefs that stop compiling, and what `Brain.Held` exposes.
+  compiler's rather than a folder's. No brain type names a world now. John's: let the
+  twenty-five world crefs GO RED on the move and fix them all, rather than softening any.
 - **A holder host and a harness that takes peers**, which is the first two-process run and
   what `Ported` has been standing in for. John's end state is this repeated twenty times.
 - **Then a likeness bar that travels**, read against shuffled moments rather than a level,

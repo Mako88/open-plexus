@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -36,11 +36,92 @@ public sealed class WithheldTests(ITestOutputHelper output)
             Grey = true,
         };
 
+    /// <summary>
+    /// Channels a question may leave off, and why each cannot change its answer.
+    /// </summary>
+    /// <remarks>
+    /// <b>A reason rather than a field with no reader</b>, and it has to be the second kind of
+    /// argument. A channel is safe to drop from an examination only where dropping it takes
+    /// every identical decision — not where it happens to be unused today, which is a fact
+    /// about the callers and changes without anybody noticing.
+    /// </remarks>
+    private static readonly IReadOnlyDictionary<string, string> Inert =
+        new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["Fleeting"] =
+                "which codes cannot recur, and it reaches the table and nothing else. An "
+                + "examination is read-only -- it weighs what fires and writes no row -- so a "
+                + "question carrying the mark would be handing over something with nowhere to "
+                + "be read. `ICouncil.AskAsync` makes the same argument one seam in: a holder "
+                + "that ignored it holds a bigger table and takes every identical decision.",
+        };
+
     /// <summary>Everything about one commitment that learning would move.</summary>
     private static string Record(Population held) =>
         string.Join("\n", held.All.Select(one =>
             $"{one.Identity} {one.Hits} {one.Misses} {one.Abstains} {one.Seen} "
             + $"{one.Accuracy:R} {one.Separations.Count}"));
+
+    /// <summary>
+    /// A held-out question is asked with everything a pushed moment carries.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The budget for a failure class this cost a reading to find.</b>
+    /// <see cref="Codes.IQuantizer{TObservation}.Bind"/> got a reader, the run learnt with
+    /// it, and <c>Machines.Watching</c> built its exam without it — so every withheld question
+    /// went to a population whose scopes were built to be read one way and was matched the
+    /// other. The arm scored at its control and the number looked like a learner that does not
+    /// generalise.
+    /// </para>
+    /// <para>
+    /// <b>Nothing could have caught it by reading a score.</b> Both arms answered every
+    /// question and both sat on the bar, which is exactly what a real null result looks like.
+    /// It came out because a second reading of the same grid showed the arm holding rules its
+    /// control could not express while scoring the same, and those two cannot both be true.
+    /// </para>
+    /// <para>
+    /// <b>So the check is structural.</b> A moment carries the front end's optional channels
+    /// beside its codes; a question is that moment asked again from outside. Every channel one
+    /// carries the other must carry, and the day a fifth is added this goes red rather than
+    /// the next grid reading low for a reason nobody can see.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void An_examination_carries_every_channel_a_moment_carries()
+    {
+        // What each record says ABOUT the codes, rather than the codes or the bookkeeping.
+        // A stamp is which moment it is and an outcome is what followed; neither is a thing
+        // the front end said, and a question has its own shape for both.
+        string[] bookkeeping = ["Codes", "From", "Followed"];
+
+        var carried = typeof(Pushed).GetProperties()
+            .Select(one => one.Name)
+            .Except(bookkeeping, StringComparer.Ordinal)
+            .Except(Inert.Keys, StringComparer.Ordinal)
+            .Order(StringComparer.Ordinal)
+            .ToList();
+
+        foreach (var (channel, why) in Inert) output.WriteLine($"inert  {channel,-10} {why}");
+
+        var asked = typeof(Question).GetProperties()
+            .Select(one => one.Name)
+            .ToHashSet(StringComparer.Ordinal);
+
+        var missing = carried.Where(one => !asked.Contains(one)).ToList();
+
+        output.WriteLine(
+            missing.Count == 0
+                ? $"an examination carries all {carried.Count}: {string.Join(", ", carried)}"
+                : $"{missing.Count} missing: {string.Join(", ", missing)}");
+
+        Assert.True(missing.Count == 0,
+            $"`Pushed` carries {string.Join(", ", missing)} and `Question` does not, so a "
+            + "withheld question is put to the population under different terms from the "
+            + "stream it learnt on. That reads as a population that does not generalise and "
+            + "is a harness fault -- add the channel to `Question` and forward it in "
+            + "`Watching.Exam` and wherever the exam is answered.");
+    }
 
     [Fact]
     public void What_is_withheld_is_never_drawn()

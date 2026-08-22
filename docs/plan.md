@@ -33,9 +33,10 @@ that is finished LEAVES, so this is only ever what is still to do.
   build: a session cannot reach green without doing them. One is left and it is fork **28**'s.
 - **Then the genesis gate**, which finds every rule three worlds hold and loses the held-out
   set on two more. Subsumption deletes what it builds, and that arm is dispatched. Fork **135**.
-- **Then what a derived category DELIVERS**, nought so far. The fold puts it in nearly every
-  moment and genesis refuses a code that never varied, so `Coarsening` is the road. Fork
-  **129**.
+- **Then what a placement is WORTH**, which is the whole of the chain. The concluding rule
+  is certain, its only firing premise is worth a quarter, and believing a placed word reaches
+  five rivals. So the value is whether the chain SETTLES, and it is learnt. `ChainingTests`.
+  Forks **115** and **129** are one item.
 - **Then which worlds still answer a live question**, measured rather than guessed. An
   isolating world leaves when its question shuts and fourteen are open.
 - **Then the crossing itself**, which falls out of that one: a name over the co-firing shape
@@ -450,12 +451,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       something and where to ask is LEARNT.
     - **OPEN** — what it converts is unread, and English's alphabet is far wider than
       anything here has run on. Fork **89**.
-    - **OPEN** — a round is fold, fire, vote, and nothing puts what fired BACK in the
-      moment, so a conclusion needing two statements is unreachable at any repetition. Fork
-      **28**.
-    - **OPEN** — and neither the loop nor a selecting front end reaches it: seven shapes are
-      refuted. What the question does not NAME cannot trigger the link. Fork **125**.
-    - **OPEN** — the horizon is K occasions, K=1. Fork **28**.
+    - **OPEN** — a round is fold, fire, vote, nothing puts what fired BACK in the moment, and
+      the horizon is K=1, so a conclusion needing two statements is unreachable at any
+      repetition. Nine shapes are refuted and the parts are all present. Forks **28**, **125**.
     - **OPEN** — entailment depth and the horizon are capped at one; both come off when
       blame diffusion has a number. Fork **32**.
     - **OPEN** — a lucky advocate blocks genesis, so proposals stop within a hundred rounds
@@ -667,7 +665,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | Claiming only a sentence's LEAST-said words, so the two claiming rules become one comparison | Worse on both axes, needing ten times the telling to reach what claiming every word reached at once | The population cost of claiming every word binding, which is a corpus rather than a lesson |
 | A refusal settling on a reserved outcome rather than the round abstaining | Nought over eight passes either way, and counting it taught the machine to stop asking | A CHOOSER that reads one. Recording a refusal buys nothing while nothing avoids what it refused |
 | A question carrying the topic while statements stay bare, so a SELECTING front end has something to walk | Nought on the implied half under every front end, and worse on the stated half than carrying nothing at all | A relevance mechanism the front end does not have. No arrangement of what exists reaches a second fact |
-| A second hop in three shapes: every conclusion made live, the winner's alone, and only rules that USED one voting | Nought on the implied half in all three, and the run's own accuracy fell each time | RELEVANCE, or a sub-question — a question not NAMING the intermediate cannot trigger the link to it |
+| A second hop in five shapes: conclusions made live, the winner's alone, only rules that USED one, only those the QUESTION touches, a backward read from the answer | Nought in the first three, accuracy falling; the fourth identical to the digit; the fifth the same arithmetic at depth one | A placement SCORED by settlement |
 | `Joining.Recent` — a word banded by how far back it was said | Half what narrowing the view buys, and the front end picks the bands | A band the learner mints. Fork 92 |
 | Background admitted to a WIDE genesis scope, a code in every moment being unable to change when the rule fires | A third of what the varied filter reaches at three tellings and three quarters at ten | A world where the varied gate refuses a code a conjunction needed |
 | `Preferring.Saving` — naming the certified pair the most scopes hold | Stacking falls 3.4 standard errors on eleven bits, the outcome columns at ceiling on both arms. A name over a two-code scope leaves it one code and out of the eligible set | A world whose eligible scopes are mostly three codes or longer |

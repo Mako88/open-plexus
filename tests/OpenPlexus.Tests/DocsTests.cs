@@ -627,7 +627,15 @@ public sealed class DocsTests
     // rounds of twenty thousand, and Monk -- the one bench whose rule set can be counted --
     // holds 14 of 22 with it and 22 of 22 without, for a better withheld score. It duplicates
     // no item and its route leaf came in shorter than the one it replaced.
-    private const int Whole = 11_784;
+    // And 11,781 is the next fall, taken in a session that added to the doc. The chain
+    // became one item in `THE ORDER` and a refutation row grew from three shapes to five,
+    // and it still came out shorter: two leaves said the same wall in two places -- the loop
+    // not putting a firing back in the moment, and the front end not reaching it either --
+    // and they are one leaf now. What the new words say is that the question moved. The
+    // concluding rule is a certainty, its only firing premise is worth a quarter because a
+    // statement claims every word in turn, and a placed word believed reaches five rivals.
+    // So forks 115 and 129 are one piece of work. The readings are in `ChainingTests`.
+    private const int Whole = 11_781;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

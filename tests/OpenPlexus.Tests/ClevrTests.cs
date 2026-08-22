@@ -286,6 +286,21 @@ public sealed class ClevrTests(ITestOutputHelper output)
                 + $"({spread:F3}) above the {run.World.Chance:F3} bar, so something "
                 + "composed. This assertion records a null result and closing it is "
                 + "progress.");
+
+            // AND THE SAME DISTANCE BELOW, which is not the same claim and had no check. A
+            // population that has learnt nothing answers held-back questions at chance; one
+            // that answers them under chance has learnt something WRONG about them, and its
+            // rules are anti-correlated with the truth on a question they were not shown.
+            //
+            // Armed by a reading rather than by symmetry. The interaction sweep's ungated arm
+            // lands at 0.167 against this 0.358 bar with the drawn stream at 0.928, and every
+            // assertion here passed it because they all name a ceiling. A null result is a
+            // score ON the bar, and only one side of that was being checked.
+            Assert.True(run.Composed > run.World.Chance - spread,
+                $"{run.Composed:F3} on the withheld set is more than three standard errors "
+                + $"({spread:F3}) BELOW the {run.World.Chance:F3} bar, so the population is "
+                + "wrong about held-back questions rather than uninformed about them. That is "
+                + "a stronger failure than not composing and it is worth a different look.");
         }
     }
 

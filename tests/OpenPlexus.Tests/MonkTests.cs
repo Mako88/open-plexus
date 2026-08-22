@@ -819,6 +819,27 @@ public sealed class MonkTests(ITestOutputHelper output)
     /// is the population the spelling costs.
     /// </para>
     /// <para>
+    /// <para>
+    /// <b>At eight seeds it buys nothing</b>, and at three it looked like +0.025. Monk-1 is
+    /// 0.830 held-out against the fused arm's 0.829, ahead on four seeds and behind on four;
+    /// Monk-3 is 0.966 against 0.957, which is one seed of eight moving from 0.909 to 0.977
+    /// and seven level; Monk-2 is 0.653 against 0.666, behind on six of eight. Three seeds had
+    /// Monk-1 ahead on all three, which is the small-sample inversion this repo's traps list
+    /// names and had not caught in the act before.
+    /// </para>
+    /// <para>
+    /// <b>And on Monk-2 both arms are below the bar</b>, 0.671 being what always saying no
+    /// scores there, so the one consistent loss is between two arms that fail. The reading is
+    /// no effect rather than a loss.
+    /// </para>
+    /// <para>
+    /// <b>What the arm was never given is the rule it needed</b>, which is fork 134 and why
+    /// this is not yet a deletion. Monk-1's concept is <c>head = body</c> and nothing else,
+    /// and <see cref="The_rule_that_is_only_a_variable_twice_is_beyond_the_proposer"/> shows
+    /// the proposer cannot reach it — so what the split arm holds is that truth with a
+    /// condition it does not need, one rule per value of whatever the condition pins. A losing
+    /// arm gets one more shape where what lost was the build rather than the idea.
+    /// </para>
     /// <b>A sweep</b>, because eight seeds of three puzzles of two arms is forty-eight runs.
     /// <see cref="Only_the_split_spelling_lets_a_variable_stand_in_two_places"/> is what the
     /// suite runs, and it holds down the links a single seed can settle.

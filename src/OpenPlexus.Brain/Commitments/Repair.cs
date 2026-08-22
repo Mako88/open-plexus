@@ -909,6 +909,15 @@ internal sealed record CommittingSettings
 /// apart.
 /// </para>
 /// <para>
+/// <b>And a part may be a sentence</b>, which this treats exactly as it treats an object.
+/// <see cref="Codes.Coded.Groups"/> says a part is a sentence, an object or a reading, and
+/// three worlds fill the channel today by grouping objects — so the day a world reports its
+/// STATEMENTS as parts, every scope spanning two of them stops firing and nothing here can
+/// tell that from the mechanism working. What would catch it is a world whose parts are
+/// sentences and whose answer needs two of them, which is the world settlement by successor
+/// is already waiting for.
+/// </para>
+/// <para>
 /// <b>Both halves or neither</b>, which is why this is one dial and not two. A matcher that
 /// refuses a scope spanning two things cannot help if nothing ever proposes a scope about
 /// one: genesis roots on single codes and repair adds a code that SEPARATES, and the code

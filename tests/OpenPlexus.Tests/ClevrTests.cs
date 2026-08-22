@@ -303,15 +303,73 @@ public sealed class ClevrTests(ITestOutputHelper output)
             Unseen.Answered == 0 ? 0.0 : Unseen.Right / (double)Unseen.Answered;
     }
 
+    /// <summary>
+    /// What reading the grouping costs where the answer needs more than one object.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The second world <see cref="Commitments.Spanning"/> owes, at more than one seed.</b>
+    /// The dial shipped on a reading taken here at one seed, and one seed is not a comparison
+    /// — it will happily invert. This is the same two arms over four, and it is a sweep
+    /// because a run of this world is a minute and a half.
+    /// </para>
+    /// <para>
+    /// <b>And the spread here is the BRAIN's alone</b>, which is a ceiling on what this can
+    /// say. This world has no seed: the corpus is read off disk in one order, so four runs
+    /// differ in placement and tie-breaks and in nothing about the scenes. A spread taken
+    /// that way understates, so a gap inside it is not evidence of no gap.
+    /// </para>
+    /// <para>
+    /// <b>And this is the world where it could COST rather than pay.</b> The corpus segments
+    /// the scene and leaves the question's codes in no part, so a scope naming attributes of
+    /// two different objects is refused — and a CLEVR question chains filters across a scene
+    /// rather than pinning one thing. What the run has to say is whether refusing those
+    /// scopes takes anything away.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_reading_the_grouping_costs_where_a_question_chains_across_a_scene()
+    {
+        foreach (var spanning in new[] { Spanning.Anything, Spanning.Thing })
+        {
+            var drawn = new List<double>();
+            var unseen = new List<double>();
+
+            foreach (var seed in new[] { 1, 2, 3, 4 })
+            {
+                var run = Learnt(fleeting: true, spanning: spanning, seed: seed);
+
+                drawn.Add(run.Tally.Recent);
+                unseen.Add(run.Composed);
+
+                output.WriteLine(
+                    $"  {spanning,-8} seed {seed} | drawn {run.Tally.Recent:F3} | withheld "
+                    + $"{run.Composed:F3} of {run.Unseen.Answered} answered | held "
+                    + $"{run.Tally.Resident}, {run.Tally.Minted} minted, {run.Tally.Repaired} "
+                    + "repairs");
+            }
+
+            output.WriteLine(
+                $"  {spanning,-8} MEAN drawn {new Measured { Arm = "drawn", Values = drawn }} "
+                + $"| withheld {new Measured { Arm = "withheld", Values = unseen }}");
+        }
+
+        // The bar is `Clevr.Chance` and it is asserted in the fact above rather than here.
+        // This one prints what the dial did to a world it was not chosen on.
+        Assert.True(true);
+    }
+
     /// <param name="fleeting">Whether the world says its per-scene indexes cannot recur.</param>
     /// <param name="spanning">Whether a scope may be about more than one of the objects.</param>
-    private static Run Learnt(bool fleeting, Spanning spanning = Spanning.Thing)
+    /// <param name="seed">The seed for the world and the brain.</param>
+    private static Run Learnt(bool fleeting, Spanning spanning = Spanning.Thing, int seed = 1)
     {
         var world = new Clevr(
             World(scenes: Scenes, fleeting: fleeting) with { Withheld = 300 });
 
         var brain = new Brain(
-            new CommittingSettings { Capacity = 4000, Spanning = spanning }, seed: 1);
+            new CommittingSettings { Capacity = 4000, Spanning = spanning }, seed);
 
         var tally = new Bench(new Watching<Coded>(world, new Passthrough<Coded>(one => one)), brain)
             .Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);

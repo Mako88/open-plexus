@@ -151,6 +151,7 @@ jobs:
             "RecalledTests.Whether_word_order_pays_where_the_front_end_selects",
             "RecalledTests.What_one_selected_statement_converts_across_the_exam",
             "SensesTests.Whether_the_cross_modal_question",
+            "ClevrTests.What_reading_the_grouping_costs",
             "SeparableTests",
             "SplitNamingTests","SplitRepairTests","SplitTests"
           ]'

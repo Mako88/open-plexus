@@ -161,11 +161,12 @@ public sealed class FiringTests(ITestOutputHelper output)
     /// <summary>Every world the reading is taken over, and what each reported.</summary>
     /// <remarks>
     /// <para>
-    /// <b>Six cheap generated worlds rather than one</b>, because a counter quiet on one
-    /// world says nothing. The multiplexer is what step one is judged on, the MONK's puzzle
-    /// is where a scope language has a known ceiling, and the arranged world is the one whose
-    /// front end has to make its own symbols. What is still quiet across all six is a
-    /// mechanism nothing generated can reach.
+    /// <b>Cheap generated worlds rather than one</b>, because a counter quiet on one world
+    /// says nothing. The multiplexer is what step one is judged on, the MONK's puzzle is
+    /// where a scope language has a known ceiling, and the arranged world is the one whose
+    /// front end has to make its own symbols. What is still quiet across all of them is a
+    /// mechanism nothing generated can reach, and the count is printed rather than written
+    /// here — a number in a remark rots the first time the list moves, and this one had.
     /// </para>
     /// <para>
     /// <b>And the three added cover shapes the first three share.</b> The graded
@@ -177,7 +178,13 @@ public sealed class FiringTests(ITestOutputHelper output)
     /// <para>
     /// <b>What they bought is one counter</b>, <c>AtScarce</c> on the graded world, which is
     /// the naming gate refusing a pair too thinly seen — a refusal a front end minting its own
-    /// symbols reaches and one code per attribute does not. Eight are quiet across all six.
+    /// symbols reaches and one code per attribute does not.
+    /// </para>
+    /// <para>
+    /// <b>And the binding world is the seventh</b>, added the day a counter arrived that
+    /// nothing here could move. It is the one that reports its objects as PARTS, so it is
+    /// where <c>Fronted.Grouped</c> fires — and the text worlds do not answer for it, because
+    /// they have parts and are read through a front end that does not implement the channel.
     /// </para>
     /// </remarks>
     private static IEnumerable<(string World, Tally Tally)> Ran()
@@ -217,6 +224,30 @@ public sealed class FiringTests(ITestOutputHelper output)
             new HomeostatRun(
                 new HomeostatSettings(), One(), Regulating.Driven, Feeling.Acted, seed: 1)
                 .Run(Rounds).Tally);
+
+        // THE ONE THAT GROUPS, and it is here because a counter that has always read nought
+        // is the shape this file exists to catch. `Fronted.Grouped` arrived with a reader for
+        // `IQuantizer.Bind` and every world above reports no parts at all -- so the census
+        // would have carried a new number that could not move, which reads exactly like a
+        // number that does.
+        //
+        // And the text worlds do not answer it either, which is worth knowing rather than
+        // assuming. `Fronted.Ordered` is quiet here because only a world with PARTS reports
+        // an order; those worlds have parts and still fill nothing, because they are read
+        // through `Joined` and it does not implement the channel.
+        yield return (
+            "binding",
+            new Bench(
+                new Watching<Coded>(
+                    new Binding(
+                        new BindingSettings
+                        {
+                            Concepts = 4, CodesPerAttribute = 3, Segmented = true,
+                        },
+                        seed: 1),
+                    new Passthrough<Coded>(one => one)),
+                One())
+                .Run(Rounds));
     }
 
     /// <summary>Every number the brain reported, by name.</summary>

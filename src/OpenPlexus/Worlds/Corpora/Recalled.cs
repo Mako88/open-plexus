@@ -195,8 +195,7 @@ public readonly record struct Asking
     /// <b>Kept apart and ordered</b>, because a bag cannot be asked which sentence a word came
     /// from. A world saying <i>these words were one sentence, and it was the latest</i>
     /// is stating a fact about its signal — the same licence
-    /// <see cref="Codes.Coded.Groups"/> and <see cref="Codes.Coded.Sequence"/> already
-    /// carry. What to make of the order is the front end's, and every arm that wants none
+    /// <see cref="Codes.Coded.Groups"/> already carries. What to make of the order is the front end's, and every arm that wants none
     /// of it flattens this in one call.
     /// </para>
     /// <para>

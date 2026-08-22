@@ -42,7 +42,7 @@ public sealed record HandingSettings
 /// </para>
 /// <para>
 /// <b>Order is a fact about the signal and not a conclusion.</b> Which is the line this stays
-/// the right side of. <see cref="Codes.Coded.Sequence"/> and
+/// the right side of. <see cref="Codes.Coded.Groups"/> and
 /// <see cref="IQuantizer{TFrame}.Order"/> already carry exactly this licence for every
 /// other sense; <see cref="Asking"/> carries it ACROSS sentences and not WITHIN one, which
 /// is an omission rather than a principle. What no world here may say is which word is the

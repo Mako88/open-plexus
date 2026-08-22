@@ -44,17 +44,31 @@ public sealed class Passthrough : IQuantizer<Coded>, IQuantizer<Worlds.Crossed>
     public IReadOnlyCollection<Code> Codify(Coded observation) => observation.Codes;
 
     /// <inheritdoc/>
-    public IReadOnlyDictionary<Code, int>? Bind(Coded observation) => observation.Groups;
+    /// <remarks>
+    /// <b>Built from the parts</b>, and a code in two of them belongs to neither. The channel
+    /// asks which THING a code belongs to and a dictionary can name one, so a code the world
+    /// put in two parts has no answer to give — leaving it out says that, and picking the
+    /// first would assert a binding the world never claimed. That is the whole reason a
+    /// moment carries a list of parts rather than this dictionary.
+    /// </remarks>
+    public IReadOnlyDictionary<Code, int>? Bind(Coded observation)
+    {
+        if (observation.Groups is not { Count: > 0 } parts) return null;
 
-    /// <inheritdoc/>
-    public IReadOnlyDictionary<Code, int>? Order(Coded observation) => observation.Sequence;
+        var one = new Dictionary<Code, int>();
+        var twice = new HashSet<Code>();
+
+        for (var part = 0; part < parts.Count; part++)
+            foreach (var code in parts[part].Codes)
+                if (!one.TryAdd(code, part) && one[code] != part) twice.Add(code);
+
+        foreach (var code in twice) one.Remove(code);
+
+        return one.Count == 0 ? null : one;
+    }
 
     /// <inheritdoc/>
     public IReadOnlySet<Code>? Fleeting(Coded observation) => observation.Passing;
-
-    /// <inheritdoc/>
-
-    /// <inheritdoc/>
 
     /// <inheritdoc/>
     public IReadOnlySet<Code>? Forced(Coded observation) => observation.Assigned;

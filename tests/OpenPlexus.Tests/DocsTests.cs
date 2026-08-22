@@ -594,7 +594,12 @@ public sealed class DocsTests
     // by being built: `Population.Scanning` reaches a scope no code names, so the leaf went
     // and 134 joined the closed list. A raise spent on a question that is answered inside a
     // day is the budget doing what it is for.
-    private const int Whole = 11_706;
+    // And 11,739 is the fifty-ninth raise, thirty-three words, for a trap with no check. An
+    // arm that changes a code's VALUE moves placement, ordering and every tie-break under it,
+    // so it is two runs of the learner as well as two arms -- found by a Monk-1 seed whose
+    // split arm held nought joins and still read 0.030 apart from the fused one. Nothing can
+    // detect it mechanically, which is what `TRAPS` is for.
+    private const int Whole = 11_739;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

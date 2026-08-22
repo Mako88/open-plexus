@@ -745,6 +745,8 @@ them. **A class earning a check moves out of here into the check.**
 - **A test can fail at both ends of a dial**, for opposite reasons, so pinning to the old value
   fixes nothing while reading as a fix. **Never attribute a red test to your own change without
   a baseline.**
+- **An arm that changes a code's value** moves every tie-break under it, so it is two runs of
+  the learner as well as two arms. The control is the same codes with the mechanism off.
 
 ### A score reached the wrong way
 

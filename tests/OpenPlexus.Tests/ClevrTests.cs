@@ -427,6 +427,14 @@ public sealed class ClevrTests(ITestOutputHelper output)
     /// <c>Arranged</c>'s tiled arm where ungated genesis costs the answer rather than buying
     /// it.
     /// </para>
+    /// <para>
+    /// <b>And 0.167 is under half the 0.358 bar</b>, which is a stronger statement than
+    /// memorising. A population that has learnt nothing answers held-back questions at chance;
+    /// one that answers them at half of chance has learnt something that is wrong about them,
+    /// so the rules ungated genesis adds are anti-correlated with the truth on a question they
+    /// were not shown. Nothing here says what they are, and the fact above asserts only a
+    /// ceiling — a floor under it would have gone red on this arm the day it ran.
+    /// </para>
     /// </remarks>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]

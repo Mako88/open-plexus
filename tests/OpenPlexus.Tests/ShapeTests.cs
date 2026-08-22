@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using Xunit.Abstractions;
@@ -109,6 +109,11 @@ public sealed class ShapeTests(ITestOutputHelper output)
     {
         var outstanding = new List<string>();
 
+        // The companion, and it is here because this check went quiet without it. The
+        // runners moved to their own assembly and `Worlds()` read the brain's, so it
+        // returned nothing and the loop below ran nought times looking flawless.
+        Assert.True(Worlds().Count() >= 7, $"only {Worlds().Count()} runner(s) found");
+
         foreach (var world in Worlds())
         {
             foreach (var made in world.GetConstructors())
@@ -180,8 +185,7 @@ public sealed class ShapeTests(ITestOutputHelper output)
     /// A new world joins this check by existing.
     /// </remarks>
     private static IEnumerable<Type> Worlds() =>
-        typeof(CommittingSettings).Assembly
-            .GetTypes()
-            .Where(one => one.IsClass && one.IsPublic && one.Name.EndsWith("Run", StringComparison.Ordinal))
+        Tree.Declared()
+            .Where(one => one.IsClass && one.Name.EndsWith("Run", StringComparison.Ordinal))
             .OrderBy(one => one.Name, StringComparer.Ordinal);
 }

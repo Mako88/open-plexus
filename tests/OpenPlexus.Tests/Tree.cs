@@ -1,3 +1,5 @@
+﻿using System.Reflection;
+
 namespace OpenPlexus.Tests;
 
 /// <summary>
@@ -56,6 +58,45 @@ public static class Tree
     /// learner, and the corpus is the same eleven megabytes on disk either way.
     /// </remarks>
     public static string Babi() => Path.Combine(Corpus("tasks_1-20_v1-2"), "en");
+
+    /// <summary>
+    /// The three assemblies the library is built out of.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>One place because it was one assembly until the split.</b> Every check that walked
+    /// <c>typeof(Code).Assembly</c> was walking the whole library, and after the split the
+    /// same expression reaches the brain alone. Two of them went on passing while covering a
+    /// fraction of what they had, which is the shape this suite exists to catch.
+    /// </para>
+    /// <para>
+    /// <b>The harness is not here</b>, being a deployment rather than the library.
+    /// <c>DrivenTests</c> composes its own list for that reason and adds it.
+    /// </para>
+    /// </remarks>
+    public static IReadOnlyList<Assembly> Library() =>
+    [
+        typeof(OpenPlexus.Codes.Code).Assembly,
+        typeof(OpenPlexus.Machines.Bench).Assembly,
+        typeof(OpenPlexus.Worlds.Multiplexer).Assembly,
+    ];
+
+    /// <summary>
+    /// Every type the library declares at the top level of a file.
+    /// </summary>
+    /// <remarks>
+    /// <b>Declared rather than public</b>, which is what <c>IsPublic</c> meant while the
+    /// library was one assembly and everything in it was public. The learner is
+    /// <c>internal</c> now, so the old spelling reads a tenth of the tree and reports on all
+    /// of it; a type is in scope here because a file declares it, never because of who may
+    /// see it.
+    /// </remarks>
+    public static IEnumerable<Type> Declared() =>
+        Library()
+            .SelectMany(one => one.GetTypes())
+            .Where(one => !one.IsNested)
+            .Where(one => one.Namespace?.StartsWith("OpenPlexus", StringComparison.Ordinal)
+                ?? false);
 
     /// <summary>
     /// Every hand-written C# file under a directory of the repo.

@@ -173,18 +173,14 @@ public sealed class DrivenTests(ITestOutputHelper output)
     /// deployment, and the chooser it wires is reached from there and from nowhere else.
     /// </para>
     /// <para>
-    /// <b>And there are three of them.</b> The
-    /// mechanisms are in <c>OpenPlexus.Brain</c> and everything that drives one is in
-    /// <c>OpenPlexus</c> or in the harness, so naming two assemblies here would ask whether
-    /// the brain reaches itself and answer that nothing reaches anything.
+    /// <b>And there are four of them.</b> The
+    /// mechanisms are in <c>OpenPlexus.Brain</c> and everything that drives one is in the
+    /// join, the worlds or the harness, so naming one assembly here would ask whether the
+    /// brain reaches itself and answer that nothing reaches anything.
     /// </para>
     /// </remarks>
     private static IReadOnlyList<Assembly> Composed() =>
-    [
-        typeof(Population).Assembly,
-        typeof(Bench).Assembly,
-        Assembly.Load("OpenPlexus.Talk"),
-    ];
+        [.. Tree.Library(), Assembly.Load("OpenPlexus.Talk")];
 
     /// <summary>The outermost type a type is declared in, which is the one with a file.</summary>
     private static Type Outermost(Type type)

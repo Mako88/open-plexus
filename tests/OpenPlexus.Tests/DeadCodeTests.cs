@@ -138,7 +138,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
 
         var orphans = new List<string>();
 
-        foreach (var type in typeof(Code).Assembly.GetTypes().Where(one => one.IsPublic))
+        foreach (var type in Tree.Declared())
         {
             foreach (var member in Members(type))
             {
@@ -261,7 +261,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
 
         var orphans = new List<string>();
 
-        foreach (var type in typeof(Code).Assembly.GetTypes().Where(one => one.IsPublic))
+        foreach (var type in Tree.Declared())
         {
             var name = type.Name.Split('`')[0];
 
@@ -322,6 +322,11 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "the same fault as a world naming a brain type, one layer out. `IBus` is "
             + "what `src` knows about; which bus is a container's or a harness's "
             + "decision, and `HybridBus` sits the same way.",
+
+        ["Leaves"] = "used by `Joins`, which shares its file — the own-file rule cannot "
+            + "see a caller sitting beside it. It arrived here when the scan stopped reading "
+            + "public types and started reading declared ones; it was `internal` before the "
+            + "learner was, so it had never been asked about.",
 
         ["Felt"] = "used by `Sensing`, which shares its file — the own-file rule "
             + "cannot see a caller sitting beside it.",

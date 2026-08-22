@@ -569,7 +569,11 @@ public sealed class DocsTests
     // entry it replaces: that one said the brain names a world, which is a fault; these say
     // what the record becomes, and that a moment may carry several readings of one signal at
     // once rather than a dial choosing between them.
-    private const int Whole = 11_713;
+    // And 11,641 is a fall rather than a raise, which the budget does by default. Three items
+    // left `THE ORDER` in one session -- the brain's own project, the learner going internal
+    // and the holder host -- and the likeness bar shrank to what is left of it, so the doc is
+    // seventy-two words shorter than the cap it was carrying.
+    private const int Whole = 11_641;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

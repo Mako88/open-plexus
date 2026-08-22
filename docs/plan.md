@@ -32,7 +32,7 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them. One is left and it is fork **28**'s.
 - **Then the genesis gate**, which finds every rule three worlds hold and loses the held-out
-  set on two more, drawn rising as it falls. Read `Loss` first. Fork **135**.
+  set on two more. Subsumption deletes what it builds, and that arm is dispatched. Fork **135**.
 - **Then what a derived category DELIVERS**, nought so far. The fold puts it in nearly every
   moment and genesis refuses a code that never varied, so `Coarsening` is the road. Fork
   **129**.

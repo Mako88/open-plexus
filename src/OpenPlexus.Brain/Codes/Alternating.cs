@@ -69,6 +69,33 @@ public enum Meeting
     Rarely,
 }
 
+/// <summary>
+/// Which counts a chance bar is read off — <b>the axis, where <see cref="Meeting"/> is the
+/// clause.</b>
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>An arm, and the two are not substitutes.</b> One reads what a code keeps company with
+/// inside a moment and one reads what it turns up beside across moments, which is the
+/// distinction <see cref="Alternating.Over"/> already draws between space and time. A twin
+/// wears its sibling's look, so company cannot part the two; a uniform stream adheres at
+/// chance everywhere, so time finds nothing a bag of moments would have.
+/// </para>
+/// <para>
+/// <b>What is shared is that neither takes a level.</b> A bar somebody picked while looking
+/// at one world is that world reaching into a mechanism, and this enum says which counts the
+/// bar travels over rather than how high it sits.
+/// </para>
+/// </remarks>
+public enum Counting
+{
+    /// <summary>What a code shares a MOMENT with, against a shuffle of the same counts.</summary>
+    Company,
+
+    /// <summary>What a code turns up BESIDE, against what independence would have made it.</summary>
+    Time,
+}
+
 public sealed class Alternating
 {
     private readonly Dictionary<Code, int> _seen = [];
@@ -82,7 +109,7 @@ public sealed class Alternating
     private bool _settled;
 
     /// <param name="span">
-    /// How many moments either side count as near, for <see cref="ByTime"/>. Fixed at
+    /// How many moments either side count as near, for <see cref="Counting.Time"/>. Fixed at
     /// construction because it decides how far back a moment has to be held, and a window
     /// widened part way through a stream would leave the earlier counts answering a narrower
     /// question than the later ones.
@@ -317,11 +344,21 @@ public sealed class Alternating
     /// and the derivation is a batch call rather than something a round pays for.
     /// </para>
     /// </remarks>
+    /// <param name="counting"><inheritdoc cref="Counting" path="/summary"/></param>
     /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
-    public IReadOnlyList<IReadOnlySet<Code>> ByChance(int floor, Meeting meeting = Meeting.Never)
+    public IReadOnlyList<IReadOnlySet<Code>> ByChance(
+        Counting counting, int floor, Meeting meeting = Meeting.Never)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
 
+        return counting == Counting.Company ? Alike(floor, meeting) : Near(floor, meeting);
+    }
+
+    /// <summary>The company reading, where the null is sampled.</summary>
+    /// <param name="floor">How often a code must have been seen to be grouped.</param>
+    /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
+    private IReadOnlyList<IReadOnlySet<Code>> Alike(int floor, Meeting meeting)
+    {
         var shuffled = Shuffled(floor);
 
         return Grouped(
@@ -335,6 +372,60 @@ public sealed class Alternating
                         return false;
 
                 return true;
+            },
+            meeting);
+    }
+
+    /// <summary>How much of the admission may be chance, before the candidates are counted.</summary>
+    /// <remarks>
+    /// <b>A twentieth, which is what <see cref="Draws"/> already commits to.</b> Nineteen draws
+    /// beaten outright is a one-sided test at 0.05 with the null sampled; this is the same test
+    /// with the null integrated, so the two readings sit at one bar rather than at two somebody
+    /// would have to reconcile.
+    /// </remarks>
+    private const double Alpha = 0.05;
+
+    /// <summary>
+    /// The groups that turn up beside each other more often than independence explains, once
+    /// the pairs the walk considered are paid for.
+    /// </summary>
+    /// <param name="floor">How often a code must have been seen to be grouped.</param>
+    /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
+    /// <remarks>
+    /// <para>
+    /// <b>Adhesion against a bar nobody picked.</b> The reading this replaced asked whether
+    /// adhesion cleared a ratio somebody chose — 1.5, on one world — and a ratio corrects for
+    /// nothing, so out of every pair in an alphabet one clears it by luck. What is asked here
+    /// is whether the excess is larger than the pairs SEARCHED would produce, which is
+    /// repair's own correction over a different candidate set.
+    /// </para>
+    /// <para>
+    /// <b>Integrated rather than sampled, unlike <see cref="Alike"/>.</b> A cosine's null has
+    /// no closed form and a pair count's does: adjacency under independence is a count with a
+    /// known mean and a known spread, so a shuffle would be paying for a draw to find out
+    /// something arithmetic already says. What it buys is a derivation cheap enough to run
+    /// while a stream is running.
+    /// </para>
+    /// </remarks>
+    private IReadOnlyList<IReadOnlySet<Code>> Near(int floor, Meeting meeting)
+    {
+        var eligible = _seen.Count(one => one.Value >= floor);
+        var candidates = Math.Max(1, eligible * (eligible - 1) / 2);
+
+        var total = (double)_moments;
+        var width = (2 * _span) + 1.0;
+
+        return Grouped(
+            _seen, floor, _withs,
+            (mine, theirs, _) =>
+            {
+                _near.TryGetValue((mine, theirs), out var beside);
+
+                var expected = _seen[mine] / total * (_seen[theirs] / total) * width * total;
+
+                return expected > 0.0
+                    && Commitments.Normal.Tail((beside - expected) / Math.Sqrt(expected))
+                        * candidates <= Alpha;
             },
             meeting);
     }
@@ -548,44 +639,6 @@ public sealed class Alternating
         return left == 0.0 || right == 0.0 ? 0.0 : dot / (left * right);
     }
 
-    /// <summary>The groups read off what turns up near in time, as <see cref="Over"/> reads them.</summary>
-    /// <param name="adhesion">
-    /// <inheritdoc cref="Over" path="/param[@name='adhesion']"/>
-    /// </param>
-    /// <param name="floor">
-    /// <inheritdoc cref="From" path="/param[@name='floor']"/>
-    /// </param>
-    /// <remarks>
-    /// Read before the stream is settled, this answers on the moments whose window is
-    /// complete and on no others. What it reads is a prefix of what a settled run holds,
-    /// which is what makes an unsettled reading early rather than wrong.
-    /// </remarks>
-    /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
-    public IReadOnlyList<IReadOnlySet<Code>> ByTime(
-        double adhesion, int floor, Meeting meeting = Meeting.Never)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
-
-        // Chance is the product of the two marginals over the window's own width, so what is
-        // being asked is whether the pair turns up beside each other more than two codes of
-        // those frequencies would have. Without the width the bar would be a claim about how
-        // wide the window is rather than about the stream.
-        var total = (double)_moments;
-        var width = (2 * _span) + 1.0;
-
-        return Grouped(
-            _seen, floor, _withs,
-            (mine, theirs, _) =>
-            {
-                _near.TryGetValue((mine, theirs), out var beside);
-
-                var expected = _seen[mine] / total * (_seen[theirs] / total) * width * total;
-
-                return expected > 0.0 && beside / expected >= adhesion;
-            },
-            meeting);
-    }
-
     /// <summary>
     /// The groups of alternatives in a stream of moments.
     /// </summary>
@@ -632,12 +685,6 @@ public sealed class Alternating
     /// one clause a bag of moments cannot carry.
     /// </summary>
     /// <param name="moments">What was seen, in the order it was seen.</param>
-    /// <param name="adhesion">
-    /// How many times more often than chance two codes must turn up near each other in TIME.
-    /// <b>A ratio against what independent codes would have done</b>, so it is not a level about
-    /// this world — the same shape rung five's independence bar has, and the reason a
-    /// share of shared company would not do here.
-    /// </param>
     /// <param name="floor">
     /// <inheritdoc cref="From" path="/param[@name='floor']"/>
     /// </param>
@@ -668,7 +715,7 @@ public sealed class Alternating
     /// </para>
     /// </remarks>
     public static IReadOnlyList<IReadOnlySet<Code>> Over(
-        IEnumerable<IReadOnlySet<Code>> moments, double adhesion, int floor, int span)
+        IEnumerable<IReadOnlySet<Code>> moments, int floor, int span)
     {
         ArgumentNullException.ThrowIfNull(moments);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(span);
@@ -682,7 +729,7 @@ public sealed class Alternating
         // ways of driving the same counts.
         watching.Settle();
 
-        return watching.ByTime(adhesion, floor);
+        return watching.ByChance(Counting.Time, floor);
     }
 
     /// <summary>The greedy grouping both derivations share.</summary>
@@ -809,8 +856,8 @@ public sealed class Alternating
 /// </remarks>
 /// <param name="inner">The front end this wraps.</param>
 /// <param name="held">The vocabulary to fill, which is the one the fold and the brain read.</param>
-/// <param name="adhesion">
-/// <inheritdoc cref="Alternating.Over" path="/param[@name='adhesion']"/>
+/// <param name="counting">
+/// <inheritdoc cref="Counting" path="/summary"/>
 /// </param>
 /// <param name="floor">
 /// <inheritdoc cref="Alternating.From" path="/param[@name='floor']"/>
@@ -827,7 +874,7 @@ public sealed class Alternating
 public sealed class Deriving<TObservation>(
     IQuantizer<TObservation> inner,
     Categories held,
-    double adhesion,
+    Counting counting,
     int floor,
     int every,
     int span = 1)
@@ -853,7 +900,7 @@ public sealed class Deriving<TObservation>(
         // Counted here rather than inside the derivation, so the cadence is a rate over
         // observations and not over whatever else might have been true.
         if (++_seen % every == 0)
-            foreach (var group in _watching.ByTime(adhesion, floor))
+            foreach (var group in _watching.ByChance(counting, floor))
                 held.Learn(group);
 
         return codes;
@@ -907,10 +954,6 @@ public sealed class Sorted<TObservation>(IQuantizer<TObservation> inner, Categor
 
     /// <inheritdoc/>
     public IReadOnlySet<Code>? Fleeting(TObservation observation) => inner.Fleeting(observation);
-
-    /// <inheritdoc/>
-
-    /// <inheritdoc/>
 
     /// <inheritdoc/>
     public IReadOnlySet<Code>? Forced(TObservation observation) => inner.Forced(observation);

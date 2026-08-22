@@ -2169,8 +2169,16 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 // The bar read off the counts rather than picked, so the level it is handed
                 // is ignored and it prints as one row repeated. What it is being read against
                 // is the best of the four hand-picked ones above.
-                ("chance/never", _ => alternating.ByChance(20, Meeting.Never)),
-                ("chance/rarely", _ => alternating.ByChance(20, Meeting.Rarely)),
+                ("chance/never", _ => alternating.ByChance(Counting.Company, 20, Meeting.Never)),
+                ("chance/rarely", _ => alternating.ByChance(Counting.Company, 20, Meeting.Rarely)),
+
+                // And the same bar read off TIME rather than company, which is the other arm
+                // of `Counting` and the one `Deriving` fills a vocabulary from. It is here
+                // because an arm measured on one world is a verdict on that world: this is
+                // the second, and what it says about a corpus-shaped stream is not what
+                // `Returning`'s runs say about a moving thing.
+                ("time/never", _ => alternating.ByChance(Counting.Time, 20, Meeting.Never)),
+                ("time/rarely", _ => alternating.ByChance(Counting.Time, 20, Meeting.Rarely)),
             })
         foreach (var alike in new[] { 0.5, 0.8, 0.9, 0.95 })
         {

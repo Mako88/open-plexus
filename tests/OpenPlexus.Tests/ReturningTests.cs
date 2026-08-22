@@ -116,7 +116,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
             : new Sorted<Coded>(
                 deriving
                     ? new Deriving<Coded>(
-                        new Passthrough<Coded>(one => one), categories, adhesion: 1.5, floor: 20, every: 250)
+                        new Passthrough<Coded>(one => one), categories, Counting.Time, floor: 20, every: 250)
                     : new Passthrough<Coded>(one => one),
                 categories);
 
@@ -509,7 +509,6 @@ public sealed class ReturningTests(ITestOutputHelper output)
     [Fact]
     public void Whether_continuity_separates_things_that_statistics_cannot()
     {
-        const double Adhesion = 1.5;
         const int Seeds = 3;
 
         var running = World(twinned: true, tagged: false, placed: true, wandering: 0.8);
@@ -525,9 +524,9 @@ public sealed class ReturningTests(ITestOutputHelper output)
         // Control two: the time derivation on a uniform stream. Every pair adheres at chance
         // there, so this must find nothing.
         var chance = Alternating.Over(
-            Watched(uniform, seed: 1), Adhesion, floor: 20, span: 1);
+            Watched(uniform, seed: 1), floor: 20, span: 1);
 
-        var found = Alternating.Over(stream, Adhesion, floor: 20, span: 1);
+        var found = Alternating.Over(stream, floor: 20, span: 1);
 
         foreach (var (label, groups) in new (string, IReadOnlyList<IReadOnlySet<Code>>)[]
             { ("space, on runs", blind), ("time, on uniform", chance), ("time, on runs", found) })
@@ -593,7 +592,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
             var watched = seed == 1 ? stream : Watched(running, seed);
 
             var bySpace = Alternating.From(watched, company: 0.5, floor: 20);
-            var byTime = Alternating.Over(watched, Adhesion, floor: 20, span: 1);
+            var byTime = Alternating.Over(watched, floor: 20, span: 1);
 
             // The derivation checked at every seed and not only the first, because the two
             // vocabularies below are the arm and a seed where they came back the same shape
@@ -693,7 +692,6 @@ public sealed class ReturningTests(ITestOutputHelper output)
     [Fact]
     public void Whether_what_continuity_recovers_survives_the_thing_moving()
     {
-        const double Adhesion = 1.5;
 
         var fixedPlace = World(twinned: true, tagged: false, placed: true, wandering: 0.8);
 
@@ -706,7 +704,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
                 twinned: true, tagged: false, placed: true, wandering: 0.8, drifting: drifting);
 
             var byTime = Alternating.Over(
-                Watched(settings, seed: 1), Adhesion, floor: 20, span: 1);
+                Watched(settings, seed: 1), floor: 20, span: 1);
 
             var places = On(byTime, 25);
 
@@ -727,7 +725,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
         // arm above found, or a place that CAN move changed the world where it was set not
         // to and every row here is about something else.
         var control = On(Alternating.Over(
-            Watched(fixedPlace, seed: 1), Adhesion, floor: 20, span: 1), 25);
+            Watched(fixedPlace, seed: 1), floor: 20, span: 1), 25);
 
         Assert.True(control.Count == 8 && control.All(one => one.Count == 4),
             $"the no-drift control found {control.Count} landmark groups of sizes "
@@ -802,7 +800,6 @@ public sealed class ReturningTests(ITestOutputHelper output)
     [Fact]
     public void A_derivation_read_while_the_stream_runs_reaches_what_a_list_reaches()
     {
-        const double Adhesion = 1.5;
 
         var stream = Watched(World(twinned: true, tagged: false, placed: true, wandering: 0.8), seed: 1);
 
@@ -817,10 +814,10 @@ public sealed class ReturningTests(ITestOutputHelper output)
         live.Settle();
 
         var space = live.BySpace(company: 0.5, floor: 20);
-        var time = live.ByTime(Adhesion, floor: 20);
+        var time = live.ByChance(Counting.Time, floor: 20);
 
         var listSpace = Alternating.From(stream, company: 0.5, floor: 20);
-        var listTime = Alternating.Over(stream, Adhesion, floor: 20, span: 1);
+        var listTime = Alternating.Over(stream, floor: 20, span: 1);
 
         output.WriteLine(
             $"{stream.Count} moments folded one at a time, {live.Moments} counted");
@@ -865,7 +862,6 @@ public sealed class ReturningTests(ITestOutputHelper output)
     [Fact]
     public void What_a_live_derivation_costs_before_it_holds_the_world()
     {
-        const double Adhesion = 1.5;
         const int Step = 250;
 
         var stream = Watched(
@@ -873,7 +869,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
             seed: 1,
             sightings: 8000);
 
-        var whole = Alternating.Over(stream, Adhesion, floor: 20, span: 1);
+        var whole = Alternating.Over(stream, floor: 20, span: 1);
 
         // Read per modality rather than whole, because a single yes-or-no cannot say WHICH
         // half is still moving -- and the two halves of this world are known to close at
@@ -892,7 +888,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
 
             if ((at + 1) % Step != 0) continue;
 
-            var groups = live.ByTime(Adhesion, floor: 20);
+            var groups = live.ByChance(Counting.Time, floor: 20);
 
             reached.Add((
                 at + 1,
@@ -965,7 +961,6 @@ public sealed class ReturningTests(ITestOutputHelper output)
     [Fact]
     public void Whether_a_vocabulary_filled_while_the_stream_runs_reaches_the_one_handed_over()
     {
-        const double Adhesion = 1.5;
         const int Seeds = 8;
 
         var missed = new List<int>();
@@ -987,7 +982,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
                 twinned: true, tagged: false, placed: true, wandering: 0.8, drifting: drifting);
 
             var offline = new Categories(
-                Alternating.Over(Watched(running, seed), Adhesion, floor: 20, span: 1));
+                Alternating.Over(Watched(running, seed), floor: 20, span: 1));
 
             var live = new Categories([]);
 

@@ -505,7 +505,7 @@ public sealed class BabiTests(ITestOutputHelper output)
                     .Select(one => ("a set  ", one, watching.BySpace(one, floor: 20)))
                     .Concat(new[] { 0.7, 0.8, 0.9, 0.95, 0.99 }
                         .Select(one => ("weighed", one, watching.ByLikeness(one, floor: 20))))
-                    .Concat([("chance ", double.NaN, watching.ByChance(floor: 20))]))
+                    .Concat([("chance ", double.NaN, watching.ByChance(Counting.Company, floor: 20))]))
             {
                 var said = groups
                     .Select(group => group

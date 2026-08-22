@@ -32,11 +32,8 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them.
 - **ACTIVE, the five `DrivenTests` says no run reaches.** The category machinery —
-  `Alternating`, `Deriving`, `Meeting`, `Sorted` — and `Unifying` behind it, so both close
-  behind the likeness bar below.
-- **Then the travelling bar into the derivation.** `ByChance` is built and ties the best
-  hand-picked level on two vocabularies; what reads it is a test. `Deriving` and `Sorted`
-  still take a level, over adhesion rather than company.
+  `Alternating`, `Deriving`, `Meeting`, `Sorted` — and `Unifying` behind it. No deployment
+  composes a derivation.
 - **Then the categories the brain derives**, into `Population.Sorts`, which nothing but a
   test has ever set. Delivery is `Coarsening`; a code in the moment is refused because a
   category over alternatives is in every one. Fork **129**.
@@ -334,8 +331,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       **112**.
     - **OPEN** — what a mint costs the recursion is the scopes it CONSUMES rather than which
       pair it picks, and nothing gates on that. Two rankings on it are refuted below.
-    - **OPEN** — but `ByTime` is what `Returning` needs, so no reading wins both. A weighed
-      adhesion is unbuilt. Fork **131**.
+    - **OPEN** — a weighed adhesion is unbuilt, and no reading yet wins both worlds. Fork
+      **131**.
     - **OPEN** — what rung five names is a SET, never a variable, so the two rungs are not
       independent: a code carrying position AND value together makes the shared thing
       unnameable.
@@ -677,6 +674,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | `Marked` — a discrete reading said as one code | Nothing ever called it, in `src` or in a test | A world handing over a raw index the brain must name, which `Passthrough` cannot take |
 | `Feeling.Intervened` -- a body's doing MARKED as one | Identical in five of six cells and inside noise in the sixth, for a tenth more population. Every doing here is forced, so the derived name and the plain one are perfectly correlated | A body acted on by something else, so an action has an observational counterpart |
 | A compound eye, several readings of ONE sense at once | The moment is a union, so the ceiling is: every pair raises it over its best channel, and the withheld score lands BETWEEN the channels on three tasks and seeds | DISJOINT alphabets, a second SENSE and `Crossing`'s case: no union reaches an outcome in one modality |
+| An adhesion bar set as a RATIO somebody picked | A corrected z over the same counts reaches every group the level reached on both worlds and nothing more | A world where an effect size and a significance test come apart |
 | A refusal as a CODE in the moment, fork **127** | Level on both shapes for a larger population, the chooser already refusing to repeat itself, so the fact was acted on before the code arrived | The exclusion having to SURVIVE the moment, which is a store's job rather than a code's |
 
 ---

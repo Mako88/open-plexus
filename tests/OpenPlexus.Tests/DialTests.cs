@@ -699,7 +699,7 @@ public sealed class DialTests
         //
         // It ships ON. Against the control that has the grouping and does not read it, on the
         // world built so the codes cannot say which shape belongs to which colour, it is
-        // 0.9988 against 0.5225 on the withheld set -- and it is the control that holds more
+        // 0.9938 against 0.5050 on the withheld set -- and it is the control that holds more
         // rules. `BindingTests` carries the grid and the kill line it was written with.
         Assert.Equal(19, HandSet.Count);
     }

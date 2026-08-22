@@ -206,7 +206,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// so it separates nothing a table counting co-occurrence can see.
     /// </para>
     /// <para>
-    /// <b>0.9988 against 0.5225 on the withheld set</b>, against the control that has the
+    /// <b>0.9938 against 0.5050 on the withheld set</b>, against the control that has the
     /// grouping and does not read it, on the world whose two arms emit identical codes. The
     /// arm holds every one of the 144 rules the world has and the control holds none of them
     /// — and the control is the bigger population, so this is not more search.
@@ -214,10 +214,10 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// </para>
     /// <para>
     /// <b>And the genesis gate is what had been hiding it.</b> Under
-    /// <c>Surprising.Unaccounted</c> the same arm reads 0.5613: proposals stop at eighty
+    /// <c>Surprising.Unaccounted</c> the same arm reads 0.5594: proposals stop at eighty
     /// because a lucky advocate expects what arrived half the time on a coin-flip world, so
-    /// the population never sees more than 24 of the 144. Ungated genesis on its own buys
-    /// nothing — 0.5225 for 2,315 residents — so what the grouping does is make an
+    /// the population never sees more than 22 of the 144. Ungated genesis on its own buys
+    /// nothing — 0.5050 for 2,328 residents — so what the grouping does is make an
     /// unaffordable proposal set worth having.
     /// </para>
     /// <para>

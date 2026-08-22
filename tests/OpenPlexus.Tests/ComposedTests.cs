@@ -128,8 +128,8 @@ public sealed class ComposedTests(ITestOutputHelper output)
     /// <remarks>
     /// <para>
     /// <b>The honest follow-up to <see cref="BindingTests"/></b>, taken the moment that
-    /// world stopped reading at chance. There a grouping lifted the withheld set from 0.5225
-    /// to 0.9988 — and the occasion under question wrote its own answer down, so what it
+    /// world stopped reading at chance. There a grouping lifted the withheld set from 0.5050
+    /// to 0.9938 — and the occasion under question wrote its own answer down, so what it
     /// showed is that a binding can be REPRESENTED. This asks whether one can be composed,
     /// and the answer is that it cannot.
     /// </para>

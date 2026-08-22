@@ -51,18 +51,21 @@ cancels it. Use it before shipping a default, or on a state worth returning to.
 
 **Run the structural guards locally every commit, as their own command.** `DocsTests`,
 `DeadCodeTests`, `DuplicationTests`, `DialTests`, `SeparationTests`, `ShapeTests`, `FlagTests`,
-`SweepListTests`, `ShardTests`, `CheckingTests`, `RemindingTests` and `ProseTests` take seconds
-and go red for changes that look unrelated. Never chain the check into the commit — that has
-produced red commits more than once. Rebuild before running with `--no-build`, or the binary
-under test is the one from before the edit.
+`SweepListTests`, `ShardTests`, `CheckingTests`, `RemindingTests`, `DeterminismTests`,
+`DrivenTests` and `ProseTests` take seconds and go red for changes that look unrelated. Never
+chain the check into the commit — that has produced red commits more than once. Rebuild before
+running with `--no-build`, or the binary under test is the one from before the edit.
 
-Three of them are worth knowing by what they catch:
+Four of them are worth knowing by what they catch:
 
 - `ShardTests` fails when a test class lands in two CI shards or in none. A class in none is
   green forever, because nothing ever asked it.
 - `CheckingTests` fails when a `[Fact]` prints a row and cannot fail — a measurement wearing a
   test's clothes, which runs on every push and checks nothing.
 - `ProseTests` ratchets how much of the prose here is shouted. See *How to write here*.
+- `DeterminismTests` fails for a value derived from a hash the runtime randomises per process,
+  and for a record compared by an array's identity reaching a position where equality decides.
+  Both rules were written in XML comments for months and checked nowhere.
 
 **`OutstandingTests` is red on purpose and it is the top priority** — John's, 2026-08-13, and
 `THE ORDER` says so at the top rather than in a phase list of its own. The

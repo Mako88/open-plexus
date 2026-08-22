@@ -1,5 +1,6 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reflection;
+using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -38,10 +39,17 @@ namespace OpenPlexus.Tests;
 /// </para>
 /// <para>
 /// <b>And the runs are generated worlds</b>, because the question is about the brain rather
-/// than about a corpus. Three of them rather than one: sixteen counters are quiet on the
-/// multiplexer alone and nine survive all three, so a single world would have called seven
+/// than about a corpus. Six of them rather than one: sixteen counters are quiet on the
+/// multiplexer alone and eight survive all six, so a single world would have called eight
 /// mechanisms dead that were not. Widening the set further is what turns <i>quiet here</i>
 /// into <i>quiet everywhere</i>, and every entry below is only as strong as the set.
+/// </para>
+/// <para>
+/// <b>And a sub-record the run does not build</b> is not asked about either, which is the
+/// same fault one level in. <see cref="Tally.Census"/> is null unless the world is asked
+/// for its truth, so fourteen counters sat outside the reading while the file read as
+/// covering everything reported. Two of the six turn it on, and the reflection reaches them
+/// on the day they do.
 /// </para>
 /// </remarks>
 public sealed class FiringTests(ITestOutputHelper output)
@@ -51,6 +59,26 @@ public sealed class FiringTests(ITestOutputHelper output)
 
     /// <summary>How many rounds the reading is taken over.</summary>
     private const long Rounds = 4000;
+
+    /// <summary>What the crossing world's population is held at.</summary>
+    /// <remarks>
+    /// <b>The one dial any world here moves</b>, and it is the world's rather than the
+    /// brain's shape that asks for it: two modalities in one moment is several times the
+    /// codes, so a default capacity culls the run down to nothing worth reading.
+    /// </remarks>
+    private const int Capacity = 4000;
+
+    /// <summary>A brain nothing has run yet.</summary>
+    /// <param name="capacity">How many commitments it may hold, or the default.</param>
+    /// <remarks>
+    /// <b>One a world</b>, because a counter that moved on the world before this one would
+    /// read as having moved on this one. Every entry below builds its own.
+    /// </remarks>
+    private static Brain One(int? capacity = null) =>
+        new(capacity is { } held
+                ? new CommittingSettings { Capacity = held }
+                : new CommittingSettings(),
+            seed: 1);
 
     /// <summary>
     /// Counters nought on this world, each with the reason.
@@ -67,7 +95,7 @@ public sealed class FiringTests(ITestOutputHelper output)
             ["Abstained"] =
                 "the world could not say what followed, and a generated world always can. What "
                 + "moves it is a world that goes quiet about its own outcome, which is the "
-                + "spine world's shape rather than any of these three.",
+                + "spine world's shape rather than any generated one.",
 
             ["Refused"] =
                 "a moment the brain would not take, which is backpressure. A bench offers one "
@@ -80,8 +108,8 @@ public sealed class FiringTests(ITestOutputHelper output)
 
             ["AtCovered"] =
                 "a repair refused because the failing case is covered already. `AtFloor` and "
-                + "`AtBudget` are what refuse on these worlds, so whether this ground is ever "
-                + "reached is unmeasured.",
+                + "`AtBudget` are what refuse on every world here, so whether this ground is "
+                + "ever reached is unmeasured.",
 
             ["AtImproving"] =
                 "a repair refused because the child did not improve on its parent, which is "
@@ -90,10 +118,6 @@ public sealed class FiringTests(ITestOutputHelper output)
             ["AtIndependent"] =
                 "a naming gate refusal, the members firing independently of one another. "
                 + "`AtUncertain` and `AtRare` are what refuse here.",
-
-            ["AtScarce"] =
-                "a naming gate refusal, too few sightings of the pair. Nothing on these worlds "
-                + "is eligible and that thinly seen at once.",
 
             ["AtUnpaired"] =
                 "a naming gate refusal, no pair to name at all. `Stackable` moves, so eligible "
@@ -107,38 +131,63 @@ public sealed class FiringTests(ITestOutputHelper output)
 
     /// <summary>Every world the reading is taken over, and what each reported.</summary>
     /// <remarks>
-    /// <b>Three cheap generated worlds rather than one</b>, because a counter quiet on one
+    /// <para>
+    /// <b>Six cheap generated worlds rather than one</b>, because a counter quiet on one
     /// world says nothing. The multiplexer is what step one is judged on, the MONK's puzzle
     /// is where a scope language has a known ceiling, and the arranged world is the one whose
-    /// front end has to make its own symbols. What is still quiet across all three is a
+    /// front end has to make its own symbols. What is still quiet across all six is a
     /// mechanism nothing generated can reach.
+    /// </para>
+    /// <para>
+    /// <b>And the three added cover shapes the first three share.</b> The graded
+    /// world is read through a winnow, so its codes are a sparse set of winners rather than
+    /// one code per attribute; the crossing world is two modalities merged into one moment;
+    /// and the homeostat is acted in, so a chooser decides what the next moment is about. All
+    /// three are cheap and none is a corpus.
+    /// </para>
+    /// <para>
+    /// <b>What they bought is one counter</b>, <c>AtScarce</c> on the graded world, which is
+    /// the naming gate refusing a pair too thinly seen — a refusal a front end minting its own
+    /// symbols reaches and one code per attribute does not. Eight are quiet across all six.
+    /// </para>
     /// </remarks>
     private static IEnumerable<(string World, Tally Tally)> Ran()
     {
         yield return (
             "multiplexer",
             new MultiplexerRun(
-                    new MultiplexerSettings { Address = Narrow },
-                    new Brain(new CommittingSettings(), seed: 1),
-                    seed: 1)
-                .Run(Rounds)
-                .Tally);
+                new MultiplexerSettings { Address = Narrow }, One(), seed: 1, census: true)
+                .Run(Rounds).Tally);
 
         yield return (
             "monk",
-            new MonkRun(new MonkSettings(), new Brain(new CommittingSettings(), seed: 1), seed: 1)
-                .Run(Rounds)
-                .Tally);
+            new MonkRun(new MonkSettings(), One(), seed: 1, census: true).Run(Rounds).Tally);
 
         yield return (
             "arranged",
-            new ArrangedRun(
-                    new ArrangedSettings(),
-                    new Brain(new CommittingSettings(), seed: 1),
-                    Looking.Whole,
-                    seed: 1)
-                .Run(Rounds)
-                .Tally);
+            new ArrangedRun(new ArrangedSettings(), One(), Looking.Whole, seed: 1)
+                .Run(Rounds).Tally);
+
+        yield return (
+            "graded",
+            new GradedRun(new GradedSettings(), One(), Fronting.Winnowed, seed: 1).Run(Rounds));
+
+        yield return (
+            "crossing",
+            new CrossingRun(
+                new CrossingSettings
+                {
+                    Words = 16, Facts = 4, Stride = 4, Asked = 64, Scrambled = false,
+                },
+                One(Capacity),
+                seed: 1)
+                .Run(Rounds).Learnt);
+
+        yield return (
+            "homeostat",
+            new HomeostatRun(
+                new HomeostatSettings(), One(), Regulating.Driven, Feeling.Acted, seed: 1)
+                .Run(Rounds).Tally);
     }
 
     /// <summary>Every number the brain reported, by name.</summary>

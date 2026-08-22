@@ -195,9 +195,12 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         // The state acted in, not the one that resulted. Compared AS A SEQUENCE, because a
         // `readonly record struct` holding an `ImmutableArray` compares by the array's
         // identity -- this repo's own trap, and it fires here on two arrays that print the
-        // same and are not the same object.
-        Assert.Equal<IEnumerable<Code>>(before, turn.Seen.Felt);
-        Assert.Equal(0, turn.Seen.Did);
+        // same and are not the same object. The doing rides at the end of the moment and is
+        // marked, so the felt half is everything the world did not say it was told to emit.
+        Assert.Equal<IEnumerable<Code>>(
+            before, turn.Seen.Codes.Where(one => !turn.Seen.Assigned!.Contains(one)));
+
+        Assert.Equal(Homeostat.Attending(0), Assert.Single(turn.Seen.Assigned!));
 
         // And the consequence, read after the step. `Lowest` is a fact about where the body
         // stands NOW, so it must have moved on from what `before` describes.
@@ -208,7 +211,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         // step would make every later round act on a choice nobody made.
         var next = body.Next();
 
-        Assert.Null(next.Seen.Did);
+        Assert.Null(next.Seen.Assigned);
     }
 
     /// <summary>
@@ -372,7 +375,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         var brain = new Brain(new CommittingSettings(), 1);
 
         Assert.Throws<ArgumentNullException>(() =>
-            new Bench(new Watching<Bodily>(body, new Bodied(Feeling.Acted)), brain));
+            new Bench(new Watching<Coded>(body, new Bodied(Feeling.Acted)), brain));
 
         // And the other way round, because a chooser nobody asks is an arm that reads as
         // having run. The multiplexer is watched, so a chooser handed to it would sit

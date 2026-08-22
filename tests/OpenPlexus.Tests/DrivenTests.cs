@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Reflection.Emit;
 using System.Text.RegularExpressions;
 using OpenPlexus.Commitments;
@@ -472,8 +472,6 @@ public sealed class DrivenTests(ITestOutputHelper output)
     private static readonly IReadOnlySet<string> Trespassing =
         new HashSet<string>(StringComparer.Ordinal)
         {
-            "Bodied names Bodily",
-            "Bodied names Homeostat",
             "Joined names Asking",
             "Joined names Recited",
             "Passthrough names Crossed",

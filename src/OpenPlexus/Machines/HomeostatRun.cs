@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Machines;
@@ -133,7 +133,7 @@ public sealed class HomeostatRun
         }
 
         _trial = new Bench(
-            new Watching<Bodily>(
+            new Watching<Coded>(
                 _body,
                 new Bodied(feeling),
                 acting: Chooses.From(

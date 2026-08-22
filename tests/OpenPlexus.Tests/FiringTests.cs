@@ -138,10 +138,10 @@ public sealed class FiringTests(ITestOutputHelper output)
                 + "world reaches the rung at all.",
 
             ["Fronted.Doings"] =
-                "an intervention code, derived from what the front end said was forced. "
-                + "`Coded.Assigned` is set by `Conversing` and by `Roaming` and by nothing "
-                + "else, so the spine worlds move it. The homeostat is acted in and says the "
-                + "doing as an ordinary code out of `Bodied`, which is not this channel.",
+                "an intervention code, derived from what the front end said was forced. Three "
+                + "worlds mark a doing on `Coded.Assigned` and only two front ends pass it on: "
+                + "`Passthrough` does and `Bodied` does not, so the homeostat marks its doing "
+                + "and the learner is never told it was one. Turning that on is an arm.",
 
             ["Fronted.Fleeting"] =
                 "a code the front end says names this occasion and cannot recur. `Clevr` and "

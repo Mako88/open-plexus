@@ -82,31 +82,6 @@ public sealed record HomeostatSettings
     public bool Ranked { get; init; }
 }
 
-/// <summary>What a body felt, and what was done about it.</summary>
-/// <remarks>
-/// <para>
-/// <b>The two halves of a moment in an acted world</b>, and they arrive together because a
-/// consequence is a fact about both. <i>Variable two was low</i> predicts nothing on its own;
-/// <i>variable two was low and I attended to variable nought</i> predicts what follows, and
-/// the difference between those is the whole of what an action buys.
-/// </para>
-/// <para>
-/// <b>Codes rather than numbers, because the body already quantised them.</b> Every other
-/// world here hands over its own terms and lets a front end code them, and this one's terms
-/// ARE bands — a drive is felt as a state rather than read as a float, which is
-/// <see cref="Homeostat.Feels"/>'s own line. What a front end is left to decide is whether the
-/// action goes in the moment at all, which is the arm.
-/// </para>
-/// </remarks>
-public readonly record struct Bodily
-{
-    /// <summary>What the body felt about itself, before anything was done.</summary>
-    public required ImmutableArray<Code> Felt { get; init; }
-
-    /// <summary>Which variable was attended to, or nothing where nothing was done.</summary>
-    public required int? Did { get; init; }
-}
-
 /// <summary>
 /// Ashby's homeostat: internal variables that must be kept in bounds, and no
 /// reward for keeping them there.
@@ -133,7 +108,7 @@ public readonly record struct Bodily
 /// rather than time until death.
 /// </para>
 /// </remarks>
-public sealed class Homeostat : IActed<Bodily>
+public sealed class Homeostat : IActed<Coded>
 {
     /// <summary>The first variable's modality; need <c>i</c> is <c>Need + i</c>.</summary>
     private const byte Need = 80;
@@ -209,10 +184,10 @@ public sealed class Homeostat : IActed<Bodily>
     /// <inheritdoc/>
     /// <remarks>
     /// <b>Nothing done yet</b>, which is what makes this the state an action is chosen in.
-    /// <see cref="Bodily.Did"/> is null here and carries the choice in the turn that follows,
-    /// so a chooser reading this cannot see its own answer.
+    /// The moment carries no doing here and carries the choice in the turn that follows, so a
+    /// chooser reading this cannot see its own answer.
     /// </remarks>
-    public Bodily Now => new() { Felt = Feels(), Did = null };
+    public Coded Now => Coded.Of(Feels());
 
     /// <inheritdoc/>
     /// <remarks>
@@ -243,7 +218,7 @@ public sealed class Homeostat : IActed<Bodily>
     /// report a body that had already been restored, and a commitment learning from that
     /// would be told what it did AND what it did it to, with nothing left to be wrong about.
     /// </remarks>
-    public Turn<Bodily> Next()
+    public Turn<Coded> Next()
     {
         var felt = Feels();
         var did = _pending;
@@ -252,7 +227,21 @@ public sealed class Homeostat : IActed<Bodily>
 
         Step(did);
 
-        return new Turn<Bodily> { Seen = new Bodily { Felt = felt, Did = did }, Outcome = Lowest };
+        // The doing rides in the moment and is MARKED as a doing, which is the one thing only
+        // the world can say about it. Every other acted world already says it this way, and a
+        // front end deciding whether the learner is told is then one filter rather than one
+        // per body -- see `Bodied`, which is that filter and the control beside it.
+        var doing = did is { } which ? Attending(which) : (Code?)null;
+
+        return new Turn<Coded>
+        {
+            Seen = new Coded
+            {
+                Codes = doing is { } code ? [.. felt, code] : felt,
+                Assigned = doing is { } marked ? new HashSet<Code> { marked } : null,
+            },
+            Outcome = Lowest,
+        };
     }
 
     /// <summary>How fast need <paramref name="which"/> falls.</summary>

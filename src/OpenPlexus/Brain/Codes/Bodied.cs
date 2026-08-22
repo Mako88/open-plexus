@@ -1,6 +1,4 @@
-using OpenPlexus.Worlds;
-
-namespace OpenPlexus.Codes;
+﻿namespace OpenPlexus.Codes;
 
 /// <summary>Whether a moment says what was DONE in it.</summary>
 /// <remarks>
@@ -41,41 +39,43 @@ public enum Feeling
 /// <remarks>
 /// <para>
 /// <b>It codes nothing and selects nothing</b>, which makes it the thinnest front end here and
-/// is correct rather than lazy. A drive is already a band by the time
-/// <see cref="Homeostat.Feels"/> has run, because the body quantises its own variables — so
-/// there is no signal left to quantise and the only decision at this seam is whether the
-/// action joins the moment.
+/// is correct rather than lazy. A body quantises its own variables, so a drive is already a
+/// band by the time the moment arrives — there is no signal left to quantise, and the only
+/// decision at this seam is whether the action stays in the moment.
 /// </para>
 /// <para>
-/// <b>And it says what is being looked at</b>, rather than what to conclude. <i>This was
-/// attended to</i> is a fact about what happened, in the same licence a front end has for
-/// <i>these codes were one object</i>. Nothing here says attending is good, which variable
-/// matters, or that <c>Act:2</c> has anything to do with <c>Need+2</c> — that connection is
-/// exactly what a learner is being asked to find.
+/// <b>And what it decides about is a MARK rather than a world</b>, which is what lets it read
+/// any body at all. A world says which of its codes it was told to emit rather than drew, on
+/// <see cref="Coded.Assigned"/>'s licence; this drops them or keeps them. Nothing here says
+/// attending is good or which variable matters — that connection is exactly what a learner is
+/// being asked to find.
 /// </para>
 /// </remarks>
 /// <param name="feeling">Whether the moment says what was done in it.</param>
-public sealed class Bodied(Feeling feeling) : IQuantizer<Bodily>
+public sealed class Bodied(Feeling feeling) : IQuantizer<Coded>
 {
-    /// <summary>The modality a felt body rides on.</summary>
+    /// <summary>
+    /// <b>Zero, and it is never read.</b>
+    /// </summary>
     /// <remarks>
-    /// <b><see cref="Homeostat"/>'s own, because the body minted these codes.</b> A front end
-    /// that re-badged them would make one state two codes depending on which translation ran,
-    /// which is the fault the whole modality scheme exists to prevent.
+    /// The body minted these codes and carries the modality it minted them with, so there is
+    /// no answer here for a front end that codes nothing to give. Naming the body's would put
+    /// one world's constant inside the brain for a number nothing asks for.
     /// </remarks>
-    public byte Modality => Homeostat.Act;
+    public byte Modality => 0;
 
     /// <inheritdoc/>
-    public IReadOnlyCollection<Code> Codify(Bodily observation)
+    /// <remarks>
+    /// <b>The blind arm drops what the world MARKED as done</b>, rather than being handed a
+    /// moment with the doing left out. A world that emitted two moments for two arms would be
+    /// two worlds, and the difference between them would be the world's rather than the
+    /// translation's.
+    /// </remarks>
+    public IReadOnlyCollection<Code> Codify(Coded observation)
     {
-        if (feeling == Feeling.Blind || observation.Did is not { } which)
-            return observation.Felt;
+        if (feeling == Feeling.Acted || observation.Assigned is not { Count: > 0 } done)
+            return observation.Codes;
 
-        var said = new List<Code>(observation.Felt.Length + 1);
-
-        said.AddRange(observation.Felt);
-        said.Add(Homeostat.Attending(which));
-
-        return said;
+        return [.. observation.Codes.Where(one => !done.Contains(one))];
     }
 }

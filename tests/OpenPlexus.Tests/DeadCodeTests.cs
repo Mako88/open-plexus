@@ -82,7 +82,6 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // Each leaves by its world getting a `Watching`, NOT BY ANYBODY EDITING THIS. And the
         // budget below is back off nought for the first time since it reached it, which
         // should read as a debt rather than as a threshold being relaxed.
-        ["Composed.Third"] = Stranded,
 
         // Five of `Homeostat`'s six came off together, which is what the entry said would
         // happen: each leaves by its world getting a runner. `IActed` is that runner's
@@ -234,8 +233,12 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // Two, and `Rhythm`'s pair left the same way. Its entry said each leaves by the world
         // getting a runner; `Watching` drives it through `IWorld` now, and the arm that prices
         // how fast a turning world is tracked reads the modality and the turn count both.
-        // What is left on the list is `Composed.Third` alone.
-        Assert.Equal(2, Unused.Count);
+        // One, and `Composed.Third` left by its world getting a runner, which is the road
+        // its entry named. A question is a fourth moment carrying the conjunction that
+        // refers, so what is asked FOR has a caller outside the file that declares it -- and
+        // the world reads at chance under every arm, which is a null result rather than a
+        // wiring. What is left on the list is `Multiplexer.Widest` alone.
+        Assert.Single(Unused);
     }
 
     [Fact]
@@ -437,7 +440,15 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "drawn stream is memorised. `ClevrTests` holds the reading and the bar it must "
             + "not cross.",
 
-        ["Composed"] = Stranded,
+        ["Composed"] =
+            "A WORLD, ON `Clevr`'S FOOTING, AND IT CAME OFF THE STRANDED LIST BY GETTING A "
+            + "RUNNER AND A NULL RESULT. `Watching` drives it through `IWorld` now: four "
+            + "moments a scene, the three the world always had and a fourth carrying the "
+            + "conjunction that refers, so the referring values and the value asked for are "
+            + "still never in one moment. Every arm sits on chance -- and the reading worth "
+            + "having is that the INDEX changes nothing, because a story moment carries no "
+            + "outcome and nothing settles it. `ComposedTests` holds it and it closes when a "
+            + "commitment is settled by its successor.",
 
         ["Homeostat"] =
             "A WORLD, ON `Roaming`'S FOOTING SINCE `IActed` EXISTS, and it is the first "

@@ -611,7 +611,11 @@ public sealed class DocsTests
     // nothing does. And the fork is the interaction the grid found rather than the one it
     // went looking for: the surprise gate starves a proposal set another mechanism had just
     // made affordable, so proposals stop while most of the world is still unfound.
-    private const int Whole = 11_778;
+    // And 11,753 is the next fall, in the same session that took the raise. Every world has
+    // a runner now, so the leaf saying some do not is gone -- it was a `BROKEN` naming a debt
+    // that `OutstandingTests` counts, which is a thing written in two places while it was
+    // true and in one place too many the moment it stopped being.
+    private const int Whole = 11_753;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

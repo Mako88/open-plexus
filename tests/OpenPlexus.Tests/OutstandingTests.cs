@@ -55,11 +55,24 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// entry leaves <see cref="DeadCodeTests"/>, by either road.
     /// </para>
     /// <para>
-    /// <b>What is left is <c>Composed</c>, the front end's own question.</b> Its
-    /// answer arrives in a SUCCESSOR moment — three moments a scene, the referring
-    /// attributes in the first two and the answer in the third — which no <c>Turn</c> can
-    /// say, a turn being one moment and one outcome. So the seam it wants is settlement by
-    /// successor, which is open.
+    /// <b>Nought</b>, and <c>Composed</c> came off by a road its own entry half had. That
+    /// entry said the answer arrives in a successor moment and no <c>Turn</c> can say so. A
+    /// turn cannot, and a fourth moment can: the three the world always had, then one
+    /// carrying the conjunction that refers, so the referring values and the value asked for
+    /// are still never in one moment. Every arm reads at chance.
+    /// </para>
+    /// <para>
+    /// <b>And the seam it named is the right one</b>, which the run says rather than argues.
+    /// A story moment carries no outcome, so nothing settles it — no genesis, no repair, and
+    /// a monotone counter with nothing to count. Three quarters of every scene is inert and
+    /// the whole population comes out of question rounds, so the INDEX linking the three
+    /// moments changes not one count. <see cref="ComposedTests"/> asserts that, and it closes
+    /// when a commitment is settled by its successor.
+    /// </para>
+    /// <para>
+    /// <b>Green is the point rather than a reason to delete it.</b> A world arriving with no
+    /// runner puts an entry back on <see cref="DeadCodeTests"/> and this goes red the same
+    /// day, which is what a deadline is for.
     /// </para>
     /// <para>
     /// <b>And four have come off, by roads worth telling apart.</b> <c>Senses</c> got a

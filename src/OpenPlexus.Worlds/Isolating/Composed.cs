@@ -137,7 +137,7 @@ public sealed record Episode
 /// met and picks between them at random, which is the control the design needs.
 /// </para>
 /// </remarks>
-public sealed class Composed
+public sealed class Composed : IWorld<Coded>
 {
     /// <summary>The first of the two attributes a question refers with. <b>A.</b></summary>
     public const byte First = 30;
@@ -154,6 +154,18 @@ public sealed class Composed
     /// </summary>
     public const byte Tag = 33;
 
+    /// <summary>
+    /// That a question is being asked, and nothing about which one.
+    /// </summary>
+    /// <remarks>
+    /// <b>A marker rather than a reference</b>, because the reference is the conjunction and
+    /// the conjunction is already in the moment. What this adds is the difference between
+    /// <i>these two values were seen</i> and <i>tell me about the thing that had both</i>,
+    /// which nothing else in the moment says: a question carries no index, so without it a
+    /// question and a story moment differ only in what they happen to lack.
+    /// </remarks>
+    public const byte Asks = 34;
+
     /// <summary>The three attributes, in the order their moments happen.</summary>
     public static IReadOnlyList<byte> Attributes { get; } = [First, Second, Third];
 
@@ -169,8 +181,24 @@ public sealed class Composed
     /// <summary>Draws the values, and which codes stand for them.</summary>
     private readonly Random _scenes;
 
+    /// <summary>
+    /// Draws which object the question is about, and <b>nothing else</b>.
+    /// </summary>
+    /// <remarks>
+    /// <b>Its own generator</b>, so an arm added between the scene and the question cannot
+    /// silently shift the stream the other arms saw.
+    /// </remarks>
+    private readonly Random _asking;
+
     /// <summary>Scenes shown, so an index can be fresh every time.</summary>
     private long _moment;
+
+    /// <summary>The scene being pushed, and how much of it has gone.</summary>
+    private Episode? _scene;
+
+    private int _at;
+
+    private int _asked;
 
     public Composed(ComposedSettings settings, int seed)
     {
@@ -186,6 +214,7 @@ public sealed class Composed
         // constructed is a control nobody ran.
         _settings = settings;
         _scenes = new Random(Seeds.Apart(seed, 0xC0FF_EE01));
+        _asking = new Random(Seeds.Apart(seed, 0x27D4_EB2F));
     }
 
     /// <inheritdoc cref="ComposedSettings.Values"/>
@@ -197,6 +226,89 @@ public sealed class Composed
     /// the two present — see the note on this class.
     /// </summary>
     public double Chance => 1.0 / _settings.Values;
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <b>Every value there is</b>, which is what <see cref="Chance"/> divides by. The answer
+    /// is ranked over the whole alphabet rather than forced between the two present, and the
+    /// note on this class says why a forced choice would break the control.
+    /// </remarks>
+    public int Outcomes => _settings.Values;
+
+    /// <summary>
+    /// One moment: a scene's three, then the question about one of its objects.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Four pushes a scene and the answer only on the last</b>, because a commitment
+    /// expects one code and the three story moments are things happening rather than
+    /// questions. The world cannot say what followed them, which is the third verdict rather
+    /// than a miss, and every one of them costs a commitment exactly nothing.
+    /// </para>
+    /// <para>
+    /// <b>The question is a fourth moment</b> rather than a field on the third, and that is
+    /// forced by the design. To ask about an object you must refer to it; the reference is
+    /// <see cref="First"/> with <see cref="Second"/>, and putting those beside
+    /// <see cref="Third"/> is exactly the co-occurrence this world exists to withhold.
+    /// </para>
+    /// <para>
+    /// <b>And the question carries no index</b>, so nothing in it points at an object. It
+    /// broadcasts every code of the two values it names, one of each being the code the scene
+    /// happened to show — see <see cref="ComposedSettings.CodesPerValue"/>.
+    /// </para>
+    /// </remarks>
+    public Turn<Coded> Next()
+    {
+        if (_scene is null || _at > Attributes.Count)
+        {
+            _scene = Draw();
+            _at = 0;
+            _asked = _asking.Next(PerScene);
+        }
+
+        var scene = _scene;
+        var at = _at++;
+
+        return at < Attributes.Count
+            ? new Turn<Coded> { Seen = Shown(scene, scene.Moments[at]), Outcome = null }
+            : new Turn<Coded>
+            {
+                Seen = Shown(scene, Asking(scene)),
+                Outcome = scene.Values[Attributes.Count - 1][_asked],
+            };
+    }
+
+    /// <summary>The codes a question is, for the object the scene is being asked about.</summary>
+    /// <param name="scene">The scene, drawn.</param>
+    private IReadOnlyCollection<Code> Asking(Episode scene)
+    {
+        List<Code> codes = [new Code(Asks, 0)];
+
+        // EVERY code of the value rather than the one the scene showed, because which code
+        // stood for a value on a given moment is an accident of the drawing and a questioner
+        // does not know it. Naming the shown one would make the question a pointer at the
+        // moment it is asking about.
+        for (var attribute = 0; attribute < Attributes.Count - 1; attribute++)
+            codes.AddRange(Of(Attributes[attribute], scene.Values[attribute][_asked]));
+
+        return codes;
+    }
+
+    /// <summary>One moment of a scene, with the parts the scene can say about it.</summary>
+    /// <param name="scene">The scene it belongs to.</param>
+    /// <param name="moment">The codes that are live.</param>
+    /// <remarks>
+    /// <b>Filtered to what is live</b>, which is what the scene's one map has always meant.
+    /// A code is looked up only when it is in the occasion, so the parts of a moment are the
+    /// parts of the scene restricted to it rather than a second thing to keep in step.
+    /// </remarks>
+    private static Coded Shown(Episode scene, IReadOnlyCollection<Code> moment) => new()
+    {
+        Codes = moment,
+        Groups = Grouped.Parts(scene.Groups is not { Count: > 0 } grouped
+            ? null
+            : moment.Where(grouped.ContainsKey).ToDictionary(code => code, code => grouped[code])),
+    };
 
     /// <summary>Every code one value of one attribute produces.</summary>
     public IReadOnlyList<Code> Of(byte attribute, int value)
@@ -212,7 +324,7 @@ public sealed class Composed
     /// <summary>
     /// One scene: three moments, and a pairing that no moment contains.
     /// </summary>
-    public Episode Next()
+    public Episode Draw()
     {
         // DRAWN FRESH EVERY SCENE, so there is no lasting kind. A world where
         // `A` and `C` belonged to one another across scenes would be answerable

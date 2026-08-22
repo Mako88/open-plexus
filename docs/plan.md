@@ -547,8 +547,6 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **NOW** — `Posted` and `Cycle`: asks, answers and settlements over real sockets, the
       learning loop existing exactly once. A round is a barrier, and a tally is atomic
       rather than final because waiting for every holder waits forever on a silent one.
-    - **BROKEN** — worlds with no runner, their `*Run` files being the walk's. Each wants a
-      `Bench` or a deletion, and `OutstandingTests` prints the debt.
     - **OPEN** — what the repair gate's query costs on a wire, priced on loopback. Open on a
       LAN. Fork **56**.
     - **OPEN** — the vote decides what repair may run on, so under skew blame lands on the

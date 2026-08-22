@@ -279,11 +279,33 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
 
         var indexed = moments.Select(one => Unifying.Index(one.Moment)).ToList();
 
+        // And the same question asked of a vocabulary the machine could hold, which is what
+        // turns the gate below from a reading into a mechanism. The exclusivity column is
+        // computed here from the moments themselves, and nothing inside a population can do
+        // that -- a commitment holds counts about its own firings and never about which codes
+        // shared a moment. A `Categories` can, and `Deriving` is what fills one.
+        //
+        // Stricter than the column it is being read against, on purpose. A category demands
+        // that the covered values never co-occur AND that they keep company a shuffle would
+        // not explain, so a gate reading it admits a subset of what exclusivity admits. If the
+        // subset is as clean the gate is buildable; if it is empty the vocabulary is the wrong
+        // instrument and fork 102 wants a different one.
+        var watching = new Alternating();
+
+        foreach (var (moment, _) in moments) watching.Watch(moment);
+
+        watching.Settle();
+
+        var sorts = new Categories(watching.ByChance(Counting.Company, floor: 20));
+
+        output.WriteLine($"{sorts.Count} categories derived over the same {moments.Count} moments");
+
         var better = 0;
         var scored = 0;
 
         var byGroup = new Dictionary<int, (int Scored, int Better)>();
         var byKind = new Dictionary<bool, (int Scored, int Better)>();
+        var bySort = new Dictionary<bool, (int Scored, int Better)>();
 
         double parentAccuracy = 0;
         double childAccuracy = 0;
@@ -362,6 +384,17 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
             byKind[exclusive] = (byKind[exclusive].Scored + 1,
                 byKind[exclusive].Better + (parent >= kids ? 1 : 0));
 
+            // The same question a machine could answer: every covered value stands in ONE
+            // derived category. A code with no coarser form answers no, which is what makes
+            // this a lookup rather than a judgement.
+            var sorted = covered.Count > 1
+                && sorts.Coarser(covered[0]) is { } coarser
+                && covered.All(one => sorts.Coarser(one) == coarser);
+
+            bySort.TryAdd(sorted, (0, 0));
+            bySort[sorted] = (bySort[sorted].Scored + 1,
+                bySort[sorted].Better + (parent >= kids ? 1 : 0));
+
             var bucket = Math.Min(members.Count, 6);
 
             byGroup.TryAdd(bucket, (0, 0));
@@ -398,6 +431,13 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
         foreach (var (exclusive, tally) in byKind.OrderByDescending(one => one.Key))
             output.WriteLine(
                 $"  values {(exclusive ? "never co-occur" : "co-occur     ")} | {tally.Better,3} of "
+                + $"{tally.Scored,3} no worse ({tally.Better / (double)tally.Scored:P0})");
+
+        output.WriteLine("and whether a DERIVED category covers them, which a machine can ask:");
+
+        foreach (var (sorted, tally) in bySort.OrderByDescending(one => one.Key))
+            output.WriteLine(
+                $"  values {(sorted ? "share a category" : "do not         ")} | {tally.Better,3} of "
                 + $"{tally.Scored,3} no worse ({tally.Better / (double)tally.Scored:P0})");
 
         Assert.True(scored > 0, "no proposal ever fired, so nothing was scored");
@@ -445,5 +485,26 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
             + $"against {overlapping.Better / (double)overlapping.Scored:P0} where they do, so "
             + "whether the covered values are alternatives is not the gate this file reports "
             + "and fork 102 is open again");
+
+        // And the same gate asked as a LOOKUP, which is the difference between a reading and
+        // a mechanism. Exclusivity is computed above from the moments themselves and nothing
+        // inside a population can do that; a `Categories` the front end derived is a table the
+        // brain already holds, and asking whether the covered values share a coarser form is
+        // one dictionary hit.
+        //
+        // The bar is that the two columns AGREE rather than that the second clears a level.
+        // The category is the stricter test -- it wants the values to keep company a shuffle
+        // cannot explain as well as never meeting -- so a world where the extra clause throws
+        // real proposals away would fail here and be worth knowing about. On this one it
+        // throws away none.
+        var sortedGate = bySort.GetValueOrDefault(true);
+        var unsorted = bySort.GetValueOrDefault(false);
+
+        Assert.True(sortedGate == alternating && unsorted == overlapping,
+            $"a derived category covers the values of {sortedGate.Scored} proposals against "
+            + $"{alternating.Scored} whose values simply never meet, and is no worse in "
+            + $"{sortedGate.Better} against {alternating.Better}. The two columns are supposed "
+            + "to be the same question asked twice, so where they part the vocabulary is "
+            + "refusing proposals the gate admits and rung four's admission cannot read it");
     }
 }

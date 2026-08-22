@@ -250,6 +250,265 @@ public sealed class ChainingTests(ITestOutputHelper output)
             + "mints the parts. Say what changed and re-price it");
     }
 
+    /// <summary>
+    /// Where the right answer RANKS once a second hop is allowed — <b>what a chain must be
+    /// worth to win.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A backward step and a flooded moment are one arithmetic.</b> At depth one a
+    /// rule is reachable exactly when its missing words are concluded by rules that fire,
+    /// which is exactly when it fires in a moment holding every conclusion. So the search is
+    /// not where a fourth shape could differ, and what is left is what a reached rule is WORTH.
+    /// </para>
+    /// <para>
+    /// <b>A chain is worth its weakest link.</b> Crediting one with its own accuracy is what
+    /// put eight outcomes at the ceiling: the rule concluding <c>faint</c> and the rule
+    /// concluding <c>harsh</c> are both perfect and both reachable; what separates them is
+    /// that one was handed <c>meow</c> by a certainty and the other was handed <c>bark</c> by
+    /// a rule believed an eighth of the time. Taking the minimum drops the tie from 7.2 to
+    /// 2.5 and the top weight from 1.000 to 0.500.
+    /// </para>
+    /// <para>
+    /// <b>And the slot is an ORACLE here, taken off the lesson.</b> The four implied answers
+    /// are alternatives that never co-occur, so a machine holding that category would choose
+    /// among them and no others. Weighted, exactly one of them is left at the top and it is
+    /// the right one on every question of every seed — which is a ceiling on what fork 129
+    /// would buy rather than a mechanism, and it is why the two forks are one piece of work.
+    /// </para>
+    /// <para>
+    /// <b>Twenty tellings destroys it and the reason is not the statistic.</b> The goal is at
+    /// the top weight on every question at one telling and on none at twenty, and reading the
+    /// lifetime rate rather than the recency-weighted estimate does not recover it — 4.5
+    /// against 4.0, both with the goal off the top. The obvious explanation was that a
+    /// front-loaded telling decays under recency, and it is refuted. Unexplained.
+    /// </para>
+    /// <para>
+    /// <b>Admitting only rules the question TOUCHES is refuted.</b> Filtering the reached set
+    /// to scopes sharing a word with the question left the advocate count, the rank and the
+    /// tie identical to the digit under the unweighted reading, so it is the third refuted
+    /// shape by another name.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Where_the_right_answer_ranks_once_a_second_hop_is_allowed()
+    {
+        const int Seeds = 3;
+
+        var lesson = Lesson.Chained;
+        var implied = lesson with { Exam = [.. lesson.Exam.Skip(lesson.Exam.Count / 2)] };
+
+        output.WriteLine($"{Seeds} seeds, {implied.Exam.Count} implied questions");
+        output.WriteLine(
+            $"{"arm",-27}{"advocated",11}{"rank",7}{"first",7}{"topweight",11}"
+            + $"{"tied",6}{"goaltied",10}{"byhits",8}{"bylength",10}{"inslot",8}{"byslot",8}");
+
+        var ranks = new Dictionary<string, double>();
+
+        // The two statistics a commitment keeps, which are a deliberate pair rather than one
+        // number. `Reliability` is the lifetime rate and merges; `Accuracy` is the
+        // recency-weighted local estimate the vote decides on, and it cannot track a world
+        // with no episode boundary if it is a lifetime average. A lesson told and then
+        // examined is front-loaded, so which of them is read is a live question here.
+        var statistics = new (string Name, Func<Commitment, double> Of)[]
+        {
+            ("accuracy", one => one.Accuracy),
+            ("reliability", one => one.Reliability),
+        };
+
+        foreach (var (statistic, of) in statistics)
+        foreach (var tellings in new[] { 1, 20 })
+        {
+            var places = new List<double>();
+            var advocated = new List<double>();
+            var best = new List<double>();
+            var tied = new List<double>();
+            var first = 0;
+            var shared = 0;
+            var won = 0;
+            var narrowed = 0;
+            var slotted = new List<double>();
+            var picked = 0;
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var learnt = Ran(implied, Carrying.Never, tellings, seed);
+                var all = learnt.Held.All.ToList();
+
+                foreach (var quiz in implied.Exam)
+                {
+                    if (Wanted(learnt.World, quiz.Answer) is not { } goal) continue;
+
+                    var asked = Babi.Words(quiz.Question).Select(Babi.Of).ToHashSet();
+
+                    var fires = all.Where(one => Fires(one, asked, learnt.World)).ToList();
+
+                    // What one hop makes available, as word indices. This is the flood and the
+                    // backward step at once, which is the point of the paragraph above.
+                    // HOW WELL each word is concluded rather than merely that it is, which
+                    // is the half the first version of this dropped. A rule reached through a
+                    // premise nothing believes is not worth what a rule reached through a
+                    // certainty is, and crediting both with their own accuracy is what put
+                    // eight outcomes at the ceiling.
+                    var concluded = new Dictionary<int, double>();
+
+                    foreach (var one in fires)
+                    {
+                        if (Brain.Meant(one.Expects) is not { } word) continue;
+
+                        concluded[word] =
+                            concluded.TryGetValue(word, out var so_far)
+                                ? Math.Max(so_far, of(one))
+                                : of(one);
+                    }
+
+                    // A chain is worth its weakest link, so a reached rule carries the minimum
+                    // of its own accuracy and every premise it had to be handed.
+                    var reached = new List<(Commitment One, double Weight)>();
+
+                    foreach (var one in all)
+                    {
+                        if (Fires(one, asked, learnt.World)) continue;
+
+                        var missing = Missing(one, asked, learnt.World);
+
+                        if (missing.Count == 0 || !missing.All(concluded.ContainsKey)) continue;
+
+                        var weakest = missing.Min(word => concluded[word]);
+
+                        reached.Add((one, Math.Min(of(one), weakest)));
+                    }
+
+                    // The vote as the machine takes it: an expectation is worth its best
+                    // advocate and no more, so a maximum per outcome and then a ranking.
+                    var weights = new Dictionary<Code, double>();
+                    var evidence = new Dictionary<Code, long>();
+                    var length = new Dictionary<Code, int>();
+
+                    var advocates = fires
+                        .Select(one => (One: one, Weight: of(one)))
+                        .Concat(reached);
+
+                    foreach (var (one, weight) in advocates)
+                    {
+                        weights[one.Expects] =
+                            weights.TryGetValue(one.Expects, out var so_far)
+                                ? Math.Max(so_far, weight)
+                                : weight;
+
+                        // How much the best advocate has been TESTED, kept beside its
+                        // accuracy rather than folded into it. One weight doing two jobs is
+                        // this design's recurring fault and a number that cannot say which of
+                        // them moved it is the shape of it.
+                        evidence[one.Expects] =
+                            evidence.TryGetValue(one.Expects, out var seen)
+                                ? Math.Max(seen, one.Fired)
+                                : one.Fired;
+
+                        // And how SPECIFIC the best advocate is. A longer scope says more and
+                        // covers less, which is the gradient subsumption reads in the other
+                        // direction, and it is the third thing that could separate a tie.
+                        length[one.Expects] =
+                            length.TryGetValue(one.Expects, out var deep)
+                                ? Math.Max(deep, one.Scope.Length)
+                                : one.Scope.Length;
+                    }
+
+                    var ranked = weights
+                        .OrderByDescending(one => one.Value)
+                        .ThenBy(one => one.Key)
+                        .Select(one => one.Key)
+                        .ToList();
+
+                    var place = ranked.IndexOf(goal);
+
+                    advocated.Add(weights.Count);
+                    places.Add(place < 0 ? weights.Count : place + 1);
+
+                    if (place == 0) first++;
+
+                    // How much of the ranking is a TIE, which a rank alone cannot say. Where
+                    // several outcomes share the top weight the answer comes out of code
+                    // order, and that is a different defect from the right rule being weak.
+                    var top = weights.Count == 0 ? 0.0 : weights.Values.Max();
+
+                    best.Add(top);
+                    tied.Add(weights.Values.Count(one => one >= top - 1e-9));
+
+                    if (weights.TryGetValue(goal, out var mine) && mine >= top - 1e-9)
+                    {
+                        shared++;
+
+                        // And whether EVIDENCE separates what accuracy could not. Among the
+                        // outcomes tied at the top, the one whose advocate has fired most is
+                        // what a tie-break on testedness would pick, so this says outright
+                        // whether such a rule would answer the question.
+                        var among = weights
+                            .Where(one => one.Value >= top - 1e-9)
+                            .OrderByDescending(one => evidence[one.Key])
+                            .ThenBy(one => one.Key)
+                            .Select(one => one.Key)
+                            .ToList();
+
+                        if (among.Count > 0 && among[0] == goal) won++;
+
+                        var deepest = weights
+                            .Where(one => one.Value >= top - 1e-9)
+                            .OrderByDescending(one => length[one.Key])
+                            .ThenBy(one => one.Key)
+                            .Select(one => one.Key)
+                            .ToList();
+
+                        if (deepest.Count > 0 && deepest[0] == goal) narrowed++;
+
+                        // And whether knowing the SLOT collapses it. The four implied answers
+                        // are alternatives -- they never co-occur and they fill one place --
+                        // so a machine holding that category would only ever be choosing among
+                        // them. An ORACLE reading, taken off the lesson rather than off
+                        // anything derived, so it is a ceiling on what fork 129 could buy.
+                        var alternatives = implied.Exam
+                            .Select(one => Wanted(learnt.World, one.Answer))
+                            .Where(one => one is not null)
+                            .Select(one => one!.Value)
+                            .ToHashSet();
+
+                        var within = weights
+                            .Where(one => one.Value >= top - 1e-9)
+                            .Where(one => alternatives.Contains(one.Key))
+                            .OrderByDescending(one => length[one.Key])
+                            .ThenBy(one => one.Key)
+                            .Select(one => one.Key)
+                            .ToList();
+
+                        slotted.Add(within.Count);
+
+                        if (within.Count > 0 && within[0] == goal) picked++;
+                    }
+                }
+            }
+
+            ranks[$"{statistic} {tellings}"] = places.Average();
+
+            output.WriteLine(
+                $"{$"{statistic}, {tellings} telling(s)",-27}"
+                + $"{advocated.Average(),11:F1}{places.Average(),7:F1}"
+                + $"{first,7}{best.Average(),11:F3}{tied.Average(),6:F1}{shared,10}"
+                + $"{won,8}{narrowed,10}"
+                + $"{(slotted.Count == 0 ? 0.0 : slotted.Average()),8:F1}{picked,8}");
+        }
+
+        // The companion, so an arm that stopped running cannot read as one that tied.
+        Assert.True(ranks.Count == 4, $"{ranks.Count} of 4 arms reported");
+
+        // And the reading, asserted so it is not a printed line nobody was asked to look at.
+        // The right answer taking first place is what every second-hop shape needs and none
+        // has had; the day one does, this goes red and is a RESULT rather than a regression.
+        Assert.True(ranks.Values.Min() > 1.0,
+            "the right answer now ranks first once a second hop is allowed, so the vote can "
+            + "carry a chain and the implied half should move. Say what changed and re-take "
+            + "`LessonTests.A_conclusion_that_follows_from_two_statements_is_never_reached`");
+    }
+
     /// <summary>Every word in a commitment's scope the question does not say.</summary>
     /// <param name="one">The commitment.</param>
     /// <param name="asked">What the question itself says.</param>

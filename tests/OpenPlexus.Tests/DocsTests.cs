@@ -615,7 +615,13 @@ public sealed class DocsTests
     // a runner now, so the leaf saying some do not is gone -- it was a `BROKEN` naming a debt
     // that `OutstandingTests` counts, which is a thing written in two places while it was
     // true and in one place too many the moment it stopped being.
-    private const int Whole = 11_753;
+    // And 11,757 is the sixty-first raise, four words, for a revival row and nothing
+    // else -- the one kind of content this budget must never price out. That row asked for a
+    // segmented world with a runner whose answer needs the pairing, the world arrived, and
+    // reading the grouping took it rather than deriving it into codes. So the condition had
+    // expired and a row with an expired condition is a superstition. What replaces it is
+    // live: a grouping cannot cross the wire beside a moment and a derived code can.
+    private const int Whole = 11_757;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

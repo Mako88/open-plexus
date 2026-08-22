@@ -504,7 +504,8 @@ public sealed class BabiTests(ITestOutputHelper output)
                 new[] { 0.3, 0.4, 0.5, 0.6, 0.7 }
                     .Select(one => ("a set  ", one, watching.BySpace(one, floor: 20)))
                     .Concat(new[] { 0.7, 0.8, 0.9, 0.95, 0.99 }
-                        .Select(one => ("weighed", one, watching.ByLikeness(one, floor: 20)))))
+                        .Select(one => ("weighed", one, watching.ByLikeness(one, floor: 20))))
+                    .Concat([("chance ", double.NaN, watching.ByChance(floor: 20))]))
             {
                 var said = groups
                     .Select(group => group
@@ -553,7 +554,19 @@ public sealed class BabiTests(ITestOutputHelper output)
         // of the key and the set one reaches no place at any threshold on any task. Putting
         // it here is what stops the claim living in a commit message alone.
         output.WriteLine(
-            $"best covered: weighed {best["weighed"]}, a set {best["a set  "]}");
+            $"best covered: weighed {best["weighed"]}, a set {best["a set  "]}, "
+            + $"chance {best.GetValueOrDefault("chance ")}");
+
+        // And the shuffled bar is one row rather than five, because it picks no level. What
+        // it is being read against is the BEST of the five hand-picked ones, which is the
+        // comparison that matters: a bar that travels is worth having if it lands where
+        // somebody looking at this world would have put one, and worth nothing if it needs
+        // the level it replaces.
+        Assert.True(best.GetValueOrDefault("chance ") > best["a set  "],
+            $"the shuffled bar covers {best.GetValueOrDefault("chance ")} of the key and the "
+            + $"bare set covers {best["a set  "]}, so a bar read off the counts is no better "
+            + "than the reading already refuted. `ByChance` is the arm and this is where it "
+            + "dies.");
 
         Assert.True(best["weighed"] > best["a set  "],
             $"the weighed reading covers {best["weighed"]} of the key at its best row and "

@@ -34,8 +34,9 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **ACTIVE, the five `DrivenTests` says no run reaches.** The category machinery —
   `Alternating`, `Deriving`, `Meeting`, `Sorted` — and `Unifying` behind it, so both close
   behind the likeness bar below.
-- **Then a likeness bar that travels**, read against shuffled moments rather than a level,
-  so no world hands a threshold in. It is what blocks the categories.
+- **Then the travelling bar into the derivation.** `ByChance` is built and ties the best
+  hand-picked level on two vocabularies; what reads it is a test. `Deriving` and `Sorted`
+  still take a level, over adhesion rather than company.
 - **Then the categories the brain derives**, into `Population.Sorts`, which nothing but a
   test has ever set. Delivery is `Coarsening`; a code in the moment is refused because a
   category over alternatives is in every one. Fork **129**.

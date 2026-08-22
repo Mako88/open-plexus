@@ -265,6 +265,151 @@ public sealed class Alternating
             meeting);
     }
 
+    /// <summary>How many shuffled streams a pair must beat to be admitted.</summary>
+    /// <remarks>
+    /// <b>Nineteen, which is a test rather than a threshold.</b> A pair
+    /// beating every draw is what <c>p &lt; 0.05</c> looks like when the null is sampled rather
+    /// than integrated, so the number says how fine the test is and never how alike two codes
+    /// must be. Raising it makes the same test finer; there is no value of it that makes a
+    /// world's codes easier to group.
+    /// </remarks>
+    private const int Draws = 19;
+
+    /// <summary>Where the shuffle's generator comes from, so every machine draws the same.</summary>
+    /// <remarks>
+    /// <b>Derived by arithmetic rather than handed in</b>, for <c>Winnow</c>'s reason. A
+    /// codebook that must be identical on every machine forever cannot rest on a seed somebody
+    /// passes, and a generator per code and per draw is what makes the table the same however
+    /// the alphabet is walked.
+    /// </remarks>
+    private const int Salt = 0x5F3A9C;
+
+    /// <summary>
+    /// The groups whose company is closer than a shuffled stream would make it.
+    /// </summary>
+    /// <param name="floor">
+    /// <inheritdoc cref="From" path="/param[@name='floor']"/>
+    /// </param>
+    /// <remarks>
+    /// <para>
+    /// <b>The bar travels, which is the whole of what this adds.</b>
+    /// <see cref="ByLikeness"/> asks whether a cosine clears a level, and the level is a
+    /// number somebody picked while looking at one world — 0.9 on bAbI and 0.5 for the set
+    /// reading, neither calibrated against the other. A level is a world reaching into a
+    /// mechanism by the back door, one seam out from the rule this repo already refuses.
+    /// </para>
+    /// <para>
+    /// <b>So the bar is what the same counts produce shuffled.</b> Each
+    /// code keeps how often it was seen and how much company it kept, and its partners are
+    /// redrawn from the alphabet's own marginal. Two codes are alternatives where their
+    /// observed company is closer than every one of <see cref="Draws"/> such redraws, which
+    /// is a number about the stream and about nothing else.
+    /// </para>
+    /// <para>
+    /// <b>And the null is the one that matters.</b> Every code's shuffled company points at
+    /// the marginal, so shuffled cosines are HIGH rather than near nought — which is why a
+    /// hand-picked bar had to be 0.9 to say anything. What a pair must now beat is exactly
+    /// the part of that cosine that mere frequency explains.
+    /// </para>
+    /// <para>
+    /// <b>What it costs is a draw per occurrence per code.</b> A code with a thousand
+    /// occurrences and seven partners a moment is seven thousand draws, nineteen times over,
+    /// and the derivation is a batch call rather than something a round pays for.
+    /// </para>
+    /// </remarks>
+    /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
+    public IReadOnlyList<IReadOnlySet<Code>> ByChance(int floor, Meeting meeting = Meeting.Never)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
+
+        var shuffled = Shuffled(floor);
+
+        return Grouped(
+            _seen, floor, _withs,
+            (mine, theirs, _) =>
+            {
+                var observed = Likeness(_withs[mine], _withs[theirs]);
+
+                for (var draw = 0; draw < Draws; draw++)
+                    if (Likeness(shuffled[mine][draw], shuffled[theirs][draw]) >= observed)
+                        return false;
+
+                return true;
+            },
+            meeting);
+    }
+
+    /// <summary>Each eligible code's company as chance alone would have written it.</summary>
+    /// <param name="floor">How often a code must have been seen to be drawn for.</param>
+    /// <remarks>
+    /// <b>The marginal and the mass are both preserved</b>, which is what makes this a shuffle
+    /// rather than a random vector. A code keeps exactly the company mass it had — every
+    /// (occurrence, partner) pair it was in — and each partner is redrawn from how often the
+    /// alphabet's codes were seen. So what is destroyed is which codes kept company with
+    /// which, and nothing else.
+    /// </remarks>
+    private Dictionary<Code, Dictionary<Code, int>[]> Shuffled(int floor)
+    {
+        var alphabet = _seen.Keys.Order().ToList();
+        var running = new long[alphabet.Count];
+
+        var total = 0L;
+
+        for (var at = 0; at < alphabet.Count; at++)
+        {
+            total += _seen[alphabet[at]];
+            running[at] = total;
+        }
+
+        var made = new Dictionary<Code, Dictionary<Code, int>[]>();
+
+        foreach (var one in _seen.Where(one => one.Value >= floor).Select(one => one.Key))
+        {
+            var mass = _withs.TryGetValue(one, out var kept) ? kept.Values.Sum() : 0;
+            var drawn = new Dictionary<Code, int>[Draws];
+
+            for (var draw = 0; draw < Draws; draw++)
+            {
+                // A generator per code and per draw, so the table is the same whatever order
+                // the alphabet is walked in and whatever else was drawn first.
+                var random = new Random(
+                    HashCode.Combine(Salt, one.Modality, one.Value, draw));
+
+                var company = new Dictionary<Code, int>();
+
+                for (var at = 0; at < mass; at++)
+                {
+                    Code other;
+
+                    // A code is never its own company, here or in what was observed.
+                    do
+                    {
+                        other = alphabet[Landed(running, random.NextInt64(total))];
+                    }
+                    while (other.Equals(one) && alphabet.Count > 1);
+
+                    company[other] = company.GetValueOrDefault(other) + 1;
+                }
+
+                drawn[draw] = company;
+            }
+
+            made[one] = drawn;
+        }
+
+        return made;
+    }
+
+    /// <summary>Which code a draw against the running totals landed on.</summary>
+    /// <param name="running">The cumulative counts, in the alphabet's own order.</param>
+    /// <param name="drawn">A number under the total.</param>
+    private static int Landed(long[] running, long drawn)
+    {
+        var at = Array.BinarySearch(running, drawn);
+
+        return at >= 0 ? Math.Min(at + 1, running.Length - 1) : ~at;
+    }
+
     /// <summary>
     /// Whether two codes meet no more often than independence would have them meet.
     /// </summary>

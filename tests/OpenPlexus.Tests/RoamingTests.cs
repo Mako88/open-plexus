@@ -2165,6 +2165,12 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 ("space/rarely", one => alternating.BySpace(one, 20, Meeting.Rarely)),
                 ("count/rarely", one => alternating.ByLikeness(one, 20, Meeting.Rarely)),
                 ("ppmi/rarely", one => alternating.ByCompany(one, 20, Meeting.Rarely)),
+
+                // The bar read off the counts rather than picked, so the level it is handed
+                // is ignored and it prints as one row repeated. What it is being read against
+                // is the best of the four hand-picked ones above.
+                ("chance/never", _ => alternating.ByChance(20, Meeting.Never)),
+                ("chance/rarely", _ => alternating.ByChance(20, Meeting.Rarely)),
             })
         foreach (var alike in new[] { 0.5, 0.8, 0.9, 0.95 })
         {

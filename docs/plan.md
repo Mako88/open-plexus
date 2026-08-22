@@ -31,8 +31,8 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them.
-- **ACTIVE, what a repeated hole is ADMITTED on.** The join is proposed and the category gate
-  refuses every one, and that gate was measured on holes that DROP. Fork **102**.
+- **ACTIVE, the derivation misses the alternatives a join stands for.** Every proposal clears
+  the gate's own clause and the vocabulary holds none of the values. Fork **102**.
 - **Then what a derived category DELIVERS**, nought so far. The fold puts it in nearly every
   moment and genesis refuses a code that never varied, so `Coarsening` is the road. Fork
   **129**.
@@ -317,7 +317,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **NOW** — a commitment IS a relation and is scored as one, so nesting is expressible
       on that rather than reached.
     - **OPEN** — anti-unification as rung four's admission, gated by a hole whose covered
-      values never co-occur. Built; open on what admits a hole that REPEATS. Fork **102**.
+      values never co-occur. Built; open on a vocabulary reaching what a join stands for.
+      Fork **102**.
     - **OPEN** — what puts a commitment in a moment without widening every world's. Fork
       **116**, and the revival row is the shape of the answer.
   - Concept and label independent

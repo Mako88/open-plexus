@@ -180,10 +180,53 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
     /// <param name="Joined">How many of the admitted ones repeat.</param>
     /// <param name="Resident">How many residents name a variable in two places.</param>
     /// <param name="Fired">How often those residents fired and were answered.</param>
+    /// <param name="Apart">
+    /// How many of the repeated groups cover values that never met in a moment. <b>The gate's
+    /// own definition asked of the stream</b> rather than of the vocabulary, which is what
+    /// says whether the refusal is the GATE or the derivation that fills it.
+    /// </param>
     /// <param name="Sorts">How many categories were derived.</param>
     private readonly record struct Chained(
         double Recent, int Held, int Twice, int Groups, int Repeated, int Admitted,
-        int Joined, int Resident, long Fired, int Sorts);
+        int Joined, int Resident, long Fired, int Apart, int Sorts);
+
+    /// <summary>A front end that keeps every moment it emitted.</summary>
+    /// <param name="inner">The translation being watched.</param>
+    /// <remarks>
+    /// <b>Because exclusivity is a fact about the moments</b> and the population holds no such
+    /// thing. <see cref="Deriving{TObservation}"/> counts them privately and gives back only
+    /// what it grouped, so asking whether two codes ever met wants the stream itself.
+    /// </remarks>
+    private sealed class Kept(IQuantizer<Coded> inner) : IQuantizer<Coded>
+    {
+        /// <summary>Every moment, in the order it was emitted.</summary>
+        public List<IReadOnlySet<Code>> Moments { get; } = [];
+
+        /// <inheritdoc/>
+        public byte Modality => inner.Modality;
+
+        /// <inheritdoc/>
+        public IReadOnlyCollection<Code> Codify(Coded observation)
+        {
+            var codes = inner.Codify(observation);
+
+            Moments.Add(new HashSet<Code>(codes));
+
+            return codes;
+        }
+
+        /// <inheritdoc/>
+        public IReadOnlyDictionary<Code, int>? Bind(Coded observation) => inner.Bind(observation);
+
+        /// <inheritdoc/>
+        public IReadOnlyDictionary<Code, int>? Order(Coded observation) => inner.Order(observation);
+
+        /// <inheritdoc/>
+        public IReadOnlySet<Code>? Fleeting(Coded observation) => inner.Fleeting(observation);
+
+        /// <inheritdoc/>
+        public IReadOnlySet<Code>? Forced(Coded observation) => inner.Forced(observation);
+    }
 
     /// <summary>One arm of the join reading.</summary>
     /// <param name="joining">How the question and the story are read.</param>
@@ -203,9 +246,10 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
 
         var sorts = new Categories([]);
 
+        var kept = new Kept(new Joined(joining));
+
         var front = new Deriving<Coded>(
-            new Joined(joining), sorts, Counting.Company, Meeting.Rarely,
-            floor: 20, every: 2000);
+            kept, sorts, Counting.Company, Meeting.Rarely, floor: 20, every: 2000);
 
         brain.Held.Sorts = sorts;
 
@@ -219,18 +263,29 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
 
         var joins = all.Where(one => one.Scope.Count(Unifying.Names) > 1).ToList();
 
+        var repeated = groups.Where(one => one.Holes.Count > 1).ToList();
+
         return new Chained(
             tally.Recent,
             all.Count,
             all.Count(one => one.Scope.GroupBy(code => code.Value).Any(group => group.Count() > 1)),
             groups.Count,
-            groups.Count(one => one.Holes.Count > 1),
+            repeated.Count,
             admitted.Count,
             admitted.Count(one => one.Holes.Count > 1),
             joins.Count,
             joins.Sum(one => one.Fired),
+            repeated.Count(one => Apart(Generalising.Covered(one), kept.Moments)),
             sorts.Count);
     }
+
+    /// <summary>Whether no moment ever held two of these codes at once.</summary>
+    /// <param name="covered">The values a hole would stand for.</param>
+    /// <param name="moments">Every moment the front end emitted.</param>
+    private static bool Apart(
+        IReadOnlyList<Code> covered, IReadOnlyList<IReadOnlySet<Code>> moments) =>
+        covered.Count > 1
+        && moments.All(one => covered.Count(one.Contains) <= 1);
 
     /// <summary>
     /// How far the join gets on the world it was designed for, link by link.
@@ -244,13 +299,21 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
     /// is the two places a variable can stand in.
     /// </para>
     /// <para>
-    /// <b>It reaches the proposal and stops at the gate.</b> The parted arm holds 74 scopes
-    /// saying one value twice and offers ten sibling groups over that shape, and the
-    /// vocabulary admits none of them: the four categories it derives do not cover the values
-    /// the hole would stand for. Whether the gate is even the right one here is open — it was
-    /// measured on single holes, where a hole is a DROP and the covered values being
-    /// alternatives is what says the drop is safe. A repeated hole constrains rather than
-    /// drops, so what it needs admitting on is a different question that owes its own reading.
+    /// <b>It reaches the proposal and stops at the vocabulary.</b> The parted arm holds 74
+    /// scopes saying one value twice and offers ten sibling groups over that shape, and every
+    /// one of the ten covers values that NEVER met in any moment — which is the gate's own
+    /// definition of a category, asked of the stream. So the clause is satisfied and the
+    /// lookup still refuses: the four categories the derivation produced do not hold those
+    /// values, and one derivation taken at the end of the stream instead of ten along it
+    /// produces two and holds them no better.
+    /// </para>
+    /// <para>
+    /// <b>Which makes it the derivation's question rather than the gate's.</b> The values are
+    /// the corpus's four people; they never co-occur and they keep near-identical company, and
+    /// <c>ByChance</c> on this vocabulary returns two groups of function words instead. A
+    /// hand-picked cosine at 0.9 over the same counts reaches three of the four on both sides,
+    /// so the travelling bar under-groups exactly where the join needs it — a third vocabulary
+    /// against the two its own reading ties on.
     /// </para>
     /// <para>
     /// <b>And the first version of this reading was not reproducible</b>, which is worth
@@ -277,7 +340,8 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
                 + $"| saying a value twice {one.Twice,4} | sibling groups {one.Groups,5} "
                 + $"| repeated {one.Repeated,4} | admitted {one.Admitted,4} "
                 + $"| joined {one.Joined,3} | resident joins {one.Resident,3} "
-                + $"| fired {one.Fired,5} | categories {one.Sorts,2}");
+                + $"| fired {one.Fired,5} | of the repeated, never met {one.Apart,3} "
+                + $"| categories {one.Sorts,2}");
         }
 
         // The front end's own contribution, and it is the link nothing else could supply. A
@@ -298,13 +362,13 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
 
         Assert.Equal(0, read[Joining.Bagged].Repeated);
 
-        // And the gate is where it stops, held down so the day it moves is visible. The
-        // vocabulary derives four categories over this stream and none of them covers the
-        // values a join would stand for, so ten proposals of the right shape are refused --
-        // which is an open question about the GATE rather than a fault in any link above it.
-        // It was measured on holes that DROP, where the covered values being alternatives is
-        // what says the drop is safe; a repeated hole constrains instead, and what it should
-        // be admitted on owes its own reading.
+        // And the clause the gate is written to test is satisfied by every one of them, which
+        // is what says the refusal is the vocabulary rather than the rule. This is the line
+        // that decides which of two very different fixes is owed: a different gate, or a
+        // derivation that reaches the alternatives it is looking at.
+        Assert.Equal(read[Joining.Parted].Repeated, read[Joining.Parted].Apart);
+
+        // And it refuses them anyway, held down so the day it moves is visible.
         Assert.Equal(0, read[Joining.Parted].Joined);
         Assert.Equal(0, read[Joining.Bagged].Joined);
 

@@ -590,7 +590,11 @@ public sealed class DocsTests
     // scope, so a rule that is only a variable twice is out of reach -- which is Monk-1's own
     // concept, and what the rung reaches there is that truth with a condition it does not
     // need. It duplicates no entry and the leaf it sits beside came in shorter.
-    private const int Whole = 11_752;
+    // And 11,706 is the next fall, in the same session that took the raise. The fork closed
+    // by being built: `Population.Scanning` reaches a scope no code names, so the leaf went
+    // and 134 joined the closed list. A raise spent on a question that is answered inside a
+    // day is the budget doing what it is for.
+    private const int Whole = 11_706;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

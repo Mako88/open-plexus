@@ -259,7 +259,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 - **Closed**, and what closed them is in the commit and in the code that cites them: **1**,
   **5**, **6**, **11**, **12**, **18**, **20**, **21**, **22**, **24**, **25**, **27**,
   **33**, **36**, **48**, **52**, **66**, **74**, **88**, **96**, **105**, **109**, **114**,
-  **121**, **124**, **126**, **127**.
+  **121**, **124**, **126**, **127**, **134**.
 
     Commitment := scope (codes that must all be present)
                 → expects (a code that should follow)
@@ -320,9 +320,6 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       values never co-occur. Built and firing; open on what it is worth. Fork **102**.
     - **OPEN** — Monk-1 says the hole that repeats once the attribute leaves the value, and
       four of its joins are true; whether it PAYS is an eight-seed grid. Fork **133**.
-    - **OPEN** — the proposer refuses a scope of variables ALONE, no code in any moment
-      reaching one, so the rule that is only a variable twice is out of reach and only the
-      truth with a condition it does not need is in it. Fork **134**.
     - **OPEN** — what puts a commitment in a moment without widening every world's. Fork
       **116**, and the revival row is the shape of the answer.
   - Concept and label independent

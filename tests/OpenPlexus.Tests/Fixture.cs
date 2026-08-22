@@ -157,6 +157,25 @@ internal static class Fixture
     }
 
     /// <summary>A code in the plain test modality.</summary>
+    /// <summary>A conversation over a scripted tutor, composed as the terminal composes it.</summary>
+    /// <param name="tutor">Who is typing, and where the machine's words go.</param>
+    /// <param name="carrying">How much of the topic a moment holds.</param>
+    /// <remarks>
+    /// <b><c>Carrying.Never</c> is the terminal's default and NOT the settings record's.</b>
+    /// Left defaulted a world carries the whole topic into every moment, every code is always
+    /// present, genesis roots on nothing and a run holds a population of nought. Three files
+    /// wrote this block out and one of them got that wrong, which is why it is here.
+    /// </remarks>
+    public static Worlds.Conversing Talking(
+        Worlds.Tutor tutor, Worlds.Carrying carrying = Worlds.Carrying.Never) =>
+        new(new Worlds.ConversingSettings
+        {
+            Typed = tutor,
+            Printed = tutor.Printed,
+            Carrying = carrying,
+            Asserting = Worlds.Asserting.Everything,
+        });
+
     public static Code C(ulong value) => new(Modality: 1, value);
 
     /// <summary>A bench over the narrow multiplexer, driving a fleet already open.</summary>

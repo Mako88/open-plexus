@@ -6,8 +6,8 @@ using OpenPlexus.Worlds;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// Which entries of THE ARCHITECTURE a <see cref="Roaming"/> run actually puts through their
-/// paces — <b>phase two's second half, which nothing had ever asked.</b>
+/// Which entries of THE ARCHITECTURE a spine run actually puts through their paces —
+/// <b>phase two's second half, which nothing had ever asked.</b>
 /// </summary>
 /// <remarks>
 /// <para>
@@ -25,23 +25,35 @@ namespace OpenPlexus.Tests;
 /// unable to fire for the life of the branch.
 /// </para>
 /// <para>
-/// <b>And the arms are the world's own rather than one run.</b> Roaming asks two questions
-/// and can be watched or acted in, so the reading is over the arms it supports — an entry
-/// reached by any of them is reached. Taking one arm would report the arm rather than the
-/// world.
+/// <b>And the arms are the worlds' own rather than one run.</b> Roaming asks two questions
+/// and can be watched or acted in; the conversation is told a lesson once and examined on it.
+/// The reading is over every arm the spine supports, so an entry reached by any of them is
+/// reached. Taking one arm would report the arm rather than the world.
+/// </para>
+/// <para>
+/// <b>Both spine worlds, because the sentence had no code behind it.</b> This ran
+/// <see cref="Roaming"/> in both arms and never <see cref="Conversing"/>, while
+/// <see cref="OutstandingTests.The_spine_world_exercises_every_entry_of_the_architecture"/>
+/// said an entry counted as reached when either spine world showed it. A documented promise
+/// is not a check, and the promise was the wrong half of this pair to trust.
 /// </para>
 /// </remarks>
 public sealed class ExercisedTests
 {
-    /// <summary>What one run of the world left behind.</summary>
-    /// <param name="Examining">Which question the house was asked.</param>
+    /// <summary>What one run of a spine world left behind.</summary>
+    /// <param name="Arm">Which run it was, for the table.</param>
+    /// <param name="Examining">
+    /// Which question the house was asked, and <b>nothing where the world is not the
+    /// house</b>. A conversation has one question and it is the lesson's.
+    /// </param>
     /// <param name="Tally">Every counter the bench reports.</param>
     /// <param name="Held">The population at the end of it.</param>
     /// <param name="Emitted">Which front-end modalities reached the brain.</param>
     /// <param name="Channels">Which of the front end's side channels were ever filled.</param>
     /// <param name="Told">Rounds a chooser read the population and named an action.</param>
     private sealed record Watched(
-        Examining Examining,
+        string Arm,
+        Examining? Examining,
         Tally Tally,
         Population Held,
         IReadOnlySet<byte> Emitted,
@@ -169,8 +181,90 @@ public sealed class ExercisedTests
             .Run(rounds, sweep: 1000, target: 0.9, window: 2000);
 
         return new Watched(
-            examining, tally, brain.Held, noted.Emitted, noted.Channels, drives.Told);
+            $"roaming {examining.ToString().ToLowerInvariant()}", examining, tally,
+            brain.Held, noted.Emitted, noted.Channels, drives.Told);
     }
+
+    /// <summary>
+    /// The other spine world, run into a brain — <b>the conversation, told a lesson once and
+    /// then examined on it.</b>
+    /// </summary>
+    /// <param name="rounds">
+    /// How many rounds to run, and <b>the whole lesson where nothing is said</b>. A
+    /// conversation's length is the tutor's rather than a number picked here: a run cut short
+    /// ends before the examination, so what it reaches would be a fact about the cut.
+    /// </param>
+    /// <remarks>
+    /// <para>
+    /// <b>The deployment's own composition rather than a fixture's</b>, which is the only kind
+    /// that says anything. <c>OpenPlexus.Talk</c> ships a <c>Sorted</c> over a
+    /// <c>Deriving</c>, the three arms that were measured to win, and a
+    /// <see cref="Curiosity"/> that reads the population — so this reaches what a session at a
+    /// terminal reaches and not what a test could arrange.
+    /// </para>
+    /// <para>
+    /// <b>Every doing is an ask or a claim</b>, so the chooser's own count is what says a
+    /// population was read. A conversation has no body and no verb, so <c>Told</c> here is
+    /// words spoken rather than actions taken and the entry it feeds reads nothing off it.
+    /// </para>
+    /// </remarks>
+    private static Watched Talked(int? rounds = null)
+    {
+        var tutor = new Tutor(Lesson.Creatures, TextWriter.Null);
+
+        var brain = new Brain(
+            new CommittingSettings
+            {
+                Capacity = 20_000,
+                Rooting = Rooting.Wholly,
+                Crediting = Crediting.Birth,
+                Admitting = Admitting.Testable,
+            },
+            seed: 1);
+
+        var world = Fixture.Talking(tutor);
+
+        // ONE vocabulary for the fold and the population, which is the seam `Categories`
+        // draws and is the same wiring the terminal ships.
+        var sorts = new Categories([]);
+
+        brain.Held.Sorts = sorts;
+
+        var noted = new Noted(new Sorted<Coded>(
+            new Deriving<Coded>(
+                new Joined(Joining.Bagged),
+                sorts,
+                Counting.Company,
+                Meeting.Rarely,
+                floor: 5,
+                every: 50),
+            sorts));
+
+        var curiosity = new Curiosity(brain, rate: 1.0, seed: 1, world.Naming);
+
+        // Budgeted for the widest statement, because `Asserting.Everything` makes a sentence
+        // one moment a word. A run stopping at the moment count ends before the examination.
+        var tally = new Bench(
+            new Watching<Coded>(
+                world,
+                noted,
+                acting: Chooses.From(
+                    felt => Doing(curiosity.Choose(felt)), curiosity.Cleared)),
+            brain)
+            .Run(
+                rounds ?? (tutor.Moments * tutor.Longest),
+                sweep: 200, target: 0.9, window: 50);
+
+        return new Watched(
+            "conversing", null, tally, brain.Held, noted.Emitted, noted.Channels,
+            curiosity.Claims + curiosity.Questions);
+    }
+
+    /// <summary>The join between what a chooser decided and how this world numbers a doing.</summary>
+    private static int? Doing(Wondered said) =>
+        said.Word is not { } word
+            ? null
+            : said.Asking ? Conversing.Asks(word) : Conversing.Asserts(word);
 
     /// <summary>One entry of THE ARCHITECTURE, and what a run must show for it.</summary>
     /// <param name="Line">The entry, in the words the plan gives it.</param>
@@ -323,9 +417,10 @@ public sealed class ExercisedTests
     /// and the work here closes by the mechanisms being reached rather than by this file.
     /// </para>
     /// <para>
-    /// <b>Both arms run whatever is asked</b>, because an entry reached by one and not the
-    /// other is still reached and the caller cannot know which without both. Two runs of ten
-    /// thousand rounds is a minute and a half, which is why nothing calls this twice.
+    /// <b>Every arm runs whatever is asked</b>, because an entry reached by one and not the
+    /// others is still reached and the caller cannot know which without all of them. Two runs
+    /// of ten thousand rounds and a lesson is a few minutes, which is why nothing calls this
+    /// twice.
     /// </para>
     /// </remarks>
     internal static IReadOnlyList<string> StillUnreached(Action<string> say)
@@ -336,6 +431,7 @@ public sealed class ExercisedTests
         {
             Run(Examining.Where, acting: false),
             Run(Examining.Effect, acting: true),
+            Talked(),
         };
 
         var missed = new List<string>();
@@ -349,9 +445,9 @@ public sealed class ExercisedTests
             if (!ran) missed.Add($"{entry.Line} — wanted {entry.Shows}");
         }
 
-        foreach (var (name, arm) in new[] { ("watched", arms[0]), ("acted", arms[1]) })
+        foreach (var arm in arms)
             say(
-                $"{name,-8}| held {arm.Tally.Resident} | repaired {arm.Tally.Repaired} "
+                $"{arm.Arm,-17}| held {arm.Tally.Resident} | repaired {arm.Tally.Repaired} "
                 + $"| named {arm.Tally.Named} of {arm.Tally.Eligible} eligible "
                 + $"({arm.Tally.PerEligible:F3}, spoke {arm.Tally.Speaking:F3}) "
                 + $"| subsumed {arm.Tally.Subsumed} "
@@ -405,7 +501,11 @@ public sealed class ExercisedTests
             "Told, never architected",
         ];
 
-        var nothing = new[] { Run(Examining.Where, acting: false, rounds: 1) };
+        var nothing = new[]
+        {
+            Run(Examining.Where, acting: false, rounds: 1),
+            Talked(rounds: 1),
+        };
 
         var free = Entries
             .Where(one => one.Ran(nothing))

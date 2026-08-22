@@ -40,11 +40,17 @@ public interface IQuantizer<in TObservation>
     /// quantiser and changes no existing measurement.
     /// </para>
     /// <para>
-    /// <b>And nothing reads it since the walk went</b>, which makes it a channel with no
-    /// far end. The walk's occasion was the only consumer; a commitment's scope is a
-    /// SET of codes and has nowhere to put a group. It stays only until something
-    /// decides between wiring it to rung four's binding and deleting it — and a front-end
-    /// ability nothing can act on is the shape this repo keeps finding read as built.
+    /// <b>And <c>Commitments.Spanning</c> is what reads it</b>, which was not true for most
+    /// of this branch. A commitment's scope is a set of codes and has nowhere to put a group,
+    /// so the grouping is read beside the scope rather than inside it: genesis mints one scope
+    /// over each thing, and no scope fires across two.
+    /// </para>
+    /// <para>
+    /// <b>What a THING is stays the world's.</b> The mechanism cannot tell two answers
+    /// apart: a part is an object in a scene on one world and a part of a sentence on
+    /// another, and both arrive down this channel as an integer. That is one name over two
+    /// ideas, which is the fault this repo has already been bitten by, and no check can reach
+    /// it because what a grouping MEANS is a judgement about the world.
     /// </para>
     /// </remarks>
     IReadOnlyDictionary<Code, int>? Bind(TObservation observation) => null;

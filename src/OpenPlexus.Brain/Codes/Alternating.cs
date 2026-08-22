@@ -112,6 +112,21 @@ public enum Counting
     /// marginal explains is gone before the cosine is taken rather than after — and a shuffled
     /// vector, being the marginal, weighs nothing at all.
     /// </para>
+    /// <para>
+    /// <b>And it is an arm rather than a repair.</b> Which the wider vocabulary says: on
+    /// bAbI's ordinary reading it loses every NAME — nought of four on all three tasks, where
+    /// <see cref="Company"/> takes four of four — and covers six of the fourteen-word key
+    /// against thirteen. The suppression is the mechanism: what four names share is the
+    /// function words they are all said with, and those are exactly the partners no rarer than
+    /// independence, so weighing throws away the evidence that they are alike and leaves each
+    /// name standing on the places only it went to.
+    /// </para>
+    /// <para>
+    /// <b>So neither travels.</b> The pair is the same shape as space against time — one
+    /// fails on a narrow alphabet where mass drowns the null, the other on a wide one where
+    /// what the members share is common. What would settle it is a statistic whose null
+    /// neither converges nor discards the shared partners, and nothing here has one.
+    /// </para>
     /// </remarks>
     Weighed,
 

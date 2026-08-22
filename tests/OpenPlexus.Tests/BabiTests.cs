@@ -571,6 +571,20 @@ public sealed class BabiTests(ITestOutputHelper output)
             + "than the reading already refuted. `ByChance` is the arm and this is where it "
             + "dies.");
 
+        // And the WEIGHED chance bar is the arm rather than the repair, held down in the
+        // direction it came out. It was built because the raw one gets stricter without bound
+        // as evidence accumulates -- measured on bAbI's parted vocabulary, where the raw
+        // grouping falls from twelve codes at five hundred moments to eight at twenty
+        // thousand and the weighed one rises to nineteen. On THIS vocabulary it goes the other
+        // way: it loses every name on all three tasks, because what four names share is the
+        // function words they are all said with and those are exactly the partners weighing
+        // throws away.
+        Assert.True(best.GetValueOrDefault("lifted ") < best.GetValueOrDefault("chance "),
+            $"the weighed bar covers {best.GetValueOrDefault("lifted ")} of the key against "
+            + $"{best.GetValueOrDefault("chance ")} for the raw one, so it is no longer the "
+            + "arm this row was added as -- and the account of why, that weighing discards "
+            + "the common partners a class shares, is what needs re-reading");
+
         Assert.True(best["weighed"] > best["a set  "],
             $"the weighed reading covers {best["weighed"]} of the key at its best row and "
             + $"the bare set covers {best["a set  "]}, so the set is no longer the loser "

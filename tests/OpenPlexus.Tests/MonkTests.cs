@@ -519,6 +519,93 @@ public sealed class MonkTests(ITestOutputHelper output)
             }
     }
 
+    /// <summary>
+    /// <b>The clean rule is refused by the proposer</b>, whatever the spelling buys.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Monk-1's first disjunct is <c>head = body</c> and nothing else, which under
+    /// <see cref="Spelling.Split"/> is a two-entry scope with both entries naming one
+    /// variable. <c>Generalising.Siblings</c> will not propose it: a group whose hole covers
+    /// every position of the scope is skipped, because a scope of variables alone is reached
+    /// by no code in any moment and <c>Population.Firing</c> walks the code index.
+    /// </para>
+    /// <para>
+    /// So what the rung can reach here is <c>head = body</c> with a constant beside it, one
+    /// rule per value of whichever attribute the constant pins. That is sound and it is
+    /// narrower than the truth, and it is the ceiling the sweep's numbers are read against —
+    /// stated by enumeration rather than inferred from a score.
+    /// </para>
+    /// <para>
+    /// <b>What lifts it is a scan list</b>, whose cost is unpriced. It is not a spelling
+    /// question and no arm here touches it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_rule_that_is_only_a_variable_twice_is_beyond_the_proposer()
+    {
+        // The two-entry scope Monk-1's first disjunct actually is, built by hand -- nothing
+        // proposes it, which is the point.
+        var clean = new[]
+        {
+            Unifying.Any(Monk.Attribute, name: 0),
+            Unifying.Any((byte)(Monk.Attribute + 1), name: 0),
+        }.ToImmutableArray();
+
+        // It is TRUE of the world, so the ceiling is the proposer's rather than the key's.
+        Assert.True(
+            Monk.Sound(Puzzle.One, clean, Monk.Says(holds: true), Spelling.Split),
+            "head equals body is not sound on Monk-1, so the key is not binding a repeated "
+            + "name and every join column in this file is about the key");
+
+        // And the ground rules it would be read off offer no sibling group at all. Three
+        // scopes, one per shared head-and-body value, and the hole would stand in both of
+        // the two positions each has -- which is the case `Siblings` skips.
+        var bare = Enumerable.Range(0, 3)
+            .Select(value => new Commitment(
+                [
+                    Monk.Of(attribute: 0, value, Spelling.Split),
+                    Monk.Of(attribute: 1, value, Spelling.Split),
+                ],
+                Monk.Says(holds: true)))
+            .ToList();
+
+        Assert.All(bare, one => Assert.True(
+            Monk.Sound(Puzzle.One, one.Scope, one.Expects, Spelling.Split)));
+
+        Assert.Empty(Generalising.Siblings(bare));
+
+        // While the same three with one attribute pinned beside them do offer one, and that
+        // is what the rung can actually reach here -- the truth with a condition it does not
+        // need, one rule per value of whatever the condition pins.
+        var beside = Enumerable.Range(0, 3)
+            .Select(value => new Commitment(
+                [
+                    Monk.Of(attribute: 0, value, Spelling.Split),
+                    Monk.Of(attribute: 1, value, Spelling.Split),
+                    Monk.Of(attribute: 2, value: 1, Spelling.Split),
+                ],
+                Monk.Says(holds: true)))
+            .ToList();
+
+        var offered = Generalising.Siblings(beside);
+
+        Assert.NotEmpty(offered);
+        Assert.Contains(offered, one => one.Holes.Count > 1);
+
+        // And what it proposes off them is sound, so the ceiling is the missing generality
+        // rather than a wrong rule.
+        var proposed = Generalising.Rule(offered.First(one => one.Holes.Count > 1));
+
+        Assert.True(
+            Monk.Sound(Puzzle.One, proposed.Scope, proposed.Expects, Spelling.Split));
+
+        output.WriteLine(
+            $"head = body is sound and offers no sibling group at length 2; with one "
+            + $"attribute pinned beside it, {offered.Count} groups are offered and what they "
+            + "propose is sound");
+    }
+
     /// <summary>What one spelling of one puzzle left behind.</summary>
     /// <param name="Recent">The trailing accuracy, on instances the run drew.</param>
     /// <param name="Unseen">
@@ -538,11 +625,18 @@ public sealed class MonkTests(ITestOutputHelper output)
     /// <param name="Joined">How many repeated ones the vocabulary admits.</param>
     /// <param name="Resident">How many residents name a variable in two places.</param>
     /// <param name="Fired">How often those residents fired and were answered.</param>
+    /// <param name="Truest">
+    /// How many of those joins are TRUE of the world. <b>The column that says whether the
+    /// rung reached the concept</b> or only a rule shaped like it — a join that fires often
+    /// and is unsound is the drop rung four already gets marked down for.
+    /// </param>
+    /// <param name="Shortest">The shortest join that is sound, or nought where none is.</param>
     /// <param name="Sorts">How many categories the front end derived.</param>
     private readonly record struct Spelt(
         double Recent, double Unseen, double Silence, double Chance,
         int Held, int Sound, int Found, int Truths,
-        int Twice, int Groups, int Repeated, int Joined, int Resident, long Fired, int Sorts);
+        int Twice, int Groups, int Repeated, int Joined, int Resident, long Fired,
+        int Truest, int Shortest, int Sorts);
 
     /// <summary>One puzzle under one spelling, with rung four's gate fed.</summary>
     /// <param name="puzzle">Which of the three.</param>
@@ -594,6 +688,10 @@ public sealed class MonkTests(ITestOutputHelper output)
 
         var joins = all.Where(one => one.Scope.Count(Unifying.Names) > 1).ToList();
 
+        var truest = joins
+            .Where(one => Monk.Sound(puzzle, one.Scope, one.Expects, spelling))
+            .ToList();
+
         return new Spelt(
             tally.Recent,
             tally.Unseen?.Accuracy ?? 0.0,
@@ -611,6 +709,8 @@ public sealed class MonkTests(ITestOutputHelper output)
             repeated.Count(one => Generalising.Admits(one, sorts)),
             joins.Count,
             joins.Sum(one => one.Fired),
+            truest.Count,
+            truest.Count == 0 ? 0 : truest.Min(one => one.Scope.Length),
             sorts.Count);
     }
 
@@ -651,6 +751,7 @@ public sealed class MonkTests(ITestOutputHelper output)
                 + $"| sound {one.Sound,3} | twice {one.Twice,4} | groups {one.Groups,4} "
                 + $"| repeated {one.Repeated,3} | admitted {one.Joined,3} "
                 + $"| resident joins {one.Resident,3} | fired {one.Fired,6} "
+                + $"| sound joins {one.Truest,3} shortest {one.Shortest} "
                 + $"| categories {one.Sorts,2}");
 
         // Both arms have a vocabulary for the gate to read, or this is an empty control
@@ -750,6 +851,7 @@ public sealed class MonkTests(ITestOutputHelper output)
                         + $"| twice {one.Twice,4} | groups {one.Groups,4} "
                         + $"| repeated {one.Repeated,3} | admitted {one.Joined,3} "
                         + $"| resident joins {one.Resident,3} | fired {one.Fired,6} "
+                        + $"| sound joins {one.Truest,3} shortest {one.Shortest} "
                         + $"| categories {one.Sorts,2}");
                 }
 

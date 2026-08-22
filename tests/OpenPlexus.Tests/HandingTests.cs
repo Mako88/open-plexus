@@ -48,7 +48,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// are for is the BASELINE any role mechanism has to beat, which this repo insists on
     /// having before an arm rather than after it.
     /// </remarks>
-    private sealed class Reciting(Reading reading) : IQuantizer<Recited>
+    private sealed class Reciting(Reading reading) : IQuantizer<Coded>
     {
         /// <inheritdoc/>
         public byte Modality => 47;
@@ -65,7 +65,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         /// <see cref="Compound{TFrame}.Order"/> refuses to offset two front ends onto one
         /// scale.
         /// </remarks>
-        public IReadOnlyDictionary<Code, int>? Order(Recited observation)
+        public IReadOnlyDictionary<Code, int>? Order(Coded observation)
         {
             // Only the arm that claims to see order reports one, which is where the axis
             // lives now. There is no dial on the brain: a machine turns whatever order it
@@ -73,7 +73,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
             // fact about the sense, so the control is a front end that says nothing.
             if (reading != Reading.Placed) return null;
 
-            var chosen = observation.Said[Selected(observation)];
+            var chosen = observation.Said()[Selected(observation)];
             var placed = new Dictionary<Code, int>();
 
             for (var at = 0; at < chosen.Count; at++) placed[chosen[at]] = at;
@@ -82,13 +82,13 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         }
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<Code> Codify(Recited observation)
+        public IReadOnlyCollection<Code> Codify(Coded observation)
         {
-            var moment = new HashSet<Code>(observation.Asked);
+            var moment = new HashSet<Code>(observation.Question());
 
             if (reading == Reading.Bagged)
             {
-                foreach (var sentence in observation.Said) moment.UnionWith(sentence);
+                foreach (var sentence in observation.Said()) moment.UnionWith(sentence);
 
                 return moment;
             }
@@ -96,7 +96,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
             // MAX OVERLAP AND NOT FIRST-ANY-OVERLAP, which is the difference the fact
             // above measures: every sentence says `the` and so does the question, so the
             // arm already built lands on the newest sentence and reads the marginal.
-            var chosen = observation.Said[Selected(observation)];
+            var chosen = observation.Said()[Selected(observation)];
 
             moment.UnionWith(chosen);
 
@@ -163,11 +163,11 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
 
     /// <summary>Everything the story said, with the order thrown away.</summary>
     /// <param name="told">One moment.</param>
-    private static HashSet<Code> Bag(Recited told)
+    private static HashSet<Code> Bag(Coded told)
     {
         var all = new HashSet<Code>();
 
-        foreach (var one in told.Said) all.UnionWith(one);
+        foreach (var one in told.Said()) all.UnionWith(one);
 
         return all;
     }
@@ -180,15 +180,15 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// first task; on this world it is worth one half and never one, and separating the two
     /// by a world rather than by an argument is the whole reason this file is not a grid.
     /// </remarks>
-    private static int Selected(Recited told)
+    private static int Selected(Coded told)
     {
-        var asked = new HashSet<Code>(told.Asked);
+        var asked = new HashSet<Code>(told.Question());
         var best = 0;
         var most = -1;
 
-        for (var at = 0; at < told.Said.Count; at++)
+        for (var at = 0; at < told.Said().Count; at++)
         {
-            var shared = told.Said[at].Distinct().Count(asked.Contains);
+            var shared = told.Said()[at].Distinct().Count(asked.Contains);
 
             if (shared <= most) continue;
 
@@ -207,7 +207,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// <b>This is the property the whole world rests on.</b> The givers are a permutation of
     /// the people and the takers are another, so every person is said exactly twice and
     /// every thing exactly once, whoever handed what to whom. A learner reading
-    /// <see cref="Recited.Bagged"/> is therefore looking at a constant and answering from
+    /// the moment as a bag is therefore looking at a constant and answering from
     /// nothing — which is what makes any lift off the marginal on this world attributable to
     /// binding and to nothing else.
     /// </remarks>
@@ -267,11 +267,11 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         for (var draw = 0; draw < Draws; draw++)
         {
             var turn = world.Next();
-            var sentence = turn.Seen.Said[Selected(turn.Seen)];
+            var sentence = turn.Seen.Said()[Selected(turn.Seen)];
 
             // The asked thing is in it, which is what says the selection was right without
             // the probe being handed which sentence to look at.
-            Assert.Contains(turn.Seen.Asked[^1], sentence);
+            Assert.Contains(turn.Seen.Question()[^1], sentence);
 
             var people = sentence.Where(cast.Contains).Distinct().ToList();
 
@@ -310,11 +310,11 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         for (var draw = 0; draw < Draws; draw++)
         {
             var turn = world.Next();
-            var asked = new HashSet<Code>(turn.Seen.Asked);
+            var asked = new HashSet<Code>(turn.Seen.Question());
 
-            var first = turn.Seen.Said.First(one => one.Any(asked.Contains));
+            var first = turn.Seen.Said().First(one => one.Any(asked.Contains));
 
-            if (first.Contains(turn.Seen.Asked[^1])) right++;
+            if (first.Contains(turn.Seen.Question()[^1])) right++;
         }
 
         // At the marginal, because it is the newest sentence and the question is drawn
@@ -342,7 +342,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
         for (var draw = 0; draw < Draws; draw++)
         {
             var turn = world.Next();
-            var sentence = turn.Seen.Said[Selected(turn.Seen)];
+            var sentence = turn.Seen.Said()[Selected(turn.Seen)];
 
             Assert.Equal(cast[turn.Outcome!.Value], sentence[^1]);
         }
@@ -369,7 +369,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
 
         for (var draw = 0; draw < Draws; draw++)
         {
-            foreach (var sentence in world.Next().Seen.Said)
+            foreach (var sentence in world.Next().Seen.Said())
             {
                 gave.Add(sentence[0]);
                 took.Add(sentence[^1]);
@@ -397,7 +397,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// <para>
     /// <b>So the blocker is the scope language and not the front end</b>, which is the
     /// correction this file exists to make. The world hands the order over —
-    /// <see cref="Recited.Said"/> is a list and not a bag, on the licence
+    /// <see cref="Coded.Groups"/> is a list of lists and not a bag, on the licence
     /// <see cref="IQuantizer{TFrame}.Order"/> already carries — and it is dropped at
     /// <c>Watching</c>'s <c>new HashSet&lt;Code&gt;(said)</c>, one call before anything could
     /// use it. Fork 33 priced the MATCHER, and the matcher was never what was in the way.
@@ -427,7 +427,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
             // learner is handed rather than about what some front end selected out of it.
             // A pair found here is a pair no arm on this world can ever separate.
             var moment = Bag(turn.Seen);
-            moment.UnionWith(turn.Seen.Asked);
+            moment.UnionWith(turn.Seen.Question());
 
             var key = string.Join(
                 ",", moment.Select(one => $"{one.Modality}:{one.Value}").Order(StringComparer.Ordinal));
@@ -557,7 +557,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
                     new CommittingSettings { Capacity = 4000 }, seed);
 
                 var tally = new Machines.Bench(
-                    new Machines.Watching<Recited>(world, new Reciting(reading)),
+                    new Machines.Watching<Coded>(world, new Reciting(reading)),
                     brain)
                     .Run(5_000, sweep: 1000, target: 0.9, window: 2000);
 

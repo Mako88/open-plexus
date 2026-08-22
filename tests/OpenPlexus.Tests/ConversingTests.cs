@@ -329,25 +329,25 @@ public sealed class ConversingTests(ITestOutputHelper output)
     /// than the rule changed. Deriving them here asks what the codes would be worth before
     /// anything is widened for them.
     /// </remarks>
-    private sealed class Placed(Joined through, Placing placing) : IQuantizer<Recited>
+    private sealed class Placed(Joined through, Placing placing) : IQuantizer<Coded>
     {
         /// <summary>What follows the last thing said, so being last is a code and not an absence.</summary>
         private static readonly Code End = Kinds.Named(49, "end-of-moment");
 
         public byte Modality => through.Modality;
 
-        public IReadOnlySet<Code>? Fleeting(Recited observation) =>
-            ((IQuantizer<Recited>)through).Fleeting(observation);
+        public IReadOnlySet<Code>? Fleeting(Coded observation) =>
+            ((IQuantizer<Coded>)through).Fleeting(observation);
 
-        public IReadOnlySet<Code>? Forced(Recited observation) => through.Forced(observation);
+        public IReadOnlySet<Code>? Forced(Coded observation) => through.Forced(observation);
 
-        public IReadOnlyDictionary<Code, int>? Bind(Recited observation) =>
-            ((IQuantizer<Recited>)through).Bind(observation);
+        public IReadOnlyDictionary<Code, int>? Bind(Coded observation) =>
+            ((IQuantizer<Coded>)through).Bind(observation);
 
         /// <summary>Nothing, because the precedences are already in the moment.</summary>
-        public IReadOnlyDictionary<Code, int>? Order(Recited observation) => null;
+        public IReadOnlyDictionary<Code, int>? Order(Coded observation) => null;
 
-        public IReadOnlyCollection<Code> Codify(Recited observation)
+        public IReadOnlyCollection<Code> Codify(Coded observation)
         {
             var said = new HashSet<Code>(through.Codify(observation));
 
@@ -356,14 +356,14 @@ public sealed class ConversingTests(ITestOutputHelper output)
             return said;
         }
 
-        private IEnumerable<Code> Precedences(Recited observation)
+        private IEnumerable<Code> Precedences(Coded observation)
         {
             // `Said` is newest first, so this walks it backwards to read oldest first. One slot
             // a word, which is what makes a repeat expressible at all.
             var slots = new List<Code>();
 
-            for (var one = observation.Said.Count - 1; one >= 0; one--)
-                foreach (var word in observation.Said[one])
+            for (var one = observation.Said().Count - 1; one >= 0; one--)
+                foreach (var word in observation.Said()[one])
                     slots.Add(word);
 
             if (slots.Count < 2) return [];
@@ -416,7 +416,7 @@ public sealed class ConversingTests(ITestOutputHelper output)
         var joined = new Joined(Joining.Bagged);
 
         var bench = new Bench(
-            new Watching<Recited>(
+            new Watching<Coded>(
                 world,
                 wrapped ? new Placed(joined, placing) : joined,
                 acting: Chooses.From(
@@ -733,18 +733,16 @@ public sealed class ConversingTests(ITestOutputHelper output)
 
         var visited = new[] { "garden", "office", "kitchen", "kitchen" };
 
-        // Newest first, which is what `Recited` promises.
+        // Newest first, which is what `Coded` promises.
         var said = visited
             .Reverse()
             .Select(where => (IReadOnlyList<Code>)
                 [.. new[] { "mary", "is", "in", "the", where }.Select(Babi.Of)])
             .ToList();
 
-        var placed = front.Order(new Recited
-        {
-            Said = said,
-            Asked = [.. new[] { "where", "is", "mary" }.Select(Babi.Of)],
-        });
+        var placed = front.Order(Coded.From(
+            [.. said.Select(Grouped.Of)],
+            Grouped.Of(new[] { "where", "is", "mary" }.Select(Babi.Of))));
 
         Assert.NotNull(placed);
 

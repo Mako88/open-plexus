@@ -105,7 +105,7 @@ internal static class Program
         var curiosity = new Curiosity(brain, rate, seed, world.Naming);
 
         var bench = new Bench(
-            new Watching<Recited>(
+            new Watching<Coded>(
                 world,
                 new Joined(joining),
                 acting: Chooses.From(

@@ -472,8 +472,6 @@ public sealed class DrivenTests(ITestOutputHelper output)
     private static readonly IReadOnlySet<string> Trespassing =
         new HashSet<string>(StringComparer.Ordinal)
         {
-            "Joined names Asking",
-            "Joined names Recited",
             "Passthrough names Crossed",
             "Tiling names Crossed",
         };

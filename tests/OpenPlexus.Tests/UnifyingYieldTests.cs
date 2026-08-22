@@ -148,7 +148,7 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
         var text = new Brain(new CommittingSettings { Capacity = 2000 }, seed: 1);
 
         new Bench(
-            new Watching<Recited>(
+            new Watching<Coded>(
                 new Recalled(new RecalledSettings
                 {
                     Corpus = Tree.Babi(),

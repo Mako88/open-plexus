@@ -50,7 +50,7 @@ public sealed class CeilingTests(ITestOutputHelper output)
     /// <b>A front end rather than an enum value</b>, so a composition can be priced by the
     /// instrument that prices the arms. Nothing here knows how the moment was made.
     /// </remarks>
-    private static (double Present, int Asked) Ceiling(IQuantizer<Recited> sensing, int task)
+    private static (double Present, int Asked) Ceiling(IQuantizer<Coded> sensing, int task)
     {
         var world = new Recalled(new RecalledSettings
         {
@@ -62,7 +62,7 @@ public sealed class CeilingTests(ITestOutputHelper output)
             Withheld = 20,
         });
 
-        var watching = new Watching<Recited>(world, sensing);
+        var watching = new Watching<Coded>(world, sensing);
 
         var exam = watching.Exam;
 
@@ -170,7 +170,7 @@ public sealed class CeilingTests(ITestOutputHelper output)
                 var pair = new[] { selecting[first], selecting[second] };
 
                 var present = Ceiling(
-                    new Compound<Recited>(pair.Select(one => new Joined(one))), Task).Present;
+                    new Compound<Coded>(pair.Select(one => new Joined(one))), Task).Present;
 
                 var best = pair.Max(one => alone[one]);
 
@@ -222,9 +222,9 @@ public sealed class CeilingTests(ITestOutputHelper output)
             world.Do(null);
             asked++;
 
-            var moment = new HashSet<Code>(turn.Seen.Asked);
+            var moment = new HashSet<Code>(turn.Seen.Question());
 
-            foreach (var said in turn.Seen.Said) moment.UnionWith(said);
+            foreach (var said in turn.Seen.Said()) moment.UnionWith(said);
 
             if (moment.Contains(Babi.Of(one.Answer))) present++;
         }

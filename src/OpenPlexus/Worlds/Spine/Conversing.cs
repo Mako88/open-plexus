@@ -226,7 +226,7 @@ public enum Asserting
 /// rather than to pass — what it says is which piece of the path bites first.
 /// </para>
 /// </remarks>
-public sealed class Conversing : IWorld<Recited>, IActed<Recited>
+public sealed class Conversing : IWorld<Coded>, IActed<Coded>
 {
     /// <summary>What ends a session, typed on a line of its own.</summary>
     public const string Over = ".quit";
@@ -237,7 +237,7 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     private readonly Dictionary<string, int> _index = new(StringComparer.Ordinal);
     private readonly Dictionary<Code, int> _naming = [];
 
-    // The topic so far, oldest first, and reversed on the way into a moment. `Recited` promises
+    // The topic so far, oldest first, and reversed on the way into a moment. `Coded` promises
     // newest first; building it that way round would be an insert at the front of a list for
     // every line typed.
     private readonly List<IReadOnlyList<Code>> _said = [];
@@ -250,7 +250,7 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     // `Everything` makes a sentence several moments, and a moment carries one outcome.
     private readonly Queue<(IReadOnlyList<string> Words, int Claim)> _claims = new();
 
-    private Recited? _pending;
+    private Coded? _pending;
     private int? _settled;
 
     // What the statement now pending claims, where this world claims anything. Kept beside the
@@ -439,7 +439,7 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     /// sense that a lazily opened walk does. What it must not do is take a second line for one
     /// round, which is why the line read here is the one <see cref="Next"/> hands back.
     /// </remarks>
-    public Recited Now => _pending ??= Read();
+    public Coded Now => _pending ??= Read();
 
     /// <inheritdoc/>
     /// <param name="doing">
@@ -617,7 +617,7 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     /// </remarks>
     private string Answered(IReadOnlyList<string> words)
     {
-        if (_pending is not { Asked: { Count: > 0 } asked }) return words[^1];
+        if (_pending is not { Asked: { Codes: { Count: > 0 } asked } }) return words[^1];
 
         var said = new HashSet<Code>(asked);
 
@@ -651,7 +651,7 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     /// moment it is then scored on is fork <b>117</b>.
     /// </para>
     /// </remarks>
-    public Turn<Recited> Next()
+    public Turn<Coded> Next()
     {
         var moment = _pending ?? Read();
 
@@ -683,18 +683,16 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
         _claimed = false;
         _questioned = false;
 
-        if (spoken.Count == 0) return new Turn<Recited> { Seen = moment, Outcome = outcome };
+        if (spoken.Count == 0) return new Turn<Coded> { Seen = moment, Outcome = outcome };
 
         var spoke = Said(spoken);
 
-        return new Turn<Recited>
+        return new Turn<Coded>
         {
-            Seen = new Recited
-            {
-                Said = [spoke, .. moment.Said],
-                Asked = moment.Asked,
-                Assigned = new HashSet<Code>(spoke),
-            },
+            Seen = Coded.From(
+                [Grouped.Of(spoke), .. moment.Groups ?? []],
+                moment.Asked,
+                new HashSet<Code>(spoke)),
             Outcome = outcome,
         };
     }
@@ -723,7 +721,7 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     /// question of whether anything was remembered is asked here and answered by a reading.
     /// </para>
     /// </remarks>
-    private Recited Read()
+    private Coded Read()
     {
         while (true)
         {
@@ -755,7 +753,7 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
                     // Nothing said, rather than the last thing said again. A world with nobody
                     // typing at it has no moment to push, and repeating one would have the
                     // machine answering a question it has already been settled on.
-                    return new Recited { Said = [], Asked = [] };
+                    return Coded.From([]);
                 }
 
                 var text = line.Trim();
@@ -821,7 +819,7 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
     /// a moment holds and in nothing else. A world that stopped accumulating would be two
     /// worlds wearing one name.
     /// </remarks>
-    private Recited Moment(IReadOnlyList<Code> sentence, bool asking, IReadOnlyList<Code>? coded)
+    private Coded Moment(IReadOnlyList<Code> sentence, bool asking, IReadOnlyList<Code>? coded)
     {
         var before = new List<IReadOnlyList<Code>>();
 
@@ -830,7 +828,9 @@ public sealed class Conversing : IWorld<Recited>, IActed<Recited>
         else if (!asking)
             before.Add(sentence);
 
-        return new Recited { Said = before, Asked = asking ? coded ?? sentence : [] };
+        return Coded.From(
+            [.. before.Select(Grouped.Of)],
+            asking ? Grouped.Of(coded ?? sentence) : null);
     }
 
     /// <summary>Whether this moment is handed the topic in front of it.</summary>

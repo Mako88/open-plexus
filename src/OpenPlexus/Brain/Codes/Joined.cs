@@ -1,6 +1,57 @@
-using OpenPlexus.Worlds;
+﻿using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Codes;
+
+/// <summary>
+/// A moment's parts as SETS — <b>the shape every story arm reads.</b>
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>A reading rather than a moment</b>, which is why it is derived and never carried. A
+/// world hands over parts in order; every arm below asks whether a word was in a statement,
+/// so turning each part into a set once a call is the difference between one pass and one
+/// per lookup. The order stays on <see cref="Coded.Groups"/>, where
+/// <see cref="Joined.Order"/> reads it.
+/// </para>
+/// <para>
+/// <b>And it is not <see cref="Joining.Bagged"/></b>, which is the arm that reads every
+/// statement. This is the shape all four arms read, including the three that select.
+/// </para>
+/// </remarks>
+public readonly record struct Storied
+{
+    /// <summary>The statements, newest first.</summary>
+    public required IReadOnlyList<IReadOnlySet<Code>> Story { get; init; }
+
+    /// <summary>The words of the question.</summary>
+    public required IReadOnlySet<Code> Question { get; init; }
+
+    /// <summary>Every word of every statement, which is what a bag-of-words arm wants.</summary>
+    public IReadOnlySet<Code> Words
+    {
+        get
+        {
+            var all = new HashSet<Code>();
+
+            foreach (var one in Story) all.UnionWith(one);
+
+            return all;
+        }
+    }
+
+    /// <summary>One moment as the sets the arms read.</summary>
+    /// <param name="moment">What the world showed.</param>
+    public static Storied Of(Coded moment) =>
+        new()
+        {
+            Story = moment.Groups is { } parts
+                ? [.. parts.Select(one => (IReadOnlySet<Code>)new HashSet<Code>(one.Codes))]
+                : [],
+            Question = moment.Asked is { } asked
+                ? new HashSet<Code>(asked.Codes)
+                : new HashSet<Code>(),
+        };
+}
 
 /// <summary>What a translation does with a question and the story in front of it.</summary>
 /// <remarks>
@@ -171,7 +222,7 @@ public enum Joining
 /// ever used it, and on this corpus none does.
 /// </para>
 /// </remarks>
-public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
+public sealed class Joined : IQuantizer<Coded>
 {
     /// <summary>The modality a coincidence rides on.</summary>
     /// <remarks>
@@ -275,8 +326,13 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     /// <inheritdoc/>
     public byte Modality => Both;
 
+
     /// <inheritdoc/>
-    public IReadOnlyCollection<Code> Codify(Asking observation)
+    public IReadOnlyCollection<Code> Codify(Coded moment) => Codify(Storied.Of(moment));
+
+    /// <summary>The same, off the reading every arm shares.</summary>
+    /// <param name="observation">The moment as sets.</param>
+    private IReadOnlyCollection<Code> Codify(Storied observation)
     {
         var read = Read(observation);
         var said = new HashSet<Code>(observation.Question);
@@ -324,7 +380,7 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     /// <para>
     /// <b>Every arm here selects statements</b>, which is what lets one report serve two
     /// channels. A moment is the question plus the words of whatever was selected, so
-    /// <see cref="Codify(Asking)"/> unions and <see cref="Order(Recited)"/> positions — off
+    /// <see cref="Codify(Coded)"/> unions and <see cref="Order"/> positions — off
     /// the same list, so the two cannot disagree about what was read.
     /// </para>
     /// <para>
@@ -335,7 +391,7 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     /// bands what its chain read and a chain that read nothing must band nothing.
     /// </para>
     /// </remarks>
-    private List<int> Read(Asking observation) => _joining switch
+    private List<int> Read(Storied observation) => _joining switch
     {
         Joining.Distinguished => Situating(observation),
         Joining.Chained => Chaining(observation),
@@ -345,7 +401,7 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
 
     /// <summary>Every statement, which is what an arm that selects none of them reads.</summary>
     /// <param name="observation">The story and the question.</param>
-    private static List<int> Every(Asking observation) =>
+    private static List<int> Every(Storied observation) =>
         [.. Enumerable.Range(0, observation.Story.Count)];
 
     /// <summary>
@@ -370,7 +426,7 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     /// the situation is being asked about.
     /// </para>
     /// </remarks>
-    private List<int> Situating(Asking observation)
+    private List<int> Situating(Storied observation)
     {
         var kept = new List<int>();
         var claimed = new HashSet<Code>();
@@ -430,7 +486,7 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     /// exactly the questions it found hardest.
     /// </para>
     /// </remarks>
-    private List<int> Chaining(Asking observation)
+    private List<int> Chaining(Storied observation)
     {
         var background = Shared(observation);
         var chain = new List<int>();
@@ -474,7 +530,7 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     /// <b>The hop is the position in the chain</b>, so this reads what the walk already
     /// recorded rather than re-walking it.
     /// </remarks>
-    private static HashSet<Code> Banded(HashSet<Code> said, Asking observation, List<int> chain)
+    private static HashSet<Code> Banded(HashSet<Code> said, Storied observation, List<int> chain)
     {
         for (var hop = 0; hop < chain.Count; hop++)
         {
@@ -495,7 +551,7 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     /// <remarks>
     /// <para>
     /// <b>Oldest first</b>, which is the opposite of every other arm here and is the point.
-    /// <see cref="Asking.Story"/> arrives newest first because a distance from the question
+    /// <see cref="Coded.Groups"/> arrives newest first because a distance from the question
     /// means the same thing in every story; a store is maintained in the order the world
     /// happened, so this walks it backwards to go forwards.
     /// </para>
@@ -528,11 +584,11 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     /// <b>An entry is which statements wrote it and not their words</b>, which is exact rather
     /// than a summary: every value here is a union of whole statements, so the words are
     /// recoverable from the indices and the word order with them. It is what lets
-    /// <see cref="Order(Recited)"/> position a folded moment at all — a store of sets has
+    /// <see cref="Order"/> position a folded moment at all — a store of sets has
     /// thrown the order away one call before the report is asked for.
     /// </para>
     /// </remarks>
-    private List<int> Storing(Asking observation)
+    private List<int> Storing(Storied observation)
     {
         var levels = new Dictionary<Code, HashSet<int>>[_resolution + 1];
 
@@ -623,7 +679,7 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     /// names. <b>A story of one statement has itself as its background</b>, so nothing is a
     /// key and nothing is superseded, which is right: there is nothing older to displace.
     /// </remarks>
-    private static HashSet<Code> Shared(Asking observation)
+    private static HashSet<Code> Shared(Storied observation)
     {
         if (observation.Story.Count == 0) return [];
 
@@ -637,33 +693,6 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
 
 
     /// <inheritdoc/>
-    /// <remarks><b>Nothing, which is what a world that says none of these gets.</b></remarks>
-    public IReadOnlyDictionary<Code, int>? Bind(Asking observation) => null;
-
-    /// <inheritdoc/>
-    /// <remarks>
-    /// <b>Nothing, because <see cref="Worlds.Asking.Story"/> is a list of sets.</b> A
-    /// statement's words arrive here already unordered, so a front end reading this shape has
-    /// nothing to report — the order was destroyed one type before the front end.
-    /// <see cref="Worlds.Recited"/> is the same moment with it still on, and
-    /// <see cref="Order(Recited)"/> is the same arms reading that.
-    /// </remarks>
-    public IReadOnlyDictionary<Code, int>? Order(Asking observation) => null;
-
-    /// <inheritdoc/>
-    public IReadOnlySet<Code>? Fleeting(Asking observation) => null;
-
-    /// <inheritdoc/>
-    public IReadOnlySet<Code>? Forced(Asking observation) => null;
-
-    /// <inheritdoc/>
-    /// <remarks>
-    /// <b>The same codes the bagged shape gets, exactly.</b> An arm reads statements and unions
-    /// their words either way, so what a world speaking <see cref="Recited"/> buys is the
-    /// ORDER report beside the moment rather than a different moment.
-    /// </remarks>
-    public IReadOnlyCollection<Code> Codify(Recited observation) => Codify(observation.Bagged);
-
     /// <summary>
     /// Where the words of the statements this arm read stood, oldest first.
     /// </summary>
@@ -685,7 +714,7 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     /// </para>
     /// <para>
     /// <b>Oldest first, because the transcript happened that way round.</b>
-    /// <see cref="Recited.Said"/> arrives newest first so that a distance from the question
+    /// <see cref="Coded.Groups"/> arrives newest first so that a distance from the question
     /// means one thing in every story; a precedence means <i>this was said before that</i>,
     /// which is the other direction. A pair spanning two statements says the older one's last
     /// surviving word came before the newer one's first, and the arm's own selection is what
@@ -698,13 +727,14 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     /// stated.
     /// </para>
     /// </remarks>
-    public IReadOnlyDictionary<Code, int>? Order(Recited observation)
+    public IReadOnlyDictionary<Code, int>? Order(Coded observation)
     {
         // The arm is run again rather than remembered, and the front end stays a function of
         // its input. A cached last answer would be state on a type whose whole contract is
         // that the same input gives the same codes on every machine forever.
-        var read = Read(observation.Bagged);
-        var said = observation.Said;
+        if (observation.Groups is not { Count: > 0 } said) return null;
+
+        var read = Read(Storied.Of(observation));
 
         if (read.Count == 0) return null;
 
@@ -714,7 +744,7 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
 
         foreach (var statement in read.OrderByDescending(one => one))
         {
-            foreach (var word in said[statement])
+            foreach (var word in said[statement].Codes)
             {
                 if (!placed.TryAdd(word, at)) twice.Add(word);
 
@@ -743,7 +773,7 @@ public sealed class Joined : IQuantizer<Asking>, IQuantizer<Recited>
     /// is not a fact about this moment.
     /// </para>
     /// </remarks>
-    public IReadOnlySet<Code>? Forced(Recited observation)
+    public IReadOnlySet<Code>? Forced(Coded observation)
     {
         if (observation.Assigned is not { Count: > 0 } assigned) return null;
 

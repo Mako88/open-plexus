@@ -20,7 +20,7 @@ namespace OpenPlexus.Tests;
 /// <b>A scope is a set and a sentence is a sequence</b>, which is the whole question. The
 /// span arms are the cheapest reading of what a bag costs at the grain of a statement, and
 /// rung three is the answer at the grain of a word — this world speaks
-/// <see cref="Recited"/>, so the precedences of each sentence reach every moment here.
+/// <see cref="Coded"/>, so the precedences of each sentence reach every moment here.
 /// </para>
 /// </remarks>
 public sealed class RecalledTests(ITestOutputHelper output)
@@ -54,7 +54,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     ];
 
     /// <summary>The moment as the bagged control sees it, which is every word once.</summary>
-    private static IEnumerable<Code> Codify(Recited recited) =>
+    private static IEnumerable<Code> Codify(Coded recited) =>
         new Joined(Joining.Bagged).Codify(recited).Order();
 
     private static (Recalled World, Bench Bench, Brain Brain) Made(
@@ -68,7 +68,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         return (
             world,
             new Bench(
-                new Watching<Recited>(
+                new Watching<Coded>(
                     world,
                     new Joined(joining, categories, hops, banded)),
                 brain),
@@ -88,12 +88,12 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// </para>
     /// <para>
     /// <b>It delegates the codes rather than rebuilding them</b>, so the two arms cannot
-    /// drift apart over what a moment holds. <see cref="Joined.Codify(Recited)"/> is
-    /// <see cref="Joined.Codify(Asking)"/> of the same moment bagged, so this is exactly the
-    /// reading every text number on this branch was taken under.
+    /// drift apart over what a moment holds. <see cref="Joined.Codify(Coded)"/> reads the
+    /// same moment's parts as sets, so this is exactly the reading every text number on this
+    /// branch was taken under.
     /// </para>
     /// </remarks>
-    private sealed class Unordered(Joining joining, int hops = 2) : IQuantizer<Recited>
+    private sealed class Unordered(Joining joining, int hops = 2) : IQuantizer<Coded>
     {
         private readonly Joined _through = new(joining, hops: hops);
 
@@ -101,7 +101,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         public byte Modality => _through.Modality;
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<Code> Codify(Recited observation) =>
+        public IReadOnlyCollection<Code> Codify(Coded observation) =>
             _through.Codify(observation);
     }
 
@@ -123,7 +123,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
             var near = last.Next();
 
             Assert.Equal(wide.Outcome, near.Outcome);
-            Assert.True(near.Seen.Bagged.Words.Count <= wide.Seen.Bagged.Words.Count);
+            Assert.True(near.Seen.Words().Count <= wide.Seen.Words().Count);
         }
 
         output.WriteLine($"task 1: {whole.Questions} questions, {whole.Outcomes} answers");
@@ -252,7 +252,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// <para>
     /// <b>The expected pairs come from the words</b> rather than from the report, so
     /// the two have to agree about what the corpus said. A word said twice is at neither
-    /// place — <see cref="Joined.Order(Recited)"/>'s own rule — so the pairs are the adjacent
+    /// place — <see cref="Joined.Order(Coded)"/>'s own rule — so the pairs are the adjacent
     /// ones among the words this statement says once.
     /// </para>
     /// </remarks>
@@ -273,7 +273,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
             reported++;
 
-            var said = seen.Said[0];
+            var said = seen.Said()[0];
             var once = said.Where(word => said.Count(other => other == word) == 1).ToList();
 
             var wanted = new List<Code>();
@@ -360,10 +360,10 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
                         var trial = ordered
                             ? new Bench(
-                                new Watching<Recited>(world, new Joined(Joining.Bagged)),
+                                new Watching<Coded>(world, new Joined(Joining.Bagged)),
                                 brain)
                             : new Bench(
-                                new Watching<Recited>(
+                                new Watching<Coded>(
                                     world,
                                     new Unordered(Joining.Bagged)),
                                 brain);
@@ -497,10 +497,10 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
                     var trial = ordered
                         ? new Bench(
-                            new Watching<Recited>(world, new Joined(joining, hops: hops)),
+                            new Watching<Coded>(world, new Joined(joining, hops: hops)),
                             brain)
                         : new Bench(
-                            new Watching<Recited>(world, new Unordered(joining, hops)),
+                            new Watching<Coded>(world, new Unordered(joining, hops)),
                             brain);
 
                     var tally = trial.Run(
@@ -603,17 +603,14 @@ public sealed class RecalledTests(ITestOutputHelper output)
     [Fact]
     public void A_newer_statement_supersedes_an_older_one_about_the_same_thing()
     {
-        var story = new Asking
-        {
-            // NEWEST FIRST, which is the order the world hands them over.
-            Story =
+        // NEWEST FIRST, which is the order the world hands them over.
+        var story = Coded.From(
             [
-                new HashSet<Code> { Babi.Of("mary"), Babi.Of("to"), Babi.Of("garden") },
-                new HashSet<Code> { Babi.Of("john"), Babi.Of("to"), Babi.Of("office") },
-                new HashSet<Code> { Babi.Of("mary"), Babi.Of("to"), Babi.Of("kitchen") },
+                Codes.Grouped.Of([Babi.Of("mary"), Babi.Of("to"), Babi.Of("garden")]),
+                Codes.Grouped.Of([Babi.Of("john"), Babi.Of("to"), Babi.Of("office")]),
+                Codes.Grouped.Of([Babi.Of("mary"), Babi.Of("to"), Babi.Of("kitchen")]),
             ],
-            Question = new HashSet<Code> { Babi.Of("where"), Babi.Of("mary") },
-        };
+            Codes.Grouped.Of([Babi.Of("where"), Babi.Of("mary")]));
 
         // `went` AND `to` ARE IN EVERY STATEMENT, so the story's own intersection makes
         // them background and `mary` a key with nothing told to the front end at all.
@@ -881,8 +878,9 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
         for (var one = 0; one < world.Withheld.Count; one++)
         {
-            var asking = world.Withheld[one].Seen.Bagged;
-            var budget = told.Codify(asking).Count;
+            var seen = world.Withheld[one].Seen;
+            var asking = Storied.Of(seen);
+            var budget = told.Codify(seen).Count;
 
             var shuffled = asking.Story.OrderBy(_ => draw.Next()).ToList();
             var moment = new HashSet<Code>(asking.Question);
@@ -1544,7 +1542,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
                 for (var one = 0; one < world.Withheld.Count; one++)
                 {
-                    var asking = world.Withheld[one].Seen.Bagged;
+                    var asking = Storied.Of(world.Withheld[one].Seen);
                     var answer = Babi.Of(world.Transcript[one].Answer);
 
                     var background = new HashSet<Code>(asking.Story.Count == 0 ? [] : asking.Story[0]);
@@ -1676,7 +1674,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
             for (var one = 0; one < world.Withheld.Count; one++)
             {
-                var asking = world.Withheld[one].Seen.Bagged;
+                var asking = Storied.Of(world.Withheld[one].Seen);
                 var at = Reading(asking, asking.Question, 0);
 
                 if (at >= 0 && asking.Story[at].Contains(Babi.Of(world.Transcript[one].Answer)))
@@ -1689,7 +1687,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
             {
                 var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, 1);
                 var trial = new Bench(
-                    new Watching<Recited>(
+                    new Watching<Coded>(
                         new Recalled(World(task, span: 0)),
                         new Joined(joining, hops: 1)),
                     brain);
@@ -1750,7 +1748,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
             for (var one = 0; one < world.Withheld.Count; one++)
             {
-                var asking = world.Withheld[one].Seen.Bagged;
+                var seen = world.Withheld[one].Seen;
+                var asking = Storied.Of(seen);
                 var at = Reading(asking, asking.Question, 0);
 
                 // The fallback is a real case and not an error: a question naming nothing
@@ -1764,7 +1763,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
                 else
                     wanted.UnionWith(asking.Story[at]);
 
-                Assert.Equal(wanted, new HashSet<Code>(front.Codify(asking)));
+                Assert.Equal(wanted, new HashSet<Code>(front.Codify(seen)));
             }
         }
     }
@@ -1831,7 +1830,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
 
             for (var one = 0; one < world.Withheld.Count; one++)
             {
-                var asking = world.Withheld[one].Seen.Bagged;
+                var asking = Storied.Of(world.Withheld[one].Seen);
                 var answer = Babi.Of(world.Transcript[one].Answer);
                 var at = Reading(asking, asking.Question, 0);
 
@@ -1893,7 +1892,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// a negative where nothing matches, which is a real case rather than an error: a
     /// question naming something never said has no store entry to read.
     /// </remarks>
-    private static int Reading(Asking asking, IReadOnlySet<Code> key, int from)
+    private static int Reading(Storied asking, IReadOnlySet<Code> key, int from)
     {
         for (var at = from; at < asking.Story.Count; at++)
             foreach (var one in asking.Story[at])
@@ -1941,11 +1940,8 @@ public sealed class RecalledTests(ITestOutputHelper output)
         // One statement built by hand rather than drawn, because a drawn moment is a whole
         // story and holds several names at once — which is a fine moment and a useless
         // instrument, since a fold demanding all members might fire on it by luck.
-        var said = new Asking
-        {
-            Story = [new HashSet<Code> { Babi.Of("mary"), Babi.Of("went"), Babi.Of("kitchen") }],
-            Question = new HashSet<Code>(),
-        };
+        var said = Coded.From(
+            [Codes.Grouped.Of([Babi.Of("mary"), Babi.Of("went"), Babi.Of("kitchen")])]);
 
         var bare = new HashSet<Code>(new Joined(Joining.Bagged).Codify(said));
         var sorted = new HashSet<Code>(

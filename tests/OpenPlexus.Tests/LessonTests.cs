@@ -51,7 +51,7 @@ public sealed class LessonTests(ITestOutputHelper output)
         // it inline is a wiring nobody can vary.
         var front = new Joined(joining);
 
-        var watching = new Watching<Recited>(
+        var watching = new Watching<Coded>(
             world, front,
             acting: Chooses.From(felt => Doing(curiosity.Choose(felt)), curiosity.Cleared));
 
@@ -299,7 +299,7 @@ public sealed class LessonTests(ITestOutputHelper output)
             var asked = Babi.Words(quiz.Question).Select(Babi.Of).ToList();
 
             var raw = (IReadOnlySet<Code>)new HashSet<Code>(
-                front.Codify(new Recited { Said = [], Asked = asked }));
+                front.Codify(Coded.From([], Grouped.Of(asked))));
 
             var firing = held.Firing(held.Moment(raw));
             var vote = held.Predict(firing);
@@ -824,11 +824,9 @@ public sealed class LessonTests(ITestOutputHelper output)
                 // naming the subject alone is a superset of, so it is minted and mute.
                 var asked = lesson.Exam
                     .Select(quiz => (IReadOnlySet<Code>)new HashSet<Code>(
-                        new Joined(Joining.Bagged).Codify(new Recited
-                        {
-                            Said = [],
-                            Asked = [.. Babi.Words(quiz.Question).Select(Babi.Of)],
-                        })))
+                        new Joined(Joining.Bagged).Codify(Coded.From(
+                            [],
+                            Grouped.Of(Babi.Words(quiz.Question).Select(Babi.Of))))))
                     .ToList();
 
                 fires.Add(wides.Count(one => asked.Any(one.Fires)));
@@ -1424,7 +1422,7 @@ public sealed class LessonTests(ITestOutputHelper output)
             Carrying = Carrying.Never,
         });
 
-        var moments = new List<Recited>();
+        var moments = new List<Coded>();
 
         while (!world.Ended)
         {
@@ -1442,12 +1440,12 @@ public sealed class LessonTests(ITestOutputHelper output)
         // question is the third moment rather than a fourth line of the first.
         Assert.All(moments.Take(2), one =>
         {
-            Assert.Single(one.Said);
-            Assert.Empty(one.Asked);
+            Assert.Single(one.Said());
+            Assert.Empty(one.Question());
         });
 
-        Assert.Empty(moments[2].Said);
-        Assert.NotEmpty(moments[2].Asked);
+        Assert.Empty(moments[2].Said());
+        Assert.NotEmpty(moments[2].Question());
     }
 
     [Fact]
@@ -2113,7 +2111,7 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         var curiosity = new Curiosity(brain, rate: 1.0, seed: 1, world.Naming);
 
-        var watching = new Watching<Recited>(
+        var watching = new Watching<Coded>(
             world, new Joined(Joining.Bagged),
             acting: Chooses.From(felt => Doing(curiosity.Choose(felt)), curiosity.Cleared));
 

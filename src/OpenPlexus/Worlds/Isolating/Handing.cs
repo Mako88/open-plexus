@@ -29,67 +29,6 @@ public sealed record HandingSettings
 }
 
 /// <summary>
-/// A moment of text with the WORD ORDER of each sentence still on it — <b>the one fact
-/// <see cref="Asking"/> throws away, and the fact roles are carried by.</b>
-/// </summary>
-/// <remarks>
-/// <para>
-/// <b>A sentence is a sequence</b> and every text arm here reads it as a set, which is where
-/// the binding dies. <i>mary gave the book to john</i> and <i>john gave the book to
-/// mary</i> hold the same words, so no scope over a bag can tell them apart however the
-/// bag is coded — and that is not a limitation of the learner, it is the front end
-/// destroying the answer one call before anything could use it.
-/// </para>
-/// <para>
-/// <b>Order is a fact about the signal and not a conclusion.</b> Which is the line this stays
-/// the right side of. <see cref="Codes.Coded.Groups"/> and
-/// <see cref="IQuantizer{TFrame}.Order"/> already carry exactly this licence for every
-/// other sense; <see cref="Asking"/> carries it ACROSS sentences and not WITHIN one, which
-/// is an omission rather than a principle. What no world here may say is which word is the
-/// giver — that is a role, and a role is what has to be learnt.
-/// </para>
-/// <para>
-/// <b>AND <see cref="Bagged"/> is one property call.</b> So the arm that loses it is the
-/// control rather than a different world. Every <see cref="Joining"/> arm, every
-/// ceiling and the withheld exam apply unchanged through it, so a reading here stands
-/// beside <see cref="Roaming"/>'s rather than starting a second scale.
-/// </para>
-/// </remarks>
-public readonly record struct Recited
-{
-    /// <summary>The sentences in front of the question, newest first, words in order.</summary>
-    public required IReadOnlyList<IReadOnlyList<Code>> Said { get; init; }
-
-    /// <summary>The words of the question itself, in order.</summary>
-    public required IReadOnlyList<Code> Asked { get; init; }
-
-    /// <summary>
-    /// Which of these words came from a step the learner CHOSE, or nothing where it chose
-    /// none.
-    /// </summary>
-    /// <remarks>
-    /// <b>What a world is allowed to say about provenance</b>, and it is a fact about the
-    /// signal in the same way order is. The world says which words it was handed rather than
-    /// drew; what that entails is the learner's to derive, and
-    /// <see cref="Codes.Intervened"/> is where that happens.
-    /// </remarks>
-    public IReadOnlySet<Code>? Assigned { get; init; }
-
-    /// <summary>The same moment with the order thrown away.</summary>
-    /// <remarks>
-    /// <b>What every existing text arm reads</b>, and the ceiling it imposes is the marginal
-    /// exactly. <see cref="Handing"/> draws its givers and its takers as permutations,
-    /// so the set of words in a story is the SAME SET in every draw — which makes the first
-    /// rung of the ladder provable by construction rather than measured and argued over.
-    /// </remarks>
-    public Asking Bagged => new()
-    {
-        Story = [.. Said.Select(one => (IReadOnlySet<Code>)new HashSet<Code>(one))],
-        Question = new HashSet<Code>(Asked),
-    };
-}
-
-/// <summary>
 /// People handing things to people, and a question about who ended up with one —
 /// <b>a world built so that a bag of words cannot win</b>. That is a fact about
 /// the world rather than a finding about a run.
@@ -139,7 +78,7 @@ public readonly record struct Recited
 /// compare across.
 /// </para>
 /// </remarks>
-public sealed class Handing : IWorld<Recited>, IWithholds<Recited>
+public sealed class Handing : IWorld<Coded>, IWithholds<Coded>
 {
     /// <summary>The modality a word rides on.</summary>
     /// <remarks>
@@ -162,7 +101,7 @@ public sealed class Handing : IWorld<Recited>, IWithholds<Recited>
 
     private readonly HandingSettings _settings;
     private readonly Random _draws;
-    private readonly List<Turn<Recited>> _kept = [];
+    private readonly List<Turn<Coded>> _kept = [];
 
     /// <param name="settings">How the world is set up.</param>
     /// <param name="seed">What draws the people, the things and the order.</param>
@@ -201,10 +140,10 @@ public sealed class Handing : IWorld<Recited>, IWithholds<Recited>
         [.. Objects.Take(_settings.People).Select(one => Kinds.Named(Word, one))];
 
     /// <inheritdoc/>
-    public IReadOnlyList<Turn<Recited>> Withheld => _kept;
+    public IReadOnlyList<Turn<Coded>> Withheld => _kept;
 
     /// <inheritdoc/>
-    public Turn<Recited> Next() => Draw();
+    public Turn<Coded> Next() => Draw();
 
     /// <summary>The codes for one sentence, in the order the words were said.</summary>
     /// <param name="words">The words of it, in order.</param>
@@ -228,7 +167,7 @@ public sealed class Handing : IWorld<Recited>, IWithholds<Recited>
     }
 
     /// <summary>One room, one round of handing over, and one question about who has what.</summary>
-    private Turn<Recited> Draw()
+    private Turn<Coded> Draw()
     {
         // Givers and takers are both permutations, which is what makes the first ceiling a
         // fact rather than a measurement. Drawing each pair independently would let a
@@ -260,17 +199,15 @@ public sealed class Handing : IWorld<Recited>, IWithholds<Recited>
 
         var about = _draws.Next(_settings.People);
 
-        // NEWEST FIRST, WHICH IS WHAT `Recited` PROMISES, and it carries no information
+        // NEWEST FIRST, WHICH IS WHAT A MOMENT'S PARTS PROMISE, and it carries no information
         // here because the order was already shuffled.
         told.Reverse();
 
-        return new Turn<Recited>
+        return new Turn<Coded>
         {
-            Seen = new Recited
-            {
-                Said = told,
-                Asked = Say("who", "has", "the", Objects[about]),
-            },
+            Seen = Coded.From(
+                [.. told.Select(Grouped.Of)],
+                Grouped.Of(Say("who", "has", "the", Objects[about]))),
             Outcome = takers[about],
         };
     }

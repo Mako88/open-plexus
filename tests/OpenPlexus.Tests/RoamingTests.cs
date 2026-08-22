@@ -89,12 +89,12 @@ public sealed class RoamingTests(ITestOutputHelper output)
             asked++;
             marginal[answer]++;
 
-            var story = turn.Seen.Said;
+            var story = turn.Seen.Said();
 
             // Which thing is being asked about, read off the question. The question is a
             // handful of words and exactly one of them is a thing, so this is the front end's
             // own intersection rather than the world being asked.
-            var about = props.FirstOrDefault(one => turn.Seen.Asked.Contains(one));
+            var about = props.FirstOrDefault(one => turn.Seen.Question().Contains(one));
 
             // `Said` is newest first, so the oldest statement naming this thing is the
             // placement that opened the episode -- which is what a bag holding the whole
@@ -740,8 +740,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
                 asked++;
 
-                var story = turn.Seen.Said;
-                var about = props.FirstOrDefault(one => turn.Seen.Asked.Contains(one));
+                var story = turn.Seen.Said();
+                var about = props.FirstOrDefault(one => turn.Seen.Question().Contains(one));
 
                 // The newest statement naming the thing and a person, which is the event that
                 // settled where it is. A thing still in a hand is never asked about, so this
@@ -884,7 +884,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed);
 
                 var tally = new Bench(
-                    new Watching<Recited>(
+                    new Watching<Coded>(
                         world,
                         joined,
                         acting: acting ?? Chooses.From(_ => null)),
@@ -952,7 +952,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
         // And what the word order bought, which is the largest single move any front-end change
         // has made on this world. The same five arms, the same seeds and the same rounds read
-        // 0.348 at the best before the world spoke `Recited`; the store with the key rule now
+        // 0.348 at the best before the world spoke `Coded`; the store with the key rule now
         // reads over half, which is three times the marginal of 0.193.
         //
         // A level rather than a comparison, because what it records is a cap being converted.
@@ -1162,7 +1162,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         var brain = new Brain(dials, seed);
 
         var tally = new Bench(
-            new Watching<Recited>(
+            new Watching<Coded>(
                 new Roaming(World(120, people: 4), seed),
                 new Joined(Joining.Resolved, resolution: 3, freshest: true),
                 acting: Chooses.From(_ => null)),
@@ -2302,9 +2302,9 @@ public sealed class RoamingTests(ITestOutputHelper output)
         var moved = asked.Count(one => one.Outcome == 1);
 
         var byVerb = asked
-            .GroupBy(one => one.Seen.Asked[1])
+            .GroupBy(one => one.Seen.Question()[1])
             .Select(group => (
-                Words: group.First().Seen.Asked.Count,
+                Words: group.First().Seen.Question().Count,
                 Count: group.Count(),
                 Moved: group.Count(one => one.Outcome == 1)))
             .OrderByDescending(one => one.Count)
@@ -2362,12 +2362,12 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
         // The effect arm holds the walk's last statement back as its question, so its
         // transcript is one shorter and the rest is word for word the same.
-        Assert.Equal(where.Seen.Said.Count - 1, effect.Seen.Said.Count);
+        Assert.Equal(where.Seen.Said().Count - 1, effect.Seen.Said().Count);
 
-        foreach (var (mine, theirs) in effect.Seen.Said.Zip(where.Seen.Said.Skip(1)))
+        foreach (var (mine, theirs) in effect.Seen.Said().Zip(where.Seen.Said().Skip(1)))
             Assert.Equal(theirs, mine);
 
-        Assert.Equal(where.Seen.Said[0], effect.Seen.Asked);
+        Assert.Equal(where.Seen.Said()[0], effect.Seen.Question());
         Assert.NotEqual(where.Seen.Asked, effect.Seen.Asked);
 
         Assert.Equal(6, new Roaming(World(120, people: 4), seed: 7).Outcomes);
@@ -2421,9 +2421,9 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
             Assert.Equal(one.Outcome, two.Outcome);
             Assert.Equal(one.Seen.Asked, two.Seen.Asked);
-            Assert.Equal(one.Seen.Said.Count, two.Seen.Said.Count);
+            Assert.Equal(one.Seen.Said().Count, two.Seen.Said().Count);
 
-            foreach (var (mine, theirs) in one.Seen.Said.Zip(two.Seen.Said))
+            foreach (var (mine, theirs) in one.Seen.Said().Zip(two.Seen.Said()))
                 Assert.Equal(mine, theirs);
         }
 
@@ -2473,11 +2473,11 @@ public sealed class RoamingTests(ITestOutputHelper output)
             // The effect question holds the last statement back as what it asks about, so
             // the chosen step is exactly the question and nothing has to be dug out of the
             // transcript to read it.
-            Assert.Contains(went, going.Next().Seen.Asked);
+            Assert.Contains(went, going.Next().Seen.Question());
 
             // And a walk of one step opens with nobody holding anything, so dropping is
             // never possible on it and the wish is refused every time.
-            Assert.Contains(waited, dropping.Next().Seen.Asked);
+            Assert.Contains(waited, dropping.Next().Seen.Question());
         }
 
         Assert.Equal(3, new Roaming(World(120, people: 4), seed: 5).Doings);
@@ -2604,7 +2604,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
             var picking = new Random(1);
 
             var tally = new Bench(
-                new Watching<Recited>(
+                new Watching<Coded>(
                     world,
                     new Joined(Joining.Resolved, resolution: 1),
                     acting: Chooses.From(

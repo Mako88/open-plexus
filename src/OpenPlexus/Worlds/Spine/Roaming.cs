@@ -135,9 +135,9 @@ public enum Examining
 /// world rather than a different world.
 /// </para>
 /// <para>
-/// <b>It speaks <see cref="Recited"/></b>, which is <see cref="Asking"/> with the word order
+/// <b>It speaks <see cref="Codes.Coded"/></b>, which is a moment with the word order
 /// still on it. The whole text front end applies unchanged — every
-/// <see cref="Joining"/> arm reads <see cref="Recited.Bagged"/> and gets the codes it always
+/// <see cref="Joining"/> arm reads its parts as sets and gets the codes it always
 /// got, so a reading here stands beside bAbI's rather than starting a second scale nobody
 /// can compare across. What the shape adds is the order report, which is the one thing a bag
 /// of a sentence cannot carry and the thing rung three is made of.
@@ -162,7 +162,7 @@ public enum Examining
 /// Adding it before the base world is read would be two unanswered questions in one grid.
 /// </para>
 /// </remarks>
-public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>, IActed<Recited>
+public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
 {
     /// <summary>The modality a word rides on.</summary>
     /// <remarks>
@@ -199,7 +199,7 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>, IActed<Recit
 
     private readonly RoamingSettings _settings;
     private readonly Random _walks;
-    private readonly List<Turn<Recited>> _kept = [];
+    private readonly List<Turn<Coded>> _kept = [];
 
     /// <summary>The walk drawn as far as its last step, waiting to be told what it is.</summary>
     private Walk? _open;
@@ -271,7 +271,7 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>, IActed<Recit
         [.. Cast.Take(_settings.People).Select(one => Kinds.Named(Word, one))];
 
     /// <inheritdoc/>
-    public IReadOnlyList<Turn<Recited>> Withheld => _kept;
+    public IReadOnlyList<Turn<Coded>> Withheld => _kept;
 
     /// <inheritdoc/>
     /// <remarks>
@@ -279,7 +279,7 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>, IActed<Recit
     /// — and drawn whole here where nothing asked. A chooser is spent by the step that
     /// follows it, so neither the walk nor the wish survives into the next episode.
     /// </remarks>
-    public Turn<Recited> Next()
+    public Turn<Coded> Next()
     {
         var walk = _open ?? Open();
         var wish = _wish;
@@ -292,7 +292,7 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>, IActed<Recit
     /// <summary>The codes for one sentence, in the order the words were said.</summary>
     /// <param name="words">The words of it, in order.</param>
     /// <remarks>
-    /// <b>A list rather than a set, on the licence <see cref="Recited"/> carries.</b> Order is
+    /// <b>A list rather than a set, on the licence <see cref="Codes.Coded"/> carries.</b> Order is
     /// a fact about the signal; which word is the room and which the thing is a role, and no
     /// world here may say that. A front end that wants none of the order flattens this in one
     /// call.
@@ -353,17 +353,15 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>, IActed<Recit
     /// the learner has not been asked.
     /// </para>
     /// </remarks>
-    public Recited Now
+    public Coded Now
     {
         get
         {
             _open ??= Open();
 
-            return new Recited
-            {
-                Said = [.. Enumerable.Reverse(_open.Told)],
-                Asked = Said("what", "next"),
-            };
+            return Coded.From(
+                [.. Enumerable.Reverse(_open.Told).Select(Grouped.Of)],
+                Grouped.Of(Said("what", "next")));
         }
     }
 
@@ -408,7 +406,7 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>, IActed<Recit
 
         Array.Fill(held, Nobody);
 
-        // Newest first, which is what `Recited` promises. So the list is built forwards and
+        // Newest first, which is what a moment's parts promise. So the list is built forwards and
         // reversed at the end rather than each statement being inserted at the front, which
         // is the same order written the cheap way round.
         var told = new List<IReadOnlyList<Code>>();
@@ -518,12 +516,12 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>, IActed<Recit
     }
 
     /// <summary>One house, one walk round it, and one question about what happened in it.</summary>
-    private Turn<Recited> Draw() => Close(Open(), null);
+    private Turn<Coded> Draw() => Close(Open(), null);
 
     /// <summary>The walk's last step, and the question about what it left behind.</summary>
     /// <param name="walk">The house drawn as far as its last step.</param>
     /// <param name="wish">Which of <see cref="Doings"/>, or nothing to let the walk draw.</param>
-    private Turn<Recited> Close(Walk walk, int? wish)
+    private Turn<Coded> Close(Walk walk, int? wish)
     {
         var (at, held, here, told) = walk;
 
@@ -574,37 +572,31 @@ public sealed class Roaming : IWorld<Recited>, IWithholds<Recited>, IActed<Recit
             told.RemoveAt(told.Count - 1);
             told.Reverse();
 
-            return new Turn<Recited>
+            return new Turn<Coded>
             {
-                Seen = new Recited
-                {
-                    Said = told,
-                    Asked = last,
-
-                    // The step the learner chose, said in the words it came out as. A wish
-                    // the house could not grant comes out as waiting, and that sentence is
-                    // as much the learner's doing as a granted one -- so what is marked is
-                    // the statement the choice PRODUCED rather than the verb it asked for.
-                    Assigned = chose ? new HashSet<Code>(last) : null,
-                },
+                // The step the learner chose, said in the words it came out as. A wish the
+                // house could not grant comes out as waiting, and that sentence is as much
+                // the learner's doing as a granted one -- so what is marked is the statement
+                // the choice PRODUCED rather than the verb it asked for.
+                Seen = Coded.From(
+                    [.. told.Select(Grouped.Of)],
+                    Grouped.Of(last),
+                    chose ? new HashSet<Code>(last) : null),
                 Outcome = moved ? 1 : 0,
             };
         }
 
         told.Reverse();
 
-        return new Turn<Recited>
+        return new Turn<Coded>
         {
-            Seen = new Recited
-            {
-                Said = told,
-                Asked = Said("where", "is", "the", Things[about]),
-
-                // The chosen step is a STATEMENT here rather than the question, so what is
-                // marked is the words of it wherever they ended up. A `where is` question
-                // is about the state the walk left behind and names nothing the learner did.
-                Assigned = chose ? new HashSet<Code>(told[0]) : null,
-            },
+            // The chosen step is a STATEMENT here rather than the question, so what is
+            // marked is the words of it wherever they ended up. A `where is` question is
+            // about the state the walk left behind and names nothing the learner did.
+            Seen = Coded.From(
+                [.. told.Select(Grouped.Of)],
+                Grouped.Of(Said("where", "is", "the", Things[about])),
+                chose ? new HashSet<Code>(told[0]) : null),
             Outcome = held[about] == Nobody ? at[about] : null,
         };
     }

@@ -132,10 +132,10 @@ public sealed class FiringTests(ITestOutputHelper output)
                 + "pays was taken under that ceiling.",
 
             ["Fronted.Ordered"] =
-                "rung three's precedences, derived where the moment is formed. Nothing in "
-                + "`Worlds/` sets `Coded.Sequence` and `Joined` reads an order off `Recited` "
-                + "alone, so the only producer on the branch is a corpus and no generated "
-                + "world reaches the rung at all.",
+                "rung three's precedences, derived where the moment is formed. Only a front "
+                + "end reading a moment's PARTS reports an order and only the text worlds "
+                + "have parts, so `Handing`, `Recalled`, `Conversing` and `Roaming` reach the "
+                + "rung and no generated world in this set does.",
 
             ["Fronted.Doings"] =
                 "an intervention code, derived from what the front end said was forced. Three "

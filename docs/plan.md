@@ -37,9 +37,9 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **`OpenPlexus.Brain` as its own project**, learner `internal`, so the boundary is the
   compiler's rather than a folder's. `Brain.Held` becoming a reported census is its own arc
   and is what shrinks the surface.
-- **Fold `Recited` and `Asking` into `Coded`**, which `Bodily` already did. They are copies
-  eleven and twelve of the type whose own doc records the first nine, and folding them is what
-  makes one input serve two worlds and what unblocks the split above.
+- **Split `Crossed` into two inputs**, being two modalities welded into one record where
+  `Compound` is what puts two senses in one moment. It is the last place the brain names a
+  world and it is what unblocks the split above.
 - **A holder host and a harness that takes peers**, which is the first two-process run and
   what `Ported` has been standing in for. John's end state is this repeated twenty times.
 - **Then a likeness bar that travels**, read against shuffled moments rather than a level,

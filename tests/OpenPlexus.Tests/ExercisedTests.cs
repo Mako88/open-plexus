@@ -59,7 +59,7 @@ public sealed class ExercisedTests
     /// crossed the seam, which a population cannot say: a code the front end emitted and
     /// nothing ever scoped is invisible from the other end.
     /// </remarks>
-    private sealed class Noted(IQuantizer<Recited> inner) : IQuantizer<Recited>
+    private sealed class Noted(IQuantizer<Coded> inner) : IQuantizer<Coded>
     {
         /// <summary>Which modalities were emitted.</summary>
         public HashSet<byte> Emitted { get; } = [];
@@ -71,7 +71,7 @@ public sealed class ExercisedTests
         public byte Modality => inner.Modality;
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<Code> Codify(Recited observation)
+        public IReadOnlyCollection<Code> Codify(Coded observation)
         {
             var codes = inner.Codify(observation);
 
@@ -81,19 +81,19 @@ public sealed class ExercisedTests
         }
 
         /// <inheritdoc/>
-        public IReadOnlyDictionary<Code, int>? Bind(Recited observation) =>
+        public IReadOnlyDictionary<Code, int>? Bind(Coded observation) =>
             Noting(inner.Bind(observation), nameof(Bind), one => one.Count > 0);
 
         /// <inheritdoc/>
-        public IReadOnlyDictionary<Code, int>? Order(Recited observation) =>
+        public IReadOnlyDictionary<Code, int>? Order(Coded observation) =>
             Noting(inner.Order(observation), nameof(Order), one => one.Count > 0);
 
         /// <inheritdoc/>
-        public IReadOnlySet<Code>? Fleeting(Recited observation) =>
+        public IReadOnlySet<Code>? Fleeting(Coded observation) =>
             Noting(inner.Fleeting(observation), nameof(Fleeting), one => one.Count > 0);
 
         /// <inheritdoc/>
-        public IReadOnlySet<Code>? Forced(Recited observation) =>
+        public IReadOnlySet<Code>? Forced(Coded observation) =>
             Noting(inner.Forced(observation), nameof(Forced), one => one.Count > 0);
 
         /// <summary>Records a channel as filled when it came back with something in it.</summary>
@@ -138,7 +138,7 @@ public sealed class ExercisedTests
             untold: () => falling.Next(3));
 
         var tally = new Bench(
-            new Watching<Recited>(
+            new Watching<Coded>(
                 world,
                 noted,
                 acting: Chooses.From(acting ? drives.Choose : _ => null)),

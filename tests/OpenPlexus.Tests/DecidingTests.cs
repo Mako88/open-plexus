@@ -36,7 +36,7 @@ public sealed class DecidingTests(ITestOutputHelper output)
     /// <summary>The spine world, translated as its own grids translate it.</summary>
     /// <param name="seed">What draws the houses and the walks.</param>
     private static IInput Roams(int seed) =>
-        new Watching<Recited>(
+        new Watching<Coded>(
             new Roaming(Fixture.House(Examining.Where), seed),
             new Joined(Joining.Resolved, resolution: 3, freshest: true),
             acting: Chooses.From(_ => null));

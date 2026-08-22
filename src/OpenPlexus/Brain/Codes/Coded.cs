@@ -25,6 +25,28 @@ public readonly record struct Grouped
     /// <summary>One part out of some codes.</summary>
     /// <param name="codes">What is in it.</param>
     public static Grouped Of(IEnumerable<Code> codes) => new() { Codes = [.. codes] };
+
+    /// <summary>Whether two parts hold the same codes in the same order.</summary>
+    /// <param name="other">The other part.</param>
+    /// <remarks>
+    /// <b>By what it holds and not by which list holds it</b>, which the compiler will not do
+    /// on its own. A record struct over a list compares the REFERENCE, so two parts built
+    /// separately out of the same words are never equal — this repo's own trap, already paid
+    /// for once on an <c>ImmutableArray</c> in a report, and a type whose whole content is a
+    /// list is where it fires next.
+    /// </remarks>
+    public bool Equals(Grouped other) =>
+        ReferenceEquals(Codes, other.Codes) || Codes.SequenceEqual(other.Codes);
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+
+        foreach (var code in Codes) hash.Add(code);
+
+        return hash.ToHashCode();
+    }
 }
 
 /// <summary>
@@ -91,6 +113,26 @@ public readonly record struct Coded
     /// </remarks>
     public IReadOnlyList<Grouped>? Groups { get; init; }
 
+    /// <summary>
+    /// The question this moment asks, or nothing where the world asks none.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Apart from the parts rather than the first of them</b>, and the alternative was
+    /// numbering it group nought. Every reader that treats the parts as a story would then
+    /// have to know to skip one, and three of them in one front end already do different
+    /// things with the split -- a bag unions both, a chain starts from the question and walks
+    /// the story, and a background intersects the story and must not see the question at all.
+    /// An index convention that three readers must each honour is a second name for a
+    /// distinction the type can simply keep.
+    /// </para>
+    /// <para>
+    /// <b>And it is a part like any other</b>, so a world that can order the question's words
+    /// says so the same way it says it for a statement.
+    /// </para>
+    /// </remarks>
+    public Grouped? Asked { get; init; }
+
     /// <inheritdoc cref="IQuantizer{TObservation}.Fleeting"/>
     public IReadOnlySet<Code>? Passing { get; init; }
 
@@ -102,4 +144,36 @@ public readonly record struct Coded
 
     /// <summary>One code, for a world whose moment is a single symbol.</summary>
     public static Coded Of(Code code) => new() { Codes = [code] };
+
+    /// <summary>A moment made of parts, whose codes are what the parts hold.</summary>
+    /// <param name="parts">The statements, newest first.</param>
+    /// <param name="asked">The question, where the world asks one.</param>
+    /// <param name="assigned">Which codes the world was told to emit rather than drew.</param>
+    /// <remarks>
+    /// <b>The flattening is done once here</b> rather than at each world, and what it yields
+    /// is the moment as a bag — every word of every part, which is what an arm that selects
+    /// nothing reads. A world that partitions its moment has no second answer to give, so
+    /// asking it for one would be the same list written twice and two places to get it wrong.
+    /// </remarks>
+    public static Coded From(
+        IReadOnlyList<Grouped> parts,
+        Grouped? asked = null,
+        IReadOnlySet<Code>? assigned = null)
+    {
+        ArgumentNullException.ThrowIfNull(parts);
+
+        var codes = new List<Code>();
+
+        if (asked is { } question) codes.AddRange(question.Codes);
+
+        foreach (var part in parts) codes.AddRange(part.Codes);
+
+        return new Coded
+        {
+            Codes = codes,
+            Groups = parts,
+            Asked = asked,
+            Assigned = assigned,
+        };
+    }
 }

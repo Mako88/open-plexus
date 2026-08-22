@@ -49,7 +49,7 @@ public sealed record RecalledSettings
     /// crudest possible way to hand the bag some recency, and the gap between the two
     /// readings is what sequence is worth on this text at the grain of a whole statement.
     /// Rung three works at the grain of a WORD and is orthogonal to it: this world reports
-    /// order through <see cref="Recited"/> whatever the span is.
+    /// order through <see cref="Codes.Coded.Groups"/> whatever the span is.
     /// </para>
     /// <para>
     /// <b>And it is a fact about what was shown</b>, rather than about how to think, which
@@ -168,61 +168,6 @@ public enum Predicting
 }
 
 /// <summary>
-/// A moment of text, with the question kept apart from what was said before it.
-/// </summary>
-/// <remarks>
-/// <para>
-/// <b>Which words were the question is a fact about the signal</b> and not a conclusion,
-/// so a world is allowed to say it — the same licence <see cref="Codes.Coded.Groups"/>
-/// carries for <i>these codes were one object</i>. What nothing here says is what to make
-/// of the split, which is the front end's business and then the learner's.
-/// </para>
-/// <para>
-/// <b>And unioning them at the world would have thrown it away</b> before anybody could
-/// choose. A bag of words is what a scope sees, and a bag cannot be asked whether the
-/// question named something the story named — so the one structural fact this task turns
-/// on would have been destroyed by the world, one call before the translation that wants
-/// it.
-/// </para>
-/// </remarks>
-public readonly record struct Asking
-{
-    /// <summary>
-    /// The statements in front of the question, newest first.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>Kept apart and ordered</b>, because a bag cannot be asked which sentence a word came
-    /// from. A world saying <i>these words were one sentence, and it was the latest</i>
-    /// is stating a fact about its signal — the same licence
-    /// <see cref="Codes.Coded.Groups"/> already carries. What to make of the order is the front end's, and every arm that wants none
-    /// of it flattens this in one call.
-    /// </para>
-    /// <para>
-    /// <b>Newest first</b>, so that a position means the same thing in every story. Counting
-    /// from the start would make <i>the second statement</i> a different distance from the
-    /// question in a two-line story and a nine-line one, so a code minted on it would name
-    /// two unrelated things.
-    /// </para>
-    /// </remarks>
-    public required IReadOnlyList<IReadOnlySet<Code>> Story { get; init; }
-
-    /// <summary>Every word of every statement, which is what a bag-of-words arm wants.</summary>
-    public IReadOnlySet<Code> Words
-    {
-        get
-        {
-            var all = new HashSet<Code>();
-            foreach (var one in Story) all.UnionWith(one);
-            return all;
-        }
-    }
-
-    /// <summary>The words of the question itself.</summary>
-    public required IReadOnlySet<Code> Question { get; init; }
-}
-
-/// <summary>
 /// What one withheld question said, in the English the corpus wrote it in.
 /// </summary>
 /// <remarks>
@@ -277,10 +222,10 @@ public sealed record Quizzed
 /// exists for — and it is a different finding from a low score.
 /// </para>
 /// </remarks>
-public sealed class Recalled : IWorld<Recited>, IWithholds<Recited>
+public sealed class Recalled : IWorld<Coded>, IWithholds<Coded>
 {
-    private readonly List<Turn<Recited>> _asked;
-    private readonly ImmutableArray<Turn<Recited>> _kept;
+    private readonly List<Turn<Coded>> _asked;
+    private readonly ImmutableArray<Turn<Coded>> _kept;
     private int _at;
 
     /// <param name="settings">Which text, how much is visible, and how much is held back.</param>
@@ -348,8 +293,8 @@ public sealed class Recalled : IWorld<Recited>, IWithholds<Recited>
         var stories = lines.Count == 0 ? 0 : lines[^1].Story + 1;
         var keeping = Math.Max(0, stories - settings.Withheld);
 
-        var told = new List<Turn<Recited>>();
-        var quizzed = new List<Turn<Recited>>();
+        var told = new List<Turn<Coded>>();
+        var quizzed = new List<Turn<Coded>>();
         var wrote = new List<Quizzed>();
         var story = -1;
         var said = new List<ImmutableArray<Code>>();
@@ -400,9 +345,9 @@ public sealed class Recalled : IWorld<Recited>, IWithholds<Recited>
             // two tasks whose answers are pairs were always unanswerable here.
             var answering = Babi.Words(line.Answer!);
 
-            var turn = new Turn<Recited>
+            var turn = new Turn<Coded>
             {
-                Seen = new Recited { Said = before, Asked = line.Words },
+                Seen = Coded.From([.. before.Select(Grouped.Of)], Grouped.Of(line.Words)),
                 Outcome = index[answering[0]],
             };
 
@@ -445,7 +390,7 @@ public sealed class Recalled : IWorld<Recited>, IWithholds<Recited>
     /// teach anything here.
     /// </remarks>
     private static void Reading(
-        List<Turn<Recited>> told,
+        List<Turn<Coded>> told,
         Predicting predicting,
         Sentence line,
         IReadOnlyDictionary<string, int> index,
@@ -491,9 +436,9 @@ public sealed class Recalled : IWorld<Recited>, IWithholds<Recited>
 
             if (moment.Count == 0) continue;
 
-            told.Add(new Turn<Recited>
+            told.Add(new Turn<Coded>
             {
-                Seen = new Recited { Said = [moment], Asked = [] },
+                Seen = Coded.From([Grouped.Of(moment)]),
                 Outcome = index[words[at]],
             });
         }
@@ -542,7 +487,7 @@ public sealed class Recalled : IWorld<Recited>, IWithholds<Recited>
     /// question after the statements that answer it, and reordering that is the one
     /// property a story has.
     /// </remarks>
-    public Turn<Recited> Next()
+    public Turn<Coded> Next()
     {
         var turn = _asked[_at];
         _at = (_at + 1) % _asked.Count;
@@ -558,5 +503,5 @@ public sealed class Recalled : IWorld<Recited>, IWithholds<Recited>
     /// examination is about. So a whole story goes, and the exam does not move when the
     /// objective does.
     /// </remarks>
-    public IReadOnlyList<Turn<Recited>> Withheld => _kept;
+    public IReadOnlyList<Turn<Coded>> Withheld => _kept;
 }

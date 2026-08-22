@@ -121,7 +121,7 @@ public sealed class DocsTests
     // difference between loading this and not.
     //
     // And 9,953 is the fourth, for rung three arriving on real English. `Recalled` speaks
-    // `Recited` now, so the sequence rung reads a corpus somebody else wrote rather than a
+    // `Coded` now, so the sequence rung reads a corpus somebody else wrote rather than a
     // generated sentence -- and whether that PAYS is a question the route had no leaf for,
     // the only rung-three item being fork 105's on `Handing`. Forty-two words, no item
     // deleted, and nothing else here says it.
@@ -569,7 +569,7 @@ public sealed class DocsTests
     // entry it replaces: that one said the brain names a world, which is a fault; these say
     // what the record becomes, and that a moment may carry several readings of one signal at
     // once rather than a dial choosing between them.
-    private const int Whole = 11_755;
+    private const int Whole = 11_752;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -71,6 +71,18 @@ public sealed class SeparationTests
         Assert.Equal(Brain.Says(1), Monk.Says(holds: true));
 
         Assert.Equal(Brain.Followed, Monk.Answered);
+
+        // And the entry naming a VARIABLE, which `Monk`'s key BINDS rather than passes over.
+        // Under a split spelling a name repeating across two modalities says those two
+        // attributes hold one value, so the key has to read the learner's own layout to grade
+        // it -- and a layout read in two places without a check between them is the drift this
+        // file exists to refuse.
+        Assert.True(Unifying.Names(new Code(Monk.Whatever, 0)));
+
+        var stands = Monk.Stands(Unifying.Any((byte)(Monk.Attribute + 1), name: 3));
+
+        Assert.Equal(Monk.Attribute + 1, stands.Modality);
+        Assert.Equal(3, stands.Name);
     }
 
     /// <summary>

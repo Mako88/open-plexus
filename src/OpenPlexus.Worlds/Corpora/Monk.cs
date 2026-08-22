@@ -34,20 +34,66 @@ public enum Puzzle
     Three = 3,
 }
 
+/// <summary>How one attribute and its value are said as codes.</summary>
+/// <remarks>
+/// <b>An arm, and it decides what rung four can reach here.</b> Monk-1's concept is
+/// <i>head shape equals body shape</i>, which is a variable standing in two positions —
+/// and whether that is sayable at all is a fact about the spelling rather than about the
+/// learner. Fork 133.
+/// </remarks>
+public enum Spelling
+{
+    /// <summary>
+    /// One modality, and the attribute packed into the value — <see cref="Codes.Bits"/>.
+    /// </summary>
+    /// <remarks>
+    /// <b>So head-round and body-round are two values</b> and no variable joins them.
+    /// <c>Commitments.Generalising</c> groups a scope's positions by the value they carry,
+    /// and these carry different ones, so the hole that REPEATS is unreachable however
+    /// many siblings the population holds.
+    /// </remarks>
+    Fused,
+
+    /// <summary>
+    /// A modality an attribute, and the value standing alone — <see cref="Codes.Slotted"/>.
+    /// </summary>
+    /// <remarks>
+    /// <b>So head-round and body-round are one value under two modalities</b>, which is
+    /// what <c>Commitments.Unifying</c> matches: two entries carrying one name are filled
+    /// by one value, so <i>whichever shape the head has, and the body has that same one</i>
+    /// is a scope.
+    /// </remarks>
+    Split,
+}
+
 /// <summary>Which MONK's problem, and how much of the bag is never drawn.</summary>
 public sealed record MonkSettings
 {
     /// <summary>Which of the three.</summary>
     public Puzzle Puzzle { get; init; } = Puzzle.Two;
 
+    /// <summary>How an attribute and its value are spelt. See <see cref="Worlds.Spelling"/>.</summary>
+    public Spelling Spelling { get; init; } = Spelling.Fused;
+
     /// <summary>
     /// How many of the 432 to load, score and never draw.
     /// </summary>
     /// <remarks>
-    /// <b>Taken from the end of a fixed enumeration</b>, so the split is a position and not
-    /// a sample — the same reason <see cref="Cifar"/> does it that way. A withheld
-    /// set chosen by the world's own generator would move with the seed, and two seeds
-    /// would then be scored against two different questions.
+    /// <para>
+    /// <b>Taken at a fixed stride through the enumeration</b>, so the split is a rule rather
+    /// than a sample. A withheld set drawn by the world's own generator would move with the
+    /// seed and two seeds would be scored against two different questions; a stride is the
+    /// same on every machine and for every seed, which is what that objection actually wanted.
+    /// </para>
+    /// <para>
+    /// <b>And it was taken from the END</b>, which held back an attribute value entire. The
+    /// enumeration's slowest position is the head shape, so the last 132 of 432 are every
+    /// instance whose head is its third value and nothing else — 12 of the 300 drawn carry it.
+    /// Every held-out score this world ever reported was therefore about one unseen value, and
+    /// on <see cref="Puzzle.One"/> it read 0.7273 on six runs of two arms and three seeds,
+    /// which is exactly what <i>the jacket is red, else no</i> scores there. A number that
+    /// cannot move reads as a learner that will not generalise.
+    /// </para>
     /// </remarks>
     public int Withheld { get; init; } = 132;
 }
@@ -104,7 +150,14 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
     /// </remarks>
     public static int Stride => 4;
 
-    /// <summary>The modality one attribute-and-value rides on.</summary>
+    /// <summary>The modality an attribute rides on, and under a split spelling the first of six.</summary>
+    /// <remarks>
+    /// <b><see cref="Spelling.Split"/> claims <see cref="Widths"/>-many numbers from here</b>,
+    /// so 150 to 155 belong to this world. Only one is declared because <c>SeparationTests</c>
+    /// reads declarations and a world may reuse another world's number freely; what it may not
+    /// take is one of the brain's, and <c>MonkTests</c> asserts the whole run stays clear of
+    /// them.
+    /// </remarks>
     public const byte Attribute = 150;
 
     /// <summary>The modality the answer rides on.</summary>
@@ -117,6 +170,37 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
     /// duplication for the identical reason.
     /// </remarks>
     public const byte Answered = 101;
+
+    /// <summary>The modality a scope entry naming a variable rides on.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>212, on exactly the footing <see cref="Answered"/> is on.</b> An answer key has to
+    /// be written in the population's alphabet or it marks the subject wrong, and a key that
+    /// refused this modality would call every rule rung four builds unsound.
+    /// <see cref="Multiplexer.Whatever"/> is the same copy for the same reason, and
+    /// <c>SeparationTests</c> asserts both agree with the learner.
+    /// </para>
+    /// <para>
+    /// <b>And this key BINDS one rather than passing over it</b>, which is where it parts
+    /// from the multiplexer's. There a variable appears once, says <i>whichever code of this
+    /// kind</i>, and claims nothing — so skipping it is exact. Under
+    /// <see cref="Spelling.Split"/> a name repeats across two modalities and says <i>these
+    /// two attributes hold one value</i>, which is a real constraint and the whole of what
+    /// fork 133 asks about. Skipping it here would call <i>head equals body</i> sound of
+    /// every instance.
+    /// </para>
+    /// </remarks>
+    public const byte Whatever = 212;
+
+    /// <summary>Which attribute a variable entry stands over, and which variable it is.</summary>
+    /// <param name="entry">A scope entry on <see cref="Whatever"/>.</param>
+    /// <remarks>
+    /// <b>The modality rides in the high half</b> and the name in the low one, which is the
+    /// learner's layout read rather than guessed — <c>SeparationTests</c> asserts this agrees
+    /// with what the learner writes, so the two cannot drift apart in silence.
+    /// </remarks>
+    public static (byte Modality, int Name) Stands(Codes.Code entry) =>
+        ((byte)(entry.Value >> 32), (int)(entry.Value & uint.MaxValue));
 
     private readonly IReadOnlyList<Turn<IReadOnlyList<int>>> _drawn;
     private readonly Random _rng;
@@ -134,14 +218,20 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
 
         var all = Everything;
 
-        _drawn = [.. all.Take(all.Length - settings.Withheld)
+        _drawn = [.. all
+            .Where((_, at) => !Back(at, settings.Withheld))
             .Select(one => Turn(settings.Puzzle, one))];
 
-        Withheld = [.. all.Skip(all.Length - settings.Withheld)
+        Withheld = [.. all
+            .Where((_, at) => Back(at, settings.Withheld))
             .Select(one => Turn(settings.Puzzle, one))];
 
         Chance = Bar(settings.Puzzle);
+        Spelling = settings.Spelling;
     }
+
+    /// <summary>How this world spells an attribute and its value.</summary>
+    public Spelling Spelling { get; }
 
     /// <inheritdoc/>
     public int Outcomes => 2;
@@ -159,6 +249,19 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
 
     /// <summary>One drawn instance, with replacement.</summary>
     public Turn<IReadOnlyList<int>> Next() => _drawn[_rng.Next(_drawn.Count)];
+
+    /// <summary>Whether the instance at one position is held back.</summary>
+    /// <param name="at">Which of the 432, in enumeration order.</param>
+    /// <param name="withheld">How many to hold back.</param>
+    /// <remarks>
+    /// <b>A stride rather than a tail</b>, and it picks exactly <paramref name="withheld"/> of
+    /// them however many that is. Walking the multiples of <paramref name="withheld"/> modulo
+    /// the bag spreads the choice through every position of the enumeration, so no attribute
+    /// value can end up on one side of the split — see the note on
+    /// <see cref="MonkSettings.Withheld"/> for what taking the tail cost.
+    /// </remarks>
+    public static bool Back(int at, int withheld) =>
+        withheld > 0 && (int)((long)at * withheld % Everything.Length) < withheld;
 
     /// <summary>Every one of the 432 instances, in a fixed order.</summary>
     /// <remarks>
@@ -212,8 +315,11 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
     /// <summary>The code for one attribute holding one value.</summary>
     /// <param name="attribute">Which of the six, nought-based.</param>
     /// <param name="value">Which value it holds, nought-based.</param>
-    public static Codes.Code Of(int attribute, int value) =>
-        Codes.Bits.Of(Attribute, attribute, value, Stride);
+    /// <param name="spelling">How the two are said. See <see cref="Worlds.Spelling"/>.</param>
+    public static Codes.Code Of(int attribute, int value, Spelling spelling = Spelling.Fused) =>
+        spelling == Spelling.Split
+            ? Codes.Slotted.Of(Attribute, attribute, value)
+            : Codes.Bits.Of(Attribute, attribute, value, Stride);
 
     /// <summary>The code for what the concept says.</summary>
     /// <param name="holds">Whether the instance is in the concept.</param>
@@ -233,8 +339,24 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
     /// world is over ALL of the population rather than over the part that happened to be
     /// small enough.
     /// </remarks>
-    public static bool Checkable(ImmutableArray<Codes.Code> scope) =>
-        !scope.IsDefaultOrEmpty && scope.All(code => code.Modality == Attribute);
+    /// <param name="spelling">How the world it came from spells an attribute.</param>
+    public static bool Checkable(
+        ImmutableArray<Codes.Code> scope, Spelling spelling = Spelling.Fused) =>
+        !scope.IsDefaultOrEmpty && scope.All(code => Mine(code, spelling));
+
+    /// <summary>Whether a code is one this world emits under a spelling.</summary>
+    /// <param name="code">The code to ask about.</param>
+    /// <param name="spelling">How the world spells an attribute.</param>
+    /// <remarks>
+    /// <b>A variable entry counts as mine</b>, or a rule rung four built would be reported
+    /// as beyond the key rather than graded — and this world's whole claim is that nothing
+    /// here is beyond the key.
+    /// </remarks>
+    private static bool Mine(Codes.Code code, Spelling spelling) =>
+        code.Modality == Whatever
+        || (spelling == Spelling.Split
+            ? code.Modality >= Attribute && code.Modality < Attribute + Widths.Length
+            : code.Modality == Attribute);
 
     /// <summary>Whether a scope really does entail an expectation, over the whole bag.</summary>
     /// <param name="puzzle">Which of the three.</param>
@@ -246,15 +368,20 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
     /// minting contradictions. It covers no instance, so the empty-coverage test below
     /// refuses it without needing to know why it was empty.
     /// </remarks>
-    public static bool Sound(Puzzle puzzle, ImmutableArray<Codes.Code> scope, Codes.Code expects)
+    /// <param name="spelling">How the world it came from spells an attribute.</param>
+    public static bool Sound(
+        Puzzle puzzle,
+        ImmutableArray<Codes.Code> scope,
+        Codes.Code expects,
+        Spelling spelling = Spelling.Fused)
     {
-        if (!Checkable(scope)) return false;
+        if (!Checkable(scope, spelling)) return false;
 
         var covered = 0;
 
         foreach (var instance in Everything)
         {
-            if (!Covers(scope, instance)) continue;
+            if (!Covers(scope, instance, spelling)) continue;
 
             covered++;
 
@@ -285,19 +412,21 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
     /// There is no compression available on that side at all.
     /// </para>
     /// </remarks>
-    public static ImmutableArray<Truth> Truths(Puzzle puzzle)
+    /// <param name="spelling">How the world it will be compared against spells an attribute.</param>
+    public static ImmutableArray<Truth> Truths(
+        Puzzle puzzle, Spelling spelling = Spelling.Fused)
     {
         var sound = new Dictionary<string, Truth>(StringComparer.Ordinal);
 
         foreach (var pinned in Conjunctions())
         {
-            var scope = Scope(pinned);
+            var scope = Scope(pinned, spelling);
 
             if (scope.IsEmpty) continue;
 
             var says = Says(Holds(puzzle, First(pinned)));
 
-            if (Sound(puzzle, scope, says))
+            if (Sound(puzzle, scope, says, spelling))
                 sound[Key(pinned)] = new Truth { Scope = scope, Expects = says };
         }
 
@@ -311,14 +440,62 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
     }
 
     /// <summary>Whether every code in a scope is satisfied by an instance.</summary>
-    private static bool Covers(ImmutableArray<Codes.Code> scope, ImmutableArray<int> instance)
+    /// <param name="scope">The codes that must be present, and the entries naming variables.</param>
+    /// <param name="instance">Six nought-based attribute values.</param>
+    /// <param name="spelling">How the world it came from spells an attribute.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>A name is bound rather than skipped.</b> One entry carrying a name constrains only
+    /// that the attribute it stands over has some value, which every instance satisfies; two
+    /// entries carrying one name say those attributes hold THE SAME value, which is Monk-1's
+    /// first disjunct and the reason this world was picked for fork 133.
+    /// </para>
+    /// <para>
+    /// <b>And under <see cref="Spelling.Fused"/> a name reaches no attribute</b>, every code
+    /// riding one modality — so <i>whichever attribute-and-value code</i> is satisfied by any
+    /// instance whatever, however often it repeats. Passing over it is exact there and would
+    /// be a lie under the split spelling.
+    /// </para>
+    /// </remarks>
+    private static bool Covers(
+        ImmutableArray<Codes.Code> scope, ImmutableArray<int> instance, Spelling spelling)
     {
+        Dictionary<int, int>? bound = null;
+
         foreach (var code in scope)
         {
-            var at = (int)(code.Value / (ulong)Stride);
-            var value = (int)(code.Value % (ulong)Stride);
+            if (code.Modality == Whatever)
+            {
+                if (spelling != Spelling.Split) continue;
 
-            if (at >= instance.Length || instance[at] != value) return false;
+                var (modality, name) = Stands(code);
+                var over = modality - Attribute;
+
+                if (over < 0 || over >= instance.Length) return false;
+
+                bound ??= [];
+
+                if (bound.TryGetValue(name, out var already))
+                {
+                    if (already != instance[over]) return false;
+                }
+                else
+                {
+                    bound[name] = instance[over];
+                }
+
+                continue;
+            }
+
+            var at = spelling == Spelling.Split
+                ? Codes.Slotted.Position(Attribute, code)
+                : (int)(code.Value / (ulong)Stride);
+
+            var value = spelling == Spelling.Split
+                ? Codes.Slotted.Value(code)
+                : (int)(code.Value % (ulong)Stride);
+
+            if (at < 0 || at >= instance.Length || instance[at] != value) return false;
         }
 
         return true;
@@ -354,17 +531,17 @@ public sealed class Monk : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<
         }
     }
 
-    private static ImmutableArray<Codes.Code> Scope(int?[] pinned) =>
+    private static ImmutableArray<Codes.Code> Scope(int?[] pinned, Spelling spelling) =>
     [
         .. pinned
             .Select((value, at) => (value, at))
             .Where(one => one.value is not null)
-            .Select(one => Of(one.at, one.value!.Value)),
+            .Select(one => Of(one.at, one.value!.Value, spelling)),
     ];
 
     /// <summary>Any instance the conjunction covers, for asking what it says.</summary>
     private static ImmutableArray<int> First(int?[] pinned) =>
-        Everything.First(one => Covers(Scope(pinned), one));
+        Everything.First(one => Covers(Scope(pinned, Spelling.Fused), one, Spelling.Fused));
 
     private static IEnumerable<int?[]> Shorter(int?[] pinned)
     {

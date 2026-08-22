@@ -469,6 +469,333 @@ public sealed class MonkTests(ITestOutputHelper output)
                 + "none of the three is wired to this run at all");
     }
 
+    /// <summary>
+    /// <b>The split hides no attribute value</b>, which the tail split did and nothing read.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The budget for the failure class rather than the fix for one instance of it. A withheld
+    /// set that holds back a whole attribute value scores a learner on a distribution it never
+    /// saw, and the number it produces is stuck — <see cref="Puzzle.One"/> read 0.7273 on six
+    /// runs across two spellings and three seeds, which is what <i>the jacket is red, else
+    /// no</i> scores on that tail. A held-out score that cannot move reads exactly like a
+    /// learner that will not generalise.
+    /// </para>
+    /// <para>
+    /// <b>Both halves, and every value on both.</b> Asking only that the withheld set is wide
+    /// would pass a split that held back all but one instance of a value, which is the same
+    /// fault at a different size.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Neither_half_of_the_split_hides_an_attribute_value()
+    {
+        var world = new Monk(new MonkSettings { Puzzle = Puzzle.One, Withheld = 132 }, seed: 1);
+
+        var held = world.Withheld.Select(one => one.Seen).ToList();
+
+        var drawn = Monk.Everything
+            .Where((_, at) => !Monk.Back(at, 132))
+            .ToList();
+
+        Assert.Equal(132, held.Count);
+        Assert.Equal(Monk.Everything.Length - 132, drawn.Count);
+
+        for (var attribute = 0; attribute < Monk.Widths.Length; attribute++)
+            for (var value = 0; value < Monk.Widths[attribute]; value++)
+            {
+                var at = attribute;
+                var of = value;
+
+                var inHeld = held.Count(one => one[at] == of);
+                var inDrawn = drawn.Count(one => one[at] == of);
+
+                output.WriteLine($"attribute {at} value {of} | drawn {inDrawn,4} held {inHeld,4}");
+
+                Assert.True(inHeld > 0 && inDrawn > 0,
+                    $"attribute {at} value {of} appears {inDrawn} times among the drawn and "
+                    + $"{inHeld} times among the withheld, so the exam is scoring a value the "
+                    + "run barely saw rather than the concept");
+            }
+    }
+
+    /// <summary>What one spelling of one puzzle left behind.</summary>
+    /// <param name="Recent">The trailing accuracy, on instances the run drew.</param>
+    /// <param name="Unseen">
+    /// The accuracy on the 132 held back. <b>The column this reading is about</b> — Monk-1 is
+    /// answered at 0.997 in sample by a population naming instances one at a time, so the
+    /// drawn score has no room to move and says nothing about whether anything generalised.
+    /// </param>
+    /// <param name="Silence">The share of the held-out instances nothing fired on.</param>
+    /// <param name="Chance">What always naming the commoner answer scores.</param>
+    /// <param name="Held">How many commitments are resident.</param>
+    /// <param name="Sound">How many of them are true of the world.</param>
+    /// <param name="Found">How many of the world's own minimal rules were reached.</param>
+    /// <param name="Truths">How many there are to find.</param>
+    /// <param name="Twice">How many residents say one value twice.</param>
+    /// <param name="Groups">How many sibling groups the residents offer.</param>
+    /// <param name="Repeated">How many of those would give a hole that repeats.</param>
+    /// <param name="Joined">How many repeated ones the vocabulary admits.</param>
+    /// <param name="Resident">How many residents name a variable in two places.</param>
+    /// <param name="Fired">How often those residents fired and were answered.</param>
+    /// <param name="Sorts">How many categories the front end derived.</param>
+    private readonly record struct Spelt(
+        double Recent, double Unseen, double Silence, double Chance,
+        int Held, int Sound, int Found, int Truths,
+        int Twice, int Groups, int Repeated, int Joined, int Resident, long Fired, int Sorts);
+
+    /// <summary>One puzzle under one spelling, with rung four's gate fed.</summary>
+    /// <param name="puzzle">Which of the three.</param>
+    /// <param name="spelling">How an attribute and its value are said.</param>
+    /// <param name="seed">The world's generator and the brain's.</param>
+    /// <remarks>
+    /// <b>Its own bench rather than <see cref="MonkRun"/></b>, because the gate needs a
+    /// vocabulary and the ordinary runner has none. <c>Population.Generalise</c> is inert
+    /// without one, so a reading taken through the shipped runner would report nought holed
+    /// rules under both spellings and say nothing whatever about the spelling.
+    /// </remarks>
+    private static Spelt Spell(Puzzle puzzle, Spelling spelling, int seed)
+    {
+        var settings = new MonkSettings
+        {
+            Puzzle = puzzle, Spelling = spelling, Withheld = 132,
+        };
+
+        var world = new Monk(settings, seed);
+        var brain = new Brain(new CommittingSettings { Capacity = 2000 }, seed);
+
+        var sorts = new Categories([]);
+
+        IQuantizer<IReadOnlyList<int>> inner = spelling == Spelling.Split
+            ? new Slotted(Monk.Attribute, Monk.Widths.Length)
+            : new Bits(Monk.Attribute, Monk.Stride);
+
+        // Never, because two values of one attribute cannot both hold -- which is the
+        // exclusivity the gate is asking about, and it is true of this world by construction
+        // under either spelling.
+        var front = new Deriving<IReadOnlyList<int>>(
+            inner, sorts, Counting.Company, Meeting.Never, floor: 20, every: 1000);
+
+        brain.Held.Sorts = sorts;
+
+        var tally = new Bench(new Watching<IReadOnlyList<int>>(world, front), brain)
+            .Run(20_000, sweep: 1000, target: 0.9, window: 2000);
+
+        var graded = Learned.Grade(
+            tally, Monk.Truths(puzzle, spelling), brain.Held, brain.Dials.Floor,
+            scope => Monk.Checkable(scope, spelling),
+            (scope, expects) => Monk.Sound(puzzle, scope, expects, spelling),
+            detailed: false);
+
+        var all = brain.Held.All;
+
+        var groups = Generalising.Siblings(all);
+        var repeated = groups.Where(one => one.Holes.Count > 1).ToList();
+
+        var joins = all.Where(one => one.Scope.Count(Unifying.Names) > 1).ToList();
+
+        return new Spelt(
+            tally.Recent,
+            tally.Unseen?.Accuracy ?? 0.0,
+            tally.Unseen?.Silence ?? 0.0,
+            world.Chance,
+            all.Count,
+            graded.Sound,
+            graded.Found,
+            graded.Truths,
+            all.Count(one => one.Scope
+                .GroupBy(code => code.Value)
+                .Any(group => group.Count() > 1)),
+            groups.Count,
+            repeated.Count,
+            repeated.Count(one => Generalising.Admits(one, sorts)),
+            joins.Count,
+            joins.Sum(one => one.Fired),
+            sorts.Count);
+    }
+
+    /// <summary>
+    /// <b>What each spelling makes SAYABLE</b>, link by link and before any question of
+    /// worth — fork 133.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Monk-1 is <c>head = body</c> or <c>jacket is red</c>, and the first disjunct is a
+    /// variable standing in two places. Whether that is expressible at all is a fact about
+    /// the front end rather than about the learner: <see cref="Spelling.Fused"/> packs the
+    /// attribute into the value, so head-round and body-round are two different values and
+    /// no name joins them; <see cref="Spelling.Split"/> puts the attribute in the modality
+    /// and leaves them one value under two.
+    /// </para>
+    /// <para>
+    /// <b>Each link is counted</b>, so an empty one is named rather than reported as a
+    /// nought. The front end has to produce a scope saying one value twice, the proposer
+    /// has to reach that shape, the vocabulary has to admit it, and the rule has to be
+    /// resident and to fire. <c>GeneralisingTests</c> found the two empty links on the
+    /// conversation this way.
+    /// </para>
+    /// <para>
+    /// <b>Whether it is WORTH anything is the sweep beside this</b>, which is one seed's work
+    /// times forty-eight. This one asserts only what a single seed can hold down.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Only_the_split_spelling_lets_a_variable_stand_in_two_places()
+    {
+        var fused = Spell(Puzzle.One, Spelling.Fused, seed: 1);
+        var split = Spell(Puzzle.One, Spelling.Split, seed: 1);
+
+        foreach (var (named, one) in new[] { ("fused", fused), ("split", split) })
+            output.WriteLine(
+                $"{named} | unseen {one.Unseen:F3} silent {one.Silence:F3} | held {one.Held,4} "
+                + $"| sound {one.Sound,3} | twice {one.Twice,4} | groups {one.Groups,4} "
+                + $"| repeated {one.Repeated,3} | admitted {one.Joined,3} "
+                + $"| resident joins {one.Resident,3} | fired {one.Fired,6} "
+                + $"| categories {one.Sorts,2}");
+
+        // Both arms have a vocabulary for the gate to read, or this is an empty control
+        // against an empty control and the spelling is not what parts them.
+        Assert.True(fused.Sorts > 0 && split.Sorts > 0);
+
+        // The two keys are the same size, or a column compared across the arms is scored
+        // against two different questions. The scope language does not move with the
+        // spelling; only the names do.
+        Assert.Equal(fused.Truths, split.Truths);
+
+        // The front end's own contribution, and it is nought by construction rather than
+        // small. One modality for every attribute cannot put one value in two positions.
+        Assert.Equal(0, fused.Twice);
+        Assert.Equal(0, fused.Repeated);
+        Assert.Equal(0, fused.Resident);
+
+        // And the split spelling reaches every link. A scope that says one value twice, a
+        // rule with a variable in two places resident, and that rule answered -- which is
+        // the thing rungs one to three cannot say at all, said on a published bench.
+        Assert.True(split.Twice > 0,
+            "the split spelling produced no scope saying one value twice, so the front end "
+            + "is not supplying the two places a variable stands in");
+
+        Assert.True(split.Resident > 0,
+            $"{split.Twice} scopes say a value twice and no rule with a variable in two "
+            + "places is resident, so the proposal was admitted and never added");
+
+        Assert.True(split.Fired > 0,
+            $"{split.Resident} rules with a variable in two places are resident and none was "
+            + "ever answered, so the join is held and unable to fire");
+    }
+
+    /// <summary>
+    /// <b>Whether a variable reaches the concept once the attribute leaves the value</b> —
+    /// fork 133, on the bench whose baselines are published.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Monk-1 is <c>head = body</c> or <c>jacket is red</c>, and the first disjunct is a
+    /// variable standing in two places — rung four's own shape. Whether it is SAYABLE is a
+    /// fact about the front end rather than about the learner:
+    /// <see cref="Spelling.Fused"/> packs the attribute into the value, so head-round and
+    /// body-round are two different values and no name joins them;
+    /// <see cref="Spelling.Split"/> puts the attribute in the modality and leaves them one
+    /// value under two.
+    /// </para>
+    /// <para>
+    /// <b>What would drop this arm</b>: a split spelling scoring no higher on the 132 held
+    /// back. A rise in resident count or in holed rules is not the reading —
+    /// <c>GeneralisingTests</c> has already found that a hole which fires more often and buys
+    /// nothing is what rung four does by default.
+    /// </para>
+    /// <para>
+    /// <b>And <see cref="Learned.Found"/> cannot be the column</b>, which is worth writing
+    /// down because it was the obvious one to reach for. That count matches residents against
+    /// the world's minimal CONJUNCTIONS, and a rule with a hole in it is not one of them at
+    /// any depth — so it is flat across the two arms by construction rather than by finding.
+    /// </para>
+    /// <para>
+    /// <b>All three puzzles, because the spelling is the world's and not Monk-1's.</b> An arm
+    /// that wins where a variable is the concept and loses where it is not would be a setting
+    /// for one puzzle rather than a spelling for the world. <see cref="Puzzle.Two"/> is the
+    /// one where a variable cannot help at all, the concept being a count, so what it reads
+    /// is the population the spelling costs.
+    /// </para>
+    /// <para>
+    /// <b>A sweep</b>, because eight seeds of three puzzles of two arms is forty-eight runs.
+    /// <see cref="Only_the_split_spelling_lets_a_variable_stand_in_two_places"/> is what the
+    /// suite runs, and it holds down the links a single seed can settle.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_a_variable_reaches_the_concept_once_the_attribute_leaves_the_value()
+    {
+        const int Seeds = 8;
+
+        var read = new Dictionary<(Puzzle, Spelling), List<Spelt>>();
+
+        foreach (var puzzle in new[] { Puzzle.One, Puzzle.Two, Puzzle.Three })
+            foreach (var spelling in new[] { Spelling.Fused, Spelling.Split })
+            {
+                var runs = new List<Spelt>();
+
+                foreach (var seed in Enumerable.Range(1, Seeds))
+                {
+                    var one = Spell(puzzle, spelling, seed);
+
+                    runs.Add(one);
+
+                    output.WriteLine(
+                        $"{puzzle,-5} {spelling,-5} seed {seed} | recent {one.Recent:F3} "
+                        + $"| unseen {one.Unseen:F3} silent {one.Silence:F3} "
+                        + $"against {one.Chance:F3} | held {one.Held,4} | sound {one.Sound,4} "
+                        + $"| found {one.Found,3} of {one.Truths,3} "
+                        + $"| twice {one.Twice,4} | groups {one.Groups,4} "
+                        + $"| repeated {one.Repeated,3} | admitted {one.Joined,3} "
+                        + $"| resident joins {one.Resident,3} | fired {one.Fired,6} "
+                        + $"| categories {one.Sorts,2}");
+                }
+
+                read[(puzzle, spelling)] = runs;
+            }
+
+        // The front end's own contribution, and it is the link nothing after it can be read
+        // without. A fused spelling cannot put one value in two positions at all -- that is
+        // nought by construction rather than a small number.
+        Assert.Equal(0, read[(Puzzle.One, Spelling.Fused)].Sum(one => one.Repeated));
+
+        // And the gate has something to read under both, or the two arms are an empty
+        // control against an empty control.
+        foreach (var spelling in new[] { Spelling.Fused, Spelling.Split })
+            Assert.All(read[(Puzzle.One, spelling)], one => Assert.True(one.Sorts > 0,
+                $"the {spelling} arm derived no categories, so rung four proposed nothing "
+                + "and the spelling is not what this row is measuring"));
+
+        // The two keys have to be the same size or the `Found` columns are scored against
+        // two different questions. The scope language does not move with the spelling --
+        // only the names do -- so this is a statement about the change rather than about
+        // the learner.
+        foreach (var puzzle in new[] { Puzzle.One, Puzzle.Two, Puzzle.Three })
+            Assert.Equal(
+                read[(puzzle, Spelling.Fused)][0].Truths,
+                read[(puzzle, Spelling.Split)][0].Truths);
+
+        // And the exam is answered at all, or the row above is an accuracy over a handful.
+        Assert.All(
+            read[(Puzzle.One, Spelling.Split)],
+            one => Assert.True(one.Silence < 1.0,
+                "the split arm fired on nothing it had not seen, so its unseen accuracy is "
+                + "over an empty set"));
+
+        foreach (var puzzle in new[] { Puzzle.One, Puzzle.Two, Puzzle.Three })
+            output.WriteLine(
+                $"{puzzle,-5} mean | unseen fused "
+                + $"{read[(puzzle, Spelling.Fused)].Average(one => one.Unseen):F3} "
+                + $"split {read[(puzzle, Spelling.Split)].Average(one => one.Unseen):F3} "
+                + $"| silent fused "
+                + $"{read[(puzzle, Spelling.Fused)].Average(one => one.Silence):F3} "
+                + $"split {read[(puzzle, Spelling.Split)].Average(one => one.Silence):F3} "
+                + $"| held fused {read[(puzzle, Spelling.Fused)].Average(one => one.Held):F0} "
+                + $"split {read[(puzzle, Spelling.Split)].Average(one => one.Held):F0}");
+    }
+
     /// <summary>One Monk run, reported in the terms every world shares.</summary>
     /// <param name="puzzle">Which of the three.</param>
     /// <param name="seed">The world's generator and the brain's.</param>

@@ -564,12 +564,12 @@ public sealed class DocsTests
     // the brain names a world in six places, so it cannot become its own project until they
     // go. Five are one fork and the sixth is not, and the entry says which is which because a
     // session that reads only the count will fix the wrong half.
-    // And 11,742 is the fifty-fifth raise, sixty-two words, for the shape the seam record has
+    // And 11,742 is the fifty-fifth raise, sixty-three words, for the shape the seam record has
     // to take and the arm that falls out of it. Both are John's and neither duplicates the
     // entry it replaces: that one said the brain names a world, which is a fault; these say
     // what the record becomes, and that a moment may carry several readings of one signal at
     // once rather than a dial choosing between them.
-    private const int Whole = 11_742;
+    private const int Whole = 11_743;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

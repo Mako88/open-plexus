@@ -36,17 +36,18 @@ that is finished LEAVES, so this is only ever what is still to do.
   — `Alternating`, `Deriving`, `Meeting`, `Sorted` — and `Unifying` close later on.
 - **A census the brain reports**, John's, and `FiringTests` is half of it. Nine counters are
   quiet on three generated worlds; a wider run set and a report past `Tally` are what is left.
+- **Price the compound eye before one is built.** John's, and cheap. Compose two front ends
+  through `Compound` on the worlds there are and read `Searched`, `Candidates` and
+  `CeilingTests` against the one-channel arm. A rise in the ceiling drops it; the search cost
+  sets how sparse a channel must be, since the constraints refuse dropping one by payoff.
 - **`OpenPlexus.Brain` as its own project**, learner `internal`, so the boundary is the
   compiler's rather than a folder's. `Brain.Held` becoming a reported census is its own arc
   and is what shrinks the surface.
 - **Grow `Coded` into an ordered list of groups**, and fold `Recited`, `Asking` and `Bodily`
-  into it. They are copies ten to twelve of the type whose own doc records the first nine. It
-  stops the brain naming a world, and it is what makes one input serve two worlds.
-- **And `Bodied` mints through `Homeostat`'s statics**, a front end asking a world for a
-  modality and a code, which goes with `Homeostat.Feels` returning codes at all.
-- **The compound eye.** John's: one moment carrying several representations of one signal
-  rather than a dial choosing between them. `Compound` already merges quantisers, so the arm
-  is a composition; `CeilingTests` and the population cost are what decide it.
+  into it. They are copies ten to twelve of the type whose own doc records the first nine, and
+  folding them is what makes one input serve two worlds.
+- **And `Bodied` mints through `Homeostat`'s statics**, which goes with `Homeostat.Feels`
+  returning codes at all.
 - **A holder host and a harness that takes peers**, which is the first two-process run and
   what `Ported` has been standing in for. John's end state is this repeated twenty times.
 - **Then a likeness bar that travels**, read against shuffled moments rather than a level,

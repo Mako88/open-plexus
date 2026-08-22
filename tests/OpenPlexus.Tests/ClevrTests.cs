@@ -399,14 +399,33 @@ public sealed class ClevrTests(ITestOutputHelper output)
     /// <para>
     /// <b>What would drop it</b>, said before the run: the two ungated arms holding
     /// populations of the same size. That is the whole claim — if reading the grouping does
-    /// not change what ungating COSTS, then the binding world's pairing was about the binding
-    /// world and fork 135 is back to needing a seat rule alone.
+    /// not change what ungating COSTS, the binding world's pairing was about the binding
+    /// world.
     /// </para>
     /// <para>
-    /// <b>And this world cannot settle it on accuracy</b>, only on cost. Its withheld set sits
-    /// on the weighted chance bar under every arm measured so far, so what this grid reads is
-    /// the population and the mint rate; a score that moved would be the more interesting
-    /// outcome and is not the one being looked for.
+    /// <b>It is dropped, and by more than the kill line asked for.</b> Reading the grouping
+    /// makes ungated genesis mint 45,078 +-576 where ignoring it mints 21,392 +-292 — twice
+    /// as expensive rather than cheaper. On the binding world the same pairing held 1,598
+    /// residents against its control's 2,328, so the interaction is that world's and not a
+    /// property of grouping. What makes a wide proposal set affordable there is that a scene
+    /// holds two things; a CLEVR scene holds up to ten, and one proposal per thing on ten
+    /// things is not one proposal.
+    /// </para>
+    /// <para>
+    /// <b>And the column the kill line named could not have fired.</b> Every cell holds 4,001
+    /// residents, because this world's capacity binds under all four — so <c>held</c> is
+    /// pinned and the pre-registered test was vacuous either way. <c>Minted</c> is what
+    /// separates them and it was printed beside it by luck rather than by design. The plan's
+    /// own row says never pre-register on a column skew can raise; this is the same rule for a
+    /// column a capacity pins.
+    /// </para>
+    /// <para>
+    /// <b>And ungating loses the held-out set here</b>, which this grid was not looking for.
+    /// The drawn stream goes 0.661 to 0.928 while the withheld set goes 0.321 to 0.167, and
+    /// with the grouping read 0.358 to 0.203 — drawn up and withheld down, on a world with a
+    /// question per scene. That is memorising, and it is the second world after
+    /// <c>Arranged</c>'s tiled arm where ungated genesis costs the answer rather than buying
+    /// it.
     /// </para>
     /// </remarks>
     [Fact]

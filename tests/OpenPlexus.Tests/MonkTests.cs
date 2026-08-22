@@ -761,7 +761,7 @@ public sealed class MonkTests(ITestOutputHelper output)
     /// </para>
     /// <para>
     /// <b>Whether it is WORTH anything is the sweep beside this</b>, which is one seed's work
-    /// times forty-eight. This one asserts only what a single seed can hold down.
+    /// times seventy-two. This one asserts only what a single seed can hold down.
     /// </para>
     /// </remarks>
     [Fact]

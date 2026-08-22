@@ -351,18 +351,25 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// entries is what closes this rather than a second guard.
     /// </para>
     /// <para>
-    /// <b>Two are unreached, and the two close by different roads.</b>
-    /// Adhesion never runs, <c>Alternating</c> being derived offline and nothing setting
-    /// <c>Population.Sorts</c> — the plan carries that as an open question about when a front
-    /// end re-derives. A commitment's identity never sits inside another's scope, and that one
-    /// is not about this world: a <c>Committed</c> code is minted as a dictionary key and
-    /// never enters a moment, so no genesis and no repair can root on one anywhere. Nesting is
-    /// a property of the type rather than a mechanism, and the leaf claiming it says
-    /// <i>expressible</i> and reads as built.
+    /// <b>One is unreached, and it is not about this world.</b> A commitment's identity never
+    /// sits inside another's scope because a <c>Committed</c> code is minted as a dictionary
+    /// key and never enters a moment, so no genesis and no repair can root on one anywhere.
+    /// Nesting is a property of the type rather than a mechanism, and the leaf claiming it
+    /// says <i>expressible</i> and reads as built.
     /// </para>
     /// <para>
-    /// <b>It costs a minute and a half</b>, being two runs of ten thousand rounds, which is
-    /// why nothing else calls it.
+    /// <b>And the derivation entry closed on a reading that could not fail.</b> It asked
+    /// whether <c>Population.Sorts</c> was set, which an EMPTY vocabulary satisfies — so
+    /// handing the run a <see cref="Codes.Categories"/> turned it green with every counter in
+    /// the run bit-identical to the control. It now asks that a group was learnt and that a
+    /// category code reached a resident scope, which the first wiring did not do: the
+    /// derivation was refusing every pair for meeting once, and a moment here spans three
+    /// sentences.
+    /// </para>
+    /// <para>
+    /// <b>It costs four and a half minutes</b>, being two runs of ten thousand rounds with a
+    /// shuffled null taken five times over each. Three of those minutes are the shuffle, which
+    /// is why nothing else calls it and why a derivation's cadence is a cost rather than a bar.
     /// </para>
     /// </remarks>
     [Fact]
@@ -390,15 +397,19 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// empty, and it is the deadline.
     /// </para>
     /// <para>
-    /// <b>Five today, and the fleet's twenty came off in one commit.</b>
+    /// <b>One today, and the last two groups came off one road.</b>
     /// `OpenPlexus.Host` runs a holder and composes an asker over peers, so the transport is
-    /// reached by something that ships rather than by a fixture. Eighteen of the twenty closed
-    /// that way; <c>HybridBus</c> and its dial are apparatus rather than mechanism and moved to
-    /// <see cref="DrivenTests"/>'s instrument list, which asserts the suite drives them.
+    /// reached by something that ships rather than by a fixture; eighteen of the fleet's
+    /// twenty closed that way. <c>HybridBus</c> and its dial are apparatus rather than
+    /// mechanism and moved to <see cref="DrivenTests"/>'s instrument list, which asserts the
+    /// suite drives them.
     /// </para>
     /// <para>
-    /// <b>What is left is the category machinery and rung four's matcher.</b> The four close
-    /// behind the likeness bar, and the matcher behind the four.
+    /// <b>The category machinery closed the same way.</b> `OpenPlexus.Talk` composes a
+    /// <c>Sorted</c> over a <c>Deriving</c> and hands the population the same
+    /// <see cref="Codes.Categories"/>, so a conversation derives its own alternatives while it
+    /// runs rather than being handed a vocabulary. What is left is rung four's matcher, and
+    /// what it waits on is a PROPOSAL rather than a category.
     /// </para>
     /// <para>
     /// <b>And it says whether a reading can be believed.</b> A

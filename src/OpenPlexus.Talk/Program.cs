@@ -104,10 +104,32 @@ internal static class Program
 
         var curiosity = new Curiosity(brain, rate, seed, world.Naming);
 
+        // ONE vocabulary for the front end and the population, which is what `Categories`
+        // requires: a category the fold puts in a moment and one a scope is rewritten over
+        // have to be the same code, or the rewrite names something no moment holds. It starts
+        // empty and only ever grows, so nothing a session learns is ever renamed.
+        //
+        // Company rather than time, and `Rarely` rather than `Never`. A typed sentence is a
+        // window rather than one assertion, so two words that are alternatives land in one
+        // moment constantly -- the clause that refuses a pair for meeting once returns nought
+        // on every text stream measured. And the codes a conversation wants grouped never
+        // turn up beside each other; what they share is the company they keep.
+        var sorts = new Categories([]);
+
+        brain.Held.Sorts = sorts;
+
         var bench = new Bench(
             new Watching<Coded>(
                 world,
-                new Joined(joining),
+                new Sorted<Coded>(
+                    new Deriving<Coded>(
+                        new Joined(joining),
+                        sorts,
+                        Counting.Company,
+                        Meeting.Rarely,
+                        floor: Number(args, "--floor", 5),
+                        every: Number(args, "--deriving", 50)),
+                    sorts),
                 acting: Chooses.From(
                     felt => Doing(curiosity.Choose(felt)), curiosity.Cleared)),
             brain);
@@ -179,6 +201,17 @@ internal static class Program
         Console.WriteLine(
             $"vocabulary : {world.Vocabulary.Count} words — "
             + string.Join(" ", world.Vocabulary));
+
+        // What the derivation cost, beside what it found. A vocabulary that grows without
+        // paying is the arm's own refutation, and a group that fills gradually mints a
+        // category at every size it passes through.
+        Console.WriteLine(
+            $"categories : {sorts.Count} groups — "
+            + string.Join(" | ", sorts.Groups.Select(group => string.Join(
+                " ",
+                group.Select(code => world.Naming(code) is { } at
+                    ? world.Vocabulary[at]
+                    : "?")))));
 
         if (tutor is not null)
         {

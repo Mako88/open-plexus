@@ -259,7 +259,7 @@ public sealed class Joined : IQuantizer<Coded>
     /// is left entirely to the learner.
     /// </para>
     /// </remarks>
-    public const byte Sorted = 43;
+    public const byte Grouped = 43;
 
     private readonly Joining _joining;
     private readonly Categories _categories;
@@ -370,7 +370,7 @@ public sealed class Joined : IQuantizer<Coded>
             hash = Hashing.Fold(hash, code.Value);
         }
 
-        return new Code(Sorted, Hashing.Mix(hash));
+        return new Code(Grouped, Hashing.Mix(hash));
     }
 
     /// <summary>Which statements of the story this arm read, in the order it read them.</summary>

@@ -94,17 +94,19 @@ public sealed class DrivenTests(ITestOutputHelper output)
         Regex.Replace(
             Regex.Replace(source, @"/\*.*?\*/", " ", RegexOptions.Singleline), @"//.*", " ");
 
-    /// <summary>Why the category machinery is reached by nothing.</summary>
-    private const string Uncategorised =
-        "`Population.Sorts` is set in one place in the repo and it is a test, so no brain has "
-        + "ever held a category. Closes with the likeness bar and the categories, in that "
-        + "order, and `THE ORDER` carries both.";
-
     /// <summary>Why rung four's matcher is reached by nothing.</summary>
+    /// <remarks>
+    /// <b>The category machinery came off in one commit</b>, which is what left this entry on
+    /// its own. `OpenPlexus.Talk` composes a `Sorted` over a `Deriving` and hands the same
+    /// `Categories` to the population, so a conversation derives its own vocabulary of
+    /// alternatives while it runs — four groups on the creatures lesson, and the wider group
+    /// arriving beside the narrower one is add-only doing exactly what it says.
+    /// </remarks>
     private const string Unproposed =
         "the matcher is priced and nothing proposes a scope for it to match. "
         + "`UnifyingYieldTests` says what would: a hole is a variable only where the values it "
-        + "covers are alternatives, which is a category. So it closes behind the entry above.";
+        + "covers are alternatives, which is a category. A deployment now derives those, so "
+        + "what is left is the proposal.";
 
     /// <summary>
     /// Brain mechanisms no run reaches today, each with what closes it.
@@ -125,11 +127,6 @@ public sealed class DrivenTests(ITestOutputHelper output)
     private static readonly IReadOnlyDictionary<string, string> Waiting =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            ["Alternating"] = Uncategorised,
-            ["Deriving"] = Uncategorised,
-            ["Meeting"] = Uncategorised,
-            ["Sorted"] = Uncategorised,
-
             ["Unifying"] = Unproposed,
         };
 

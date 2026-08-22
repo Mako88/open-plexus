@@ -859,6 +859,7 @@ public sealed class Alternating
 /// <param name="counting">
 /// <inheritdoc cref="Counting" path="/summary"/>
 /// </param>
+/// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
 /// <param name="floor">
 /// <inheritdoc cref="Alternating.From" path="/param[@name='floor']"/>
 /// </param>
@@ -875,6 +876,7 @@ public sealed class Deriving<TObservation>(
     IQuantizer<TObservation> inner,
     Categories held,
     Counting counting,
+    Meeting meeting,
     int floor,
     int every,
     int span = 1)
@@ -900,7 +902,7 @@ public sealed class Deriving<TObservation>(
         // Counted here rather than inside the derivation, so the cadence is a rate over
         // observations and not over whatever else might have been true.
         if (++_seen % every == 0)
-            foreach (var group in _watching.ByChance(counting, floor))
+            foreach (var group in _watching.ByChance(counting, floor, meeting))
                 held.Learn(group);
 
         return codes;

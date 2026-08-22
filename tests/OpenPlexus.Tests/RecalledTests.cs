@@ -1927,7 +1927,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
         var shuffled = new HashSet<Code> { Babi.Of("sandra"), Babi.Of("mary"), Babi.Of("john") };
 
         Assert.Equal(Joined.Category(people), Joined.Category(shuffled));
-        Assert.Equal(Joined.Sorted, Joined.Category(people).Modality);
+        Assert.Equal(Joined.Grouped, Joined.Category(people).Modality);
 
         // A different set is a different category, so dropping a member cannot silently
         // rewrite what every scope holding the old name was claiming.

@@ -116,7 +116,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
             : new Sorted<Coded>(
                 deriving
                     ? new Deriving<Coded>(
-                        new Passthrough<Coded>(one => one), categories, Counting.Time, floor: 20, every: 250)
+                        new Passthrough<Coded>(one => one), categories, Counting.Time, Meeting.Never, floor: 20, every: 250)
                     : new Passthrough<Coded>(one => one),
                 categories);
 

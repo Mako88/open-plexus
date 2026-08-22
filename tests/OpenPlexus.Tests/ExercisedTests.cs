@@ -123,8 +123,25 @@ public sealed class ExercisedTests
     {
         var world = new Roaming(Fixture.House(examining), seed: 1);
         var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed: 1);
-        var noted = new Noted(new Joined(Joining.Resolved, resolution: 3, freshest: true));
         var falling = new Random(1);
+
+        // ONE vocabulary for the fold and the population, which is the seam `Categories`
+        // draws: a category the front end emits and one a scope is rewritten over have to be
+        // the same code or the rewrite names something no moment ever holds. The derivation
+        // sits UNDER the fold, so what it counts is what the world sent.
+        var sorts = new Categories([]);
+
+        brain.Held.Sorts = sorts;
+
+        var noted = new Noted(new Sorted<Coded>(
+            new Deriving<Coded>(
+                new Joined(Joining.Resolved, resolution: 3, freshest: true),
+                sorts,
+                Counting.Company,
+                Meeting.Rarely,
+                floor: 20,
+                every: 2_000),
+            sorts));
 
         // Nothing to want and nothing told, which is stated rather than hidden. A house has no
         // felt bands, so every advocated action is wanted equally and what `Drives` is being
@@ -182,8 +199,9 @@ public sealed class ExercisedTests
             arms => Any(arms, one => one.Tally.Right + one.Tally.Wrong > 0)),
 
         new("A concept a thing in its own right",
-            "adhesion reached a group over a window",
-            arms => Any(arms, one => one.Held.Sorts is not null)),
+            "the derivation learnt a group and a scope was written over one",
+            arms => Any(arms, one => one.Held.Sorts is { Count: > 0 }
+                && Scoped(one.Held, Joined.Grouped))),
 
         new("Every input an attribute of it",
             "a front end manufactured symbols from the signal",

@@ -31,12 +31,11 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them.
-- **ACTIVE, the five `DrivenTests` says no run reaches.** The category machinery —
-  `Alternating`, `Deriving`, `Meeting`, `Sorted` — and `Unifying` behind it. No deployment
-  composes a derivation.
-- **Then the categories the brain derives**, into `Population.Sorts`, which nothing but a
-  test has ever set. Delivery is `Coarsening`; a code in the moment is refused because a
-  category over alternatives is in every one. Fork **129**.
+- **ACTIVE, `Unifying` is the one no run reaches.** Nothing proposes a scope with a hole, and
+  a hole is a variable only over alternatives.
+- **Then what a derived category DELIVERS**, nought so far. The fold puts
+  it in nearly every moment and genesis refuses a code that never varied, so `Coarsening` is
+  the road and it wants a repair to judge. Fork **129**.
 - **Then which worlds still answer a live question**, measured rather than guessed. An
   isolating world leaves when its question shuts and fourteen are open.
 - **Then the crossing itself**, which falls out of that one: a name over the co-firing shape

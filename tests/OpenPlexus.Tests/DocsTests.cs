@@ -585,7 +585,12 @@ public sealed class DocsTests
     // pay for each other. `THE ORDER` said rung four owed a second world and now names which:
     // Monk-1's concept is a hole that repeats, and the front end fusing attribute with value
     // is why the one published bench that wants the rung cannot say it.
-    private const int Whole = 11_707;
+    // And 11,752 is the fifty-eighth raise, forty-five words, for a fork nothing had named.
+    // The proposer skips a sibling group whose hole would stand in every position of the
+    // scope, so a rule that is only a variable twice is out of reach -- which is Monk-1's own
+    // concept, and what the rung reaches there is that truth with a condition it does not
+    // need. It duplicates no entry and the leaf it sits beside came in shorter.
+    private const int Whole = 11_752;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

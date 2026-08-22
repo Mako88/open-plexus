@@ -30,7 +30,9 @@ ends: read it first, strike what got done, and write the handoff from what is le
 that is finished LEAVES, so this is only ever what is still to do.
 
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
-  build: a session cannot reach green without doing them.
+  build: a session cannot reach green without doing them. One is left and it is fork **28**'s.
+- **Then the genesis gate**, which leaves a third of an enumerable world's rules unfound and
+  costs nothing to lift on three worlds. Fork **135**.
 - **Then what a derived category DELIVERS**, nought so far. The fold puts it in nearly every
   moment and genesis refuses a code that never varied, so `Coarsening` is the road. Fork
   **129**.
@@ -456,9 +458,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — the horizon is K occasions, K=1. Fork **28**.
     - **OPEN** — entailment depth and the horizon are capped at one; both come off when
       blame diffusion has a number. Fork **32**.
-    - **OPEN** — the surprise gate starves a proposal set another mechanism made affordable:
-      a lucky advocate blocks genesis, so proposals stop while most of the world is unfound.
-      Fork **135**.
+    - **OPEN** — a lucky advocate blocks genesis, so proposals stop within a hundred rounds
+      of twenty thousand. Fork **135**.
     - **OPEN** — and what that bar COSTS is a function of how young the population is, free
       at saturation and most of the examination before it, because it blocks repair while
       nothing can clear the floor yet. Unpriced, and it is why the bar does not ship. Fork

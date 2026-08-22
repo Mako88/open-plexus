@@ -117,12 +117,45 @@ internal sealed class Fleet : ICouncil
     };
 
     /// <inheritdoc/>
+    /// <param name="raw">What the front end said, before any minted name is folded in.</param>
+    /// <param name="fleeting">Which of those codes the source says will not come back.</param>
+    /// <param name="grouping">
+    /// Which thing each code belongs to. <b>Refused rather than dropped</b>, because this one
+    /// decides what fires.
+    /// </param>
+    /// <param name="ct">Cancellation.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>A grouping is refused here and it is not an oversight.</b> <c>Fleeting</c> reaches
+    /// the table and nothing else, so a holder that never heard it takes every identical
+    /// decision and the field is safe to leave off a message. A grouping decides which scopes
+    /// fire and which genesis proposes, so a holder that never heard it holds a DIFFERENT
+    /// population — and the settlement re-matches the moment, which would then blame
+    /// commitments the vote never asked.
+    /// </para>
+    /// <para>
+    /// <b>So the wire half arrives when the arm does.</b> One int a code beside a message that
+    /// already carries every code is what it costs, and the cost buys nothing until
+    /// <see cref="Spanning.Thing"/> has beaten its control on the one world that can separate
+    /// them. Paying for it first would be shipping a wire format for a mechanism that may be
+    /// deleted, and a throw is what stops the gap being read as a green fleet run.
+    /// </para>
+    /// </remarks>
     public async ValueTask<Vote> AskAsync(
         IReadOnlySet<Code> raw,
         IReadOnlySet<Code>? fleeting = null,
+        IReadOnlyDictionary<Code, int>? grouping = null,
         CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(raw);
+
+        if (grouping is { Count: > 0 })
+            throw new NotSupportedException(
+                "this moment carries a grouping and `Ask` cannot. A grouping decides what "
+                + "fires, so a holder that never heard it would hold a different population "
+                + "and the settlement would blame commitments the vote never asked -- which "
+                + "is a wrong number rather than a missing one. Run this world on one "
+                + "machine, or carry the grouping on the wire beside the moment");
 
         // Remembered here and sent again with the settlement, so no holder has to keep
         // state keyed by a vote that C2 permits never to be followed up. The asker is the

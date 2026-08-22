@@ -157,9 +157,16 @@ internal interface ICouncil
     /// say. <b>It reaches the table and nothing else</b>, so a holder that ignored it would
     /// hold a bigger table and take every identical decision.
     /// </param>
+    /// <param name="grouping">
+    /// Which THING each of those codes belongs to, or nothing where the source did not say.
+    /// <b>It decides what fires</b>, which is what separates it from <paramref name="fleeting"/>
+    /// — a holder that ignored it would hold a different population rather than a bigger
+    /// table, so it is not safe to drop.
+    /// </param>
     ValueTask<Vote> AskAsync(
         IReadOnlySet<Code> raw,
         IReadOnlySet<Code>? fleeting = null,
+        IReadOnlyDictionary<Code, int>? grouping = null,
         CancellationToken ct = default);
 
     /// <summary>
@@ -196,6 +203,7 @@ internal sealed class Alone : ICouncil
 
     private IReadOnlySet<Code> _moment = new HashSet<Code>();
     private IReadOnlySet<Code>? _fleeting;
+    private IReadOnlyDictionary<Code, int>? _grouping;
     private ImmutableArray<Commitment> _firing;
 
     private long _firingTicks;
@@ -238,8 +246,9 @@ internal sealed class Alone : ICouncil
     public ValueTask<Vote> AskAsync(
         IReadOnlySet<Code> raw,
         IReadOnlySet<Code>? fleeting = null,
+        IReadOnlyDictionary<Code, int>? grouping = null,
         CancellationToken ct = default) =>
-        ValueTask.FromResult(Ask(raw, fleeting));
+        ValueTask.FromResult(Ask(raw, fleeting, grouping));
 
     /// <summary>
     /// The same ask, and <b>the shape everything here is really in.</b>
@@ -253,7 +262,11 @@ internal sealed class Alone : ICouncil
     /// way there is exactly one place where the two shapes meet, and it is the line above.
     /// </remarks>
     /// <param name="fleeting">Which of the moment's codes the source says will not come back.</param>
-    public Vote Ask(IReadOnlySet<Code> raw, IReadOnlySet<Code>? fleeting = null)
+    /// <param name="grouping">Which thing each of the moment's codes belongs to.</param>
+    public Vote Ask(
+        IReadOnlySet<Code> raw,
+        IReadOnlySet<Code>? fleeting = null,
+        IReadOnlyDictionary<Code, int>? grouping = null)
     {
         ArgumentNullException.ThrowIfNull(raw);
 
@@ -264,6 +277,11 @@ internal sealed class Alone : ICouncil
         // is the same slot the firing is already kept in.
         _fleeting = fleeting;
 
+        // Kept for the settlement on the same reason, and it matters more here: genesis
+        // proposes a scope per thing, so a telling that had forgotten the grouping would
+        // mint nothing where the ask fired on it.
+        _grouping = grouping;
+
         _moment = _held.Moment(raw);
 
         // NOTED BEFORE ANYTHING READS IT, so a code is counted live in the very moment
@@ -271,7 +289,7 @@ internal sealed class Alone : ICouncil
         // moment a code appears be judged against a table that had not seen it.
         _held.Witness(_moment);
 
-        _firing = _held.Firing(_moment);
+        _firing = _held.Firing(_moment, _grouping);
 
         var vote = _held.Predict(_firing);
 
@@ -368,7 +386,7 @@ internal sealed class Alone : ICouncil
         // which is the refutation that put `Surprising` back, and it would arrive again by
         // this door. And it is gated again inside, on whether anything that fired proposed
         // what arrived.
-        long minted = _held.Genesis(_moment, outcome, _firing);
+        long minted = _held.Genesis(_moment, outcome, _firing, _grouping);
 
         at = Mark(ref _genesis, at);
 

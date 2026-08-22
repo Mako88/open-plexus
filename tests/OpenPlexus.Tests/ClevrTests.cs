@@ -229,7 +229,16 @@ public sealed class ClevrTests(ITestOutputHelper output)
         var told = Learnt(fleeting: true);
         var silent = Learnt(fleeting: false);
 
-        foreach (var (arm, run) in new[] { ("told", told), ("silent", silent) })
+        // The second world `Spanning` owes, and it is the one that says what the dial costs
+        // where a grouping exists and the question does not sit inside one. The corpus
+        // segments the SCENE and leaves the question's codes in no part, so a scope naming a
+        // referring filter and an attribute of one object is refused wherever the two came
+        // from different objects -- which is the mechanism doing what it says on a world
+        // nobody generated for it.
+        var spanning = Learnt(fleeting: true, spanning: Spanning.Anything);
+
+        foreach (var (arm, run) in new[]
+                 { ("told", told), ("silent", silent), ("told, spanning", spanning) })
         {
             output.WriteLine(
                 $"{arm} | chance {run.World.Chance:F3} | drawn {run.Tally.Recent:F3} | held "
@@ -267,7 +276,7 @@ public sealed class ClevrTests(ITestOutputHelper output)
         // the weighted chance over however many were answered, so the width is the sample's
         // and not a constant somebody chose. Going red means the withheld set moved off the
         // bar, which is the day something composed -- take the number and raise this.
-        foreach (var run in new[] { told, silent })
+        foreach (var run in new[] { told, silent, spanning })
         {
             var spread = 3.0 * Math.Sqrt(
                 run.World.Chance * (1.0 - run.World.Chance) / run.Unseen.Answered);
@@ -295,12 +304,14 @@ public sealed class ClevrTests(ITestOutputHelper output)
     }
 
     /// <param name="fleeting">Whether the world says its per-scene indexes cannot recur.</param>
-    private static Run Learnt(bool fleeting)
+    /// <param name="spanning">Whether a scope may be about more than one of the objects.</param>
+    private static Run Learnt(bool fleeting, Spanning spanning = Spanning.Thing)
     {
         var world = new Clevr(
             World(scenes: Scenes, fleeting: fleeting) with { Withheld = 300 });
 
-        var brain = new Brain(new CommittingSettings { Capacity = 4000 }, seed: 1);
+        var brain = new Brain(
+            new CommittingSettings { Capacity = 4000, Spanning = spanning }, seed: 1);
 
         var tally = new Bench(new Watching<Coded>(world, new Passthrough<Coded>(one => one)), brain)
             .Run(rounds: 20_000, sweep: 1000, target: 0.9, window: 2000);

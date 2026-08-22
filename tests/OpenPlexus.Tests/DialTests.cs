@@ -323,6 +323,16 @@ public sealed class DialTests
             + "keeps the rewrite and refuses the root, and it is the arm that says which of "
             + "them the machine was paying for",
 
+        ["Spanning"] =
+            "whether a scope is about ONE thing, and not a level: the arms are a mechanism "
+            + "and its absence, so there is no quantity a controller could hunt. It is the "
+            + "reader `IQuantizer.Bind` never had, and the second road to it -- deriving the "
+            + "grouping into a code per pair inside a thing was built and refuted, so what is "
+            + "left changes what a scope MEANS and leaves every code alone. Both halves move "
+            + "together on purpose: a matcher refusing a scope that spans two things cannot "
+            + "help while nothing proposes a scope about one, because the code completing a "
+            + "thing separates nothing a table counting co-occurrence can see",
+
         // ---- arrived from the worlds, 2026-08-04 ---------------------------
         //
         // none of these is new. Every one was already a dial, passed to a `*Run`
@@ -679,7 +689,19 @@ public sealed class DialTests
         // The knob was spent knowingly and recovered the same way. A dial exists to hold a
         // comparison open; when every arm but the default has a revival row, what is left is
         // the code and this budget is what says so.
-        Assert.Equal(18, HandSet.Count);
+        //
+        // And nineteen for `Spanning`, which is a rise and is written as one. It is the
+        // reader `IQuantizer.Bind` never had, and the channel is nine months old: the walk's
+        // occasion was its only consumer, a commitment's scope is a set with nowhere to put a
+        // group, and the derivation that tried to turn one into codes is refuted. So the
+        // question the knob holds open is whether the channel goes, and it is one of the
+        // three `OutstandingTests` entries rather than a preference between two builds.
+        //
+        // It ships ON. Against the control that has the grouping and does not read it, on the
+        // world built so the codes cannot say which shape belongs to which colour, it is
+        // 0.9988 against 0.5225 on the withheld set -- and it is the control that holds more
+        // rules. `BindingTests` carries the grid and the kill line it was written with.
+        Assert.Equal(19, HandSet.Count);
     }
 
     /// <summary>

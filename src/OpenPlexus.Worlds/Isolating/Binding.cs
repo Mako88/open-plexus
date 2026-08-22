@@ -38,7 +38,7 @@ public sealed record BindingSettings
     /// anything.
     /// </para>
     /// <para>
-    /// <b>It changes no code the world emits.</b> The scenes are drawn from the
+    /// <b>It changes no code the world emits.</b> Scenes are drawn from the
     /// same generator in the same order either way — only which shape is
     /// *answerable for* which colour moves. That is asserted rather than
     /// described.
@@ -97,6 +97,25 @@ public sealed record BindingSettings
     /// </para>
     /// </remarks>
     public bool Fleeting { get; init; }
+
+    /// <summary>
+    /// How many scenes are drawn before the run and never shown to it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Nought by default</b>, which is every reading taken of this world before it had a
+    /// runner. A world that withholds nothing answers an examination of nothing, and every
+    /// count in it is nought.
+    /// </para>
+    /// <para>
+    /// <b>Drawn first, so the live stream is what is left.</b> A held-out set the world could
+    /// wander into would measure the trailing accuracy again, more slowly — see
+    /// <see cref="IWithholds{TSeen}.Withheld"/>. Both arms draw the same number from the same
+    /// generators, so withholding shifts the stream identically and the two still see the
+    /// identical input.
+    /// </para>
+    /// </remarks>
+    public int Withheld { get; init; }
 }
 
 /// <summary>
@@ -145,8 +164,45 @@ public sealed record Scene
     /// </summary>
     public IReadOnlySet<Code>? Passing { get; init; }
 
+    /// <summary>Which object the question is about.</summary>
+    /// <remarks>
+    /// <b>Drawn per scene from its own generator</b>, so both arms ask about the same object
+    /// in the same order and the question is not a second thing that moved.
+    /// </remarks>
+    public required int Asked { get; init; }
+
+    /// <summary>The code that asks about <see cref="Asked"/>.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Derived from that object's colour code</b>, so the question names the object the
+    /// way a questioner has to — by something about it — rather than by an index the world
+    /// made up. Two machines reach the same name for <i>asked about this colour</i> from the
+    /// code alone, which a table minted per run would not.
+    /// </para>
+    /// <para>
+    /// <b>And it is in the asked object's group</b>, which is the front end saying what it is
+    /// pointing at. Both colours are in every scene, so a question sitting in no group would
+    /// single out a colour and not a thing, and the two objects' shapes would then be equally
+    /// good answers to it.
+    /// </para>
+    /// </remarks>
+    public required Code Question { get; init; }
+
     /// <summary>How many objects the scene holds.</summary>
     public int Objects => Colours.Count;
+
+    /// <summary>What the machine is shown, with the question in it.</summary>
+    /// <remarks>
+    /// <b>The parts are the objects</b>, and they are the only place the binding is expressed
+    /// as anything a front end could report. <see cref="Codes"/> is identical whichever way
+    /// the scene is bound; the parts are not.
+    /// </remarks>
+    public Coded Shown => new()
+    {
+        Codes = [.. Codes, Question],
+        Groups = Grouped.Parts(Groups),
+        Passing = Passing,
+    };
 }
 
 /// <summary>
@@ -178,7 +234,7 @@ public sealed record Scene
 /// form this comparison can take.
 /// </para>
 /// </remarks>
-public sealed class Binding
+public sealed class Binding : IWorld<Coded>, IWithholds<Coded>
 {
     /// <summary>What an object looks like.</summary>
     public const byte Colour = 20;
@@ -191,6 +247,17 @@ public sealed class Binding
     /// see <see cref="BindingSettings.Tagged"/>.</b>
     /// </summary>
     public const byte Tag = 22;
+
+    /// <summary>
+    /// Which object is being asked about, said by naming its colour.
+    /// </summary>
+    /// <remarks>
+    /// <b>Its own modality</b>, so the question is not a fifth thing in the scene. A question
+    /// re-emitting the colour code itself would be a code the scene already holds, and
+    /// nothing could then tell <i>a red thing is here</i> from <i>which shape is the red
+    /// one</i>.
+    /// </remarks>
+    public const byte Asks = 23;
 
     /// <summary>
     /// How many objects a scene holds. <b>Two, and not a dial</b> — the question
@@ -215,8 +282,21 @@ public sealed class Binding
     /// </remarks>
     private readonly Random _binding;
 
+    /// <summary>
+    /// Draws which object is asked about, and <b>nothing else</b>.
+    /// </summary>
+    /// <remarks>
+    /// <b>Its own generator, on <see cref="_binding"/>'s reason.</b> Drawing the question out
+    /// of the scene generator would mean the two arms saw different scenes as well as
+    /// different truths, and every reading here rests on their seeing the same stream.
+    /// </remarks>
+    private readonly Random _asking;
+
     /// <summary>Scenes shown, so a tag can be fresh every time.</summary>
     private long _moment;
+
+    /// <summary>Scenes drawn before the run and never pushed into it.</summary>
+    private readonly List<Turn<Coded>> _withheld = [];
 
     public Binding(BindingSettings settings, int seed)
     {
@@ -243,6 +323,12 @@ public sealed class Binding
         // what happens when they are merely offset from each other.
         _scenes = new Random(Seeds.Apart(seed, 0x9E37_79B9));
         _binding = new Random(Seeds.Apart(seed, 0x85EB_CA6B));
+        _asking = new Random(Seeds.Apart(seed, 0xC2B2_AE35));
+
+        // Drawn first, so the live stream is what is left over. Both arms draw the same
+        // number from the same generators, so withholding moves the stream identically and
+        // the two still see the identical input.
+        for (var held = 0; held < settings.Withheld; held++) _withheld.Add(Next());
     }
 
     /// <summary>How many kinds of thing there are.</summary>
@@ -263,6 +349,19 @@ public sealed class Binding
     /// </remarks>
     public static double Chance => 1.0 / PerScene;
 
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <b>Every shape there is, which is not what <see cref="Chance"/> divides by.</b> The
+    /// answer is named out of the whole alphabet, so a BLIND guess is one in
+    /// <see cref="Concepts"/>; a guesser that has noticed which two shapes are in front of it
+    /// is at <see cref="Chance"/>, and that is the bar this world is read against. Both
+    /// numbers are true and they answer different questions.
+    /// </remarks>
+    public int Outcomes => _settings.Concepts;
+
+    /// <inheritdoc/>
+    public IReadOnlyList<Turn<Coded>> Withheld => _withheld;
+
     /// <summary>Every code one attribute of one concept produces.</summary>
     public IReadOnlyList<Code> Of(byte attribute, int concept)
     {
@@ -275,10 +374,26 @@ public sealed class Binding
     public static int Concept(Code code) => Kinds.Of(code);
 
     /// <summary>
+    /// One turn: a scene, the question about one of its objects, and the answer.
+    /// </summary>
+    /// <remarks>
+    /// <b>The answer is a shape's CONCEPT and never its code</b>, so the machine has to say
+    /// which kind of thing it is rather than repeat a code it was shown. A concept shows
+    /// <see cref="BindingSettings.CodesPerAttribute"/> codes, which is what stops identity
+    /// being a table read.
+    /// </remarks>
+    public Turn<Coded> Next()
+    {
+        var scene = Draw();
+
+        return new Turn<Coded> { Seen = scene.Shown, Outcome = scene.Shapes[scene.Asked] };
+    }
+
+    /// <summary>
     /// One scene: two distinct concepts, their four codes, and a binding that is
     /// nowhere in those codes.
     /// </summary>
-    public Scene Next()
+    public Scene Draw()
     {
         var first = _scenes.Next(_settings.Concepts);
 
@@ -315,13 +430,24 @@ public sealed class Binding
         IReadOnlyList<int> colours = [first, second];
         IReadOnlyList<int> shapes = swapped ? [second, first] : [first, second];
 
+        // Which object, drawn before the grouping is built because the question goes into
+        // that object's part. Asking about a colour and leaving the question outside every
+        // part would name a colour rather than a thing, and both shapes would answer it.
+        var asked = _asking.Next(PerScene);
+        var pointing = colours[asked] == low ? colourLow : colourHigh;
+        var question = new Code(Asks, pointing.Value);
+
         return new Scene
         {
             Codes = codes,
             Colours = colours,
             Shapes = shapes,
             Tags = tags,
-            Groups = _settings.Segmented ? Segment(colours, shapes, codes, tags) : null,
+            Asked = asked,
+            Question = question,
+            Groups = _settings.Segmented
+                ? Segment(colours, shapes, codes, tags, asked, question)
+                : null,
             Passing = _settings.Fleeting ? tags.ToHashSet() : null,
         };
     }
@@ -340,9 +466,11 @@ public sealed class Binding
         IReadOnlyList<int> colours,
         IReadOnlyList<int> shapes,
         IReadOnlyCollection<Code> codes,
-        IReadOnlyList<Code> tags)
+        IReadOnlyList<Code> tags,
+        int asked,
+        Code question)
     {
-        var groups = new Dictionary<Code, int>();
+        var groups = new Dictionary<Code, int> { [question] = asked };
 
         for (var obj = 0; obj < tags.Count; obj++) groups[tags[obj]] = obj;
 

@@ -26,6 +26,36 @@ public readonly record struct Grouped
     /// <param name="codes">What is in it.</param>
     public static Grouped Of(IEnumerable<Code> codes) => new() { Codes = [.. codes] };
 
+    /// <summary>The parts a code-to-group report describes, or nothing where it said none.</summary>
+    /// <param name="grouped">Which thing each code belongs to.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>Here rather than in each world</b>, because two of them wrote it and a third would
+    /// have. A world knows which object it drew a code for and the dictionary is the shape
+    /// that falls out of drawing; the parts are the shape a front end reports, and turning one
+    /// into the other is neither world's business.
+    /// </para>
+    /// <para>
+    /// <b>Ordered by group and then by code</b>, so two machines reading one report build the
+    /// identical parts. A dictionary's order does not survive a run, and a part compares by
+    /// what it holds in the order it holds it.
+    /// </para>
+    /// <para>
+    /// <b>Partial is normal.</b> A world segments what it can and leaves the rest out, so the
+    /// parts are what it can say about the moment's shape rather than a partition of it.
+    /// </para>
+    /// </remarks>
+    public static IReadOnlyList<Grouped>? Parts(IReadOnlyDictionary<Code, int>? grouped) =>
+        grouped is not { Count: > 0 }
+            ? null
+            :
+            [
+                .. grouped
+                    .GroupBy(one => one.Value)
+                    .OrderBy(one => one.Key)
+                    .Select(one => Of(one.Select(each => each.Key).Order())),
+            ];
+
     /// <summary>Whether two parts hold the same codes in the same order.</summary>
     /// <param name="other">The other part.</param>
     /// <remarks>

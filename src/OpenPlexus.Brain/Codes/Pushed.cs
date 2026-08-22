@@ -78,6 +78,31 @@ public readonly record struct Pushed
     /// </remarks>
     public IReadOnlySet<Code>? Fleeting { get; init; }
 
+    /// <summary>
+    /// Which THING each of those codes belongs to, where the source can say.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A fact only the front end holds</b>, on <see cref="Fleeting"/>'s reason and with a
+    /// larger consequence. A retina hands the cortex an already-grouped signal and nothing
+    /// downstream can recover the grouping from the codes: a red ball beside a blue box and a
+    /// blue ball beside a red box are the identical set, so the binding is destroyed before
+    /// anything the population does gets a chance to run.
+    /// </para>
+    /// <para>
+    /// <b>And it cannot be derived into codes</b>, which is what makes it travel rather than
+    /// be computed at the join the way a precedence is. Deriving a code per pair inside a
+    /// group was built and refuted — it composed nothing on CLEVR while flooding repair's
+    /// candidate set — and it is quadratic in the group's size where this is one int a code.
+    /// </para>
+    /// <para>
+    /// <b>Codes in no group are unconstrained</b> rather than being one group of their own. A
+    /// world may segment its objects and leave a question's codes outside every part, so this
+    /// is what the source can say about the moment's shape rather than a partition of it.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyDictionary<Code, int>? Grouping { get; init; }
+
     /// <summary>What the source says followed it, or nothing where it cannot say.</summary>
     /// <remarks>
     /// <b>Nothing is the third verdict rather than a miss</b>. Most moments in any real

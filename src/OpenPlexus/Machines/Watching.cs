@@ -48,6 +48,15 @@ internal sealed record Fronted
 
     /// <summary>Codes the front end said name this occasion and cannot recur.</summary>
     public required long Fleeting { get; init; }
+
+    /// <summary>Codes the front end put in one of the moment's things.</summary>
+    /// <remarks>
+    /// <b>Codes rather than things</b>, so it reads against <see cref="Said"/> and says what
+    /// share of a moment the front end could place. How many things there were is a fact
+    /// about the scene; how much of the scene is IN one is a fact about the front end, and
+    /// that is the one a reader needs to tell a segmenting world from a segmented moment.
+    /// </remarks>
+    public required long Grouped { get; init; }
 }
 
 /// <summary>
@@ -119,7 +128,7 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
 
     private long _sequence;
 
-    private long _said, _ordered, _doings, _fleeting;
+    private long _said, _ordered, _doings, _fleeting, _grouped;
     private long _chosen, _quiet, _again;
 
     /// <param name="world">The problem.</param>
@@ -202,6 +211,7 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
                     {
                         Codes = new HashSet<Code>(Sensed(one.Seen)),
                         Followed = Brain.Says(one.Outcome!.Value),
+                        Grouping = _sensing.Bind(one.Seen),
                     }),
             ];
 
@@ -214,6 +224,7 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
             Ordered = _ordered,
             Doings = _doings,
             Fleeting = _fleeting,
+            Grouped = _grouped,
         };
 
     /// <inheritdoc/>
@@ -241,11 +252,20 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
 
         _fleeting += passing?.Count ?? 0;
 
+        // Forwarded whole for the same reason and it is the channel that cannot be derived.
+        // A precedence and an intervention become codes here because a code is what a fleet
+        // broadcasts; a grouping cannot, and the derivation that tried it is refuted. So this
+        // one travels beside the moment.
+        var grouping = _sensing.Bind(turn.Seen);
+
+        _grouped += grouping?.Count ?? 0;
+
         return new Pushed
         {
             From = new Stamp { Source = Source, Sequence = _sequence++ },
             Codes = new HashSet<Code>(Sensed(turn.Seen, telling: true)),
             Fleeting = passing,
+            Grouping = grouping,
             Followed = turn.Outcome is { } outcome ? Brain.Says(outcome) : null,
         };
     }

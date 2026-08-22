@@ -1,4 +1,8 @@
-﻿using OpenPlexus.Worlds;
+﻿using OpenPlexus.Codes;
+using OpenPlexus.Commitments;
+using OpenPlexus.Machines;
+using OpenPlexus.Worlds;
+using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
 
@@ -34,7 +38,7 @@ namespace OpenPlexus.Tests;
 /// the system.
 /// </para>
 /// </remarks>
-public sealed class BindingTests
+public sealed class BindingTests(ITestOutputHelper output)
 {
     private static BindingSettings World(bool bound, int concepts = 8, int codes = 3) =>
         Fixture.Binding(bound, concepts, codes);
@@ -52,7 +56,7 @@ public sealed class BindingTests
         var unbound = new Binding(World(bound: false), seed: 1);
 
         for (var i = 0; i < 2_000; i++)
-            Assert.Equal(bound.Next().Codes, unbound.Next().Codes);
+            Assert.Equal(bound.Draw().Codes, unbound.Draw().Codes);
     }
 
     [Fact]
@@ -66,7 +70,7 @@ public sealed class BindingTests
 
         var differed = 0;
         for (var i = 0; i < 1_000; i++)
-            if (!bound.Next().Shapes.SequenceEqual(unbound.Next().Shapes)) differed++;
+            if (!bound.Draw().Shapes.SequenceEqual(unbound.Draw().Shapes)) differed++;
 
         Assert.InRange(differed, 400, 600);
     }
@@ -91,7 +95,7 @@ public sealed class BindingTests
 
             for (var moment = 0; moment < 400; moment++)
             {
-                var scene = world.Next();
+                var scene = world.Draw();
 
                 // The questions are asked on every tenth scene, so that is the
                 // subsample whose fairness actually decides a score.
@@ -124,7 +128,7 @@ public sealed class BindingTests
 
         for (var i = 0; i < 1_000; i++)
         {
-            var scene = world.Next();
+            var scene = world.Draw();
 
             Assert.Equal(2, scene.Objects);
             Assert.Equal(4, scene.Codes.Count);
@@ -143,7 +147,7 @@ public sealed class BindingTests
 
         for (var i = 0; i < 500; i++)
         {
-            var attributes = world.Next().Codes
+            var attributes = world.Draw().Codes
                 .GroupBy(code => code.Modality)
                 .ToDictionary(group => group.Key, group => group.Count());
 
@@ -169,12 +173,6 @@ public sealed class BindingTests
 
     // ---- what it measures ---------------------------------------------------
 
-    /// <summary>
-    /// Grouping in the occasion, the index in the question, and the edge weighed
-    /// from the sender's end. <b>The three together are what lift it.</b>
-    /// </summary>
-    private static BindingSettings Bound => Fixture.Binding(segmented: true, tagged: true);
-
     [Fact]
     public void A_tag_without_its_group_is_refused_rather_than_accepted()
     {
@@ -185,4 +183,283 @@ public sealed class BindingTests
             new Binding(World(bound: false) with { Tagged = true }, seed: 1));
     }
 
+    [Fact]
+    public void The_question_points_at_a_thing_and_never_at_a_colour()
+    {
+        // The reading rests on this. Both colours are in every scene, so a question that sat
+        // outside every part would name a colour and not an object -- and the two shapes
+        // would then be equally good answers to it, with no grouping able to say otherwise.
+        var world = new Binding(World(bound: false) with { Segmented = true }, seed: 4);
+
+        for (var i = 0; i < 500; i++)
+        {
+            var scene = world.Draw();
+
+            Assert.NotNull(scene.Groups);
+            Assert.Equal(scene.Asked, scene.Groups[scene.Question]);
+            Assert.Equal(Binding.Asks, scene.Question.Modality);
+
+            // And it is derived from that object's colour rather than from its shape, or the
+            // question would be the answer written down.
+            Assert.Equal(scene.Colours[scene.Asked], Binding.Concept(scene.Question));
+        }
+    }
+
+    [Fact]
+    public void The_two_arms_of_the_grouping_still_see_the_identical_input()
+    {
+        // The same proof one seam further out. Reading the grouping changes what a scope
+        // MEANS and never what arrives, so the arm and its control are two runs of the
+        // learner over one stream -- which is what the trap about an arm that changes a
+        // code's value asks for and what the Monk comparison did not have.
+        var told = new Binding(World(bound: false) with { Segmented = true }, seed: 1);
+        var silent = new Binding(World(bound: false), seed: 1);
+
+        for (var i = 0; i < 1_000; i++)
+        {
+            var one = told.Next();
+            var other = silent.Next();
+
+            Assert.Equal(one.Seen.Codes, other.Seen.Codes);
+            Assert.Equal(one.Outcome, other.Outcome);
+
+            Assert.NotNull(one.Seen.Groups);
+            Assert.Null(other.Seen.Groups);
+        }
+    }
+
+    // ---- what it measures ---------------------------------------------------
+
+    /// <summary>How many concepts, and how many codes each attribute of one shows.</summary>
+    /// <remarks>
+    /// <b>Small, because the question is representability and not scale.</b> Every
+    /// (colour, shape) pair needs its own rule and each attribute shows three codes, so the
+    /// rules a perfect population would hold is concepts squared times nine — 576 at four,
+    /// which a capacity of four thousand holds with room to spare.
+    /// </remarks>
+    private const int Concepts = 4;
+
+    /// <summary>One arm of the grid, run whole.</summary>
+    /// <param name="Arm">What is being run.</param>
+    /// <param name="Tally">What the run scored on the stream.</param>
+    /// <param name="Unseen">What it scored on the scenes it was never shown.</param>
+    /// <param name="Held">How many commitments are resident at the end.</param>
+    /// <param name="Sound">Resident rules that are right about this world whatever it shows.</param>
+    /// <param name="Found">How many DISTINCT ones of those, which is what coverage means.</param>
+    /// <param name="Lengths">How many residents there are at each scope length.</param>
+    private sealed record Run(
+        string Arm,
+        Tally Tally,
+        Examined Unseen,
+        int Held,
+        int Sound,
+        int Found,
+        SortedDictionary<int, int> Lengths)
+    {
+        /// <summary>What share of the answered withheld scenes were right.</summary>
+        public double Withheld =>
+            Unseen.Answered == 0 ? 0.0 : Unseen.Right / (double)Unseen.Answered;
+    }
+
+    /// <summary>
+    /// What reading the grouping is worth, against the control that has it and ignores it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The kill line, written before the run.</b> <see cref="Spanning.Thing"/> must beat
+    /// its control on the withheld set by more than the seed spread. If it does not, the arm
+    /// is deleted and <see cref="Codes.IQuantizer{TObservation}.Bind"/> goes with it — the
+    /// channel has no other proposed reader, and the one that was built is refuted.
+    /// </para>
+    /// <para>
+    /// <b>The control is the same codes with the mechanism off</b>, which is the sharpest
+    /// form this comparison can take and the form the Monk comparison did not have. Nothing
+    /// the world emits moves between the two arms:
+    /// <see cref="The_two_arms_of_the_grouping_still_see_the_identical_input"/> asserts it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_reading_the_grouping_is_worth_where_the_codes_cannot_say()
+    {
+        int[] seeds = [1, 2, 3, 4];
+
+        var arms =
+            new (string Arm, bool Bound, bool Segmented, Spanning Spanning, Surprising Gate)[]
+            {
+                ("bound, ungrouped     ", true, false, Spanning.Anything, Surprising.Unaccounted),
+                ("unbound, ungrouped   ", false, false, Spanning.Anything, Surprising.Unaccounted),
+                ("unbound, ignored     ", false, true, Spanning.Anything, Surprising.Unaccounted),
+                ("unbound, read        ", false, true, Spanning.Thing, Surprising.Unaccounted),
+                ("unbound, ignored, any", false, true, Spanning.Anything, Surprising.AnyFailure),
+                ("unbound, read, any   ", false, true, Spanning.Thing, Surprising.AnyFailure),
+            };
+
+        var measured = new Dictionary<string, Measured>();
+        var taken = new Dictionary<string, List<Run>>();
+
+        foreach (var (arm, bound, segmented, spanning, gate) in arms)
+        {
+            var runs = seeds
+                .Select(seed => Learnt(arm, bound, segmented, spanning, gate, seed))
+                .ToList();
+
+            taken[arm] = runs;
+            measured[arm] = new Measured
+            {
+                Arm = arm,
+                Values = [.. runs.Select(one => one.Withheld)],
+            };
+
+            output.WriteLine(
+                $"{arm} | withheld {measured[arm]} | drawn "
+                + $"{runs.Average(one => one.Tally.Recent):F3} | held "
+                + $"{runs.Average(one => (double)one.Held):F0} | answered "
+                + $"{runs.Average(one => (double)one.Unseen.Answered):F0} of "
+                + $"{runs.Average(one => (double)one.Unseen.Asked):F0} | sound "
+                + $"{runs.Average(one => (double)one.Sound):F0}, {runs.Average(one => (double)one.Found):F0} "
+                + $"of {Concepts * Concepts * 9} the world has");
+
+            output.WriteLine(
+                $"{arm} |   minted {runs.Average(one => (double)one.Tally.Minted):F0}, "
+                + $"repaired {runs.Average(one => (double)one.Tally.Repaired):F0}, "
+                + $"lengths {string.Join(" ", runs[0].Lengths.Select(one => $"{one.Key}:{one.Value}"))}");
+        }
+
+        output.WriteLine($"informed chance is {Binding.Chance:F3}");
+
+        // The grouping changes nothing until it is read, asserted rather than argued. These
+        // two runs differ in one thing: the front end reports which codes are one object.
+        // Bit-identical scores are what says the control is a control, and that the arm
+        // below is a mechanism rather than a second stream.
+        Assert.Equal(
+            measured["unbound, ungrouped   "].Mean,
+            measured["unbound, ignored     "].Mean);
+
+        // The reading. The arm against the control that has the grouping and ignores it,
+        // both under the same genesis gate, on a world whose codes cannot say which shape
+        // belongs to which colour.
+        var read = measured["unbound, read, any   "];
+        var control = measured["unbound, ignored, any"];
+        var spread = Math.Sqrt((read.StdErr * read.StdErr) + (control.StdErr * control.StdErr));
+
+        Assert.True(read.Mean - control.Mean > 5 * spread,
+            $"{read} against {control} is under five pooled standard errors ({spread:F4}). "
+            + "This is the kill line `Spanning` was built with: the grouping must beat the "
+            + "control that has it and does not read it, or the dial goes and "
+            + "`IQuantizer.Bind` goes with it -- the channel has no other proposed reader "
+            + "and the one that was built is refuted.");
+
+        // And it is not a lucky vote: the population holds every rule the world has. A score
+        // this high with a fraction of them would be memorising the drawn stream and being
+        // asked easy questions, which is what the withheld set exists to catch.
+        var whole = Concepts * Concepts * 9;
+        var worst = taken["unbound, read, any   "].Min(one => one.Found);
+
+        output.WriteLine($"the worst seed of the arm holds {worst} of {whole}");
+
+        Assert.True(worst > 0.95 * whole,
+            $"the worst seed holds {worst} of the {whole} rules this world has, which is "
+            + "under nineteen in twenty. A score this high on a fraction of them would be "
+            + "the drawn stream memorised and the withheld set asked easy questions.");
+
+        // What the genesis gate costs, which is the other half of the reading and was not
+        // what this grid was built to find. `Surprising.Unaccounted` stops genesis whenever
+        // anything that fired expects what arrived, and on a coin-flip world a lucky
+        // advocate does that half the time -- so the proposals dry up at eighty and the
+        // mechanism is starved rather than refuted.
+        var gated = measured["unbound, read        "];
+
+        Assert.True(read.Mean - gated.Mean > 0.3,
+            $"{read} against {gated}: the gate used to cost this world most of its score, and "
+            + "a gap this small means the gate stopped mattering. Take the reading again.");
+
+        // And ungated genesis buys nothing on its own, which is what makes the line above an
+        // interaction rather than two mechanisms added up. The control mints far more and
+        // holds more, and it answers at chance.
+        Assert.True(control.Mean < Binding.Chance + (3 * control.StdErr),
+            $"{control} is above the {Binding.Chance:F3} bar, so ungated genesis is composing "
+            + "something on its own and the grouping is not what lifted the arm.");
+    }
+
+    /// <param name="arm">What to call it.</param>
+    /// <param name="bound">Whether a colour keeps its shape for the life of the world.</param>
+    /// <param name="segmented">Whether the front end says which codes are one object.</param>
+    /// <param name="spanning">Whether the learner reads the grouping.</param>
+    /// <param name="gate">What it takes for genesis to run at all.</param>
+    /// <param name="seed">The seed for both the world and the brain.</param>
+    private static Run Learnt(
+        string arm,
+        bool bound,
+        bool segmented,
+        Spanning spanning,
+        Surprising gate,
+        int seed)
+    {
+        var world = new Binding(
+            Fixture.Binding(bound: bound, concepts: Concepts, codes: 3, segmented: segmented)
+                with { Withheld = 200 },
+            seed);
+
+        var brain = new Brain(
+            new CommittingSettings
+            {
+                Capacity = 4000,
+                Spanning = spanning,
+                Surprising = gate,
+            },
+            seed);
+
+        var tally = new Bench(
+                new Watching<Coded>(world, new Passthrough<Coded>(one => one)), brain)
+            .Run(rounds: 20_000, sweep: 1000, target: 0.99, window: 2000);
+
+        Assert.NotNull(tally.Unseen);
+
+        // What a perfect population holds, enumerated rather than guessed, and it is what
+        // the grouping makes sayable at all. The question and a shape, both in the asked
+        // object's part: under `Spanning.Thing` that fires only where the shape is the
+        // asked object's, so the answer is that shape's concept whatever else is in the
+        // scene. Every colour code and slot against every shape code and slot is nine per
+        // pair of concepts, so the world has `Concepts` squared times nine.
+        //
+        // A colour code beside them is sound and redundant -- the question already names
+        // that colour, and it is in the same part by construction -- so the two lengths are
+        // one rule and are counted as one. Counting them apart would report coverage twice
+        // for the deeper copy of a rule the shorter one already states.
+        var sound = 0;
+        var found = new HashSet<(int, int, int, int)>();
+
+        // And it is only sound under the rule, which is why the control is not counted at
+        // all rather than counted and read across. The same scope under `Spanning.Anything`
+        // fires on both of the scene's shapes and is right half the time, so one column
+        // would mean two things -- and a statistic whose halves count different events is
+        // this repo's own trap.
+        foreach (var one in spanning is Spanning.Thing ? brain.Held.All : [])
+        {
+            var asks = one.Scope.FirstOrDefault(code => code.Modality == Binding.Asks);
+            var shape = one.Scope.FirstOrDefault(code => code.Modality == Binding.Shape);
+
+            if (asks.Modality != Binding.Asks
+                || shape.Modality != Binding.Shape
+                || one.Expects != Brain.Says(Binding.Concept(shape))) continue;
+
+            // And nothing else in it, or the rule is narrower than the world and says less
+            // than this count would claim for it.
+            if (one.Scope.Any(code =>
+                    code != asks && code != shape && code.Value != asks.Value)) continue;
+
+            sound++;
+            found.Add((
+                Binding.Concept(asks), (int)(asks.Value % 1000),
+                Binding.Concept(shape), (int)(shape.Value % 1000)));
+        }
+
+        var lengths = new SortedDictionary<int, int>();
+
+        foreach (var one in brain.Held.All)
+            lengths[one.Scope.Length] = lengths.GetValueOrDefault(one.Scope.Length) + 1;
+
+        return new Run(
+            arm, tally, tally.Unseen, brain.Held.All.Count, sound, found.Count, lengths);
+    }
 }

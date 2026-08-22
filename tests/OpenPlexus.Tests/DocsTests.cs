@@ -605,7 +605,13 @@ public sealed class DocsTests
     // was written twice, first with the numbers in it, which `The_plan_looks_forward` refused
     // and was right to. A refutation is a claim about what not to build again; the reading
     // behind it belongs in the commit that took it.
-    private const int Whole = 11_736;
+    // And 11,778 is the sixtieth raise, forty-two words, for a fork nothing had named and a
+    // leaf that stopped being true. Something makes an input an attribute of one thing now,
+    // where the front end can say which, so the leaf says what is left rather than that
+    // nothing does. And the fork is the interaction the grid found rather than the one it
+    // went looking for: the surprise gate starves a proposal set another mechanism had just
+    // made affordable, so proposals stop while most of the world is still unfound.
+    private const int Whole = 11_778;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

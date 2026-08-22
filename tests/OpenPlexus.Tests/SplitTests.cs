@@ -238,7 +238,7 @@ public sealed class SplitTests(ITestOutputHelper output)
         // decides identically, so a population too quiet to advocate would pass every line
         // above without the format having been asked anything.
         var spoke = moments
-            .Select(held.Firing)
+            .Select(moment => held.Firing(moment))
             .Where(firing => !firing.IsDefaultOrEmpty)
             .Sum(firing => Spread(firing, held, 12).Count(one => !one.Silent));
 

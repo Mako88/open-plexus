@@ -70,6 +70,16 @@ public readonly record struct Question
 
     /// <summary>What followed it.</summary>
     public required Code Followed { get; init; }
+
+    /// <summary>Which thing each of those codes belongs to, where the front end can say.</summary>
+    /// <remarks>
+    /// <b>Or the examination is taken under a different learner.</b> A grouping decides what
+    /// fires, so a held-out question asked without one is put to a population whose scopes
+    /// were built to be read with it — and the arm reads at its control's score for a reason
+    /// that has nothing to do with generalising. That is what the first reading of it said,
+    /// and this field is what the second one has.
+    /// </remarks>
+    public IReadOnlyDictionary<Code, int>? Grouping { get; init; }
 }
 
 /// <summary>An input keeping part of its stream back, so it can be examined on it.</summary>

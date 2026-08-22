@@ -887,6 +887,52 @@ internal sealed record CommittingSettings
     /// <inheritdoc cref="Commitments.Broadening"/>
     public Broadening Broadening { get; init; } = Broadening.Named;
 
+    /// <inheritdoc cref="Commitments.Spanning"/>
+    public Spanning Spanning { get; init; } = Spanning.Thing;
+}
+
+/// <summary>
+/// How many THINGS one scope may be about, where the front end says which is which.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>The reader <see cref="Codes.IQuantizer{TObservation}.Bind"/> never had</b>, and the
+/// second road to it rather than the first. Deriving the grouping into a code per pair inside
+/// a thing was built, measured and refuted; this leaves the codes exactly as they are and
+/// changes what a scope MEANS.
+/// </para>
+/// <para>
+/// <b>A moment is a set</b>, so the binding is destroyed before the population runs. A red
+/// ball beside a blue box and a blue ball beside a red box emit the identical codes, and no
+/// conjunction over them can separate the two. What the grouping adds is the one fact the
+/// codes cannot carry, and reading it is the only thing that could ever tell those scenes
+/// apart.
+/// </para>
+/// <para>
+/// <b>Both halves or neither</b>, which is why this is one dial and not two. A matcher that
+/// refuses a scope spanning two things cannot help if nothing ever proposes a scope about
+/// one: genesis roots on single codes and repair adds a code that SEPARATES, and the code
+/// that completes a thing separates nothing a table counting co-occurrence can see. So the
+/// generate half and the test half arrive together, and a run with only the second measures
+/// a rule nobody wrote.
+/// </para>
+/// </remarks>
+internal enum Spanning
+{
+    /// <summary>
+    /// A scope is about whatever codes it names, and the grouping is not read.
+    /// </summary>
+    /// <remarks>
+    /// <b>The control</b>, and every number recorded before this existed was taken under it.
+    /// It has to be named to be one: a run that simply lacked the mechanism and a run that
+    /// has it turned off are the same run, and only one of them is a comparison.
+    /// </remarks>
+    Anything,
+
+    /// <summary>
+    /// A scope is about ONE thing: genesis mints one over each, and none fires across two.
+    /// </summary>
+    Thing,
 }
 
 /// <summary>

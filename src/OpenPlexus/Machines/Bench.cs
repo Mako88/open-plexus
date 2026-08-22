@@ -1063,7 +1063,8 @@ internal sealed class Bench
         foreach (var question in exam)
         {
             var heard = holding
-                .Select(held => held.Weigh(held.Firing(held.Moment(question.Codes))))
+                .Select(held => held.Weigh(
+                    held.Firing(held.Moment(question.Codes), question.Grouping)))
                 .ToList();
 
             var vote = Population.Decide(heard);

@@ -732,9 +732,21 @@ internal sealed class Population
 
     /// <summary>Every commitment whose scope is satisfied by this moment.</summary>
     /// <param name="moment">What is live.</param>
-    public ImmutableArray<Commitment> Firing(IReadOnlySet<Code> moment)
+    /// <param name="grouping">
+    /// Which thing each code belongs to, where the front end said — <b>read only under
+    /// <see cref="Spanning.Thing"/></b>, and nothing at all without it.
+    /// </param>
+    public ImmutableArray<Commitment> Firing(
+        IReadOnlySet<Code> moment, IReadOnlyDictionary<Code, int>? grouping = null)
     {
         ArgumentNullException.ThrowIfNull(moment);
+
+        // Read once rather than once a commitment. The dial decides whether the grouping is
+        // consulted at all, so a run whose front end cannot segment pays nothing for the
+        // mechanism and a run under the control pays nothing for having the report.
+        var spanning = _dials.Spanning is Spanning.Thing && grouping is { Count: > 0 }
+            ? grouping
+            : null;
 
         var seen = new HashSet<Code>();
         var firing = ImmutableArray.CreateBuilder<Commitment>();
@@ -759,6 +771,9 @@ internal sealed class Population
                         commitment.Scope, moment, indexed ??= Unifying.Index(moment)).Fired
                     : commitment.Fires(moment);
 
+                if (fired && spanning is not null && !OneThing(commitment.Scope, spanning))
+                    fired = false;
+
                 if (fired) firing.Add(commitment);
             }
         }
@@ -766,6 +781,38 @@ internal sealed class Population
         firing.Sort((left, right) => left.Identity.CompareTo(right.Identity));
 
         return firing.ToImmutable();
+    }
+
+    /// <summary>Whether every grouped code of a scope belongs to the same thing.</summary>
+    /// <param name="scope">The codes the commitment names.</param>
+    /// <param name="grouping">Which thing each code belongs to, where the front end said.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>A code in no group constrains nothing</b> rather than forming a group of its own. A
+    /// world segments what it can and leaves the rest outside every part, and a question that
+    /// points at nothing in particular has to be allowed to sit beside whatever it asks about.
+    /// </para>
+    /// <para>
+    /// <b>And a variable's filling is not checked</b>, only the constants a scope names. Rung
+    /// four fills a hole from the moment's values by modality and the grouping is keyed on
+    /// whole codes, so constraining a filling is a second mechanism rather than this one
+    /// applied further — it is what fork 33's own entry asks for and it is not built.
+    /// </para>
+    /// </remarks>
+    private static bool OneThing(
+        ImmutableArray<Code> scope, IReadOnlyDictionary<Code, int> grouping)
+    {
+        var thing = -1;
+
+        foreach (var code in scope)
+        {
+            if (!grouping.TryGetValue(code, out var which)) continue;
+
+            if (thing < 0) thing = which;
+            else if (thing != which) return false;
+        }
+
+        return true;
     }
 
     /// <summary>The accuracy-weighted vote of everything that fired.</summary>
@@ -1011,7 +1058,15 @@ internal sealed class Population
     /// <i>the vote was wrong</i> is not.
     /// </para>
     /// </remarks>
-    public int Genesis(IReadOnlySet<Code> moment, Code arrived, ImmutableArray<Commitment> firing)
+    /// <param name="grouping">
+    /// Which thing each code belongs to, where the front end said — <b>read only under
+    /// <see cref="Spanning.Thing"/></b>, and nothing at all without it.
+    /// </param>
+    public int Genesis(
+        IReadOnlySet<Code> moment,
+        Code arrived,
+        ImmutableArray<Commitment> firing,
+        IReadOnlyDictionary<Code, int>? grouping = null)
     {
         ArgumentNullException.ThrowIfNull(moment);
 
@@ -1085,6 +1140,70 @@ internal sealed class Population
                 Credit(whole, moment);
                 minted++;
             }
+        }
+
+        // And one scope per thing, which is the generate half of `Spanning`. Repair cannot
+        // reach these: the code that completes a thing is present whether or not the thing is
+        // bound that way, so it separates nothing a table counting co-occurrence can see, and
+        // the intermediate scope a step-by-step walk would pass through is no better than its
+        // parent. So the proposal has to come from the grouping directly.
+        if (_dials.Spanning is Spanning.Thing && grouping is { Count: > 0 })
+            minted += Things(moment, arrived, eligible, grouping);
+
+        return minted;
+    }
+
+    /// <summary>One scope over each thing the front end says is in the moment.</summary>
+    /// <param name="moment">What is live.</param>
+    /// <param name="arrived">What followed it.</param>
+    /// <param name="eligible">The codes a wide scope may hold, as the roots were filtered.</param>
+    /// <param name="grouping">Which thing each code belongs to.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>Filtered exactly as <see cref="Rooting.Wholly"/> filters</b>, so a thing's scope
+    /// holds what a root may hold and nothing else. Letting background into a wide scope was
+    /// measured and is worse, and a thing whose codes are all background would otherwise mint
+    /// a rule that fires forever and says nothing.
+    /// </para>
+    /// <para>
+    /// <b>Two codes at least</b>, or it is the one-code rule the roots already made. A thing
+    /// showing one attribute is not a binding.
+    /// </para>
+    /// </remarks>
+    private int Things(
+        IReadOnlySet<Code> moment,
+        Code arrived,
+        List<Code> eligible,
+        IReadOnlyDictionary<Code, int> grouping)
+    {
+        var things = new SortedDictionary<int, List<Code>>();
+
+        // Walked in the eligible order rather than the grouping's, because a dictionary's
+        // order does not survive a run and a scope's identity comes off its codes.
+        foreach (var code in eligible)
+        {
+            if (!grouping.TryGetValue(code, out var which)) continue;
+
+            if (!things.TryGetValue(which, out var held)) things[which] = held = [];
+
+            held.Add(code);
+        }
+
+        var minted = 0;
+
+        foreach (var held in things.Values)
+        {
+            if (held.Count < 2) continue;
+
+            var thing = new Commitment([.. held], arrived);
+
+            if (Places is not null && !Places(thing)) continue;
+
+            if (!Add(thing)) continue;
+
+            Born(thing, Birth.Genesis);
+            Credit(thing, moment);
+            minted++;
         }
 
         return minted;

@@ -292,8 +292,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **NOW** — front ends manufacture symbols from a signal, and `Winnow` is the defence:
       overlapping winner sets mean a scope that is a SUBSET still fires, at the price that
       its sparsity unbounds rung two's candidate set.
-    - **OPEN** — nothing makes them attributes of one THING. Rung five names what co-fires,
-      as a seen ball and a heard *ball* do.
+    - **OPEN** — a scope is one thing's where a front end SAYS which, and nothing derives a
+      thing from moments alone. Rung five names what co-fires, as a seen and a heard ball do.
     - **OPEN** — text as an IMAGE keeps ground truth enumerable, so soundness survives where
       a camera kills it, and it GATES every sensor. The world and both its ceilings are
       built, so what is unbuilt is a name over the co-firing shape and symbol. Fork **107**.
@@ -456,6 +456,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — the horizon is K occasions, K=1. Fork **28**.
     - **OPEN** — entailment depth and the horizon are capped at one; both come off when
       blame diffusion has a number. Fork **32**.
+    - **OPEN** — the surprise gate starves a proposal set another mechanism made affordable:
+      a lucky advocate blocks genesis, so proposals stop while most of the world is unfound.
+      Fork **135**.
     - **OPEN** — and what that bar COSTS is a function of how young the population is, free
       at saturation and most of the examination before it, because it blocks repair while
       nothing can clear the floor yet. Unpriced, and it is why the bar does not ship. Fork

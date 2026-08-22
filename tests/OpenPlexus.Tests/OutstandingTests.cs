@@ -178,13 +178,34 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// deriving into codes avoided was a quadratic in the group's size, and this is linear.
     /// </para>
     /// <para>
-    /// <b>And the first step is a runner for <c>Binding</c></b>, which is the world built to
-    /// make the dial falsifiable and has never been put in front of a brain — <c>BindingRun</c>
-    /// is an entry in <see cref="DeadCodeTests"/> naming a file that does not exist.
-    /// <c>Kinds.At</c> gives a concept's colour and its shape the SAME code value under two
-    /// modalities, so the repeated hole rung four is made of already has its shape there, and
-    /// the grouping is the question of WHICH OBJECT on top of it. Until something runs the
-    /// world, the reader has nowhere to be measured.
+    /// <b>And <c>Bind</c> has come off</b>, by the road this entry named last and not by rung
+    /// four. <c>Binding</c> is an <c>IWorld</c> now — a question code derived from one
+    /// object's colour, sitting in that object's part, and the answer is that object's shape
+    /// — so <c>Bench</c> drives it and the channel has somewhere to be measured. The reader
+    /// is <see cref="Commitments.Spanning"/>: a scope is about ONE thing, so genesis mints
+    /// one over each and none fires across two.
+    /// </para>
+    /// <para>
+    /// <b>Both halves or neither</b>, which is the part that had to be found by running it.
+    /// A matcher refusing a scope that spans two things cannot help while nothing proposes a
+    /// scope about one — genesis roots on single codes and repair adds a code that SEPARATES,
+    /// and the code completing a thing is present whether or not the thing is bound that way,
+    /// so it separates nothing a table counting co-occurrence can see.
+    /// </para>
+    /// <para>
+    /// <b>0.9988 against 0.5225 on the withheld set</b>, against the control that has the
+    /// grouping and does not read it, on the world whose two arms emit identical codes. The
+    /// arm holds every one of the 144 rules the world has and the control holds none of them
+    /// — and the control is the bigger population, so this is not more search.
+    /// <see cref="BindingTests"/> carries the grid.
+    /// </para>
+    /// <para>
+    /// <b>And the genesis gate is what had been hiding it.</b> Under
+    /// <c>Surprising.Unaccounted</c> the same arm reads 0.5613: proposals stop at eighty
+    /// because a lucky advocate expects what arrived half the time on a coin-flip world, so
+    /// the population never sees more than 24 of the 144. Ungated genesis on its own buys
+    /// nothing — 0.5225 for 2,315 residents — so what the grouping does is make an
+    /// unaffordable proposal set worth having.
     /// </para>
     /// <para>
     /// <b>And <c>Composed</c> does not close with it</b>, which this entry had wrong. Its

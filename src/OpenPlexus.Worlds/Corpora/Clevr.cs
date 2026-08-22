@@ -684,30 +684,12 @@ public sealed class Clevr : IWorld<Coded>, IWithholds<Coded>
                 // nothing. A world reporting what it knows is not the same as a learner
                 // acting on it, and pretending otherwise is how `Surprise` read as wired for
                 // the life of a branch.
-                Groups = Parts(scene.Groups),
+                Groups = Grouped.Parts(scene.Groups),
                 Passing = scene.Fleeting,
             },
             Outcome = _answers[question.Answer],
         };
     }
-
-    /// <summary>One part a segmented object, or nothing where the corpus segmented none.</summary>
-    /// <param name="grouped">Which object each code belongs to, as the corpus read it.</param>
-    /// <remarks>
-    /// <b>The corpus segments the SCENE and not the question</b>, so the parts cover some of
-    /// the moment and the rest sits in none of them. A moment's parts are what a world can
-    /// say about its shape rather than a partition of it.
-    /// </remarks>
-    private static IReadOnlyList<Grouped>? Parts(IReadOnlyDictionary<Code, int>? grouped) =>
-        grouped is not { Count: > 0 }
-            ? null
-            :
-            [
-                .. grouped
-                    .GroupBy(one => one.Value)
-                    .OrderBy(one => one.Key)
-                    .Select(one => Grouped.Of(one.Select(each => each.Key).Order())),
-            ];
 
     /// <summary>The code for <i>the question refers by this</i>.</summary>
     /// <remarks>

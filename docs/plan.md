@@ -782,8 +782,8 @@ them. **A class earning a check moves out of here into the check.**
 - **One seed is not a comparison and will happily invert.** Error bars before ordering, every
   time, and count seeds in BOTH directions — a small sample hides a real effect as readily as
   it invents one.
-- **A seed spread is not always a yardstick**, so a kill line resting on one can be vacuous:
-  identical scores in every cell admit any gain at all.
+- **A kill line can rest on a column nothing moves**, and reads as a test: identical
+  scores in every cell, or a count a capacity pins.
 - **An estimate is noise before it is a statistic**, and a chaotic run keeps the perturbation,
   so a mid-run reading and an end-of-run one are different measurements.
 - **A winner-take-all argmax is chaotic in its evidence**, and two ends of a sweep cannot

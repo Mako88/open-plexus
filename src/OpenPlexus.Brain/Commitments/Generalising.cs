@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Commitments;
@@ -86,11 +86,9 @@ internal static class Generalising
     /// condition dropped.
     /// </para>
     /// <para>
-    /// <b>Nothing constant need stay</b>, and it had to for as long as the code index was the
-    /// only way in. A scope of variables alone is reached by no code in any moment, so it was
-    /// refused rather than proposed — which put a concept whose whole content is <i>these two
-    /// hold the same thing</i> out of reach at its own length. <c>Population.Scanning</c> is
-    /// the list that reaches one, and this is the refusal it lifts. Fork 134.
+    /// <b>Something constant always stays.</b> A scope with every position blanked is reached
+    /// by no code in any moment, so <c>Population.Firing</c> would never look at it — an
+    /// all-variable scope wants a scan list, and what one costs is unpriced.
     /// </para>
     /// </remarks>
     public static IReadOnlyList<Sibling> Siblings(
@@ -117,6 +115,8 @@ internal static class Generalising
 
             foreach (var (_, positions) in byValue)
             {
+                if (positions.Count == one.Scope.Length) continue;
+
                 var key = $"{one.Expects.Modality}:{one.Expects.Value}|"
                     + $"{string.Join(".", positions)}|"
                     + string.Join(

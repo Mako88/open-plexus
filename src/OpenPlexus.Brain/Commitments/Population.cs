@@ -398,24 +398,6 @@ internal sealed class Population
     private readonly Dictionary<Code, List<Commitment>> _byCode = [];
 
     /// <summary>
-    /// The residents no code in any moment reaches — <b>every entry a variable</b>, and one
-    /// name in two of them.
-    /// </summary>
-    /// <remarks>
-    /// <b>A list rather than an index</b>, because there is nothing to index on.
-    /// <see cref="Firing"/> walks the moment's codes and asks what named each; a scope saying
-    /// only <i>whichever code of this kind, and that same one over there</i> names none, so it
-    /// would never be looked at. Rung four refused to propose one for exactly that reason,
-    /// which put Monk-1's own concept out of reach at its own length. Fork 134.
-    /// <para>
-    /// <b>What it costs is one unification a round each</b>, paid whether or not the moment
-    /// could satisfy them, which is the price the code index buys off for everything else.
-    /// A run that has built none pays nothing.
-    /// </para>
-    /// </remarks>
-    private readonly List<Commitment> _scanning = [];
-
-    /// <summary>
     /// One party at a time in these tables.
     /// </summary>
     /// <remarks>
@@ -610,15 +592,6 @@ internal sealed class Population
     /// </remarks>
     public int Count => _byName.Count;
 
-    /// <summary>How many residents no code in any moment reaches.</summary>
-    /// <remarks>
-    /// <b>What the scan costs, as a number</b>, since it is one unification a round each and
-    /// the code index buys that off for everything else. A run holding none pays nothing, and
-    /// a run where this grows without the score moving is the rung being expensive rather than
-    /// useful. Fork 134.
-    /// </remarks>
-    public int Scanning => _scanning.Count;
-
     /// <summary>What a holder takes while it is being asked, so a reader may take it too.</summary>
     /// <remarks>
     /// <b>Handed out rather than hidden.</b> The tally walks these tables more than once, and
@@ -748,13 +721,6 @@ internal sealed class Population
 
         if (!_byName.TryAdd(commitment.Identity, commitment)) return false;
 
-        // A scope of variables alone is indexed by nothing, so it is scanned instead -- and
-        // only where a name repeats, or the scan turns a rule that fires on everything into an
-        // advocate on every round. See `Unifying.Joins`. It is still put in `_byCode` under its
-        // own entries, which costs a list nobody reads and keeps `Remove` one path rather than
-        // two.
-        if (Unifying.Joins(commitment.Scope)) _scanning.Add(commitment);
-
         foreach (var code in commitment.Scope)
         {
             if (!_byCode.TryGetValue(code, out var at)) _byCode[code] = at = [];
@@ -779,18 +745,6 @@ internal sealed class Population
         // every round for a mechanism most runs never reach is the shape this repo keeps
         // finding.
         Dictionary<byte, List<ulong>>? indexed = null;
-
-        // The ones no code reaches, first and unconditionally. `seen` keeps them out of the
-        // walk below, which would find them under their own variable entries if a moment ever
-        // held one -- and none can, `Unifying.Whatever` being a modality no world may emit.
-        foreach (var commitment in _scanning)
-        {
-            if (!seen.Add(commitment.Identity)) continue;
-
-            if (Unifying.Fires(
-                commitment.Scope, moment, indexed ??= Unifying.Index(moment)).Fired)
-                firing.Add(commitment);
-        }
 
         foreach (var code in moment.Order())
         {
@@ -1897,9 +1851,6 @@ internal sealed class Population
     private void Remove(Commitment commitment, Loss loss)
     {
         if (!_byName.Remove(commitment.Identity)) return;
-
-        if (Unifying.Joins(commitment.Scope))
-            _scanning.RemoveAll(one => one.Identity == commitment.Identity);
 
         // Bounded by what is held rather than by what has ever been held, which is the whole
         // reason this is dropped here. A run mints tens of thousands against a capacity of a

@@ -76,44 +76,6 @@ internal static class Unifying
     public static bool Names(Code entry) => entry.Modality == Whatever;
 
     /// <summary>
-    /// Whether a scope is reached by no code in a moment and constrains something anyway.
-    /// </summary>
-    /// <param name="scope">The codes that must be present, and the entries naming variables.</param>
-    /// <remarks>
-    /// <para>
-    /// <b>Every entry a variable, and one name in two of them.</b> The first half is what puts
-    /// it beyond <c>Population.Firing</c>'s code index, since there is no constant to look it
-    /// up by. The second is what makes it worth reaching: <i>whichever code of this kind</i>
-    /// said once is satisfied by any moment holding a code of that kind, so a scope of one
-    /// such entry fires on everything and advocates for its expectation on every round.
-    /// </para>
-    /// <para>
-    /// <b>Which is the drop <c>Widening</c> was refuted for</b>, arriving by another road. A
-    /// scan list that took every all-variable scope made one such rule an always-firing
-    /// advocate and moved a Monk-1 arm from 0.818 to 0.886 with no join involved at all — a
-    /// mechanism reading as a rung. Two entries carrying one name say <i>these two hold the
-    /// same thing</i>, which a moment can fail.
-    /// </para>
-    /// </remarks>
-    public static bool Joins(ImmutableArray<Code> scope)
-    {
-        if (scope.IsDefaultOrEmpty || scope.Length < 2) return false;
-
-        var names = new Dictionary<int, int>();
-
-        foreach (var entry in scope)
-        {
-            if (!Names(entry)) return false;
-
-            var name = (int)(entry.Value & uint.MaxValue);
-
-            names[name] = names.TryGetValue(name, out var already) ? already + 1 : 1;
-        }
-
-        return names.Values.Any(count => count > 1);
-    }
-
-    /// <summary>
     /// The values present in a moment, by modality — <b>the per-round index a subset test
     /// never needed.</b>
     /// </summary>

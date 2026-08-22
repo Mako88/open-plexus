@@ -599,7 +599,12 @@ public sealed class DocsTests
     // so it is two runs of the learner as well as two arms -- found by a Monk-1 seed whose
     // split arm held nought joins and still read 0.030 apart from the fused one. Nothing can
     // detect it mechanically, which is what `TRAPS` is for.
-    private const int Whole = 11_739;
+    // And 11,736 is the next fall. Rung four's second world is refuted, so `THE ORDER`'s
+    // active item and its route leaf both went and a refutation row came in -- and the row
+    // was written twice, first with the numbers in it, which `The_plan_looks_forward` refused
+    // and was right to. A refutation is a claim about what not to build again; the reading
+    // behind it belongs in the commit that took it.
+    private const int Whole = 11_736;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

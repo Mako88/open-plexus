@@ -26,7 +26,6 @@ internal sealed class MonkRun
 {
     private readonly Monk _world;
     private readonly Puzzle _puzzle;
-    private readonly Spelling _spelling;
     private readonly Brain _brain;
     private readonly Bench _trial;
 
@@ -52,26 +51,18 @@ internal sealed class MonkRun
 
         _world = new Monk(world, seed);
         _puzzle = world.Puzzle;
-        _spelling = world.Spelling;
         _brain = brain;
 
         // One code per attribute and value, against a declared stride. The jacket has
         // four colours and the tie has two, so a stride taken from the widest attribute
         // is the only one that cannot alias -- which is the fault `Bits` already carried
         // once, when its only caller happened to be binary.
-        //
-        // And the split spelling is the arm, moving the attribute out of the value and
-        // into the modality, so head-round and body-round become one value under two
-        // modalities. Fork 133.
-        IQuantizer<IReadOnlyList<int>> sensing = world.Spelling == Spelling.Split
-            ? new Slotted(Monk.Attribute, Monk.Widths.Length)
-            : new Bits(Monk.Attribute, Monk.Stride);
-
         _trial = new Bench(
-            new Watching<IReadOnlyList<int>>(_world, sensing),
+            new Watching<IReadOnlyList<int>>(
+                _world, new Bits(Monk.Attribute, Monk.Stride)),
             brain,
             sound: census
-                ? (scope, expects) => Monk.Sound(world.Puzzle, scope, expects, world.Spelling)
+                ? (scope, expects) => Monk.Sound(world.Puzzle, scope, expects)
                 : null);
     }
 
@@ -96,9 +87,9 @@ internal sealed class MonkRun
         // only the small rules would be the sampled-instrument fault this project keeps
         // finding.
         return Learned.Grade(
-            tally, Monk.Truths(_puzzle, _spelling), _brain.Held, _brain.Dials.Floor,
-            scope => Monk.Checkable(scope, _spelling),
-            (scope, expects) => Monk.Sound(_puzzle, scope, expects, _spelling),
+            tally, Monk.Truths(_puzzle), _brain.Held, _brain.Dials.Floor,
+            Monk.Checkable,
+            (scope, expects) => Monk.Sound(_puzzle, scope, expects),
 
             // NO OVERSHOOT READING HERE. This world enumerates 432 instances however little
             // a scope pins, so the drop-by-drop walk is cheap -- but nothing reads the column

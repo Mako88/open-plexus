@@ -509,6 +509,111 @@ public sealed class ChainingTests(ITestOutputHelper output)
             + "`LessonTests.A_conclusion_that_follows_from_two_statements_is_never_reached`");
     }
 
+    /// <summary>
+    /// What the weakest link is worth as the telling repeats — <b>why the chain wins once and
+    /// then stops.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The premise is the suspect.</b> Answering <i>what is the cat loudness</i> wants
+    /// <c>meow</c> handed over by a rule that fires on the question, and the only such rule is
+    /// rooted on <c>cat</c>. What that rule is believed to be worth is the weakest link, so if
+    /// it stops being a certainty the chain stops being worth more than its rivals.
+    /// </para>
+    /// <para>
+    /// <b>And <c>Asserting.Everything</c> is what would do it.</b> A statement claims every
+    /// word in turn, so <i>the cat sound is meow</i> is five moments and <c>cat</c> is present
+    /// in four of them, expecting <c>the</c>, <c>sound</c>, <c>is</c> and <c>meow</c> one time
+    /// each. The true rate of <c>cat</c> to <c>meow</c> is a quarter, and a rule born on the
+    /// round that made it starts at one because nothing has contradicted it yet.
+    /// </para>
+    /// <para>
+    /// <b>So the reading is one number twice</b>, and it decides whether the twelve-of-twelve
+    /// above is a mechanism or an artifact of when the rule was born.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_the_weakest_link_is_worth_as_the_telling_repeats()
+    {
+        const int Seeds = 3;
+
+        var lesson = Lesson.Chained;
+        var implied = lesson with { Exam = [.. lesson.Exam.Skip(lesson.Exam.Count / 2)] };
+
+        // One question, followed all the way down, because a mean over four would hide which
+        // link moved. The cat's loudness needs `meow`, and `cat` is the only word of the
+        // question any statement about `meow` holds.
+        var quiz = implied.Exam[0];
+
+        output.WriteLine($"{Seeds} seeds, on \"{quiz.Question}\" wanting {quiz.Answer}");
+        output.WriteLine(
+            $"{"tellings",-10}{"premise",9}{"fired",7}{"concluder",11}{"fired",7}{"chain",7}");
+
+        var premises = new Dictionary<int, double>();
+
+        foreach (var tellings in new[] { 1, 20 })
+        {
+            var link = new List<double>();
+            var tested = new List<double>();
+            var rule = new List<double>();
+            var opportunity = new List<double>();
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var learnt = Ran(implied, Carrying.Never, tellings, seed);
+                var all = learnt.Held.All.ToList();
+                var asked = Babi.Words(quiz.Question).Select(Babi.Of).ToHashSet();
+
+                if (Wanted(learnt.World, quiz.Answer) is not { } goal) continue;
+
+                // The best premise: whatever fires on the question and concludes a word some
+                // rule expecting the answer is missing.
+                var wants = all
+                    .Where(one => one.Expects == goal)
+                    .SelectMany(one => Missing(one, asked, learnt.World))
+                    .ToHashSet();
+
+                var supplying = all
+                    .Where(one => Fires(one, asked, learnt.World))
+                    .Where(one => Brain.Meant(one.Expects) is { } word && wants.Contains(word))
+                    .OrderByDescending(one => one.Accuracy)
+                    .ToList();
+
+                var concluding = all
+                    .Where(one => one.Expects == goal)
+                    .Where(one => Missing(one, asked, learnt.World).Count > 0)
+                    .OrderByDescending(one => one.Accuracy)
+                    .ToList();
+
+                if (supplying.Count == 0 || concluding.Count == 0) continue;
+
+                link.Add(supplying[0].Accuracy);
+                tested.Add(supplying[0].Fired);
+                rule.Add(concluding[0].Accuracy);
+                opportunity.Add(concluding[0].Fired);
+            }
+
+            premises[tellings] = link.Count == 0 ? 0.0 : link.Average();
+
+            output.WriteLine(
+                $"{tellings,-10}{premises[tellings],9:F3}{tested.Average(),7:F1}"
+                + $"{rule.Average(),11:F3}{opportunity.Average(),7:F1}"
+                + $"{Math.Min(premises[tellings], rule.Average()),7:F3}");
+        }
+
+        Assert.True(premises.Count == 2, "an arm did not report");
+
+        // The reading. A premise that falls as the telling repeats says the chain's weight was
+        // a birth credit rather than evidence, and the twelve-of-twelve above is an artifact of
+        // when a rule was minted. Level, and something else moved.
+        output.WriteLine(
+            premises[20] < premises[1] - 1e-9
+                ? $"the weakest link falls from {premises[1]:F3} to {premises[20]:F3}, so the "
+                  + "chain was carried by a rule nothing had contradicted yet"
+                : $"the weakest link holds at {premises[20]:F3}, so the premise is not what "
+                  + "the repeated telling took away and the collapse is elsewhere");
+    }
+
     /// <summary>Every word in a commitment's scope the question does not say.</summary>
     /// <param name="one">The commitment.</param>
     /// <param name="asked">What the question itself says.</param>

@@ -148,7 +148,7 @@ public enum Predicting
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>THE FAIR FORM OF <see cref="Masked"/>.</b> And it exists because the naive form
+    /// <b>The fair form of <see cref="Masked"/>.</b> And it exists because the naive form
     /// failed for a reason that is not about co-occurrence. Hiding every word in turn
     /// spends most of the demand on <i>the</i>, <i>to</i> and <i>back</i>, which is where a
     /// bag of words predicts best and carries least — so the population fills with the
@@ -383,7 +383,7 @@ public sealed class Recalled : IWorld<Coded>, IWithholds<Coded>
     /// Turns one statement into whatever the objective asks the learner to be wrong about.
     /// </summary>
     /// <remarks>
-    /// <b>NOTHING AT ALL UNDER <see cref="Predicting.Asked"/>, which is the point of the
+    /// <b>Nothing at all under <see cref="Predicting.Asked"/>, which is the point of the
     /// control.</b> A statement with no question attached settles nothing, and a round that
     /// settles nothing takes no score, no genesis and no repair — so plain English moves not
     /// one counter. That is the whole reason a primer needed an objective before it could

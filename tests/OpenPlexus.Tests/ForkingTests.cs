@@ -84,7 +84,7 @@ public sealed class ForkingTests(ITestOutputHelper output)
         run.Held.Lineages.Values.Sum(one => one.Collided);
 
     /// <summary>
-    /// <b>THE READING: two arms, three worlds, and the ungameable columns.</b>
+    /// <b>The reading: two arms, three worlds, and the ungameable columns.</b>
     /// </summary>
     /// <remarks>
     /// <b>The collision count is what says the mechanism ran.</b> And it goes beside the score

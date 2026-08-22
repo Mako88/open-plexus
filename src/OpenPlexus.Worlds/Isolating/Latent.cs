@@ -61,7 +61,7 @@ public sealed record LatentSettings
 /// code, and cannot be reached by any walk.
 /// </para>
 /// <para>
-/// <b>SO IT IS THE MEASUREMENT `Thought.Grouped` HAS BEEN MISSING.</b> That method
+/// <b>So it is the measurement `Thought.Grouped` has been missing.</b> That method
 /// finds origins which all reached one another, and every world already here either
 /// has no latent structure or has one nobody stated — a hub minted over a group was
 /// cheaper by arithmetic and unmeasurable in fact. Here the group is exactly the

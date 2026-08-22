@@ -118,7 +118,7 @@ internal sealed class Forks
 
     /// <summary>The codes it has already forked on.</summary>
     /// <remarks>
-    /// <b>NOT DERIVABLE FROM <see cref="Names"/>, which is why it is a second set.</b> A
+    /// <b>Not derivable from <see cref="Names"/>, which is why it is a second set.</b> A
     /// child's identity is a hash of its whole scope and its expectation, so the code that
     /// was added to reach it cannot be read back out — and a parent that wants to propose
     /// somewhere NEW has to be told where it has been.

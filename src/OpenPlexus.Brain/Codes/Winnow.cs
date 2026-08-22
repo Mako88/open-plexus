@@ -213,7 +213,7 @@ public sealed class Winnow
     /// The sparse random connections, built once from the arithmetic alone.
     /// </summary>
     /// <remarks>
-    /// <b>REJECTION RATHER THAN A SHUFFLE</b>, because a shuffle needs a generator and
+    /// <b>Rejection rather than a shuffle</b>, because a shuffle needs a generator and
     /// the point is to need nothing. Each draw is a mix of the cell, the
     /// sample slot and a retry counter, taken modulo the inputs; a collision with
     /// an input this cell already has is redrawn. <b>The retry is part of the

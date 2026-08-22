@@ -150,7 +150,7 @@ public enum Examining
 /// read against the one below it on the same scale.
 /// </para>
 /// <para>
-/// <b>WHAT IT FIXES ABOUT bAbI is the property that disqualified it.</b> Some two thousand
+/// <b>What it fixes about bAbI is the property that disqualified it.</b> Some two thousand
 /// distinct contexts exist there and no more, so reading it twice is re-reading it. This
 /// draws a fresh house, a fresh scatter of things and a fresh walk every episode, so the
 /// held-out half is genuinely unseen and a score cannot be a lookup.

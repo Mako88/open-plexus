@@ -124,7 +124,7 @@ public sealed class Cifar : IWorld<IReadOnlyList<double>>, IWithholds<IReadOnlyL
     /// The batch files, test first.
     /// </summary>
     /// <remarks>
-    /// <b>NAMED RATHER THAN GLOBBED, so the order cannot change with the
+    /// <b>Named rather than globbed, so the order cannot change with the
     /// filesystem.</b> A world whose stream depends on directory enumeration order is
     /// not reproducible, and <see cref="Seeds"/> already records what that costs.
     /// </remarks>

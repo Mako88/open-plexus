@@ -12,7 +12,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>STEP EIGHT IS <i>the rung the failures demand</i>.</b> And never the rung that sounds
+/// <b>Step eight is <i>the rung the failures demand</i>.</b> And never the rung that sounds
 /// next, AND NO FAILURE HAD ASKED. On the multiplexer twelve one-code rules
 /// cover everything held out, so the scope language is nowhere near binding there. This
 /// world is built so a failure can ask, and it asks BEFORE a learner is run: the concept

@@ -685,7 +685,7 @@ public sealed class DocsTests
 
     /// <summary>The lines under one heading, at any depth, the heading excluded.</summary>
     /// <remarks>
-    /// <b>BY DEPTH RATHER THAN BY `##`</b>, because collapsing nine sections into four made
+    /// <b>By depth rather than by `##`</b>, because collapsing nine sections into four made
     /// `THE ARCHITECTURE` a subsection — and a reader hard-coded to one level would have
     /// silently returned nothing for it, which is a correspondence check passing on an empty
     /// list.

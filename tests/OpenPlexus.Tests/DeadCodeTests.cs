@@ -22,7 +22,7 @@ namespace OpenPlexus.Tests;
 /// described to John as one of three signals the system has.
 /// </para>
 /// <para>
-/// <b>THE SHAPE IS <c>DialTests</c>'s, ON PURPOSE.</b> Either something uses it,
+/// <b>The shape is <c>DialTests</c>'s, on purpose.</b> Either something uses it,
 /// or somebody has written down why not — and "nobody has got to it yet" is a
 /// perfectly good reason as long as it is written where it can be counted. What
 /// is not allowed is silence.
@@ -566,7 +566,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     /// Why a role in a deployment is not named by the library it is deployed from.
     /// </summary>
     /// <remarks>
-    /// <b>THE SAME REASON `Posted` carries, one layer up</b>, and it replaced a better-known
+    /// <b>The same reason `Posted` carries, one layer up</b>, and it replaced a better-known
     /// one. These two used to say <i>fork 52's transport is built and the learner is
     /// not on it</i>, which was the honest state and is exactly what this list is for.
     /// The learner is on it now, and what is left is not a gap: a library that constructed

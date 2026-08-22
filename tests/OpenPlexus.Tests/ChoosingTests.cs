@@ -49,7 +49,7 @@ public sealed class ChoosingTests(ITestOutputHelper output)
             census: true).Run(Rounds);
 
     /// <summary>
-    /// <b>DISCRIMINATIVE-Z AGAINST RANDOM-Z, on the reading that cannot be gamed.</b>
+    /// <b>Discriminative-z against random-z, on the reading that cannot be gamed.</b>
     /// </summary>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]

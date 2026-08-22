@@ -62,7 +62,7 @@ public sealed record HomeostatSettings
     /// something to be conditional on.
     /// </para>
     /// <para>
-    /// <b>IT IS THE <see cref="Codes.IQuantizer{TObservation}.Bind"/> split again</b>,
+    /// <b>It is the <see cref="Codes.IQuantizer{TObservation}.Bind"/> split again</b>,
     /// and the same caveat applies word for word. Comparison is pre-attentive
     /// here exactly as segmentation is there — Ashby's units deviate against each
     /// other by their physics, not by deliberation. So the front end supplies the

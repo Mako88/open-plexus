@@ -17,7 +17,7 @@ public enum Puzzle
     One = 1,
 
     /// <summary>
-    /// <b>EXACTLY TWO of the six attributes hold their first value</b> — the counting
+    /// <b>Exactly two of the six attributes hold their first value</b> — the counting
     /// concept, and the cheapest language ceiling there is.
     /// </summary>
     /// <remarks>

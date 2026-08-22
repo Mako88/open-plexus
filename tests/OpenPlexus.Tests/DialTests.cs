@@ -10,7 +10,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S STANDING ASK: fewer knobs, more things that find their own
+/// <b>John's standing ask: fewer knobs, more things that find their own
 /// level.</b> The trouble with that as an aspiration is that nobody notices a
 /// sixth dial arriving beside five — so this makes the count a number the build
 /// checks, in the same way the doc has a word budget and the source has a clone

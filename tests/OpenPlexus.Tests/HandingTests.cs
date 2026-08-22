@@ -42,7 +42,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// codes either way</b>, because that is all the learner can receive.
     /// </summary>
     /// <remarks>
-    /// <b>WRITTEN HERE RATHER THAN IN <c>src</c> BECAUSE NEITHER IS A MECHANISM.</b> One is
+    /// <b>Written here rather than in <c>src</c> because neither is a mechanism.</b> One is
     /// the control and the other is a selector whose ceiling is a coin flip, so shipping
     /// either would be shipping a thing already known not to answer the world. What they
     /// are for is the BASELINE any role mechanism has to beat, which this repo insists on
@@ -287,7 +287,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>EVERY SENTENCE SAYS <i>the</i> AND SO DOES THE QUESTION</b>, so first-any-overlap
+    /// <b>Every sentence says <i>the</i> and so does the question</b>, so first-any-overlap
     /// returns the newest sentence every time and the middle rung is not reached by the arm
     /// that looks like it should reach it. The refutation table already says this in
     /// <see cref="Joining.Chained"/>'s words — a chain keyed on everything walks back a

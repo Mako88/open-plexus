@@ -108,7 +108,7 @@ public sealed class RefusalTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE READING: which gate is deciding the run.</b>
+    /// <b>The reading: which gate is deciding the run.</b>
     /// </summary>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]

@@ -27,7 +27,7 @@
 /// no comparison is needed anywhere.
 /// </para>
 /// <para>
-/// <b>IT IS THE <c>Groups</c> TRICK A FOURTH TIME.</b> Segmentation, order and now
+/// <b>It is the <c>Groups</c> trick a fourth time.</b> Segmentation, order and now
 /// grain: the front end says something structural INSIDE the occasion, where C2
 /// cannot touch it, and the graph is left to find out what it means. <b>And it is
 /// the one of the four that asks least</b> — a coarser reading of a signal is not

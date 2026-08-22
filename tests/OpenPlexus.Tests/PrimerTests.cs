@@ -9,7 +9,7 @@ namespace OpenPlexus.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S ASK, 2026-08-04: give it basic English first, then re-run what
+/// <b>John's ask, 2026-08-04: give it basic English first, then re-run what
 /// failed,</b> in the same run with no reset. The reasoning was exactly right —
 /// six bAbI tasks score nought because <i>yes</i>, <i>no</i>, <i>maybe</i> and the
 /// counting words never occur as words, so there is no node to arrive at. Show it

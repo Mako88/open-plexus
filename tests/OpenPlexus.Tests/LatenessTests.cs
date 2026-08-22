@@ -75,7 +75,7 @@ public sealed class LatenessTests(ITestOutputHelper output)
     /// <param name="late">Lateness to inject, or nothing for the control.</param>
     /// <param name="seed">The world's generator and every holder's.</param>
     /// <remarks>
-    /// <b>ONE BUS RATHER THAN N sockets</b>, which is the whole reason this can be asked.
+    /// <b>One bus rather than N sockets</b>, which is the whole reason this can be asked.
     /// Delay injected into <see cref="Posted"/> would be delay injected into an HTTP client,
     /// which is a different thing to measure and slower by orders of magnitude. Here the
     /// transport is a dictionary and a dispatcher, so the ONLY difference between the two
@@ -181,7 +181,7 @@ public sealed class LatenessTests(ITestOutputHelper output)
     /// above rather than a defect, and it is what fork 62's slots would buy back.
     /// </para>
     /// <para>
-    /// <b>WHAT WOULD REFUTE IT: the two tallies differing at all.</b> Under a barrier they
+    /// <b>What would refute it: the two tallies differing at all.</b> Under a barrier they
     /// cannot, so a difference means something has started reading a round before it closed
     /// — which would be a real change to what C2 can do to this design, and would deserve
     /// finding out this way rather than as a flake somewhere else.

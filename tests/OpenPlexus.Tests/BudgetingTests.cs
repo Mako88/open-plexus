@@ -176,7 +176,7 @@ public sealed class BudgetingTests(ITestOutputHelper output)
     /// rather than a sweep.
     /// </para>
     /// <para>
-    /// <b>AND IT ASSERTS BOTH HALVES, because one alone passes for free.</b> Identity under
+    /// <b>And it asserts both halves, because one alone passes for free.</b> Identity under
     /// <see cref="Forking.Distinct"/> would also be what a harness that ignored the dial
     /// produced; a DIFFERENCE under <see cref="Forking.Repeated"/> is what says the arm is
     /// wired to anything at all. The second half is the reading the deletion rests on.

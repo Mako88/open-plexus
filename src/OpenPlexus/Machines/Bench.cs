@@ -385,7 +385,7 @@ internal sealed record Tally
     /// true.
     /// </summary>
     /// <remarks>
-    /// <b>NOTHING RATHER THAN ZERO, for the same reason <see cref="Unseen"/> is.</b> A
+    /// <b>Nothing rather than zero, for the same reason <see cref="Unseen"/> is.</b> A
     /// census of nought outvoted and nought uncovered is what a perfect run looks like and
     /// also what an unasked question looks like, and those are opposite readings.
     /// </remarks>
@@ -584,7 +584,7 @@ internal sealed record Census
 
     /// <summary>Of those, how many had a SOUND rule fire and advocate the right answer.</summary>
     /// <remarks>
-    /// <b>THE INSTRUMENT `Found` should have been all along.</b> A world admits several
+    /// <b>The instrument `Found` should have been all along.</b> A world admits several
     /// correct rule sets and this repo has a trap saying so — scoring against one answer
     /// key marks the basis rather than the learner, and a run holding a dozen perfectly
     /// accurate true rules can read as having learnt nothing. What cannot be gamed is

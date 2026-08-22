@@ -35,7 +35,7 @@ public sealed class ShardTests
 {
     /// <summary>Every filter expression in the shard matrix, in file order.</summary>
     /// <remarks>
-    /// <b>READ AS TEXT, WHICH IS <c>SweepListTests</c>' limit and its reason.</b> A YAML
+    /// <b>Read as text, which is <c>SweepListTests</c>' limit and its reason.</b> A YAML
     /// parser would reach the same strings and would have to be told where to look; what
     /// neither survives is the matrix being written in another shape, which fails loudly
     /// here because no entry is found at all.

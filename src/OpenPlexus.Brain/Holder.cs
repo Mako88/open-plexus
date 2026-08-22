@@ -142,7 +142,7 @@ internal sealed class Holder : IReceiveAsks
     /// a holder that cannot be left holding a settlement for a moment it has forgotten.
     /// </para>
     /// <para>
-    /// <b>AND THE ROUND ITSELF IS <see cref="Alone"/>'S</b>, which is the one thing this file
+    /// <b>And the round itself is <see cref="Alone"/>'s</b>, which is the one thing this file
     /// must not reimplement. Settle, sweep, repair, cover, repair — in that order,
     /// because the order is what makes a distributed run comparable with the hundred runs
     /// taken in one process. Two copies of a learning loop is the duplication that could

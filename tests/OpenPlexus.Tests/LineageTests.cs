@@ -315,7 +315,7 @@ public sealed class LineageTests(ITestOutputHelper output)
     /// </summary>
     /// <param name="settings">The world's shape.</param>
     /// <remarks>
-    /// <b>DRAWN RATHER THAN DECLARED, which is the discipline <c>Census.Hard</c> uses.</b>
+    /// <b>Drawn rather than declared, which is the discipline <c>Census.Hard</c> uses.</b>
     /// A harness that read the skew off the settings would be naming the minority by a
     /// fact the learner cannot see, and on a world whose skew is nought the answer is a
     /// coin toss that has to be taken from the same place either way.

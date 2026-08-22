@@ -43,8 +43,8 @@ public static class Sequenced
 {
     /// <summary>The modality a precedence rides on.</summary>
     /// <remarks>
-    /// <b>ITS OWN, BESIDE <see cref="Commitments.Commitment.Committed"/>,
-    /// <see cref="Commitments.Naming.Meant"/> AND <see cref="Commitments.Unifying"/>'S.</b> A
+    /// <b>Its own, beside <see cref="Commitments.Commitment.Committed"/>,
+    /// <see cref="Commitments.Naming.Meant"/> and <see cref="Commitments.Unifying"/>'s.</b> A
     /// precedence is DERIVED from two codes rather than emitted by a sense, so a world able
     /// to produce one would be writing the learner's rules — the same reason a pattern may
     /// not be emitted.

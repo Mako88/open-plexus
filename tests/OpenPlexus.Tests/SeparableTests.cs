@@ -82,7 +82,7 @@ public sealed class SeparableTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE READING: how far apart truth and falsehood look, per world.</b>
+    /// <b>The reading: how far apart truth and falsehood look, per world.</b>
     /// </summary>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]

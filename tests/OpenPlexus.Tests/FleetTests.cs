@@ -28,7 +28,7 @@ namespace OpenPlexus.Tests;
 /// nothing whatever about lateness.
 /// </para>
 /// <para>
-/// <b>NOR OF C3.</b> Nothing dies in any of this, and every number below is a fleet whose
+/// <b>Nor of C3.</b> Nothing dies in any of this, and every number below is a fleet whose
 /// machines are all present — which is what makes them comparable with the one-process
 /// curve. A run that LOSES a holder goes on, since fork 53 writes off an ask that could not
 /// be handed over; what that costs a curve is measured in <c>UnreachedTests</c> and is a

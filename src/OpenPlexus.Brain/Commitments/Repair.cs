@@ -343,7 +343,7 @@ internal enum Mending
     /// single sentence about it has ever been safe.
     /// </para>
     /// <para>
-    /// <b>AND IT SELF-LIMITS THE WAY <c>Budget</c> WAS BUILT TO FAKE.</b> A parent forks,
+    /// <b>And it self-limits the way <c>Budget</c> was built to fake.</b> A parent forks,
     /// its child takes over a region, and the parent stops forking there — so the cap on
     /// children per parent stops being the thing that prevents a runaway. Fork 37 is
     /// about that cap having an interior optimum nobody can hunt; this is the signal it
@@ -1158,7 +1158,7 @@ internal static class Conditions
     /// <param name="otherHits">Firings the second one got right.</param>
     /// <param name="otherFired">Firings the second one settled at all.</param>
     /// <remarks>
-    /// <b>THE SAME ARITHMETIC AS <see cref="Divergence"/> under a name that fits the
+    /// <b>The same arithmetic as <see cref="Divergence"/> under a name that fits the
     /// second use.</b> That one asks whether a code was present more often in the hits
     /// than in the misses; this asks whether one commitment is more accurate than
     /// another. Both are the pooled two-proportion z, and calling it by the first

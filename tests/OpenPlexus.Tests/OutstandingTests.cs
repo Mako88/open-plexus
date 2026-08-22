@@ -230,6 +230,21 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// The typography is all any check here can see; the reveal, the stinger and the corrective
     /// turn are written down in CLAUDE.md and nothing reaches them.
     /// </para>
+    /// <para>
+    /// <b>And both counts are nought.</b> The bold half came down over the
+    /// passes <see cref="ProseTests.Falls"/> paces, five files at a time and eighty judgements
+    /// at a sitting; the shouted leads went in one pass that looked for them. The ratio this
+    /// entry claimed held throughout, which is what makes the estimate here worth keeping
+    /// rather than deleting.
+    /// </para>
+    /// <para>
+    /// <b>What the last pass found is where a script stops.</b> Forty-five leads lowercased
+    /// mechanically left eleven spans half-shouted, the capitals carrying on after an inline
+    /// tag the run had stopped at — the guard satisfied and the prose still in the register.
+    /// Six more were invisible to it because a one-letter word ends a run, so <i>rather than A
+    /// SHUFFLE</i> is a shout no version of this check can see. The entry closes on the two
+    /// counts and the register is still a written rule.
+    /// </para>
     /// </remarks>
     [Fact]
     public void The_prose_is_out_of_the_engagement_register()

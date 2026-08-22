@@ -65,7 +65,7 @@ internal sealed record Counts
 {
     /// <summary>How many scopes the sender counted.</summary>
     /// <remarks>
-    /// <b>CARRIED RATHER THAN INFERRED, because it cannot be recovered from the rows.</b>
+    /// <b>Carried rather than inferred, because it cannot be recovered from the rows.</b>
     /// The z the naming gate computes divides by this, so a reader that guessed it from
     /// the table would be testing a different hypothesis from the one the sender counted.
     /// </remarks>

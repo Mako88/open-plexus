@@ -35,7 +35,7 @@ public sealed record HandingSettings
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S FORK 105, ISOLATED. Is a relation just a category?</b> Half yes: a category
+/// <b>John's fork 105, isolated. Is a relation just a category?</b> Half yes: a category
 /// over the arguments says <i>people hand things to people</i> more narrowly than a hole
 /// does, and it retires most of rung four. What it cannot reach is BINDING — a subset test
 /// over a sentence holding two people cannot say which of them is the one who now has the

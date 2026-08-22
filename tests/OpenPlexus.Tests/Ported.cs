@@ -200,7 +200,7 @@ internal sealed class Ported : IAsyncDisposable
     /// not a shard and is not a distribution.
     /// </para>
     /// <para>
-    /// <b>AND IT IS <c>Fixture.Sharded</c>'S rule rather than a new one</b>, so a fleet
+    /// <b>And it is <c>Fixture.Sharded</c>'s rule rather than a new one</b>, so a fleet
     /// that learnt its population and a fleet handed one already trained are split the
     /// same way — otherwise a difference between the two arrangements would be a
     /// difference in how the ring was drawn.

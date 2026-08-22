@@ -111,7 +111,7 @@ public sealed class Primer
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>SEPARATE FROM <see cref="Read"/> because the story number is load-bearing in
+    /// <b>Separate from <see cref="Read"/> because the story number is load-bearing in
     /// opposite directions.</b> The walk needs every sentence at story nought so no
     /// per-story code is minted and the fleeting code stays null. A text world needs
     /// the opposite: Tatoeba lines are unrelated, so a span reaching back past a full

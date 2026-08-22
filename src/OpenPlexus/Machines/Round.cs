@@ -164,7 +164,7 @@ internal sealed class Round
 
     /// <summary>Rounds whose settlement could not say what followed.</summary>
     /// <remarks>
-    /// <b>DIFFERENT FROM <see cref="Silent"/> at both ends</b>, and the pair is why either
+    /// <b>Different from <see cref="Silent"/> at both ends</b>, and the pair is why either
     /// means anything. Silence is the POPULATION having nothing to say about a moment
     /// whose outcome is known; this is the WORLD having nothing to say about a moment the
     /// population may well have answered. One is a gap in what has been learnt and the

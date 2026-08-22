@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Worlds;
@@ -131,7 +131,7 @@ public sealed record MultiplexerSettings
     /// about it is not this world's business.
     /// </para>
     /// <para>
-    /// <b>AND IT IS NOT <see cref="Noise"/>.</b> Noise flips an outcome, so what is
+    /// <b>And it is not <see cref="Noise"/>.</b> Noise flips an outcome, so what is
     /// reported is FALSE. This reports NOTHING. The two pull in opposite directions —
     /// one is bad evidence and the other is absent evidence — and a single dial doing duty
     /// for both would make every reading of either unreadable.
@@ -322,7 +322,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// permits.
     /// </para>
     /// <para>
-    /// <b>IT PINS NOTHING, so <see cref="Sound"/> and <see cref="Checkable"/> pass over
+    /// <b>It pins nothing, so <see cref="Sound"/> and <see cref="Checkable"/> pass over
     /// it.</b> A rule whose scope carries one of these claims no more about the world than
     /// the same rule without it, and the enumeration is over the FINE codes alone — which
     /// keeps the sharpest measurement here working rather than turning the experiment's own
@@ -385,7 +385,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// How many bits actually carry the function, which is what an assignment is.
     /// </summary>
     /// <remarks>
-    /// <b>SEPARATE FROM <see cref="Bits"/> so clutter and withholding stay
+    /// <b>Separate from <see cref="Bits"/> so clutter and withholding stay
     /// orthogonal.</b> A withheld assignment is a setting of the bits that MATTER;
     /// counting the always-one ones into it would make almost every assignment
     /// unreachable and the held-out set mostly fiction.
@@ -414,7 +414,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// generated world can, and it was the one world that held nothing back.
     /// </para>
     /// <para>
-    /// <b>IT READS THE CURRENT MAPPING, exactly as <see cref="Truths"/> does.</b> On a
+    /// <b>It reads the current mapping, exactly as <see cref="Truths"/> does.</b> On a
     /// switching run the answer to a withheld assignment moves with the target, and
     /// scoring against the answer it had at the start would measure the switch.
     /// </para>

@@ -226,8 +226,23 @@ public sealed class ProseTests(ITestOutputHelper output)
     /// different sets of files, so the next pass should be recorded as a number rather than
     /// as a finding.
     /// </para>
+    /// <para>
+    /// And nought, on a pass that went looking for the last forty-five. It is a rule now
+    /// rather than a ratchet, on <see cref="Shouted"/>'s terms: there is no condition under
+    /// which this repo wants a bold span that opens in capitals and carries on in lower case,
+    /// so raising this constant is not a thing a commit may do.
+    /// </para>
+    /// <para>
+    /// What the pass cost is worth recording, because the entry above predicted it. A shouted
+    /// sentence has one correct rewrite, so a script took all forty-five leads — and it left
+    /// eleven spans half-shouted, the capitals carrying on after an inline tag the run had
+    /// stopped at. Lowercasing the lead alone satisfies this check and leaves the prose in the
+    /// register, which is the guard being met rather than the work being done. Six more needed
+    /// a hand because a one-letter word breaks a run: <i>rather than A SHUFFLE</i> is a shout
+    /// this cannot see at all.
+    /// </para>
     /// </remarks>
-    private const int Opened = 45;
+    private const int Opened = 0;
 
     /// <summary>
     /// The commit the decay schedule counts from. <b>John's, 2026-08-13.</b>

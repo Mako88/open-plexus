@@ -1130,7 +1130,7 @@ public sealed class RecalledTests(ITestOutputHelper output)
     /// 1.2x. So a gate can pay here and could never have paid there.
     /// </para>
     /// <para>
-    /// <b>WHICH MAKES <see cref="Predicting.Salient"/> AGAINST <see cref="Predicting.Masked"/>
+    /// <b>Which makes <see cref="Predicting.Salient"/> against <see cref="Predicting.Masked"/>
     /// A real comparison for the first time.</b> The two were compared on bAbI and the
     /// gate could only ever have lost there, because the words it selects were drawn at
     /// random over a template. This is the same pair on a text where the gate is

@@ -75,7 +75,7 @@ public sealed class RecoveryTests(ITestOutputHelper output)
     /// <param name="dials">The brain, per seed.</param>
     /// <param name="address">Address bits, so a finding can be asked at a second width.</param>
     /// <remarks>
-    /// <b>ONE COPY BECAUSE `DuplicationTests` REFUSED THE THIRD.</b> Every grid in this file
+    /// <b>One copy because `DuplicationTests` refused the third.</b> Every grid in this file
     /// is the same curve read under a different setting, and three copies of the loop is
     /// three chances for one grid's distances or seed count to drift from another's — which
     /// would make rows that look comparable and are not. The reading is the row; the walk is

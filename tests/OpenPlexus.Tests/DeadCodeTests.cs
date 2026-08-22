@@ -278,25 +278,68 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + string.Join(", ", orphans.Order(StringComparer.Ordinal)));
     }
 
+    /// <summary>
+    /// Every excuse names something that is still here.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>An excuse for a type that is gone</b> is a check that produces false PASSES, which
+    /// is the one failure this file exists to prevent. Eleven of them had accumulated: eight
+    /// runners that went with the walk, and <c>Felt</c>, <c>Marked</c> and <c>LatentRun</c>
+    /// deleted for their own reasons. Each was inert on the day it went stale and each was a
+    /// pardon waiting for a type of that name to come back — a <c>BindingRun</c> written
+    /// tomorrow and wired to nothing would have been excused by a line written for a
+    /// different one.
+    /// </para>
+    /// <para>
+    /// <b>And nothing had ever asked.</b> The list above is checked in both directions — a
+    /// member named unused and since called comes off — and the type list was checked in one.
+    /// A budget counts entries and says nothing about whether an entry means anything.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_excuse_is_written_for_a_type_that_is_gone()
+    {
+        var declared = Tree.Declared()
+            .Select(type => type.Name.Split('`')[0])
+            .ToHashSet(StringComparer.Ordinal);
+
+        var superstitions = Unwired.Keys
+            .Where(name => !declared.Contains(name))
+            .Order(StringComparer.Ordinal)
+            .ToList();
+
+        output.WriteLine(
+            superstitions.Count == 0
+                ? "every excuse names a type that is still here"
+                : $"{superstitions.Count} stale: {string.Join(", ", superstitions)}");
+
+        Assert.True(superstitions.Count == 0,
+            $"{superstitions.Count} excuse(s) naming no public type: "
+            + $"{string.Join(", ", superstitions)}. The type is gone and the line pardons "
+            + "whatever comes back under its name, which is a false pass. Delete the entry.");
+    }
+
     /// <summary>Public types the library never names, each with its reason.</summary>
     /// <remarks>
-    /// <b>Ten entry points and one orphan</b>, which is the whole value of the
-    /// check. A world's run exists for a harness to call, so a test IS its
-    /// caller and the library never naming it is correct. `Winnow` is not that: it
-    /// is a mechanism, and a mechanism the library has never heard of is wired to
-    /// nothing however thoroughly its own tests exercise it.
+    /// <para>
+    /// <b>Entry points and orphans</b>, and telling the two apart is the whole value of the
+    /// check. A world's run exists for a harness to call, so a test IS its caller and the
+    /// library never naming it is correct. `Winnow` is not that: it is a mechanism, and a
+    /// mechanism the library has never heard of is wired to nothing however thoroughly its
+    /// own tests exercise it.
+    /// </para>
+    /// <para>
+    /// <b>The count is printed rather than written here</b>, which is the correction this
+    /// remark is. It said <i>ten entry points and one orphan</i> and had said so through
+    /// eleven entries going stale and several more arriving —
+    /// <see cref="No_excuse_is_written_for_a_type_that_is_gone"/> is what asks now, and a
+    /// number in a comment is what it replaced.
+    /// </para>
     /// </remarks>
     private static readonly Dictionary<string, string> Unwired = new(StringComparer.Ordinal)
     {
-        ["BabiRun"] = Harness,
-        ["BindingRun"] = Harness,
-        ["ClevrRun"] = Harness,
-        ["ComposedRun"] = Harness,
         ["HomeostatRun"] = Harness,
-        ["MotifRun"] = Harness,
-        ["SensesRun"] = Harness,
-        ["TendingRun"] = Harness,
-        ["ClutrrRun"] = Harness,
         ["CrossingRun"] = Harness,
 
         // A chooser is composed rather than constructed, which is `Composed`'s reason one
@@ -310,7 +353,6 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "would decide which of three arms over `IActed`'s seam is the policy -- the "
             + "same fault as a world naming a brain type, one layer out. `Watching` takes it as "
             + "a delegate and `HomeostatTests` supplies it beside the oracle and the draw.",
-        ["LatentRun"] = Harness,
         ["MultiplexerRun"] = Harness,
         ["GradedRun"] = Harness,
         ["CifarRun"] = Harness,
@@ -327,9 +369,6 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "see a caller sitting beside it. It arrived here when the scan stopped reading "
             + "public types and started reading declared ones; it was `internal` before the "
             + "learner was, so it had never been asked about.",
-
-        ["Felt"] = "used by `Sensing`, which shares its file — the own-file rule "
-            + "cannot see a caller sitting beside it.",
 
         ["Bodied"] = "A FRONT END IS CHOSEN AT THE JOIN, so the library naming one would "
             + "be the library deciding how a world is perceived -- the same line `Posted` "
@@ -459,7 +498,6 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // is picked where the two meet -- `ShapeTests` admits `fronting` and `through` on a
         // world's runner for exactly this reason. A library that named one would be
         // deciding how everything it is ever shown gets perceived.
-        ["Marked"] = Join,
         ["Passthrough"] = Join,
 
         ["Roaming"] = "A WORLD, ON THE SAME FOOTING AS `Returning`: `Watching` drives it "

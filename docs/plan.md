@@ -32,7 +32,7 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them.
 - **ACTIVE, what rung four is WORTH.** It pays nothing over eight seeds and displaces none
-  of what it covers. What is owed is a second world. Fork **102**.
+  of what it covers. Monk-1 is the second world and its encoding blocks it. Fork **133**.
 - **Then what a derived category DELIVERS**, nought so far. The fold puts it in nearly every
   moment and genesis refuses a code that never varied, so `Coarsening` is the road. Fork
   **129**.
@@ -318,6 +318,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       on that rather than reached.
     - **OPEN** — anti-unification as rung four's admission, gated by a hole whose covered
       values never co-occur. Built and firing; open on what it is worth. Fork **102**.
+    - **OPEN** — Monk-1's concept IS a hole that repeats and its front end fuses attribute
+      with value, so the shared thing is unnameable on the one published bench that wants
+      it. Fork **133**.
     - **OPEN** — what puts a commitment in a moment without widening every world's. Fork
       **116**, and the revival row is the shape of the answer.
   - Concept and label independent

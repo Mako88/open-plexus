@@ -581,7 +581,11 @@ public sealed class DocsTests
     // else. Deriving a front end's grouping into a code per pair was built, measured on both
     // worlds that fill the channel and deleted, so what the row buys is a session not building
     // it again -- which is the whole of what this table is for, and it duplicates no entry.
-    private const int Whole = 11_671;
+    // And 11,707 is the fifty-seventh raise, thirty-six words, for a fork and a strike that
+    // pay for each other. `THE ORDER` said rung four owed a second world and now names which:
+    // Monk-1's concept is a hole that repeats, and the front end fusing attribute with value
+    // is why the one published bench that wants the rung cannot say it.
+    private const int Whole = 11_707;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

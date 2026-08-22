@@ -171,6 +171,22 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// which is what deriving into codes exists to avoid.
     /// </para>
     /// <para>
+    /// <b>The cost is one int a code</b>, on a message that already carries every code, which
+    /// is smaller than the objection above reads. <c>Fleeting</c> travels on <c>Pushed</c>
+    /// and again as <c>Asked.Fleeting</c>, so a per-code channel beside the moment is a
+    /// shape the wire already pays for; a grouping is a partition of the same codes. What
+    /// deriving into codes avoided was a quadratic in the group's size, and this is linear.
+    /// </para>
+    /// <para>
+    /// <b>And the first step is a runner for <c>Binding</c></b>, which is the world built to
+    /// make the dial falsifiable and has never been put in front of a brain — <c>BindingRun</c>
+    /// is an entry in <see cref="DeadCodeTests"/> naming a file that does not exist.
+    /// <c>Kinds.At</c> gives a concept's colour and its shape the SAME code value under two
+    /// modalities, so the repeated hole rung four is made of already has its shape there, and
+    /// the grouping is the question of WHICH OBJECT on top of it. Until something runs the
+    /// world, the reader has nowhere to be measured.
+    /// </para>
+    /// <para>
     /// <b>And <c>Composed</c> does not close with it</b>, which this entry had wrong. Its
     /// scene is three moments and its answer arrives in the third, so what it wants is
     /// settlement by successor rather than a reader for a grouping. The two were tied

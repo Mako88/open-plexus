@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -31,7 +31,14 @@ namespace OpenPlexus.Tests;
 /// and the trailing accuracy is level or a fraction down on all eight.
 /// </para>
 /// <para>
-/// <b>And the reason is that one hole is a DROP.</b> An entry naming a variable once is
+/// <b>And subsumption takes none of them</b>, which is what the rung costs. A holed parent
+/// is added beside the siblings it covers and every one of them is still resident at the
+/// end — 31.5 standing beside 9.6 parents, on all eight seeds. The rule that keeps the
+/// general one where both are equally accurate cannot reach a parent with no record yet,
+/// because a fresh commitment starts blind and re-earns its statistics.
+/// </para>
+/// <para>
+/// <b>And it buys nothing because one hole is a DROP.</b> An entry naming a variable once is
 /// satisfied by any moment holding a code of that kind, so a rule with one is the same rule
 /// with that condition removed — which is <c>Widening</c>, already refuted in three shapes.
 /// What makes rung four a rung is a hole that REPEATS: <i>whichever word was asked about, and
@@ -60,8 +67,52 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
     /// <param name="Found">How many of the world's own rules were reached.</param>
     /// <param name="Holed">How many residents name a variable.</param>
     /// <param name="Sorts">How many categories the front end derived.</param>
+    /// <param name="Undisplaced">
+    /// How many of the siblings a holed parent covers are still resident beside it.
+    /// <b>What subsumption did not take</b>, which is the half of the add-only rule nothing
+    /// had read. A parent that covers its siblings and does not displace them is a second
+    /// copy of what the population already held.
+    /// </param>
     private readonly record struct Ran(
-        double Recent, int Held, int Sound, int Found, int Holed, int Sorts);
+        double Recent, int Held, int Sound, int Found, int Holed, int Sorts, int Undisplaced);
+
+    /// <summary>
+    /// Every resident a holed parent generalises that is still resident beside it.
+    /// </summary>
+    /// <param name="held">The population a run finished with.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>By the constants rather than by position</b>, which is forced and not a shortcut. A
+    /// scope is sorted canonically and a variable entry rides its own modality, so the hole
+    /// sits somewhere the filled value does not — and comparing position by position would
+    /// call every sibling a stranger. A sibling is a resident of the same length expecting
+    /// the same thing and holding every constant the parent holds.
+    /// </para>
+    /// <para>
+    /// <b>A repeated hole is covered by the same test.</b> Two variable entries leave two
+    /// positions free, and a sibling filling both with one value still holds every constant
+    /// and still has the same length.
+    /// </para>
+    /// </remarks>
+    private static int Undisplaced(Population held)
+    {
+        var all = held.All.ToList();
+
+        var standing = 0;
+
+        foreach (var parent in all.Where(one => one.Varies))
+        {
+            var constants = parent.Scope.Where(code => !Unifying.Names(code)).ToHashSet();
+
+            standing += all.Count(one =>
+                !one.Varies
+                && one.Scope.Length == parent.Scope.Length
+                && one.Expects == parent.Expects
+                && constants.All(one.Scope.Contains));
+        }
+
+        return standing;
+    }
 
     /// <summary>One arm of one seed.</summary>
     /// <param name="deriving">Whether the front end fills a vocabulary the gate can read.</param>
@@ -100,7 +151,7 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
 
         return new Ran(
             tally.Recent, tally.Resident, graded.Sound, graded.Found,
-            brain.Held.All.Count(one => one.Varies), sorts.Count);
+            brain.Held.All.Count(one => one.Varies), sorts.Count, Undisplaced(brain.Held));
     }
 
     [Fact]
@@ -118,7 +169,8 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
                 output.WriteLine(
                     $"{(deriving ? "gated " : "control"),-7} seed {seed} | recent {ran.Recent:F3} "
                     + $"| held {ran.Held,4} | sound {ran.Sound,3} | found {ran.Found,3} "
-                    + $"| categories {ran.Sorts,2} | holed {ran.Holed,3}");
+                    + $"| categories {ran.Sorts,2} | holed {ran.Holed,3} "
+                    + $"| siblings kept {ran.Undisplaced,4}");
             }
 
         foreach (var (deriving, ran) in arms)
@@ -127,7 +179,8 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
                 + $"{ran.Average(one => one.Recent):F3} | held {ran.Average(one => one.Held):F0} "
                 + $"| sound {ran.Average(one => one.Sound):F1} "
                 + $"| found {ran.Average(one => one.Found):F1} "
-                + $"| holed {ran.Average(one => one.Holed):F1}");
+                + $"| holed {ran.Average(one => one.Holed):F1} "
+                + $"| siblings kept {ran.Average(one => one.Undisplaced):F1}");
 
         // The operator RUNS, which is the first thing to hold down and what every other
         // reading here rests on. A rung nothing reaches is measured by whatever called it

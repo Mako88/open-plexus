@@ -31,8 +31,8 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them.
-- **ACTIVE, what rung four is WORTH.** The join fires and pays nothing at one seed. Owed are
-  seeds, a second world, and whether subsumption takes its siblings. Fork **102**.
+- **ACTIVE, what rung four is WORTH.** It pays nothing over eight seeds and displaces none
+  of what it covers. What is owed is a second world. Fork **102**.
 - **Then what a derived category DELIVERS**, nought so far. The fold puts it in nearly every
   moment and genesis refuses a code that never varied, so `Coarsening` is the road. Fork
   **129**.

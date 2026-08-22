@@ -621,13 +621,13 @@ public sealed class DocsTests
     // reading the grouping took it rather than deriving it into codes. So the condition had
     // expired and a row with an expired condition is a superstition. What replaces it is
     // live: a grouping cannot cross the wire beside a moment and a derived code can.
-    // And 11,781 is the sixty-second raise, twenty-four words, for an item entering
+    // And 11,784 is the sixty-second raise, twenty-seven words, for an item entering
     // `THE ORDER` and a line saying which red is left. The gate one is a finding on three
     // worlds rather than a proposal: `Surprising.Unaccounted` stops genesis inside a hundred
     // rounds of twenty thousand, and Monk -- the one bench whose rule set can be counted --
     // holds 14 of 22 with it and 22 of 22 without, for a better withheld score. It duplicates
     // no item and its route leaf came in shorter than the one it replaced.
-    private const int Whole = 11_781;
+    private const int Whole = 11_784;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

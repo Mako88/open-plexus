@@ -414,6 +414,39 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         Assert.True(true);
     }
 
+    /// <summary>
+    /// Whether the gate that was load-bearing on photographs is one here.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Fork 135's counterweight</b>, and it is the reading that stopped a default flip.
+    /// Three worlds say <c>Surprising.Unaccounted</c> costs coverage and nothing else: Monk
+    /// holds 14 of its 22 minimal rules with the gate and 22 of 22 without, the multiplexer
+    /// finds one more truth in every cell, and the binding world goes 0.5594 to 0.9938. This
+    /// world is the one whose front end makes its own symbols, which is what the CIFAR
+    /// refutation was taken on.
+    /// </para>
+    /// <para>
+    /// <b>And it splits on the front end.</b> Whole: the unseen set goes 0.565 +-0.020 to
+    /// 0.610 +-0.014 and the sound singles held go from about ten of 241 to about eighty —
+    /// better, at 18,000 mints against 600 into a population capped at 2,000, so the run is
+    /// churning thirty times as hard for two standard errors. Tiled: every one of the 36
+    /// sound singles is held and the unseen set FALLS, 0.800 +-0.024 to 0.733 +-0.023.
+    /// </para>
+    /// <para>
+    /// <b>Finding every rule and answering worse is the whole finding.</b> Unsound residents
+    /// roughly double on the tiled arm while sound ones fall, and the vote weighs accuracy
+    /// with no floor — so what the extra proposals buy is seats for rules that have not been
+    /// tested yet. That is the refuted <c>Speaking</c> arm's territory approached from the
+    /// other side: the problem is not which rules are HELD but which take the round.
+    /// </para>
+    /// <para>
+    /// <b>So the gate is not a mistake and neither is ungating it.</b> What separates the
+    /// worlds is whether capacity binds, and on this one it binds exactly — 2,000 of 2,000 on
+    /// both arms of the whole front end. A seat rule is what fork 135 wants, and flipping the
+    /// default without one would trade three worlds' coverage for this one's answers.
+    /// </para>
+    /// </remarks>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_the_gate_that_was_load_bearing_on_photographs_is_one_here()

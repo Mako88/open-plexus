@@ -321,6 +321,19 @@ public sealed class ClevrTests(ITestOutputHelper output)
     /// at all. <see cref="ClevrSettings.Phase"/> moves the held-out stride instead.
     /// </para>
     /// <para>
+    /// <b>And the axis is three wide</b>, because the stride is <c>Asked / Withheld</c> and a
+    /// phase past it wraps onto the first. The second version of this sweep took four and two
+    /// of its rows were the same run, which reports a spread narrower than the sample it has.
+    /// That is the same fault as the first version one step further along.
+    /// </para>
+    /// <para>
+    /// <b>What it says</b>: reading the grouping takes the drawn stream from 0.665 +-0.008 to
+    /// 0.757 +-0.004, which is ten standard errors, and the withheld set from 0.311 +-0.019
+    /// to 0.360 +-0.011 — from under this world's 0.358 weighted chance bar back onto it. So
+    /// the null result <see cref="Clevr_reaches_the_commitment_learner"/> records is
+    /// untouched, and the dial is better on both columns of the world it was not chosen on.
+    /// </para>
+    /// <para>
     /// <b>And this is the world where it could COST rather than pay.</b> The corpus segments
     /// the scene and leaves the question's codes in no part, so a scope naming attributes of
     /// two different objects is refused — and a CLEVR question chains filters across a scene
@@ -337,7 +350,11 @@ public sealed class ClevrTests(ITestOutputHelper output)
             var drawn = new List<double>();
             var unseen = new List<double>();
 
-            foreach (var seed in new[] { 1, 2, 3, 4 })
+            // THREE, because the axis is bounded by the stride and the stride is
+            // `Asked / Withheld`. A fourth phase wraps onto the first, and the first reading
+            // took four -- so two of its rows were the same run and the spread it reported
+            // was narrower than the sample it had.
+            foreach (var seed in new[] { 0, 1, 2 })
             {
                 var run = Learnt(fleeting: true, spanning: spanning, phase: seed);
 

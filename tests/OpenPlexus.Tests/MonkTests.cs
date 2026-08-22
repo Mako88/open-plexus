@@ -520,29 +520,25 @@ public sealed class MonkTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The clean rule is refused by the proposer</b>, whatever the spelling buys.
+    /// <b>The clean rule is reached</b>, which wanted a list no index could stand in for.
     /// </summary>
     /// <remarks>
     /// <para>
     /// Monk-1's first disjunct is <c>head = body</c> and nothing else, which under
     /// <see cref="Spelling.Split"/> is a two-entry scope with both entries naming one
-    /// variable. <c>Generalising.Siblings</c> will not propose it: a group whose hole covers
-    /// every position of the scope is skipped, because a scope of variables alone is reached
-    /// by no code in any moment and <c>Population.Firing</c> walks the code index.
+    /// variable. <c>Generalising.Siblings</c> used to skip a group whose hole covers every
+    /// position of the scope, so what the rung could reach was that truth with a condition it
+    /// does not need — one rule per value of whatever the condition pinned.
     /// </para>
     /// <para>
-    /// So what the rung can reach here is <c>head = body</c> with a constant beside it, one
-    /// rule per value of whichever attribute the constant pins. That is sound and it is
-    /// narrower than the truth, and it is the ceiling the sweep's numbers are read against —
-    /// stated by enumeration rather than inferred from a score.
-    /// </para>
-    /// <para>
-    /// <b>What lifts it is a scan list</b>, whose cost is unpriced. It is not a spelling
-    /// question and no arm here touches it.
+    /// <b>The refusal was the code index and not the rung.</b> A scope of variables alone
+    /// names no code, so <c>Population.Firing</c>'s walk of the moment could never look at
+    /// it; <c>Population.Scanning</c> is the list that does, and <c>Unifying.Joins</c> is
+    /// what may go in it. Fork 134.
     /// </para>
     /// </remarks>
     [Fact]
-    public void The_rule_that_is_only_a_variable_twice_is_beyond_the_proposer()
+    public void The_rule_that_is_only_a_variable_twice_is_reached_and_scanned()
     {
         // The two-entry scope Monk-1's first disjunct actually is, built by hand -- nothing
         // proposes it, which is the point.
@@ -558,9 +554,9 @@ public sealed class MonkTests(ITestOutputHelper output)
             "head equals body is not sound on Monk-1, so the key is not binding a repeated "
             + "name and every join column in this file is about the key");
 
-        // And the ground rules it would be read off offer no sibling group at all. Three
-        // scopes, one per shared head-and-body value, and the hole would stand in both of
-        // the two positions each has -- which is the case `Siblings` skips.
+        // And it is what the ground rules it is read off now propose. Three scopes, one per
+        // shared head-and-body value, and the hole stands in both of the two positions each
+        // has -- which is the case `Siblings` used to skip.
         var bare = Enumerable.Range(0, 3)
             .Select(value => new Commitment(
                 [
@@ -573,11 +569,26 @@ public sealed class MonkTests(ITestOutputHelper output)
         Assert.All(bare, one => Assert.True(
             Monk.Sound(Puzzle.One, one.Scope, one.Expects, Spelling.Split)));
 
-        Assert.Empty(Generalising.Siblings(bare));
+        var straight = Generalising.Siblings(bare);
 
-        // While the same three with one attribute pinned beside them do offer one, and that
-        // is what the rung can actually reach here -- the truth with a condition it does not
-        // need, one rule per value of whatever the condition pins.
+        Assert.Contains(straight, one => one.Holes.Count > 1);
+
+        // And what they propose is the rule itself, entry for entry.
+        var clean2 = Generalising.Rule(straight.First(one => one.Holes.Count > 1));
+
+        Assert.Equal([.. clean.Order()], [.. clean2.Scope.Order()]);
+
+        // And it is a scope the code index cannot reach, so it goes on the scan list rather
+        // than being resident and dead.
+        Assert.True(Unifying.Joins(clean2.Scope));
+
+        // While one variable and no repeat is refused, being satisfied by any moment holding
+        // a code of that kind -- the drop `Widening` was refuted for.
+        Assert.False(Unifying.Joins(
+            [Unifying.Any(Monk.Attribute, name: 0), Unifying.Any((byte)(Monk.Attribute + 1), name: 1)]));
+
+        // And the same three with one attribute pinned beside them still offer a group, which
+        // is what the rung reached before the scan list and reaches beside it now.
         var beside = Enumerable.Range(0, 3)
             .Select(value => new Commitment(
                 [
@@ -601,9 +612,9 @@ public sealed class MonkTests(ITestOutputHelper output)
             Monk.Sound(Puzzle.One, proposed.Scope, proposed.Expects, Spelling.Split));
 
         output.WriteLine(
-            $"head = body is sound and offers no sibling group at length 2; with one "
-            + $"attribute pinned beside it, {offered.Count} groups are offered and what they "
-            + "propose is sound");
+            $"head = body is sound, is what its ground siblings propose at length 2, and is "
+            + $"scanned rather than indexed; with one attribute pinned beside it, "
+            + $"{offered.Count} groups are offered and what they propose is sound too");
     }
 
     /// <summary>What one spelling of one puzzle left behind.</summary>
@@ -631,12 +642,13 @@ public sealed class MonkTests(ITestOutputHelper output)
     /// and is unsound is the drop rung four already gets marked down for.
     /// </param>
     /// <param name="Shortest">The shortest join that is sound, or nought where none is.</param>
+    /// <param name="Scanned">How many residents no code in any moment reaches.</param>
     /// <param name="Sorts">How many categories the front end derived.</param>
     private readonly record struct Spelt(
         double Recent, double Unseen, double Silence, double Chance,
         int Held, int Sound, int Found, int Truths,
         int Twice, int Groups, int Repeated, int Joined, int Resident, long Fired,
-        int Truest, int Shortest, int Sorts);
+        int Truest, int Shortest, int Scanned, int Sorts);
 
     /// <summary>One puzzle under one spelling, with rung four's gate fed.</summary>
     /// <param name="puzzle">Which of the three.</param>
@@ -711,6 +723,7 @@ public sealed class MonkTests(ITestOutputHelper output)
             joins.Sum(one => one.Fired),
             truest.Count,
             truest.Count == 0 ? 0 : truest.Min(one => one.Scope.Length),
+            brain.Held.Scanning,
             sorts.Count);
     }
 
@@ -752,6 +765,7 @@ public sealed class MonkTests(ITestOutputHelper output)
                 + $"| repeated {one.Repeated,3} | admitted {one.Joined,3} "
                 + $"| resident joins {one.Resident,3} | fired {one.Fired,6} "
                 + $"| sound joins {one.Truest,3} shortest {one.Shortest} "
+                + $"| scanned {one.Scanned,3} "
                 + $"| categories {one.Sorts,2}");
 
         // Both arms have a vocabulary for the gate to read, or this is an empty control
@@ -835,7 +849,7 @@ public sealed class MonkTests(ITestOutputHelper output)
     /// <para>
     /// <b>What the arm was never given is the rule it needed</b>, which is fork 134 and why
     /// this is not yet a deletion. Monk-1's concept is <c>head = body</c> and nothing else,
-    /// and <see cref="The_rule_that_is_only_a_variable_twice_is_beyond_the_proposer"/> shows
+    /// and <see cref="The_rule_that_is_only_a_variable_twice_is_reached_and_scanned"/> shows
     /// the proposer cannot reach it — so what the split arm holds is that truth with a
     /// condition it does not need, one rule per value of whatever the condition pins. A losing
     /// arm gets one more shape where what lost was the build rather than the idea.
@@ -873,6 +887,7 @@ public sealed class MonkTests(ITestOutputHelper output)
                         + $"| repeated {one.Repeated,3} | admitted {one.Joined,3} "
                         + $"| resident joins {one.Resident,3} | fired {one.Fired,6} "
                         + $"| sound joins {one.Truest,3} shortest {one.Shortest} "
+                + $"| scanned {one.Scanned,3} "
                         + $"| categories {one.Sorts,2}");
                 }
 

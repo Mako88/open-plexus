@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 namespace OpenPlexus.Codes;
 
@@ -9,10 +9,10 @@ namespace OpenPlexus.Codes;
 /// <remarks>
 /// <para>
 /// <b>A sensor per machine would not do this</b>, and that is the whole point. A
-/// front end is asked for a MOMENT — see <see cref="Machines.Watching{TSeen}"/> — and
+/// front end is asked for a MOMENT — see <c>Machines.Watching</c> — and
 /// a moment is what puts codes together, so a camera on one machine and a
 /// microphone on another would never co-fire, and the sight–sound pairing that
-/// <see cref="Worlds.Senses"/> exists to measure could not be reached at all.
+/// <c>Worlds.Senses</c> exists to measure could not be reached at all.
 /// <b>Cross-modal binding needs the streams in ONE moment</b>, which means one
 /// machine holding several front ends rather than several machines holding one
 /// each.
@@ -27,7 +27,7 @@ namespace OpenPlexus.Codes;
 /// <b>Groups are offset per front end.</b> Because a group number only means
 /// something inside the thing that said it. Two front ends both calling
 /// something "object 0" mean different objects, and merging them unchanged would
-/// assert the binding <see cref="Worlds.Binding"/> exists to withhold — the same
+/// assert the binding <c>Worlds.Binding</c> exists to withhold — the same
 /// fault a chunk spanning two groups makes, from the other end.
 /// </para>
 /// </remarks>

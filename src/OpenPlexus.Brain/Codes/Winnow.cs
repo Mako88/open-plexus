@@ -53,8 +53,8 @@ namespace OpenPlexus.Codes;
 /// </para>
 /// <para>
 /// <b>And it is derived by arithmetic rather than from <see cref="Random"/>.</b>
-/// <see cref="Worlds.Seeds"/> already records that a seeded generator normalises
-/// its seed by magnitude, and <see cref="Worlds.Kinds.Named"/> already refuses
+/// <c>Worlds.Seeds</c> already records that a seeded generator normalises
+/// its seed by magnitude, and <c>Worlds.Kinds.Named</c> already refuses
 /// <see cref="string.GetHashCode()"/> for being randomised per process. A
 /// codebook that must be identical on every machine FOREVER should not rest on a
 /// library's internals at all: the connections here are a stated mix of the cell
@@ -257,7 +257,7 @@ public sealed class Winnow
     /// The stated mix — <b>the whole codebook, in four lines.</b>
     /// </summary>
     /// <remarks>
-    /// The same avalanche <see cref="Worlds.Seeds.Apart"/> uses, over three
+    /// The same avalanche <c>Worlds.Seeds.Apart</c> uses, over three
     /// numbers rather than two. <b>It is written out here rather than called</b>
     /// because that one returns a seed for a generator and this one returns the
     /// draw itself, and a shared helper would invite someone to change the

@@ -123,7 +123,7 @@ public enum Rooting
 /// what the population expects and branches on the answer, so a moment with nothing grounded
 /// has no claim to make and the machine falls to a blind ask or to silence. Declining removes
 /// DOINGS there, and a doing is how a settlement is obtained — a third of the asks on
-/// <c>Conversing</c>, which is learning rather than assertion.
+/// <c>Worlds.Conversing</c>, which is learning rather than assertion.
 /// </para>
 /// <para>
 /// <b>It is coherent rather than a fault</b>, and it ships. Claiming a groundless guess in a
@@ -338,7 +338,7 @@ public enum Mending
     /// <b>And its sign flips with the timing beside it</b>, which is why the split matters.
     /// Every round on the clean multiplexer it is the best thing measured; after a failure
     /// on the same world it is six and a half standard errors behind no gate at all. On
-    /// <see cref="Worlds.Arranged"/> it is inert in both timings to three metrics. Its size
+    /// <c>Worlds.Arranged</c> it is inert in both timings to three metrics. Its size
     /// is a fact about the world and its sign a fact about the timing, which is why no
     /// single sentence about it has ever been safe.
     /// </para>
@@ -410,7 +410,7 @@ public enum Repairing
     /// <para>
     /// <b>The default because it won everywhere it was asked</b>, which took a ledger to
     /// see. Sixteen standard errors of hard-round coverage at eleven bits skewed, six
-    /// of true rules found, two on <see cref="Worlds.Arranged"/> — the world fork 58
+    /// of true rules found, two on <c>Worlds.Arranged</c> — the world fork 58
     /// predicted it would die on — and inside one standard error on both even multiplexers.
     /// <c>RepairingTests</c> holds the grid and <c>LineageTests</c> holds the mechanism.
     /// </para>
@@ -541,7 +541,7 @@ public enum Budgeting
     /// <remarks>
     /// <para>
     /// <b><see cref="Earned"/> reads misses alone</b>, so it funds a parent in proportion to
-    /// how wrong it is. Measured on <see cref="Worlds.Arranged"/>, whose true rules are one
+    /// how wrong it is. Measured on <c>Worlds.Arranged</c>, whose true rules are one
     /// code and where any repair is therefore damage: 0.651 unseen at 95 sound rules against
     /// the shipped total's 0.725 at 709. The parents doing the most damage are the ones
     /// earning fastest, which is a rate reading free rather than a budget. See
@@ -582,7 +582,7 @@ public enum Budgeting
     /// parent right half the time or better and bites hardest where a rule is almost always
     /// wrong. A rule right one round in ten is allowed a ninth of what
     /// <see cref="Earned"/> grants it. That is where the refuted arm's damage was — 1281
-    /// unsound rules on <see cref="Worlds.Arranged"/> — so the cap is aimed at the population
+    /// unsound rules on <c>Worlds.Arranged</c> — so the cap is aimed at the population
     /// the reading blamed rather than at the whole of it.
     /// </para>
     /// <para>
@@ -812,9 +812,9 @@ public sealed record CommittingSettings
     /// </para>
     /// <para>
     /// <b>And the gate turns out to be load-bearing</b>, which refutes the paragraph above as
-    /// an argument for removing it. On <see cref="Worlds.Multiplexer"/> at eleven bits,
+    /// an argument for removing it. On <c>Worlds.Multiplexer</c> at eleven bits,
     /// dropping it takes 0.944 to 0.983 under the best-advocate vote. On
-    /// <see cref="Worlds.Arranged"/> it is a disaster: 1.000 falls to 0.752, because the
+    /// <c>Worlds.Arranged</c> it is a disaster: 1.000 falls to 0.752, because the
     /// gated arm repairs NINE times in twenty thousand rounds and the ungated one mints
     /// 1,349 children that then compete in the vote. Sound rules rose from 36 to 137 and
     /// unsound ones from 178 to 325, and the score went with the second number.

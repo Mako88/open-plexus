@@ -6,7 +6,7 @@ namespace OpenPlexus.Machines;
 /// <remarks>
 /// <b>A word and an intent rather than an action index</b>, because how a world numbers its
 /// doings is that world's business. A chooser handing back <c>2n + 1</c> would have one world's
-/// encoding in front of every other one, which is the fault <c>Bench</c> takes a delegate to
+/// encoding in front of every other one, which is the fault <c>Machines.Bench</c> takes a delegate to
 /// avoid.
 /// </remarks>
 public readonly record struct Wondered
@@ -66,7 +66,7 @@ public sealed class Curiosity
     /// </param>
     /// <remarks>
     /// <b>The naming is what lets a machine with no rules ask anything</b>, and it is a delegate
-    /// rather than a world for the reason <c>Bench</c>'s oracle is: a chooser naming one world
+    /// rather than a world for the reason <c>Machines.Bench</c>'s oracle is: a chooser naming one world
     /// would put that world's vocabulary in front of every other one.
     /// </remarks>
     public Curiosity(Brain brain, double rate, int seed, Func<Code, int?> naming)

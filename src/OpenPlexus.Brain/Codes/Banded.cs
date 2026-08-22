@@ -66,7 +66,7 @@ public sealed class Banded<TFrame> : IQuantizer<TFrame>
     /// <para>
     /// <b>It was already known and guarded in exactly one world.</b> The walk's tending
     /// world refused more plants than its block held, and that guard sat there while
-    /// <see cref="Machines.GradedRun"/> built the same type with no check at all. A
+    /// <c>Machines.GradedRun</c> built the same type with no check at all. A
     /// defence mounted on one caller is the failure this repo keeps re-finding, so it
     /// moved here where it covers all of them — and the world it was copied from has
     /// since been deleted, which is exactly why it had to move.

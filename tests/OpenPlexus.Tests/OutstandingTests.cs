@@ -160,11 +160,11 @@ public sealed class OutstandingTests(ITestOutputHelper output)
         // and an unrelated `.Bind(` anywhere in `src` would have done the same.
         var sources = new[]
             {
-                Path.Combine("Brain", "Commitments"),
-                "Machines",
+                Path.Combine("OpenPlexus.Brain", "Commitments"),
+                Path.Combine("OpenPlexus", "Machines"),
             }
             .SelectMany(where => Directory.GetFiles(
-                Path.Combine(Tree.Repo(), "src", "OpenPlexus", where),
+                Path.Combine(Tree.Repo(), "src", where),
                 "*.cs",
                 SearchOption.AllDirectories))
             .Select(File.ReadAllText)
@@ -182,7 +182,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
 
         Assert.True(unread.Count == 0,
             $"{string.Join(", ", unread)} on `IQuantizer` are implemented everywhere and read "
-            + "nowhere in `Brain/Commitments/` or `Machines/`. Wire one to something that ACTS on "
+            + "nowhere in the learner or the runners. Wire one to something that ACTS on "
             + "it, or delete it together with the world dials that feed it. This test is red "
             + "on purpose.");
     }

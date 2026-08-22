@@ -65,8 +65,8 @@ public readonly record struct Grouped
 /// </para>
 /// <para>
 /// <b>A world with no signal is a legitimate world</b>, and also a limit — John,
-/// 2026-08-05. <see cref="Worlds.Motif"/>'s task is compression of token sets
-/// and <see cref="Worlds.Senses"/>'s is the sight–sound pairing; rendering either
+/// 2026-08-05. <c>Worlds.Motif</c>'s task is compression of token sets
+/// and <c>Worlds.Senses</c>'s is the sight–sound pairing; rendering either
 /// as pixels would measure a different thing. So feeding codes straight in stays
 /// available on purpose. <b>What it costs</b> is that such a world can never tell
 /// anybody whether the quantisers work, which is worth knowing before the

@@ -1,5 +1,4 @@
-﻿using OpenPlexus.Worlds;
-
+﻿
 namespace OpenPlexus.Codes;
 
 /// <summary>
@@ -56,7 +55,7 @@ public readonly record struct Storied
 /// <summary>What a translation does with a question and the story in front of it.</summary>
 /// <remarks>
 /// <b>A fact about the pipe, which is neither side's to decide</b> — the same place
-/// <see cref="Machines.Fronting"/> sits. The world says which words were the question and
+/// <c>Machines.Fronting</c> sits. The world says which words were the question and
 /// stops there; what is made of that split is chosen here, and the learner is told
 /// nothing about which arm it is running under.
 /// </remarks>
@@ -195,7 +194,7 @@ public enum Joining
     /// inference performed while reading, which is forks 89, 91 and 93 as one question.
     /// </para>
     /// <para>
-    /// <b>And it is John's account of an individual run forwards.</b> <see cref="Worlds.Returning"/>
+    /// <b>And it is John's account of an individual run forwards.</b> <c>Worlds.Returning</c>
     /// found a thing is re-identifiable as the bundle of relations it stands in rather than as
     /// a stored name, on a landmark that never moved. Here the landmark moves, and what holds
     /// the bundle together across the movement is the entry — so the individual is what the
@@ -226,7 +225,7 @@ public sealed class Joined : IQuantizer<Coded>
 {
     /// <summary>The modality a coincidence rides on.</summary>
     /// <remarks>
-    /// <b>Its own, so a marked word is not the word.</b> Sharing <see cref="Babi"/>'s
+    /// <b>Its own, so a marked word is not the word.</b> Sharing <c>Worlds.Babi</c>'s
     /// modality would make <i>mary</i> and <i>mary was also asked about</i> the same code,
     /// which is the distinction this whole arm exists to make.
     /// </remarks>
@@ -710,7 +709,7 @@ public sealed class Joined : IQuantizer<Coded>
     /// so a repeated word would take its last occurrence and claim to have stood only there.
     /// Dropping it is what makes <i>in</i> then <i>kitchen</i> derivable across the
     /// <i>the</i> between them, which is the precedence that separates a placement from a
-    /// movement on <see cref="Worlds.Roaming"/>.
+    /// movement on <c>Worlds.Roaming</c>.
     /// </para>
     /// <para>
     /// <b>Oldest first, because the transcript happened that way round.</b>

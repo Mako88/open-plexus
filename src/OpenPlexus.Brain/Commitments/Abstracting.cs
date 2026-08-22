@@ -555,8 +555,8 @@ public readonly record struct Proposed
 /// <para>
 /// <b>What the recursion costs is the thing it needs</b>, and two benches say so from
 /// opposite directions. Naming a pair that is the whole scope removes that commitment from
-/// <see cref="Recurrence.Eligible"/> forever, so on <c>Motif</c> a name leaves its scope too
-/// short to carry another; on <c>Latent</c> three-code scopes exist in hundreds and fire a
+/// <see cref="Recurrence.Eligible"/> forever, so on <c>Worlds.Motif</c> a name leaves its scope too
+/// short to carry another; on <c>Worlds.Latent</c> three-code scopes exist in hundreds and fire a
 /// fraction of once, so the depth is there and is never tested.
 /// </para>
 /// </remarks>

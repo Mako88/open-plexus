@@ -59,7 +59,7 @@ public interface IQuantizer<in TObservation>
     /// exactly what destroys an oscillator relationship — so the order has to
     /// travel INSIDE the moment, where lateness cannot reach it. Only the front end
     /// knows it: by the time codes reach a population they are a set. <b>Read by
-    /// <see cref="Machines.Watching{TSeen}"/></b>, which turns it into the precedence codes rung
+    /// <c>Machines.Watching</c></b>, which turns it into the precedence codes rung
     /// three is made of — the seam <see cref="Forced"/> now shares. Defaulted so that adding it breaks
     /// no existing quantiser and changes no existing measurement.
     /// </remarks>
@@ -98,8 +98,8 @@ public interface IQuantizer<in TObservation>
     /// <b>Its reader was the walk's intervened edge kind</b>, and it had none for the life
     /// of this branch — see <see cref="Bind"/>. Both halves were missing and they went in
     /// order. <i>I picked this without looking at the state</i> was unsayable while every
-    /// world was watched; <see cref="Worlds.IActed{TSeen}"/> is that call, and
-    /// <see cref="Worlds.Roaming"/> is the world that says it.
+    /// world was watched; <c>Worlds.IActed</c> is that call, and
+    /// <c>Worlds.Roaming</c> is the world that says it.
     /// </para>
     /// <para>
     /// <b>And the reader is <see cref="Intervened"/></b>, on rung three's seam. A moment
@@ -112,7 +112,7 @@ public interface IQuantizer<in TObservation>
     /// <para>
     /// <b>Repair reaches for it</b>, which is the half that had to be measured. A derivation
     /// nothing selects would be a channel with a reader that reads nothing, which is the same
-    /// fault one layer in. On <see cref="Worlds.Roaming"/>'s effect question under a chooser
+    /// fault one layer in. On <c>Worlds.Roaming</c>'s effect question under a chooser
     /// that acts on a coin, 193 of 318 resident scopes name a doing — see
     /// <c>RoamingTests</c>, where the always-acting arm is printed beside it because acting
     /// every round makes provenance and <i>in the question</i> the same fact.

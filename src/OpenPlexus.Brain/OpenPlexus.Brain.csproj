@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <!-- The brain has no namespace of its own and this project name is not one.
+         `RootNamespace` is pinned to `OpenPlexus` so a new file dropped in here
+         gets the same namespace the file beside it already declares; every type
+         in this assembly is in `OpenPlexus.Bus`, `OpenPlexus.Codes`,
+         `OpenPlexus.Commitments` or `OpenPlexus.Machines`. A namespace
+         `OpenPlexus.Brain` would sit beside the class `OpenPlexus.Machines.Brain`,
+         and `DrivenTests` says why that spelling is refused. -->
+    <RootNamespace>OpenPlexus</RootNamespace>
+
+    <!-- The same three gates the library has, and for the same reasons. The
+         reasons are written once, on `OpenPlexus.csproj`. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The only dependency in the library, and it runs somebody else's constants
+         rather than learning any. Step four needs a trained front end to lose to, or
+         the claim that a fixed random projection recovers most of what training buys
+         is unfalsifiable. The weights are frozen published files, which satisfies the
+         red-ball property the same way `Winnow`'s arithmetic-derived wiring does: same
+         file, same numbers, every machine, forever.
+
+         Nothing else in the library may touch it. It is reachable only from
+         `Codes/Encoded.cs`, so a machine without the encoders fetched runs every
+         other world exactly as before. -->
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.28.0" />
+    <PackageReference Include="SimpleHttpClient" Version="5.1.0" />
+  </ItemGroup>
+
+</Project>

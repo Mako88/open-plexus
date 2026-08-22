@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 
@@ -112,7 +112,7 @@ public sealed record Encoder
 /// <para>
 /// <b>And on its own it cannot answer the question it is for.</b> The open defect asks
 /// whether the ceiling is the front end or the learner behind it. A score here is two
-/// unknowns multiplied; it needs <see cref="Machines.Probe"/> over the SAME embeddings
+/// unknowns multiplied; it needs <c>Machines.Probe</c> over the SAME embeddings
 /// as the other column, or the number is unanchored — a published 95% was measured
 /// through a different pipeline at a different resolution and is not a bar this can be
 /// held against.
@@ -215,7 +215,7 @@ public sealed class Encoded : IQuantizer<IReadOnlyList<double>>, IDisposable
     /// <param name="observation">One reading, three colour planes together.</param>
     /// <remarks>
     /// <b>What the control arm needs</b>, and it has to be the same numbers.
-    /// <see cref="Machines.Probe"/> is only a yardstick if it reads exactly what the
+    /// <c>Machines.Probe</c> is only a yardstick if it reads exactly what the
     /// commitment population reads; an embedding computed down a second path could
     /// differ by a bug rather than by the learner, and the whole comparison would be
     /// measuring that instead.

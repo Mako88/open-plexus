@@ -173,7 +173,7 @@ public sealed class Commitment
     /// </para>
     /// <para>
     /// <b>It is kept as an instrument</b> because it settled something no other number
-    /// could. On <see cref="Worlds.Arranged"/> a subsumption rule weighing advantage
+    /// could. On <c>Worlds.Arranged</c> a subsumption rule weighing advantage
     /// against THIS deleted an ordinary 83% of children — the same share as the rules
     /// that weigh it against firings — and landed on the identical withheld score, seed
     /// for seed. The children that sink that world are not memorised. That is a negative

@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 
@@ -12,12 +12,12 @@ namespace OpenPlexus.Machines;
 /// <para>
 /// <b>The last idea owed off <c>csharp</c></b>, and that branch's own build of it lost. What
 /// is inherited is where the signal comes from rather than the mechanism: a body with
-/// variables of its own to be in trouble about. <c>Homeostat</c> is that body and
-/// <see cref="Worlds.IActed{TSeen}"/> is the verb; this is the half between them.
+/// variables of its own to be in trouble about. <c>Worlds.Homeostat</c> is that body and
+/// <c>Worlds.IActed</c> is the verb; this is the half between them.
 /// </para>
 /// <para>
 /// <b>It is the learner arm of three over one seam</b>, which
-/// <see cref="Worlds.IActed{TSeen}"/> named before anything filled it — a random chooser, an
+/// <c>Worlds.IActed</c> named before anything filled it — a random chooser, an
 /// oracle and a learner. The other two are the controls and they stay: a chooser that beats
 /// neither is a chooser that has not been measured.
 /// </para>
@@ -45,7 +45,7 @@ namespace OpenPlexus.Machines;
 /// </para>
 /// <para>
 /// <b>And what it may read is what the learner feels</b>, which is the line that separates it
-/// from the oracle. The oracle on <c>Homeostat</c> reads <c>Lowest</c> off the world's own
+/// from the oracle. The oracle on <c>Worlds.Homeostat</c> reads <c>Lowest</c> off the world's own
 /// state; this reads the codes the front end emitted and nothing else, so its preference is
 /// computed from a body's variables as the body reports them rather than as the world holds
 /// them.
@@ -183,7 +183,7 @@ public sealed class Drives
     /// <param name="scope">The codes that must all be present.</param>
     /// <remarks>
     /// <b>Exactly one</b>, because two would be a claim about doing two things at once, and
-    /// <see cref="Worlds.IActed{TSeen}.Do"/> takes one. Nothing forbids repair from minting
+    /// <c>Worlds.IActed.Do</c> takes one. Nothing forbids repair from minting
     /// such a scope — it separates on whatever code discriminates, and an action code is an
     /// ordinary one — so this is a shape that occurs rather than one that cannot.
     /// </remarks>

@@ -2,6 +2,7 @@
 using System.Reflection.Emit;
 using System.Text.RegularExpressions;
 using OpenPlexus.Commitments;
+using OpenPlexus.Machines;
 using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
@@ -49,8 +50,14 @@ namespace OpenPlexus.Tests;
 public sealed class DrivenTests(ITestOutputHelper output)
 {
     /// <summary>The directory the brain lives in.</summary>
+    /// <remarks>
+    /// <b>It is a project rather than a folder now</b>, and the compiler holds the line the
+    /// folder used to. <c>OpenPlexus.Brain</c> has no reference to <c>OpenPlexus</c>, so a
+    /// brain type naming a world does not compile; this file still reads the directory
+    /// because the question it asks is the other one, which is what reaches each mechanism.
+    /// </remarks>
     private static string Inside =>
-        Path.Combine(Tree.Repo(), "src", "OpenPlexus", "Brain");
+        Path.Combine(Tree.Repo(), "src", "OpenPlexus.Brain");
 
     /// <summary>Where a type declaration starts, in source.</summary>
     /// <remarks>
@@ -161,11 +168,23 @@ public sealed class DrivenTests(ITestOutputHelper output)
 
     /// <summary>The assemblies a deployment is composed out of.</summary>
     /// <remarks>
+    /// <para>
     /// <b>The harness is a driver.</b> <c>OpenPlexus.Talk</c> composes the conversation
     /// deployment, and the chooser it wires is reached from there and from nowhere else.
+    /// </para>
+    /// <para>
+    /// <b>And there are three of them.</b> The
+    /// mechanisms are in <c>OpenPlexus.Brain</c> and everything that drives one is in
+    /// <c>OpenPlexus</c> or in the harness, so naming two assemblies here would ask whether
+    /// the brain reaches itself and answer that nothing reaches anything.
+    /// </para>
     /// </remarks>
     private static IReadOnlyList<Assembly> Composed() =>
-        [typeof(Population).Assembly, Assembly.Load("OpenPlexus.Talk")];
+    [
+        typeof(Population).Assembly,
+        typeof(Bench).Assembly,
+        Assembly.Load("OpenPlexus.Talk"),
+    ];
 
     /// <summary>The outermost type a type is declared in, which is the one with a file.</summary>
     private static Type Outermost(Type type)
@@ -449,96 +468,6 @@ public sealed class DrivenTests(ITestOutputHelper output)
         Assert.True(closed.Count == 0,
             $"{closed.Count} mechanism(s) reached now and still listed as waiting: "
             + $"{string.Join(", ", closed)}. Take each entry off `Waiting`, which only means "
-            + "something while it is exact.");
-    }
-
-    /// <summary>Where the brain names a world today, and it may only shrink.</summary>
-    /// <remarks>
-    /// <para>
-    /// <b>Empty, and it went in three roads.</b> Six front ends each named the record its
-    /// world handed over, so a piece of the brain knew what a sentence, a body and a crossed
-    /// observation were. What emptied it was one answer per road rather than one rule.
-    /// </para>
-    /// <para>
-    /// <b>Three records folded into <see cref="OpenPlexus.Codes.Coded"/></b>, being copies
-    /// ten to twelve of a type that already carried what they carried. One took a projection
-    /// instead: a frame a body reads several ways is whoever composed the body's business,
-    /// and <c>Tiling</c> and <c>Passthrough</c> take the part they read as a delegate on
-    /// <see cref="OpenPlexus.Codes.Banded{TFrame}"/>'s pattern. And one was a front end
-    /// calling a world's statics for a modality and a code, which is the world minting its
-    /// codes one seam late.
-    /// </para>
-    /// <para>
-    /// <b>It stays empty rather than going away</b>, because the check is the cheap half of
-    /// the project boundary and the boundary is not built yet. A brain in its own assembly
-    /// cannot reference the worlds; until then this says so.
-    /// </para>
-    /// </remarks>
-    private static readonly IReadOnlySet<string> Trespassing =
-        new HashSet<string>(StringComparer.Ordinal)
-        {
-        };
-
-    /// <summary>Where the worlds live.</summary>
-    private static string Worlds =>
-        Path.Combine(Tree.Repo(), "src", "OpenPlexus", "Worlds");
-
-    /// <summary>
-    /// <b>No part of the brain names a world.</b>
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>The other direction, which nothing checked.</b> <c>SeparationTests</c> fails the
-    /// build when a world names a brain type, because that is how a world came to decide how
-    /// the brain thought. The reverse is the same fault with the arrow turned round: a brain
-    /// that knows a world exists cannot be the one brain every world is shown to.
-    /// </para>
-    /// <para>
-    /// <b>And it is what a project boundary would enforce for nothing.</b> A brain in its own
-    /// assembly cannot reference the worlds, because the worlds reference it. Until that
-    /// split lands this is the check that says so, and the list below is the work it costs.
-    /// </para>
-    /// <para>
-    /// <b>Read off the compiled code for the reason this whole file is.</b> The textual
-    /// version reports four more: <c>Unifying</c> holds a field called <c>Binding</c>,
-    /// <c>Curiosity</c> holds one called <c>Asking</c>, and <c>Joined</c> reads a property
-    /// called <c>Question</c> — three world types spelt like three members, and none of them
-    /// a dependency.
-    /// </para>
-    /// </remarks>
-    [Fact]
-    public void And_no_part_of_the_brain_names_a_world()
-    {
-        var inside = Names(Inside, within: true);
-        var worlds = Names(Worlds, within: true);
-
-        Assert.NotEmpty(worlds);
-
-        var trespass = new SortedSet<string>(StringComparer.Ordinal);
-
-        foreach (var type in Composed().SelectMany(one => one.GetTypes()))
-        {
-            if (!inside.Contains(Spelt(type))) continue;
-
-            foreach (var used in Uses(type))
-                if (worlds.Contains(Spelt(used)))
-                    trespass.Add($"{Spelt(type)} names {Spelt(used)}");
-        }
-
-        foreach (var one in trespass) output.WriteLine($"  {one}");
-
-        var arrived = trespass.Except(Trespassing, StringComparer.Ordinal).ToList();
-        var gone = Trespassing.Except(trespass, StringComparer.Ordinal).ToList();
-
-        Assert.True(arrived.Count == 0,
-            $"{arrived.Count} new place(s) where the brain names a world: "
-            + $"{string.Join(", ", arrived)}. A world is shown to the brain and the brain does "
-            + "not know one exists. Move what is shared to the seam, or move the mechanism to "
-            + "the join.");
-
-        Assert.True(gone.Count == 0,
-            $"{gone.Count} place(s) listed as trespassing and no longer doing so: "
-            + $"{string.Join(", ", gone)}. Take each entry off `Trespassing`, which only means "
             + "something while it is exact.");
     }
 

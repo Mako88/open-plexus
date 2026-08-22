@@ -22,7 +22,7 @@ namespace OpenPlexus.Codes;
 /// numbers</i> and packed <c>(position &lt;&lt; 1) | value</c>, so position one holding
 /// nought and position nought holding two were THE SAME CODE — two attributes silently
 /// conflated, and a learner blamed for it. Nothing had ever caught it because the only
-/// caller was <see cref="Worlds.Multiplexer"/>, whose values are bits: the repo's own
+/// caller was <c>Worlds.Multiplexer</c>, whose values are bits: the repo's own
 /// trap about a guard mounted on one caller, arriving in the packing rather than in a
 /// guard.
 /// </para>

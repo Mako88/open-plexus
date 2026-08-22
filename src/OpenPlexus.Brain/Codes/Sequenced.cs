@@ -97,7 +97,7 @@ public static class Sequenced
     /// </para>
     /// <para>
     /// <b>Immediate and not transitive, and the closure is deleted rather than optional.</b>
-    /// It reached the identical ceiling on <see cref="Worlds.Handing"/> for two and a half
+    /// It reached the identical ceiling on <c>Worlds.Handing</c> for two and a half
     /// times the population. The revival row in the plan says what would bring it back: a
     /// world whose relation spans an intervening position, where this falls short.
     /// </para>

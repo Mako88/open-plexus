@@ -36,7 +36,7 @@ public readonly record struct Vote
     /// </para>
     /// <para>
     /// <b>And that arrived from a null result.</b> Two subsumption rules on
-    /// <see cref="Worlds.Arranged"/> left populations differing by a sixth in residents
+    /// <c>Worlds.Arranged</c> left populations differing by a sixth in residents
     /// and a seventh in unsound rules, and returned the identical withheld score on every
     /// seed. Either the deciders are the same handful in both, or that is a coincidence
     /// worth the same surprise.
@@ -400,7 +400,7 @@ public sealed class Population
     /// <para>
     /// <b>It lives here rather than on <c>Holder</c>.</b> A holder serialises the asks it is
     /// delivered, which is enough while it is the only party touching its own population.
-    /// <c>Bench</c> reads every holder's tables from the thread running the trial, and a lock
+    /// <c>Machines.Bench</c> reads every holder's tables from the thread running the trial, and a lock
     /// on one side of that is not a lock.
     /// </para>
     /// <para>
@@ -591,7 +591,7 @@ public sealed class Population
     /// <summary>What a holder takes while it is being asked, so a reader may take it too.</summary>
     /// <remarks>
     /// <b>Handed out rather than hidden.</b> The tally walks these tables more than once, and
-    /// each walk under its own acquire is a reading of a different population, so <c>Bench</c>
+    /// each walk under its own acquire is a reading of a different population, so <c>Machines.Bench</c>
     /// holds this across every walk it makes of one holder. The scalar counters beside them
     /// are single reads and are left outside it. See <see cref="_gate"/> for why ordering the
     /// read after the writes is not available.
@@ -695,7 +695,7 @@ public sealed class Population
     /// <para>
     /// <b>And a precedence is already in <paramref name="raw"/> by the time it gets here</b>,
     /// which is a decision about the wire and not about the fold. Rung three is derived
-    /// where the moment is FORMED — see <see cref="Machines.Watching{TSeen}"/> — because a
+    /// where the moment is FORMED — see <c>Machines.Watching</c> — because a
     /// fleet broadcasts the moment as a set of codes and a
     /// precedence IS one. Deriving it here instead would mean every holder needed the
     /// front end's order report on the wire beside the moment it already has.
@@ -1735,7 +1735,7 @@ public sealed class Population
     /// <para>
     /// <b>It cost more than half the score</b> — 0.240 against 0.550 at ten-way chance
     /// of 0.100, and it had never fired anywhere else because no earlier world
-    /// overshot the capacity at all. <c>Graded</c> holds 371 commitments and the
+    /// overshot the capacity at all. <c>Worlds.Graded</c> holds 371 commitments and the
     /// multiplexer 203, so both sit under the cap and returned identical numbers with
     /// this path disabled. The first world wide enough to reach the cap is the first
     /// one that could have found this.

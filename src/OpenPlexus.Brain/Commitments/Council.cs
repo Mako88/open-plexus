@@ -50,7 +50,7 @@ public sealed record Spent
     /// <para>
     /// <b>The rule above was written and broken in one commit</b>, and only the compiler was
     /// enforcing anything. <i>Nothing may assert on it</i> is three lines up, and
-    /// this record went inside <see cref="Machines.Tally"/> — whose generated equality
+    /// this record went inside <c>Machines.Tally</c> — whose generated equality
     /// asserts on every field it has. So the three <i>a fixed seed reproduces a run
     /// exactly</i> tests began comparing a wall clock, and went red on a machine doing
     /// nothing wrong. Fork 12, reopened by the instrument that was supposed to be the
@@ -58,7 +58,7 @@ public sealed record Spent
     /// </para>
     /// <para>
     /// <b>And the half that was not red was worse.</b> Every <c>Assert.NotEqual</c> over
-    /// a <see cref="Machines.Tally"/> passed the moment the clocks differed, which they
+    /// a <c>Machines.Tally</c> passed the moment the clocks differed, which they
     /// always do — so the controls beside those three tests could not fail. A check that
     /// cannot fire reads as a pass, and this project has a line in its trap list about
     /// exactly that.
@@ -67,7 +67,7 @@ public sealed record Spent
     /// <b>So it is enforced here rather than at the three call sites.</b> Normalising the
     /// clock away in each test would be a guard mounted on one caller, and the fourth
     /// determinism test — written later, by somebody who never read this — would
-    /// reintroduce it. Excluding it by hand from <see cref="Machines.Tally"/>'s equality
+    /// reintroduce it. Excluding it by hand from <c>Machines.Tally</c>'s equality
     /// would be worse still: that list would then have to be edited every time the report
     /// grows a field, and the field that got forgotten would be silently uncompared.
     /// Here, both records may grow freely and the clock never counts.
@@ -133,7 +133,7 @@ public interface ICouncil
 {
     /// <summary>Where the wall clock went, by phase.</summary>
     /// <remarks>
-    /// <b>And no dials beside it, which is a deliberate absence.</b> <c>Round</c> read
+    /// <b>And no dials beside it, which is a deliberate absence.</b> <c>Machines.Round</c> read
     /// <c>Repairing</c> off the population to decide where a call sat, so one setting was
     /// consulted in two places and a cell that moved the gate also moved the timing.
     /// Every dial that decides something is now read where it decides, and a loop that

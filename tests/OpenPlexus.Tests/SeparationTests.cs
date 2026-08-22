@@ -1,3 +1,4 @@
+﻿using System.Reflection;
 using System.Text.RegularExpressions;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
@@ -29,13 +30,20 @@ public sealed class SeparationTests
 {
     /// <summary>Everything a world is not allowed to have heard of.</summary>
     /// <remarks>
+    /// <para>
     /// <b>The NEW brain only.</b> `csharp`'s walk types are named all over the old
     /// worlds and go when they go; naming them here would make this check a report on
     /// work already scheduled rather than a guard on work being done.
+    /// </para>
+    /// <para>
+    /// <b>And two assemblies since the brain became its own project.</b> The mechanisms are
+    /// in <c>OpenPlexus.Brain</c> and the runners that drive them stayed beside the worlds,
+    /// so reading one assembly would let a world name <c>Bench</c> for nothing.
+    /// </para>
     /// </remarks>
     private static IEnumerable<string> Brainish() =>
-        typeof(Commitment).Assembly
-            .GetTypes()
+        new[] { typeof(Commitment).Assembly, typeof(Bench).Assembly }
+            .SelectMany(one => one.GetTypes())
             .Where(one => one.IsPublic)
             .Where(one =>
                 one.Namespace == "OpenPlexus.Commitments"
@@ -159,5 +167,116 @@ public sealed class SeparationTests
         // and not the trial's. Whether that HELPS is a separate question nobody has
         // measured; that it is possible at all is what the seam buys.
         Assert.True(second.Resident > first.Resident);
+    }
+
+    /// <summary>
+    /// <b>Every name the brain reaches across the boundary for is live.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>What this replaces is the compiler.</b> Until the split, a brain comment citing a
+    /// world was a <c>cref</c> and CS1574 failed the build the day that world was renamed or
+    /// deleted — which is where this repo keeps its findings, so the enforcement was load
+    /// bearing. <c>OpenPlexus.Brain</c> cannot see a world any more, so those thirty-six
+    /// stopped compiling, and softening them to plain prose would have traded a check for a
+    /// comment nobody reads again.
+    /// </para>
+    /// <para>
+    /// <b>So the reference stays and the check moves here</b>, to the one project that sees
+    /// both assemblies. The convention is the namespace: <c>Worlds.Arranged</c> rather than
+    /// <c>Arranged</c>, which is what makes a reference tellable from a word.
+    /// </para>
+    /// <para>
+    /// <b>And a bare mention is not caught, which is the honest limit.</b> A textual rule over
+    /// unqualified names would demand the wrong repair on the ones that collide —
+    /// <c>Codes.Coded</c> names a deleted nested class <c>Looking</c> and
+    /// <c>Machines.ArrangedRun</c> declares an enum of the same spelling. That is the
+    /// two-ideas-one-name trap arriving inside the instrument, which is why <c>DrivenTests</c>
+    /// reads compiled code and this reads only what says it is a reference.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Every_name_the_brain_reaches_across_the_boundary_for_still_exists()
+    {
+        var reference = new Regex(@"<c>((?:Worlds|Machines)\.[A-Za-z0-9_.]+)</c>");
+
+        var dangling = new SortedSet<string>(StringComparer.Ordinal);
+        var seen = 0;
+
+        foreach (var path in Tree.Sources("src"))
+        {
+            if (!path.Contains(
+                    $"{Path.DirectorySeparatorChar}OpenPlexus.Brain{Path.DirectorySeparatorChar}",
+                    StringComparison.Ordinal))
+                continue;
+
+            foreach (Match found in reference.Matches(File.ReadAllText(path)))
+            {
+                seen++;
+
+                if (!Resolves(found.Groups[1].Value))
+                    dangling.Add($"{Path.GetFileName(path)} names {found.Groups[1].Value}");
+            }
+        }
+
+        // The companion. Without it this passes for a regex that stopped matching, which is
+        // how a rule turns into a comment.
+        Assert.True(seen >= 40, $"only {seen} qualified reference(s) found under the brain");
+
+        Assert.True(dangling.Count == 0,
+            $"{dangling.Count} name(s) the brain's comments reach for and nothing answers to:"
+            + Environment.NewLine + "  "
+            + string.Join(Environment.NewLine + "  ", dangling)
+            + Environment.NewLine
+            + "The reference is a `cref` the compiler cannot see, so this is where it is "
+            + "checked. Repair the name or rewrite the claim.");
+    }
+
+    /// <summary>Whether a namespace-qualified name still names something.</summary>
+    /// <param name="qualified">A name under <c>OpenPlexus</c>, such as <c>Worlds.Seeds.Apart</c>.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>Types first and then members</b>, longest type prefix winning, because a name may end
+    /// at a type or carry one member past it. Generic arity is taken off the type's own name
+    /// rather than written into the reference, so <c>Worlds.IActed</c> resolves the interface a
+    /// <c>cref</c> had to spell <c>IActed{TSeen}</c>.
+    /// </para>
+    /// <para>
+    /// <b>And both assemblies</b>, because the brain's own <c>OpenPlexus.Machines</c> types are
+    /// named this way in four places and the question here is whether a name still answers to
+    /// something, which is what CS1574 asked.
+    /// </para>
+    /// </remarks>
+    private static bool Resolves(string qualified)
+    {
+        var parts = ("OpenPlexus." + qualified).Split('.');
+
+        for (var take = parts.Length; take >= 2; take--)
+        {
+            var named = string.Join(".", parts.Take(take));
+
+            var type = new[] { typeof(Bench).Assembly, typeof(Commitment).Assembly }
+                .SelectMany(one => one.GetTypes())
+                .FirstOrDefault(one => one.FullName?.Split('`')[0] == named);
+
+            if (type is null) continue;
+
+            const BindingFlags Every =
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
+                | BindingFlags.Static | BindingFlags.DeclaredOnly;
+
+            foreach (var member in parts.Skip(take))
+            {
+                var found = type.GetMember(member, Every);
+
+                if (found.Length == 0) return false;
+
+                type = found[0] as Type ?? type;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }

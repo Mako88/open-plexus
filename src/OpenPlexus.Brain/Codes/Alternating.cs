@@ -44,7 +44,7 @@
 /// bAbI a line is a moment and names never share one.
 /// </para>
 /// <para>
-/// <b>And it is wrong where a moment is a WINDOW.</b> On <c>Roaming</c> a moment spans three
+/// <b>And it is wrong where a moment is a WINDOW.</b> On <c>Worlds.Roaming</c> a moment spans three
 /// sentences, so two room words land in one constantly although a person is in one room, and
 /// the clause refused 27 of 27 within-set pairs: every grouping returned nought at every bar.
 /// </para>
@@ -274,7 +274,7 @@ public sealed class Alternating
     /// <para>
     /// <b>What the admission clause used to say as an absolute.</b> It refused a pair that
     /// had co-occurred even ONCE, which is <i>alternatives never co-occur</i> taken
-    /// literally — and a moment is a WINDOW rather than an assertion. On <c>Roaming</c> a
+    /// literally — and a moment is a WINDOW rather than an assertion. On <c>Worlds.Roaming</c> a
     /// moment spans three sentences, so two room words land in one constantly although a
     /// person is in one room, and the clause refused 27 of 27 within-set pairs.
     /// </para>
@@ -311,7 +311,7 @@ public sealed class Alternating
     /// <see cref="BySpace"/> discards the counts and <see cref="ByLikeness"/> keeps them raw.
     /// Raw counts are dominated by how often a code appears, so a common partner counts for
     /// as much as a rare one and every profile looks alike to every other — measured on
-    /// <c>Roaming</c> at 0.993 within the room words against 0.965 across the sets, which is
+    /// <c>Worlds.Roaming</c> at 0.993 within the room words against 0.965 across the sets, which is
     /// no separation at all.
     /// </para>
     /// <para>
@@ -659,7 +659,7 @@ public sealed class Alternating
 /// <b>The codes it watches are the inner ones</b> and never the folded ones. A category
 /// entering the moment would then be company for its own members and evidence for the next
 /// derivation, which is a name reached by inference being written back as a partner — the
-/// arrangement that broke two controls on <c>Rhythm</c>.
+/// arrangement that broke two controls on <c>Worlds.Rhythm</c>.
 /// </para>
 /// </remarks>
 /// <param name="inner">The front end this wraps.</param>

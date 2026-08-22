@@ -39,12 +39,21 @@ public sealed class RemindingTests(ITestOutputHelper output)
 {
     /// <summary>How many reminders a session can be expected to actually read.</summary>
     /// <remarks>
-    /// <b>A ratchet, and it only goes down.</b> Twelve is about a screen. Past that this
+    /// <para>
+    /// <b>A ratchet, and it only goes down.</b> Twelve was about a screen. Past that this
     /// stops being a reminder and becomes a second doc, which is the thing it was written
     /// instead of. Raising it wants John and a reason in the commit message; the ordinary
     /// way to make room is to turn one into a guard.
+    /// </para>
+    /// <para>
+    /// <b>Thirteen, and John raised it on 2026-08-22.</b> The grouping's caveat had nowhere
+    /// to go: every entry already here resists being a check, so there was nothing to
+    /// promote and the rule was sitting in one mechanism's XML comment where no session
+    /// reads it. A guard must not cost information, and a cap that only ever falls decides
+    /// what may be written down.
+    /// </para>
     /// </remarks>
-    private const int Room = 12;
+    private const int Room = 13;
 
     /// <summary>What to do, and why it is not a check.</summary>
     private static readonly (string Doing, string Why)[] Reminders =
@@ -115,6 +124,16 @@ public sealed class RemindingTests(ITestOutputHelper output)
         ("A REASON IS EASY TO WRITE. Where a rule could be a check, it should be one, and an "
          + "entry here is a debt rather than a home.",
          "This list is the thing most likely to be gamed by its own author, so it says so."),
+
+        ("ASK WHAT A GROUPING MEANS BEFORE READING ONE. `Bind` says which thing a code "
+         + "belongs to, and what a THING is stays the world's — an object in a scene on one "
+         + "world, a part of a sentence on another. Anything reading that channel treats the "
+         + "two alike.",
+         "Both answers are the same integer, so nothing structural separates them, and what a "
+         + "grouping means is a judgement about the world. `Spanning` reads it today and its "
+         + "numbers were taken where a part is an object; a text world hands the same shape "
+         + "for a different idea, which is the two-ideas-one-name fault that already cost a "
+         + "`Choosing` reading."),
     ];
 
     /// <summary>

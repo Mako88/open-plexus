@@ -3371,4 +3371,69 @@ public sealed class LessonTests(ITestOutputHelper output)
             + "remark joins the two before it");
     }
 
+
+    /// <summary>
+    /// Whether a doing the machine did reaches a scope on the conversation — <b>it is marked,
+    /// and nothing is ever conditioned on it.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The wiring is there and it fires.</b> <c>Conversing</c> marks the words the machine
+    /// itself spoke as <c>Assigned</c>, <c>Watching</c> turns that channel into
+    /// <see cref="Intervened"/> codes, and they reach the moment. So this is not a world that
+    /// forgot to report its doings — I said it was, and it is not.
+    /// </para>
+    /// <para>
+    /// <b>Genesis is forbidden to root on one, deliberately and with a reason.</b> A precedence
+    /// and an intervention are refused to both of its arms, because <i>this stood before
+    /// that</i> and <i>I did something</i> are claims about grammar and agency rather than
+    /// about the world, and the moment carries one for every pair.
+    /// </para>
+    /// <para>
+    /// <b>Which makes rung three the control rather than an aside.</b> A precedence is refused
+    /// by the SAME line, so if precedences reach a scope and doings do not, the exclusion is
+    /// not what is stopping them — repair is free to narrow with either, and it is finding one
+    /// worth narrowing on and not the other.
+    /// </para>
+    /// <para>
+    /// <b>What it means for the north star</b>: <c>do(x)</c> against <c>x</c> is the one thing
+    /// a sequence model cannot be, and on the world the first north star is defined on the
+    /// machine is currently not using it. It is a fact about what repair finds discriminating
+    /// rather than about a missing mechanism, which is a different repair.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_doing_is_marked_on_the_conversation_and_no_scope_is_conditioned_on_it()
+    {
+        var one = Ran(
+            Lesson.Creatures, Carrying.Never, seed: 1, passes: 1,
+            asserting: Asserting.Everything, tellings: 20, rooting: Rooting.Wholly,
+            crediting: Crediting.Birth, admitting: Admitting.Testable);
+
+        var residents = one.Brain.Held.All.ToList();
+
+        var doing = residents.Count(held => held.Scope.Any(Intervened.Names));
+        var ordered = residents.Count(held => held.Scope.Any(Sequenced.Names));
+        var wanted = residents.Count(held => Intervened.Names(held.Expects));
+
+        output.WriteLine(
+            $"{residents.Count} residents, {one.World.Told} answered, "
+            + $"{one.Tally.Repaired} repaired");
+        output.WriteLine(
+            $"scopes naming a doing      : {doing}");
+        output.WriteLine(
+            $"scopes naming a precedence : {ordered}   (refused to genesis by the same line)");
+        output.WriteLine(
+            $"expectations naming a doing: {wanted}");
+
+        // The control has to have worked, or this compares a doing against another nothing and
+        // the exclusion cannot be ruled out as the cause.
+        Assert.True(ordered > 0,
+            $"no resident names a precedence either, so both kinds refused to genesis are "
+            + "absent and this says nothing about which of the two reasons applies to a doing");
+
+        // The reading. It goes red the day repair finds a doing worth narrowing on, which is
+        // the day `do(x)` starts doing work on the world the north star is defined on.
+        Assert.Equal(0, doing);
+    }
 }

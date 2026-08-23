@@ -105,7 +105,7 @@ public sealed class LessonTests(ITestOutputHelper output)
     /// of pairs and nothing placed.
     /// </para>
     /// </remarks>
-    private static (Conversing World, List<(HashSet<Code> Moment, int Arrived)> Stream) Streamed(
+    private static (Conversing World, List<(HashSet<Code> Moment, int? Arrived)> Stream) Streamed(
         Lesson lesson, int tellings)
     {
         var tutor = new Tutor(lesson, TextWriter.Null, passes: 1, tellings: tellings);
@@ -119,14 +119,15 @@ public sealed class LessonTests(ITestOutputHelper output)
         });
 
         var front = new Joined(Joining.Bagged);
-        var stream = new List<(HashSet<Code> Moment, int Arrived)>();
+        var stream = new List<(HashSet<Code> Moment, int? Arrived)>();
 
+        // Unsettled turns are kept, because what never settles is the question one reading
+        // here asks. A moment nothing followed is exactly where a sentence's last word sits.
         for (var round = 0; round < tutor.Moments * tutor.Longest && !world.Ended; round++)
         {
             var turn = world.Next();
 
-            if (turn.Outcome is { } outcome)
-                stream.Add(([.. front.Codify(turn.Seen)], outcome));
+            stream.Add(([.. front.Codify(turn.Seen)], turn.Outcome));
         }
 
         return (world, stream);
@@ -2812,8 +2813,10 @@ public sealed class LessonTests(ITestOutputHelper output)
             var (world, stream) = Streamed(lesson, Tellings);
             var arrivals = new Dictionary<string, HashSet<int>>(StringComparer.Ordinal);
 
-            foreach (var (moment, arrived) in stream)
+            foreach (var (moment, followed) in stream)
             {
+                if (followed is not { } arrived) continue;
+
                 var ordered = moment.Order().ToList();
 
                 foreach (var dropped in ordered)
@@ -2979,8 +2982,8 @@ public sealed class LessonTests(ITestOutputHelper output)
                 var seen = new HashSet<int>();
 
                 foreach (var (moment, arrived) in stream)
-                    if (resident.Scope.All(moment.Contains))
-                        seen.Add(arrived);
+                    if (arrived is { } followed && resident.Scope.All(moment.Contains))
+                        seen.Add(followed);
 
                 if (seen.Count > 1) contexts.Add(seen);
             }
@@ -3154,10 +3157,25 @@ public sealed class LessonTests(ITestOutputHelper output)
             + $"{both} in both, {expected.Except(perceived, StringComparer.Ordinal).Count()} "
             + "expected and never perceived");
 
+        // How often each of them was actually THERE, because a word in no moment and a word in
+        // hundreds of them are two different faults and the list alone cannot tell them apart.
+        // My first account of this said the moments never settle, and they do.
+        var (_, stream) = Streamed(lesson, 20);
+
         foreach (var word in expected
             .Except(perceived, StringComparer.Ordinal)
             .Order(StringComparer.Ordinal))
-            output.WriteLine($"  expected only : {word}");
+        {
+            var code = Babi.Of(word);
+
+            var anywhere = stream.Count(turn => turn.Moment.Contains(code));
+            var settling = stream.Count(
+                turn => turn.Arrived is not null && turn.Moment.Contains(code));
+
+            output.WriteLine(
+                $"  expected only : {word,-10} in {anywhere,4} moments, {settling,4} of them "
+                + "settled, 0 scopes");
+        }
 
         foreach (var word in perceived
             .Except(expected, StringComparer.Ordinal)
@@ -3179,5 +3197,177 @@ public sealed class LessonTests(ITestOutputHelper output)
             $"every one of the {expected.Count} words the machine can expect also reaches a "
             + "scope, so nothing here bounds a chain and this reading has stopped saying "
             + "anything -- take it off fork 137");
+    }
+
+    /// <summary>
+    /// What a sentence TERMINATOR would buy the nine words nothing can be conditioned on —
+    /// <b>John's, and it is priced before it is built.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The period is split away as a word break and becomes nothing.</b>
+    /// <c>Babi.Words</c> breaks on it, so a sentence's last word is followed by the next
+    /// sentence's first — across a boundary the machine cannot see — or by nothing at all.
+    /// John asked whether the full stop could be the thing predicted there, and it is the right
+    /// question: a word with a successor to predict sits in a moment that SETTLES, and a
+    /// settled moment is the only kind a scope is ever rooted on.
+    /// </para>
+    /// <para>
+    /// <b>Priced without changing the world</b>, which is the ordering this repo keeps. What a
+    /// terminator would buy is exactly the codes that reach a moment and never reach a settled
+    /// one, and both sets are readable off the stream with no learner. A world change costs a
+    /// re-take of every recorded number, so it is worth knowing the answer first.
+    /// </para>
+    /// <para>
+    /// <b>And what it would cost is in the same reading.</b> Every sentence would end with the
+    /// same arrival, so the terminator becomes the commonest outcome in the world and a rule
+    /// predicting it is right constantly while teaching nothing — the plan already names that
+    /// shape, the informative words being the unpredictable ones and the predictable ones being
+    /// <c>to</c> and <c>the</c>. The share it would take is printed beside what it buys.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_a_sentence_terminator_would_buy_the_words_nothing_is_conditioned_on()
+    {
+        const int Tellings = 20;
+
+        output.WriteLine($"told {Tellings} times, no world changed, no learner run");
+        output.WriteLine(
+            $"{"lesson",-11}{"turns",7}{"settled",9}{"in any",8}{"in settled",12}"
+            + $"{"bought",8}{"cost",7}");
+
+        var bought = new Dictionary<string, int>();
+
+        foreach (var (named, lesson) in
+            new[] { ("creatures", Lesson.Creatures), ("chained", Lesson.Chained) })
+        {
+            var (world, stream) = Streamed(lesson, Tellings);
+
+            var anywhere = stream.SelectMany(turn => turn.Moment).ToHashSet();
+
+            var settling = stream
+                .Where(turn => turn.Arrived is not null)
+                .SelectMany(turn => turn.Moment)
+                .ToHashSet();
+
+            // A moment nothing followed is where a terminator would land, so the turns it
+            // would settle are the unsettled ones and the codes it would buy are theirs.
+            var unsettled = stream.Count(turn => turn.Arrived is null);
+
+            var gained = anywhere.Except(settling).ToList();
+
+            bought[named] = gained.Count;
+
+            // What it costs: the terminator becomes one more outcome and takes every turn it
+            // settles, so this is its share of all settled turns after the change.
+            var share = unsettled / (double)(stream.Count(turn => turn.Arrived is not null)
+                + unsettled);
+
+            output.WriteLine(
+                $"{named,-11}{stream.Count,7}{stream.Count - unsettled,9}{anywhere.Count,8}"
+                + $"{settling.Count,12}{gained.Count,8}{share,7:F3}");
+
+            foreach (var code in gained.Take(12))
+                output.WriteLine(
+                    "  bought : "
+                    + (world.Naming(code) is { } at ? world.Vocabulary[at] : code.ToString()));
+        }
+
+        // The reading, and it can fail either way. Nought bought says a sentence's last word is
+        // in no moment at all, so a terminator settles nothing that was not already settled and
+        // John's fix does not reach the nine; anything above it is the size of what it reaches.
+        foreach (var (named, gained) in bought)
+            Assert.True(gained > 0,
+                $"on {named} every code that reaches a moment already reaches a settled one, so "
+                + "a terminator would buy no word a scope could be conditioned on and the nine "
+                + "are unreachable by this road");
+    }
+
+    /// <summary>
+    /// Whether which words can ever be a PREMISE depends on the order the lesson was told
+    /// in — <b>the control, because two accounts of this were already wrong.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Nine answer words never reach a scope, and it is not settlement.</b>
+    /// Each of the nine sits in eighty moments, all eighty settled, and no resident is ever
+    /// conditioned on one. A sentence terminator buys a single code and it is <c>what</c>. Both
+    /// of those were measured after being asserted, which is why this one is a control rather
+    /// than a third account.
+    /// </para>
+    /// <para>
+    /// <b>The suspect is the surprise gate.</b> The tell is which words got through.
+    /// <c>fur</c>, <c>meow</c> and <c>fish</c> reach scopes and they are the cat's — the FIRST
+    /// creature told. Genesis mints only where nothing accounted for what arrived, so once a
+    /// rule covers <i>the</i> as the next word the later sentences stop surprising, and repair
+    /// narrows by a DISCRIMINATOR, which is the subject rather than the answer. An answer word
+    /// would then be premisable only where it arrived before the population closed over it.
+    /// </para>
+    /// <para>
+    /// <b>So reversing the telling order is the control.</b> If the premisable set follows the
+    /// order, the cause is genesis rather than anything about answers, and what a machine can
+    /// reason FROM is a fact about what it happened to hear first. If the same words come
+    /// through both ways, the order is innocent and the account above joins the other two.
+    /// </para>
+    /// <para>
+    /// <b>It is fork 135's territory arriving from a new side.</b> That fork says a lucky
+    /// advocate blocks genesis and proposals stop; this says what the blocking COSTS is not
+    /// population, it is which words can ever be premises.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_a_word_can_be_a_premise_follows_the_order_the_lesson_was_told_in()
+    {
+        const int Tellings = 20;
+
+        var forward = Lesson.Creatures;
+        var backward = forward with { Statements = [.. forward.Statements.Reverse()] };
+
+        output.WriteLine($"told {Tellings} times, the same lesson in two orders");
+
+        var reached = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+
+        foreach (var (named, lesson) in new[] { ("forward", forward), ("backward", backward) })
+        {
+            var one = Ran(
+                lesson, Carrying.Never, seed: 1, passes: 1, asserting: Asserting.Everything,
+                tellings: Tellings, rooting: Rooting.Wholly, crediting: Crediting.Birth,
+                admitting: Admitting.Testable);
+
+            var spelt = one.World.Vocabulary;
+
+            var scoped = one.Brain.Held.All
+                .SelectMany(held => held.Scope)
+                .Distinct()
+                .Select(code => one.World.Naming(code))
+                .Where(at => at is not null)
+                .Select(at => spelt[at!.Value])
+                .ToHashSet(StringComparer.Ordinal);
+
+            // The answers only, because the function words and the subjects reach a scope
+            // either way and would drown the comparison.
+            var answers = lesson.Facts.Select(fact => fact.Answer).ToHashSet(StringComparer.Ordinal);
+
+            reached[named] = answers.Intersect(scoped, StringComparer.Ordinal)
+                .ToHashSet(StringComparer.Ordinal);
+
+            output.WriteLine(
+                $"{named,-9}: {one.Tally.Resident,4} residents, "
+                + $"{reached[named].Count} of {answers.Count} answer words reach a scope -- "
+                + string.Join(" ", reached[named].Order(StringComparer.Ordinal)));
+        }
+
+        Assert.True(reached["forward"].Count > 0 || reached["backward"].Count > 0,
+            "no answer word reaches a scope in either order, so this compares two nothings and "
+            + "the order cannot be the cause of anything");
+
+        // Asserted as a difference rather than a direction, because a prediction written into a
+        // wiring check fails two ways and reads the same. Which words came through in which
+        // order is in the output and in the commit.
+        Assert.False(
+            reached["forward"].SetEquals(reached["backward"]),
+            "the same answer words reach a scope whichever order the lesson is told in, so "
+            + "genesis is not what decides which words can be a premise and the account in this "
+            + "remark joins the two before it");
     }
 }

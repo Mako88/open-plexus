@@ -451,6 +451,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       something and where to ask is LEARNT.
     - **OPEN** — what it converts is unread, and English's alphabet is far wider than
       anything here has run on. Fork **89**.
+    - **OPEN** — what supplies a talked world its evidence: repair cannot fire until the
+      fifth telling and the terminal ships one. Fork **136**.
     - **OPEN** — a round is fold, fire, vote, nothing puts what fired BACK in the moment, and
       the horizon is K=1, so a conclusion needing two statements is unreachable at any
       repetition. Nine shapes are refuted and the parts are all present. Forks **28**, **125**.
@@ -592,8 +594,6 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — a child fires only where its parent does and matching IGNORES that, going
       through the code index. Rete's own problem, with the wrinkle that culling orphans a
       child and an orphan that stops firing reads as nothing.
-    - **BROKEN** — four `EncodedTests` fail on a file never built: the graph is cut one
-      `Gemm` early to drop a 1000-way classifier, needing `onnx`, which the runner lacks.
     - **BROKEN** — `BudgetTests` crosses two settings and pins neither timing nor budget, so
       it changed arms silently; being a sweep, CI never looked.
   - Withholding is real and the gap is readable

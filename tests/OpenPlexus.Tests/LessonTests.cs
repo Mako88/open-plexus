@@ -2267,4 +2267,97 @@ public sealed class LessonTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>
+    /// Why repair never fires at the telling the terminal ships — <b>the run is right fewer
+    /// times than one commitment needs.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The reading above measures at twenty tellings and the deployment ships one</b>, and
+    /// the two are not the same machine. <c>OpenPlexus.Talk</c> defaults to a single telling,
+    /// and a session run that way settles 3,249 firings wrongly, refuses all 3,249 under the
+    /// floor and reaches the candidate search nought times. Repair is present, wired and
+    /// unable to fire.
+    /// </para>
+    /// <para>
+    /// <b>And the cause is arithmetic rather than statistical</b>, which is what makes it
+    /// worth a test of its own. <c>PastFloor</c> under <see cref="Admitting.Testable"/> wants
+    /// <see cref="CommittingSettings.Floor"/> hits as well as that many misses, a
+    /// commitment's hits can never exceed the rounds the run got right, and one telling of
+    /// <see cref="Lesson.Creatures"/> gets eleven rounds right in total. No condition, no
+    /// language and no separating code can reach a bar the whole run cannot supply the
+    /// numerator for.
+    /// </para>
+    /// <para>
+    /// <b>So <c>wanting</c> is a null reading wherever this holds</b>, and it reads 0.000
+    /// exactly as it does where the language separates everything. That is this repo's own
+    /// trap at the instrument: a check that cannot fire reads like a check that passes, and
+    /// the harness now prints the gate census beside the number so the two are told apart.
+    /// </para>
+    /// <para>
+    /// <b>The entry it feeds is carried by another arm.</b> <see cref="ExercisedTests"/> asks
+    /// whether THE ARCHITECTURE's <i>understanding deepens without limit</i> is reached and
+    /// takes any arm, so <c>Roaming</c> answers for a conversation that has never once
+    /// specialised.
+    /// </para>
+    /// <para>
+    /// <b>What this does not say is which way the floor should move.</b> Lowering it buys
+    /// repair on a population nothing can judge, which is the churn the reading above deleted.
+    /// The finding is that the conversation supplies too little settled evidence per rule for
+    /// an evidence-gated mechanism, and that is a fact about the world rather than about the
+    /// dial.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void At_one_telling_the_run_is_right_too_few_times_for_any_commitment_to_be_repaired()
+    {
+        var floor = new CommittingSettings().Floor;
+
+        output.WriteLine(
+            $"creatures, one examination pass, the terminal's arms, floor {floor}");
+        output.WriteLine(
+            $"{"tellings",-10}{"right",8}{"wrong",8}{"at floor",10}{"searched",10}"
+            + $"{"repaired",10}{"resident",10}");
+
+        var searched = new Dictionary<int, long>();
+        var right = new Dictionary<int, long>();
+
+        foreach (var tellings in new[] { 1, 2, 5, 10, 20 })
+        {
+            var one = Ran(
+                Lesson.Creatures, Carrying.Never, seed: 1, passes: 1,
+                asserting: Asserting.Everything, tellings: tellings, rooting: Rooting.Wholly,
+                crediting: Crediting.Birth, admitting: Admitting.Testable);
+
+            var held = one.Brain.Held;
+
+            searched[tellings] = held.Searched;
+            right[tellings] = one.Tally.Right;
+
+            output.WriteLine(
+                $"{tellings,-10}{one.Tally.Right,8}{held.Wrong,8}{held.AtFloor,10}"
+                + $"{held.Searched,10}{one.Tally.Repaired,10}{one.Tally.Resident,10}");
+        }
+
+        // A commitment's hits are a subset of the rounds the run got right, so a run right
+        // fewer times than the floor cannot put one commitment past `Testable`'s hit side.
+        // Computed from the run rather than pinned, so this closes by the world supplying more
+        // settled evidence and never by editing the number.
+        foreach (var (tellings, got) in right.Where(one => one.Value < floor))
+            Assert.True(searched[tellings] == 0,
+                $"at {tellings} telling(s) the run was right {got} times against a floor of "
+                + $"{floor}, so no commitment can have cleared the hit side -- yet "
+                + $"{searched[tellings]} reached the candidate search, which means the bar is "
+                + "not the one being described here");
+
+        // And the arms differ, which is what stops this being a reading about a mechanism that
+        // is simply dead. Repeating the lesson is what buys the evidence, and it is the only
+        // thing measured here that does.
+        Assert.True(searched[20] > 0,
+            $"repair reached the candidate search {searched[20]} times at twenty tellings, so "
+            + "nothing in this grid separates a floor that is too high from a mechanism that "
+            + "never runs");
+
+        Assert.Equal(0, searched[1]);
+    }
 }

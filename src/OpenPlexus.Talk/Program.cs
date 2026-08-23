@@ -227,12 +227,22 @@ internal static class Program
                 $"the tutor  : {tutor.Corrected} corrected, {tutor.Shrugged} shrugged at");
         }
 
+        // Which gate refused, and it is printed BEFORE `wanting` because it says whether that
+        // number means anything. `Searched` is the only one of the five that reaches the scope
+        // language, so a run where nothing reaches it has not learnt that its language is too
+        // weak -- it has learnt that its gates are strict, and `wanting` reads 0.000 either way.
+        Console.WriteLine(
+            $"repair     : {brain.Held.Wrong} wrong, {brain.Held.AtFloor} under the floor, "
+            + $"{brain.Held.AtBudget} out of budget, {brain.Held.AtCovered} already covered, "
+            + $"{brain.Held.AtImproving} not improving, {brain.Held.Searched} searched");
+
         // What the ladder could not do, which is the reading this harness exists for. A high
         // share here is the admission rule firing on typed English: the machine was blamed and
         // nothing in the scope language told the misses from the hits.
         Console.WriteLine(
             $"wanting    : {tally.Wanting.ToString("F3", CultureInfo.InvariantCulture)} of "
-            + $"{tally.Blamed} blamed rounds nothing separated");
+            + $"{tally.Blamed} blamed rounds nothing separated"
+            + (tally.Blamed == 0 ? " -- nothing was ever asked, so this says nothing" : ""));
 
         return 0;
     }

@@ -30,7 +30,7 @@ ends: read it first, strike what got done, and write the handoff from what is le
 that is finished LEAVES, so this is only ever what is still to do.
 
 - **The genesis gate**, which finds every rule three worlds hold and loses the held-out set
-  on two more. Subsumption and the vote are both refuted as the cost. Fork **135**.
+  on two more. Fork **135**.
 - **Then the third store, read BY KEY.** John's, and above the chain because the reading says
   so: where the right statement is in front of it the learner is at its bound, so the exam is
   short of RETRIEVAL. Not measurable on a spine lesson, exhausted at one telling. Fork **139**.
@@ -455,8 +455,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — entailment depth and the horizon are capped at one; both come off when
       blame diffusion has a number. Fork **32**.
     - **OPEN** — a lucky advocate blocks genesis, so proposals stop within a hundred rounds
-      of twenty thousand. The vote is refuted, an unsound rule being believed as hard as a
-      sound one. Fork **135**.
+      of twenty thousand. Subsumption, the vote and opportunity are all refuted as the cost:
+      an unsound rule is believed as hard as a sound one over a thousand firings. Fork **135**.
     - **OPEN** — and what that bar COSTS is a function of how young the population is, free
       at saturation and most of the examination before it, because it blocks repair while
       nothing can clear the floor yet. Unpriced, and it is why the bar does not ship. Fork

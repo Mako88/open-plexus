@@ -437,6 +437,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
                 })]);
 
         var best = new Dictionary<(Looking, Surprising), (double Sound, double Unsound)>();
+        var chances = new Dictionary<(Looking, Surprising), long>();
 
         for (var at = 0; at < grid.Length; at++)
         {
@@ -454,12 +455,14 @@ public sealed class ArrangedTests(ITestOutputHelper output)
                 + $"(narrowed {got.Rules.Narrowed}, rootless {got.Rules.Rootless}) · "
                 + $"believed {got.Rules.Trusted:F3} sound vs {got.Rules.Doubted:F3} "
                 + $"unsound, BEST {got.Rules.Best:F3} vs {got.Rules.Worst:F3} "
+                + $"over {got.Rules.Chances} firings "
                 + $"· mean scope {got.Rules.Scope:F2}");
 
             // What a MAXIMUM vote decides on, which no mean can say. An expectation is worth
             // its best advocate, so where the best unsound rule reaches the best sound one the
             // vote has nothing left to separate them with and no weighting is the answer.
             best[(looking, gate)] = (got.Rules.Best, got.Rules.Worst);
+            chances[(looking, gate)] = got.Rules.Chances;
 
             // The two ways an unsound rule survives, and they partition. Either
             // subsumption had a general parent to absorb it into and declined, or there
@@ -482,6 +485,18 @@ public sealed class ArrangedTests(ITestOutputHelper output)
         // would be the first thing here to give the vote something to decide on, and it must
         // go red rather than pass quietly.
         Assert.All(best.Keys, key => Assert.Equal(best[key].Sound, best[key].Unsound));
+
+        // And it is not an UNTESTED rule, which is the other mechanism the tie could have
+        // wanted. The rule holding the top of the unsound side fired over a thousand times in
+        // every cell and was never once wrong, so a weight read against what a rule has had
+        // the chance to be wrong about -- a confidence bound, a floor, anything computable
+        // from counters it holds -- cannot separate it either. Its own record says perfect
+        // over more evidence than most sound rules have.
+        Assert.All(chances.Keys, key => Assert.True(
+            chances[key] > 1_000,
+            $"under {key} the best unsound rule fired {chances[key]} times, so it may be a "
+            + "rule nobody has asked yet and a weight read against its opportunity is back "
+            + "on the table"));
     }
 
     /// <summary>

@@ -156,6 +156,22 @@ internal sealed record Judged
     /// <inheritdoc cref="Best"/>
     public required double Worst { get; init; }
 
+    /// <summary>
+    /// How many times the rule that set <see cref="Worst"/> fired — <b>the number that says
+    /// which mechanism the tie wants.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>Two records at one accuracy are not one claim.</b> A perfect three firings and a
+    /// perfect three thousand weigh the same and say different things. If the best unsound rule is believed at the
+    /// top because it has barely been asked, the answer is a weight read against what a rule
+    /// has had the CHANCE to be wrong about, and that is computable from counters it already
+    /// holds. If it has fired thousands of times and never been contradicted, then the
+    /// evidence does not contain the contradiction and no weighting is the answer — the
+    /// held-out fifth is unreachable for this learner and the gap is a fact about the
+    /// examination.
+    /// </remarks>
+    public required long Chances { get; init; }
+
     /// <summary>How many codes a resident scope names, on average.</summary>
     /// <remarks>
     /// <b>The memorisation tell, and it is a distribution rather than a score.</b> This
@@ -565,6 +581,7 @@ internal sealed class ArrangedRun
         var trusted = 0.0;
         var best = 0.0;
         var worst = 0.0;
+        var chances = 0L;
         var doubted = 0.0;
 
         var codes = 0L;
@@ -635,7 +652,12 @@ internal sealed class ArrangedRun
             {
                 unsound++;
                 doubted += one.Accuracy;
-                worst = Math.Max(worst, one.Accuracy);
+                if (one.Accuracy > worst || (one.Accuracy == worst && one.Fired > chances))
+                {
+                    worst = one.Accuracy;
+                    chances = one.Fired;
+                }
+
                 falses.Add((scope, one.Expects));
             }
             else
@@ -664,6 +686,7 @@ internal sealed class ArrangedRun
             Doubted = unsound == 0 ? 0.0 : doubted / unsound,
             Best = best,
             Worst = worst,
+            Chances = chances,
             Scope = held == 0 ? 0.0 : codes / (double)held,
         };
     }

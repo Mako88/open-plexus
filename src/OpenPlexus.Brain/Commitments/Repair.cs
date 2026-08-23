@@ -891,7 +891,7 @@ internal sealed record CommittingSettings
     public Spanning Spanning { get; init; } = Spanning.Thing;
 
     /// <inheritdoc cref="Supposing"/>
-    public Supposing Supposing { get; init; } = Supposing.Thinly;
+    public Supposing Supposing { get; init; } = Supposing.Attributed;
 }
 
 /// <summary>
@@ -1396,4 +1396,68 @@ internal enum Supposing
     /// </para>
     /// </remarks>
     Thinly,
+
+    /// <summary>
+    /// The same second vote, and the deciding commitment's own name goes into the moment the
+    /// population learns from.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Because <see cref="Thinly"/> computes a chain and cannot record one.</b> The second
+    /// hop is read-only of the population, so a question answered by putting two statements
+    /// together is answered again from scratch every time it is put. What the machine
+    /// concluded leaves no trace, and nothing about the composition can ever be scored.
+    /// </para>
+    /// <para>
+    /// <b>The NAME and never the supposed word.</b> A word the machine guessed is not
+    /// something the world said, so a moment carrying it would credit and blame every rule
+    /// that fired on the guess — a machine scoring its own conclusions as evidence. The name
+    /// of the best advocate is a true statement about this moment either way: that
+    /// commitment led the vote here, and whether it led it rightly is what the settlement
+    /// then says.
+    /// </para>
+    /// <para>
+    /// <b>So one claim becomes learnable</b> — <i>when this commitment decides, that
+    /// follows</i>, which is a commitment inside another's scope and the meta level THE
+    /// ARCHITECTURE asks for. Nothing new matches it: an identity is a <see cref="Code"/>, so genesis roots on
+    /// it and the subset test is untouched.
+    /// </para>
+    /// <para>
+    /// <b>And it widens no world's moment but the one that supposes.</b> Carrying the
+    /// decider's identity every round is refuted — the table grew by half, no score moved,
+    /// and on a cyclic world the identity became a marker for the phase. The translation is
+    /// what confines this one: a world that cannot say which code an outcome IS supposes
+    /// nothing and so marks nothing, and its moments are the width they always were.
+    /// </para>
+    /// <para>
+    /// <b>The moment handed to the council is the final one</b>, which is not a detail. Two
+    /// earlier shapes asked, marked, and asked again — so every marked moment was noted live
+    /// twice and counted twice in the separation tables. That cost the stated half a quarter
+    /// at five tellings and the readings said so, about a double-counted moment rather than
+    /// about the mark.
+    /// </para>
+    /// <para>
+    /// <b>And a mark goes in where a supposition is AVAILABLE</b>, rather than where one
+    /// moved the answer. Gating on the second vote having reached something different was tried and
+    /// is worse: it cuts the marks to a third and gives back the twenty-telling gain below, so
+    /// what pays is not the moments where a composition happened.
+    /// </para>
+    /// <para>
+    /// <b>What it is worth, on <c>Lesson.Chained</c> at five seeds.</b> At five tellings it is
+    /// <see cref="Thinly"/> exactly on both halves, which is the cell that arm won on. At
+    /// twenty it keeps the stated half whole where <see cref="Thinly"/> loses a quarter of it,
+    /// and gives up a quarter of the implied half doing it. The sum over the halves is the
+    /// same number, so it trades them as the three references before it did.
+    /// <c>LessonTests</c> holds the grid.
+    /// </para>
+    /// <para>
+    /// <b>It is inert on a fleet, and that is the open half.</b>
+    /// <c>Fleet</c> holds no population, so a brain over one has an empty
+    /// <c>Held</c> and the read-only vote the mark comes off finds nothing. A council has no
+    /// ask that changes nothing, and adding one would put a round trip inside every round to
+    /// decide whether to widen a moment. The mechanism is reached on one machine and not on
+    /// twenty.
+    /// </para>
+    /// </remarks>
+    Attributed,
 }

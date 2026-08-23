@@ -74,11 +74,12 @@ green without doing it. Do not delete them, do not weaken them, and do not read 
 regression. Each computes the state rather than asserting a constant, so none can be satisfied
 by editing that file; an entry closes when the work closes.
 
-**The red set is named, so anything else red is yours.** Check the failures are exactly those
-before assuming a run is clean — a stable red set is the only kind you can read a new failure
-against. Adding an entry is stricter than adding anywhere else: it must be work somebody has
-decided to do, computable without judgement, and closeable. An open question goes in the plan
-as `OPEN`.
+**The red set is EMPTY, so anything red is yours.** Every entry closed on 2026-08-23; the
+file and its rule stay, because the next piece of decided work is registered there. Check the
+failures against that before assuming a run is clean — a stable red set is the only kind you
+can read a new failure against. Adding an entry is stricter than adding anywhere else: it must
+be work somebody has decided to do, computable without judgement, and closeable. An open
+question goes in the plan as `OPEN`.
 
 **`PushbackTests` is green and prints**, and it is the other half of the same idea. This file
 asks for pushback the moment it is seen, and a disagreement stated in a reply is gone by the

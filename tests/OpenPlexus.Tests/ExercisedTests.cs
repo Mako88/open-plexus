@@ -51,6 +51,10 @@ public sealed class ExercisedTests
     /// <param name="Emitted">Which front-end modalities reached the brain.</param>
     /// <param name="Channels">Which of the front end's side channels were ever filled.</param>
     /// <param name="Told">Rounds a chooser read the population and named an action.</param>
+    /// <param name="Supposals">
+    /// What the second hop did — <b>because two failures read alike here</b>. An arm
+    /// nothing reaches and an arm that changed nothing are the same unchanged table.
+    /// </param>
     private sealed record Watched(
         string Arm,
         Examining? Examining,
@@ -58,7 +62,8 @@ public sealed class ExercisedTests
         Population Held,
         IReadOnlySet<byte> Emitted,
         IReadOnlySet<string> Channels,
-        long Told);
+        long Told,
+        Supposed Supposals);
 
     /// <summary>
     /// A front end that says what it emitted — <b>the only way to see a channel filled and
@@ -182,7 +187,7 @@ public sealed class ExercisedTests
 
         return new Watched(
             $"roaming {examining.ToString().ToLowerInvariant()}", examining, tally,
-            brain.Held, noted.Emitted, noted.Channels, drives.Told);
+            brain.Held, noted.Emitted, noted.Channels, drives.Told, brain.Supposals);
     }
 
     /// <summary>
@@ -193,6 +198,17 @@ public sealed class ExercisedTests
     /// How many rounds to run, and <b>the whole lesson where nothing is said</b>. A
     /// conversation's length is the tutor's rather than a number picked here: a run cut short
     /// ends before the examination, so what it reaches would be a fact about the cut.
+    /// </param>
+    /// <param name="lesson">Which lesson is told, defaulting to the one every fact is stated in.</param>
+    /// <param name="tellings">How many times it is told.</param>
+    /// <param name="admitting">
+    /// Which admission bar the repair gate holds, and <b>the axis that decides whether this
+    /// arm repairs at all.</b> <c>OpenPlexus.Talk</c> passes
+    /// <see cref="Admitting.Testable"/> where the brain's own default is
+    /// <see cref="Admitting.Anything"/>, and under the deployment's choice this world reads
+    /// <c>repaired 0</c> at one telling and at five. So every mechanism repair is the only
+    /// road to is unreachable on the shipped composition, for a reason that is the bar rather
+    /// than the mechanism.
     /// </param>
     /// <remarks>
     /// <para>
@@ -208,9 +224,12 @@ public sealed class ExercisedTests
     /// words spoken rather than actions taken and the entry it feeds reads nothing off it.
     /// </para>
     /// </remarks>
-    private static Watched Talked(int? rounds = null)
+    private static Watched Talked(
+        int? rounds = null, Lesson? lesson = null, int tellings = 1,
+        Admitting admitting = Admitting.Testable)
     {
-        var tutor = new Tutor(Lesson.Creatures, TextWriter.Null);
+        var told = lesson ?? Lesson.Creatures;
+        var tutor = new Tutor(told, TextWriter.Null, tellings: tellings);
 
         var brain = new Brain(
             new CommittingSettings
@@ -218,7 +237,7 @@ public sealed class ExercisedTests
                 Capacity = 20_000,
                 Rooting = Rooting.Wholly,
                 Crediting = Crediting.Birth,
-                Admitting = Admitting.Testable,
+                Admitting = admitting,
             },
             seed: 1);
 
@@ -259,8 +278,9 @@ public sealed class ExercisedTests
                 sweep: 200, target: 0.9, window: 50);
 
         return new Watched(
-            "conversing", null, tally, brain.Held, noted.Emitted, noted.Channels,
-            curiosity.Claims + curiosity.Questions);
+            $"conversing x{tellings} {admitting.ToString().ToLowerInvariant()}",
+            null, tally, brain.Held, noted.Emitted, noted.Channels,
+            curiosity.Claims + curiosity.Questions, brain.Supposals);
     }
 
     /// <summary>The join between what a chooser decided and how this world numbers a doing.</summary>
@@ -435,6 +455,13 @@ public sealed class ExercisedTests
             Run(Examining.Where, acting: false),
             Run(Examining.Effect, acting: true),
             Talked(),
+
+            // And a conversation that REPAIRS, which the arm above does not. The deployment
+            // passes `Admitting.Testable` and under it this world reads `repaired 0` however
+            // many times the lesson is told -- so every mechanism repair is the only road to
+            // is unreachable on that composition. This one is the brain as it is built, on the
+            // chained lesson, which is where the second hop has something to compose.
+            Talked(lesson: Lesson.Chained, tellings: 5, admitting: Admitting.Anything),
         };
 
         var missed = new List<string>();
@@ -455,6 +482,8 @@ public sealed class ExercisedTests
                 + $"({arm.Tally.PerEligible:F3}, spoke {arm.Tally.Speaking:F3}) "
                 + $"| subsumed {arm.Tally.Subsumed} "
                 + $"| abstained {arm.Tally.Abstained} | told {arm.Told} "
+                + $"| supposed {arm.Supposals.Put}/{arm.Supposals.Refused}/{arm.Supposals.Moved} "
+                + $"| marked {arm.Supposals.Marked} "
                 + $"| channels {string.Join(",", arm.Channels.Order())}");
 
         return missed;

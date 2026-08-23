@@ -161,6 +161,58 @@ internal sealed class Brain
     public static int? Meant(Code said) =>
         said.Modality == Followed ? (int)said.Value : null;
 
+    /// <summary>
+    /// Whose decision this moment should carry, or nothing where it should carry none.
+    /// </summary>
+    /// <param name="raw">The codes the world pushed.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>Exactly where a supposition would be made and kept</b>, which is what confines the
+    /// mark to one world. The translation is the condition that does it: a brain whose world
+    /// cannot say which code an outcome IS supposes nothing, so it marks nothing, so its
+    /// moments are the width they always were. That is the whole difference from carrying the
+    /// decider's identity every round, which is refuted.
+    /// </para>
+    /// <para>
+    /// <b>Decided BEFORE the moment is taken, off a vote that changes nothing.</b> Two earlier
+    /// shapes marked after the council had already been asked and then asked it again, so
+    /// every marked moment was witnessed twice and counted twice in the separation tables —
+    /// readings about a double-counted moment rather than about the mark. A council notes what
+    /// is live the instant it is asked, so the moment handed to it has to be the final one.
+    /// </para>
+    /// <para>
+    /// <b>This machine's own vote and not a council's</b>, which is <see cref="Voting"/>'s
+    /// limitation arriving here for its reason. A holder reading its own share is a
+    /// measurement rather than a bug, and a hop over the wire to decide whether to widen a
+    /// moment would put a round trip inside every round.
+    /// </para>
+    /// </remarks>
+    private Code? Marking(IReadOnlySet<Code> raw)
+    {
+        if (Dials.Supposing is not Supposing.Attributed || Meaning is not { } meaning)
+            return null;
+
+        var vote = Held.Predict(Held.Firing(Held.Moment(raw)));
+
+        if (vote.Expects is not { } said
+            || Meant(said) is not { } outcome
+            || meaning(outcome) is not { } word
+            || raw.Contains(word)
+            || vote.Margin >= _typical
+            || vote.By is not { } by)
+            return null;
+
+        Supposals = Supposals with { Marked = Supposals.Marked + 1 };
+
+        return by;
+    }
+
+    /// <summary>The moment as this brain takes it, which is the raw one under every arm but
+    /// <see cref="Supposing.Attributed"/>.</summary>
+    /// <param name="raw">The codes the world pushed.</param>
+    private IReadOnlySet<Code> Taking(IReadOnlySet<Code> raw) =>
+        Marking(raw) is { } mark ? new HashSet<Code>(raw) { mark } : raw;
+
     /// <summary>What this brain would say about a moment, without taking it.</summary>
     /// <param name="felt">The codes a moment would arrive as.</param>
     /// <remarks>
@@ -183,7 +235,7 @@ internal sealed class Brain
     {
         ArgumentNullException.ThrowIfNull(felt);
 
-        var raw = felt as IReadOnlySet<Code> ?? new HashSet<Code>(felt);
+        var raw = Taking(felt as IReadOnlySet<Code> ?? new HashSet<Code>(felt));
         var bare = Held.Firing(Held.Moment(raw));
         var vote = Held.Predict(bare);
 
@@ -209,7 +261,8 @@ internal sealed class Brain
         // add advocates, but the moment is FOLDED -- a minted name over a set holding the
         // supposed word replaces its members, so a rule that fired on the bare moment can
         // stop firing and one that never needed the supposition can take the round.
-        if (Dials.Supposing is Supposing.Thinly && vote.Margin >= _typical)
+        if (Dials.Supposing is (Supposing.Thinly or Supposing.Attributed)
+            && vote.Margin >= _typical)
         {
             Supposals = Supposals with { Refused = Supposals.Refused + 1 };
             return vote;
@@ -263,7 +316,7 @@ internal sealed class Brain
         _seen[moment.From.Source] = moment.From.Sequence;
 
         var vote = await _substrate
-            .AskAsync(moment.Codes, moment.Fleeting, moment.Grouping, ct)
+            .AskAsync(Taking(moment.Codes), moment.Fleeting, moment.Grouping, ct)
             .ConfigureAwait(false);
 
         // Wrong is the fleet's verdict and never a holder's, which is why it is told rather
@@ -308,6 +361,15 @@ internal readonly record struct Supposed
 
     /// <summary>How many of those changed the answer.</summary>
     public long Moved { get; init; }
+
+    /// <summary>How many moments were widened by the name of what decided them.</summary>
+    /// <remarks>
+    /// <b>Counted apart from <see cref="Put"/> because they are different gates.</b> A
+    /// supposition is put where the world can translate what was said; a mark goes in where
+    /// that supposition would also clear the bar. An arm whose marks never reach a scope and
+    /// an arm whose marks are never made read as the same empty column without this.
+    /// </remarks>
+    public long Marked { get; init; }
 
     /// <summary>What a decisive vote looked like for this machine, when it was last asked.</summary>
     /// <remarks>

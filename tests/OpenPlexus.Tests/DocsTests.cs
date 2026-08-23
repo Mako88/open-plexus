@@ -668,7 +668,16 @@ public sealed class DocsTests
     // identical to dropping it, because moments are growing prefixes and a trailing token is
     // either the arrival or absent. Without the row the next session builds it again. The
     // readings are in the commit.
-    private const int Whole = 11_975;
+    // And 12,024 is the sixty-seventh raise, forty-nine words, for the last red in
+    // `OutstandingTests` closing and for the row that says what lost on the way. The relations
+    // leaf goes from an OPEN to a NOW: a commitment's own name now reaches a moment, because
+    // the second hop marks its supposition with the identity of what supposed it. Two things
+    // are worth the words beside it. The mark reaches a scope through REPAIR and never through
+    // genesis, so a world that does not repair holds no relation however often it supposes --
+    // and the deployment's own conversation is such a world. And it is inert on a fleet, which
+    // holds no population for the read-only vote the mark comes off. Both are forks rather
+    // than findings, so both are one line.
+    private const int Whole = 12_024;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

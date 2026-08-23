@@ -29,10 +29,7 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
-  build: a session cannot reach green without doing them. One is left and it wants a
-  commitment's own name in a moment, which the second hop does not put there.
-- **Then the genesis gate**, which finds every rule three worlds hold and loses the held-out
+- **The genesis gate**, which finds every rule three worlds hold and loses the held-out
   set on two more. Subsumption is refuted as the cost and the vote is what is left. Fork **135**.
 - **Then the third store, read BY KEY.** John's, and above the chain because the reading says
   so: where the right statement is in front of it the learner is at its bound, so the exam is
@@ -314,12 +311,13 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — the multiplexer does not test the bet, its inputs being symbols already, so
       it measures the learner and the front end not at all.
   - Relations are concepts too
-    - **NOW** — a commitment IS a relation and is scored as one, so nesting is expressible
-      on that rather than reached.
+    - **NOW** — a commitment IS a relation, is scored as one, and its own name reaches a
+      moment: the second hop marks its supposition with what supposed it, so repair roots a
+      scope on a decision. `Supposing.Attributed`.
     - **OPEN** — anti-unification is built, firing and worth nothing on three worlds, and
       negative where its shape IS the concept. Open on whether it goes. Fork **102**.
-    - **OPEN** — what puts a commitment in a moment without widening every world's. Fork
-      **116**, and the revival row is the shape of the answer.
+    - **OPEN** — the mark reaches a scope through REPAIR and never through genesis, so a
+      world that does not repair holds no relation however often it supposes. Fork **140**.
   - Concept and label independent
     - **NOW** — rung five goes UP: mint a code for a shared sub-scope and rewrite in terms
       of it, gated by two bars and triggered by REDUNDANCY rather than by failure.
@@ -450,9 +448,11 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       anything here has run on. Fork **89**.
     - **OPEN** — what supplies a talked world its evidence: repair cannot fire until the
       fifth telling and the terminal ships one. Fork **136**.
-    - **OPEN** — a second hop is built and read-only, and what is open is the telling it stops
-      paying at: its gate reads the vote's own thinness and repair outgrows it. Forks **28**,
-      **125**.
+    - **OPEN** — a second hop is built and marks what it supposed, and what is open is the
+      telling it stops paying at: its gate reads the vote's own thinness and repair outgrows
+      it. Forks **28**, **125**.
+    - **OPEN** — and the mark is inert on a FLEET, which holds no population for the
+      read-only vote it comes off. Fork **141**.
     - **OPEN** — entailment depth and the horizon are capped at one; both come off when
       blame diffusion has a number. Fork **32**.
     - **OPEN** — a lucky advocate blocks genesis, so proposals stop within a hundred rounds
@@ -676,6 +676,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | Fork **80** — two residents agreeing on what they expect and one scope code apart | Below a rewiring of its own pairs: a scope holds a subject and an attribute, so one code apart walks between slots rather than inside one | A scope holding one slot, so a single difference can only be a substitution |
 | The same pairing where the two residents DISAGREE, so scope and expectation name a pair each | Below its own rewiring too, and the commonest pair being right does not lift a share that one subject with every attribute drowns | Reading the pairs by RANK rather than by share, which the head of the list half supports |
 | Speaking a sentence's mark, as its own word and as one nobody claims | Spoken it takes the vote for twice the population and a score of nought, a mark following every last word. Unclaimed it is identical to dropping it, moments being prefixes | A boundary code OPENING a sentence, one in every moment never varying |
+| Marking a supposition only where the second vote MOVED the answer | A third of the marks, and it hands back the stated half at twenty tellings that marking every available one keeps | A world where a supposition changing nothing is a cost rather than a neutral |
 | A refusal as a CODE in the moment, fork **127** | Level on both shapes for a larger population, the chooser already refusing to repeat itself, so the fact was acted on before the code arrived | The exclusion having to SURVIVE the moment, which is a store's job rather than a code's |
 
 ---

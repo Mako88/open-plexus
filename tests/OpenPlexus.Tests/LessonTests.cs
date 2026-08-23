@@ -85,6 +85,29 @@ public sealed class LessonTests(ITestOutputHelper output)
             Admitting = admitting,
         };
 
+    /// <summary>One seed of the chained lesson's two halves, under one arm.</summary>
+    /// <param name="stated">The half every answer is said outright in.</param>
+    /// <param name="implied">The half no statement answers.</param>
+    /// <param name="supposing">Which second hop, if any.</param>
+    /// <param name="many">How many times the lesson is told.</param>
+    /// <param name="seed">Which run.</param>
+    /// <remarks>
+    /// <b>Extracted because two grids read the same pair</b>, and a difference between them
+    /// would read as a difference the arm caused. Both halves carry the three settings that
+    /// answer a lesson told once, so a grid that spelt them out per test would drift one from
+    /// the other the moment either changed.
+    /// </remarks>
+    private static (
+        (Tally Tally, Tutor Tutor, Conversing World, Brain Brain) Direct,
+        (Tally Tally, Tutor Tutor, Conversing World, Brain Brain) Hops) Both(
+        Lesson stated, Lesson implied, Supposing supposing, int many, int seed) =>
+        (Ran(stated, Carrying.Never, seed, passes: 1, asserting: Asserting.Everything,
+             tellings: many, rooting: Rooting.Wholly, crediting: Crediting.Birth,
+             supposing: supposing),
+         Ran(implied, Carrying.Never, seed, passes: 1, asserting: Asserting.Everything,
+             tellings: many, rooting: Rooting.Wholly, crediting: Crediting.Birth,
+             supposing: supposing));
+
     /// <summary>The join between what a chooser decided and how this world numbers its doings.</summary>
     private static int? Doing(Wondered said) =>
         said.Word is not { } word
@@ -2177,15 +2200,7 @@ public sealed class LessonTests(ITestOutputHelper output)
 
             for (var seed = 1; seed <= Seeds; seed++)
             {
-                var direct = Ran(
-                    stated, Carrying.Never, seed, passes: 1, asserting: Asserting.Everything,
-                    tellings: many, rooting: Rooting.Wholly, crediting: Crediting.Birth,
-                    supposing: supposing);
-
-                var hops = Ran(
-                    implied, Carrying.Never, seed, passes: 1, asserting: Asserting.Everything,
-                    tellings: many, rooting: Rooting.Wholly, crediting: Crediting.Birth,
-                    supposing: supposing);
+                var (direct, hops) = Both(stated, implied, supposing, many, seed);
 
                 one.Add(Right(direct.Tutor, 0));
                 two.Add(Right(hops.Tutor, 0));
@@ -2273,6 +2288,131 @@ public sealed class LessonTests(ITestOutputHelper output)
             $"ungated supposing keeps the stated half at {told[(Supposing.Once, 5)].Mean:F3} "
             + $"against the gate's {told[(Supposing.Thinly, 5)].Mean:F3}, so the bar is "
             + "refusing nothing that matters and the two arms are one arm");
+    }
+
+    /// <summary>
+    /// What marking a supposition with its author costs and buys —
+    /// <b>the second hop written down instead of only computed.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><see cref="Supposing.Thinly"/> reaches a conclusion and keeps nothing.</b> The hop
+    /// is read-only of the population, so the same question is composed from scratch every
+    /// time it is put and nothing about the composition is ever scored.
+    /// <see cref="Supposing.Attributed"/> puts the deciding commitment's own name into the
+    /// moment the population learns from, so genesis may root on the decision and a rule
+    /// saying <i>when this one decides, that follows</i> becomes minteable.
+    /// </para>
+    /// <para>
+    /// <b>The name and never the supposed word</b>, which is what keeps it sound. A guessed
+    /// word in the learnt moment would credit and blame every rule that fired on the guess.
+    /// The author's identity is true of the moment whichever way the settlement goes.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Marking_a_supposition_with_its_author_puts_a_commitment_in_a_scope()
+    {
+        static string Said(Measured one) => $"{one.Mean:F3} +-{one.StdErr:F3}";
+
+        const int Seeds = 5;
+
+        int[] tellings = [5, 20];
+
+        var lesson = Lesson.Chained;
+        var half = lesson.Exam.Count / 2;
+
+        var stated = lesson with { Exam = [.. lesson.Exam.Take(half)] };
+        var implied = lesson with { Exam = [.. lesson.Exam.Skip(half)] };
+
+        var marginal = new Tutor(lesson, TextWriter.Null).Marginal / (double)lesson.Exam.Count;
+
+        output.WriteLine($"{Seeds} seeds, one examination pass, {half} questions a half");
+        output.WriteLine($"marginal {marginal:F3}");
+        output.WriteLine(
+            $"{"supposing",-12}{"tellings",9}{"stated",17}{"implied",17}{"put",7}"
+            + $"{"refused",9}{"moved",7}{"marked",8}{"held",7}");
+
+        var told = new Dictionary<(Supposing, int), Measured>();
+        var reached = new Dictionary<(Supposing, int), Measured>();
+        var scoped = new Dictionary<(Supposing, int), double>();
+
+        foreach (var supposing in new[] { Supposing.Thinly, Supposing.Attributed })
+        foreach (var many in tellings)
+        {
+            var one = new List<double>();
+            var two = new List<double>();
+            var put = new List<double>();
+            var refused = new List<double>();
+            var moved = new List<double>();
+            var carrying = new List<double>();
+            var resident = new List<double>();
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var (direct, hops) = Both(stated, implied, supposing, many, seed);
+
+                one.Add(Right(direct.Tutor, 0));
+                two.Add(Right(hops.Tutor, 0));
+
+                put.Add(hops.Brain.Supposals.Put);
+                refused.Add(hops.Brain.Supposals.Refused);
+                moved.Add(hops.Brain.Supposals.Moved);
+
+                // The whole of what the arm adds, counted where it lands. A commitment whose
+                // scope holds another commitment's name is the meta level, and a run that
+                // scored identically while minting none of them would be an arm nothing
+                // reached rather than an arm that did not pay.
+                carrying.Add(hops.Brain.Held.All.Count(
+                    commitment => commitment.Scope.Any(
+                        code => code.Modality == Commitment.Committed)));
+
+                resident.Add(hops.Brain.Held.All.Count);
+            }
+
+            told[(supposing, many)] = new Measured { Arm = "stated", Values = one };
+            reached[(supposing, many)] = new Measured { Arm = "implied", Values = two };
+            scoped[(supposing, many)] = carrying.Average();
+
+            output.WriteLine(
+                $"{supposing.ToString().ToLowerInvariant(),-12}{many,9}"
+                + $"{Said(told[(supposing, many)]),17}{Said(reached[(supposing, many)]),17}"
+                + $"{put.Average(),7:F0}{refused.Average(),9:F0}{moved.Average(),7:F0}"
+                + $"{carrying.Average(),8:F1}{resident.Average(),7:F0}");
+        }
+
+        // The arm exists to put a commitment's own name where a scope can root on it, and
+        // under the shipped arm nothing ever does. This is the half that cannot be argued.
+        Assert.All(tellings, many => Assert.Equal(0.0, scoped[(Supposing.Thinly, many)]));
+
+        Assert.All(tellings, many => Assert.True(
+            scoped[(Supposing.Attributed, many)] > 0.0,
+            $"marking a supposition put no commitment in any scope at {many} tellings, so the "
+            + "mechanism is not reaching the moment genesis roots on -- read `Marking` "
+            + "against where the council notes what is live"));
+
+        // At five tellings it is the shipped arm exactly, on both halves. That is the cell
+        // `Thinly` won on outright, so an arm that moved it would be paying for the meta
+        // level with the one reading this lesson has.
+        Assert.Equal(told[(Supposing.Thinly, 5)].Mean, told[(Supposing.Attributed, 5)].Mean);
+        Assert.Equal(
+            reached[(Supposing.Thinly, 5)].Mean, reached[(Supposing.Attributed, 5)].Mean);
+
+        // And at twenty it keeps the stated half whole, which nothing else here does. The
+        // shipped arm loses a quarter of it to a bar that rises while the exam's margins hold.
+        Assert.True(
+            told[(Supposing.Attributed, 20)].Mean > told[(Supposing.Thinly, 20)].Mean,
+            $"marking reads {told[(Supposing.Attributed, 20)].Mean:F3} on the stated half at "
+            + $"twenty tellings against the shipped arm's {told[(Supposing.Thinly, 20)].Mean:F3}, "
+            + "so the one thing it buys outright has gone");
+
+        // AND IT TRADES THE HALVES, which every reference read so far has done and this one
+        // does by another road. Asserted so that a change which stops it going red is read
+        // rather than passing quietly: the sum over the two halves is the same number.
+        Assert.True(
+            reached[(Supposing.Attributed, 20)].Mean < reached[(Supposing.Thinly, 20)].Mean,
+            $"marking reads {reached[(Supposing.Attributed, 20)].Mean:F3} on the implied half "
+            + $"at twenty tellings against {reached[(Supposing.Thinly, 20)].Mean:F3}. The trade "
+            + "has gone, which is the result this arm is waiting for -- say what changed");
     }
 
     /// <summary>
@@ -2372,6 +2512,90 @@ public sealed class LessonTests(ITestOutputHelper output)
             $"the implied half is under the bar on {under[(false, 5)]} and "
             + $"{under[(false, 20)]} questions, so the gate is not what lets the chain "
             + "through and the arm wants re-reading");
+    }
+
+    /// <summary>
+    /// Whether a mark tells one exam question from another —
+    /// <b>the whole of whether marking can carry a composition.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>Four questions with four different answers.</b> A mark is the name of the bare
+    /// vote's best advocate, so where one commitment leads every loudness question the four
+    /// moments carry one code between them — and a rule rooted on it can be right about one
+    /// question in four however well it is scored. Counting the distinct marks says whether
+    /// that is what is happening, which arguing about the population cannot.
+    /// </remarks>
+    [Fact]
+    public void How_many_marks_the_implied_questions_carry_between_them()
+    {
+        const int Seeds = 3;
+
+        var lesson = Lesson.Chained;
+        var half = lesson.Exam.Count / 2;
+
+        var implied = lesson with { Exam = [.. lesson.Exam.Skip(half)] };
+
+        output.WriteLine($"{Seeds} seeds, {half} implied questions");
+        output.WriteLine($"{"supposing",-12}{"tellings",9}{"marks",7}{"of",5}{"answers",9}");
+
+        var distinct = new Dictionary<(Supposing, int), int>();
+
+        foreach (var supposing in new[] { Supposing.Thinly, Supposing.Attributed })
+        foreach (var tellings in new[] { 5, 20 })
+        {
+            var marks = 0;
+            var of = 0;
+            var answers = 0;
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var run = Ran(
+                    implied, Carrying.Never, seed, passes: 1, asserting: Asserting.Everything,
+                    tellings: tellings, rooting: Rooting.Wholly, crediting: Crediting.Birth,
+                    supposing: supposing);
+
+                var seen = new HashSet<Code>();
+                var said = new HashSet<Code>();
+
+                foreach (var quiz in implied.Exam)
+                {
+                    var codes = Babi.Words(quiz.Question).Select(Babi.Of).ToHashSet();
+
+                    // The BARE vote, which is what the mark is taken off. Reading it back
+                    // through `Voting` would hand over whatever the supposition decided.
+                    var firing = run.Brain.Held.Firing(run.Brain.Held.Moment(codes));
+
+                    if (firing.IsDefaultOrEmpty) continue;
+
+                    var vote = run.Brain.Held.Predict(firing);
+
+                    if (vote.Expects is not { } expects || vote.By is not { } by) continue;
+
+                    of++;
+                    seen.Add(by);
+                    said.Add(expects);
+                }
+
+                marks += seen.Count;
+                answers += said.Count;
+            }
+
+            distinct[(supposing, tellings)] = marks;
+
+            output.WriteLine(
+                $"{supposing.ToString().ToLowerInvariant(),-12}{tellings,9}{marks,7}{of,5}"
+                + $"{answers,9}");
+        }
+
+        Assert.True(distinct.Count == 4,
+            $"{distinct.Count} of 4 cells reported, so the grid did not run");
+
+        // The reading that decides the arm. As many marks as questions means a mark can carry
+        // which question it is about; fewer means it cannot, and a rule rooted on one is
+        // answering several questions with one answer.
+        Assert.True(distinct[(Supposing.Attributed, 20)] > 0,
+            "no exam question carried a mark at twenty tellings, so the bare vote names no "
+            + "advocate there and the arm cannot be read on this lesson at all");
     }
 
     [Fact]

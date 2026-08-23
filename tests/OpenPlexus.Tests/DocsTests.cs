@@ -699,7 +699,14 @@ public sealed class DocsTests
     // red build, which is what `OutstandingTests` is for -- and a deliberate red is the right
     // move for a session that cannot finish something, because the next one has no memory of
     // the decision and a green suite would tell it nothing was owed.
-    private const int Whole = 12_364;
+    // And 12,410 is the seventieth raise, forty-six words, for one refutation row. Naming a
+    // bundle for staying present in the SUCCESSOR moment was built for fork 93 and deleted
+    // the same session: it reads whether two codes ARRIVE together and never whether they
+    // STAY, so on `Returning` it names FEWER bundles the more a thing is re-met, and names
+    // the same number at every rate once a thing's codes are stable. Every bundle it ever
+    // named was one appearance's, which is a kind. A row is what an arm leaves behind, and
+    // it is the only thing that stops the next session building it again.
+    private const int Whole = 12_410;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

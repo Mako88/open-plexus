@@ -425,9 +425,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **NOW** — the front end reports PARTS rather than one thing a code, so a code in two
       of them is in two things and a moment carries two of a kind. `Spanning` intersects
       them. Fork **142**.
-    - **OPEN** — minting an INDIVIDUAL is unbuilt and CONTINUITY is where to site it: a
-      bundle mostly recurring in the successor moment is one thing. Confidence over repetition
-      is the other road and the biology says it is the later one. Fork **93**.
+    - **OPEN** — minting an INDIVIDUAL is unbuilt and a bundle recurring in the successor
+      moment is refuted below, being co-occurrence read twice. What is left is persistence of
+      a PART, or confidence over repetition. Fork **93**.
     - **OPEN** — a front end whose codes survive a scene SHIFTING is the other half, and
       changing the feature basis to get one is refuted below. Fork **145**.
   - It can say what does not hold
@@ -703,6 +703,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | The same pairing where the two residents DISAGREE, so scope and expectation name a pair each | Below its own rewiring too, and the commonest pair being right does not lift a share that one subject with every attribute drowns | Reading the pairs by RANK rather than by share, which the head of the list half supports |
 | Speaking a sentence's mark, as its own word and as one nobody claims | Spoken it takes the vote for twice the population and a score of nought, a mark following every last word. Unclaimed it is identical to dropping it, moments being prefixes | A boundary code OPENING a sentence, one in every moment never varying |
 | Marking a supposition only where the second vote MOVED the answer | A third of the marks, and it hands back the stated half at twenty tellings that marking every available one keeps | A world where a supposition changing nothing is a cost rather than a neutral |
+| Naming a bundle for staying in the SUCCESSOR moment, fork **93** | It reads whether two codes ARRIVE together, never whether they STAY: `Returning` names 150, 150, 85 and 11 as things are re-met more, and 160 at every rate with stable codes | Persistence of a PART, fork **142** having made two of a kind sayable |
 | A refusal as a CODE in the moment, fork **127** | Level on both shapes for a larger population, the chooser already refusing to repeat itself, so the fact was acted on before the code arrived | The exclusion having to SURVIVE the moment, which is a store's job rather than a code's |
 
 ---

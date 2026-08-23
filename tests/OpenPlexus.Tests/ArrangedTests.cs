@@ -436,6 +436,8 @@ public sealed class ArrangedTests(ITestOutputHelper output)
                     return (could, got, Fixture.Alone(run.Held));
                 })]);
 
+        var best = new Dictionary<(Looking, Surprising), (double Sound, double Unsound)>();
+
         for (var at = 0; at < grid.Length; at++)
         {
             var (looking, gate) = grid[at];
@@ -451,7 +453,13 @@ public sealed class ArrangedTests(ITestOutputHelper output)
                 + $"{could.CoversUnseen:F3} · sound {got.Rules.Sound} unsound {got.Rules.Unsound} "
                 + $"(narrowed {got.Rules.Narrowed}, rootless {got.Rules.Rootless}) · "
                 + $"believed {got.Rules.Trusted:F3} sound vs {got.Rules.Doubted:F3} "
-                + $"unsound · mean scope {got.Rules.Scope:F2}");
+                + $"unsound, BEST {got.Rules.Best:F3} vs {got.Rules.Worst:F3} "
+                + $"· mean scope {got.Rules.Scope:F2}");
+
+            // What a MAXIMUM vote decides on, which no mean can say. An expectation is worth
+            // its best advocate, so where the best unsound rule reaches the best sound one the
+            // vote has nothing left to separate them with and no weighting is the answer.
+            best[(looking, gate)] = (got.Rules.Best, got.Rules.Worst);
 
             // The two ways an unsound rule survives, and they partition. Either
             // subsumption had a general parent to absorb it into and declined, or there
@@ -461,6 +469,19 @@ public sealed class ArrangedTests(ITestOutputHelper output)
 
             Assert.NotEmpty(could.Alone);
         }
+
+        // And the reading the gate's whole open question rests on: they are TIED, in every
+        // cell, under both gates and both front ends. An expectation is worth its best
+        // advocate, so a maximum already at the top on both sides cannot be moved by how many
+        // unsound residents there are -- which is what says the vote is not the road ungated
+        // genesis's cost travels. A fifth of this world is never drawn and a rule wrong only
+        // there has a perfect observed record, so what is tied is the evidence rather than the
+        // weighting, and no dial reaches it.
+        //
+        // Asserted as an equality because the tie is the finding. An arm that separated them
+        // would be the first thing here to give the vote something to decide on, and it must
+        // go red rather than pass quietly.
+        Assert.All(best.Keys, key => Assert.Equal(best[key].Sound, best[key].Unsound));
     }
 
     /// <summary>

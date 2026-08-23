@@ -29,8 +29,8 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **The genesis gate**, which finds every rule three worlds hold and loses the held-out
-  set on two more. Subsumption is refuted as the cost and the vote is what is left. Fork **135**.
+- **The genesis gate**, which finds every rule three worlds hold and loses the held-out set
+  on two more. Subsumption and the vote are both refuted as the cost. Fork **135**.
 - **Then the third store, read BY KEY.** John's, and above the chain because the reading says
   so: where the right statement is in front of it the learner is at its bound, so the exam is
   short of RETRIEVAL. Not measurable on a spine lesson, exhausted at one telling. Fork **139**.
@@ -311,9 +311,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — the multiplexer does not test the bet, its inputs being symbols already, so
       it measures the learner and the front end not at all.
   - Relations are concepts too
-    - **NOW** — a commitment IS a relation, is scored as one, and its own name reaches a
-      moment: the second hop marks its supposition with what supposed it, so repair roots a
-      scope on a decision. `Supposing.Attributed`.
+    - **NOW** — a commitment IS a relation and its own name reaches a moment: the second hop
+      marks its supposition with what supposed it. `Supposing.Attributed`.
     - **OPEN** — anti-unification is built, firing and worth nothing on three worlds, and
       negative where its shape IS the concept. Open on whether it goes. Fork **102**.
     - **OPEN** — the mark reaches a scope through REPAIR and never through genesis, so a
@@ -456,7 +455,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — entailment depth and the horizon are capped at one; both come off when
       blame diffusion has a number. Fork **32**.
     - **OPEN** — a lucky advocate blocks genesis, so proposals stop within a hundred rounds
-      of twenty thousand. Fork **135**.
+      of twenty thousand. The vote is refuted, an unsound rule being believed as hard as a
+      sound one. Fork **135**.
     - **OPEN** — and what that bar COSTS is a function of how young the population is, free
       at saturation and most of the examination before it, because it blocks repair while
       nothing can clear the floor yet. Unpriced, and it is why the bar does not ship. Fork

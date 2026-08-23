@@ -130,6 +130,32 @@ internal sealed record Judged
     /// <summary>The same, for the residents the world contradicts.</summary>
     public required double Doubted { get; init; }
 
+    /// <summary>
+    /// The highest accuracy any resident the world contradicts holds, against the highest a
+    /// sound one holds — <b>the pair a MAXIMUM vote actually decides on.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A mean cannot say whether the vote can separate them.</b>
+    /// <see cref="Commitments.Population.Weigh"/> takes an expectation's weight to be its
+    /// best advocate's accuracy, so what decides a round is the top of each distribution and
+    /// never its centre. Two populations with the same <see cref="Doubted"/> decide
+    /// differently where one of them holds a single unsound rule that has never been caught.
+    /// </para>
+    /// <para>
+    /// <b>And the fear beside <see cref="Trusted"/> is exactly this statistic.</b> A rule is
+    /// unsound when the world contradicts it SOMEWHERE, and a fifth of this world is never
+    /// drawn — so a rule wrong only about arrangements the learner has not been shown has a
+    /// perfect observed record. Where <see cref="Worst"/> reaches <see cref="Best"/>, no
+    /// weighting of what the population knows can separate what is true from what has merely
+    /// not been caught, and the answer is not a dial.
+    /// </para>
+    /// </remarks>
+    public required double Best { get; init; }
+
+    /// <inheritdoc cref="Best"/>
+    public required double Worst { get; init; }
+
     /// <summary>How many codes a resident scope names, on average.</summary>
     /// <remarks>
     /// <b>The memorisation tell, and it is a distribution rather than a score.</b> This
@@ -537,6 +563,8 @@ internal sealed class ArrangedRun
         // gap between them is the only thing that decides whether a sharper vote could
         // help, and it costs one running total apiece.
         var trusted = 0.0;
+        var best = 0.0;
+        var worst = 0.0;
         var doubted = 0.0;
 
         var codes = 0L;
@@ -607,12 +635,14 @@ internal sealed class ArrangedRun
             {
                 unsound++;
                 doubted += one.Accuracy;
+                worst = Math.Max(worst, one.Accuracy);
                 falses.Add((scope, one.Expects));
             }
             else
             {
                 sound++;
                 trusted += one.Accuracy;
+                best = Math.Max(best, one.Accuracy);
                 trues.Add((scope, one.Expects));
             }
         }
@@ -632,6 +662,8 @@ internal sealed class ArrangedRun
             Rootless = falses.Count - narrowed,
             Trusted = sound == 0 ? 0.0 : trusted / sound,
             Doubted = unsound == 0 ? 0.0 : doubted / unsound,
+            Best = best,
+            Worst = worst,
             Scope = held == 0 ? 0.0 : codes / (double)held,
         };
     }

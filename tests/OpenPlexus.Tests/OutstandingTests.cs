@@ -415,7 +415,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// <remarks>
     /// <para>
     /// <b>The two halves are different questions and only one had a check.</b>
-    /// <see cref="DocsTests.Every_requirement_has_a_mechanism"/> reads the doc against itself:
+    /// <see cref="DocsTests.WithoutMechanism"/> reads the doc against itself:
     /// every entry carries a NOW leaf, so nothing is claimed with nothing under it. That says
     /// nothing about whether any run reaches the mechanism, and a mechanism no run reaches is
     /// the fault this repo keeps finding read as built.
@@ -454,6 +454,24 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// is why nothing else calls it and why a derivation's cadence is a cost rather than a bar.
     /// </para>
     /// </remarks>
+    [Fact]
+    public void Every_requirement_has_a_mechanism()
+    {
+        var without = DocsTests.WithoutMechanism();
+
+        foreach (var one in without) output.WriteLine($"no mechanism | {one}");
+
+        Assert.True(without.Count == 0,
+            $"{without.Count} of THE ARCHITECTURE's entries have no mechanism at all: "
+            + string.Join("; ", without)
+            + ". These are requirements the project has decided on and cannot yet meet, which "
+            + "is a legitimate state and a RED one. Each closes by a NOW leaf arriving under "
+            + "its route entry, and never by the line leaving the architecture.");
+    }
+
+    /// <summary>
+    /// <b>The spine world reaches every entry of THE ARCHITECTURE.</b>
+    /// </summary>
     [Fact]
     public void The_spine_world_exercises_every_entry_of_the_architecture()
     {

@@ -68,18 +68,29 @@ Four of them are worth knowing by what they catch:
   Both rules were written in XML comments for months and checked nowhere.
 
 **`OutstandingTests` is red on purpose and it is the top priority** — John's, 2026-08-13, and
-`THE ORDER` says so at the top rather than in a phase list of its own. The
+`THE ORDER` opens with whatever closes it rather than keeping a phase list of its own. The
 outstanding work is written as tests that fail until it is done, so a session cannot reach
 green without doing it. Do not delete them, do not weaken them, and do not read them as a
 regression. Each computes the state rather than asserting a constant, so none can be satisfied
 by editing that file; an entry closes when the work closes.
 
-**The red set is EMPTY, so anything red is yours.** Every entry closed on 2026-08-23; the
-file and its rule stay, because the next piece of decided work is registered there. Check the
-failures against that before assuming a run is clean — a stable red set is the only kind you
-can read a new failure against. Adding an entry is stricter than adding anywhere else: it must
+**The red set is `OutstandingTests.Every_requirement_has_a_mechanism`, and anything else red
+is yours.** Two architecture lines carry no mechanism: *a thing is ONE thing* and *it can say
+what does not hold*. Check the failures against that before assuming a run is clean — a
+stable red set is the only kind you can read a new failure against. Adding an entry is stricter than adding anywhere else: it must
 be work somebody has decided to do, computable without judgement, and closeable. An open
 question goes in the plan as `OPEN`.
+
+**Making something red on purpose is often the RIGHT move.** John's, and it is the reason
+the file above exists. A human developer would raise an issue and carry the intent in their
+head; a session ends and the next one has no memory of the decision, so a green suite tells
+it nothing is owed. If you decide something is required and cannot finish it, write the
+requirement down where it belongs and let the build go red for it — an intent that survives
+only in a reply is an intent that does not survive.
+
+**And it goes in `OutstandingTests` rather than among the guards.** The fourteen are read
+every commit and a deliberate red among them would make a new failure unreadable. Register it
+where the red set is named, and say in the message what would close it.
 
 **`PushbackTests` is green and prints**, and it is the other half of the same idea. This file
 asks for pushback the moment it is seen, and a disagreement stated in a reply is gone by the

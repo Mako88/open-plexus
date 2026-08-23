@@ -30,8 +30,8 @@ ends: read it first, strike what got done, and write the handoff from what is le
 that is finished LEAVES, so this is only ever what is still to do.
 
 - **The five below are REQUIREMENTS rather than arms.** John's. A losing reading is a cost
-  to record rather than grounds to delete, and each owes an ARCHITECTURE line written the day
-  its mechanism ships — *a thing is ONE thing* and *it can say what does not hold*.
+  to record rather than grounds to delete, and the two architecture lines they serve are
+  WRITTEN and carry no mechanism, so `OutstandingTests` is red until they do.
 - **A moment carries multiplicity**, a SET being what it is. Fork **142**.
 - **Then an individual, minted on CONTINUITY** rather than on confidence. Fork **93**.
 - **Then a category named from a founding key**, so membership moves under a name that does
@@ -103,6 +103,10 @@ a mechanism written here is a decision wearing a requirement's clothes. No findi
   truths about one individual, each sharpening what it is.
 - **And part of what is understood is which aspects are temporal** — which properties come
   and go, what those aspects are in themselves, and how they stand to everything else.
+- **And a thing is ONE thing** — told from another of its kind in the same moment, and from
+  itself at another moment through a change in what it is made of. John's.
+- **And it can say what does NOT hold.** A belief whose negation is unsayable is one the
+  machine cannot be precise about, and every other connective follows from that one. John's.
 - **And knowledge is held at several grains at once** — *a person sleeps in a bedroom* and
   *this bedroom is Mary's*, both live, neither replacing the other.
 - **And how hard a belief is to shift is its own record**, never a weight. Gravity is
@@ -292,13 +296,6 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       offline, so no run reaches it.
     - **OPEN** — nothing tracks a source through a CHANGE, so a thing that moves is a new
       one and adhesion never reaches an individual. Fork **106**.
-    - **OPEN** — a moment is a SET, so two of a kind at once collapse to one. A multiset, or
-      a code carrying an instance. Fork **142**.
-    - **OPEN** — minting an INDIVIDUAL is unbuilt and CONTINUITY is where to site it: a
-      bundle mostly recurring in the successor moment is one thing. Confidence over repetition
-      is the other road and the biology says it is the later one. Fork **93**.
-    - **OPEN** — a front end whose codes survive a scene SHIFTING is the other half, and
-      changing the feature basis to get one is refuted below. Fork **145**.
     - **OPEN** — the same input mints the same codes, so a KIND recurs for free. What never
       recurs is two moments' codes being present TOGETHER, which is what co-firing reads.
       John's.
@@ -387,11 +384,6 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       wired rather than measured. Its grid is `Arranged`'s. Fork **110**.
     - **OPEN** — a fresh child starts BLIND and re-earns its statistics, a floor every rung
       of a chain pays while only the last pays off. The escape is rung five.
-    - **OPEN** — negation is the WHOLE propositional gap: the population is already a
-      disjunction of conjunctions, so DNF plus a negation says every Boolean function and XOR
-      needs nothing of its own. Forks **30**, **64**.
-    - **OPEN** — an expectation is one code, so *X implies NOT Z* is unsayable however the
-      scope is written. Fork **115**.
     - **OPEN** — `Mending.Uncovered` is a gate plus every-round repair, and the gate alone
       is far worse than none. Fork **37**.
     - **OPEN** — a per-COMMITMENT signal separating *needs specialising* from *is being
@@ -430,6 +422,20 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       `Distinguished`. Fork **94**.
     - **OPEN** — the key that moved last is not worth following: it leads where one walker
       makes it the only candidate and loses at four. Fork **95**.
+  - A thing is one thing
+    - **OPEN** — a moment is a SET, so two of a kind at once collapse to one. A multiset, or
+      a code carrying an instance. Fork **142**.
+    - **OPEN** — minting an INDIVIDUAL is unbuilt and CONTINUITY is where to site it: a
+      bundle mostly recurring in the successor moment is one thing. Confidence over repetition
+      is the other road and the biology says it is the later one. Fork **93**.
+    - **OPEN** — a front end whose codes survive a scene SHIFTING is the other half, and
+      changing the feature basis to get one is refuted below. Fork **145**.
+  - It can say what does not hold
+    - **OPEN** — negation is the WHOLE propositional gap: the population is already a
+      disjunction of conjunctions, so DNF plus a negation says every Boolean function and XOR
+      needs nothing of its own. Forks **30**, **64**.
+    - **OPEN** — an expectation is one code, so *X implies NOT Z* is unsayable however the
+      scope is written. Fork **115**.
   - Several grains at once
     - **NOW** — subsumption keeps the general rule where both are equally accurate, and
       reads a category's entailment.

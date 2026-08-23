@@ -691,7 +691,15 @@ public sealed class DocsTests
     // ORDER block that marks them REQUIREMENTS rather than arms -- which is the rule that
     // stops the next session deleting a prerequisite for losing a reading it cannot win until
     // what it enables exists. `CLAUDE.md` carries the rule and this carries the list.
-    private const int Whole = 12_290;
+    // And 12,364 is the sixty-ninth raise, seventy-four words, for two ARCHITECTURE lines
+    // written before anything meets them: a thing is ONE thing, and it can say what does NOT
+    // hold. John's, and the reasoning is worth keeping. A requirement the project has decided
+    // on exists whether or not a mechanism does, so leaving it out of the section written to
+    // STAY is a doc that describes the code rather than the goal. The cost of saying it is a
+    // red build, which is what `OutstandingTests` is for -- and a deliberate red is the right
+    // move for a session that cannot finish something, because the next one has no memory of
+    // the decision and a green suite would tell it nothing was owed.
+    private const int Whole = 12_364;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.
@@ -1003,9 +1011,17 @@ public sealed class DocsTests
     /// point of <i>however bad</i>. Phase six is where that is asked, and a check demanding a
     /// mechanism WORK would be phase six wearing phase two's clothes.
     /// </para>
+    /// <para>
+    /// <b>The reading is here and the deadline is in <c>OutstandingTests</c></b>, which is
+    /// John's arrangement and the one <c>DrivenTests</c> already uses. A requirement the
+    /// project has decided on and cannot yet meet belongs in THE ARCHITECTURE the day it is
+    /// decided, and the cost of saying so is a RED BUILD until somebody meets it — which is
+    /// the whole mechanism that file exists for. Asserting it here would put a deliberate red
+    /// among the structural guards, where a new failure could no longer be read against a
+    /// stable set.
+    /// </para>
     /// </remarks>
-    [Fact]
-    public void Every_requirement_has_a_mechanism()
+    internal static IReadOnlyList<string> WithoutMechanism()
     {
         var route = Nested(Section("THE ROUTE"));
 
@@ -1019,13 +1035,7 @@ public sealed class DocsTests
 
         Assert.NotEmpty(under);
 
-        var without = Unbuilt(under);
-
-        Assert.True(without.Count == 0,
-            $"{without.Count} of `WHAT IT MUST DO`'s entries carry no NOW leaf, so an "
-            + "architecture line has an entry and no mechanism:\n  "
-            + string.Join("\n  ", without)
-            + "\nPhase two is a mechanism for every one of them, however bad.");
+        return Unbuilt(under);
     }
 
     /// <summary>The entries under a branch with no <c>NOW</c> leaf beneath them.</summary>

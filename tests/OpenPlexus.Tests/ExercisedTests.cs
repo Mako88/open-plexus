@@ -12,7 +12,7 @@ namespace OpenPlexus.Tests;
 /// <remarks>
 /// <para>
 /// <b>The phase is two things and only one of them was measured.</b>
-/// <see cref="DocsTests.Every_requirement_has_a_mechanism"/> says every entry under WHAT IT
+/// <see cref="DocsTests.WithoutMechanism"/> says every entry under WHAT IT
 /// MUST DO carries a NOW leaf, so a mechanism exists for each. That is a fact about the doc
 /// and the code. Whether the spine world REACHES any of them is a fact about a run, and a
 /// mechanism no run reaches is this repo's oldest trap wearing phase two's clothes.

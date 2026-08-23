@@ -3370,4 +3370,5 @@ public sealed class LessonTests(ITestOutputHelper output)
             + "genesis is not what decides which words can be a premise and the account in this "
             + "remark joins the two before it");
     }
+
 }

@@ -678,6 +678,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | An adhesion bar set as a RATIO somebody picked | A corrected z over the same counts reaches every group the level reached on both worlds and nothing more | A world where an effect size and a significance test come apart |
 | Fork **80** — two residents agreeing on what they expect and one scope code apart | Below a rewiring of its own pairs: a scope holds a subject and an attribute, so one code apart walks between slots rather than inside one | A scope holding one slot, so a single difference can only be a substitution |
 | The same pairing where the two residents DISAGREE, so scope and expectation name a pair each | Below its own rewiring too, and the commonest pair being right does not lift a share that one subject with every attribute drowns | Reading the pairs by RANK rather than by share, which the head of the list half supports |
+| Speaking a sentence's mark, as its own word and as one nobody claims | Spoken it takes the vote for twice the population and a score of nought, a mark following every last word. Unclaimed it is identical to dropping it, moments being prefixes | A boundary code OPENING a sentence, one in every moment never varying |
 | A refusal as a CODE in the moment, fork **127** | Level on both shapes for a larger population, the chooser already refusing to repeat itself, so the fact was acted on before the code arrived | The exclusion having to SURVIVE the moment, which is a store's job rather than a code's |
 
 ---

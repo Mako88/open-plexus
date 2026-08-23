@@ -658,7 +658,17 @@ public sealed class DocsTests
     // reason from them, which bounds a chain before any population does -- and the chain is
     // what `THE ORDER` is on. Leaving it out would have cost the next session the reason the
     // fork matters. The reading is in `LessonTests`.
-    private const int Whole = 11_927;
+    // And 11,986 is the sixty-sixth raise, fifty-nine words, and the THIRD this session --
+    // which is one more than the note above already called too many, so it is said again and
+    // louder. What it buys is one refutation row, and a refutation row is the content this
+    // budget must never price out: John proposed speaking punctuation as its own words, it was
+    // built in two shapes, and both lost. Spoken, a mark follows every sentence's last word,
+    // so rules expecting one are accurate for a reason about the corpus and take the
+    // examination's vote -- nought on both lessons for twice the population. Unclaimed, it is
+    // identical to dropping it, because moments are growing prefixes and a trailing token is
+    // either the arrival or absent. Without the row the next session builds it again. The
+    // readings are in the commit.
+    private const int Whole = 11_986;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

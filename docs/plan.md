@@ -33,6 +33,9 @@ that is finished LEAVES, so this is only ever what is still to do.
   build: a session cannot reach green without doing them. One is left and it is fork **28**'s.
 - **Then the genesis gate**, which finds every rule three worlds hold and loses the held-out
   set on two more. Subsumption deletes what it builds, and that arm is dispatched. Fork **135**.
+- **Then the third store, read BY KEY.** John's, and it goes above the chain because the
+  reading says so: where the right statement is put in front of it the learner is already at
+  its bound, so what the exam is short of is the RETRIEVAL. Fork **139**.
 - **Then what a placement is WORTH**, which is the chain and fork **137** at once: a placed
   word is IN a moment, so it can be a premise where an answer word never is. Believing one
   reaches five rivals, so the value is whether the chain SETTLES. `ChainingTests`. Forks
@@ -353,14 +356,10 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       Open on the individual, which substitutability never reaches. `csharp` refuted a
       SIMILARITY code as the coarse form, a hub at one end and an index at the other. **83**
       to **85** want an alphabet and `Deriving` fills one. Fork **97**.
-    - **OPEN** — a name over ALTERNATIVES is derivable and not admitted, rung five being the
-      wrong SHAPE: it names what CO-FIRES, and alternatives never do.
-    - **OPEN** — so likeness read off the RESIDUAL rather than the moment: two codes are
-      alike where they ARRIVE in one another's place, which co-occurrence can never reach.
-      The ceiling is taken. Fork **129**.
-    - **OPEN** — and it is the wall both architectures hit. `csharp` refuted widening a walk
-      in three shapes and its row asks for a likeness the GRAPH DID NOT COMPUTE; this branch
-      refuted a similarity code. Four tries, two designs, one target.
+    - **OPEN** — a name over ALTERNATIVES is not admitted, rung five naming what CO-FIRES. So
+      likeness off the RESIDUAL instead: two codes are alike where they ARRIVE in one
+      another's place. Five tries across two designs preceded it and the ceiling is taken.
+      Fork **129**.
   - Understanding deepens without limit
     - **NOW** — repair: specialisation on failure, adding a narrower rule and never editing
       the old. The gate is the whole difference from overfitting — a floor of misses, and a
@@ -408,9 +407,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       tracked. Placing a repeat at its LATEST recovers a RECENCY bar needing no learning and
       never clears it, so a front end reaches the shortcut and not past it. John's. Fork
       **119**.
-    - **OPEN** — a referent is a THIRD store: *Mary's bedroom* survives leaving the room and
-      *Mary is in the bedroom* does not, so one store gets a lifetime wrong whichever it
-      takes.
+    - **OPEN** — a referent is a THIRD store, read BY KEY: *Mary's bedroom* survives leaving
+      the room and *Mary is in the bedroom* does not, so one store gets a lifetime wrong
+      whichever it takes. Fork **139**.
     - **OPEN** — nothing SCORES the update, so what retracts is the experimenter's rule.
       Fork **104**.
     - **OPEN** — does a band the learner MINTS differ from a handed one. Fork **92**.

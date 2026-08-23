@@ -446,8 +446,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       something and where to ask is LEARNT.
     - **OPEN** — what it converts is unread, and English's alphabet is far wider than
       anything here has run on. Fork **89**.
-    - **OPEN** — what supplies a talked world its evidence: repair cannot fire until the
-      fifth telling and the terminal ships one. Fork **136**.
+    - **OPEN** — a talked world reaches its ceiling by GENESIS, so a repair-side reading
+      taken on one is unread. Fork **136**.
     - **OPEN** — a second hop is built and marks what it supposed, and what is open is the
       telling it stops paying at: its gate reads the vote's own thinness and repair outgrows
       it. Forks **28**, **125**.

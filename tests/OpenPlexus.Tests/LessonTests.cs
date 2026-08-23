@@ -2291,6 +2291,106 @@ public sealed class LessonTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// What the admission bar costs the world it is shipped on —
+    /// <b>the deployment's fourth arm, which no comment claims.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>OpenPlexus.Talk</c> passes <see cref="Admitting.Testable"/> and the brain's own
+    /// default is <see cref="Admitting.Anything"/>.</b>
+    /// <see cref="The_three_hand_set_arms_read_on_lessons_that_are_drawn"/> is why the default
+    /// is the one it is: the bar costs most of the examination under both roots, being a
+    /// function of how young the population is. That reading is on drawn lessons, and the
+    /// deployment runs a conversation.
+    /// </para>
+    /// <para>
+    /// <b>And under it that conversation does not repair.</b> <c>ExercisedTests</c> reads
+    /// <c>repaired 0</c> on the shipped composition at one telling and at five, against 374
+    /// repairs at the brain's default. So the bar is not costing a few points here, it is
+    /// removing the one operator that deepens a rule.
+    /// </para>
+    /// <para>
+    /// <b>The examination does not notice.</b> Every cell of this grid scores the same under
+    /// both bars — the creatures lesson whole at either telling count, the chained lesson at
+    /// 0.500 told once and 0.875 told five times. Two orders of magnitude of repair buy no
+    /// answer. That refutes the objection this grid was written to settle and leaves a
+    /// harder finding: this world reaches its ceiling by GENESIS, so every reading of a
+    /// repair-side mechanism taken on it is a reading of something the score cannot see.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_the_admission_bar_costs_the_conversation_it_is_shipped_on()
+    {
+        static string Said(Measured one) => $"{one.Mean:F3} +-{one.StdErr:F3}";
+
+        const int Seeds = 5;
+
+        int[] tellings = [1, 5];
+
+        output.WriteLine($"{Seeds} seeds, one examination pass");
+        output.WriteLine(
+            $"{"lesson",-10}{"bar",-10}{"tellings",9}{"right",17}{"repaired",10}{"held",7}");
+
+        var scored = new Dictionary<(string, Admitting, int), Measured>();
+        var mended = new Dictionary<(string, Admitting, int), double>();
+
+        foreach (var (name, lesson) in new[]
+        {
+            ("creatures", Lesson.Creatures),
+            ("chained", Lesson.Chained),
+        })
+        foreach (var admitting in new[] { Admitting.Anything, Admitting.Testable })
+        foreach (var many in tellings)
+        {
+            var right = new List<double>();
+            var repaired = new List<double>();
+            var resident = new List<double>();
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var run = Ran(
+                    lesson, Carrying.Never, seed, passes: 1, asserting: Asserting.Everything,
+                    tellings: many, rooting: Rooting.Wholly, crediting: Crediting.Birth,
+                    admitting: admitting);
+
+                right.Add(Right(run.Tutor, 0));
+                repaired.Add(run.Tally.Repaired);
+                resident.Add(run.Brain.Held.All.Count);
+            }
+
+            scored[(name, admitting, many)] = new Measured { Arm = name, Values = right };
+            mended[(name, admitting, many)] = repaired.Average();
+
+            output.WriteLine(
+                $"{name,-10}{admitting.ToString().ToLowerInvariant(),-10}{many,9}"
+                + $"{Said(scored[(name, admitting, many)]),17}"
+                + $"{repaired.Average(),10:F1}{resident.Average(),7:F0}");
+        }
+
+        (string Lesson, int Told)[] cells =
+            [("creatures", 1), ("creatures", 5), ("chained", 1), ("chained", 5)];
+
+        // The bar removes the ladder, which is what the objection said and is true. Under it
+        // the conversation repairs a tenth of what it repairs without it at best, and nothing
+        // at all in three cells of four.
+        Assert.All(cells, cell => Assert.True(
+            mended[(cell.Lesson, Admitting.Testable, cell.Told)]
+                < mended[(cell.Lesson, Admitting.Anything, cell.Told)] / 10.0,
+            $"on {cell.Lesson} at {cell.Told} telling(s) the bar left "
+            + $"{mended[(cell.Lesson, Admitting.Testable, cell.Told)]:F0} repairs against "
+            + $"{mended[(cell.Lesson, Admitting.Anything, cell.Told)]:F0} without it, so it is "
+            + "no longer removing the ladder and the finding below is about something else"));
+
+        // And the examination does not notice, which is what refutes the objection. Identical
+        // in every cell, to every decimal, while repair moves by two orders of magnitude. So
+        // the deployment is not passing the wrong bar: this world reaches its ceiling by
+        // genesis, and the ladder is buying it no answer at either bar.
+        Assert.All(cells, cell => Assert.Equal(
+            scored[(cell.Lesson, Admitting.Anything, cell.Told)].Mean,
+            scored[(cell.Lesson, Admitting.Testable, cell.Told)].Mean));
+    }
+
+    /// <summary>
     /// What marking a supposition with its author costs and buys —
     /// <b>the second hop written down instead of only computed.</b>
     /// </summary>

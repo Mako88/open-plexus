@@ -140,25 +140,6 @@ public sealed class PushbackTests(ITestOutputHelper output)
                 + "against anything -- a control nothing reads is a candidate wearing a "
                 + "control's clothes, and that one really should go."),
 
-        new(
-            With: "Admitting.Testable, as OpenPlexus.Talk passes it",
-            Claim: "Under it the conversation does not repair AT ALL. `ExercisedTests` runs "
-                + "the deployment's own composition and reads `repaired 0` on the creatures "
-                + "lesson told once and on the chained lesson told five times; the same "
-                + "world at the brain's own default of `Anything` repairs 177 times. So the "
-                + "world this project's first north star is written on ships with the one "
-                + "operator that deepens a rule switched off by a bar, and every mechanism "
-                + "repair is the only road to is unreachable there -- which is how a "
-                + "commitment's own name in a scope came to be unreachable on the shipped "
-                + "arm while the mechanism that puts it there was working. The bar was "
-                + "measured on lessons where it wins and nobody read what it does to the "
-                + "operator count.",
-            Settles: "The two arms of `Admitting` on the conversation, scored on the "
-                + "examination rather than on the population, at one telling and at five. If "
-                + "`Testable` still wins the exam while repairing nothing, the objection is "
-                + "refuted and the finding is that this world learns without repair -- which "
-                + "is worth more than the objection was. If it loses, the deployment is "
-                + "passing the wrong bar."),
     ];
 
     /// <summary>
@@ -211,6 +192,6 @@ public sealed class PushbackTests(ITestOutputHelper output)
     [Fact]
     public void A_disagreement_leaves_by_being_settled_and_not_by_being_dropped()
     {
-        Assert.Equal(6, Open.Length);
+        Assert.Equal(5, Open.Length);
     }
 }

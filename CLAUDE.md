@@ -233,9 +233,14 @@ These are the parts worth more than the code.
   anything or to not change it. A dial is a new ability — turn it on, that is why it was built
   — or a replacement, so both arms run until one wins and the loser goes. Neither road ends at
   a default that does nothing. The baseline is safe in the commit and the test.
-- **Adjusting a losing arm is allowed**, one more shape before it goes, where what lost was the
-  build rather than the idea. What is forbidden is leaving it off while nobody decides.
-  `DialTests` holds both halves.
+- **Adjusting a losing arm is bounded by the DIAGNOSIS, not a count.** It is allowed, and an
+  adjustment must name why the last shape lost, and that reason must be one no
+  earlier shape's failure named. A reshape that cannot say what was wrong with the last one is
+  attachment; a reshape whose diagnosis repeats an earlier one is the same shape in new
+  clothes. Where the diagnosis is new, reshape again. Diagnoses run out long before shapes do,
+  which is what makes this terminate — a count does not, because it is uncorrelated with
+  whether anything is being learnt. What is forbidden is leaving an arm off while nobody
+  decides. `DialTests` holds that half.
 - **Run the guards and read what they print.** `RemindingTests` lists the rules that could not
   be made into checks and prints them into that same output. An entry there leaves by becoming
   a guard.

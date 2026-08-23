@@ -296,6 +296,116 @@ public sealed class SeparationTests
             + "checked. Repair the name or rewrite the claim.");
     }
 
+    /// <summary>
+    /// No world holds a front end — <b>the half of this rule the compiler does not enforce.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The friend list does not name <c>OpenPlexus.Worlds</c>.</b> So a world writing
+    /// <c>Population</c>, <c>Brain</c> or <c>Bench</c> does not compile, those three being
+    /// internal. That is three names. Every quantizer in
+    /// <c>Codes/</c> is PUBLIC — <see cref="Winnow"/>, <see cref="Banded{TFrame}"/>,
+    /// <see cref="Tiling{TFrame}"/>, <see cref="Joined"/>, <see cref="Bodied"/>,
+    /// <see cref="Deriving{TObservation}"/> and the rest — so a world could build its own
+    /// translation and choose the codes it hands over, and the build would pass.
+    /// </para>
+    /// <para>
+    /// <b>Nothing does it today and that is the point of checking.</b> Every mention of those
+    /// names under <c>OpenPlexus.Worlds</c> is a <c>see cref</c> in prose. So the rule holds
+    /// in fact and did not hold by construction, and a rule that holds only in fact is one
+    /// world away from not holding — which is the sentence this file's own header opens with.
+    /// </para>
+    /// <para>
+    /// <b>The data shapes are not front ends and are exempt by name.</b> A world must be able
+    /// to say <see cref="Code"/>, <see cref="Coded"/>, <see cref="Grouped"/> and the stamped
+    /// forms, because that is what it emits; what it may not hold is the thing that DECIDES
+    /// which codes a signal becomes. The line is between a value and a policy.
+    /// </para>
+    /// <para>
+    /// <b>Read off the members rather than the text</b>, because the textual half of this file
+    /// was deleted for walking filenames and reporting on five of twenty-seven. A field, a
+    /// property, a constructor parameter, a method parameter or a return type is where a world
+    /// would have to put one to use it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_world_holds_a_front_end()
+    {
+        var carried = new[]
+        {
+            typeof(Code), typeof(Coded), typeof(Grouped), typeof(Stamp), typeof(Pushed),
+            typeof(Storied), typeof(Encoder),
+        };
+
+        var translation = typeof(Winnow).Assembly
+            .GetTypes()
+            .Where(one => one.Namespace == "OpenPlexus.Codes")
+            .Where(one => !one.IsEnum && !carried.Contains(one))
+            .ToHashSet();
+
+        bool Translating(Type? one)
+        {
+            if (one is null) return false;
+
+            var bare = one.IsGenericType && !one.IsGenericTypeDefinition
+                ? one.GetGenericTypeDefinition()
+                : one;
+
+            return translation.Contains(bare)
+                || (one.IsGenericType && one.GetGenericArguments().Any(Translating));
+        }
+
+        const BindingFlags Every =
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
+            | BindingFlags.Static | BindingFlags.DeclaredOnly;
+
+        var holding = new SortedSet<string>(StringComparer.Ordinal);
+        var walked = 0;
+
+        foreach (var one in typeof(IWorld<>).Assembly.GetTypes())
+        {
+            walked++;
+
+            foreach (var field in one.GetFields(Every))
+                if (Translating(field.FieldType))
+                    holding.Add($"{one.Name} holds a {field.FieldType.Name} in {field.Name}");
+
+            foreach (var made in one.GetConstructors(Every))
+                foreach (var taken in made.GetParameters())
+                    if (Translating(taken.ParameterType))
+                        holding.Add(
+                            $"{one.Name} is constructed with a {taken.ParameterType.Name}");
+
+            foreach (var method in one.GetMethods(Every))
+            {
+                if (Translating(method.ReturnType))
+                    holding.Add($"{one.Name}.{method.Name} returns a {method.ReturnType.Name}");
+
+                foreach (var taken in method.GetParameters())
+                    if (Translating(taken.ParameterType))
+                        holding.Add(
+                            $"{one.Name}.{method.Name} takes a {taken.ParameterType.Name}");
+            }
+        }
+
+        // The companions, because a check over an empty set of types or an empty set of front
+        // ends reads exactly like a check that passes. Both are computed from the tree.
+        Assert.True(walked >= 20, $"only {walked} type(s) found in the worlds assembly");
+
+        Assert.True(translation.Count >= 10,
+            $"only {translation.Count} translation type(s) found, so this is asking about "
+            + "almost nothing");
+
+        Assert.True(holding.Count == 0,
+            $"{holding.Count} place(s) where a world holds a front end:"
+            + Environment.NewLine + "  "
+            + string.Join(Environment.NewLine + "  ", holding)
+            + Environment.NewLine
+            + "A world says what happened in its own terms and never how it is perceived. The "
+            + "translation is a third thing and belongs at the join, which is `OpenPlexus` and "
+            + "the two harnesses.");
+    }
+
     /// <summary>Whether a namespace-qualified name still names something.</summary>
     /// <param name="qualified">A name under <c>OpenPlexus</c>, such as <c>Worlds.Seeds.Apart</c>.</param>
     /// <remarks>

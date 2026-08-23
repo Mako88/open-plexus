@@ -139,26 +139,6 @@ public sealed class PushbackTests(ITestOutputHelper output)
                 + "reading showing one of the five self-declared controls is not compared "
                 + "against anything -- a control nothing reads is a candidate wearing a "
                 + "control's clothes, and that one really should go."),
-        new(
-            With: "CLAUDE.md's one-more-shape rule for a losing arm",
-            Claim: "It measures the wrong thing. The target is attachment -- the person "
-                + "adjusting an arm is the one who built it -- and a COUNT is uncorrelated "
-                + "with whether anything is being learnt. The nine-shape second hop is the "
-                + "case: shapes three to nine shared one diagnosis, the parts were not in the "
-                + "population, so they were one shape repeated and a count rule stopped none "
-                + "of them. It also prices a one-minute ceiling the same as a runner-hour "
-                + "sweep, in a repo that refuses every other bar not set by measurement. What "
-                + "would work instead is a rule on DIAGNOSIS: an adjustment must name why the "
-                + "last shape lost and that reason must be one no earlier failure named. It "
-                + "terminates faster than the count does, because diagnoses run out before "
-                + "shapes do, and the refutation table's revival column is already the same "
-                + "field pointing backwards. AND THE OBJECTION WAS RAISED BY SOMEBODY AT SHAPE "
-                + "TWO, which is said here rather than left for John to notice.",
-            Settles: "John's call, because it is his rule and the replacement is judgement "
-                + "where the count is unarguable. What would refute it is a session that "
-                + "claims a fresh diagnosis for a shape whose failure repeats an earlier one "
-                + "-- if that happens twice, the count was the better bar and this row goes to "
-                + "the plan's table."),
     ];
 
     /// <summary>
@@ -211,6 +191,6 @@ public sealed class PushbackTests(ITestOutputHelper output)
     [Fact]
     public void A_disagreement_leaves_by_being_settled_and_not_by_being_dropped()
     {
-        Assert.Equal(6, Open.Length);
+        Assert.Equal(5, Open.Length);
     }
 }

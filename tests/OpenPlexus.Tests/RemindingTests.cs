@@ -91,10 +91,14 @@ public sealed class RemindingTests(ITestOutputHelper output)
          "Which aspects are missing is a judgement about reality, and no check can hold a "
          + "list of what reality contains."),
 
-        ("ADJUSTING A LOSING ARM IS ALLOWED. A mechanism that lost as BUILT may be worth one "
-         + "more shape before it goes.",
-         "This repo has read `the loser is deleted` as `delete immediately` more than once. "
-         + "What is forbidden is leaving it switched off while nobody decides."),
+        ("ADJUSTING A LOSING ARM IS BOUNDED BY THE DIAGNOSIS, NOT BY A COUNT. Name why the "
+         + "last shape lost, and reshape only where that reason is one no earlier failure "
+         + "named.",
+         "Whether two diagnoses are the same is a judgement about mechanisms, which no check "
+         + "can hold. What made the old count rule checkable also made it useless: shapes "
+         + "three to nine of the second hop shared one diagnosis and a count stopped none of "
+         + "them. This repo has also read `the loser is deleted` as `delete immediately` more "
+         + "than once, and what is forbidden is leaving an arm off while nobody decides."),
 
         ("PRESERVING RECORDED NUMBERS IS NEVER A REASON to keep something, or to not change "
          + "it. The baseline is in the commit and in the test.",

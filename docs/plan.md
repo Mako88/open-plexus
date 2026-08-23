@@ -284,9 +284,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       one and adhesion never reaches an individual. Fork **106**.
     - **OPEN** — minting an INDIVIDUAL is unbuilt. Where a thing never moves a source and a
       thing are one set; where it moves they come apart.
-    - **OPEN** — co-firing binds what is SIMULTANEOUS and never what persists, so a thing at
-      two moments does not co-occur with itself and no amount of it reaches the same thing
-      seen twice.
+    - **OPEN** — the same input mints the same codes, so a KIND recurs for free. What never
+      recurs is two moments' codes being present TOGETHER, which is what co-firing reads.
+      John's.
   - Every input an attribute of it
     - **NOW** — front ends manufacture symbols from a signal, and `Winnow` is the defence:
       overlapping winner sets mean a scope that is a SUBSET still fires, at the price that
@@ -455,8 +455,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — entailment depth and the horizon are capped at one; both come off when
       blame diffusion has a number. Fork **32**.
     - **OPEN** — a lucky advocate blocks genesis, so proposals stop within a hundred rounds
-      of twenty thousand. Subsumption, the vote and opportunity are all refuted as the cost:
-      an unsound rule is believed as hard as a sound one over a thousand firings. Fork **135**.
+      of twenty thousand. Subsumption, the vote, opportunity and abstention are all refuted
+      as the cost, an unsound rule being believed as hard as a sound one over a thousand
+      firings. Fork **135**.
     - **OPEN** — and what that bar COSTS is a function of how young the population is, free
       at saturation and most of the examination before it, because it blocks repair while
       nothing can clear the floor yet. Unpriced, and it is why the bar does not ship. Fork

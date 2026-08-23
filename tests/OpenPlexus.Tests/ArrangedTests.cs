@@ -438,6 +438,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
 
         var best = new Dictionary<(Looking, Surprising), (double Sound, double Unsound)>();
         var chances = new Dictionary<(Looking, Surprising), long>();
+        var silent = new Dictionary<(Looking, Surprising), double>();
 
         for (var at = 0; at < grid.Length; at++)
         {
@@ -450,7 +451,8 @@ public sealed class ArrangedTests(ITestOutputHelper output)
                 $"{looking,-6} {gate,-11} | {found} of {could.Alone.Length} sound single "
                 + $"codes resident, of {got.Tally.Resident} commitments "
                 + $"({got.Tally.Minted} minted, {got.Tally.Repaired} repaired) · "
-                + $"unseen {got.Tally.Unseen!.Accuracy:F3} against a ceiling of "
+                + $"unseen {got.Tally.Unseen!.Accuracy:F3} (silent {got.Tally.Unseen!.Silence:F3}) "
+                + $"against a ceiling of "
                 + $"{could.CoversUnseen:F3} · sound {got.Rules.Sound} unsound {got.Rules.Unsound} "
                 + $"(narrowed {got.Rules.Narrowed}, rootless {got.Rules.Rootless}) · "
                 + $"believed {got.Rules.Trusted:F3} sound vs {got.Rules.Doubted:F3} "
@@ -463,6 +465,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
             // vote has nothing left to separate them with and no weighting is the answer.
             best[(looking, gate)] = (got.Rules.Best, got.Rules.Worst);
             chances[(looking, gate)] = got.Rules.Chances;
+            silent[(looking, gate)] = got.Tally.Unseen!.Silence;
 
             // The two ways an unsound rule survives, and they partition. Either
             // subsumption had a general parent to absorb it into and declined, or there
@@ -492,6 +495,17 @@ public sealed class ArrangedTests(ITestOutputHelper output)
         // the chance to be wrong about -- a confidence bound, a floor, anything computable
         // from counters it holds -- cannot separate it either. Its own record says perfect
         // over more evidence than most sound rules have.
+        // And the gap is ERROR rather than silence, which closes the other way it could have
+        // gone. The vote declines where nothing separates two advocates, so a population tied
+        // at the top could have been abstaining its way to a low score -- it is not. It answers
+        // essentially every withheld question and gets a fifth to a quarter of them wrong, so
+        // on a withheld arrangement a rule with a perfect drawn record fires and wins outright.
+        Assert.All(silent.Keys, key => Assert.True(
+            silent[key] < 0.05,
+            $"under {key} the learner was silent on {silent[key]:F3} of the withheld set, so "
+            + "the gap has become abstention and is a different problem from the one this "
+            + "fork has been about"));
+
         Assert.All(chances.Keys, key => Assert.True(
             chances[key] > 1_000,
             $"under {key} the best unsound rule fired {chances[key]} times, so it may be a "

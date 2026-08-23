@@ -32,7 +32,7 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
   build: a session cannot reach green without doing them. One is left and it is fork **28**'s.
 - **Then the genesis gate**, which finds every rule three worlds hold and loses the held-out
-  set on two more. Subsumption deletes what it builds, and that arm is dispatched. Fork **135**.
+  set on two more. Subsumption is refuted as the cost and the vote is what is left. Fork **135**.
 - **Then the third store, read BY KEY.** John's, and above the chain because the reading says
   so: where the right statement is in front of it the learner is at its bound, so the exam is
   short of RETRIEVAL. Not measurable on a spine lesson, exhausted at one telling. Fork **139**.
@@ -46,12 +46,11 @@ that is finished LEAVES, so this is only ever what is still to do.
   and symbol is what carries a fact back to a drawing. Fork **107**.
 - **A beginner language course as the primer.** John's. Ostensive by construction, one
   referent across video, audio and text, ordered for a learner with no language. Fork **132**.
-- **Mutual exclusion**, so a belief can be CONTRADICTED rather than only outvoted. A miss says
-  what arrived, and nothing yet says the two cannot both hold. Fork **99**.
+- **Mutual exclusion**, so a belief can be CONTRADICTED rather than only outvoted. Fork **99**.
 - **A weighed adhesion**, which no arm has built, with PPMI over `ByLikeness`'s counts beside
   it. One of the three likeness readings leaves with a revival row. Fork **131**.
 - **What add-only costs** — a group that fills gradually mints at every size it passes
-  through, and the closure sightings are what a patience rule would read. Fork **130**.
+  through. Fork **130**.
 - **Audit TRAPS and DO NOT RE-TRY** — a failure class that has earned a check belongs in the
   check, and a revival condition that has expired is a superstition.
 - **Split `Population`** and any other class holding several mechanisms at once.
@@ -214,8 +213,6 @@ FORBIDS things, and several of them are already measured.
 - **John's curriculum proposal**: teach it English, then examine it — and mixing the two is
   worse than either alone, the function-word rules crowding out the population the questions
   needed.
-- **And a beginner language course is that primer**, John's: one referent through video, audio
-  and text, ordered for a learner with no language. Ostension by construction. Fork **132**.
 - **And the first conversation demands unification rather than sequence**, which inverts what
   the ordering assumed. Binding the question's actor to a statement's actor is rung four, and
   no dose of recency reaches it.
@@ -645,6 +642,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | Rung five proposing a pair it has already named | Mints nothing, and spends a third of the rung's asks. Skipping them nearly tripled the stacking | A rung minting more than once an ask, so a spent chance costs less |
 | Subsumption weighed against DISTINCT occasions rather than firings | Chance on the noisy multiplexer, no sound rule left. Its halving explanation is measured true on even worlds only | A bar tracking depth as that world's reach does, which is not one direction |
 | `Minting.UntilRefused` — naming until the gate refuses | Every count rose and hard-round coverage fell 2.7 standard errors; the extra sound rules were the LONG ones | A gate charging a name by what it stands for — fork 71 |
+| Subsumption as what ungated genesis costs | A third fewer deletions moved the held-out set well inside one standard error, five seeds a cell, on the condition registered before the run | A world where the deletions and the held-out score move together |
 | A kill condition pre-registered on counts | `Minting`'s said the arm dies unless `named` or `stacked` moves. Both moved and it died anyway | Never on a column skew can raise. Pre-register on `Census.Paying` |
 | `Weighing.Summing` — an expectation worth its advocates added up | Led on none of ten worlds once the vote stopped steering the search, and a sum splits inexactly | A world where a crowd outweighs one always-right rule |
 | `Weighing.Lifting` — divide the best advocate by its answer's base rate | Beat `Strongest` nowhere in ten worlds, and trails worst where skew gives the divisor something to do | A world where an unusual answer on thin evidence is right |

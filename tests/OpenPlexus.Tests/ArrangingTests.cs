@@ -440,6 +440,26 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     /// once and would then be the only one left.
     /// </para>
     /// <para>
+    /// <b>And it dropped on that condition</b>, five seeds a cell. Ungated reads 0.7325
+    /// +-0.0230 on the unseen set under <see cref="Subsuming.Weaker"/> and 0.7429 +-0.0252
+    /// under <see cref="Subsuming.Insignificant"/>, while the deletions fall from about 5,270
+    /// to about 3,490. A third of the subsumption goes and the score moves 0.010 inside a
+    /// standard error of 0.025.
+    /// </para>
+    /// <para>
+    /// <b>The bar is worth nothing on either gate.</b> Gated reads 0.8000 +-0.0235 and
+    /// 0.8032 +-0.0230 on the same two, so the gate is worth about 0.065 on either bar. The
+    /// grid separates the two questions and answers one of them: subsumption is not what
+    /// ungating costs, and the row in <c>DO NOT RE-TRY</c> carries it.
+    /// </para>
+    /// <para>
+    /// <b>What the columns leave pointing somewhere is the population's composition.</b>
+    /// Ungated holds 36 of the world's 36 sound singles against nought to six gated, and its
+    /// residents are about half unsound where gated's are about a quarter. An accuracy-weighted
+    /// vote over a population that is half wrong is the reading fork 135 has left, and it is
+    /// the vote rather than the deletions.
+    /// </para>
+    /// <para>
     /// <b>And the population is the column to watch beside it.</b> Demanding significance
     /// keeps far more residents — 228 against 116 at eleven bits, on the reading that dial
     /// carries — so an arm that scores better while holding twice as much has bought the score

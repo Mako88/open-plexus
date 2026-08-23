@@ -3436,4 +3436,95 @@ public sealed class LessonTests(ITestOutputHelper output)
         // the day `do(x)` starts doing work on the world the north star is defined on.
         Assert.Equal(0, doing);
     }
+
+    /// <summary>
+    /// What a front end that FOLLOWS the question buys on the conversation — <b>the retrieval
+    /// arm, on the spine world rather than on bAbI.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The exam is short of retrieval rather than of learning</b>, which
+    /// <c>RecalledTests.What_one_selected_statement_converts_across_the_exam</c> measures on
+    /// bAbI: put the right statement in front of the learner and it converts most of the
+    /// ceiling into score. That reading is a sweep, so CI never runs it and it had not been
+    /// read against the conversation at all.
+    /// </para>
+    /// <para>
+    /// <b>And the thing that does the retrieval already ships.</b> <c>Joining.Chained</c> walks
+    /// back from the question's words through what was said; <c>Joining.Bagged</c> hands over
+    /// the bag. The terminal composes <c>Bagged</c>, so the front end that wins on bAbI is not
+    /// the one a session at a terminal gets.
+    /// </para>
+    /// <para>
+    /// <b>The refutation was pre-registered and it fired.</b> What would refute the arm was the
+    /// two front ends levelling at ONE telling as well as twenty, and they do — identically, on
+    /// both lessons, at both tellings. So this records a negative rather than a win.
+    /// </para>
+    /// <para>
+    /// <b>Because the conversation has no retrieval problem to solve.</b> Creatures is answered
+    /// outright at a single telling, so every fact is already addressable and there is nothing
+    /// for a front end to find. Chained sits at half either way, and its missing half is the
+    /// four implied questions — a chain rather than a retrieval.
+    /// </para>
+    /// <para>
+    /// <b>Which is the useful half, and it is about the world.</b> Fork 139
+    /// cannot be measured on a sixteen-statement lesson told to saturation: retrieval only
+    /// becomes a problem when there is more than a population can hold addressably. It wants
+    /// <c>Recalled</c>, where the same comparison moves task 1 from 0.235 to 1.000, or a
+    /// <see cref="Lesson.Drawn"/> lesson large enough to be told once and not exhausted.
+    /// </para>
+    /// <para>
+    /// <b>And an earlier reading of mine was an asking-rate artifact.</b> The terminal scored
+    /// one of twelve on this lesson at one telling and I read it as a learning failure. The
+    /// terminal asks a quarter of the time for a person's sake and a silence scores as wrong;
+    /// at a rate of one the same lesson is answered outright. The repair finding beside it
+    /// stands, because that was counted off the gates rather than off the score.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_a_front_end_that_follows_the_question_buys_on_the_conversation()
+    {
+        output.WriteLine($"{"lesson",-11}{"tellings",-10}{"joining",-15}{"right",8}{"found",8}"
+            + $"{"resident",10}");
+
+        var right = new Dictionary<(string, int, Joining), double>();
+
+        foreach (var (named, lesson) in
+            new[] { ("creatures", Lesson.Creatures), ("chained", Lesson.Chained) })
+        {
+            foreach (var tellings in new[] { 1, 20 })
+            {
+                foreach (var joining in new[] { Joining.Bagged, Joining.Chained })
+                {
+                    var one = Ran(
+                        lesson, Carrying.Never, seed: 1, passes: 1,
+                        asserting: Asserting.Everything, tellings: tellings,
+                        rooting: Rooting.Wholly, crediting: Crediting.Birth,
+                        admitting: Admitting.Testable, joining: joining);
+
+                    right[(named, tellings, joining)] = Right(one.Tutor, 0);
+
+                    output.WriteLine(
+                        $"{named,-11}{tellings,-10}{joining.ToString().ToLowerInvariant(),-15}"
+                        + $"{Right(one.Tutor, 0),8:F3}"
+                        + $"{Found(one.Brain, one.World, lesson),8:F3}{one.Tally.Resident,10}");
+                }
+            }
+        }
+
+        // The companion first, because two arms both scoring nought would level too and would
+        // read the same. Creatures is answered outright, so the exam ran and the population
+        // holds what it is asked about.
+        Assert.Equal(1.0, right[("creatures", 1, Joining.Bagged)]);
+
+        // The reading: following the question buys nothing here, on either lesson at either
+        // telling. It goes red the day a spine lesson has headroom for a front end to find
+        // something in, which is the day fork 139 can be measured on this world at all.
+        foreach (var named in new[] { "creatures", "chained" })
+            foreach (var tellings in new[] { 1, 20 })
+                Assert.Equal(
+                    right[(named, tellings, Joining.Bagged)],
+                    right[(named, tellings, Joining.Chained)],
+                    precision: 3);
+    }
 }

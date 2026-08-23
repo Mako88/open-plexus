@@ -33,9 +33,9 @@ that is finished LEAVES, so this is only ever what is still to do.
   build: a session cannot reach green without doing them. One is left and it is fork **28**'s.
 - **Then the genesis gate**, which finds every rule three worlds hold and loses the held-out
   set on two more. Subsumption deletes what it builds, and that arm is dispatched. Fork **135**.
-- **Then the third store, read BY KEY.** John's, and it goes above the chain because the
-  reading says so: where the right statement is put in front of it the learner is already at
-  its bound, so what the exam is short of is the RETRIEVAL. Fork **139**.
+- **Then the third store, read BY KEY.** John's, and above the chain because the reading says
+  so: where the right statement is in front of it the learner is at its bound, so the exam is
+  short of RETRIEVAL. Not measurable on a spine lesson, exhausted at one telling. Fork **139**.
 - **Then what a placement is WORTH**, which is the chain and fork **137** at once: a placed
   word is IN a moment, so it can be a premise where an answer word never is. Believing one
   reaches five rivals, so the value is whether the chain SETTLES. `ChainingTests`. Forks

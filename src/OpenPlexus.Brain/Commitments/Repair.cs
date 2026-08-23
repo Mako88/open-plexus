@@ -1372,6 +1372,20 @@ internal enum Supposing
     /// cause and the first vote stands. <c>ChainingTests</c> reads the two halves apart on
     /// exactly that: 12 of 12 on the implied half against 3 of 12 on the stated one.
     /// </para>
+    /// <para>
+    /// <b>The MARGIN rather than the weight</b>, which is a comparison rather than a
+    /// preference. The winning advocate's own accuracy separates the two halves further --
+    /// about 0.3 against about 1.0 -- and a bar learnt over it costs the stated half a quarter
+    /// at five tellings, where the margin's costs nothing. So the readable signal is how far
+    /// the winner led rather than how good it is.
+    /// </para>
+    /// <para>
+    /// <b>And it is not paid for at twenty tellings.</b> <c>LessonTests</c> reads the bar
+    /// against the margins it judges: the stated half's margins hold while the bar rises, so
+    /// three stated questions in twelve fall under it and the stated half reads 0.750. Repair
+    /// makes ordinary moments more decisive and the exam's questions no more decisive, and a
+    /// bar learnt over the first is the wrong reference for the second.
+    /// </para>
     /// </remarks>
     Thinly,
 }

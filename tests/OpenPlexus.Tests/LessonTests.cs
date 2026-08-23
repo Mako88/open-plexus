@@ -2275,6 +2275,105 @@ public sealed class LessonTests(ITestOutputHelper output)
             + "refusing nothing that matters and the two arms are one arm");
     }
 
+    /// <summary>
+    /// Where the gate's bar sits against the margins it is judging —
+    /// <b>the twenty-telling loss, read in the composition that has it.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The signal does not decay and the bar rises.</b>
+    /// <see cref="ChainingTests.What_separates_a_question_the_second_hop_should_take_from_one_it_should_not"/>
+    /// reads the two halves far apart at both tellings, and
+    /// <see cref="Supposed.Bar"/> goes from 0.167 at five tellings to 0.331 at twenty. That
+    /// pair says the loss is the reference rather than the separation, and it is read on a
+    /// composition that admits any separating condition rather than on this one.
+    /// </para>
+    /// <para>
+    /// <b>So this puts both numbers in one place.</b> The bar is what the run ended with; the
+    /// margins are the bare vote's, taken over the same exam questions the run was scored on.
+    /// A stated question whose margin has fallen under the bar is a question the gate will let
+    /// a supposition through on, and that is the whole of the twenty-telling cost.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Where_the_gates_bar_sits_against_the_margins_it_judges()
+    {
+        const int Seeds = 3;
+
+        var lesson = Lesson.Chained;
+        var half = lesson.Exam.Count / 2;
+
+        output.WriteLine($"{Seeds} seeds, {half} questions a half");
+        output.WriteLine(
+            $"{"half",-9}{"tellings",9}{"margin",9}{"bar",8}{"under",7}{"of",5}");
+
+        var under = new Dictionary<(bool, int), int>();
+
+        foreach (var tellings in new[] { 5, 20 })
+        foreach (var stated in new[] { true, false })
+        {
+            var asked = lesson with
+            {
+                Exam = [.. stated ? lesson.Exam.Take(half) : lesson.Exam.Skip(half)],
+            };
+
+            var margins = new List<double>();
+            var bars = new List<double>();
+            var below = 0;
+            var of = 0;
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var run = Ran(
+                    asked, Carrying.Never, seed, passes: 1, asserting: Asserting.Everything,
+                    tellings: tellings, rooting: Rooting.Wholly, crediting: Crediting.Birth);
+
+                var bar = run.Brain.Supposals.Bar;
+
+                bars.Add(bar);
+
+                foreach (var quiz in asked.Exam)
+                {
+                    var codes = Babi.Words(quiz.Question).Select(Babi.Of).ToHashSet();
+
+                    // The BARE vote, which is what the gate reads. `Brain.Voting` would hand
+                    // back whatever the supposition decided, so a reading off it would be
+                    // about the mechanism's output rather than about its input.
+                    var firing = run.Brain.Held.Firing(run.Brain.Held.Moment(codes));
+
+                    if (firing.IsDefaultOrEmpty) continue;
+
+                    var vote = run.Brain.Held.Predict(firing);
+
+                    if (vote.Expects is null) continue;
+
+                    of++;
+                    margins.Add(vote.Margin);
+
+                    if (vote.Margin < bar) below++;
+                }
+            }
+
+            under[(stated, tellings)] = below;
+
+            output.WriteLine(
+                $"{(stated ? "stated" : "implied"),-9}{tellings,9}"
+                + $"{margins.DefaultIfEmpty(0.0).Average(),9:F3}{bars.Average(),8:F3}"
+                + $"{below,7}{of,5}");
+        }
+
+        Assert.True(under.Count == 4,
+            $"{under.Count} of 4 cells reported, so the grid did not run");
+
+        // The implied half is under the bar at both tellings, which is what says the gate
+        // fires where the chain is. A nought here would mean the mechanism is reaching those
+        // questions by some other road and the bar is decoration.
+        Assert.True(under[(false, 5)] > 0 && under[(false, 20)] > 0,
+            $"the implied half is under the bar on {under[(false, 5)]} and "
+            + $"{under[(false, 20)]} questions, so the gate is not what lets the chain "
+            + "through and the arm wants re-reading");
+    }
+
     [Fact]
     public void Claiming_every_word_costs_a_population_that_grows_with_every_telling()
     {

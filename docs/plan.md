@@ -351,9 +351,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       to **85** want an alphabet and `Deriving` fills one. Fork **97**.
     - **OPEN** — a name over ALTERNATIVES is derivable and not admitted, rung five being the
       wrong SHAPE: it names what CO-FIRES, and alternatives never do.
-    - **OPEN** — so likeness read off the POPULATION rather than the moment: two codes are
-      alike where the commitments naming them EXPECT the same things. Never asks whether
-      they co-occurred, which is the one thing they never do. Fork **129**.
+    - **OPEN** — so likeness read off the RESIDUAL rather than the moment: two codes are
+      alike where they ARRIVE in one another's place, which co-occurrence can never reach.
+      The ceiling is taken. Fork **129**.
     - **OPEN** — and it is the wall both architectures hit. `csharp` refuted widening a walk
       in three shapes and its row asks for a likeness the GRAPH DID NOT COMPUTE; this branch
       refuted a similarity code. Four tries, two designs, one target.

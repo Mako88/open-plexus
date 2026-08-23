@@ -2556,4 +2556,230 @@ public sealed class LessonTests(ITestOutputHelper output)
                 + "not when this was refuted -- read the DO NOT RE-TRY rows and take the arm "
                 + "off them");
     }
+
+    /// <summary>
+    /// Whether what ARRIVES in one context names a pair of alternatives — <b>fork 129's
+    /// ceiling, off the stream with no learner.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Fork 80 asked the population and the population said no.</b> Two residents one scope
+    /// code apart are dis-assortative by slot, both shapes, both below a rewiring of their own
+    /// pairs — the rows are in <c>DO NOT RE-TRY</c>. What that refutes is reading likeness off
+    /// the SHAPE of what is held.
+    /// </para>
+    /// <para>
+    /// <b>This reads the residual instead, which is a different signal.</b> Two substitutes
+    /// never share a moment, so no counting of company reaches them; what they share is the
+    /// slot they arrive in. A context leaving the subject unsaid is followed by <c>cat</c>,
+    /// <c>dog</c>, <c>bird</c> and <c>snake</c> in turn. The alternatives are what a prediction
+    /// from that context would be wrong about.
+    /// </para>
+    /// <para>
+    /// <b>And it wants no brain</b>, which is why it comes before any mechanism. A context is a
+    /// moment with one code dropped and an arrival is what the stream put next, so this is the
+    /// world and the front end and nothing else.
+    /// </para>
+    /// <para>
+    /// <b>Two lessons, because one is a story.</b> <see cref="Lesson.Chained"/> is the control
+    /// that matters rather than a second helping of the same shape: a sound is a VALUE in one
+    /// of its statements and a SUBJECT in the next, so a word sits in two slots at once and the
+    /// ground truth stops being a function. A pair counts as same-slot where the two words
+    /// share any slot, which is the only reading that survives a word being both.
+    /// </para>
+    /// <para>
+    /// <b>The cut at recurrence was chosen after seeing the first grid</b>, and that is said
+    /// rather than hidden. What justifies it is that a pair several contexts agree on is the
+    /// claim itself; what would have made it a fit to one lesson is the second lesson, which is
+    /// why the second lesson is here.
+    /// </para>
+    /// <para>
+    /// <b>The null is a rewiring.</b> Every pair is split into its ends, the ends shuffled and
+    /// re-paired, so each word stays in as many pairs as it was in and only its partner
+    /// changes. A word that arrives everywhere cannot buy a share that way.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_arrives_in_one_context_names_a_pair_of_alternatives()
+    {
+        const int Tellings = 20;
+        const int Shuffles = 20;
+
+        output.WriteLine(
+            $"told {Tellings} times, contexts are a moment with one code dropped");
+        output.WriteLine(
+            $"{"lesson",-11}{"moments",9}{"pairs",7}{"placed",8}{"share",8}{"null",7}"
+            + $"{"twice",7}{"share",8}{"null",7}");
+
+        var recurring = new Dictionary<string, (double Share, double Null, int Count)>();
+        var every = new Dictionary<string, (double Share, double Null)>();
+
+        foreach (var (named, lesson) in
+            new[] { ("creatures", Lesson.Creatures), ("chained", Lesson.Chained) })
+        {
+            var tutor = new Tutor(lesson, TextWriter.Null, passes: 1, tellings: Tellings);
+
+            var world = new Conversing(new ConversingSettings
+            {
+                Typed = tutor,
+                Printed = tutor.Printed,
+                Carrying = Carrying.Never,
+                Asserting = Asserting.Everything,
+            });
+
+            var front = new Joined(Joining.Bagged);
+
+            // The arrival is kept as the WORLD's outcome number rather than as a code, because
+            // the two alphabets are not one. `Brain.Says` numbers an outcome and `Babi.Of`
+            // hashes a word, and comparing one against the other is a column that cannot fire
+            // -- which is how this reading first came back with nothing placed at all.
+            var stream = new List<(List<Code> Moment, int Arrived)>();
+
+            for (var round = 0; round < tutor.Moments * tutor.Longest && !world.Ended; round++)
+            {
+                var turn = world.Next();
+
+                if (turn.Outcome is { } outcome)
+                    stream.Add((front.Codify(turn.Seen).Order().ToList(), outcome));
+            }
+
+            var arrivals = new Dictionary<string, HashSet<int>>(StringComparer.Ordinal);
+
+            foreach (var (moment, arrived) in stream)
+            {
+                foreach (var dropped in moment)
+                {
+                    var context = string.Join(
+                        ",", moment.Where(code => code != dropped).Select(code => code.Value));
+
+                    if (!arrivals.TryGetValue(context, out var seen))
+                        arrivals[context] = seen = [];
+
+                    seen.Add(arrived);
+                }
+            }
+
+            // Keyed on the WORD, which is the one alphabet both sides read in, and a SET
+            // because a word can be in two slots. `chained` says the cat's sound is meow and
+            // then the meow's loudness is faint, so `meow` is a value and a subject at once.
+            var slots = new Dictionary<string, HashSet<int>>(StringComparer.Ordinal);
+
+            void Places(string word, int slot)
+            {
+                if (!slots.TryGetValue(word, out var at)) slots[word] = at = [];
+
+                at.Add(slot);
+            }
+
+            foreach (var fact in lesson.Facts)
+            {
+                Places(fact.Subject, 0);
+                Places(fact.Attribute, 1);
+                Places(fact.Answer, 2);
+            }
+
+            var spelt = world.Vocabulary;
+
+            HashSet<int>? Slot(int outcome) =>
+                outcome >= 0 && outcome < spelt.Count
+                    && slots.TryGetValue(spelt[outcome], out var at)
+                        ? at
+                        : null;
+
+            bool Together(int left, int right) =>
+                Slot(left) is { } one && Slot(right) is { } other && one.Overlaps(other);
+
+            var pairs = new List<(int Left, int Right)>();
+
+            foreach (var seen in arrivals.Values.Where(one => one.Count > 1))
+            {
+                var members = seen.Order().ToList();
+
+                for (var at = 0; at < members.Count; at++)
+                    for (var other = at + 1; other < members.Count; other++)
+                        pairs.Add((members[at], members[other]));
+            }
+
+            var placed = pairs
+                .Where(pair => Slot(pair.Left) is not null && Slot(pair.Right) is not null)
+                .ToList();
+
+            // A pair several contexts agree on, which is the claim rather than a filter. The
+            // share over every pair is diluted by a slot whose members pair once each.
+            var repeated = placed
+                .GroupBy(pair => (Low: Math.Min(pair.Left, pair.Right),
+                                  High: Math.Max(pair.Left, pair.Right)))
+                .Where(group => group.Count() > 1)
+                .Select(group => group.First())
+                .ToList();
+
+            double Shared(List<(int Left, int Right)> over) => over.Count == 0
+                ? 0.0
+                : over.Count(pair => Together(pair.Left, pair.Right)) / (double)over.Count;
+
+            double Rewired(List<(int Left, int Right)> over, uint purpose)
+            {
+                var found = 0.0;
+
+                for (var shuffle = 0; shuffle < Shuffles; shuffle++)
+                {
+                    var rng = new Random(Seeds.Apart(shuffle + 1, purpose));
+                    var ends = over
+                        .SelectMany(pair => new[] { pair.Left, pair.Right })
+                        .OrderBy(_ => rng.Next())
+                        .ToList();
+
+                    var same = 0;
+
+                    for (var end = 0; end + 1 < ends.Count; end += 2)
+                        if (Together(ends[end], ends[end + 1])) same++;
+
+                    found += same / (double)Math.Max(over.Count, 1) / Shuffles;
+                }
+
+                return found;
+            }
+
+            every[named] = (Shared(placed), Rewired(placed, 129));
+            recurring[named] = (Shared(repeated), Rewired(repeated, 130), repeated.Count);
+
+            output.WriteLine(
+                $"{named,-11}{stream.Count,9}{pairs.Count,7}{placed.Count,8}"
+                + $"{every[named].Share,8:F3}{every[named].Null,7:F3}"
+                + $"{repeated.Count,7}{recurring[named].Share,8:F3}"
+                + $"{recurring[named].Null,7:F3}");
+
+            foreach (var group in placed
+                .GroupBy(pair => (Low: Math.Min(pair.Left, pair.Right),
+                                  High: Math.Max(pair.Left, pair.Right)))
+                .OrderByDescending(group => group.Count())
+                .Take(10))
+            {
+                var pair = group.First();
+
+                output.WriteLine(
+                    $"  {spelt[pair.Left],-10}{spelt[pair.Right],-10}{group.Count(),5} "
+                    + $"{(Together(pair.Left, pair.Right) ? "same slot" : "across")}");
+            }
+        }
+
+        foreach (var (named, reading) in recurring)
+        {
+            Assert.True(reading.Count > 0,
+                $"on {named} no pair recurs across two contexts, so there is nothing here to "
+                + "read and the reading below is about an empty set");
+
+            // The reading a mechanism would be built on, so it is the one asserted hardest.
+            Assert.True(reading.Share > reading.Null,
+                $"on {named} pairs seen in more than one context are same-slot "
+                + $"{reading.Share:F3} against a rewiring at {reading.Null:F3}, so recurrence "
+                + "buys nothing and the residual carries no grouping");
+
+            // And recurrence has to be what buys it, or the cut is a fit to the first lesson.
+            Assert.True(reading.Share > every[named].Share,
+                $"on {named} recurring pairs are same-slot {reading.Share:F3} against "
+                + $"{every[named].Share:F3} for every pair, so the ranking is as diluted as the "
+                + "share and the cut at recurrence was a fit rather than a claim");
+        }
+    }
 }

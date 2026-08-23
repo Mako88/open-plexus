@@ -60,29 +60,15 @@ public sealed class Passthrough<TFrame> : IQuantizer<TFrame>
 
     /// <inheritdoc/>
     /// <remarks>
-    /// <b>Built from the parts</b>, and a code in two of them belongs to neither. The channel
-    /// asks which THING a code belongs to and a dictionary can name one, so a code the world
-    /// put in two parts has no answer to give — leaving it out says that, and picking the
-    /// first would assert a binding the world never claimed. That is the whole reason a
-    /// moment carries a list of parts rather than this dictionary.
+    /// <b>The parts as the world drew them</b>, which is a passthrough now that the channel
+    /// takes the shape the world already had. It used to flatten them into a code-to-thing
+    /// dictionary and drop every code that landed in two parts, so a scene of two red balls
+    /// reported no things at all while a scene of one reported one. That is the front end
+    /// saying LESS the more of a kind it is shown, and it destroyed multiplicity at the one
+    /// seam that had it.
     /// </remarks>
-    public IReadOnlyDictionary<Code, int>? Bind(TFrame frame)
-    {
-        var observation = _reading(frame);
-
-        if (observation.Groups is not { Count: > 0 } parts) return null;
-
-        var one = new Dictionary<Code, int>();
-        var twice = new HashSet<Code>();
-
-        for (var part = 0; part < parts.Count; part++)
-            foreach (var code in parts[part].Codes)
-                if (!one.TryAdd(code, part) && one[code] != part) twice.Add(code);
-
-        foreach (var code in twice) one.Remove(code);
-
-        return one.Count == 0 ? null : one;
-    }
+    public IReadOnlyList<Grouped>? Bind(TFrame frame) =>
+        _reading(frame).Groups is { Count: > 0 } parts ? parts : null;
 
     /// <inheritdoc/>
     public IReadOnlySet<Code>? Fleeting(TFrame frame) => _reading(frame).Passing;

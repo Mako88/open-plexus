@@ -270,7 +270,7 @@ public sealed class GeneralisingTests(ITestOutputHelper output)
         }
 
         /// <inheritdoc/>
-        public IReadOnlyDictionary<Code, int>? Bind(Coded observation) => inner.Bind(observation);
+        public IReadOnlyList<Grouped>? Bind(Coded observation) => inner.Bind(observation);
 
         /// <inheritdoc/>
         public IReadOnlyDictionary<Code, int>? Order(Coded observation) => inner.Order(observation);

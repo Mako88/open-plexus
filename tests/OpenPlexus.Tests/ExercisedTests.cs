@@ -98,7 +98,7 @@ public sealed class ExercisedTests
         }
 
         /// <inheritdoc/>
-        public IReadOnlyDictionary<Code, int>? Bind(Coded observation) =>
+        public IReadOnlyList<Grouped>? Bind(Coded observation) =>
             Noting(inner.Bind(observation), nameof(Bind), one => one.Count > 0);
 
         /// <inheritdoc/>

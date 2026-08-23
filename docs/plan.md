@@ -29,11 +29,10 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **The five below are REQUIREMENTS rather than arms.** John's. A losing reading is a cost
-  to record rather than grounds to delete, and the two architecture lines they serve are
-  WRITTEN and carry no mechanism, so `OutstandingTests` is red until they do.
-- **A moment carries multiplicity**, a SET being what it is. Fork **142**.
-- **Then an individual, minted on CONTINUITY** rather than on confidence. Fork **93**.
+- **The four below are REQUIREMENTS rather than arms.** John's. A losing reading is a cost
+  to record rather than grounds to delete, and *it can say what does NOT hold* carries no
+  mechanism, so `OutstandingTests` is red until it does.
+- **An individual, minted on CONTINUITY** rather than on confidence. Fork **93**.
 - **Then a category named from a founding key**, so membership moves under a name that does
   not. Fork **143**.
 - **Then negation, by a code fired when one LEAVES** — never here, here and just left being
@@ -423,8 +422,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — the key that moved last is not worth following: it leads where one walker
       makes it the only candidate and loses at four. Fork **95**.
   - A thing is one thing
-    - **OPEN** — a moment is a SET, so two of a kind at once collapse to one. A multiset, or
-      a code carrying an instance. Fork **142**.
+    - **NOW** — the front end reports PARTS rather than one thing a code, so a code in two
+      of them is in two things and a moment carries two of a kind. `Spanning` intersects
+      them. Fork **142**.
     - **OPEN** — minting an INDIVIDUAL is unbuilt and CONTINUITY is where to site it: a
       bundle mostly recurring in the successor moment is one thing. Confidence over repetition
       is the other road and the biology says it is the later one. Fork **93**.

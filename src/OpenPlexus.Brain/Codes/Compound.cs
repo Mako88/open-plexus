@@ -72,30 +72,26 @@ public sealed class Compound<TFrame> : IQuantizer<TFrame>
     }
 
     /// <inheritdoc/>
-    public IReadOnlyDictionary<Code, int>? Bind(TFrame observation)
+    /// <remarks>
+    /// <b>Concatenated, because two senses' things are different things.</b> A sight and a
+    /// sound both say <i>part nought</i> and mean their own, so appending keeps them apart
+    /// with no number to renumber — which is what the offsetting arithmetic here used to buy
+    /// and got wrong for a code both senses reported: the last sense's group overwrote the
+    /// first's, so a code seen AND heard belonged only to what was heard.
+    /// </remarks>
+    public IReadOnlyList<Grouped>? Bind(TFrame observation)
     {
-        Dictionary<Code, int>? groups = null;
-        var offset = 0;
+        List<Grouped>? parts = null;
 
         foreach (var sense in _senses)
         {
-            var mine = sense.Bind(observation);
-            if (mine is null || mine.Count == 0) continue;
+            if (sense.Bind(observation) is not { Count: > 0 } mine) continue;
 
-            groups ??= [];
-
-            var highest = offset;
-
-            foreach (var (code, group) in mine)
-            {
-                groups[code] = offset + group;
-                highest = Math.Max(highest, offset + group);
-            }
-
-            offset = highest + 1;
+            parts ??= [];
+            parts.AddRange(mine);
         }
 
-        return groups;
+        return parts;
     }
 
     /// <inheritdoc/>

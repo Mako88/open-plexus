@@ -341,7 +341,7 @@ public sealed class ConversingTests(ITestOutputHelper output)
 
         public IReadOnlySet<Code>? Forced(Coded observation) => through.Forced(observation);
 
-        public IReadOnlyDictionary<Code, int>? Bind(Coded observation) =>
+        public IReadOnlyList<Grouped>? Bind(Coded observation) =>
             ((IQuantizer<Coded>)through).Bind(observation);
 
         /// <summary>Nothing, because the precedences are already in the moment.</summary>

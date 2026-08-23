@@ -51,10 +51,18 @@ internal sealed record Fronted
 
     /// <summary>Codes the front end put in one of the moment's things.</summary>
     /// <remarks>
+    /// <para>
     /// <b>Codes rather than things</b>, so it reads against <see cref="Said"/> and says what
     /// share of a moment the front end could place. How many things there were is a fact
     /// about the scene; how much of the scene is IN one is a fact about the front end, and
     /// that is the one a reader needs to tell a segmenting world from a segmented moment.
+    /// </para>
+    /// <para>
+    /// <b>And DISTINCT codes</b>, now that a code can be in two things at once. Counting a
+    /// code once a thing would make this a count of memberships against a count of codes,
+    /// which is the share whose halves count different events and announces itself by
+    /// exceeding one. The multiplicity is in the parts and this is not where to read it.
+    /// </para>
     /// </remarks>
     public required long Grouped { get; init; }
 }
@@ -258,7 +266,9 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
         // one travels beside the moment.
         var grouping = _sensing.Bind(turn.Seen);
 
-        _grouped += grouping?.Count ?? 0;
+        _grouped += grouping is null
+            ? 0
+            : grouping.SelectMany(part => part.Codes).Distinct().Count();
 
         return new Pushed
         {

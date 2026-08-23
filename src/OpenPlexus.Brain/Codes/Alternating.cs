@@ -1014,7 +1014,7 @@ public sealed class Deriving<TObservation>(
     }
 
     /// <inheritdoc/>
-    public IReadOnlyDictionary<Code, int>? Bind(TObservation observation) => inner.Bind(observation);
+    public IReadOnlyList<Grouped>? Bind(TObservation observation) => inner.Bind(observation);
 
     /// <inheritdoc/>
     public IReadOnlyDictionary<Code, int>? Order(TObservation observation) => inner.Order(observation);
@@ -1054,7 +1054,7 @@ public sealed class Sorted<TObservation>(IQuantizer<TObservation> inner, Categor
         categories.Folded(new HashSet<Code>(inner.Codify(observation)));
 
     /// <inheritdoc/>
-    public IReadOnlyDictionary<Code, int>? Bind(TObservation observation) => inner.Bind(observation);
+    public IReadOnlyList<Grouped>? Bind(TObservation observation) => inner.Bind(observation);
 
     /// <inheritdoc/>
     public IReadOnlyDictionary<Code, int>? Order(TObservation observation) => inner.Order(observation);

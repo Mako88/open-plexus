@@ -250,6 +250,122 @@ public sealed class BindingTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>
+    /// <b>Two of a kind at once reach the brain as two things.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The check <see cref="Codes.IQuantizer{TObservation}.Bind"/>'s parts owe.</b> A
+    /// moment's codes are a SET, so one red ball and two red balls are the identical set and
+    /// nothing in it can say which was shown. The parts are where the difference lives, and
+    /// this asserts that it survives the front end rather than being argued to.
+    /// </para>
+    /// <para>
+    /// <b>And the shape it replaces went quiet</b>, reporting less the more of a kind it saw. The
+    /// channel was a code-to-thing dictionary, which names one thing per code, so a code in
+    /// two parts had no answer to give and was dropped — leaving a two-ball scene with no
+    /// grouping at all. A one-ball scene reported one thing. That is the front end going
+    /// quiet exactly where multiplicity is, and it is asserted here as the identity of the
+    /// codes beside the difference in the parts.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_moment_holding_two_of_a_kind_says_two_things_over_the_same_codes()
+    {
+        Code red = Kinds.Named(Binding.Colour, "red");
+        Code ball = Kinds.Named(Binding.Shape, "ball");
+
+        var one = Coded.From([Grouped.Of([red, ball])]);
+        var two = Coded.From([Grouped.Of([red, ball]), Grouped.Of([red, ball])]);
+
+        var front = new Passthrough<Coded>(seen => seen);
+
+        // The set cannot tell them apart, which is the whole reason the parts have to.
+        Assert.Equal(new HashSet<Code>(one.Codes), new HashSet<Code>(two.Codes));
+
+        var told = ((IQuantizer<Coded>)front).Bind(one);
+        var twice = ((IQuantizer<Coded>)front).Bind(two);
+
+        Assert.NotNull(told);
+        Assert.NotNull(twice);
+
+        Assert.Single(told);
+        Assert.Equal(2, twice.Count);
+
+        // And both things hold the same codes, which is what makes them two of a KIND rather
+        // than two things. A front end that had to make them differ to say there were two
+        // would be minting an instance into a code, and then nothing would recur.
+        Assert.Equal(twice[0], twice[1]);
+    }
+
+    /// <summary>
+    /// <b>A scope about no ONE thing does not fire</b>, however many things share its codes.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The reader's half of the same mechanism.</b> <see cref="Spanning.Thing"/> asks
+    /// whether some one thing accounts for a scope, which is an intersection over the things
+    /// each code is in. Where every code was in exactly one thing that was the same test as
+    /// equality; where a code is in two, equality had nothing to compare.
+    /// </para>
+    /// <para>
+    /// <b>And the failure it fixes</b> is the dial switching itself off. The flattening
+    /// dropped a shared code, so a scope naming one of those and a code from a THIRD thing
+    /// saw one grouped code, read as being about that third thing, and fired. The more of a
+    /// kind a scene held the less of it was grouped, so <see cref="Spanning.Thing"/>
+    /// degenerated towards <see cref="Spanning.Anything"/> exactly where it was needed.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_scope_spanning_a_shared_thing_and_another_does_not_fire()
+    {
+        Code red = Kinds.Named(Binding.Colour, "red");
+        Code ball = Kinds.Named(Binding.Shape, "ball");
+        Code blue = Kinds.Named(Binding.Colour, "blue");
+        Code box = Kinds.Named(Binding.Shape, "box");
+
+        // Two red balls and a blue box: `red` and `ball` are each in two things, `blue` and
+        // `box` in one.
+        IReadOnlyList<Grouped> things =
+        [
+            Grouped.Of([red, ball]),
+            Grouped.Of([red, ball]),
+            Grouped.Of([blue, box]),
+        ];
+
+        var answer = Brain.Says(0);
+        var moment = new HashSet<Code> { red, ball, blue, box };
+
+        var held = new Population(
+            new CommittingSettings { Spanning = Spanning.Thing }, seed: 1);
+
+        var kind = new Commitment([red, ball], answer);
+        var other = new Commitment([blue, box], answer);
+        var across = new Commitment([red, blue], answer);
+
+        foreach (var one in new[] { kind, other, across }) Assert.True(held.Add(one));
+
+        var firing = held.Firing(moment, things).Select(one => one.Identity).ToHashSet();
+
+        // Each is about one thing -- the kind about either of two, which is what a shared
+        // code buys and what the intersection reads.
+        Assert.Contains(kind.Identity, firing);
+        Assert.Contains(other.Identity, firing);
+
+        // And this one is about no thing at all. Under the flattening it was about the box.
+        Assert.DoesNotContain(across.Identity, firing);
+
+        // The control still sees all three, so what moved is what a scope MEANS and not what
+        // arrived -- the same separation the arms above are read under.
+        var ignoring = new Population(
+            new CommittingSettings { Spanning = Spanning.Anything }, seed: 1);
+
+        foreach (var one in new[] { kind, other, across })
+            Assert.True(ignoring.Add(new Commitment(one.Scope, answer)));
+
+        Assert.Equal(3, ignoring.Firing(moment, things).Length);
+    }
+
     // ---- what it measures ---------------------------------------------------
 
     /// <summary>How many concepts, and how many codes each attribute of one shows.</summary>

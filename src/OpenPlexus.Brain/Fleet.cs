@@ -120,7 +120,7 @@ internal sealed class Fleet : ICouncil
     /// <param name="raw">What the front end said, before any minted name is folded in.</param>
     /// <param name="fleeting">Which of those codes the source says will not come back.</param>
     /// <param name="grouping">
-    /// Which thing each code belongs to. <b>Refused rather than dropped</b>, because this one
+    /// Which things are in the moment. <b>Refused rather than dropped</b>, because this one
     /// decides what fires.
     /// </param>
     /// <param name="ct">Cancellation.</param>
@@ -134,8 +134,8 @@ internal sealed class Fleet : ICouncil
     /// commitments the vote never asked.
     /// </para>
     /// <para>
-    /// <b>So the wire half arrives when the arm does.</b> One int a code beside a message that
-    /// already carries every code is what it costs, and the cost buys nothing until
+    /// <b>So the wire half arrives when the arm does.</b> A list of code lists beside a message
+    /// that already carries every code is what it costs, and the cost buys nothing until
     /// <see cref="Spanning.Thing"/> has beaten its control on the one world that can separate
     /// them. Paying for it first would be shipping a wire format for a mechanism that may be
     /// deleted, and a throw is what stops the gap being read as a green fleet run.
@@ -144,7 +144,7 @@ internal sealed class Fleet : ICouncil
     public async ValueTask<Vote> AskAsync(
         IReadOnlySet<Code> raw,
         IReadOnlySet<Code>? fleeting = null,
-        IReadOnlyDictionary<Code, int>? grouping = null,
+        IReadOnlyList<Grouped>? grouping = null,
         CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(raw);

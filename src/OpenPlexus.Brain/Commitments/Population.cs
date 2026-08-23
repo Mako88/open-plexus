@@ -737,15 +737,20 @@ internal sealed class Population
     /// <see cref="Spanning.Thing"/></b>, and nothing at all without it.
     /// </param>
     public ImmutableArray<Commitment> Firing(
-        IReadOnlySet<Code> moment, IReadOnlyDictionary<Code, int>? grouping = null)
+        IReadOnlySet<Code> moment, IReadOnlyList<Grouped>? grouping = null)
     {
         ArgumentNullException.ThrowIfNull(moment);
 
         // Read once rather than once a commitment. The dial decides whether the grouping is
         // consulted at all, so a run whose front end cannot segment pays nothing for the
         // mechanism and a run under the control pays nothing for having the report.
+        //
+        // Inverted once rather than once a commitment for the same reason: the parts are the
+        // shape the front end reports and the membership is the shape a scope is judged
+        // against, and walking every part for every candidate would pay the inversion once a
+        // resident instead.
         var spanning = _dials.Spanning is Spanning.Thing && grouping is { Count: > 0 }
-            ? grouping
+            ? Membership(grouping)
             : null;
 
         var seen = new HashSet<Code>();
@@ -783,12 +788,43 @@ internal sealed class Population
         return firing.ToImmutable();
     }
 
-    /// <summary>Whether every grouped code of a scope belongs to the same thing.</summary>
+    /// <summary>Which things each code of a moment belongs to, from the parts.</summary>
+    /// <param name="parts">The things the front end says are in the moment.</param>
+    /// <remarks>
+    /// <b>A set a code rather than one thing a code</b>, which is the whole of what the parts
+    /// carry that a dictionary could not. A scene holding two of a kind puts the same codes in
+    /// two parts, so the code belongs to both and its multiplicity is what the set counts.
+    /// </remarks>
+    private static Dictionary<Code, HashSet<int>> Membership(IReadOnlyList<Grouped> parts)
+    {
+        var membership = new Dictionary<Code, HashSet<int>>();
+
+        for (var part = 0; part < parts.Count; part++)
+            foreach (var code in parts[part].Codes)
+            {
+                if (!membership.TryGetValue(code, out var things))
+                    membership[code] = things = [];
+
+                things.Add(part);
+            }
+
+        return membership;
+    }
+
+    /// <summary>Whether some ONE thing holds every grouped code of a scope.</summary>
     /// <param name="scope">The codes the commitment names.</param>
-    /// <param name="grouping">Which thing each code belongs to, where the front end said.</param>
+    /// <param name="grouping">Which things each code belongs to, where the front end said.</param>
     /// <remarks>
     /// <para>
-    /// <b>A code in no group constrains nothing</b> rather than forming a group of its own. A
+    /// <b>An intersection rather than an equality</b>, because a code may be in two things at
+    /// once and the question is whether one thing accounts for the whole scope. Equality was
+    /// the same test where every code belonged to exactly one thing, and unreachable
+    /// otherwise: the flattening upstream dropped a shared code before this ever saw it, so a
+    /// scope naming a shared code and a code from a THIRD thing read as being about that
+    /// third thing and fired. It is about no one thing and now does not.
+    /// </para>
+    /// <para>
+    /// <b>A code in no part constrains nothing</b> rather than forming a thing of its own. A
     /// world segments what it can and leaves the rest outside every part, and a question that
     /// points at nothing in particular has to be allowed to sit beside whatever it asks about.
     /// </para>
@@ -800,16 +836,21 @@ internal sealed class Population
     /// </para>
     /// </remarks>
     private static bool OneThing(
-        ImmutableArray<Code> scope, IReadOnlyDictionary<Code, int> grouping)
+        ImmutableArray<Code> scope, IReadOnlyDictionary<Code, HashSet<int>> grouping)
     {
-        var thing = -1;
+        HashSet<int>? shared = null;
 
         foreach (var code in scope)
         {
-            if (!grouping.TryGetValue(code, out var which)) continue;
+            if (!grouping.TryGetValue(code, out var things)) continue;
 
-            if (thing < 0) thing = which;
-            else if (thing != which) return false;
+            if (shared is null) shared = [.. things];
+            else
+            {
+                shared.IntersectWith(things);
+
+                if (shared.Count == 0) return false;
+            }
         }
 
         return true;
@@ -1066,7 +1107,7 @@ internal sealed class Population
         IReadOnlySet<Code> moment,
         Code arrived,
         ImmutableArray<Commitment> firing,
-        IReadOnlyDictionary<Code, int>? grouping = null)
+        IReadOnlyList<Grouped>? grouping = null)
     {
         ArgumentNullException.ThrowIfNull(moment);
 
@@ -1157,7 +1198,7 @@ internal sealed class Population
     /// <param name="moment">What is live.</param>
     /// <param name="arrived">What followed it.</param>
     /// <param name="eligible">The codes a wide scope may hold, as the roots were filtered.</param>
-    /// <param name="grouping">Which thing each code belongs to.</param>
+    /// <param name="grouping">The things the front end says are in the moment.</param>
     /// <remarks>
     /// <para>
     /// <b>Filtered exactly as <see cref="Rooting.Wholly"/> filters</b>, so a thing's scope
@@ -1169,24 +1210,36 @@ internal sealed class Population
     /// <b>Two codes at least</b>, or it is the one-code rule the roots already made. A thing
     /// showing one attribute is not a binding.
     /// </para>
+    /// <para>
+    /// <b>And two of a kind propose ONE scope between them</b>, which is the parts arriving
+    /// here rather than a second mechanism. Two things holding the same eligible codes reach
+    /// the same scope, and a scope's identity is its codes, so the second is refused by
+    /// <see cref="Add"/> the way any duplicate is. What the moment gained is that both things
+    /// were sayable; what it did not gain is a rule per occurrence, and a rule per occurrence
+    /// is the memorising this design is otherwise careful about.
+    /// </para>
     /// </remarks>
     private int Things(
         IReadOnlySet<Code> moment,
         Code arrived,
         List<Code> eligible,
-        IReadOnlyDictionary<Code, int> grouping)
+        IReadOnlyList<Grouped> grouping)
     {
+        var membership = Membership(grouping);
         var things = new SortedDictionary<int, List<Code>>();
 
-        // Walked in the eligible order rather than the grouping's, because a dictionary's
-        // order does not survive a run and a scope's identity comes off its codes.
+        // Walked in the eligible order rather than the parts', because the eligible order is
+        // the filtered one and a scope's identity comes off its codes.
         foreach (var code in eligible)
         {
-            if (!grouping.TryGetValue(code, out var which)) continue;
+            if (!membership.TryGetValue(code, out var which)) continue;
 
-            if (!things.TryGetValue(which, out var held)) things[which] = held = [];
+            foreach (var one in which)
+            {
+                if (!things.TryGetValue(one, out var held)) things[one] = held = [];
 
-            held.Add(code);
+                held.Add(code);
+            }
         }
 
         var minted = 0;

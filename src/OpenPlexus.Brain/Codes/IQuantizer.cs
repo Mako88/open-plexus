@@ -29,8 +29,8 @@ public interface IQuantizer<in TObservation>
     IReadOnlyCollection<Code> Codify(TObservation observation);
 
     /// <summary>
-    /// Which of those codes belong to which thing, when this front end can say.
-    /// <b>Null by default, which is every front end that cannot.</b>
+    /// Which things are in this observation and which codes each holds, when this front end
+    /// can say. <b>Null by default, which is every front end that cannot.</b>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -46,14 +46,28 @@ public interface IQuantizer<in TObservation>
     /// over each thing, and no scope fires across two.
     /// </para>
     /// <para>
+    /// <b>Parts rather than a code-to-thing dictionary</b>, because a moment may hold two of
+    /// a KIND and a dictionary cannot say so. A dictionary names one thing per code, so the
+    /// front end that saw two red balls could report the shared codes against one of them,
+    /// which asserts a binding nobody claimed, or against neither — and neither is what the
+    /// world said. Reporting fewer things the more of a kind a scene holds is the shape that
+    /// was here, and it is backwards. <see cref="Grouped"/> is the part.
+    /// </para>
+    /// <para>
+    /// <b>A code in two parts is in two things</b>, so the number of parts holding a code is
+    /// its multiplicity in the moment. That is what makes a moment a multiset without
+    /// <see cref="Codify"/> ceasing to be a set — the same input still mints the same codes,
+    /// so a kind still recurs for free, and what recurs twice at once is said by the parts.
+    /// </para>
+    /// <para>
     /// <b>What a THING is stays the world's.</b> The mechanism cannot tell two answers
     /// apart: a part is an object in a scene on one world and a part of a sentence on
-    /// another, and both arrive down this channel as an integer. That is one name over two
+    /// another, and both arrive down this channel the same way. That is one name over two
     /// ideas, which is the fault this repo has already been bitten by, and no check can reach
     /// it because what a grouping MEANS is a judgement about the world.
     /// </para>
     /// </remarks>
-    IReadOnlyDictionary<Code, int>? Bind(TObservation observation) => null;
+    IReadOnlyList<Grouped>? Bind(TObservation observation) => null;
 
     /// <summary>
     /// What order those codes came in, when this front end can say. <b>Null by

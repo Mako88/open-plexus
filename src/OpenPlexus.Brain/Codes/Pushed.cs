@@ -79,7 +79,7 @@ public readonly record struct Pushed
     public IReadOnlySet<Code>? Fleeting { get; init; }
 
     /// <summary>
-    /// Which THING each of those codes belongs to, where the source can say.
+    /// Which THINGS are in the moment and which codes each holds, where the source can say.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -93,15 +93,23 @@ public readonly record struct Pushed
     /// <b>And it cannot be derived into codes</b>, which is what makes it travel rather than
     /// be computed at the join the way a precedence is. Deriving a code per pair inside a
     /// group was built and refuted — it composed nothing on CLEVR while flooding repair's
-    /// candidate set — and it is quadratic in the group's size where this is one int a code.
+    /// candidate set — and it is quadratic in the group's size where this is one part a
+    /// thing.
     /// </para>
     /// <para>
-    /// <b>Codes in no group are unconstrained</b> rather than being one group of their own. A
+    /// <b>Parts rather than a code-to-thing map</b>, so a moment can carry two of a KIND.
+    /// <see cref="Codes"/> is a set and stays one, which is what makes a kind recur for free;
+    /// what a set cannot say is that two of that kind are present at once, and the parts say
+    /// it by holding the same codes twice. The number of parts a code is in is its
+    /// multiplicity.
+    /// </para>
+    /// <para>
+    /// <b>Codes in no part are unconstrained</b> rather than being one thing of their own. A
     /// world may segment its objects and leave a question's codes outside every part, so this
     /// is what the source can say about the moment's shape rather than a partition of it.
     /// </para>
     /// </remarks>
-    public IReadOnlyDictionary<Code, int>? Grouping { get; init; }
+    public IReadOnlyList<Grouped>? Grouping { get; init; }
 
     /// <summary>What the source says followed it, or nothing where it cannot say.</summary>
     /// <remarks>

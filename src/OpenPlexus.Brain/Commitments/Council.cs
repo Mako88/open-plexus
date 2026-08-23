@@ -166,7 +166,7 @@ internal interface ICouncil
     ValueTask<Vote> AskAsync(
         IReadOnlySet<Code> raw,
         IReadOnlySet<Code>? fleeting = null,
-        IReadOnlyDictionary<Code, int>? grouping = null,
+        IReadOnlyList<Grouped>? grouping = null,
         CancellationToken ct = default);
 
     /// <summary>
@@ -203,7 +203,7 @@ internal sealed class Alone : ICouncil
 
     private IReadOnlySet<Code> _moment = new HashSet<Code>();
     private IReadOnlySet<Code>? _fleeting;
-    private IReadOnlyDictionary<Code, int>? _grouping;
+    private IReadOnlyList<Grouped>? _grouping;
     private ImmutableArray<Commitment> _firing;
 
     private long _firingTicks;
@@ -246,7 +246,7 @@ internal sealed class Alone : ICouncil
     public ValueTask<Vote> AskAsync(
         IReadOnlySet<Code> raw,
         IReadOnlySet<Code>? fleeting = null,
-        IReadOnlyDictionary<Code, int>? grouping = null,
+        IReadOnlyList<Grouped>? grouping = null,
         CancellationToken ct = default) =>
         ValueTask.FromResult(Ask(raw, fleeting, grouping));
 
@@ -266,7 +266,7 @@ internal sealed class Alone : ICouncil
     public Vote Ask(
         IReadOnlySet<Code> raw,
         IReadOnlySet<Code>? fleeting = null,
-        IReadOnlyDictionary<Code, int>? grouping = null)
+        IReadOnlyList<Grouped>? grouping = null)
     {
         ArgumentNullException.ThrowIfNull(raw);
 

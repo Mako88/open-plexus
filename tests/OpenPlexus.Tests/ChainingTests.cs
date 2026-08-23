@@ -745,10 +745,18 @@ public sealed class ChainingTests(ITestOutputHelper output)
     /// this does not explain that nought.
     /// </para>
     /// <para>
+    /// <b>And the front end adds nothing to a question</b>, which is why the second basis is
+    /// here and why it reads identically in every column. Under <see cref="Joining.Bagged"/> a
+    /// question's moment is five codes and they are the question's five words, so this is the
+    /// run's own moment rather than a ceiling above it.
+    /// </para>
+    /// <para>
     /// <b>What is left unexplained is the gap between this and the run.</b> The winner supposed
     /// back reaches the goal on twelve of twelve here and scored nought in a run of the same
-    /// lesson. Neither the alphabet, the choice of word nor the second vote's arithmetic is what
-    /// separates them, so what is left is what a question's moment carries beyond its own words.
+    /// lesson. Not the alphabet, not the choice of word, not the second vote's arithmetic and
+    /// not the moment. What is left is that the refuted arm ran INSIDE the run and changed what
+    /// was learnt — its own accuracy fell with it — where this reads a population learnt
+    /// without it.
     /// </para>
     /// </remarks>
     [Fact]
@@ -761,18 +769,20 @@ public sealed class ChainingTests(ITestOutputHelper output)
 
         output.WriteLine($"{Seeds} seeds, {implied.Exam.Count} implied questions");
         output.WriteLine(
-            $"{"tellings",-10}{"asked",7}{"bare",6}{"supposed",10}{"words",7}{"working",9}"
-            + $"{"winner",8}{"as said",9}");
+            $"{"moment",-11}{"tellings",9}{"asked",7}{"bare",6}{"supposed",10}{"words",7}"
+            + $"{"working",9}{"winner",8}{"as said",9}{"codes",7}{"added",7}");
 
-        var supposing = new Dictionary<int, int>();
-        var bareRight = new Dictionary<int, int>();
-        var selective = new Dictionary<int, double>();
-        var ownAnswer = new Dictionary<int, int>();
-        var ownTop = new Dictionary<int, int>();
-        var untranslatedBy = new Dictionary<int, int>();
-        var questions = new Dictionary<int, int>();
+        var supposing = new Dictionary<(int, bool), int>();
+        var bareRight = new Dictionary<(int, bool), int>();
+        var selective = new Dictionary<(int, bool), double>();
+        var ownAnswer = new Dictionary<(int, bool), int>();
+        var ownTop = new Dictionary<(int, bool), int>();
+        var untranslatedBy = new Dictionary<(int, bool), int>();
+        var added = new Dictionary<(int, bool), int>();
+        var questions = new Dictionary<(int, bool), int>();
 
         foreach (var tellings in new[] { 1, 20 })
+        foreach (var through in new[] { false, true })
         {
             var asked = 0;
             var bare = 0;
@@ -783,12 +793,19 @@ public sealed class ChainingTests(ITestOutputHelper output)
             var shown = new List<string>();
             var circular = 0;
             var untranslated = 0;
+            var held = 0;
+            var extra = 0;
 
             foreach (var put in Asking(implied, tellings, Seeds))
             {
                 asked++;
 
-                var vote = Voted(put, null);
+                var basis = through ? Front(put) : put.Asked;
+
+                held = Math.Max(held, basis.Count);
+                extra = Math.Max(extra, basis.Count(one => !put.Asked.Contains(one)));
+
+                var vote = Voted(put, basis, null);
 
                 if (vote?.Expects == put.Goal) bare++;
 
@@ -800,11 +817,11 @@ public sealed class ChainingTests(ITestOutputHelper output)
                 {
                     var word = Babi.Of(put.World.Vocabulary[at]);
 
-                    if (put.Asked.Contains(word)) continue;
+                    if (basis.Contains(word)) continue;
 
                     tried++;
 
-                    if (Voted(put, word)?.Expects != put.Goal) continue;
+                    if (Voted(put, basis, word)?.Expects != put.Goal) continue;
 
                     wins++;
                     found.Add(put.World.Vocabulary[at]);
@@ -835,28 +852,29 @@ public sealed class ChainingTests(ITestOutputHelper output)
                 if (vote?.Expects is { } said
                     && Brain.Meant(said) is { } meant
                     && meant < put.World.Vocabulary.Count
-                    && Voted(put, Babi.Of(put.World.Vocabulary[meant]))?.Expects == put.Goal)
+                    && Voted(put, basis, Babi.Of(put.World.Vocabulary[meant]))?.Expects == put.Goal)
                     winner++;
 
                 // And the same word in the OTHER alphabet, which is fork 137's whole claim.
                 // An expectation is an index and a scope holds a hash, so putting back what
                 // the vote handed over reaches no scope at all.
-                if (vote?.Expects is { } raw && Voted(put, raw)?.Expects == put.Goal)
+                if (vote?.Expects is { } raw && Voted(put, basis, raw)?.Expects == put.Goal)
                     untranslated++;
             }
 
-            supposing[tellings] = reached;
-            bareRight[tellings] = bare;
-            selective[tellings] = working.DefaultIfEmpty(0.0).Average();
-            ownAnswer[tellings] = circular;
-            ownTop[tellings] = winner;
-            untranslatedBy[tellings] = untranslated;
-            questions[tellings] = asked;
+            added[(tellings, through)] = extra;
+            supposing[(tellings, through)] = reached;
+            bareRight[(tellings, through)] = bare;
+            selective[(tellings, through)] = working.DefaultIfEmpty(0.0).Average();
+            ownAnswer[(tellings, through)] = circular;
+            ownTop[(tellings, through)] = winner;
+            untranslatedBy[(tellings, through)] = untranslated;
+            questions[(tellings, through)] = asked;
 
             output.WriteLine(
-                $"{tellings,-10}{asked,7}{bare,6}{reached,10}{words,7}"
-                + $"{working.DefaultIfEmpty(0.0).Average(),9:F1}{winner,8}"
-                + $"{untranslated,9}");
+                $"{(through ? "front end" : "words"),-11}{tellings,9}{asked,7}{bare,6}"
+                + $"{reached,10}{words,7}{working.DefaultIfEmpty(0.0).Average(),9:F1}"
+                + $"{winner,8}{untranslated,9}{held,7}{extra,7}");
 
             // Which word, because a column saying one of thirteen works cannot say whether
             // that one is the intermediate or the answer itself. The second would be the
@@ -864,8 +882,16 @@ public sealed class ChainingTests(ITestOutputHelper output)
             foreach (var line in shown) output.WriteLine(line);
         }
 
-        Assert.True(supposing.Count == 2 && bareRight.Count == 2,
-            $"{supposing.Count} of 2 tellings reported, so the grid did not run");
+        Assert.True(supposing.Count == 4,
+            $"{supposing.Count} of 4 cells reported, so the grid did not run");
+
+        // The front end adds NOTHING to a question, which is the finding rather than a
+        // control. A run's moment for a question is the question's own words, so this
+        // reading is the run's moment and the gap to the refuted arm is not the moment.
+        Assert.True(added[(1, true)] == 0 && added[(20, true)] == 0,
+            $"the front end adds {added[(1, true)]} codes to a question's own words. The two "
+            + "bases have come apart, so this reading is a ceiling again and what it is a "
+            + "ceiling above wants saying");
 
         // The premise the rest of the file rests on, read here rather than assumed. A bare
         // question naming its own implied answer would mean the chain is already reached and
@@ -874,29 +900,11 @@ public sealed class ChainingTests(ITestOutputHelper output)
             $"{bareRight.Values.Sum()} implied questions are answered by the bare vote, so "
             + "the second hop is not what this half is short of. Re-read the file");
 
-        // The reading itself. A nought here kills every shape that supposes a word, because
-        // no choice of word reaches the answer under the ordinary vote.
-        Assert.True(supposing.Values.All(one => one == questions[1]),
-            $"supposing one word reaches the goal on {supposing[1]} and {supposing[20]} of "
-            + $"{questions[1]} implied questions rather than all of them. The ceiling on the "
-            + "family has moved, so say what changed and re-price fork 28");
-
-        // And it is a CHOICE rather than a licence. Thirteen candidates and about one of them
-        // works, so a mechanism that supposes at random reaches almost nothing and the value
-        // is in which word.
-        Assert.True(selective.Values.Max() < 2.0,
-            $"about {selective.Values.Max():F1} of the candidate words reach the goal, so "
-            + "supposing is closer to a licence than a choice and a chooser buys less than "
-            + "this reading assumed");
-
         // The corpus containing its own answer, which is what would make all of it worthless.
         Assert.True(ownAnswer.Values.Sum() == 0,
             $"the answer word itself is a working supposition on {ownAnswer.Values.Sum()} "
             + "questions, so the reading is circular and says nothing about a chain");
 
-        // And the refuted shape, run as a control. The machine's own top answer supposed back
-        // reaches the goal here while the same shape scored nought in a run, so what separates
-        // them is not the choice of word.
         // The alphabet, and it is a check on this reading rather than a reading. A supposition
         // put back untranslated cannot reach any scope, so a run that got this wrong would
         // print nought everywhere and look like a verdict on the mechanism.
@@ -905,10 +913,32 @@ public sealed class ChainingTests(ITestOutputHelper output)
             + "questions when it is put back untranslated. A scope holds a hash and an "
             + "expectation is an index, so a number here means fork 137 has moved");
 
-        Assert.True(ownTop.Values.Min() > 0,
-            $"the machine's own top answer supposed back reaches the goal on {ownTop[1]} and "
-            + $"{ownTop[20]} of {questions[1]}. A nought would put the refuted shape and this "
-            + "ceiling in agreement, which is a different finding");
+        // The reading on the question's own words. A nought here kills every shape that
+        // supposes a word, because no choice of word reaches the answer under the vote.
+        Assert.True(
+            supposing[(1, false)] == questions[(1, false)]
+            && supposing[(20, false)] == questions[(20, false)],
+            $"supposing one word reaches the goal on {supposing[(1, false)]} and "
+            + $"{supposing[(20, false)]} of {questions[(1, false)]} implied questions rather "
+            + "than all of them. The ceiling on the family has moved, so say what changed and "
+            + "re-price fork 28");
+
+        // And it is a CHOICE rather than a licence. Thirteen candidates and about one of them
+        // works, so a mechanism that supposes at random reaches almost nothing and the value
+        // is in which word.
+        Assert.True(selective[(1, false)] < 2.0 && selective[(20, false)] < 2.0,
+            $"about {selective[(1, false)]:F1} of the candidate words reach the goal, so "
+            + "supposing is closer to a licence than a choice and a chooser buys less than "
+            + "this reading assumed");
+
+        // And the refuted shape, run as a control on both bases. The machine's own top answer
+        // supposed back reaches the goal on the question's own words while the same shape
+        // scored nought in a run, so the two bases are the comparison this file is now about.
+        Assert.True(ownTop[(1, false)] > 0,
+            $"the machine's own top answer supposed back reaches the goal on "
+            + $"{ownTop[(1, false)]} of {questions[(1, false)]} on the question's own words. A "
+            + "nought would put the refuted shape and this ceiling in agreement, which is a "
+            + "different finding");
     }
 
     /// <summary>The word an outcome code stands for in this world, for a printed row.</summary>
@@ -923,6 +953,10 @@ public sealed class ChainingTests(ITestOutputHelper output)
     /// What the ordinary vote says about a question, with one word supposed or with none.
     /// </summary>
     /// <param name="put">The question, its run and the population that votes.</param>
+    /// <param name="basis">
+    /// The moment before anything is supposed — the question's own words, or what the front
+    /// end makes of them.
+    /// </param>
     /// <param name="supposed">
     /// The word the machine puts in front of itself, or nothing for the bare question.
     /// </param>
@@ -932,9 +966,9 @@ public sealed class ChainingTests(ITestOutputHelper output)
     /// skipped the fold would be a different kind of input, and the whole claim is that it is
     /// not one.
     /// </remarks>
-    private static Vote? Voted(Put put, Code? supposed)
+    private static Vote? Voted(Put put, IReadOnlySet<Code> basis, Code? supposed)
     {
-        var raw = new HashSet<Code>(put.Asked);
+        var raw = new HashSet<Code>(basis);
 
         if (supposed is { } one) raw.Add(one);
 
@@ -942,6 +976,23 @@ public sealed class ChainingTests(ITestOutputHelper output)
 
         return firing.IsDefaultOrEmpty ? null : put.Population.Predict(firing);
     }
+
+    /// <summary>
+    /// The question as the FRONT END hands it over, rather than as its own words.
+    /// </summary>
+    /// <param name="put">The question and the world that numbered its words.</param>
+    /// <remarks>
+    /// <b>The one thing left between this ceiling and the run.</b> A question reaches the brain
+    /// through <see cref="Joined"/> like every other moment, and what that adds beside the words
+    /// is what the bare reading leaves out. Built the way <c>Conversing</c> builds an asking
+    /// moment under <see cref="Carrying.Never"/>: the sentence as the question, nothing carried.
+    /// </remarks>
+    private static IReadOnlySet<Code> Front(Put put) =>
+        new Joined(Joining.Bagged)
+            .Codify(Coded.From(
+                [],
+                Grouped.Of(Babi.Words(put.Quiz.Question).Select(Babi.Of))))
+            .ToHashSet();
 
     /// <summary>
     /// What a commitment is worth once grounded, allowing a number of words to be PLACED.

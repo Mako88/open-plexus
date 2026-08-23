@@ -36,8 +36,8 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **Then the third store, read BY KEY.** John's, and above the chain because the reading says
   so: where the right statement is in front of it the learner is at its bound, so the exam is
   short of RETRIEVAL. Not measurable on a spine lesson, exhausted at one telling. Fork **139**.
-- **Then what a question's moment carries beyond its own WORDS**, which the chain turns on: a
-  supposed word wins the ordinary vote on the words and the same shape scored nought in a run.
+- **Then a second hop that is READ-ONLY**, which the chain turns on: a supposed word wins the
+  ordinary vote on the run's own question moment, and the refuted arm ran inside the learning.
   `ChainingTests`. Forks **28**, **115**, **129**, **137**.
 - **Then which worlds still answer a live question**, measured rather than guessed. An
   isolating world leaves when its question shuts and fourteen are open.
@@ -451,8 +451,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — what supplies a talked world its evidence: repair cannot fire until the
       fifth telling and the terminal ships one. Fork **136**.
     - **OPEN** — a round is fold, fire, vote, nothing puts what fired BACK in the moment, and
-      the horizon is K=1. Nine shapes are refuted, and the tenth is barred by the run rather
-      than by the vote, which reaches the answer. Forks **28**, **125**.
+      the horizon is K=1. Nine shapes are refuted and the vote reaches the answer, so the
+      tenth is the one that does not touch what is learnt. Forks **28**, **125**.
     - **OPEN** — entailment depth and the horizon are capped at one; both come off when
       blame diffusion has a number. Fork **32**.
     - **OPEN** — a lucky advocate blocks genesis, so proposals stop within a hundred rounds

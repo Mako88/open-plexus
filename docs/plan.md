@@ -34,7 +34,7 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **Then the third store, read BY KEY.** John's, and above the chain because the reading says
   so: where the right statement is in front of it the learner is at its bound, so the exam is
   short of RETRIEVAL. Not measurable on a spine lesson, exhausted at one telling. Fork **139**.
-- **Then a reference the second hop's gate can hold**, three having been read and every one
+- **Then a reference the second hop's gate can hold**, four having been read and every one
   trading the exam's two halves against each other. `LessonTests`. Forks **28**, **115**,
   **129**, **137**.
 - **Then which worlds still answer a live question**, measured rather than guessed. Fourteen
@@ -456,8 +456,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       blame diffusion has a number. Fork **32**.
     - **OPEN** — a lucky advocate blocks genesis, so proposals stop within a hundred rounds
       of twenty thousand. Subsumption, the vote, opportunity and abstention are all refuted
-      as the cost, an unsound rule being believed as hard as a sound one over a thousand
-      firings. Fork **135**.
+      as the cost. Open on whether a sound rule fires and loses. Fork **135**.
     - **OPEN** — and what that bar COSTS is a function of how young the population is, free
       at saturation and most of the examination before it, because it blocks repair while
       nothing can clear the floor yet. Unpriced, and it is why the bar does not ship. Fork

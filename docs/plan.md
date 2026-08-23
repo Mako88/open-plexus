@@ -30,14 +30,15 @@ ends: read it first, strike what got done, and write the handoff from what is le
 that is finished LEAVES, so this is only ever what is still to do.
 
 - **The reds in `OutstandingTests` come before all of it.** John's. It is why they fail the
-  build: a session cannot reach green without doing them. One is left and it is fork **28**'s.
+  build: a session cannot reach green without doing them. One is left and it wants a
+  commitment's own name in a moment, which the second hop does not put there.
 - **Then the genesis gate**, which finds every rule three worlds hold and loses the held-out
   set on two more. Subsumption is refuted as the cost and the vote is what is left. Fork **135**.
 - **Then the third store, read BY KEY.** John's, and above the chain because the reading says
   so: where the right statement is in front of it the learner is at its bound, so the exam is
   short of RETRIEVAL. Not measurable on a spine lesson, exhausted at one telling. Fork **139**.
-- **Then why the second hop stops paying as the telling repeats**, its gate reading the vote's
-  own thinness against a population repair keeps growing. `LessonTests`. Forks **28**, **115**,
+- **Then a reference the second hop's gate can hold**, three having been read and every one
+  trading the exam's two halves against each other. `LessonTests`. Forks **28**, **115**,
   **129**, **137**.
 - **Then which worlds still answer a live question**, measured rather than guessed. Fourteen
   are open.
@@ -50,8 +51,7 @@ that is finished LEAVES, so this is only ever what is still to do.
   likeness readings leaves with a revival row. Fork **131**.
 - **What add-only costs** — a group that fills gradually mints at every size it passes
   through. Fork **130**.
-- **Audit TRAPS and DO NOT RE-TRY** — a failure class that has earned a check belongs in the
-  check, and a revival condition that has expired is a superstition.
+- **Audit TRAPS and DO NOT RE-TRY** — a revival condition that has expired is a superstition.
 - **Split `Population`** and any other class holding several mechanisms at once.
 
 ---

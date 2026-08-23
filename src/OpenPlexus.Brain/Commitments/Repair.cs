@@ -1386,6 +1386,14 @@ internal enum Supposing
     /// makes ordinary moments more decisive and the exam's questions no more decisive, and a
     /// bar learnt over the first is the wrong reference for the second.
     /// </para>
+    /// <para>
+    /// <b>And conditioning the bar on a MISS does not recover it.</b> A bar
+    /// learnt only where the settlement contradicted the vote sits at about a tenth, which
+    /// puts nought of twelve stated questions under it and only six of twelve implied ones --
+    /// so the implied half falls to 0.050, under the marginal, while the stated half at twenty
+    /// tellings stays where it was. Three references have been read and every one of them
+    /// trades the two halves against each other.
+    /// </para>
     /// </remarks>
     Thinly,
 }

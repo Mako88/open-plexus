@@ -343,8 +343,6 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       by construction. Priced by a corpus statistic first. Fork **108**.
     - **OPEN** — whether rung five buys anything a better-aimed projection does not, patch
       tokens having raised the floor while abstracting nothing. Fork **42**.
-    - **OPEN** — two clean rules disagreeing about one code name the redundant one neither
-      can see. Fork **80**.
     - **OPEN** — should the separation bar be charged by what a scope's codes STAND FOR
       rather than by how many. Fork **71**.
     - **OPEN** — a category is the set of codes that are ALTERNATIVES, from moments alone.
@@ -674,6 +672,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | `Feeling.Intervened` -- a body's doing MARKED as one | Identical in five of six cells and inside noise in the sixth, for a tenth more population. Every doing here is forced, so the derived name and the plain one are perfectly correlated | A body acted on by something else, so an action has an observational counterpart |
 | A compound eye, several readings of ONE sense at once | The moment is a union, so the ceiling is: every pair raises it over its best channel, and the withheld score lands BETWEEN the channels on three tasks and seeds | DISJOINT alphabets, a second SENSE and `Crossing`'s case: no union reaches an outcome in one modality |
 | An adhesion bar set as a RATIO somebody picked | A corrected z over the same counts reaches every group the level reached on both worlds and nothing more | A world where an effect size and a significance test come apart |
+| Fork **80** — two residents agreeing on what they expect and one scope code apart | Below a rewiring of its own pairs: a scope holds a subject and an attribute, so one code apart walks between slots rather than inside one | A scope holding one slot, so a single difference can only be a substitution |
+| The same pairing where the two residents DISAGREE, so scope and expectation name a pair each | Below its own rewiring too, and the commonest pair being right does not lift a share that one subject with every attribute drowns | Reading the pairs by RANK rather than by share, which the head of the list half supports |
 | A refusal as a CODE in the moment, fork **127** | Level on both shapes for a larger population, the chooser already refusing to repeat itself, so the fact was acted on before the code arrived | The exclusion having to SURVIVE the moment, which is a store's job rather than a code's |
 
 ---

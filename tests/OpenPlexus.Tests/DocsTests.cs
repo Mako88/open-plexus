@@ -635,7 +635,15 @@ public sealed class DocsTests
     // concluding rule is a certainty, its only firing premise is worth a quarter because a
     // statement claims every word in turn, and a placed word believed reaches five rivals.
     // So forks 115 and 129 are one piece of work. The readings are in `ChainingTests`.
-    private const int Whole = 11_781;
+    // And 11,876 is the sixty-third raise, ninety-five words, for two refutation rows against
+    // one route leaf -- the trade this budget exists to allow rather than to price out. Fork
+    // 80 asked whether two clean rules one code apart name the redundant code neither can see,
+    // and it is answered: they do not, and neither does the shape beside it where the two rules
+    // disagree. Both land below a rewiring of their own pairs, which is the null that keeps
+    // each code in as many pairs as it was in. The leaf leaves as a question that closed and
+    // the rows arrive as two things nobody should build again, so what grew is the memory
+    // rather than the plan. The readings are in `LessonTests`.
+    private const int Whole = 11_876;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

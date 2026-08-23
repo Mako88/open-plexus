@@ -2360,4 +2360,200 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         Assert.Equal(0, searched[1]);
     }
+
+    /// <summary>
+    /// Whether two rules one scope code apart name a pair of alternatives — <b>fork 80's
+    /// ceiling, off a finished population.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Rung five names what CO-FIRES, and alternatives never do.</b> The plan carries that
+    /// as the shape problem behind four refuted tries across two architectures, and
+    /// <see cref="Codes.Counting"/>'s own remark says what is missing: a statistic whose null
+    /// neither converges nor discards the partners the members share. Every reading tried so
+    /// far has been over the MOMENT, where two substitutes are the one thing never there
+    /// together. This reads the population instead and needs nothing built.
+    /// </para>
+    /// <para>
+    /// <b>Two arms, and the second is what fork 80 is not.</b> Fork 80
+    /// pairs residents that AGREE on what they expect and differ in one scope code, which is
+    /// the redundancy reading — the code neither rule can see is doing no work. The other pairs
+    /// residents that DISAGREE, which is the substitution reading: <c>the cat covering is</c>
+    /// expecting <c>fur</c> beside <c>the dog covering is</c> expecting <c>hair</c> yields two
+    /// pairs at once, and both are pairs of alternatives.
+    /// </para>
+    /// <para>
+    /// <b>The null REWIRES the pairs and keeps every code's degree</b>, which the first null
+    /// here did not and which is why its reading could not be believed. Shuffling which word
+    /// sits in which slot leaves thirteen of twenty words in the value slot, so a random
+    /// labelling calls most pairs same-slot for free, and a code appearing in hundreds of pairs
+    /// carries its partners with it. Splitting every pair into its two ends, shuffling the ends
+    /// and re-pairing them keeps each code in exactly as many pairs as it was in and destroys
+    /// only who it was paired WITH. That is the one thing being asked about.
+    /// </para>
+    /// <para>
+    /// <b>The first null is kept beside it rather than replaced</b>, because the two disagreeing
+    /// is the whole reason to trust the second. A reading that moves when the control is
+    /// repaired was a reading about the control.
+    /// </para>
+    /// <para>
+    /// <b>A ceiling rather than a mechanism</b>, which is this repo's ordering: what the signal
+    /// permits with no learning costs milliseconds against a runner's hour, and a grid cannot
+    /// tell a rule that failed from a signal that was never there.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Two_rules_one_code_apart_name_a_pair_of_alternatives()
+    {
+        const int Tellings = 20;
+        const int Shuffles = 20;
+
+        var lesson = Lesson.Creatures;
+
+        var one = Ran(
+            lesson, Carrying.Never, seed: 1, passes: 1, asserting: Asserting.Everything,
+            tellings: Tellings, rooting: Rooting.Wholly, crediting: Crediting.Birth,
+            admitting: Admitting.Testable);
+
+        // The lesson's own three slots, which is the only ground truth here. A pair inside one
+        // is a pair of substitutes; a pair across two is not.
+        var slots = new Dictionary<Code, int>();
+
+        foreach (var fact in lesson.Facts)
+        {
+            slots[Babi.Of(fact.Subject)] = 0;
+            slots[Babi.Of(fact.Attribute)] = 1;
+            slots[Babi.Of(fact.Answer)] = 2;
+        }
+
+        var residents = one.Brain.Held.All.ToList();
+        var agreeing = new List<(Code Left, Code Right)>();
+        var disagreeing = new List<(Code Left, Code Right)>();
+
+        for (var at = 0; at < residents.Count; at++)
+        {
+            for (var other = at + 1; other < residents.Count; other++)
+            {
+                if (residents[at].Scope.Length != residents[other].Scope.Length) continue;
+
+                var left = residents[at].Scope.Except(residents[other].Scope).ToList();
+                var right = residents[other].Scope.Except(residents[at].Scope).ToList();
+
+                if (left.Count != 1 || right.Count != 1) continue;
+
+                if (residents[at].Expects == residents[other].Expects)
+                {
+                    agreeing.Add((left[0], right[0]));
+                    continue;
+                }
+
+                // The substitution reading yields BOTH pairs, which is the whole of why it is
+                // a different shape rather than the same one filtered differently. The scopes
+                // name the subjects that swap and the expectations name the values that swap
+                // with them.
+                disagreeing.Add((left[0], right[0]));
+                disagreeing.Add((residents[at].Expects, residents[other].Expects));
+            }
+        }
+
+        output.WriteLine($"{lesson.About}, told {Tellings} times, {residents.Count} residents");
+        output.WriteLine(
+            $"{"arm",-14}{"pairs",8}{"placed",8}{"same slot",11}{"rewired",9}{"labelled",10}");
+
+        var shares = new Dictionary<string, (double Share, double Null, int Placed)>();
+
+        foreach (var (named, pairs) in
+            new[] { ("agreeing", agreeing), ("disagreeing", disagreeing) })
+        {
+            var placed = pairs
+                .Where(pair => slots.ContainsKey(pair.Left) && slots.ContainsKey(pair.Right))
+                .ToList();
+
+            var share = placed.Count == 0
+                ? 0.0
+                : placed.Count(pair => slots[pair.Left] == slots[pair.Right])
+                    / (double)placed.Count;
+
+            // The label shuffle, kept only so the repair is visible. It preserves the slot
+            // sizes and nothing else, so thirteen value words out of twenty make most pairs
+            // same-slot before anything is measured.
+            var labelled = 0.0;
+
+            for (var shuffle = 0; shuffle < Shuffles; shuffle++)
+            {
+                var rng = new Random(Seeds.Apart(shuffle + 1, purpose: 80));
+                var words = slots.Keys.ToList();
+                var mixed = slots.Values.OrderBy(_ => rng.Next()).ToList();
+                var swapped = words
+                    .Select((word, at) => (word, slot: mixed[at]))
+                    .ToDictionary(pair => pair.word, pair => pair.slot);
+
+                labelled += placed.Count(pair => swapped[pair.Left] == swapped[pair.Right])
+                    / (double)Math.Max(placed.Count, 1) / Shuffles;
+            }
+
+            // The rewiring, which is the null this reading is against. Every end stays, so a
+            // code in two hundred pairs is in two hundred pairs afterwards; only its partner
+            // changes.
+            var rewired = 0.0;
+
+            for (var shuffle = 0; shuffle < Shuffles; shuffle++)
+            {
+                var rng = new Random(Seeds.Apart(shuffle + 1, purpose: 81));
+                var ends = placed
+                    .SelectMany(pair => new[] { pair.Left, pair.Right })
+                    .OrderBy(_ => rng.Next())
+                    .ToList();
+
+                var same = 0;
+
+                for (var end = 0; end + 1 < ends.Count; end += 2)
+                    if (slots[ends[end]] == slots[ends[end + 1]]) same++;
+
+                rewired += same / (double)Math.Max(placed.Count, 1) / Shuffles;
+            }
+
+            shares[named] = (share, rewired, placed.Count);
+
+            output.WriteLine(
+                $"{named,-14}{pairs.Count,8}{placed.Count,8}{share,11:F3}{rewired,9:F3}"
+                + $"{labelled,10:F3}");
+
+            var spelt = one.World.Vocabulary;
+
+            foreach (var group in placed
+                .GroupBy(pair => (Low: Math.Min(pair.Left.Value, pair.Right.Value),
+                                  High: Math.Max(pair.Left.Value, pair.Right.Value)))
+                .OrderByDescending(group => group.Count())
+                .Take(8))
+            {
+                var pair = group.First();
+                var left = one.World.Naming(pair.Left) is { } at ? spelt[at] : "?";
+                var right = one.World.Naming(pair.Right) is { } to ? spelt[to] : "?";
+
+                output.WriteLine(
+                    $"  {left,-10}{right,-10}{group.Count(),5} "
+                    + $"{(slots[pair.Left] == slots[pair.Right] ? "same slot" : "across")}");
+            }
+        }
+
+        Assert.True(shares["agreeing"].Placed > 0 && shares["disagreeing"].Placed > 0,
+            "one arm found no pair between two words the lesson places, so this compares a "
+            + "reading against nothing rather than against the other shape");
+
+        // The reading, asserted rather than printed, because a number in a commit message is a
+        // claim and this is the record. Both arms land BELOW a rewiring of their own pairs, so
+        // the population's shape is dis-assortative by slot rather than silent about it: a
+        // scope is a subject and an attribute among function words, and moving one code walks
+        // between those two far more freely than it swaps one subject for another.
+        //
+        // It goes red the day either arm clears its own null, which is the day somebody should
+        // look at this again. Nothing here can be satisfied by editing the file.
+        foreach (var (named, reading) in shares)
+            Assert.True(reading.Share < reading.Null,
+                $"the {named} arm lands {reading.Share:F3} against a rewired null of "
+                + $"{reading.Null:F3}, so the population's shape now carries a grouping it did "
+                + "not when this was refuted -- read the DO NOT RE-TRY rows and take the arm "
+                + "off them");
+    }
 }

@@ -367,9 +367,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       wired rather than measured. Its grid is `Arranged`'s. Fork **110**.
     - **OPEN** — a fresh child starts BLIND and re-earns its statistics, a floor every rung
       of a chain pays while only the last pays off. The escape is rung five.
-    - **OPEN** — rung two, negation, *X and NOT Z*. Unsound against a live moment, so it may
-      only be read against a SETTLED occasion and fires one settlement behind; its
-      candidates must be bounded to codes seen in this commitment's own hits. Fork **30**.
+    - **OPEN** — rung two, negation, *X and NOT Z*. The failures do not ask for it and the
+      probe that says so cannot see monk-2's known ceiling, so what is unpriced is the rung
+      AND the instrument. Fork **30**.
     - **OPEN** — emit *Z was absent* as its own code at settlement, so rung two needs no new
       matcher. Bounded to the commitment's own hits. Fork **64**.
     - **OPEN** — `Mending.Uncovered` is a gate plus every-round repair, and the gate alone

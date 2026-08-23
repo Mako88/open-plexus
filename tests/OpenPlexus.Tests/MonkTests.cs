@@ -446,6 +446,38 @@ public sealed class MonkTests(ITestOutputHelper output)
         // NO BAR ON EITHER SHARE. Which rung a failure demands has never been measured, so
         // a threshold written before the first reading would be a prediction dressed as a
         // requirement -- and this suite already had one of those refuted tonight.
+        //
+        // And the first reading says this instrument cannot answer its own question. Monk-2
+        // is here because it is a counting concept a conjunctive scope CANNOT express -- the
+        // language-ceiling probe with a published number -- and `Wanting` reads about 0.009
+        // on it, the same order as every world whose concept the language covers outright.
+        // An instrument built to say which rung a failure demands does not see a ceiling it
+        // is provably standing on.
+        //
+        // The reason is structural rather than a calibration. `Unseparated` counts rounds
+        // where the search came back EMPTY, and a conjunctive search almost never does,
+        // because narrowing is always available: a longer scope separates misses from hits
+        // on nearly any finite sample whether or not it is the rule. So a low share here is
+        // equally consistent with the language being adequate and with the machine
+        // memorising, which is the specialise-only failure the plan already names.
+        //
+        // What follows for rung two is that the failures are not asking for it. The second
+        // column is conditional on the first, so monk-2's 0.279 is 0.279 of 0.009 and
+        // monk-3's 0.817 is that share of a denominator near nought on the five seeds that
+        // had one at all.
+        //
+        // Asserted on the world whose ceiling is KNOWN, because that is the cell that says
+        // the instrument is blind rather than the world easy. The day monk-2 reads high
+        // here, `Unseparated` has started detecting a ceiling and this whole reading is
+        // worth re-taking.
+        Assert.All(
+            Enumerable.Range(1, Seeds),
+            seed => Assert.True(
+                Monked(Puzzle.Two, seed).Wanting < 0.1,
+                $"monk-2 seed {seed} reports the language running out on "
+                + $"{Monked(Puzzle.Two, seed).Wanting:F3} of repairable rounds. The probe has "
+                + "started seeing the ceiling it is standing on, so re-read the rung question "
+                + "-- the reading it was answered with says it could not"));
     }
 
     /// <summary>

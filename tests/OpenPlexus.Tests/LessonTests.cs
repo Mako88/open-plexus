@@ -2159,7 +2159,7 @@ public sealed class LessonTests(ITestOutputHelper output)
         output.WriteLine($"bars: recency {bar:F3}, marginal {marginal:F3}");
         output.WriteLine(
             $"{"supposing",-11}{"tellings",9}{"stated",17}{"implied",17}{"put",7}"
-            + $"{"refused",9}{"moved",7}{"repaired",10}");
+            + $"{"refused",9}{"moved",7}{"bar",8}{"repaired",10}");
 
         var told = new Dictionary<(Supposing, int), Measured>();
         var reached = new Dictionary<(Supposing, int), Measured>();
@@ -2173,6 +2173,7 @@ public sealed class LessonTests(ITestOutputHelper output)
             var put = new List<double>();
             var refused = new List<double>();
             var moved = new List<double>();
+            var thin = new List<double>();
 
             for (var seed = 1; seed <= Seeds; seed++)
             {
@@ -2196,6 +2197,7 @@ public sealed class LessonTests(ITestOutputHelper output)
                 put.Add(hops.Brain.Supposals.Put);
                 refused.Add(hops.Brain.Supposals.Refused);
                 moved.Add(hops.Brain.Supposals.Moved);
+                thin.Add(hops.Brain.Supposals.Bar);
 
                 // And every front end this repo has, on the arm that carries the story to the
                 // question. A SELECTING front end is the one relevance mechanism here -- it is
@@ -2220,7 +2222,7 @@ public sealed class LessonTests(ITestOutputHelper output)
                 $"{supposing.ToString().ToLowerInvariant(),-11}{many,9}"
                 + $"{Said(told[(supposing, many)]),17}{Said(reached[(supposing, many)]),17}"
                 + $"{put.Average(),7:F0}{refused.Average(),9:F0}{moved.Average(),7:F0}"
-                + $"{repaired.Average(),10:F1}");
+                + $"{thin.Average(),8:F3}{repaired.Average(),10:F1}");
         }
 
         // What a statement says is answered from one telling, which is the control half and

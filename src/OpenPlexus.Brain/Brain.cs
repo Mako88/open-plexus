@@ -275,7 +275,10 @@ internal sealed class Brain
         // against. A level somebody picked would be a world's number wearing a brain's
         // clothes; this one moves with whatever the machine is currently doing.
         if (vote.Expects is not null)
+        {
             _typical += Dials.Recency * (vote.Margin - _typical);
+            Supposals = Supposals with { Bar = _typical };
+        }
 
         var learnt = await _substrate
             .TellAsync(
@@ -305,4 +308,12 @@ internal readonly record struct Supposed
 
     /// <summary>How many of those changed the answer.</summary>
     public long Moved { get; init; }
+
+    /// <summary>What a decisive vote looked like for this machine, when it was last asked.</summary>
+    /// <remarks>
+    /// <b>The bar itself, so a reading can say whether it drifted.</b> A gate whose refusals
+    /// change between two runs is either seeing different moments or holding a different bar,
+    /// and a count of refusals cannot tell those apart.
+    /// </remarks>
+    public double Bar { get; init; }
 }

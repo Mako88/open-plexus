@@ -974,14 +974,15 @@ public sealed class ChainingTests(ITestOutputHelper output)
         var lesson = Lesson.Chained;
         var half = lesson.Exam.Count / 2;
 
-        output.WriteLine($"{Seeds} seeds, {half} questions a half, 5 tellings");
+        output.WriteLine($"{Seeds} seeds, {half} questions a half");
         output.WriteLine(
-            $"{"half",-9}{"first",8}{"weight",9}{"margin",9}{"second",8}{"weight",9}"
-            + $"{"margin",9}{"uses",7}{"right",7}");
+            $"{"half",-9}{"tellings",9}{"first",8}{"weight",9}{"margin",9}{"second",8}"
+            + $"{"weight",9}{"margin",9}{"uses",7}{"right",7}");
 
         var used = new Dictionary<string, int>();
         var right = new Dictionary<string, int>();
 
+        foreach (var tellings in new[] { 5, 20 })
         foreach (var stated in new[] { true, false })
         {
             var asked = lesson with
@@ -997,7 +998,7 @@ public sealed class ChainingTests(ITestOutputHelper output)
             var reached = 0;
             var over = 0;
 
-            foreach (var put in Asking(asked, tellings: 5, Seeds))
+            foreach (var put in Asking(asked, tellings, Seeds))
             {
                 var one = Voted(put, put.Asked, null);
 
@@ -1033,20 +1034,21 @@ public sealed class ChainingTests(ITestOutputHelper output)
                     uses++;
             }
 
-            var name = stated ? "stated" : "implied";
+            var name = $"{(stated ? "stated" : "implied")}{tellings}";
 
             used[name] = uses;
             right[name] = reached;
 
             output.WriteLine(
-                $"{name,-9}{over,8}{firsts.DefaultIfEmpty(0.0).Average(),9:F3}"
+                $"{(stated ? "stated" : "implied"),-9}{tellings,9}{over,8}"
+                + $"{firsts.DefaultIfEmpty(0.0).Average(),9:F3}"
                 + $"{firstMargin.DefaultIfEmpty(0.0).Average(),9:F3}{over,8}"
                 + $"{seconds.DefaultIfEmpty(0.0).Average(),9:F3}"
                 + $"{secondMargin.DefaultIfEmpty(0.0).Average(),9:F3}{uses,7}{reached,7}");
         }
 
-        Assert.True(used.Count == 2 && right.Count == 2,
-            $"{used.Count} of 2 halves reported, so the grid did not run");
+        Assert.True(used.Count == 4 && right.Count == 4,
+            $"{used.Count} of 4 cells reported, so the grid did not run");
     }
 
     /// <summary>The word an outcome code stands for in this world, for a printed row.</summary>

@@ -677,7 +677,21 @@ public sealed class DocsTests
     // and the deployment's own conversation is such a world. And it is inert on a fleet, which
     // holds no population for the read-only vote the mark comes off. Both are forks rather
     // than findings, so both are one line.
-    private const int Whole = 12_024;
+    // And 12,290 is the sixty-eighth raise, John's, and the largest in a while at two
+    // hundred and sixty-six words. It buys a REORDERING rather than an item: five things the
+    // machine cannot represent at all go above everything that tunes what it already
+    // represents. A moment is a set, so two of a kind at once are one thing. Nothing mints an
+    // individual, so nothing persists through a change. A category is named from its members,
+    // so a group that grows is a new code and every scope over the old one goes stale. Nothing
+    // can say a thing does NOT hold, which is the whole propositional gap because the
+    // population is already a disjunction of conjunctions. And an expectation is one code, so
+    // a negated conclusion is unsayable however the scope is written.
+    //
+    // Three of those are new forks and two are old ones re-aimed, and the words are mostly the
+    // ORDER block that marks them REQUIREMENTS rather than arms -- which is the rule that
+    // stops the next session deleting a prerequisite for losing a reading it cannot win until
+    // what it enables exists. `CLAUDE.md` carries the rule and this carries the list.
+    private const int Whole = 12_290;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -29,8 +29,18 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **The genesis gate**, which finds every rule three worlds hold and loses the held-out set
-  on two more. Fork **135**.
+- **The five below are REQUIREMENTS rather than arms.** John's. A losing reading is a cost
+  to record rather than grounds to delete, and each owes an ARCHITECTURE line written the day
+  its mechanism ships — *a thing is ONE thing* and *it can say what does not hold*.
+- **A moment carries multiplicity**, a SET being what it is. Fork **142**.
+- **Then an individual, minted on CONTINUITY** rather than on confidence. Fork **93**.
+- **Then a category named from a founding key**, so membership moves under a name that does
+  not. Fork **143**.
+- **Then negation, by a code fired when one LEAVES** — never here, here and just left being
+  three states of which only the last is an event. Forks **30**, **64**.
+- **Then a negated expectation, then reading a commitment backwards.** Fork **115**.
+- **Then the genesis gate**, which finds every rule three worlds hold and loses the held-out
+  set on two more. Fork **135**.
 - **Then the third store, read BY KEY.** John's, and above the chain because the reading says
   so: where the right statement is in front of it the learner is at its bound, so the exam is
   short of RETRIEVAL. Not measurable on a spine lesson, exhausted at one telling. Fork **139**.
@@ -282,8 +292,13 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       offline, so no run reaches it.
     - **OPEN** — nothing tracks a source through a CHANGE, so a thing that moves is a new
       one and adhesion never reaches an individual. Fork **106**.
-    - **OPEN** — minting an INDIVIDUAL is unbuilt. Where a thing never moves a source and a
-      thing are one set; where it moves they come apart.
+    - **OPEN** — a moment is a SET, so two of a kind at once collapse to one. A multiset, or
+      a code carrying an instance. Fork **142**.
+    - **OPEN** — minting an INDIVIDUAL is unbuilt and CONTINUITY is where to site it: a
+      bundle mostly recurring in the successor moment is one thing. Confidence over repetition
+      is the other road and the biology says it is the later one. Fork **93**.
+    - **OPEN** — a front end whose codes survive a scene SHIFTING is the other half, and
+      changing the feature basis to get one is refuted below. Fork **145**.
     - **OPEN** — the same input mints the same codes, so a KIND recurs for free. What never
       recurs is two moments' codes being present TOGETHER, which is what co-firing reads.
       John's.
@@ -336,6 +351,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       an expectation, so a group off the misses is unreadable to categories. Fork **137**.
     - **OPEN** — which words can be a PREMISE follows the telling ORDER, so a machine reasons
       from what it heard first. Fork **138**.
+    - **OPEN** — nothing relates two ATTRIBUTE words, so *how loud is the cat* reaches *the
+      cat sound is meow* only where a chain happens to pass through. Fork **144**.
     - **OPEN** — label-first is unbuilt: being told a word for a thing nothing else is known
       about.
     - **OPEN** — a word is one hash, so `walked` and `walking` are as unrelated as `walked`
@@ -345,6 +362,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       tokens having raised the floor while abstracting nothing. Fork **42**.
     - **OPEN** — should the separation bar be charged by what a scope's codes STAND FOR
       rather than by how many. Fork **71**.
+    - **OPEN** — a category is named from its MEMBERS, so a group that grows is a new code
+      and every scope over the old one goes stale. Name it from a founding key and membership
+      moves under a name that does not. John's. Fork **143**.
     - **OPEN** — a category is the set of codes that are ALTERNATIVES, from moments alone.
       Open on the individual, which substitutability never reaches. `csharp` refuted a
       SIMILARITY code as the coarse form, a hub at one end and an index at the other. **83**
@@ -367,11 +387,11 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       wired rather than measured. Its grid is `Arranged`'s. Fork **110**.
     - **OPEN** — a fresh child starts BLIND and re-earns its statistics, a floor every rung
       of a chain pays while only the last pays off. The escape is rung five.
-    - **OPEN** — rung two, negation, *X and NOT Z*. The failures do not ask for it and the
-      probe that says so cannot see monk-2's known ceiling, so what is unpriced is the rung
-      AND the instrument. Fork **30**.
-    - **OPEN** — emit *Z was absent* as its own code at settlement, so rung two needs no new
-      matcher. Bounded to the commitment's own hits. Fork **64**.
+    - **OPEN** — negation is the WHOLE propositional gap: the population is already a
+      disjunction of conjunctions, so DNF plus a negation says every Boolean function and XOR
+      needs nothing of its own. Forks **30**, **64**.
+    - **OPEN** — an expectation is one code, so *X implies NOT Z* is unsayable however the
+      scope is written. Fork **115**.
     - **OPEN** — `Mending.Uncovered` is a gate plus every-round repair, and the gate alone
       is far worse than none. Fork **37**.
     - **OPEN** — a per-COMMITMENT signal separating *needs specialising* from *is being

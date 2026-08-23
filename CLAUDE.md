@@ -230,6 +230,16 @@ These are the parts worth more than the code.
 - **An arm only lives while it is compared.** A winner becomes the code; the loser is deleted
   and leaves a revival row saying what would bring it back. A row without one is a
   superstition.
+- **A requirement is not an arm.** John's, and the comparison is never against absence.
+  Where an entry of THE ARCHITECTURE has one mechanism and no alternative, a
+  losing reading is a cost to record rather than grounds to delete — a prerequisite pays off
+  only once what it enables exists, so a greedy read deletes it every time. It leaves when a
+  better mechanism for the same entry beats it, and never before. `THE ORDER` marks which
+  items these are.
+- **And an exemption from deletion is never one from measurement.** The reading is still
+  taken and still written down, and the mechanism still owes a check that can FAIL — that it
+  does the thing it claims, which is falsifiable without being a score. Score-gating becomes
+  capability-gating; it does not become faith.
 - **Nothing ships switched off**, and preserving recorded numbers is never a reason to keep
   anything or to not change it. A dial is a new ability — turn it on, that is why it was built
   — or a replacement, so both arms run until one wins and the loser goes. Neither road ends at

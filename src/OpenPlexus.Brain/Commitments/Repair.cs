@@ -913,12 +913,17 @@ internal sealed record CommittingSettings
 /// </para>
 /// <para>
 /// <b>And a part may be a sentence</b>, which this treats exactly as it treats an object.
-/// <see cref="Codes.Coded.Groups"/> says a part is a sentence, an object or a reading, and
-/// three worlds fill the channel today by grouping objects — so the day a world reports its
-/// STATEMENTS as parts, every scope spanning two of them stops firing and nothing here can
-/// tell that from the mechanism working. What would catch it is a world whose parts are
-/// sentences and whose answer needs two of them, which is the world settlement by successor
-/// is already waiting for.
+/// <see cref="Codes.Coded.Groups"/> says a part is a sentence, an object or a reading, and a
+/// world reporting its STATEMENTS as parts has every scope spanning two of them stop firing,
+/// which nothing here can tell from the mechanism working.
+/// </para>
+/// <para>
+/// <b>That case is live rather than hypothetical</b>, and it arrived when the grouping stopped
+/// being flattened. A word said in two statements used to be dropped from the report and so
+/// constrained nothing; it is now in two things, and a scope naming it beside a word from a
+/// THIRD statement is about no one thing and no longer fires. What would still catch a
+/// mechanism failing silently is a world whose parts are sentences and whose answer needs two
+/// of them, which is the world settlement by successor is already waiting for.
 /// </para>
 /// <para>
 /// <b>Both halves or neither</b>, which is why this is one dial and not two. A matcher that

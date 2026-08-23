@@ -32,12 +32,12 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **The four below are REQUIREMENTS rather than arms.** John's. A losing reading is a cost
   to record rather than grounds to delete, and *it can say what does NOT hold* carries no
   mechanism, so `OutstandingTests` is red until it does.
-- **An individual, minted on CONTINUITY** rather than on confidence. Fork **93**.
-- **Then a category named from a founding key**, so membership moves under a name that does
-  not. Fork **143**.
-- **Then negation, by a code fired when one LEAVES** — never here, here and just left being
-  three states of which only the last is an event. Forks **30**, **64**.
+- **Negation, by a code fired when one LEAVES** — never here, here and just left being three
+  states of which only the last is an event. It closes the red. Forks **30**, **64**.
 - **Then a negated expectation, then reading a commitment backwards.** Fork **115**.
+- **Then a category named from a founding key**, so membership moves under a fixed name.
+  Fork **143**.
+- **Then an individual**, the successor moment refuted below. Fork **93**.
 - **Then the genesis gate**, which finds every rule three worlds hold and loses the held-out
   set on two more. Fork **135**.
 - **Then the third store, read BY KEY.** John's, and above the chain because the reading says

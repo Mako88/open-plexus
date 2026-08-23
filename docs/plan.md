@@ -33,10 +33,10 @@ that is finished LEAVES, so this is only ever what is still to do.
   build: a session cannot reach green without doing them. One is left and it is fork **28**'s.
 - **Then the genesis gate**, which finds every rule three worlds hold and loses the held-out
   set on two more. Subsumption deletes what it builds, and that arm is dispatched. Fork **135**.
-- **Then what a placement is WORTH**, which is the whole of the chain. The concluding rule
-  is certain, its only firing premise is worth a quarter, and believing a placed word reaches
-  five rivals. So the value is whether the chain SETTLES, and it is learnt. `ChainingTests`.
-  Forks **115** and **129** are one item.
+- **Then what a placement is WORTH**, which is the chain and fork **137** at once: a placed
+  word is IN a moment, so it can be a premise where an answer word never is. Believing one
+  reaches five rivals, so the value is whether the chain SETTLES. `ChainingTests`. Forks
+  **115**, **129**, **137**.
 - **Then which worlds still answer a live question**, measured rather than guessed. An
   isolating world leaves when its question shuts and fourteen are open.
 - **Then the crossing itself**, which falls out of that one: a name over the co-firing shape

@@ -330,7 +330,7 @@ public sealed class ChainingTests(ITestOutputHelper output)
             var slotted = new List<double>();
             var picked = 0;
 
-            foreach (var (all, world, _, goal, asked) in Asking(implied, tellings, Seeds))
+            foreach (var (all, _, world, _, goal, asked) in Asking(implied, tellings, Seeds))
             {
                 {
                     var fires = all.Where(one => Fires(one, asked, world)).ToList();
@@ -550,7 +550,7 @@ public sealed class ChainingTests(ITestOutputHelper output)
             var rule = new List<double>();
             var opportunity = new List<double>();
 
-            foreach (var (all, world, _, goal, asked) in
+            foreach (var (all, _, world, _, goal, asked) in
                 Asking(implied, tellings, Seeds).Where(one => one.Quiz == quiz))
             {
                 // The best premise: whatever fires on the question and concludes a word some
@@ -662,7 +662,7 @@ public sealed class ChainingTests(ITestOutputHelper output)
             var weights = new List<double>();
             var rivals = new List<double>();
 
-            foreach (var (all, world, _, goal, asked) in Asking(implied, tellings, Seeds))
+            foreach (var (all, _, world, _, goal, asked) in Asking(implied, tellings, Seeds))
             {
                 {
                     // Every outcome, weighted by the best chain that grounds it when the
@@ -708,6 +708,239 @@ public sealed class ChainingTests(ITestOutputHelper output)
         }
 
         Assert.True(grounded.Count == 4, $"{grounded.Count} of 4 arms reported");
+    }
+
+    /// <summary>
+    /// What the ORDINARY vote says once one word is supposed — <b>the reading the weights
+    /// above stand in for.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A chain weight is not a vote.</b> This file held only weights: both ceilings above
+    /// score a chain by an arithmetic written here — a believed place is worth one, an inferred
+    /// one is worth what some rule already says — and a mechanism has neither. It puts a code in
+    /// the moment and the machine votes the ordinary way, so what decides is
+    /// <see cref="Population.Predict"/> over <see cref="Population.Firing"/> and nothing else.
+    /// </para>
+    /// <para>
+    /// <b>Three columns answering three questions.</b> Whether ANY single word makes the
+    /// ordinary vote name the goal is the ceiling on the whole family, and a nought there kills
+    /// it with no mechanism written. How MANY words do it says whether the choice is a choice: a
+    /// question where every supposition wins is one where supposing carries no information. And
+    /// the machine's own top answer supposed back is the refuted shape, run beside the other two
+    /// as the control it never had.
+    /// </para>
+    /// <para>
+    /// <b>The candidate set is the whole vocabulary.</b> That is the generous half: a mechanism
+    /// would bound it by a backward read, so a word that works here may be one no backward read
+    /// proposes. A nought is decisive and a number above it is an upper bound, which is the
+    /// arrangement <see cref="Missing"/> already uses.
+    /// </para>
+    /// <para>
+    /// <b>And the last column is a trap check rather than a finding.</b> Putting back the code
+    /// the vote handed over, untranslated, reaches the goal on nought of twelve where the same
+    /// word through the world's alphabet reaches twelve. An expectation is an index and a scope
+    /// holds a hash, which is fork 137. It is checked here because a reading that got the
+    /// alphabet wrong would print nought and read as a verdict; the refuted arm translated, so
+    /// this does not explain that nought.
+    /// </para>
+    /// <para>
+    /// <b>What is left unexplained is the gap between this and the run.</b> The winner supposed
+    /// back reaches the goal on twelve of twelve here and scored nought in a run of the same
+    /// lesson. Neither the alphabet, the choice of word nor the second vote's arithmetic is what
+    /// separates them, so what is left is what a question's moment carries beyond its own words.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_the_ordinary_vote_says_once_one_word_is_supposed()
+    {
+        const int Seeds = 3;
+
+        var lesson = Lesson.Chained;
+        var implied = lesson with { Exam = [.. lesson.Exam.Skip(lesson.Exam.Count / 2)] };
+
+        output.WriteLine($"{Seeds} seeds, {implied.Exam.Count} implied questions");
+        output.WriteLine(
+            $"{"tellings",-10}{"asked",7}{"bare",6}{"supposed",10}{"words",7}{"working",9}"
+            + $"{"winner",8}{"as said",9}");
+
+        var supposing = new Dictionary<int, int>();
+        var bareRight = new Dictionary<int, int>();
+        var selective = new Dictionary<int, double>();
+        var ownAnswer = new Dictionary<int, int>();
+        var ownTop = new Dictionary<int, int>();
+        var untranslatedBy = new Dictionary<int, int>();
+        var questions = new Dictionary<int, int>();
+
+        foreach (var tellings in new[] { 1, 20 })
+        {
+            var asked = 0;
+            var bare = 0;
+            var reached = 0;
+            var winner = 0;
+            var words = 0;
+            var working = new List<double>();
+            var shown = new List<string>();
+            var circular = 0;
+            var untranslated = 0;
+
+            foreach (var put in Asking(implied, tellings, Seeds))
+            {
+                asked++;
+
+                var vote = Voted(put, null);
+
+                if (vote?.Expects == put.Goal) bare++;
+
+                var wins = 0;
+                var tried = 0;
+                var found = new List<string>();
+
+                for (var at = 0; at < put.World.Vocabulary.Count; at++)
+                {
+                    var word = Babi.Of(put.World.Vocabulary[at]);
+
+                    if (put.Asked.Contains(word)) continue;
+
+                    tried++;
+
+                    if (Voted(put, word)?.Expects != put.Goal) continue;
+
+                    wins++;
+                    found.Add(put.World.Vocabulary[at]);
+
+                    // The circularity check, and it is the one that decides whether any of
+                    // this is worth reading. A supposition of the ANSWER word that reaches
+                    // the answer is the corpus containing its own answer, one seam in.
+                    if (string.Equals(
+                        put.World.Vocabulary[at], put.Quiz.Answer, StringComparison.Ordinal))
+                        circular++;
+                }
+
+                words = Math.Max(words, tried);
+
+                if (wins > 0) reached++;
+
+                working.Add(wins);
+
+                if (shown.Count < 4)
+                    shown.Add(
+                        $"    \"{put.Quiz.Question}\" wants {put.Quiz.Answer}, "
+                        + $"bare says {Named(put, vote?.Expects)}, "
+                        + $"supposing {string.Join(" or ", found)} reaches it");
+
+                // The refuted shape as a control: the machine's own top answer, put back in
+                // front of itself. Nought here beside a number in the column left of it is
+                // what would say the family survives its own refutation.
+                if (vote?.Expects is { } said
+                    && Brain.Meant(said) is { } meant
+                    && meant < put.World.Vocabulary.Count
+                    && Voted(put, Babi.Of(put.World.Vocabulary[meant]))?.Expects == put.Goal)
+                    winner++;
+
+                // And the same word in the OTHER alphabet, which is fork 137's whole claim.
+                // An expectation is an index and a scope holds a hash, so putting back what
+                // the vote handed over reaches no scope at all.
+                if (vote?.Expects is { } raw && Voted(put, raw)?.Expects == put.Goal)
+                    untranslated++;
+            }
+
+            supposing[tellings] = reached;
+            bareRight[tellings] = bare;
+            selective[tellings] = working.DefaultIfEmpty(0.0).Average();
+            ownAnswer[tellings] = circular;
+            ownTop[tellings] = winner;
+            untranslatedBy[tellings] = untranslated;
+            questions[tellings] = asked;
+
+            output.WriteLine(
+                $"{tellings,-10}{asked,7}{bare,6}{reached,10}{words,7}"
+                + $"{working.DefaultIfEmpty(0.0).Average(),9:F1}{winner,8}"
+                + $"{untranslated,9}");
+
+            // Which word, because a column saying one of thirteen works cannot say whether
+            // that one is the intermediate or the answer itself. The second would be the
+            // corpus containing its own answer and the reading would be worth nothing.
+            foreach (var line in shown) output.WriteLine(line);
+        }
+
+        Assert.True(supposing.Count == 2 && bareRight.Count == 2,
+            $"{supposing.Count} of 2 tellings reported, so the grid did not run");
+
+        // The premise the rest of the file rests on, read here rather than assumed. A bare
+        // question naming its own implied answer would mean the chain is already reached and
+        // every reading above is about something else.
+        Assert.True(bareRight.Values.Sum() == 0,
+            $"{bareRight.Values.Sum()} implied questions are answered by the bare vote, so "
+            + "the second hop is not what this half is short of. Re-read the file");
+
+        // The reading itself. A nought here kills every shape that supposes a word, because
+        // no choice of word reaches the answer under the ordinary vote.
+        Assert.True(supposing.Values.All(one => one == questions[1]),
+            $"supposing one word reaches the goal on {supposing[1]} and {supposing[20]} of "
+            + $"{questions[1]} implied questions rather than all of them. The ceiling on the "
+            + "family has moved, so say what changed and re-price fork 28");
+
+        // And it is a CHOICE rather than a licence. Thirteen candidates and about one of them
+        // works, so a mechanism that supposes at random reaches almost nothing and the value
+        // is in which word.
+        Assert.True(selective.Values.Max() < 2.0,
+            $"about {selective.Values.Max():F1} of the candidate words reach the goal, so "
+            + "supposing is closer to a licence than a choice and a chooser buys less than "
+            + "this reading assumed");
+
+        // The corpus containing its own answer, which is what would make all of it worthless.
+        Assert.True(ownAnswer.Values.Sum() == 0,
+            $"the answer word itself is a working supposition on {ownAnswer.Values.Sum()} "
+            + "questions, so the reading is circular and says nothing about a chain");
+
+        // And the refuted shape, run as a control. The machine's own top answer supposed back
+        // reaches the goal here while the same shape scored nought in a run, so what separates
+        // them is not the choice of word.
+        // The alphabet, and it is a check on this reading rather than a reading. A supposition
+        // put back untranslated cannot reach any scope, so a run that got this wrong would
+        // print nought everywhere and look like a verdict on the mechanism.
+        Assert.True(untranslatedBy.Values.Sum() == 0,
+            $"the code the vote handed over reaches the goal on {untranslatedBy.Values.Sum()} "
+            + "questions when it is put back untranslated. A scope holds a hash and an "
+            + "expectation is an index, so a number here means fork 137 has moved");
+
+        Assert.True(ownTop.Values.Min() > 0,
+            $"the machine's own top answer supposed back reaches the goal on {ownTop[1]} and "
+            + $"{ownTop[20]} of {questions[1]}. A nought would put the refuted shape and this "
+            + "ceiling in agreement, which is a different finding");
+    }
+
+    /// <summary>The word an outcome code stands for in this world, for a printed row.</summary>
+    /// <param name="put">The question and its world.</param>
+    /// <param name="said">The outcome code, or nothing where nothing was said.</param>
+    private static string Named(Put put, Code? said) =>
+        said is { } one && Brain.Meant(one) is { } at && at < put.World.Vocabulary.Count
+            ? put.World.Vocabulary[at]
+            : "nothing";
+
+    /// <summary>
+    /// What the ordinary vote says about a question, with one word supposed or with none.
+    /// </summary>
+    /// <param name="put">The question, its run and the population that votes.</param>
+    /// <param name="supposed">
+    /// The word the machine puts in front of itself, or nothing for the bare question.
+    /// </param>
+    /// <remarks>
+    /// <b>Folded through <see cref="Population.Moment"/> like any other moment</b>, so a
+    /// supposed code reaches a minted name exactly as a heard one does. A supposition that
+    /// skipped the fold would be a different kind of input, and the whole claim is that it is
+    /// not one.
+    /// </remarks>
+    private static Vote? Voted(Put put, Code? supposed)
+    {
+        var raw = new HashSet<Code>(put.Asked);
+
+        if (supposed is { } one) raw.Add(one);
+
+        var firing = put.Population.Firing(put.Population.Moment(raw));
+
+        return firing.IsDefaultOrEmpty ? null : put.Population.Predict(firing);
     }
 
     /// <summary>
@@ -845,12 +1078,23 @@ public sealed class ChainingTests(ITestOutputHelper output)
 
     /// <summary>One question put to one run, with everything a reading needs.</summary>
     /// <param name="Held">Every resident at the end of that run.</param>
+    /// <param name="Population">
+    /// The same residents as the thing that VOTES over them.
+    /// </param>
     /// <param name="World">The conversation, for the word a code stands for.</param>
     /// <param name="Quiz">The question, for a reading that wants only one of them.</param>
     /// <param name="Goal">The outcome code the right answer is.</param>
     /// <param name="Asked">What the question itself says, as codes.</param>
+    /// <remarks>
+    /// <b>The population is here beside the list</b>, because a weight is not a vote. Every
+    /// reading in this file before <see cref="What_the_ordinary_vote_says_once_one_word_is_supposed"/>
+    /// scored a chain by an arithmetic of its own, and a mechanism would have to win the
+    /// ordinary vote instead. So one reading needs the thing that decides rather than the
+    /// residents it decides over.
+    /// </remarks>
     private readonly record struct Put(
         IReadOnlyList<Commitment> Held,
+        Population Population,
         Conversing World,
         Quiz Quiz,
         Code Goal,
@@ -881,6 +1125,7 @@ public sealed class ChainingTests(ITestOutputHelper output)
 
                 yield return new Put(
                     all,
+                    learnt.Held,
                     learnt.World,
                     quiz,
                     goal,

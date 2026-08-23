@@ -36,10 +36,9 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **Then the third store, read BY KEY.** John's, and above the chain because the reading says
   so: where the right statement is in front of it the learner is at its bound, so the exam is
   short of RETRIEVAL. Not measurable on a spine lesson, exhausted at one telling. Fork **139**.
-- **Then what a placement is WORTH**, which is the chain and fork **137** at once: a placed
-  word is IN a moment, so it can be a premise where an answer word never is. Believing one
-  reaches five rivals, so the value is whether the chain SETTLES. `ChainingTests`. Forks
-  **115**, **129**, **137**.
+- **Then what a question's moment carries beyond its own WORDS**, which the chain turns on: a
+  supposed word wins the ordinary vote on the words and the same shape scored nought in a run.
+  `ChainingTests`. Forks **28**, **115**, **129**, **137**.
 - **Then which worlds still answer a live question**, measured rather than guessed. An
   isolating world leaves when its question shuts and fourteen are open.
 - **Then the crossing itself**, which falls out of that one: a name over the co-firing shape
@@ -452,8 +451,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — what supplies a talked world its evidence: repair cannot fire until the
       fifth telling and the terminal ships one. Fork **136**.
     - **OPEN** — a round is fold, fire, vote, nothing puts what fired BACK in the moment, and
-      the horizon is K=1, so a conclusion needing two statements is unreachable at any
-      repetition. Nine shapes are refuted and the parts are all present. Forks **28**, **125**.
+      the horizon is K=1. Nine shapes are refuted, and the tenth is barred by the run rather
+      than by the vote, which reaches the answer. Forks **28**, **125**.
     - **OPEN** — entailment depth and the horizon are capped at one; both come off when
       blame diffusion has a number. Fork **32**.
     - **OPEN** — a lucky advocate blocks genesis, so proposals stop within a hundred rounds

@@ -3048,4 +3048,72 @@ public sealed class LessonTests(ITestOutputHelper output)
                 + "is not reachable through the scopes a run actually mints");
         }
     }
+
+    /// <summary>
+    /// Which vocabulary a group off the misses is IN — <b>and nothing in the brain reads that
+    /// one.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The ceilings said build it and this says out of what.</b> A commitment that fires
+    /// and is wrong says what it wanted and what came, so the
+    /// pair is two codes standing in one another's place — and both of them are OUTCOME codes,
+    /// modality <c>Brain.Followed</c>, numbered by the world's own vocabulary index.
+    /// </para>
+    /// <para>
+    /// <b><see cref="Categories"/> is a vocabulary of MOMENT codes and the two are not one.</b>
+    /// A word reaches a scope as <c>Babi.Of</c>'s hash and reaches an expectation as
+    /// <c>Brain.Says</c>'s index, so the machine holds two names for one word and only the
+    /// world knows they are the same. Learning an outcome group into <c>Sorts</c> puts a code
+    /// in the fold's alphabet that no moment can hold and asks <c>Coarser</c> a question about
+    /// scopes it can never answer.
+    /// </para>
+    /// <para>
+    /// <b>This is the reading that stopped the build</b>, and it is asserted rather than
+    /// remembered. A mechanism was written, wired into settlement and the sweep, given a dial,
+    /// and taken out again: <c>Under</c> reads <c>Sorts.Coarser</c> over the SCOPE alone, so
+    /// the two arms of that dial could not have differed in anything a run does. A dial whose
+    /// arms cannot come apart is this repo's oldest trap wearing a new mechanism's clothes.
+    /// </para>
+    /// <para>
+    /// <b>What the misses name is a category over EXPECTATIONS</b>, and nothing consumes one
+    /// yet. That is the build, and it is the architecture's own line rather than a detour: a
+    /// goal is a set of codes wanted present, so a goal and a prediction are one type once
+    /// what is expected is a set.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_group_off_the_misses_is_in_the_outcome_alphabet_and_nothing_reads_that_one()
+    {
+        var lesson = Lesson.Creatures;
+
+        var one = Ran(
+            lesson, Carrying.Never, seed: 1, passes: 1, asserting: Asserting.Everything,
+            tellings: 20, rooting: Rooting.Wholly, crediting: Crediting.Birth,
+            admitting: Admitting.Testable);
+
+        var expectations = one.Brain.Held.All.Select(held => held.Expects).Distinct().ToList();
+        var scoped = one.Brain.Held.All.SelectMany(held => held.Scope).Distinct().ToList();
+
+        var outcomes = expectations.Count(code => Brain.Meant(code) is not null);
+        var crossing = scoped.Count(code => Brain.Meant(code) is not null);
+
+        output.WriteLine($"{lesson.About}, told 20 times, {one.Tally.Resident} residents");
+        output.WriteLine(
+            $"expectations : {expectations.Count} distinct, {outcomes} of them outcome codes");
+        output.WriteLine(
+            $"scope codes  : {scoped.Count} distinct, {crossing} of them outcome codes");
+        output.WriteLine(
+            "a word is `Babi.Of`'s hash in a scope and `Brain.Says`'s index in an expectation, "
+            + "so a group over one is unreadable in the other");
+
+        // Every expectation is in the outcome alphabet, which is what makes a group off the
+        // misses an outcome group. Computed rather than pinned, so it closes if the two
+        // alphabets are ever made one.
+        Assert.Equal(expectations.Count, outcomes);
+
+        // And no scope code is, so `Categories` and a group off the misses share nothing. If
+        // this ever goes red the vocabularies have met and the mechanism can be built.
+        Assert.Equal(0, crossing);
+    }
 }

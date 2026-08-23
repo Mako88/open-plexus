@@ -336,6 +336,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — what rung five names is a SET, never a variable, so the two rungs are not
       independent: a code carrying position AND value together makes the shared thing
       unnameable.
+    - **OPEN** — a word is two codes and only the WORLD knows: a hash in a scope, an index in
+      an expectation. So what the misses group is unreadable where categories live. Fork
+      **137**.
     - **OPEN** — label-first is unbuilt: being told a word for a thing nothing else is known
       about.
     - **OPEN** — a word is one hash, so `walked` and `walking` are as unrelated as `walked`

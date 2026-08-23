@@ -643,7 +643,13 @@ public sealed class DocsTests
     // each code in as many pairs as it was in. The leaf leaves as a question that closed and
     // the rows arrive as two things nobody should build again, so what grew is the memory
     // rather than the plan. The readings are in `LessonTests`.
-    private const int Whole = 11_876;
+    // And 11,905 is the sixty-fourth raise, twenty-nine words, for a fork nothing had named
+    // and which stopped a mechanism mid-build. A word is two codes -- `Babi.Of`'s hash where
+    // it sits in a scope, `Brain.Says`'s index where a commitment expects it -- so a group
+    // read off what stood in for what is in the outcome alphabet and `Categories` is in the
+    // moment's. `Under` reads `Sorts.Coarser` over the scope alone, so learning one into the
+    // other is a vocabulary nothing can ever read. The reading is in `LessonTests`.
+    private const int Whole = 11_905;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

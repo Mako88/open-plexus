@@ -3081,6 +3081,18 @@ public sealed class LessonTests(ITestOutputHelper output)
     /// goal is a set of codes wanted present, so a goal and a prediction are one type once
     /// what is expected is a set.
     /// </para>
+    /// <para>
+    /// <b>And the two alphabets are not one set under two names.</b> Nine of the twenty-three
+    /// words this lesson can expect never reach a scope at all, and they are answers — a word
+    /// only said at the end of a sentence has no successor to predict, so no moment carrying
+    /// it ever settles and no rule is ever conditioned on having heard it.
+    /// </para>
+    /// <para>
+    /// <b>So it can answer with a word it can never reason from</b>, which bounds a
+    /// chain before any population does. A conclusion wanting one of those nine as its premise
+    /// is unreachable however many rules are held, and that is the same wall
+    /// <c>ChainingTests</c> reports from the other side.
+    /// </para>
     /// </remarks>
     [Fact]
     public void A_group_off_the_misses_is_in_the_outcome_alphabet_and_nothing_reads_that_one()
@@ -3115,5 +3127,57 @@ public sealed class LessonTests(ITestOutputHelper output)
         // And no scope code is, so `Categories` and a group off the misses share nothing. If
         // this ever goes red the vocabularies have met and the mechanism can be built.
         Assert.Equal(0, crossing);
+
+        // What the fork actually costs, which naming it does not say. If every expectation is
+        // a word that also reaches a scope, the two alphabets are one set under two names and
+        // joining them is a renaming. If they are not, joining them changes what can be
+        // expected and what can be perceived at once, and that is a decision rather than a
+        // repair.
+        var spoken = one.World.Vocabulary;
+
+        var expected = expectations
+            .Select(code => Brain.Meant(code))
+            .Where(at => at is >= 0 && at < spoken.Count)
+            .Select(at => spoken[at!.Value])
+            .ToHashSet(StringComparer.Ordinal);
+
+        var perceived = scoped
+            .Select(code => one.World.Naming(code))
+            .Where(at => at is not null)
+            .Select(at => spoken[at!.Value])
+            .ToHashSet(StringComparer.Ordinal);
+
+        var both = expected.Intersect(perceived, StringComparer.Ordinal).Count();
+
+        output.WriteLine(
+            $"as words     : {expected.Count} expected, {perceived.Count} perceived, "
+            + $"{both} in both, {expected.Except(perceived, StringComparer.Ordinal).Count()} "
+            + "expected and never perceived");
+
+        foreach (var word in expected
+            .Except(perceived, StringComparer.Ordinal)
+            .Order(StringComparer.Ordinal))
+            output.WriteLine($"  expected only : {word}");
+
+        foreach (var word in perceived
+            .Except(expected, StringComparer.Ordinal)
+            .Order(StringComparer.Ordinal))
+            output.WriteLine($"  perceived only: {word}");
+
+        Assert.True(both > 0,
+            "no word is both expected and perceived, so the two alphabets are not one set "
+            + "under two names and fork 137 is a change to what can be expressed rather than "
+            + "a renaming");
+
+        // The half that prices the fork, and it is a ceiling on chaining rather than a fact
+        // about names. A word the machine can expect and never perceive is one it can answer
+        // with and never reason FROM, so any conclusion needing it as a premise is unreachable
+        // whatever the population holds. This is asserted as an inequality because it closes
+        // the day a front end puts those words in a scope, and that is the fix rather than
+        // this file.
+        Assert.True(expected.Count > both,
+            $"every one of the {expected.Count} words the machine can expect also reaches a "
+            + "scope, so nothing here bounds a chain and this reading has stopped saying "
+            + "anything -- take it off fork 137");
     }
 }

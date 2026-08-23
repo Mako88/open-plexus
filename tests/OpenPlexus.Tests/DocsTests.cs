@@ -649,7 +649,16 @@ public sealed class DocsTests
     // read off what stood in for what is in the outcome alphabet and `Categories` is in the
     // moment's. `Under` reads `Sorts.Coarser` over the scope alone, so learning one into the
     // other is a vocabulary nothing can ever read. The reading is in `LessonTests`.
-    private const int Whole = 11_905;
+    // And 11,927 is the sixty-fifth raise, twenty-two words, and the second in one session --
+    // which is said plainly because two in a session is how a budget stops meaning anything.
+    // What it buys is the sharper half of the fork above and the session's largest finding: a
+    // word said only at the end of a sentence has no successor to predict, so no moment
+    // carrying it ever settles and no scope is ever conditioned on it. Nine of the twenty-three
+    // words `Creatures` can answer with are in that state. The machine can say them and cannot
+    // reason from them, which bounds a chain before any population does -- and the chain is
+    // what `THE ORDER` is on. Leaving it out would have cost the next session the reason the
+    // fork matters. The reading is in `LessonTests`.
+    private const int Whole = 11_927;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

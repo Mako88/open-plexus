@@ -102,6 +102,9 @@ internal static class Program
             Asserting = asserting,
         });
 
+        // Handed in where the world and the brain meet, because which code an outcome is
+        // about is a fact only the world holds. Without it `Supposing` is one vote.
+        brain.Meaning = world.Meaning;
         var curiosity = new Curiosity(brain, rate, seed, world.Naming);
 
         // ONE vocabulary for the front end and the population, which is what `Categories`

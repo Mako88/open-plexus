@@ -36,18 +36,18 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **Then the third store, read BY KEY.** John's, and above the chain because the reading says
   so: where the right statement is in front of it the learner is at its bound, so the exam is
   short of RETRIEVAL. Not measurable on a spine lesson, exhausted at one telling. Fork **139**.
-- **Then a second hop that is READ-ONLY**, which the chain turns on: a supposed word wins the
-  ordinary vote on the run's own question moment, and the refuted arm ran inside the learning.
-  `ChainingTests`. Forks **28**, **115**, **129**, **137**.
-- **Then which worlds still answer a live question**, measured rather than guessed. An
-  isolating world leaves when its question shuts and fourteen are open.
-- **Then the crossing itself**, which falls out of that one: a name over the co-firing shape
-  and symbol is what carries a fact back to a drawing. Fork **107**.
+- **Then why the second hop stops paying as the telling repeats**, its gate reading the vote's
+  own thinness against a population repair keeps growing. `LessonTests`. Forks **28**, **115**,
+  **129**, **137**.
+- **Then which worlds still answer a live question**, measured rather than guessed. Fourteen
+  are open.
+- **Then the crossing itself**, which falls out of that one and carries a fact back to a
+  drawing. Fork **107**.
 - **A beginner language course as the primer.** John's. Ostensive by construction, one
   referent across video, audio and text, ordered for a learner with no language. Fork **132**.
 - **Mutual exclusion**, so a belief can be CONTRADICTED rather than only outvoted. Fork **99**.
-- **A weighed adhesion**, which no arm has built, with PPMI over `ByLikeness`'s counts beside
-  it. One of the three likeness readings leaves with a revival row. Fork **131**.
+- **A weighed adhesion**, with PPMI over `ByLikeness`'s counts beside it. One of the three
+  likeness readings leaves with a revival row. Fork **131**.
 - **What add-only costs** — a group that fills gradually mints at every size it passes
   through. Fork **130**.
 - **Audit TRAPS and DO NOT RE-TRY** — a failure class that has earned a check belongs in the
@@ -450,9 +450,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       anything here has run on. Fork **89**.
     - **OPEN** — what supplies a talked world its evidence: repair cannot fire until the
       fifth telling and the terminal ships one. Fork **136**.
-    - **OPEN** — a round is fold, fire, vote, nothing puts what fired BACK in the moment, and
-      the horizon is K=1. Nine shapes are refuted and the vote reaches the answer, so the
-      tenth is the one that does not touch what is learnt. Forks **28**, **125**.
+    - **OPEN** — a second hop is built and read-only, and what is open is the telling it stops
+      paying at: its gate reads the vote's own thinness and repair outgrows it. Forks **28**,
+      **125**.
     - **OPEN** — entailment depth and the horizon are capped at one; both come off when
       blame diffusion has a number. Fork **32**.
     - **OPEN** — a lucky advocate blocks genesis, so proposals stop within a hundred rounds
@@ -642,6 +642,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | Subsumption weighed against DISTINCT occasions rather than firings | Chance on the noisy multiplexer, no sound rule left. Its halving explanation is measured true on even worlds only | A bar tracking depth as that world's reach does, which is not one direction |
 | `Minting.UntilRefused` — naming until the gate refuses | Every count rose and hard-round coverage fell 2.7 standard errors; the extra sound rules were the LONG ones | A gate charging a name by what it stands for — fork 71 |
 | Subsumption as what ungated genesis costs | A third fewer deletions moved the held-out set well inside one standard error, five seeds a cell, on the condition registered before the run | A world where the deletions and the held-out score move together |
+| Gating a second hop on anything but the vote's own thinness | Refusing where the second vote's winner already fired separates neither half; refusing unless the first vote tied refuses the implied half with the stated one | A composition where a reached winner and an unreached one come apart |
 | A kill condition pre-registered on counts | `Minting`'s said the arm dies unless `named` or `stacked` moves. Both moved and it died anyway | Never on a column skew can raise. Pre-register on `Census.Paying` |
 | `Weighing.Summing` — an expectation worth its advocates added up | Led on none of ten worlds once the vote stopped steering the search, and a sum splits inexactly | A world where a crowd outweighs one always-right rule |
 | `Weighing.Lifting` — divide the best advocate by its answer's base rate | Beat `Strongest` nowhere in ten worlds, and trails worst where skew gives the divisor something to do | A world where an unusual answer on thin evidence is right |

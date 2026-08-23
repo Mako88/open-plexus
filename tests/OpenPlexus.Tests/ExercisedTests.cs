@@ -240,6 +240,9 @@ public sealed class ExercisedTests
                 every: 50),
             sorts));
 
+        // Handed in where the world and the brain meet, because which code an outcome is
+        // about is a fact only the world holds. Without it `Supposing` is one vote.
+        brain.Meaning = world.Meaning;
         var curiosity = new Curiosity(brain, rate: 1.0, seed: 1, world.Naming);
 
         // Budgeted for the widest statement, because `Asserting.Everything` makes a sentence

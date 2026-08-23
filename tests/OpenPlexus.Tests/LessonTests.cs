@@ -28,13 +28,15 @@ public sealed class LessonTests(ITestOutputHelper output)
         Asserting asserting = Asserting.Nothing, int tellings = 1, int revising = 0,
         Rooting rooting = Rooting.Singly, Crediting crediting = Crediting.Nothing,
         Replying replying = Replying.Word, Admitting admitting = Admitting.Anything,
-        Joining joining = Joining.Bagged, Deciding deciding = Deciding.Grounded)
+        Joining joining = Joining.Bagged, Deciding deciding = Deciding.Grounded,
+        Supposing supposing = Supposing.Thinly)
     {
         var tutor = new Tutor(
             lesson, TextWriter.Null, passes, tellings, revising, replying: replying);
 
         var brain = new Brain(
-            Committing(capacity, rooting, crediting, admitting) with { Deciding = deciding },
+            Committing(capacity, rooting, crediting, admitting)
+                with { Deciding = deciding, Supposing = supposing },
             seed);
 
         var world = new Conversing(new ConversingSettings
@@ -45,6 +47,9 @@ public sealed class LessonTests(ITestOutputHelper output)
             Asserting = asserting,
         });
 
+        // Handed in where the world and the brain meet, because which code an outcome is
+        // about is a fact only the world holds. Without it `Supposing` is one vote.
+        brain.Meaning = world.Meaning;
         var curiosity = new Curiosity(brain, rate: 1.0, seed, world.Naming);
 
         // Named, because the front end is the next arm this file will want and a bench holding
@@ -2128,9 +2133,11 @@ public sealed class LessonTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public void A_conclusion_that_follows_from_two_statements_is_never_reached()
+    public void A_conclusion_that_follows_from_two_statements_is_reached_only_by_supposing()
     {
-        const int Seeds = 3;
+        static string Said(Measured one) => $"{one.Mean:F3} +-{one.StdErr:F3}";
+
+        const int Seeds = 5;
 
         int[] tellings = [1, 5, 20];
 
@@ -2150,32 +2157,45 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         output.WriteLine($"{Seeds} seeds, one examination pass, {half} questions a half");
         output.WriteLine($"bars: recency {bar:F3}, marginal {marginal:F3}");
-        output.WriteLine($"{"tellings",-10}{"stated",9}{"implied",9}{"wanting",9}{"repaired",10}");
+        output.WriteLine(
+            $"{"supposing",-11}{"tellings",9}{"stated",17}{"implied",17}{"put",7}"
+            + $"{"refused",9}{"moved",7}{"repaired",10}");
 
-        var told = new Dictionary<int, double>();
-        var reached = new Dictionary<int, double>();
+        var told = new Dictionary<(Supposing, int), Measured>();
+        var reached = new Dictionary<(Supposing, int), Measured>();
 
+        foreach (var supposing in new[] { Supposing.Never, Supposing.Once, Supposing.Thinly })
         foreach (var many in tellings)
         {
             var one = new List<double>();
             var two = new List<double>();
-            var wanting = new List<double>();
             var repaired = new List<double>();
+            var put = new List<double>();
+            var refused = new List<double>();
+            var moved = new List<double>();
 
             for (var seed = 1; seed <= Seeds; seed++)
             {
                 var direct = Ran(
                     stated, Carrying.Never, seed, passes: 1, asserting: Asserting.Everything,
-                    tellings: many, rooting: Rooting.Wholly, crediting: Crediting.Birth);
+                    tellings: many, rooting: Rooting.Wholly, crediting: Crediting.Birth,
+                    supposing: supposing);
 
                 var hops = Ran(
                     implied, Carrying.Never, seed, passes: 1, asserting: Asserting.Everything,
-                    tellings: many, rooting: Rooting.Wholly, crediting: Crediting.Birth);
+                    tellings: many, rooting: Rooting.Wholly, crediting: Crediting.Birth,
+                    supposing: supposing);
 
                 one.Add(Right(direct.Tutor, 0));
                 two.Add(Right(hops.Tutor, 0));
-                wanting.Add(hops.Tally.Wanting);
                 repaired.Add(hops.Tally.Repaired);
+
+                // What the supposition DID, beside what it scored. A gate that refuses
+                // everything and a mechanism nothing reaches are the same unchanged score,
+                // and no accuracy column can tell them apart.
+                put.Add(hops.Brain.Supposals.Put);
+                refused.Add(hops.Brain.Supposals.Refused);
+                moved.Add(hops.Brain.Supposals.Moved);
 
                 // And every front end this repo has, on the arm that carries the story to the
                 // question. A SELECTING front end is the one relevance mechanism here -- it is
@@ -2189,40 +2209,68 @@ public sealed class LessonTests(ITestOutputHelper output)
                         Ran(implied, Carrying.Statements, seed, passes: 1,
                             asserting: Asserting.Everything, tellings: many,
                             rooting: Rooting.Wholly, crediting: Crediting.Birth,
-                            joining: reading).Tutor,
+                            joining: reading, supposing: supposing).Tutor,
                         0));
             }
 
-            told[many] = one.Average();
-            reached[many] = two.Average();
+            told[(supposing, many)] = new Measured { Arm = "stated", Values = one };
+            reached[(supposing, many)] = new Measured { Arm = "implied", Values = two };
 
             output.WriteLine(
-                $"{many,-10}{one.Average(),9:F3}{two.Average(),9:F3}{wanting.Average(),9:F3}"
+                $"{supposing.ToString().ToLowerInvariant(),-11}{many,9}"
+                + $"{Said(told[(supposing, many)]),17}{Said(reached[(supposing, many)]),17}"
+                + $"{put.Average(),7:F0}{refused.Average(),9:F0}{moved.Average(),7:F0}"
                 + $"{repaired.Average(),10:F1}");
         }
 
         // What a statement says is answered from one telling, which is the control half and
         // says the machinery is working.
-        Assert.True(told[1] > 0.9,
-            $"the stated half read {told[1]:F3} at one telling, so the control is broken and "
-            + "nothing below it can be interpreted");
+        Assert.True(told[(Supposing.Never, 1)].Mean > 0.9,
+            $"the stated half read {told[(Supposing.Never, 1)].Mean:F3} at one telling under "
+            + "the control, so the control is broken and nothing below it can be interpreted");
 
-        // And what two statements IMPLY is never reached, at any amount of repetition. A round
-        // is three calls -- fold the minted names in, collect every commitment whose scope is a
-        // subset of the moment, vote -- and no step puts what fired back into the moment and
-        // fires again. So a conclusion needing two facts is reachable only where both are
-        // already in front of the machine, and here neither statement holds the question's
-        // words together.
-        //
-        // This closes the day something chains. Forks 28 and 32.
-        Assert.All(tellings, many => Assert.True(reached[many] <= marginal,
-            $"the implied half read {reached[many]:F3} at {many} telling(s) against a marginal "
-            + $"of {marginal:F3}. Something is chaining, which is a result rather than a "
-            + "regression -- say what, and re-take this reading"));
+        // Under the control, what two statements IMPLY is never reached at any repetition. A
+        // round is three calls -- fold the minted names in, collect every commitment whose
+        // scope is a subset of the moment, vote -- and no step puts what fired back into the
+        // moment and fires again. So a conclusion needing two facts is reachable only where
+        // both are already in front of the machine, and here neither statement holds the
+        // question's words together.
+        Assert.All(tellings, many => Assert.True(
+            reached[(Supposing.Never, many)].Mean <= marginal,
+            $"the implied half read {reached[(Supposing.Never, many)].Mean:F3} at {many} "
+            + $"telling(s) under the CONTROL, against a marginal of {marginal:F3}. Something "
+            + "chains without a supposition, which is a different finding -- say what, and "
+            + "re-take this reading"));
 
         // And repetition does not creep towards it either, which is what says the ceiling is
         // structural rather than a matter of evidence.
-        Assert.Equal(reached[1], reached[20]);
+        Assert.Equal(
+            reached[(Supposing.Never, 1)].Mean, reached[(Supposing.Never, 20)].Mean);
+
+        // And supposing reaches it. This is the first thing in this repo to move the implied
+        // half off nought, and it is asserted where a printed row would have been read by
+        // nobody. Five tellings is the cell it wins on outright: the implied half clears the
+        // marginal and the stated half is untouched.
+        Assert.True(reached[(Supposing.Thinly, 5)].Mean > marginal,
+            $"supposing reads {reached[(Supposing.Thinly, 5)].Mean:F3} on the implied half at "
+            + $"five tellings, against a marginal of {marginal:F3}. The chain has gone, so say "
+            + "what changed and re-price fork 28");
+
+        Assert.True(
+            told[(Supposing.Thinly, 5)].Mean >= told[(Supposing.Never, 5)].Mean,
+            $"supposing costs the stated half at five tellings, "
+            + $"{told[(Supposing.Thinly, 5)].Mean:F3} against "
+            + $"{told[(Supposing.Never, 5)].Mean:F3}. The cell it won on has gone and the arm "
+            + "is owed a diagnosis or a deletion");
+
+        // And the GATE is what makes it pay rather than the supposition. Ungated it buys the
+        // same implied half and hands back the stated one, which is the comparison that says
+        // the bar is the mechanism and not a decoration on it.
+        Assert.True(
+            told[(Supposing.Once, 5)].Mean < told[(Supposing.Thinly, 5)].Mean,
+            $"ungated supposing keeps the stated half at {told[(Supposing.Once, 5)].Mean:F3} "
+            + $"against the gate's {told[(Supposing.Thinly, 5)].Mean:F3}, so the bar is "
+            + "refusing nothing that matters and the two arms are one arm");
     }
 
     [Fact]
@@ -2302,6 +2350,9 @@ public sealed class LessonTests(ITestOutputHelper output)
             Asserting = Asserting.Everything,
         });
 
+        // Handed in where the world and the brain meet, because which code an outcome is
+        // about is a fact only the world holds. Without it `Supposing` is one vote.
+        brain.Meaning = world.Meaning;
         var curiosity = new Curiosity(brain, rate: 1.0, seed: 1, world.Naming);
 
         var watching = new Watching<Coded>(

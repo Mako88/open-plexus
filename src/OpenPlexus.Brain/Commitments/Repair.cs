@@ -889,6 +889,9 @@ internal sealed record CommittingSettings
 
     /// <inheritdoc cref="Commitments.Spanning"/>
     public Spanning Spanning { get; init; } = Spanning.Thing;
+
+    /// <inheritdoc cref="Supposing"/>
+    public Supposing Supposing { get; init; } = Supposing.Thinly;
 }
 
 /// <summary>
@@ -1302,4 +1305,73 @@ internal static class Normal
 
         return x >= 0.0 ? y : 2.0 - y;
     }
+}
+
+/// <summary>
+/// Whether the machine puts its own answer back in front of itself before saying it.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>The second hop, read-only.</b> A round is fold, fire, vote, and nothing puts what fired
+/// back in the moment — so a conclusion following from two statements is unreachable at any
+/// repetition. <c>ChainingTests</c> reads the arithmetic: on the implied half of
+/// <c>Lesson.Chained</c> the bare vote never names the answer, one word of thirteen makes it
+/// name it, and that word is the one the bare vote already said.
+/// </para>
+/// <para>
+/// <b>What makes it a tenth shape rather than a refuted one.</b> Nine are in the plan's table
+/// and the closest, <i>the vote winner's alone</i>, is this shape written INSIDE the learning:
+/// it made a conclusion live in the round, so every counter after it was taken on a population
+/// the mechanism had changed, and its own accuracy fell with the score. This one sits in
+/// <c>Machines.Brain.Voting</c>, which settles nothing and mints nothing, so what it can change
+/// is the answer and nothing else.
+/// </para>
+/// <para>
+/// <b>And it is inert where a world cannot translate.</b> The supposition is a code in the
+/// moment's own alphabet and an expectation is an index, so <c>Machines.Brain.Meaning</c> is what
+/// relates them. A world that hands none in gets one vote, which is why this dial is measured
+/// on the conversation alone.
+/// </para>
+/// </remarks>
+internal enum Supposing
+{
+    /// <summary>One vote, on the moment as it arrived.</summary>
+    /// <remarks>
+    /// <b>The control</b>, and every number recorded before this existed was taken under it. It
+    /// has to be named to be one: a run that simply lacked the mechanism and a run with it
+    /// turned off are the same run, and only one of them is a comparison.
+    /// </remarks>
+    Never,
+
+    /// <summary>
+    /// The vote's own answer goes back into the moment once, and the second vote is what is
+    /// said.
+    /// </summary>
+    /// <remarks>
+    /// <b>One word and one step</b>, which is what the reading asks for. The chain on that
+    /// lesson is three links and two of them are already certainties, so what has to be reached
+    /// is the one leaf nothing grounds. Allowing more would price a search rather than this.
+    /// </remarks>
+    Once,
+
+    /// <summary>
+    /// The same, kept only where the supposition REACHED the rule that won the second vote.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>What <see cref="Once"/> lost on, and it lost on WHERE it fires.</b> A question whose
+    /// answer the machine already holds is answered by the first vote, and supposing that
+    /// answer back replaces a right answer with another one. On <c>Lesson.Chained</c> at five
+    /// tellings that costs the stated half a quarter and takes it to nought at twenty, while
+    /// buying the implied half its first number above the marginal.
+    /// </para>
+    /// <para>
+    /// <b>So the test is whether the supposition is the reason</b>, rather than a level
+    /// somebody picked. A second vote won by a rule that was already firing was reachable
+    /// without supposing anything, so the supposition changed the answer without being the
+    /// cause and the first vote stands. <c>ChainingTests</c> reads the two halves apart on
+    /// exactly that: 12 of 12 on the implied half against 3 of 12 on the stated one.
+    /// </para>
+    /// </remarks>
+    Thinly,
 }

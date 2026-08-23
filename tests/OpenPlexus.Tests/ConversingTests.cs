@@ -411,6 +411,9 @@ public sealed class ConversingTests(ITestOutputHelper output)
             Budget = budget,
         });
 
+        // Handed in where the world and the brain meet, because which code an outcome is
+        // about is a fact only the world holds. Without it `Supposing` is one vote.
+        brain.Meaning = world.Meaning;
         var asking = new Curiosity(brain, rate, seed, world.Naming);
 
         var joined = new Joined(Joining.Bagged);

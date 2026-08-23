@@ -81,6 +81,9 @@ public sealed class ChainingTests(ITestOutputHelper output)
 
         var world = Fixture.Talking(tutor, carrying);
 
+        // Handed in where the world and the brain meet, because which code an outcome is
+        // about is a fact only the world holds. Without it `Supposing` is one vote.
+        brain.Meaning = world.Meaning;
         var curiosity = new Curiosity(brain, rate: 1.0, seed, world.Naming);
 
         var tally = new Bench(
@@ -106,9 +109,11 @@ public sealed class ChainingTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>The implied half of <c>Lesson.Chained</c> reads nought</b> at one, five and twenty
-    /// tellings, against a marginal of 0.125 and a recency bar of 0.250. That reading is
-    /// <see cref="LessonTests.A_conclusion_that_follows_from_two_statements_is_never_reached"/>'s;
+    /// <b>The implied half of <c>Lesson.Chained</c> read nought</b> at one, five and twenty
+    /// tellings, against a marginal of 0.125 and a recency bar of 0.250, and it is
+    /// <see cref="Supposing"/> that moved it. That reading is
+    /// <see cref="LessonTests.A_conclusion_that_follows_from_two_statements_is_reached_only_by_supposing"/>'s
+    /// and its control arm still holds the nought;
     /// this one asks why, and there are two answers. Either the concluding rule exists and
     /// nothing reaches it, which is the loop's fault and is what backward reading would
     /// repair, or it was never minted, which is genesis's and is not.
@@ -498,7 +503,7 @@ public sealed class ChainingTests(ITestOutputHelper output)
         Assert.True(ranks.Values.Min() > 1.0,
             "the right answer now ranks first once a second hop is allowed, so the vote can "
             + "carry a chain and the implied half should move. Say what changed and re-take "
-            + "`LessonTests.A_conclusion_that_follows_from_two_statements_is_never_reached`");
+            + "`LessonTests.A_conclusion_that_follows_from_two_statements_is_reached_only_by_supposing`");
     }
 
     /// <summary>
@@ -939,6 +944,109 @@ public sealed class ChainingTests(ITestOutputHelper output)
             + $"{ownTop[(1, false)]} of {questions[(1, false)]} on the question's own words. A "
             + "nought would put the refuted shape and this ceiling in agreement, which is a "
             + "different finding");
+    }
+
+    /// <summary>
+    /// What separates a question the second hop should take from one it should not —
+    /// <b>the diagnosis on <see cref="Supposing.Once"/>'s loss.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>It moved the implied half off nought and cost the stated half.</b> On
+    /// <c>Lesson.Chained</c> at five tellings the implied half goes 0.000 to 0.150 against a
+    /// marginal of 0.125 and the stated half goes 1.000 to 0.750; at twenty the stated half
+    /// goes to nought. Nothing before it moved the implied half at all, so what is wrong with
+    /// the shape is WHERE it fires rather than what it does.
+    /// </para>
+    /// <para>
+    /// <b>So the question is what a machine can read.</b> On the stated half the first vote is
+    /// already the answer and supposing it replaces a right answer with a wrong one; on the
+    /// implied half the first vote is the intermediate. The machine cannot tell those apart by
+    /// the question, so this reads what it CAN see — the two votes' weights and margins, and
+    /// whether the second vote's advocate is a rule whose scope holds the supposed word.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_separates_a_question_the_second_hop_should_take_from_one_it_should_not()
+    {
+        const int Seeds = 3;
+
+        var lesson = Lesson.Chained;
+        var half = lesson.Exam.Count / 2;
+
+        output.WriteLine($"{Seeds} seeds, {half} questions a half, 5 tellings");
+        output.WriteLine(
+            $"{"half",-9}{"first",8}{"weight",9}{"margin",9}{"second",8}{"weight",9}"
+            + $"{"margin",9}{"uses",7}{"right",7}");
+
+        var used = new Dictionary<string, int>();
+        var right = new Dictionary<string, int>();
+
+        foreach (var stated in new[] { true, false })
+        {
+            var asked = lesson with
+            {
+                Exam = [.. stated ? lesson.Exam.Take(half) : lesson.Exam.Skip(half)],
+            };
+
+            var firsts = new List<double>();
+            var seconds = new List<double>();
+            var firstMargin = new List<double>();
+            var secondMargin = new List<double>();
+            var uses = 0;
+            var reached = 0;
+            var over = 0;
+
+            foreach (var put in Asking(asked, tellings: 5, Seeds))
+            {
+                var one = Voted(put, put.Asked, null);
+
+                if (one?.Expects is not { } first) continue;
+
+                if (Brain.Meant(first) is not { } at
+                    || at >= put.World.Vocabulary.Count) continue;
+
+                var word = Babi.Of(put.World.Vocabulary[at]);
+
+                if (put.Asked.Contains(word)) continue;
+
+                var two = Voted(put, put.Asked, word);
+
+                if (two?.Expects is not { } second) continue;
+
+                over++;
+                firsts.Add(one.Value.Weight);
+                seconds.Add(two.Value.Weight);
+                firstMargin.Add(one.Value.Margin);
+                secondMargin.Add(two.Value.Margin);
+
+                if (second == put.Goal) reached++;
+
+                // Whether the rule that won the second vote is one the supposition REACHED,
+                // read as whether it fired without one. A scope test would miss the folded
+                // case: a minted name over a set holding the supposed word puts the name in
+                // the scope and the word nowhere in it.
+                if (two.Value.By is { } by
+                    && !put.Population
+                        .Firing(put.Population.Moment(put.Asked))
+                        .Any(rule => rule.Identity == by))
+                    uses++;
+            }
+
+            var name = stated ? "stated" : "implied";
+
+            used[name] = uses;
+            right[name] = reached;
+
+            output.WriteLine(
+                $"{name,-9}{over,8}{firsts.DefaultIfEmpty(0.0).Average(),9:F3}"
+                + $"{firstMargin.DefaultIfEmpty(0.0).Average(),9:F3}{over,8}"
+                + $"{seconds.DefaultIfEmpty(0.0).Average(),9:F3}"
+                + $"{secondMargin.DefaultIfEmpty(0.0).Average(),9:F3}{uses,7}{reached,7}");
+        }
+
+        Assert.True(used.Count == 2 && right.Count == 2,
+            $"{used.Count} of 2 halves reported, so the grid did not run");
     }
 
     /// <summary>The word an outcome code stands for in this world, for a printed row.</summary>

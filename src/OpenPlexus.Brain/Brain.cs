@@ -73,6 +73,11 @@ internal sealed class Brain
 
     private readonly Dictionary<byte, long> _seen = [];
 
+    // How decisive this machine's votes usually are, recency-weighted over the moments a
+    // world pushed. It is the bar `Supposing.Thinly` reads and it is written HERE rather
+    // than where the bar is read, so `Voting` stays a question that can be asked twice.
+    private double _typical;
+
     /// <param name="dials">Every number the brain is allowed to have.</param>
     /// <param name="seed">The control arm's generator.</param>
     public Brain(CommittingSettings dials, int seed)
@@ -109,6 +114,35 @@ internal sealed class Brain
     /// <summary>Where the wall clock went, by phase.</summary>
     public Spent Spent => _substrate.Spent;
 
+    /// <summary>
+    /// Which code in a moment's own alphabet an outcome is about, where the world can say.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A fact only the world holds</b>, which is why it is handed in the way
+    /// <see cref="Population.Places"/> is. A word is two codes: a hash where it sits in a
+    /// scope and an index where it is expected, and nothing inside the brain relates the two.
+    /// So a machine putting its own answer back in front of itself needs the world to say
+    /// which code that answer IS.
+    /// </para>
+    /// <para>
+    /// <b>Nothing where a world cannot say</b>, and then <see cref="Supposing"/> is inert
+    /// rather than wrong. A world whose outcomes are not words of its own moments has no
+    /// translation to give, and a brain that guessed one would be putting a code in a moment
+    /// that stands for nothing there.
+    /// </para>
+    /// </remarks>
+    public Func<int, Code?>? Meaning { get; set; }
+
+    /// <summary>How many votes a supposition was put to, and how many it changed.</summary>
+    /// <remarks>
+    /// <b>Because a gate refusing nothing reads as one refusing a lot</b>, until something
+    /// counts what was built. Two arms of
+    /// <see cref="Supposing"/> can score alike while one of them never fires, and no accuracy
+    /// column can say so.
+    /// </remarks>
+    public Supposed Supposals { get; private set; }
+
     /// <summary>The code for one outcome.</summary>
     /// <param name="outcome">Which outcome, as a small whole number.</param>
     public static Code Says(int outcome)
@@ -131,9 +165,11 @@ internal sealed class Brain
     /// <param name="felt">The codes a moment would arrive as.</param>
     /// <remarks>
     /// <para>
-    /// <b>Read-only</b>, and it is the same three calls the failure census is built out of. It
-    /// moves no counter, mints nothing and settles nothing, so asking twice and asking once are
-    /// the same question.
+    /// <b>Read-only of the POPULATION</b>, and that is what <see cref="Supposing"/> rests on.
+    /// It mints nothing and settles nothing, so a supposition put here reaches what the machine
+    /// SAYS without reaching what it learns. What it does move is
+    /// <see cref="Supposals"/>, which is an instrument on this method rather than evidence
+    /// about anything — asking twice still gets the same answer.
     /// </para>
     /// <para>
     /// <b>What this machine holds rather than what a fleet would say</b>. A council's answer is
@@ -147,9 +183,42 @@ internal sealed class Brain
     {
         ArgumentNullException.ThrowIfNull(felt);
 
-        var moment = Held.Moment(felt as IReadOnlySet<Code> ?? new HashSet<Code>(felt));
+        var raw = felt as IReadOnlySet<Code> ?? new HashSet<Code>(felt);
+        var bare = Held.Firing(Held.Moment(raw));
+        var vote = Held.Predict(bare);
 
-        return Held.Predict(Held.Firing(moment));
+        if (Dials.Supposing is Supposing.Never
+            || Meaning is not { } meaning
+            || vote.Expects is not { } said
+            || Meant(said) is not { } outcome
+            || meaning(outcome) is not { } word
+            || raw.Contains(word))
+            return vote;
+
+        var supposed = new HashSet<Code>(raw) { word };
+        var again = Held.Predict(Held.Firing(Held.Moment(supposed)));
+
+        // A supposition that silenced the population says nothing, so the first vote stands.
+        // Nothing here is written down: the moment the world pushed is what settles, and a
+        // machine that learnt from its own guess would be scoring the guess as evidence.
+        Supposals = Supposals with { Put = Supposals.Put + 1 };
+
+        if (again.Expects is null) return vote;
+
+        // Whether the supposition is the REASON the answer changed. Adding a code can only
+        // add advocates, but the moment is FOLDED -- a minted name over a set holding the
+        // supposed word replaces its members, so a rule that fired on the bare moment can
+        // stop firing and one that never needed the supposition can take the round.
+        if (Dials.Supposing is Supposing.Thinly && vote.Margin >= _typical)
+        {
+            Supposals = Supposals with { Refused = Supposals.Refused + 1 };
+            return vote;
+        }
+
+        if (again.Expects != vote.Expects)
+            Supposals = Supposals with { Moved = Supposals.Moved + 1 };
+
+        return again;
     }
 
     /// <summary>Takes one moment, says what it expects, and settles what the source said.</summary>
@@ -202,6 +271,12 @@ internal sealed class Brain
         // the population as a whole answered correctly has not witnessed a failure, and
         // covering there would mint on every machine that happened to be quiet -- the
         // ungated genesis refutation arriving through the distribution.
+        // What a decisive vote looks like for this machine, which is what a thin one is thin
+        // against. A level somebody picked would be a world's number wearing a brain's
+        // clothes; this one moves with whatever the machine is currently doing.
+        if (vote.Expects is not null)
+            _typical += Dials.Recency * (vote.Margin - _typical);
+
         var learnt = await _substrate
             .TellAsync(
                 moment.Followed,
@@ -212,4 +287,22 @@ internal sealed class Brain
 
         return new Response { To = moment.From, Took = true, Vote = vote, Learnt = learnt };
     }
+}
+
+/// <summary>How much work a supposition did, for a reading that wants to know it fired.</summary>
+/// <remarks>
+/// <b>Three counts because they fail differently.</b> A gate refusing everything and a
+/// mechanism nothing ever reaches both read as an unchanged score, and a mechanism that fires
+/// constantly while changing no answer reads the same again.
+/// </remarks>
+internal readonly record struct Supposed
+{
+    /// <summary>How many moments a supposition was put to a second vote on.</summary>
+    public long Put { get; init; }
+
+    /// <summary>How many of those the gate sent back to the first vote.</summary>
+    public long Refused { get; init; }
+
+    /// <summary>How many of those changed the answer.</summary>
+    public long Moved { get; init; }
 }

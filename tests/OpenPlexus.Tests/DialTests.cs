@@ -85,6 +85,17 @@ public sealed class DialTests
     /// </summary>
     private static readonly Dictionary<string, string> HandSet = new(StringComparer.Ordinal)
     {
+        ["Supposing"] =
+            "whether the machine puts its own answer back in front of itself before saying "
+            + "it, and it is the tenth shape of a second hop rather than a level. Nine are "
+            + "refuted in the plan and the closest of them is this one written INSIDE the "
+            + "learning, so what a controller would hunt is not a number here -- the arms are "
+            + "off, ungated, and gated on the vote being thin for this machine. `LessonTests` "
+            + "runs all three on `Lesson.Chained`: ungated buys the implied half 0.150 against "
+            + "a control of nought and hands back the stated half, and the gate keeps both. "
+            + "The entry leaves when one arm has won at every telling, which it has not -- at "
+            + "twenty the gate still costs the stated half a quarter",
+
         ["Admitting"] =
             "what a separating condition must do besides separate, and the reason "
             + "it is an ARM has changed rather than gone. Two generated worlds have "
@@ -701,7 +712,18 @@ public sealed class DialTests
         // world built so the codes cannot say which shape belongs to which colour, it is
         // 0.9938 against 0.5050 on the withheld set -- and it is the control that holds more
         // rules. `BindingTests` carries the grid and the kill line it was written with.
-        Assert.Equal(19, HandSet.Count);
+        //
+        // AND TWENTY FOR `Supposing`, which is a rise and is written as one. It is the first
+        // mechanism in this repo to move `Lesson.Chained`'s implied half off nought, and what
+        // the knob holds open is not a level: its three arms are the mechanism off, the
+        // mechanism ungated, and the mechanism gated on the vote being thin for this machine.
+        // The middle one is what says the gate is doing the work rather than decorating it,
+        // and deleting it would delete that comparison.
+        //
+        // It ships ON, on the gated arm. At five tellings it reads 1.000 stated and 0.150
+        // implied against a control's 1.000 and nought, and at twenty it costs the stated half
+        // a quarter -- so the entry is open on a diagnosis rather than on a preference.
+        Assert.Equal(20, HandSet.Count);
     }
 
     /// <summary>
@@ -849,6 +871,15 @@ public sealed class DialTests
             + "so it is INERT everywhere else by construction. What it is waiting for is a "
             + "second world whose front end derives its own categories -- which is "
             + "`Alternating`'s wiring, and blocked on when a front end re-derives",
+
+        ["Supposing"] =
+            "`Conversing` ONLY, and it is inert everywhere else by construction rather than "
+            + "by nobody having done it. A supposition is a code in the moment's own alphabet "
+            + "and an expectation is an index, so a world that cannot translate one into the "
+            + "other gets one vote -- and `Conversing` is the only world here that numbers its "
+            + "outcomes in words of its own moments. What it is waiting for is fork 137: a "
+            + "brain-side relation between the two alphabets, after which every world can "
+            + "suppose and the bar is a comparison rather than one world's reading",
 
         ["Choosing"] =
             "`Multiplexer` ONLY, AND IT ALWAYS WAS -- this entry is a check that was passing "

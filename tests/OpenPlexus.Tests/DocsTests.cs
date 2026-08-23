@@ -668,7 +668,7 @@ public sealed class DocsTests
     // identical to dropping it, because moments are growing prefixes and a trailing token is
     // either the arrival or absent. Without the row the next session builds it again. The
     // readings are in the commit.
-    private const int Whole = 11_979;
+    private const int Whole = 11_975;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

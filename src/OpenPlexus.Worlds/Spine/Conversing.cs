@@ -926,6 +926,23 @@ public sealed class Conversing : IWorld<Coded>, IActed<Coded>
     /// </remarks>
     public int? Naming(Code code) => _naming.TryGetValue(code, out var at) ? at : null;
 
+    /// <summary>Which code a word is SAID as, by where it sits in the alphabet.</summary>
+    /// <param name="word">Where the word sits in <see cref="Vocabulary"/>.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>The inverse of <see cref="Naming"/></b>, and the pair is the whole of what a word
+    /// being two codes costs. A machine is handed an outcome as an index and a moment holds a
+    /// hash, so putting an answer back into a moment is a translation only the world can do.
+    /// </para>
+    /// <para>
+    /// <b>Nothing outside the alphabet</b>, which a caller has to be able to ask for. An
+    /// outcome index is a small whole number and there is no promise this world has heard a
+    /// word for every one of them.
+    /// </para>
+    /// </remarks>
+    public Code? Meaning(int word) =>
+        word >= 0 && word < _vocabulary.Count ? Babi.Of(_vocabulary[word]) : null;
+
     /// <summary>Where a word sits in the outcome alphabet, adding it if it is new.</summary>
     private int Heard(string word)
     {

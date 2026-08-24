@@ -449,8 +449,6 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
   - It can say what does not hold
     - **NOW** — a code derived at the join for what was live and is NOT now, so an absence is
       an EVENT and a scope is a conjunction of literals. `Departed`. Forks **30**, **64**.
-    - **OPEN** — no spine composition turns the dial on, so the code is derived on
-      instruments alone and the entry has never run. Fork **148**.
     - **OPEN** — never here is still unsayable, only a transition being observable.
     - **OPEN** — an expectation is one code, so *X implies NOT Z* is unsayable however the
       scope is written. Fork **115**.

@@ -29,14 +29,14 @@ public sealed class LessonTests(ITestOutputHelper output)
         Rooting rooting = Rooting.Singly, Crediting crediting = Crediting.Nothing,
         Replying replying = Replying.Word, Admitting admitting = Admitting.Anything,
         Joining joining = Joining.Bagged, Deciding deciding = Deciding.Grounded,
-        Supposing supposing = Supposing.Thinly)
+        Supposing supposing = Supposing.Thinly, Spanning spanning = Spanning.Thing)
     {
         var tutor = new Tutor(
             lesson, TextWriter.Null, passes, tellings, revising, replying: replying);
 
         var brain = new Brain(
             Committing(capacity, rooting, crediting, admitting)
-                with { Deciding = deciding, Supposing = supposing },
+                with { Deciding = deciding, Supposing = supposing, Spanning = spanning },
             seed);
 
         var world = new Conversing(new ConversingSettings
@@ -721,6 +721,89 @@ public sealed class LessonTests(ITestOutputHelper output)
         // run where both derived a vocabulary would mean the blocker had moved and this
         // reading no longer says what it says.
         Assert.NotEqual(vocabulary[Carrying.Never], vocabulary[Carrying.Statements]);
+    }
+
+    /// <summary>
+    /// What confining a scope to ONE STATEMENT does to the conversation — <b>the other
+    /// target world, where a cross-statement scope is the whole point.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Every reading in this file predates the front end reporting its parts.</b>
+    /// <c>Spanning.Thing</c> has shipped as the brain's default throughout and
+    /// <see cref="Joined"/> handed it nothing, so the dial was on and inert — the control by
+    /// accident. <c>Conversing</c> builds one part a statement, so it fires here now.
+    /// </para>
+    /// <para>
+    /// <b>And this world is where it should hurt if it hurts anywhere.</b> The walk reads it
+    /// free, refusing a ninth of the population and moving no answer, because a store arm has
+    /// already folded the hops into the statement it selects. Binding a question's actor to a
+    /// statement's actor is a scope over two utterances by construction, and it is what the
+    /// implied half of a chained lesson is made of.
+    /// </para>
+    /// <para>
+    /// <b>What would refute the default</b>, said before the run: the implied half falling
+    /// under the unconfined arm. Then a statement is the wrong grain of thing for a
+    /// conversation, and a dial chosen on a scene of objects is costing the target world the
+    /// rung it is waiting on.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_confining_a_scope_to_one_statement_does_to_the_conversation()
+    {
+        const int Seeds = 3;
+        const int Many = 8;
+
+        // The two halves as their own examinations, exactly as
+        // `A_conclusion_that_follows_from_two_statements_is_reached_only_by_supposing` splits
+        // them, so this reading and that one are about the same two things.
+        var chained = Lesson.Chained;
+        var half = chained.Exam.Count / 2;
+        var stated = chained with { Exam = [.. chained.Exam.Take(half)] };
+        var implied = chained with { Exam = [.. chained.Exam.Skip(half)] };
+
+        var scores = new Dictionary<(Spanning Spanning, bool Implied), List<double>>();
+
+        foreach (var spanning in new[] { Spanning.Thing, Spanning.Anything })
+            foreach (var seed in Enumerable.Range(1, Seeds))
+                foreach (var (told, hidden) in new[] { (stated, false), (implied, true) })
+                {
+                    var ran = Ran(
+                        told, Carrying.Never, seed, passes: 1,
+                        asserting: Asserting.Everything, tellings: Many,
+                        rooting: Rooting.Wholly, crediting: Crediting.Birth,
+                        spanning: spanning);
+
+                    var right = Right(ran.Tutor, 0);
+
+                    if (!scores.TryGetValue((spanning, hidden), out var taken))
+                        scores[(spanning, hidden)] = taken = [];
+
+                    taken.Add(right);
+
+                    output.WriteLine(
+                        $"{spanning,-9}| {(hidden ? "implied" : "stated ")} | seed {seed} "
+                        + $"| right {right:F3} | held {ran.Brain.Held.Count}");
+                }
+
+        foreach (var ((spanning, hidden), taken) in scores)
+            output.WriteLine(
+                $"{spanning,-9}| {(hidden ? "implied" : "stated ")} | worst {taken.Min():F3} "
+                + $"| best {taken.Max():F3}");
+
+        var confined = scores[(Spanning.Thing, true)];
+        var free = scores[(Spanning.Anything, true)];
+
+        // The implied half, worst against best, because that is the half a scope over two
+        // utterances is for. The stated half is printed beside it as the control: a fall in
+        // both is the dial costing population, and a fall in the implied half alone is the
+        // dial costing the binding.
+        Assert.True(confined.Max() >= free.Min(),
+            $"confining a scope to one statement reads {confined.Max():F3} at its best on the "
+            + $"implied half against {free.Min():F3} unconfined at its worst, so a statement "
+            + "is the wrong grain of THING for a conversation and the default is costing the "
+            + "target world the rung it is waiting on");
     }
 
     /// <summary>

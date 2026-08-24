@@ -864,11 +864,18 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// redrawn under a fixed population. <b>Written once because two grids read it</b>, and
     /// two loops that drifted apart would make their columns unreadable against each other.
     /// </remarks>
+    /// <param name="spanning">
+    /// Whether a scope may be about more than one of the things the front end reports —
+    /// <b>the brain's own default, named so the grid can turn it.</b> Every reading
+    /// in this file before <see cref="Joined"/> reported its parts was taken under
+    /// <see cref="Spanning.Thing"/> with nothing to read, which is the control by accident.
+    /// </param>
     private Dictionary<string, List<double>> Scored(
         IEnumerable<(string Name, Joined Joined)> arms,
         int people,
         Examining examining,
-        IChooses? acting = null)
+        IChooses? acting = null,
+        Spanning spanning = Spanning.Thing)
     {
         var scores = new Dictionary<string, List<double>>();
 
@@ -881,7 +888,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 var world = new Roaming(
                     World(120, people) with { Examining = examining }, seed);
 
-                var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed);
+                var brain = new Brain(
+                    new CommittingSettings { Capacity = 20_000, Spanning = spanning }, seed);
 
                 var tally = new Bench(
                     new Watching<Coded>(
@@ -905,6 +913,60 @@ public sealed class RoamingTests(ITestOutputHelper output)
             output.WriteLine($"{name,-12}| worst {taken.Min():F3} | best {taken.Max():F3}");
 
         return scores;
+    }
+
+    /// <summary>
+    /// What reading a statement as a THING costs the spine world — <b>the reading
+    /// <see cref="Joined"/>'s parts owe the moment they exist.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The dial had a reader and no filler.</b> <see cref="Spanning.Thing"/> ships as the
+    /// brain's default and was chosen on <c>Worlds.Binding</c>, an instrument whose parts are
+    /// objects in a scene. No text front end ever filled the channel, so every score in this
+    /// file was taken under a mechanism that could not fire — the control by accident rather
+    /// than by design.
+    /// </para>
+    /// <para>
+    /// <b>What would refute the default</b>, said before the run: this world's answer is
+    /// reached by two hops through two statements, so a scope confined to one of them cannot
+    /// express it. If <see cref="Spanning.Thing"/> reads below <see cref="Spanning.Anything"/>
+    /// at its best against the other's worst, a statement is the wrong grain of thing for text
+    /// and the default is an instrument's answer applied to the target.
+    /// </para>
+    /// <para>
+    /// <b>One arm rather than the grid</b>, and it is the leading one. What is being separated
+    /// is the dial and not the translation, so a second translation would move two things at
+    /// once for no extra reading.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_reading_a_statement_as_a_thing_costs_the_spine_world()
+    {
+        var arm = new (string Name, Joined Joined)[]
+        {
+            ("Freshest(3)", new Joined(Joining.Resolved, resolution: 3, freshest: true)),
+        };
+
+        var thing = Scored(arm, people: 1, Examining.Where)["Freshest(3)"];
+
+        var anything = Scored(
+            arm, people: 1, Examining.Where, spanning: Spanning.Anything)["Freshest(3)"];
+
+        output.WriteLine(
+            $"one thing a scope | worst {thing.Min():F3} | best {thing.Max():F3}");
+        output.WriteLine(
+            $"any thing a scope | worst {anything.Min():F3} | best {anything.Max():F3}");
+
+        // Worst against best, which is this file's own bar and cannot be gamed by a run that
+        // landed well. Stated as the refutation rather than as the expectation: what is
+        // asserted is that a text world does not lose the exam to a dial chosen on a scene.
+        Assert.True(thing.Max() >= anything.Min(),
+            $"confining a scope to one statement reads {thing.Max():F3} at its best against "
+            + $"{anything.Min():F3} at the unconfined arm's worst, so a statement is the wrong "
+            + "grain of THING for text and `Spanning.Thing` is an instrument's answer shipped "
+            + "as the target's default");
     }
 
     [Fact]

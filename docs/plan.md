@@ -35,11 +35,11 @@ that is finished LEAVES, so this is only ever what is still to do.
   it ends the spine running two brains by there being one world. Fork **147**.
 - **A mechanism reached only by an INSTRUMENT goes red**, John's, `DrivenTests` being
   satisfied by any world at all — so a mechanism can be built, exercised beside itself
-  forever and never seen by the spine. `Spanning` is the live case, defaulted on instrument
-  evidence and never once fired on either spine world.
-- **`Joined` reports its PARTS**, both spine worlds building one per statement while the text
-  front end implements no `Bind` at all. It is what the red set is, and it turns `Spanning` on
-  for every text world at once.
+  forever and never seen by the spine. `Departed` is the live case and the red set: no spine
+  composition turns the dial on.
+- **Then what confining a scope to ONE STATEMENT costs**, `Spanning.Thing` shipping as the
+  default off an instrument whose parts are objects and now firing on every text world.
+  `RoamingTests`.
 - **Then a regime with COMPANY and a population**, the conversation having neither together: a
   moment of one word derives no vocabulary and a moment carrying a story roots genesis on
   nothing, no arm a middle. Fork **120**, priced. `LessonTests`.
@@ -449,6 +449,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
   - It can say what does not hold
     - **NOW** — a code derived at the join for what was live and is NOT now, so an absence is
       an EVENT and a scope is a conjunction of literals. `Departed`. Forks **30**, **64**.
+    - **OPEN** — no spine composition turns the dial on, so the code is derived on
+      instruments alone and the entry has never run. Fork **148**.
     - **OPEN** — never here is still unsayable, only a transition being observable.
     - **OPEN** — an expectation is one code, so *X implies NOT Z* is unsayable however the
       scope is written. Fork **115**.

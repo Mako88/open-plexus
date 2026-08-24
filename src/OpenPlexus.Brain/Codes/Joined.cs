@@ -753,6 +753,71 @@ public sealed class Joined : IQuantizer<Coded>
 
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// <para>
+    /// <b>The statements this arm read, one part each</b>, which is the world's own claim
+    /// passed on rather than a claim of this front end's. <see cref="Coded.Groups"/> arrives
+    /// one part a statement and every reading before this dropped it here, so no grouping
+    /// had ever reached the brain from text and <c>Commitments.Spanning</c> had never once
+    /// fired on either spine world.
+    /// </para>
+    /// <para>
+    /// <b>Only what the arm read</b>, for the reason <see cref="Order"/> reports only what
+    /// the arm read: a selecting arm's moment does not hold the words of a statement it
+    /// dropped, and a part naming codes no moment carries constrains nothing while looking
+    /// like a thing.
+    /// </para>
+    /// <para>
+    /// <b>The question is no part of it</b>, and that is a decision rather than an omission.
+    /// Under <see cref="Joining.Parted"/> the question's words are the same values in their
+    /// own modality, so a question part would make <i>this word, asked and told</i> a scope
+    /// spanning two things — which is exactly the scope that arm exists to make sayable, and
+    /// <c>Commitments.Spanning</c> would refuse it. The world puts the question beside the
+    /// parts for its own reasons and this keeps it there.
+    /// </para>
+    /// <para>
+    /// <b>A word said in two statements is in two things</b>, which is the multiplicity a
+    /// dictionary could not carry and the reason <see cref="Coded.Groups"/> is a list. A
+    /// category code belongs to no statement and stays outside every part, where it
+    /// constrains nothing.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyList<Grouped>? Bind(Coded observation)
+    {
+        if (observation.Groups is not { Count: > 0 } said) return null;
+
+        // The arm is run again rather than remembered, for the reason `Order` runs it again:
+        // a front end is a function of its input on every machine forever, and a remembered
+        // last answer is state.
+        var story = Storied.Of(observation);
+        var read = Read(story);
+
+        if (read.Count == 0) read = Every(story);
+
+        var parts = new List<Grouped>();
+
+        for (var hop = 0; hop < read.Count; hop++)
+        {
+            var words = new HashSet<Code>(said[read[hop]].Codes);
+
+            // And the band goes in the part its hop read, because a banded word is that
+            // statement's word wearing its depth. Leaving it out would put half of a chained
+            // arm's moment in no thing at all, which reads as the grouping being partial and
+            // is the mechanism being blind to the codes the arm added.
+            if (_joining == Joining.Chained && _banded)
+                foreach (var code in said[read[hop]].Codes)
+                    words.Add(new Code(
+                        Both, unchecked(code.Value * Bands + (ulong)Math.Min(hop, Bands - 1) + 2)));
+
+            // Ordered, because a part compares by what it holds in the order it holds it and
+            // two machines must build the identical one out of the same words.
+            parts.Add(new() { Codes = [.. words.Order()] });
+        }
+
+        return parts;
+    }
+
+    /// <inheritdoc/>
     /// <summary>
     /// Where the words of the statements this arm read stood, oldest first.
     /// </summary>

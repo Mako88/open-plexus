@@ -608,6 +608,63 @@ public sealed class ConversingTests(ITestOutputHelper output)
         static double Average(IReadOnlyCollection<double> of) => of.Average();
     }
 
+    /// <summary>
+    /// <b>The front end hands on the statements the world called its parts.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The check the channel owes</b>, and it is capability rather than score. Every text
+    /// reading before this dropped <see cref="Coded.Groups"/> at the front end, so
+    /// <c>Commitments.Spanning</c> had a reader and no text world ever filled it — a
+    /// mechanism exercised beside itself forever and never seen by the spine.
+    /// </para>
+    /// <para>
+    /// <b>A word said in two statements is in two parts</b>, which is the multiplicity the
+    /// architecture asks for and the shape a code-to-thing dictionary cannot hold. The
+    /// question is in none, because a question part would put <see cref="Joining.Parted"/>'s
+    /// whole scope across two things.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_front_end_hands_on_the_statements_the_world_called_its_parts()
+    {
+        var mary = Kinds.Named(1, "mary");
+        var kitchen = Kinds.Named(1, "kitchen");
+        var garden = Kinds.Named(1, "garden");
+        var where = Kinds.Named(1, "where");
+
+        var moment = Coded.From(
+            [
+                Grouped.Of([mary, kitchen]),
+                Grouped.Of([mary, garden]),
+            ],
+            Grouped.Of([where, mary]));
+
+        var front = new Joined(Joining.Bagged);
+        var parts = front.Bind(moment);
+
+        Assert.NotNull(parts);
+
+        output.WriteLine(
+            $"{parts.Count} parts, mary in {parts.Count(one => one.Codes.Contains(mary))}, "
+            + $"where in {parts.Count(one => one.Codes.Contains(where))}");
+
+        Assert.Equal(2, parts.Count);
+
+        Assert.Equal(2, parts.Count(one => one.Codes.Contains(mary)));
+
+        Assert.Equal(1, parts.Count(one => one.Codes.Contains(kitchen)));
+
+        // The question points at what the statements are about and is no thing of its own.
+        Assert.Equal(0, parts.Count(one => one.Codes.Contains(where)));
+
+        // And every part names codes the moment carries, or it constrains a scope with words
+        // no round ever holds -- a grouping that reads as a thing and is a typo.
+        var said = new HashSet<Code>(front.Codify(moment));
+
+        Assert.All(parts, one => Assert.All(one.Codes, code => Assert.Contains(code, said)));
+    }
+
     [Fact]
     public void What_a_front_end_does_with_a_word_said_twice_decides_whether_a_thing_can_be_tracked()
     {

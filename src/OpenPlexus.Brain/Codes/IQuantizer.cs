@@ -44,6 +44,12 @@ public interface IQuantizer<in TObservation>
     /// of this branch. A commitment's scope is a set of codes and has nowhere to put a group,
     /// so the grouping is read beside the scope rather than inside it: genesis mints one scope
     /// over each thing, and no scope fires across two.
+    /// <para>
+    /// <b>And a reader is not a filler.</b> <c>Codes.Joined</c> had no <c>Bind</c> for most of
+    /// this branch either, so the dial shipped on as the default with no text world able to
+    /// fill it — a mechanism exercised beside itself on an instrument and never once seen by
+    /// the spine.
+    /// </para>
     /// </para>
     /// <para>
     /// <b>Parts rather than a code-to-thing dictionary</b>, because a moment may hold two of

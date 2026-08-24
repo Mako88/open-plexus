@@ -918,12 +918,18 @@ internal sealed record CommittingSettings
 /// which nothing here can tell from the mechanism working.
 /// </para>
 /// <para>
-/// <b>And that case has never run</b>, which is worth saying because it reads as though it
-/// must have. Both spine worlds build one part per statement and <see cref="Codes.Joined"/>
-/// implements no <c>Bind</c>, so the parts are dropped at the front end and no grouping has
-/// ever reached the brain from text. What would catch a mechanism failing silently is a world
-/// whose parts are sentences AND a front end that passes them on, which is the top of THE
-/// ORDER and unbuilt.
+/// <b>And that case ran for the first time when <see cref="Codes.Joined"/> gained a
+/// <c>Bind</c></b>, which is worth saying because it had read as though it must have run
+/// long before. Both spine worlds build one part per statement and every text reading before
+/// that dropped them at the front end, so this dial shipped as the default with nothing to
+/// read on the world it matters most on.
+/// <para>
+/// <b>And it costs the walk nothing measurable</b> — three seeds of the leading store arm
+/// read 0.587, 0.642 and 0.538 confined against 0.589, 0.620 and 0.539 unconfined. What that
+/// does not yet separate is the dial doing nothing from the arm giving it nothing to do, and
+/// <c>RoamingTests.What_reading_a_statement_as_a_thing_costs_the_spine_world</c> prints the
+/// parts a moment beside the scores for exactly that reason.
+/// </para>
 /// </para>
 /// <para>
 /// <b>Both halves or neither</b>, which is why this is one dial and not two. A matcher that

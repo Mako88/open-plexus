@@ -959,9 +959,15 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// <b>Measured, three seeds</b>: 0.587, 0.642 and 0.538 confined against 0.589, 0.620 and
     /// 0.539 unconfined. Two thousandths behind on two seeds and two hundredths ahead on the
     /// third, so the prediction that a two-hop answer would be forbidden is refuted at this
-    /// arm. The parts column above is what says whether that is the dial or the arm: a store
-    /// keyed on the freshest word selects few statements, and a moment of one part cannot
-    /// span two.
+    /// arm.
+    /// </para>
+    /// <para>
+    /// <b>And the parts column says the dial had plenty to do</b>, which is the half that
+    /// stops this being read as a mechanism with nothing to bite on: every moment of five
+    /// hundred holds more than one part and the most is seven. It bites and it is not free
+    /// either — the confined arm holds 653, 986 and 841 residents against 800, 949 and 1,033,
+    /// so a ninth of the population goes and no answer moves. What it refuses is worth
+    /// nothing, which is a stronger reading than the score alone.
     /// </para>
     /// </remarks>
     [Fact]

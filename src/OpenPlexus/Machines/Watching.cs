@@ -168,6 +168,14 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
     /// Whether a moment carries what has just stopped being live. <b>Here rather than on the
     /// brain</b>, because it decides what a moment IS and the join is where every other
     /// derivation of one lives — a brain dial would be the world reaching in one level out.
+    /// <para>
+    /// <b>And off unless a world turns it on</b>, which is measured rather than cautious. An
+    /// absence pays where what LEFT decides the answer and costs a wider moment everywhere
+    /// else, and a wider moment is a bigger population — so on by default it moved every
+    /// comparison in the repo that reads a population SIZE, inverting one about a deleted
+    /// arm's expansion. A join setting is per world by construction, exactly as
+    /// <see cref="Codes.Joining"/> is.
+    /// </para>
     /// </param>
     /// <remarks>
     /// <para>
@@ -195,7 +203,7 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
         IQuantizer<TSeen> sensing,
         byte source = Stamp.First,
         IChooses? acting = null,
-        Departing departing = Departing.Left)
+        Departing departing = Departing.Never)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(sensing);

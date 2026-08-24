@@ -721,7 +721,13 @@ public sealed class DocsTests
     // story's bag so a variable binds against nothing. THE ORDER now opens with those two and
     // the primer, and says the first two are one fault. What it replaces was a list that read
     // as though binding and retrieval were unbuilt, which would have cost a session.
-    private const int Whole = 12_516;
+    // And 12,576 is the seventy-third raise, sixty words, for one refutation row. A
+    // departure code in every world's moments was the dial's default for two commits, and CI
+    // said what a local run could not: a wider moment is a bigger population, six suites moved
+    // and an arm comparison about a deleted arm's expansion INVERTED because both sides had
+    // grown. The mechanism lives and its DEFAULT is what lost, which is a distinction the row
+    // has to carry or the next session reads `Never` as a refutation of the code itself.
+    private const int Whole = 12_576;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

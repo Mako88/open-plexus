@@ -102,7 +102,8 @@ public sealed class DepartingTests(ITestOutputHelper output)
             },
             seed: 1);
 
-        var watching = new Watching<Coded>(world, new Passthrough<Coded>(one => one));
+        var watching = new Watching<Coded>(
+            world, new Passthrough<Coded>(one => one), departing: Departing.Left);
 
         var exam = watching.Exam;
 

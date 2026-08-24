@@ -29,9 +29,18 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **`Joined` reports its PARTS**, both spine worlds already building one per statement while
-  the text front end implements no `Bind` at all. It is what the red set is, and it turns
-  `Spanning` on for every text world at once.
+- **The first three are John's**, and the first two are ONE fault: rung four and the forward
+  store are BUILT, and what stops them on the conversation is the front end throwing away what
+  its world already reports.
+- **`Joined` reports its PARTS**, both spine worlds building one per statement while the text
+  front end implements no `Bind` at all. It is what the red set is, and it turns `Spanning` on
+  for every text world at once.
+- **Then the conversation keeps the question APART from the story**, `Bagged` unioning the two
+  so *asked* and *told* are one code and a repeated entry binds against nothing. Rung four
+  cannot fire on the path the milestone is measured on. `Wondered` is the modality.
+- **Then a primer that teaches English**, ostensive by construction, one referent across
+  video, audio and text, ordered for a learner with no language. Unbuilt on every side:
+  corpus, alignment and the pointing. John's. Fork **132**.
 - **The three below are REQUIREMENTS rather than arms.** John's. A losing reading is a cost
   to record rather than grounds to delete.
 - **A negated EXPECTATION, then reading a commitment backwards.** A scope can now name an
@@ -41,9 +50,9 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **Then an individual**, the successor moment refuted below. Fork **93**.
 - **Then the genesis gate**, which finds every rule three worlds hold and loses the held-out
   set on two more. Fork **135**.
-- **Then the third store, read BY KEY.** John's, and above the chain because the reading says
-  so: where the right statement is in front of it the learner is at its bound, so the exam is
-  short of RETRIEVAL. Not measurable on a spine lesson, exhausted at one telling. Fork **139**.
+- **Then the third store, read BY KEY.** Above the chain because the reading says so: where
+  the right statement is in front of it the learner is at its bound, so the exam is short of
+  RETRIEVAL. Reading by key is rung four, so it waits on the two above. Fork **139**.
 - **Then a reference the second hop's gate can hold**, four having been read and every one
   trading the exam's two halves against each other. `LessonTests`. Forks **28**, **115**,
   **129**, **137**.
@@ -51,8 +60,6 @@ that is finished LEAVES, so this is only ever what is still to do.
   are open.
 - **Then the crossing itself**, which falls out of that one and carries a fact back to a
   drawing. Fork **107**.
-- **A beginner language course as the primer.** John's. Ostensive by construction, one
-  referent across video, audio and text, ordered for a learner with no language. Fork **132**.
 - **Mutual exclusion**, so a belief can be CONTRADICTED rather than only outvoted. Fork **99**.
 - **A weighed adhesion**, with PPMI over `ByLikeness`'s counts beside it. One of the three
   likeness readings leaves with a revival row. Fork **131**.

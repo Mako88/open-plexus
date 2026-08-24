@@ -713,7 +713,15 @@ public sealed class DocsTests
     // having taken the scopes that spanned two; and no spine world puts two things in one
     // moment, so multiplicity is built and unexercised. `CLAUDE.md` names both, and the rule
     // that THE ORDER opens with whatever closes the red is what these two lines are.
-    private const int Whole = 12_456;
+    // And 12,516 is the seventy-second raise, sixty words, and it buys a REORDERING that
+    // John asked for once the state was read correctly. Rung four and the forward store are
+    // both BUILT, and the reason neither fires on the conversation is one fault in the text
+    // front end rather than three missing mechanisms: `Joined` implements no `Bind`, so the
+    // parts its worlds build are dropped, and `Bagged` unions the question's words into the
+    // story's bag so a variable binds against nothing. THE ORDER now opens with those two and
+    // the primer, and says the first two are one fault. What it replaces was a list that read
+    // as though binding and retrieval were unbuilt, which would have cost a session.
+    private const int Whole = 12_516;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

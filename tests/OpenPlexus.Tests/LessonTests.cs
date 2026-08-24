@@ -621,6 +621,14 @@ public sealed class LessonTests(ITestOutputHelper output)
     /// story in the moment, derives sixteen categories, and scores nought for every arm.
     /// </para>
     /// <para>
+    /// <b>And the second of those is fork 120</b>, which the plan already names and now has a
+    /// number. A moment re-handing the story leaves every code always-present, and genesis may
+    /// not root on a code that never varied — so it mints three rules where the one-word
+    /// moment mints seventy-five, holds three where the other holds eight hundred, and under
+    /// <see cref="Joining.Parted"/> holds NONE at all. The regime that has a vocabulary has no
+    /// population to use it.
+    /// </para>
+    /// <para>
     /// <b>Rung four proposes nothing even where the vocabulary exists</b>, so the vocabulary
     /// is necessary and not sufficient either. Three things have to hold together before an
     /// arm flip is worth taking, and none of them is the flip.
@@ -686,7 +694,8 @@ public sealed class LessonTests(ITestOutputHelper output)
 
                 output.WriteLine(
                     $"  {joining,-8} {carrying,-10} | vocabulary {cell.Sorts,2}"
-                    + $" | holed {cell.Holed} | right {cell.Right:F3}");
+                    + $" | holed {cell.Holed} | held {cell.Held,4} | minted {cell.Minted,5}"
+                    + $" | right {cell.Right:F3}");
             }
         }
 
@@ -720,7 +729,7 @@ public sealed class LessonTests(ITestOutputHelper output)
     /// property of the lesson, and this is the composition <c>ExercisedTests</c> already uses
     /// on the same world.
     /// </remarks>
-    private static (int Sorts, int Holed, double Right) Sorted(
+    private static (int Sorts, int Holed, double Right, int Held, long Minted) Sorted(
         Lesson lesson, int seed, Joining joining, int floor = 5,
         Meeting meeting = Meeting.Rarely, Carrying carrying = Carrying.Never)
     {
@@ -759,10 +768,15 @@ public sealed class LessonTests(ITestOutputHelper output)
             world, front,
             acting: Chooses.From(felt => Doing(curiosity.Choose(felt)), curiosity.Cleared));
 
-        new Bench(watching, brain)
+        var tally = new Bench(watching, brain)
             .Run(tutor.Moments * tutor.Longest, sweep: 200, target: 0.9, window: 50);
 
-        return (sorts.Count, brain.Held.All.Count(one => one.Varies), Right(tutor, 0));
+        return (
+            sorts.Count,
+            brain.Held.All.Count(one => one.Varies),
+            Right(tutor, 0),
+            brain.Held.Count,
+            tally.Minted);
     }
 
     private static double Right(Tutor tutor, int pass) =>

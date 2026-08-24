@@ -74,10 +74,11 @@ green without doing it. Do not delete them, do not weaken them, and do not read 
 regression. Each computes the state rather than asserting a constant, so none can be satisfied
 by editing that file; an entry closes when the work closes.
 
-**The red set is `OutstandingTests.Every_requirement_has_a_mechanism`, and anything else red
-is yours.** Two architecture lines carry no mechanism: *a thing is ONE thing* and *it can say
-what does not hold*. Check the failures against that before assuming a run is clean — a
-stable red set is the only kind you can read a new failure against. Adding an entry is stricter than adding anywhere else: it must
+**The red set is `OutstandingTests.The_spine_world_exercises_every_entry_of_the_architecture`,
+and anything else red is yours.** One entry is unreached: *a concept a thing in its own
+right*, whose category scopes were spanning two statements until the grouping stopped being
+flattened. Check the failures against that before assuming a run is clean — a stable red set
+is the only kind you can read a new failure against. Adding an entry is stricter than adding anywhere else: it must
 be work somebody has decided to do, computable without judgement, and closeable. An open
 question goes in the plan as `OPEN`.
 

@@ -29,12 +29,11 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **The four below are REQUIREMENTS rather than arms.** John's. A losing reading is a cost
-  to record rather than grounds to delete, and *it can say what does NOT hold* carries no
-  mechanism, so `OutstandingTests` is red until it does.
-- **Negation, by a code fired when one LEAVES** — never here, here and just left being three
-  states of which only the last is an event. It closes the red. Forks **30**, **64**.
-- **Then a negated expectation, then reading a commitment backwards.** Fork **115**.
+- **The three below are REQUIREMENTS rather than arms.** John's. A losing reading is a cost
+  to record rather than grounds to delete. Both architecture lines they served now carry a
+  mechanism, so nothing here is what `OutstandingTests` is red for.
+- **A negated EXPECTATION, then reading a commitment backwards.** A scope can now name an
+  absence and a claim still cannot be one. Fork **115**.
 - **Then a category named from a founding key**, so membership moves under a fixed name.
   Fork **143**.
 - **Then an individual**, the successor moment refuted below. Fork **93**.
@@ -431,9 +430,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — a front end whose codes survive a scene SHIFTING is the other half, and
       changing the feature basis to get one is refuted below. Fork **145**.
   - It can say what does not hold
-    - **OPEN** — negation is the WHOLE propositional gap: the population is already a
-      disjunction of conjunctions, so DNF plus a negation says every Boolean function and XOR
-      needs nothing of its own. Forks **30**, **64**.
+    - **NOW** — a code derived at the join for what was live and is NOT now, so an absence is
+      an EVENT and a scope is a conjunction of literals. `Departed`. Forks **30**, **64**.
+    - **OPEN** — never here is still unsayable, only a transition being observable.
     - **OPEN** — an expectation is one code, so *X implies NOT Z* is unsayable however the
       scope is written. Fork **115**.
   - Several grains at once

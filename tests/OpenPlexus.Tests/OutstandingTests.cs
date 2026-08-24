@@ -472,6 +472,28 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// <summary>
     /// <b>The spine world reaches every entry of THE ARCHITECTURE.</b>
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Red again on the derivation entry</b>, and the grouping is what took it. It was
+    /// green until the front end stopped flattening its parts. A word said in two statements
+    /// used to be dropped from the grouping report and so constrained nothing, which let a
+    /// scope naming it beside a word from a THIRD statement fire and read as being about that
+    /// third one. Such a scope is about no one thing, and <see cref="Commitments.Spanning"/>
+    /// now refuses it.
+    /// </para>
+    /// <para>
+    /// <b>So the category scopes this entry looks for were spanning two statements</b>, which
+    /// the front end's own report says they may not. That is the tightening working rather
+    /// than a regression to undo, and what it exposed is that the mechanism was reached by a
+    /// scope nobody would have written on purpose.
+    /// </para>
+    /// <para>
+    /// <b>What closes it</b> is a category code reaching a scope about ONE statement. The
+    /// derivation still learns groups, so the half that fails is the resident scope rather
+    /// than the vocabulary — and a control run with the departure codes off is red the same
+    /// way, so the absence derivation is not what did it.
+    /// </para>
+    /// </remarks>
     [Fact]
     public void The_spine_world_exercises_every_entry_of_the_architecture()
     {

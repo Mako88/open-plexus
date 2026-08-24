@@ -46,6 +46,15 @@ internal sealed record Fronted
     /// <summary>Intervention codes derived from what the front end said was forced.</summary>
     public required long Doings { get; init; }
 
+    /// <summary>Departure codes derived from what was live in the moment before.</summary>
+    /// <remarks>
+    /// <b>Read against <see cref="Said"/> as the others are</b>, and it is the one that says
+    /// what an absence COSTS. A world whose moment is a sentence has every word of the last
+    /// one depart, so this landing near <see cref="Said"/> is the moment doubling — which is
+    /// the price the dial is measured against rather than a fault.
+    /// </remarks>
+    public required long Leaving { get; init; }
+
     /// <summary>Codes the front end said name this occasion and cannot recur.</summary>
     public required long Fleeting { get; init; }
 
@@ -133,10 +142,19 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
     private readonly IWorld<TSeen> _world;
     private readonly IQuantizer<TSeen> _sensing;
     private readonly IChooses? _acting;
+    private readonly Departing _departing;
+
+    /// <summary>What the last moment held, before any departure was derived into it.</summary>
+    /// <remarks>
+    /// <b>What a SENSE said and not what the join built</b>, so a departure is never derived
+    /// from a departure. Keeping the finished moment would let the alphabet grow a level every
+    /// round, which is the same rule that stops a precedence taking a precedence.
+    /// </remarks>
+    private IReadOnlySet<Code>? _last;
 
     private long _sequence;
 
-    private long _said, _ordered, _doings, _fleeting, _grouped;
+    private long _said, _ordered, _doings, _fleeting, _grouped, _leaving;
     private long _chosen, _quiet, _again;
 
     /// <param name="world">The problem.</param>
@@ -145,6 +163,11 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
     /// <param name="acting">
     /// What to do about the state the world is in, given the codes it reads as —
     /// <b>required of a world that can be acted in</b>, and refused of one that cannot.
+    /// </param>
+    /// <param name="departing">
+    /// Whether a moment carries what has just stopped being live. <b>Here rather than on the
+    /// brain</b>, because it decides what a moment IS and the join is where every other
+    /// derivation of one lives — a brain dial would be the world reaching in one level out.
     /// </param>
     /// <remarks>
     /// <para>
@@ -171,7 +194,8 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
         IWorld<TSeen> world,
         IQuantizer<TSeen> sensing,
         byte source = Stamp.First,
-        IChooses? acting = null)
+        IChooses? acting = null,
+        Departing departing = Departing.Left)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(sensing);
@@ -190,6 +214,7 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
         _world = world;
         _sensing = sensing;
         _acting = acting;
+        _departing = departing;
 
         Source = source;
     }
@@ -208,20 +233,47 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
     /// reads as a population that generalises to nothing rather than as a question nobody
     /// asked.
     /// </remarks>
-    public IReadOnlyList<Question> Exam =>
-        _world is not IWithholds<TSeen> withholding
-            ? []
-            :
-            [
-                .. withholding.Withheld
-                    .Where(one => one.Outcome is not null)
-                    .Select(one => new Question
+    /// <remarks>
+    /// <b>And the withheld set is a STREAM rather than a bag</b>, which is what lets a
+    /// question carry what has just left. A world draws its withheld turns consecutively, so
+    /// each one has the one before it as a predecessor and a departure is derivable exactly as
+    /// it is on the live stream. Reading them as unrelated would put the examination in a
+    /// different alphabet from the run -- a scope naming a departure could never fire on it,
+    /// and the arm would read at its control's score for a reason that has nothing to do with
+    /// generalising.
+    /// </remarks>
+    public IReadOnlyList<Question> Exam
+    {
+        get
+        {
+            if (_world is not IWithholds<TSeen> withholding) return [];
+
+            var asked = new List<Question>();
+
+            // What a SENSE said of the previous withheld turn, so the derivation is fed the
+            // same thing it is fed on the live stream. Every turn advances it, including one
+            // with no outcome -- a turn nobody may be asked about still happened, and skipping
+            // it would make the question after it follow a moment that never preceded it.
+            IReadOnlySet<Code>? before = null;
+
+            foreach (var one in withholding.Withheld)
+            {
+                var codes = new HashSet<Code>(Sensed(one.Seen, before: before));
+
+                if (one.Outcome is { } outcome)
+                    asked.Add(new Question
                     {
-                        Codes = new HashSet<Code>(Sensed(one.Seen)),
-                        Followed = Brain.Says(one.Outcome!.Value),
+                        Codes = codes,
+                        Followed = Brain.Says(outcome),
                         Grouping = _sensing.Bind(one.Seen),
-                    }),
-            ];
+                    });
+
+                before = new HashSet<Code>(_sensing.Codify(one.Seen));
+            }
+
+            return asked;
+        }
+    }
 
     /// <inheritdoc/>
     public Fronted Fronted =>
@@ -233,6 +285,7 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
             Doings = _doings,
             Fleeting = _fleeting,
             Grouped = _grouped,
+            Leaving = _leaving,
         };
 
     /// <inheritdoc/>
@@ -270,14 +323,20 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
             ? 0
             : grouping.SelectMany(part => part.Codes).Distinct().Count();
 
-        return new Pushed
+        var moment = new Pushed
         {
             From = new Stamp { Source = Source, Sequence = _sequence++ },
-            Codes = new HashSet<Code>(Sensed(turn.Seen, telling: true)),
+            Codes = new HashSet<Code>(Sensed(turn.Seen, telling: true, before: _last)),
             Fleeting = passing,
             Grouping = grouping,
             Followed = turn.Outcome is { } outcome ? Brain.Says(outcome) : null,
         };
+
+        // What a sense said, and never the moment that was built out of it. A departure
+        // derived from a departure would grow the alphabet a level a round.
+        _last = new HashSet<Code>(_sensing.Codify(turn.Seen));
+
+        return moment;
     }
 
     /// <summary>Everything the chooser has to say about the moment the world is in.</summary>
@@ -361,18 +420,43 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
     /// is no dial: a front end reporting no order gets exactly the codes it always did.
     /// </para>
     /// </remarks>
-    private IReadOnlyCollection<Code> Sensed(TSeen seen, bool telling = false)
+    /// <param name="before">
+    /// What a sense said of the moment before, or nothing where there is none.
+    /// <b>Threaded rather than read off a field</b>, because the examination is a second
+    /// stream: a withheld question's predecessor is the withheld question before it, and
+    /// taking the live stream's last moment there would derive departures against a moment
+    /// the question never followed.
+    /// </param>
+    private IReadOnlyCollection<Code> Sensed(
+        TSeen seen, bool telling = false, IReadOnlySet<Code>? before = null)
     {
         var said = _sensing.Codify(seen);
 
         var order = _sensing.Order(seen) is { Count: > 1 } reported ? reported : null;
         var forced = _sensing.Forced(seen) is { Count: > 0 } assigned ? assigned : null;
 
+        // What LEFT, and it needs the moment before rather than anything in this one. A
+        // departure is the only derivation here that is about a change, which is why it is the
+        // only one that could not have been written when the others were: nothing at this seam
+        // remembered a moment until it had to.
+        var leaving = _departing is Departing.Left && before is not null
+            ? Departed.From(before, said as IReadOnlySet<Code> ?? new HashSet<Code>(said))
+                .ToList()
+            : null;
+
         if (telling) _said += said.Count;
 
-        if (order is null && forced is null) return said;
+        if (order is null && forced is null && leaving is not { Count: > 0 }) return said;
 
         var carried = new HashSet<Code>(said);
+
+        if (leaving is not null)
+            foreach (var gone in leaving)
+            {
+                carried.Add(gone);
+
+                if (telling) _leaving++;
+            }
 
         if (order is not null)
             foreach (var precedence in Sequenced.From(order))

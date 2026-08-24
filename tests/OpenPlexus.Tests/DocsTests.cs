@@ -706,7 +706,14 @@ public sealed class DocsTests
     // the same number at every rate once a thing's codes are stable. Every bundle it ever
     // named was one appearance's, which is a kind. A row is what an arm leaves behind, and
     // it is the only thing that stops the next session building it again.
-    private const int Whole = 12_410;
+    // And 12,456 is the seventy-first raise, forty-six words, for the two items THE ORDER
+    // opens with. The red set changed today rather than clearing: both architecture lines
+    // that carried no mechanism now carry one, and two ENTRIES went unreached instead. A
+    // category code no longer reaches a scope about one statement, the parts tightening
+    // having taken the scopes that spanned two; and no spine world puts two things in one
+    // moment, so multiplicity is built and unexercised. `CLAUDE.md` names both, and the rule
+    // that THE ORDER opens with whatever closes the red is what these two lines are.
+    private const int Whole = 12_456;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

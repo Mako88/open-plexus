@@ -52,9 +52,16 @@ cancels it. Use it before shipping a default, or on a state worth returning to.
 **Run the structural guards locally every commit, as their own command.** `DocsTests`,
 `DeadCodeTests`, `DuplicationTests`, `DialTests`, `SeparationTests`, `ShapeTests`, `FlagTests`,
 `SweepListTests`, `ShardTests`, `CheckingTests`, `RemindingTests`, `DeterminismTests`,
-`DrivenTests` and `ProseTests` take seconds and go red for changes that look unrelated. Never
-chain the check into the commit — that has produced red commits more than once. Rebuild before
-running with `--no-build`, or the binary under test is the one from before the edit.
+`DrivenTests`, `ProseTests` and `ExercisedTests.Every_entry_of_the_architecture_is_asked_about`
+take seconds and go red for changes that look unrelated. Never chain the check into the commit
+— that has produced red commits more than once. Rebuild before running with `--no-build`, or
+the binary under test is the one from before the edit.
+
+**And the last is named by its METHOD**, its class not being cheap. The rest of
+`ExercisedTests` runs two spine worlds and takes minutes; that one fact parses the plan and
+compares a list. It was added here after three commits went out on a local read that could not
+have shown it red, which is the catch-all shard's own lesson arriving one level in: a filter
+naming fourteen classes is not the suite either.
 
 Four of them are worth knowing by what they catch:
 

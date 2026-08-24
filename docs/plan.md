@@ -29,9 +29,14 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
+- **The two below are what the red set is**, and each closes by a run REACHING a mechanism
+  rather than by one being built.
+- **A category code in a scope about ONE statement.** The parts tightening took the spine
+  world's category scopes, which were spanning two.
+- **Then a spine world whose moment holds TWO things**, neither ever sending one, so
+  multiplicity is built and unexercised.
 - **The three below are REQUIREMENTS rather than arms.** John's. A losing reading is a cost
-  to record rather than grounds to delete. Both architecture lines they served now carry a
-  mechanism, so nothing here is what `OutstandingTests` is red for.
+  to record rather than grounds to delete.
 - **A negated EXPECTATION, then reading a commitment backwards.** A scope can now name an
   absence and a claim still cannot be one. Fork **115**.
 - **Then a category named from a founding key**, so membership moves under a fixed name.

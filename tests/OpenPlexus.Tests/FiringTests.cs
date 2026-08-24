@@ -120,6 +120,15 @@ public sealed class FiringTests(ITestOutputHelper output)
                 "a naming gate refusal, the members firing independently of one another. "
                 + "`AtUncertain` and `AtRare` are what refuse here.",
 
+            ["Fronted.Leaving"] =
+                "a code the front end says has just stopped being live, which is `Departing "
+                + ".Left` and ships OFF. It fires on `Rhythm` where what LEFT decides the "
+                + "answer, and `DepartingTests` is where that is asserted; on by default it "
+                + "widened every moment, and a wider moment is a bigger population -- six "
+                + "suites moved and an arm comparison inverted, which is the row in DO NOT "
+                + "RE-TRY. So nought here is a join dial a world turns on rather than a "
+                + "mechanism nobody wired.",
+
             ["Chosen.Quiet"] =
                 "the chooser had nothing to say about a moment, so the world was told so. The "
                 + "one acted world here draws a doing every round, which is what an arm that "

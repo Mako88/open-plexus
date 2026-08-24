@@ -258,7 +258,7 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
 
             foreach (var one in withholding.Withheld)
             {
-                var codes = new HashSet<Code>(Sensed(one.Seen, before: before));
+                var codes = new HashSet<Code>(Sensed(one.Seen, out var raw, before: before));
 
                 if (one.Outcome is { } outcome)
                     asked.Add(new Question
@@ -268,7 +268,7 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
                         Grouping = _sensing.Bind(one.Seen),
                     });
 
-                before = new HashSet<Code>(_sensing.Codify(one.Seen));
+                before = raw;
             }
 
             return asked;
@@ -326,15 +326,18 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
         var moment = new Pushed
         {
             From = new Stamp { Source = Source, Sequence = _sequence++ },
-            Codes = new HashSet<Code>(Sensed(turn.Seen, telling: true, before: _last)),
+            Codes = new HashSet<Code>(
+                Sensed(turn.Seen, out var raw, telling: true, before: _last)),
             Fleeting = passing,
             Grouping = grouping,
             Followed = turn.Outcome is { } outcome ? Brain.Says(outcome) : null,
         };
 
         // What a sense said, and never the moment that was built out of it. A departure
-        // derived from a departure would grow the alphabet a level a round.
-        _last = new HashSet<Code>(_sensing.Codify(turn.Seen));
+        // derived from a departure would grow the alphabet a level a round. Taken from the
+        // read above rather than asked for again, because a front end may learn from what it
+        // emits and a second ask is an observation the world never sent.
+        _last = raw;
 
         return moment;
     }
@@ -428,9 +431,28 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
     /// the question never followed.
     /// </param>
     private IReadOnlyCollection<Code> Sensed(
-        TSeen seen, bool telling = false, IReadOnlySet<Code>? before = null)
+        TSeen seen, bool telling = false, IReadOnlySet<Code>? before = null) =>
+        Sensed(seen, out _, telling, before);
+
+    /// <summary>The same, handing back what the SENSE said before anything was derived.</summary>
+    /// <param name="seen">One observation.</param>
+    /// <param name="said">
+    /// What the quantiser emitted, which is what a departure is derived against next time.
+    /// <b>Handed back rather than asked for again</b>, and that is a correctness rule rather
+    /// than a saving. A front end may LEARN from what it emits — <c>Deriving</c> counts the
+    /// company its own codes keep — so calling it twice about one observation feeds the
+    /// derivation an observation the world never sent, and the vocabulary a run ends with is
+    /// then a fact about how often the seam asked.
+    /// </param>
+    /// <param name="telling">Whether this moment is one the run had.</param>
+    /// <param name="before">What a sense said of the moment before.</param>
+    private IReadOnlyCollection<Code> Sensed(
+        TSeen seen,
+        out IReadOnlySet<Code> said,
+        bool telling = false,
+        IReadOnlySet<Code>? before = null)
     {
-        var said = _sensing.Codify(seen);
+        said = new HashSet<Code>(_sensing.Codify(seen));
 
         var order = _sensing.Order(seen) is { Count: > 1 } reported ? reported : null;
         var forced = _sensing.Forced(seen) is { Count: > 0 } assigned ? assigned : null;
@@ -440,8 +462,7 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
         // only one that could not have been written when the others were: nothing at this seam
         // remembered a moment until it had to.
         var leaving = _departing is Departing.Left && before is not null
-            ? Departed.From(before, said as IReadOnlySet<Code> ?? new HashSet<Code>(said))
-                .ToList()
+            ? Departed.From(before, said).ToList()
             : null;
 
         if (telling) _said += said.Count;

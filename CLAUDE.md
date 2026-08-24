@@ -82,11 +82,11 @@ regression. Each computes the state rather than asserting a constant, so none ca
 by editing that file; an entry closes when the work closes.
 
 **The red set is `OutstandingTests.The_spine_world_exercises_every_entry_of_the_architecture`,
-and anything else red is yours.** Two entries are unreached. *A concept a thing in its own
-right*, whose category scopes were spanning two statements until the grouping stopped being
-flattened. And *a thing is ONE thing*, which no spine world reaches because neither ever puts
-two things in one moment. Check the failures against that before assuming a run is clean — a
-stable red set is the only kind you can read a new failure against. Adding an entry is stricter than adding anywhere else: it must
+and anything else red is yours.** One entry is unreached: *a thing is ONE thing*. Both spine
+worlds put one part per STATEMENT in every moment they build, and `Joined` — the text front
+end — does not implement `Bind` at all, so none of it reaches the brain. Check the failures
+against that before assuming a run is clean — a stable red set is the only kind you can read a
+new failure against. Adding an entry is stricter than adding anywhere else: it must
 be work somebody has decided to do, computable without judgement, and closeable. An open
 question goes in the plan as `OPEN`.
 

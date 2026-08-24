@@ -29,12 +29,9 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **The two below are what the red set is**, and each closes by a run REACHING a mechanism
-  rather than by one being built.
-- **A category code in a scope about ONE statement.** The parts tightening took the spine
-  world's category scopes, which were spanning two.
-- **Then a spine world whose moment holds TWO things**, neither ever sending one, so
-  multiplicity is built and unexercised.
+- **`Joined` reports its PARTS**, both spine worlds already building one per statement while
+  the text front end implements no `Bind` at all. It is what the red set is, and it turns
+  `Spanning` on for every text world at once.
 - **The three below are REQUIREMENTS rather than arms.** John's. A losing reading is a cost
   to record rather than grounds to delete.
 - **A negated EXPECTATION, then reading a commitment backwards.** A scope can now name an

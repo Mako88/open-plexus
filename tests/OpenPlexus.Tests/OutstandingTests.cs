@@ -474,31 +474,23 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Red again on the derivation entry</b>, and the grouping is what took it. It was
-    /// green until the front end stopped flattening its parts. A word said in two statements
-    /// used to be dropped from the grouping report and so constrained nothing, which let a
-    /// scope naming it beside a word from a THIRD statement fire and read as being about that
-    /// third one. Such a scope is about no one thing, and <see cref="Commitments.Spanning"/>
-    /// now refuses it.
+    /// <b>One entry, and it is a world's gap</b> rather than a mechanism's. A moment can carry
+    /// two of a kind, both spine worlds build one part per STATEMENT, and
+    /// <see cref="Codes.Joined"/> implements no <c>Bind</c> at all — so the parts are thrown
+    /// away at the front end and the brain has never once been told a moment held two things.
     /// </para>
     /// <para>
-    /// <b>So the category scopes this entry looks for were spanning two statements</b>, which
-    /// the front end's own report says they may not. That is the tightening working rather
-    /// than a regression to undo, and what it exposed is that the mechanism was reached by a
-    /// scope nobody would have written on purpose.
+    /// <b>What closes it</b> is that front end reporting what its world already said, which
+    /// also turns <see cref="Commitments.Spanning"/> on for every text world at once and owes
+    /// a reading when it does.
     /// </para>
     /// <para>
-    /// <b>What closes it</b> is a category code reaching a scope about ONE statement. The
-    /// derivation still learns groups, so the half that fails is the resident scope rather
-    /// than the vocabulary — and a control run with the departure codes off is red the same
-    /// way, so the absence derivation is not what did it.
-    /// </para>
-    /// <para>
-    /// <b>And the second unreached entry</b> is a world's gap rather than a mechanism's. A
-    /// moment can carry two of a kind and neither spine world ever sends one: a conversation's
-    /// moment is a sentence and a question, which is one thing at a time. So the front end
-    /// reports one part a moment for ever, and what would close it is a spine world whose
-    /// moment holds two things — not a change to anything the brain does.
+    /// <b>And the derivation entry was a BUG</b>, red for a session. It read as the
+    /// parts tightening and was not: <c>Watching</c> asked its quantiser for the same
+    /// observation twice, once for the moment and once to remember it, and <c>Deriving</c>
+    /// learns from what it emits — so every observation was counted twice and the vocabulary a
+    /// run ended with was a fact about how often the seam asked. A worktree at the parts
+    /// commit is green, which is what said so.
     /// </para>
     /// </remarks>
     [Fact]

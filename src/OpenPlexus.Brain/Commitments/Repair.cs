@@ -918,12 +918,12 @@ internal sealed record CommittingSettings
 /// which nothing here can tell from the mechanism working.
 /// </para>
 /// <para>
-/// <b>That case is live rather than hypothetical</b>, and it arrived when the grouping stopped
-/// being flattened. A word said in two statements used to be dropped from the report and so
-/// constrained nothing; it is now in two things, and a scope naming it beside a word from a
-/// THIRD statement is about no one thing and no longer fires. What would still catch a
-/// mechanism failing silently is a world whose parts are sentences and whose answer needs two
-/// of them, which is the world settlement by successor is already waiting for.
+/// <b>And that case has never run</b>, which is worth saying because it reads as though it
+/// must have. Both spine worlds build one part per statement and <see cref="Codes.Joined"/>
+/// implements no <c>Bind</c>, so the parts are dropped at the front end and no grouping has
+/// ever reached the brain from text. What would catch a mechanism failing silently is a world
+/// whose parts are sentences AND a front end that passes them on, which is the top of THE
+/// ORDER and unbuilt.
 /// </para>
 /// <para>
 /// <b>Both halves or neither</b>, which is why this is one dial and not two. A matcher that

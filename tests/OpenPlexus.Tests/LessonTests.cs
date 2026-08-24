@@ -621,12 +621,19 @@ public sealed class LessonTests(ITestOutputHelper output)
     /// story in the moment, derives sixteen categories, and scores nought for every arm.
     /// </para>
     /// <para>
-    /// <b>And the second of those is fork 120</b>, which the plan already names and now has a
-    /// number. A moment re-handing the story leaves every code always-present, and genesis may
-    /// not root on a code that never varied — so it mints three rules where the one-word
-    /// moment mints seventy-five, holds three where the other holds eight hundred, and under
+    /// <b>And that is fork 120</b>, which the plan already names and now has a number. A moment
+    /// re-handing the story leaves every code always-present, and genesis may not root on a
+    /// code that never varied — so it mints three rules where the one-word moment mints
+    /// seventy-five, holds three where the other holds eight hundred, and under
     /// <see cref="Joining.Parted"/> holds NONE at all. The regime that has a vocabulary has no
     /// population to use it.
+    /// </para>
+    /// <para>
+    /// <b>All three carrying arms fail and none is a middle</b>, so there is no setting to
+    /// pick. <see cref="Carrying.Always"/> holds nothing either, and the 0.250 it reads with
+    /// an EMPTY population is the chooser's fallback drawing rather than anything learnt —
+    /// this repo's own trap about a fallback being a control arm nobody meant to run, and the
+    /// reason a score is reported here beside a count of what was held.
     /// </para>
     /// <para>
     /// <b>Rung four proposes nothing even where the vocabulary exists</b>, so the vocabulary
@@ -686,7 +693,8 @@ public sealed class LessonTests(ITestOutputHelper output)
             // And what a DERIVED vocabulary would give it, which is what rung four proposes
             // from. Read at one seed a regime, because a count of groups is a fact about the
             // corpus rather than an estimate -- every seed returns the same number.
-            foreach (var carrying in new[] { Carrying.Never, Carrying.Statements })
+            foreach (var carrying in
+                new[] { Carrying.Never, Carrying.Statements, Carrying.Always })
             {
                 var cell = Sorted(stated, seed: 1, joining, floor: 5, carrying: carrying);
 

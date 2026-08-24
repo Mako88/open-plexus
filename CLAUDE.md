@@ -244,6 +244,25 @@ These are the parts worth more than the code.
 - **A front end handing over the answer** is that fault one seam over. `CeilingTests` prices
   every arm on how often the answer is already in the moment it produces, before anything has
   learnt. An arm may raise that and must never do it silently.
+- **Two worlds are the TARGET and every other is an INSTRUMENT.** John's, 2026-08-24, and it
+  is the thing the other rules assumed without saying. `Roaming` and the text conversation are
+  meant to be a microcosm of the real world, so a score on one of them is what the machine is
+  worth. A score anywhere else answers a question about a mechanism and is never the
+  objective.
+- **So an instrument's dials may be tuned to sharpen it**, freely and per world, because a
+  microscope is allowed to be focused. What may never happen is a number off one being read as
+  how well the brain is doing, or two of them being put in one table — the settings differ, so
+  that compares configurations as much as problems.
+- **And a mechanism has not RUN until the SPINE runs it.** John's, and it is stronger than
+  gating a default on spine evidence. That weaker rule lets an instrument be built alongside a
+  mechanism, satisfy every reachability guard forever, and leave the spine never seeing it. So
+  something goes red the day a mechanism is built and stays red until a spine world exercises
+  it, which is what `OutstandingTests` already does one level up, per ARCHITECTURE entry
+  rather than per mechanism.
+- **The spine is two worlds and they run two BRAINS today**, `Rooting`, `Crediting` and
+  `Admitting` all differing between them. That is `csharp`'s own fault — a dial set one way on
+  one world and another way on another — sitting inside the set that matters most, and it is
+  unresolved.
 - **A control beats an argument.** Before shipping an explanation that names a mechanism, run
   the arm that isolates it. A one-minute baseline at the starting commit costs less than a
   wrong repair that looks like a fix.

@@ -739,7 +739,13 @@ public sealed class DocsTests
     // primer moves BELOW both with the reason written beside it: its value is ostension rather
     // than volume, `Lesson.Drawn` already gives any size for free, and its payoff is the exam
     // half binding blocks. A primer built first is work whose effect cannot be read.
-    private const int Whole = 12_604;
+    // And 12,657 is the seventy-sixth raise, fifty-three words, for a guard John asked for
+    // that nothing here can currently express. `DrivenTests` is satisfied by ANY world
+    // reaching a mechanism, so one can be built, exercised by an instrument built beside it,
+    // and never seen by the spine -- which is `Spanning` exactly: defaulted on Binding and
+    // Clevr and never once fired on either spine world. The weaker rule, that a default ships
+    // only on spine evidence, does not reach it, because the instrument satisfies the guard.
+    private const int Whole = 12_657;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

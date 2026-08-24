@@ -31,6 +31,10 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The first four are John's**, and the CONVERSATION is what the middle two are
   for. Rung four and the forward store are BUILT and neither is on this list.
+- **A mechanism reached only by an INSTRUMENT goes red**, John's, `DrivenTests` being
+  satisfied by any world at all — so a mechanism can be built, exercised beside itself
+  forever and never seen by the spine. `Spanning` is the live case, defaulted on instrument
+  evidence and never once fired on either spine world.
 - **`Joined` reports its PARTS**, both spine worlds building one per statement while the text
   front end implements no `Bind` at all. It is what the red set is, and it turns `Spanning` on
   for every text world at once.

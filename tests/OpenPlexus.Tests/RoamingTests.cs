@@ -870,12 +870,24 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// in this file before <see cref="Joined"/> reported its parts was taken under
     /// <see cref="Spanning.Thing"/> with nothing to read, which is the control by accident.
     /// </param>
+    /// <param name="departing">
+    /// Whether the join derives a code for what was live and is not now — <b>off everywhere
+    /// this world has ever run</b>, so the architecture entry it serves has been reached by
+    /// instruments alone.
+    /// </param>
+    /// <param name="absences">
+    /// Told, per seed, how many residents name a departure — <b>the reading the dial owes
+    /// rather than a score.</b> A code reaching every moment and no scope is what refuted
+    /// fork 36, and a count is the only thing that separates it from the dial being off.
+    /// </param>
     private Dictionary<string, List<double>> Scored(
         IEnumerable<(string Name, Joined Joined)> arms,
         int people,
         Examining examining,
         IChooses? acting = null,
-        Spanning spanning = Spanning.Thing)
+        Spanning spanning = Spanning.Thing,
+        Departing departing = Departing.Never,
+        Action<int>? absences = null)
     {
         var scores = new Dictionary<string, List<double>>();
 
@@ -895,7 +907,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
                     new Watching<Coded>(
                         world,
                         joined,
-                        acting: acting ?? Chooses.From(_ => null)),
+                        acting: acting ?? Chooses.From(_ => null),
+                        departing: departing),
                     brain)
                     .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
 
@@ -903,9 +916,13 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
                 scores[name].Add(exam);
 
+                var absent = brain.Held.All.Count(one => one.Scope.Any(Departed.Names));
+
+                absences?.Invoke(absent);
+
                 output.WriteLine(
                     $"{name,-12}| seed {seed} | exam {exam:F3} | own {tally.Recent:F3} "
-                    + $"| held {brain.Held.Count}");
+                    + $"| held {brain.Held.Count} | absences {absent}");
             }
         }
 
@@ -939,6 +956,14 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// is the dial and not the translation, so a second translation would move two things at
     /// once for no extra reading.
     /// </para>
+    /// <para>
+    /// <b>Measured, three seeds</b>: 0.587, 0.642 and 0.538 confined against 0.589, 0.620 and
+    /// 0.539 unconfined. Two thousandths behind on two seeds and two hundredths ahead on the
+    /// third, so the prediction that a two-hop answer would be forbidden is refuted at this
+    /// arm. The parts column above is what says whether that is the dial or the arm: a store
+    /// keyed on the freshest word selects few statements, and a moment of one part cannot
+    /// span two.
+    /// </para>
     /// </remarks>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
@@ -948,6 +973,19 @@ public sealed class RoamingTests(ITestOutputHelper output)
         {
             ("Freshest(3)", new Joined(Joining.Resolved, resolution: 3, freshest: true)),
         };
+
+        // How often the arm reports two things at all, taken before any learner runs. A dial
+        // that changed nothing and a dial that had nothing to change read alike from a score,
+        // which is this repo's own trap, and it costs milliseconds to tell them apart.
+        var world = new Roaming(World(120, people: 1) with { Examining = Examining.Where }, 1);
+        var parts = new List<int>();
+
+        for (var round = 0; round < 500; round++)
+            parts.Add(arm[0].Joined.Bind(world.Next().Seen)?.Count ?? 0);
+
+        output.WriteLine(
+            $"parts a moment   | most {parts.Max()} "
+            + $"| over one {parts.Count(one => one > 1) / (double)parts.Count:F3}");
 
         var thing = Scored(arm, people: 1, Examining.Where)["Freshest(3)"];
 
@@ -967,6 +1005,62 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + $"{anything.Min():F3} at the unconfined arm's worst, so a statement is the wrong "
             + "grain of THING for text and `Spanning.Thing` is an instrument's answer shipped "
             + "as the target's default");
+    }
+
+    /// <summary>
+    /// What a code for what LEFT does on the spine world — <b>the entry no spine run has
+    /// ever reached.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A requirement rather than an arm.</b> <c>Departed</c> is the one mechanism under
+    /// <i>it can say what does NOT hold</i> and there is no alternative to it, so a losing
+    /// score is a cost to record rather than grounds to switch it off. What it owes is a
+    /// check that can FAIL, and this is that check.
+    /// </para>
+    /// <para>
+    /// <b>Why this world and not the conversation.</b> A retraction here is visible: a
+    /// forward store keyed on the freshest word replaces the statement about a room the
+    /// moment somebody leaves it, so the room word stops being live and the departure says
+    /// so. Under <c>Asserting.Everything</c> a sentence is one moment a word, so every word
+    /// departs every round and the code separates nothing.
+    /// </para>
+    /// <para>
+    /// <b>What would refute the siting</b>, said before the run: no resident scope naming a
+    /// departure. Then the code reaches the moment and no scope, which is fork 36's
+    /// refutation one seam over, and the entry wants another world rather than this dial.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_a_code_for_what_left_does_on_the_spine_world()
+    {
+        var arm = new (string Name, Joined Joined)[]
+        {
+            ("Freshest(3)", new Joined(Joining.Resolved, resolution: 3, freshest: true)),
+        };
+
+        var scoped = new List<int>();
+
+        var quiet = Scored(arm, people: 1, Examining.Where)["Freshest(3)"];
+
+        var leaving = Scored(
+            arm, people: 1, Examining.Where, departing: Departing.Left,
+            absences: scoped.Add)["Freshest(3)"];
+
+        output.WriteLine($"no departures | worst {quiet.Min():F3} | best {quiet.Max():F3}");
+        output.WriteLine(
+            $"departures    | worst {leaving.Min():F3} | best {leaving.Max():F3} "
+            + $"| absences scoped {string.Join(", ", scoped)}");
+
+        // The score is recorded beside the count rather than gated on it, which is what a
+        // requirement's reading looks like. A cost here is a fact about what saying an
+        // absence costs this world and never a reason to stop being able to say one.
+        Assert.True(scoped.Sum() > 0,
+            $"a departure code was derived on every round and reached {scoped.Sum()} resident "
+            + "scopes over three seeds, so the moment carries it and nothing can name it -- "
+            + "which is the code-reaches-no-scope refutation, and the entry needs a world "
+            + "whose absences a conjunction can use rather than this dial");
     }
 
     [Fact]

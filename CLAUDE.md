@@ -259,10 +259,11 @@ These are the parts worth more than the code.
   something goes red the day a mechanism is built and stays red until a spine world exercises
   it, which is what `OutstandingTests` already does one level up, per ARCHITECTURE entry
   rather than per mechanism.
-- **The spine is two worlds and they run two BRAINS today**, `Rooting`, `Crediting` and
-  `Admitting` all differing between them. That is `csharp`'s own fault — a dial set one way on
-  one world and another way on another — sitting inside the set that matters most, and it is
-  unresolved.
+- **The spine is two worlds and they run two BRAINS today**, `Crediting` and `Admitting`
+  differing between them. That is `csharp`'s own fault — a dial set one way on one world and
+  another way on another — sitting inside the set that matters most.
+  `OutstandingTests.The_spine_runs_one_brain` computes which, and is red until they converge
+  or fork 147 leaves one world.
 - **A refutation is conditional on the MACHINE that produced it.** John's, 2026-08-24. A row
   in `DO NOT RE-TRY` records what beat an arm on the brain of that day, and a brain that has
   since gained the mechanism the arm was starved of is a different comparison — so re-take

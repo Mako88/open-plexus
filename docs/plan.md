@@ -33,13 +33,13 @@ that is finished LEAVES, so this is only ever what is still to do.
   for. Rung four and the forward store are BUILT and neither is on this list.
 - **ONE spine world: explore, then converse, then a SURVEY of verifiable facts.** John's, and
   it ends the spine running two brains by there being one world. Fork **147**.
-- **A mechanism reached only by an INSTRUMENT goes red**, John's, `DrivenTests` being
-  satisfied by any world at all — so a mechanism can be built, exercised beside itself
-  forever and never seen by the spine. `Departed` is the live case and the red set: no spine
-  composition turns the dial on.
-- **Then what confining a scope to ONE STATEMENT costs**, `Spanning.Thing` shipping as the
-  default off an instrument whose parts are objects and now firing on every text world.
+- **ONE brain across the spine**, `Crediting` and `Admitting` parting the two worlds. It is
+  the red set, and fork **147** closes it by there being one world.
+- **Then what confining a scope to ONE STATEMENT costs**, `Spanning.Thing` defaulted on an
+  instrument and now firing on every text world, and what a departure costs beside it.
   `RoamingTests`.
+- **Then a mechanism reached only by an INSTRUMENT going red**, John's, `DrivenTests` being
+  satisfied by any world at all. Two have now been caught by hand and neither by a guard.
 - **Then a regime with COMPANY and a population**, the conversation having neither together: a
   moment of one word derives no vocabulary and a moment carrying a story roots genesis on
   nothing, no arm a middle. Fork **120**, priced. `LessonTests`.

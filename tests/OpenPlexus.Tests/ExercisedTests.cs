@@ -40,6 +40,43 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class ExercisedTests
 {
+    /// <summary>The brain the house is walked with.</summary>
+    /// <remarks>
+    /// <b>Named rather than written inline, so the two are comparable.</b> The spine is two
+    /// worlds and they run two brains; a check cannot say which dials part while each is a
+    /// literal at its own call site.
+    /// </remarks>
+    internal static CommittingSettings Walking => new() { Capacity = 20_000 };
+
+    /// <summary>The brain the conversation ships with, as <c>OpenPlexus.Talk</c> composes it.</summary>
+    /// <remarks>
+    /// <b>The deployment's own numbers</b>, which is what makes a difference from
+    /// <see cref="Walking"/> a fact about the spine rather than about a fixture.
+    /// </remarks>
+    internal static CommittingSettings Talking => new()
+    {
+        Capacity = 20_000,
+        Rooting = Rooting.Wholly,
+        Crediting = Crediting.Birth,
+        Admitting = Admitting.Testable,
+    };
+
+    /// <summary>Which dials the spine's two brains disagree on, in name order.</summary>
+    /// <remarks>
+    /// <b>Reflected rather than listed</b>, so a dial added to one composition and not the
+    /// other appears here without anybody remembering to write it down. What it reads is the
+    /// settings object each spine world hands its brain, which is where a world reaching into
+    /// the brain would show.
+    /// </remarks>
+    internal static IReadOnlyList<string> BrainsApart() =>
+    [
+        .. typeof(CommittingSettings)
+            .GetProperties()
+            .Where(one => !Equals(one.GetValue(Walking), one.GetValue(Talking)))
+            .Select(one => $"{one.Name} {one.GetValue(Walking)} vs {one.GetValue(Talking)}")
+            .Order(StringComparer.Ordinal),
+    ];
+
     /// <summary>What one run of a spine world left behind.</summary>
     /// <param name="Arm">Which run it was, for the table.</param>
     /// <param name="Examining">
@@ -167,7 +204,7 @@ public sealed class ExercisedTests
     private static Watched Run(Examining examining, bool acting, long rounds = 10_000)
     {
         var world = new Roaming(Fixture.House(examining), seed: 1);
-        var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed: 1);
+        var brain = new Brain(Walking, seed: 1);
         var falling = new Random(1);
 
         // ONE vocabulary for the fold and the population, which is the seam `Categories`
@@ -199,11 +236,19 @@ public sealed class ExercisedTests
             wanting: (_, _) => 1.0,
             untold: () => falling.Next(3));
 
+        // And the join derives what left, which is this world's own dial rather than a
+        // default for every world -- the one default is refuted, and its row says a world
+        // turns it on. A retraction is visible here: the store keyed on the freshest word
+        // replaces the statement about a room the moment somebody leaves it, so the room word
+        // stops being live and the departure is the event that says so. Off, the mechanism
+        // under `it can say what does NOT hold` is reached by instruments alone and the spine
+        // has never run it.
         var tally = new Bench(
             new Watching<Coded>(
                 world,
                 noted,
-                acting: Chooses.From(acting ? drives.Choose : _ => null)),
+                acting: Chooses.From(acting ? drives.Choose : _ => null),
+                departing: Departing.Left),
             brain)
             .Run(rounds, sweep: 1000, target: 0.9, window: 2000);
 
@@ -254,15 +299,7 @@ public sealed class ExercisedTests
         var told = lesson ?? Lesson.Creatures;
         var tutor = new Tutor(told, TextWriter.Null, tellings: tellings);
 
-        var brain = new Brain(
-            new CommittingSettings
-            {
-                Capacity = 20_000,
-                Rooting = Rooting.Wholly,
-                Crediting = Crediting.Birth,
-                Admitting = admitting,
-            },
-            seed: 1);
+        var brain = new Brain(Talking with { Admitting = admitting }, seed: 1);
 
         var world = Fixture.Talking(tutor);
 

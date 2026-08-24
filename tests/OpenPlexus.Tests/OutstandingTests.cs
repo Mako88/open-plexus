@@ -508,6 +508,54 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// <b>The spine runs ONE brain.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>John's, and <c>csharp</c>'s own fault in the set that matters most.</b>
+    /// A brain dial set one way on one world and another way on another makes every score a
+    /// comparison between two brains as much as between two problems.
+    /// <see cref="SeparationTests"/> already fails the build for a world naming a brain type;
+    /// this is the same rule read off what the compositions actually hand in.
+    /// </para>
+    /// <para>
+    /// <b>Two dials part today</b> — the walk takes the brain's defaults and the conversation
+    /// ships <c>Crediting.Birth</c> and <c>Admitting.Testable</c>. So the two halves of the
+    /// spine are not one machine and no number off one of them says anything about the other.
+    /// <c>Rooting</c> is named in the epistemics as a third and is not one: the brain's own
+    /// default is already <c>Wholly</c>, which is what a computed check catches and a written
+    /// list does not.
+    /// </para>
+    /// <para>
+    /// <b>What closes it is fork 147</b>, which is the top of THE ORDER: one spine world, so
+    /// there is one composition and nothing left to disagree. Converging the dials closes it
+    /// too, and that is the cheaper road wherever a reading says which value wins.
+    /// </para>
+    /// <para>
+    /// <b>Red on purpose, and it computes the state.</b> The dials are reflected off the two
+    /// settings objects rather than listed, so an entry cannot be satisfied by editing this
+    /// file and a dial added to one side alone appears here with nobody writing it down.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_spine_runs_one_brain()
+    {
+        var apart = ExercisedTests.BrainsApart();
+
+        output.WriteLine(
+            apart.Count == 0
+                ? "the spine's two worlds hand their brains the same dials"
+                : $"{apart.Count} dial(s) apart: {string.Join(", ", apart)}");
+
+        Assert.True(apart.Count == 0,
+            $"the spine's two worlds run brains that differ on {apart.Count} dial(s): "
+            + string.Join(", ", apart)
+            + ". A score off one of them is a comparison between two brains as much as "
+            + "between two problems. This test is red on purpose and closes on one spine "
+            + "world or on the dials converging, not on this file.");
+    }
+
+    /// <summary>
     /// <b>Every mechanism in the brain is reached by something that drives it.</b>
     /// </summary>
     /// <remarks>

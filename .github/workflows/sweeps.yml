@@ -144,6 +144,7 @@ jobs:
             "RoamingTests.What_a_learner_reads_where_the_transcript_stops_answering_itself",
             "RoamingTests.What_reading_a_statement_as_a_thing_costs_the_spine_world",
             "RoamingTests.What_a_code_for_what_left_does_on_the_spine_world",
+            "RoamingTests.What_the_conversations_two_dials_cost_the_walk",
             "RoamingTests.What_a_learner_reads_when_four_people_walk_the_house",
             "RoamingTests.Whether_what_a_statement_does_can_be_learnt",
             "RecalledTests.Which_objective_grows",

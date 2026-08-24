@@ -864,11 +864,11 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// redrawn under a fixed population. <b>Written once because two grids read it</b>, and
     /// two loops that drifted apart would make their columns unreadable against each other.
     /// </remarks>
-    /// <param name="spanning">
-    /// Whether a scope may be about more than one of the things the front end reports —
-    /// <b>the brain's own default, named so the grid can turn it.</b> Every reading
-    /// in this file before <see cref="Joined"/> reported its parts was taken under
-    /// <see cref="Spanning.Thing"/> with nothing to read, which is the control by accident.
+    /// <param name="dials">
+    /// The brain, or nothing for the one the spine walks this house with —
+    /// <b><see cref="ExercisedTests.Walking"/> rather than a literal here</b>, so a dial that
+    /// converges moves this grid with it and a reading in this file is about the brain the
+    /// spine runs rather than about a fixture's.
     /// </param>
     /// <param name="departing">
     /// Whether the join derives a code for what was live and is not now — <b>off everywhere
@@ -885,7 +885,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         int people,
         Examining examining,
         IChooses? acting = null,
-        Spanning spanning = Spanning.Thing,
+        CommittingSettings? dials = null,
         Departing departing = Departing.Never,
         Action<int>? absences = null)
     {
@@ -900,8 +900,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 var world = new Roaming(
                     World(120, people) with { Examining = examining }, seed);
 
-                var brain = new Brain(
-                    new CommittingSettings { Capacity = 20_000, Spanning = spanning }, seed);
+                var brain = new Brain(dials ?? ExercisedTests.Walking, seed);
 
                 var tally = new Bench(
                     new Watching<Coded>(
@@ -990,7 +989,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
         var thing = Scored(arm, people: 1, Examining.Where)["Freshest(3)"];
 
         var anything = Scored(
-            arm, people: 1, Examining.Where, spanning: Spanning.Anything)["Freshest(3)"];
+            arm, people: 1, Examining.Where,
+            dials: ExercisedTests.Walking with { Spanning = Spanning.Anything })["Freshest(3)"];
 
         output.WriteLine(
             $"one thing a scope | worst {thing.Min():F3} | best {thing.Max():F3}");
@@ -1061,6 +1061,77 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + "scopes over three seeds, so the moment carries it and nothing can name it -- "
             + "which is the code-reaches-no-scope refutation, and the entry needs a world "
             + "whose absences a conjunction can use rather than this dial");
+    }
+
+    /// <summary>
+    /// What the conversation's two dials cost the walk — <b>the cheaper road to one brain
+    /// across the spine.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The spine runs two brains and this is the half nobody measured.</b>
+    /// <c>OpenPlexus.Talk</c> ships <c>Crediting.Birth</c> and <c>Admitting.Testable</c> where
+    /// the walk takes the brain's defaults, so every score off either world is a comparison
+    /// between brains as much as between problems.
+    /// <c>OutstandingTests.The_spine_runs_one_brain</c> is red for it.
+    /// </para>
+    /// <para>
+    /// <b>Both were chosen on the conversation and neither was refused here</b>, which is the
+    /// asymmetry. A conversation says a thing once, so a mint that waits to hear it twice sits
+    /// mute — that is what <c>Birth</c> is for, and <c>LessonTests</c> holds its reading. This
+    /// house repeats itself constantly, so the same dial may be free or may flatten the vote
+    /// among a hundred rules that all arrive perfect.
+    /// </para>
+    /// <para>
+    /// <b>What would refute the convergence</b>, said before the run: the conversation's pair
+    /// reading below the walk's own defaults, worst against best. Then the two worlds want
+    /// different brains for a measured reason and fork 147 is the only road left, rather than
+    /// the cheap one.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_the_conversations_two_dials_cost_the_walk()
+    {
+        var arm = new (string Name, Joined Joined)[]
+        {
+            ("Freshest(3)", new Joined(Joining.Resolved, resolution: 3, freshest: true)),
+        };
+
+        var cells = new List<(string Name, List<double> Scores)>();
+
+        foreach (var crediting in new[] { Crediting.Nothing, Crediting.Birth })
+            foreach (var admitting in new[] { Admitting.Anything, Admitting.Testable })
+            {
+                var name = $"{crediting}+{admitting}";
+
+                output.WriteLine(name);
+
+                cells.Add((
+                    name,
+                    Scored(
+                        arm, people: 1, Examining.Where,
+                        dials: ExercisedTests.Walking with
+                        {
+                            Crediting = crediting,
+                            Admitting = admitting,
+                        })["Freshest(3)"]));
+            }
+
+        foreach (var (name, taken) in cells)
+            output.WriteLine($"{name,-22}| worst {taken.Min():F3} | best {taken.Max():F3}");
+
+        var walks = cells.Single(one => one.Name == "Nothing+Anything").Scores;
+        var talks = cells.Single(one => one.Name == "Birth+Testable").Scores;
+
+        // Worst against best, this file's own bar. What is asserted is that the walk does not
+        // LOSE to the pair the conversation ships, which is what makes converging on that pair
+        // a change of one composition rather than a trade between two worlds.
+        Assert.True(talks.Max() >= walks.Min(),
+            $"the conversation's pair reads {talks.Max():F3} at its best against "
+            + $"{walks.Min():F3} for the walk's own defaults at their worst, so the two spine "
+            + "worlds want different brains for a measured reason and one composition cannot "
+            + "serve both -- which leaves fork 147 as the only road to one brain");
     }
 
     [Fact]

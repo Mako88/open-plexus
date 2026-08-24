@@ -745,7 +745,15 @@ public sealed class DocsTests
     // and never seen by the spine -- which is `Spanning` exactly: defaulted on Binding and
     // Clevr and never once fired on either spine world. The weaker rule, that a default ships
     // only on spine evidence, does not reach it, because the instrument satisfies the guard.
-    private const int Whole = 12_657;
+    // And 12,795 is the seventy-seventh raise, a hundred and thirty-eight words, for two things
+    // John decided: ONE spine world -- explore, converse, then a survey of verifiable facts,
+    // which resolves the spine running two brains by there being one -- and the DRIVE that
+    // world needs, a desire to understand built in from the start. The drive entry is worth
+    // its words because two shapes of it are already known to fail here and the third is not
+    // obvious: wanting to be correct is the dead body fork 111 measured, wanting surprise
+    // takes the noisy channel, and learning PROGRESS is the one that sates by construction.
+    // A session reaching for a drive without those three lines would build one of the two.
+    private const int Whole = 12_795;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

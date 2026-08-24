@@ -263,6 +263,14 @@ These are the parts worth more than the code.
   `Admitting` all differing between them. That is `csharp`'s own fault — a dial set one way on
   one world and another way on another — sitting inside the set that matters most, and it is
   unresolved.
+- **A refutation is conditional on the MACHINE that produced it.** John's, 2026-08-24. A row
+  in `DO NOT RE-TRY` records what beat an arm on the brain of that day, and a brain that has
+  since gained the mechanism the arm was starved of is a different comparison — so re-take
+  before believing a row, rather than reading it as permanent.
+- **And that is bounded by the row still SAYING something**, or the table stops meaning
+  anything and the re-treading it exists to prevent starts again. A row is worth re-taking
+  when its reading predates a mechanism it depended on; it is not worth re-taking because
+  time passed.
 - **A control beats an argument.** Before shipping an explanation that names a mechanism, run
   the arm that isolates it. A one-minute baseline at the starting commit costs less than a
   wrong repair that looks like a fix.

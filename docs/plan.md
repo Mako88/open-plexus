@@ -31,6 +31,8 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The first four are John's**, and the CONVERSATION is what the middle two are
   for. Rung four and the forward store are BUILT and neither is on this list.
+- **ONE spine world: explore, then converse, then a SURVEY of verifiable facts.** John's, and
+  it ends the spine running two brains by there being one world. Fork **147**.
 - **A mechanism reached only by an INSTRUMENT goes red**, John's, `DrivenTests` being
   satisfied by any world at all — so a mechanism can be built, exercised beside itself
   forever and never seen by the spine. `Spanning` is the live case, defaulted on instrument
@@ -549,6 +551,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       it.
     - **OPEN** — a drive that cannot be sated is a fault in the design and not a risk to
       manage, so a term must have a point where it stops pulling. John's.
+    - **OPEN** — the drive is a DESIRE TO UNDERSTAND, John's, built in rather than added, and
+      two shapes fail: wanting to be CORRECT is the dead body above, and wanting SURPRISE
+      takes the noisy channel. Learning PROGRESS sates by construction. Fork **146**.
     - **OPEN** — and no world here holds a common cause, so nothing says those claims are
       better.
     - **OPEN** — and nothing ranks a chooser there, a house having nothing to want. Twins
@@ -611,6 +616,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       schedule is a second `IInput`, not a second bench. Fork **113**.
     - **OPEN** — what a moment carries beside its own sentence. A question re-handing the
       story leaves every code always-present, so genesis roots on nothing. Fork **120**.
+    - **OPEN** — ONE spine world: the machine explores rather than being recited to, comes
+      back and both asks and answers, and is surveyed on what it saw. Every question
+      verifiable, and a machine that explored ANOTHER house is the control. Fork **147**.
     - **OPEN** — rarest is one split of a statement into scope and claim, and the brain does
       not choose it. What picks the claim with no experimenter. Fork **123**.
     - **OPEN** — one brain process, worlds attached over a stream: fork **113**'s shape as a

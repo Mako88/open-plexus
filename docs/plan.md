@@ -35,9 +35,10 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **`Joined` reports its PARTS**, both spine worlds building one per statement while the text
   front end implements no `Bind` at all. It is what the red set is, and it turns `Spanning` on
   for every text world at once.
-- **Then rung four MINTS on the lesson**, `Parted` being the only arm it fires under and
-  costing the whole score alone, the question's words leaving the reach of every rule the
-  telling built. Binding is built and has nothing to bind. `LessonTests`.
+- **Then the conversation gets a regime rung four can work in**, having none: a moment of one
+  word derives no vocabulary and a moment of the story scores nought, the rung proposes
+  nothing where the vocabulary does exist, and `Parted` costs the whole score alone. Binding
+  is built and has nothing to bind. `LessonTests`.
 - **Then a primer that teaches English**, ostensive by construction, one referent across
   video, audio and text, ordered for a learner with no language. Unbuilt on every side:
   corpus, alignment and the pointing. John's. Fork **132**.

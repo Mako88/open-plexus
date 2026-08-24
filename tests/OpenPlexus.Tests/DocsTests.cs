@@ -727,7 +727,13 @@ public sealed class DocsTests
     // and an arm comparison about a deleted arm's expansion INVERTED because both sides had
     // grown. The mechanism lives and its DEFAULT is what lost, which is a distinction the row
     // has to carry or the next session reads `Never` as a refutation of the code itself.
-    private const int Whole = 12_576;
+    // And 12,586 is the seventy-fourth raise, ten words, for THE ORDER's second item saying
+    // what the run said rather than what I guessed. It was a wiring change -- put the
+    // conversation on the arm rung four can fire under. Run, that arm reads nought on both
+    // halves, and underneath it the conversation has no regime where a vocabulary and a score
+    // both exist: a moment of one word groups nothing at any floor and a moment of the story
+    // scores nought for every arm. Ten words buys a session not spending a day on the flip.
+    private const int Whole = 12_586;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -601,36 +601,35 @@ public sealed class LessonTests(ITestOutputHelper output)
     /// <remarks>
     /// <para>
     /// <b>The one arm rung four can fire under</b>, asked of the path the milestone is scored
-    /// on. <see cref="Joining.Bagged"/> unions the question's words into the story's bag,
-    /// so a moment holds each word once and no scope can say one value TWICE — the rung fires
+    /// on. <see cref="Joining.Bagged"/> unions the question's words into the story's bag, so a
+    /// moment holds each word once and no scope can say one value TWICE — the rung fires
     /// nought by construction, which <c>GeneralisingTests</c> measures on its own world.
     /// <see cref="Joining.Parted"/> says a question word in its own modality, which is the two
     /// places a variable can stand in.
     /// </para>
     /// <para>
-    /// <b>And the conversation had never been run on it.</b> Every arm this file crosses is
-    /// bagged, chained, distinguished or resolved, so binding has been structurally unable to
-    /// fire wherever the lesson is scored and no reading said so. This is that reading.
+    /// <b>Parting alone costs the WHOLE score.</b> It reads nought on both halves where
+    /// bagging reads 0.75 and 0.50. The question's words move out of the alphabet every rule
+    /// the telling built is written in, so nothing the machine learned matches the question
+    /// and the only thing left that could answer is a rule with a variable in two places.
     /// </para>
     /// <para>
-    /// <b>It costs the WHOLE score, which is the finding.</b> Parting reads nought on both
-    /// halves where bagging reads 0.75 and 0.50. That is not a trade and it is not noise: the
-    /// question's words move to their own modality, so every rule the telling built over the
-    /// story's words stops matching the question, and the only thing that could answer is a
-    /// rule with a variable in two places — which this lesson has none of.
+    /// <b>And no regime gives a VOCABULARY and a SCORE at once</b>, which is the blocker
+    /// underneath and is upstream of the joining arm entirely.
+    /// <see cref="Carrying.Never"/> makes a moment one word, so no code has any company and
+    /// the derivation groups nothing at any floor; <see cref="Carrying.Statements"/> puts the
+    /// story in the moment, derives sixteen categories, and scores nought for every arm.
     /// </para>
     /// <para>
-    /// <b>So parting is NECESSARY for rung four and nowhere near sufficient</b>, and an arm
-    /// that only pays once another mechanism produces rules is one this repo has no way to
-    /// ship half of. What is owed before it is flipped is rung four minting on THIS lesson,
-    /// which <c>GeneralisingTests</c> shows happening on another world.
+    /// <b>Rung four proposes nothing even where the vocabulary exists</b>, so the vocabulary
+    /// is necessary and not sufficient either. Three things have to hold together before an
+    /// arm flip is worth taking, and none of them is the flip.
     /// </para>
     /// <para>
     /// <b>Both halves, because they trade.</b> The stated half is answered from what was said
     /// outright and the implied half needs two facts joined, so an arm that helps one and
-    /// hurts the other is the shape every front end here has had — and one number over the
-    /// whole exam would hide it. Here both went to nought together, which says the mechanism
-    /// is absent rather than mispriced.
+    /// hurts the other is the shape every front end here has had. Here both went to nought
+    /// together, which says the mechanism is absent rather than mispriced.
     /// </para>
     /// </remarks>
     [Fact]
@@ -646,6 +645,7 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         var told = new Dictionary<Joining, Measured>();
         var reached = new Dictionary<Joining, Measured>();
+        var vocabulary = new Dictionary<Carrying, int>();
 
         foreach (var joining in new[] { Joining.Bagged, Joining.Parted })
         {
@@ -654,18 +654,19 @@ public sealed class LessonTests(ITestOutputHelper output)
 
             for (var seed = 1; seed <= Seeds; seed++)
             {
-                var first = Ran(stated, Carrying.Never, seed, passes: 1,
-                    asserting: Asserting.Everything, tellings: 20,
-                    rooting: Rooting.Wholly, crediting: Crediting.Birth,
-                    joining: joining).Tutor;
+                one.Add(Right(
+                    Ran(stated, Carrying.Never, seed, passes: 1,
+                        asserting: Asserting.Everything, tellings: 20,
+                        rooting: Rooting.Wholly, crediting: Crediting.Birth,
+                        joining: joining).Tutor,
+                    0));
 
-                var second = Ran(implied, Carrying.Never, seed, passes: 1,
-                    asserting: Asserting.Everything, tellings: 20,
-                    rooting: Rooting.Wholly, crediting: Crediting.Birth,
-                    joining: joining).Tutor;
-
-                one.Add(Right(first, 0));
-                two.Add(Right(second, 0));
+                two.Add(Right(
+                    Ran(implied, Carrying.Never, seed, passes: 1,
+                        asserting: Asserting.Everything, tellings: 20,
+                        rooting: Rooting.Wholly, crediting: Crediting.Birth,
+                        joining: joining).Tutor,
+                    0));
             }
 
             told[joining] = new Measured { Arm = $"{joining} stated", Values = one };
@@ -673,17 +674,95 @@ public sealed class LessonTests(ITestOutputHelper output)
 
             output.WriteLine(
                 $"{joining,-10} | stated {told[joining]} | implied {reached[joining]}");
+
+            // And what a DERIVED vocabulary would give it, which is what rung four proposes
+            // from. Read at one seed a regime, because a count of groups is a fact about the
+            // corpus rather than an estimate -- every seed returns the same number.
+            foreach (var carrying in new[] { Carrying.Never, Carrying.Statements })
+            {
+                var cell = Sorted(stated, seed: 1, joining, floor: 5, carrying: carrying);
+
+                vocabulary[carrying] = cell.Sorts;
+
+                output.WriteLine(
+                    $"  {joining,-8} {carrying,-10} | vocabulary {cell.Sorts,2}"
+                    + $" | holed {cell.Holed} | right {cell.Right:F3}");
+            }
         }
 
-        // Asserted that the arms DIFFER on the implied half rather than which way, because
-        // which way is what nobody knows and a prediction written into a check fails two ways
-        // and reads the same. What would be a null result is the two being identical, which is
-        // what a front end that changed nothing the rung could use would give.
+        // Asserted that the arms DIFFER rather than which way, because which way is what
+        // nobody knew and a prediction written into a check fails two ways and reads the same.
+        // A null result is the two being identical, which is what a front end that changed
+        // nothing the rung could use would give.
         Assert.True(
             Math.Abs(reached[Joining.Parted].Mean - reached[Joining.Bagged].Mean) > 1e-9
             || Math.Abs(told[Joining.Parted].Mean - told[Joining.Bagged].Mean) > 1e-9,
             "parting the question from the story changed neither half of the exam, so the arm "
             + "rung four needs is doing nothing at all where the milestone is scored");
+
+        // And that the two regimes really are the disjoint pair the remark says they are. A
+        // run where both derived a vocabulary would mean the blocker had moved and this
+        // reading no longer says what it says.
+        Assert.NotEqual(vocabulary[Carrying.Never], vocabulary[Carrying.Statements]);
+    }
+
+    /// <summary>The same lesson with a DERIVED vocabulary in front of it.</summary>
+    /// <param name="lesson">What is told.</param>
+    /// <param name="seed">Which run.</param>
+    /// <param name="joining">Which front end.</param>
+    /// <param name="floor">How often a code must be seen before it may be grouped.</param>
+    /// <param name="meeting">Whether a code that shares a moment may still be an alternative.</param>
+    /// <param name="carrying">How much of the topic a moment holds.</param>
+    /// <remarks>
+    /// <b><c>Ran</c> builds a bare <see cref="Joined"/> and never sets <c>Sorts</c></b>, so
+    /// <see cref="Commitments.Generalising"/> has no vocabulary and proposes nothing on every
+    /// lesson this file has ever run. Rung four minting nought here is that rather than a
+    /// property of the lesson, and this is the composition <c>ExercisedTests</c> already uses
+    /// on the same world.
+    /// </remarks>
+    private static (int Sorts, int Holed, double Right) Sorted(
+        Lesson lesson, int seed, Joining joining, int floor = 5,
+        Meeting meeting = Meeting.Rarely, Carrying carrying = Carrying.Never)
+    {
+        var tutor = new Tutor(lesson, TextWriter.Null, passes: 1, tellings: 20);
+
+        var brain = new Brain(
+            Committing(2000, Rooting.Wholly, Crediting.Birth, Admitting.Anything),
+            seed);
+
+        var world = new Conversing(new ConversingSettings
+        {
+            Typed = tutor,
+            Printed = tutor.Printed,
+            Carrying = carrying,
+            Asserting = Asserting.Everything,
+        });
+
+        brain.Meaning = world.Meaning;
+
+        var curiosity = new Curiosity(brain, rate: 1.0, seed, world.Naming);
+
+        // ONE vocabulary for the fold and the population, which is the seam `Categories`
+        // draws: a rewrite reading a vocabulary the front end is not folding mints rules that
+        // can never fire, and nothing downstream would report it.
+        var sorts = new Categories([]);
+
+        brain.Held.Sorts = sorts;
+
+        var front = new Sorted<Coded>(
+            new Deriving<Coded>(
+                new Joined(joining), sorts, Counting.Company, meeting,
+                floor: floor, every: 50),
+            sorts);
+
+        var watching = new Watching<Coded>(
+            world, front,
+            acting: Chooses.From(felt => Doing(curiosity.Choose(felt)), curiosity.Cleared));
+
+        new Bench(watching, brain)
+            .Run(tutor.Moments * tutor.Longest, sweep: 200, target: 0.9, window: 50);
+
+        return (sorts.Count, brain.Held.All.Count(one => one.Varies), Right(tutor, 0));
     }
 
     private static double Right(Tutor tutor, int pass) =>

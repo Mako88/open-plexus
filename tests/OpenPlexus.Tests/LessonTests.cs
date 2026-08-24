@@ -595,6 +595,97 @@ public sealed class LessonTests(ITestOutputHelper output)
     }
 
     /// <summary>What share of one pass's questions were answered right.</summary>
+    /// <summary>
+    /// <b>What keeping the question APART from the story buys the lesson.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The one arm rung four can fire under</b>, asked of the path the milestone is scored
+    /// on. <see cref="Joining.Bagged"/> unions the question's words into the story's bag,
+    /// so a moment holds each word once and no scope can say one value TWICE — the rung fires
+    /// nought by construction, which <c>GeneralisingTests</c> measures on its own world.
+    /// <see cref="Joining.Parted"/> says a question word in its own modality, which is the two
+    /// places a variable can stand in.
+    /// </para>
+    /// <para>
+    /// <b>And the conversation had never been run on it.</b> Every arm this file crosses is
+    /// bagged, chained, distinguished or resolved, so binding has been structurally unable to
+    /// fire wherever the lesson is scored and no reading said so. This is that reading.
+    /// </para>
+    /// <para>
+    /// <b>It costs the WHOLE score, which is the finding.</b> Parting reads nought on both
+    /// halves where bagging reads 0.75 and 0.50. That is not a trade and it is not noise: the
+    /// question's words move to their own modality, so every rule the telling built over the
+    /// story's words stops matching the question, and the only thing that could answer is a
+    /// rule with a variable in two places — which this lesson has none of.
+    /// </para>
+    /// <para>
+    /// <b>So parting is NECESSARY for rung four and nowhere near sufficient</b>, and an arm
+    /// that only pays once another mechanism produces rules is one this repo has no way to
+    /// ship half of. What is owed before it is flipped is rung four minting on THIS lesson,
+    /// which <c>GeneralisingTests</c> shows happening on another world.
+    /// </para>
+    /// <para>
+    /// <b>Both halves, because they trade.</b> The stated half is answered from what was said
+    /// outright and the implied half needs two facts joined, so an arm that helps one and
+    /// hurts the other is the shape every front end here has had — and one number over the
+    /// whole exam would hide it. Here both went to nought together, which says the mechanism
+    /// is absent rather than mispriced.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_parting_the_question_from_the_story_buys_the_lesson()
+    {
+        const int Seeds = 4;
+
+        var lesson = Lesson.Chained;
+        var half = lesson.Exam.Count / 2;
+
+        var stated = lesson with { Exam = [.. lesson.Exam.Take(half)] };
+        var implied = lesson with { Exam = [.. lesson.Exam.Skip(half)] };
+
+        var told = new Dictionary<Joining, Measured>();
+        var reached = new Dictionary<Joining, Measured>();
+
+        foreach (var joining in new[] { Joining.Bagged, Joining.Parted })
+        {
+            var one = new List<double>();
+            var two = new List<double>();
+
+            for (var seed = 1; seed <= Seeds; seed++)
+            {
+                var first = Ran(stated, Carrying.Never, seed, passes: 1,
+                    asserting: Asserting.Everything, tellings: 20,
+                    rooting: Rooting.Wholly, crediting: Crediting.Birth,
+                    joining: joining).Tutor;
+
+                var second = Ran(implied, Carrying.Never, seed, passes: 1,
+                    asserting: Asserting.Everything, tellings: 20,
+                    rooting: Rooting.Wholly, crediting: Crediting.Birth,
+                    joining: joining).Tutor;
+
+                one.Add(Right(first, 0));
+                two.Add(Right(second, 0));
+            }
+
+            told[joining] = new Measured { Arm = $"{joining} stated", Values = one };
+            reached[joining] = new Measured { Arm = $"{joining} implied", Values = two };
+
+            output.WriteLine(
+                $"{joining,-10} | stated {told[joining]} | implied {reached[joining]}");
+        }
+
+        // Asserted that the arms DIFFER on the implied half rather than which way, because
+        // which way is what nobody knows and a prediction written into a check fails two ways
+        // and reads the same. What would be a null result is the two being identical, which is
+        // what a front end that changed nothing the rung could use would give.
+        Assert.True(
+            Math.Abs(reached[Joining.Parted].Mean - reached[Joining.Bagged].Mean) > 1e-9
+            || Math.Abs(told[Joining.Parted].Mean - told[Joining.Bagged].Mean) > 1e-9,
+            "parting the question from the story changed neither half of the exam, so the arm "
+            + "rung four needs is doing nothing at all where the milestone is scored");
+    }
+
     private static double Right(Tutor tutor, int pass) =>
         tutor.Put[pass] == 0 ? 0.0 : tutor.Confirmed[pass] / (double)tutor.Put[pass];
 

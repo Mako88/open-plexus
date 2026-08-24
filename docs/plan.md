@@ -35,10 +35,9 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **`Joined` reports its PARTS**, both spine worlds building one per statement while the text
   front end implements no `Bind` at all. It is what the red set is, and it turns `Spanning` on
   for every text world at once.
-- **Then the conversation runs on `Parted`**, which exists and which rung four is measured
-  firing under, where `Bagged` unions the halves so a repeated entry is impossible and the
-  rung fires NOUGHT. Binding is built and cannot fire where the milestone is scored.
-  `GeneralisingTests`.
+- **Then rung four MINTS on the lesson**, `Parted` being the only arm it fires under and
+  costing the whole score alone, the question's words leaving the reach of every rule the
+  telling built. Binding is built and has nothing to bind. `LessonTests`.
 - **Then a primer that teaches English**, ostensive by construction, one referent across
   video, audio and text, ordered for a learner with no language. Unbuilt on every side:
   corpus, alignment and the pointing. John's. Fork **132**.

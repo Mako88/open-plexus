@@ -29,9 +29,9 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **The first three are John's**, and the first two are ONE fault: rung four and the forward
-  store are BUILT, and what stops them on the conversation is the front end throwing away what
-  its world already reports.
+- **The first three are John's, and they are three GOALS** rather than three steps: one closes
+  the red build, one blocks the conversation, one teaches it English. Rung four and the
+  forward store are BUILT.
 - **`Joined` reports its PARTS**, both spine worlds building one per statement while the text
   front end implements no `Bind` at all. It is what the red set is, and it turns `Spanning` on
   for every text world at once.

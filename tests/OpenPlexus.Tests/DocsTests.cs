@@ -733,7 +733,13 @@ public sealed class DocsTests
     // halves, and underneath it the conversation has no regime where a vocabulary and a score
     // both exist: a moment of one word groups nothing at any floor and a moment of the story
     // scores nought for every arm. Ten words buys a session not spending a day on the flip.
-    private const int Whole = 12_586;
+    // And 12,604 is the seventy-fifth raise, eighteen words, for an ORDERING John decided
+    // after the readings came in. The conversation's blockers split into two items -- a regime
+    // with company AND a population, then rung four minting and only then `Parted` -- and the
+    // primer moves BELOW both with the reason written beside it: its value is ostension rather
+    // than volume, `Lesson.Drawn` already gives any size for free, and its payoff is the exam
+    // half binding blocks. A primer built first is work whose effect cannot be read.
+    private const int Whole = 12_604;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

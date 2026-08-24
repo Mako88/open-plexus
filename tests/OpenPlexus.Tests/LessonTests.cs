@@ -723,6 +723,57 @@ public sealed class LessonTests(ITestOutputHelper output)
         Assert.NotEqual(vocabulary[Carrying.Never], vocabulary[Carrying.Statements]);
     }
 
+    /// <summary>
+    /// <b>Whether the rung is starved or blocked</b>, which the same nought reports either way.
+    /// </summary>
+    /// <remarks>
+    /// <b>A SWEEP rather than a suite test</b>, at a quarter of an hour for three cells. It
+    /// answers an ordering question once rather than every push.
+    /// <para>
+    /// <b>The control that decides an ordering</b>, and it is cheaper than the argument. A
+    /// primer is a bigger corpus, so whether one is worth building before rung four works
+    /// turns on whether the rung is starved or blocked — and those are opposite readings that
+    /// the same nought reports.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_the_rung_is_starved_or_blocked_by_the_lesson_it_is_told()
+    {
+        var holed = new List<int>();
+
+        // `Carrying.Statements` alone, because it is the only regime that derives a
+        // vocabulary at all and the rung proposes from one. A cell under `Never` would be
+        // asking whether a rung with no alphabet proposes, which is answered already.
+        foreach (var (subjects, attributes) in
+            new[] { (4, 3), (8, 4), (12, 5) })
+            {
+                var carrying = Carrying.Statements;
+
+                var lesson = Lesson.Drawn(subjects, attributes, seed: 1);
+
+                var cell = Sorted(
+                    lesson, seed: 1, Joining.Bagged, floor: 5, carrying: carrying);
+
+                holed.Add(cell.Holed);
+
+                output.WriteLine(
+                    $"{subjects,3} x {attributes} | {lesson.Statements.Count,4} statements"
+                    + $" | {carrying,-10} | vocabulary {cell.Sorts,3} | held {cell.Held,5}"
+                    + $" | holed {cell.Holed,3} | right {cell.Right:F3}");
+            }
+
+        // Asserted as a reading rather than a bar: what closes this is the rung proposing at
+        // SOME size, and the day it does the ordering changes. Nought everywhere says the
+        // corpus is not the axis and a primer would be built in front of a blocked rung.
+        Assert.True(holed.Count > 0, "no cell ran");
+
+        output.WriteLine(
+            holed.Sum() == 0
+                ? "BLOCKED: no size proposes a rule with a variable, so size is not the axis"
+                : "STARVED: the rung proposes once the lesson is big enough");
+    }
+
     /// <summary>The same lesson with a DERIVED vocabulary in front of it.</summary>
     /// <param name="lesson">What is told.</param>
     /// <param name="seed">Which run.</param>

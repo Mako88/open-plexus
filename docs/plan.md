@@ -29,19 +29,20 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **The first three are John's, and they are three GOALS** rather than three steps: one closes
-  the red build, one blocks the conversation, one teaches it English. Rung four and the
-  forward store are BUILT.
+- **The first four are John's**, and the CONVERSATION is what the middle two are
+  for. Rung four and the forward store are BUILT and neither is on this list.
 - **`Joined` reports its PARTS**, both spine worlds building one per statement while the text
   front end implements no `Bind` at all. It is what the red set is, and it turns `Spanning` on
   for every text world at once.
-- **Then the conversation gets a regime rung four can work in**, having none: a moment of one
-  word derives no vocabulary, and a moment carrying a story roots genesis on nothing — fork
-  **120**, priced, no arm a middle. `Parted` costs the score alone. Binding has nothing to
-  bind. `LessonTests`.
-- **Then a primer that teaches English**, ostensive by construction, one referent across
-  video, audio and text, ordered for a learner with no language. Unbuilt on every side:
-  corpus, alignment and the pointing. John's. Fork **132**.
+- **Then a regime with COMPANY and a population**, the conversation having neither together: a
+  moment of one word derives no vocabulary and a moment carrying a story roots genesis on
+  nothing, no arm a middle. Fork **120**, priced. `LessonTests`.
+- **Then rung four MINTS, and only then `Parted`** — the rung proposing nothing even where a
+  vocabulary exists, and parting costing the whole score alone because nothing bound is left
+  to answer. Both read on the lesson.
+- **Then a primer that teaches English**, and it is ORDERED here deliberately: its value is
+  ostension rather than volume, `Lesson.Drawn` already giving any size for free, and its
+  payoff is the exam half binding blocks. John's. Fork **132**.
 - **The three below are REQUIREMENTS rather than arms.** John's. A losing reading is a cost
   to record rather than grounds to delete.
 - **A negated EXPECTATION, then reading a commitment backwards.** A scope can now name an

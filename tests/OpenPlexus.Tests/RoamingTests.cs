@@ -1036,6 +1036,21 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// departure. Then the code reaches the moment and no scope, which is fork 36's
     /// refutation one seam over, and the entry wants another world rather than this dial.
     /// </para>
+    /// <para>
+    /// <b>Measured, three seeds</b>: 284, 523 and 593 residents name a departure, against a
+    /// population of 986, 1,453 and 1,411 — so between a fifth and two fifths of what the
+    /// machine holds is a rule about something having stopped. It reaches a scope easily and
+    /// the siting stands.
+    /// </para>
+    /// <para>
+    /// <b>And it costs half again the population for a hundredth.</b> The
+    /// exam reads 0.587, 0.642 and 0.548 against 0.587, 0.642 and 0.538 quiet — identical
+    /// twice and ten thousandths ahead once — while the population goes from 653, 986 and 841
+    /// to 986, 1,453 and 1,411. That is the refuted every-world default's own cost arriving
+    /// where a world asked for it, and it is recorded rather than acted on: this entry has one
+    /// mechanism and no alternative, so a price is a fact about saying an absence and never a
+    /// reason to stop being able to.
+    /// </para>
     /// </remarks>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]

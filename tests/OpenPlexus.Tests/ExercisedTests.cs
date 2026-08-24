@@ -55,6 +55,12 @@ public sealed class ExercisedTests
     /// What the second hop did — <b>because two failures read alike here</b>. An arm
     /// nothing reaches and an arm that changed nothing are the same unchanged table.
     /// </param>
+    /// <param name="Parts">
+    /// The most things the front end put in any one moment. <b>The most rather than a total</b>,
+    /// because what <i>a thing is one thing</i> asks is whether TWO were ever sayable at once —
+    /// a run reporting one part a moment for ever has a front end that segments and a moment
+    /// that never held two, and a sum could not tell those apart.
+    /// </param>
     private sealed record Watched(
         string Arm,
         Examining? Examining,
@@ -63,7 +69,8 @@ public sealed class ExercisedTests
         IReadOnlySet<byte> Emitted,
         IReadOnlySet<string> Channels,
         long Told,
-        Supposed Supposals);
+        Supposed Supposals,
+        int Parts);
 
     /// <summary>
     /// A front end that says what it emitted — <b>the only way to see a channel filled and
@@ -84,6 +91,15 @@ public sealed class ExercisedTests
         /// <summary>Which side channels came back with anything in them.</summary>
         public HashSet<string> Channels { get; } = [];
 
+        /// <summary>The most things the front end put in any one moment.</summary>
+        /// <remarks>
+        /// <b>Here rather than in <c>Fronted</c></b>, on this class's own reason: what the
+        /// seam reports is a share of a moment the front end could place, and the most parts
+        /// it ever said is a different question that only an instrument wants. A total could
+        /// not answer it -- one part a moment for ever sums as high as two parts sometimes.
+        /// </remarks>
+        public int Parts { get; private set; }
+
         /// <inheritdoc/>
         public byte Modality => inner.Modality;
 
@@ -98,8 +114,14 @@ public sealed class ExercisedTests
         }
 
         /// <inheritdoc/>
-        public IReadOnlyList<Grouped>? Bind(Coded observation) =>
-            Noting(inner.Bind(observation), nameof(Bind), one => one.Count > 0);
+        public IReadOnlyList<Grouped>? Bind(Coded observation)
+        {
+            var parts = Noting(inner.Bind(observation), nameof(Bind), one => one.Count > 0);
+
+            if (parts is not null) Parts = Math.Max(Parts, parts.Count);
+
+            return parts;
+        }
 
         /// <inheritdoc/>
         public IReadOnlyDictionary<Code, int>? Order(Coded observation) =>
@@ -187,7 +209,8 @@ public sealed class ExercisedTests
 
         return new Watched(
             $"roaming {examining.ToString().ToLowerInvariant()}", examining, tally,
-            brain.Held, noted.Emitted, noted.Channels, drives.Told, brain.Supposals);
+            brain.Held, noted.Emitted, noted.Channels, drives.Told, brain.Supposals,
+            noted.Parts);
     }
 
     /// <summary>
@@ -280,7 +303,7 @@ public sealed class ExercisedTests
         return new Watched(
             $"conversing x{tellings} {admitting.ToString().ToLowerInvariant()}",
             null, tally, brain.Held, noted.Emitted, noted.Channels,
-            curiosity.Claims + curiosity.Questions, brain.Supposals);
+            curiosity.Claims + curiosity.Questions, brain.Supposals, noted.Parts);
     }
 
     /// <summary>The join between what a chooser decided and how this world numbers a doing.</summary>
@@ -345,6 +368,14 @@ public sealed class ExercisedTests
         new("Which aspects are temporal",
             "rung three's precedence codes reached a scope",
             arms => Any(arms, one => Scoped(one.Held, Sequenced.Ordered))),
+
+        new("A thing is one thing",
+            "the front end reported more than one thing in a moment",
+            arms => Any(arms, one => one.Parts > 1)),
+
+        new("It can say what does not hold",
+            "a departure code reached a scope",
+            arms => Any(arms, one => Scoped(one.Held, Departed.Left))),
 
         new("Several grains at once",
             "subsumption kept a general rule over a narrower one",

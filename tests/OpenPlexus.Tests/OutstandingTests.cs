@@ -493,6 +493,13 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// than the vocabulary — and a control run with the departure codes off is red the same
     /// way, so the absence derivation is not what did it.
     /// </para>
+    /// <para>
+    /// <b>And the second unreached entry</b> is a world's gap rather than a mechanism's. A
+    /// moment can carry two of a kind and neither spine world ever sends one: a conversation's
+    /// moment is a sentence and a question, which is one thing at a time. So the front end
+    /// reports one part a moment for ever, and what would close it is a spine world whose
+    /// moment holds two things — not a change to anything the brain does.
+    /// </para>
     /// </remarks>
     [Fact]
     public void The_spine_world_exercises_every_entry_of_the_architecture()

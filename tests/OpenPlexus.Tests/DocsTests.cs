@@ -753,7 +753,15 @@ public sealed class DocsTests
     // obvious: wanting to be correct is the dead body fork 111 measured, wanting surprise
     // takes the noisy channel, and learning PROGRESS is the one that sates by construction.
     // A session reaching for a drive without those three lines would build one of the two.
-    private const int Whole = 12_795;
+    // And 12,892 is the seventy-eighth raise, ninety-seven words, for two FAILURE CLASSES
+    // that cost this branch a day between them and have no check. Two dials can mint the
+    // same thing while only one is asked -- a per-part scope gated on the grouping alone
+    // handed the wide root to a machine told to mint narrowly, and two arms became one arm
+    // twice across five readings. And an instrument built beside a run is a different run:
+    // parts count taken over the same lesson with no learner speaking read one part a moment
+    // where the scored stream reaches two, so a null result read as a mechanism that could
+    // not fire. Both leave here the day a guard can express them.
+    private const int Whole = 12_892;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

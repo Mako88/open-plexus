@@ -769,6 +769,9 @@ them. **A class earning a check moves out of here into the check.**
 - **Arm anything that has always read zero.** `Surprise` and `Abstain` were both found wired
   and unable to fire, and *promiscuous on purpose* meant EXHAUSTIVE for the life of the repo
   because its gate was mounted nowhere.
+- **An instrument built beside a run is a different run.** A parts count taken over the same
+  lesson with no learner speaking read one part a moment where the scored stream reaches two,
+  so a null result read as a mechanism that could not fire.
 - **A guard mounted on one caller is not mounted**, and a code path guarded by a cap is
   untested until something reaches the cap. Both sat unexercised for the life of the repo
   because no world was wide enough.
@@ -786,6 +789,10 @@ them. **A class earning a check moves out of here into the check.**
 - **Measure one mechanism on from a known baseline**, never one off from all-on.
 - **A setting can decide two independent things while being named for one**, so the cell that
   separates them may already exist and never have been read as a control.
+- **Two dials can mint the same thing while only one is asked.** A per-part scope gated on
+  the grouping alone handed the wide root to a machine told to mint narrowly, so two arms
+  became one arm twice across five readings and every one read as a mechanism that stopped
+  paying.
 - **A readout arm is a search arm** wherever the readout triggers the search, and every vote
   comparison in four sessions moved both.
 - **A fixture inherits every dial it does not pin**, so a moving default rewrites an experiment

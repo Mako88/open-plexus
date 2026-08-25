@@ -511,10 +511,24 @@ public sealed class MonkTests(ITestOutputHelper output)
 
         var arms = new (string Named, CommittingSettings Dials)[]
         {
-            ("shipped ", new CommittingSettings()),
+            // The control, with its arms NAMED rather than left to the record. An empty
+            // settings object is the same run either way and it cannot say which arm it is,
+            // so a census reading which arms a test selects saw a control as nothing at all.
+            ("shipped ", new CommittingSettings
+            {
+                Crediting = Crediting.Nothing,
+                Admitting = Admitting.Anything,
+                Deciding = Deciding.Grounded,
+            }),
             ("wholly  ", new CommittingSettings { Rooting = Rooting.Wholly }),
             ("credited", new CommittingSettings { Crediting = Crediting.Birth }),
             ("testable", new CommittingSettings { Admitting = Admitting.Testable }),
+
+            // And answering with nothing behind the answer, which had been compared on the
+            // conversation and on the walk. The conversation is gone, so the arm needs a
+            // world whose rules are conjunctions or it is measured on one world and the grid
+            // is a verdict on that world.
+            ("anyway  ", new CommittingSettings { Deciding = Deciding.Anyway }),
         };
 
         output.WriteLine($"{Seeds} seeds, 20,000 rounds, one arm off the shipped brain");

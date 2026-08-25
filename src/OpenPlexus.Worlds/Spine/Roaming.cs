@@ -66,26 +66,50 @@ public sealed record RoamingSettings
     /// </remarks>
     public required int Asked { get; init; }
 
-    /// <summary>How many rounds the machine gets to ask about the house before the exam.</summary>
+    /// <summary>How many rounds a person gets with the machine once the exam is over.</summary>
     /// <remarks>
     /// <para>
-    /// <b>The middle phase, and a SIZE like the other two.</b> The machine explores the house,
-    /// converses about what it saw, then sits the survey — so a conversation is a window in
-    /// one world's episode rather than a world of its own.
+    /// <b>The last phase, and a SIZE like the other two.</b> The machine explores the house,
+    /// sits the survey, and then somebody talks to it about what it saw — so a conversation
+    /// is a window in one world's episode rather than a world of its own.
     /// </para>
     /// <para>
-    /// <b>What it buys is the machine OBTAINING its settlements.</b> The walk settles by
-    /// ostension, which is the world choosing what to name; here the machine chooses, and
-    /// what it can ask for is exactly what the exam asks about. A machine that knows what to
-    /// ask and remembers the answer is what understanding looks like from outside.
+    /// <b>After the exam, because asking first restates the answer.</b> An answer given in
+    /// the conversation joins the transcript, so an exam that followed it would be asking a
+    /// question whose answer is the most recent statement — recency wearing a conversation's
+    /// clothes. <c>RoamingTests</c> measured the lift that road produced before it was cut.
     /// </para>
     /// <para>
-    /// <b>And the house stands still through it.</b> The walk is over, so an answer given here
-    /// is still true at the exam — which means a long enough conversation hands the exam over
-    /// and the length is the reading rather than a setting to get right.
+    /// <b>And the answerer is a PERSON rather than the house</b>, which is what an exam on
+    /// facts cannot be. A score on stated facts is reachable by a script holding the
+    /// transcript; what is said between somebody and the machine is not, and the plumbing is
+    /// all a suite may check of it.
+    /// </para>
+    /// <para>
+    /// <b>So it is nought wherever nobody is typing</b>, and <see cref="RoamingSettings.Typed"/>
+    /// and <see cref="RoamingSettings.Printed"/> are required the moment it is not. A run with
+    /// no person in it walks the house and sits the exam, which is every reading this world
+    /// has ever taken.
     /// </para>
     /// </remarks>
     public required int Chatting { get; init; }
+
+    /// <summary>Where the person's lines come from, or nothing where there is no person.</summary>
+    /// <remarks>
+    /// <b>A reader rather than a transcript</b>, so the same seam takes a terminal and a
+    /// script. What is refused is a world that answers its own questions: the house knows
+    /// where everything is and would hand the machine what it asked for, which is the
+    /// experimenter supplying what the machine should go and get.
+    /// </remarks>
+    public TextReader? Typed { get; init; }
+
+    /// <summary>Where the machine's words are shown, or nothing where nobody is reading.</summary>
+    /// <remarks>
+    /// <b>Printed in words, because a hash goes nowhere back.</b> A person asked to answer
+    /// <i>? 41</i> cannot, and a session reporting how many questions were answered without
+    /// ever saying which is a score with no way to be embarrassed by it.
+    /// </remarks>
+    public TextWriter? Printed { get; init; }
 }
 
 /// <summary>
@@ -237,6 +261,15 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
     /// <summary>What holds a thing that is lying on the floor.</summary>
     private const int Nobody = -1;
 
+    /// <summary>What a person types to leave the conversation.</summary>
+    /// <remarks>
+    /// <b>A stop word rather than an empty line</b>, because a blank line is a round somebody
+    /// had nothing to say in and both have to be sayable. It is honoured wherever a line is
+    /// read, including the reply to a question — a session that could not be left while the
+    /// machine was asking is one nobody would start.
+    /// </remarks>
+    public const string Over = ".quit";
+
     private static readonly string[] Places =
     [
         "kitchen", "garden", "office", "bathroom", "bedroom", "hallway", "cellar", "attic",
@@ -343,8 +376,13 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
     // stays alive while they are being asked, because what they are about is its transcript.
     private readonly List<Question> _asking = [];
 
-    // How many rounds of talking about the house are left, once its walk is over.
+    // How many rounds of talking about the house are left, once its exam is over.
     private int _chats;
+
+    // What the person said this round, or nothing where they have not been read yet. Empty
+    // and read are different states, which is why this is nullable rather than counted: a
+    // blank line is a round they said nothing in and must not cost a second read.
+    private IReadOnlyList<Code>? _heard;
 
     private readonly List<string> _order = [];
     private readonly Dictionary<string, List<Code>> _met = new(StringComparer.Ordinal);
@@ -369,6 +407,16 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Steps);
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Asked);
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Chatting);
+
+        // A conversation with nobody in it is the house answering itself, which is the one
+        // thing this phase may not be. Refused at construction rather than read as no rounds,
+        // because a run asking for a conversation and silently getting none is a composition
+        // that reads as the arm it is not.
+        if (settings.Chatting > 0 && (settings.Typed is null || settings.Printed is null))
+            throw new ArgumentException(
+                "a conversation is with a PERSON, so `Typed` and `Printed` are required "
+                + "wherever `Chatting` is not nought",
+                nameof(settings));
 
         _settings = settings;
         _walks = new Random(seed);
@@ -468,7 +516,7 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
     /// </remarks>
     public bool Sat { get; private set; }
 
-    /// <summary>How many of the conversation's rounds the house had an answer for.</summary>
+    /// <summary>How many of the conversation's rounds somebody had an answer for.</summary>
     /// <remarks>
     /// <b>An instrument's channel, on <see cref="Sat"/>'s standing.</b> A round the machine
     /// said nothing askable in settles on nothing and costs a commitment nothing, so a
@@ -476,6 +524,18 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
     /// a tally cannot tell them apart.
     /// </remarks>
     public long Answered { get; private set; }
+
+    /// <summary>How many questions the machine put to the person.</summary>
+    public long Questions { get; private set; }
+
+    /// <summary>Whether the person has left.</summary>
+    /// <remarks>
+    /// <b>The walk carries on without them</b>, because a house is walked whether or not
+    /// anybody is watching. What ends is the conversation: a phase whose answerer has gone is
+    /// one where the world would be reading a stream with nothing left in it, and a read that
+    /// returns nothing for ever is a loop rather than a world.
+    /// </remarks>
+    public bool Ended { get; private set; }
 
     /// <inheritdoc/>
     /// <remarks>
@@ -571,7 +631,7 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
         _asking.Count == 0
         && _spoken is { Count: > 0 } spoken
         && spoken.Count < Patience
-        && (_chats > 0 ? Wondered(spoken) is null : Parse(spoken) is null);
+        && (_chats > 0 ? !Wondered(spoken) : Parse(spoken) is null);
 
     /// <inheritdoc/>
     /// <remarks>
@@ -592,6 +652,8 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
         get
         {
             if (_shown is { } already) return already;
+
+            if (_asking.Count == 0 && _chats > 0) Spoke(_house!);
 
             return (_shown = _asking.Count > 0
                 ? Surveying()
@@ -1016,32 +1078,62 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
 
         Meets(named, word);
 
-        // The walk is over, so the conversation opens and the exam follows it.
-        if (--_left <= 0)
-        {
-            _chats = _settings.Chatting;
+        // The walk in words, for whoever is going to talk about it. Nothing that learns is
+        // shown this -- the machine gets the codes and always did -- and somebody who never
+        // saw the house has nothing to hold a conversation about.
+        Narrate(spoken, seen, named);
 
-            if (_chats == 0) Examined(walk);
-        }
+        // The walk is over, so the exam opens and the conversation follows it.
+        if (--_left <= 0) Examined(walk);
 
         return turn;
     }
 
-    /// <summary>The exam for this house, or the house dropped where it poses none.</summary>
+    /// <summary>One step of the walk, said out loud for whoever is watching it.</summary>
+    /// <param name="spoken">What the machine said about this step, or nothing.</param>
+    /// <param name="seen">What is in front of it now.</param>
+    /// <param name="named">Which of those the world named.</param>
+    /// <remarks>
+    /// <b>A view rather than a channel</b>, and it carries nothing the moment does not. What
+    /// is in front of the machine and what the world named are both already in the codes it
+    /// is handed; this is the same two facts in English, for somebody who is going to be
+    /// asked about them afterwards.
+    /// </remarks>
+    private void Narrate(IReadOnlyList<int>? spoken, IReadOnlyList<string> seen, string named)
+    {
+        // Nothing once they have gone, because the run does not stop when they do. A walk
+        // that went on printing at somebody who left would fill a terminal nobody is at.
+        if (Ended || _settings.Printed is not { } shown) return;
+
+        if (spoken is { Count: > 0 })
+            shown.WriteLine($"  . {string.Join(" ", spoken.Select(one => _vocabulary[one]))}");
+
+        shown.WriteLine($"  > {string.Join(", ", seen)} — this is a {named}");
+    }
+
+    /// <summary>The exam for this house, or straight on to the conversation where it poses none.</summary>
     /// <param name="walk">The house, at the state the walk left it in.</param>
     private void Examined(Walk walk)
     {
         _asking.AddRange(Survey(walk));
 
-        if (_asking.Count == 0) _house = null;
+        if (_asking.Count == 0) Opened();
     }
 
-    /// <summary>What the machine wants to know, as a kind and the noun it names.</summary>
-    /// <param name="Kind">Which of the survey's three questions it put.</param>
-    /// <param name="About">The room or thing it named.</param>
-    private sealed record Wonder(int Kind, int About);
+    /// <summary>The conversation about the house, or the house dropped where nobody is in it.</summary>
+    /// <remarks>
+    /// <b>The one phase that needs somebody else.</b> A person who
+    /// has left leaves no rounds behind them, so a session ended mid-house walks the rest of
+    /// the run exactly as a session nobody ever joined does.
+    /// </remarks>
+    private void Opened()
+    {
+        _chats = Ended ? 0 : _settings.Chatting;
 
-    /// <summary>The question in what the machine said, or nothing where there is none.</summary>
+        if (_chats == 0) _house = null;
+    }
+
+    /// <summary>Whether what the machine said is a question somebody could answer.</summary>
     /// <param name="spoken">The words it has said about this moment, in order.</param>
     /// <remarks>
     /// <para>
@@ -1054,23 +1146,27 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
     /// the signal, and a world refusing <i>apple where</i> would be teaching a grammar by
     /// refusing rather than saying anything.
     /// </para>
+    /// <para>
+    /// <b>Whether rather than what</b>, which is what the answerer being a person changed.
+    /// The house used to read the kind out of this and look the answer up; nothing here knows
+    /// the answer now, so all this decides is when the machine has finished a question and
+    /// the prompt goes out.
+    /// </para>
     /// </remarks>
-    private Wonder? Wondered(IReadOnlyList<int> spoken)
+    private bool Wondered(IReadOnlyList<int> spoken)
     {
         var words = spoken.Select(one => _vocabulary[one]).ToList();
 
         // Where before how before what, because a machine that said two of them said one
         // question and the world may not draw which. The order is arbitrary and fixed.
-        if (words.Contains("where"))
-            return Pointed(words, _things) is { } thing ? new Wonder(0, thing) : null;
+        if (words.Contains("where")) return Pointed(words, _things) is not null;
 
         if (words.Contains("how") || words.Contains("many"))
-            return Pointed(words, _rooms) is { } counting ? new Wonder(2, counting) : null;
+            return Pointed(words, _rooms) is not null;
 
-        if (words.Contains("what"))
-            return Pointed(words, _rooms) is { } holding ? new Wonder(1, holding) : null;
+        if (words.Contains("what")) return Pointed(words, _rooms) is not null;
 
-        return null;
+        return false;
     }
 
     /// <summary>The first of these words that names one of those, or nothing.</summary>
@@ -1084,56 +1180,60 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
         return null;
     }
 
-    /// <summary>The house's answer to what was asked, or nothing where it has none.</summary>
-    /// <param name="walk">The house, standing still while it is talked about.</param>
-    /// <param name="wonder">What the machine asked.</param>
+    /// <summary>What the person said back, and the word of it that settles the round.</summary>
+    /// <param name="asked">What the machine said, in order.</param>
     /// <remarks>
-    /// <b>A shrug is an outcome, and it answers an ambiguous question.</b> A room
-    /// holding two things has two right answers and one word to say, so the world says
-    /// nothing rather than drawing one — which is the survey's own rule arriving on the half
-    /// where the machine chose the question.
+    /// <para>
+    /// <b>The last word the question did not already say</b>, which is how a whole sentence
+    /// answers as readily as a word. Somebody asked <i>where is the apple</i> answers <i>the
+    /// apple is in the kitchen</i> as often as <i>kitchen</i>, and reading the first word of
+    /// that would settle the round on <i>the</i>. Both halves are arithmetic over two sets
+    /// rather than a claim about English, and neither reaches the learner.
+    /// </para>
+    /// <para>
+    /// <b>A blank reply is a shrug and settles nothing</b>, because the counters here are
+    /// monotone and there is no way to record that an answer was withheld. Recording one
+    /// would be inventing evidence, which is fork <b>30</b>'s question rather than a world's.
+    /// </para>
+    /// <para>
+    /// <b>And a reply is a fact as well as an answer.</b> Somebody who says <i>the apple is
+    /// in the kitchen</i> has told the machine something, so the whole sentence joins the
+    /// transcript and the word it settles on is drawn from it.
+    /// </para>
     /// </remarks>
-    private Question? Replied(Walk walk, Wonder wonder)
+    private (IReadOnlyList<Code> Sentence, int Outcome)? Replied(IReadOnlyList<string> asked)
     {
-        var placed = Placed(walk.At, walk.Held, walk.Here);
+        Questions++;
 
-        switch (wonder.Kind)
+        _settings.Printed!.Write($"  ? {string.Join(" ", asked)} ");
+        _settings.Printed.Flush();
+
+        var told = _settings.Typed!.ReadLine();
+
+        // The prompt is closed whatever came back. A prompt is a line with no newline after
+        // it, so leaving one open makes the very next thing printed look like a second ask
+        // and the person answers twice while the conversation stands still.
+        _settings.Printed.WriteLine();
+
+        if (told is null || string.Equals(told.Trim(), Over, StringComparison.Ordinal))
         {
-            case 0:
-            {
-                var room = Places[placed[wonder.About]];
+            Ended = true;
 
-                return new Question(
-                    Said("the", Things[wonder.About], "is", "in", "the", room),
-                    _naming[Kinds.Named(Word, room)]);
-            }
-
-            case 1:
-            {
-                var inside = Enumerable.Range(0, _settings.Props)
-                    .Where(prop => placed[prop] == wonder.About)
-                    .ToList();
-
-                if (inside.Count != 1) return null;
-
-                return new Question(
-                    Said(
-                        "the", Things[inside[0]], "is", "in", "the", Places[wonder.About]),
-                    _naming[Kinds.Named(Word, Things[inside[0]])]);
-            }
-
-            default:
-            {
-                var count = Counts[placed.Count(at => at == wonder.About)];
-
-                return new Question(
-                    Said(count, "in", "the", Places[wonder.About]),
-                    _naming[Kinds.Named(Word, count)]);
-            }
+            return null;
         }
+
+        var words = Babi.Words(told);
+
+        if (words.Count == 0) return null;
+
+        var said = new HashSet<string>(asked, StringComparer.Ordinal);
+
+        var answer = words.LastOrDefault(word => !said.Contains(word)) ?? words[^1];
+
+        return (Said([.. words]), Heard(answer));
     }
 
-    /// <summary>One round of talking about the house the walk is over in.</summary>
+    /// <summary>One round of talking about the house the exam is over in.</summary>
     /// <remarks>
     /// <para>
     /// <b>The machine's own words are the question of the moment</b>, and marked as its
@@ -1151,15 +1251,33 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
         var walk = _house!;
         var spoken = _spoken;
 
-        (_spoken, _shown) = (null, null);
+        // Once a round whether or not a chooser looked, so the person is read exactly as
+        // often as they are talked to. A composition with nothing acting in it still holds a
+        // conversation, and one where a chooser read the moment first must not read a second
+        // line for the same round.
+        Spoke(walk);
+
+        (_spoken, _shown, _heard) = (null, null, null);
 
         var said = spoken is null
             ? []
             : spoken.Select(one => Kinds.Named(Word, _vocabulary[one])).ToList();
 
-        var answer = spoken is not null && Wondered(spoken) is { } wonder
-            ? Replied(walk, wonder)
+        var asked = spoken is not null && Wondered(spoken);
+
+        var answer = asked
+            ? Replied([.. spoken!.Select(one => _vocabulary[one])])
             : null;
+
+        // Everything else it said, shown rather than swallowed. A person watching a machine
+        // that only ever speaks when it has a well-formed question would be watching a
+        // machine that says nothing most rounds, which is not what happened.
+        //
+        // Read off whether it ASKED rather than off whether it was answered, or a question
+        // somebody shrugged at would be printed a second time as a claim.
+        if (!asked && spoken is { Count: > 0 })
+            _settings.Printed!.WriteLine(
+                $"  . {string.Join(" ", spoken.Select(one => _vocabulary[one]))}");
 
         var turn = new Turn<Coded> { Seen = Talking(walk, said), Outcome = answer?.Outcome };
 
@@ -1170,17 +1288,78 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
             Answered++;
         }
 
-        if (--_chats <= 0) Examined(walk);
+        // The rounds go with the house, so a person who left mid-conversation does not leave
+        // a count behind that would have the next round reading a stream nobody is at.
+        if (--_chats <= 0 || Ended)
+        {
+            _chats = 0;
+            _house = null;
+        }
 
         return turn;
     }
 
+    /// <summary>The person's line for this round, read at most once.</summary>
+    /// <param name="walk">The house their statement is about.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>Read where the moment is BUILT rather than where it is settled</b>, so what
+    /// somebody said is in front of the machine when it decides what to say back. A line read
+    /// after the machine had spoken would be a conversation where nobody is ever replied to.
+    /// </para>
+    /// <para>
+    /// <b>And it joins the transcript rather than sitting beside it</b>, because a person
+    /// saying <i>the apple is in the cellar</i> has told the machine something about the
+    /// house. What the exam was scored on is over, so a statement here cannot restate an
+    /// answer that has already been marked.
+    /// </para>
+    /// <para>
+    /// <b>A blank line is a round with nothing in it</b>, which is somebody letting the
+    /// machine carry on. The house is what the moment is about either way, so a round nobody
+    /// spoke in still shows the transcript and still takes a word back.
+    /// </para>
+    /// </remarks>
+    private void Spoke(Walk walk)
+    {
+        if (_heard is not null) return;
+
+        _heard = [];
+
+        if (Ended) return;
+
+        // The turn is offered rather than taken silently, because a stream that reads a line
+        // without saying so is one a person sits in front of not knowing it is waiting for
+        // them. It is the same unterminated line a question is put on.
+        _settings.Printed!.Write("  you ");
+        _settings.Printed.Flush();
+
+        var line = _settings.Typed!.ReadLine();
+
+        _settings.Printed.WriteLine();
+
+        if (line is null || string.Equals(line.Trim(), Over, StringComparison.Ordinal))
+        {
+            Ended = true;
+
+            return;
+        }
+
+        var words = Babi.Words(line);
+
+        if (words.Count == 0) return;
+
+        foreach (var word in words) Heard(word);
+
+        walk.Told.Add(_heard = Said([.. words]));
+    }
+
     /// <summary>What the machine is looking at while the house is being talked about.</summary>
     /// <param name="walk">The house, standing still.</param>
-    /// <param name="said">Its own words this round, newest statement of all.</param>
+    /// <param name="said">Its own words this round, newest of all.</param>
     /// <remarks>
-    /// <b>The world's turn is the invitation a recited walk gets.</b> Somebody has come in and the machine may speak, and a phase the
-    /// signal did not mark would be one nothing outside the world could tell had started.
+    /// <b>The world's turn is the invitation.</b> Somebody has come in and the machine may
+    /// speak, and a phase the signal did not mark would be one nothing outside the world
+    /// could tell had started.
     /// </remarks>
     private Coded Talking(Walk walk, IReadOnlyList<Code> said)
     {
@@ -1336,11 +1515,20 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
             Outcome = _asking[0].Outcome,
         };
 
+        // The exam in words, on the walk's narration and its standing. What a person watching
+        // may not be told is what the MACHINE said, which is the brain's and never crosses
+        // this seam -- so this says what was asked rather than how it went.
+        if (!Ended)
+            _settings.Printed?.WriteLine(
+                "  = " + string.Join(
+                    " ",
+                    _asking[0].Sentence.Select(code => _vocabulary[_naming[code]])));
+
         _asking.RemoveAt(0);
 
         (_spoken, _shown) = (null, null);
 
-        if (_asking.Count == 0) _house = null;
+        if (_asking.Count == 0) Opened();
 
         return turn;
     }

@@ -121,6 +121,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             "THE SOUNDNESS INSTRUMENT'S OWN BOUND, and it reads as uncalled because its one "
             + "caller shares its file -- the own-file rule cannot see a caller sitting "
             + "beside it, which is the exemption `Felt` carries on the type list.",
+
     };
 
     /// <summary>What a record or a runtime generates and nobody writes.</summary>

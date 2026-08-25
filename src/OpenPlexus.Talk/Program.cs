@@ -7,122 +7,98 @@ using OpenPlexus.Worlds;
 namespace OpenPlexus.Talk;
 
 /// <summary>
-/// The conversation harness, wired to a terminal.
+/// The walked house, wired to a terminal so somebody can talk to it.
 /// </summary>
 /// <remarks>
 /// <para>
 /// <b>A deployment is chosen by whoever composes the system</b>, which is why this is a project
 /// of its own rather than an entry point on the library. What front end a stream is read through,
-/// how big a population is allowed to be and how curious the machine is are all decisions taken
+/// how big a population is allowed to be and what the machine wants are all decisions taken
 /// here, and a library taking them would be deciding how everything it is ever shown is
 /// perceived.
 /// </para>
 /// <para>
-/// <b>Run it with <c>dotnet run --project src/OpenPlexus.Talk</c></b>. Type statements, type
-/// questions, leave a line blank to start a new topic, and type <c>.quit</c> to stop.
+/// <b>A person talks to a machine that has just explored somewhere</b>, which is what an exam on
+/// facts cannot be. The machine walks a house, sits a survey on what was in it, and then the
+/// conversation opens — so what is said is about somewhere it went rather than about a block of
+/// text it was recited. A score on stated facts is reachable by a script holding the transcript;
+/// this is not, and that is the whole reason the phase exists.
 /// </para>
 /// <para>
-/// <b>Or hand it a lesson with <c>--lesson creatures</c></b> and a scripted person tells the
-/// topic once and then examines, which is the same interface driven by something repeatable.
-/// The no-learning bars are printed BEFORE the run, because every wrong turn on this world came
-/// from reading a score before the bar it had to beat.
+/// <b>Run it with <c>dotnet run --project src/OpenPlexus.Talk</c></b>. The walk scrolls past
+/// with <c>&gt;</c> in front of it, the survey's questions with <c>=</c>, and then it is your
+/// turn: type what you like, answer what it asks, and type <c>.quit</c> to stop.
+/// </para>
+/// <para>
+/// <b>And the brain is the one the walk is measured on</b>, dial for dial. The spine is one
+/// world now, so a terminal shipping its own settings would be a second brain inside the set
+/// that matters most — which is the fault <c>OutstandingTests.The_spine_runs_one_brain</c>
+/// exists to catch.
 /// </para>
 /// </remarks>
 internal static class Program
 {
     private static int Main(string[] args)
     {
-        var capacity = Number(args, "--capacity", 2000);
-        // The three arms that were measured to win, shipped rather than left off, and all three
-        // are load-bearing: a statement claims every word in turn so that nothing has to pick
-        // one, genesis mints the whole remaining scope rather than finding it by failing, and a
-        // mint is credited with the round that made it so a correct rule is believed without
-        // hearing the sentence twice. Together they answer a lesson told ONCE; any two of them
-        // reach a fraction of it. No generated world has weighed in -- see `DialTests`.
-        var rooting = Given(args, "--rooting") is { } wide
-            ? Enum.Parse<Rooting>(wide, ignoreCase: true)
-            : Rooting.Wholly;
-        var crediting = Given(args, "--crediting") is { } paid
-            ? Enum.Parse<Crediting>(paid, ignoreCase: true)
-            : Crediting.Birth;
-        var admitting = Given(args, "--admitting") is { } bar
-            ? Enum.Parse<Admitting>(bar, ignoreCase: true)
-            : Admitting.Testable;
+        var capacity = Number(args, "--capacity", 20_000);
         var seed = Number(args, "--seed", 1);
-        var rate = Fraction(args, "--asking", 0.25);
-        var passes = Number(args, "--passes", 3);
-        var tellings = Number(args, "--tellings", 1);
-        var clarifying = Number(args, "--clarifying", 0);
-        var revising = Number(args, "--revising", 0);
-        var replying = Given(args, "--replying") is { } how
-            ? Enum.Parse<Replying>(how, ignoreCase: true)
-            : Replying.Word;
-        var carrying = Carried(args);
+
+        // The house, and every number here is a SIZE. A real house has some number of rooms,
+        // things, people and steps, and choosing six rather than eight does not make it less
+        // like a house -- where a setting that chose what KIND of question got asked would be
+        // a world the real one is not.
+        var rooms = Number(args, "--rooms", 6);
+        var props = Number(args, "--props", 4);
+        var people = Number(args, "--people", 4);
+        var steps = Number(args, "--steps", 40);
+        var asked = Number(args, "--asked", 6);
+        var chatting = Number(args, "--chatting", 20);
+
         var joining = Given(args, "--joining") is { } read
             ? Enum.Parse<Joining>(read, ignoreCase: true)
-            : Joining.Bagged;
-        // Claiming by default, because a statement that claims nothing cannot teach anything
-        // and a session at a terminal is mostly statements.
-        //
-        // And the asking rate stays low FOR THE PERSON rather than for the population. A claim
-        // prints an answer and costs nothing; an ask opens a prompt and eats the next line they
-        // type, so a machine asking on every moment is one nobody will talk to twice. Pass
-        // `--asking 1.0` where the reply is scripted and the settlements are the point.
-        var asserting = Given(args, "--asserting") is { } claim
-            ? Enum.Parse<Asserting>(claim, ignoreCase: true)
-            : Asserting.Everything;
-        var lesson = Taught(args);
+            : Joining.Resolved;
 
-        // The control, and it is the only thing that says whether the telling taught anything.
-        // A machine examined over and over learns the examination by being corrected on it, so
-        // an accuracy with no un-told arm beside it cannot be read as comprehension.
-        if (lesson is not null && Given(args, "--told") == "no")
-            lesson = lesson with { Statements = [] };
+        // The brain's own defaults and nothing else, which is the point rather than an
+        // omission. `ExercisedTests.Walking` is this composition and the walk is measured on
+        // it; a dial turned here and nowhere else would make every reading on the house a
+        // comparison between two brains as much as between two problems.
+        var brain = new Brain(new CommittingSettings { Capacity = capacity }, seed);
 
-        var brain = new Brain(
-            new CommittingSettings
+        var world = new Roaming(
+            new RoamingSettings
             {
-                Capacity = capacity,
-                Rooting = rooting,
-                Crediting = crediting,
-                Admitting = admitting,
+                Rooms = rooms,
+                Props = props,
+                People = people,
+                Steps = steps,
+                Asked = asked,
+                Chatting = chatting,
+                Typed = Console.In,
+                Printed = Console.Out,
             },
             seed);
-
-        // The tutor owns the writer, because seeing the prompt is how it knows a reply is
-        // wanted. A session with nobody scripted prints straight at the console.
-        var tutor = lesson is null ? null : new Tutor(
-            lesson, Console.Out, passes, tellings, revising, clarifying, Console.In, replying);
-
-        var world = new Conversing(new ConversingSettings
-        {
-            Typed = tutor ?? Console.In,
-            Printed = tutor?.Printed ?? Console.Out,
-            Carrying = carrying,
-            Asserting = asserting,
-
-            // Nothing where a person is typing, because a conversation cannot segment
-            // itself. A lesson knows which of its words it is about and a keyboard does
-            // not, so the terminal reports things exactly where somebody can say what they
-            // are.
-            Things = tutor?.Things ?? [],
-        });
 
         // Handed in where the world and the brain meet, because which code an outcome is
         // about is a fact only the world holds. Without it `Supposing` is one vote.
         brain.Meaning = world.Meaning;
-        var curiosity = new Curiosity(brain, rate, seed, world.Naming);
+
+        var draw = new Random(seed);
+
+        // Wanting to LEARN, which is fork 146's drive and the arm the walk turned on. There is
+        // nothing else to want: a house is not a body with variables to be in trouble about,
+        // so every advocated word is wanted equally and what ranks them is how much saying one
+        // would teach.
+        var drives = new Drives(
+            brain.Held,
+            doing: world.Naming,
+            wanting: (_, _) => 1.0,
+            untold: () => draw.Next(world.Doings),
+            arm: Wanting.Learning);
 
         // ONE vocabulary for the front end and the population, which is what `Categories`
         // requires: a category the fold puts in a moment and one a scope is rewritten over
         // have to be the same code, or the rewrite names something no moment holds. It starts
         // empty and only ever grows, so nothing a session learns is ever renamed.
-        //
-        // Company rather than time, and `Rarely` rather than `Never`. A typed sentence is a
-        // window rather than one assertion, so two words that are alternatives land in one
-        // moment constantly -- the clause that refuses a pair for meeting once returns nought
-        // on every text stream measured. And the codes a conversation wants grouped never
-        // turn up beside each other; what they share is the company they keep.
         var sorts = new Categories([]);
 
         brain.Held.Sorts = sorts;
@@ -132,75 +108,43 @@ internal static class Program
                 world,
                 new Sorted<Coded>(
                     new Deriving<Coded>(
-                        new Joined(joining),
+                        new Joined(joining, resolution: 3, freshest: true),
                         sorts,
                         Counting.Company,
                         Meeting.Rarely,
-                        floor: Number(args, "--floor", 5),
-                        every: Number(args, "--deriving", 50)),
+                        floor: Number(args, "--floor", 20),
+                        every: Number(args, "--deriving", 2_000)),
                     sorts),
                 acting: Chooses.From(
-                    felt => Doing(curiosity.Choose(felt)), curiosity.Cleared)),
+                    felt => Answering(brain, world, felt) ?? drives.Choose(felt),
+                    drives.Cleared)),
             brain);
 
-        // Budgeted for the widest statement, because `Asserting.Everything` makes a sentence
-        // one moment a word. A run stopping at the moment count would end before the
-        // examination; the spare rounds after the lesson go by empty and are reported.
-        var rounds = tutor is null
-            ? Number(args, "--rounds", 400)
-            : asserting is Asserting.Everything || replying is Replying.Sentence
-                ? tutor.Moments * tutor.Longest
-                : tutor.Moments;
+        // Enough rounds for as many houses as were asked for, because a run stopping mid-walk
+        // would end before anybody was spoken to.
+        var houses = Number(args, "--houses", 3);
+        var rounds = Number(args, "--rounds", houses * (steps + asked + chatting));
 
         Console.WriteLine(
-            $"talking, {rounds} rounds, capacity {capacity}, seed {seed}, asking "
-            + $"{rate.ToString("F2", CultureInfo.InvariantCulture)} of the time, carrying "
-            + $"{carrying.ToString().ToLowerInvariant()}, asserting "
-            + $"{asserting.ToString().ToLowerInvariant()}, rooting "
-            + $"{rooting.ToString().ToLowerInvariant()}, crediting "
-            + $"{crediting.ToString().ToLowerInvariant()}, admitting "
-            + $"{admitting.ToString().ToLowerInvariant()}, joining "
-            + $"{joining.ToString().ToLowerInvariant()}");
+            $"walking, {rounds} rounds, capacity {capacity}, seed {seed}, {rooms} rooms, "
+            + $"{props} things, {people} people, {steps} steps, {asked} asked, {chatting} "
+            + $"rounds of talking, joining {joining.ToString().ToLowerInvariant()}");
 
-        if (lesson is null || tutor is null)
-        {
-            Console.WriteLine(
-                "  a sentence is a moment. end one with `?` to ask, leave a line blank for a "
-                + $"new topic, type `{Conversing.Over}` to stop.");
-            Console.WriteLine(
-                "  the machine says `. word` to claim and `? word` to ask. answer an ask with "
-                + "yes, no, or the word.");
-        }
-        else
-        {
-            Console.WriteLine(
-                $"  lesson: {lesson.About} — {lesson.Statements.Count} statements told {tellings} "
-                + $"times, then {lesson.Exam.Count} questions {passes} times over.");
-
-            if (clarifying > 0)
-                Console.WriteLine(
-                    $"  and {clarifying} moments in between are yours — answer what it asks, "
-                    + $"say what you like, `{Tutor.Done}` to move on.");
-
-            // Before anything is run, which is the whole point of printing them here. A score
-            // at or under either of these is a reading about the lesson and not about the
-            // machine.
-            Console.WriteLine(
-                $"  bars   : recency {Share(tutor.Recency, lesson.Exam.Count)}, marginal "
-                + $"{Share(tutor.Marginal, lesson.Exam.Count)} — both need no learning.");
-        }
+        Console.WriteLine(
+            $"  `>` is what it can see, `=` is the survey, `.` is what it said, `?` is what it "
+            + $"asked you. type `{Roaming.Over}` to stop.");
 
         Console.WriteLine();
 
-        var tally = bench.Run(rounds, sweep: 200, target: 0.9, window: 50);
+        var tally = bench.Run(rounds, sweep: 1000, target: 0.9, window: 2000);
 
         Console.WriteLine();
-        Console.WriteLine($"lines      : {tally.Rounds} of {rounds} rounds, ended {world.Ended}");
+        Console.WriteLine($"rounds     : {tally.Rounds} of {rounds}, ended {world.Ended}");
         Console.WriteLine(
-            $"speaking   : {curiosity.Claims} claims, {curiosity.Questions} questions, "
-            + $"{curiosity.Silences} with nothing to say");
+            $"talking    : {world.Questions} asked of you, {world.Answered} answered");
         Console.WriteLine(
-            $"asking     : {world.Asked} asked, {world.Told} answered, {world.Quiet} let go by");
+            $"speaking   : the drive named the word {drives.Told} times and the draw "
+            + $"{drives.Untold}");
         Console.WriteLine(
             $"settling   : {tally.Right} right, {tally.Wrong} wrong, {tally.Abstained} settled "
             + "nothing");
@@ -222,20 +166,6 @@ internal static class Program
                     ? world.Vocabulary[at]
                     : "?")))));
 
-        if (tutor is not null)
-        {
-            // One row a pass, because the first pass and the rest answer different questions.
-            // The first says whether being TOLD the statements taught anything; the rest say
-            // what being CORRECTED teaches, and averaging the two hides both.
-            for (var pass = 0; pass < passes; pass++)
-                Console.WriteLine(
-                    $"pass {pass + 1,-6} : {tutor.Confirmed[pass]} of {tutor.Put[pass]} right, "
-                    + $"{Share(tutor.Confirmed[pass], tutor.Put[pass])}");
-
-            Console.WriteLine(
-                $"the tutor  : {tutor.Corrected} corrected, {tutor.Shrugged} shrugged at");
-        }
-
         // Which gate refused, and it is printed BEFORE `wanting` because it says whether that
         // number means anything. `Searched` is the only one of the five that reaches the scope
         // language, so a run where nothing reaches it has not learnt that its language is too
@@ -246,8 +176,8 @@ internal static class Program
             + $"{brain.Held.AtImproving} not improving, {brain.Held.Searched} searched");
 
         // What the ladder could not do, which is the reading this harness exists for. A high
-        // share here is the admission rule firing on typed English: the machine was blamed and
-        // nothing in the scope language told the misses from the hits.
+        // share here is the admission rule firing: the machine was blamed and nothing in the
+        // scope language told the misses from the hits.
         Console.WriteLine(
             $"wanting    : {tally.Wanting.ToString("F3", CultureInfo.InvariantCulture)} of "
             + $"{tally.Blamed} blamed rounds nothing separated"
@@ -256,54 +186,41 @@ internal static class Program
         return 0;
     }
 
-    /// <summary>An action index for what the machine decided to say.</summary>
+    /// <summary>The word this machine believes follows, or nothing where it believes none.</summary>
+    /// <param name="brain">Whose belief it is.</param>
+    /// <param name="world">Which house numbers the words.</param>
+    /// <param name="felt">The moment it is looking at.</param>
     /// <remarks>
-    /// <b>The join</b>, and it is one line because that is all the coupling there is. A chooser
-    /// hands back a word and an intent; how a world numbers its doings is that world's business,
-    /// and this is where the two meet.
+    /// <para>
+    /// <b>The other half of a conversation, and it is a DEPLOYMENT choice.</b> A person who
+    /// asks the machine something wants what the machine holds; <c>Drives</c> ranks what to
+    /// say by how much saying it would TEACH, which is a question about the population rather
+    /// than an answer to anybody. So a terminal that only had the drive would be a machine
+    /// nobody can ask anything.
+    /// </para>
+    /// <para>
+    /// <b>Read-only, which is what makes it safe to ask.</b> <c>Brain.Voting</c> mints
+    /// nothing and settles nothing, so consulting it is not the machine having learnt
+    /// something — and it is the one road <c>Supposing</c>'s second hop has to a chooser.
+    /// </para>
+    /// <para>
+    /// <b>And it is unmeasured</b>, which is why it is here and not in a fixture. Whether
+    /// answering first beats asking first is a comparison nobody has run;
+    /// <c>OutstandingTests.The_machine_can_say_what_it_expects</c> is red until one is taken
+    /// on the house, and until then this is a capability for whoever is typing rather than a
+    /// number about the brain.
+    /// </para>
     /// </remarks>
-    private static int? Doing(Wondered said) =>
-        said.Word is not { } word
-            ? null
-            : said.Asking ? Conversing.Asks(word) : Conversing.Asserts(word);
-
-    /// <summary>Which lesson to be told, or nothing to be typed at.</summary>
-    private static Lesson? Taught(string[] args) =>
-        Given(args, "--lesson") is not { } named
-            ? null
-            : string.Equals(named, "creatures", StringComparison.OrdinalIgnoreCase)
-                ? Lesson.Creatures
-                : string.Equals(named, "corrected", StringComparison.OrdinalIgnoreCase)
-                    ? Lesson.Corrected
-                    : string.Equals(named, "chained", StringComparison.OrdinalIgnoreCase)
-                        ? Lesson.Chained
-                        : throw new ArgumentException(
-                            $"no lesson called `{named}`", nameof(args));
-
-    /// <summary>How much of the topic a moment holds.</summary>
-    /// <remarks>
-    /// <b>Bare by default, because the other two are measured to mint nothing.</b> A moment
-    /// carrying the topic so far leaves every word said always-present, and genesis may not
-    /// root on a code that has never been absent — so a session that accumulates never starts
-    /// a population at all. <c>LessonTests</c> holds the reading.
-    /// </remarks>
-    private static Carrying Carried(string[] args) =>
-        Given(args, "--carrying") is not { } named
-            ? Carrying.Never
-            : Enum.Parse<Carrying>(named, ignoreCase: true);
-
-    private static string Share(int of, int over) => over == 0
-        ? "0.000"
-        : (of / (double)over).ToString("F3", CultureInfo.InvariantCulture);
+    private static int? Answering(Brain brain, Roaming world, IReadOnlyCollection<Code> felt) =>
+        brain.Voting(felt).Expects is { } said
+        && Brain.Meant(said) is { } word
+        && word < world.Doings
+            ? word
+            : null;
 
     private static int Number(string[] args, string named, int fallback) =>
         Given(args, named) is { } value
             ? int.Parse(value, CultureInfo.InvariantCulture)
-            : fallback;
-
-    private static double Fraction(string[] args, string named, double fallback) =>
-        Given(args, named) is { } value
-            ? double.Parse(value, CultureInfo.InvariantCulture)
             : fallback;
 
     private static string? Given(string[] args, string named)

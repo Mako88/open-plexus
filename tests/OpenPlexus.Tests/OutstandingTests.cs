@@ -173,7 +173,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// worth keeping. <c>Roaming</c> reads through <c>Joined</c> and that front end has no
     /// <c>Bind</c>, so the derivation was inert there and the run's time did not move.
     /// Teaching <c>Joined</c> that a statement is the thing a word belongs to did fill it,
-    /// at three <see cref="LessonTests"/> going red, one entry of
+    /// at three readings on the lesson going red, one entry of
     /// <see cref="ExercisedTests"/> going from reached to unreached, and the population
     /// rising from 1,102 to 1,258 with no score to pay for it.
     /// </para>
@@ -572,22 +572,23 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// this is the same rule read off what the compositions actually hand in.
     /// </para>
     /// <para>
-    /// <b>Two dials part today</b> — the walk takes the brain's defaults and the conversation
-    /// ships <c>Crediting.Birth</c> and <c>Admitting.Testable</c>. So the two halves of the
-    /// spine are not one machine and no number off one of them says anything about the other.
-    /// <c>Rooting</c> is named in the epistemics as a third and is not one: the brain's own
-    /// default is already <c>Wholly</c>, which is what a computed check catches and a written
-    /// list does not.
+    /// <b>Two dials parted while the spine was two worlds</b> — the walk took the brain's
+    /// defaults and the conversation shipped <c>Crediting.Birth</c> and
+    /// <c>Admitting.Testable</c>, so no number off one half said anything about the other.
+    /// <c>Rooting</c> was named in the epistemics as a third and was not one: the brain's
+    /// own default is already <c>Wholly</c>, which is what a computed check catches and a
+    /// written list does not.
     /// </para>
     /// <para>
-    /// <b>What closes it is fork 147</b>, which is the top of THE ORDER: one spine world, so
-    /// there is one composition and nothing left to disagree. Converging the dials closes it
-    /// too, and that is the cheaper road wherever a reading says which value wins.
+    /// <b>Fork 147 closed it.</b> The conversation is the house's last phase rather than a
+    /// world of its own, so there is one composition and nothing left to disagree. The two
+    /// dials went with the world that turned them, which is the road THE ORDER named and
+    /// not the cheaper one of converging them where a reading says which value wins.
     /// </para>
     /// <para>
-    /// <b>Red on purpose, and it computes the state.</b> The dials are reflected off the two
-    /// settings objects rather than listed, so an entry cannot be satisfied by editing this
-    /// file and a dial added to one side alone appears here with nobody writing it down.
+    /// <b>Green is the point rather than a reason to delete it.</b> What it reads is the
+    /// deployment's own source, so a terminal that turns a dial the measurements do not
+    /// puts the spine back on two brains and this goes red the same day.
     /// </para>
     /// </remarks>
     [Fact]
@@ -597,15 +598,15 @@ public sealed class OutstandingTests(ITestOutputHelper output)
 
         output.WriteLine(
             apart.Count == 0
-                ? "the spine's two worlds hand their brains the same dials"
+                ? "the spine world and the terminal hand their brains the same dials"
                 : $"{apart.Count} dial(s) apart: {string.Join(", ", apart)}");
 
         Assert.True(apart.Count == 0,
-            $"the spine's two worlds run brains that differ on {apart.Count} dial(s): "
-            + string.Join(", ", apart)
-            + ". A score off one of them is a comparison between two brains as much as "
-            + "between two problems. This test is red on purpose and closes on one spine "
-            + "world or on the dials converging, not on this file.");
+            $"the spine world and the terminal run brains that differ on {apart.Count} "
+            + $"dial(s): {string.Join(", ", apart)}. A score off the measurements is then a "
+            + "comparison between two brains as much as between two problems, and the "
+            + "machine somebody talks to is not the machine anything was measured on. Turn "
+            + "it in both places or in neither.");
     }
 
     /// <summary>
@@ -769,6 +770,60 @@ public sealed class OutstandingTests(ITestOutputHelper output)
             + ". Each has an arm that is a world the real one is not, and a number off it is "
             + "what the machine is worth. This test is red on purpose and closes on the "
             + "merged world, not on this file.");
+    }
+
+    /// <summary>
+    /// <b>The machine can say what it EXPECTS.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Registered the day the conversation world went</b>, which is when it stopped being
+    /// true. <c>Brain.Voting</c> is the read-only vote — it mints nothing and settles nothing,
+    /// so a chooser may ask it what the machine believes without that reading counting as
+    /// having learnt anything — and it is <c>Supposing</c>'s only road to a chooser. Its one
+    /// caller read a typed conversation and went with it.
+    /// </para>
+    /// <para>
+    /// <b>What is left on the house can ask and cannot answer.</b> <c>Drives</c> ranks the
+    /// WORDS it might say by how much saying one would teach, which is a question about the
+    /// population rather than about the moment in front of it. So a person who asks the
+    /// machine something gets whatever the drive felt like saying, and the machine's own
+    /// belief reaches nothing.
+    /// </para>
+    /// <para>
+    /// <b>Red on purpose, and it computes the state.</b> What it asks is whether any test
+    /// building the spine world reads the vote, which is <c>DialTests.OffTheSpine</c>'s own
+    /// proxy — so it cannot be satisfied by editing this file, and it closes on a
+    /// composition rather than on a call.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_machine_can_say_what_it_expects()
+    {
+        // Spelt in halves so this file does not read as a caller itself. `DeadCodeTests`
+        // scans source for a use, and a literal naming the call would satisfy it -- a check
+        // being satisfied by the text of the check that asks about it.
+        var call = "." + "Voting(";
+
+        var reading = Directory
+            .GetFiles(Path.Combine(Tree.Repo(), "tests", "OpenPlexus.Tests"), "*.cs")
+            .Where(path => Path.GetFileName(path) != "OutstandingTests.cs")
+            .Where(path => File.ReadAllText(path) is var source
+                && source.Contains(call, StringComparison.Ordinal)
+                && source.Contains("new Roaming(", StringComparison.Ordinal))
+            .Select(Path.GetFileName)
+            .ToList();
+
+        output.WriteLine(
+            reading.Count == 0
+                ? "nothing on the spine reads what the machine expects"
+                : $"read by {string.Join(", ", reading)}");
+
+        Assert.True(reading.Count > 0,
+            "`Brain.Voting` is what the machine BELIEVES and nothing on the spine reads it, "
+            + "so a person can ask the house's machine a question and never be answered from "
+            + "what it holds. `Supposing` reaches a chooser by this road and no other. This "
+            + "test is red on purpose and closes on a chooser that answers, not on this file.");
     }
 
 }

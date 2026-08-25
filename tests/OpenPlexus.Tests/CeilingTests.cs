@@ -273,52 +273,6 @@ public sealed class CeilingTests(ITestOutputHelper output)
         Assert.Equal(3, raised);
     }
 
-    [Fact]
-    public void A_bare_question_hands_over_nothing_at_all()
-    {
-        // The conversation's own ceiling, and it is what makes every reading in `LessonTests`
-        // safe to read. Under `Carrying.Never` a question arrives as its own words and nothing
-        // else, so the answer is never in front of the machine -- it either learnt the thing or
-        // it did not, and no amount of front end can be doing the work.
-        var lesson = Lesson.Creatures;
-
-        var lines = lesson.Exam.Select(one => one.Question).Append(Conversing.Over);
-
-        var typed = new StringReader(string.Join(Environment.NewLine, lines));
-
-        var world = new Conversing(new ConversingSettings
-        {
-            Typed = typed,
-            Printed = TextWriter.Null,
-            Carrying = Carrying.Never,
-            Things = lesson.Things,
-        });
-
-        var present = 0;
-        var asked = 0;
-
-        foreach (var one in lesson.Exam)
-        {
-            var turn = world.Next();
-
-            if (world.Ended) break;
-
-            world.Do(null);
-            asked++;
-
-            var moment = new HashSet<Code>(turn.Seen.Question());
-
-            foreach (var said in turn.Seen.Said()) moment.UnionWith(said);
-
-            if (moment.Contains(Babi.Of(one.Answer))) present++;
-        }
-
-        output.WriteLine($"{present} of {asked} bare questions already hold their answer");
-
-        Assert.Equal(lesson.Exam.Count, asked);
-        Assert.Equal(0, present);
-    }
-
     /// <summary>
     /// <b>What the walked house's survey is worth before anything has learnt.</b>
     /// </summary>

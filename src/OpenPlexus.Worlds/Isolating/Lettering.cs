@@ -64,8 +64,13 @@ public static class Lettering
     /// <summary>How many pixels down one glyph is. <b>Read through <see cref="Room"/></b>.</summary>
     private const int Tall = 7;
 
-    /// <summary>How many pixels sit between two glyphs.</summary>
-    public const int Gap = 1;
+    /// <summary>How many pixels sit between two glyphs. <b>Read through <see cref="Room"/></b>.</summary>
+    /// <remarks>
+    /// <b>Private, because nothing outside ever asked for it.</b> It read as called for the
+    /// life of the branch because an unrelated test held a tuple field spelt the same, which
+    /// is this repo's own homonym trap arriving in the dead-code census.
+    /// </remarks>
+    private const int Gap = 1;
 
     /// <summary>How many pixels across the square canvas is.</summary>
     /// <remarks>

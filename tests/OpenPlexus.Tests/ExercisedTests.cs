@@ -25,17 +25,16 @@ namespace OpenPlexus.Tests;
 /// unable to fire for the life of the branch.
 /// </para>
 /// <para>
-/// <b>And the arms are the worlds' own rather than one run.</b> Roaming asks two questions
-/// and can be watched or acted in; the conversation is told a lesson once and examined on it.
-/// The reading is over every arm the spine supports, so an entry reached by any of them is
-/// reached. Taking one arm would report the arm rather than the world.
+/// <b>And the arms are the world's own rather than one run.</b> The house can be watched
+/// or acted in, and it walks, sits a survey and is talked about under both. The reading is
+/// over every arm the spine supports, so an entry reached by either is reached; taking one
+/// would report the arm rather than the world.
 /// </para>
 /// <para>
-/// <b>Both spine worlds, because the sentence had no code behind it.</b> This ran
-/// <see cref="Roaming"/> in both arms and never <see cref="Conversing"/>, while
-/// <see cref="OutstandingTests.The_spine_world_exercises_every_entry_of_the_architecture"/>
-/// said an entry counted as reached when either spine world showed it. A documented promise
-/// is not a check, and the promise was the wrong half of this pair to trust.
+/// <b>One spine world, so both arms are the house.</b> This used to run
+/// <see cref="Roaming"/> in both arms while the sentence above claimed two worlds, which
+/// was a documented promise standing in for a check. The conversation is a phase of the
+/// house now, so the sentence and the code say the same thing.
 /// </para>
 /// </remarks>
 public sealed class ExercisedTests
@@ -43,61 +42,59 @@ public sealed class ExercisedTests
     /// <summary>The brain the house is walked with.</summary>
     /// <remarks>
     /// <para>
-    /// <b>Named rather than written inline, so the two are comparable.</b> The spine ran two
-    /// worlds on two brains; a check cannot say which dials part while each is a literal at
-    /// its own call site.
-    /// </para>
-    /// <para>
-    /// <b>And it is NOT <see cref="Talking"/>'s pair, which was tried and reverted.</b>
-    /// <c>RoamingTests.What_the_conversations_two_dials_cost_the_walk</c> read the walk as
-    /// indifferent — 0.612, 0.640 and 0.538 under the conversation's pair against 0.587,
-    /// 0.642 and 0.538 under these, for two thirds of the residents — so the cheap road to
-    /// one brain looked open.
-    /// </para>
-    /// <para>
-    /// <b>The effect arm pays HERE rather than on the grid.</b> Under
-    /// <c>Admitting.Testable</c> it falls from 105 residents and 131 repairs to 39 and 7, and
-    /// the derivation stops reaching a scope — so <i>a concept a thing in its own right</i>
-    /// goes unreached and the spine loses an entry of THE ARCHITECTURE to buy dial parity.
-    /// The grid re-run with the question as an axis reads the same bar as a fifth of the
-    /// population and no score, on both questions: it runs a bare front end and no chooser,
-    /// and this composition runs a derived vocabulary and one that acts. The cost is in that
-    /// interaction rather than in the bar.
-    /// Parity is the means and coverage is the end, so the trade is refused and
-    /// <c>OutstandingTests.The_spine_runs_one_brain</c> stays red with a measured reason
-    /// rather than an unexamined one.
+    /// <b>Named rather than written inline.</b> It can be compared with what ships, and the
+    /// spine ran two worlds on two brains and a check could not say which dials parted while
+    /// each was a literal at its own call site. It is the brain's own defaults and a bound on
+    /// what it may hold, so a dial the terminal turns is a dial the walk does not.
     /// </para>
     /// </remarks>
     internal static CommittingSettings Walking => new() { Capacity = 20_000 };
 
-    /// <summary>The brain the conversation ships with, as <c>OpenPlexus.Talk</c> composes it.</summary>
+    /// <summary>Which dials the spine's brains disagree on, in name order.</summary>
     /// <remarks>
-    /// <b>The deployment's own numbers</b>, which is what makes a difference from
-    /// <see cref="Walking"/> a fact about the spine rather than about a fixture.
-    /// </remarks>
-    internal static CommittingSettings Talking => new()
-    {
-        Capacity = 20_000,
-        Rooting = Rooting.Wholly,
-        Crediting = Crediting.Birth,
-        Admitting = Admitting.Testable,
-    };
-
-    /// <summary>Which dials the spine's two brains disagree on, in name order.</summary>
-    /// <remarks>
-    /// <b>Reflected rather than listed</b>, so a dial added to one composition and not the
-    /// other appears here without anybody remembering to write it down. What it reads is the
-    /// settings object each spine world hands its brain, which is where a world reaching into
-    /// the brain would show.
+    /// <para>
+    /// <b>Read off the deployment's SOURCE.</b> Not off a copy of its settings, and the
+    /// spine is one world, so the only way two brains can still run on it is a terminal
+    /// composing one while the measurements compose another. A second settings object here
+    /// would be a copy that drifts, and it would read as parity the whole time.
+    /// </para>
+    /// <para>
+    /// <b>A dial the terminal NAMES is one the walk does not</b>, because
+    /// <see cref="Walking"/> hands the brain its own defaults and nothing else. So the check
+    /// is that the deployment's settings block names the capacity and no dial at all —
+    /// a bound on what the machine may hold is a resource and not a way of thinking.
+    /// </para>
     /// </remarks>
     internal static IReadOnlyList<string> BrainsApart() =>
     [
         .. typeof(CommittingSettings)
             .GetProperties()
-            .Where(one => !Equals(one.GetValue(Walking), one.GetValue(Talking)))
-            .Select(one => $"{one.Name} {one.GetValue(Walking)} vs {one.GetValue(Talking)}")
+            .Where(one => one.Name != nameof(CommittingSettings.Capacity))
+            .Where(one => Composed().Contains(one.Name, StringComparison.Ordinal))
+            .Select(one => $"{one.Name} is turned by the terminal and defaulted by the walk")
             .Order(StringComparer.Ordinal),
     ];
+
+    /// <summary>The settings block <c>OpenPlexus.Talk</c> hands its brain, as source.</summary>
+    /// <remarks>
+    /// <b>The block rather than the file</b>, because the project names dials for the front
+    /// end and for what the machine wants, and neither is a brain dial. What is read is the
+    /// one construction that decides how the brain thinks.
+    /// </remarks>
+    private static string Composed()
+    {
+        var source = File.ReadAllText(
+            Path.Combine(Tree.Repo(), "src", "OpenPlexus.Talk", "Program.cs"));
+
+        var opened = source.IndexOf(
+            $"new {nameof(CommittingSettings)}", StringComparison.Ordinal);
+
+        if (opened < 0) return string.Empty;
+
+        var closed = source.IndexOf('}', opened);
+
+        return closed < 0 ? source[opened..] : source[opened..closed];
+    }
 
     /// <summary>What one run of a spine world left behind.</summary>
     /// <param name="Arm">Which run it was, for the table.</param>
@@ -228,10 +225,18 @@ public sealed class ExercisedTests
     /// </param>
     private static Watched Run(bool acting, long rounds = 10_000)
     {
-        // Walked, talked about and then examined, which is the whole of the one spine
+        // Walked, examined and then talked about, which is the whole of the one spine
         // world. The three phases are what reach different entries, so an arm that ran
-        // only the walk would leave the telling and the exam unreached.
-        var world = new Roaming(Fixture.House(asked: 6, chatting: 6), seed: 1);
+        // only the walk would leave the exam and the telling unreached.
+        //
+        // And the person is scripted and often wrong, which is the point rather than a
+        // shortcut. What the entry under `told must be settleable` asks is that a told
+        // statement CARRIES a settlement and can be wrong about it; somebody answering
+        // `kitchen` to everything supplies exactly that, and a stand-in that read the house
+        // would be the world answering itself one seam over.
+        var person = new Person(answers: ["kitchen", "garden", "apple", "one", string.Empty]);
+
+        var world = new Roaming(Fixture.House(asked: 6, chatting: 6, person), seed: 1);
         var brain = new Brain(Walking, seed: 1);
         var falling = new Random(1);
 
@@ -252,6 +257,13 @@ public sealed class ExercisedTests
                 floor: 20,
                 every: 2_000),
             sorts));
+
+        // Handed in where the world and the brain meet, because which code an outcome is
+        // about is a fact only the world holds. Without it `Supposing` cannot mark anything
+        // and `relations are concepts too` goes unreached -- which is what the deletion of
+        // the conversation world showed: that entry had been read off the only composition
+        // that handed this in, and the house had never been asked for it.
+        brain.Meaning = world.Meaning;
 
         // Which word an intervention code was derived from, built exactly rather than
         // guessed. The join holds both halves -- the world says which code a word is said as
@@ -342,97 +354,6 @@ public sealed class ExercisedTests
             noted.Parts);
     }
 
-    /// <summary>
-    /// The other spine world, run into a brain — <b>the conversation, told a lesson once and
-    /// then examined on it.</b>
-    /// </summary>
-    /// <param name="rounds">
-    /// How many rounds to run, and <b>the whole lesson where nothing is said</b>. A
-    /// conversation's length is the tutor's rather than a number picked here: a run cut short
-    /// ends before the examination, so what it reaches would be a fact about the cut.
-    /// </param>
-    /// <param name="lesson">Which lesson is told, defaulting to the one every fact is stated in.</param>
-    /// <param name="tellings">How many times it is told.</param>
-    /// <param name="admitting">
-    /// Which admission bar the repair gate holds, and <b>the axis that decides whether this
-    /// arm repairs at all.</b> <c>OpenPlexus.Talk</c> passes
-    /// <see cref="Admitting.Testable"/> where the brain's own default is
-    /// <see cref="Admitting.Anything"/>, and under the deployment's choice this world reads
-    /// <c>repaired 0</c> at one telling and at five. So every mechanism repair is the only
-    /// road to is unreachable on the shipped composition, for a reason that is the bar rather
-    /// than the mechanism.
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// <b>The deployment's own composition rather than a fixture's</b>, which is the only kind
-    /// that says anything. <c>OpenPlexus.Talk</c> ships a <c>Sorted</c> over a
-    /// <c>Deriving</c>, the three arms that were measured to win, and a
-    /// <see cref="Curiosity"/> that reads the population — so this reaches what a session at a
-    /// terminal reaches and not what a test could arrange.
-    /// </para>
-    /// <para>
-    /// <b>Every doing is an ask or a claim</b>, so the chooser's own count is what says a
-    /// population was read. A conversation has no body and no verb, so <c>Told</c> here is
-    /// words spoken rather than actions taken and the entry it feeds reads nothing off it.
-    /// </para>
-    /// </remarks>
-    private static Watched Talked(
-        int? rounds = null, Lesson? lesson = null, int tellings = 1,
-        Admitting admitting = Admitting.Testable)
-    {
-        var told = lesson ?? Lesson.Creatures;
-        var tutor = new Tutor(told, TextWriter.Null, tellings: tellings);
-
-        var brain = new Brain(Talking with { Admitting = admitting }, seed: 1);
-
-        var world = Fixture.Talking(tutor);
-
-        // ONE vocabulary for the fold and the population, which is the seam `Categories`
-        // draws and is the same wiring the terminal ships.
-        var sorts = new Categories([]);
-
-        brain.Held.Sorts = sorts;
-
-        var noted = new Noted(new Sorted<Coded>(
-            new Deriving<Coded>(
-                new Joined(Joining.Bagged),
-                sorts,
-                Counting.Company,
-                Meeting.Rarely,
-                floor: 5,
-                every: 50),
-            sorts));
-
-        // Handed in where the world and the brain meet, because which code an outcome is
-        // about is a fact only the world holds. Without it `Supposing` is one vote.
-        brain.Meaning = world.Meaning;
-        var curiosity = new Curiosity(brain, rate: 1.0, seed: 1, world.Naming);
-
-        // Budgeted for the widest statement, because `Asserting.Everything` makes a sentence
-        // one moment a word. A run stopping at the moment count ends before the examination.
-        var tally = new Bench(
-            new Watching<Coded>(
-                world,
-                noted,
-                acting: Chooses.From(
-                    felt => Doing(curiosity.Choose(felt)), curiosity.Cleared)),
-            brain)
-            .Run(
-                rounds ?? (tutor.Moments * tutor.Longest),
-                sweep: 200, target: 0.9, window: 50);
-
-        return new Watched(
-            $"conversing x{tellings} {admitting.ToString().ToLowerInvariant()}",
-            0, tally, brain.Held, noted.Emitted, noted.Channels,
-            curiosity.Claims + curiosity.Questions, brain.Supposals, noted.Parts);
-    }
-
-    /// <summary>The join between what a chooser decided and how this world numbers a doing.</summary>
-    private static int? Doing(Wondered said) =>
-        said.Word is not { } word
-            ? null
-            : said.Asking ? Conversing.Asks(word) : Conversing.Asserts(word);
-
     /// <summary>One entry of THE ARCHITECTURE, and what a run must show for it.</summary>
     /// <param name="Line">The entry, in the words the plan gives it.</param>
     /// <param name="Shows">What would count as having exercised it.</param>
@@ -518,7 +439,7 @@ public sealed class ExercisedTests
                 one.Emitted.Count > 0 && !one.Emitted.Contains(Brain.Followed))),
 
         new("What it is told must be settleable",
-            "the house answered what the machine asked and the round was scored",
+            "somebody answered what the machine asked and the round was scored",
             arms => Any(arms, one => one.Answered > 0
                 && one.Tally.Right + one.Tally.Wrong > 0)),
 
@@ -612,15 +533,6 @@ public sealed class ExercisedTests
             // round, so it saturates a population far sooner.
             Run(acting: false, rounds: 4_000),
             Run(acting: true, rounds: 4_000),
-
-            Talked(),
-
-            // And a conversation that REPAIRS, which the arm above does not. The deployment
-            // passes `Admitting.Testable` and under it this world reads `repaired 0` however
-            // many times the lesson is told -- so every mechanism repair is the only road to
-            // is unreachable on that composition. This one is the brain as it is built, on the
-            // chained lesson, which is where the second hop has something to compose.
-            Talked(lesson: Lesson.Chained, tellings: 5, admitting: Admitting.Anything),
         };
 
         var missed = new List<string>();
@@ -698,7 +610,7 @@ public sealed class ExercisedTests
         var nothing = new[]
         {
             Run(acting: false, rounds: 1),
-            Talked(rounds: 1),
+            Run(acting: true, rounds: 1),
         };
 
         var free = Entries

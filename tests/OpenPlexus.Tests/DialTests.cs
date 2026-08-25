@@ -861,13 +861,15 @@ public sealed class DialTests
         return seen;
     }
 
-    /// <summary>The two worlds a score is allowed to be ABOUT.</summary>
+    /// <summary>The world a score is allowed to be ABOUT.</summary>
     /// <remarks>
-    /// <b>John's, and the line every other reading is measured against.</b>
-    /// <c>Roaming</c> and the conversation are meant to be a microcosm of the real world;
-    /// every other world answers a question about a mechanism and is never the objective.
+    /// <b>John's, and the line every other reading is measured against.</b> <c>Roaming</c> is
+    /// meant to be a microcosm of the real world -- walked, examined, then talked about by
+    /// somebody -- and every other world answers a question about a mechanism and is never
+    /// the objective. It was two while the conversation was a world of its own; it is one
+    /// now, and the conversation is that world's last phase.
     /// </remarks>
-    private static readonly string[] Spine = ["Roaming", "Conversing"];
+    private static readonly string[] Spine = ["Roaming"];
 
     /// <summary>Dials no test that builds a SPINE world names, in name order.</summary>
     /// <remarks>
@@ -928,13 +930,14 @@ public sealed class DialTests
             + "`Alternating`'s wiring, and blocked on when a front end re-derives",
 
         ["Supposing"] =
-            "`Conversing` ONLY, and it is inert everywhere else by construction rather than "
-            + "by nobody having done it. A supposition is a code in the moment's own alphabet "
-            + "and an expectation is an index, so a world that cannot translate one into the "
-            + "other gets one vote -- and `Conversing` is the only world here that numbers its "
-            + "outcomes in words of its own moments. What it is waiting for is fork 137: a "
+            "THE CONVERSATION ONLY, and that world is gone. A supposition is a code in the "
+            + "moment's own alphabet and an expectation is an index, so a world that cannot "
+            + "translate one into the other gets one vote -- and the two that can are the "
+            + "house and the conversation it ended in. What it is waiting for is fork 137: a "
             + "brain-side relation between the two alphabets, after which every world can "
-            + "suppose and the bar is a comparison rather than one world's reading",
+            + "suppose and the bar is a comparison rather than one world's reading. The "
+            + "cheaper road is a reading on the house, which numbers its outcomes in words "
+            + "of its own moments and has never been asked",
 
         ["Choosing"] =
             "`Multiplexer` ONLY, AND IT ALWAYS WAS -- this entry is a check that was passing "

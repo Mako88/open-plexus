@@ -29,12 +29,9 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **First a PERSON talks to a machine that has just explored somewhere.** John's, and it is
-  what an exam on facts cannot be. `Conversing` goes, the terminal moves to the walked house,
-  one brain falls out, and Claude drives it until John can.
-- **And the conversation comes AFTER the exam and is never the house.** Asking the house
-  first restates the answer, so the lift measures recency. John's. Rung four and the
-  forward store are BUILT.
+- **First the machine can say what it EXPECTS.** A person asks it something and the drive
+  answers with whatever teaches most, so nothing on the spine reads the belief. The
+  terminal reads it and no measurement does. `OutstandingTests`.
 - **And the walk ends when the MACHINE is done**, not on a count somebody set.
   `Commitment.Progress` is what sates, so `Steps` becomes a cap. John's. Fork **152**.
 - **And the exam asks a CONSEQUENCE, never only a fact.** A stated answer is one a script
@@ -43,14 +40,14 @@ that is finished LEAVES, so this is only ever what is still to do.
   half; the drive pays on the WALK and asks less than a coin. Forks **146**, **151**.
 - **Then the four dials read off the spine only** — `Budgeting`, `Feeling`, `Forking`,
   `Subsuming`. Re-taken HERE: the world they want a reading on is the one being built.
-- **Then a regime with COMPANY and a population**, the conversation having neither together: a
-  moment of one word derives no vocabulary and a moment carrying a story roots genesis on
-  nothing, no arm a middle. Fork **120**, priced. `LessonTests`.
+- **Then a regime with COMPANY and a population**, priced on the lesson and unread on the
+  house: a moment of one word derives no vocabulary and a moment carrying a story roots
+  genesis on nothing, no arm a middle. Fork **120**.
 - **Then rung four MINTS, and only then `Parted`** — the rung proposing nothing even where a
   vocabulary exists, and parting costing the whole score alone because nothing bound is left
-  to answer. Both read on the lesson.
+  to answer. Both were read on the lesson and are owed a reading on the house.
 - **Then a primer that teaches English**, and it is ORDERED here deliberately: its value is
-  ostension rather than volume, `Lesson.Drawn` already giving any size for free, and its
+  ostension rather than volume, a generated corpus already giving any size for free, and its
   payoff is the exam half binding blocks. John's. Fork **132**.
 - **The three below are REQUIREMENTS rather than arms.** John's. A losing reading is a cost
   to record rather than grounds to delete.
@@ -64,8 +61,8 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **Then the third store, read BY KEY.** Above the chain because the reading says so: where
   the right statement is in front of it the learner is at its bound, so the exam is short of
   RETRIEVAL. Reading by key is rung four, so it waits on the two above. Fork **139**.
-- **Then a reference the second hop's gate can hold**, four having been read and every one
-  trading the exam's two halves against each other. `LessonTests`. Forks **28**, **115**,
+- **Then a reference the second hop's gate can hold**, four having been read on the lesson
+  and every one trading the exam's two halves against each other. Forks **28**, **115**,
   **129**, **137**.
 - **Then which worlds still answer a live question**, measured rather than guessed. Fourteen
   are open.
@@ -530,8 +527,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **NOW** — a front end may say what it is looking at, never what to conclude, and
       `SeparationTests` fails the build. A final `?` is all a world says, so questionhood is
       the learner's. John's.
-    - **OPEN** — the conversation reads questionhood off the text and the CORPORA still hand
-      it separated, so one path obeys the rule and the other does not.
+    - **OPEN** — the house reads questionhood off the machine's own words and the CORPORA
+      still hand it separated, so one path obeys the rule and the other does not.
     - **OPEN** — how hard a fleet searches is a deployment choice, which is a world reaching
       into the brain one level out. Fork **60** carries it, under the machine.
   - What it is told must be settleable

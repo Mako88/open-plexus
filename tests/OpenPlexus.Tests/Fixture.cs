@@ -58,7 +58,8 @@ internal static class Fixture
     /// literal per instrument.</b>
     /// </summary>
     /// <param name="asked">How many survey questions follow the walk.</param>
-    /// <param name="chatting">How many rounds of talking about it come before those.</param>
+    /// <param name="chatting">How many rounds a person gets once those are over.</param>
+    /// <param name="person">Who is talking to it, where anybody is.</param>
     /// <remarks>
     /// <b>Named at every call and defaulted nowhere else</b>, which is the rule this repo
     /// learnt the hard way: a fixture inherits every dial it does not pin, so a default
@@ -66,7 +67,8 @@ internal static class Fixture
     /// and the one axis that differs, so two instruments cannot drift apart while reading
     /// against each other. Four people, because one leaves the middle hop free.
     /// </remarks>
-    public static Worlds.RoamingSettings House(int asked = 0, int chatting = 0) =>
+    public static Worlds.RoamingSettings House(
+        int asked = 0, int chatting = 0, Person? person = null) =>
         new()
         {
             Rooms = 6,
@@ -75,6 +77,8 @@ internal static class Fixture
             Steps = 120,
             Asked = asked,
             Chatting = chatting,
+            Typed = person,
+            Printed = person?.Printed,
         };
 
     /// <summary>The senses world, clean unless a test asks for noise.</summary>
@@ -158,29 +162,6 @@ internal static class Fixture
     }
 
     /// <summary>A code in the plain test modality.</summary>
-    /// <summary>A conversation over a scripted tutor, composed as the terminal composes it.</summary>
-    /// <param name="tutor">Who is typing, and where the machine's words go.</param>
-    /// <param name="carrying">How much of the topic a moment holds.</param>
-    /// <remarks>
-    /// <b><c>Carrying.Never</c> is the terminal's default and NOT the settings record's.</b>
-    /// Left defaulted a world carries the whole topic into every moment, every code is always
-    /// present, genesis roots on nothing and a run holds a population of nought. Three files
-    /// wrote this block out and one of them got that wrong, which is why it is here.
-    /// </remarks>
-    /// <param name="asserting">What a told statement claims.</param>
-    public static Worlds.Conversing Talking(
-        Worlds.Tutor tutor,
-        Worlds.Carrying carrying = Worlds.Carrying.Never,
-        Worlds.Asserting asserting = Worlds.Asserting.Everything) =>
-        new(new Worlds.ConversingSettings
-        {
-            Typed = tutor,
-            Printed = tutor.Printed,
-            Things = tutor.Things,
-            Carrying = carrying,
-            Asserting = asserting,
-        });
-
     public static Code C(ulong value) => new(Modality: 1, value);
 
     /// <summary>A bench over the narrow multiplexer, driving a fleet already open.</summary>

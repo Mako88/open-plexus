@@ -101,7 +101,7 @@ internal enum Rooting
 /// <b>John's, and it answers a tie</b> rather than breaking one. The vote ranks
 /// expectations by weight and breaks a tie by code order, so on a first telling — where every
 /// accuracy is still nought — the machine answers from a hash and is then corrected on a guess
-/// it had no basis for. <c>LessonTests</c> reads half of what claiming the rarest word gets
+/// it had no basis for. the lesson's readings reads half of what claiming the rarest word gets
 /// wrong as exactly that.
 /// </para>
 /// <para>
@@ -119,11 +119,11 @@ internal enum Rooting
 /// <para>
 /// <b>And an ACTED world costs more than that</b>, which is a correction rather
 /// than a caveat: this said the learning was untouched full stop, and that was written from the
-/// watched case alone. <see cref="Machines.Curiosity"/> asks <see cref="Machines.Brain.Voting"/>
+/// watched case alone. <see cref="Machines.Drives"/> asks <see cref="Machines.Brain.Voting"/>
 /// what the population expects and branches on the answer, so a moment with nothing grounded
-/// has no claim to make and the machine falls to a blind ask or to silence. Declining removes
-/// DOINGS there, and a doing is how a settlement is obtained — a third of the asks on
-/// <c>Worlds.Conversing</c>, which is learning rather than assertion.
+/// has no claim to make and the machine falls to a blind draw or to silence. Declining removes
+/// DOINGS there, and a doing is how a settlement is obtained — a third of the asks on the
+/// conversation the walked house ends in, which is learning rather than assertion.
 /// </para>
 /// <para>
 /// <b>It is coherent rather than a fault</b>, and it ships. Claiming a groundless guess in a
@@ -1325,7 +1325,7 @@ internal static class Normal
 /// <para>
 /// <b>The second hop, read-only.</b> A round is fold, fire, vote, and nothing puts what fired
 /// back in the moment — so a conclusion following from two statements is unreachable at any
-/// repetition. <c>ChainingTests</c> reads the arithmetic: on the implied half of
+/// repetition. the chained lesson's readings reads the arithmetic: on the implied half of
 /// <c>Lesson.Chained</c> the bare vote never names the answer, one word of thirteen makes it
 /// name it, and that word is the one the bare vote already said.
 /// </para>
@@ -1380,7 +1380,7 @@ internal enum Supposing
     /// <b>So the test is whether the supposition is the reason</b>, rather than a level
     /// somebody picked. A second vote won by a rule that was already firing was reachable
     /// without supposing anything, so the supposition changed the answer without being the
-    /// cause and the first vote stands. <c>ChainingTests</c> reads the two halves apart on
+    /// cause and the first vote stands. the chained lesson's readings reads the two halves apart on
     /// exactly that: 12 of 12 on the implied half against 3 of 12 on the stated one.
     /// </para>
     /// <para>
@@ -1391,7 +1391,7 @@ internal enum Supposing
     /// the winner led rather than how good it is.
     /// </para>
     /// <para>
-    /// <b>And it is not paid for at twenty tellings.</b> <c>LessonTests</c> reads the bar
+    /// <b>And it is not paid for at twenty tellings.</b> the lesson's readings reads the bar
     /// against the margins it judges: the stated half's margins hold while the bar rises, so
     /// three stated questions in twelve fall under it and the stated half reads 0.750. Repair
     /// makes ordinary moments more decisive and the exam's questions no more decisive, and a
@@ -1459,7 +1459,7 @@ internal enum Supposing
     /// twenty it keeps the stated half whole where <see cref="Thinly"/> loses a quarter of it,
     /// and gives up a quarter of the implied half doing it. The sum over the halves is the
     /// same number, so it trades them as the three references before it did.
-    /// <c>LessonTests</c> holds the grid.
+    /// the lesson's readings holds the grid.
     /// </para>
     /// <para>
     /// <b>It is inert on a fleet, and that is the open half.</b>

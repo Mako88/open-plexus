@@ -82,15 +82,15 @@ regression. Each computes the state rather than asserting a constant, so none ca
 by editing that file; an entry closes when the work closes.
 
 **The red set is two, and anything else red is yours.**
-`OutstandingTests.The_spine_runs_one_brain` is two dials apart, `Admitting` and `Crediting`,
-and `OutstandingTests.Every_dial_is_measured_on_a_world_whose_score_counts` names four dials no
-spine composition turns. Check the failures against that before assuming a run is
-clean — a stable red set is the only kind you can read a new failure against.
+`OutstandingTests.Every_dial_is_measured_on_a_world_whose_score_counts` names seven dials no
+test building the spine world turns, and `OutstandingTests.The_machine_can_say_what_it_expects`
+says nothing there reads `Brain.Voting`. Check the failures against that before assuming a run
+is clean — a stable red set is the only kind you can read a new failure against.
 
-**And both of them close on `Conversing` going.** The spine is two worlds today and the two
-brains are the second one's; the four dials want a reading on the world that counts. The
-walked house is the one world now — explored, talked about, then examined — and what is left
-is the terminal, which is built on `Conversing` and has to move with it.
+**The seven went from four when the spine became ONE world.** `Rooting`, `Spanning` and
+`Subsuming` had been named beside the conversation, so they read as measured on a world whose
+score counts while their readings were taken on an instrument. What closes each is a reading
+on the walked house, a deletion with a revival row, or an entry in `DialTests.Waiting`.
 
 **Adding an entry is stricter than adding anywhere else**: it must be work somebody has decided
 to do, computable without judgement, and closeable. An open question goes in the plan as
@@ -272,11 +272,11 @@ These are the parts worth more than the code.
   something goes red the day a mechanism is built and stays red until a spine world exercises
   it, which is what `OutstandingTests` already does one level up, per ARCHITECTURE entry
   rather than per mechanism.
-- **The spine is two worlds today and they run two BRAINS**, `Crediting` and `Admitting`
-  differing between them. That is `csharp`'s own fault — a dial set one way on one world and
-  another way on another — sitting inside the set that matters most.
-  `OutstandingTests.The_spine_runs_one_brain` computes which, and the merged world closes it
-  by there being nothing left to disagree.
+- **The spine is ONE world and it runs one brain.** It was two, running two, `Crediting` and
+  `Admitting` differing between them — `csharp`'s own fault sitting inside the set that
+  matters most. The merged world closed it by there being nothing left to disagree, and
+  `OutstandingTests.The_spine_runs_one_brain` now reads the terminal's own source: a dial the
+  deployment turns and the measurements do not puts the spine back on two brains.
 - **A refutation is conditional on the MACHINE that produced it.** John's, 2026-08-24. A row
   in `DO NOT RE-TRY` records what beat an arm on the brain of that day, and a brain that has
   since gained the mechanism the arm was starved of is a different comparison — so re-take

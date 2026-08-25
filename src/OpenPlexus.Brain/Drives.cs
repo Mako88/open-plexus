@@ -4,6 +4,28 @@ using OpenPlexus.Commitments;
 
 namespace OpenPlexus.Machines;
 
+/// <summary>What a chooser reading a population WANTS.</summary>
+/// <remarks>
+/// <para>
+/// <b>Two arms that both do something</b>, and the second is fork 146's. A body's want is a
+/// fact about that body and is handed in; a desire to UNDERSTAND is a fact about the learner
+/// and cannot be handed in at all, its term being a brain internal no world may name.
+/// </para>
+/// <para>
+/// <b>An arm on the chooser rather than a brain dial</b>, on <c>Regulating</c>'s own
+/// reasoning: which drive holds the body is a fact about an experiment, and a bar demanding a
+/// second world of it would demand one world's setting be measured on another.
+/// </para>
+/// </remarks>
+internal enum Wanting
+{
+    /// <summary>The world says how much this body wants an outcome.</summary>
+    Told,
+
+    /// <summary>How fast the rules that would be tested are still learning.</summary>
+    Learning,
+}
+
 /// <summary>
 /// A chooser that reads a population — <b>a third factor from the body's own variables</b>,
 /// rather than a reward handed in.
@@ -84,6 +106,7 @@ internal sealed class Drives
     private readonly Func<Code, int?> _doing;
     private readonly Func<Code, IReadOnlyCollection<Code>, double> _wanting;
     private readonly Func<int?> _untold;
+    private readonly Wanting _arm;
 
     // What it has already said about the moment on the table. A world that takes several
     // doings a moment asks with the same codes in front of it every time, and the population
@@ -96,11 +119,13 @@ internal sealed class Drives
     /// <param name="doing">Which action a code names, or nothing where it names none.</param>
     /// <param name="wanting">How much this body wants an expected outcome.</param>
     /// <param name="untold">What to do on a round the population advocates nothing.</param>
+    /// <param name="arm">What it wants.</param>
     public Drives(
         Population held,
         Func<Code, int?> doing,
         Func<Code, IReadOnlyCollection<Code>, double> wanting,
-        Func<int?> untold)
+        Func<int?> untold,
+        Wanting arm = Wanting.Told)
     {
         ArgumentNullException.ThrowIfNull(held);
         ArgumentNullException.ThrowIfNull(doing);
@@ -111,6 +136,7 @@ internal sealed class Drives
         _doing = doing;
         _wanting = wanting;
         _untold = untold;
+        _arm = arm;
     }
 
     /// <summary>Rounds the population advocated nothing and the fallback decided.</summary>
@@ -180,7 +206,9 @@ internal sealed class Drives
 
             if (vote.Expects is not Code expects) continue;
 
-            var want = _wanting(expects, felt);
+            var want = _arm is Wanting.Learning
+                ? Learning(advocates[doing], expects)
+                : _wanting(expects, felt);
 
             // Want first and weight only to break a tie. Multiplying them would make a
             // confident prediction of a poor outcome trade against an unsure one of a good
@@ -201,6 +229,48 @@ internal sealed class Drives
         if (said is { } spoken) _already.Add(spoken);
 
         return said;
+    }
+
+    /// <summary>How fast the rules that would be tested are still learning.</summary>
+    /// <param name="behind">Everything advocating this action.</param>
+    /// <param name="expects">What the vote among them settled on.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>Over the advocates for the WINNER alone</b>, because those are the rules whose
+    /// prediction is on the line. An advocate for a losing expectation is not tested by doing
+    /// this, so counting it would read the crowd's state rather than the claim's.
+    /// </para>
+    /// <para>
+    /// <b>The mean rather than the best</b>, a maximum over a set being the noisiest reader
+    /// of a trend there is: one rule mid-swing would carry an action whose rules are settled.
+    /// </para>
+    /// <para>
+    /// <b>Signed, which is <see cref="Commitment.Progress"/>'s own choice.</b> A magnitude
+    /// would rank a rule falling apart level with one coming good, and a channel that cannot
+    /// be predicted swings both ways forever — which is how a want built to sate would come
+    /// back as surprise.
+    /// </para>
+    /// <para>
+    /// <b>And it exploits exactly as far as the population reaches</b>, which is the class's
+    /// own stated limit and worth repeating here: an action nothing advocates is not a
+    /// candidate, so this is curiosity about what is already half-known rather than about
+    /// what has never been tried. Naming it stops a reading being attributed to the want.
+    /// </para>
+    /// </remarks>
+    private static double Learning(List<Commitment> behind, Code expects)
+    {
+        var total = 0.0;
+        var counted = 0;
+
+        foreach (var one in behind)
+        {
+            if (one.Expects != expects) continue;
+
+            total += one.Progress;
+            counted++;
+        }
+
+        return counted == 0 ? 0.0 : total / counted;
     }
 
     /// <summary>The moment is over, so what was said about it is forgotten.</summary>

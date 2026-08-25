@@ -16,6 +16,13 @@ namespace OpenPlexus.Machines;
 /// reasoning: which drive holds the body is a fact about an experiment, and a bar demanding a
 /// second world of it would demand one world's setting be measured on another.
 /// </para>
+/// <para>
+/// <b>And <see cref="Told"/> is the default only because the body is the only caller.</b>
+/// Nothing may ship switched off while nobody decides, so the decision is registered rather
+/// than left here: <c>OutstandingTests.The_learning_trend_is_read_by_something_that_chooses</c>
+/// fails the build until a spine world turns <see cref="Learning"/> on. That is a stronger
+/// bar than a dial default, and it is why this one is allowed to sit at the old arm.
+/// </para>
 /// </remarks>
 internal enum Wanting
 {

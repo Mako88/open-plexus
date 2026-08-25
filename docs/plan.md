@@ -31,8 +31,8 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The spine becomes ONE world and the items below build it.** John's. Rung four
   and the forward store are BUILT and neither is on this list.
-- **First, the DRIVE**, rankable at last, there being choices worth ranking. `Progress` is
-  built and nothing chooses by it. Fork **146**.
+- **First, the DRIVE**, rankable at last. `Wanting.Learning` is built and no spine world
+  turns it on. Fork **146**.
 - **Then the SURVEY and its control**, another house's machine sitting this one's exam. Its
   ceiling is taken before a learner is wired to it.
 - **Then the CHAT**, `Curiosity` pointed at what was seen rather than at a lesson.

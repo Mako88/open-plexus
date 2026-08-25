@@ -783,7 +783,7 @@ public sealed class DocsTests
     // a ledger dropped with its commitment read the mechanism as never having run. Neither
     // gate decides it and the fresh-code arm is refuted in the table. The words buy a
     // revival row, a failure class with no check, and the item that replaces the fork.
-    private const int Whole = 13_036;
+    private const int Whole = 13_033;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

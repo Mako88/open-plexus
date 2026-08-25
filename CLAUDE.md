@@ -90,7 +90,8 @@ clean — a stable red set is the only kind you can read a new failure against.
 **And `The_learning_trend_is_read_by_something_that_chooses` is the third.**
 `Commitment.Progress` is fork 146's drive: it rises while a rule is being learnt and lets go
 both when the rule is mastered and when the channel is noise, which is what makes it sate.
-`CommitmentTests` asserts all three. Nothing chooses by it yet, and that is what closes it.
+`CommitmentTests` asserts all three and `Drives` has the arm. No spine world turns it on, and
+a reading off the walk or the conversation is what closes it.
 
 **Adding an entry is stricter than adding anywhere else**: it must be work somebody has decided
 to do, computable without judgement, and closeable. An open question goes in the plan as

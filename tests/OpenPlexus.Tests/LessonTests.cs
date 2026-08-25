@@ -115,27 +115,6 @@ public sealed class LessonTests(ITestOutputHelper output)
              tellings: many, rooting: Rooting.Wholly, crediting: Crediting.Birth,
              supposing: supposing));
 
-    /// <summary>The lesson told into this world, with no learner on the other end.</summary>
-    /// <param name="lesson">What is told.</param>
-    /// <param name="tellings">How many times.</param>
-    /// <remarks>
-    /// <b>Extracted because <c>DuplicationTests</c> refused the second copy</b>, for the reason
-    /// it refused the first: two readings over one lesson that each build their own world are
-    /// two worlds the moment either changes a setting.
-    /// </remarks>
-    private static (Tutor Tutor, Conversing World) Telling(Lesson lesson, int tellings)
-    {
-        var tutor = new Tutor(lesson, TextWriter.Null, passes: 1, tellings: tellings);
-
-        return (tutor, new Conversing(new ConversingSettings
-        {
-            Typed = tutor,
-            Printed = tutor.Printed,
-            Carrying = Carrying.Never,
-            Asserting = Asserting.Everything,
-        }));
-    }
-
     /// <summary>The join between what a chooser decided and how this world numbers its doings.</summary>
     private static int? Doing(Wondered said) =>
         said.Word is not { } word
@@ -164,7 +143,15 @@ public sealed class LessonTests(ITestOutputHelper output)
     private static (Conversing World, List<(HashSet<Code> Moment, int? Arrived)> Stream) Streamed(
         Lesson lesson, int tellings)
     {
-        var (tutor, world) = Telling(lesson, tellings);
+        var tutor = new Tutor(lesson, TextWriter.Null, passes: 1, tellings: tellings);
+
+        var world = new Conversing(new ConversingSettings
+        {
+            Typed = tutor,
+            Printed = tutor.Printed,
+            Carrying = Carrying.Never,
+            Asserting = Asserting.Everything,
+        });
 
         var front = new Joined(Joining.Bagged);
         var stream = new List<(HashSet<Code> Moment, int? Arrived)>();

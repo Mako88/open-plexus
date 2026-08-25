@@ -1236,6 +1236,25 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// proposals this world needed and the CIFAR row is a fact about a wide alphabet rather
     /// than about the mechanism.
     /// </para>
+    /// <para>
+    /// <b>Measured, and the gate holds.</b> The where question reads 0.587, 0.642 and 0.538
+    /// gated against 0.606, 0.632 and 0.555 ungated; the effect question 0.803, 0.858 and
+    /// 0.828 against 0.805, 0.855 and 0.830. Neither pair separates.
+    /// </para>
+    /// <para>
+    /// <b>What the gate buys is a population five times smaller.</b> Gated, the walk holds
+    /// 653, 986 and 841 on the where question and 164, 193 and 254 on the effect one; ungated
+    /// it holds 3,617, 3,640 and 3,508 and 1,982, 2,144 and 2,130. So the CIFAR row's warning
+    /// survives contact with a house's vocabulary — the space is smaller and the walk of it is
+    /// the same walk.
+    /// </para>
+    /// <para>
+    /// <b>And it is the third dial the exam could not decide.</b> This world's
+    /// score does not move when the population moves by a factor of six, so a dial ranked on
+    /// it is ranked on nothing. The ceiling here is selection, which this file's own grids
+    /// already say, and the consequence for a dial grid is that the discriminating column is
+    /// what the run HOLDS rather than what it answers.
+    /// </para>
     /// </remarks>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]

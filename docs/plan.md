@@ -35,12 +35,11 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **And that world has a SIZE and no SWITCHES.** John's. A number off it is what the machine
   is worth, so what makes it less like the real world goes and the MACHINE changes instead.
   `Examining`, `Knowing` and `Seeing` are the three.
-- **First a chooser that can ASK the exam's question.** The chat is a phase and asking
-  perfectly triples the walked half. Fork **151**.
+- **First a chooser that can ASK the exam's question.** Asking perfectly triples the
+  walked half and the drive is on; what it does is ask LESS. Forks **146**, **151**.
 - **Then the switches and `Conversing` GO**, in that order: the explored walk abstains nought
   where the recital abstains 682 and supposes nothing at all, so cutting first costs the
   spine entries it already reaches.
-- **Then the DRIVE**, `Wanting.Learning` being built and turned on nowhere. Fork **146**.
 - **One brain falls out** of there being one composition.
 - **Then the four dials read off the spine only** — `Budgeting`, `Feeling`, `Forking`,
   `Subsuming`. Re-taken HERE: the world they want a reading on is the one being built.
@@ -489,8 +488,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **NOW** — commitment, settlement, blame capped at one hop, repair, and abstention so a
       round that could not settle costs nothing. A SHRUG is an outcome, so an ask costs
       something and where to ask is LEARNT.
-    - **OPEN** — no chooser forms the exam's question, the blind draw being over the
-      moment's words and no sighting holding `where`. Fork **151**.
+    - **OPEN** — nothing forms the exam's question on purpose: a blind draw is over the
+      moment's words, and the drive says a word at a time. Fork **151**.
     - **OPEN** — what it converts is unread, and English's alphabet is far wider than
       anything here has run on. Fork **89**.
     - **OPEN** — a talked world reaches its ceiling by GENESIS, so a repair-side reading
@@ -558,8 +557,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — a drive that cannot be sated is a fault in the design and not a risk to
       manage, so a term must have a point where it stops pulling. John's.
     - **OPEN** — the drive is a DESIRE TO UNDERSTAND, John's, built in rather than added.
-      `Commitment.Progress` is the term and lets go both when a rule is mastered and when the
-      channel is noise; no chooser ranks by it yet. Fork **146**.
+      `Commitment.Progress` is the term and `Wanting.Learning` ranks what to SAY by it,
+      and its asking falls away as it goes. Fork **146**.
     - **OPEN** — and no world here holds a common cause, so nothing says those claims are
       better.
     - **OPEN** — and nothing ranks a chooser there, a house having nothing to want. Twins

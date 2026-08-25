@@ -3836,6 +3836,190 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + "answer and then being asked the question changes nothing the machine does");
     }
 
+    /// <summary>
+    /// <b>What a machine wanting to LEARN says about the house.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Fork 146's drive on the spine world, and fork 151's first reading.</b>
+    /// <c>Commitment.Progress</c> rises while a rule is being learnt and lets go both when the
+    /// rule is mastered and when the channel is noise, and <c>Wanting.Learning</c> ranks what
+    /// to say by it. Nothing had ever turned the arm on.
+    /// </para>
+    /// <para>
+    /// <b>Against a machine drawing its words uniformly</b>, which is the same fallback the
+    /// drive falls back to. So an arm that never advocated anything would read as its control
+    /// exactly, and <c>Drives.Told</c> is counted so that cannot pass unseen.
+    /// </para>
+    /// <para>
+    /// <b>What the conversation makes askable is a whole question.</b> A scope holding one
+    /// word and a look advocates that word, so <i>where</i> and the thing come from two
+    /// commitments and the moment's budget puts them in one sentence — which is why nothing
+    /// here needs a scope to name a command.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task What_a_machine_that_wants_to_learn_asks_the_house()
+    {
+        const int Houses = 40;
+        const int Steps = 40;
+        const int Asked = 6;
+        const int Chatting = 6;
+        const int Seeds = 3;
+
+        var rounds = Houses * (Steps + Chatting + Asked);
+
+        output.WriteLine(
+            $"{Houses} houses a seed over {Seeds} seeds, {Steps} steps, "
+            + $"{Chatting} spoken, {Asked} asked");
+
+        output.WriteLine(
+            $"{"wanting",-10}{"seed",-8}{"asked",8}{"right",8}{"score",9}");
+
+        var scored = new Dictionary<(string Arm, string Kind), (int Asked, int Right)>();
+        var questions = new Dictionary<string, (int Talked, int Spoke)>(StringComparer.Ordinal);
+        var perSeed = new Dictionary<(string Arm, int Seed), double>();
+        var advocated = 0L;
+
+        foreach (var arm in new[] { "uniform", "learning" })
+        foreach (var seed in Enumerable.Range(1, Seeds))
+        {
+            var house = new Roaming(
+                World(Steps, people: 2, Knowing.Explored, asked: Asked, chatting: Chatting),
+                seed);
+
+            var words = new Dictionary<Code, string>();
+
+            for (var one = 0; one < house.Vocabulary.Count; one++)
+                words[house.Meaning(one)!.Value] = house.Vocabulary[one];
+
+            var world = new Sitting(house, null);
+
+            var brain = new Brain(new CommittingSettings { Capacity = 2_000 }, seed);
+
+            var draw = new Random(seed);
+
+            var drives = new Drives(
+                brain.Held,
+                doing: house.Naming,
+
+                // Nothing to want, because a house is not a body with variables to be in
+                // trouble about. What is being asked is whether the LEARNING term can pick a
+                // word, so every advocated word is wanted equally under the other arm.
+                wanting: (_, _) => 1.0,
+                untold: () => draw.Next(house.Doings),
+                arm: Wanting.Learning);
+
+            var watching = new Watching<Coded>(
+                world,
+                new Joined(Joining.Bagged),
+                acting: arm == "learning"
+                    ? Chooses.From(drives.Choose, drives.Cleared)
+                    : Chooses.From(_ => draw.Next(house.Doings)));
+
+            var loop = new Round(brain, rounds, sweep: 500, target: 0.9, window: 500);
+
+            var asked = new Dictionary<string, int>(StringComparer.Ordinal);
+            var right = new Dictionary<string, int>(StringComparer.Ordinal);
+
+            var talked = 0;
+            var spoke = 0;
+
+            for (var round = 0; round < rounds; round++)
+            {
+                if (watching.Push() is not { } pushed) continue;
+
+                var was = loop.Right;
+
+                await loop.StepAsync(pushed);
+
+                if (world.Talked)
+                {
+                    // A conversation round the world could answer is a question the machine
+                    // managed to PUT, which is the whole of what fork 151 asks. A round that
+                    // settled on nothing is a round it said nothing askable in.
+                    spoke += pushed.Followed is null ? 0 : 1;
+                    talked++;
+
+                    continue;
+                }
+
+                if (world.Asking is not { } code) continue;
+
+                var kind = words[code];
+
+                asked[kind] = asked.GetValueOrDefault(kind) + 1;
+
+                if (loop.Right > was) right[kind] = right.GetValueOrDefault(kind) + 1;
+            }
+
+            foreach (var kind in asked.Keys)
+            {
+                var had = scored.GetValueOrDefault((arm, kind));
+
+                scored[(arm, kind)] =
+                    (had.Asked + asked[kind], had.Right + right.GetValueOrDefault(kind));
+            }
+
+            var before = questions.GetValueOrDefault(arm);
+
+            questions[arm] = (before.Talked + talked, before.Spoke + spoke);
+
+            // Per seed, so the direction can be COUNTED rather than read off a total one
+            // seed could have carried on its own.
+            var here = right.Values.Sum() / (double)asked.Values.Sum();
+
+            perSeed[(arm, seed)] = here;
+
+            output.WriteLine(
+                $"{arm,-10}{seed,-8}{asked.Values.Sum(),8}{right.Values.Sum(),8}{here,9:F3}"
+                + $"   spoke {spoke} of {talked}"
+                + (arm == "learning"
+                    ? $", drive named {drives.Told} and the draw {drives.Untold}"
+                    : string.Empty));
+
+            if (arm == "learning") advocated += drives.Told;
+        }
+
+        foreach (var arm in new[] { "uniform", "learning" })
+        {
+            var rows = scored.Where(one => one.Key.Arm == arm).ToList();
+            var put = rows.Sum(one => one.Value.Asked);
+            var hit = rows.Sum(one => one.Value.Right);
+
+            output.WriteLine(
+                $"{arm,-10}{"all",-8}{put,8}{hit,8}{hit / (double)put,9:F3}"
+                + $"   spoke {questions[arm].Spoke} of {questions[arm].Talked}");
+        }
+
+        var ahead = Enumerable.Range(1, Seeds)
+            .Count(seed => perSeed[("learning", seed)] > perSeed[("uniform", seed)]);
+
+        output.WriteLine($"the drive leads on {ahead} seeds of {Seeds}");
+
+        // Every house's exam was sat under both arms, whatever the walk before it looked
+        // like. Which KINDS got asked is a fact about where the machine ended up walking and
+        // is not the same number under two choosers.
+        Assert.All(
+            new[] { "uniform", "learning" },
+            arm => Assert.Equal(
+                Houses * Asked * Seeds,
+                scored.Where(one => one.Key.Arm == arm).Sum(one => one.Value.Asked)));
+
+        Assert.All(
+            questions.Values,
+            one => Assert.Equal(Houses * Chatting * Seeds, one.Talked));
+
+        // The population advocated a word on rounds of its own, or the drive was its own
+        // fallback all run and this table is the control printed twice. A fallback is a
+        // control arm nobody meant to run, and silence drifts an arm toward the random bar
+        // for free.
+        Assert.True(advocated > 0,
+            "`Wanting.Learning` never once named the word: every round was decided by the "
+            + "uniform draw it falls back to, so the two arms here are one arm and nothing "
+            + "in the table is about the drive");
+    }
+
     /// <summary>A walked house whose exam may be ANOTHER house's.</summary>
     /// <param name="walked">The house the machine walks and is settled by.</param>
     /// <param name="instead">The house whose questions it is asked, or nothing.</param>

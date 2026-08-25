@@ -1040,18 +1040,41 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// and present whenever any of them is in the room.
     /// </para>
     /// <para>
-    /// <b>What stops the binding is the SURPRISE gate, measured over two arms.</b> Under the
-    /// shipped <c>Surprising.Unaccounted</c> a walked house holds 1,139 commitments, 35 of
-    /// them a look with its word, and not one binding; ungated it holds 3,591, 47 crossed,
-    /// and 55 bindings. Genesis runs only where nothing that fired accounted for what
-    /// arrived, and by the time a thing's codes have varied enough to be eligible the
-    /// population accounts for most outcomes — so the two gates shut the door between them.
+    /// <b>The binding is MINTED under both gates and SUBSUMED under both.</b> Under the
+    /// shipped <c>Surprising.Unaccounted</c> genesis is called 1,639 times, runs 35 of them,
+    /// and mints 49 scopes each over one thing; every one of the 49 is then deleted by
+    /// subsumption and the run ends holding none. Ungated it mints 901 and subsumption takes
+    /// 832, so 55 survive. The mechanism runs under both; what differs is how often, and 49
+    /// mints at the ungated arm's survival would have bought about three.
     /// </para>
     /// <para>
-    /// <b>So <i>a thing is one thing</i> stays unreached on the spine</b>, and what it is
-    /// waiting on is a brain-side question rather than a world. Minting on every failure is
-    /// refuted and is not the answer; what is open is whether the eligibility a fresh code
-    /// has to earn should cost it the one window genesis leaves open.
+    /// <b>Neither gate is what stops it.</b>
+    /// Counting a code's absence BEFORE it arrived as variation — the one change fork 149
+    /// proposed — moves the population from 1,139 to 1,162 and mints not one extra binding
+    /// under either gate. What decides is subsumption, and it decides correctly on the
+    /// evidence: genesis mints a thing's scope in the same call as the one-code roots it is
+    /// built from, both are experienced past the floor, and the narrower one is never more
+    /// accurate. A thing's shade is a FUNCTION of the thing — <c>Shades[thing % 4]</c> — so
+    /// it is live whenever the look is, and a scope holding both fires exactly where the look
+    /// alone fires. Sharedness is why a shade cannot carry a rule by itself; determinacy is
+    /// why it adds nothing to one.
+    /// </para>
+    /// <para>
+    /// <b>What was actually wrong was the INSTRUMENT.</b> <c>Population.Births</c> is dropped
+    /// when a commitment is, for a memory reason written on it, so a count off it answers
+    /// <i>did this survive</i>. The architecture entry asked it <i>did this happen</i>, and a
+    /// whole item at the top of THE ORDER was written on the difference. <c>EverBorn</c>
+    /// counts what was built, and both are printed here.
+    /// </para>
+    /// <para>
+    /// <b>And no binding can earn its place here</b>, which is a fact about
+    /// the WORLD rather than about a gate. A look is <c>Kinds.Named(Look, name)</c>, so it
+    /// identifies its thing outright and no second attribute can add to it. <c>Shades</c>'
+    /// own comment argues that sharing a shade between things is what makes the pair a
+    /// conjunction; sharing is what stops a shade carrying a rule alone, and it does not stop
+    /// the look carrying one. What a binding wants is two things OF A KIND — one look, two
+    /// shades — which is the architecture line this entry sits under, and the house has none.
+    /// Fork <b>149</b>.
     /// </para>
     /// </remarks>
     [Fact]
@@ -1106,6 +1129,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // is the mechanism under `a thing is one thing` and the reading this world was built
         // to take. Two arms, because the shipped gate is what decides it.
         var bound = new Dictionary<Surprising, int>();
+        var held = new Dictionary<Surprising, int>();
         var crossed = new Dictionary<Surprising, int>();
 
         foreach (var surprising in new[] { Surprising.Unaccounted, Surprising.AnyFailure })
@@ -1129,27 +1153,39 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 && one.Scope.Any(code => code.Modality == 48)
                 && one.Scope.Any(code => code.Modality == 46));
 
-            bound[surprising] = brain.Held.Births.Values.Count(one => one == Birth.Bound);
+            // What was BUILT rather than what survived, which is the distinction this
+            // reading was written on the wrong side of. Both are printed: a mechanism that
+            // mints and is then deleted and a mechanism that never runs are opposite
+            // diagnoses, and a held count alone cannot tell them apart.
+            bound[surprising] = (int)brain.Held.EverBorn.GetValueOrDefault(Birth.Bound);
+            held[surprising] = brain.Held.Births.Values.Count(one => one == Birth.Bound);
 
             output.WriteLine(
                 $"{surprising,-12}| held {tally.Resident} | crossed {crossed[surprising]} "
-                + $"| bound {bound[surprising]}");
+                + $"| bound {bound[surprising]} minted, {held[surprising]} still held");
         }
 
         // A look and its word do come to sit in one scope under either gate, which is what
         // says the crossing is made rather than handed over.
         Assert.All(crossed.Values, one => Assert.True(one > 0));
 
-        // And the binding is the GATE's rather than the world's. `Spanning`'s generate half is
-        // written on the argument that repair cannot reach a thing's scope, and a thing here
-        // shows a look, a shade and a name — but genesis runs only where nothing that fired
-        // accounted for what arrived, and by the time a thing's codes have varied enough to
-        // be eligible the population accounts for most outcomes. Ungated it mints them.
-        Assert.True(bound[Surprising.AnyFailure] > bound[Surprising.Unaccounted],
-            $"{bound[Surprising.AnyFailure]} bindings ungated against "
-            + $"{bound[Surprising.Unaccounted]} under the shipped gate, so what stops the "
-            + "spine minting a scope over one of its things is not the surprise gate after "
-            + "all and the reading above needs re-taking");
+        // A scope over ONE of the things is minted under the SHIPPED gate, which is the
+        // mechanism under `a thing is one thing` running on a spine world. Asserted on the
+        // shipped arm alone, because a mechanism that only runs ungated is a mechanism the
+        // machine does not have.
+        Assert.True(bound[Surprising.Unaccounted] > 0,
+            "the shipped gate minted no scope over one thing, so `Spanning`'s generate half "
+            + "does not run on the spine and the reading above needs re-taking");
+
+        // And subsumption takes them, under both gates and hardest under the shipped one.
+        // Genesis mints a thing's scope in the same call as the roots it is built from, so
+        // the narrower rule is weighed against its own parent and says nothing extra -- a
+        // shade being determined by its thing, the pair fires exactly where the look does.
+        // This is the constraint working rather than failing, and it is the reason a held
+        // count read nought while the mechanism was running.
+        Assert.All(bound.Keys, one => Assert.True(held[one] < bound[one],
+            $"{one}: {held[one]} of {bound[one]} bindings survived, so subsumption has "
+            + "stopped deleting them and what a held count means here has changed"));
     }
 
     /// <summary>

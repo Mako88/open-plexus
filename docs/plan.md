@@ -31,10 +31,10 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The spine becomes ONE world and the items below build it.** John's. Rung four
   and the forward store are BUILT and neither is on this list.
-- **First, what a fresh code must EARN before genesis roots on it.** Under
-  `Surprising.Unaccounted` a walked house mints no binding and 55 under `AnyFailure`, so the
-  varied filter and that gate shut the door between them and an entry of THE ARCHITECTURE
-  goes unreached. Fork **149**.
+- **First, TWO THINGS OF A KIND in the walked house**, the architecture's own words. A look
+  is named from its thing, so nothing can add to it and subsumption takes every binding
+  genesis mints. One look and two shades is where a pair says what neither part does. Fork
+  **149**.
 - **The DRIVE**, rankable at last, there being choices worth ranking. Fork **146**.
 - **Then the SURVEY and its control**, another house's machine sitting this one's exam. Its
   ceiling is taken before a learner is wired to it.
@@ -309,8 +309,6 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       world the naming reaches holds a nameable concept. Fork **34**.
     - **OPEN** — genesis does not root on a code that never varied, and an always-present
       one is still an entry in every table forever. Fork **51**.
-    - **OPEN** — and a code just arrived is ineligible until it has been absent, by which time
-      the surprise gate has shut. Between them no binding is minted. Fork **149**.
   - A concept a thing in its own right
     - **NOW** — `Code`, and adhesion over a window reaches a persistent SOURCE. Derived
       offline, so no run reaches it.
@@ -735,6 +733,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | Marking a supposition only where the second vote MOVED the answer | A third of the marks, and it hands back the stated half at twenty tellings that marking every available one keeps | A world where a supposition changing nothing is a cost rather than a neutral |
 | Naming a bundle for staying in the SUCCESSOR moment, fork **93** | It reads whether two codes ARRIVE together, never whether they STAY: `Returning` names 150, 150, 85 and 11 as things are re-met more, and 160 at every rate with stable codes | Persistence of a PART, fork **142** having made two of a kind sayable |
 | A departure code in EVERY world's moments, as the dial's default | A wider moment is a bigger population: six suites moved and one arm comparison INVERTED, both sides having grown. It pays on `Rhythm` and costs the multiplexer | Nothing. `Departing.Left` lives and a world turns it on; what is refuted is one default for every world |
+| Counting a code's absence BEFORE it arrived as variation, fork **149** | Not one extra binding either gated or not, for a crossing falling 35 to 30. Subsumption decides this, not eligibility | A world where genesis's window is early and the code that separates has only just arrived |
 | A refusal as a CODE in the moment, fork **127** | Level on both shapes for a larger population, the chooser already refusing to repeat itself, so the fact was acted on before the code arrived | The exclusion having to SURVIVE the moment, which is a store's job rather than a code's |
 
 ---
@@ -833,6 +832,9 @@ them. **A class earning a check moves out of here into the check.**
 - **Two arms that score alike need not be the same mechanism**, and a score cannot say. A cap
   that refuses nothing and a cap that refuses a lot read identically until something counts
   what was BUILT.
+- **A SURVIVOR count is not a BUILT count**, and a ledger dropped with its commitment answers
+  only the first. An entry of THE ARCHITECTURE read it as the second, and a top item of `THE
+  ORDER` was written on the difference.
 
 ### A statistic whose halves count different things
 

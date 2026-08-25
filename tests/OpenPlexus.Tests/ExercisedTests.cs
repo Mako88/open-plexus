@@ -483,7 +483,7 @@ public sealed class ExercisedTests
 
         new("A thing is one thing",
             "a scope was minted over ONE of the things a moment held",
-            arms => Any(arms, one => one.Held.Births.Values.Contains(Birth.Bound))),
+            arms => Any(arms, one => one.Held.EverBorn.GetValueOrDefault(Birth.Bound) > 0)),
 
         new("It can say what does not hold",
             "a departure code reached a scope",
@@ -639,7 +639,8 @@ public sealed class ExercisedTests
                 + $"| supposed {arm.Supposals.Put}/{arm.Supposals.Refused}/{arm.Supposals.Moved} "
                 + $"| marked {arm.Supposals.Marked} "
                 + $"| parts {arm.Parts} "
-                + $"| bound {arm.Held.Births.Values.Count(one => one == Birth.Bound)} "
+                + $"| bound {arm.Held.EverBorn.GetValueOrDefault(Birth.Bound)} minted, "
+                + $"{arm.Held.Births.Values.Count(one => one == Birth.Bound)} held "
                 + $"| channels {string.Join(",", arm.Channels.Order())}");
 
         return missed;

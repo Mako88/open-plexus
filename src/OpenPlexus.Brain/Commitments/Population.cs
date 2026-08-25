@@ -473,6 +473,13 @@ internal sealed class Population
     /// <inheritdoc cref="Births"/>
     private readonly Dictionary<Code, Birth> _born = [];
 
+    /// <inheritdoc cref="EverBorn"/>
+    /// <remarks>
+    /// <b>Sorted, because this class iterates nothing unordered</b> and a reader printing a
+    /// breakdown is the obvious next use.
+    /// </remarks>
+    private readonly SortedDictionary<Birth, long> _ever = [];
+
     /// <summary>
     /// Which holder a commitment sits on, or nothing while everything is in one place.
     /// </summary>
@@ -651,12 +658,33 @@ internal sealed class Population
         get { lock (_gate) return new Dictionary<Code, Birth>(_born); }
     }
 
+    /// <summary>How many commitments each operator has ever minted.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>What was BUILT, where <see cref="Births"/> is what is still held.</b> That one is
+    /// dropped when a commitment is, for the memory reason written on it, so reading it asks
+    /// whether an operator's work SURVIVED. The two are different questions and one of them
+    /// was being asked in the other's name: <i>a scope was minted over one of the things a
+    /// moment held</i> was answered by counting the ones subsumption had not yet deleted.
+    /// </para>
+    /// <para>
+    /// <b>It is one counter a birth reason</b> rather than a ledger of identities, so it
+    /// costs nothing to keep for the life of a run and cannot grow with the population.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyDictionary<Birth, long> EverBorn
+    {
+        get { lock (_gate) return new SortedDictionary<Birth, long>(_ever); }
+    }
+
     /// <summary>Notes that a commitment of this shape entered.</summary>
     /// <param name="commitment">What was added.</param>
     /// <param name="how">Which operator added it.</param>
     private void Born(Commitment commitment, Birth how)
     {
         _born[commitment.Identity] = how;
+
+        _ever[how] = _ever.GetValueOrDefault(how) + 1;
 
         ref var life = ref CollectionsMarshal.GetValueRefOrAddDefault(
             _lineage, (commitment.Expects, commitment.Scope.Length), out _);

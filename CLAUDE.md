@@ -87,22 +87,6 @@ and `OutstandingTests.Every_dial_is_measured_on_a_world_whose_score_counts` name
 spine composition turns. Check the failures against that before assuming a run is
 clean — a stable red set is the only kind you can read a new failure against.
 
-**And `The_spine_world_exercises_every_entry_of_the_architecture` is the third**, on one
-entry: *a thing is one thing*. A moment's parts are THINGS, a text world's thing is the one
-word that names it, and a scope over one code is the root genesis already mints — so the bound
-birth cannot fire while the spine only ever hears about things.
-
-**And what blocks it is the SURPRISE gate**, measured on
-`RoamingTests.A_walked_house_shows_the_machine_what_is_in_front_of_it`. A walked house shows a
-thing through a look, a shade and a name, and under the shipped `Surprising.Unaccounted` it
-mints no binding at all; ungated it mints 55. Genesis runs only where nothing that fired
-accounted for what arrived, and by the time a fresh code has varied enough to be eligible the
-population accounts for most outcomes.
-
-**It was green until the parts stopped being statements**, which is the reading rather than a
-regression. A scope over one sentence was being counted as a scope over one thing, so the
-entry's evidence was a statement all along.
-
 **Adding an entry is stricter than adding anywhere else**: it must be work somebody has decided
 to do, computable without judgement, and closeable. An open question goes in the plan as
 `OPEN`.

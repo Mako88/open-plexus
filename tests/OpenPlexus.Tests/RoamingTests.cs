@@ -459,6 +459,77 @@ public sealed class RoamingTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// <b>A spoken step is taken where it can be, and marked.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>What the machine does is a fact about the moment</b>, so its own words ride in the
+    /// sighting and are marked as its doing. A world that took the words and reported the
+    /// consequence as if nobody had spoken would leave a scope unable to name what it did.
+    /// </para>
+    /// <para>
+    /// <b>And a wish the house cannot grant does nothing.</b>
+    /// Substituting the nearest possible action would make a chooser's arm the world's own
+    /// draw wearing the chooser's name, which is a fallback arm nobody meant to run.
+    /// </para>
+    /// <para>
+    /// <b>One person, so nothing else moves.</b> A second walker takes a step of its own each
+    /// round, and then a room that changed would say nothing about whose doing changed it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_spoken_step_is_taken_where_it_can_be_and_marked_either_way()
+    {
+        var world = new Roaming(World(20, people: 1), seed: 1);
+        var alphabet = world.Vocabulary.ToList();
+
+        // Where the body is standing, read off the room's own look. A room is the first thing
+        // in front of whoever is in it, so the first look of the newest sighting is the room.
+        static Code Standing(Coded seen) =>
+            seen.Statements![0].Codes.First(one => one.Modality == 48);
+
+        // Declining leaves the world drawing its own step, and marks nothing.
+        world.Do(null);
+
+        Assert.Null(world.Next().Seen.Assigned);
+
+        var before = Standing(world.Now);
+
+        var elsewhere = new[] { "kitchen", "garden", "office", "bathroom" }
+            .First(room => Kinds.Named(48, room) != before);
+
+        // A verb with nothing to be about is not yet a command, which is what a command being
+        // several words costs.
+        world.Do(alphabet.IndexOf("went"));
+
+        Assert.True(world.Listening);
+
+        world.Do(alphabet.IndexOf(elsewhere));
+
+        Assert.False(world.Listening);
+
+        var moved = world.Next();
+
+        // The machine is shown the room its own words put it in, and the words are marked as
+        // its doing rather than as something the world said.
+        Assert.NotNull(moved.Seen.Assigned);
+        Assert.Equal(Kinds.Named(48, elsewhere), Standing(moved.Seen));
+
+        // And a wish the house cannot grant spends the step and moves nothing. Nothing is
+        // being carried after a walk to another room, so putting a thing down is impossible.
+        world.Do(alphabet.IndexOf("dropped"));
+        world.Do(alphabet.IndexOf("apple"));
+
+        var waited = world.Next();
+
+        Assert.NotNull(waited.Seen.Assigned);
+        Assert.Equal(Kinds.Named(48, elsewhere), Standing(waited.Seen));
+
+        output.WriteLine(
+            $"walked to the {elsewhere} and stayed there through a wish it could not grant");
+    }
+
+    /// <summary>
     /// <b>The house is talked about between the walk and the exam.</b>
     /// </summary>
     /// <remarks>

@@ -32,13 +32,14 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **The first four are John's**, and the CONVERSATION is what the middle two are
   for. Rung four and the forward store are BUILT and neither is on this list.
 - **ONE spine world: explore, then converse, then a SURVEY of verifiable facts.** John's, and
-  it ends the spine running two brains by there being one world. Fork **147**.
-- **ONE brain across the spine**, `Crediting` and `Admitting` parting the two worlds. It is
-  the red set, and fork **147** closes it by there being one world.
+  it ends the spine running two brains — `Crediting` and `Admitting` part them and that is the
+  red set. Fork **147**.
+- **Or converge those two dials, which wants the QUESTION as an axis**: the walk's effect arm
+  loses an architecture entry to a bar its where arm ignores. `RoamingTests`.
 - **Then a THING that is not an utterance**, both text worlds calling a statement a part so
   the grouping says what the signal is shaped like rather than what is in it. Fork **148**.
 - **Then a mechanism reached only by an INSTRUMENT going red**, John's, `DrivenTests` being
-  satisfied by any world at all. Two have now been caught by hand and neither by a guard.
+  satisfied by any world. Two were caught by hand and neither by a guard.
 - **Then a regime with COMPANY and a population**, the conversation having neither together: a
   moment of one word derives no vocabulary and a moment carrying a story roots genesis on
   nothing, no arm a middle. Fork **120**, priced. `LessonTests`.
@@ -72,7 +73,7 @@ that is finished LEAVES, so this is only ever what is still to do.
   likeness readings leaves with a revival row. Fork **131**.
 - **What add-only costs** — a group that fills gradually mints at every size it passes
   through. Fork **130**.
-- **Audit TRAPS and DO NOT RE-TRY** — a revival condition that has expired is a superstition.
+- **Audit TRAPS and DO NOT RE-TRY** — an expired revival condition is a superstition.
 - **Split `Population`** and any other class holding several mechanisms at once.
 
 ---

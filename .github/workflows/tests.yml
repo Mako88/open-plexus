@@ -244,6 +244,13 @@ jobs:
       # shard, which is the one that has been running past the timeout above while the other
       # three finish inside ten minutes.
       #
+      # AND THE SPINE CLASSES GOT ONE TOO, FOR LENGTH RATHER THAN CONTENTION.
+      # `ExercisedTests` and `OutstandingTests` each run both spine worlds into a brain, and
+      # they run them twice between them -- nine minutes of the catch-all shard's wall clock
+      # on their own, and the catch-all is the one that sits near the timeout. A shard that
+      # overruns reports as CANCELLED rather than as failed, so length there is disguised as
+      # the concurrency group working.
+      #
       # AND THE LIST IS CHECKED NOW, WHICH IS WHY MOVING ANYTHING IS SAFE. `ShardTests`
       # fails the build if a class lands in two shards or in none -- the second being the
       # one that costs nothing to make and reads as green forever. It also wants this to be
@@ -254,7 +261,8 @@ jobs:
           - "(FullyQualifiedName~HomeostatTests|FullyQualifiedName~EncodedTests|FullyQualifiedName~RecalledTests)"
           - "(FullyQualifiedName~ArrangedTests|FullyQualifiedName~SensesTests|FullyQualifiedName~GradedTests|FullyQualifiedName~MotifTests|FullyQualifiedName~RhythmTests)"
           - "(FullyQualifiedName~AskedTests|FullyQualifiedName~FleetTests|FullyQualifiedName~UnreachedTests|FullyQualifiedName~SlotTests|FullyQualifiedName~PostedTests|FullyQualifiedName~HostedTests)"
-          - "(FullyQualifiedName!~BindingTests&FullyQualifiedName!~ClevrTests&FullyQualifiedName!~HomeostatTests&FullyQualifiedName!~EncodedTests&FullyQualifiedName!~ArrangedTests&FullyQualifiedName!~SensesTests&FullyQualifiedName!~GradedTests&FullyQualifiedName!~MotifTests&FullyQualifiedName!~RhythmTests&FullyQualifiedName!~AskedTests&FullyQualifiedName!~FleetTests&FullyQualifiedName!~UnreachedTests&FullyQualifiedName!~SlotTests&FullyQualifiedName!~RecalledTests&FullyQualifiedName!~PostedTests&FullyQualifiedName!~HostedTests)"
+          - "(FullyQualifiedName~ExercisedTests|FullyQualifiedName~OutstandingTests)"
+          - "(FullyQualifiedName!~BindingTests&FullyQualifiedName!~ClevrTests&FullyQualifiedName!~HomeostatTests&FullyQualifiedName!~EncodedTests&FullyQualifiedName!~ArrangedTests&FullyQualifiedName!~SensesTests&FullyQualifiedName!~GradedTests&FullyQualifiedName!~MotifTests&FullyQualifiedName!~RhythmTests&FullyQualifiedName!~AskedTests&FullyQualifiedName!~FleetTests&FullyQualifiedName!~UnreachedTests&FullyQualifiedName!~SlotTests&FullyQualifiedName!~RecalledTests&FullyQualifiedName!~PostedTests&FullyQualifiedName!~HostedTests&FullyQualifiedName!~ExercisedTests&FullyQualifiedName!~OutstandingTests)"
 
     steps:
       # THE WHOLE HISTORY, BECAUSE ONE CHECK READS A CLOCK OFF IT. `ProseTests` has a decay

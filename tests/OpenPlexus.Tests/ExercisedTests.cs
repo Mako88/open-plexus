@@ -94,9 +94,13 @@ public sealed class ExercisedTests
     /// </param>
     /// <param name="Parts">
     /// The most things the front end put in any one moment. <b>The most rather than a total</b>,
-    /// because what <i>a thing is one thing</i> asks is whether TWO were ever sayable at once —
-    /// a run reporting one part a moment for ever has a front end that segments and a moment
-    /// that never held two, and a sum could not tell those apart.
+    /// because what it answers is whether TWO were ever sayable at once — a run reporting one
+    /// part a moment for ever has a front end that segments and a moment that never held two,
+    /// and a sum could not tell those apart.
+    /// <b>And it is printed rather than read as the entry.</b> It was the entry's reading and
+    /// it was satisfied by a run of no rounds at all, because the withheld pass binds whether
+    /// or not the bench turns — a channel being filled by the harness standing in for the
+    /// machine having done anything, which is the fault this file exists to catch.
     /// </param>
     private sealed record Watched(
         string Arm,
@@ -407,8 +411,8 @@ public sealed class ExercisedTests
             arms => Any(arms, one => Scoped(one.Held, Sequenced.Ordered))),
 
         new("A thing is one thing",
-            "the front end reported more than one thing in a moment",
-            arms => Any(arms, one => one.Parts > 1)),
+            "a scope was minted over ONE of the things a moment held",
+            arms => Any(arms, one => one.Held.Births.Values.Contains(Birth.Bound))),
 
         new("It can say what does not hold",
             "a departure code reached a scope",
@@ -552,6 +556,8 @@ public sealed class ExercisedTests
                 + $"| abstained {arm.Tally.Abstained} | told {arm.Told} "
                 + $"| supposed {arm.Supposals.Put}/{arm.Supposals.Refused}/{arm.Supposals.Moved} "
                 + $"| marked {arm.Supposals.Marked} "
+                + $"| parts {arm.Parts} "
+                + $"| bound {arm.Held.Births.Values.Count(one => one == Birth.Bound)} "
                 + $"| channels {string.Join(",", arm.Channels.Order())}");
 
         return missed;

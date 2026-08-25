@@ -145,6 +145,18 @@ internal enum Birth
 
     /// <summary>Rung four punched a hole through a group of siblings.</summary>
     Holed,
+
+    /// <summary>Genesis minted it over ONE of the things the front end reported.</summary>
+    /// <remarks>
+    /// <b>Its own reason rather than <see cref="Genesis"/></b>, because it is the only birth
+    /// that could not have happened without the grouping. A front end reporting parts is a
+    /// channel being filled; a scope born over one of them is the machine having done
+    /// something with what it was told, and only the second says the mechanism ran.
+    /// <b>It counts as a genesis in the lineage</b>, which is what it is — the reason is what
+    /// separates them, and the tally that balances births against losses must not see two
+    /// kinds where the ladder sees one.
+    /// </remarks>
+    Bound,
 }
 
 /// <summary>How a commitment stopped being held.</summary>
@@ -651,7 +663,7 @@ internal sealed class Population
 
         life = how switch
         {
-            Birth.Genesis => life with { Genesis = life.Genesis + 1 },
+            Birth.Genesis or Birth.Bound => life with { Genesis = life.Genesis + 1 },
             Birth.Repaired => life with { Repaired = life.Repaired + 1 },
             Birth.Holed => life with { Holed = life.Holed + 1 },
             _ => life with { Reborn = life.Reborn + 1 },
@@ -1188,7 +1200,17 @@ internal sealed class Population
         // bound that way, so it separates nothing a table counting co-occurrence can see, and
         // the intermediate scope a step-by-step walk would pass through is no better than its
         // parent. So the proposal has to come from the grouping directly.
-        if (_dials.Spanning is Spanning.Thing && grouping is { Count: > 0 })
+        //
+        // UNDER `Rooting.Wholly` AND NEVER OTHERWISE, because this IS the wide root read
+        // through the grouping: where a world reports one part a moment the two mint the same
+        // scope, and where it reports several this mints the ones the wide root should have
+        // been. Ungated it minted a wide scope for a machine told to mint none, which lifted
+        // the narrow arm to the wide arm's score on five readings of the conversation and made
+        // one comparison out of two. A dial that quietly does the other dial's job is not a
+        // second mechanism, it is the first one with no control left.
+        if (_dials.Rooting is Rooting.Wholly
+            && _dials.Spanning is Spanning.Thing
+            && grouping is { Count: > 0 })
             minted += Things(moment, arrived, eligible, grouping);
 
         return minted;
@@ -1254,7 +1276,7 @@ internal sealed class Population
 
             if (!Add(thing)) continue;
 
-            Born(thing, Birth.Genesis);
+            Born(thing, Birth.Bound);
             Credit(thing, moment);
             minted++;
         }

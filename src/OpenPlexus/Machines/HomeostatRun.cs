@@ -128,7 +128,7 @@ internal sealed class HomeostatRun
                     Wants,
                     () => draw.Next(_body.Doings));
 
-                chosen = Chooses.From(_drives.Choose);
+                chosen = Chooses.From(_drives.Choose, _drives.Cleared);
                 break;
         }
 

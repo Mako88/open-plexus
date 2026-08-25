@@ -251,6 +251,28 @@ public sealed class ExercisedTests
                 every: 2_000),
             sorts));
 
+        // Which word an intervention code was derived from, built exactly rather than
+        // guessed. The join holds both halves -- the world says which code a word is said as
+        // and the brain says what it derives over a forced one -- so the mapping back is a
+        // lookup, where a modulo over the hash used to answer with whatever word it landed on.
+        var doings = Enumerable
+            .Range(0, world.Doings)
+            .ToDictionary(word => Intervened.Of(world.Meaning(word)!.Value), word => word);
+
+        // A verb and then something for it to be about, which is what a command is. The
+        // fallback used to be one draw because a doing used to be one number; a uniform draw
+        // over the whole alphabet would spend the run saying words no command can be parsed
+        // out of, so what the acting arm exercised would be the parse refusing rather than
+        // the world's verbs.
+        var verbs = new[] { "went", "took", "dropped" }
+            .Select(word => world.Vocabulary.ToList().IndexOf(word))
+            .ToList();
+
+        var rooms = world.Named.Select(code => world.Naming(code)!.Value).ToList();
+        var things = world.Called.Select(code => world.Naming(code)!.Value).ToList();
+
+        var going = default(bool?);
+
         // Nothing to want and nothing told, which is stated rather than hidden. A house has no
         // felt bands, so every advocated action is wanted equally and what `Drives` is being
         // asked here is whether it can read the population at all -- and where the population
@@ -258,9 +280,23 @@ public sealed class ExercisedTests
         // own fallback all run reads as one.
         var drives = new Drives(
             brain.Held,
-            doing: code => Intervened.Names(code) ? (int)(code.Value % 3UL) : null,
+            doing: code => doings.TryGetValue(code, out var word) ? word : null,
             wanting: (_, _) => 1.0,
-            untold: () => falling.Next(3));
+            untold: () =>
+            {
+                if (going is { } went)
+                {
+                    var about = went ? rooms : things;
+
+                    return about[falling.Next(about.Count)];
+                }
+
+                var verb = verbs[falling.Next(verbs.Count)];
+
+                going = verb == verbs[0];
+
+                return verb;
+            });
 
         // And the join derives what left, which is this world's own dial rather than a
         // default for every world -- the one default is refuted, and its row says a world
@@ -273,7 +309,14 @@ public sealed class ExercisedTests
             new Watching<Coded>(
                 world,
                 noted,
-                acting: Chooses.From(acting ? drives.Choose : _ => null),
+                acting: Chooses.From(
+                    acting ? drives.Choose : _ => null,
+                    () =>
+                    {
+                        drives.Cleared();
+
+                        going = null;
+                    }),
                 departing: Departing.Left),
             brain)
             .Run(rounds, sweep: 1000, target: 0.9, window: 2000);

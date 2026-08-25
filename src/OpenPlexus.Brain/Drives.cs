@@ -77,6 +77,13 @@ internal sealed class Drives
     private readonly Func<Code, IReadOnlyCollection<Code>, double> _wanting;
     private readonly Func<int?> _untold;
 
+    // What it has already said about the moment on the table. A world that takes several
+    // doings a moment asks with the same codes in front of it every time, and the population
+    // does not move between two calls -- so without this the best advocate comes back until
+    // the budget is gone and a machine that could have said a verb and a thing says the verb
+    // twice. `Curiosity` carries the same set for the same reason.
+    private readonly HashSet<int> _already = [];
+
     /// <param name="held">The population to read.</param>
     /// <param name="doing">Which action a code names, or nothing where it names none.</param>
     /// <param name="wanting">How much this body wants an expected outcome.</param>
@@ -158,6 +165,8 @@ internal sealed class Drives
         // across a merge, which this repo has already been bitten by.
         foreach (var doing in advocates.Keys.Order())
         {
+            if (_already.Contains(doing)) continue;
+
             var vote = Population.Decide(
                 [_held.Weigh([.. advocates[doing]])]);
 
@@ -176,8 +185,22 @@ internal sealed class Drives
         if (best is null) Untold++;
         else Told++;
 
-        return best ?? _untold();
+        var said = best ?? _untold();
+
+        // The fallback's draw is remembered too, because what has been spent is a chance to
+        // say something and not the route it was said by. A fallback repeating itself is the
+        // same wasted second doing an advocate repeating itself would be.
+        if (said is { } spoken) _already.Add(spoken);
+
+        return said;
     }
+
+    /// <summary>The moment is over, so what was said about it is forgotten.</summary>
+    /// <remarks>
+    /// <b>Told rather than worked out</b>, because two moments running can carry the same
+    /// codes and a chooser comparing them would call that one moment.
+    /// </remarks>
+    public void Cleared() => _already.Clear();
 
     /// <summary>Which action this scope names, where exactly one code names one.</summary>
     /// <param name="scope">The codes that must all be present.</param>

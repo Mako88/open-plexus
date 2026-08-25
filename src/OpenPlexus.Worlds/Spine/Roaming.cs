@@ -197,15 +197,53 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         "john", "mary", "sandra", "daniel", "fred", "julie", "bill", "emma",
     ];
 
+    /// <summary>The words this world says that name no room, thing or person.</summary>
+    /// <remarks>
+    /// <b>Verbs among them, which is what makes a command sayable.</b> A machine that could
+    /// only name a room would be picking from a menu the world wrote; naming the verb and
+    /// what it is about out of the same alphabet the world speaks is the whole of the
+    /// channel.
+    /// </remarks>
+    private static readonly string[] Grammar =
+    [
+        "the", "is", "in", "to", "what", "next", "where", "went", "took", "dropped", "waited",
+    ];
+
+    /// <summary>Going somewhere.</summary>
+    private const string Went = "went";
+
+    /// <summary>Picking something up.</summary>
+    private const string Took = "took";
+
+    /// <summary>Putting something down.</summary>
+    private const string Dropped = "dropped";
+
+    /// <summary>
+    /// How many words the world hears about one moment before it acts on what it has.
+    /// </summary>
+    /// <remarks>
+    /// <b>The world's own longest statement, rather than a number picked here.</b> <i>the
+    /// apple is in the kitchen</i> is six words, so a machine is allowed to say as much
+    /// about a step as the world says about one — and something has to bound it, because a
+    /// chooser that never runs out and a world that never stops listening are a loop with no
+    /// end in it.
+    /// </remarks>
+    private const int Patience = 6;
+
     private readonly RoamingSettings _settings;
     private readonly Random _walks;
     private readonly List<Turn<Coded>> _kept = [];
 
+    private readonly List<string> _vocabulary = [];
+    private readonly Dictionary<Code, int> _naming = [];
+    private readonly Dictionary<string, int> _rooms = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, int> _things = new(StringComparer.Ordinal);
+
     /// <summary>The walk drawn as far as its last step, waiting to be told what it is.</summary>
     private Walk? _open;
 
-    /// <summary>What the chooser asked for, or nothing where it declined to intervene.</summary>
-    private int? _wish;
+    /// <summary>What the machine said about this moment, or nothing where it said none.</summary>
+    private List<int>? _spoken;
 
     /// <param name="settings">How the world is set up.</param>
     /// <param name="seed">What draws the houses and the walks.</param>
@@ -229,6 +267,27 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
 
         _settings = settings;
         _walks = new Random(seed);
+
+        // The alphabet the machine may speak, which is the one this house speaks. A word for
+        // a room that does not exist would be a doing that can never be done, and a machine
+        // spending its say on one would be measured against a menu rather than a house.
+        foreach (var word in Grammar) Heard(word);
+
+        for (var room = 0; room < settings.Rooms; room++)
+        {
+            _rooms[Places[room]] = room;
+
+            Heard(Places[room]);
+        }
+
+        for (var prop = 0; prop < settings.Props; prop++)
+        {
+            _things[Things[prop]] = prop;
+
+            Heard(Things[prop]);
+        }
+
+        foreach (var one in Cast.Take(settings.People)) Heard(one);
 
         for (var back = 0; back < settings.Withheld; back++) _kept.Add(Draw());
     }
@@ -282,11 +341,11 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     public Turn<Coded> Next()
     {
         var walk = _open ?? Open();
-        var wish = _wish;
+        var said = _spoken;
 
-        (_open, _wish) = (null, null);
+        (_open, _spoken) = (null, null);
 
-        return Close(walk, wish);
+        return Close(walk, said);
     }
 
     /// <summary>The codes for one sentence, in the order the words were said.</summary>
@@ -320,22 +379,51 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     private sealed record Walk(
         int[] At, int[] Held, int[] Here, List<IReadOnlyList<Code>> Told);
 
-    /// <inheritdoc/>
-    /// <remarks>
-    /// <b>Go, take or drop</b>, which is the verb set the scripted walk already draws from.
-    /// Who does it and what they do it to stay the world's, because a chooser reading codes
-    /// cannot know which thing is loose in the room somebody is standing in — and a world
-    /// that let it name one would be answering the question through the action channel.
-    /// </remarks>
-    public int Doings => 3;
+    /// <summary>Every word this house speaks, in the order a doing numbers them.</summary>
+    public IReadOnlyList<string> Vocabulary => _vocabulary;
 
     /// <inheritdoc/>
     /// <remarks>
-    /// <b>Never, because a doing here is a STEP</b>, and a moment is where the walker stands.
-    /// Two steps about one moment is two moments with the middle one unreported, so listening
-    /// twice would hide half the walk from the learner while the chooser saw all of it.
+    /// <para>
+    /// <b>A word rather than a verb index.</b> The machine says words and the world
+    /// parses a command out of them, where three opaque verbs made the argument the
+    /// world's: a chooser picking
+    /// <i>take</i> was told which thing by the draw, so what it had learnt could never be
+    /// about a particular thing. Saying <i>took</i> and <i>the apple</i> is one claim about
+    /// one thing, which is what a scope can be about.
+    /// </para>
+    /// <para>
+    /// <b>And the alphabet is the house's whole vocabulary rather than the commands.</b> A
+    /// menu of legal commands is the world telling the machine which words are verbs and
+    /// which rooms exist, which is a fact it should have to learn. What a word the parse
+    /// cannot use costs is a step spent waiting.
+    /// </para>
+    /// <para>
+    /// <b>Who does it stays the world's</b>, because a chooser reading codes cannot know
+    /// which thing is loose in the room somebody is standing in — and a world that let it
+    /// name the walker would be choosing between people on the machine's behalf.
+    /// </para>
     /// </remarks>
-    public bool Listening => false;
+    public int Doings => _vocabulary.Count;
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <para>
+    /// <b>While what was said is not yet a command</b>, which is what a command being
+    /// several words costs. A step is still one step and a moment is still
+    /// where the walker stands — what listening twice buys is the rest of one sentence
+    /// rather than a second sentence, so no part of the walk goes unreported.
+    /// </para>
+    /// <para>
+    /// <b>And it stops the moment the parse succeeds</b>, so a machine that says the verb
+    /// and the thing in two words is not made to fill the rest of a budget. Everything after
+    /// a complete command would be words about a step already decided.
+    /// </para>
+    /// </remarks>
+    public bool Listening =>
+        _spoken is { Count: > 0 } spoken
+        && spoken.Count < Patience
+        && Parse(spoken) is null;
 
     /// <inheritdoc/>
     /// <remarks>
@@ -382,13 +470,89 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// </remarks>
     public void Do(int? doing)
     {
-        if (doing is { } wanted)
+        if (doing is not { } said)
         {
-            ArgumentOutOfRangeException.ThrowIfNegative(wanted, nameof(doing));
-            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(wanted, Doings, nameof(doing));
+            _spoken = null;
+
+            return;
         }
 
-        _wish = doing;
+        ArgumentOutOfRangeException.ThrowIfNegative(said, nameof(doing));
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(said, Doings, nameof(doing));
+
+        (_spoken ??= []).Add(said);
+    }
+
+    /// <summary>Which word a code is, or nothing where it is none of this house's.</summary>
+    /// <param name="code">A code from a moment.</param>
+    /// <remarks>
+    /// <b>What a machine with no rules needs.</b> A command
+    /// is words, and until something fires there is no word the population can offer — so a
+    /// chooser that could only say its own expectations would never act, never settle and
+    /// never come to have one. Handed to a chooser rather than read by one, because a
+    /// chooser naming this world would put one house's vocabulary in front of every other.
+    /// </remarks>
+    public int? Naming(Code code) => _naming.TryGetValue(code, out var at) ? at : null;
+
+    /// <summary>Which code a word is SAID as, by where it sits in the alphabet.</summary>
+    /// <param name="word">Where the word sits in <see cref="Vocabulary"/>.</param>
+    /// <remarks>
+    /// <b>The inverse of <see cref="Naming"/></b>, and the pair is what a word being an index
+    /// on one side and a hash on the other costs. Nothing outside the alphabet, which a
+    /// caller has to be able to ask for.
+    /// </remarks>
+    public Code? Meaning(int word) =>
+        word >= 0 && word < _vocabulary.Count
+            ? Kinds.Named(Word, _vocabulary[word])
+            : null;
+
+    /// <summary>Where a word sits in the alphabet, adding it if it is new.</summary>
+    private int Heard(string word)
+    {
+        if (_naming.TryGetValue(Kinds.Named(Word, word), out var at)) return at;
+
+        _naming[Kinds.Named(Word, word)] = at = _vocabulary.Count;
+
+        _vocabulary.Add(word);
+
+        return at;
+    }
+
+    /// <summary>A verb and the one thing or room it was said about.</summary>
+    /// <param name="Verb">Which of <see cref="Went"/>, <see cref="Took"/>, <see cref="Dropped"/>.</param>
+    /// <param name="About">The room it names under <see cref="Went"/>, and the thing otherwise.</param>
+    private sealed record Command(string Verb, int About);
+
+    /// <summary>The command in what was said, or nothing where there is none in it.</summary>
+    /// <param name="spoken">The words the machine said about this moment, in order.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>The first verb and the first thing it could be about</b>, and the words between
+    /// them are ignored rather than refused. <i>went to the garden</i> and <i>garden went</i>
+    /// are the same command here, because word order is a fact about the signal and the
+    /// grammar of a command is not something this world is entitled to teach by refusing.
+    /// </para>
+    /// <para>
+    /// <b>And a verb with nothing to be about is no command</b> rather than a drawn
+    /// argument. Filling the gap would make the machine's arm the world's own draw wearing
+    /// the machine's name, which is a fallback arm nobody meant to run.
+    /// </para>
+    /// </remarks>
+    private Command? Parse(IReadOnlyList<int> spoken)
+    {
+        var words = spoken.Select(one => _vocabulary[one]).ToList();
+
+        var verb = words.FirstOrDefault(
+            word => word is Went or Took or Dropped);
+
+        if (verb is null) return null;
+
+        var named = verb == Went ? _rooms : _things;
+
+        foreach (var word in words)
+            if (named.TryGetValue(word, out var about)) return new Command(verb, about);
+
+        return null;
     }
 
     /// <summary>The house, the scatter, and every step but the one still to be chosen.</summary>
@@ -445,10 +609,15 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         return walk;
     }
 
-    /// <summary>One step of the walk, chosen or drawn.</summary>
+    /// <summary>One step of the walk, commanded or drawn.</summary>
     /// <param name="walk">The house and where everything in it stands.</param>
-    /// <param name="wish">Which of <see cref="Doings"/>, or nothing to let the walk draw.</param>
-    private void Step(Walk walk, int? wish)
+    /// <param name="spoken">What the machine said, or nothing to let the walk draw.</param>
+    /// <remarks>
+    /// <b>A wish is not filtered against what is possible</b>, because filtering it would
+    /// hand a chooser the world's knowledge of what is possible through the back of the
+    /// interface. What an impossible command gets is a step that happens and does nothing.
+    /// </remarks>
+    private void Step(Walk walk, IReadOnlyList<int>? spoken)
     {
         var (at, held, here, told) = walk;
 
@@ -456,6 +625,14 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         // option decides nothing, so it is not taken -- which also leaves the walk of a
         // one-person house the walk every earlier reading was taken on.
         var who = _settings.People == 1 ? 0 : _walks.Next(_settings.People);
+
+        if (spoken is not null)
+        {
+            if (Parse(spoken) is { } wanted && Possible(walk, who, wanted)) Done(walk, who, wanted);
+            else told.Add(Said(Cast[who], "waited"));
+
+            return;
+        }
 
         var holding = Enumerable.Range(0, _settings.Props)
             .Where(one => held[one] == who)
@@ -473,43 +650,58 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         if (loose.Count > 0) can.Add(1);
         if (holding.Count > 0) can.Add(2);
 
-        // And a CHOSEN one is not filtered, because filtering it would hand a chooser the
-        // world's knowledge of what is possible through the back of the interface. What an
-        // impossible wish gets is a step that happens and does nothing.
-        var doing = wish ?? can[_walks.Next(can.Count)];
-
-        if (wish is not null && !can.Contains(doing))
+        var drawn = can[_walks.Next(can.Count)] switch
         {
-            told.Add(Said(Cast[who], "waited"));
+            1 => new Command(Took, loose[_walks.Next(loose.Count)]),
+            2 => new Command(Dropped, holding[_walks.Next(holding.Count)]),
+            _ => new Command(Went, _walks.Next(_settings.Rooms)),
+        };
 
-            return;
-        }
+        Done(walk, who, drawn);
+    }
 
-        switch (doing)
+    /// <summary>Whether a walker could do this now.</summary>
+    /// <param name="walk">The house and where everything in it stands.</param>
+    /// <param name="who">Whose step it is.</param>
+    /// <param name="doing">What was asked for.</param>
+    private static bool Possible(Walk walk, int who, Command doing) =>
+        doing.Verb switch
         {
-            case 1:
-                var taken = loose[_walks.Next(loose.Count)];
+            Took => walk.Held[doing.About] == Nobody
+                && walk.At[doing.About] == walk.Here[who],
+            Dropped => walk.Held[doing.About] == who,
+            _ => true,
+        };
 
-                held[taken] = who;
+    /// <summary>The step, done and said out loud.</summary>
+    /// <param name="walk">The house and where everything in it stands.</param>
+    /// <param name="who">Whose step it is.</param>
+    /// <param name="doing">What is done, which this world has already found possible.</param>
+    private static void Done(Walk walk, int who, Command doing)
+    {
+        var (at, held, here, told) = walk;
 
-                told.Add(Said(Cast[who], "took", "the", Things[taken]));
+        switch (doing.Verb)
+        {
+            case Took:
+                held[doing.About] = who;
+
+                told.Add(Said(Cast[who], "took", "the", Things[doing.About]));
 
                 break;
 
-            case 2:
-                var dropped = holding[_walks.Next(holding.Count)];
+            case Dropped:
+                held[doing.About] = Nobody;
+                at[doing.About] = here[who];
 
-                held[dropped] = Nobody;
-                at[dropped] = here[who];
-
-                told.Add(Said(Cast[who], "dropped", "the", Things[dropped]));
+                told.Add(Said(Cast[who], "dropped", "the", Things[doing.About]));
 
                 break;
 
             default:
-                here[who] = _walks.Next(_settings.Rooms);
+                here[who] = doing.About;
 
-                told.Add(Said(Cast[who], "went", "to", "the", Places[here[who]]));
+                told.Add(Said(Cast[who], "went", "to", "the", Places[doing.About]));
 
                 break;
         }
@@ -520,8 +712,8 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
 
     /// <summary>The walk's last step, and the question about what it left behind.</summary>
     /// <param name="walk">The house drawn as far as its last step.</param>
-    /// <param name="wish">Which of <see cref="Doings"/>, or nothing to let the walk draw.</param>
-    private Turn<Coded> Close(Walk walk, int? wish)
+    /// <param name="spoken">What the machine said, or nothing to let the walk draw.</param>
+    private Turn<Coded> Close(Walk walk, IReadOnlyList<int>? spoken)
     {
         var (at, held, here, told) = walk;
 
@@ -534,13 +726,13 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         // a chooser that was asked and one that was heard. `Open` adds the placements before
         // any walking, so without this the opening statement of a no-step walk would be
         // reported as the learner's doing.
-        var chose = wish is not null && _settings.Steps > 0;
+        var chose = spoken is not null && _settings.Steps > 0;
 
         if (_settings.Steps > 0)
         {
             var before = Placed(at, held, here);
 
-            Step(walk, wish);
+            Step(walk, spoken);
 
             moved = !before.SequenceEqual(Placed(at, held, here));
         }

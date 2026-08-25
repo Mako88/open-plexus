@@ -2849,52 +2849,80 @@ public sealed class RoamingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// A chosen verb is what the walk does, and one that cannot be done is a wait.
+    /// A spoken command is what the walk does, and one it cannot do is a wait.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>An impossible wish is not quietly turned into a possible one.</b> Substituting the
-    /// nearest action would make the chooser's arm the world's own draw wearing the chooser's
-    /// name, which is a fallback arm nobody meant to run — and dropping the step would leave
-    /// the effect question answering about a statement nobody made.
+    /// <b>The machine says words and the world parses them</b>, so what it
+    /// says names the room or the thing as well as the verb. Three opaque verbs left the
+    /// argument with the draw, and a machine that said <i>take</i> was told which thing by
+    /// the world — so nothing it learnt could ever have been about a particular thing.
     /// </para>
     /// <para>
-    /// <b>Going somewhere is the one that is always possible</b>, so it is the verb this can
-    /// assert on without arranging the house first. Taking needs something loose underfoot
-    /// and dropping needs a full hand, and at the opening of a walk neither is guaranteed.
+    /// <b>An impossible command is not quietly turned into a possible one.</b> Substituting
+    /// the nearest action would make the machine's arm the world's own draw wearing the
+    /// machine's name, which is a fallback arm nobody meant to run — and dropping the step
+    /// would leave the effect question answering about a statement nobody made.
+    /// </para>
+    /// <para>
+    /// <b>And a verb with nothing to be about is a wait too</b>, which is the half that is
+    /// new. A command is a verb and one thing, so half of one is not a command — filling the
+    /// gap from the draw is the same fallback by a shorter road.
     /// </para>
     /// </remarks>
     [Fact]
-    public void A_chosen_verb_is_done_where_it_can_be_and_waited_where_it_cannot()
+    public void A_spoken_command_is_done_where_it_can_be_and_waited_where_it_cannot()
     {
-        var went = Kinds.Named(46, "went");
         var waited = Kinds.Named(46, "waited");
 
-        var going = new Roaming(
-            World(1, people: 1) with { Examining = Examining.Effect }, seed: 5);
+        var settings = World(1, people: 1) with { Examining = Examining.Effect };
 
-        var dropping = new Roaming(
-            World(1, people: 1) with { Examining = Examining.Effect }, seed: 5);
+        var going = new Roaming(settings, seed: 5);
+        var dropping = new Roaming(settings, seed: 5);
+        var half = new Roaming(settings, seed: 5);
+
+        // Where the world's own words sit in the alphabet it will hear. Nothing that learns
+        // is shown this: it is the test standing in for a chooser that has come to expect a
+        // word, which is what `Naming` hands one at a run.
+        int Word(Roaming world, string word) =>
+            world.Vocabulary.ToList().IndexOf(word);
 
         for (var episode = 0; episode < 40; episode++)
         {
             _ = going.Now;
-            going.Do(0);
+            going.Do(Word(going, "went"));
+            going.Do(Word(going, "garden"));
 
             _ = dropping.Now;
-            dropping.Do(2);
+            dropping.Do(Word(dropping, "dropped"));
+            dropping.Do(Word(dropping, "apple"));
+
+            _ = half.Now;
+            half.Do(Word(half, "went"));
 
             // The effect question holds the last statement back as what it asks about, so
             // the chosen step is exactly the question and nothing has to be dug out of the
-            // transcript to read it.
-            Assert.Contains(went, going.Next().Seen.Question());
+            // transcript to read it. The room is the machine's own, which is what a doing
+            // index could not carry.
+            var said = going.Next().Seen.Question();
+
+            Assert.Contains(Kinds.Named(46, "went"), said);
+            Assert.Contains(Kinds.Named(46, "garden"), said);
 
             // And a walk of one step opens with nobody holding anything, so dropping is
-            // never possible on it and the wish is refused every time.
+            // never possible on it and the command is refused every time.
             Assert.Contains(waited, dropping.Next().Seen.Question());
+
+            // A verb and nothing for it to be about is no command at all.
+            Assert.Contains(waited, half.Next().Seen.Question());
         }
 
-        Assert.Equal(3, new Roaming(World(120, people: 4), seed: 5).Doings);
+        // Every word this house speaks, which is the eleven that name nothing plus a word a
+        // room, a thing and a person. A machine is not handed a menu of legal commands.
+        var house = new Roaming(World(120, people: 4), seed: 5);
+
+        Assert.Equal(11 + 6 + 4 + 4, house.Doings);
+        Assert.Equal(house.Doings, house.Vocabulary.Count);
     }
 
     /// <summary>
@@ -3017,12 +3045,38 @@ public sealed class RoamingTests(ITestOutputHelper output)
             var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed: 1);
             var picking = new Random(1);
 
+            // A command drawn uniformly, which is what a doing index used to be. The words
+            // are read off the world's own alphabet rather than written here, so a house
+            // with different rooms in it needs no second list to stay in step.
+            var words = world.Vocabulary.ToList();
+            var verbs = new[] { "went", "took", "dropped" }.Select(word => words.IndexOf(word)).ToList();
+            var rooms = world.Named.Select(code => world.Naming(code)!.Value).ToList();
+            var things = world.Called.Select(code => world.Naming(code)!.Value).ToList();
+
+            // The verb it has already said about this moment, so the second word is about
+            // the first. A moment takes as many words as it needs to be a command, and
+            // `Cleared` is where the world says the moment is over.
+            var verb = default(int?);
+
             var tally = new Bench(
                 new Watching<Coded>(
                     world,
                     new Joined(Joining.Resolved, resolution: 1),
                     acting: Chooses.From(
-                        _ => picking.NextDouble() < often ? picking.Next(3) : null)),
+                        _ =>
+                        {
+                            if (verb is { } already)
+                            {
+                                var about = already == verbs[0] ? rooms : things;
+
+                                return about[picking.Next(about.Count)];
+                            }
+
+                            if (picking.NextDouble() >= often) return null;
+
+                            return verb = verbs[picking.Next(verbs.Count)];
+                        },
+                        () => verb = null)),
                 brain)
                 .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
 
@@ -3042,7 +3096,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
             World(4, people: 4) with { Examining = Examining.Effect }, seed: 1);
 
         _ = marked.Now;
-        marked.Do(0);
+        marked.Do(marked.Vocabulary.ToList().IndexOf("went"));
+        marked.Do(marked.Vocabulary.ToList().IndexOf("garden"));
 
         Assert.NotNull(marked.Next().Seen.Assigned);
 

@@ -331,4 +331,143 @@ public sealed class CeilingTests(ITestOutputHelper output)
         Assert.Equal(lesson.Exam.Count, asked);
         Assert.Equal(0, present);
     }
+
+    /// <summary>
+    /// <b>What the walked house's survey is worth before anything has learnt.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Taken before a learner runs, which is this repo's own ordering.</b> A grid cannot
+    /// tell a rule that dropped the wrong sentence from a learner that failed to use the
+    /// right one, and an exam whose answers are already lying in the moment prices the front
+    /// end rather than the population.
+    /// </para>
+    /// <para>
+    /// <b>The marginal is the control the survey was given.</b> A machine that walked ANOTHER
+    /// house reads this exam's question and its own transcript, and its transcript says
+    /// nothing about this house — so the best it can do is the commonest answer of the kind
+    /// it was asked. Two are printed: over the kind, and over the kind and the noun the
+    /// question names, which is the sharper of the two and the one an arm has to beat.
+    /// </para>
+    /// <para>
+    /// <b>And the recency rule is the roof the WALK puts on it.</b> Answering with the most
+    /// recent word of the answer's own kind is what a bag reads straight off, and the gap
+    /// between it and one is what moved after the machine last looked.
+    /// </para>
+    /// <para>
+    /// <b>The counting kind reads nought on both, and it is meant to.</b> A number
+    /// word is never said by the house, so it is never in the moment and no recency rule can
+    /// reach it — and a conjunction of codes cannot say <i>two of these</i> either, which is
+    /// Monk-2's own ceiling arriving on the spine world. Leaving the kind out would be
+    /// editing the exam until it could be passed.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_the_walked_houses_survey_is_worth_before_anything_learns()
+    {
+        const int Rounds = 12_600;
+        const int Asked = 6;
+
+        var world = new Roaming(
+            Fixture.House(Examining.Where, Knowing.Explored, Seeing.Apart, asked: Asked),
+            seed: 1);
+
+        // What the world SAID, never what to conclude. The same standing as `Named`: a probe
+        // is allowed to know which codes are this world's words, and nothing that learns is
+        // ever shown it.
+        var words = new Dictionary<Code, string>();
+
+        for (var one = 0; one < world.Vocabulary.Count; one++)
+            words[world.Meaning(one)!.Value] = world.Vocabulary[one];
+
+        var sat = new List<(string Kind, Code About, Code Answer, Coded Seen)>();
+
+        for (var round = 0; round < Rounds; round++)
+        {
+            var turn = world.Next();
+
+            if (turn.Seen.Asked is not { } question) continue;
+
+            sat.Add((
+                words[question.Codes[0]],
+                question.Codes[^1],
+                world.Meaning(turn.Outcome!.Value)!.Value,
+                turn.Seen));
+        }
+
+        output.WriteLine(
+            $"a walked house, {Rounds} steps, {Asked} questions an exam, nobody choosing");
+
+        output.WriteLine(
+            $"{"kind",-6}{"asked",8}{"marginal",10}{"by noun",10}{"present",10}{"latest",10}");
+
+        var priced = new Dictionary<string, (int Asked, double Present, double Latest)>();
+
+        foreach (var kind in sat.Select(one => one.Kind).Distinct().Order(StringComparer.Ordinal))
+        {
+            var these = sat.Where(one => one.Kind == kind).ToList();
+
+            // The answer alphabet of this kind, read off what was asked rather than declared
+            // here. A list written into the test would be the world's own answer key copied
+            // into a second place for the two to drift apart.
+            var alphabet = new HashSet<Code>(these.Select(one => one.Answer));
+
+            var marginal = these
+                .GroupBy(one => one.Answer)
+                .Max(one => one.Count()) / (double)these.Count;
+
+            var noun = these
+                .GroupBy(one => one.About)
+                .Sum(group => group.GroupBy(one => one.Answer).Max(one => one.Count()))
+                / (double)these.Count;
+
+            var present = these.Count(one => one.Seen.Codes.Contains(one.Answer))
+                / (double)these.Count;
+
+            var latest = these.Count(one => Latest(one.Seen, alphabet) == one.Answer)
+                / (double)these.Count;
+
+            output.WriteLine(
+                $"{kind,-6}{these.Count,8}{marginal,10:F3}{noun,10:F3}{present,10:F3}"
+                + $"{latest,10:F3}");
+
+            priced[kind] = (these.Count, present, latest);
+        }
+
+        // Three kinds, or the survey is one question wearing three names. What makes an exam
+        // of a walk is that no single rule answers all of it.
+        Assert.Equal(3, priced.Count);
+
+        Assert.All(priced.Values, one => Assert.True(one.Asked > 0));
+
+        // And the counting kind is at the language's ceiling before anything runs: a number
+        // word is never said by the house, so it is in no moment and no recency rule reaches
+        // it. This is the falsifiable half -- a house that started saying its own counts
+        // would fail here.
+        Assert.Equal(0.0, priced["how"].Present);
+        Assert.Equal(0.0, priced["how"].Latest);
+
+        // And the other two are not free either, or the exam is answered by the transcript
+        // and a score off it says nothing about what was understood.
+        Assert.True(priced["where"].Latest < 1.0 && priced["what"].Latest < 1.0,
+            "the most recent word of the answer's own kind answers the whole exam, so the "
+            + "survey is recency wearing an exam's clothes");
+    }
+
+    /// <summary>The most recent code of one alphabet in a moment's statements.</summary>
+    /// <param name="seen">The moment.</param>
+    /// <param name="alphabet">The codes that could be an answer of this kind.</param>
+    /// <remarks>
+    /// <b>Newest statement first and the last such code within it</b>, which is what recency
+    /// means where a statement is several words. A sighting names the room it is of before
+    /// the things in it, so the last match is the one nearest the moment.
+    /// </remarks>
+    private static Code? Latest(Coded seen, IReadOnlySet<Code> alphabet)
+    {
+        foreach (var statement in seen.Statements ?? [])
+            for (var at = statement.Codes.Count - 1; at >= 0; at--)
+                if (alphabet.Contains(statement.Codes[at])) return statement.Codes[at];
+
+        return null;
+    }
 }

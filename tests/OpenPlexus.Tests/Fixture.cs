@@ -60,6 +60,7 @@ internal static class Fixture
     /// <param name="examining">Which question the house is asked.</param>
     /// <param name="knowing">Whether the walk is recited to the machine or walked by it.</param>
     /// <param name="seeing">Whether a look and a word are one code.</param>
+    /// <param name="asked">How many survey questions follow the walk.</param>
     /// <remarks>
     /// <b>Named at every call and defaulted nowhere else</b>, which is the rule this repo
     /// learnt the hard way: a fixture inherits every dial it does not pin, so a default
@@ -70,13 +71,15 @@ internal static class Fixture
     public static Worlds.RoamingSettings House(
         Worlds.Examining examining,
         Worlds.Knowing knowing = Worlds.Knowing.Recited,
-        Worlds.Seeing seeing = Worlds.Seeing.Apart) =>
+        Worlds.Seeing seeing = Worlds.Seeing.Apart,
+        int asked = 0) =>
         new()
         {
             Rooms = 6,
             Props = 4,
             People = 4,
             Steps = 120,
+            Asked = asked,
 
             // Nothing held back where the house is walked, because a held-out question there
             // would be about a house the machine never saw.

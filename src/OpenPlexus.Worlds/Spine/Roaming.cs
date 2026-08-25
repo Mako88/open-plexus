@@ -46,6 +46,34 @@ public sealed record RoamingSettings
     /// <summary>How many questions are kept back and never drawn.</summary>
     public required int Withheld { get; init; }
 
+    /// <summary>How many questions the survey asks once the walk round the house is over.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A SIZE, which is what admits the survey to the target world.</b> A house
+    /// can be asked about at any length and none of the lengths makes it less like a house,
+    /// where a setting choosing WHICH single question gets asked is a switch and one of the
+    /// three the target is not allowed to keep.
+    /// </para>
+    /// <para>
+    /// <b>Three kinds rather than one, and they are asked in one exam.</b> Where a thing
+    /// ended up, what a room held, and how many things were in one — so a machine at the top
+    /// of the exam has to have tracked a thing, read a room, and counted, rather than have
+    /// found the one rule the single question rewarded.
+    /// </para>
+    /// <para>
+    /// <b>And counting is at the scope language's ceiling on purpose.</b> A conjunction of
+    /// codes cannot say <i>two of these</i>, which is Monk-2's own lesson with a published
+    /// number beside it. Leaving the kind out would be editing the exam until the machine
+    /// could pass it, and the exam is the one thing here that may not move.
+    /// </para>
+    /// <para>
+    /// <b>Nought under <see cref="Knowing.Recited"/></b>, where the walk already ends in a
+    /// question of its own. Two exams over one transcript would be two problems averaged
+    /// into one number.
+    /// </para>
+    /// </remarks>
+    public required int Asked { get; init; }
+
     /// <inheritdoc cref="Worlds.Examining"/>
     /// <remarks>
     /// <b>Read under <see cref="Knowing.Recited"/> alone</b>, because a question about the
@@ -350,6 +378,26 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         "the", "is", "in", "to", "what", "next", "where", "went", "took", "dropped", "waited",
     ];
 
+    /// <summary>The words the survey adds, and it adds them only where there is a survey.</summary>
+    /// <remarks>
+    /// <b>Apart from <see cref="Grammar"/> so no earlier reading moves.</b> The alphabet is
+    /// what a blind guess is against and what a chooser may say, so putting <i>how</i> and
+    /// the numbers in every house would have changed the marginal of every walk taken before
+    /// the survey existed.
+    /// </remarks>
+    private static readonly string[] Asking = ["how", "many"];
+
+    /// <summary>How many of something there were, as a word.</summary>
+    /// <remarks>
+    /// <b>As many as the house has things, and one more for none</b>, so the answer
+    /// alphabet is a fact about the house's size rather than a number chosen here. A word for
+    /// nine in a house of four things would be an answer no question could have.
+    /// </remarks>
+    private static readonly string[] Counts =
+    [
+        "none", "one", "two", "three", "four", "five", "six", "seven", "eight",
+    ];
+
     /// <summary>Going somewhere.</summary>
     private const string Went = "went";
 
@@ -403,6 +451,10 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     private Walk? _house;
     private int _left;
 
+    // The survey's questions, oldest first, drawn when the walk runs out of steps. The house
+    // stays alive while they are being asked, because what they are about is its transcript.
+    private readonly List<Question> _asking = [];
+
     private readonly List<string> _order = [];
     private readonly Dictionary<string, List<Code>> _met = new(StringComparer.Ordinal);
 
@@ -425,12 +477,20 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         ArgumentOutOfRangeException.ThrowIfGreaterThan(settings.People, Cast.Length);
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Steps);
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Withheld);
+        ArgumentOutOfRangeException.ThrowIfNegative(settings.Asked);
 
         // The effect question is about a STEP, and a walk of no steps ends on a placement.
         // Asking what a placement did is asking about the round before the world started,
         // which is a question with no answer rather than an answer of nought.
         if (settings.Examining == Examining.Effect)
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Steps);
+
+        // A recital already ends in a question, so a survey there would be a second exam over
+        // one transcript and a score that averaged two problems.
+        if (settings.Knowing is Knowing.Recited && settings.Asked != 0)
+            throw new ArgumentException(
+                "a recited walk ends in a question of its own, so the survey is the walked "
+                + "house's exam and nothing else's", nameof(settings));
 
         if (settings.Knowing is Knowing.Explored)
         {
@@ -484,6 +544,15 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
             _nouns.Add(Kinds.Named(Word, one));
 
             Heard(one);
+        }
+
+        // And the survey's own words, where there is a survey. Last, so a house without one
+        // speaks the alphabet it always spoke and every reading taken on one still stands.
+        if (settings.Asked > 0)
+        {
+            foreach (var word in Asking) Heard(word);
+
+            foreach (var word in Counts.Take(settings.Props + 1)) Heard(word);
         }
 
         // Round the palette over everything there is, so a room, a prop and a person can wear
@@ -632,9 +701,15 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// and the thing in two words is not made to fill the rest of a budget. Everything after
     /// a complete command would be words about a step already decided.
     /// </para>
+    /// <para>
+    /// <b>And deaf while the survey is running</b>, because the walk is over. A machine
+    /// still filling a command's words there would be acting on a house it has finished
+    /// walking.
+    /// </para>
     /// </remarks>
     public bool Listening =>
-        _spoken is { Count: > 0 } spoken
+        _asking.Count == 0
+        && _spoken is { Count: > 0 } spoken
         && spoken.Count < Patience
         && Parse(spoken) is null;
 
@@ -661,7 +736,9 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
             if (_shown is { } already) return already;
 
             if (_settings.Knowing is Knowing.Explored)
-                return (_shown = Sighted(_house ??= Housed(), null)).Value;
+                return (_shown = _asking.Count > 0
+                    ? Surveying()
+                    : Sighted(_house ??= Housed(), null)).Value;
 
             _open ??= Open();
 
@@ -1118,6 +1195,8 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// </remarks>
     private Turn<Coded> Walked()
     {
+        if (_asking.Count > 0) return Surveyed();
+
         var walk = _house ??= Housed();
         var spoken = _spoken;
 
@@ -1152,7 +1231,160 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
 
         Meets(named, word);
 
-        if (--_left <= 0) _house = null;
+        // The walk is over, so the exam is drawn. A house nobody can be asked anything about
+        // is dropped here rather than sat in silence.
+        if (--_left <= 0)
+        {
+            _asking.AddRange(Survey(walk));
+
+            if (_asking.Count == 0) _house = null;
+        }
+
+        return turn;
+    }
+
+    /// <summary>One question of the survey and the word that answers it.</summary>
+    /// <param name="Sentence">What is asked, in the order the words are said.</param>
+    /// <param name="Outcome">Which word of the alphabet is right.</param>
+    private sealed record Question(IReadOnlyList<Code> Sentence, int Outcome);
+
+    /// <summary>Whether the machine has been given a word for this.</summary>
+    /// <param name="name">A room, a thing or a person.</param>
+    /// <remarks>
+    /// <b>What bounds which questions may be asked.</b> A question about a thing whose name
+    /// never reached the machine is one nothing in it could answer, and an exam holding those
+    /// measures how often the naming happened to land rather than what was understood.
+    /// </remarks>
+    private bool Worded(string name) =>
+        _met.TryGetValue(name, out var codes) && codes.Contains(Kinds.Named(Word, name));
+
+    /// <summary>The exam for the house that has just been walked.</summary>
+    /// <param name="walk">The house, at the state the walk left it in.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>Three kinds, and the draw is between whichever this house can pose.</b> A
+    /// house where nothing was ever named poses none, and one where every room holds two
+    /// things poses no question about what a room held.
+    /// </para>
+    /// <para>
+    /// <b>What a room held is asked of a room holding ONE thing</b>, because the
+    /// answer is a single word. A room with two in it has two right answers and one answer
+    /// key, so a machine that said the other one would be marked wrong for being right —
+    /// which is the experimenter's knife rather than the exam.
+    /// </para>
+    /// <para>
+    /// <b>And every answer is the state the walk ENDED in</b>, whether or not the machine was
+    /// there to see it change. Somebody else moving a thing after the machine last looked
+    /// makes a question unanswerable, and how much of the exam that is is a ceiling this
+    /// world's own instrument takes before any learner runs — a world that only asked what
+    /// the machine had seen would be an exam edited until it could be passed.
+    /// </para>
+    /// </remarks>
+    private List<Question> Survey(Walk walk)
+    {
+        var asked = new List<Question>();
+
+        if (_settings.Asked == 0) return asked;
+
+        var placed = Placed(walk.At, walk.Held, walk.Here);
+
+        var things = Enumerable.Range(0, _settings.Props)
+            .Where(prop => Worded(Things[prop]))
+            .ToList();
+
+        var rooms = Enumerable.Range(0, _settings.Rooms)
+            .Where(room => Worded(Places[room]))
+            .ToList();
+
+        var alone = rooms
+            .Where(room => placed.Count(at => at == room) == 1
+                && Worded(Things[Array.IndexOf(placed, room)]))
+            .ToList();
+
+        for (var one = 0; one < _settings.Asked; one++)
+        {
+            var kinds = new List<int>();
+
+            if (things.Count > 0) kinds.Add(0);
+            if (alone.Count > 0) kinds.Add(1);
+            if (rooms.Count > 0) kinds.Add(2);
+
+            if (kinds.Count == 0) break;
+
+            switch (kinds[_walks.Next(kinds.Count)])
+            {
+                case 0:
+                {
+                    var prop = things[_walks.Next(things.Count)];
+
+                    asked.Add(new Question(
+                        Said("where", "is", "the", Things[prop]),
+                        _naming[Kinds.Named(Word, Places[placed[prop]])]));
+
+                    break;
+                }
+
+                case 1:
+                {
+                    var room = alone[_walks.Next(alone.Count)];
+
+                    asked.Add(new Question(
+                        Said("what", "is", "in", "the", Places[room]),
+                        _naming[Kinds.Named(Word, Things[Array.IndexOf(placed, room)])]));
+
+                    break;
+                }
+
+                default:
+                {
+                    var room = rooms[_walks.Next(rooms.Count)];
+
+                    asked.Add(new Question(
+                        Said("how", "many", "in", "the", Places[room]),
+                        _naming[Kinds.Named(
+                            Word, Counts[placed.Count(at => at == room)])]));
+
+                    break;
+                }
+            }
+        }
+
+        return asked;
+    }
+
+    /// <summary>The moment the survey's next question is asked in.</summary>
+    /// <remarks>
+    /// <b>The walk's transcript and the question over it</b>, and the questions do not join
+    /// the transcript. An earlier question sitting in a later one's background would put room
+    /// words the exam chose into the moment the exam is scored on, so what a question is
+    /// answered against would depend on which questions came before it.
+    /// </remarks>
+    private Coded Surveying() =>
+        Coded.From(
+            [.. Enumerable.Reverse(_house!.Told).Select(Grouped.Of)],
+            Grouped.Of(_asking[0].Sentence),
+            things: [.. _order.Select(name => Grouped.Of(_met[name]))]);
+
+    /// <summary>One question of the survey, asked and settled.</summary>
+    /// <remarks>
+    /// <b>The last question drops the house, rather than the last step</b>, because
+    /// the transcript the exam is about is the house's. A machine that said something while
+    /// the exam was running said it about a walk that is over, so it is dropped with the
+    /// house rather than carried into the next one.
+    /// </remarks>
+    private Turn<Coded> Surveyed()
+    {
+        var turn = new Turn<Coded>
+        {
+            Seen = _shown ?? Surveying(),
+            Outcome = _asking[0].Outcome,
+        };
+
+        _asking.RemoveAt(0);
+
+        (_spoken, _shown) = (null, null);
+
+        if (_asking.Count == 0) _house = null;
 
         return turn;
     }

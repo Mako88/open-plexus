@@ -40,6 +40,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// <param name="people">How many are walking it.</param>
     /// <param name="knowing">Whether the walk is recited to the machine or walked by it.</param>
     /// <param name="seeing">Whether a look and a word are one code.</param>
+    /// <param name="asked">How many survey questions follow the walk.</param>
     /// <remarks>
     /// <b>One person is the cell every earlier reading was taken at</b>, and it is named at
     /// each call rather than defaulted. A fixture inheriting a dial it does not pin is how a
@@ -47,13 +48,15 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// </remarks>
     private static RoamingSettings World(
         int steps, int people,
-        Knowing knowing = Knowing.Recited, Seeing seeing = Seeing.Apart) =>
+        Knowing knowing = Knowing.Recited, Seeing seeing = Seeing.Apart,
+        int asked = 0) =>
         new()
         {
             Rooms = 6,
             Props = 4,
             People = people,
             Steps = steps,
+            Asked = asked,
             Withheld = knowing is Knowing.Explored ? 0 : 600,
             Examining = Examining.Where,
             Knowing = knowing,
@@ -3487,5 +3490,89 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + "one scope names a doing, so nothing here comes apart between doing a thing "
             + "and seeing it. Delete `Forced` and `Intervened` with a revival row naming a "
             + "world where a common cause makes them differ.");
+    }
+
+    /// <summary>
+    /// <b>A walked house is sat down and asked several verifiable things.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>What makes an exam of a walk</b>, and it is the difference between a machine that
+    /// was settled step by step and one that has to have kept something. The walk's own
+    /// settlement is a naming of what is in front of it; the survey's questions are about a
+    /// house it has finished walking and can no longer see.
+    /// </para>
+    /// <para>
+    /// <b>Three kinds, asserted as three rather than as which</b>, because a prediction
+    /// written into a wiring check fails two ways and reads the same. What matters is that no
+    /// single rule answers the whole exam.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_walked_house_is_surveyed_on_what_was_in_it()
+    {
+        const int Steps = 20;
+        const int Asked = 5;
+
+        var world = new Roaming(
+            World(Steps, people: 2, Knowing.Explored, asked: Asked), seed: 4);
+
+        var words = new Dictionary<Code, string>();
+
+        for (var one = 0; one < world.Vocabulary.Count; one++)
+            words[world.Meaning(one)!.Value] = world.Vocabulary[one];
+
+        var kinds = new HashSet<string>(StringComparer.Ordinal);
+        var walked = 0;
+        var asked = 0;
+        var exams = 0;
+
+        for (var round = 0; round < (Steps + Asked) * 20; round++)
+        {
+            var turn = world.Next();
+
+            // Every round settles under both halves. The walk names what is in front of the
+            // machine and the survey answers with a word of the house, so a round that
+            // settled on nothing would be a question with no answer.
+            Assert.NotNull(turn.Outcome);
+            Assert.NotNull(world.Meaning(turn.Outcome.Value));
+
+            if (turn.Seen.Asked is not { } question)
+            {
+                walked++;
+
+                continue;
+            }
+
+            asked++;
+
+            kinds.Add(words[question.Codes[0]]);
+
+            world.Do(0);
+
+            // Deaf while the exam runs, because the walk is over. The last question ends the
+            // exam and the house with it, so a word said after that one is the first word of
+            // the next walk rather than a word about a house that is gone.
+            if (asked % Asked == 0) exams++;
+            else Assert.False(world.Listening);
+        }
+
+        output.WriteLine(
+            $"{walked} steps walked, {asked} questions over {exams} exams, "
+            + $"kinds {string.Join(", ", kinds.Order(StringComparer.Ordinal))}");
+
+        // The exam is the length it was asked for, house after house, and the walk is the
+        // length it was asked for too. A survey that ran short would be a house nobody could
+        // be asked about reading as an exam that happened.
+        Assert.Equal(20, exams);
+        Assert.Equal(Asked * 20, asked);
+        Assert.Equal(Steps * 20, walked);
+
+        Assert.Equal(3, kinds.Count);
+
+        // And a recited walk has no survey, its own question already ending it. Two exams
+        // over one transcript would be two problems averaged into one number.
+        Assert.Throws<ArgumentException>(
+            () => new Roaming(World(Steps, people: 2, asked: 1), seed: 4));
     }
 }

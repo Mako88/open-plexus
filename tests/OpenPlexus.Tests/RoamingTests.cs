@@ -1031,22 +1031,27 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// already mints.
     /// </para>
     /// <para>
-    /// <b>And repair takes that scope before the binding can</b>, which is measured here and
-    /// was not expected. <c>Spanning</c>'s generate half is written on the argument that a
-    /// thing's scope is unreachable by repair: the code completing a thing is present whether
-    /// or not the thing is bound that way, so it separates nothing a table of co-occurrence
-    /// can see. A NAME breaks the argument. It arrives after the look and is absent until the
-    /// world says it, so it separates the misses from the hits perfectly and repair reaches
-    /// for it — 39 scopes hold a look and its word here, 37 of them minted by repair, and not
-    /// one is a binding.
+    /// <b>And repair reaches a look and its NAME before the binding can</b>, which is why a
+    /// thing here shows a shade as well. <c>Spanning</c>'s generate half is written on the
+    /// argument that a thing's scope is unreachable by repair: the code completing a thing is
+    /// present whether or not the thing is bound that way, so it separates nothing. A name
+    /// breaks that — it is absent until the world says it, so it separates the misses from
+    /// the hits perfectly and repair takes it. A shade does not, being shared between things
+    /// and present whenever any of them is in the room.
     /// </para>
     /// <para>
-    /// <b>So a walked house does not close <i>a thing is one thing</i></b>, and what would is
-    /// a thing showing MORE than one attribute at once. Two attributes that co-fire perfectly
-    /// are what repair cannot separate, which is the case <c>Worlds.Binding</c> was chosen on
-    /// — and the architecture's own line is that every input is an attribute of a thing
-    /// rather than the thing, so a seen thing showing exactly one code is the degenerate
-    /// case rather than the ordinary one.
+    /// <b>What stops the binding is the SURPRISE gate, measured over two arms.</b> Under the
+    /// shipped <c>Surprising.Unaccounted</c> a walked house holds 1,139 commitments, 35 of
+    /// them a look with its word, and not one binding; ungated it holds 3,591, 47 crossed,
+    /// and 55 bindings. Genesis runs only where nothing that fired accounted for what
+    /// arrived, and by the time a thing's codes have varied enough to be eligible the
+    /// population accounts for most outcomes — so the two gates shut the door between them.
+    /// </para>
+    /// <para>
+    /// <b>So <i>a thing is one thing</i> stays unreached on the spine</b>, and what it is
+    /// waiting on is a brain-side question rather than a world. Minting on every failure is
+    /// refuted and is not the answer; what is open is whether the eligibility a fresh code
+    /// has to earn should cost it the one window genesis leaves open.
     /// </para>
     /// </remarks>
     [Fact]
@@ -1086,10 +1091,10 @@ public sealed class RoamingTests(ITestOutputHelper output)
             output.WriteLine(
                 $"{seeing,-6}| widest moment {widest} sightings | most codes a thing {deepest}");
 
-            // Apart, a thing seen and then named holds its look and its word; shared, the two
-            // are one code and there is nothing to join. That is the arm, asserted as the
-            // DIFFERENCE rather than as either value.
-            Assert.Equal(seeing is Seeing.Apart ? 2 : 1, deepest);
+            // A thing shows its look and its shade, and its word once it has been named.
+            // Shared, the look IS the word and the three are two. That is the arm, asserted
+            // as the difference rather than as either value.
+            Assert.Equal(seeing is Seeing.Apart ? 3 : 2, deepest);
         }
 
         // And a house that is walked holds nothing back, because a question about a house the
@@ -1097,42 +1102,54 @@ public sealed class RoamingTests(ITestOutputHelper output)
         Assert.Empty(
             new Roaming(World(6, people: 2, Knowing.Explored), seed: 4).Withheld);
 
-        // And a look and the word for it do come to sit in ONE scope, which is the crossing
-        // being made rather than handed over. What mints it is the reading below.
-        var walked = new Roaming(World(20, people: 2, Knowing.Explored), seed: 4);
-        var brain = new Brain(new CommittingSettings { Capacity = 4_000 }, seed: 1);
+        // And a scope over ONE of the things is minted where genesis is allowed to run, which
+        // is the mechanism under `a thing is one thing` and the reading this world was built
+        // to take. Two arms, because the shipped gate is what decides it.
+        var bound = new Dictionary<Surprising, int>();
+        var crossed = new Dictionary<Surprising, int>();
 
-        var tally = new Bench(
-            new Watching<Coded>(
-                walked, new Joined(Joining.Bagged), acting: Chooses.From(_ => null)),
-            brain)
-            .Run(2_000, sweep: 500, target: 0.9, window: 500);
+        foreach (var surprising in new[] { Surprising.Unaccounted, Surprising.AnyFailure })
+        {
+            var walked = new Roaming(World(20, people: 2, Knowing.Explored), seed: 4);
 
-        var crossed = brain.Held.All
-            .Where(one => one.Scope.Length == 2
+            var brain = new Brain(
+                new CommittingSettings { Capacity = 4_000, Surprising = surprising },
+                seed: 1);
+
+            var tally = new Bench(
+                new Watching<Coded>(
+                    walked, new Joined(Joining.Bagged), acting: Chooses.From(_ => null)),
+                brain)
+                .Run(2_000, sweep: 500, target: 0.9, window: 500);
+
+            // A look and the word for it in one scope, which is the crossing being made
+            // rather than handed over. Forty-six is the modality this world's words ride on
+            // and forty-eight is what a thing looks like.
+            crossed[surprising] = brain.Held.All.Count(one => one.Scope.Length == 2
                 && one.Scope.Any(code => code.Modality == 48)
-                && one.Scope.Any(code => code.Modality == 46))
-            .ToList();
+                && one.Scope.Any(code => code.Modality == 46));
 
-        var born = crossed
-            .Select(one => brain.Held.Births[one.Identity])
-            .GroupBy(one => one)
-            .ToDictionary(one => one.Key, one => one.Count());
+            bound[surprising] = brain.Held.Births.Values.Count(one => one == Birth.Bound);
 
-        output.WriteLine(
-            $"walked | held {tally.Resident} | crossed {crossed.Count} | "
-            + $"bound {brain.Held.Births.Values.Count(one => one == Birth.Bound)} | "
-            + string.Join(", ", born.Select(one => $"{one.Key} {one.Value}")));
+            output.WriteLine(
+                $"{surprising,-12}| held {tally.Resident} | crossed {crossed[surprising]} "
+                + $"| bound {bound[surprising]}");
+        }
 
-        Assert.NotEmpty(crossed);
+        // A look and its word do come to sit in one scope under either gate, which is what
+        // says the crossing is made rather than handed over.
+        Assert.All(crossed.Values, one => Assert.True(one > 0));
 
-        // And not one of them is a binding, which is the reading. `Spanning`'s generate half
-        // is written on the argument that repair cannot reach a thing's scope -- the code
-        // completing a thing is present whether or not the thing is bound that way, so it
-        // separates nothing. A NAME breaks that: it arrives after the look and is absent
-        // until the world says it, so it separates the misses from the hits perfectly and
-        // repair takes it first. A thing of a look and a later name is a thing repair binds.
-        Assert.DoesNotContain(Birth.Bound, born.Keys);
+        // And the binding is the GATE's rather than the world's. `Spanning`'s generate half is
+        // written on the argument that repair cannot reach a thing's scope, and a thing here
+        // shows a look, a shade and a name — but genesis runs only where nothing that fired
+        // accounted for what arrived, and by the time a thing's codes have varied enough to
+        // be eligible the population accounts for most outcomes. Ungated it mints them.
+        Assert.True(bound[Surprising.AnyFailure] > bound[Surprising.Unaccounted],
+            $"{bound[Surprising.AnyFailure]} bindings ungated against "
+            + $"{bound[Surprising.Unaccounted]} under the shipped gate, so what stops the "
+            + "spine minting a scope over one of its things is not the surprise gate after "
+            + "all and the reading above needs re-taking");
     }
 
     /// <summary>

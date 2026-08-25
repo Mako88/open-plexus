@@ -243,6 +243,36 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// </remarks>
     private const byte Look = 48;
 
+    /// <summary>The modality a thing's SHADE rides on.</summary>
+    /// <remarks>
+    /// <b>Its own under both arms</b>, because the arm is about a look and a name rather than
+    /// about how much of a thing a sense reports. A shade that followed the sharing would
+    /// move two things at once.
+    /// </remarks>
+    private const byte Shade = 49;
+
+    /// <summary>The shades a thing can be, and several things are each of them.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A second way a thing shows through one sense</b>, which is the architecture's own
+    /// line: every input is an attribute of a thing and never the thing. A seen thing
+    /// reporting exactly one code is the degenerate case, and it is the one that made a
+    /// thing's scope reachable by repair — a look and a later NAME separate the misses from
+    /// the hits, so repair takes the binding before genesis can mint it.
+    /// </para>
+    /// <para>
+    /// <b>Shared between things on purpose.</b> A shade a thing had to itself would be a
+    /// second name for it, and a scope over the two would say nothing a scope over one did
+    /// not. Several things wearing one shade is what makes the pair a conjunction.
+    /// </para>
+    /// <para>
+    /// <b>And it carries no ontology.</b> A world reporting that a thing is a PERSON would be
+    /// handing over the category rung five is supposed to find; a shade is a reading off the
+    /// signal, and what it stands for is the machine's to work out.
+    /// </para>
+    /// </remarks>
+    private static readonly string[] Shades = ["pale", "dark", "warm", "cold"];
+
     /// <summary>What holds a thing that is lying on the floor.</summary>
     private const int Nobody = -1;
 
@@ -308,6 +338,9 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     private readonly Dictionary<Code, int> _naming = [];
     private readonly Dictionary<string, int> _rooms = new(StringComparer.Ordinal);
     private readonly Dictionary<string, int> _things = new(StringComparer.Ordinal);
+
+    /// <summary>What shade each thing shows, by where it sits among everything there is.</summary>
+    private readonly Dictionary<string, Code> _shades = new(StringComparer.Ordinal);
 
     /// <summary>The words that name a thing, as against the ones that name none.</summary>
     /// <remarks>
@@ -411,6 +444,14 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
 
             Heard(one);
         }
+
+        // Round the palette over everything there is, so a room, a prop and a person can wear
+        // one shade and no thing has one to itself.
+        var everything = Places.Concat(Things).Concat(Cast).ToList();
+
+        for (var thing = 0; thing < everything.Count; thing++)
+            _shades[everything[thing]] =
+                Kinds.Named(Shade, Shades[thing % Shades.Length]);
 
         for (var back = 0; back < settings.Withheld; back++) _kept.Add(Draw());
     }
@@ -928,11 +969,20 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
 
         foreach (var name in Before(walk))
         {
-            var code = Seen(name);
+            var look = Seen(name);
 
-            sighting.Add(code);
+            sighting.Add(look);
 
-            Meets(name, code);
+            Meets(name, look);
+
+            // And what else the sense says of it. A thing showing one code is a thing a
+            // scope has nothing to bind, so the second attribute is what makes the binding
+            // a binding rather than the root genesis already mints.
+            var shade = _shades[name];
+
+            sighting.Add(shade);
+
+            Meets(name, shade);
         }
 
         walk.Told.Add(sighting);

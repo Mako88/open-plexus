@@ -680,7 +680,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>What a conversation about the house is worth to the exam.</b>
+    /// <b>What asking the house before the exam is worth.</b>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -692,6 +692,19 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// <b>Read per kind, because only one of the three is asked about.</b> The chooser asks
     /// where each thing ended up, so <i>where</i> is the kind the conversation covers and the
     /// other two say whether a transcript with more room words in it helps or hurts.
+    /// </para>
+    /// <para>
+    /// <b>And the lift it reads is the reason the phase goes.</b> John's, and it corrects what
+    /// this reading was first written up as. An answer given here joins the transcript, so the
+    /// exam that follows asks a question whose answer is the most recent statement — the
+    /// three-fold rise on <i>where</i> is recency wearing a conversation's clothes, and it is
+    /// this repo's own <i>a corpus can contain its own answer</i> one seam over.
+    /// </para>
+    /// <para>
+    /// <b>What it says about the WALK is the finding worth keeping.</b> A machine that had
+    /// tracked where things ended up would not need telling again a round later, so the size
+    /// of the lift is the size of what the walk failed to teach. The conversation moves to
+    /// after the exam and its answerer becomes a person.
     /// </para>
     /// </remarks>
     [Fact]

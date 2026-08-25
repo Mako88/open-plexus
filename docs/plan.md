@@ -29,10 +29,16 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **First `Conversing` GOES and the spine is ONE world.** John's, and the walked house
-  already does all three: explore, converse, sit a survey. The terminal is built on
-  `Conversing`, so a terminal on the walked house comes with it, and one brain falls out
-  of there being one composition. Rung four and the forward store are BUILT.
+- **First a PERSON talks to a machine that has just explored somewhere.** John's, and it is
+  what an exam on facts cannot be. `Conversing` goes, the terminal moves to the walked house,
+  one brain falls out, and Claude drives it until John can.
+- **And the conversation comes AFTER the exam and is never the house.** Asking the house
+  first restates the answer, so the lift measures recency. John's. Rung four and the
+  forward store are BUILT.
+- **And the walk ends when the MACHINE is done**, not on a count somebody set.
+  `Commitment.Progress` is what sates, so `Steps` becomes a cap. John's. Fork **152**.
+- **And the exam asks a CONSEQUENCE, never only a fact.** A stated answer is one a script
+  holding the transcript reaches. John's. Fork **153**.
 - **Then a chooser that can ASK the exam's question.** Asking perfectly triples the walked
   half; the drive pays on the WALK and asks less than a coin. Forks **146**, **151**.
 - **Then the four dials read off the spine only** — `Budgeting`, `Feeling`, `Forking`,
@@ -299,6 +305,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — the POPULATION is where it grows: 19, 797 and 1,824 sound rules.
     - **OPEN** — the scope language is the CEILING: whatever a scope cannot say cannot be
       learnt. ILP's language-bias problem, what killed the field, and the ladder is finite.
+    - **OPEN** — every kind the exam asks was STATED, so a script holding the transcript
+      scores full marks. A consequence never said is the half no matching reaches. Fork
+      **153**.
     - **OPEN** — six bits is refused on POWER and eleven names the wrong thing; whether any
       world the naming reaches holds a nameable concept. Fork **34**.
     - **OPEN** — genesis does not root on a code that never varied, and an always-present
@@ -553,6 +562,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — the drive is a DESIRE TO UNDERSTAND, John's, built in rather than added.
       `Commitment.Progress` is the term and `Wanting.Learning` ranks what to SAY by it,
       and its asking falls away as it goes. Fork **146**.
+    - **OPEN** — nothing says when the machine has SEEN enough, so a walk ends on a count
+      the experimenter set. A drive that sates is what could say. Fork **152**.
     - **OPEN** — and no world here holds a common cause, so nothing says those claims are
       better.
     - **OPEN** — and nothing ranks a chooser there, a house having nothing to want. Twins

@@ -800,7 +800,14 @@ public sealed class DocsTests
     //
     // And back to 13,090 once the switches went: two items of `THE ORDER` became one, because
     // the world they were about is built and what is left of them is a deletion.
-    private const int Whole = 13_090;
+    //
+    // And 13,225 for four decisions John made in one sitting, which is the raise his own
+    // conditions allow: the existing items are reasonable, none of the four duplicates one,
+    // and this is still a doc you would load whole. A conversation is with a PERSON and comes
+    // after the exam, the walk ends when the machine is done rather than on a count, and the
+    // exam asks a consequence rather than only a fact. Two forks and their leaves came with
+    // them.
+    private const int Whole = 13_225;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

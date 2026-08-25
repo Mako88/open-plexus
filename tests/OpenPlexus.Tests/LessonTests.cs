@@ -29,7 +29,8 @@ public sealed class LessonTests(ITestOutputHelper output)
         Rooting rooting = Rooting.Singly, Crediting crediting = Crediting.Nothing,
         Replying replying = Replying.Word, Admitting admitting = Admitting.Anything,
         Joining joining = Joining.Bagged, Deciding deciding = Deciding.Grounded,
-        Supposing supposing = Supposing.Thinly, Spanning spanning = Spanning.Thing)
+        Supposing supposing = Supposing.Thinly, Spanning spanning = Spanning.Thing,
+        Action<int>? parts = null)
     {
         var tutor = new Tutor(
             lesson, TextWriter.Null, passes, tellings, revising, replying: replying);
@@ -54,7 +55,7 @@ public sealed class LessonTests(ITestOutputHelper output)
 
         // Named, because the front end is the next arm this file will want and a bench holding
         // it inline is a wiring nobody can vary.
-        var front = new Joined(joining);
+        var front = new ExercisedTests.Noted(new Joined(joining));
 
         var watching = new Watching<Coded>(
             world, front,
@@ -67,6 +68,12 @@ public sealed class LessonTests(ITestOutputHelper output)
             : tutor.Moments;
 
         var tally = new Bench(watching, brain).Run(rounds, sweep: 200, target: 0.9, window: 50);
+
+        // The most things the front end put in a moment, off the stream the SCORE came from
+        // and never a second one. A parts count taken over a lesson with no learner speaking
+        // is a different world -- the machine's own utterances are moments too, and a reading
+        // that missed them called this world one-part-a-moment when it is not.
+        parts?.Invoke(front.Parts);
 
         return (tally, tutor, world, brain);
     }
@@ -127,27 +134,6 @@ public sealed class LessonTests(ITestOutputHelper output)
             Carrying = Carrying.Never,
             Asserting = Asserting.Everything,
         }));
-    }
-
-    /// <summary>How many things the front end puts in each moment of a lesson.</summary>
-    /// <param name="lesson">What is told.</param>
-    /// <param name="tellings">How many times.</param>
-    /// <remarks>
-    /// <b>No learner in it</b>, for <c>Streamed</c>'s reason: what a front end says about a
-    /// moment's shape is a fact about the world and the translation, and a population would
-    /// only make it slower to read.
-    /// </remarks>
-    private static List<int> Parted(Lesson lesson, int tellings)
-    {
-        var (tutor, world) = Telling(lesson, tellings);
-
-        var front = new Joined(Joining.Bagged);
-        var counted = new List<int>();
-
-        for (var round = 0; round < tutor.Moments * tutor.Longest; round++)
-            counted.Add(front.Bind(world.Next().Seen)?.Count ?? 0);
-
-        return counted;
     }
 
     /// <summary>The join between what a chooser decided and how this world numbers its doings.</summary>
@@ -781,25 +767,25 @@ public sealed class LessonTests(ITestOutputHelper output)
     /// free here.
     /// </para>
     /// <para>
-    /// <b>This world puts ONE thing in every moment</b>, so there was nothing to confine.
-    /// Under <c>Asserting.Everything</c> a sentence arrives a word a moment, and a moment of
-    /// one word is a moment of one part — most 1 over the whole lesson, none over one. Every
-    /// cell of the grid is 0.750 right and 368 resident, to the digit, at both dial values and
-    /// all three seeds, because the two arms are the same run.
+    /// <b>The dial bites here and the exam does not move</b>: every run reaches a moment of two
+    /// parts, and all twelve cells read 0.750 at both dial values, both halves and all three
+    /// seeds. So the TEST half — refusing a scope that spans two — costs this lesson nothing
+    /// at this telling count.
     /// </para>
     /// <para>
-    /// <b>So the architecture entry is reached by the walk alone.</b> <i>A thing is ONE
-    /// thing</i> asks whether two of a kind are sayable at once, and the world where that
-    /// matters most cannot say it: a question's actor and a statement's actor are never in one
-    /// moment to be told apart. That is evidence for fork 147 rather than a dial to turn — one
-    /// spine world explores and converses, so a moment holds a scene and an utterance
-    /// together.
+    /// <b>The GENERATE half is why this file went red.</b>
+    /// <c>Population.Things</c> minted a scope over each part whatever <c>Rooting</c> said, so
+    /// a machine set to mint narrowly was handed the wide root through the other dial and five
+    /// readings here lost their comparison. It is gated on <c>Rooting.Wholly</c> now. This
+    /// grid is the test half read on its own.
     /// </para>
     /// <para>
-    /// <b>And the vacuity is asserted rather than noted</b>, which is what stops this reading
-    /// green forever. The parts count and the identity of the two arms are both checked, so
-    /// the day this world reports two things the comparison stops being vacuous and this fact
-    /// goes red to say the score line now means something.
+    /// <b>And the parts are counted off the stream the score came from</b>, which a first
+    /// version of this got wrong. Counted over a lesson with no learner speaking the world
+    /// reads one part a moment and the null result reads as a dial that could not fire; the
+    /// machine's own utterances are moments too, and with them in it reaches two. A null
+    /// result and an inert mechanism are the same table, so which one this is has to be
+    /// measured rather than assumed — and it was assumed once already.
     /// </para>
     /// </remarks>
     [Fact]
@@ -816,15 +802,10 @@ public sealed class LessonTests(ITestOutputHelper output)
         var stated = chained with { Exam = [.. chained.Exam.Take(half)] };
         var implied = chained with { Exam = [.. chained.Exam.Skip(half)] };
 
-        // How many things the front end puts in a moment of this world, taken before any
-        // learner runs. Two runs that read alike because the dial changed nothing and two that
-        // read alike because it could not fire are the same table, and this is what tells them
-        // apart -- the reading the walk's grid already prints and this one owed.
-        var parts = Parted(implied, Many);
-
-        output.WriteLine(
-            $"parts a moment | most {parts.Max()} "
-            + $"| over one {parts.Count(one => one > 1) / (double)parts.Count:F3}");
+        // Two runs that read alike because the dial changed nothing and two that read alike
+        // because it could not fire are the same table, so the parts are counted beside the
+        // scores -- off the same stream, which is the half a first version of this got wrong.
+        var parts = new List<int>();
 
         var scores = new Dictionary<(Spanning Spanning, bool Implied), List<double>>();
 
@@ -836,7 +817,7 @@ public sealed class LessonTests(ITestOutputHelper output)
                         told, Carrying.Never, seed, passes: 1,
                         asserting: Asserting.Everything, tellings: Many,
                         rooting: Rooting.Wholly, crediting: Crediting.Birth,
-                        spanning: spanning);
+                        spanning: spanning, parts: parts.Add);
 
                     var right = Right(ran.Tutor, 0);
 
@@ -855,6 +836,12 @@ public sealed class LessonTests(ITestOutputHelper output)
                 $"{spanning,-9}| {(hidden ? "implied" : "stated ")} | worst {taken.Min():F3} "
                 + $"| best {taken.Max():F3}");
 
+        // The most any one moment held, per run, so the column is twelve numbers rather than
+        // one. A run whose largest moment held one part exercised nothing.
+        output.WriteLine(
+            $"parts a moment | most {parts.Max()} | least of the run maxima {parts.Min()} "
+            + $"| runs holding two {parts.Count(one => one > 1)} of {parts.Count}");
+
         var confined = scores[(Spanning.Thing, true)];
         var free = scores[(Spanning.Anything, true)];
 
@@ -868,15 +855,13 @@ public sealed class LessonTests(ITestOutputHelper output)
             + "is the wrong grain of THING for a conversation and the default is costing the "
             + "target world the rung it is waiting on");
 
-        // And why the line above says nothing yet, asserted so it cannot read as a verdict. A
-        // moment of one part cannot span two, so the dial is inert and the two arms are one
-        // run -- which a score alone reports exactly as it reports a dial that is free.
-        Assert.True(parts.Max() == 1,
-            $"this world now puts {parts.Max()} things in a moment where it put one, so the "
-            + "grid above has stopped being two copies of one run and its comparison means "
-            + "something for the first time. Read it, and take this assertion off");
-
-        Assert.Equal(free, confined);
+        // And the dial had something to bite on, asserted so a null result cannot be read as
+        // one. A run whose every moment held one part could not have exercised the mechanism
+        // at all, and a score reports that exactly as it reports a dial that is free.
+        Assert.True(parts.Max() > 1,
+            $"the front end put at most {parts.Max()} thing(s) in any moment of this world, so "
+            + "confining a scope to one of them constrained nothing and the grid above is two "
+            + "copies of one run rather than a comparison");
     }
 
     /// <summary>

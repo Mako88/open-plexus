@@ -35,9 +35,8 @@ that is finished LEAVES, so this is only ever what is still to do.
   it ends the spine running two brains by there being one world. Fork **147**.
 - **ONE brain across the spine**, `Crediting` and `Admitting` parting the two worlds. It is
   the red set, and fork **147** closes it by there being one world.
-- **Then a CONVERSATION whose moment holds two things**, `Asserting.Everything` putting one
-  word in each, so the world that most needs two of a kind cannot say it and the walk reaches
-  that entry alone. `LessonTests`.
+- **Then a THING that is not an utterance**, both text worlds calling a statement a part so
+  the grouping says what the signal is shaped like rather than what is in it. Fork **142**.
 - **Then a mechanism reached only by an INSTRUMENT going red**, John's, `DrivenTests` being
   satisfied by any world at all. Two have now been caught by hand and neither by a guard.
 - **Then a regime with COMPANY and a population**, the conversation having neither together: a

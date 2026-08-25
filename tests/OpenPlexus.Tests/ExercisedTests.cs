@@ -124,7 +124,7 @@ public sealed class ExercisedTests
     /// crossed the seam, which a population cannot say: a code the front end emitted and
     /// nothing ever scoped is invisible from the other end.
     /// </remarks>
-    private sealed class Noted(IQuantizer<Coded> inner) : IQuantizer<Coded>
+    internal sealed class Noted(IQuantizer<Coded> inner) : IQuantizer<Coded>
     {
         /// <summary>Which modalities were emitted.</summary>
         public HashSet<byte> Emitted { get; } = [];

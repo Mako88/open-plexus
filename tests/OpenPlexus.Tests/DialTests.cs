@@ -809,30 +809,7 @@ public sealed class DialTests
         {
             if (Waiting.ContainsKey(name) || Waiting.ContainsKey(kind.Name)) continue;
 
-            var arms = Enum.GetNames(kind);
-            var seen = new HashSet<string>(StringComparer.Ordinal);
-
-            foreach (var path in Directory.GetFiles(
-                Path.Combine(Tree.Repo(), "tests", "OpenPlexus.Tests"), "*.cs"))
-            {
-                if (Path.GetFileName(path) == "DialTests.cs") continue;
-
-                var source = File.ReadAllText(path);
-
-                // A file that never names the dial says nothing about it, whatever worlds it
-                // builds. Both forms count: selecting an arm by name, and assigning the
-                // property in a settings initialiser.
-                if (!arms.Any(arm => source.Contains(
-                        $"{kind.Name}.{arm}", StringComparison.Ordinal))
-                    && !System.Text.RegularExpressions.Regex.IsMatch(
-                        source, $@"\b{name}\s*[=:]"))
-                    continue;
-
-                foreach (var world in Worlds)
-                    if (System.Text.RegularExpressions.Regex.IsMatch(
-                            source, $@"\bnew {world}\s*[({{]|\bFixture\.{world}\b|\b{world}Settings\b|\b{world}Run\b"))
-                        seen.Add(world);
-            }
+            var seen = Measured(name, kind);
 
             if (seen.Count < 2) thin.Add($"{name} ({seen.Count})");
         }
@@ -844,6 +821,84 @@ public sealed class DialTests
             + "wants. A second world, a deletion with a revival row, or an entry in "
             + "`Waiting` saying what it is waiting for are all good answers");
     }
+
+    /// <summary>Which worlds a test naming this dial builds.</summary>
+    /// <param name="name">The dial's own name, as a settings property.</param>
+    /// <param name="kind">The enum its arms are.</param>
+    /// <remarks>
+    /// <b>What a test CONSTRUCTS is the fact</b>, which is the line the two-world bar stands
+    /// on and the reason its first version was wrong. Extracted because a second reader
+    /// arrived, and two walks that drifted apart would disagree about what a dial is measured
+    /// on while each read as a coverage check.
+    /// </remarks>
+    private static HashSet<string> Measured(string name, Type kind)
+    {
+        var arms = Enum.GetNames(kind);
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var path in Directory.GetFiles(
+            Path.Combine(Tree.Repo(), "tests", "OpenPlexus.Tests"), "*.cs"))
+        {
+            if (Path.GetFileName(path) == "DialTests.cs") continue;
+
+            var source = File.ReadAllText(path);
+
+            // A file that never names the dial says nothing about it, whatever worlds it
+            // builds. Both forms count: selecting an arm by name, and assigning the
+            // property in a settings initialiser.
+            if (!arms.Any(arm => source.Contains(
+                    $"{kind.Name}.{arm}", StringComparison.Ordinal))
+                && !System.Text.RegularExpressions.Regex.IsMatch(
+                    source, $@"\b{name}\s*[=:]"))
+                continue;
+
+            foreach (var world in Worlds)
+                if (System.Text.RegularExpressions.Regex.IsMatch(
+                        source, $@"\bnew {world}\s*[({{]|\bFixture\.{world}\b|\b{world}Settings\b|\b{world}Run\b"))
+                    seen.Add(world);
+        }
+
+        return seen;
+    }
+
+    /// <summary>The two worlds a score is allowed to be ABOUT.</summary>
+    /// <remarks>
+    /// <b>John's, and the line every other reading is measured against.</b>
+    /// <c>Roaming</c> and the conversation are meant to be a microcosm of the real world;
+    /// every other world answers a question about a mechanism and is never the objective.
+    /// </remarks>
+    private static readonly string[] Spine = ["Roaming", "Conversing"];
+
+    /// <summary>Dials no test that builds a SPINE world names, in name order.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>John's rule, computed</b>: a mechanism reached only by an INSTRUMENT goes red. A
+    /// dial can be built, given two arms, measured across six worlds and never once turned
+    /// on a world whose score is what the machine is worth — and
+    /// <see cref="Every_arm_is_measured_on_at_least_two_worlds"/> passes it the whole time,
+    /// because two instruments are two worlds.
+    /// </para>
+    /// <para>
+    /// <b>The same proxy as the bar above and no better one</b>: which worlds the file
+    /// naming the dial constructs. It can be satisfied by naming a dial beside a spine world
+    /// without measuring it, which is a fault this cannot see and a reader can. What it
+    /// catches is the case that has twice reached the default here — a dial whose every
+    /// reading was taken somewhere the answer does not count.
+    /// </para>
+    /// <para>
+    /// <b>Asserted in <see cref="OutstandingTests"/> rather than here</b>, because it is red
+    /// on purpose and a deliberate red among the guards makes a new failure unreadable.
+    /// </para>
+    /// </remarks>
+    internal static IReadOnlyList<string> OffTheSpine() =>
+    [
+        .. Arms()
+            .Where(one => !Waiting.ContainsKey(one.Name) && !Waiting.ContainsKey(one.Kind.Name))
+            .Where(one => !Measured(one.Name, one.Kind).Overlaps(Spine))
+            .Select(one => one.Name)
+            .Distinct(StringComparer.Ordinal)
+            .Order(StringComparer.Ordinal),
+    ];
 
     /// <summary>Every world this repo has, by name, for the check above.</summary>
     private static readonly HashSet<string> Worlds =

@@ -38,8 +38,8 @@ that is finished LEAVES, so this is only ever what is still to do.
   loses an architecture entry to a bar its where arm ignores. `RoamingTests`.
 - **Then a THING that is not an utterance**, both text worlds calling a statement a part so
   the grouping says what the signal is shaped like rather than what is in it. Fork **148**.
-- **Then a mechanism reached only by an INSTRUMENT going red**, John's, `DrivenTests` being
-  satisfied by any world. Two were caught by hand and neither by a guard.
+- **Five dials measured off the spine only** — `Budgeting`, `Feeling`, `Forking`,
+  `Subsuming`, `Surprising`. Each closes by a target-world reading, a deletion, or `Waiting`.
 - **Then a regime with COMPANY and a population**, the conversation having neither together: a
   moment of one word derives no vocabulary and a moment carrying a story roots genesis on
   nothing, no arm a middle. Fork **120**, priced. `LessonTests`.

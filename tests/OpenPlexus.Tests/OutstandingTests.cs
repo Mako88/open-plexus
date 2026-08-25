@@ -508,6 +508,56 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// <b>Every dial is measured on a world whose score counts.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>John's, and it is THE ORDER's third item made computable.</b> A mechanism reached
+    /// only by an INSTRUMENT goes red. <see cref="DrivenTests"/> is satisfied by any world at
+    /// all and <c>DialTests.Every_arm_is_measured_on_at_least_two_worlds</c> by any two, so a
+    /// dial can be built, given two arms, measured across six worlds and never once turned on
+    /// a world whose score is what the machine is worth.
+    /// </para>
+    /// <para>
+    /// <b>It has reached the default twice, both caught by hand.</b> <c>Spanning</c> shipped
+    /// on with no text front end able to fill the channel it reads, and <c>Departing</c>
+    /// shipped off with no spine composition passing it. Neither a guard nor a reading said
+    /// so; a session reading the code did, months apart.
+    /// </para>
+    /// <para>
+    /// <b>Five today, and the list is the work.</b> <c>Budgeting</c>, <c>Feeling</c>,
+    /// <c>Forking</c>, <c>Subsuming</c> and <c>Surprising</c>. Each closes by a reading on
+    /// <c>Roaming</c> or the conversation, by a deletion with a revival row, or by an entry in
+    /// <c>DialTests.Waiting</c> saying what it is waiting for — which is the same three
+    /// answers the two-world bar takes.
+    /// </para>
+    /// <para>
+    /// <b>And the proxy is the two-world bar's own</b>, which is what keeps the two readable
+    /// against each other. It asks which worlds the file naming a dial constructs, so it can
+    /// be satisfied by a dial named beside a spine world and not measured on it. That is a
+    /// fault a reader catches and this cannot, and it is written down rather than left to be
+    /// found.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Every_dial_is_measured_on_a_world_whose_score_counts()
+    {
+        var adrift = DialTests.OffTheSpine();
+
+        output.WriteLine(
+            adrift.Count == 0
+                ? "every dial is named by a test that builds a spine world"
+                : $"{adrift.Count} off the spine: {string.Join(", ", adrift)}");
+
+        Assert.True(adrift.Count == 0,
+            $"{adrift.Count} dial(s) that no test building a SPINE world names: "
+            + string.Join(", ", adrift)
+            + ". Every reading behind each was taken where a score answers a question about a "
+            + "mechanism rather than saying what the machine is worth. This test is red on "
+            + "purpose and closes on those readings, not on this file.");
+    }
+
+    /// <summary>
     /// <b>The spine runs ONE brain.</b>
     /// </summary>
     /// <remarks>

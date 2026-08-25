@@ -1067,14 +1067,19 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// counts what was built, and both are printed here.
     /// </para>
     /// <para>
-    /// <b>And no binding can earn its place here</b>, which is a fact about
-    /// the WORLD rather than about a gate. A look is <c>Kinds.Named(Look, name)</c>, so it
-    /// identifies its thing outright and no second attribute can add to it. <c>Shades</c>'
-    /// own comment argues that sharing a shade between things is what makes the pair a
-    /// conjunction; sharing is what stops a shade carrying a rule alone, and it does not stop
-    /// the look carrying one. What a binding wants is two things OF A KIND — one look, two
-    /// shades — which is the architecture line this entry sits under, and the house has none.
-    /// Fork <b>149</b>.
+    /// <b>And what a binding wanted was two things OF A KIND</b>, which is the architecture
+    /// line this entry sits under. A look used to name its own thing, so it identified it
+    /// outright and no second attribute could add to it — both parts have to be ambiguous
+    /// before the pair can say what neither does. <see cref="Roaming"/>'s looks are now four
+    /// over eight props, adjacent so the shades differ, and the binding survives.
+    /// </para>
+    /// <para>
+    /// <b>Measured on three seeds against the house that had none.</b> Surviving bindings go
+    /// 0, 0, 0 to 2, 3, 4 under the shipped gate and 55, 43, 31 to 70, 55, 47 ungated, for a
+    /// score of 0.175, 0.205, 0.205 against 0.200, 0.210, 0.210 — so posing the requirement
+    /// costs the walk nothing and is what lets a scope over one thing hold its seat. The
+    /// control is the same house with a look per thing, and it is a reading rather than a
+    /// live arm: no world should fail to pose a line of THE ARCHITECTURE. Fork <b>149</b>.
     /// </para>
     /// </remarks>
     [Fact]
@@ -1146,9 +1151,10 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 brain)
                 .Run(2_000, sweep: 500, target: 0.9, window: 500);
 
-            // A look and the word for it in one scope, which is the crossing being made
-            // rather than handed over. Forty-six is the modality this world's words ride on
-            // and forty-eight is what a thing looks like.
+            // A look and a word in one scope, which is the crossing being made rather than
+            // handed over. Forty-six is the modality this world's words ride on and
+            // forty-eight is what a thing looks like -- and a look is its KIND's now, so
+            // this counts a crossing from a look several things share to one thing's name.
             crossed[surprising] = brain.Held.All.Count(one => one.Scope.Length == 2
                 && one.Scope.Any(code => code.Modality == 48)
                 && one.Scope.Any(code => code.Modality == 46));
@@ -1177,12 +1183,18 @@ public sealed class RoamingTests(ITestOutputHelper output)
             "the shipped gate minted no scope over one thing, so `Spanning`'s generate half "
             + "does not run on the spine and the reading above needs re-taking");
 
-        // And subsumption takes them, under both gates and hardest under the shipped one.
-        // Genesis mints a thing's scope in the same call as the roots it is built from, so
-        // the narrower rule is weighed against its own parent and says nothing extra -- a
-        // shade being determined by its thing, the pair fires exactly where the look does.
-        // This is the constraint working rather than failing, and it is the reason a held
-        // count read nought while the mechanism was running.
+        // And one HOLDS ITS SEAT under the shipped gate, which is the capability the
+        // architecture line asks for and what a look per thing made impossible: subsumption
+        // weighs a binding against the roots genesis minted it beside, and a pair that fires
+        // exactly where its own look fires says nothing extra and correctly goes.
+        Assert.True(held[Surprising.Unaccounted] > 0,
+            $"{bound[Surprising.Unaccounted]} bindings minted and none survived, so a scope "
+            + "over one thing still says nothing its parts do not and two things of a kind "
+            + "are not what a binding needed");
+
+        // And subsumption still takes most of them, which is the constraint working. A run
+        // where it stopped deleting them would be the population drifting to a rule per
+        // instance, which is the memorising this design is otherwise careful about.
         Assert.All(bound.Keys, one => Assert.True(held[one] < bound[one],
             $"{one}: {held[one]} of {bound[one]} bindings survived, so subsumption has "
             + "stopped deleting them and what a held count means here has changed"));
@@ -1212,6 +1224,13 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// <b>One arm rather than the grid</b>, and it is the leading one. What is being separated
     /// is the dial and not the translation, so a second translation would move two things at
     /// once for no extra reading.
+    /// </para>
+    /// <para>
+    /// <b>And the reading below is OWED AGAIN</b>, taken on a house where every look named
+    /// its own thing. A scope's codes were never ambiguous about which thing they belonged
+    /// to, so the match half had nothing to confine for the same reason the generate half had
+    /// nothing to mint. <see cref="Roaming"/> now holds two things of a kind and this is
+    /// re-taken before it means anything.
     /// </para>
     /// <para>
     /// <b>Measured over three seeds</b>: 0.589, 0.605 and 0.523 confined against 0.589, 0.620

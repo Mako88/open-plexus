@@ -31,10 +31,9 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The spine becomes ONE world and the items below build it.** John's. Rung four
   and the forward store are BUILT and neither is on this list.
-- **First, TWO THINGS OF A KIND in the walked house**, the architecture's own words. A look
-  is named from its thing, so nothing can add to it and subsumption takes every binding
-  genesis mints. One look and two shades is where a pair says what neither part does. Fork
-  **149**.
+- **First, what confining a scope to one THING costs now.** `Spanning`'s match half was
+  inert for its generate half's reason: no scope's codes were ambiguous about which thing
+  they belonged to. Fork **150**.
 - **The DRIVE**, rankable at last, there being choices worth ranking. Fork **146**.
 - **Then the SURVEY and its control**, another house's machine sitting this one's exam. Its
   ceiling is taken before a learner is wired to it.
@@ -443,7 +442,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
   - A thing is one thing
     - **NOW** — the front end reports THINGS rather than one thing a code, so a code in two
       of them is in two things and a moment carries two of a kind. `Spanning` intersects
-      them, and what it costs the walk is owed again. Fork **142**.
+      them. Fork **142**.
+    - **OPEN** — what confining a scope to one thing costs, owed again: the reading behind
+      the default predates two things of a kind. Fork **150**.
     - **OPEN** — minting an INDIVIDUAL is unbuilt and a bundle recurring in the successor
       moment is refuted below, being co-occurrence read twice. What is left is persistence of
       a PART, or confidence over repetition. Fork **93**.

@@ -263,7 +263,13 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// <para>
     /// <b>Shared between things on purpose.</b> A shade a thing had to itself would be a
     /// second name for it, and a scope over the two would say nothing a scope over one did
-    /// not. Several things wearing one shade is what makes the pair a conjunction.
+    /// not.
+    /// </para>
+    /// <para>
+    /// <b>And sharing a shade is HALF of that</b>, which this said was all of it. Sharing stops a shade carrying a rule alone; it does nothing about
+    /// the look, and a look that named its own thing carried one perfectly well — so the pair
+    /// said nothing extra and subsumption deleted every binding genesis minted.
+    /// <see cref="Looks"/> is the other half.
     /// </para>
     /// <para>
     /// <b>And it carries no ontology.</b> A world reporting that a thing is a PERSON would be
@@ -272,6 +278,41 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// </para>
     /// </remarks>
     private static readonly string[] Shades = ["pale", "dark", "warm", "cold"];
+
+    /// <summary>The looks a thing can have, and two things are each of them.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Two things OF A KIND, which is the architecture's own words.</b> A thing is one
+    /// thing, told from another of its kind in the same moment — and a house where every look
+    /// named its own thing never posed that. A look identified its thing outright, so no
+    /// second attribute could add to it: genesis minted a scope over one thing and
+    /// subsumption deleted every one for saying nothing extra, on three seeds of three.
+    /// </para>
+    /// <para>
+    /// <b>Sharing a look is what makes the pair a conjunction</b>, and a shade alone was
+    /// never going to. <see cref="Shades"/>' argument is half right: sharing a shade stops a
+    /// shade carrying a rule by itself, and it does not stop the look carrying one. Both
+    /// parts have to be ambiguous before the pair can say what neither does.
+    /// </para>
+    /// <para>
+    /// <b>Paired adjacently so the shades differ.</b> A palette rounded over everything gives
+    /// consecutive things consecutive shades, so <c>prop / 2</c> puts two things of a kind in
+    /// different shades and <c>prop % 4</c> would put them in the same one — which is the
+    /// pairing that looks equivalent and mints nothing.
+    /// </para>
+    /// <para>
+    /// <b>And it carries no ontology</b>, on <see cref="Shades"/>' own terms. Round and flat
+    /// are readings off a signal; which things are round is this house's arbitrary fact, as
+    /// which are pale is, and what a look stands for is the machine's to work out.
+    /// </para>
+    /// <para>
+    /// <b>It hands over no more than a look per thing did.</b> A look rides its own modality
+    /// and never enters the answer vocabulary, so the alphabet and the marginal are the same
+    /// numbers on both sides, and <c>CeilingTests</c> reads 0.890 apart either way. An arm
+    /// may raise what the front end gives away and must never do it quietly.
+    /// </para>
+    /// </remarks>
+    private static readonly string[] Looks = ["round", "flat", "tall", "small"];
 
     /// <summary>What holds a thing that is lying on the floor.</summary>
     private const int Nobody = -1;
@@ -913,8 +954,30 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
 
     /// <summary>The code for what a thing LOOKS like.</summary>
     /// <param name="name">The thing.</param>
+    /// <remarks>
+    /// <b>Its KIND's under <see cref="Seeing.Apart"/> and its own under
+    /// <see cref="Seeing.Shared"/></b>, where the look IS the word. Sharing a look there
+    /// would give two things one name and shrink the answer alphabet, which is a different
+    /// world rather than the same one seen differently.
+    /// </remarks>
     private Code Seen(string name) =>
-        Kinds.Named(_settings.Seeing is Seeing.Shared ? Word : Look, name);
+        _settings.Seeing is Seeing.Shared
+            ? Kinds.Named(Word, name)
+            : Kinds.Named(Look, Alike(name));
+
+    /// <summary>What a thing looks like, which several things share.</summary>
+    /// <param name="name">The thing.</param>
+    /// <remarks>
+    /// <b>Props alone</b>, because two rooms of a kind are one room to a walker and a second
+    /// person who looks like the first is the individual this world has no mechanism for.
+    /// What is wanted is the smallest house that poses the architecture's line.
+    /// </remarks>
+    private static string Alike(string name)
+    {
+        var at = Array.IndexOf(Things, name);
+
+        return at < 0 ? name : Looks[at / 2 % Looks.Length];
+    }
 
     /// <summary>What the body can see from where it stands, the room first.</summary>
     /// <param name="walk">The house and where everything in it stands.</param>

@@ -29,14 +29,12 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **The spine becomes ONE world and the items build it.** John's: the machine explores the
-  house, converses about what it saw, then sits a survey. Rung four and the forward store are
-  BUILT and neither is on this list.
-- **First a chooser that can ASK the exam's question.** Asking perfectly triples the walked
+- **First `Conversing` GOES and the spine is ONE world.** John's, and the walked house
+  already does all three: explore, converse, sit a survey. The terminal is built on
+  `Conversing`, so a terminal on the walked house comes with it, and one brain falls out
+  of there being one composition. Rung four and the forward store are BUILT.
+- **Then a chooser that can ASK the exam's question.** Asking perfectly triples the walked
   half; the drive pays on the WALK and asks less than a coin. Forks **146**, **151**.
-- **Then `Conversing` GOES**, its half being the middle phase of the one world. The
-  terminal is built on it, so a terminal on the walked house comes with it.
-- **One brain falls out** of there being one composition.
 - **Then the four dials read off the spine only** — `Budgeting`, `Feeling`, `Forking`,
   `Subsuming`. Re-taken HERE: the world they want a reading on is the one being built.
 - **Then a regime with COMPANY and a population**, the conversation having neither together: a

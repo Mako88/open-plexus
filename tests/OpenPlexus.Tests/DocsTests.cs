@@ -797,7 +797,10 @@ public sealed class DocsTests
     // arm leaves behind, so the alternative to the words is a superstition -- the next session
     // reaching for a chooser that says a scope a word at a time with nothing to say it has
     // been run. A guard must not cost information.
-    private const int Whole = 13_160;
+    //
+    // And back to 13,090 once the switches went: two items of `THE ORDER` became one, because
+    // the world they were about is built and what is left of them is a deletion.
+    private const int Whole = 13_090;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

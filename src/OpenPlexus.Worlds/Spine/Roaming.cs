@@ -564,6 +564,34 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
     /// <summary>How many questions the machine put to the person.</summary>
     public long Questions { get; private set; }
 
+    /// <summary>Which room the body is standing in, or nothing where no house is open.</summary>
+    /// <remarks>
+    /// <b>An instrument's channel, on <see cref="Named"/>'s standing.</b> How much of a house
+    /// a chooser covered is a fact about the walk it took, and two arms that stood in
+    /// different numbers of rooms were examined about different things -- which no exam score
+    /// can say. Nothing that learns is ever shown this.
+    /// </remarks>
+    public Code? Standing => _house is null
+        ? null
+        : Kinds.Named(Word, Places[_house.Here[Body]]);
+
+    /// <summary>Rounds the machine's words made a command at all.</summary>
+    /// <remarks>
+    /// <b>An instrument's channel, on <see cref="Sat"/>'s standing.</b> A chooser that never
+    /// says a verb and a chooser that says one the world refuses are two different failures
+    /// and no score can tell them apart -- both read as a machine that stood still. Nothing
+    /// that learns is ever shown this.
+    /// </remarks>
+    public long Ordered { get; private set; }
+
+    /// <summary>Rounds one of those commands was possible and was carried out.</summary>
+    /// <remarks>
+    /// <b>The other half of <see cref="Ordered"/>.</b> A wish it could not grant spends the step
+    /// and moves nothing, so the gap between the two is how often the machine asked for
+    /// something the house could not do.
+    /// </remarks>
+    public long Did { get; private set; }
+
     /// <summary>How many capped steps went unwalked because the machine had had enough.</summary>
     /// <remarks>
     /// <b>An instrument's channel, on <see cref="Sat"/>'s standing.</b> A walk that ended
@@ -838,8 +866,17 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
 
         if (spoken is not null)
         {
-            if (Parse(spoken) is { } wanted && Possible(walk, who, wanted))
-                Done(walk, who, wanted);
+            if (Parse(spoken) is { } wanted)
+            {
+                Ordered++;
+
+                if (Possible(walk, who, wanted))
+                {
+                    Did++;
+
+                    Done(walk, who, wanted);
+                }
+            }
 
             return;
         }

@@ -274,14 +274,11 @@ internal sealed class Drives
             (best, wanted, weighed) = (doing, want, vote.Weight);
         }
 
-        if (best is null)
+        if (best is not null)
         {
-            Untold++;
-        }
-        else
-        {
-            Told++;
-
+            // Recorded before the refusal below, so `Sated` reads the same wants under
+            // both arms. An arm that stopped filling the window would read as a machine
+            // that never has enough, which is a second mechanism changed by accident.
             Wanted = wanted;
 
             if (wanted > 0.0) _rose = true;
@@ -290,6 +287,9 @@ internal sealed class Drives
 
             if (_lately.Count > _window) _lately.Dequeue();
         }
+
+        if (best is null) Untold++;
+        else Told++;
 
         var said = best ?? _untold();
 

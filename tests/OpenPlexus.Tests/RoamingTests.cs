@@ -85,13 +85,18 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// be in trouble about. Every advocated word is wanted equally, so what ranks them is the
     /// term rather than a preference over outcomes.
     /// </remarks>
-    private static Drives Wanting(Brain brain, Roaming house, Random draw) =>
+    /// <param name="arm">What it wants.</param>
+    private static Drives Wanting(
+        Brain brain,
+        Roaming house,
+        Random draw,
+        Wanting arm = Machines.Wanting.Learning) =>
         new(
             brain.Held,
             doing: house.Naming,
             wanting: (_, _) => 1.0,
             untold: () => draw.Next(house.Doings),
-            arm: Machines.Wanting.Learning);
+            arm: arm);
 
     /// <summary>One exam question counted against its kind, where the round was one.</summary>
     /// <param name="world">The house being sat.</param>
@@ -795,7 +800,34 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// what the drive is read on, and the person answering is what settles them.
     /// </para>
     /// <para>
-    /// <b>And the third arm says what it BELIEVES first.</b> <see cref="Answers"/> is a
+    /// <b>And the arm that says NOTHING is the control.</b> Every other row needs it. Saying
+    /// nothing is not standing still: the world draws the body's step where the machine
+    /// names none, so <c>declining</c> moves every round and speaks never. Without it a
+    /// chooser that walks badly and a chooser whose words leave the body waiting are the
+    /// same low score.
+    /// </para>
+    /// <para>
+    /// <b>And it WINS, which is the finding.</b> 0.337 saying nothing, against 0.250 under
+    /// the drive, 0.233 saying what it believes and 0.119 drawing uniformly — and the
+    /// silent arm is the one whose body moved most, because the world walks it. So moving
+    /// does not cost the exam and SPEAKING does: every word the machine says joins the
+    /// moment as a code that predicts nothing, and the more it says the worse it reads.
+    /// </para>
+    /// <para>
+    /// <b>And the exam is the same exam under every arm</b>, which is what makes that
+    /// readable. All four are asked about the same fourteen or fifteen distinct answers
+    /// across all six rooms, so no arm was examined on a narrower house than another —
+    /// which was the first explanation and it is refuted.
+    /// </para>
+    /// <para>
+    /// <b>A cost to record rather than grounds to stop acting.</b> The silent arm obtains
+    /// nothing: it never asks, so it never has a settlement it went and got, and it cannot
+    /// be talked to at all. What the number prices is the acting channel, and every reading
+    /// on this world that compared two choosers without it read a cost as a difference
+    /// between them.
+    /// </para>
+    /// <para>
+    /// <b>And the fourth arm says what it BELIEVES first.</b> <see cref="Answers"/> is a
     /// requirement rather than an arm — a machine nobody can ask anything is not something
     /// a person can talk to — so what this reads is its COST rather than whether it wins.
     /// The belief and the drive answer different questions and there is no scale on which
@@ -853,9 +885,23 @@ public sealed class RoamingTests(ITestOutputHelper output)
         var perSeed = new Dictionary<(string Arm, int Seed), double>();
         var advocated = 0L;
 
+        // Commands the machine managed and commands the house carried out, per arm. The
+        // column exists because a chooser that never says a verb reads exactly like one
+        // that explores badly: both are a machine standing in one room, and the exam
+        // cannot tell them apart.
+        var commanded = new Dictionary<string, (long Ordered, long Did)>(StringComparer.Ordinal);
+
+        // How many DISTINCT things each arm was examined about, and how many rooms it
+        // stood in. A question is only asked about a thing the machine has been given a
+        // word for, so an arm that walked further is examined on a wider set it knows less
+        // well -- which would make the exam column a comparison between two exams as much
+        // as between two choosers.
+        var about = new Dictionary<string, HashSet<Code>>(StringComparer.Ordinal);
+        var stood = new Dictionary<string, HashSet<Code>>(StringComparer.Ordinal);
+
         var believed = 0L;
 
-        foreach (var arm in new[] { "uniform", "learning", "believing" })
+        foreach (var arm in new[] { "declining", "uniform", "learning", "believing" })
         foreach (var seed in Enumerable.Range(1, Seeds))
         {
             var rounds = Houses * (Steps + Chatting + Asked);
@@ -895,6 +941,12 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 {
                     "learning" => Chooses.From(drives.Choose, drives.Cleared),
                     "believing" => answers,
+
+                    // Saying nothing is not standing still: the world draws the body's step
+                    // where the machine names none, so this arm MOVES every round and says
+                    // nothing. It is what separates a chooser that walks badly from one whose
+                    // words leave the body waiting.
+                    "declining" => Chooses.From(_ => null),
                     _ => Chooses.From(_ => draw.Next(house.Doings)),
                 });
 
@@ -926,6 +978,23 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 }
 
                 Marked(world, words, asked, right, loop.Right > was);
+
+                // What the exam was ABOUT, which is the answer it was scored against, and
+                // which room the body was standing in. Both on `Roaming.Named`'s standing
+                // and nothing that learns is shown either.
+                if (world.Asking is not null && pushed.Followed is { } answer)
+                {
+                    if (!about.TryGetValue(arm, out var seen)) about[arm] = seen = [];
+
+                    seen.Add(answer);
+                }
+
+                if (house.Standing is { } room)
+                {
+                    if (!stood.TryGetValue(arm, out var rooms)) stood[arm] = rooms = [];
+
+                    rooms.Add(room);
+                }
             }
 
             foreach (var kind in asked.Keys)
@@ -939,6 +1008,11 @@ public sealed class RoamingTests(ITestOutputHelper output)
             var before = questions.GetValueOrDefault(arm);
 
             questions[arm] = (before.Talked + talked, before.Spoke + spoke);
+
+            var ordered = commanded.GetValueOrDefault(arm);
+
+            commanded[arm] =
+                (ordered.Ordered + house.Ordered, ordered.Did + house.Did);
 
             // Per seed, so the direction can be COUNTED rather than read off a total one
             // seed could have carried on its own.
@@ -961,7 +1035,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
             if (arm == "believing") believed += answers.Said;
         }
 
-        foreach (var arm in new[] { "uniform", "learning", "believing" })
+        foreach (var arm in new[] { "declining", "uniform", "learning", "believing" })
         {
             var rows = scored.Where(one => one.Key.Arm == arm).ToList();
 
@@ -970,7 +1044,10 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
             output.WriteLine(
                 $"{Chatting,-8}{arm,-10}{"all",-6}{put,8}{hit,8}{hit / (double)put,9:F3}"
-                + $"   spoke {questions[arm].Spoke} of {questions[arm].Talked}");
+                + $"   spoke {questions[arm].Spoke} of {questions[arm].Talked}"
+                + $", commanded {commanded[arm].Ordered} and moved {commanded[arm].Did}"
+                + $", asked about {about.GetValueOrDefault(arm)?.Count ?? 0} distinct "
+                + $"answers across {stood.GetValueOrDefault(arm)?.Count ?? 0} rooms stood in");
         }
 
         var leads = Enumerable.Range(1, Seeds).Count(seed =>
@@ -993,8 +1070,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
         // Every house's exam was sat under every arm, whatever the walk before it looked
         // like. Which KINDS got asked is a fact about where the machine ended up walking and
-        // is not the same number under three choosers.
-        Assert.Equal(3, questions.Count);
+        // is not the same number under four choosers.
+        Assert.Equal(4, questions.Count);
 
         Assert.All(
             questions.Keys,
@@ -1014,6 +1091,17 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // And the conversation ran, or the asking column is about a phase that never
         // happened. Every house offers its rounds whether or not the machine takes them up.
         Assert.All(questions.Values, one => Assert.True(one.Talked > 0));
+
+        // Every arm walked SOMEWHERE of its own accord, or the column above is about a
+        // machine that stood in the room it was dropped in and the exam is scored on a
+        // house it watched rather than explored. Asserted per arm because the arms differ
+        // in exactly the thing that decides it -- which word gets said.
+        Assert.All(
+            commanded.Where(one => one.Key != "declining"),
+            one => Assert.True(one.Value.Did > 0,
+                $"the `{one.Key}` arm carried out no command at all across "
+                + $"{Houses * Seeds} houses, so the machine never once moved itself and "
+                + "every score under it is about a walk somebody else took"));
 
         // The belief was SAID, or the third arm is the second one under a second name and
         // every row of it is the drive's printed twice. A chooser that believed nothing

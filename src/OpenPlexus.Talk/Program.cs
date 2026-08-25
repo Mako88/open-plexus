@@ -152,6 +152,9 @@ internal static class Program
             $"rounds     : {tally.Rounds} of {rounds}, ended {world.Ended}, {world.Left} "
             + "capped steps left unwalked");
         Console.WriteLine(
+            $"walking    : it ordered {world.Ordered} commands and the house carried out "
+            + $"{world.Did}");
+        Console.WriteLine(
             $"talking    : {world.Questions} asked of you, {world.Answered} answered");
         Console.WriteLine(
             $"speaking   : it said what it believed {answering.Said} times, the drive named "

@@ -807,7 +807,14 @@ public sealed class DocsTests
     // after the exam, the walk ends when the machine is done rather than on a count, and the
     // exam asks a consequence rather than only a fact. Two forks and their leaves came with
     // them.
-    private const int Whole = 13_225;
+    //
+    // And 13,320 for one refutation row and the question it opened. `Wanting.Trying` is
+    // deleted and a row is what a deleted arm leaves behind; the item beside it is the
+    // reading that killed it, which is that a machine saying NOTHING beats every chooser on
+    // the exam while its body moves most. That inverts what a chooser is priced against, so
+    // no arm over what to say can be read until it is understood -- and an item nobody wrote
+    // down would have the next session reaching for a better chooser.
+    private const int Whole = 13_320;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

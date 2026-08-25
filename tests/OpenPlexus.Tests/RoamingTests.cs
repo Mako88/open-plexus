@@ -3861,31 +3861,33 @@ public sealed class RoamingTests(ITestOutputHelper output)
     [Fact]
     public async Task What_a_machine_that_wants_to_learn_asks_the_house()
     {
-        const int Houses = 40;
+        const int Houses = 30;
         const int Steps = 40;
         const int Asked = 6;
         const int Chatting = 6;
         const int Seeds = 3;
 
-        var rounds = Houses * (Steps + Chatting + Asked);
+        output.WriteLine(
+            $"{Houses} houses a seed over {Seeds} seeds, {Steps} steps and {Asked} asked");
 
         output.WriteLine(
-            $"{Houses} houses a seed over {Seeds} seeds, {Steps} steps, "
-            + $"{Chatting} spoken, {Asked} asked");
+            $"{"spoken",-8}{"wanting",-10}{"seed",-6}{"asked",8}{"right",8}{"score",9}");
 
-        output.WriteLine(
-            $"{"wanting",-10}{"seed",-8}{"asked",8}{"right",8}{"score",9}");
+        var scored =
+            new Dictionary<(int Chatting, string Arm, string Kind), (int Asked, int Right)>();
 
-        var scored = new Dictionary<(string Arm, string Kind), (int Asked, int Right)>();
-        var questions = new Dictionary<string, (int Talked, int Spoke)>(StringComparer.Ordinal);
-        var perSeed = new Dictionary<(string Arm, int Seed), double>();
+        var questions = new Dictionary<(int Chatting, string Arm), (int Talked, int Spoke)>();
+        var perSeed = new Dictionary<(int Chatting, string Arm, int Seed), double>();
         var advocated = 0L;
 
+        foreach (var chatting in new[] { 0, Chatting })
         foreach (var arm in new[] { "uniform", "learning" })
         foreach (var seed in Enumerable.Range(1, Seeds))
         {
+            var rounds = Houses * (Steps + chatting + Asked);
+
             var house = new Roaming(
-                World(Steps, people: 2, Knowing.Explored, asked: Asked, chatting: Chatting),
+                World(Steps, people: 2, Knowing.Explored, asked: Asked, chatting: chatting),
                 seed);
 
             var words = new Dictionary<Code, string>();
@@ -3955,25 +3957,26 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
             foreach (var kind in asked.Keys)
             {
-                var had = scored.GetValueOrDefault((arm, kind));
+                var had = scored.GetValueOrDefault((chatting, arm, kind));
 
-                scored[(arm, kind)] =
+                scored[(chatting, arm, kind)] =
                     (had.Asked + asked[kind], had.Right + right.GetValueOrDefault(kind));
             }
 
-            var before = questions.GetValueOrDefault(arm);
+            var before = questions.GetValueOrDefault((chatting, arm));
 
-            questions[arm] = (before.Talked + talked, before.Spoke + spoke);
+            questions[(chatting, arm)] = (before.Talked + talked, before.Spoke + spoke);
 
             // Per seed, so the direction can be COUNTED rather than read off a total one
             // seed could have carried on its own.
             var here = right.Values.Sum() / (double)asked.Values.Sum();
 
-            perSeed[(arm, seed)] = here;
+            perSeed[(chatting, arm, seed)] = here;
 
             output.WriteLine(
-                $"{arm,-10}{seed,-8}{asked.Values.Sum(),8}{right.Values.Sum(),8}{here,9:F3}"
-                + $"   spoke {spoke} of {talked}"
+                $"{chatting,-8}{arm,-10}{seed,-6}{asked.Values.Sum(),8}"
+                + $"{right.Values.Sum(),8}{here,9:F3}"
+                + (chatting == 0 ? string.Empty : $"   spoke {spoke} of {talked}")
                 + (arm == "learning"
                     ? $", drive named {drives.Told} and the draw {drives.Untold}"
                     : string.Empty));
@@ -3981,34 +3984,42 @@ public sealed class RoamingTests(ITestOutputHelper output)
             if (arm == "learning") advocated += drives.Told;
         }
 
-        foreach (var arm in new[] { "uniform", "learning" })
+        var leads = new Dictionary<int, int>();
+
+        foreach (var chatting in new[] { 0, Chatting })
         {
-            var rows = scored.Where(one => one.Key.Arm == arm).ToList();
-            var put = rows.Sum(one => one.Value.Asked);
-            var hit = rows.Sum(one => one.Value.Right);
+            foreach (var arm in new[] { "uniform", "learning" })
+            {
+                var rows = scored.Where(one => one.Key.Chatting == chatting
+                    && one.Key.Arm == arm).ToList();
+
+                var put = rows.Sum(one => one.Value.Asked);
+                var hit = rows.Sum(one => one.Value.Right);
+
+                output.WriteLine(
+                    $"{chatting,-8}{arm,-10}{"all",-6}{put,8}{hit,8}{hit / (double)put,9:F3}"
+                    + $"   spoke {questions[(chatting, arm)].Spoke} of "
+                    + $"{questions[(chatting, arm)].Talked}");
+            }
+
+            leads[chatting] = Enumerable.Range(1, Seeds).Count(seed =>
+                perSeed[(chatting, "learning", seed)] > perSeed[(chatting, "uniform", seed)]);
 
             output.WriteLine(
-                $"{arm,-10}{"all",-8}{put,8}{hit,8}{hit / (double)put,9:F3}"
-                + $"   spoke {questions[arm].Spoke} of {questions[arm].Talked}");
+                $"the drive leads on {leads[chatting]} seeds of {Seeds} at {chatting} spoken");
         }
 
-        var ahead = Enumerable.Range(1, Seeds)
-            .Count(seed => perSeed[("learning", seed)] > perSeed[("uniform", seed)]);
-
-        output.WriteLine($"the drive leads on {ahead} seeds of {Seeds}");
-
-        // Every house's exam was sat under both arms, whatever the walk before it looked
+        // Every house's exam was sat under every cell, whatever the walk before it looked
         // like. Which KINDS got asked is a fact about where the machine ended up walking and
         // is not the same number under two choosers.
-        Assert.All(
-            new[] { "uniform", "learning" },
-            arm => Assert.Equal(
-                Houses * Asked * Seeds,
-                scored.Where(one => one.Key.Arm == arm).Sum(one => one.Value.Asked)));
+        Assert.Equal(4, questions.Count);
 
         Assert.All(
-            questions.Values,
-            one => Assert.Equal(Houses * Chatting * Seeds, one.Talked));
+            questions.Keys,
+            one => Assert.Equal(
+                Houses * Asked * Seeds,
+                scored.Where(row => row.Key.Chatting == one.Chatting && row.Key.Arm == one.Arm)
+                    .Sum(row => row.Value.Asked)));
 
         // The population advocated a word on rounds of its own, or the drive was its own
         // fallback all run and this table is the control printed twice. A fallback is a
@@ -4018,6 +4029,12 @@ public sealed class RoamingTests(ITestOutputHelper output)
             "`Wanting.Learning` never once named the word: every round was decided by the "
             + "uniform draw it falls back to, so the two arms here are one arm and nothing "
             + "in the table is about the drive");
+
+        // And the conversation is what the drive's asking is about, so a machine given no
+        // conversation at all has none of it to do. A cell that spoke where nothing was
+        // spoken would mean the phase ran when it was set to nought.
+        Assert.Equal(0, questions[(0, "uniform")].Talked);
+        Assert.Equal(0, questions[(0, "learning")].Talked);
     }
 
     /// <summary>A walked house whose exam may be ANOTHER house's.</summary>

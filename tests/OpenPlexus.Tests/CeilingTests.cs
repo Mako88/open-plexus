@@ -161,7 +161,7 @@ public sealed class CeilingTests(ITestOutputHelper output)
         var front = new Joined(Joining.Bagged);
 
         var world = new Roaming(
-            Fixture.House(Examining.Where, Knowing.Explored), seed: 1);
+            Fixture.House(), seed: 1);
 
         var present = 0;
         var settled = 0;
@@ -356,7 +356,7 @@ public sealed class CeilingTests(ITestOutputHelper output)
         const int Asked = 6;
 
         var world = new Roaming(
-            Fixture.House(Examining.Where, Knowing.Explored, asked: Asked),
+            Fixture.House(asked: Asked),
             seed: 1);
 
         // What the world SAID, never what to conclude. The same standing as `Named`: a probe

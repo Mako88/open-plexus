@@ -32,14 +32,10 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **The spine becomes ONE world and the items build it.** John's: the machine explores the
   house, converses about what it saw, then sits a survey. Rung four and the forward store are
   BUILT and neither is on this list.
-- **And that world has a SIZE and no SWITCHES.** John's. A number off it is what the machine
-  is worth, so what makes it less like the real world goes and the MACHINE changes instead.
-  `Examining` and `Knowing` are the two left.
 - **First a chooser that can ASK the exam's question.** Asking perfectly triples the walked
   half; the drive pays on the WALK and asks less than a coin. Forks **146**, **151**.
-- **Then the switches and `Conversing` GO**, in that order: the explored walk abstains nought
-  where the recital abstains 682 and supposes nothing at all, so cutting first costs the
-  spine entries it already reaches.
+- **Then `Conversing` GOES**, its half being the middle phase of the one world. The
+  terminal is built on it, so a terminal on the walked house comes with it.
 - **One brain falls out** of there being one composition.
 - **Then the four dials read off the spine only** — `Budgeting`, `Feeling`, `Forking`,
   `Subsuming`. Re-taken HERE: the world they want a reading on is the one being built.

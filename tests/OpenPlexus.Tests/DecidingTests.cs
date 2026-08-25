@@ -37,7 +37,7 @@ public sealed class DecidingTests(ITestOutputHelper output)
     /// <param name="seed">What draws the houses and the walks.</param>
     private static IInput Roams(int seed) =>
         new Watching<Coded>(
-            new Roaming(Fixture.House(Examining.Where), seed),
+            new Roaming(Fixture.House(), seed),
             new Joined(Joining.Resolved, resolution: 3, freshest: true),
             acting: Chooses.From(_ => null));
 

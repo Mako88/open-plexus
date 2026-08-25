@@ -81,16 +81,16 @@ green without doing it. Do not delete them, do not weaken them, and do not read 
 regression. Each computes the state rather than asserting a constant, so none can be satisfied
 by editing that file; an entry closes when the work closes.
 
-**The red set is three, and anything else red is yours.**
+**The red set is two, and anything else red is yours.**
 `OutstandingTests.The_spine_runs_one_brain` is two dials apart, `Admitting` and `Crediting`,
 and `OutstandingTests.Every_dial_is_measured_on_a_world_whose_score_counts` names four dials no
 spine composition turns. Check the failures against that before assuming a run is
 clean — a stable red set is the only kind you can read a new failure against.
 
-**And `The_target_world_has_a_size_and_no_switches` is the third.** John's: `Roaming` is what
-the machine is worth, so what makes it less like the real world goes and the machine changes
-instead. An enum is a switch and an int is a size — `Examining` and `Knowing` are what is
-left, `Seeing` having gone once the merged world could do without it.
+**And both of them close on `Conversing` going.** The spine is two worlds today and the two
+brains are the second one's; the four dials want a reading on the world that counts. The
+walked house is the one world now — explored, talked about, then examined — and what is left
+is the terminal, which is built on `Conversing` and has to move with it.
 
 **Adding an entry is stricter than adding anywhere else**: it must be work somebody has decided
 to do, computable without judgement, and closeable. An open question goes in the plan as

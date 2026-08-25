@@ -101,9 +101,9 @@ public sealed class ExercisedTests
 
     /// <summary>What one run of a spine world left behind.</summary>
     /// <param name="Arm">Which run it was, for the table.</param>
-    /// <param name="Examining">
-    /// Which question the house was asked, and <b>nothing where the world is not the
-    /// house</b>. A conversation has one question and it is the lesson's.
+    /// <param name="Answered">
+    /// How many of the house's conversation rounds it had an answer for, and
+    /// <b>nought where the world is not the house</b>.
     /// </param>
     /// <param name="Tally">Every counter the bench reports.</param>
     /// <param name="Held">The population at the end of it.</param>
@@ -126,7 +126,7 @@ public sealed class ExercisedTests
     /// </param>
     private sealed record Watched(
         string Arm,
-        Examining? Examining,
+        long Answered,
         Tally Tally,
         Population Held,
         IReadOnlySet<byte> Emitted,
@@ -213,8 +213,7 @@ public sealed class ExercisedTests
     }
 
     /// <summary>One arm of the world, run into a brain.</summary>
-    /// <param name="examining">Which question the house is asked.</param>
-    /// <param name="acting">Whether the learner takes the walk's last step.</param>
+    /// <param name="acting">Whether the learner takes the walk's steps.</param>
     /// <remarks>
     /// <b>The chooser is <see cref="Drives"/> where there is one</b>, rather than a coin. The
     /// entry being asked about is <i>original thought</i>, and a random chooser exercises the
@@ -227,12 +226,12 @@ public sealed class ExercisedTests
     /// rounds is the emptiest honest arm there is, and it cannot drift from the shape of a
     /// real one the way a hand-built <c>Tally</c> would.
     /// </param>
-    /// <param name="knowing">Whether the walk is recited to the machine or walked by it.</param>
-    private static Watched Run(
-        Examining examining, bool acting, long rounds = 10_000,
-        Knowing knowing = Knowing.Recited)
+    private static Watched Run(bool acting, long rounds = 10_000)
     {
-        var world = new Roaming(Fixture.House(examining, knowing), seed: 1);
+        // Walked, talked about and then examined, which is the whole of the one spine
+        // world. The three phases are what reach different entries, so an arm that ran
+        // only the walk would leave the telling and the exam unreached.
+        var world = new Roaming(Fixture.House(asked: 6, chatting: 6), seed: 1);
         var brain = new Brain(Walking, seed: 1);
         var falling = new Random(1);
 
@@ -262,14 +261,26 @@ public sealed class ExercisedTests
             .Range(0, world.Doings)
             .ToDictionary(word => Intervened.Of(world.Meaning(word)!.Value), word => word);
 
-        // A verb and then something for it to be about, which is what a command is. The
-        // fallback used to be one draw because a doing used to be one number; a uniform draw
-        // over the whole alphabet would spend the run saying words no command can be parsed
-        // out of, so what the acting arm exercised would be the parse refusing rather than
-        // the world's verbs.
-        var verbs = new[] { "went", "took", "dropped" }
+        // A word and then something for it to be about, which is what a command and a
+        // question both are. The fallback used to be one draw because a doing used to be one
+        // number; a uniform draw over the whole alphabet would spend the run saying words no
+        // parse can be made of, so what the acting arm exercised would be the parse refusing
+        // rather than the world's own verbs.
+        //
+        // And the two question words are here for the BOOTSTRAP. `Drives` exploits and never
+        // explores, so a word no commitment holds is not a candidate -- and no commitment
+        // can hold `where` until something has said it. Without them the conversation runs
+        // every episode and the machine never once puts a question, so the entry under
+        // `what it is told must be settleable` reads unreached for want of a draw.
+        var opening = new[] { "went", "took", "dropped", "where", "what" };
+
+        var verbs = opening
             .Select(word => world.Vocabulary.ToList().IndexOf(word))
             .ToList();
+
+        // Which of them wants a room rather than a thing: going somewhere and asking what a
+        // room held.
+        var asking = new[] { verbs[0], verbs[4] };
 
         var rooms = world.Named.Select(code => world.Naming(code)!.Value).ToList();
         var things = world.Called.Select(code => world.Naming(code)!.Value).ToList();
@@ -296,7 +307,7 @@ public sealed class ExercisedTests
 
                 var verb = verbs[falling.Next(verbs.Count)];
 
-                going = verb == verbs[0];
+                going = asking.Contains(verb);
 
                 return verb;
             });
@@ -325,9 +336,8 @@ public sealed class ExercisedTests
             .Run(rounds, sweep: 1000, target: 0.9, window: 2000);
 
         return new Watched(
-            $"roaming {knowing.ToString().ToLowerInvariant()} "
-            + $"{examining.ToString().ToLowerInvariant()}",
-            knowing is Knowing.Explored ? null : examining, tally,
+            acting ? "roaming acted" : "roaming watched",
+            world.Answered, tally,
             brain.Held, noted.Emitted, noted.Channels, drives.Told, brain.Supposals,
             noted.Parts);
     }
@@ -413,7 +423,7 @@ public sealed class ExercisedTests
 
         return new Watched(
             $"conversing x{tellings} {admitting.ToString().ToLowerInvariant()}",
-            null, tally, brain.Held, noted.Emitted, noted.Channels,
+            0, tally, brain.Held, noted.Emitted, noted.Channels,
             curiosity.Claims + curiosity.Questions, brain.Supposals, noted.Parts);
     }
 
@@ -508,8 +518,8 @@ public sealed class ExercisedTests
                 one.Emitted.Count > 0 && !one.Emitted.Contains(Brain.Followed))),
 
         new("What it is told must be settleable",
-            "the effect question scored what the statement it was told did",
-            arms => Any(arms, one => one.Examining == Examining.Effect
+            "the house answered what the machine asked and the round was scored",
+            arms => Any(arms, one => one.Answered > 0
                 && one.Tally.Right + one.Tally.Wrong > 0)),
 
         new("Original thought",
@@ -594,18 +604,14 @@ public sealed class ExercisedTests
 
         var arms = new List<Watched>
         {
-            Run(Examining.Where, acting: false),
-            Run(Examining.Effect, acting: true),
-
-            // And a house the machine WALKS, which is where a thing is met rather than
-            // mentioned. A thing seen and then named holds two codes, so a scope over one of
-            // them is a scope about one thing -- and a mentioned thing is the one word that
-            // names it, which is the root genesis already mints.
-            // Fewer rounds than the recited arms, because what is wanted here is that the
-            // mechanisms are reached rather than a score. A walked house settles every round
-            // where a recital settles once, so it saturates a population far sooner -- and at
-            // ten thousand it doubled the time this whole reading takes for no entry gained.
-            Run(Examining.Where, acting: true, rounds: 4_000, knowing: Knowing.Explored),
+            // The house watched and the house acted in. A thing is MET here rather than
+            // mentioned: seen and then named it holds two codes, so a scope over one of
+            // them is a scope about one thing.
+            // Four thousand rounds rather than ten, because what is wanted is that the
+            // mechanisms are reached rather than a score. A walked house settles every
+            // round, so it saturates a population far sooner.
+            Run(acting: false, rounds: 4_000),
+            Run(acting: true, rounds: 4_000),
 
             Talked(),
 
@@ -691,7 +697,7 @@ public sealed class ExercisedTests
 
         var nothing = new[]
         {
-            Run(Examining.Where, acting: false, rounds: 1),
+            Run(acting: false, rounds: 1),
             Talked(rounds: 1),
         };
 

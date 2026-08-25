@@ -43,9 +43,6 @@ public sealed record RoamingSettings
     /// </remarks>
     public required int Steps { get; init; }
 
-    /// <summary>How many questions are kept back and never drawn.</summary>
-    public required int Withheld { get; init; }
-
     /// <summary>How many questions the survey asks once the walk round the house is over.</summary>
     /// <remarks>
     /// <para>
@@ -65,11 +62,6 @@ public sealed record RoamingSettings
     /// codes cannot say <i>two of these</i>, which is Monk-2's own lesson with a published
     /// number beside it. Leaving the kind out would be editing the exam until the machine
     /// could pass it, and the exam is the one thing here that may not move.
-    /// </para>
-    /// <para>
-    /// <b>Nought under <see cref="Knowing.Recited"/></b>, where the walk already ends in a
-    /// question of its own. Two exams over one transcript would be two problems averaged
-    /// into one number.
     /// </para>
     /// </remarks>
     public required int Asked { get; init; }
@@ -92,100 +84,8 @@ public sealed record RoamingSettings
     /// is still true at the exam — which means a long enough conversation hands the exam over
     /// and the length is the reading rather than a setting to get right.
     /// </para>
-    /// <para>
-    /// <b>Nought under <see cref="Knowing.Recited"/></b>, which has no walk to talk about.
-    /// </para>
     /// </remarks>
     public required int Chatting { get; init; }
-
-    /// <inheritdoc cref="Worlds.Examining"/>
-    /// <remarks>
-    /// <b>Read under <see cref="Knowing.Recited"/> alone</b>, because a question about the
-    /// walk is what a recital ends with and an explorer is settled step by step.
-    /// </remarks>
-    public required Examining Examining { get; init; }
-
-    /// <inheritdoc cref="Worlds.Knowing"/>
-    public required Knowing Knowing { get; init; }
-
-}
-
-/// <summary>How the machine comes to know what happened in the house.</summary>
-/// <remarks>
-/// <para>
-/// <b>John's, and it is what the spine becoming ONE world turns on.</b> A machine recited to
-/// is a machine reading somebody else's account; a machine that walks the house has to make
-/// its own, and every mechanism between the two is the same one.
-/// </para>
-/// <para>
-/// <b>The two are not arms of one question.</b> They are not scored against each other: one is
-/// answered in words about a walk it was told, the other is settled by what it is shown while
-/// it looks — different alphabets and different rounds, so a table holding both would be
-/// comparing configurations as much as problems.
-/// </para>
-/// </remarks>
-public enum Knowing
-{
-    /// <summary>The walk is recited to it whole. Every reading taken before this.</summary>
-    Recited,
-
-    /// <summary>It walks the house and is shown what is in front of it.</summary>
-    Explored,
-}
-
-/// <summary>
-/// What the world asks about the walk it just recited — <b>where a thing ended up</b>, or
-/// what the last thing it was told did.
-/// </summary>
-/// <remarks>
-/// <para>
-/// <b>The architecture line with nothing under it, given a mechanism however bad.</b> What
-/// it is told must be falsifiable, and told and configured are indistinguishable from the
-/// inside — so a statement the learner cannot be wrong about was installed in it rather than
-/// taught to it. Under <see cref="Where"/> every statement in the transcript is background
-/// the answer is read out of, and no commitment is ever about a statement.
-/// </para>
-/// <para>
-/// <b>And it is a second QUESTION rather than a second world</b>, which is what keeps the
-/// two comparable. The house, the scatter and the walk are drawn identically under both —
-/// the same seed produces the same transcript — so a difference between the arms is the
-/// question and cannot be the world.
-/// </para>
-/// <para>
-/// <b>What it does not close is the store's own update rule</b>, and saying so is cheaper
-/// than having it read as more than it is. The settlement is the world's ground truth about
-/// its own state, so what becomes falsifiable is <i>this statement changes what is known</i>
-/// and not <i>my store was right to overwrite</i>. Fork 104 wants the second and this is the
-/// first, which is the half that needs no new machinery.
-/// </para>
-/// </remarks>
-public enum Examining
-{
-    /// <summary>Where a thing ended up. Every reading taken before this existed.</summary>
-    Where,
-
-    /// <summary>
-    /// Whether the statement the walk ended on moved anything.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>The verb decides two of the three cases</b> and the store decides the third. A
-    /// thing taken is where its holder already stood and a thing dropped lands in the room
-    /// the dropper is already in, so <i>took</i> and <i>dropped</i> never move anything.
-    /// <i>Went</i> moves a thing exactly when the walker is carrying one and the room is
-    /// different — which needs the transcript read backwards to a take that has no word in
-    /// common with the question.
-    /// </para>
-    /// <para>
-    /// <b>So the verb-only ceiling is what this is read against</b>, and it is computed
-    /// before any learner runs. A conjunctive rule over the question's own words reaches
-    /// <i>took</i> and <i>dropped</i> for nothing, and everything above that ceiling is
-    /// binding. If the learner lands on it, the reading is that the headroom here is rung
-    /// four's — which is a finding rather than a failure, and this repo's own rule is that
-    /// a front-end ceiling costing milliseconds is taken FIRST.
-    /// </para>
-    /// </remarks>
-    Effect,
 }
 
 /// <summary>
@@ -245,7 +145,7 @@ public enum Examining
 /// Adding it before the base world is read would be two unanswered questions in one grid.
 /// </para>
 /// </remarks>
-public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
+public sealed class Roaming : IWorld<Coded>, IActed<Coded>
 {
     /// <summary>The modality a word rides on.</summary>
     /// <remarks>
@@ -413,7 +313,6 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
 
     private readonly RoamingSettings _settings;
     private readonly Random _walks;
-    private readonly List<Turn<Coded>> _kept = [];
 
     private readonly List<string> _vocabulary = [];
     private readonly Dictionary<Code, int> _naming = [];
@@ -431,9 +330,6 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// which of its own nouns are worth having concepts of.
     /// </remarks>
     private readonly HashSet<Code> _nouns = [];
-
-    /// <summary>The walk drawn as far as its last step, waiting to be told what it is.</summary>
-    private Walk? _open;
 
     /// <summary>What the machine said about this moment, or nothing where it said none.</summary>
     private List<int>? _spoken;
@@ -470,44 +366,9 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         ArgumentOutOfRangeException.ThrowIfGreaterThan(settings.Props, Things.Length);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.People);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(settings.People, Cast.Length);
-        ArgumentOutOfRangeException.ThrowIfNegative(settings.Steps);
-        ArgumentOutOfRangeException.ThrowIfNegative(settings.Withheld);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Steps);
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Asked);
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Chatting);
-
-        // The effect question is about a STEP, and a walk of no steps ends on a placement.
-        // Asking what a placement did is asking about the round before the world started,
-        // which is a question with no answer rather than an answer of nought.
-        if (settings.Examining == Examining.Effect)
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Steps);
-
-        // A recital already ends in a question, so a survey there would be a second exam over
-        // one transcript and a score that averaged two problems.
-        if (settings.Knowing is Knowing.Recited && (settings.Asked != 0 || settings.Chatting != 0))
-            throw new ArgumentException(
-                "a recited walk ends in a question of its own and has no walk to talk about, "
-                + "so the survey and the conversation are the walked house's", nameof(settings));
-
-        if (settings.Knowing is Knowing.Explored)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Steps);
-
-            // Both refused rather than ignored, because a setting read by nothing is a
-            // setting somebody will read a result off. An explorer is settled by what it is
-            // shown at each step, so there is no question at the end of a house to choose
-            // between and no held-out one to draw -- the survey is the item after this and
-            // does not exist yet.
-            if (settings.Examining != Examining.Where)
-                throw new ArgumentException(
-                    "an explored house asks no question at the end of the walk, so the "
-                    + "examining arm decides nothing here", nameof(settings));
-
-            if (settings.Withheld != 0)
-                throw new ArgumentException(
-                    "an explored house has no question to hold back: a withheld one would "
-                    + "be about a house the machine never walked, which nothing could "
-                    + "answer. The survey is what makes an exam of this", nameof(settings));
-        }
 
         _settings = settings;
         _walks = new Random(seed);
@@ -559,19 +420,16 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         for (var thing = 0; thing < everything.Count; thing++)
             _shades[everything[thing]] =
                 Kinds.Named(Shade, Shades[thing % Shades.Length]);
-
-        for (var back = 0; back < settings.Withheld; back++) _kept.Add(Draw());
     }
 
     /// <inheritdoc/>
     /// <remarks>
-    /// <b>Two under <see cref="Examining.Effect"/></b>, because what a blind guess is against
-    /// is the answer alphabet and the effect question's is <i>moved</i> and <i>did not</i>.
-    /// A world reporting its room count there would price every arm against the wrong bar.
+    /// <b>The whole alphabet, because the answer is a WORD.</b> The walk names one of the
+    /// things in front of the machine, the conversation answers what it asked, and the
+    /// survey answers in a room, a thing or a number — so what a blind guess is against is
+    /// everything the house can say.
     /// </remarks>
-    public int Outcomes => _settings.Knowing is Knowing.Explored
-        ? _vocabulary.Count
-        : _settings.Examining == Examining.Effect ? 2 : _settings.Rooms;
+    public int Outcomes => _vocabulary.Count;
 
     /// <summary>
     /// The code for each room's word, in outcome order — <b>so a ceiling comes off the transcript</b>
@@ -610,32 +468,26 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// </remarks>
     public bool Sat { get; private set; }
 
-    /// <inheritdoc/>
+    /// <summary>How many of the conversation's rounds the house had an answer for.</summary>
     /// <remarks>
-    /// <b>Empty under <see cref="Knowing.Explored"/></b>, and the constructor refuses a
-    /// setting that asks for otherwise. A held-out question there would be about a house the
-    /// machine never walked.
+    /// <b>An instrument's channel, on <see cref="Sat"/>'s standing.</b> A round the machine
+    /// said nothing askable in settles on nothing and costs a commitment nothing, so a
+    /// conversation that ran and a conversation that was answered are two different facts and
+    /// a tally cannot tell them apart.
     /// </remarks>
-    public IReadOnlyList<Turn<Coded>> Withheld => _kept;
+    public long Answered { get; private set; }
 
     /// <inheritdoc/>
     /// <remarks>
-    /// <b>The walk <see cref="Now"/> opened, finished by whatever <see cref="Do"/> was told</b>
-    /// — and drawn whole here where nothing asked. A chooser is spent by the step that
-    /// follows it, so neither the walk nor the wish survives into the next episode.
+    /// <b>A walked step, a turn of the conversation, or an exam question</b>, in that order
+    /// and drawn from the same house. A chooser is
+    /// spent by the round that follows it, so no wish survives into the next one.
     /// </remarks>
     public Turn<Coded> Next()
     {
         Sat = false;
 
-        if (_settings.Knowing is Knowing.Explored) return Walked();
-
-        var walk = _open ?? Open();
-        var said = _spoken;
-
-        (_open, _spoken, _shown) = (null, null, null);
-
-        return Close(walk, said);
+        return Walked();
     }
 
     /// <summary>The codes for one sentence, in the order the words were said.</summary>
@@ -724,17 +576,15 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// <inheritdoc/>
     /// <remarks>
     /// <para>
-    /// <b>The walk with its last step still to happen</b>, so what is read is the state an
-    /// action is taken in rather than one it has already been taken in. Asking for it draws
-    /// the house, the scatter and every step but the last, and the same walk is what
-    /// <see cref="Next"/> then finishes — a caller that never asks gets the walk drawn whole
-    /// on the spot and the identical sequence out of the generator either way.
+    /// <b>The house as it stands before the round is taken</b>, so what is read is the
+    /// state an action is taken in rather than one it has already been taken in. Asking
+    /// for it draws the house where none is open, and the same walk is what
+    /// <see cref="Next"/> then steps.
     /// </para>
     /// <para>
-    /// <b>The question slot says what is being asked</b>, never what to conclude. Which
-    /// thing the walk will be asked about is not drawn yet under
-    /// <see cref="Examining.Where"/>, and putting it here would show the chooser a question
-    /// the learner has not been asked.
+    /// <b>The question slot says what is being asked</b>, never what to conclude. In the
+    /// conversation it is the world's own turn and in the exam it is the question; on a
+    /// walked step there is none, because nothing is being asked.
     /// </para>
     /// </remarks>
     public Coded Now
@@ -743,21 +593,11 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         {
             if (_shown is { } already) return already;
 
-            if (_settings.Knowing is Knowing.Explored)
-                return (_shown = _asking.Count > 0
-                    ? Surveying()
-                    : _chats > 0
-                        ? Talking(_house!, [])
-                        : Sighted(_house ??= Housed(), null)).Value;
-
-            _open ??= Open();
-
-            var asked = Said("what", "next");
-
-            return (_shown = Coded.From(
-                [.. Enumerable.Reverse(_open.Told).Select(Grouped.Of)],
-                Grouped.Of(asked),
-                things: Grouped.Things([.. _open.Told, asked], _nouns))).Value;
+            return (_shown = _asking.Count > 0
+                ? Surveying()
+                : _chats > 0
+                    ? Talking(_house!, [])
+                    : Sighted(_house ??= Housed(), null)).Value;
         }
     }
 
@@ -863,60 +703,6 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         return null;
     }
 
-    /// <summary>The house, the scatter, and every step but the one still to be chosen.</summary>
-    private Walk Open()
-    {
-        // Where everything starts, stated out loud. Without the opening placements the
-        // answer is not derivable from the transcript at all, and the world would be asking
-        // about something it never said.
-        var at = new int[_settings.Props];
-
-        // Who is holding each thing, or nobody. A flag would have been enough for one person
-        // and says the wrong thing for two: a thing in a hand is somewhere, and which hand it
-        // is in is what the room it lands in depends on.
-        var held = new int[_settings.Props];
-
-        Array.Fill(held, Nobody);
-
-        // Newest first, which is what a moment's parts promise. So the list is built forwards and
-        // reversed at the end rather than each statement being inserted at the front, which
-        // is the same order written the cheap way round.
-        var told = new List<IReadOnlyList<Code>>();
-
-        for (var prop = 0; prop < _settings.Props; prop++)
-        {
-            at[prop] = _walks.Next(_settings.Rooms);
-
-            told.Add(Said("the", Things[prop], "is", "in", "the", Places[at[prop]]));
-        }
-
-        var here = new int[_settings.People];
-
-        // And where each person starts, stated out loud for the reason the things' placements
-        // are. A person who picks a thing up and puts it down before ever moving has put it
-        // somewhere no rule could name, so five thousandths of the questions at four people
-        // were unanswerable by anything -- measured, not supposed. Saying it costs one
-        // statement a person and closes the hole.
-        //
-        // The draw is unchanged and so is every house and every walk: this consumes no
-        // randomness, it says out loud what was already drawn. What moves is the transcript.
-        for (var one = 0; one < _settings.People; one++)
-        {
-            here[one] = _walks.Next(_settings.Rooms);
-
-            told.Add(Said(Cast[one], "is", "in", "the", Places[here[one]]));
-        }
-
-        var walk = new Walk(at, held, here, told);
-
-        // Every step but the last, because the last is the one an action gets to be. A walk
-        // of no steps has no last step and this loop runs nowhere, which is the same walk it
-        // always was.
-        for (var step = 0; step < _settings.Steps - 1; step++) Step(walk, null);
-
-        return walk;
-    }
-
     /// <summary>One step of the walk, commanded or drawn.</summary>
     /// <param name="walk">The house and where everything in it stands.</param>
     /// <param name="spoken">What the machine said, or nothing to let the walk draw.</param>
@@ -928,14 +714,14 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// interface. What an impossible command gets is a step that happens and does nothing.
     /// </para>
     /// <para>
-    /// <b>And it is said out loud only where the walk is RECITED.</b> An explorer is shown
-    /// what its step left in front of it rather than told what it did, so a sentence there
-    /// would be the world narrating the machine to itself.
+    /// <b>And it is never said out loud.</b> The machine is shown what its step left in
+    /// front of it rather than told what it did, so a sentence here would be the world
+    /// narrating the machine to itself.
     /// </para>
     /// </remarks>
     private void Step(Walk walk, IReadOnlyList<int>? spoken, int? walker = null)
     {
-        var (at, held, here, told) = walk;
+        var (at, held, here, _) = walk;
 
         // Whose turn it is, and one person is nobody to choose between. A draw over one
         // option decides nothing, so it is not taken -- which also leaves the walk of a
@@ -943,15 +729,10 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         var who = walker
             ?? (_settings.People == 1 ? 0 : _walks.Next(_settings.People));
 
-        var saying = _settings.Knowing is Knowing.Recited;
-
         if (spoken is not null)
         {
-            var sentence = Parse(spoken) is { } wanted && Possible(walk, who, wanted)
-                ? Done(walk, who, wanted)
-                : Said(Cast[who], "waited");
-
-            if (saying) told.Add(sentence);
+            if (Parse(spoken) is { } wanted && Possible(walk, who, wanted))
+                Done(walk, who, wanted);
 
             return;
         }
@@ -979,9 +760,7 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
             _ => new Command(Went, _walks.Next(_settings.Rooms)),
         };
 
-        var said = Done(walk, who, drawn);
-
-        if (saying) told.Add(said);
+        Done(walk, who, drawn);
     }
 
     /// <summary>Whether a walker could do this now.</summary>
@@ -1314,7 +1093,7 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// nothing rather than drawing one — which is the survey's own rule arriving on the half
     /// where the machine chose the question.
     /// </remarks>
-    private Question? Answered(Walk walk, Wonder wonder)
+    private Question? Replied(Walk walk, Wonder wonder)
     {
         var placed = Placed(walk.At, walk.Held, walk.Here);
 
@@ -1379,12 +1158,17 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
             : spoken.Select(one => Kinds.Named(Word, _vocabulary[one])).ToList();
 
         var answer = spoken is not null && Wondered(spoken) is { } wonder
-            ? Answered(walk, wonder)
+            ? Replied(walk, wonder)
             : null;
 
         var turn = new Turn<Coded> { Seen = Talking(walk, said), Outcome = answer?.Outcome };
 
-        if (answer is { } told) walk.Told.Add(told.Sentence);
+        if (answer is { } told)
+        {
+            walk.Told.Add(told.Sentence);
+
+            Answered++;
+        }
 
         if (--_chats <= 0) Examined(walk);
 
@@ -1561,93 +1345,4 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         return turn;
     }
 
-    /// <summary>One house, one walk round it, and one question about what happened in it.</summary>
-    private Turn<Coded> Draw() => Close(Open(), null);
-
-    /// <summary>The walk's last step, and the question about what it left behind.</summary>
-    /// <param name="walk">The house drawn as far as its last step.</param>
-    /// <param name="spoken">What the machine said, or nothing to let the walk draw.</param>
-    private Turn<Coded> Close(Walk walk, IReadOnlyList<int>? spoken)
-    {
-        var (at, held, here, told) = walk;
-
-        // Whether the walk's LAST statement moved anything, which is the effect question's
-        // whole answer. Taken around that one step rather than around every one: the vector
-        // costs a pass over the props and only the final step is ever asked about.
-        var moved = false;
-
-        // A wish with no step to spend it on marked nothing, which is the difference between
-        // a chooser that was asked and one that was heard. `Open` adds the placements before
-        // any walking, so without this the opening statement of a no-step walk would be
-        // reported as the learner's doing.
-        var chose = spoken is not null && _settings.Steps > 0;
-
-        if (_settings.Steps > 0)
-        {
-            var before = Placed(at, held, here);
-
-            Step(walk, spoken);
-
-            moved = !before.SequenceEqual(Placed(at, held, here));
-        }
-
-        // Asked about something put down, so the answer is a room. A thing still in hand is
-        // wherever its holder is, which is a different question with a different ceiling, and
-        // mixing the two would average two problems into one number.
-        var settled = Enumerable.Range(0, _settings.Props)
-            .Where(one => held[one] == Nobody)
-            .ToList();
-
-        // Drawn under both arms and used by one, which is what keeps the two comparable. The
-        // effect question has no thing to pick, and skipping the draw would leave the walks
-        // aligned for one episode and diverging from the second -- two transcripts differing
-        // by one draw read identically from every column, so nothing else here could say so.
-        var about = settled.Count > 0
-            ? settled[_walks.Next(settled.Count)]
-            : _walks.Next(_settings.Props);
-
-        if (_settings.Examining == Examining.Effect)
-        {
-            // The statement the walk ended on is the QUESTION rather than the last line of
-            // the transcript, so the learner is answering about something it is being told
-            // now and not about something it has already read. Leaving it in `Said` as well
-            // would put the answer's own sentence in the background, which is the shape a
-            // corpus containing its own answer has.
-            var last = told[^1];
-
-            told.RemoveAt(told.Count - 1);
-            told.Reverse();
-
-            return new Turn<Coded>
-            {
-                // The step the learner chose, said in the words it came out as. A wish the
-                // house could not grant comes out as waiting, and that sentence is as much
-                // the learner's doing as a granted one -- so what is marked is the statement
-                // the choice PRODUCED rather than the verb it asked for.
-                Seen = Coded.From(
-                    [.. told.Select(Grouped.Of)],
-                    Grouped.Of(last),
-                    chose ? new HashSet<Code>(last) : null,
-                    Grouped.Things([.. told, last], _nouns)),
-                Outcome = moved ? 1 : 0,
-            };
-        }
-
-        told.Reverse();
-
-        var asking = Said("where", "is", "the", Things[about]);
-
-        return new Turn<Coded>
-        {
-            // The chosen step is a STATEMENT here rather than the question, so what is
-            // marked is the words of it wherever they ended up. A `where is` question is
-            // about the state the walk left behind and names nothing the learner did.
-            Seen = Coded.From(
-                [.. told.Select(Grouped.Of)],
-                Grouped.Of(asking),
-                chose ? new HashSet<Code>(told[0]) : null,
-                Grouped.Things([.. told, asking], _nouns)),
-            Outcome = held[about] == Nobody ? at[about] : null,
-        };
-    }
 }

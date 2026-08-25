@@ -57,8 +57,6 @@ internal static class Fixture
     /// The spine world's house, at the cell its own grids read — <b>one house rather than a
     /// literal per instrument.</b>
     /// </summary>
-    /// <param name="examining">Which question the house is asked.</param>
-    /// <param name="knowing">Whether the walk is recited to the machine or walked by it.</param>
     /// <param name="asked">How many survey questions follow the walk.</param>
     /// <param name="chatting">How many rounds of talking about it come before those.</param>
     /// <remarks>
@@ -68,11 +66,7 @@ internal static class Fixture
     /// and the one axis that differs, so two instruments cannot drift apart while reading
     /// against each other. Four people, because one leaves the middle hop free.
     /// </remarks>
-    public static Worlds.RoamingSettings House(
-        Worlds.Examining examining,
-        Worlds.Knowing knowing = Worlds.Knowing.Recited,
-        int asked = 0,
-        int chatting = 0) =>
+    public static Worlds.RoamingSettings House(int asked = 0, int chatting = 0) =>
         new()
         {
             Rooms = 6,
@@ -81,12 +75,6 @@ internal static class Fixture
             Steps = 120,
             Asked = asked,
             Chatting = chatting,
-
-            // Nothing held back where the house is walked, because a held-out question there
-            // would be about a house the machine never saw.
-            Withheld = knowing is Worlds.Knowing.Explored ? 0 : 600,
-            Examining = examining,
-            Knowing = knowing,
         };
 
     /// <summary>The senses world, clean unless a test asks for noise.</summary>

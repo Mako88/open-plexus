@@ -795,6 +795,10 @@ them. **A class earning a check moves out of here into the check.**
   paying.
 - **A readout arm is a search arm** wherever the readout triggers the search, and every vote
   comparison in four sessions moved both.
+- **A LOOK is an observation wherever the front end learns.** A world taking several doings a
+  moment had it read through the front end once a doing, so a derivation counted one moment as
+  seven and fired its cadence three times as often. The census flag guarded the count and not
+  the learner.
 - **A fixture inherits every dial it does not pin**, so a moving default rewrites an experiment
   nobody edited — and the grid deciding a default rewrites itself the moment it wins.
 - **A default can short-circuit the mechanism being measured**, so a sweep on defaults

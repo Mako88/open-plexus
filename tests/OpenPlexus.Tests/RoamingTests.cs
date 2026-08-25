@@ -1117,6 +1117,19 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// the bar would be converging on a spine that never runs the one operator that deepens a
     /// rule. Which value to converge on is decided by that column and not by the exam.
     /// </para>
+    /// <para>
+    /// <b>Measured, and the convergence it appeared to license was refused.</b> Four cells
+    /// within four thousandths at both ends, and the bar takes the walk from 811, 1,236 and
+    /// 1,035 repairs to 565, 921 and 708 while holding two thirds of the rules — so this grid
+    /// says converge. <c>ExercisedTests</c> says do not: this reads the WHERE question and the
+    /// EFFECT arm falls from 105 residents and 131 repairs to 39 and 7 under the same bar,
+    /// taking an entry of THE ARCHITECTURE off the spine with it.
+    /// </para>
+    /// <para>
+    /// <b>So the axis this grid is missing is the QUESTION</b>, and that is the reading it
+    /// owes next. A dial crossed against one of a world's two questions is a dial measured on
+    /// half its world, which is this file's own trap read one level out.
+    /// </para>
     /// </remarks>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]

@@ -36,7 +36,7 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **ONE brain across the spine**, `Crediting` and `Admitting` parting the two worlds. It is
   the red set, and fork **147** closes it by there being one world.
 - **Then a THING that is not an utterance**, both text worlds calling a statement a part so
-  the grouping says what the signal is shaped like rather than what is in it. Fork **142**.
+  the grouping says what the signal is shaped like rather than what is in it. Fork **148**.
 - **Then a mechanism reached only by an INSTRUMENT going red**, John's, `DrivenTests` being
   satisfied by any world at all. Two have now been caught by hand and neither by a guard.
 - **Then a regime with COMPANY and a population**, the conversation having neither together: a
@@ -443,6 +443,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — minting an INDIVIDUAL is unbuilt and a bundle recurring in the successor
       moment is refuted below, being co-occurrence read twice. What is left is persistence of
       a PART, or confidence over repetition. Fork **93**.
+    - **OPEN** — a text world calls a STATEMENT a part, so one dial reads two ideas.
+      Fork **148**.
     - **OPEN** — a front end whose codes survive a scene SHIFTING is the other half, and
       changing the feature basis to get one is refuted below. Fork **145**.
   - It can say what does not hold

@@ -42,9 +42,27 @@ public sealed class ExercisedTests
 {
     /// <summary>The brain the house is walked with.</summary>
     /// <remarks>
-    /// <b>Named rather than written inline, so the two are comparable.</b> The spine is two
-    /// worlds and they run two brains; a check cannot say which dials part while each is a
-    /// literal at its own call site.
+    /// <para>
+    /// <b>Named rather than written inline, so the two are comparable.</b> The spine ran two
+    /// worlds on two brains; a check cannot say which dials part while each is a literal at
+    /// its own call site.
+    /// </para>
+    /// <para>
+    /// <b>And it is NOT <see cref="Talking"/>'s pair, which was tried and reverted.</b>
+    /// <c>RoamingTests.What_the_conversations_two_dials_cost_the_walk</c> read the walk as
+    /// indifferent — 0.612, 0.640 and 0.538 under the conversation's pair against 0.587,
+    /// 0.642 and 0.538 under these, for two thirds of the residents — so the cheap road to
+    /// one brain looked open.
+    /// </para>
+    /// <para>
+    /// <b>That grid asked the WHERE question only, and the effect arm pays.</b> Under
+    /// <c>Admitting.Testable</c> it falls from 105 residents and 131 repairs to 39 and 7, and
+    /// the derivation stops reaching a scope — so <i>a concept a thing in its own right</i>
+    /// goes unreached and the spine loses an entry of THE ARCHITECTURE to buy dial parity.
+    /// Parity is the means and coverage is the end, so the trade is refused and
+    /// <c>OutstandingTests.The_spine_runs_one_brain</c> stays red with a measured reason
+    /// rather than an unexamined one.
+    /// </para>
     /// </remarks>
     internal static CommittingSettings Walking => new() { Capacity = 20_000 };
 

@@ -29,17 +29,16 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **First the machine can say what it EXPECTS.** A person asks it something and the drive
-  answers with whatever teaches most, so nothing on the spine reads the belief. The
-  terminal reads it and no measurement does. `OutstandingTests`.
-- **And the walk ends when the MACHINE is done**, not on a count somebody set.
+- **First the walk ends when the MACHINE is done**, not on a count somebody set.
   `Commitment.Progress` is what sates, so `Steps` becomes a cap. John's. Fork **152**.
 - **And the exam asks a CONSEQUENCE, never only a fact.** A stated answer is one a script
   holding the transcript reaches. John's. Fork **153**.
 - **Then a chooser that can ASK the exam's question.** Asking perfectly triples the walked
   half; the drive pays on the WALK and asks less than a coin. Forks **146**, **151**.
-- **Then the four dials read off the spine only** — `Budgeting`, `Feeling`, `Forking`,
-  `Subsuming`. Re-taken HERE: the world they want a reading on is the one being built.
+- **Then the seven dials read off the spine only** — `Budgeting`, `Deciding`, `Feeling`,
+  `Forking`, `Rooting`, `Spanning`, `Subsuming`. Re-taken HERE: the world they want a
+  reading on is the one being built, and three of them read as measured on it by being named
+  beside the conversation.
 - **Then a regime with COMPANY and a population**, priced on the lesson and unread on the
   house: a moment of one word derives no vocabulary and a moment carrying a story roots
   genesis on nothing, no arm a middle. Fork **120**.

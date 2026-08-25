@@ -103,6 +103,17 @@ internal static class Program
 
         brain.Held.Sorts = sorts;
 
+        // What the machine BELIEVES, said first where it has a belief about the moment in
+        // front of it, and the drive after. A machine with only a drive is one nobody can ask
+        // anything: `Drives` ranks what to say by how much saying it would teach, which is a
+        // question about the population rather than an answer to whoever is typing.
+        var answering = new Answers(
+            brain,
+            saying: expects => Brain.Meant(expects) is { } word && word < world.Doings
+                ? word
+                : null,
+            otherwise: Chooses.From(drives.Choose, drives.Cleared));
+
         var bench = new Bench(
             new Watching<Coded>(
                 world,
@@ -115,9 +126,7 @@ internal static class Program
                         floor: Number(args, "--floor", 20),
                         every: Number(args, "--deriving", 2_000)),
                     sorts),
-                acting: Chooses.From(
-                    felt => Answering(brain, world, felt) ?? drives.Choose(felt),
-                    drives.Cleared)),
+                acting: answering),
             brain);
 
         // Enough rounds for as many houses as were asked for, because a run stopping mid-walk
@@ -143,8 +152,8 @@ internal static class Program
         Console.WriteLine(
             $"talking    : {world.Questions} asked of you, {world.Answered} answered");
         Console.WriteLine(
-            $"speaking   : the drive named the word {drives.Told} times and the draw "
-            + $"{drives.Untold}");
+            $"speaking   : it said what it believed {answering.Said} times, the drive named "
+            + $"the word {drives.Told} times and the draw {drives.Untold}");
         Console.WriteLine(
             $"settling   : {tally.Right} right, {tally.Wrong} wrong, {tally.Abstained} settled "
             + "nothing");
@@ -185,38 +194,6 @@ internal static class Program
 
         return 0;
     }
-
-    /// <summary>The word this machine believes follows, or nothing where it believes none.</summary>
-    /// <param name="brain">Whose belief it is.</param>
-    /// <param name="world">Which house numbers the words.</param>
-    /// <param name="felt">The moment it is looking at.</param>
-    /// <remarks>
-    /// <para>
-    /// <b>The other half of a conversation, and it is a DEPLOYMENT choice.</b> A person who
-    /// asks the machine something wants what the machine holds; <c>Drives</c> ranks what to
-    /// say by how much saying it would TEACH, which is a question about the population rather
-    /// than an answer to anybody. So a terminal that only had the drive would be a machine
-    /// nobody can ask anything.
-    /// </para>
-    /// <para>
-    /// <b>Read-only, which is what makes it safe to ask.</b> <c>Brain.Voting</c> mints
-    /// nothing and settles nothing, so consulting it is not the machine having learnt
-    /// something — and it is the one road <c>Supposing</c>'s second hop has to a chooser.
-    /// </para>
-    /// <para>
-    /// <b>And it is unmeasured</b>, which is why it is here and not in a fixture. Whether
-    /// answering first beats asking first is a comparison nobody has run;
-    /// <c>OutstandingTests.The_machine_can_say_what_it_expects</c> is red until one is taken
-    /// on the house, and until then this is a capability for whoever is typing rather than a
-    /// number about the brain.
-    /// </para>
-    /// </remarks>
-    private static int? Answering(Brain brain, Roaming world, IReadOnlyCollection<Code> felt) =>
-        brain.Voting(felt).Expects is { } said
-        && Brain.Meant(said) is { } word
-        && word < world.Doings
-            ? word
-            : null;
 
     private static int Number(string[] args, string named, int fallback) =>
         Given(args, named) is { } value

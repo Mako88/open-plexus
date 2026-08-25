@@ -784,32 +784,34 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// caller read a typed conversation and went with it.
     /// </para>
     /// <para>
-    /// <b>What is left on the house can ask and cannot answer.</b> <c>Drives</c> ranks the
-    /// WORDS it might say by how much saying one would teach, which is a question about the
-    /// population rather than about the moment in front of it. So a person who asks the
-    /// machine something gets whatever the drive felt like saying, and the machine's own
-    /// belief reaches nothing.
+    /// <b>What was left on the house could ask and could not answer.</b> <c>Drives</c>
+    /// ranks the WORDS it might say by how much saying one would teach, which is a question
+    /// about the population rather than about the moment in front of it. So a person who
+    /// asked the machine something got whatever the drive felt like saying.
     /// </para>
     /// <para>
-    /// <b>Red on purpose, and it computes the state.</b> What it asks is whether any test
-    /// building the spine world reads the vote, which is <c>DialTests.OffTheSpine</c>'s own
-    /// proxy — so it cannot be satisfied by editing this file, and it closes on a
-    /// composition rather than on a call.
+    /// <b><see cref="Machines.Answers"/> closed it, and the cost is nought.</b> It says the
+    /// word the vote expects and hands the round to the drive where it believes nothing.
+    /// <c>RoamingTests.What_decides_the_words_the_machine_says_about_the_house</c> holds
+    /// the grid: the exam is 0.283 under the drive and 0.278 under the belief, and it puts
+    /// slightly more askable questions rather than fewer.
+    /// </para>
+    /// <para>
+    /// <b>Green is the point rather than a reason to delete it.</b> What it computes is
+    /// whether a test that builds the spine world composes the chooser, which is
+    /// <c>DialTests.OffTheSpine</c>'s own proxy — so it goes red the day the machine on
+    /// the house stops being able to answer, and it cannot be satisfied by editing this
+    /// file.
     /// </para>
     /// </remarks>
     [Fact]
     public void The_machine_can_say_what_it_expects()
     {
-        // Spelt in halves so this file does not read as a caller itself. `DeadCodeTests`
-        // scans source for a use, and a literal naming the call would satisfy it -- a check
-        // being satisfied by the text of the check that asks about it.
-        var call = "." + "Voting(";
-
         var reading = Directory
             .GetFiles(Path.Combine(Tree.Repo(), "tests", "OpenPlexus.Tests"), "*.cs")
             .Where(path => Path.GetFileName(path) != "OutstandingTests.cs")
             .Where(path => File.ReadAllText(path) is var source
-                && source.Contains(call, StringComparison.Ordinal)
+                && source.Contains($"new {nameof(Machines.Answers)}(", StringComparison.Ordinal)
                 && source.Contains("new Roaming(", StringComparison.Ordinal))
             .Select(Path.GetFileName)
             .ToList();
@@ -823,7 +825,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
             "`Brain.Voting` is what the machine BELIEVES and nothing on the spine reads it, "
             + "so a person can ask the house's machine a question and never be answered from "
             + "what it holds. `Supposing` reaches a chooser by this road and no other. This "
-            + "test is red on purpose and closes on a chooser that answers, not on this file.");
+            + "closes on a chooser that answers, not on this file.");
     }
 
 }

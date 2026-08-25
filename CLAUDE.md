@@ -81,10 +81,9 @@ green without doing it. Do not delete them, do not weaken them, and do not read 
 regression. Each computes the state rather than asserting a constant, so none can be satisfied
 by editing that file; an entry closes when the work closes.
 
-**The red set is two, and anything else red is yours.**
+**The red set is ONE, and anything else red is yours.**
 `OutstandingTests.Every_dial_is_measured_on_a_world_whose_score_counts` names seven dials no
-test building the spine world turns, and `OutstandingTests.The_machine_can_say_what_it_expects`
-says nothing there reads `Brain.Voting`. Check the failures against that before assuming a run
+test building the spine world turns. Check the failures against that before assuming a run
 is clean — a stable red set is the only kind you can read a new failure against.
 
 **The seven went from four when the spine became ONE world.** `Rooting`, `Spanning` and

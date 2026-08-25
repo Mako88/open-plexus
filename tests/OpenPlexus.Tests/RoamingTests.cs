@@ -712,7 +712,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>What a machine wanting to LEARN says about the house.</b>
+    /// <b>What decides the words the machine says about the house.</b>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -738,9 +738,35 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// nothing said afterwards can reach it; how many askable questions the machine put is
     /// what the drive is read on, and the person answering is what settles them.
     /// </para>
+    /// <para>
+    /// <b>And the third arm says what it BELIEVES first.</b> <see cref="Answers"/> is a
+    /// requirement rather than an arm — a machine nobody can ask anything is not something
+    /// a person can talk to — so what this reads is its COST rather than whether it wins.
+    /// The belief and the drive answer different questions and there is no scale on which
+    /// they trade, so the belief goes first and the drive takes the rounds it has nothing
+    /// to say about.
+    /// </para>
+    /// <para>
+    /// <b>And the cost is nought.</b> Thirty houses a seed over three seeds: the exam
+    /// reads 0.104 under the draw, 0.283 under the drive and 0.278 under the belief, and
+    /// the belief leads the drive on two seeds of three and trails on one. So answering
+    /// from what is held is free where it was owed anyway.
+    /// </para>
+    /// <para>
+    /// <b>And it puts slightly MORE askable questions</b>, 217 of 540 conversation rounds
+    /// against the drive's 211 and the draw's 170. That is inside noise and it is the
+    /// direction worth naming: a belief is not a question, so an arm that spent its budget
+    /// answering could have crowded the asking out and did not.
+    /// </para>
+    /// <para>
+    /// <b>It believes about a fifth of what it says</b> — 1,503, 1,500 and 1,505 beliefs
+    /// against some 8,200 doings a seed, the rest falling to the drive. A count that moved
+    /// is what separates an arm that bit and changed nothing from an arm nothing reached,
+    /// and no score here could tell those apart.
+    /// </para>
     /// </remarks>
     [Fact]
-    public async Task What_a_machine_that_wants_to_learn_asks_the_house()
+    public async Task What_decides_the_words_the_machine_says_about_the_house()
     {
         const int Houses = 30;
         const int Steps = 40;
@@ -765,7 +791,9 @@ public sealed class RoamingTests(ITestOutputHelper output)
         var perSeed = new Dictionary<(string Arm, int Seed), double>();
         var advocated = 0L;
 
-        foreach (var arm in new[] { "uniform", "learning" })
+        var believed = 0L;
+
+        foreach (var arm in new[] { "uniform", "learning", "believing" })
         foreach (var seed in Enumerable.Range(1, Seeds))
         {
             var rounds = Houses * (Steps + Chatting + Asked);
@@ -801,12 +829,28 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 untold: () => draw.Next(house.Doings),
                 arm: Wanting.Learning);
 
+            // Handed in where the world and the brain meet, because which code an outcome
+            // is about is a fact only the world holds. Without it the belief has no word
+            // to be said as and the third arm is its own fallback.
+            brain.Meaning = house.Meaning;
+
+            var answers = new Answers(
+                brain,
+                saying: expects => Brain.Meant(expects) is { } word
+                    && word < house.Doings
+                        ? word
+                        : null,
+                otherwise: Chooses.From(drives.Choose, drives.Cleared));
+
             var watching = new Watching<Coded>(
                 world,
                 new Joined(Joining.Bagged),
-                acting: arm == "learning"
-                    ? Chooses.From(drives.Choose, drives.Cleared)
-                    : Chooses.From(_ => draw.Next(house.Doings)));
+                acting: arm switch
+                {
+                    "learning" => Chooses.From(drives.Choose, drives.Cleared),
+                    "believing" => answers,
+                    _ => Chooses.From(_ => draw.Next(house.Doings)),
+                });
 
             var loop = new Round(brain, rounds, sweep: 500, target: 0.9, window: 500);
 
@@ -868,12 +912,16 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 + $"   spoke {spoke} of {talked}"
                 + (arm == "learning"
                     ? $", drive named {drives.Told} and the draw {drives.Untold}"
+                    : string.Empty)
+                + (arm == "believing"
+                    ? $", believed {answers.Said} and had nothing {answers.Quiet}"
                     : string.Empty));
 
             if (arm == "learning") advocated += drives.Told;
+            if (arm == "believing") believed += answers.Said;
         }
 
-        foreach (var arm in new[] { "uniform", "learning" })
+        foreach (var arm in new[] { "uniform", "learning", "believing" })
         {
             var rows = scored.Where(one => one.Key.Arm == arm).ToList();
 
@@ -888,12 +936,19 @@ public sealed class RoamingTests(ITestOutputHelper output)
         var leads = Enumerable.Range(1, Seeds).Count(seed =>
             perSeed[("learning", seed)] > perSeed[("uniform", seed)]);
 
-        output.WriteLine($"the drive leads on {leads} seeds of {Seeds}");
+        // Counted in BOTH directions, because a small sample hides a real effect as readily
+        // as it invents one and a count one way reads as a verdict either way.
+        var over = Enumerable.Range(1, Seeds).Count(seed =>
+            perSeed[("believing", seed)] > perSeed[("learning", seed)]);
 
-        // Every house's exam was sat under both arms, whatever the walk before it looked
+        output.WriteLine(
+            $"the drive leads the draw on {leads} seeds of {Seeds}, and saying what it "
+            + $"believes leads the drive on {over} and trails it on {Seeds - over}");
+
+        // Every house's exam was sat under every arm, whatever the walk before it looked
         // like. Which KINDS got asked is a fact about where the machine ended up walking and
-        // is not the same number under two choosers.
-        Assert.Equal(2, questions.Count);
+        // is not the same number under three choosers.
+        Assert.Equal(3, questions.Count);
 
         Assert.All(
             questions.Keys,
@@ -913,6 +968,30 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // And the conversation ran, or the asking column is about a phase that never
         // happened. Every house offers its rounds whether or not the machine takes them up.
         Assert.All(questions.Values, one => Assert.True(one.Talked > 0));
+
+        // The belief was SAID, or the third arm is the second one under a second name and
+        // every row of it is the drive's printed twice. A chooser that believed nothing
+        // all run reads exactly like one whose belief never differed, and no score here
+        // can tell those apart.
+        Assert.True(believed > 0,
+            "`Answers` never once had a belief about the moment in front of it, so the "
+            + "`believing` arm was `Drives` all run and the two rows are one row. The "
+            + "usual cause is `Brain.Meaning` not being handed in, which leaves every "
+            + "expectation with no word to be said as.");
+
+        // And it CHANGED what the machine said, which is the half a count of beliefs
+        // cannot give. A chooser whose belief was always the word the drive would have
+        // picked anyway is the drive under a second name, and every row of it is the
+        // second row printed twice. Asserted as a DIFFERENCE rather than a direction: a
+        // requirement is not an arm, so which way this goes is a cost to record.
+        Assert.True(
+            Enumerable.Range(1, Seeds).Any(seed =>
+                perSeed[("believing", seed)] != perSeed[("learning", seed)])
+            || questions["believing"] != questions["learning"],
+            "the `believing` arm scored and spoke exactly as `learning` did on every seed, "
+            + "so saying what it believes never once changed what it said and the two rows "
+            + "are one row. Either the belief is always the drive's own pick or the "
+            + "chooser is not reaching the world.");
     }
 
     /// <summary>A walked house whose exam may be ANOTHER house's.</summary>

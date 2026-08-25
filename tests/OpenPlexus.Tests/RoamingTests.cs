@@ -94,11 +94,28 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// be enumerated, so a name that finds no new truth can be seen to find none.
     /// </para>
     /// <para>
-    /// <b>The spine half is OWED a reading and does not have one.</b> The number it had was
-    /// taken on the recited walk, which is deleted, and a reading about a world that no
-    /// longer exists is worse than none. The eleven-bit half stands: naming held several
-    /// times the sound rules, found exactly the same truths, and scored behind its own
-    /// absence — so what the rung buys there is a wider vocabulary and nothing else.
+    /// <b>Measured on the walked house, five seeds, ten thousand rounds.</b> Own 0.198, 0.199
+    /// and 0.199 for named, unrooted and never; residents 1,657, 1,627 and 1,618; repairs
+    /// 1,702, 1,659 and 1,649. Every column is inside noise, which is what the recited walk
+    /// said before it was deleted — so the finding survived the world it was taken on.
+    /// </para>
+    /// <para>
+    /// <b>And the spine mints ONE name a run</b>, so that null is weaker than it looks. An arm
+    /// with nothing to bite on and an arm that bit and changed nothing read alike from a
+    /// score, and the names column is what separates them.
+    /// </para>
+    /// <para>
+    /// <b>The eleven-bit half is where the arms come apart</b>, and the middle one answers
+    /// what the control could not. Sound rules 266.8, 176.4 and 58.2 for named, unrooted and
+    /// never; unsound 285.8, 194.2 and 119.2; recent 0.990, 0.995 and 0.997. Found is 15.4
+    /// under all three, to the digit.
+    /// </para>
+    /// <para>
+    /// <b>So the ROOT is most of the inflation.</b> Refusing
+    /// genesis the minted code takes a third of the extra sound rules away and half the extra
+    /// unsound ones, and the truths found do not move — naming finds nothing a machine
+    /// without it misses, whichever half of the delivery it keeps. Fork 129 changes which
+    /// codes are named and keeps the delivery, so it inherits this.
     /// </para>
     /// <para>
     /// <b>And a held-out set is gone with the recital</b>, so the score reported is the

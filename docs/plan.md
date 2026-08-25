@@ -29,9 +29,7 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **First the exam asks a CONSEQUENCE, never only a fact.** A stated answer is one a script
-  holding the transcript reaches. John's. Fork **153**.
-- **Then a chooser that can ASK the exam's question.** Asking perfectly triples the walked
+- **First a chooser that can ASK the exam's question.** Asking perfectly triples the walked
   half; the drive pays on the WALK and asks less than a coin. Forks **146**, **151**.
 - **Then the seven dials read off the spine only** — `Budgeting`, `Deciding`, `Feeling`,
   `Forking`, `Rooting`, `Spanning`, `Subsuming`. Re-taken HERE: the world they want a
@@ -299,9 +297,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — the POPULATION is where it grows: 19, 797 and 1,824 sound rules.
     - **OPEN** — the scope language is the CEILING: whatever a scope cannot say cannot be
       learnt. ILP's language-bias problem, what killed the field, and the ladder is finite.
-    - **OPEN** — every kind the exam asks was STATED, so a script holding the transcript
-      scores full marks. A consequence never said is the half no matching reaches. Fork
-      **153**.
+    - **OPEN** — the exam asks a consequence now and the learner is at its MARGINAL on it,
+      and nearly as good on another house's. What no matching reaches is reached by nothing
+      else either.
     - **OPEN** — six bits is refused on POWER and eleven names the wrong thing; whether any
       world the naming reaches holds a nameable concept. Fork **34**.
     - **OPEN** — genesis does not root on a code that never varied, and an always-present

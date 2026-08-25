@@ -537,7 +537,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         Assert.Equal(Asked * 20, asked);
         Assert.Equal(Steps * 20, walked);
 
-        Assert.Equal(3, kinds.Count);
+        Assert.Equal(4, kinds.Count);
     }
 
     /// <summary>
@@ -803,20 +803,26 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// to say about.
     /// </para>
     /// <para>
-    /// <b>And the cost is nought.</b> Thirty houses a seed over three seeds: the exam
-    /// reads 0.104 under the draw, 0.283 under the drive and 0.278 under the belief, and
-    /// the belief leads the drive on two seeds of three and trails on one. So answering
-    /// from what is held is free where it was owed anyway.
+    /// <b>And the cost is small.</b> Thirty houses a seed over three seeds: the exam reads
+    /// 0.119 under the draw, 0.250 under the drive and 0.233 under the belief, and the
+    /// belief is behind on two seeds and ahead on one — 0.244 against 0.239, 0.328 against
+    /// 0.350, and 0.128 against 0.161. Three seeds cannot tell those apart.
     /// </para>
     /// <para>
-    /// <b>And it puts slightly MORE askable questions</b>, 217 of 540 conversation rounds
-    /// against the drive's 211 and the draw's 170. That is inside noise and it is the
-    /// direction worth naming: a belief is not a question, so an arm that spent its budget
-    /// answering could have crowded the asking out and did not.
+    /// <b>And it was read as FREE on the three-kind exam</b>, which is the correction worth
+    /// keeping rather than the number. That exam read 0.283 against 0.278 with the belief
+    /// ahead on two seeds of three; adding the question no transcript states moved the
+    /// order. A reading is conditional on the exam that produced it as much as on the brain.
+    /// </para>
+    /// <para>
+    /// <b>What it buys is a third again as many askable questions</b>, 242 of 540
+    /// conversation rounds against the drive's 184 and the draw's 145. A belief is not a
+    /// question, so an arm spending its budget answering could have crowded the asking out
+    /// and did the opposite.
     /// </para>
     /// <para>
     /// <b>It believes about a fifth of what it says</b> — 1,503, 1,500 and 1,505 beliefs
-    /// against some 8,200 doings a seed, the rest falling to the drive. A count that moved
+    /// against some 8,000 doings a seed, the rest falling to the drive. A count that moved
     /// is what separates an arm that bit and changed nothing from an arm nothing reached,
     /// and no score here could tell those apart.
     /// </para>
@@ -975,9 +981,15 @@ public sealed class RoamingTests(ITestOutputHelper output)
         var over = Enumerable.Range(1, Seeds).Count(seed =>
             perSeed[("believing", seed)] > perSeed[("learning", seed)]);
 
+        // Level counted apart from behind, because a tie is not a loss and a count that
+        // read it as one would report a direction nothing showed.
+        var level = Enumerable.Range(1, Seeds)
+            .Count(seed => perSeed[("believing", seed)] == perSeed[("learning", seed)]);
+
         output.WriteLine(
             $"the drive leads the draw on {leads} seeds of {Seeds}, and saying what it "
-            + $"believes leads the drive on {over} and trails it on {Seeds - over}");
+            + $"believes leads the drive on {over}, is level on {level} and trails on "
+            + $"{Seeds - over - level}");
 
         // Every house's exam was sat under every arm, whatever the walk before it looked
         // like. Which KINDS got asked is a fact about where the machine ended up walking and
@@ -1065,17 +1077,31 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// printed twice — which no score here could tell apart.
     /// </para>
     /// <para>
-    /// <b>Eight thousand rounds a seed over three seeds:</b> 0.386 sated, 0.282 against the
-    /// full cap and 0.317 against the matched one, and the sated arm walked 21, 26 and 25
-    /// steps of a cap of 40. So the shorter walk is worth 0.035 of the 0.104 and the CHOICE
-    /// of when to leave is worth the other 0.069, and it leads the matched control on three
-    /// seeds of three.
+    /// <b>Eight thousand rounds a seed over three seeds:</b> 0.332 sated, 0.274 against the
+    /// full cap and 0.330 against the matched one, and the sated arm walked 25, 24 and 26
+    /// steps of a cap of 40. So the whole of what ending early buys is the shorter walk,
+    /// and choosing WHEN to leave is worth nothing over being capped at the same length.
     /// </para>
     /// <para>
-    /// <b>Which is why the control came first.</b> It was taken before the number went down. A first
-    /// pass had the two arms alone and read 0.282 to 0.386 as what ending early buys — and a
-    /// third of that is the exam getting easier, because a walk with fewer steps in it has
-    /// had fewer chances for the truth to move away from the sentence that stated it.
+    /// <b>And it read the other way on the three-kind exam</b>, which is the correction
+    /// worth keeping. There it was 0.353 against 0.293 and led the matched control on three
+    /// seeds of three; adding the question no transcript states took the whole lead away.
+    /// Three seeds cannot tell 0.332 from 0.330 either way — per seed it is 0.274 against
+    /// 0.376, 0.417 against 0.305 and 0.300 against 0.309, which is a spread far wider than
+    /// the difference. What would settle it is seeds, and a grid this size is a sweep's
+    /// work rather than a suite's.
+    /// </para>
+    /// <para>
+    /// <b>The requirement stands whichever way it goes.</b> A walk whose length is a number
+    /// the experimenter set is the target world carrying a decision that is not its own, so
+    /// a losing reading is a cost to record rather than grounds to put the count back.
+    /// </para>
+    /// <para>
+    /// <b>Which is why the control came first.</b> It was taken before the number went
+    /// down. A first pass had the two arms alone and read the whole gap as what ending
+    /// early buys — and a third of it is the exam getting easier, because a walk with fewer
+    /// steps in it has had fewer chances for the truth to move away from the sentence that
+    /// stated it.
     /// </para>
     /// </remarks>
     [Fact]
@@ -1305,15 +1331,22 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// one is measuring the alphabet rather than the walk.
     /// </para>
     /// <para>
-    /// <b>Read per kind</b>, because the three do not have one ceiling between them. Counting
+    /// <b>Read per kind</b>, because the four do not have one ceiling between them. Counting
     /// is at the scope language's own bound and reads its marginal under both arms; where a
-    /// thing ended up and what a room held are the halves the walk can be about.
+    /// thing ended up, what a room held and what WOULD be in one are what the walk can be
+    /// about.
     /// </para>
     /// </remarks>
     [Fact]
     public async Task What_a_learner_scores_on_the_survey_against_the_wrong_houses_exam()
     {
-        const int Rounds = 6_000;
+        // Four times what it was, and the exam gaining a fourth kind is why. Four kinds
+        // over one budget is three quarters of the questions a row used to hold, and the
+        // arms are separated by a hair over three standard errors at this size -- so the
+        // gap stopped clearing the bar at six thousand for want of sample rather than
+        // because the exam had stopped reading the walk. Twelve thousand reads 2.1 and
+        // this reads 3.2, which is the square root the arithmetic predicts.
+        const int Rounds = 24_000;
         const int Steps = 40;
         const int Asked = 6;
 
@@ -1383,9 +1416,9 @@ public sealed class RoamingTests(ITestOutputHelper output)
             }
         }
 
-        // Three kinds under both arms, or the table is a verdict on which questions got asked
+        // Four kinds under both arms, or the table is a verdict on which questions got asked
         // rather than on the machine.
-        Assert.Equal(6, scored.Count);
+        Assert.Equal(8, scored.Count);
 
         Assert.All(scored.Values, one => Assert.True(one.Asked > 100));
 
@@ -1411,10 +1444,10 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
         // And the two arms come apart somewhere, or the exam reads nothing about the walk at
         // all and a score off it is a score off the alphabet. Asserted on the widest of the
-        // three rather than on all of them, because the kinds do not have one ceiling
+        // four rather than on all of them, because the kinds do not have one ceiling
         // between them -- and it does not invert when the machine improves, because it asks
         // whether the pairing matters rather than whether the answer was right.
-        var apart = new[] { "how", "what", "where" }.Max(kind =>
+        var apart = new[] { "how", "if", "what", "where" }.Max(kind =>
         {
             var (was, hit) = scored[("paired", kind)];
             var (crossed, other) = scored[("crossed", kind)];

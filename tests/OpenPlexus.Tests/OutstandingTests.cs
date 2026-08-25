@@ -790,11 +790,11 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// asked the machine something got whatever the drive felt like saying.
     /// </para>
     /// <para>
-    /// <b><see cref="Machines.Answers"/> closed it, and the cost is nought.</b> It says the
+    /// <b><see cref="Machines.Answers"/> closed it, and the cost is priced.</b> It says the
     /// word the vote expects and hands the round to the drive where it believes nothing.
     /// <c>RoamingTests.What_decides_the_words_the_machine_says_about_the_house</c> holds
-    /// the grid: the exam is 0.283 under the drive and 0.278 under the belief, and it puts
-    /// slightly more askable questions rather than fewer.
+    /// the grid: the exam is 0.250 under the drive and 0.233 under the belief, and it puts
+    /// a third again as many askable questions.
     /// </para>
     /// <para>
     /// <b>Green is the point rather than a reason to delete it.</b> What it computes is

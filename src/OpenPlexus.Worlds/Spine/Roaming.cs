@@ -59,10 +59,20 @@ public sealed record RoamingSettings
     /// three the target is not allowed to keep.
     /// </para>
     /// <para>
-    /// <b>Three kinds rather than one, and they are asked in one exam.</b> Where a thing
-    /// ended up, what a room held, and how many things were in one — so a machine at the top
-    /// of the exam has to have tracked a thing, read a room, and counted, rather than have
-    /// found the one rule the single question rewarded.
+    /// <b>Four kinds rather than one, and they are asked in one exam.</b> Where a thing
+    /// ended up, what a room held, how many things were in one, and what WOULD follow a
+    /// doing — so a machine at the top of the exam has to have tracked a thing, read a
+    /// room, counted and reasoned, rather than have found the one rule the single question
+    /// rewarded.
+    /// </para>
+    /// <para>
+    /// <b>And the fourth was never SAID.</b> The first three are facts the transcript
+    /// carries, so a script that tracked it scores full marks on them and understands
+    /// nothing. <i>If mary took the football where would the football be</i> is answered by
+    /// knowing that picking a thing up puts it where the hands are, which no sentence in
+    /// front of the machine states — it is <i>what would the world look like if I did X</i>
+    /// arriving on the exam. The question names nobody's ROOM, so it does not carry its
+    /// own answer, which the first shape of it did.
     /// </para>
     /// <para>
     /// <b>And counting is at the scope language's ceiling on purpose.</b> A conjunction of
@@ -336,7 +346,7 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
     /// the numbers in every house would have changed the marginal of every walk taken before
     /// the survey existed.
     /// </remarks>
-    private static readonly string[] Asking = ["how", "many"];
+    private static readonly string[] Asking = ["how", "many", "if", "would", "be"];
 
     /// <summary>How many of something there were, as a word.</summary>
     /// <remarks>
@@ -1454,6 +1464,12 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
     /// world's own instrument takes before any learner runs — a world that only asked what
     /// the machine had seen would be an exam edited until it could be passed.
     /// </para>
+    /// <para>
+    /// <b>Except the fourth, whose answer is a state the walk never reached.</b> It is
+    /// asked of a LOOSE thing and of somebody standing somewhere else, so the answer is
+    /// where that person is and the transcript says that about the person and never about
+    /// the thing — what reaches it is knowing that picking something up moves it.
+    /// </para>
     /// </remarks>
     private List<Question> Survey(Walk walk)
     {
@@ -1476,6 +1492,24 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
                 && Worded(Things[Array.IndexOf(placed, room)]))
             .ToList();
 
+        // A loose thing and somebody who is NOT in the room with it. What makes the
+        // consequence question askable: picking a thing up puts it where the hands are, so
+        // the answer is where that person is standing and no sentence says it about the
+        // thing. Somebody already in the room would make the answer where the thing
+        // already is, which is the transcript's own fact wearing a consequence's clothes.
+        // The body is left out because the exam is about the house rather than about the
+        // machine, and nothing here names it as a person.
+        var reachable = Enumerable
+            .Range(0, _settings.Props)
+            .Where(prop => walk.Held[prop] == Nobody && Worded(Things[prop]))
+            .SelectMany(prop => Enumerable
+                .Range(1, _settings.People - 1)
+                .Where(who => walk.Here[who] != placed[prop]
+                    && Worded(Cast[who])
+                    && Worded(Places[walk.Here[who]]))
+                .Select(who => (Prop: prop, Who: who)))
+            .ToList();
+
         for (var one = 0; one < _settings.Asked; one++)
         {
             var kinds = new List<int>();
@@ -1483,6 +1517,7 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
             if (things.Count > 0) kinds.Add(0);
             if (alone.Count > 0) kinds.Add(1);
             if (rooms.Count > 0) kinds.Add(2);
+            if (reachable.Count > 0) kinds.Add(3);
 
             if (kinds.Count == 0) break;
 
@@ -1510,7 +1545,7 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
                     break;
                 }
 
-                default:
+                case 2:
                 {
                     var room = rooms[_walks.Next(rooms.Count)];
 
@@ -1518,6 +1553,19 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
                         Said("how", "many", "in", "the", Places[room]),
                         _naming[Kinds.Named(
                             Word, Counts[placed.Count(at => at == room)])]));
+
+                    break;
+                }
+
+                default:
+                {
+                    var (prop, who) = reachable[_walks.Next(reachable.Count)];
+
+                    asked.Add(new Question(
+                        Said(
+                            "if", Cast[who], "took", "the", Things[prop], "where", "would",
+                            "the", Things[prop], "be"),
+                        _naming[Kinds.Named(Word, Places[walk.Here[who]])]));
 
                     break;
                 }

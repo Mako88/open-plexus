@@ -375,9 +375,9 @@ public sealed class CeilingTests(ITestOutputHelper output)
             priced[kind] = (these.Count, present, latest);
         }
 
-        // Three kinds, or the survey is one question wearing three names. What makes an exam
+        // Four kinds, or the survey is one question wearing four names. What makes an exam
         // of a walk is that no single rule answers all of it.
-        Assert.Equal(3, priced.Count);
+        Assert.Equal(4, priced.Count);
 
         Assert.All(priced.Values, one => Assert.True(one.Asked > 0));
 

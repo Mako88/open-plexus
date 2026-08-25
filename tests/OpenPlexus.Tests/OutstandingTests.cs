@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using OpenPlexus.Codes;
+using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
@@ -711,6 +712,63 @@ public sealed class OutstandingTests(ITestOutputHelper output)
             + "built, and no spine world turns the arm on — so the drive fork 146 asks for "
             + "has not RUN. This test is red on purpose and closes on a reading off the walk "
             + "or the conversation, not on this file.");
+    }
+
+
+    /// <summary>
+    /// <b>The target world has a SIZE and no switches.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>John's, and it is a rule already here made checkable.</b>
+    /// <c>Roaming</c> is what the machine is worth, so it is meant to be a microcosm of the
+    /// real world and nothing else. A setting that makes it LESS than that is a way of
+    /// helping the machine by moving the world, which is the one thing the epistemics forbid
+    /// outright — and <c>RemindingTests</c> already carries <i>a world's dials are pinned
+    /// facts about the scenario, never levers</i> as a rule no check could hold.
+    /// </para>
+    /// <para>
+    /// <b>An enum is a switch and an int is a size</b>, which is what makes it checkable at
+    /// last. A real house has some number of rooms, props, people and steps, and choosing six
+    /// rather than eight does not make it less like a house. <c>Knowing</c>, <c>Seeing</c>
+    /// and <c>Examining</c> are not sizes: they say whether the machine explores or is
+    /// recited to, whether a thing's look already IS its name, and which single question gets
+    /// asked. Each has an arm that is a world the real one is not.
+    /// </para>
+    /// <para>
+    /// <b>What closes it is the merged world</b>: explore, then converse about what was seen,
+    /// then a survey of several verifiable things. The three switches collapse into that —
+    /// there is no reciting, a look is never a name, and the survey asks more than one kind
+    /// of question. <c>Conversing</c> goes at the same time, its half being the middle phase.
+    /// </para>
+    /// <para>
+    /// <b>And the deletions may not come first</b>, which is measured rather than assumed.
+    /// The explored walk abstains NOUGHT today where the recital abstains 682, and supposes
+    /// nothing where the conversation supposes; so cutting them before the merged world can
+    /// do both takes the spine below where it already is.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_target_world_has_a_size_and_no_switches()
+    {
+        var switches = typeof(RoamingSettings)
+            .GetProperties()
+            .Where(one => one.PropertyType.IsEnum)
+            .Select(one => $"{one.Name} ({one.PropertyType.Name})")
+            .Order(StringComparer.Ordinal)
+            .ToList();
+
+        output.WriteLine(
+            switches.Count == 0
+                ? "the walked house has a size and no switches"
+                : $"{switches.Count} switch(es): {string.Join(", ", switches)}");
+
+        Assert.True(switches.Count == 0,
+            $"{switches.Count} setting(s) on the target world are a SWITCH rather than a "
+            + "size: " + string.Join(", ", switches)
+            + ". Each has an arm that is a world the real one is not, and a number off it is "
+            + "what the machine is worth. This test is red on purpose and closes on the "
+            + "merged world, not on this file.");
     }
 
 }

@@ -783,7 +783,16 @@ public sealed class DocsTests
     // a ledger dropped with its commitment read the mechanism as never having run. Neither
     // gate decides it and the fresh-code arm is refuted in the table. The words buy a
     // revival row, a failure class with no check, and the item that replaces the fork.
-    private const int Whole = 13_033;
+    // And 13,119 is the eighty-second raise, eighty-six words, for John's decision about what
+    // the spine IS. One world -- explore, converse about what was
+    // seen, sit a survey -- so `Conversing` becomes its middle phase rather than a world of
+    // its own. And the rule under it: the target world has a SIZE and no SWITCHES, because a
+    // number off it is what the machine is worth, so what makes it less like the real world
+    // goes and the machine changes instead. It is worth its words because it INVERTS the
+    // order a session would otherwise take -- the deletions look like the cheap half and are
+    // the half that must come last, the explored walk abstaining nought today where the
+    // recital abstains 682.
+    private const int Whole = 13_119;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

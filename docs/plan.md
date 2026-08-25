@@ -29,15 +29,21 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **The spine becomes ONE world and the items below build it.** John's. Rung four
-  and the forward store are BUILT and neither is on this list.
-- **First, the DRIVE**, rankable at last. `Wanting.Learning` is built and no spine world
-  turns it on. Fork **146**.
-- **Then the SURVEY and its control**, another house's machine sitting this one's exam. Its
-  ceiling is taken before a learner is wired to it.
-- **Then the CHAT**, `Curiosity` pointed at what was seen rather than at a lesson.
-- **Then ONE BRAIN**, out of one composition. Converging the dials instead was priced and
-  refused: it costs the walk an entry of THE ARCHITECTURE.
+- **The spine becomes ONE world and the items build it.** John's: the machine explores the
+  house, converses about what it saw, then sits a survey. Rung four and the forward store are
+  BUILT and neither is on this list.
+- **And that world has a SIZE and no SWITCHES.** John's. A number off it is what the machine
+  is worth, so what makes it less like the real world goes and the MACHINE changes instead.
+  `Examining`, `Knowing` and `Seeing` are the three.
+- **First the SURVEY**, several verifiable questions rather than one: how many of a thing
+  were seen, what a room held, where things ended up. Its control is another house's machine
+  sitting this exam, and its ceiling comes first.
+- **Then the CHAT**, `Curiosity` pointed at what was seen, and a phase rather than a world.
+- **Then the switches and `Conversing` GO**, in that order: the explored walk abstains nought
+  where the recital abstains 682 and supposes nothing at all, so cutting first costs the
+  spine entries it already reaches.
+- **Then the DRIVE**, `Wanting.Learning` being built and turned on nowhere. Fork **146**.
+- **One brain falls out** of there being one composition.
 - **Then the four dials read off the spine only** — `Budgeting`, `Feeling`, `Forking`,
   `Subsuming`. Re-taken HERE: the world they want a reading on is the one being built.
 - **Then a regime with COMPANY and a population**, the conversation having neither together: a

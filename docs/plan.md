@@ -31,6 +31,10 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The spine becomes ONE world and the items below build it.** John's. Rung four
   and the forward store are BUILT and neither is on this list.
+- **First, what a fresh code must EARN before genesis roots on it.** Under
+  `Surprising.Unaccounted` a walked house mints no binding and 55 under `AnyFailure`, so the
+  varied filter and that gate shut the door between them and an entry of THE ARCHITECTURE
+  goes unreached. Fork **149**.
 - **The DRIVE**, rankable at last, there being choices worth ranking. Fork **146**.
 - **Then the SURVEY and its control**, another house's machine sitting this one's exam. Its
   ceiling is taken before a learner is wired to it.
@@ -305,6 +309,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       world the naming reaches holds a nameable concept. Fork **34**.
     - **OPEN** — genesis does not root on a code that never varied, and an always-present
       one is still an entry in every table forever. Fork **51**.
+    - **OPEN** — and a code just arrived is ineligible until it has been absent, by which time
+      the surprise gate has shut. Between them no binding is minted. Fork **149**.
   - A concept a thing in its own right
     - **NOW** — `Code`, and adhesion over a window reaches a persistent SOURCE. Derived
       offline, so no run reaches it.

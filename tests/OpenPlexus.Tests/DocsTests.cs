@@ -769,7 +769,15 @@ public sealed class DocsTests
     // is the crossing being handed over for free, which is the fault `CeilingTests` exists
     // to price, and it is a decision that would otherwise be made by whoever writes the
     // world first.
-    private const int Whole = 12_946;
+    // And 13,021 is the eightieth raise, seventy-five words, for a fork nobody had: what a
+    // fresh code must EARN before genesis may root on it. A walked house mints no binding
+    // under `Surprising.Unaccounted` and 55 under `AnyFailure`, so the varied filter and the
+    // surprise gate shut the door between them and `a thing is one thing` goes unreached. It
+    // is worth its words because both halves are shipped defaults with their own refutations
+    // behind them -- rooting on a code that never varied is 7.4 standard errors worse, and
+    // minting on every failure walks the whole code-to-outcome space -- so a session reaching
+    // for either would be re-treading a row rather than asking the question between them.
+    private const int Whole = 13_021;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

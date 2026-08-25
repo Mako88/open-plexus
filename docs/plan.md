@@ -555,9 +555,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       it.
     - **OPEN** — a drive that cannot be sated is a fault in the design and not a risk to
       manage, so a term must have a point where it stops pulling. John's.
-    - **OPEN** — the drive is a DESIRE TO UNDERSTAND, John's, built in rather than added, and
-      two shapes fail: wanting to be CORRECT is the dead body above, and wanting SURPRISE
-      takes the noisy channel. Learning PROGRESS sates by construction. Fork **146**.
+    - **OPEN** — the drive is a DESIRE TO UNDERSTAND, John's, built in rather than added.
+      `Commitment.Progress` is the term and lets go both when a rule is mastered and when the
+      channel is noise; no chooser ranks by it yet. Fork **146**.
     - **OPEN** — and no world here holds a common cause, so nothing says those claims are
       better.
     - **OPEN** — and nothing ranks a chooser there, a house having nothing to want. Twins

@@ -661,4 +661,45 @@ public sealed class OutstandingTests(ITestOutputHelper output)
             + "with a revival row, and `DrivenTests.Waiting` carries what closes each group. "
             + "This test is red on purpose and closes on that work, not on this file.");
     }
+
+    /// <summary>
+    /// <b>The learning trend is read by something that chooses.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Built and wired to nothing, so it has not run.</b>
+    /// <c>Commitment.Progress</c> is the drive fork 146 asks for — a want that sates, where
+    /// wanting to be CORRECT makes the world constant and wanting SURPRISE takes the noisy
+    /// channel. <c>CommitmentTests</c> asserts it rises while learning and lets go at both
+    /// exits, so what it claims is checked; what is missing is anything that acts on it.
+    /// </para>
+    /// <para>
+    /// <b>Red on purpose, and registered rather than left in a reply.</b> A number computed
+    /// every round and read by nobody is this repo's own recurring fault — <c>Surprise</c>
+    /// and <c>Abstain</c> were both found wired and unable to fire, and <c>Unseparated</c>
+    /// was computed for months and read by nothing. This closes when a chooser ranks by it,
+    /// and it is a source scan so it cannot be satisfied by editing this file.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_learning_trend_is_read_by_something_that_chooses()
+    {
+        var readers = Tree.Sources("src")
+            .Where(path => !path.EndsWith("Commitment.cs", StringComparison.Ordinal))
+            .Where(path => File.ReadAllText(path).Contains(".Progress", StringComparison.Ordinal))
+            .Select(Path.GetFileName)
+            .ToList();
+
+        output.WriteLine(
+            readers.Count == 0
+                ? "nothing in src reads a commitment's learning trend"
+                : $"read by {string.Join(", ", readers)}");
+
+        Assert.True(readers.Count > 0,
+            "`Commitment.Progress` is computed every settlement and read by nothing in the "
+            + "brain, so the drive fork 146 asks for is a number rather than a mechanism. "
+            + "This test is red on purpose and closes on a chooser ranking by it, not on "
+            + "this file.");
+    }
+
 }

@@ -81,11 +81,16 @@ green without doing it. Do not delete them, do not weaken them, and do not read 
 regression. Each computes the state rather than asserting a constant, so none can be satisfied
 by editing that file; an entry closes when the work closes.
 
-**The red set is two, and anything else red is yours.**
+**The red set is three, and anything else red is yours.**
 `OutstandingTests.The_spine_runs_one_brain` is two dials apart, `Admitting` and `Crediting`,
 and `OutstandingTests.Every_dial_is_measured_on_a_world_whose_score_counts` names four dials no
 spine composition turns. Check the failures against that before assuming a run is
 clean — a stable red set is the only kind you can read a new failure against.
+
+**And `The_learning_trend_is_read_by_something_that_chooses` is the third.**
+`Commitment.Progress` is fork 146's drive: it rises while a rule is being learnt and lets go
+both when the rule is mastered and when the channel is noise, which is what makes it sate.
+`CommitmentTests` asserts all three. Nothing chooses by it yet, and that is what closes it.
 
 **Adding an entry is stricter than adding anywhere else**: it must be work somebody has decided
 to do, computable without judgement, and closeable. An open question goes in the plan as

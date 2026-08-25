@@ -248,4 +248,90 @@ public sealed class CommitmentTests
         Assert.Equal<IEnumerable<Code>>([Of(2), Of(5), Of(9)], one.Scope);
         Assert.Equal(ImmutableArray.Create(Of(2), Of(5), Of(9)).ToList(), one.Scope.ToList());
     }
+
+    // ---- how fast it is still learning -------------------------------------
+
+    /// <summary>
+    /// <b>The trend rises while learning and lets go at both exits.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The check a drive that sates owes.</b> <see cref="Commitment.Progress"/> is meant
+    /// to pull toward what is still being learnt and to stop pulling at both exits — a rule
+    /// that has been mastered, and a channel that cannot be predicted at all. Nothing in a
+    /// score can tell a drive that sates from one nobody has starved yet, so the three
+    /// behaviours are asserted directly on the number.
+    /// </para>
+    /// <para>
+    /// <b>The noise arm is the one that separates it from SURPRISE.</b> A term reading how
+    /// often the machine was wrong is largest exactly where nothing can be learnt, which is
+    /// how a curious machine ends up watching static. Here the smoothed estimate catches the
+    /// estimate up, so the gap has no sign to prefer and the mean over a run is nought.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_learning_trend_rises_while_learning_and_sates_at_both_exits()
+    {
+        const double Recency = 0.05;
+
+        var moment = Moment(1, 2);
+
+        // Learning is WRONG AND THEN RIGHT, which is the only shape where an estimate
+        // actually moves. A rule right from its first firing was born correct and learnt
+        // nothing: its estimate goes to one in a step and stays, so a trend reading nought
+        // there is the trend being right rather than blind.
+        var learning = One(1);
+
+        for (var round = 0; round < 60; round++)
+            learning.Settle(Verdict.Miss, moment, Recency);
+
+        var climbing = new List<double>();
+
+        for (var round = 0; round < 60; round++)
+        {
+            learning.Settle(Verdict.Hit, moment, Recency);
+            climbing.Add(learning.Progress);
+        }
+
+        Assert.True(climbing.Average() > 0.0,
+            $"the trend averaged {climbing.Average():F4} while the estimate climbed off the "
+            + "floor, so it does not read learning at all");
+
+        // Mastered: the same rule, gone on being right long enough that the estimate stops
+        // moving. The trend has to let go, or a drive built on it never leaves a solved
+        // problem.
+        for (var round = 0; round < 4_000; round++)
+            learning.Settle(Verdict.Hit, moment, Recency);
+
+        Assert.True(Math.Abs(learning.Progress) < 0.001,
+            $"the trend is {learning.Progress:F4} on a rule that has been right four thousand "
+            + "times running, so it does not sate on what has been mastered");
+
+        // Noise: a channel that is right half the time and never gets better. The mean has
+        // to be nought -- a positive one is surprise, and a machine wanting it watches static
+        // forever.
+        var noisy = One(2);
+        var draw = new Random(7);
+        var drifting = new List<double>();
+
+        for (var round = 0; round < 20_000; round++)
+        {
+            noisy.Settle(draw.NextDouble() < 0.5 ? Verdict.Hit : Verdict.Miss, moment, Recency);
+
+            if (round >= 1_000) drifting.Add(noisy.Progress);
+        }
+
+        Assert.True(Math.Abs(drifting.Average()) < 0.001,
+            $"the trend averaged {drifting.Average():F4} on a channel that is a coin, so it "
+            + "has a sign to prefer where nothing can be learnt and it is surprise rather "
+            + "than progress");
+
+        // And the noisy rule's estimate is genuinely still moving, or the reading above is a
+        // number that could not have been anything else. A trend of nought on a dead
+        // estimate and a trend of nought on a live one are opposite findings.
+        Assert.True(drifting.Any(one => Math.Abs(one) > 0.001),
+            "the trend never once moved on the noisy channel, so the mean above says nothing "
+            + "about whether it prefers noise");
+    }
+
 }

@@ -83,6 +83,9 @@ internal sealed class Commitment
     private readonly Dictionary<Code, Separation> _separations = [];
 
     private double _accuracy;
+
+    /// <inheritdoc cref="Progress"/>
+    private double _settled;
     private long _seen;
     private ulong _witness;
 
@@ -157,6 +160,31 @@ internal sealed class Commitment
     /// and never travels, so C1 is untouched: nothing here is another node's data.
     /// </remarks>
     public double Accuracy => _accuracy;
+
+    /// <summary>
+    /// How fast the local estimate is still MOVING, which is a drive that sates.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A trend rather than an error</b>, and the difference is the whole of why this shape
+    /// was picked. Wanting to be CORRECT makes the world constant and is the dead body fork
+    /// 111 measured; wanting SURPRISE takes the noisy channel and never leaves. A channel
+    /// that cannot be predicted has an accuracy that bounces around a fixed mean, so the
+    /// smoothed estimate catches up and this averages nought — and a channel that has been
+    /// mastered has an accuracy that stops moving, so this is nought there too. Both roads
+    /// out of a drive end in it letting go, which is what <i>sates by construction</i> means.
+    /// </para>
+    /// <para>
+    /// <b>Signed rather than absolute</b>, because the size of the gap is what surprise reads
+    /// and the SIGN is what progress reads. Taking the magnitude would make noise attractive
+    /// again by a longer road.
+    /// </para>
+    /// <para>
+    /// <b>Local, like <see cref="Accuracy"/>.</b> It is built from that estimate and nothing
+    /// else, so it never merges and never travels, and C1 is untouched.
+    /// </para>
+    /// </remarks>
+    public double Progress => _accuracy - _settled;
 
     /// <summary>How many firings the local estimate has seen.</summary>
     /// <remarks>
@@ -321,6 +349,12 @@ internal sealed class Commitment
 
         _accuracy += rate * ((hit ? 1.0 : 0.0) - _accuracy);
 
+        // And the same rate again over the estimate itself, which is what makes the pair a
+        // TREND rather than a second opinion. Smoothing the smoothed value doubles the time
+        // constant without naming a second number, so `recency` still fixes both and the gap
+        // between them is how fast this commitment is still learning.
+        _settled += rate * (_accuracy - _settled);
+
         var occasion = 0UL;
 
         // The tally is over what was present and not over the scope. Every scope
@@ -390,6 +424,7 @@ internal sealed class Commitment
         Abstains = from.Abstains;
 
         _accuracy = from._accuracy;
+        _settled = from._settled;
         _seen = from._seen;
 
         // The register comes too, for the reason the tally does. A rewrite entails

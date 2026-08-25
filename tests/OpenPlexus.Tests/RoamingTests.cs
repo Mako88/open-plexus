@@ -921,7 +921,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
                 output.WriteLine(
                     $"{name,-12}| seed {seed} | exam {exam:F3} | own {tally.Recent:F3} "
-                    + $"| held {brain.Held.Count} | absences {absent}");
+                    + $"| held {brain.Held.Count} | repaired {tally.Repaired} "
+                    + $"| absences {absent}");
             }
         }
 
@@ -1108,6 +1109,13 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// reading below the walk's own defaults, worst against best. Then the two worlds want
     /// different brains for a measured reason and fork 147 is the only road left, rather than
     /// the cheap one.
+    /// </para>
+    /// <para>
+    /// <b>And the repair column is what a score cannot say.</b>
+    /// <c>LessonTests.What_the_admission_bar_costs_the_conversation_it_is_shipped_on</c> reads
+    /// the bar as exam-neutral there and finds it removes repair entirely, so converging on
+    /// the bar would be converging on a spine that never runs the one operator that deepens a
+    /// rule. Which value to converge on is decided by that column and not by the exam.
     /// </para>
     /// </remarks>
     [Fact]

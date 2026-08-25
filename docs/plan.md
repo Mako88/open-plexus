@@ -29,9 +29,7 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **First the walk ends when the MACHINE is done**, not on a count somebody set.
-  `Commitment.Progress` is what sates, so `Steps` becomes a cap. John's. Fork **152**.
-- **And the exam asks a CONSEQUENCE, never only a fact.** A stated answer is one a script
+- **First the exam asks a CONSEQUENCE, never only a fact.** A stated answer is one a script
   holding the transcript reaches. John's. Fork **153**.
 - **Then a chooser that can ASK the exam's question.** Asking perfectly triples the walked
   half; the drive pays on the WALK and asks less than a coin. Forks **146**, **151**.
@@ -558,8 +556,6 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — the drive is a DESIRE TO UNDERSTAND, John's, built in rather than added.
       `Commitment.Progress` is the term and `Wanting.Learning` ranks what to SAY by it,
       and its asking falls away as it goes. Fork **146**.
-    - **OPEN** — nothing says when the machine has SEEN enough, so a walk ends on a count
-      the experimenter set. A drive that sates is what could say. Fork **152**.
     - **OPEN** — and no world here holds a common cause, so nothing says those claims are
       better.
     - **OPEN** — and nothing ranks a chooser there, a house having nothing to want. Twins

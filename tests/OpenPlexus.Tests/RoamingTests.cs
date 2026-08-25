@@ -59,6 +59,62 @@ public sealed class RoamingTests(ITestOutputHelper output)
             Printed = person?.Printed,
         };
 
+    /// <summary>Which word each of this house's codes is, for reading a question's kind.</summary>
+    /// <param name="house">The house whose alphabet it is.</param>
+    /// <remarks>
+    /// <b>An answer key on <c>Roaming.Named</c>'s standing</b>, and nothing that learns is ever
+    /// shown it. What it is for is telling one KIND of exam question from another in the row,
+    /// which is a fact about the vocabulary the world emitted.
+    /// </remarks>
+    private static Dictionary<Code, string> Named(Roaming house)
+    {
+        var words = new Dictionary<Code, string>();
+
+        for (var one = 0; one < house.Vocabulary.Count; one++)
+            words[house.Meaning(one)!.Value] = house.Vocabulary[one];
+
+        return words;
+    }
+
+    /// <summary>The drive that wants to learn, over this house.</summary>
+    /// <param name="brain">Whose population it reads.</param>
+    /// <param name="house">Which house numbers the words.</param>
+    /// <param name="draw">The fallback, for the rounds nothing is advocated.</param>
+    /// <remarks>
+    /// <b>Nothing to want beyond learning</b>, because a house is not a body with variables to
+    /// be in trouble about. Every advocated word is wanted equally, so what ranks them is the
+    /// term rather than a preference over outcomes.
+    /// </remarks>
+    private static Drives Wanting(Brain brain, Roaming house, Random draw) =>
+        new(
+            brain.Held,
+            doing: house.Naming,
+            wanting: (_, _) => 1.0,
+            untold: () => draw.Next(house.Doings),
+            arm: Machines.Wanting.Learning);
+
+    /// <summary>One exam question counted against its kind, where the round was one.</summary>
+    /// <param name="world">The house being sat.</param>
+    /// <param name="words">Which word each code is.</param>
+    /// <param name="asked">How many of each kind were put, added to.</param>
+    /// <param name="right">How many of each kind were got, added to.</param>
+    /// <param name="better">Whether the loop scored this round right.</param>
+    private static void Marked(
+        Sitting world,
+        IReadOnlyDictionary<Code, string> words,
+        Dictionary<string, int> asked,
+        Dictionary<string, int> right,
+        bool better)
+    {
+        if (world.Asking is not { } code) return;
+
+        var kind = words[code];
+
+        asked[kind] = asked.GetValueOrDefault(kind) + 1;
+
+        if (better) right[kind] = right.GetValueOrDefault(kind) + 1;
+    }
+
     /// <summary>The house run into a brain, with nobody choosing for it.</summary>
     /// <param name="dials">How the brain is built.</param>
     /// <param name="seed">What draws the houses and the walks.</param>
@@ -807,27 +863,11 @@ public sealed class RoamingTests(ITestOutputHelper output)
                     new Person(answers: replies)),
                 seed);
 
-            var words = new Dictionary<Code, string>();
-
-            for (var one = 0; one < house.Vocabulary.Count; one++)
-                words[house.Meaning(one)!.Value] = house.Vocabulary[one];
-
+            var words = Named(house);
             var world = new Sitting(house, null);
-
             var brain = new Brain(new CommittingSettings { Capacity = 2_000 }, seed);
-
             var draw = new Random(seed);
-
-            var drives = new Drives(
-                brain.Held,
-                doing: house.Naming,
-
-                // Nothing to want, because a house is not a body with variables to be in
-                // trouble about. What is being asked is whether the LEARNING term can pick a
-                // word, so every advocated word is wanted equally under the other arm.
-                wanting: (_, _) => 1.0,
-                untold: () => draw.Next(house.Doings),
-                arm: Wanting.Learning);
+            var drives = Wanting(brain, house, draw);
 
             // Handed in where the world and the brain meet, because which code an outcome
             // is about is a fact only the world holds. Without it the belief has no word
@@ -879,13 +919,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
                     continue;
                 }
 
-                if (world.Asking is not { } code) continue;
-
-                var kind = words[code];
-
-                asked[kind] = asked.GetValueOrDefault(kind) + 1;
-
-                if (loop.Right > was) right[kind] = right.GetValueOrDefault(kind) + 1;
+                Marked(world, words, asked, right, loop.Right > was);
             }
 
             foreach (var kind in asked.Keys)
@@ -992,6 +1026,203 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + "so saying what it believes never once changed what it said and the two rows "
             + "are one row. Either the belief is always the drive's own pick or the "
             + "chooser is not reaching the world.");
+    }
+
+    /// <summary>
+    /// <b>What ending the walk when the machine has had enough costs.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Fork 152, and it is a REQUIREMENT rather than an arm.</b> John's: how long somebody
+    /// stays in a house is decided by whoever is walking it, so a walk whose length is a
+    /// number the experimenter set is the target world carrying a decision that is not its
+    /// own. <c>Steps</c> is a cap now and <c>Drives.Sated</c> is what ends it sooner.
+    /// </para>
+    /// <para>
+    /// <b>The want has to have RISEN before it can be flat.</b>
+    /// <c>Commitment.Progress</c> is nought for a rule that has been mastered and nought for
+    /// one nobody has learnt yet, so a machine that had just arrived would read as finished —
+    /// which would shorten the walk to suit the brain, and the target world is the one place
+    /// that may never happen. A machine whose want never goes positive walks to the cap.
+    /// </para>
+    /// <para>
+    /// <b>Every arm gets the same ROUNDS rather than the same houses</b>, because that is
+    /// what the trade is. A walk that ends early spends the rest of its budget on another
+    /// house, so what is being asked is whether more houses seen less thoroughly is worth
+    /// more or less than fewer seen to a cap.
+    /// </para>
+    /// <para>
+    /// <b>And the third arm is the control the other two need.</b> A shorter walk is an
+    /// EASIER exam — every step is a chance for the truth to move while the sentence that
+    /// stated the old one is still in view — so ending early raises the score for a reason
+    /// that has nothing to do with knowing when to stop. <c>matched</c> is the plain cap set
+    /// to the length the sated arm actually walked, per seed, so what is left between them
+    /// is the CHOICE of when to leave rather than the leaving.
+    /// </para>
+    /// <para>
+    /// <b>And the check that can FAIL is that it fired.</b> An arm that never once ended a
+    /// walk early is the cap wearing a second name, and every column of it is the control
+    /// printed twice — which no score here could tell apart.
+    /// </para>
+    /// <para>
+    /// <b>Eight thousand rounds a seed over three seeds:</b> 0.386 sated, 0.282 against the
+    /// full cap and 0.317 against the matched one, and the sated arm walked 21, 26 and 25
+    /// steps of a cap of 40. So the shorter walk is worth 0.035 of the 0.104 and the CHOICE
+    /// of when to leave is worth the other 0.069, and it leads the matched control on three
+    /// seeds of three.
+    /// </para>
+    /// <para>
+    /// <b>Which is why the control came first.</b> It was taken before the number went down. A first
+    /// pass had the two arms alone and read 0.282 to 0.386 as what ending early buys — and a
+    /// third of that is the exam getting easier, because a walk with fewer steps in it has
+    /// had fewer chances for the truth to move away from the sentence that stated it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task What_ending_the_walk_when_the_machine_has_had_enough_costs()
+    {
+        const int Rounds = 8_000;
+        const int Steps = 40;
+        const int Asked = 6;
+        const int Seeds = 3;
+
+        output.WriteLine(
+            $"{Rounds} rounds a seed over {Seeds} seeds, a cap of {Steps} steps and {Asked} "
+            + "asked");
+
+        output.WriteLine(
+            $"{"ending",-9}{"seed",-6}{"asked",8}{"right",8}{"score",9}{"unwalked",10}");
+
+        var scored = new Dictionary<(string Arm, string Kind), (int Asked, int Right)>();
+        var perSeed = new Dictionary<(string Arm, int Seed), double>();
+        var unwalked = new Dictionary<string, long>(StringComparer.Ordinal);
+
+        // How long the sated arm walked, per seed, so the matched control can be set to it.
+        // Sated runs first for that reason and for no other.
+        var walked = new Dictionary<int, int>();
+
+        foreach (var arm in new[] { "sated", "capped", "matched" })
+        foreach (var seed in Enumerable.Range(1, Seeds))
+        {
+            Drives? drives = null;
+
+            var house = new Roaming(
+                World(
+                    arm == "matched" ? walked[seed] : Steps,
+                    people: 2,
+                    asked: Asked) with
+                {
+                    Enough = arm == "sated" ? () => drives?.Sated == true : null,
+                },
+                seed);
+
+            var words = Named(house);
+            var world = new Sitting(house, null);
+            var brain = new Brain(new CommittingSettings { Capacity = 2_000 }, seed);
+            var draw = new Random(seed);
+
+            drives = Wanting(brain, house, draw);
+
+            var watching = new Watching<Coded>(
+                world,
+                new Joined(Joining.Bagged),
+                acting: Chooses.From(drives.Choose, drives.Cleared));
+
+            var loop = new Round(brain, Rounds, sweep: 500, target: 0.9, window: 500);
+
+            var asked = new Dictionary<string, int>(StringComparer.Ordinal);
+            var right = new Dictionary<string, int>(StringComparer.Ordinal);
+
+            for (var round = 0; round < Rounds; round++)
+            {
+                if (watching.Push() is not { } pushed) continue;
+
+                var was = loop.Right;
+
+                await loop.StepAsync(pushed);
+
+                Marked(world, words, asked, right, loop.Right > was);
+            }
+
+            foreach (var kind in asked.Keys)
+            {
+                var had = scored.GetValueOrDefault((arm, kind));
+
+                scored[(arm, kind)] =
+                    (had.Asked + asked[kind], had.Right + right.GetValueOrDefault(kind));
+            }
+
+            unwalked[arm] = unwalked.GetValueOrDefault(arm) + house.Left;
+
+            // The mean walk this seed actually took, which is what the matched control is
+            // capped at. A house asks `Asked` questions, so the count of them says how
+            // many houses were walked without the world having to report it.
+            if (arm == "sated")
+            {
+                var houses = Math.Max(1, asked.Values.Sum() / Asked);
+
+                walked[seed] = Math.Max(
+                    1, (int)Math.Round(((houses * (double)Steps) - house.Left) / houses));
+            }
+
+            var here = right.Values.Sum() / (double)asked.Values.Sum();
+
+            perSeed[(arm, seed)] = here;
+
+            output.WriteLine(
+                $"{arm,-9}{seed,-6}{asked.Values.Sum(),8}{right.Values.Sum(),8}{here,9:F3}"
+                + $"{house.Left,10}"
+                + (arm == "sated" ? $"   walked {walked[seed]} of {Steps}" : string.Empty));
+        }
+
+        foreach (var arm in new[] { "sated", "capped", "matched" })
+        {
+            var rows = scored.Where(one => one.Key.Arm == arm).ToList();
+
+            var put = rows.Sum(one => one.Value.Asked);
+            var hit = rows.Sum(one => one.Value.Right);
+
+            output.WriteLine(
+                $"{arm,-9}{"all",-6}{put,8}{hit,8}{hit / (double)put,9:F3}"
+                + $"{unwalked[arm],10}");
+        }
+
+        // Counted in both directions, because a small sample hides a real effect as readily
+        // as it invents one. The comparison that matters is against the MATCHED cap: the
+        // full one differs in walk length as well as in who decided it.
+        var over = Enumerable.Range(1, Seeds)
+            .Count(seed => perSeed[("sated", seed)] > perSeed[("capped", seed)]);
+
+        var apart = Enumerable.Range(1, Seeds)
+            .Count(seed => perSeed[("sated", seed)] > perSeed[("matched", seed)]);
+
+        output.WriteLine(
+            $"ending early leads the full cap on {over} seeds of {Seeds} and trails on "
+            + $"{Seeds - over}; against the matched cap it leads on {apart} and trails on "
+            + $"{Seeds - apart}");
+
+        // It FIRED, or the arm is the cap under a second name and every column of it is the
+        // control printed twice. A want that never rose and a walk that never ended early are
+        // the same unchanged table from outside.
+        Assert.True(unwalked["sated"] > 0,
+            "no walk ended before its cap in three runs of eight thousand rounds, so "
+            + "`Drives.Sated` never once read true and this grid is the capped arm twice. "
+            + "The want has to go positive before it can be flat, so the usual cause is a "
+            + "population that never learnt anything rather than a rule that never fires.");
+
+        // And the cap still bounds it, or a machine that has had enough of everything walks
+        // no house at all and the exam is asked about a scatter it never saw.
+        Assert.Equal(0, unwalked["capped"]);
+        Assert.Equal(0, unwalked["matched"]);
+
+        // And the matched control is genuinely shorter, or it is the full cap under a
+        // third name and the separation this grid rests on was never taken.
+        Assert.All(
+            Enumerable.Range(1, Seeds),
+            seed => Assert.True(walked[seed] < Steps,
+                $"the sated arm walked {walked[seed]} steps of a {Steps} cap on seed "
+                + $"{seed}, so the matched control is the full cap and nothing here "
+                + "separates ending early from walking a shorter house"));
     }
 
     /// <summary>A walked house whose exam may be ANOTHER house's.</summary>

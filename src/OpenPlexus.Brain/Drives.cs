@@ -114,6 +114,14 @@ internal sealed class Drives
     private readonly Func<Code, IReadOnlyCollection<Code>, double> _wanting;
     private readonly Func<int?> _untold;
     private readonly Wanting _arm;
+    private readonly int _window;
+
+    // The wants behind the last few rounds a commitment named the action, newest last,
+    // and whether they have ever been positive. Only named rounds go in: a round the
+    // fallback decided says nothing about what is left to learn, and counting those would
+    // read a machine with no population at all as one with nothing left to learn.
+    private readonly Queue<double> _lately = [];
+    private bool _rose;
 
     // What it has already said about the moment on the table. A world that takes several
     // doings a moment asks with the same codes in front of it every time, and the population
@@ -127,23 +135,31 @@ internal sealed class Drives
     /// <param name="wanting">How much this body wants an expected outcome.</param>
     /// <param name="untold">What to do on a round the population advocates nothing.</param>
     /// <param name="arm">What it wants.</param>
+    /// <param name="window">
+    /// How many named rounds <see cref="Sated"/> reads. <b>A SIZE and not a threshold</b>:
+    /// what it decides is how long the want has to have been flat, and every length of
+    /// flatness is a real one.
+    /// </param>
     public Drives(
         Population held,
         Func<Code, int?> doing,
         Func<Code, IReadOnlyCollection<Code>, double> wanting,
         Func<int?> untold,
-        Wanting arm = Wanting.Told)
+        Wanting arm = Wanting.Told,
+        int window = 50)
     {
         ArgumentNullException.ThrowIfNull(held);
         ArgumentNullException.ThrowIfNull(doing);
         ArgumentNullException.ThrowIfNull(wanting);
         ArgumentNullException.ThrowIfNull(untold);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(window);
 
         _held = held;
         _doing = doing;
         _wanting = wanting;
         _untold = untold;
         _arm = arm;
+        _window = window;
     }
 
     /// <summary>Rounds the population advocated nothing and the fallback decided.</summary>
@@ -156,6 +172,39 @@ internal sealed class Drives
 
     /// <summary>Rounds a commitment named the action.</summary>
     public long Told { get; private set; }
+
+    /// <summary>
+    /// Whether there is nothing left here that saying anything would teach.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A want that ROSE and then stopped</b>, rather than a want that is currently
+    /// small. <see cref="Commitment.Progress"/> is nought for a rule that has been
+    /// mastered and nought for a rule nobody has learnt yet, so <i>the want is flat</i>
+    /// alone reads a machine that has just arrived as one that is finished — which would
+    /// end a walk before it started and would be a world shortened to suit the brain.
+    /// </para>
+    /// <para>
+    /// <b>So it cannot fire before something was learnt.</b> A machine whose want never
+    /// once went positive is never sated however long it walks, and whatever cap the world
+    /// keeps is what stops it. That is the safe direction to be wrong in.
+    /// </para>
+    /// <para>
+    /// <b>And it reads NAMED rounds only.</b> A round the fallback decided is one the
+    /// population had nothing to say about, so its want is not a fact about what is left to
+    /// learn — counting those would have a young population read as a finished one by a
+    /// second road.
+    /// </para>
+    /// </remarks>
+    public bool Sated =>
+        _rose && _lately.Count == _window && _lately.Average() <= 0.0;
+
+    /// <summary>The want behind the last round a commitment named the action.</summary>
+    /// <remarks>
+    /// <b>Reported beside <see cref="Sated"/></b>, because a want that never moved and a
+    /// want that moved and settled are the same nought from outside.
+    /// </remarks>
+    public double Wanted { get; private set; }
 
     /// <summary>What to do, given what is felt.</summary>
     /// <param name="felt">The codes the front end emitted for the state acted in.</param>
@@ -225,8 +274,22 @@ internal sealed class Drives
             (best, wanted, weighed) = (doing, want, vote.Weight);
         }
 
-        if (best is null) Untold++;
-        else Told++;
+        if (best is null)
+        {
+            Untold++;
+        }
+        else
+        {
+            Told++;
+
+            Wanted = wanted;
+
+            if (wanted > 0.0) _rose = true;
+
+            _lately.Enqueue(wanted);
+
+            if (_lately.Count > _window) _lately.Dequeue();
+        }
 
         var said = best ?? _untold();
 

@@ -236,7 +236,19 @@ public sealed class ExercisedTests
         // would be the world answering itself one seam over.
         var person = new Person(answers: ["kitchen", "garden", "apple", "one", string.Empty]);
 
-        var world = new Roaming(Fixture.House(asked: 6, chatting: 6, person), seed: 1);
+        // Assigned below and closed over here, because the world asks the drive whether it has
+        // had enough and the drive reads the brain the world is run into.
+        Drives? drives = null;
+
+        // And the walk ends when the MACHINE is done, wherever something is choosing. `Steps`
+        // is the cap; a watched arm has no walker to have had enough, so the cap is its whole
+        // length and always was.
+        var world = new Roaming(
+            Fixture.House(asked: 6, chatting: 6, person) with
+            {
+                Enough = acting ? () => drives?.Sated == true : null,
+            },
+            seed: 1);
         var brain = new Brain(Walking, seed: 1);
         var falling = new Random(1);
 
@@ -304,7 +316,7 @@ public sealed class ExercisedTests
         // asked here is whether it can read the population at all -- and where the population
         // advocates none the fallback draws. Both halves are counted, so an arm that was its
         // own fallback all run reads as one.
-        var drives = new Drives(
+        drives = new Drives(
             brain.Held,
             doing: code => doings.TryGetValue(code, out var word) ? word : null,
             wanting: (_, _) => 1.0,

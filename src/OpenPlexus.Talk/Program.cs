@@ -148,7 +148,9 @@ internal static class Program
         var tally = bench.Run(rounds, sweep: 1000, target: 0.9, window: 2000);
 
         Console.WriteLine();
-        Console.WriteLine($"rounds     : {tally.Rounds} of {rounds}, ended {world.Ended}");
+        Console.WriteLine(
+            $"rounds     : {tally.Rounds} of {rounds}, ended {world.Ended}, {world.Left} "
+            + "capped steps left unwalked");
         Console.WriteLine(
             $"talking    : {world.Questions} asked of you, {world.Answered} answered");
         Console.WriteLine(

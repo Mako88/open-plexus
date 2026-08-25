@@ -34,12 +34,19 @@ public sealed record RoamingSettings
     /// </remarks>
     public required int People { get; init; }
 
-    /// <summary>How many things happen before the question is asked.</summary>
+    /// <summary>At most how many things happen before the survey.</summary>
     /// <remarks>
+    /// <para>
     /// <b>What makes the answer move, which is the whole world.</b> At nought the opening
     /// placements are the answer and a bag reads them straight off; every step after that
     /// is a chance for the truth to change while the sentence that stated the old one is
     /// still sitting there in plain view.
+    /// </para>
+    /// <para>
+    /// <b>A CAP rather than a length</b>, because how long somebody stays in a house is
+    /// decided by whoever is walking it. <see cref="Enough"/> is what ends it sooner, and
+    /// this is what stops a machine that never has enough from walking one house forever.
+    /// </para>
     /// </remarks>
     public required int Steps { get; init; }
 
@@ -102,6 +109,25 @@ public sealed record RoamingSettings
     /// experimenter supplying what the machine should go and get.
     /// </remarks>
     public TextReader? Typed { get; init; }
+
+    /// <summary>Whether whoever is walking has had enough of this house.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Asked once a step</b>, and the walk ends the moment it says so. How long to stay
+    /// somewhere is a fact about the visitor rather than about the house, so a length set
+    /// here would be the experimenter deciding when the machine had seen enough.
+    /// </para>
+    /// <para>
+    /// <b>Told rather than read</b>, which is the same standing <see cref="Typed"/> has.
+    /// The world asks a question of whoever composed it and never reaches into anything;
+    /// what answers it is a decision taken where the world and the brain meet.
+    /// </para>
+    /// <para>
+    /// <b>And nothing means the cap decides</b>, which is the walk every reading before
+    /// this was taken on.
+    /// </para>
+    /// </remarks>
+    public Func<bool>? Enough { get; init; }
 
     /// <summary>Where the machine's words are shown, or nothing where nobody is reading.</summary>
     /// <remarks>
@@ -527,6 +553,15 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
 
     /// <summary>How many questions the machine put to the person.</summary>
     public long Questions { get; private set; }
+
+    /// <summary>How many capped steps went unwalked because the machine had had enough.</summary>
+    /// <remarks>
+    /// <b>An instrument's channel, on <see cref="Sat"/>'s standing.</b> A walk that ended
+    /// early and a walk that ran to its cap are two different episodes, and no score can
+    /// say which happened — so an arm that never once ended early would read exactly like
+    /// the cap it replaced. Nothing that learns is ever shown this.
+    /// </remarks>
+    public long Left { get; private set; }
 
     /// <summary>Whether the person has left.</summary>
     /// <remarks>
@@ -1083,8 +1118,15 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
         // saw the house has nothing to hold a conversation about.
         Narrate(spoken, seen, named);
 
-        // The walk is over, so the exam opens and the conversation follows it.
-        if (--_left <= 0) Examined(walk);
+        // The walk is over, so the exam opens and the conversation follows it. Either the
+        // cap ran out or whoever is walking has had enough of the house, and which of the
+        // two it was is `Left`.
+        if (--_left <= 0 || _settings.Enough?.Invoke() == true)
+        {
+            Left += _left > 0 ? _left : 0;
+
+            Examined(walk);
+        }
 
         return turn;
     }

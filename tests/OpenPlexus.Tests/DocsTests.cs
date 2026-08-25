@@ -792,7 +792,12 @@ public sealed class DocsTests
     // order a session would otherwise take -- the deletions look like the cheap half and are
     // the half that must come last, the explored walk abstaining nought today where the
     // recital abstains 682.
-    private const int Whole = 13_119;
+    //
+    // And 13,160 for one refutation row. `Saying.Part` is deleted and a row is what a deleted
+    // arm leaves behind, so the alternative to the words is a superstition -- the next session
+    // reaching for a chooser that says a scope a word at a time with nothing to say it has
+    // been run. A guard must not cost information.
+    private const int Whole = 13_160;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

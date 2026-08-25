@@ -256,11 +256,18 @@ These are the parts worth more than the code.
 - **A front end handing over the answer** is that fault one seam over. `CeilingTests` prices
   every arm on how often the answer is already in the moment it produces, before anything has
   learnt. An arm may raise that and must never do it silently.
-- **Two worlds are the TARGET and every other is an INSTRUMENT.** John's, 2026-08-24, and it
-  is the thing the other rules assumed without saying. `Roaming` and the text conversation are
-  meant to be a microcosm of the real world, so a score on one of them is what the machine is
-  worth. A score anywhere else answers a question about a mechanism and is never the
+- **One world is the TARGET and every other is an INSTRUMENT.** John's, and it is the thing
+  the other rules assumed without saying. `Roaming` is meant to be a microcosm of the real
+  world — explored, then conversed about, then surveyed — so a score on it is what the machine
+  is worth. A score anywhere else answers a question about a mechanism and is never the
   objective.
+- **And the target has a SIZE and no SWITCHES.** John's. What makes it less like the real
+  world goes, and the MACHINE is what changes to cope. An enum is a switch and an int is a
+  size, which is the checkable form: a house has some number of rooms, and none of *recited*,
+  *a look that is already a name* or *one kind of question* is a number.
+- **So a world is never edited to help the brain**, which is the rule above with its teeth in.
+  A world made easier until a score moves is a benchmark measuring the edit, and the target is
+  the one place that may never happen.
 - **So an instrument's dials may be tuned to sharpen it**, freely and per world, because a
   microscope is allowed to be focused. What may never happen is a number off one being read as
   how well the brain is doing, or two of them being put in one table — the settings differ, so
@@ -271,11 +278,11 @@ These are the parts worth more than the code.
   something goes red the day a mechanism is built and stays red until a spine world exercises
   it, which is what `OutstandingTests` already does one level up, per ARCHITECTURE entry
   rather than per mechanism.
-- **The spine is two worlds and they run two BRAINS today**, `Crediting` and `Admitting`
+- **The spine is two worlds today and they run two BRAINS**, `Crediting` and `Admitting`
   differing between them. That is `csharp`'s own fault — a dial set one way on one world and
   another way on another — sitting inside the set that matters most.
-  `OutstandingTests.The_spine_runs_one_brain` computes which, and is red until they converge
-  or fork 147 leaves one world.
+  `OutstandingTests.The_spine_runs_one_brain` computes which, and the merged world closes it
+  by there being nothing left to disagree.
 - **A refutation is conditional on the MACHINE that produced it.** John's, 2026-08-24. A row
   in `DO NOT RE-TRY` records what beat an arm on the brain of that day, and a brain that has
   since gained the mechanism the arm was starved of is a different comparison — so re-take

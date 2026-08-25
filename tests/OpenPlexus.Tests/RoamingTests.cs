@@ -1226,11 +1226,19 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// once for no extra reading.
     /// </para>
     /// <para>
-    /// <b>And the reading below is OWED AGAIN</b>, taken on a house where every look named
-    /// its own thing. A scope's codes were never ambiguous about which thing they belonged
-    /// to, so the match half had nothing to confine for the same reason the generate half had
-    /// nothing to mint. <see cref="Roaming"/> now holds two things of a kind and this is
-    /// re-taken before it means anything.
+    /// <b>And the reading below prices the dial on a RECITAL</b>, which is the half of the
+    /// spine where a thing has one code. A mentioned thing is the word that names it, so a
+    /// scope confined to one of them is confined to one word and there is no second attribute
+    /// to hold together — the dial exists for a thing with parts. Re-taken after
+    /// <see cref="Roaming"/> gained two things of a kind, it came back bit-identical, seed
+    /// for seed and resident for resident, which is what said so.
+    /// </para>
+    /// <para>
+    /// <b>So the walked half is measured beside it and apart from it.</b> A walked thing
+    /// shows a look, a shade and a name, and two of a kind share a look. It is its own block
+    /// and its own column because a walked house withholds nothing: that score is the online
+    /// reading and this one is an unseen set, and a table holding both would be a share whose
+    /// halves count different events. Fork <b>150</b>.
     /// </para>
     /// <para>
     /// <b>Measured over three seeds</b>: 0.589, 0.605 and 0.523 confined against 0.589, 0.620
@@ -1285,6 +1293,51 @@ public sealed class RoamingTests(ITestOutputHelper output)
             $"one thing a scope | worst {thing.Min():F3} | best {thing.Max():F3}");
         output.WriteLine(
             $"any thing a scope | worst {anything.Min():F3} | best {anything.Max():F3}");
+
+        // And the same dial on the WALKED half, which is the case it exists for. Everything
+        // above is a recital, where a thing is a word somebody mentioned and carries one
+        // code -- so a scope confined to one of them is confined to one WORD, and the dial
+        // has no second attribute to hold together. A walked thing shows a look, a shade and
+        // a name, and two things of a kind share a look.
+        //
+        // Its own block and its own column, because the score is not the same statistic. A
+        // walked house withholds nothing, so there is no unseen set and this is the online
+        // reading. Putting the two in one table would be a share whose halves count
+        // different events.
+        var walked = new Dictionary<Spanning, List<double>>();
+
+        foreach (var spanning in new[] { Spanning.Thing, Spanning.Anything })
+        {
+            walked[spanning] = [];
+
+            foreach (var seed in new[] { 1, 2, 3 })
+            {
+                var house = new Roaming(World(20, people: 2, Knowing.Explored), seed);
+
+                var brain = new Brain(
+                    ExercisedTests.Walking with { Spanning = spanning }, seed);
+
+                var tally = new Bench(
+                    new Watching<Coded>(
+                        house, arm[0].Joined, acting: Chooses.From(_ => null)),
+                    brain)
+                    .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
+
+                walked[spanning].Add(tally.Recent);
+
+                output.WriteLine(
+                    $"walked {spanning,-8}| seed {seed} | own {tally.Recent:F3} "
+                    + $"| held {brain.Held.Count} | repaired {tally.Repaired} "
+                    + $"| bound {brain.Held.EverBorn.GetValueOrDefault(Birth.Bound)} minted");
+            }
+        }
+
+        output.WriteLine(
+            $"walked one thing  | worst {walked[Spanning.Thing].Min():F3} "
+            + $"| best {walked[Spanning.Thing].Max():F3}");
+        output.WriteLine(
+            $"walked any thing  | worst {walked[Spanning.Anything].Min():F3} "
+            + $"| best {walked[Spanning.Anything].Max():F3}");
 
         // Worst against best, which is this file's own bar and cannot be gamed by a run that
         // landed well. Stated as the refutation rather than as the expectation: what is

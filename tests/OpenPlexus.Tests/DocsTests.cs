@@ -777,13 +777,13 @@ public sealed class DocsTests
     // behind them -- rooting on a code that never varied is 7.4 standard errors worse, and
     // minting on every failure walks the whole code-to-outcome space -- so a session reaching
     // for either would be re-treading a row rather than asking the question between them.
-    // And 13,087 is the eighty-first raise, sixty-six words, and it REFUTES the eightieth
+    // And 13,077 is the eighty-first raise, fifty-six words, and it REFUTES the eightieth
     // above. The walked house mints 49 bindings under `Surprising.Unaccounted` and not
     // nought, and 83 on the spine composition; every one is then deleted by subsumption, so
     // a ledger dropped with its commitment read the mechanism as never having run. Neither
     // gate decides it and the fresh-code arm is refuted in the table. The words buy a
     // revival row, a failure class with no check, and the item that replaces the fork.
-    private const int Whole = 13_087;
+    private const int Whole = 13_077;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

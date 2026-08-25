@@ -525,8 +525,10 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// so; a session reading the code did, months apart.
     /// </para>
     /// <para>
-    /// <b>Five today, and the list is the work.</b> <c>Budgeting</c>, <c>Feeling</c>,
-    /// <c>Forking</c>, <c>Subsuming</c> and <c>Surprising</c>. Each closes by a reading on
+    /// <b>Four today, and the list is the work.</b> <c>Budgeting</c>, <c>Feeling</c>,
+    /// <c>Forking</c> and <c>Subsuming</c>. <c>Surprising</c> was the fifth and left by the
+    /// road the others take: a grid on the walk, both questions, with a kill line in it. Each
+    /// of the rest closes by a reading on
     /// <c>Roaming</c> or the conversation, by a deletion with a revival row, or by an entry in
     /// <c>DialTests.Waiting</c> saying what it is waiting for — which is the same three
     /// answers the two-world bar takes.

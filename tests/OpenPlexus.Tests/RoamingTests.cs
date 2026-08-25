@@ -1195,6 +1195,73 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + "same world");
     }
 
+    /// <summary>
+    /// What the genesis gate costs the spine world — <b>one of the dials read only where
+    /// the answer does not count.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The refutation behind it warns, and does not read this world.</b>
+    /// Minting on every failure walks the whole <c>code → outcome</c> space given enough
+    /// failures: on winnowed CIFAR that space is 25,600 and the population reached 23,762
+    /// against a capacity of 2,000. CIFAR is an instrument, and what a gate costs where the
+    /// alphabet is a house's vocabulary is a different question.
+    /// </para>
+    /// <para>
+    /// <b>Both questions, because the last dial grid asked one and erred.</b>
+    /// A gate on what genesis mints is not obviously question-shaped, which is exactly what
+    /// was assumed about <c>Admitting</c> before the effect arm was measured.
+    /// </para>
+    /// <para>
+    /// <b>What would refute the shipped gate</b>, said before the run: the ungated arm reading
+    /// above it, worst against best, on either question. Then <c>Unaccounted</c> is refusing
+    /// proposals this world needed and the CIFAR row is a fact about a wide alphabet rather
+    /// than about the mechanism.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_the_genesis_gate_costs_the_spine_world()
+    {
+        var arm = new (string Name, Joined Joined)[]
+        {
+            ("Freshest(3)", new Joined(Joining.Resolved, resolution: 3, freshest: true)),
+        };
+
+        var cells = new List<(string Name, List<double> Scores)>();
+
+        foreach (var examining in new[] { Examining.Where, Examining.Effect })
+            foreach (var surprising in new[] { Surprising.Unaccounted, Surprising.AnyFailure })
+            {
+                var name = $"{examining}|{surprising}";
+
+                output.WriteLine(name);
+
+                cells.Add((
+                    name,
+                    Scored(
+                        arm, people: 1, examining,
+                        dials: ExercisedTests.Walking with { Surprising = surprising })
+                        ["Freshest(3)"]));
+            }
+
+        foreach (var (name, taken) in cells)
+            output.WriteLine($"{name,-30}| worst {taken.Min():F3} | best {taken.Max():F3}");
+
+        foreach (var examining in new[] { Examining.Where, Examining.Effect })
+        {
+            var gated = cells.Single(one => one.Name == $"{examining}|Unaccounted").Scores;
+            var open = cells.Single(one => one.Name == $"{examining}|AnyFailure").Scores;
+
+            Assert.True(gated.Max() >= open.Min(),
+                $"on the {examining} question the shipped gate reads {gated.Max():F3} at its "
+                + $"best against {open.Min():F3} for the ungated arm at its worst, so "
+                + "`Unaccounted` is refusing proposals this world needed and the reading that "
+                + "put it in the code was a fact about a wide alphabet rather than about the "
+                + "mechanism");
+        }
+    }
+
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_a_learner_reads_where_the_transcript_stops_answering_itself()

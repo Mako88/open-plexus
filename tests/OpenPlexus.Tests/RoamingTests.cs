@@ -3575,4 +3575,198 @@ public sealed class RoamingTests(ITestOutputHelper output)
         Assert.Throws<ArgumentException>(
             () => new Roaming(World(Steps, people: 2, asked: 1), seed: 4));
     }
+
+    /// <summary>A walked house whose exam may be ANOTHER house's.</summary>
+    /// <param name="walked">The house the machine walks and is settled by.</param>
+    /// <param name="instead">The house whose questions it is asked, or nothing.</param>
+    /// <remarks>
+    /// <b>The control THE ORDER names, built by swapping the question.</b> A machine that walked another house sitting this exam and this machine
+    /// sitting another house's exam are the same broken pairing, and the second is reachable
+    /// without running two brains. The transcript, the things and the walk are the machine's
+    /// own; only the question and its answer come from a house it never saw.
+    /// </remarks>
+    private sealed class Sitting(Roaming walked, Roaming? instead)
+        : IWorld<Coded>, IActed<Coded>
+    {
+        /// <summary>The first code of the question just asked, or nothing on a walked step.</summary>
+        public Code? Asking { get; private set; }
+
+        public int Outcomes => walked.Outcomes;
+
+        public int Doings => walked.Doings;
+
+        public bool Listening => walked.Listening;
+
+        public Coded Now => walked.Now;
+
+        public void Do(int? doing) => walked.Do(doing);
+
+        public Turn<Coded> Next()
+        {
+            var turn = walked.Next();
+
+            // Stepped in lock-step whether or not this round is a question, because two
+            // houses of one size run their walks and their exams on the same rounds and a
+            // world asked only sometimes would drift out of alignment by the second house.
+            var other = instead?.Next();
+
+            Asking = null;
+
+            if (turn.Seen.Asked is not { } question) return turn;
+
+            Asking = question.Codes[0];
+
+            if (other is not { Seen.Asked: { } swapped } sat) return turn;
+
+            Asking = swapped.Codes[0];
+
+            return new Turn<Coded>
+            {
+                Seen = Coded.From(
+                    turn.Seen.Statements!, swapped, things: turn.Seen.Things),
+                Outcome = sat.Outcome,
+            };
+        }
+    }
+
+    /// <summary>
+    /// <b>What a learner scores on the survey, against the wrong house's exam.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The control the survey was owed, and stronger than the marginal.</b>
+    /// <c>CeilingTests</c> prices what a rule keyed on the question alone reaches; this pairs
+    /// a real walk with another house's questions, so everything the machine holds is intact
+    /// and only the pairing is broken. A survey the crossed arm answers as well as the paired
+    /// one is measuring the alphabet rather than the walk.
+    /// </para>
+    /// <para>
+    /// <b>Read per kind</b>, because the three do not have one ceiling between them. Counting
+    /// is at the scope language's own bound and reads its marginal under both arms; where a
+    /// thing ended up and what a room held are the halves the walk can be about.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task What_a_learner_scores_on_the_survey_against_the_wrong_houses_exam()
+    {
+        const int Rounds = 6_000;
+        const int Steps = 40;
+        const int Asked = 6;
+
+        var settings = World(Steps, people: 2, Knowing.Explored, asked: Asked);
+
+        var words = new Dictionary<Code, string>();
+
+        var alphabet = new Roaming(settings, seed: 4);
+
+        for (var one = 0; one < alphabet.Vocabulary.Count; one++)
+            words[alphabet.Meaning(one)!.Value] = alphabet.Vocabulary[one];
+
+        output.WriteLine(
+            $"a walked house, {Rounds} rounds, {Steps} steps and {Asked} questions a house");
+
+        output.WriteLine($"{"arm",-9}{"kind",-8}{"asked",8}{"right",8}{"silent",8}{"score",9}");
+
+        var scored = new Dictionary<(string Arm, string Kind), (int Asked, int Right)>();
+
+        foreach (var arm in new[] { "paired", "crossed" })
+        {
+            var world = new Sitting(
+                new Roaming(settings, seed: 4),
+                arm == "crossed" ? new Roaming(settings, seed: 9) : null);
+
+            var brain = new Brain(
+                new CommittingSettings { Capacity = 4_000 }, seed: 1);
+
+            var watching = new Watching<Coded>(
+                world, new Joined(Joining.Bagged), acting: Chooses.From(_ => null));
+
+            var loop = new Round(brain, Rounds, sweep: 500, target: 0.9, window: 500);
+
+            var asked = new Dictionary<string, int>(StringComparer.Ordinal);
+            var right = new Dictionary<string, int>(StringComparer.Ordinal);
+            var silent = new Dictionary<string, int>(StringComparer.Ordinal);
+
+            for (var round = 0; round < Rounds; round++)
+            {
+                if (watching.Push() is not { } pushed) continue;
+
+                var was = (loop.Right, loop.Silent);
+
+                await loop.StepAsync(pushed);
+
+                // A walked step settles by ostension and is not the exam. What is read here
+                // is the questions alone, which is the whole point of there being a survey.
+                if (world.Asking is not { } code) continue;
+
+                var kind = words[code];
+
+                asked[kind] = asked.GetValueOrDefault(kind) + 1;
+
+                if (loop.Right > was.Right) right[kind] = right.GetValueOrDefault(kind) + 1;
+                if (loop.Silent > was.Silent) silent[kind] = silent.GetValueOrDefault(kind) + 1;
+            }
+
+            foreach (var kind in asked.Keys.Order(StringComparer.Ordinal))
+            {
+                var hits = right.GetValueOrDefault(kind);
+
+                output.WriteLine(
+                    $"{arm,-9}{kind,-8}{asked[kind],8}{hits,8}"
+                    + $"{silent.GetValueOrDefault(kind),8}{hits / (double)asked[kind],9:F3}");
+
+                scored[(arm, kind)] = (asked[kind], hits);
+            }
+        }
+
+        // Three kinds under both arms, or the table is a verdict on which questions got asked
+        // rather than on the machine.
+        Assert.Equal(6, scored.Count);
+
+        Assert.All(scored.Values, one => Assert.True(one.Asked > 100));
+
+        // The crossed arm may not beat the exam's own marginal by anything a sample this size
+        // could not produce. It reads a transcript that says nothing about the house it is
+        // being asked about, so an arm above the commonest answer means the QUESTION is
+        // carrying its own answer and the exam is measuring the alphabet.
+        foreach (var kind in new[] { "how", "what", "where" })
+        {
+            var (count, hits) = scored[("crossed", kind)];
+
+            // The marginal `CeilingTests` measured on this exam, taken there before anything
+            // learnt and read here rather than recomputed, so the two cannot drift apart.
+            var marginal = kind switch { "how" => 0.579, "what" => 0.319, _ => 0.252 };
+
+            var error = Math.Sqrt(marginal * (1.0 - marginal) / count);
+
+            Assert.True(hits / (double)count < marginal + (3.0 * error),
+                $"the crossed arm reached {hits / (double)count:F3} on {kind} against a "
+                + $"marginal of {marginal:F3}, which is more than the question alone can "
+                + "carry -- so the exam is answerable without having walked the house");
+        }
+
+        // And the two arms come apart somewhere, or the exam reads nothing about the walk at
+        // all and a score off it is a score off the alphabet. Asserted on the widest of the
+        // three rather than on all of them, because the kinds do not have one ceiling
+        // between them -- and it does not invert when the machine improves, because it asks
+        // whether the pairing matters rather than whether the answer was right.
+        var apart = new[] { "how", "what", "where" }.Max(kind =>
+        {
+            var (was, hit) = scored[("paired", kind)];
+            var (crossed, other) = scored[("crossed", kind)];
+
+            var here = hit / (double)was;
+            var there = other / (double)crossed;
+
+            return Math.Abs(here - there) / Math.Sqrt(
+                (here * (1.0 - here) / was) + (there * (1.0 - there) / crossed));
+        });
+
+        output.WriteLine($"the arms are {apart:F1} standard errors apart at their widest");
+
+        Assert.True(apart > 3.0,
+            $"the widest kind separates the paired exam from another house's by {apart:F1} "
+            + "standard errors, so nothing the machine took from the walk is being read by "
+            + "the survey and the exam is measuring the alphabet");
+    }
 }

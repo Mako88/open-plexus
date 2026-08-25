@@ -35,10 +35,8 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **And that world has a SIZE and no SWITCHES.** John's. A number off it is what the machine
   is worth, so what makes it less like the real world goes and the MACHINE changes instead.
   `Examining`, `Knowing` and `Seeing` are the three.
-- **First the SURVEY**, several verifiable questions rather than one: how many of a thing
-  were seen, what a room held, where things ended up. Its control is another house's machine
-  sitting this exam, and its ceiling comes first.
-- **Then the CHAT**, `Curiosity` pointed at what was seen, and a phase rather than a world.
+- **First the CHAT**, `Curiosity` pointed at what was seen, and a phase rather than a world.
+  The SURVEY is built and its ceiling and its crossed control are taken.
 - **Then the switches and `Conversing` GO**, in that order: the explored walk abstains nought
   where the recital abstains 682 and supposes nothing at all, so cutting first costs the
   spine entries it already reaches.

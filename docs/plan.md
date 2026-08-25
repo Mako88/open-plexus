@@ -32,7 +32,11 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **The spine becomes ONE world and the items below build it.** John's. Rung four
   and the forward store are BUILT and neither is on this list.
 - **First the walk is DRIVEN**: the machine says words, the world parses a command and acts,
-  and a moment reports its THINGS rather than its sentences. Forks **147**, **148**.
+  and a moment reports its THINGS in both phases — a sentence being a moment whose things
+  are mentioned rather than present. Forks **147**, **148**.
+- **A seen thing and its name sharing a CODE is an ARM**, never a default. Shared,
+  the crossing is free and the answer was handed over; apart, it is the problem a picture
+  will pose. `CeilingTests` prices it.
 - **Then the DRIVE**, rankable at last, there being choices worth ranking. Fork **146**.
 - **Then the SURVEY and its control**, another house's machine sitting this one's exam. Its
   ceiling is taken before a learner is wired to it.

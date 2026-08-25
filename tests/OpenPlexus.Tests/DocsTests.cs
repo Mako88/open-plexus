@@ -761,7 +761,15 @@ public sealed class DocsTests
     // parts count taken over the same lesson with no learner speaking read one part a moment
     // where the scored stream reaches two, so a null result read as a mechanism that could
     // not fire. Both leave here the day a guard can express them.
-    private const int Whole = 12_892;
+    // And 12,946 is the seventy-ninth raise, fifty-four words, for two things John settled
+    // while the merged world was being ordered. A moment reports its THINGS in both phases
+    // rather than things while exploring and sentences while conversing -- a sentence is a
+    // moment whose things are mentioned rather than present, so there is one rule and not
+    // two regimes. And whether a seen thing and its spoken name share a CODE is an arm: it
+    // is the crossing being handed over for free, which is the fault `CeilingTests` exists
+    // to price, and it is a decision that would otherwise be made by whoever writes the
+    // world first.
+    private const int Whole = 12_946;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -29,12 +29,20 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **First a chooser that can ASK the exam's question.** Asking perfectly triples the walked
-  half; the drive pays on the WALK and asks less than a coin. Forks **146**, **151**.
-- **Then the seven dials read off the spine only** — `Budgeting`, `Deciding`, `Feeling`,
-  `Forking`, `Rooting`, `Spanning`, `Subsuming`. Re-taken HERE: the world they want a
-  reading on is the one being built, and three of them read as measured on it by being named
-  beside the conversation.
+- **First the seven dials read off the spine only** — `Budgeting`, `Deciding`, `Forking`,
+  `Rooting`, `Spanning`, `Subsuming` are six brain dials and ONE GRID on the house, at a
+  sweep's size. Three of them read as measured there by having been named beside the
+  conversation. It is the whole red set.
+- **And `Feeling` is not one of the six**, being a front end's dial on a BODY and inert on a
+  house by construction. So it wants a spine world with variables to be in trouble about, a
+  deletion, or a waiting list of its own — and the third is the answer only if the first two
+  are refused.
+- **Then what asking a PERSON well is worth**, which is what is left of forks **146** and
+  **151** now the conversation follows the exam. Nothing said afterwards can reach the score,
+  so the payoff is a settlement obtained rather than a mark, and what to measure it against
+  is the open half.
+- **And the CONSEQUENCE question is unaskable by the machine**, the parse reading three of
+  the four kinds. A machine that cannot ask what it is examined on cannot practise it.
 - **Then a regime with COMPANY and a population**, priced on the lesson and unread on the
   house: a moment of one word derives no vocabulary and a moment carrying a story roots
   genesis on nothing, no arm a middle. Fork **120**.

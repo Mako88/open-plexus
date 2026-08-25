@@ -88,8 +88,10 @@ is clean — a stable red set is the only kind you can read a new failure agains
 
 **The seven went from four when the spine became ONE world.** `Rooting`, `Spanning` and
 `Subsuming` had been named beside the conversation, so they read as measured on a world whose
-score counts while their readings were taken on an instrument. What closes each is a reading
-on the walked house, a deletion with a revival row, or an entry in `DialTests.Waiting`.
+score counts while their readings were taken on an instrument. Six of them are one grid on the
+house at a sweep's size; `Feeling` is a front end's dial on a BODY and inert on a house by
+construction, so it wants a spine world with variables, a deletion, or a waiting list of its
+own.
 
 **Adding an entry is stricter than adding anywhere else**: it must be work somebody has decided
 to do, computable without judgement, and closeable. An open question goes in the plan as

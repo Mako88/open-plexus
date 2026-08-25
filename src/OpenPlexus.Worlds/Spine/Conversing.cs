@@ -66,6 +66,24 @@ public sealed record ConversingSettings
     /// </para>
     /// </remarks>
     public IReadOnlyList<string> Words { get; init; } = [];
+
+    /// <summary>Which of the words typed at it name a THING.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Empty is the honest default, because a conversation cannot segment itself.</b> A
+    /// world knows which object it drew a code for and a text world reading typed lines knows
+    /// no such thing — so this is filled where whoever is typing can say, which is a lesson,
+    /// and left empty where a person is at the keyboard. The same standing as a scene world
+    /// reporting its objects.
+    /// </para>
+    /// <para>
+    /// <b>And a statement is not one of them</b>, which is the whole reason this exists.
+    /// <i>The cat covering is fur</i> is about the cat, so a moment of it reports the cat and
+    /// leaves every other word in no part — where a statement reported as a part made a scope
+    /// over the whole sentence read as being about one thing.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyList<string> Things { get; init; } = [];
 }
 
 /// <summary>What of the topic so far a moment holds, beside the sentence it is.</summary>
@@ -237,6 +255,11 @@ public sealed class Conversing : IWorld<Coded>, IActed<Coded>
     private readonly Dictionary<string, int> _index = new(StringComparer.Ordinal);
     private readonly Dictionary<Code, int> _naming = [];
 
+    // Which codes name a thing, as the lesson said. Built once from the words rather than
+    // asked for a word at a time, because a moment is read far more often than a session is
+    // composed.
+    private readonly HashSet<Code> _nouns = [];
+
     // The topic so far, oldest first, and reversed on the way into a moment. `Coded` promises
     // newest first; building it that way round would be an insert at the front of a list for
     // every line typed.
@@ -310,6 +333,8 @@ public sealed class Conversing : IWorld<Coded>, IActed<Coded>
         _vocabulary.Add("(nobody knew)");
 
         foreach (var word in settings.Words) Heard(word);
+
+        foreach (var word in settings.Things) _nouns.Add(Babi.Of(word));
     }
 
     /// <summary>Whether the human has finished.</summary>
@@ -690,9 +715,10 @@ public sealed class Conversing : IWorld<Coded>, IActed<Coded>
         return new Turn<Coded>
         {
             Seen = Coded.From(
-                [Grouped.Of(spoke), .. moment.Groups ?? []],
+                [Grouped.Of(spoke), .. moment.Statements ?? []],
                 moment.Asked,
-                new HashSet<Code>(spoke)),
+                new HashSet<Code>(spoke),
+                moment.Things),
             Outcome = outcome,
         };
     }
@@ -828,9 +854,13 @@ public sealed class Conversing : IWorld<Coded>, IActed<Coded>
         else if (!asking)
             before.Add(sentence);
 
+        var asked = asking ? coded ?? sentence : null;
+
         return Coded.From(
             [.. before.Select(Grouped.Of)],
-            asking ? Grouped.Of(coded ?? sentence) : null);
+            asked is null ? null : Grouped.Of(asked),
+            things: Grouped.Things(
+                asked is null ? before : [.. before, asked], _nouns));
     }
 
     /// <summary>Whether this moment is handed the topic in front of it.</summary>

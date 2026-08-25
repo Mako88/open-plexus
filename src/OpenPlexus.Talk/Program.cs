@@ -100,6 +100,12 @@ internal static class Program
             Printed = tutor?.Printed ?? Console.Out,
             Carrying = carrying,
             Asserting = asserting,
+
+            // Nothing where a person is typing, because a conversation cannot segment
+            // itself. A lesson knows which of its words it is about and a keyboard does
+            // not, so the terminal reports things exactly where somebody can say what they
+            // are.
+            Things = tutor?.Things ?? [],
         });
 
         // Handed in where the world and the brain meet, because which code an outcome is

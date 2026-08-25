@@ -142,7 +142,7 @@ jobs:
             "RepairingTests.What_the_new_timing_costs",
             "RepairingTests.Whether_the_names_return",
             "RoamingTests.What_a_learner_reads_where_the_transcript_stops_answering_itself",
-            "RoamingTests.What_reading_a_statement_as_a_thing_costs_the_spine_world",
+            "RoamingTests.What_confining_a_scope_to_one_thing_costs_the_spine_world",
             "RoamingTests.What_a_code_for_what_left_does_on_the_spine_world",
             "RoamingTests.What_the_conversations_two_dials_cost_the_walk",
             "RoamingTests.What_the_genesis_gate_costs_the_spine_world",

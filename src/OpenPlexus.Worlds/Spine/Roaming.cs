@@ -239,6 +239,15 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     private readonly Dictionary<string, int> _rooms = new(StringComparer.Ordinal);
     private readonly Dictionary<string, int> _things = new(StringComparer.Ordinal);
 
+    /// <summary>The words that name a thing, as against the ones that name none.</summary>
+    /// <remarks>
+    /// <b>A room is a thing</b>, which is a claim rather than a convenience. The kitchen is
+    /// as much a thing as the apple in it — <i>the apple is in the kitchen</i> is a relation
+    /// between two of them — and a world that reported rooms as background would be saying
+    /// which of its own nouns are worth having concepts of.
+    /// </remarks>
+    private readonly HashSet<Code> _nouns = [];
+
     /// <summary>The walk drawn as far as its last step, waiting to be told what it is.</summary>
     private Walk? _open;
 
@@ -277,6 +286,8 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         {
             _rooms[Places[room]] = room;
 
+            _nouns.Add(Kinds.Named(Word, Places[room]));
+
             Heard(Places[room]);
         }
 
@@ -284,10 +295,17 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         {
             _things[Things[prop]] = prop;
 
+            _nouns.Add(Kinds.Named(Word, Things[prop]));
+
             Heard(Things[prop]);
         }
 
-        foreach (var one in Cast.Take(settings.People)) Heard(one);
+        foreach (var one in Cast.Take(settings.People))
+        {
+            _nouns.Add(Kinds.Named(Word, one));
+
+            Heard(one);
+        }
 
         for (var back = 0; back < settings.Withheld; back++) _kept.Add(Draw());
     }
@@ -447,9 +465,12 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         {
             _open ??= Open();
 
+            var asked = Said("what", "next");
+
             return Coded.From(
                 [.. Enumerable.Reverse(_open.Told).Select(Grouped.Of)],
-                Grouped.Of(Said("what", "next")));
+                Grouped.Of(asked),
+                things: Grouped.Things([.. _open.Told, asked], _nouns));
         }
     }
 
@@ -773,12 +794,15 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
                 Seen = Coded.From(
                     [.. told.Select(Grouped.Of)],
                     Grouped.Of(last),
-                    chose ? new HashSet<Code>(last) : null),
+                    chose ? new HashSet<Code>(last) : null,
+                    Grouped.Things([.. told, last], _nouns)),
                 Outcome = moved ? 1 : 0,
             };
         }
 
         told.Reverse();
+
+        var asking = Said("where", "is", "the", Things[about]);
 
         return new Turn<Coded>
         {
@@ -787,8 +811,9 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
             // about the state the walk left behind and names nothing the learner did.
             Seen = Coded.From(
                 [.. told.Select(Grouped.Of)],
-                Grouped.Of(Said("where", "is", "the", Things[about])),
-                chose ? new HashSet<Code>(told[0]) : null),
+                Grouped.Of(asking),
+                chose ? new HashSet<Code>(told[0]) : null,
+                Grouped.Things([.. told, asking], _nouns)),
             Outcome = held[about] == Nobody ? at[about] : null,
         };
     }

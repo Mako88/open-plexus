@@ -8,7 +8,7 @@ internal static class Bagging
     /// <summary>The statements as ordered word lists, which is the shape a world built.</summary>
     /// <param name="moment">What the world showed.</param>
     public static IReadOnlyList<IReadOnlyList<Code>> Said(this Coded moment) =>
-        moment.Groups is { } parts ? [.. parts.Select(one => one.Codes)] : [];
+        moment.Statements is { } parts ? [.. parts.Select(one => one.Codes)] : [];
 
     /// <summary>Every word of every statement, which is what a bag-of-words arm sees.</summary>
     /// <param name="moment">What the world showed.</param>

@@ -397,7 +397,7 @@ public sealed class HandingTests(Xunit.Abstractions.ITestOutputHelper output)
     /// <para>
     /// <b>So the blocker is the scope language and not the front end</b>, which is the
     /// correction this file exists to make. The world hands the order over —
-    /// <see cref="Coded.Groups"/> is a list of lists and not a bag, on the licence
+    /// <see cref="Coded.Statements"/> is a list of lists and not a bag, on the licence
     /// <see cref="IQuantizer{TFrame}.Order"/> already carries — and it is dropped at
     /// <c>Watching</c>'s <c>new HashSet&lt;Code&gt;(said)</c>, one call before anything could
     /// use it. Fork 33 priced the MATCHER, and the matcher was never what was in the way.

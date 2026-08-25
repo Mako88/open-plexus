@@ -140,6 +140,31 @@ public sealed record Lesson
         }
     }
 
+    /// <summary>Which of this lesson's words name a THING.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The subjects, because a statement is about one of them.</b> <i>The cat covering is
+    /// fur</i> says a property of the cat, so the cat is what the moment holds and the rest of
+    /// the sentence is what is said about it. A world that reported the sentence as a part
+    /// made a scope over the whole of it read as being about one thing, which is the fault
+    /// <c>Codes.Coded.Things</c> exists to fix.
+    /// </para>
+    /// <para>
+    /// <b>And an ANSWER is not one of them here</b>, which is a claim the lesson shape makes
+    /// rather than a general truth. Nothing is drawn twice, so no value is also a subject —
+    /// <i>fur</i> is a property's value and never something the lesson goes on to say
+    /// anything about. Reporting it as a thing would put two things in every statement and
+    /// leave the relation unsayable, which is the opposite of what the split is for.
+    /// </para>
+    /// <para>
+    /// <b>Read out of the statements rather than kept beside them</b>, for the reason
+    /// <see cref="Facts"/> is: an answer key written by hand is a second copy of the lesson
+    /// and the two go out of step silently.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyList<string> Things =>
+        [.. Facts.Select(one => one.Subject).Distinct(StringComparer.Ordinal)];
+
     /// <summary>A lesson of the same shape with every word drawn, so the world moves.</summary>
     /// <param name="subjects">How many things the lesson is about.</param>
     /// <param name="attributes">How many properties each of them has.</param>
@@ -538,6 +563,14 @@ public sealed class Tutor : TextReader
 
     /// <summary>Where a session should print, so that a prompt can be seen.</summary>
     public TextWriter Printed => _printed;
+
+    /// <inheritdoc cref="Lesson.Things"/>
+    /// <remarks>
+    /// <b>Passed on rather than restated</b>, because every composition of this world already
+    /// holds the tutor and none of them holds the lesson. A site that had to reach past the
+    /// tutor for it is a site that can forget to.
+    /// </remarks>
+    public IReadOnlyList<string> Things => _lesson.Things;
 
     /// <summary>The most words any one statement has.</summary>
     /// <remarks>

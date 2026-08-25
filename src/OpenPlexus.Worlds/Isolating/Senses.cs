@@ -173,7 +173,7 @@ public sealed class Senses : IWorld<Coded>, IWithholds<Coded>
     /// <para>
     /// <b>It says what is being looked at and never what to conclude</b>, which is the line a
     /// world's report has to stay on. <i>You are being asked about touch</i> is the same
-    /// standing as <see cref="Coded.Groups"/>'s <i>these codes were one object</i>; what
+    /// standing as <see cref="Coded.Statements"/>'s <i>these codes were one object</i>; what
     /// nothing here says is which code answers it.
     /// </para>
     /// </remarks>

@@ -933,7 +933,76 @@ public sealed class RoamingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// What reading a statement as a THING costs the spine world — <b>the reading
+    /// A moment reports the THINGS it names, and the statements beside them.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A sentence is a moment whose things are MENTIONED rather than present</b>, John's,
+    /// and it is what lets one rule cover a walk that is recited and a walk that is looked
+    /// at. Before this the world reported its statements as the moment's parts, so
+    /// <c>Spanning</c> read <i>one sentence</i> here and <i>one object</i> on a scene — one
+    /// name over two ideas, sitting inside the mechanism for <i>a thing is one thing</i>.
+    /// </para>
+    /// <para>
+    /// <b>A word said in five statements is one thing said five times.</b> A part per mention
+    /// would report the house as holding as many Johns as the transcript talked about, which
+    /// is the multiplicity a front end reports, backwards.
+    /// </para>
+    /// <para>
+    /// <b>And a word that names no thing is in no part</b>, where it constrains nothing.
+    /// <i>The</i>, <i>is</i> and <i>went</i> are what a statement says ABOUT its things.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_moment_reports_the_things_it_names_and_the_statements_beside_them()
+    {
+        var world = new Roaming(World(20, people: 4), seed: 3);
+        var seen = world.Next().Seen;
+
+        Assert.NotNull(seen.Things);
+        Assert.NotNull(seen.Statements);
+
+        // Every noun of the house, which is what a part may hold and nothing else is.
+        var nouns = world.Named.Concat(world.Called).Concat(world.Walking).ToHashSet();
+
+        output.WriteLine(
+            $"{seen.Statements.Count} statements | {seen.Things.Count} things | "
+            + $"{nouns.Count} nouns in the house");
+
+        // One word a part here, because a mention is a name and nothing else of the thing is
+        // in the moment. A world the machine LOOKED at would put the rest of what it saw in
+        // the same part, which is the crossing rather than this.
+        Assert.All(seen.Things, one => Assert.Single(one.Codes));
+
+        Assert.All(seen.Things, one => Assert.Contains(one.Codes[0], nouns));
+
+        // A thing rather than a mention, so the same word twice is one part.
+        Assert.Equal(
+            seen.Things.Count, seen.Things.Select(one => one.Codes[0]).Distinct().Count());
+
+        // Every person and every prop is named, which is what says the parts are not a
+        // sample: a walk opens by placing all of them out loud. A ROOM is not, because a room
+        // nobody is in and nothing lies in is a room the transcript never mentions -- which
+        // is the difference between what exists and what a moment is about.
+        Assert.All(
+            world.Called.Concat(world.Walking),
+            code => Assert.Contains(code, seen.Things.Select(one => one.Codes[0])));
+
+        // The words that name none are in no part at all, which is where a scope may hold as
+        // many of them as it likes without being about two things.
+        foreach (var word in new[] { "the", "is", "in", "went", "to", "where" })
+            Assert.DoesNotContain(
+                Kinds.Named(46, word), seen.Things.SelectMany(one => one.Codes));
+
+        // And the statements are still reported, because a story arm reads them and a thing
+        // is not one. Twenty steps and eight placements is more sentences than the house has
+        // nouns, which is the two channels saying different things about one moment.
+        Assert.True(seen.Statements.Count > seen.Things.Count,
+            $"{seen.Statements.Count} statements against {seen.Things.Count} things");
+    }
+
+    /// <summary>
+    /// What confining a scope to one THING costs the spine world — <b>the reading
     /// <see cref="Joined"/>'s parts owe the moment they exist.</b>
     /// </summary>
     /// <remarks>
@@ -946,9 +1015,10 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// </para>
     /// <para>
     /// <b>What would refute the default</b>, said before the run: this world's answer is
-    /// reached by two hops through two statements, so a scope confined to one of them cannot
-    /// express it. If <see cref="Spanning.Thing"/> reads below <see cref="Spanning.Anything"/>
-    /// at its best against the other's worst, a statement is the wrong grain of thing for text
+    /// reached by two hops through two statements, and a thing is a word rather than a
+    /// sentence, so a scope naming a person and a room is now about two things and cannot
+    /// fire. If <see cref="Spanning.Thing"/> reads below <see cref="Spanning.Anything"/> at
+    /// its best against the other's worst, one thing a scope is the wrong grain for a walk
     /// and the default is an instrument's answer applied to the target.
     /// </para>
     /// <para>
@@ -957,23 +1027,16 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// once for no extra reading.
     /// </para>
     /// <para>
-    /// <b>Measured, three seeds</b>: 0.587, 0.642 and 0.538 confined against 0.589, 0.620 and
-    /// 0.539 unconfined. Two thousandths behind on two seeds and two hundredths ahead on the
-    /// third, so the prediction that a two-hop answer would be forbidden is refuted at this
-    /// arm.
-    /// </para>
-    /// <para>
-    /// <b>And the parts column says the dial had plenty to do</b>, which is the half that
-    /// stops this being read as a mechanism with nothing to bite on: every moment of five
-    /// hundred holds more than one part and the most is seven. It bites and it is not free
-    /// either — the confined arm holds 653, 986 and 841 residents against 800, 949 and 1,033,
-    /// so a ninth of the population goes and no answer moves. What it refuses is worth
-    /// nothing, which is a stronger reading than the score alone.
+    /// <b>The reading is owed again</b>, because the one that stood here was taken while a
+    /// part was a STATEMENT. It read 0.587, 0.642 and 0.538 confined against 0.589, 0.620 and
+    /// 0.539 unconfined over three seeds, with the parts column saying the dial had plenty to
+    /// do, and the confined arm holding about a ninth fewer residents. That is a different
+    /// mechanism from this one and is kept only so the two can be compared when this runs.
     /// </para>
     /// </remarks>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
-    public void What_reading_a_statement_as_a_thing_costs_the_spine_world()
+    public void What_confining_a_scope_to_one_thing_costs_the_spine_world()
     {
         var arm = new (string Name, Joined Joined)[]
         {

@@ -912,24 +912,24 @@ internal sealed record CommittingSettings
 /// apart.
 /// </para>
 /// <para>
-/// <b>And a part may be a sentence</b>, which this treats exactly as it treats an object.
-/// <see cref="Codes.Coded.Groups"/> says a part is a sentence, an object or a reading, and a
-/// world reporting its STATEMENTS as parts has every scope spanning two of them stop firing,
-/// which nothing here can tell from the mechanism working.
+/// <b>A part is a THING and never a sentence</b>, which is the correction fork 148 asked for.
+/// <see cref="Codes.Coded.Things"/> is what this reads and <see cref="Codes.Coded.Statements"/>
+/// is a text world's own shape beside it; while the two shared a channel, a world reporting
+/// its statements had every scope spanning two of them stop firing and nothing here could
+/// tell that from the mechanism working.
 /// </para>
 /// <para>
 /// <b>And that case ran for the first time when <see cref="Codes.Joined"/> gained a
 /// <c>Bind</c></b>, which is worth saying because it had read as though it must have run
-/// long before. Both spine worlds build one part per statement and every text reading before
-/// that dropped them at the front end, so this dial shipped as the default with nothing to
-/// read on the world it matters most on.
-/// <para>
-/// <b>And it costs the walk nothing measurable</b> — three seeds of the leading store arm
-/// read 0.587, 0.642 and 0.538 confined against 0.589, 0.620 and 0.539 unconfined. What that
-/// does not yet separate is the dial doing nothing from the arm giving it nothing to do, and
-/// <c>RoamingTests.What_reading_a_statement_as_a_thing_costs_the_spine_world</c> prints the
-/// parts a moment beside the scores for exactly that reason.
+/// long before. Every text reading before that dropped the world's report at the front end,
+/// so this dial shipped as the default with nothing to read on the world it matters most on.
 /// </para>
+/// <para>
+/// <b>What it costs the walk is owed again</b>, because the reading that said <i>nothing
+/// measurable</i> was taken while a part was a sentence and is about a different mechanism.
+/// <c>RoamingTests.What_confining_a_scope_to_one_thing_costs_the_spine_world</c> prints the
+/// parts a moment beside the scores, so a dial doing nothing and a dial with nothing to do
+/// can be told apart.
 /// </para>
 /// <para>
 /// <b>Both halves or neither</b>, which is why this is one dial and not two. A matcher that

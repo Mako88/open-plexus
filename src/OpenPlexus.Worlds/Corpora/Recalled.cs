@@ -49,7 +49,7 @@ public sealed record RecalledSettings
     /// crudest possible way to hand the bag some recency, and the gap between the two
     /// readings is what sequence is worth on this text at the grain of a whole statement.
     /// Rung three works at the grain of a WORD and is orthogonal to it: this world reports
-    /// order through <see cref="Codes.Coded.Groups"/> whatever the span is.
+    /// order through <see cref="Codes.Coded.Statements"/> whatever the span is.
     /// </para>
     /// <para>
     /// <b>And it is a fact about what was shown</b>, rather than about how to think, which

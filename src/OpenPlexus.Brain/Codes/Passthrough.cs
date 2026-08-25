@@ -68,7 +68,7 @@ public sealed class Passthrough<TFrame> : IQuantizer<TFrame>
     /// seam that had it.
     /// </remarks>
     public IReadOnlyList<Grouped>? Bind(TFrame frame) =>
-        _reading(frame).Groups is { Count: > 0 } parts ? parts : null;
+        _reading(frame).Things is { Count: > 0 } parts ? parts : null;
 
     /// <inheritdoc/>
     public IReadOnlySet<Code>? Fleeting(TFrame frame) => _reading(frame).Passing;

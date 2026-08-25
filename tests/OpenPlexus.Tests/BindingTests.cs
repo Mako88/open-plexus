@@ -245,8 +245,8 @@ public sealed class BindingTests(ITestOutputHelper output)
             Assert.Equal(one.Seen.Codes, other.Seen.Codes);
             Assert.Equal(one.Outcome, other.Outcome);
 
-            Assert.NotNull(one.Seen.Groups);
-            Assert.Null(other.Seen.Groups);
+            Assert.NotNull(one.Seen.Things);
+            Assert.Null(other.Seen.Things);
         }
     }
 

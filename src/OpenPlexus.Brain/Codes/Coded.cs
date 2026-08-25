@@ -56,6 +56,48 @@ public readonly record struct Grouped
                     .Select(one => Of(one.Select(each => each.Key).Order())),
             ];
 
+    /// <summary>The things a moment names, one part each.</summary>
+    /// <param name="sentences">Every sentence of the moment, the question among them.</param>
+    /// <param name="nouns">Which codes name a thing, which only the world can say.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>A sentence is a moment whose things are MENTIONED rather than present</b>, which is
+    /// what lets one rule cover a walk that is recited and a walk that is looked at. A word
+    /// naming a room, a thing or a person is that thing appearing in the moment; every other
+    /// word names none and belongs to no part, where it constrains nothing.
+    /// </para>
+    /// <para>
+    /// <b>One part a thing rather than one a mention</b>, and the difference decides what two
+    /// of a kind means. Two sentences about the apple are one apple said twice, so a part per
+    /// mention would report a moment as holding as many apples as it talked about — which is
+    /// the multiplicity a front end is supposed to report, backwards.
+    /// </para>
+    /// <para>
+    /// <b>In the order they are first named</b>, because two machines reading one transcript
+    /// must build the identical parts and a set walks in whatever order it was filled in.
+    /// </para>
+    /// <para>
+    /// <b>Here rather than in each text world</b>, for the reason <see cref="Parts"/> is here.
+    /// Which of its words name a thing is the world's own fact; turning a list of sentences
+    /// into the parts a front end reports is nobody's in particular.
+    /// </para>
+    /// </remarks>
+    public static IReadOnlyList<Grouped> Things(
+        IReadOnlyList<IReadOnlyList<Code>> sentences, IReadOnlySet<Code> nouns)
+    {
+        ArgumentNullException.ThrowIfNull(sentences);
+        ArgumentNullException.ThrowIfNull(nouns);
+
+        var found = new List<Code>();
+        var already = new HashSet<Code>();
+
+        foreach (var sentence in sentences)
+            foreach (var word in sentence)
+                if (nouns.Contains(word) && already.Add(word)) found.Add(word);
+
+        return [.. found.Select(word => Of([word]))];
+    }
+
     /// <summary>Whether two parts hold the same codes in the same order.</summary>
     /// <param name="other">The other part.</param>
     /// <remarks>
@@ -118,30 +160,51 @@ public readonly record struct Coded
     public required IReadOnlyCollection<Code> Codes { get; init; }
 
     /// <summary>
-    /// The parts of the moment, in order, or nothing where the world cannot say.
+    /// The THINGS in the moment, or nothing where the world cannot say.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A list of parts rather than a code-to-group dictionary</b>, which is the shape
-    /// three worlds each rebuilt for themselves because the dictionary could not hold what
-    /// they had. One code belongs to one group in a dictionary, and a word said in two
-    /// statements is what every text world is made of.
+    /// <b>One idea rather than two, which is what it was.</b> This channel was called the
+    /// moment's parts, and a scene world filled it with its objects while a text world
+    /// filled it with its statements — so <c>Commitments.Spanning</c> read <i>one thing</i>
+    /// on one world and <i>one sentence</i> on another under a single name. That is this
+    /// repo's own two-ideas-one-name trap sitting inside the mechanism for <i>a thing is one
+    /// thing</i>. The statements have their own channel now and this one means a thing
+    /// everywhere.
     /// </para>
     /// <para>
-    /// <b>Partial where a world groups some of what it shows</b>, so a scene may segment its
-    /// objects and leave the question's codes in no part at all. <see cref="Codes"/> is what
-    /// the moment IS and this is what the world can say about its shape, so the two are not
+    /// <b>A list of parts rather than a code-to-thing dictionary</b>, because a moment may
+    /// hold two of a KIND and a dictionary names one thing per code. A code in two parts is
+    /// in two things, so the number of parts holding it is its multiplicity.
+    /// </para>
+    /// <para>
+    /// <b>Partial where a world can say some of it</b>, so a scene may segment its objects
+    /// and leave the question's codes in no part at all. <see cref="Codes"/> is what the
+    /// moment IS and this is what the world can say about its shape, so the two are not
     /// required to cover each other.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyList<Grouped>? Things { get; init; }
+
+    /// <summary>
+    /// The statements of the moment, newest first, or nothing where the world makes none.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A text world's own shape, and no other world has one.</b> A statement is not a
+    /// thing: <i>the apple is in the kitchen</i> mentions two things and is neither of them.
+    /// Every <c>Codes.Joining</c> arm reads this — a bag unions it, a chain starts from the
+    /// question and walks it — and none of them is asking which thing anything is about.
     /// </para>
     /// <para>
     /// <b>And the order carries what a separate sequence used to.</b> A world that can say
-    /// what came first says it by ordering the parts and the codes inside them; a
+    /// what came first says it by ordering the statements and the codes inside them; a
     /// code-to-position dictionary said the same thing in a second place, was set by no
     /// world on the branch, and is gone. Deriving a precedence from this order is rung three
     /// arriving on every constructed world at once, which is an arm rather than a rename.
     /// </para>
     /// </remarks>
-    public IReadOnlyList<Grouped>? Groups { get; init; }
+    public IReadOnlyList<Grouped>? Statements { get; init; }
 
     /// <summary>
     /// The question this moment asks, or nothing where the world asks none.
@@ -175,20 +238,23 @@ public readonly record struct Coded
     /// <summary>One code, for a world whose moment is a single symbol.</summary>
     public static Coded Of(Code code) => new() { Codes = [code] };
 
-    /// <summary>A moment made of parts, whose codes are what the parts hold.</summary>
+    /// <summary>A moment made of statements, whose codes are what the statements hold.</summary>
     /// <param name="parts">The statements, newest first.</param>
     /// <param name="asked">The question, where the world asks one.</param>
     /// <param name="assigned">Which codes the world was told to emit rather than drew.</param>
+    /// <param name="things">The things mentioned, where the world can say which words name one.</param>
     /// <remarks>
     /// <b>The flattening is done once here</b> rather than at each world, and what it yields
-    /// is the moment as a bag — every word of every part, which is what an arm that selects
-    /// nothing reads. A world that partitions its moment has no second answer to give, so
-    /// asking it for one would be the same list written twice and two places to get it wrong.
+    /// is the moment as a bag — every word of every statement, which is what an arm that
+    /// selects nothing reads. A world that partitions its moment has no second answer to
+    /// give, so asking it for one would be the same list written twice and two places to get
+    /// it wrong.
     /// </remarks>
     public static Coded From(
         IReadOnlyList<Grouped> parts,
         Grouped? asked = null,
-        IReadOnlySet<Code>? assigned = null)
+        IReadOnlySet<Code>? assigned = null,
+        IReadOnlyList<Grouped>? things = null)
     {
         ArgumentNullException.ThrowIfNull(parts);
 
@@ -201,7 +267,8 @@ public readonly record struct Coded
         return new Coded
         {
             Codes = codes,
-            Groups = parts,
+            Statements = parts,
+            Things = things,
             Asked = asked,
             Assigned = assigned,
         };

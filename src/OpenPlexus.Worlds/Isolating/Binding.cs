@@ -200,7 +200,7 @@ public sealed record Scene
     public Coded Shown => new()
     {
         Codes = [.. Codes, Question],
-        Groups = Grouped.Parts(Groups),
+        Things = Grouped.Parts(Groups),
         Passing = Passing,
     };
 }

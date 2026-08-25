@@ -609,36 +609,46 @@ public sealed class ConversingTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>The front end hands on the statements the world called its parts.</b>
+    /// <b>The front end hands on the THINGS the world mentioned</b>, never the statements.
     /// </summary>
     /// <remarks>
     /// <para>
     /// <b>The check the channel owes</b>, and it is capability rather than score. Every text
-    /// reading before this dropped <see cref="Coded.Groups"/> at the front end, so
+    /// reading before this dropped the world's report at the front end, so
     /// <c>Commitments.Spanning</c> had a reader and no text world ever filled it — a
-    /// mechanism exercised beside itself forever and never seen by the spine.
+    /// mechanism exercised beside itself forever and never seen by the spine. Then it was
+    /// filled with STATEMENTS, so the mechanism for <i>a thing is one thing</i> was reading
+    /// <i>one sentence</i> on every text world and <i>one object</i> on every scene.
     /// </para>
     /// <para>
-    /// <b>A word said in two statements is in two parts</b>, which is the multiplicity the
-    /// architecture asks for and the shape a code-to-thing dictionary cannot hold. The
-    /// question is in none, because a question part would put <see cref="Joining.Parted"/>'s
-    /// whole scope across two things.
+    /// <b>A word said in two statements is ONE thing said twice.</b> Two mentions of Mary are
+    /// one Mary, so she is in one part and a scope naming her and a room is about two things
+    /// — which is the relation the architecture puts in a scope and an expectation rather
+    /// than in one scope.
+    /// </para>
+    /// <para>
+    /// <b>The question is in no part</b>, because a question part would put
+    /// <see cref="Joining.Parted"/>'s whole scope across two things.
     /// </para>
     /// </remarks>
     [Fact]
-    public void The_front_end_hands_on_the_statements_the_world_called_its_parts()
+    public void The_front_end_hands_on_the_things_the_world_mentioned()
     {
         var mary = Kinds.Named(1, "mary");
         var kitchen = Kinds.Named(1, "kitchen");
         var garden = Kinds.Named(1, "garden");
         var where = Kinds.Named(1, "where");
 
+        IReadOnlyList<IReadOnlyList<Code>> said =
+            [[mary, kitchen], [mary, garden], [where, mary]];
+
         var moment = Coded.From(
             [
                 Grouped.Of([mary, kitchen]),
                 Grouped.Of([mary, garden]),
             ],
-            Grouped.Of([where, mary]));
+            Grouped.Of([where, mary]),
+            things: Grouped.Things(said, new HashSet<Code> { mary, kitchen, garden }));
 
         var front = new Joined(Joining.Bagged);
         var parts = front.Bind(moment);
@@ -649,9 +659,11 @@ public sealed class ConversingTests(ITestOutputHelper output)
             $"{parts.Count} parts, mary in {parts.Count(one => one.Codes.Contains(mary))}, "
             + $"where in {parts.Count(one => one.Codes.Contains(where))}");
 
-        Assert.Equal(2, parts.Count);
+        // Mary, the kitchen and the garden. Two statements and a question mention them
+        // between them, and how often is not what a part counts.
+        Assert.Equal(3, parts.Count);
 
-        Assert.Equal(2, parts.Count(one => one.Codes.Contains(mary)));
+        Assert.Equal(1, parts.Count(one => one.Codes.Contains(mary)));
 
         Assert.Equal(1, parts.Count(one => one.Codes.Contains(kitchen)));
 
@@ -660,9 +672,14 @@ public sealed class ConversingTests(ITestOutputHelper output)
 
         // And every part names codes the moment carries, or it constrains a scope with words
         // no round ever holds -- a grouping that reads as a thing and is a typo.
-        var said = new HashSet<Code>(front.Codify(moment));
+        var carried = new HashSet<Code>(front.Codify(moment));
 
-        Assert.All(parts, one => Assert.All(one.Codes, code => Assert.Contains(code, said)));
+        Assert.All(parts, one => Assert.All(one.Codes, code => Assert.Contains(code, carried)));
+
+        // A world that cannot say which of its words name a thing reports none, and the front
+        // end has nothing to hand on rather than a statement to call a thing.
+        Assert.Null(front.Bind(Coded.From(
+            [Grouped.Of([mary, kitchen])], Grouped.Of([where, mary]))));
     }
 
     [Fact]

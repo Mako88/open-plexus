@@ -305,7 +305,7 @@ public sealed class Composed : IWorld<Coded>
     private static Coded Shown(Episode scene, IReadOnlyCollection<Code> moment) => new()
     {
         Codes = moment,
-        Groups = Grouped.Parts(scene.Groups is not { Count: > 0 } grouped
+        Things = Grouped.Parts(scene.Groups is not { Count: > 0 } grouped
             ? null
             : moment.Where(grouped.ContainsKey).ToDictionary(code => code, code => grouped[code])),
     };

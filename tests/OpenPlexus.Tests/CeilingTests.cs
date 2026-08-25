@@ -208,6 +208,7 @@ public sealed class CeilingTests(ITestOutputHelper output)
             Typed = typed,
             Printed = TextWriter.Null,
             Carrying = Carrying.Never,
+            Things = lesson.Things,
         });
 
         var present = 0;

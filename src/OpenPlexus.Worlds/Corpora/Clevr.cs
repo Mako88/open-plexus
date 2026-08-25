@@ -707,7 +707,7 @@ public sealed class Clevr : IWorld<Coded>, IWithholds<Coded>
                 // nothing. A world reporting what it knows is not the same as a learner
                 // acting on it, and pretending otherwise is how `Surprise` read as wired for
                 // the life of a branch.
-                Groups = Grouped.Parts(scene.Groups),
+                Things = Grouped.Parts(scene.Groups),
                 Passing = scene.Fleeting,
             },
             Outcome = _answers[question.Answer],

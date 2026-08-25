@@ -99,6 +99,16 @@ public sealed class Handing : IWorld<Coded>, IWithholds<Coded>
         "apple", "football", "milk", "book", "lamp", "kettle", "hat", "brush",
     ];
 
+    /// <summary>The words that name a thing, as against the ones that name none.</summary>
+    /// <remarks>
+    /// <b>The people and the objects</b>, which is what this world is made of. <i>Gave</i>,
+    /// <i>the</i> and <i>to</i> name none, so they belong to no part and constrain nothing —
+    /// a scope over a whole sentence is about two people and a thing at once, which is what a
+    /// statement reported as a part could never say.
+    /// </remarks>
+    private static readonly HashSet<Code> Nouns =
+        [.. Cast.Concat(Objects).Select(word => Kinds.Named(Word, word))];
+
     private readonly HandingSettings _settings;
     private readonly Random _draws;
     private readonly List<Turn<Coded>> _kept = [];
@@ -207,7 +217,8 @@ public sealed class Handing : IWorld<Coded>, IWithholds<Coded>
         {
             Seen = Coded.From(
                 [.. told.Select(Grouped.Of)],
-                Grouped.Of(Say("who", "has", "the", Objects[about]))),
+                Grouped.Of(Say("who", "has", "the", Objects[about])),
+                things: Grouped.Things(told, Nouns)),
             Outcome = takers[about],
         };
     }

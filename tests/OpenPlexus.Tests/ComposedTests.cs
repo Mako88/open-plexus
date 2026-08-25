@@ -172,7 +172,7 @@ public sealed class ComposedTests(ITestOutputHelper output)
 
             output.WriteLine(
                 $"{arm} | moments {string.Join(" ", first.Select(one => one.Codes.Count))} "
-                + $"| parts {string.Join(" ", first.Select(one => one.Groups?.Count ?? -1))} "
+                + $"| parts {string.Join(" ", first.Select(one => one.Things?.Count ?? -1))} "
                 + $"| codes {tally.Codes:F2}");
 
             output.WriteLine(

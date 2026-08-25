@@ -166,14 +166,18 @@ internal static class Fixture
     /// present, genesis roots on nothing and a run holds a population of nought. Three files
     /// wrote this block out and one of them got that wrong, which is why it is here.
     /// </remarks>
+    /// <param name="asserting">What a told statement claims.</param>
     public static Worlds.Conversing Talking(
-        Worlds.Tutor tutor, Worlds.Carrying carrying = Worlds.Carrying.Never) =>
+        Worlds.Tutor tutor,
+        Worlds.Carrying carrying = Worlds.Carrying.Never,
+        Worlds.Asserting asserting = Worlds.Asserting.Everything) =>
         new(new Worlds.ConversingSettings
         {
             Typed = tutor,
             Printed = tutor.Printed,
+            Things = tutor.Things,
             Carrying = carrying,
-            Asserting = Worlds.Asserting.Everything,
+            Asserting = asserting,
         });
 
     public static Code C(ulong value) => new(Modality: 1, value);

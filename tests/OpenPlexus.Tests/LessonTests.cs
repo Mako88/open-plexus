@@ -40,13 +40,7 @@ public sealed class LessonTests(ITestOutputHelper output)
                 with { Deciding = deciding, Supposing = supposing, Spanning = spanning },
             seed);
 
-        var world = new Conversing(new ConversingSettings
-        {
-            Typed = tutor,
-            Printed = tutor.Printed,
-            Carrying = carrying,
-            Asserting = asserting,
-        });
+        var world = Fixture.Talking(tutor, carrying, asserting);
 
         // Handed in where the world and the brain meet, because which code an outcome is
         // about is a fact only the world holds. Without it `Supposing` is one vote.
@@ -145,13 +139,7 @@ public sealed class LessonTests(ITestOutputHelper output)
     {
         var tutor = new Tutor(lesson, TextWriter.Null, passes: 1, tellings: tellings);
 
-        var world = new Conversing(new ConversingSettings
-        {
-            Typed = tutor,
-            Printed = tutor.Printed,
-            Carrying = Carrying.Never,
-            Asserting = Asserting.Everything,
-        });
+        var world = Fixture.Talking(tutor);
 
         var front = new Joined(Joining.Bagged);
         var stream = new List<(HashSet<Code> Moment, int? Arrived)>();
@@ -926,13 +914,7 @@ public sealed class LessonTests(ITestOutputHelper output)
             Committing(2000, Rooting.Wholly, Crediting.Birth, Admitting.Anything),
             seed);
 
-        var world = new Conversing(new ConversingSettings
-        {
-            Typed = tutor,
-            Printed = tutor.Printed,
-            Carrying = carrying,
-            Asserting = Asserting.Everything,
-        });
+        var world = Fixture.Talking(tutor, carrying);
 
         brain.Meaning = world.Meaning;
 
@@ -3138,13 +3120,7 @@ public sealed class LessonTests(ITestOutputHelper output)
             },
             seed: 1);
 
-        var world = new Conversing(new ConversingSettings
-        {
-            Typed = tutor,
-            Printed = tutor.Printed,
-            Carrying = Carrying.Never,
-            Asserting = Asserting.Everything,
-        });
+        var world = Fixture.Talking(tutor);
 
         // Handed in where the world and the brain meet, because which code an outcome is
         // about is a fact only the world holds. Without it `Supposing` is one vote.

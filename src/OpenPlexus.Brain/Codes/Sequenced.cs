@@ -25,7 +25,7 @@
 /// <b>And it is the learner that derives it</b>, which is the seam this sits the right side
 /// of. The front end reports order through
 /// <see cref="IQuantizer{TObservation}.Order"/>, which is a fact about the signal on the
-/// licence <see cref="Coded.Groups"/> already carries. Turning that into <i>these two
+/// licence <see cref="Coded.Statements"/> already carries. Turning that into <i>these two
 /// stood this way round</i> is a derivation, and a front end doing it would be deciding
 /// which relations exist.
 /// </para>

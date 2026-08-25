@@ -9,7 +9,7 @@ namespace OpenPlexus.Codes;
 /// <b>A reading rather than a moment</b>, which is why it is derived and never carried. A
 /// world hands over parts in order; every arm below asks whether a word was in a statement,
 /// so turning each part into a set once a call is the difference between one pass and one
-/// per lookup. The order stays on <see cref="Coded.Groups"/>, where
+/// per lookup. The order stays on <see cref="Coded.Statements"/>, where
 /// <see cref="Joined.Order"/> reads it.
 /// </para>
 /// <para>
@@ -43,7 +43,7 @@ public readonly record struct Storied
     public static Storied Of(Coded moment) =>
         new()
         {
-            Story = moment.Groups is { } parts
+            Story = moment.Statements is { } parts
                 ? [.. parts.Select(one => (IReadOnlySet<Code>)new HashSet<Code>(one.Codes))]
                 : [],
             Question = moment.Asked is { } asked
@@ -283,7 +283,7 @@ public sealed class Joined : IQuantizer<Coded>
     /// <para>
     /// <b>And it is a front end saying what it is looking at</b>, rather than what to conclude.
     /// <i>This code is one of a set that never co-occurs and keeps one company</i> is
-    /// arithmetic over what was seen, in the same licence <see cref="Codes.Coded.Groups"/>
+    /// arithmetic over what was seen, in the same licence <see cref="Codes.Coded.Statements"/>
     /// carries for <i>these codes were one object</i>. Which category matters, and to what,
     /// is left entirely to the learner.
     /// </para>
@@ -611,7 +611,7 @@ public sealed class Joined : IQuantizer<Coded>
     /// <remarks>
     /// <para>
     /// <b>Oldest first</b>, which is the opposite of every other arm here and is the point.
-    /// <see cref="Coded.Groups"/> arrives newest first because a distance from the question
+    /// <see cref="Coded.Statements"/> arrives newest first because a distance from the question
     /// means the same thing in every story; a store is maintained in the order the world
     /// happened, so this walks it backwards to go forwards.
     /// </para>
@@ -755,17 +755,17 @@ public sealed class Joined : IQuantizer<Coded>
     /// <inheritdoc/>
     /// <remarks>
     /// <para>
-    /// <b>The statements this arm read, one part each</b>, which is the world's own claim
-    /// passed on rather than a claim of this front end's. <see cref="Coded.Groups"/> arrives
-    /// one part a statement and every reading before this dropped it here, so no grouping
-    /// had ever reached the brain from text and <c>Commitments.Spanning</c> had never once
-    /// fired on either spine world.
+    /// <b>The things the world mentioned, and never the statements.</b> A statement was
+    /// reported as a part while this channel had one name for two ideas, so
+    /// <c>Commitments.Spanning</c> read <i>one sentence</i> here and <i>one object</i> on a
+    /// scene. <i>The apple is in the kitchen</i> mentions two things and is neither of them,
+    /// so a scope over the whole of it was about no one thing and fired anyway.
     /// </para>
     /// <para>
     /// <b>Only what the arm read</b>, for the reason <see cref="Order"/> reports only what
     /// the arm read: a selecting arm's moment does not hold the words of a statement it
     /// dropped, and a part naming codes no moment carries constrains nothing while looking
-    /// like a thing.
+    /// like a thing. So a thing mentioned only in a dropped statement is no part here.
     /// </para>
     /// <para>
     /// <b>The question is no part of it</b>, and that is a decision rather than an omission.
@@ -773,18 +773,25 @@ public sealed class Joined : IQuantizer<Coded>
     /// own modality, so a question part would make <i>this word, asked and told</i> a scope
     /// spanning two things — which is exactly the scope that arm exists to make sayable, and
     /// <c>Commitments.Spanning</c> would refuse it. The world puts the question beside the
-    /// parts for its own reasons and this keeps it there.
+    /// statements for its own reasons and this keeps it there.
     /// </para>
     /// <para>
-    /// <b>A word said in two statements is in two things</b>, which is the multiplicity a
-    /// dictionary could not carry and the reason <see cref="Coded.Groups"/> is a list. A
-    /// category code belongs to no statement and stays outside every part, where it
-    /// constrains nothing.
+    /// <b>A word said twice is one thing said twice</b>, which is the half a statement part
+    /// got backwards. Two mentions of an apple are one apple, so what makes a moment hold two
+    /// of a kind is the world saying so and never the transcript repeating itself. A category
+    /// code belongs to no thing and stays outside every part, where it constrains nothing.
+    /// </para>
+    /// <para>
+    /// <b>A banded word goes in the thing its plain word names</b>, because a banded word is
+    /// that word wearing the depth it was read at. Leaving it out would put half of a chained
+    /// arm's moment in no thing at all, which reads as the grouping being partial and is the
+    /// mechanism being blind to the codes the arm added.
     /// </para>
     /// </remarks>
     public IReadOnlyList<Grouped>? Bind(Coded observation)
     {
-        if (observation.Groups is not { Count: > 0 } said) return null;
+        if (observation.Things is not { Count: > 0 } things) return null;
+        if (observation.Statements is not { Count: > 0 } said) return null;
 
         // The arm is run again rather than remembered, for the reason `Order` runs it again:
         // a front end is a function of its input on every machine forever, and a remembered
@@ -794,27 +801,37 @@ public sealed class Joined : IQuantizer<Coded>
 
         if (read.Count == 0) read = Every(story);
 
-        var parts = new List<Grouped>();
+        // Every form a word the arm read arrived in: its plain one, and whatever depth it was
+        // banded at. Built once over the statements rather than once a thing, because a thing
+        // mentioned in three of them would otherwise walk all three.
+        var mentioned = new Dictionary<Code, HashSet<Code>>();
 
         for (var hop = 0; hop < read.Count; hop++)
-        {
-            var words = new HashSet<Code>(said[read[hop]].Codes);
+            foreach (var word in said[read[hop]].Codes)
+            {
+                if (!mentioned.TryGetValue(word, out var forms))
+                    mentioned[word] = forms = [word];
 
-            // And the band goes in the part its hop read, because a banded word is that
-            // statement's word wearing its depth. Leaving it out would put half of a chained
-            // arm's moment in no thing at all, which reads as the grouping being partial and
-            // is the mechanism being blind to the codes the arm added.
-            if (_joining == Joining.Chained && _banded)
-                foreach (var code in said[read[hop]].Codes)
-                    words.Add(new Code(
-                        Both, unchecked(code.Value * Bands + (ulong)Math.Min(hop, Bands - 1) + 2)));
+                if (_joining == Joining.Chained && _banded)
+                    forms.Add(new Code(
+                        Both, unchecked(word.Value * Bands + (ulong)Math.Min(hop, Bands - 1) + 2)));
+            }
+
+        var parts = new List<Grouped>();
+
+        foreach (var thing in things)
+        {
+            var words = new HashSet<Code>();
+
+            foreach (var code in thing.Codes)
+                if (mentioned.TryGetValue(code, out var forms)) words.UnionWith(forms);
 
             // Ordered, because a part compares by what it holds in the order it holds it and
             // two machines must build the identical one out of the same words.
-            parts.Add(new() { Codes = [.. words.Order()] });
+            if (words.Count > 0) parts.Add(new() { Codes = [.. words.Order()] });
         }
 
-        return parts;
+        return parts.Count > 0 ? parts : null;
     }
 
     /// <inheritdoc/>
@@ -839,7 +856,7 @@ public sealed class Joined : IQuantizer<Coded>
     /// </para>
     /// <para>
     /// <b>Oldest first, because the transcript happened that way round.</b>
-    /// <see cref="Coded.Groups"/> arrives newest first so that a distance from the question
+    /// <see cref="Coded.Statements"/> arrives newest first so that a distance from the question
     /// means one thing in every story; a precedence means <i>this was said before that</i>,
     /// which is the other direction. A pair spanning two statements says the older one's last
     /// surviving word came before the newer one's first, and the arm's own selection is what
@@ -857,7 +874,7 @@ public sealed class Joined : IQuantizer<Coded>
         // The arm is run again rather than remembered, and the front end stays a function of
         // its input. A cached last answer would be state on a type whose whole contract is
         // that the same input gives the same codes on every machine forever.
-        if (observation.Groups is not { Count: > 0 } said) return null;
+        if (observation.Statements is not { Count: > 0 } said) return null;
 
         var read = Read(Storied.Of(observation));
 

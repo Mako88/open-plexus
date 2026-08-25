@@ -31,9 +31,8 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The spine becomes ONE world and the items below build it.** John's. Rung four
   and the forward store are BUILT and neither is on this list.
-- **First, what one THING a scope costs when WALKED.** The reading
-  pricing the dial is a recital, where a thing is one word. Fork **150**.
-- **The DRIVE**, rankable at last, there being choices worth ranking. Fork **146**.
+- **First, the DRIVE**, rankable at last, there being choices worth ranking. `Progress` is
+  built and nothing chooses by it. Fork **146**.
 - **Then the SURVEY and its control**, another house's machine sitting this one's exam. Its
   ceiling is taken before a learner is wired to it.
 - **Then the CHAT**, `Curiosity` pointed at what was seen rather than at a lesson.
@@ -442,8 +441,6 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **NOW** — the front end reports THINGS rather than one thing a code, so a code in two
       of them is in two things and a moment carries two of a kind. `Spanning` intersects
       them. Fork **142**.
-    - **OPEN** — the reading behind the default is a recital, where a thing has one code.
-      Owed on the walked half. Fork **150**.
     - **OPEN** — minting an INDIVIDUAL is unbuilt and a bundle recurring in the successor
       moment is refuted below, being co-occurrence read twice. What is left is persistence of
       a PART, or confidence over repetition. Fork **93**.

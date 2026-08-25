@@ -1238,7 +1238,20 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// shows a look, a shade and a name, and two of a kind share a look. It is its own block
     /// and its own column because a walked house withholds nothing: that score is the online
     /// reading and this one is an unseen set, and a table holding both would be a share whose
-    /// halves count different events. Fork <b>150</b>.
+    /// halves count different events.
+    /// </para>
+    /// <para>
+    /// <b>And there the dial is LEVEL and anything but inert.</b> Confined reads 0.186, 0.175
+    /// and 0.183 against 0.182, 0.175 and 0.188 — ahead on one seed, level on one, behind on
+    /// one — for 645, 762 and 617 residents against 240, 257 and 230, and 547, 671 and 520
+    /// repairs against 2,667, 2,898 and 2,103. So it holds nearly three times the population
+    /// on a fifth of the repair for the same score, which is a different machine reaching the
+    /// same number rather than a setting nothing reads.
+    /// </para>
+    /// <para>
+    /// <b>The recital's point and a half is a fact about recitals.</b> It does not transfer
+    /// to the half where a thing has parts, and this is the only arm under which a binding
+    /// exists at all — 45, 51 and 42 minted against nought. Fork <b>150</b>.
     /// </para>
     /// <para>
     /// <b>Measured over three seeds</b>: 0.589, 0.605 and 0.523 confined against 0.589, 0.620
@@ -1305,10 +1318,14 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // reading. Putting the two in one table would be a share whose halves count
         // different events.
         var walked = new Dictionary<Spanning, List<double>>();
+        var minted = new Dictionary<Spanning, long>();
+        var residents = new Dictionary<Spanning, int>();
 
         foreach (var spanning in new[] { Spanning.Thing, Spanning.Anything })
         {
             walked[spanning] = [];
+            minted[spanning] = 0;
+            residents[spanning] = 0;
 
             foreach (var seed in new[] { 1, 2, 3 })
             {
@@ -1324,6 +1341,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
                     .Run(10_000, sweep: 1000, target: 0.9, window: 2000);
 
                 walked[spanning].Add(tally.Recent);
+                minted[spanning] += brain.Held.EverBorn.GetValueOrDefault(Birth.Bound);
+                residents[spanning] += brain.Held.Count;
 
                 output.WriteLine(
                     $"walked {spanning,-8}| seed {seed} | own {tally.Recent:F3} "
@@ -1338,6 +1357,23 @@ public sealed class RoamingTests(ITestOutputHelper output)
         output.WriteLine(
             $"walked any thing  | worst {walked[Spanning.Anything].Min():F3} "
             + $"| best {walked[Spanning.Anything].Max():F3}");
+
+        // A scope over one thing exists under one arm and not the other, which is what says
+        // the walked block reads the mechanism rather than a setting beside it. Asserted as
+        // the presence and the absence together: the confined arm minting none would mean the
+        // reading above is about something else entirely.
+        Assert.True(minted[Spanning.Thing] > 0 && minted[Spanning.Anything] == 0,
+            $"{minted[Spanning.Thing]} bindings confined against "
+            + $"{minted[Spanning.Anything]} unconfined, so `Spanning` no longer decides "
+            + "whether a scope over one thing is minted and this block reads something else");
+
+        // And the two arms are different machines on this half, whatever the score says. A
+        // dial level on score and level on population would be a dial with nothing to change,
+        // which this file's own trap list says reads identically to one that changed nothing.
+        Assert.True(residents[Spanning.Thing] > residents[Spanning.Anything] * 2,
+            $"{residents[Spanning.Thing]} residents confined against "
+            + $"{residents[Spanning.Anything]} unconfined, so the arms have converged and a "
+            + "level score no longer says the dial is paid for rather than absent");
 
         // Worst against best, which is this file's own bar and cannot be gamed by a run that
         // landed well. Stated as the refutation rather than as the expectation: what is

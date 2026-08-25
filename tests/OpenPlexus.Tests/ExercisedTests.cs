@@ -55,10 +55,14 @@ public sealed class ExercisedTests
     /// one brain looked open.
     /// </para>
     /// <para>
-    /// <b>That grid asked the WHERE question only, and the effect arm pays.</b> Under
+    /// <b>The effect arm pays HERE rather than on the grid.</b> Under
     /// <c>Admitting.Testable</c> it falls from 105 residents and 131 repairs to 39 and 7, and
     /// the derivation stops reaching a scope — so <i>a concept a thing in its own right</i>
     /// goes unreached and the spine loses an entry of THE ARCHITECTURE to buy dial parity.
+    /// The grid re-run with the question as an axis reads the same bar as a fifth of the
+    /// population and no score, on both questions: it runs a bare front end and no chooser,
+    /// and this composition runs a derived vocabulary and one that acts. The cost is in that
+    /// interaction rather than in the bar.
     /// Parity is the means and coverage is the end, so the trade is refused and
     /// <c>OutstandingTests.The_spine_runs_one_brain</c> stays red with a measured reason
     /// rather than an unexamined one.

@@ -1128,8 +1128,26 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// <para>
     /// <b>So the QUESTION is an axis here now</b>, and it was the reading this grid owed. A
     /// dial crossed against one of a world's two questions is a dial measured on half its
-    /// world, which is this file's own trap read one level out — and the half it left out is
-    /// the half that refused the verdict.
+    /// world, which is this file's own trap read one level out.
+    /// </para>
+    /// <para>
+    /// <b>And the effect question's exam is indifferent too</b>: 0.803, 0.858 and 0.828
+    /// ungated against 0.805, 0.855 and 0.827 under the bar, where the where question reads
+    /// 0.587, 0.642 and 0.538 against 0.612, 0.640 and 0.534. Eight cells and nothing outside
+    /// the seed spread, so the exam cannot decide this dial on either half of this world.
+    /// </para>
+    /// <para>
+    /// <b>What moves is what the run HOLDS.</b> The bar takes the effect arm from 164, 193 and
+    /// 254 residents to 152, 168 and 194, and its repairs from 216, 242 and 276 to 159, 190
+    /// and 209 — a fifth of the population and a quarter of the ladder for no answer. A kill
+    /// line written on the exam passes over all of that, which is what this grid did twice.
+    /// </para>
+    /// <para>
+    /// <b>And a fifth is not what the spine's own composition reads.</b> There the same bar
+    /// takes the effect arm to 39 residents and 7 repairs and the derivation stops reaching a
+    /// scope. This grid runs a bare front end and no chooser; the spine runs a derived
+    /// vocabulary and one that acts. So the cost is in the interaction rather than in the bar,
+    /// and a dial priced on the simpler machine is priced on the wrong one.
     /// </para>
     /// </remarks>
     [Fact]

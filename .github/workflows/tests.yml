@@ -245,11 +245,12 @@ jobs:
       # three finish inside ten minutes.
       #
       # AND THE SPINE CLASSES GOT ONE TOO, FOR LENGTH RATHER THAN CONTENTION.
-      # `ExercisedTests` and `OutstandingTests` each run both spine worlds into a brain, and
-      # they run them twice between them -- nine minutes of the catch-all shard's wall clock
-      # on their own, and the catch-all is the one that sits near the timeout. A shard that
-      # overruns reports as CANCELLED rather than as failed, so length there is disguised as
-      # the concurrency group working.
+      # `OutstandingTests` runs both spine worlds into a brain -- four minutes forty on a
+      # developer's box for that one fact, and longer on a runner -- and it sat in the
+      # catch-all shard, which is the one that has been finishing near the timeout above
+      # while the others take ten minutes. A shard that overruns reports as CANCELLED rather
+      # than as failed, so length there is disguised as the concurrency group working.
+      # `ExercisedTests` comes with it because the two share the reading.
       #
       # AND THE LIST IS CHECKED NOW, WHICH IS WHY MOVING ANYTHING IS SAFE. `ShardTests`
       # fails the build if a class lands in two shards or in none -- the second being the

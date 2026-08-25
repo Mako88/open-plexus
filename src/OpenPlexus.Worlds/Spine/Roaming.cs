@@ -47,7 +47,70 @@ public sealed record RoamingSettings
     public required int Withheld { get; init; }
 
     /// <inheritdoc cref="Worlds.Examining"/>
+    /// <remarks>
+    /// <b>Read under <see cref="Knowing.Recited"/> alone</b>, because a question about the
+    /// walk is what a recital ends with and an explorer is settled step by step.
+    /// </remarks>
     public required Examining Examining { get; init; }
+
+    /// <inheritdoc cref="Worlds.Knowing"/>
+    public required Knowing Knowing { get; init; }
+
+    /// <inheritdoc cref="Worlds.Seeing"/>
+    public required Seeing Seeing { get; init; }
+}
+
+/// <summary>How the machine comes to know what happened in the house.</summary>
+/// <remarks>
+/// <para>
+/// <b>John's, and it is what the spine becoming ONE world turns on.</b> A machine recited to
+/// is a machine reading somebody else's account; a machine that walks the house has to make
+/// its own, and every mechanism between the two is the same one.
+/// </para>
+/// <para>
+/// <b>The two are not arms of one question.</b> They are not scored against each other: one is
+/// answered in words about a walk it was told, the other is settled by what it is shown while
+/// it looks — different alphabets and different rounds, so a table holding both would be
+/// comparing configurations as much as problems.
+/// </para>
+/// </remarks>
+public enum Knowing
+{
+    /// <summary>The walk is recited to it whole. Every reading taken before this.</summary>
+    Recited,
+
+    /// <summary>It walks the house and is shown what is in front of it.</summary>
+    Explored,
+}
+
+/// <summary>Whether what is SEEN of a thing and the word for it are one code.</summary>
+/// <remarks>
+/// <para>
+/// <b>An arm and never a default, which is John's.</b> Shared, the crossing is free and the
+/// front end has handed over the answer in the one form the codes cannot otherwise carry —
+/// which is the fault <c>CeilingTests</c> exists to price. Apart, it is the same problem a
+/// picture will pose, and that is the point.
+/// </para>
+/// <para>
+/// <b>And it would otherwise be decided by whoever wrote the world first</b>, silently. A
+/// world whose looks and words are one code reads as a learner that crossed two senses, and
+/// nothing in a score can tell that from a front end that never had two.
+/// </para>
+/// <para>
+/// <b>Shared also lets the machine's own words look like things.</b> A command is in the
+/// moment, so a machine that said <i>garden</i> put the garden's code there whether or not it
+/// can see one — the answer arriving through the action channel. That is inherent to one code
+/// meaning two things rather than a fault in the wiring, and it is one more reason the arm is
+/// priced rather than chosen.
+/// </para>
+/// </remarks>
+public enum Seeing
+{
+    /// <summary>Two codes, so what a thing looks like and what it is called must be joined.</summary>
+    Apart,
+
+    /// <summary>One code, so a thing seen is already named.</summary>
+    Shared,
 }
 
 /// <summary>
@@ -173,6 +236,13 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// </remarks>
     private const byte Word = 46;
 
+    /// <summary>The modality what a thing LOOKS like rides on.</summary>
+    /// <remarks>
+    /// <b>Unused under <see cref="Seeing.Shared"/></b>, where a look is the word. That is the
+    /// whole of the arm: one modality or two, with the same house behind it.
+    /// </remarks>
+    private const byte Look = 48;
+
     /// <summary>What holds a thing that is lying on the floor.</summary>
     private const int Nobody = -1;
 
@@ -254,6 +324,14 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// <summary>What the machine said about this moment, or nothing where it said none.</summary>
     private List<int>? _spoken;
 
+    // The house being walked, how many steps of it are left, and what has been met in it.
+    // Explored only: a recital opens and closes a house inside one turn and needs none of it.
+    private Walk? _house;
+    private int _left;
+
+    private readonly List<string> _order = [];
+    private readonly Dictionary<string, List<Code>> _met = new(StringComparer.Ordinal);
+
     // The moment the open walk reads as, built once. A doing accumulates words and moves
     // nothing, so a machine that says three of them is looking at one state -- and the
     // caller reads this once a doing, so a fresh build a look would be a whole moment's
@@ -279,6 +357,27 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         // which is a question with no answer rather than an answer of nought.
         if (settings.Examining == Examining.Effect)
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Steps);
+
+        if (settings.Knowing is Knowing.Explored)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Steps);
+
+            // Both refused rather than ignored, because a setting read by nothing is a
+            // setting somebody will read a result off. An explorer is settled by what it is
+            // shown at each step, so there is no question at the end of a house to choose
+            // between and no held-out one to draw -- the survey is the item after this and
+            // does not exist yet.
+            if (settings.Examining != Examining.Where)
+                throw new ArgumentException(
+                    "an explored house asks no question at the end of the walk, so the "
+                    + "examining arm decides nothing here", nameof(settings));
+
+            if (settings.Withheld != 0)
+                throw new ArgumentException(
+                    "an explored house has no question to hold back: a withheld one would "
+                    + "be about a house the machine never walked, which nothing could "
+                    + "answer. The survey is what makes an exam of this", nameof(settings));
+        }
 
         _settings = settings;
         _walks = new Random(seed);
@@ -322,8 +421,9 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// is the answer alphabet and the effect question's is <i>moved</i> and <i>did not</i>.
     /// A world reporting its room count there would price every arm against the wrong bar.
     /// </remarks>
-    public int Outcomes =>
-        _settings.Examining == Examining.Effect ? 2 : _settings.Rooms;
+    public int Outcomes => _settings.Knowing is Knowing.Explored
+        ? _vocabulary.Count
+        : _settings.Examining == Examining.Effect ? 2 : _settings.Rooms;
 
     /// <summary>
     /// The code for each room's word, in outcome order — <b>so a ceiling comes off the transcript</b>
@@ -354,6 +454,11 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         [.. Cast.Take(_settings.People).Select(one => Kinds.Named(Word, one))];
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// <b>Empty under <see cref="Knowing.Explored"/></b>, and the constructor refuses a
+    /// setting that asks for otherwise. A held-out question there would be about a house the
+    /// machine never walked.
+    /// </remarks>
     public IReadOnlyList<Turn<Coded>> Withheld => _kept;
 
     /// <inheritdoc/>
@@ -364,6 +469,8 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// </remarks>
     public Turn<Coded> Next()
     {
+        if (_settings.Knowing is Knowing.Explored) return Walked();
+
         var walk = _open ?? Open();
         var said = _spoken;
 
@@ -470,6 +577,9 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         get
         {
             if (_shown is { } already) return already;
+
+            if (_settings.Knowing is Knowing.Explored)
+                return (_shown = Sighted(_house ??= Housed(), null)).Value;
 
             _open ??= Open();
 
@@ -641,24 +751,38 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// <summary>One step of the walk, commanded or drawn.</summary>
     /// <param name="walk">The house and where everything in it stands.</param>
     /// <param name="spoken">What the machine said, or nothing to let the walk draw.</param>
+    /// <param name="walker">Whose step it is, or nothing to draw one.</param>
     /// <remarks>
+    /// <para>
     /// <b>A wish is not filtered against what is possible</b>, because filtering it would
     /// hand a chooser the world's knowledge of what is possible through the back of the
     /// interface. What an impossible command gets is a step that happens and does nothing.
+    /// </para>
+    /// <para>
+    /// <b>And it is said out loud only where the walk is RECITED.</b> An explorer is shown
+    /// what its step left in front of it rather than told what it did, so a sentence there
+    /// would be the world narrating the machine to itself.
+    /// </para>
     /// </remarks>
-    private void Step(Walk walk, IReadOnlyList<int>? spoken)
+    private void Step(Walk walk, IReadOnlyList<int>? spoken, int? walker = null)
     {
         var (at, held, here, told) = walk;
 
         // Whose turn it is, and one person is nobody to choose between. A draw over one
         // option decides nothing, so it is not taken -- which also leaves the walk of a
         // one-person house the walk every earlier reading was taken on.
-        var who = _settings.People == 1 ? 0 : _walks.Next(_settings.People);
+        var who = walker
+            ?? (_settings.People == 1 ? 0 : _walks.Next(_settings.People));
+
+        var saying = _settings.Knowing is Knowing.Recited;
 
         if (spoken is not null)
         {
-            if (Parse(spoken) is { } wanted && Possible(walk, who, wanted)) Done(walk, who, wanted);
-            else told.Add(Said(Cast[who], "waited"));
+            var sentence = Parse(spoken) is { } wanted && Possible(walk, who, wanted)
+                ? Done(walk, who, wanted)
+                : Said(Cast[who], "waited");
+
+            if (saying) told.Add(sentence);
 
             return;
         }
@@ -686,7 +810,9 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
             _ => new Command(Went, _walks.Next(_settings.Rooms)),
         };
 
-        Done(walk, who, drawn);
+        var said = Done(walk, who, drawn);
+
+        if (saying) told.Add(said);
     }
 
     /// <summary>Whether a walker could do this now.</summary>
@@ -702,38 +828,220 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
             _ => true,
         };
 
-    /// <summary>The step, done and said out loud.</summary>
+    /// <summary>The step, done, and the sentence for it.</summary>
     /// <param name="walk">The house and where everything in it stands.</param>
     /// <param name="who">Whose step it is.</param>
     /// <param name="doing">What is done, which this world has already found possible.</param>
-    private static void Done(Walk walk, int who, Command doing)
+    /// <remarks>
+    /// <b>The sentence is handed back rather than said</b>, because an explorer is not told
+    /// what it just did. Doing and saying were one call while every walk was recited, and a
+    /// world that narrated a step to the machine that took it would be handing over the half
+    /// it is supposed to see.
+    /// </remarks>
+    private static IReadOnlyList<Code> Done(Walk walk, int who, Command doing)
     {
-        var (at, held, here, told) = walk;
+        var (at, held, here, _) = walk;
 
         switch (doing.Verb)
         {
             case Took:
                 held[doing.About] = who;
 
-                told.Add(Said(Cast[who], "took", "the", Things[doing.About]));
-
-                break;
+                return Said(Cast[who], "took", "the", Things[doing.About]);
 
             case Dropped:
                 held[doing.About] = Nobody;
                 at[doing.About] = here[who];
 
-                told.Add(Said(Cast[who], "dropped", "the", Things[doing.About]));
-
-                break;
+                return Said(Cast[who], "dropped", "the", Things[doing.About]);
 
             default:
                 here[who] = doing.About;
 
-                told.Add(Said(Cast[who], "went", "to", "the", Places[doing.About]));
-
-                break;
+                return Said(Cast[who], "went", "to", "the", Places[doing.About]);
         }
+    }
+
+    /// <summary>Whose body the machine is walking.</summary>
+    /// <remarks>
+    /// <b>The first of the cast</b>, so a house of one person is the machine alone in it. A
+    /// body drawn per house would make what the machine is called a fact about the episode,
+    /// and every rule it learnt about itself would be about somebody else next time.
+    /// </remarks>
+    private const int Body = 0;
+
+    /// <summary>The code for what a thing LOOKS like.</summary>
+    /// <param name="name">The thing.</param>
+    private Code Seen(string name) =>
+        Kinds.Named(_settings.Seeing is Seeing.Shared ? Word : Look, name);
+
+    /// <summary>What the body can see from where it stands, the room first.</summary>
+    /// <param name="walk">The house and where everything in it stands.</param>
+    /// <remarks>
+    /// <b>A thing in a hand is where the hand is</b>, which is <see cref="Placed"/>'s rule and
+    /// the reason it is reused here. What somebody standing in this room is carrying is in
+    /// this room, and a machine looking at the room is looking at it.
+    /// </remarks>
+    private List<string> Before(Walk walk)
+    {
+        var room = walk.Here[Body];
+        var placed = Placed(walk.At, walk.Held, walk.Here);
+        var found = new List<string> { Places[room] };
+
+        for (var prop = 0; prop < _settings.Props; prop++)
+            if (placed[prop] == room) found.Add(Things[prop]);
+
+        // From one rather than from nought, because the body is not a thing in front of it.
+        for (var one = 1; one < _settings.People; one++)
+            if (walk.Here[one] == room) found.Add(Cast[one]);
+
+        return found;
+    }
+
+    /// <summary>What one code says about a thing, kept with everything else about it.</summary>
+    /// <param name="name">The thing.</param>
+    /// <param name="code">What has just been said or seen of it.</param>
+    /// <remarks>
+    /// <b>One part a thing rather than one a sighting</b>, which is what makes a look and a
+    /// name the same thing rather than two. Under <see cref="Seeing.Shared"/> they are one
+    /// code and a part holds one; apart, a thing met and then named holds two, and a scope
+    /// over it is a scope about one thing.
+    /// </remarks>
+    private void Meets(string name, Code code)
+    {
+        if (!_met.TryGetValue(name, out var codes))
+        {
+            _met[name] = codes = [];
+
+            _order.Add(name);
+        }
+
+        if (!codes.Contains(code)) codes.Add(code);
+    }
+
+    /// <summary>A look at the room, recorded and added to what has been seen.</summary>
+    /// <param name="walk">The house and where everything in it stands.</param>
+    /// <param name="doing">The machine's own words, which are part of what happened.</param>
+    private List<Code> Sight(Walk walk, IReadOnlyList<Code> doing)
+    {
+        var sighting = new List<Code>(doing);
+
+        foreach (var name in Before(walk))
+        {
+            var code = Seen(name);
+
+            sighting.Add(code);
+
+            Meets(name, code);
+        }
+
+        walk.Told.Add(sighting);
+
+        return sighting;
+    }
+
+    /// <summary>A fresh house with the body in it, and its first look at the room.</summary>
+    private Walk Housed()
+    {
+        _order.Clear();
+        _met.Clear();
+
+        _left = _settings.Steps;
+
+        var at = new int[_settings.Props];
+        var held = new int[_settings.Props];
+
+        Array.Fill(held, Nobody);
+
+        var here = new int[_settings.People];
+
+        for (var prop = 0; prop < _settings.Props; prop++)
+            at[prop] = _walks.Next(_settings.Rooms);
+
+        for (var one = 0; one < _settings.People; one++)
+            here[one] = _walks.Next(_settings.Rooms);
+
+        var walk = new Walk(at, held, here, []);
+
+        // The opening look, which nothing names. A machine asked what it can see before it has
+        // seen anything would have an empty moment on the first step of every house.
+        Sight(walk, []);
+
+        return walk;
+    }
+
+    /// <summary>Everything seen so far, newest first, and one part a thing met.</summary>
+    /// <param name="walk">The house being walked.</param>
+    /// <param name="chose">The machine's own words, or nothing where it said none.</param>
+    private Coded Sighted(Walk walk, IReadOnlySet<Code>? chose) =>
+        Coded.From(
+            [.. Enumerable.Reverse(walk.Told).Select(Grouped.Of)],
+            assigned: chose,
+            things: [.. _order.Select(name => Grouped.Of(_met[name]))]);
+
+    /// <summary>
+    /// One step of the house the machine is walking, and what it left in front of it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The step first and the look after</b>, which is what makes a moment a consequence.
+    /// A machine shown the room it is about to leave would be predicting what it can already
+    /// see; shown the room its own command put it in, it is answering <i>what would the world
+    /// look like if I did X</i>.
+    /// </para>
+    /// <para>
+    /// <b>And the naming is the SETTLEMENT</b>, which is ostension doing the job the plan says
+    /// it does. The world says one of the things in front of the machine out loud, and what
+    /// the machine had to get right is which. Under <see cref="Seeing.Shared"/> the answer is
+    /// already in the moment, because a look IS the word — which is what makes the arm an arm
+    /// and what <c>CeilingTests</c> is for.
+    /// </para>
+    /// <para>
+    /// <b>The name joins the transcript AFTER the round it settled</b>, or the answer would be
+    /// sitting in the moment it is the answer to. What that leaves is a thing met once and
+    /// named once, so the second time it is seen its word is already in front of the machine
+    /// and the crossing has something to be learnt from.
+    /// </para>
+    /// </remarks>
+    private Turn<Coded> Walked()
+    {
+        var walk = _house ??= Housed();
+        var spoken = _spoken;
+
+        (_spoken, _shown) = (null, null);
+
+        // The machine's own words, in the moment rather than beside it, so a scope may name
+        // what it did and expect the consequence.
+        var doing = spoken is null
+            ? []
+            : spoken.Select(one => Kinds.Named(Word, _vocabulary[one])).ToList();
+
+        Step(walk, spoken, Body);
+
+        // And one of the others moves, so the house does not stand still while it is walked.
+        // Drawn from everybody but the body, because a resident taking the machine's turn
+        // would be the world moving it twice.
+        if (_settings.People > 1)
+            Step(walk, null, 1 + _walks.Next(_settings.People - 1));
+
+        var sighting = Sight(walk, doing);
+        var seen = Before(walk);
+        var named = seen[_walks.Next(seen.Count)];
+        var word = Kinds.Named(Word, named);
+
+        var turn = new Turn<Coded>
+        {
+            Seen = Sighted(walk, doing.Count > 0 ? new HashSet<Code>(doing) : null),
+            Outcome = _naming[word],
+        };
+
+        sighting.Add(word);
+
+        Meets(named, word);
+
+        if (--_left <= 0) _house = null;
+
+        return turn;
     }
 
     /// <summary>One house, one walk round it, and one question about what happened in it.</summary>

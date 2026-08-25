@@ -227,9 +227,13 @@ public sealed class ExercisedTests
     /// rounds is the emptiest honest arm there is, and it cannot drift from the shape of a
     /// real one the way a hand-built <c>Tally</c> would.
     /// </param>
-    private static Watched Run(Examining examining, bool acting, long rounds = 10_000)
+    /// <param name="knowing">Whether the walk is recited to the machine or walked by it.</param>
+    /// <param name="seeing">Whether a look and a word are one code.</param>
+    private static Watched Run(
+        Examining examining, bool acting, long rounds = 10_000,
+        Knowing knowing = Knowing.Recited, Seeing seeing = Seeing.Apart)
     {
-        var world = new Roaming(Fixture.House(examining), seed: 1);
+        var world = new Roaming(Fixture.House(examining, knowing, seeing), seed: 1);
         var brain = new Brain(Walking, seed: 1);
         var falling = new Random(1);
 
@@ -322,7 +326,9 @@ public sealed class ExercisedTests
             .Run(rounds, sweep: 1000, target: 0.9, window: 2000);
 
         return new Watched(
-            $"roaming {examining.ToString().ToLowerInvariant()}", examining, tally,
+            $"roaming {knowing.ToString().ToLowerInvariant()} "
+            + $"{examining.ToString().ToLowerInvariant()}",
+            knowing is Knowing.Explored ? null : examining, tally,
             brain.Held, noted.Emitted, noted.Channels, drives.Told, brain.Supposals,
             noted.Parts);
     }
@@ -591,6 +597,17 @@ public sealed class ExercisedTests
         {
             Run(Examining.Where, acting: false),
             Run(Examining.Effect, acting: true),
+
+            // And a house the machine WALKS, which is where a thing is met rather than
+            // mentioned. A thing seen and then named holds two codes, so a scope over one of
+            // them is a scope about one thing -- and a mentioned thing is the one word that
+            // names it, which is the root genesis already mints.
+            // Fewer rounds than the recited arms, because what is wanted here is that the
+            // mechanisms are reached rather than a score. A walked house settles every round
+            // where a recital settles once, so it saturates a population far sooner -- and at
+            // ten thousand it doubled the time this whole reading takes for no entry gained.
+            Run(Examining.Where, acting: true, rounds: 4_000, knowing: Knowing.Explored),
+
             Talked(),
 
             // And a conversation that REPAIRS, which the arm above does not. The deployment

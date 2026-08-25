@@ -38,20 +38,26 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// <summary>The house every reading here is taken in.</summary>
     /// <param name="steps">How long the walk is.</param>
     /// <param name="people">How many are walking it.</param>
+    /// <param name="knowing">Whether the walk is recited to the machine or walked by it.</param>
+    /// <param name="seeing">Whether a look and a word are one code.</param>
     /// <remarks>
     /// <b>One person is the cell every earlier reading was taken at</b>, and it is named at
     /// each call rather than defaulted. A fixture inheriting a dial it does not pin is how a
     /// default moving rewrites an experiment nobody edited.
     /// </remarks>
-    private static RoamingSettings World(int steps, int people) =>
+    private static RoamingSettings World(
+        int steps, int people,
+        Knowing knowing = Knowing.Recited, Seeing seeing = Seeing.Apart) =>
         new()
         {
             Rooms = 6,
             Props = 4,
             People = people,
             Steps = steps,
-            Withheld = 600,
+            Withheld = knowing is Knowing.Explored ? 0 : 600,
             Examining = Examining.Where,
+            Knowing = knowing,
+            Seeing = seeing,
         };
 
     /// <summary>What the rules that need no learning reach on one house.</summary>
@@ -999,6 +1005,134 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // nouns, which is the two channels saying different things about one moment.
         Assert.True(seen.Statements.Count > seen.Things.Count,
             $"{seen.Statements.Count} statements against {seen.Things.Count} things");
+    }
+
+    /// <summary>
+    /// A walked house shows the machine what is in front of it, and names one of it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The machine explores rather than being recited to</b>, which is John's and is what
+    /// the spine becoming one world turns on. Nothing narrates a step back to the walker that
+    /// took it: what arrives is the room its own command put it in, so a moment is a
+    /// consequence and the question <i>what would the world look like if I did X</i> is the
+    /// one being answered.
+    /// </para>
+    /// <para>
+    /// <b>And the naming is the SETTLEMENT</b>, which is ostension doing the job the plan
+    /// gives it. One of the things in front of the machine is said out loud, and what the
+    /// machine had to get right is which — so a round is scored on what it was shown rather
+    /// than on a question at the end of a walk.
+    /// </para>
+    /// <para>
+    /// <b>A thing met and then named holds TWO codes</b> where a look and a word are apart,
+    /// which is what makes a scope over one of them a scope about one thing. A mentioned
+    /// thing is the one word that names it, and a scope over one code is the root genesis
+    /// already mints.
+    /// </para>
+    /// <para>
+    /// <b>And repair takes that scope before the binding can</b>, which is measured here and
+    /// was not expected. <c>Spanning</c>'s generate half is written on the argument that a
+    /// thing's scope is unreachable by repair: the code completing a thing is present whether
+    /// or not the thing is bound that way, so it separates nothing a table of co-occurrence
+    /// can see. A NAME breaks the argument. It arrives after the look and is absent until the
+    /// world says it, so it separates the misses from the hits perfectly and repair reaches
+    /// for it — 39 scopes hold a look and its word here, 37 of them minted by repair, and not
+    /// one is a binding.
+    /// </para>
+    /// <para>
+    /// <b>So a walked house does not close <i>a thing is one thing</i></b>, and what would is
+    /// a thing showing MORE than one attribute at once. Two attributes that co-fire perfectly
+    /// are what repair cannot separate, which is the case <c>Worlds.Binding</c> was chosen on
+    /// — and the architecture's own line is that every input is an attribute of a thing
+    /// rather than the thing, so a seen thing showing exactly one code is the degenerate
+    /// case rather than the ordinary one.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_walked_house_shows_the_machine_what_is_in_front_of_it()
+    {
+        foreach (var seeing in new[] { Seeing.Apart, Seeing.Shared })
+        {
+            var world = new Roaming(World(6, people: 2, Knowing.Explored, seeing), seed: 4);
+
+            var widest = 0;
+            var deepest = 0;
+
+            for (var round = 0; round < 24; round++)
+            {
+                var turn = world.Next();
+
+                // Every round settles, because the world names something every time. A walk
+                // that only settled at the end would be a recital with extra steps.
+                Assert.NotNull(turn.Outcome);
+
+                // And it asks no question, which is the difference between exploring and
+                // being examined. The survey is a later item and does not exist yet.
+                Assert.Null(turn.Seen.Asked);
+
+                Assert.NotNull(turn.Seen.Things);
+                Assert.NotNull(turn.Seen.Statements);
+
+                widest = Math.Max(widest, turn.Seen.Statements.Count);
+                deepest = Math.Max(deepest, turn.Seen.Things.Max(one => one.Codes.Count));
+
+                // The word it named is a word of the house, and it is one the machine could
+                // see: a name for something in another room would be a settlement nothing in
+                // the moment could ever have been about.
+                Assert.NotNull(world.Meaning(turn.Outcome.Value));
+            }
+
+            output.WriteLine(
+                $"{seeing,-6}| widest moment {widest} sightings | most codes a thing {deepest}");
+
+            // Apart, a thing seen and then named holds its look and its word; shared, the two
+            // are one code and there is nothing to join. That is the arm, asserted as the
+            // DIFFERENCE rather than as either value.
+            Assert.Equal(seeing is Seeing.Apart ? 2 : 1, deepest);
+        }
+
+        // And a house that is walked holds nothing back, because a question about a house the
+        // machine never saw is one nothing could answer.
+        Assert.Empty(
+            new Roaming(World(6, people: 2, Knowing.Explored), seed: 4).Withheld);
+
+        // And a look and the word for it do come to sit in ONE scope, which is the crossing
+        // being made rather than handed over. What mints it is the reading below.
+        var walked = new Roaming(World(20, people: 2, Knowing.Explored), seed: 4);
+        var brain = new Brain(new CommittingSettings { Capacity = 4_000 }, seed: 1);
+
+        var tally = new Bench(
+            new Watching<Coded>(
+                walked, new Joined(Joining.Bagged), acting: Chooses.From(_ => null)),
+            brain)
+            .Run(2_000, sweep: 500, target: 0.9, window: 500);
+
+        var crossed = brain.Held.All
+            .Where(one => one.Scope.Length == 2
+                && one.Scope.Any(code => code.Modality == 48)
+                && one.Scope.Any(code => code.Modality == 46))
+            .ToList();
+
+        var born = crossed
+            .Select(one => brain.Held.Births[one.Identity])
+            .GroupBy(one => one)
+            .ToDictionary(one => one.Key, one => one.Count());
+
+        output.WriteLine(
+            $"walked | held {tally.Resident} | crossed {crossed.Count} | "
+            + $"bound {brain.Held.Births.Values.Count(one => one == Birth.Bound)} | "
+            + string.Join(", ", born.Select(one => $"{one.Key} {one.Value}")));
+
+        Assert.NotEmpty(crossed);
+
+        // And not one of them is a binding, which is the reading. `Spanning`'s generate half
+        // is written on the argument that repair cannot reach a thing's scope -- the code
+        // completing a thing is present whether or not the thing is bound that way, so it
+        // separates nothing. A NAME breaks that: it arrives after the look and is absent
+        // until the world says it, so it separates the misses from the hits perfectly and
+        // repair takes it first. A thing of a look and a later name is a thing repair binds.
+        Assert.DoesNotContain(Birth.Bound, born.Keys);
     }
 
     /// <summary>

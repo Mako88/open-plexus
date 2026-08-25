@@ -120,6 +120,102 @@ public sealed class CeilingTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// How often a walked house has already handed over the word it is about to ask for.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>John's, and it is why the sharing is an ARM.</b> Shared,
+    /// what a thing looks like IS the word for it, so the answer to <i>which of these is
+    /// being named</i> is in the moment before anything has learnt and the crossing is free.
+    /// Apart, the two are different codes and joining them is the same problem a picture will
+    /// pose — which is the one this project exists to reach rather than to design away.
+    /// </para>
+    /// <para>
+    /// <b>And apart is not nought either</b>, which is what makes it learnable rather than
+    /// impossible. A thing named once keeps its word in the transcript, so meeting it again
+    /// puts its look and its name in one moment — and that co-firing is the whole of what a
+    /// crossing has to be built out of. The share here is how often a house re-meets what it
+    /// has already been told the name of.
+    /// </para>
+    /// <para>
+    /// <b>Read on the bag</b>, because a front end is not what is being priced. A selecting front
+    /// end would put its own reading between the world and this number, and what is wanted is
+    /// what the world hands over.
+    /// </para>
+    /// <para>
+    /// <b>Measured: 1.000 shared and 0.890 apart</b>, over two thousand steps of a house
+    /// nobody was choosing for. So the arm is worth eleven points of ceiling and no more,
+    /// because a moment carries every past naming and a house of six rooms re-meets what it
+    /// has already been told the name of nine times in ten.
+    /// </para>
+    /// <para>
+    /// <b>Which says where the crossing actually bites</b>: a thing's FIRST meeting, and
+    /// nothing else. A walk whose moment did not carry the whole house behind it would price
+    /// this quite differently, and that is the next question rather than this one's answer.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_a_seen_thing_sharing_its_names_code_hands_over()
+    {
+        const int Rounds = 2_000;
+
+        var front = new Joined(Joining.Bagged);
+        var handed = new Dictionary<Seeing, double>();
+
+        output.WriteLine($"a walked house, {Rounds} steps, nobody choosing");
+        output.WriteLine($"{"seeing",-10}{"answer present",16}{"settled",11}");
+
+        foreach (var seeing in Enum.GetValues<Seeing>())
+        {
+            var world = new Roaming(
+                Fixture.House(Examining.Where, Knowing.Explored, seeing), seed: 1);
+
+            var present = 0;
+            var settled = 0;
+
+            for (var round = 0; round < Rounds; round++)
+            {
+                var turn = world.Next();
+
+                if (turn.Outcome is not { } outcome) continue;
+
+                settled++;
+
+                // The answer as the front end would have to see it, which is the word the
+                // outcome names rather than the outcome code itself.
+                if (world.Meaning(outcome) is { } answer
+                    && front.Codify(turn.Seen).Contains(answer))
+                {
+                    present++;
+                }
+            }
+
+            handed[seeing] = present / (double)settled;
+
+            output.WriteLine(
+                $"{seeing.ToString().ToLowerInvariant(),-10}{handed[seeing],16:F3}{settled,11}");
+        }
+
+        // Shared hands it over every time, which is the arm being what it says it is. A
+        // reading below one would mean a thing was named that the machine could not see.
+        Assert.Equal(1.0, handed[Seeing.Shared]);
+
+        // And apart hands over strictly less, or the two arms are one arm and the dial is
+        // decoration. What is asserted is the ORDER rather than the value: a prediction
+        // written into a wiring check fails two ways and reads the same.
+        Assert.True(handed[Seeing.Apart] < handed[Seeing.Shared],
+            $"a look apart from its word handed over {handed[Seeing.Apart]:F3} against "
+            + $"{handed[Seeing.Shared]:F3} shared, so the arm changes nothing about what the "
+            + "world gives away and the crossing was free either way");
+
+        // And more than nothing, or the crossing has nothing to be learnt from: a look and a
+        // name that never share a moment can never come to be joined by counting.
+        Assert.True(handed[Seeing.Apart] > 0.0,
+            "a look and the word for it never once arrived together, so no co-firing could "
+            + "ever join them and the arm is unlearnable rather than hard");
+    }
+
+    /// <summary>
     /// <b>What a compound of two readings of ONE sense costs</b>, before anything has learnt.
     /// </summary>
     /// <remarks>

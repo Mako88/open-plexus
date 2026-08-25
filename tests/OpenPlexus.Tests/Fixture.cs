@@ -58,6 +58,8 @@ internal static class Fixture
     /// literal per instrument.</b>
     /// </summary>
     /// <param name="examining">Which question the house is asked.</param>
+    /// <param name="knowing">Whether the walk is recited to the machine or walked by it.</param>
+    /// <param name="seeing">Whether a look and a word are one code.</param>
     /// <remarks>
     /// <b>Named at every call and defaulted nowhere else</b>, which is the rule this repo
     /// learnt the hard way: a fixture inherits every dial it does not pin, so a default
@@ -65,15 +67,23 @@ internal static class Fixture
     /// and the one axis that differs, so two instruments cannot drift apart while reading
     /// against each other. Four people, because one leaves the middle hop free.
     /// </remarks>
-    public static Worlds.RoamingSettings House(Worlds.Examining examining) =>
+    public static Worlds.RoamingSettings House(
+        Worlds.Examining examining,
+        Worlds.Knowing knowing = Worlds.Knowing.Recited,
+        Worlds.Seeing seeing = Worlds.Seeing.Apart) =>
         new()
         {
             Rooms = 6,
             Props = 4,
             People = 4,
             Steps = 120,
-            Withheld = 600,
+
+            // Nothing held back where the house is walked, because a held-out question there
+            // would be about a house the machine never saw.
+            Withheld = knowing is Worlds.Knowing.Explored ? 0 : 600,
             Examining = examining,
+            Knowing = knowing,
+            Seeing = seeing,
         };
 
     /// <summary>The senses world, clean unless a test asks for noise.</summary>

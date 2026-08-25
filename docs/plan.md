@@ -31,10 +31,7 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The spine becomes ONE world and the items below build it.** John's. Rung four
   and the forward store are BUILT and neither is on this list.
-- **A seen thing and its name sharing a CODE is an ARM**, never a default. Shared,
-  the crossing is free and the answer was handed over; apart, it is the problem a picture
-  will pose. `CeilingTests` prices it.
-- **Then the DRIVE**, rankable at last, there being choices worth ranking. Fork **146**.
+- **The DRIVE**, rankable at last, there being choices worth ranking. Fork **146**.
 - **Then the SURVEY and its control**, another house's machine sitting this one's exam. Its
   ceiling is taken before a learner is wired to it.
 - **Then the CHAT**, `Curiosity` pointed at what was seen rather than at a lesson.
@@ -621,6 +618,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — ONE spine world: the machine explores rather than being recited to, comes
       back and both asks and answers, and is surveyed on what it saw. Every question
       verifiable, and a machine that explored ANOTHER house is the control. Fork **147**.
+    - **OPEN** — a walked house puts every past sighting in the moment, so a look and its
+      name have already shared one nine times in ten. Whether an explorer should carry the
+      whole house. Fork **147**.
     - **OPEN** — rarest is one split of a statement into scope and claim, and the brain does
       not choose it. What picks the claim with no experimenter. Fork **123**.
     - **OPEN** — one brain process, worlds attached over a stream: fork **113**'s shape as a

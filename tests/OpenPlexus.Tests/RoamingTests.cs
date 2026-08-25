@@ -1126,9 +1126,10 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// taking an entry of THE ARCHITECTURE off the spine with it.
     /// </para>
     /// <para>
-    /// <b>So the axis this grid is missing is the QUESTION</b>, and that is the reading it
-    /// owes next. A dial crossed against one of a world's two questions is a dial measured on
-    /// half its world, which is this file's own trap read one level out.
+    /// <b>So the QUESTION is an axis here now</b>, and it was the reading this grid owed. A
+    /// dial crossed against one of a world's two questions is a dial measured on half its
+    /// world, which is this file's own trap read one level out — and the half it left out is
+    /// the half that refused the verdict.
     /// </para>
     /// </remarks>
     [Fact]
@@ -1142,38 +1143,56 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
         var cells = new List<(string Name, List<double> Scores)>();
 
-        foreach (var crediting in new[] { Crediting.Nothing, Crediting.Birth })
-            foreach (var admitting in new[] { Admitting.Anything, Admitting.Testable })
-            {
-                var name = $"{crediting}+{admitting}";
+        // BOTH QUESTIONS, because the first version of this asked only the where one and its
+        // verdict was wrong. The house is drawn identically under both, so a difference
+        // between them is the question -- and the effect arm is where the bar was measured to
+        // take an entry of THE ARCHITECTURE off the spine.
+        foreach (var examining in new[] { Examining.Where, Examining.Effect })
+            foreach (var crediting in new[] { Crediting.Nothing, Crediting.Birth })
+                foreach (var admitting in new[] { Admitting.Anything, Admitting.Testable })
+                {
+                    var name = $"{examining}|{crediting}+{admitting}";
 
-                output.WriteLine(name);
+                    output.WriteLine(name);
 
-                cells.Add((
-                    name,
-                    Scored(
-                        arm, people: 1, Examining.Where,
-                        dials: ExercisedTests.Walking with
-                        {
-                            Crediting = crediting,
-                            Admitting = admitting,
-                        })["Freshest(3)"]));
-            }
+                    cells.Add((
+                        name,
+                        Scored(
+                            arm, people: 1, examining,
+                            dials: ExercisedTests.Walking with
+                            {
+                                Crediting = crediting,
+                                Admitting = admitting,
+                            })["Freshest(3)"]));
+                }
 
         foreach (var (name, taken) in cells)
-            output.WriteLine($"{name,-22}| worst {taken.Min():F3} | best {taken.Max():F3}");
+            output.WriteLine($"{name,-30}| worst {taken.Min():F3} | best {taken.Max():F3}");
 
-        var walks = cells.Single(one => one.Name == "Nothing+Anything").Scores;
-        var talks = cells.Single(one => one.Name == "Birth+Testable").Scores;
+        var walks = cells.Single(one => one.Name == "Where|Nothing+Anything").Scores;
+        var talks = cells.Single(one => one.Name == "Where|Birth+Testable").Scores;
+
+        var acts = cells.Single(one => one.Name == "Effect|Nothing+Anything").Scores;
+        var bars = cells.Single(one => one.Name == "Effect|Birth+Testable").Scores;
 
         // Worst against best, this file's own bar. What is asserted is that the walk does not
         // LOSE to the pair the conversation ships, which is what makes converging on that pair
         // a change of one composition rather than a trade between two worlds.
         Assert.True(talks.Max() >= walks.Min(),
             $"the conversation's pair reads {talks.Max():F3} at its best against "
-            + $"{walks.Min():F3} for the walk's own defaults at their worst, so the two spine "
-            + "worlds want different brains for a measured reason and one composition cannot "
-            + "serve both -- which leaves fork 147 as the only road to one brain");
+            + $"{walks.Min():F3} for the walk's own defaults at their worst on the where "
+            + "question, so the two spine worlds want different brains for a measured reason "
+            + "and one composition cannot serve both -- which leaves fork 147 as the only road "
+            + "to one brain");
+
+        // And the same on the other question, asserted separately rather than folded in. A
+        // pair that serves one question of a world and not the other is not a pair that
+        // serves the world, and a single bar over both would let one carry the other.
+        Assert.True(bars.Max() >= acts.Min(),
+            $"on the effect question the conversation's pair reads {bars.Max():F3} at its best "
+            + $"against {acts.Min():F3} for the walk's own defaults at their worst, so the "
+            + "convergence the where question licenses is refused by the other half of the "
+            + "same world");
     }
 
     [Fact]

@@ -201,10 +201,10 @@ FORBIDS things, and several of them are already measured.
   rather than a precondition for it.
 - **First is one process on one box**, the only sense English, and talking to it is the first
   interactive test of the system — no camera or wifi.
-- **And the CONVERSATION is that world**, John's: a block told, a window where
-  the machine may ask, then a fixed examination. It stays until it is exhausted.
-- **`Roaming` is kept for the modalities rather than retired**, being the world where a sound,
-  a look and a sentence can be one moment. A parked world rots, so that is its reason.
+- **And the ONE spine world is that world**, John's: explored, then a window where the
+  machine may ask, then a survey. It stays until it is exhausted.
+- **Then it takes PICTURES, then SOUNDS**, John's ordering and after text works, so one
+  moment holds a look, a sound and a sentence about one thing.
 - **Then the phone as the body and the containers as the brain**, video and sensors in, if one
   machine can hold enough containers to be a fleet. That is what says whether twenty of anything
   is needed before twenty are bought.

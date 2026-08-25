@@ -44,6 +44,14 @@ namespace OpenPlexus.Machines;
 /// layer out.
 /// </para>
 /// <para>
+/// <b>And that argument does not reach a desire to UNDERSTAND</b>, which is fork 146 and the
+/// drive John asked for. Wanting to know is a fact about the learner rather than about any
+/// body, and the term it reads — <c>Commitment.Progress</c> — is a brain internal that
+/// <c>SeparationTests</c> forbids a world from naming. So a want that a world hands in cannot
+/// be that drive, and this is where it has to be built. The line above is right about a
+/// hunger and says nothing about curiosity.
+/// </para>
+/// <para>
 /// <b>And what it may read is what the learner feels</b>, which is the line that separates it
 /// from the oracle. The oracle on <c>Worlds.Homeostat</c> reads <c>Lowest</c> off the world's own
 /// state; this reads the codes the front end emitted and nothing else, so its preference is

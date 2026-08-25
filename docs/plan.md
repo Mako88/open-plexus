@@ -31,9 +31,6 @@ that is finished LEAVES, so this is only ever what is still to do.
 
 - **The spine becomes ONE world and the items below build it.** John's. Rung four
   and the forward store are BUILT and neither is on this list.
-- **First the walk is DRIVEN**: the machine says words, the world parses a command and acts,
-  and a moment reports its THINGS in both phases — a sentence being a moment whose things
-  are mentioned rather than present. Forks **147**, **148**.
 - **A seen thing and its name sharing a CODE is an ARM**, never a default. Shared,
   the crossing is free and the answer was handed over; apart, it is the problem a picture
   will pose. `CeilingTests` prices it.
@@ -290,7 +287,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 - **Closed**, and what closed them is in the commit and in the code that cites them: **1**,
   **5**, **6**, **11**, **12**, **18**, **20**, **21**, **22**, **24**, **25**, **27**,
   **33**, **36**, **48**, **52**, **66**, **74**, **88**, **96**, **105**, **109**, **114**,
-  **121**, **124**, **126**, **127**, **134**.
+  **121**, **124**, **126**, **127**, **134**, **148**.
 
     Commitment := scope (codes that must all be present)
                 → expects (a code that should follow)
@@ -443,14 +440,12 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — the key that moved last is not worth following: it leads where one walker
       makes it the only candidate and loses at four. Fork **95**.
   - A thing is one thing
-    - **NOW** — the front end reports PARTS rather than one thing a code, so a code in two
+    - **NOW** — the front end reports THINGS rather than one thing a code, so a code in two
       of them is in two things and a moment carries two of a kind. `Spanning` intersects
-      them. Fork **142**.
+      them, and what it costs the walk is owed again. Fork **142**.
     - **OPEN** — minting an INDIVIDUAL is unbuilt and a bundle recurring in the successor
       moment is refuted below, being co-occurrence read twice. What is left is persistence of
       a PART, or confidence over repetition. Fork **93**.
-    - **OPEN** — a text world calls a STATEMENT a part, so one dial reads two ideas.
-      Fork **148**.
     - **OPEN** — a front end whose codes survive a scene SHIFTING is the other half, and
       changing the feature basis to get one is refuted below. Fork **145**.
   - It can say what does not hold

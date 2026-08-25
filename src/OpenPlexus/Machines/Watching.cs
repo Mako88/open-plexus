@@ -373,6 +373,20 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
     /// avoid handing anybody.
     /// </para>
     /// <para>
+    /// <b>But an UNCHANGED state is not read through the front end twice</b>, and that is a
+    /// correctness fix rather than a saving. A front end that LEARNS counts what it is shown,
+    /// so a moment spoken about five times read as five observations — the fault
+    /// the census flag on the reading below was added for, arriving one counter over. The
+    /// world's own report is what decides: a world that changed anything builds a different
+    /// observation and is read again, and one that did not is the same value.
+    /// </para>
+    /// <para>
+    /// <b>And it fails towards reading again</b>, which is the direction that costs nothing
+    /// but time. A moment holds lists and compares by their identity, so two built separately
+    /// out of the same words are NOT equal and are sensed twice — the old behaviour exactly.
+    /// What the comparison can never do is call a rebuilt state unchanged.
+    /// </para>
+    /// <para>
     /// <b>And a quiet moment is still told to the world</b>, exactly once. A world counts the
     /// rounds nothing was said about it, and a loop that simply broke would stop counting
     /// them — so the one call that used to happen still happens where nothing was said, and
@@ -383,13 +397,22 @@ internal sealed class Watching<TSeen> : IInput, IExamines, IReports
     {
         var said = 0;
 
+        // What the chooser was last shown, and what the front end made of it.
+        var shown = default(TSeen);
+        var felt = default(IReadOnlyCollection<Code>);
+
         while (said == 0 || acted.Listening)
         {
+            var now = acted.Now;
+
             // The chooser reads `Now` through the same front end the learner reads its
             // moments through, so what it is allowed to see is exactly what the learner is
             // allowed to see -- an oracle that read the world's own terms would be a fourth
             // channel nobody declared.
-            if (_acting!.Choose(Sensed(acted.Now)) is not { } doing) break;
+            if (felt is null || !EqualityComparer<TSeen>.Default.Equals(now, shown))
+                (shown, felt) = (now, Sensed(now));
+
+            if (_acting!.Choose(felt) is not { } doing) break;
 
             acted.Do(doing);
 

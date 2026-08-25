@@ -1027,11 +1027,24 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// once for no extra reading.
     /// </para>
     /// <para>
-    /// <b>The reading is owed again</b>, because the one that stood here was taken while a
-    /// part was a STATEMENT. It read 0.587, 0.642 and 0.538 confined against 0.589, 0.620 and
-    /// 0.539 unconfined over three seeds, with the parts column saying the dial had plenty to
-    /// do, and the confined arm holding about a ninth fewer residents. That is a different
-    /// mechanism from this one and is kept only so the two can be compared when this runs.
+    /// <b>Measured over three seeds</b>: 0.589, 0.605 and 0.523 confined against 0.589, 0.620
+    /// and 0.539 unconfined. Level on the first and a point and a half behind on the other
+    /// two, for 762, 937 and 884 residents against 800, 949 and 1,033. So confining a scope to
+    /// one thing costs the walk a little and buys it nothing, and the prediction that a
+    /// two-hop answer would be forbidden outright is refuted at this arm.
+    /// </para>
+    /// <para>
+    /// <b>And the parts column says the dial had plenty to bite on</b>: every moment of five
+    /// hundred holds more than one thing and the most is eight. A dial that changed nothing
+    /// and a dial with nothing to change read alike from a score, and this separates them.
+    /// </para>
+    /// <para>
+    /// <b>A cost to record rather than grounds to delete</b>, because <see cref="Spanning"/>
+    /// is the mechanism under <i>a thing is one thing</i> and there is no other. The control
+    /// is unchanged from the reading taken while a part was a STATEMENT — 0.589, 0.620 and
+    /// 0.539, to the digit, which is what says the two readings differ in the grouping and in
+    /// nothing else. Confined, a statement part read 0.587, 0.642 and 0.538, so a thing is
+    /// behind a sentence on two seeds of three.
     /// </para>
     /// </remarks>
     [Fact]

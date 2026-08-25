@@ -254,6 +254,12 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// <summary>What the machine said about this moment, or nothing where it said none.</summary>
     private List<int>? _spoken;
 
+    // The moment the open walk reads as, built once. A doing accumulates words and moves
+    // nothing, so a machine that says three of them is looking at one state -- and the
+    // caller reads this once a doing, so a fresh build a look would be a whole moment's
+    // worth of work for a state that did not change. Cleared with the walk it is of.
+    private Coded? _shown;
+
     /// <param name="settings">How the world is set up.</param>
     /// <param name="seed">What draws the houses and the walks.</param>
     public Roaming(RoamingSettings settings, int seed)
@@ -361,7 +367,7 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
         var walk = _open ?? Open();
         var said = _spoken;
 
-        (_open, _spoken) = (null, null);
+        (_open, _spoken, _shown) = (null, null, null);
 
         return Close(walk, said);
     }
@@ -463,14 +469,16 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     {
         get
         {
+            if (_shown is { } already) return already;
+
             _open ??= Open();
 
             var asked = Said("what", "next");
 
-            return Coded.From(
+            return (_shown = Coded.From(
                 [.. Enumerable.Reverse(_open.Told).Select(Grouped.Of)],
                 Grouped.Of(asked),
-                things: Grouped.Things([.. _open.Told, asked], _nouns));
+                things: Grouped.Things([.. _open.Told, asked], _nouns))).Value;
         }
     }
 

@@ -275,8 +275,20 @@ public sealed class BindingTests(ITestOutputHelper output)
         Code red = Kinds.Named(Binding.Colour, "red");
         Code ball = Kinds.Named(Binding.Shape, "ball");
 
-        var one = Coded.From([Grouped.Of([red, ball])]);
-        var two = Coded.From([Grouped.Of([red, ball]), Grouped.Of([red, ball])]);
+        // Built as a scene rather than through `Coded.From`, which makes STATEMENTS. A scene
+        // has none: what it holds is things, and this file is about how many of them there
+        // are.
+        var one = new Coded
+        {
+            Codes = new HashSet<Code> { red, ball },
+            Things = [Grouped.Of([red, ball])],
+        };
+
+        var two = new Coded
+        {
+            Codes = new HashSet<Code> { red, ball },
+            Things = [Grouped.Of([red, ball]), Grouped.Of([red, ball])],
+        };
 
         var front = new Passthrough<Coded>(seen => seen);
 

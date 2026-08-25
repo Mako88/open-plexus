@@ -81,14 +81,25 @@ green without doing it. Do not delete them, do not weaken them, and do not read 
 regression. Each computes the state rather than asserting a constant, so none can be satisfied
 by editing that file; an entry closes when the work closes.
 
-**The red set is `OutstandingTests.The_spine_world_exercises_every_entry_of_the_architecture`,
-and anything else red is yours.** One entry is unreached: *it can say what does NOT hold*. A
-departure code is derived only under `Departing.Left` and no spine composition passes it, so
-the mechanism is reached by instruments alone. Check the failures
-against that before assuming a run is clean — a stable red set is the only kind you can read a
-new failure against. Adding an entry is stricter than adding anywhere else: it must
-be work somebody has decided to do, computable without judgement, and closeable. An open
-question goes in the plan as `OPEN`.
+**The red set is two, and anything else red is yours.**
+`OutstandingTests.The_spine_runs_one_brain` is two dials apart, `Admitting` and `Crediting`,
+and `OutstandingTests.Every_dial_is_measured_on_a_world_whose_score_counts` names four dials no
+spine composition turns. Check the failures against that before assuming a run is
+clean — a stable red set is the only kind you can read a new failure against.
+
+**And `The_spine_world_exercises_every_entry_of_the_architecture` is the third**, on one
+entry: *a thing is one thing*. A moment's parts are THINGS, a text world's thing is the one
+word that names it, and a scope over one code is the root genesis already mints — so the bound
+birth cannot fire while the spine only ever hears about things. It closes when the machine SEES
+one, which is what THE ORDER's crossing item builds.
+
+**It was green until the parts stopped being statements**, which is the reading rather than a
+regression. A scope over one sentence was being counted as a scope over one thing, so the
+entry's evidence was a statement all along.
+
+**Adding an entry is stricter than adding anywhere else**: it must be work somebody has decided
+to do, computable without judgement, and closeable. An open question goes in the plan as
+`OPEN`.
 
 **Making something red on purpose is often the RIGHT move.** John's, and it is the reason
 the file above exists. A human developer would raise an issue and carry the intent in their

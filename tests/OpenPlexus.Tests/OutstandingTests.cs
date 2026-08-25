@@ -684,9 +684,15 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     [Fact]
     public void The_learning_trend_is_read_by_something_that_chooses()
     {
+        // Comments stripped first, or a guard is satisfied by PROSE. This one passed the
+        // moment `Drives` gained an XML line naming the term, which is the trap list's own
+        // entry -- a check that cannot fire reads exactly like a check that passes -- caught
+        // within an hour of the check being written and only because the red set was counted.
         var readers = Tree.Sources("src")
             .Where(path => !path.EndsWith("Commitment.cs", StringComparison.Ordinal))
-            .Where(path => File.ReadAllText(path).Contains(".Progress", StringComparison.Ordinal))
+            .Where(path => File.ReadLines(path)
+                .Where(line => !line.TrimStart().StartsWith("//", StringComparison.Ordinal))
+                .Any(line => line.Contains(".Progress", StringComparison.Ordinal)))
             .Select(Path.GetFileName)
             .ToList();
 

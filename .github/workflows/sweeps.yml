@@ -86,7 +86,6 @@ jobs:
           all='[
             "AbstainTests","AskedTests","BudgetCurveTests",
             "LessonTests.Whether_the_rung_is_starved_or_blocked_by_the_lesson_it_is_told",
-            "LessonTests.What_confining_a_scope_to_one_statement_does_to_the_conversation",
             "CrossingTests.What_the_crossing_and_the_position",
             "BabiTests.What_the_two_likeness_readings",
             "ArrangingTests.What_an_unbounded_repair_budget",

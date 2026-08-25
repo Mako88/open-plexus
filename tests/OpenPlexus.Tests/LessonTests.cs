@@ -108,6 +108,48 @@ public sealed class LessonTests(ITestOutputHelper output)
              tellings: many, rooting: Rooting.Wholly, crediting: Crediting.Birth,
              supposing: supposing));
 
+    /// <summary>The lesson told into this world, with no learner on the other end.</summary>
+    /// <param name="lesson">What is told.</param>
+    /// <param name="tellings">How many times.</param>
+    /// <remarks>
+    /// <b>Extracted because <c>DuplicationTests</c> refused the second copy</b>, for the reason
+    /// it refused the first: two readings over one lesson that each build their own world are
+    /// two worlds the moment either changes a setting.
+    /// </remarks>
+    private static (Tutor Tutor, Conversing World) Telling(Lesson lesson, int tellings)
+    {
+        var tutor = new Tutor(lesson, TextWriter.Null, passes: 1, tellings: tellings);
+
+        return (tutor, new Conversing(new ConversingSettings
+        {
+            Typed = tutor,
+            Printed = tutor.Printed,
+            Carrying = Carrying.Never,
+            Asserting = Asserting.Everything,
+        }));
+    }
+
+    /// <summary>How many things the front end puts in each moment of a lesson.</summary>
+    /// <param name="lesson">What is told.</param>
+    /// <param name="tellings">How many times.</param>
+    /// <remarks>
+    /// <b>No learner in it</b>, for <c>Streamed</c>'s reason: what a front end says about a
+    /// moment's shape is a fact about the world and the translation, and a population would
+    /// only make it slower to read.
+    /// </remarks>
+    private static List<int> Parted(Lesson lesson, int tellings)
+    {
+        var (tutor, world) = Telling(lesson, tellings);
+
+        var front = new Joined(Joining.Bagged);
+        var counted = new List<int>();
+
+        for (var round = 0; round < tutor.Moments * tutor.Longest; round++)
+            counted.Add(front.Bind(world.Next().Seen)?.Count ?? 0);
+
+        return counted;
+    }
+
     /// <summary>The join between what a chooser decided and how this world numbers its doings.</summary>
     private static int? Doing(Wondered said) =>
         said.Word is not { } word
@@ -136,15 +178,7 @@ public sealed class LessonTests(ITestOutputHelper output)
     private static (Conversing World, List<(HashSet<Code> Moment, int? Arrived)> Stream) Streamed(
         Lesson lesson, int tellings)
     {
-        var tutor = new Tutor(lesson, TextWriter.Null, passes: 1, tellings: tellings);
-
-        var world = new Conversing(new ConversingSettings
-        {
-            Typed = tutor,
-            Printed = tutor.Printed,
-            Carrying = Carrying.Never,
-            Asserting = Asserting.Everything,
-        });
+        var (tutor, world) = Telling(lesson, tellings);
 
         var front = new Joined(Joining.Bagged);
         var stream = new List<(HashSet<Code> Moment, int? Arrived)>();
@@ -742,14 +776,33 @@ public sealed class LessonTests(ITestOutputHelper output)
     /// implied half of a chained lesson is made of.
     /// </para>
     /// <para>
-    /// <b>What would refute the default</b>, said before the run: the implied half falling
-    /// under the unconfined arm. Then a statement is the wrong grain of thing for a
-    /// conversation, and a dial chosen on a scene of objects is costing the target world the
-    /// rung it is waiting on.
+    /// <b>What would have refuted the default</b>, said before the run: the implied half
+    /// falling under the unconfined arm. It did not, and the reason is not that the dial is
+    /// free here.
+    /// </para>
+    /// <para>
+    /// <b>This world puts ONE thing in every moment</b>, so there was nothing to confine.
+    /// Under <c>Asserting.Everything</c> a sentence arrives a word a moment, and a moment of
+    /// one word is a moment of one part — most 1 over the whole lesson, none over one. Every
+    /// cell of the grid is 0.750 right and 368 resident, to the digit, at both dial values and
+    /// all three seeds, because the two arms are the same run.
+    /// </para>
+    /// <para>
+    /// <b>So the architecture entry is reached by the walk alone.</b> <i>A thing is ONE
+    /// thing</i> asks whether two of a kind are sayable at once, and the world where that
+    /// matters most cannot say it: a question's actor and a statement's actor are never in one
+    /// moment to be told apart. That is evidence for fork 147 rather than a dial to turn — one
+    /// spine world explores and converses, so a moment holds a scene and an utterance
+    /// together.
+    /// </para>
+    /// <para>
+    /// <b>And the vacuity is asserted rather than noted</b>, which is what stops this reading
+    /// green forever. The parts count and the identity of the two arms are both checked, so
+    /// the day this world reports two things the comparison stops being vacuous and this fact
+    /// goes red to say the score line now means something.
     /// </para>
     /// </remarks>
     [Fact]
-    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_confining_a_scope_to_one_statement_does_to_the_conversation()
     {
         const int Seeds = 3;
@@ -762,6 +815,16 @@ public sealed class LessonTests(ITestOutputHelper output)
         var half = chained.Exam.Count / 2;
         var stated = chained with { Exam = [.. chained.Exam.Take(half)] };
         var implied = chained with { Exam = [.. chained.Exam.Skip(half)] };
+
+        // How many things the front end puts in a moment of this world, taken before any
+        // learner runs. Two runs that read alike because the dial changed nothing and two that
+        // read alike because it could not fire are the same table, and this is what tells them
+        // apart -- the reading the walk's grid already prints and this one owed.
+        var parts = Parted(implied, Many);
+
+        output.WriteLine(
+            $"parts a moment | most {parts.Max()} "
+            + $"| over one {parts.Count(one => one > 1) / (double)parts.Count:F3}");
 
         var scores = new Dictionary<(Spanning Spanning, bool Implied), List<double>>();
 
@@ -804,6 +867,16 @@ public sealed class LessonTests(ITestOutputHelper output)
             + $"implied half against {free.Min():F3} unconfined at its worst, so a statement "
             + "is the wrong grain of THING for a conversation and the default is costing the "
             + "target world the rung it is waiting on");
+
+        // And why the line above says nothing yet, asserted so it cannot read as a verdict. A
+        // moment of one part cannot span two, so the dial is inert and the two arms are one
+        // run -- which a score alone reports exactly as it reports a dial that is free.
+        Assert.True(parts.Max() == 1,
+            $"this world now puts {parts.Max()} things in a moment where it put one, so the "
+            + "grid above has stopped being two copies of one run and its comparison means "
+            + "something for the first time. Read it, and take this assertion off");
+
+        Assert.Equal(free, confined);
     }
 
     /// <summary>

@@ -29,17 +29,18 @@ What is being worked on and in what order, and it is the one list a session edit
 ends: read it first, strike what got done, and write the handoff from what is left. An item
 that is finished LEAVES, so this is only ever what is still to do.
 
-- **The first four are John's**, and the CONVERSATION is what the middle two are
-  for. Rung four and the forward store are BUILT and neither is on this list.
-- **ONE spine world: explore, then converse, then a SURVEY of verifiable facts.** John's, and
-  it ends the spine running two brains — `Crediting` and `Admitting` part them and that is the
-  red set. Fork **147**.
-- **Or converge those two dials, which wants the QUESTION as an axis**: the walk's effect arm
-  loses an architecture entry to a bar its where arm ignores. `RoamingTests`.
-- **Then a THING that is not an utterance**, both text worlds calling a statement a part so
-  the grouping says what the signal is shaped like rather than what is in it. Fork **148**.
-- **Four dials measured off the spine only** — `Budgeting`, `Feeling`, `Forking`,
-  `Subsuming`. Each closes by a target-world reading, a deletion, or `Waiting`.
+- **The spine becomes ONE world and the items below build it.** John's. Rung four
+  and the forward store are BUILT and neither is on this list.
+- **First the walk is DRIVEN**: the machine says words, the world parses a command and acts,
+  and a moment reports its THINGS rather than its sentences. Forks **147**, **148**.
+- **Then the DRIVE**, rankable at last, there being choices worth ranking. Fork **146**.
+- **Then the SURVEY and its control**, another house's machine sitting this one's exam. Its
+  ceiling is taken before a learner is wired to it.
+- **Then the CHAT**, `Curiosity` pointed at what was seen rather than at a lesson.
+- **Then ONE BRAIN**, out of one composition. Converging the dials instead was priced and
+  refused: it costs the walk an entry of THE ARCHITECTURE.
+- **Then the four dials read off the spine only** — `Budgeting`, `Feeling`, `Forking`,
+  `Subsuming`. Re-taken HERE: the world they want a reading on is the one being built.
 - **Then a regime with COMPANY and a population**, the conversation having neither together: a
   moment of one word derives no vocabulary and a moment carrying a story roots genesis on
   nothing, no arm a middle. Fork **120**, priced. `LessonTests`.

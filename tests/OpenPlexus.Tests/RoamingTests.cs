@@ -41,6 +41,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// <param name="knowing">Whether the walk is recited to the machine or walked by it.</param>
     /// <param name="seeing">Whether a look and a word are one code.</param>
     /// <param name="asked">How many survey questions follow the walk.</param>
+    /// <param name="chatting">How many rounds of talking about it come before those.</param>
     /// <remarks>
     /// <b>One person is the cell every earlier reading was taken at</b>, and it is named at
     /// each call rather than defaulted. A fixture inheriting a dial it does not pin is how a
@@ -49,7 +50,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
     private static RoamingSettings World(
         int steps, int people,
         Knowing knowing = Knowing.Recited, Seeing seeing = Seeing.Apart,
-        int asked = 0) =>
+        int asked = 0, int chatting = 0) =>
         new()
         {
             Rooms = 6,
@@ -57,6 +58,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
             People = people,
             Steps = steps,
             Asked = asked,
+            Chatting = chatting,
             Withheld = knowing is Knowing.Explored ? 0 : 600,
             Examining = Examining.Where,
             Knowing = knowing,
@@ -3576,6 +3578,264 @@ public sealed class RoamingTests(ITestOutputHelper output)
             () => new Roaming(World(Steps, people: 2, asked: 1), seed: 4));
     }
 
+    /// <summary>
+    /// <b>The house is talked about between the walk and the exam.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The middle phase, and it is where the machine OBTAINS a settlement.</b> The walk
+    /// settles by ostension, which is the world choosing what to name; here the machine asks
+    /// and the house answers, and what it may ask for is exactly what the exam asks about.
+    /// </para>
+    /// <para>
+    /// <b>Checked against itself rather than against a key</b>, because nothing outside the
+    /// world knows where the apple ended up. The house stands still while it is talked about,
+    /// so one question asked twice must answer twice the same — and the answer must be a word
+    /// for a room, which is a fact about the alphabet.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_walked_house_is_talked_about_before_it_is_examined()
+    {
+        const int Steps = 20;
+        const int Chatting = 5;
+
+        var world = new Roaming(
+            World(Steps, people: 2, Knowing.Explored, asked: 5, chatting: Chatting), seed: 4);
+
+        var alphabet = world.Vocabulary.ToList();
+        var rooms = new HashSet<Code>(world.Named);
+
+        for (var step = 0; step < Steps; step++)
+        {
+            // The walk asks nothing, which is the difference between exploring and being
+            // spoken to.
+            Assert.Null(world.Now.Asked);
+
+            world.Do(null);
+            world.Next();
+        }
+
+        // And the conversation opens with the world's turn, so a phase the signal did not
+        // mark would be one nothing outside the world could tell had started.
+        var opener = world.Now.Asked;
+
+        Assert.NotNull(opener);
+
+        Assert.Equal(
+            [
+                world.Meaning(alphabet.IndexOf("what"))!.Value,
+                world.Meaning(alphabet.IndexOf("next"))!.Value,
+            ],
+            opener.Value.Codes);
+
+        var answers = new List<int>();
+
+        // Asked twice, because the house stands still while it is talked about and a second
+        // answer that differed would mean the walk was still running under the conversation.
+        for (var again = 0; again < 2; again++)
+        {
+            world.Do(alphabet.IndexOf("where"));
+
+            // Still listening, because a verb with nothing to be about is no question.
+            Assert.True(world.Listening);
+
+            world.Do(alphabet.IndexOf("apple"));
+
+            Assert.False(world.Listening);
+
+            var turn = world.Next();
+
+            Assert.NotNull(turn.Outcome);
+
+            // The answer is a word for a ROOM, which is what a question about where a thing
+            // ended up can be answered with.
+            Assert.Contains(world.Meaning(turn.Outcome.Value)!.Value, rooms);
+
+            answers.Add(turn.Outcome.Value);
+        }
+
+        Assert.Equal(answers[0], answers[1]);
+
+        // And what it was told joined the transcript, or the machine asked and kept nothing.
+        // The answer stands in one statement with the thing it is about.
+        var apple = world.Meaning(alphabet.IndexOf("apple"))!.Value;
+        var told = world.Meaning(answers[0])!.Value;
+
+        Assert.Contains(
+            world.Now.Statements!,
+            one => one.Codes.Contains(apple) && one.Codes.Contains(told));
+
+        // A round it says nothing in settles on nothing, so a conversation the machine has no
+        // question for costs a commitment exactly nothing.
+        world.Do(null);
+
+        Assert.Null(world.Next().Outcome);
+
+        output.WriteLine(
+            $"{Chatting} rounds of talking, answered {alphabet[answers[0]]} twice for the apple");
+
+        // And a recited walk has none of this, having no walk of its own to talk about.
+        Assert.Throws<ArgumentException>(
+            () => new Roaming(World(Steps, people: 2, chatting: 1), seed: 4));
+    }
+
+    /// <summary>A chooser that asks where each thing ended up and says nothing else.</summary>
+    /// <param name="opener">The code the world's own turn carries, so the walk is left alone.</param>
+    /// <param name="where">The word that opens the question.</param>
+    /// <param name="things">The words for the things, in turn.</param>
+    /// <remarks>
+    /// <b>The chat's CEILING rather than a chooser worth shipping.</b> What is wanted first is
+    /// what a conversation is worth to a machine that asks perfectly, which costs one run and
+    /// bounds everything a chooser that has to LEARN to ask could reach. <c>Curiosity</c>
+    /// cannot form one of these questions today — its blind draw is over the words in the
+    /// moment, and no sighting holds <i>where</i>.
+    /// </remarks>
+    private sealed class Asks(Code opener, int where, IReadOnlyList<int> things) : IChooses
+    {
+        private int _said;
+        private int _turn;
+
+        public int? Choose(IReadOnlyCollection<Code> felt)
+        {
+            ArgumentNullException.ThrowIfNull(felt);
+
+            // Quiet unless the world has taken its turn, so the walk is the walk the control
+            // takes and the arms differ in the conversation alone.
+            if (!felt.Contains(opener)) return null;
+
+            return _said++ switch
+            {
+                0 => where,
+                1 => things[_turn++ % things.Count],
+                _ => null,
+            };
+        }
+
+        public void Cleared() => _said = 0;
+    }
+
+    /// <summary>
+    /// <b>What a conversation about the house is worth to the exam.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The arms differ in the conversation and in nothing else.</b> Both walk the same
+    /// number of houses with the same chooser, which is quiet until the world takes its turn;
+    /// one gets no turns and the other gets six, and the exam after them is the same exam.
+    /// </para>
+    /// <para>
+    /// <b>Read per kind, because only one of the three is asked about.</b> The chooser asks
+    /// where each thing ended up, so <i>where</i> is the kind the conversation covers and the
+    /// other two say whether a transcript with more room words in it helps or hurts.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task What_talking_about_the_house_first_is_worth_to_the_exam()
+    {
+        const int Houses = 130;
+        const int Steps = 40;
+        const int Asked = 6;
+        const int Chatting = 6;
+
+        output.WriteLine(
+            $"{Houses} houses, {Steps} steps and {Asked} questions each, asking perfectly");
+
+        output.WriteLine($"{"chatting",-10}{"kind",-8}{"asked",8}{"right",8}{"score",9}");
+
+        var scored = new Dictionary<(int Chatting, string Kind), (int Asked, int Right)>();
+
+        foreach (var chatting in new[] { 0, Chatting })
+        {
+            var house = new Roaming(
+                World(Steps, people: 2, Knowing.Explored, asked: Asked, chatting: chatting),
+                seed: 4);
+
+            var alphabet = house.Vocabulary.ToList();
+
+            var words = new Dictionary<Code, string>();
+
+            for (var one = 0; one < house.Vocabulary.Count; one++)
+                words[house.Meaning(one)!.Value] = house.Vocabulary[one];
+
+            var world = new Sitting(house, null);
+
+            var brain = new Brain(new CommittingSettings { Capacity = 4_000 }, seed: 1);
+
+            var watching = new Watching<Coded>(
+                world,
+                new Joined(Joining.Bagged),
+                acting: new Asks(
+                    house.Meaning(alphabet.IndexOf("next"))!.Value,
+                    alphabet.IndexOf("where"),
+                    [.. house.Called.Select(one => house.Naming(one)!.Value)]));
+
+            var rounds = Houses * (Steps + chatting + Asked);
+
+            var loop = new Round(brain, rounds, sweep: 500, target: 0.9, window: 500);
+
+            var asked = new Dictionary<string, int>(StringComparer.Ordinal);
+            var right = new Dictionary<string, int>(StringComparer.Ordinal);
+
+            for (var round = 0; round < rounds; round++)
+            {
+                if (watching.Push() is not { } pushed) continue;
+
+                var was = loop.Right;
+
+                await loop.StepAsync(pushed);
+
+                // The conversation's own rounds are reported beside the exam's rather than
+                // among them: the machine asked those and the world asked these, and a table
+                // holding both would average two problems.
+                var kind = world.Asking is { } code ? words[code] : world.Talked ? "chat" : null;
+
+                if (kind is null) continue;
+
+                asked[kind] = asked.GetValueOrDefault(kind) + 1;
+
+                if (loop.Right > was) right[kind] = right.GetValueOrDefault(kind) + 1;
+            }
+
+            foreach (var kind in asked.Keys.Order(StringComparer.Ordinal))
+            {
+                var hits = right.GetValueOrDefault(kind);
+
+                output.WriteLine(
+                    $"{chatting,-10}{kind,-8}{asked[kind],8}{hits,8}"
+                    + $"{hits / (double)asked[kind],9:F3}");
+
+                scored[(chatting, kind)] = (asked[kind], hits);
+            }
+        }
+
+        // Three kinds under both arms and a conversation under one of them.
+        Assert.Equal(7, scored.Count);
+
+        Assert.All(scored.Values, one => Assert.True(one.Asked > 100));
+
+        // The kind the conversation covered moves, or asking about a thing and being told
+        // where it is buys the machine nothing it can use when the same question is put back
+        // to it. Asserted as a difference rather than a direction, because a transcript that
+        // grew by six statements is a wider moment as well as a better-informed one.
+        var (quiet, unhelped) = scored[(0, "where")];
+        var (talked, helped) = scored[(Chatting, "where")];
+
+        var here = unhelped / (double)quiet;
+        var there = helped / (double)talked;
+
+        var apart = Math.Abs(here - there) / Math.Sqrt(
+            (here * (1.0 - here) / quiet) + (there * (1.0 - there) / talked));
+
+        output.WriteLine(
+            $"where moves {here:F3} to {there:F3}, {apart:F1} standard errors");
+
+        Assert.True(apart > 3.0,
+            $"the conversation asked where every thing was and the exam's own `where` kind "
+            + $"moved {here:F3} to {there:F3}, {apart:F1} standard errors — so being told the "
+            + "answer and then being asked the question changes nothing the machine does");
+    }
+
     /// <summary>A walked house whose exam may be ANOTHER house's.</summary>
     /// <param name="walked">The house the machine walks and is settled by.</param>
     /// <param name="instead">The house whose questions it is asked, or nothing.</param>
@@ -3588,8 +3848,15 @@ public sealed class RoamingTests(ITestOutputHelper output)
     private sealed class Sitting(Roaming walked, Roaming? instead)
         : IWorld<Coded>, IActed<Coded>
     {
-        /// <summary>The first code of the question just asked, or nothing on a walked step.</summary>
+        /// <summary>The first code of the EXAM question just asked, or nothing otherwise.</summary>
+        /// <remarks>
+        /// <b>Read off the world's own channel rather than off the question's words</b>,
+        /// because the world takes a turn in the conversation and that is a question too.
+        /// </remarks>
         public Code? Asking { get; private set; }
+
+        /// <summary>Whether the round just taken was one of the conversation's.</summary>
+        public bool Talked { get; private set; }
 
         public int Outcomes => walked.Outcomes;
 
@@ -3611,8 +3878,16 @@ public sealed class RoamingTests(ITestOutputHelper output)
             var other = instead?.Next();
 
             Asking = null;
+            Talked = false;
 
             if (turn.Seen.Asked is not { } question) return turn;
+
+            if (!walked.Sat)
+            {
+                Talked = true;
+
+                return turn;
+            }
 
             Asking = question.Codes[0];
 

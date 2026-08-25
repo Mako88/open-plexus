@@ -35,8 +35,8 @@ that is finished LEAVES, so this is only ever what is still to do.
 - **And that world has a SIZE and no SWITCHES.** John's. A number off it is what the machine
   is worth, so what makes it less like the real world goes and the MACHINE changes instead.
   `Examining`, `Knowing` and `Seeing` are the three.
-- **First the CHAT**, `Curiosity` pointed at what was seen, and a phase rather than a world.
-  The SURVEY is built and its ceiling and its crossed control are taken.
+- **First a chooser that can ASK the exam's question.** The chat is a phase and asking
+  perfectly triples the walked half. Fork **151**.
 - **Then the switches and `Conversing` GO**, in that order: the explored walk abstains nought
   where the recital abstains 682 and supposes nothing at all, so cutting first costs the
   spine entries it already reaches.
@@ -489,6 +489,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **NOW** — commitment, settlement, blame capped at one hop, repair, and abstention so a
       round that could not settle costs nothing. A SHRUG is an outcome, so an ask costs
       something and where to ask is LEARNT.
+    - **OPEN** — no chooser forms the exam's question, the blind draw being over the
+      moment's words and no sighting holding `where`. Fork **151**.
     - **OPEN** — what it converts is unread, and English's alphabet is far wider than
       anything here has run on. Fork **89**.
     - **OPEN** — a talked world reaches its ceiling by GENESIS, so a repair-side reading

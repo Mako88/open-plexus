@@ -89,8 +89,8 @@ clean — a stable red set is the only kind you can read a new failure against.
 
 **And `The_target_world_has_a_size_and_no_switches` is the third.** John's: `Roaming` is what
 the machine is worth, so what makes it less like the real world goes and the machine changes
-instead. An enum is a switch and an int is a size — `Examining`, `Knowing` and `Seeing` are
-the three, and they close on the merged world rather than on a deletion.
+instead. An enum is a switch and an int is a size — `Examining` and `Knowing` are what is
+left, `Seeing` having gone once the merged world could do without it.
 
 **Adding an entry is stricter than adding anywhere else**: it must be work somebody has decided
 to do, computable without judgement, and closeable. An open question goes in the plan as

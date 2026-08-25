@@ -124,95 +124,82 @@ public sealed class CeilingTests(ITestOutputHelper output)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>John's, and it is why the sharing is an ARM.</b> Shared,
-    /// what a thing looks like IS the word for it, so the answer to <i>which of these is
-    /// being named</i> is in the moment before anything has learnt and the crossing is free.
-    /// Apart, the two are different codes and joining them is the same problem a picture will
-    /// pose — which is the one this project exists to reach rather than to design away.
+    /// <b>The target world's own ceiling, and a look is never a name.</b> What a thing
+    /// looks like and what it is called are two codes, so the answer to <i>which of these is
+    /// being named</i> has to be joined rather than read — which is the problem a picture will
+    /// pose, reached rather than designed away.
     /// </para>
     /// <para>
-    /// <b>And apart is not nought either</b>, which is what makes it learnable rather than
-    /// impossible. A thing named once keeps its word in the transcript, so meeting it again
-    /// puts its look and its name in one moment — and that co-firing is the whole of what a
-    /// crossing has to be built out of. The share here is how often a house re-meets what it
-    /// has already been told the name of.
+    /// <b>And it is not nought either</b>, which is what makes the crossing learnable rather
+    /// than impossible. A thing named once keeps its word in the transcript, so meeting it
+    /// again puts its look and its name in one moment, and that co-firing is the whole of
+    /// what a crossing has to be built out of.
     /// </para>
     /// <para>
-    /// <b>Read on the bag</b>, because a front end is not what is being priced. A selecting front
-    /// end would put its own reading between the world and this number, and what is wanted is
-    /// what the world hands over.
+    /// <b>Read on the bag</b>, because a front end is not what is being priced. A selecting
+    /// front end would put its own reading between the world and this number, and what is
+    /// wanted is what the world hands over.
     /// </para>
     /// <para>
-    /// <b>Measured: 1.000 shared and 0.890 apart</b>, over two thousand steps of a house
-    /// nobody was choosing for. So the arm is worth eleven points of ceiling and no more,
-    /// because a moment carries every past naming and a house of six rooms re-meets what it
-    /// has already been told the name of nine times in ten.
+    /// <b>What the reading says is where the crossing BITES</b>: a thing's first meeting, and
+    /// nothing else. A house of six rooms re-meets what it has already been told the name of
+    /// most of the time, so the gap between this and one is the whole of what is hard — and a
+    /// walk whose moment did not carry the house behind it would price it quite differently.
     /// </para>
     /// <para>
-    /// <b>Which says where the crossing actually bites</b>: a thing's FIRST meeting, and
-    /// nothing else. A walk whose moment did not carry the whole house behind it would price
-    /// this quite differently, and that is the next question rather than this one's answer.
+    /// <b>An arm that made it ONE lived here and is deleted.</b> A world whose look and word
+    /// were one code read 1.000 against 0.890, and it was a switch on the target world rather
+    /// than a size — so it went with the other two. What is left is the absolute reading,
+    /// which is the half that could ever fail.
     /// </para>
     /// </remarks>
     [Fact]
-    public void What_a_seen_thing_sharing_its_names_code_hands_over()
+    public void What_a_walked_house_hands_over_of_the_word_it_will_ask_for()
     {
         const int Rounds = 2_000;
 
         var front = new Joined(Joining.Bagged);
-        var handed = new Dictionary<Seeing, double>();
 
-        output.WriteLine($"a walked house, {Rounds} steps, nobody choosing");
-        output.WriteLine($"{"seeing",-10}{"answer present",16}{"settled",11}");
+        var world = new Roaming(
+            Fixture.House(Examining.Where, Knowing.Explored), seed: 1);
 
-        foreach (var seeing in Enum.GetValues<Seeing>())
+        var present = 0;
+        var settled = 0;
+
+        for (var round = 0; round < Rounds; round++)
         {
-            var world = new Roaming(
-                Fixture.House(Examining.Where, Knowing.Explored, seeing), seed: 1);
+            var turn = world.Next();
 
-            var present = 0;
-            var settled = 0;
+            if (turn.Outcome is not { } outcome) continue;
 
-            for (var round = 0; round < Rounds; round++)
+            settled++;
+
+            // The answer as the front end would have to see it, which is the word the
+            // outcome names rather than the outcome code itself.
+            if (world.Meaning(outcome) is { } answer
+                && front.Codify(turn.Seen).Contains(answer))
             {
-                var turn = world.Next();
-
-                if (turn.Outcome is not { } outcome) continue;
-
-                settled++;
-
-                // The answer as the front end would have to see it, which is the word the
-                // outcome names rather than the outcome code itself.
-                if (world.Meaning(outcome) is { } answer
-                    && front.Codify(turn.Seen).Contains(answer))
-                {
-                    present++;
-                }
+                present++;
             }
-
-            handed[seeing] = present / (double)settled;
-
-            output.WriteLine(
-                $"{seeing.ToString().ToLowerInvariant(),-10}{handed[seeing],16:F3}{settled,11}");
         }
 
-        // Shared hands it over every time, which is the arm being what it says it is. A
-        // reading below one would mean a thing was named that the machine could not see.
-        Assert.Equal(1.0, handed[Seeing.Shared]);
+        var handed = present / (double)settled;
 
-        // And apart hands over strictly less, or the two arms are one arm and the dial is
-        // decoration. What is asserted is the ORDER rather than the value: a prediction
-        // written into a wiring check fails two ways and reads the same.
-        Assert.True(handed[Seeing.Apart] < handed[Seeing.Shared],
-            $"a look apart from its word handed over {handed[Seeing.Apart]:F3} against "
-            + $"{handed[Seeing.Shared]:F3} shared, so the arm changes nothing about what the "
-            + "world gives away and the crossing was free either way");
+        output.WriteLine($"a walked house, {Rounds} steps, nobody choosing");
+        output.WriteLine($"the answer was already in the moment {handed:F3} of {settled}");
 
-        // And more than nothing, or the crossing has nothing to be learnt from: a look and a
-        // name that never share a moment can never come to be joined by counting.
-        Assert.True(handed[Seeing.Apart] > 0.0,
+        // Below one, or the world hands the answer over every time and nothing below it can
+        // be read as learning at all. This is the check the class exists for.
+        Assert.True(handed < 1.0,
+            $"the walked house handed the answer over on every one of {settled} settled "
+            + "rounds, so naming what is in front of it is reading rather than crossing and "
+            + "no score off this world is about a learner");
+
+        // And above nothing, or the crossing has nothing to be learnt from: a look and a name
+        // that never share a moment can never come to be joined by counting.
+        Assert.True(handed > 0.0,
             "a look and the word for it never once arrived together, so no co-firing could "
-            + "ever join them and the arm is unlearnable rather than hard");
+            + "ever join them and the crossing is unlearnable rather than hard");
     }
 
     /// <summary>
@@ -369,7 +356,7 @@ public sealed class CeilingTests(ITestOutputHelper output)
         const int Asked = 6;
 
         var world = new Roaming(
-            Fixture.House(Examining.Where, Knowing.Explored, Seeing.Apart, asked: Asked),
+            Fixture.House(Examining.Where, Knowing.Explored, asked: Asked),
             seed: 1);
 
         // What the world SAID, never what to conclude. The same standing as `Named`: a probe

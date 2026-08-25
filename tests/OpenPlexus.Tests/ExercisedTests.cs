@@ -228,12 +228,11 @@ public sealed class ExercisedTests
     /// real one the way a hand-built <c>Tally</c> would.
     /// </param>
     /// <param name="knowing">Whether the walk is recited to the machine or walked by it.</param>
-    /// <param name="seeing">Whether a look and a word are one code.</param>
     private static Watched Run(
         Examining examining, bool acting, long rounds = 10_000,
-        Knowing knowing = Knowing.Recited, Seeing seeing = Seeing.Apart)
+        Knowing knowing = Knowing.Recited)
     {
-        var world = new Roaming(Fixture.House(examining, knowing, seeing), seed: 1);
+        var world = new Roaming(Fixture.House(examining, knowing), seed: 1);
         var brain = new Brain(Walking, seed: 1);
         var falling = new Random(1);
 

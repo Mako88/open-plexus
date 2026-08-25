@@ -108,8 +108,6 @@ public sealed record RoamingSettings
     /// <inheritdoc cref="Worlds.Knowing"/>
     public required Knowing Knowing { get; init; }
 
-    /// <inheritdoc cref="Worlds.Seeing"/>
-    public required Seeing Seeing { get; init; }
 }
 
 /// <summary>How the machine comes to know what happened in the house.</summary>
@@ -133,36 +131,6 @@ public enum Knowing
 
     /// <summary>It walks the house and is shown what is in front of it.</summary>
     Explored,
-}
-
-/// <summary>Whether what is SEEN of a thing and the word for it are one code.</summary>
-/// <remarks>
-/// <para>
-/// <b>An arm and never a default, which is John's.</b> Shared, the crossing is free and the
-/// front end has handed over the answer in the one form the codes cannot otherwise carry —
-/// which is the fault <c>CeilingTests</c> exists to price. Apart, it is the same problem a
-/// picture will pose, and that is the point.
-/// </para>
-/// <para>
-/// <b>And it would otherwise be decided by whoever wrote the world first</b>, silently. A
-/// world whose looks and words are one code reads as a learner that crossed two senses, and
-/// nothing in a score can tell that from a front end that never had two.
-/// </para>
-/// <para>
-/// <b>Shared also lets the machine's own words look like things.</b> A command is in the
-/// moment, so a machine that said <i>garden</i> put the garden's code there whether or not it
-/// can see one — the answer arriving through the action channel. That is inherent to one code
-/// meaning two things rather than a fault in the wiring, and it is one more reason the arm is
-/// priced rather than chosen.
-/// </para>
-/// </remarks>
-public enum Seeing
-{
-    /// <summary>Two codes, so what a thing looks like and what it is called must be joined.</summary>
-    Apart,
-
-    /// <summary>One code, so a thing seen is already named.</summary>
-    Shared,
 }
 
 /// <summary>
@@ -290,16 +258,16 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
 
     /// <summary>The modality what a thing LOOKS like rides on.</summary>
     /// <remarks>
-    /// <b>Unused under <see cref="Seeing.Shared"/></b>, where a look is the word. That is the
-    /// whole of the arm: one modality or two, with the same house behind it.
+    /// <b>Its own, so a look is never a name.</b> A world whose looks and words were one
+    /// code would hand the crossing over, and a score off it would read as a learner that
+    /// joined two senses when nothing in it ever had two.
     /// </remarks>
     private const byte Look = 48;
 
     /// <summary>The modality a thing's SHADE rides on.</summary>
     /// <remarks>
-    /// <b>Its own under both arms</b>, because the arm is about a look and a name rather than
-    /// about how much of a thing a sense reports. A shade that followed the sharing would
-    /// move two things at once.
+    /// <b>Its own modality</b>, because a shade is a second way a thing shows through one
+    /// sense rather than a second name for it.
     /// </remarks>
     private const byte Shade = 49;
 
@@ -1074,15 +1042,11 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// <summary>The code for what a thing LOOKS like.</summary>
     /// <param name="name">The thing.</param>
     /// <remarks>
-    /// <b>Its KIND's under <see cref="Seeing.Apart"/> and its own under
-    /// <see cref="Seeing.Shared"/></b>, where the look IS the word. Sharing a look there
-    /// would give two things one name and shrink the answer alphabet, which is a different
-    /// world rather than the same one seen differently.
+    /// <b>Its KIND's and never its own</b>, so two things of a kind look alike and what a
+    /// thing is called has to be joined to what it looks like. That is the crossing a
+    /// picture will pose, reached rather than designed away.
     /// </remarks>
-    private Code Seen(string name) =>
-        _settings.Seeing is Seeing.Shared
-            ? Kinds.Named(Word, name)
-            : Kinds.Named(Look, Alike(name));
+    private static Code Seen(string name) => Kinds.Named(Look, Alike(name));
 
     /// <summary>What a thing looks like, which several things share.</summary>
     /// <param name="name">The thing.</param>
@@ -1126,9 +1090,8 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// <param name="code">What has just been said or seen of it.</param>
     /// <remarks>
     /// <b>One part a thing rather than one a sighting</b>, which is what makes a look and a
-    /// name the same thing rather than two. Under <see cref="Seeing.Shared"/> they are one
-    /// code and a part holds one; apart, a thing met and then named holds two, and a scope
-    /// over it is a scope about one thing.
+    /// name the same thing rather than two. A thing met and then named holds both, and a
+    /// scope over the pair is a scope about one thing.
     /// </remarks>
     private void Meets(string name, Code code)
     {
@@ -1224,9 +1187,8 @@ public sealed class Roaming : IWorld<Coded>, IWithholds<Coded>, IActed<Coded>
     /// <para>
     /// <b>And the naming is the SETTLEMENT</b>, which is ostension doing the job the plan says
     /// it does. The world says one of the things in front of the machine out loud, and what
-    /// the machine had to get right is which. Under <see cref="Seeing.Shared"/> the answer is
-    /// already in the moment, because a look IS the word — which is what makes the arm an arm
-    /// and what <c>CeilingTests</c> is for.
+    /// the machine had to get right is which. How often the answer is already in the moment
+    /// is what <c>CeilingTests</c> prices, and it is never all of them.
     /// </para>
     /// <para>
     /// <b>The name joins the transcript AFTER the round it settled</b>, or the answer would be

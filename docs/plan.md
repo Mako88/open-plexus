@@ -34,7 +34,7 @@ that is finished LEAVES, so this is only ever what is still to do.
   BUILT and neither is on this list.
 - **And that world has a SIZE and no SWITCHES.** John's. A number off it is what the machine
   is worth, so what makes it less like the real world goes and the MACHINE changes instead.
-  `Examining`, `Knowing` and `Seeing` are the three.
+  `Examining` and `Knowing` are the two left.
 - **First a chooser that can ASK the exam's question.** Asking perfectly triples the walked
   half; the drive pays on the WALK and asks less than a coin. Forks **146**, **151**.
 - **Then the switches and `Conversing` GO**, in that order: the explored walk abstains nought

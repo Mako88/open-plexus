@@ -39,7 +39,6 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// <param name="steps">How long the walk is.</param>
     /// <param name="people">How many are walking it.</param>
     /// <param name="knowing">Whether the walk is recited to the machine or walked by it.</param>
-    /// <param name="seeing">Whether a look and a word are one code.</param>
     /// <param name="asked">How many survey questions follow the walk.</param>
     /// <param name="chatting">How many rounds of talking about it come before those.</param>
     /// <remarks>
@@ -49,7 +48,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// </remarks>
     private static RoamingSettings World(
         int steps, int people,
-        Knowing knowing = Knowing.Recited, Seeing seeing = Seeing.Apart,
+        Knowing knowing = Knowing.Recited,
         int asked = 0, int chatting = 0) =>
         new()
         {
@@ -62,7 +61,6 @@ public sealed class RoamingTests(ITestOutputHelper output)
             Withheld = knowing is Knowing.Explored ? 0 : 600,
             Examining = Examining.Where,
             Knowing = knowing,
-            Seeing = seeing,
         };
 
     /// <summary>What the rules that need no learning reach on one house.</summary>
@@ -1090,9 +1088,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
     [Fact]
     public void A_walked_house_shows_the_machine_what_is_in_front_of_it()
     {
-        foreach (var seeing in new[] { Seeing.Apart, Seeing.Shared })
         {
-            var world = new Roaming(World(6, people: 2, Knowing.Explored, seeing), seed: 4);
+            var world = new Roaming(World(6, people: 2, Knowing.Explored), seed: 4);
 
             var widest = 0;
             var deepest = 0;
@@ -1122,12 +1119,12 @@ public sealed class RoamingTests(ITestOutputHelper output)
             }
 
             output.WriteLine(
-                $"{seeing,-6}| widest moment {widest} sightings | most codes a thing {deepest}");
+                $"widest moment {widest} sightings | most codes a thing {deepest}");
 
             // A thing shows its look and its shade, and its word once it has been named.
-            // Shared, the look IS the word and the three are two. That is the arm, asserted
-            // as the difference rather than as either value.
-            Assert.Equal(seeing is Seeing.Apart ? 3 : 2, deepest);
+            // Three, because a look is never a name here: what a thing is called has to
+            // be joined to what it looks like, which is the crossing a picture will pose.
+            Assert.Equal(3, deepest);
         }
 
         // And a house that is walked holds nothing back, because a question about a house the

@@ -59,7 +59,6 @@ internal static class Fixture
     /// </summary>
     /// <param name="examining">Which question the house is asked.</param>
     /// <param name="knowing">Whether the walk is recited to the machine or walked by it.</param>
-    /// <param name="seeing">Whether a look and a word are one code.</param>
     /// <param name="asked">How many survey questions follow the walk.</param>
     /// <param name="chatting">How many rounds of talking about it come before those.</param>
     /// <remarks>
@@ -72,7 +71,6 @@ internal static class Fixture
     public static Worlds.RoamingSettings House(
         Worlds.Examining examining,
         Worlds.Knowing knowing = Worlds.Knowing.Recited,
-        Worlds.Seeing seeing = Worlds.Seeing.Apart,
         int asked = 0,
         int chatting = 0) =>
         new()
@@ -89,7 +87,6 @@ internal static class Fixture
             Withheld = knowing is Worlds.Knowing.Explored ? 0 : 600,
             Examining = examining,
             Knowing = knowing,
-            Seeing = seeing,
         };
 
     /// <summary>The senses world, clean unless a test asks for noise.</summary>

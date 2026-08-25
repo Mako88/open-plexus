@@ -730,7 +730,7 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// <para>
     /// <b>An enum is a switch and an int is a size</b>, which is what makes it checkable at
     /// last. A real house has some number of rooms, props, people and steps, and choosing six
-    /// rather than eight does not make it less like a house. <c>Knowing</c>, <c>Seeing</c>
+    /// rather than eight does not make it less like a house. <c>Knowing</c>
     /// and <c>Examining</c> are not sizes: they say whether the machine explores or is
     /// recited to, whether a thing's look already IS its name, and which single question gets
     /// asked. Each has an arm that is a world the real one is not.

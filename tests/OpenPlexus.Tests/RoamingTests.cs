@@ -814,6 +814,28 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// moment as a code that predicts nothing, and the more it says the worse it reads.
     /// </para>
     /// <para>
+    /// <b>What it costs is the WIDTH of the moment it makes.</b> Silence hands the brain
+    /// 21.7 codes a moment, the drive 24.5, the belief 24.1 and a uniform talker 45.5 —
+    /// twice as wide for a third of the score. A moment is a SET, so a chooser that repeats
+    /// itself barely widens one and a chooser saying six distinct words every round doubles
+    /// it.
+    /// </para>
+    /// <para>
+    /// <b>Which is the whole of what the drive was buying.</b> <c>narrow</c> says ONE
+    /// uniformly drawn word a moment and reads 0.250, the same 135 of 540 the drive reads,
+    /// leading it on one seed and trailing on two. So <c>Wanting.Learning</c> is level with
+    /// a coin once the number of words said is held down, and every earlier reading that
+    /// had it ahead was against a six-word talker — a control far worse than a one-word
+    /// one, which is this repo's own <i>a fallback is a control arm nobody meant to
+    /// run</i> arriving on the chooser.
+    /// </para>
+    /// <para>
+    /// <b>And <c>narrow</c> ties it while never once commanding.</b> One word cannot be a
+    /// verb and a thing, so its body waited every step where the drive's moved 207 times.
+    /// Two arms that differ in whether the machine walks at all and score the same say the
+    /// walk is not what the exam is reading.
+    /// </para>
+    /// <para>
     /// <b>And the exam is the same exam under every arm</b>, which is what makes that
     /// readable. All four are asked about the same fourteen or fifteen distinct answers
     /// across all six rooms, so no arm was examined on a narrower house than another —
@@ -899,11 +921,23 @@ public sealed class RoamingTests(ITestOutputHelper output)
         var about = new Dictionary<string, HashSet<Code>>(StringComparer.Ordinal);
         var stood = new Dictionary<string, HashSet<Code>>(StringComparer.Ordinal);
 
+        // How big a moment the arm hands the brain, summed and counted. The machine's own
+        // words ride IN the moment so a chooser that says six of them adds six codes and the
+        // derived doing beside each -- and a population spending its capacity on codes that
+        // predict nothing is the leading explanation for why speaking costs the exam.
+        var wide = new Dictionary<string, (long Codes, long Moments)>(StringComparer.Ordinal);
+
         var believed = 0L;
 
-        foreach (var arm in new[] { "declining", "uniform", "learning", "believing" })
+        foreach (var arm in new[] { "declining", "uniform", "narrow", "learning", "believing" })
         foreach (var seed in Enumerable.Range(1, Seeds))
         {
+            // One drawn word a moment rather than six, which is the control that separates
+            // the drive saying BETTER words from the drive saying FEWER of them. A moment is
+            // a set and the drive repeats itself, so its moments are barely wider than
+            // silence while a uniform talker says six distinct words every round.
+            var once = false;
+
             var rounds = Houses * (Steps + Chatting + Asked);
 
             var house = new Roaming(
@@ -947,6 +981,16 @@ public sealed class RoamingTests(ITestOutputHelper output)
                     // nothing. It is what separates a chooser that walks badly from one whose
                     // words leave the body waiting.
                     "declining" => Chooses.From(_ => null),
+                    "narrow" => Chooses.From(
+                        _ =>
+                        {
+                            if (once) return null;
+
+                            once = true;
+
+                            return draw.Next(house.Doings);
+                        },
+                        () => once = false),
                     _ => Chooses.From(_ => draw.Next(house.Doings)),
                 });
 
@@ -995,6 +1039,10 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
                     rooms.Add(room);
                 }
+
+                var width = wide.GetValueOrDefault(arm);
+
+                wide[arm] = (width.Codes + pushed.Codes.Count, width.Moments + 1);
             }
 
             foreach (var kind in asked.Keys)
@@ -1035,7 +1083,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
             if (arm == "believing") believed += answers.Said;
         }
 
-        foreach (var arm in new[] { "declining", "uniform", "learning", "believing" })
+        foreach (var arm in new[] { "declining", "uniform", "narrow", "learning", "believing" })
         {
             var rows = scored.Where(one => one.Key.Arm == arm).ToList();
 
@@ -1047,7 +1095,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 + $"   spoke {questions[arm].Spoke} of {questions[arm].Talked}"
                 + $", commanded {commanded[arm].Ordered} and moved {commanded[arm].Did}"
                 + $", asked about {about.GetValueOrDefault(arm)?.Count ?? 0} distinct "
-                + $"answers across {stood.GetValueOrDefault(arm)?.Count ?? 0} rooms stood in");
+                + $"answers across {stood.GetValueOrDefault(arm)?.Count ?? 0} rooms stood in"
+                + $", moments {wide[arm].Codes / (double)wide[arm].Moments:F1} codes wide");
         }
 
         var leads = Enumerable.Range(1, Seeds).Count(seed =>
@@ -1071,7 +1120,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // Every house's exam was sat under every arm, whatever the walk before it looked
         // like. Which KINDS got asked is a fact about where the machine ended up walking and
         // is not the same number under four choosers.
-        Assert.Equal(4, questions.Count);
+        Assert.Equal(5, questions.Count);
 
         Assert.All(
             questions.Keys,
@@ -1097,7 +1146,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // house it watched rather than explored. Asserted per arm because the arms differ
         // in exactly the thing that decides it -- which word gets said.
         Assert.All(
-            commanded.Where(one => one.Key != "declining"),
+            commanded.Where(one => one.Key is not ("declining" or "narrow")),
             one => Assert.True(one.Value.Did > 0,
                 $"the `{one.Key}` arm carried out no command at all across "
                 + $"{Houses * Seeds} houses, so the machine never once moved itself and "

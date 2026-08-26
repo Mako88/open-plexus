@@ -1030,10 +1030,15 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
 
     /// <summary>A look at the room, recorded and added to what has been seen.</summary>
     /// <param name="walk">The house and where everything in it stands.</param>
-    /// <param name="doing">The machine's own words, which are part of what happened.</param>
-    private List<Code> Sight(Walk walk, IReadOnlyList<Code> doing)
+    /// <remarks>
+    /// <b>What was SEEN and not what was said.</b> The machine's own words used to be
+    /// folded in here, and a sighting is what joins the transcript — so a word said once
+    /// was in every later moment of that house and a talkative machine widened every
+    /// moment it would be examined over. A doing is not something the house showed it.
+    /// </remarks>
+    private List<Code> Sight(Walk walk)
     {
-        var sighting = new List<Code>(doing);
+        var sighting = new List<Code>();
 
         foreach (var name in Before(walk))
         {
@@ -1083,7 +1088,7 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
 
         // The opening look, which nothing names. A machine asked what it can see before it has
         // seen anything would have an empty moment on the first step of every house.
-        Sight(walk, []);
+        Sight(walk);
 
         return walk;
     }
@@ -1091,9 +1096,16 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
     /// <summary>Everything seen so far, newest first, and one part a thing met.</summary>
     /// <param name="walk">The house being walked.</param>
     /// <param name="chose">The machine's own words, or nothing where it said none.</param>
-    private Coded Sighted(Walk walk, IReadOnlySet<Code>? chose) =>
+    /// <param name="said">
+    /// Those same words as a part of THIS moment, where the sighting no longer carries them.
+    /// </param>
+    private Coded Sighted(
+        Walk walk, IReadOnlySet<Code>? chose, IReadOnlyList<Code>? said = null) =>
         Coded.From(
-            [.. Enumerable.Reverse(walk.Told).Select(Grouped.Of)],
+            [
+                .. said is { Count: > 0 } ? new[] { Grouped.Of(said) } : [],
+                .. Enumerable.Reverse(walk.Told).Select(Grouped.Of),
+            ],
             assigned: chose,
             things: [.. _order.Select(name => Grouped.Of(_met[name]))]);
 
@@ -1145,14 +1157,22 @@ public sealed class Roaming : IWorld<Coded>, IActed<Coded>
         if (_settings.People > 1)
             Step(walk, null, 1 + _walks.Next(_settings.People - 1));
 
-        var sighting = Sight(walk, doing);
+        var sighting = Sight(walk);
         var seen = Before(walk);
         var named = seen[_walks.Next(seen.Count)];
         var word = Kinds.Named(Word, named);
 
         var turn = new Turn<Coded>
         {
-            Seen = Sighted(walk, doing.Count > 0 ? new HashSet<Code>(doing) : null),
+            Seen = Sighted(
+                walk,
+                doing.Count > 0 ? new HashSet<Code>(doing) : null,
+
+                // The moment carries them and the sighting does not, so a doing is in the
+                // moment it was done in -- which is what `IActed` requires -- and in no
+                // later one. Folded into the sighting they joined the transcript and the
+                // house repeated them back for the rest of the walk.
+                doing),
             Outcome = _naming[word],
         };
 

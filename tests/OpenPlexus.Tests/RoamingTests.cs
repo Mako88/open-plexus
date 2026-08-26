@@ -600,9 +600,13 @@ public sealed class RoamingTests(ITestOutputHelper output)
         var alphabet = world.Vocabulary.ToList();
 
         // Where the body is standing, read off the room's own look. A room is the first thing
-        // in front of whoever is in it, so the first look of the newest sighting is the room.
+        // in front of whoever is in it, so the first look of the newest SIGHTING is the room --
+        // and the newest statement is not the newest sighting where the machine spoke, its own
+        // words being their own statement and holding no look at all.
         static Code Standing(Coded seen) =>
-            seen.Statements![0].Codes.First(one => one.Modality == 48);
+            seen.Statements!
+                .First(one => one.Codes.Any(code => code.Modality == 48))
+                .Codes.First(one => one.Modality == 48);
 
         // Declining leaves the world drawing its own step, and marks nothing.
         world.Do(null);
@@ -767,6 +771,67 @@ public sealed class RoamingTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// <b>A word it says reaches its own moment and no later one.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>John's, and it is two things this branch had run together.</b> A doing has to be in
+    /// the moment it was done in or no scope can name it and expect the consequence, which is
+    /// what <c>IActed</c> is for. Whether it is in every moment AFTER that one is a separate
+    /// question and nothing had asked it.
+    /// </para>
+    /// <para>
+    /// <b>It was folded into the SIGHTING</b>, and a sighting joins the house's transcript for
+    /// the rest of the walk — so a word said once was in every later moment, and a machine
+    /// saying six a round widened every moment it would be examined over. The conversation
+    /// already did the other thing, which is what made it an inconsistency rather than a
+    /// design: a turn of talking puts what was said in that moment and never in the record.
+    /// </para>
+    /// <para>
+    /// <b>Asserted as the property rather than as a comparison</b>, because the arm that
+    /// measured it is deleted. A switch on the target world may not outlive the reading that
+    /// settled it, and a check that needs both arms would have kept it alive.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_word_the_machine_says_reaches_its_own_moment_and_no_later_one()
+    {
+        var world = new Roaming(World(steps: 20, people: 2), seed: 4);
+
+        var alphabet = world.Vocabulary.ToList();
+        var said = world.Meaning(alphabet.IndexOf("football"))!.Value;
+
+        // A step it says nothing on, so what follows is the only thing that put the word
+        // anywhere. The house draws the body's step either way.
+        world.Do(null);
+        world.Next();
+
+        Assert.DoesNotContain(said, world.Now.Codes);
+
+        world.Do(alphabet.IndexOf("football"));
+
+        var spoken = world.Next();
+
+        // In the moment it was said in, and marked as the machine's doing rather than as
+        // something the house showed it.
+        Assert.Contains(said, spoken.Seen.Codes);
+        Assert.Contains(said, spoken.Seen.Assigned!);
+
+        world.Do(null);
+
+        var after = world.Next();
+
+        // And gone from the next one. A word in the transcript would be in every moment of
+        // this house from here to its exam.
+        Assert.DoesNotContain(said, after.Seen.Codes);
+        Assert.Null(after.Seen.Assigned);
+
+        output.WriteLine(
+            "`football` reached the moment it was said in, marked as the machine's own, and "
+            + "no moment after it");
+    }
+
+    /// <summary>
     /// <b>Whether a wide moment costs CAPACITY or costs something else.</b>
     /// </summary>
     /// <remarks>
@@ -794,29 +859,25 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// and is the honest null.
     /// </para>
     /// <para>
-    /// <b>It is not capacity, and the bound was never binding.</b> The gap is 0.259 at two
-    /// thousand and 0.259 at twenty thousand, to the digit, and the populations end at 1,729
-    /// and 1,172 — under the smaller bound either way. Lifting a bound nothing reached
-    /// changed nothing, which is the null this arm was built to be able to read.
+    /// <b>It is not capacity, and the bound was never binding.</b> The gap is 0.285 at two
+    /// thousand and 0.285 at twenty thousand, to the digit, and the populations end at 1,522
+    /// and 1,073 — under the smaller bound either way. Lifting a bound nothing reached changed
+    /// nothing, which is the null this arm was built to be able to read.
     /// </para>
     /// <para>
-    /// <b>What it is instead is the VOTE being outnumbered.</b> 473 commitments fire on an
-    /// exam round under the wide arm against 153 under the narrow one — three times as many,
-    /// off a population only half again as big. A moment three times wider is a moment three
-    /// times as many scopes are a subset of, so the round is decided by a crowd whose extra
-    /// members are rules about the machine's own babble.
+    /// <b>And it is not the vote being outnumbered either</b>, which is the reading that had to
+    /// be taken back. Under the echo a wide moment fired 473 advocates against a narrow one's
+    /// 153 and that looked like the whole story. With the machine's words out of the transcript
+    /// the two fire 162 and 154 — the same crowd — and the exam still reads 0.183 against
+    /// 0.469. The extra advocates were the echo's, not the width's.
     /// </para>
     /// <para>
-    /// <b>Which is fork 35 answered on the world that counts.</b> That leaf asks whether the
-    /// vote is robust to holding more unsound commitments than sound ones, or whether they
-    /// are why it stops short. Here they are why: nothing about the population's SIZE
-    /// separates the arms and everything about how many of it speaks at once does.
-    /// </para>
-    /// <para>
-    /// <b>So the fix is vote-side rather than population-side</b>, which is this repo's own
-    /// <i>a gate on what is HELD cannot reach what DECIDES</i>. Culling, subsumption and a
-    /// tighter capacity all change what is held; which rule takes the round is the vote's
-    /// alone, and it is the vote that is being outnumbered.
+    /// <b>So what a wide moment costs is not the count of anything.</b> Not the population's
+    /// room, not the number of rules that speak, and not how tested they are — the wide arm's
+    /// are seen 245 times against the narrow arm's 138, better rather than thinner. What is
+    /// left is what a scope may be ABOUT: a rule keyed on codes that predict nothing can be
+    /// perfectly accurate, because nothing is what they reliably predict, and it still fires on
+    /// an exam moment and wins.
     /// </para>
     /// </remarks>
     [Fact]
@@ -842,6 +903,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // wide moment costs is the right rule being outvoted by rules about noise, this is
         // where it shows. Read-only, and it is the same call the vote makes.
         var firing = new Dictionary<(string Arm, int Capacity), (long Fired, long Rounds)>();
+        var tests = new Dictionary<(string Arm, int Capacity), (long Seen, long Rules)>();
 
         foreach (var capacity in new[] { 2_000, 20_000 })
         foreach (var arm in new[] { "wide", "narrow" })
@@ -886,9 +948,16 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
                 var lit = firing.GetValueOrDefault((arm, capacity));
 
-                firing[(arm, capacity)] = (
-                    lit.Fired + brain.Held.Firing(brain.Held.Moment(pushed.Codes)).Length,
-                    lit.Rounds + 1);
+                var alight = brain.Held.Firing(brain.Held.Moment(pushed.Codes));
+
+                firing[(arm, capacity)] = (lit.Fired + alight.Length, lit.Rounds + 1);
+
+                // How TESTED the rules deciding an exam round are, which is what says whether
+                // the extra advocates a wide moment lights up are unproven or simply wrong.
+                var tested = tests.GetValueOrDefault((arm, capacity));
+
+                tests[(arm, capacity)] =
+                    (tested.Seen + alight.Sum(one => one.Seen), tested.Rules + alight.Length);
             }
 
             var had = scored.GetValueOrDefault((arm, capacity));
@@ -902,7 +971,9 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 + $"{widths[(arm, capacity)].Codes / (double)widths[(arm, capacity)].Moments,8:F1}"
                 + $"{brain.Held.Count,9}"
                 + $"   {firing[(arm, capacity)].Fired
-                    / (double)firing[(arm, capacity)].Rounds:F1} fire an exam round");
+                    / (double)firing[(arm, capacity)].Rounds:F1} fire an exam round, each "
+                + $"seen {tests[(arm, capacity)].Seen
+                    / (double)tests[(arm, capacity)].Rules:F0} times");
         }
 
         var gaps = new Dictionary<int, double>();
@@ -936,7 +1007,8 @@ public sealed class RoamingTests(ITestOutputHelper output)
         Assert.All(
             new[] { 2_000, 20_000 },
             capacity => Assert.True(
-                (widths[("wide", capacity)].Codes / (double)widths[("wide", capacity)].Moments)
+                (widths[("wide", capacity)].Codes
+                    / (double)widths[("wide", capacity)].Moments)
                 > (widths[("narrow", capacity)].Codes
                     / (double)widths[("narrow", capacity)].Moments) + 5.0,
                 $"the wide arm's moments are not five codes wider than the narrow arm's at "
@@ -1013,103 +1085,30 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// same low score.
     /// </para>
     /// <para>
-    /// <b>And it WINS, which is the finding.</b> 0.337 saying nothing, against 0.250 under
-    /// the drive, 0.233 saying what it believes and 0.119 drawing uniformly — and the
-    /// silent arm is the one whose body moved most, because the world walks it. So moving
-    /// does not cost the exam and SPEAKING does: every word the machine says joins the
-    /// moment as a code that predicts nothing, and the more it says the worse it reads.
+    /// <b>And the ordering is the moment's WIDTH, arm for arm.</b> 10.4 codes a moment reads
+    /// 0.463, 10.8 reads 0.463, 19.4 reads 0.400, 21.4 reads 0.380, 21.7 reads 0.337 and 25.6
+    /// reads 0.180. Which words the machine says, whether it walks and what it wants all sit
+    /// inside that ordering rather than across it.
     /// </para>
     /// <para>
-    /// <b>What it costs is the WIDTH of the moment it makes.</b> Silence hands the brain
-    /// 21.7 codes a moment, the drive 24.5, the belief 24.1 and a uniform talker 45.5 —
-    /// twice as wide for a third of the score. A moment is a SET, so a chooser that repeats
-    /// itself barely widens one and a chooser saying six distinct words every round doubles
-    /// it.
+    /// <b>And the arm that says nothing is not the narrowest.</b> Its body is the one the
+    /// world walks, so it meets the whole house and its moments are 21.7 codes wide; a machine
+    /// that says one word cannot form a command, waits where it stands, sees one room over and
+    /// over and hands the brain 10.4. So the best score here belongs to a machine standing in
+    /// a corner repeating itself, which is a reductio rather than a result.
     /// </para>
     /// <para>
-    /// <b>Which is the whole of what the drive was buying.</b> <c>narrow</c> says ONE
-    /// uniformly drawn word a moment and reads 0.250, the same 135 of 540 the drive reads,
-    /// leading it on one seed and trailing on two. So <c>Wanting.Learning</c> is level with
-    /// a coin at six words a moment, and every earlier reading that had it ahead was
-    /// against a six-word talker — a control far worse than a one-word one, which is this
-    /// repo's own <i>a fallback is a control arm nobody meant to run</i> arriving on the
-    /// chooser.
+    /// <b>The drive is level with a coin, and one word beats six.</b> <c>narrow</c> says one
+    /// uniformly drawn word and <c>sparing</c> one the drive picked; both read 0.463, to the
+    /// same 250 of 540. Six words of the drive read 0.380 and six drawn read 0.180, so what a
+    /// chooser is worth here is how MANY things it says and not which.
     /// </para>
     /// <para>
-    /// <b>And <c>narrow</c> ties it while never once commanding.</b> One word cannot be a
-    /// verb and a thing, so its body waited every step where the drive's moved 207 times.
-    /// Two arms that differ in whether the machine walks at all and score the same say the
-    /// walk is not what the exam is reading.
-    /// </para>
-    /// <para>
-    /// <b>The drive on a BUDGET of one word wins.</b> <c>sparing</c> reads
-    /// 0.369 at 14.4 codes a moment — narrower than silence, because a body that waits sees
-    /// one room over and over where a body the world walks meets the whole house. It is
-    /// 1.1 standard errors ahead of saying nothing, so the two are level and everything
-    /// that talks more is behind them.
-    /// </para>
-    /// <para>
-    /// <b>So the exam reads the moment's WIDTH and little else.</b> 14.4 reads
-    /// 0.369, 21.7 reads 0.337, 24.1 and 24.5 read 0.233 and 0.250, 32.3 reads 0.250 and
-    /// 45.5 reads 0.119. Which words, whether the machine walks, whether it commands and
-    /// what it wants all sit inside that ordering rather than across it.
-    /// </para>
-    /// <para>
-    /// <b>And it is not the machine's own words that cost</b>, which <c>sparing</c> settles:
-    /// it says one every round and has the narrowest moments of all, where the silent arm
-    /// says none and has wider ones. What costs is the count of DISTINCT codes the brain is
-    /// handed, whoever put them there.
-    /// </para>
-    /// <para>
-    /// <b>So the best machine here stands in a corner repeating itself</b>,
-    /// and that is a reductio rather than a result. What it prices is the brain against wide
-    /// moments rather than the chooser against the house, and no comparison between two
-    /// choosers on this world means anything until the width is held.
-    /// </para>
-    /// <para>
-    /// <b>And the exam is the same exam under every arm</b>, which is what makes that
-    /// readable. All four are asked about the same fourteen or fifteen distinct answers
-    /// across all six rooms, so no arm was examined on a narrower house than another —
-    /// which was the first explanation and it is refuted.
-    /// </para>
-    /// <para>
-    /// <b>A cost to record rather than grounds to stop acting.</b> The silent arm obtains
-    /// nothing: it never asks, so it never has a settlement it went and got, and it cannot
-    /// be talked to at all. What the number prices is the acting channel, and every reading
-    /// on this world that compared two choosers without it read a cost as a difference
-    /// between them.
-    /// </para>
-    /// <para>
-    /// <b>And the fourth arm says what it BELIEVES first.</b> <see cref="Answers"/> is a
-    /// requirement rather than an arm — a machine nobody can ask anything is not something
-    /// a person can talk to — so what this reads is its COST rather than whether it wins.
-    /// The belief and the drive answer different questions and there is no scale on which
-    /// they trade, so the belief goes first and the drive takes the rounds it has nothing
-    /// to say about.
-    /// </para>
-    /// <para>
-    /// <b>And the cost is small.</b> Thirty houses a seed over three seeds: the exam reads
-    /// 0.119 under the draw, 0.250 under the drive and 0.233 under the belief, and the
-    /// belief is behind on two seeds and ahead on one — 0.244 against 0.239, 0.328 against
-    /// 0.350, and 0.128 against 0.161. Three seeds cannot tell those apart.
-    /// </para>
-    /// <para>
-    /// <b>And it was read as FREE on the three-kind exam</b>, which is the correction worth
-    /// keeping rather than the number. That exam read 0.283 against 0.278 with the belief
-    /// ahead on two seeds of three; adding the question no transcript states moved the
-    /// order. A reading is conditional on the exam that produced it as much as on the brain.
-    /// </para>
-    /// <para>
-    /// <b>What it buys is a third again as many askable questions</b>, 242 of 540
-    /// conversation rounds against the drive's 184 and the draw's 145. A belief is not a
-    /// question, so an arm spending its budget answering could have crowded the asking out
-    /// and did the opposite.
-    /// </para>
-    /// <para>
-    /// <b>It believes about a fifth of what it says</b> — 1,503, 1,500 and 1,505 beliefs
-    /// against some 8,000 doings a seed, the rest falling to the drive. A count that moved
-    /// is what separates an arm that bit and changed nothing from an arm nothing reached,
-    /// and no score here could tell those apart.
+    /// <b>And the acting channel is nearly dead.</b> The drive orders 9 commands over 3,600
+    /// walked steps and 3 are carried out. Under the echo it ordered 471 and moved 207 — its
+    /// own past words sat in every later moment, rules keyed on them fired, and those rules
+    /// advocated words that sometimes parsed. So the acting this world was measuring was
+    /// manufactured by the defect rather than merely inflated by it.
     /// </para>
     /// </remarks>
     [Fact]

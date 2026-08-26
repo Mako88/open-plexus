@@ -814,7 +814,15 @@ public sealed class DocsTests
     // the exam while its body moves most. That inverts what a chooser is priced against, so
     // no arm over what to say can be read until it is understood -- and an item nobody wrote
     // down would have the next session reaching for a better chooser.
-    private const int Whole = 13_320;
+    //
+    // And 13,390 for one refutation row and the road it shut. `Weighing.Assured` is deleted,
+    // and what the row carries is the reading rather than the arm: the advocates a wide
+    // moment adds are BETTER tested than the ones a narrow one fires, so they are wrong
+    // rather than unproven and no correction to the vote can reach them. Three roads are
+    // measured shut -- capacity, what is held, and how the vote weighs what fires -- and the
+    // item beside it names the one left. A row saying which roads are closed is worth more
+    // than the arm that closed them.
+    private const int Whole = 13_390;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

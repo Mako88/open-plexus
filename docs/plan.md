@@ -37,8 +37,9 @@ that is finished LEAVES, so this is only ever what is still to do.
   house by construction. So it wants a spine world with variables to be in trouble about, a
   deletion, or a waiting list of its own — and the third is the answer only if the first two
   are refused.
-- **Then a vote a WIDER moment does not outnumber**, which is neither capacity nor what is
-  held. No chooser comparison on this world means anything until it is fixed. Fork **35**.
+- **Then what a scope may be ABOUT**, a wider moment costing the score where the same crowd
+  of equally tested rules fires. Capacity, what is held and how the vote weighs it are all
+  measured shut. Fork **35**.
 - **Then what asking a PERSON well is worth**, which is what is left of forks **146** and
   **151** now the conversation follows the exam. Nothing said afterwards can reach the score,
   so the payoff is a settlement obtained rather than a mark, and what to measure it against
@@ -482,8 +483,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **NOW** — an accuracy-weighted vote over a wide root, plus a recency-weighted local
       estimate that never merges, and no tie-break: where nothing separates two advocates
       the machine DECLINES. `Deciding`. John's.
-    - **OPEN** — the vote is OUTNUMBERED rather than outbid: a wider moment fires more
-      advocates and the score falls with it, off a population no bigger. Fork **35**.
+    - **OPEN** — a wider moment costs the score and NO COUNT explains it: not the population,
+      not how many advocates fire, not how tested they are. Fork **35**.
     - **OPEN** — it costs 4.7x the rules. Nothing waits for a group to hold still, and the
       closure sightings are what a patience rule reads. Fork **130**.
     - **OPEN** — mutual exclusion is unbuilt, so a belief can be wrong and never
@@ -741,6 +742,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | Naming a bundle for staying in the SUCCESSOR moment, fork **93** | It reads whether two codes ARRIVE together, never whether they STAY: `Returning` names 150, 150, 85 and 11 as things are re-met more, and 160 at every rate with stable codes | Persistence of a PART, fork **142** having made two of a kind sayable |
 | A departure code in EVERY world's moments, as the dial's default | A wider moment is a bigger population: six suites moved and one arm comparison INVERTED, both sides having grown. It pays on `Rhythm` and costs the multiplexer | Nothing. `Departing.Left` lives and a world turns it on; what is refuted is one default for every world |
 | Counting a code's absence BEFORE it arrived as variation, fork **149** | Not one extra binding either gated or not, for a crossing falling 35 to 30. Subsumption decides this, not eligibility | A world where genesis's window is early and the code that separates has only just arrived |
+| `Weighing.Assured` — discounting an advocate by what searching that many candidates could find by chance | The winners it would unseat are better TESTED than the ones it favours, so no bound reaches them | A vote whose winner is a THIN estimate rather than a well-tested wrong one |
 | `Wanting.Trying` — refusing a pick whose advocates have stopped moving | It explored far more and lost the exam on every seed. Its bar was NOT POSITIVE, which is every untested rule's state, so it refused to exploit where it had something to exploit | A reading that says the acting channel pays at all |
 | `Saying.Part` — a chooser saying the part of a SCOPE it can | Identical asking and a lower exam, saying one code of a scope having never been blocked: two commitments each naming one word already put the pair | A world where no two commitments hold the halves of a question separately |
 | A refusal as a CODE in the moment, fork **127** | Level on both shapes for a larger population, the chooser already refusing to repeat itself, so the fact was acted on before the code arrived | The exclusion having to SURVIVE the moment, which is a store's job rather than a code's |

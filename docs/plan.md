@@ -37,8 +37,9 @@ that is finished LEAVES, so this is only ever what is still to do.
   house by construction. So it wants a spine world with variables to be in trouble about, a
   deletion, or a waiting list of its own — and the third is the answer only if the first two
   are refused.
-- **Then what a chooser is FOR**, a silent machine beating every one of them and the drive
-  being level with one drawn word. What a chooser costs is the WIDTH of the moment it makes.
+- **Then the exam reads the moment's WIDTH and little else**, the narrowest arm winning and
+  the widest losing threefold. No chooser comparison on this world means anything until the
+  width is held.
 - **Then what asking a PERSON well is worth**, which is what is left of forks **146** and
   **151** now the conversation follows the exam. Nothing said afterwards can reach the score,
   so the payoff is a settlement obtained rather than a mark, and what to measure it against

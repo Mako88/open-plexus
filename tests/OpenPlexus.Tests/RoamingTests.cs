@@ -824,16 +824,41 @@ public sealed class RoamingTests(ITestOutputHelper output)
     /// <b>Which is the whole of what the drive was buying.</b> <c>narrow</c> says ONE
     /// uniformly drawn word a moment and reads 0.250, the same 135 of 540 the drive reads,
     /// leading it on one seed and trailing on two. So <c>Wanting.Learning</c> is level with
-    /// a coin once the number of words said is held down, and every earlier reading that
-    /// had it ahead was against a six-word talker — a control far worse than a one-word
-    /// one, which is this repo's own <i>a fallback is a control arm nobody meant to
-    /// run</i> arriving on the chooser.
+    /// a coin at six words a moment, and every earlier reading that had it ahead was
+    /// against a six-word talker — a control far worse than a one-word one, which is this
+    /// repo's own <i>a fallback is a control arm nobody meant to run</i> arriving on the
+    /// chooser.
     /// </para>
     /// <para>
     /// <b>And <c>narrow</c> ties it while never once commanding.</b> One word cannot be a
     /// verb and a thing, so its body waited every step where the drive's moved 207 times.
     /// Two arms that differ in whether the machine walks at all and score the same say the
     /// walk is not what the exam is reading.
+    /// </para>
+    /// <para>
+    /// <b>The drive on a BUDGET of one word wins.</b> <c>sparing</c> reads
+    /// 0.369 at 14.4 codes a moment — narrower than silence, because a body that waits sees
+    /// one room over and over where a body the world walks meets the whole house. It is
+    /// 1.1 standard errors ahead of saying nothing, so the two are level and everything
+    /// that talks more is behind them.
+    /// </para>
+    /// <para>
+    /// <b>So the exam reads the moment's WIDTH and little else.</b> 14.4 reads
+    /// 0.369, 21.7 reads 0.337, 24.1 and 24.5 read 0.233 and 0.250, 32.3 reads 0.250 and
+    /// 45.5 reads 0.119. Which words, whether the machine walks, whether it commands and
+    /// what it wants all sit inside that ordering rather than across it.
+    /// </para>
+    /// <para>
+    /// <b>And it is not the machine's own words that cost</b>, which <c>sparing</c> settles:
+    /// it says one every round and has the narrowest moments of all, where the silent arm
+    /// says none and has wider ones. What costs is the count of DISTINCT codes the brain is
+    /// handed, whoever put them there.
+    /// </para>
+    /// <para>
+    /// <b>So the best machine here stands in a corner repeating itself</b>,
+    /// and that is a reductio rather than a result. What it prices is the brain against wide
+    /// moments rather than the chooser against the house, and no comparison between two
+    /// choosers on this world means anything until the width is held.
     /// </para>
     /// <para>
     /// <b>And the exam is the same exam under every arm</b>, which is what makes that
@@ -929,7 +954,10 @@ public sealed class RoamingTests(ITestOutputHelper output)
 
         var believed = 0L;
 
-        foreach (var arm in new[] { "declining", "uniform", "narrow", "learning", "believing" })
+        foreach (var arm in new[]
+        {
+            "declining", "uniform", "narrow", "learning", "sparing", "believing",
+        })
         foreach (var seed in Enumerable.Range(1, Seeds))
         {
             // One drawn word a moment rather than six, which is the control that separates
@@ -937,6 +965,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
             // a set and the drive repeats itself, so its moments are barely wider than
             // silence while a uniform talker says six distinct words every round.
             var once = false;
+            var budget = 0;
 
             var rounds = Houses * (Steps + Chatting + Asked);
 
@@ -974,6 +1003,26 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 acting: arm switch
                 {
                     "learning" => Chooses.From(drives.Choose, drives.Cleared),
+
+                    // The drive on a budget of ONE word a moment, which is what separates a
+                    // chooser that picks better words from one that picks fewer. `narrow`
+                    // says one word drawn uniformly, so the pair differ in the pick and in
+                    // nothing else.
+                    "sparing" => Chooses.From(
+                        felt =>
+                        {
+                            if (budget > 0) return null;
+
+                            budget++;
+
+                            return drives.Choose(felt);
+                        },
+                        () =>
+                        {
+                            budget = 0;
+
+                            drives.Cleared();
+                        }),
                     "believing" => answers,
 
                     // Saying nothing is not standing still: the world draws the body's step
@@ -1072,18 +1121,21 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 $"{Chatting,-8}{arm,-10}{seed,-6}{asked.Values.Sum(),8}"
                 + $"{right.Values.Sum(),8}{here,9:F3}"
                 + $"   spoke {spoke} of {talked}"
-                + (arm == "learning"
+                + (arm is "learning" or "sparing"
                     ? $", drive named {drives.Told} and the draw {drives.Untold}"
                     : string.Empty)
                 + (arm == "believing"
                     ? $", believed {answers.Said} and had nothing {answers.Quiet}"
                     : string.Empty));
 
-            if (arm == "learning") advocated += drives.Told;
+            if (arm is "learning" or "sparing") advocated += drives.Told;
             if (arm == "believing") believed += answers.Said;
         }
 
-        foreach (var arm in new[] { "declining", "uniform", "narrow", "learning", "believing" })
+        foreach (var arm in new[]
+        {
+            "declining", "uniform", "narrow", "learning", "sparing", "believing",
+        })
         {
             var rows = scored.Where(one => one.Key.Arm == arm).ToList();
 
@@ -1120,7 +1172,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // Every house's exam was sat under every arm, whatever the walk before it looked
         // like. Which KINDS got asked is a fact about where the machine ended up walking and
         // is not the same number under four choosers.
-        Assert.Equal(5, questions.Count);
+        Assert.Equal(6, questions.Count);
 
         Assert.All(
             questions.Keys,
@@ -1146,7 +1198,7 @@ public sealed class RoamingTests(ITestOutputHelper output)
         // house it watched rather than explored. Asserted per arm because the arms differ
         // in exactly the thing that decides it -- which word gets said.
         Assert.All(
-            commanded.Where(one => one.Key is not ("declining" or "narrow")),
+            commanded.Where(one => one.Key is not ("declining" or "narrow" or "sparing")),
             one => Assert.True(one.Value.Did > 0,
                 $"the `{one.Key}` arm carried out no command at all across "
                 + $"{Houses * Seeds} houses, so the machine never once moved itself and "

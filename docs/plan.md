@@ -37,6 +37,8 @@ that is finished LEAVES, so this is only ever what is still to do.
   house by construction. So it wants a spine world with variables to be in trouble about, a
   deletion, or a waiting list of its own — and the third is the answer only if the first two
   are refused.
+- **First why the house stops TEACHING early**, its exam curve flat where the multiplexer's
+  climbs. `LearningTests`.
 - **Then what a scope may be ABOUT**, a wider moment costing the score where the same crowd
   of equally tested rules fires. Capacity, what is held and how the vote weighs it are all
   measured shut. Fork **35**.

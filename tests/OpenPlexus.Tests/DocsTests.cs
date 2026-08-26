@@ -822,7 +822,14 @@ public sealed class DocsTests
     // measured shut -- capacity, what is held, and how the vote weighs what fires -- and the
     // item beside it names the one left. A row saying which roads are closed is worth more
     // than the arm that closed them.
-    private const int Whole = 13_390;
+    //
+    // And 13,430 for two items off the first instrument that reads a run rather than an
+    // instant. Genesis stops after a run's first fifth on both worlds, so every point the
+    // multiplexer climbs is repair; and the repair gate refuses noise there and not on the
+    // house, which ends with more rules answered by a coin than by its own world. Neither is
+    // a mechanism decided, so neither belongs in a leaf -- they are the two questions the
+    // curve opened and the next session's first work.
+    private const int Whole = 13_430;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

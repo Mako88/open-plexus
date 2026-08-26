@@ -104,16 +104,23 @@ public sealed class LearningTests(ITestOutputHelper output)
     /// curve over every round is a curve about predicting the walk and the exam is a fiftieth
     /// of it — and the exam is the thing this world exists to ask.
     /// </param>
-    private static async Task<IReadOnlyList<double>> Curve(
-        IInput input, Brain brain, int rounds, Func<bool>? counting = null)
+    private static async Task<(IReadOnlyList<double> Curve, IReadOnlyList<string> Growth)>
+        Curve(IInput input, Brain brain, int rounds, Func<bool>? counting = null)
     {
         var loop = new Round(brain, rounds, sweep: 500, target: 0.9, window: 500);
 
         var curve = new List<double>();
+        var growth = new List<string>();
         var every = rounds / Slices;
 
         var hits = 0;
         var asked = 0;
+
+        // What the population DID in each slice, beside what it scored. A machine that stops
+        // improving because it has stopped proposing and one that proposes all run and learns
+        // nothing from it are the same flat curve, and no score tells them apart.
+        var minted = 0L;
+        var repaired = 0L;
 
         for (var round = 0; round < rounds; round++)
         {
@@ -135,10 +142,14 @@ public sealed class LearningTests(ITestOutputHelper output)
 
             curve.Add(asked == 0 ? 0.0 : hits / (double)asked);
 
+            growth.Add(
+                $"{loop.Minted - minted}/{loop.Repaired - repaired}@{brain.Held.Count}");
+
             (hits, asked) = (0, 0);
+            (minted, repaired) = (loop.Minted, loop.Repaired);
         }
 
-        return curve;
+        return (curve, growth);
     }
 
     /// <summary>The eleven-bit multiplexer, whose rules are conjunctions and enumerable.</summary>
@@ -216,6 +227,36 @@ public sealed class LearningTests(ITestOutputHelper output)
     /// same counts, so anything under about a twentieth is invisible here and slow learning
     /// cannot be ruled out. What can be ruled out is a rise the size of the multiplexer's.
     /// </para>
+    /// <para>
+    /// <b>Genesis stops after the first fifth, on every world.</b> The multiplexer mints 37 and
+    /// then 0, 0, 0, 0; the house mints 372 and then 9, 0, 19, 0. Fork 135 says a lucky
+    /// advocate blocks it and this is that, measured on two worlds at once and inside two
+    /// thousand rounds rather than twenty.
+    /// </para>
+    /// <para>
+    /// <b>So the climb is repair and not genesis.</b> The multiplexer goes from 0.723 to 0.989
+    /// while minting nothing after its first slice — every point of it is specialising rules it
+    /// already had. That is worth knowing before anything is spent on proposing better.
+    /// </para>
+    /// <para>
+    /// <b>And on the house repair runs and does not pay.</b> 388, 208, 196 and 124 repairs
+    /// after the first slice, and the exam does not move. The machine narrows and narrows and
+    /// gets no better, which is the specialise-only ladder's own stated failure arriving as a
+    /// reading rather than as an argument.
+    /// </para>
+    /// <para>
+    /// <b>And the gate refuses noise on one world and not the other.</b> Answered by a
+    /// coin the multiplexer ends with 32 rules against its own 465; the house ends with 4,922
+    /// against its own 1,833. So on the house the machine is half again as prolific about
+    /// nothing as it is about something, and the gate that is supposed to stop that is working
+    /// perfectly one world over.
+    /// </para>
+    /// <para>
+    /// <b>Which puts the moment's width back with a mechanism.</b> A wide moment hands repair
+    /// far more candidate codes to specialise on, and searching more candidates clears a fixed
+    /// bar by chance — this repo's own <i>take the argmax with no correction</i>, arriving at
+    /// the repair gate on a world whose moments are twice the multiplexer's.
+    /// </para>
     /// </remarks>
     [Fact]
     public async Task Whether_the_machine_gets_better_as_a_run_goes_on()
@@ -226,7 +267,9 @@ public sealed class LearningTests(ITestOutputHelper output)
         const int Seeds = 2;
 
         output.WriteLine($"{Rounds} rounds a seed over {Seeds} seeds, {Slices} slices");
-        output.WriteLine($"{"world",-14}{"answers",-9}{"curve",-44}{"rise",8}");
+        output.WriteLine(
+            $"{"world",-14}{"answers",-9}{"curve",-44}{"rise",8}"
+            + "   minted/repaired@held, per slice");
 
         var rises = new Dictionary<(string World, bool Coined), List<double>>();
 
@@ -242,7 +285,7 @@ public sealed class LearningTests(ITestOutputHelper output)
             {
                 var (input, brain, counting) = build(seed, coined);
 
-                var curve = await Curve(input, brain, Rounds, counting);
+                var (curve, growth) = await Curve(input, brain, Rounds, counting);
 
                 var rise = curve[^1] - curve[0];
 
@@ -254,7 +297,7 @@ public sealed class LearningTests(ITestOutputHelper output)
                 output.WriteLine(
                     $"{name,-14}{(coined ? "a coin" : "its own"),-9}"
                     + $"{string.Join("  ", curve.Select(one => one.ToString("F3"))),-44}"
-                    + $"{rise,8:F3}");
+                    + $"{rise,8:F3}   {string.Join(" ", growth)}");
             }
         }
 

@@ -121,6 +121,7 @@ public sealed class LearningTests(ITestOutputHelper output)
         // nothing from it are the same flat curve, and no score tells them apart.
         var minted = 0L;
         var repaired = 0L;
+        var searched = 0L;
 
         for (var round = 0; round < rounds; round++)
         {
@@ -142,11 +143,18 @@ public sealed class LearningTests(ITestOutputHelper output)
 
             curve.Add(asked == 0 ? 0.0 : hits / (double)asked);
 
+            // And how many gates RAN, beside how many passed. The bar is Bonferroni over the
+            // candidates one parent offers, so its false-positive rate is per parent -- and
+            // the rate that matters is per ROUND, over however many parents failed. Passed
+            // over searched is that rate, and on a world answered by a coin it is the whole
+            // of what the gate is for.
             growth.Add(
-                $"{loop.Minted - minted}/{loop.Repaired - repaired}@{brain.Held.Count}");
+                $"{loop.Minted - minted}/{loop.Repaired - repaired}"
+                + $"of{brain.Held.Searched - searched}@{brain.Held.Count}");
 
             (hits, asked) = (0, 0);
-            (minted, repaired) = (loop.Minted, loop.Repaired);
+            (minted, repaired, searched) =
+                (loop.Minted, loop.Repaired, brain.Held.Searched);
         }
 
         return (curve, growth);
@@ -252,10 +260,22 @@ public sealed class LearningTests(ITestOutputHelper output)
     /// perfectly one world over.
     /// </para>
     /// <para>
-    /// <b>Which puts the moment's width back with a mechanism.</b> A wide moment hands repair
-    /// far more candidate codes to specialise on, and searching more candidates clears a fixed
-    /// bar by chance — this repo's own <i>take the argmax with no correction</i>, arriving at
-    /// the repair gate on a world whose moments are twice the multiplexer's.
+    /// <b>And the bar is NOT what is loose</b>, which took two wrong accounts to establish. The
+    /// gate is Bonferroni over the candidates one parent offers and its pass rate on a world
+    /// answered by a coin is 0.03 per cent on the multiplexer and 0.13 on the house — both far
+    /// under an alpha of five per cent. Nothing about the threshold is being cleared by chance.
+    /// </para>
+    /// <para>
+    /// <b>It is the NUMBER of gates.</b> The house runs 3.5 million of them in ten thousand
+    /// rounds where the multiplexer runs 75 thousand, forty-seven times as many, because it
+    /// holds fifteen hundred rules and each failure searches a moment twice as wide. A per-gate
+    /// rate of a thousandth over 350 gates a round is a false child every other round, for ever.
+    /// </para>
+    /// <para>
+    /// <b>So the correction is per PARENT and nothing corrects for the parents.</b> Each gate
+    /// pays for the candidates it looked at, and no gate pays for the hundreds of other gates
+    /// that ran the same round. That is the same statistic the repair bar already respects,
+    /// one level out, and it is the first account of the width cost that survives being checked.
     /// </para>
     /// </remarks>
     [Fact]
@@ -269,7 +289,7 @@ public sealed class LearningTests(ITestOutputHelper output)
         output.WriteLine($"{Rounds} rounds a seed over {Seeds} seeds, {Slices} slices");
         output.WriteLine(
             $"{"world",-14}{"answers",-9}{"curve",-44}{"rise",8}"
-            + "   minted/repaired@held, per slice");
+            + "   minted/repaired-of-searched@held, per slice");
 
         var rises = new Dictionary<(string World, bool Coined), List<double>>();
 

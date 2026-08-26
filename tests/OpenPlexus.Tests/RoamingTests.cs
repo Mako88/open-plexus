@@ -98,6 +98,35 @@ public sealed class RoamingTests(ITestOutputHelper output)
             untold: () => draw.Next(house.Doings),
             arm: arm);
 
+    /// <summary>The drive on a budget of ONE word a moment.</summary>
+    /// <param name="drives">What picks the word.</param>
+    /// <remarks>
+    /// <b>What separates picking better words from picking fewer of them.</b> The exam on this
+    /// world reads the moment's WIDTH, and a chooser that speaks six times a moment widens one
+    /// six ways -- so an arm compared against a six-word talker is being compared against a
+    /// handicap rather than against a chooser.
+    /// </remarks>
+    private static IChooses Sparing(Drives drives)
+    {
+        var budget = 0;
+
+        return Chooses.From(
+            felt =>
+            {
+                if (budget > 0) return null;
+
+                budget++;
+
+                return drives.Choose(felt);
+            },
+            () =>
+            {
+                budget = 0;
+
+                drives.Cleared();
+            });
+    }
+
     /// <summary>One exam question counted against its kind, where the round was one.</summary>
     /// <param name="world">The house being sat.</param>
     /// <param name="words">Which word each code is.</param>
@@ -737,6 +766,183 @@ public sealed class RoamingTests(ITestOutputHelper output)
             + $"the person after {Asked} exam questions");
     }
 
+    /// <summary>
+    /// <b>Whether a wide moment costs CAPACITY or costs something else.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The exam on this world reads the moment's width and little else</b>, which
+    /// <c>What_decides_the_words_the_machine_says_about_the_house</c> measured: sort the arms
+    /// by how many codes they hand the brain and you have sorted them by score. That is a
+    /// fact about a brain rather than about a chooser, and this asks which fact.
+    /// </para>
+    /// <para>
+    /// <b>Capacity is the first suspect and the cheapest to rule out.</b> A wider moment is
+    /// more candidate scopes, so a population bounded at two thousand may simply be full of
+    /// rules about codes that predict nothing. If that is it, the widest arm recovers when the
+    /// bound is lifted and the narrowest barely moves.
+    /// </para>
+    /// <para>
+    /// <b>Two arms and no more.</b> They are the ends of the range: a uniform talker
+    /// hands over 45.5 codes a moment and the drive on a one-word budget 14.4, and everything
+    /// measured sits between them. A middle arm would add rows and no answer.
+    /// </para>
+    /// <para>
+    /// <b>And the reading is a DIFFERENCE of differences</b>, which is what makes it about
+    /// capacity rather than about either arm. What is asked is whether the gap between wide
+    /// and narrow shrinks when the bound is lifted, so both arms moving together says nothing
+    /// and is the honest null.
+    /// </para>
+    /// <para>
+    /// <b>It is not capacity, and the bound was never binding.</b> The gap is 0.259 at two
+    /// thousand and 0.259 at twenty thousand, to the digit, and the populations end at 1,729
+    /// and 1,172 — under the smaller bound either way. Lifting a bound nothing reached
+    /// changed nothing, which is the null this arm was built to be able to read.
+    /// </para>
+    /// <para>
+    /// <b>What it is instead is the VOTE being outnumbered.</b> 473 commitments fire on an
+    /// exam round under the wide arm against 153 under the narrow one — three times as many,
+    /// off a population only half again as big. A moment three times wider is a moment three
+    /// times as many scopes are a subset of, so the round is decided by a crowd whose extra
+    /// members are rules about the machine's own babble.
+    /// </para>
+    /// <para>
+    /// <b>Which is fork 35 answered on the world that counts.</b> That leaf asks whether the
+    /// vote is robust to holding more unsound commitments than sound ones, or whether they
+    /// are why it stops short. Here they are why: nothing about the population's SIZE
+    /// separates the arms and everything about how many of it speaks at once does.
+    /// </para>
+    /// <para>
+    /// <b>So the fix is vote-side rather than population-side</b>, which is this repo's own
+    /// <i>a gate on what is HELD cannot reach what DECIDES</i>. Culling, subsumption and a
+    /// tighter capacity all change what is held; which rule takes the round is the vote's
+    /// alone, and it is the vote that is being outnumbered.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task Whether_a_wide_moment_costs_the_population_its_room()
+    {
+        const int Houses = 30;
+        const int Steps = 40;
+        const int Asked = 6;
+        const int Seeds = 3;
+
+        output.WriteLine(
+            $"{Houses} houses a seed over {Seeds} seeds, {Steps} steps and {Asked} asked");
+
+        output.WriteLine(
+            $"{"saying",-9}{"capacity",-10}{"seed",-6}{"asked",8}{"right",8}{"score",9}"
+            + $"{"wide",8}{"held",9}");
+
+        var scored = new Dictionary<(string Arm, int Capacity), (int Asked, int Right)>();
+        var widths = new Dictionary<(string Arm, int Capacity), (long Codes, long Moments)>();
+
+        // How many commitments fire on an EXAM round, which is what the vote is taken over. A
+        // wider moment holds more codes, so more scopes are a subset of it -- and if what a
+        // wide moment costs is the right rule being outvoted by rules about noise, this is
+        // where it shows. Read-only, and it is the same call the vote makes.
+        var firing = new Dictionary<(string Arm, int Capacity), (long Fired, long Rounds)>();
+
+        foreach (var capacity in new[] { 2_000, 20_000 })
+        foreach (var arm in new[] { "wide", "narrow" })
+        foreach (var seed in Enumerable.Range(1, Seeds))
+        {
+            var house = new Roaming(World(Steps, people: 2, asked: Asked), seed);
+            var words = Named(house);
+            var world = new Sitting(house, null);
+            var brain = new Brain(new CommittingSettings { Capacity = capacity }, seed);
+            var draw = new Random(seed);
+            var drives = Wanting(brain, house, draw);
+
+            var watching = new Watching<Coded>(
+                world,
+                new Joined(Joining.Bagged),
+                acting: arm == "wide"
+                    ? Chooses.From(_ => draw.Next(house.Doings))
+                    : Sparing(drives));
+
+            var rounds = Houses * (Steps + Asked);
+            var loop = new Round(brain, rounds, sweep: 500, target: 0.9, window: 500);
+
+            var asked = new Dictionary<string, int>(StringComparer.Ordinal);
+            var right = new Dictionary<string, int>(StringComparer.Ordinal);
+
+            for (var round = 0; round < rounds; round++)
+            {
+                if (watching.Push() is not { } pushed) continue;
+
+                var was = loop.Right;
+
+                await loop.StepAsync(pushed);
+
+                Marked(world, words, asked, right, loop.Right > was);
+
+                var width = widths.GetValueOrDefault((arm, capacity));
+
+                widths[(arm, capacity)] =
+                    (width.Codes + pushed.Codes.Count, width.Moments + 1);
+
+                if (world.Asking is null) continue;
+
+                var lit = firing.GetValueOrDefault((arm, capacity));
+
+                firing[(arm, capacity)] = (
+                    lit.Fired + brain.Held.Firing(brain.Held.Moment(pushed.Codes)).Length,
+                    lit.Rounds + 1);
+            }
+
+            var had = scored.GetValueOrDefault((arm, capacity));
+
+            scored[(arm, capacity)] =
+                (had.Asked + asked.Values.Sum(), had.Right + right.Values.Sum());
+
+            output.WriteLine(
+                $"{arm,-9}{capacity,-10}{seed,-6}{asked.Values.Sum(),8}"
+                + $"{right.Values.Sum(),8}{right.Values.Sum() / (double)asked.Values.Sum(),9:F3}"
+                + $"{widths[(arm, capacity)].Codes / (double)widths[(arm, capacity)].Moments,8:F1}"
+                + $"{brain.Held.Count,9}"
+                + $"   {firing[(arm, capacity)].Fired
+                    / (double)firing[(arm, capacity)].Rounds:F1} fire an exam round");
+        }
+
+        var gaps = new Dictionary<int, double>();
+
+        foreach (var capacity in new[] { 2_000, 20_000 })
+        {
+            var wide = scored[("wide", capacity)];
+            var narrow = scored[("narrow", capacity)];
+
+            var here = wide.Right / (double)wide.Asked;
+            var there = narrow.Right / (double)narrow.Asked;
+
+            gaps[capacity] = there - here;
+
+            output.WriteLine(
+                $"{"both",-9}{capacity,-10}{"all",-6}{wide.Asked + narrow.Asked,8}"
+                + $"{wide.Right + narrow.Right,8}"
+                + $"   wide {here:F3}, narrow {there:F3}, gap {there - here:F3}");
+        }
+
+        output.WriteLine(
+            $"lifting the bound moves the gap by {gaps[20_000] - gaps[2_000]:F3}");
+
+        // Both arms ran and were examined the same number of times, or the gap is between two
+        // different exams.
+        Assert.Equal(4, scored.Count);
+        Assert.All(scored.Values, one => Assert.True(one.Asked > 100));
+
+        // And the wide arm really is wider, or the axis this whole reading is about was never
+        // varied and the two rows are one row at two capacities.
+        Assert.All(
+            new[] { 2_000, 20_000 },
+            capacity => Assert.True(
+                (widths[("wide", capacity)].Codes / (double)widths[("wide", capacity)].Moments)
+                > (widths[("narrow", capacity)].Codes
+                    / (double)widths[("narrow", capacity)].Moments) + 5.0,
+                $"the wide arm's moments are not five codes wider than the narrow arm's at "
+                + $"capacity {capacity}, so nothing here varied the thing it is named for"));
+    }
+
     /// <summary>A chooser that asks where each thing ended up and says nothing else.</summary>
     /// <param name="opener">The code the world's own turn carries, so the walk is left alone.</param>
     /// <param name="where">The word that opens the question.</param>
@@ -965,7 +1171,6 @@ public sealed class RoamingTests(ITestOutputHelper output)
             // a set and the drive repeats itself, so its moments are barely wider than
             // silence while a uniform talker says six distinct words every round.
             var once = false;
-            var budget = 0;
 
             var rounds = Houses * (Steps + Chatting + Asked);
 
@@ -1004,25 +1209,9 @@ public sealed class RoamingTests(ITestOutputHelper output)
                 {
                     "learning" => Chooses.From(drives.Choose, drives.Cleared),
 
-                    // The drive on a budget of ONE word a moment, which is what separates a
-                    // chooser that picks better words from one that picks fewer. `narrow`
-                    // says one word drawn uniformly, so the pair differ in the pick and in
-                    // nothing else.
-                    "sparing" => Chooses.From(
-                        felt =>
-                        {
-                            if (budget > 0) return null;
-
-                            budget++;
-
-                            return drives.Choose(felt);
-                        },
-                        () =>
-                        {
-                            budget = 0;
-
-                            drives.Cleared();
-                        }),
+                    // `narrow` says one word drawn uniformly and this says one the drive
+                    // picked, so the pair differ in the pick and in nothing else.
+                    "sparing" => Sparing(drives),
                     "believing" => answers,
 
                     // Saying nothing is not standing still: the world draws the body's step

@@ -37,9 +37,8 @@ that is finished LEAVES, so this is only ever what is still to do.
   house by construction. So it wants a spine world with variables to be in trouble about, a
   deletion, or a waiting list of its own — and the third is the answer only if the first two
   are refused.
-- **Then the exam reads the moment's WIDTH and little else**, the narrowest arm winning and
-  the widest losing threefold. No chooser comparison on this world means anything until the
-  width is held.
+- **Then a vote a WIDER moment does not outnumber**, which is neither capacity nor what is
+  held. No chooser comparison on this world means anything until it is fixed. Fork **35**.
 - **Then what asking a PERSON well is worth**, which is what is left of forks **146** and
   **151** now the conversation follows the exam. Nothing said afterwards can reach the score,
   so the payoff is a settlement obtained rather than a mark, and what to measure it against
@@ -483,8 +482,8 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **NOW** — an accuracy-weighted vote over a wide root, plus a recency-weighted local
       estimate that never merges, and no tie-break: where nothing separates two advocates
       the machine DECLINES. `Deciding`. John's.
-    - **OPEN** — more unsound commitments resident than sound ones while the score holds: is
-      the vote robust to them, or are they why it stops short. Fork **35**.
+    - **OPEN** — the vote is OUTNUMBERED rather than outbid: a wider moment fires more
+      advocates and the score falls with it, off a population no bigger. Fork **35**.
     - **OPEN** — it costs 4.7x the rules. Nothing waits for a group to hold still, and the
       closure sightings are what a patience rule reads. Fork **130**.
     - **OPEN** — mutual exclusion is unbuilt, so a belief can be wrong and never

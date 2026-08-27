@@ -1,0 +1,45 @@
+# The greenfield skeleton, built and not run.
+#
+# It compiles or it does not, and that is the whole invariant while the skeleton is under
+# review. Its tests are red on purpose -- every claim in the proposal is written as a fact
+# that fails until somebody builds the mechanism it names -- so running them here would
+# produce a permanently red check that nobody reads, which is worse than no check.
+#
+# The step to add when the first increment lands is a filtered test run over whatever has
+# stopped being pending. Until then, a build failure is the only signal available and it is
+# a real one: the greenfield is a separate solution and the main suite never touches it.
+name: greenfield
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "greenfield/**"
+      - ".github/workflows/greenfield.yml"
+  pull_request:
+    paths:
+      - "greenfield/**"
+      - ".github/workflows/greenfield.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: greenfield-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Build
+        run: dotnet build greenfield/Plexus.Greenfield.slnx --nologo

@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The single-process reference brain. It knows nothing about transport, holders or any
+       world; a world reaching it would be a world editing the brain's own vocabulary. -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Core\Plexus.Core.csproj" />
+  </ItemGroup>
+
+</Project>

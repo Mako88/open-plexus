@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Plexus.Testing" />
+  </ItemGroup>
+
+  <!-- One copy of the pending-claim helper, linked rather than repeated in four
+       projects. -->
+  <ItemGroup>
+    <Compile Include="..\Pending.cs" Link="Pending.cs" />
+  </ItemGroup>
+
+  <!-- Deviation from the skeleton document. The substrate equivalence reading needs a seeded world, so this project reaches Plexus.Worlds and therefore references as much as the acceptance project does. That is the first sign that four test projects do not stratify the way the source projects do. -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Plexus.Core\Plexus.Core.csproj" />
+    <ProjectReference Include="..\..\src\Plexus.Engine\Plexus.Engine.csproj" />
+    <ProjectReference Include="..\..\src\Plexus.Distributed\Plexus.Distributed.csproj" />
+    <ProjectReference Include="..\..\src\Plexus.Worlds\Plexus.Worlds.csproj" />
+  </ItemGroup>
+
+</Project>

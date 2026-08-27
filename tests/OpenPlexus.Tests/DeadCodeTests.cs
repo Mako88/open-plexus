@@ -662,6 +662,14 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}",
                 StringComparison.Ordinal))
 
+            // Not the greenfield tree either, which is a separate solution with its own
+            // types and its own guards. A use is textual, so a member spelt the same in
+            // there would report a dead member here as live, which is the same false pass a
+            // `cref` produces one directory over.
+            .Where(path => !path.Contains(
+                $"{Path.DirectorySeparatorChar}greenfield{Path.DirectorySeparatorChar}",
+                StringComparison.Ordinal))
+
             // AND NOT THIS FILE, which names every member on the list and would
             // otherwise report all of them as used — the list keeping itself
             // alive, which is the funniest way this check could be worth nothing.

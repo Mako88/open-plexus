@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Plexus.Core/Plexus.Core.csproj" />
+    <Project Path="src/Plexus.Engine/Plexus.Engine.csproj" />
+    <Project Path="src/Plexus.Distributed/Plexus.Distributed.csproj" />
+    <Project Path="src/Plexus.Worlds/Plexus.Worlds.csproj" />
+    <Project Path="src/Plexus.Host/Plexus.Host.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Plexus.Core.Tests/Plexus.Core.Tests.csproj" />
+    <Project Path="tests/Plexus.Engine.Tests/Plexus.Engine.Tests.csproj" />
+    <Project Path="tests/Plexus.Distributed.Tests/Plexus.Distributed.Tests.csproj" />
+    <Project Path="tests/Plexus.Acceptance.Tests/Plexus.Acceptance.Tests.csproj" />
+  </Folder>
+</Solution>

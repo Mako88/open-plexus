@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Plexus.Testing" />
+  </ItemGroup>
+
+  <!-- One copy of the pending-claim helper, linked rather than repeated in four
+       projects. -->
+  <ItemGroup>
+    <Compile Include="..\Pending.cs" Link="Pending.cs" />
+  </ItemGroup>
+
+  <!-- Core alone, which is the point of the project: if these tests need anything else, Core is not the standalone representation layer it claims to be. -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Plexus.Core\Plexus.Core.csproj" />
+  </ItemGroup>
+
+</Project>

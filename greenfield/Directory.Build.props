@@ -1,0 +1,24 @@
+<Project>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+
+    <!-- The same three gates the existing library runs, for the same reasons: a cref into a
+         deleted type is a build error only where a documentation file is generated, and
+         CS1591 would demand a comment on every member of a skeleton. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Immutable collections and IBufferWriter are in almost every file here and are not
+         implicit usings, so they are declared once rather than at the top of forty files. -->
+    <Using Include="System.Collections.Immutable" />
+    <Using Include="System.Buffers" />
+  </ItemGroup>
+
+</Project>

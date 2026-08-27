@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Instruments, reached through the public observation and action contracts. The absence
+       of a reference to Plexus.Engine is the rule rather than a convention: a world that
+       names an engine type does not compile, whatever it is called and whenever it is
+       written. -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Core\Plexus.Core.csproj" />
+  </ItemGroup>
+
+</Project>

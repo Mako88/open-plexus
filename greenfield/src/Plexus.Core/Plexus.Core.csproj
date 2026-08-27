@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Immutable semantic types and contracts. No database, transport, host or world may be
+       named from here, and the absence of any ProjectReference is what enforces it. -->
+
+</Project>

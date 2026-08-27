@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Holders, mailboxes and unreliable messages around the same engine. Distribution is
+       replaceable infrastructure: a one-holder fleet and a local engine have to produce the
+       same semantic output, so nothing here may decide anything the engine would have. -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Core\Plexus.Core.csproj" />
+    <ProjectReference Include="..\Plexus.Engine\Plexus.Engine.csproj" />
+  </ItemGroup>
+
+</Project>

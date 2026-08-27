@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <!-- Composition and nothing else. Anything here that decides something is a mechanism no
+       test reaches, because a test composes its own run. -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Core\Plexus.Core.csproj" />
+    <ProjectReference Include="..\Plexus.Engine\Plexus.Engine.csproj" />
+    <ProjectReference Include="..\Plexus.Distributed\Plexus.Distributed.csproj" />
+    <ProjectReference Include="..\Plexus.Worlds\Plexus.Worlds.csproj" />
+  </ItemGroup>
+
+</Project>

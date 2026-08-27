@@ -809,10 +809,11 @@ internal sealed record CommittingSettings
 
     /// <summary>What the separation bar is paid for out of.</summary>
     /// <remarks>
-    /// <b>Candidates is the control and is every earlier reading.</b> See
-    /// <see cref="Correcting"/> for what one parent's correction leaves unpaid for.
+    /// <b>Gates SHIPS and Candidates is the control</b>, which is every reading recorded
+    /// before this existed. See <see cref="Correcting"/> for what one parent's correction
+    /// leaves unpaid for, and <c>LearningTests</c> for the table that chose between them.
     /// </remarks>
-    public Correcting Correcting { get; init; } = Correcting.Candidates;
+    public Correcting Correcting { get; init; } = Correcting.Gates;
 
     /// <summary>How many times one commitment may ever separate.</summary>
     /// <remarks>

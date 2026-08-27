@@ -274,6 +274,42 @@ public sealed class LearningTests(ITestOutputHelper output)
     /// perfectly one world over.
     /// </para>
     /// <para>
+    /// <b>The round's gates are paid for and the population falls a third.</b>
+    /// <c>Correcting.Gates</c> holds 382 rules against 518 on the multiplexer and 1,236
+    /// against 1,823 on the house, at a final slice of 0.985 against 0.985 and 0.266 against
+    /// 0.276. The house's difference is a quarter of what two seeds can see here, so what the
+    /// arm buys is parsimony at no measured score.
+    /// </para>
+    /// <para>
+    /// <b>And it is not what fills a coin-answered population.</b> The house answered by a
+    /// coin ends on 3,922 rules against 4,862, a fifth, where the correction it adds is alpha
+    /// over about 485 parents a round. A bar tightened five hundredfold that removes a fifth
+    /// of the children is a bar refusing candidates that were far past it already, so the
+    /// per-round family was never the whole account of the width cost.
+    /// </para>
+    /// <para>
+    /// <b>What is left to check is whether the p-value is calibrated.</b> A parent may repair
+    /// on one hit under <c>Admitting.Anything</c>, and the two-proportion z is a normal
+    /// approximation that is anti-conservative at counts that small. No correction repairs a
+    /// mis-calibrated statistic, and this would explain a coin world admitting children at
+    /// five hundred times the bar. It is a question rather than a finding: what would settle
+    /// it is the hit counts of the parents that pass.
+    /// </para>
+    /// <para>
+    /// <b>Genesis is refused rather than exhausted, on both worlds.</b> After the first fifth
+    /// the census reads <c>barren</c> at nought in every slice, and <c>accounted</c> at every
+    /// failure there was: 22 of 22 on the multiplexer's last slice and 1,675 of 1,675 on the
+    /// house's. Genesis is never once allowed to look and find nothing. It is not allowed to
+    /// look.
+    /// </para>
+    /// <para>
+    /// <b>Which closes fork 135's open half.</b> That fork asked whether a sound rule fires
+    /// and loses, and <c>Council</c> reaches genesis only where the vote MISSED — so every
+    /// one of those rounds is a round where the vote was wrong and something firing had
+    /// already named what arrived. The competing account, a world out of roots, is ruled out
+    /// by <c>barren</c> rather than argued against.
+    /// </para>
+    /// <para>
     /// <b>And the bar is NOT what is loose</b>, which took two wrong accounts to establish. The
     /// gate is Bonferroni over the candidates one parent offers and its pass rate on a world
     /// answered by a coin is 0.03 per cent on the multiplexer and 0.13 on the house — both far

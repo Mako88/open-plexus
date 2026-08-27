@@ -829,7 +829,19 @@ public sealed class DocsTests
     // house, which ends with more rules answered by a coin than by its own world. Neither is
     // a mechanism decided, so neither belongs in a leaf -- they are the two questions the
     // curve opened and the next session's first work.
-    private const int Whole = 13_430;
+    //
+    // And 13,455 for fork 152, which is a validity hole in a bar that SHIPS. The curve
+    // answered both questions above -- genesis is refused rather than exhausted, and paying
+    // for the round's gates removed a fifth of a coin-answered population where the
+    // correction added was five hundredfold -- and a bar tightened that far that removes that
+    // little is a bar whose p-value was never calibrated. One hit is too few for a normal
+    // approximation, and the same table is then read once a round for ever. Both halves want
+    // one mechanism and it is a leaf rather than a question, so it costs a line in two
+    // sections rather than one.
+    //
+    // Raised rather than paid for by a deletion, which is this file's own rule: a guard must
+    // not cost information. The two items it makes room for close two it was raised for.
+    private const int Whole = 13_455;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

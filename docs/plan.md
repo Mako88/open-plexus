@@ -37,11 +37,8 @@ that is finished LEAVES, so this is only ever what is still to do.
   house by construction. So it wants a spine world with variables to be in trouble about, a
   deletion, or a waiting list of its own — and the third is the answer only if the first two
   are refused.
-- **First a repair bar that pays for the OTHER gates.** Each pays for its own candidates and
-  nothing pays for the hundreds run the same round, so a rate under alpha still fills a
-  population with noise. `LearningTests`.
-- **And genesis stops after a run's first fifth** on both worlds, so the climb is all repair.
-  Fork **135**.
+- **First a separation bar valid at every stopping time**, and CALIBRATED. Fork **152**.
+- **Then which advocate may block a proposal**, genesis being refused. Fork **135**.
 - **Then what a scope may be ABOUT**, a wider moment costing the score where the same crowd
   of equally tested rules fires. Capacity, what is held and how the vote weighs it are all
   measured shut. Fork **35**.
@@ -407,6 +404,10 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — it only ever NARROWS, rungs one to four making a scope smaller and nothing
       but rung five broadening. A specialise-only machine is arbitrarily accurate and
       conceptless, and the ladder's ORDER is a bias over when a construct is tried.
+    - **OPEN** — one hit is too few for the normal approximation the bar is, and no
+      correction repairs a mis-calibrated statistic; the same table is then read once a round
+      for ever. A confidence sequence answers both and needs no episode boundary, so C4
+      permits it where a run-wide correction it does not. Fork **152**.
     - **OPEN** — a total is a lifetime, which C4 refuses, and the earned rate replacing it
       reads as free on `Arranged` rather than as a budget.
     - **OPEN** — the curve is `Curved`, that rate capped by the parent's hits, and it is
@@ -512,9 +513,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       read-only vote it comes off. Fork **141**.
     - **OPEN** — entailment depth and the horizon are capped at one; both come off when
       blame diffusion has a number. Fork **32**.
-    - **OPEN** — a lucky advocate blocks genesis, so proposals stop within a hundred rounds
-      of twenty thousand. Subsumption, the vote, opportunity and abstention are all refuted
-      as the cost. Open on whether a sound rule fires and loses. Fork **135**.
+    - **OPEN** — a lucky advocate blocks genesis and the census says so: past a run's first
+      fifth every failure is refused and none is barren, on two worlds. Open on which
+      advocate is credible enough to block one. Fork **135**.
     - **OPEN** — and what that bar COSTS is a function of how young the population is, free
       at saturation and most of the examination before it, because it blocks repair while
       nothing can clear the floor yet. Unpriced, and it is why the bar does not ship. Fork

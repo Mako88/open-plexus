@@ -43,36 +43,6 @@ public sealed class LearningTests(ITestOutputHelper output)
     /// </remarks>
     private const int Slices = 5;
 
-    /// <summary>
-    /// A source whose answers are a COIN — <b>the world nothing can learn.</b>
-    /// </summary>
-    /// <param name="inner">The world whose moments are passed through untouched.</param>
-    /// <param name="outcomes">How many answers it draws between.</param>
-    /// <param name="seed">The draw.</param>
-    /// <remarks>
-    /// <b>The control the curve needs to mean anything.</b> An instrument that reads flat on a
-    /// world nobody could learn and flat on a world the machine failed to learn says nothing
-    /// about either; what makes it a measurement is that the two are different worlds and one
-    /// of them is known. The moments are the inner world's, so the only thing that changed is
-    /// whether the answer can be predicted at all.
-    /// </remarks>
-    private sealed class Coined(IInput inner, int outcomes, int seed) : IInput
-    {
-        private readonly Random _draws = new(seed);
-
-        /// <inheritdoc/>
-        public byte Source => inner.Source;
-
-        /// <inheritdoc/>
-        public int Outcomes => outcomes;
-
-        /// <inheritdoc/>
-        public Pushed? Push() =>
-            inner.Push() is not { } pushed
-                ? null
-                : pushed with { Followed = Brain.Says(_draws.Next(outcomes)) };
-    }
-
     /// <summary>The score over each fifth of one run, each fifth counted on its own.</summary>
     /// <param name="input">Whatever is pushing moments.</param>
     /// <param name="brain">The brain they are pushed into.</param>
@@ -177,14 +147,14 @@ public sealed class LearningTests(ITestOutputHelper output)
     /// <summary>The eleven-bit multiplexer, whose rules are conjunctions and enumerable.</summary>
     /// <param name="seed">What draws it.</param>
     /// <param name="coined">Whether its answers are replaced by a draw.</param>
-    /// <param name="correcting">What the separation bar is paid for out of.</param>
+    /// <param name="testing">Which test the separation bar admits on.</param>
     private static (IInput Input, Brain Brain, Func<bool>? Counting) Multiplexed(
-        int seed, bool coined, Correcting correcting)
+        int seed, bool coined, Testing testing)
     {
         var world = new Multiplexer(new MultiplexerSettings { Address = 3 }, seed);
 
         var brain = new Brain(
-            new CommittingSettings { Capacity = 20_000, Correcting = correcting }, seed);
+            new CommittingSettings { Capacity = 20_000, Testing = testing }, seed);
 
         IInput input = new Watching<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit));
 
@@ -195,14 +165,14 @@ public sealed class LearningTests(ITestOutputHelper output)
     /// <summary>The walked house, at the composition the terminal ships.</summary>
     /// <param name="seed">What draws it.</param>
     /// <param name="coined">Whether its answers are replaced by a draw.</param>
-    /// <param name="correcting">What the separation bar is paid for out of.</param>
+    /// <param name="testing">Which test the separation bar admits on.</param>
     private static (IInput Input, Brain Brain, Func<bool>? Counting) Walked(
-        int seed, bool coined, Correcting correcting)
+        int seed, bool coined, Testing testing)
     {
         var world = new Roaming(Fixture.House(asked: 6), seed);
 
         var brain = new Brain(
-            new CommittingSettings { Capacity = 20_000, Correcting = correcting }, seed);
+            new CommittingSettings { Capacity = 20_000, Testing = testing }, seed);
 
         IInput input = new Watching<Coded>(
             world,
@@ -347,17 +317,17 @@ public sealed class LearningTests(ITestOutputHelper output)
             $"{"world",-14}{"answers",-9}{"bar",-11}{"curve",-44}{"rise",8}{"held",7}"
             + "   minted/repaired-of-searched@held~accounted+barren!thin, per slice");
 
-        var rises = new Dictionary<(string World, bool Coined, Correcting Bar), List<double>>();
-        var holds = new Dictionary<(string World, bool Coined, Correcting Bar), List<int>>();
+        var rises = new Dictionary<(string World, bool Coined, Testing Bar), List<double>>();
+        var holds = new Dictionary<(string World, bool Coined, Testing Bar), List<int>>();
 
         foreach (var (name, build) in
-            new (string Name, Func<int, bool, Correcting, (IInput, Brain, Func<bool>?)> Build)[]
+            new (string Name, Func<int, bool, Testing, (IInput, Brain, Func<bool>?)> Build)[]
         {
             ("multiplexer", Multiplexed),
             ("the house", Walked),
         })
         foreach (var coined in new[] { false, true })
-        foreach (var bar in new[] { Correcting.Candidates, Correcting.Gates })
+        foreach (var bar in new[] { Testing.Approximated, Testing.Exact })
         {
             foreach (var seed in Enumerable.Range(1, Seeds))
             {
@@ -393,7 +363,7 @@ public sealed class LearningTests(ITestOutputHelper output)
         // Its rules are conjunctions and enumerable, so a machine that cannot climb there
         // cannot climb anywhere and a curve that cannot show it climbing is broken. A tenth is
         // a wide bar for a world that goes from a coin's 0.5 to nearly 1.0.
-        var shipped = new CommittingSettings().Correcting;
+        var shipped = new CommittingSettings().Testing;
 
         Assert.True(
             rises[("multiplexer", false, shipped)].Average()

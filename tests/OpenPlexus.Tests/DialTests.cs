@@ -156,6 +156,18 @@ public sealed class DialTests
             + "property of the TEST rather than of the world -- below it no "
             + "statistic has power, and that is arithmetic rather than a level",
 
+        ["Testing"] =
+            "which test the separation bar admits a candidate on, and it is an ARM rather "
+            + "than a level -- a bar either approximates the exact test or bounds it, and "
+            + "there is no third value. Nothing could drive it either: which test is "
+            + "CALIBRATED is arithmetic rather than a setting, and the standard of proof "
+            + "beside it is `Alpha`. What it exists for is that the normal tail is "
+            + "anti-conservative by a hundred orders of magnitude at one hit, which no "
+            + "correction repairs, and every fresh mint starts at one hit. The entry leaves "
+            + "when one arm has won on both worlds -- and the expected cost is the same one "
+            + "`Admitting` carries, refusing repair while a population is young, except that "
+            + "a bound refuses only the unattainable where a floor refuses the young",
+
         ["Correcting"] =
             "what the separation bar is paid for out of, and it is an ARM rather than a "
             + "level -- a gate either pays for the other gates the round ran or it does not, "
@@ -747,7 +759,14 @@ public sealed class DialTests
         // value between paying for one table and paying for the round's tables, and the
         // control is what every reading in this tree was taken under -- so deleting either
         // arm before the reading is in would delete the comparison the mechanism exists for.
-        Assert.Equal(21, HandSet.Count);
+        //
+        // AND TWENTY-TWO FOR `Testing`, which is a rise and is written as one. The bar in
+        // front of it was a normal approximation read at counts of one, where it is wrong by
+        // a hundred orders of magnitude -- so the knob does not hold a preference open, it
+        // holds open whether the statistic the whole repair gate rests on was ever calibrated.
+        // Both arms run because the exact bound has a cost nobody has priced: it refuses
+        // candidates a young population would have used.
+        Assert.Equal(22, HandSet.Count);
     }
 
     /// <summary>

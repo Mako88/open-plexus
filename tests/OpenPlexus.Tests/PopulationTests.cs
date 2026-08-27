@@ -61,6 +61,69 @@ public sealed class PopulationTests(ITestOutputHelper output)
         Assert.Null(Conditions.Discriminator(inverted, dials, null));
     }
 
+
+    [Fact]
+    public void The_normal_tail_is_wrong_by_a_hundred_orders_where_the_hits_are_one()
+    {
+        // The reading that opened fork 152, as arithmetic anybody can re-run. One hit, the
+        // candidate present in it and absent from five hundred misses. The pooled z reads 22
+        // and its normal tail reads a number no bar can survive; the exact test on the same
+        // table reads one in five hundred and one, which no corrected bar admits.
+        var z = Conditions.Divergence(inHits: 1, hits: 1, inMisses: 0, misses: 500);
+
+        Assert.True(z > 20, $"z reads {z:F1} where the approximation was expected to break");
+        Assert.True(Normal.Tail(z) < 1e-50, $"the normal tail reads {Normal.Tail(z):g3}");
+
+        var exact = Hypergeometric.AtLeast(inHits: 1, hits: 1, inMisses: 0, misses: 500);
+
+        Assert.Equal(1.0 / 501.0, exact, 6);
+    }
+
+    [Fact]
+    public void The_bound_refuses_what_no_arrangement_of_the_data_could_earn()
+    {
+        // A parent cannot clear a corrected bar on one or two hits however its codes fall,
+        // and can on three. That is what makes the bound cost nothing where it bites: it
+        // refuses candidates for which no evidence existed rather than evidence it declines
+        // to weigh. The bar here is an alpha of 0.05 over 200 candidates and 485 parents,
+        // which is what the house runs.
+        const double Bar = 0.05 / (200 * 485);
+
+        // Every one of the parent's hits carries the code and none of its misses does, which
+        // is the most extreme table those margins allow.
+        Assert.True(Hypergeometric.AtLeast(1, 1, 0, 500) > Bar);
+        Assert.True(Hypergeometric.AtLeast(2, 2, 0, 500) > Bar);
+        Assert.True(Hypergeometric.AtLeast(3, 3, 0, 500) < Bar);
+
+        // And it is an OVER-estimate, so it never admits what the exact test would refuse.
+        // Against the summed tail on a table small enough to sum by hand.
+        var summed = 0.0;
+
+        for (var k = 6L; k <= 8; k++)
+            summed += Math.Exp(
+                LogChoose(8, k) + LogChoose(20, 8 - k) - LogChoose(28, 8));
+
+        var bounded = Hypergeometric.AtLeast(inHits: 6, hits: 8, inMisses: 2, misses: 20);
+
+        Assert.True(bounded >= summed,
+            $"the bound reads {bounded:g4} against a summed tail of {summed:g4}, so it is "
+            + "not an upper bound and could admit what the exact test refuses");
+
+        Assert.True(bounded <= summed * 4, $"the bound is loose: {bounded:g4} for {summed:g4}");
+    }
+
+    /// <summary>The log of n choose k, for the hand-summed tail above.</summary>
+    /// <param name="n">How many there are.</param>
+    /// <param name="k">How many are taken.</param>
+    private static double LogChoose(long n, long k)
+    {
+        var total = 0.0;
+
+        for (var i = 0L; i < k; i++) total += Math.Log(n - i) - Math.Log(i + 1);
+
+        return total;
+    }
+
     [Fact]
     public void Nothing_is_repaired_before_there_is_enough_to_test()
     {

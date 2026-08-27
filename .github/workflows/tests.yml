@@ -323,8 +323,18 @@ jobs:
       #
       # `dotnet test --filter "kind=sweep"` takes the measurements again. They
       # are still compiled here, so a rotted reference still fails the build.
+      #
+      # AND THE LOGGER IS `detailed` FOR A SHARD THAT PRINTS A TABLE. xunit routes
+      # `ITestOutputHelper` through the console logger and `normal` drops it for a test that
+      # PASSED -- so `LearningTests` ran green here for a whole session while the curve it
+      # exists to print was invisible, and every table had to be re-run on somebody's laptop
+      # serially. The trap list already carries the local form of this, that a passing fact
+      # hides the number it printed; this is the same fault one machine over.
+      #
+      # Per shard rather than everywhere, because `detailed` also prints a line per test and
+      # the catch-all shard is most of a thousand of them.
       - name: Test
+        env:
+          LOUD: ${{ contains(matrix.shard, 'LearningTests') && 'detailed' || 'normal' }}
         run: |
-          dotnet test --configuration Debug --nologo --no-build \
-            --filter "kind!=sweep&${{ matrix.shard }}" \
-            --verbosity quiet --logger "console;verbosity=normal"
+          dotnet test --configuration Debug --nologo --no-build --filter "kind!=sweep&${{ matrix.shard }}" --verbosity quiet --logger "console;verbosity=$LOUD"

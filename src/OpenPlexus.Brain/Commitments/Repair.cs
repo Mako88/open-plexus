@@ -597,6 +597,62 @@ internal enum Budgeting
     Curved,
 }
 
+/// <summary>Which test the separation bar admits a candidate on.</summary>
+/// <remarks>
+/// <para>
+/// <b>The two-proportion z is an approximation and it breaks at small counts.</b> A parent
+/// with one hit, whose candidate was present in that hit and absent from five hundred misses,
+/// reads z = 22.4 and a tail of 3e-111. The exact test on the same table gives one in five
+/// hundred and one. No correction repairs that: a Bonferroni over five hundred parents moves
+/// the bar three orders and the candidate cleared it by a hundred and eight.
+/// </para>
+/// <para>
+/// <b>And the approximation is anti-conservative exactly where a young population lives</b>,
+/// so it is not a rare corner. A commitment may repair on a single hit, and every fresh mint
+/// starts there.
+/// </para>
+/// <para>
+/// <b>Ranking is untouched and only ADMISSION changes</b>, which is what makes this a control
+/// rather than two runs. The argmax is still the largest z, so the same candidate is chosen
+/// from the same table in the same order; what differs is whether it is let in.
+/// </para>
+/// </remarks>
+internal enum Testing
+{
+    /// <summary>
+    /// The pooled two-proportion z, read through a normal tail. <b>The control</b>, and every
+    /// number recorded before this existed was taken under it.
+    /// </summary>
+    Approximated,
+
+    /// <summary>An upper bound on the one-tailed exact test for the same table.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Bounded rather than summed, because a sum is not affordable here.</b> The exact tail
+    /// runs from the observed count to the smaller of the parent's hits and the candidate's
+    /// firings, and that is hundreds of terms on a wide world at hundreds of parents a round.
+    /// Above the mode the hypergeometric is decreasing, so the tail is at most its first term
+    /// times the number of terms — one expression in log-gamma, and it is an OVER-estimate, so
+    /// it can only ever refuse more than the exact test would.
+    /// </para>
+    /// <para>
+    /// <b>And it costs nothing where it bites.</b> A parent with one hit cannot clear a
+    /// corrected bar by any arrangement of its data: its best attainable p is one over the
+    /// misses plus one, 0.002 against a bar near 5e-7. Two hits reach 8e-6 and still cannot.
+    /// Three hits reach 5e-8 and can. So what this refuses is candidates for which no evidence
+    /// existed, rather than evidence it declines to weigh.
+    /// </para>
+    /// <para>
+    /// <b>Which is what separates it from <see cref="Admitting.Testable"/>.</b> That arm
+    /// refuses a candidate seen in fewer hits than <see cref="CommittingSettings.Floor"/>,
+    /// twenty of them, so it also refuses the three-hit parent that could have cleared the bar
+    /// honestly — which is its recorded cost, blocking repair while a population is young. A
+    /// bound refuses exactly the unattainable and keeps the rest.
+    /// </para>
+    /// </remarks>
+    Exact,
+}
+
 /// <summary>What the separation bar is paid for out of.</summary>
 /// <remarks>
 /// <para>
@@ -814,6 +870,13 @@ internal sealed record CommittingSettings
     /// leaves unpaid for, and <c>LearningTests</c> for the table that chose between them.
     /// </remarks>
     public Correcting Correcting { get; init; } = Correcting.Gates;
+
+    /// <summary>Which test the separation bar admits a candidate on.</summary>
+    /// <remarks>
+    /// <b>Approximated is the control and is every earlier reading.</b> See
+    /// <see cref="Testing"/> for where a normal tail is wrong by a hundred orders.
+    /// </remarks>
+    public Testing Testing { get; init; } = Testing.Approximated;
 
     /// <summary>How many times one commitment may ever separate.</summary>
     /// <remarks>
@@ -1166,11 +1229,20 @@ internal static class Conditions
         // identical bar -- the search a round is allowed to make does not get cheaper for
         // the parent it happens to reach last. One is the control's multiplier and costs a
         // multiplication rather than a branch.
-        return Clears(strongest, candidates, dials, gates) ? best : null;
+        return Clears(
+            strongest, parent.Separations[best.Value], parent.Hits, parent.Misses,
+            candidates, dials, gates)
+            ? best
+            : null;
     }
 
     /// <summary>Whether a separation survives being paid for.</summary>
-    /// <param name="z">How many standard errors the best candidate separated by.</param>
+    /// <param name="z">
+    /// How many standard errors the best candidate separated by, read under the control.
+    /// </param>
+    /// <param name="seen">How often that candidate was present in each of the two.</param>
+    /// <param name="hits">The parent's hits.</param>
+    /// <param name="misses">The parent's misses.</param>
     /// <param name="candidates">How many codes this parent's table offered.</param>
     /// <param name="dials">The gate's numbers.</param>
     /// <param name="gates">How many parents the round was going to search.</param>
@@ -1188,8 +1260,12 @@ internal static class Conditions
     /// one keeps the bar from LOOSENING there — a zero would divide the correction away.
     /// </para>
     /// </remarks>
-    private static bool Clears(double z, int candidates, CommittingSettings dials, int gates) =>
-        Normal.Tail(z)
+    private static bool Clears(
+        double z, Separation seen, long hits, long misses,
+        int candidates, CommittingSettings dials, int gates) =>
+        (dials.Testing == Testing.Exact
+            ? Hypergeometric.AtLeast(seen.InHits, hits, seen.InMisses, misses)
+            : Normal.Tail(z))
             * candidates
             * (dials.Correcting == Correcting.Gates ? Math.Max(1, gates) : 1)
         <= dials.Alpha;
@@ -1253,7 +1329,12 @@ internal static class Conditions
             }
         }
 
-        return second is not null && Clears(next, candidates, dials, gates) ? second : null;
+        return second is not null
+            && Clears(
+                next, parent.Separations[second.Value], parent.Hits, parent.Misses,
+                candidates, dials, gates)
+            ? second
+            : null;
     }
 
 
@@ -1331,7 +1412,20 @@ internal static class Conditions
         // exactly where the conjunctive bar had just been tightened -- the rung-two demand
         // rising because its own control got stricter, which is a reading about the bar and
         // not about the language.
-        return Clears(strongest, candidates, dials, gates) ? best : null;
+        // And the two are the other way round here, an ABSENCE separating: the code is
+        // commoner in the misses, so the exact bound is asked of that side.
+        var absent = parent.Separations[best.Value];
+
+        return Clears(
+            strongest,
+            new Separation { InHits = absent.InMisses, InMisses = absent.InHits },
+            parent.Misses,
+            parent.Hits,
+            candidates,
+            dials,
+            gates)
+            ? best
+            : null;
     }
 
     /// <summary>
@@ -1430,6 +1524,92 @@ internal static class Normal
             + (t * (-0.82215223 + (t * 0.17087277))))))))))))))))));
 
         return x >= 0.0 ? y : 2.0 - y;
+    }
+}
+
+/// <summary>The exact test's tail, bounded above rather than summed.</summary>
+/// <remarks>
+/// <para>
+/// <b>Fisher's one-tailed p for the two-by-two repair reads</b>, which asks how likely it is
+/// that a code enriched in a commitment's hits got there by the draw. The normal
+/// approximation <see cref="Normal.Tail"/> stands in for this and is anti-conservative by a
+/// hundred orders of magnitude at counts of one.
+/// </para>
+/// <para>
+/// <b>Bounded because the sum is not affordable.</b> The tail runs from the observed count to
+/// the smaller of the hits and the code's firings, which is hundreds of terms on a wide world
+/// at hundreds of parents a round. Above the distribution's mode the terms decrease, so the
+/// sum is at most the first term times how many there are — and an over-estimate of a p-value
+/// can only ever refuse a candidate the exact test would have admitted, never the reverse.
+/// </para>
+/// </remarks>
+internal static class Hypergeometric
+{
+    /// <summary>
+    /// A bound on the chance of seeing this many of the code's firings among the hits, or
+    /// more, when the code is unrelated to whether the commitment was right.
+    /// </summary>
+    /// <param name="inHits">Firings that hit with the code present.</param>
+    /// <param name="hits">Firings that hit.</param>
+    /// <param name="inMisses">Firings that missed with the code present.</param>
+    /// <param name="misses">Firings that missed.</param>
+    /// <remarks>
+    /// <b>One where the count is at or below the mode</b>, which is a code no rarer among the
+    /// hits than chance would put it. There is nothing to admit there and the caller's bar
+    /// refuses it, so the bound need not be tight.
+    /// </remarks>
+    public static double AtLeast(long inHits, long hits, long inMisses, long misses)
+    {
+        var drawn = inHits + inMisses;
+        var all = hits + misses;
+
+        if (drawn <= 0 || hits <= 0 || misses <= 0 || all <= 0) return 1.0;
+
+        // Where the count sits if the code is indifferent to being right. At or below it the
+        // tail is most of the distribution and the answer is one.
+        if (inHits * all <= drawn * hits) return 1.0;
+
+        var last = Math.Min(hits, drawn);
+
+        if (inHits > last) return 1.0;
+
+        var first = Math.Exp(
+            Choose(hits, inHits) + Choose(misses, drawn - inHits) - Choose(all, drawn));
+
+        return Math.Min(1.0, first * (last - inHits + 1));
+    }
+
+    /// <summary>The log of n choose k, or negative infinity where there is no such choice.</summary>
+    /// <param name="n">How many there are.</param>
+    /// <param name="k">How many are taken.</param>
+    private static double Choose(long n, long k) =>
+        k < 0 || k > n
+            ? double.NegativeInfinity
+            : LogGamma(n + 1) - LogGamma(k + 1) - LogGamma(n - k + 1);
+
+    /// <summary>The log of the gamma function, by the Lanczos approximation.</summary>
+    /// <param name="x">Where to evaluate it, at least one here.</param>
+    /// <remarks>
+    /// <b>The g = 7, n = 9 coefficients</b>, whose relative error is below 1e-13 on the
+    /// positive reals — far tighter than a bar compared against an alpha, and it needs no
+    /// table. <c>Math.LogGamma</c> is not in this runtime's surface.
+    /// </remarks>
+    private static double LogGamma(double x)
+    {
+        double[] c =
+        [
+            0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+            771.32342877765313, -176.61502916214059, 12.507343278686905,
+            -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7,
+        ];
+
+        var z = x - 1.0;
+        var a = c[0];
+        var t = z + 7.5;
+
+        for (var i = 1; i < 9; i++) a += c[i] / (z + i);
+
+        return (0.5 * Math.Log(2 * Math.PI)) + ((z + 0.5) * Math.Log(t)) - t + Math.Log(a);
     }
 }
 

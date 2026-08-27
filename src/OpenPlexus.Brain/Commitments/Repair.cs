@@ -1178,7 +1178,7 @@ internal static class Conditions
         }
 
         Code? best = null;
-        var strongest = 0.0;
+        var slightest = 1.0;
         var candidates = 0;
 
         foreach (var (code, seen) in parent.Separations)
@@ -1211,9 +1211,23 @@ internal static class Conditions
 
             var z = Divergence(seen.InHits, parent.Hits, seen.InMisses, parent.Misses);
 
-            if (z <= strongest) continue;
+            // The code must be commoner in the HITS, which is the eligibility this loop always
+            // had. It was carried by comparing against a best that started at nought; the rank
+            // below is a p-value, where smaller is better, so it is said separately now.
+            if (z <= 0.0) continue;
 
-            strongest = z;
+            // Ranked by what the gate TESTS, which the first shape of the exact arm got wrong
+            // and it was a defect rather than a choice. Ranking by z and admitting by an exact
+            // test picks the candidate that most flatters the approximation -- one hit in one
+            // hit reads z = 22.4 and an exact 0.002, where eighteen hits in twenty reads z =
+            // 7.3 and an exact 3e-10. So the search would hand the gate the worst candidate it
+            // had, the gate would refuse it, and the admissible ones would never be tested. A
+            // search maximising one statistic while a gate tests another cannot do its job.
+            var weight = Weight(z, seen, parent.Hits, parent.Misses, dials);
+
+            if (weight >= slightest) continue;
+
+            slightest = weight;
             best = code;
         }
 
@@ -1229,20 +1243,27 @@ internal static class Conditions
         // identical bar -- the search a round is allowed to make does not get cheaper for
         // the parent it happens to reach last. One is the control's multiplier and costs a
         // multiplication rather than a branch.
-        return Clears(
-            strongest, parent.Separations[best.Value], parent.Hits, parent.Misses,
-            candidates, dials, gates)
-            ? best
-            : null;
+        return Clears(slightest, candidates, dials, gates) ? best : null;
     }
 
-    /// <summary>Whether a separation survives being paid for.</summary>
-    /// <param name="z">
-    /// How many standard errors the best candidate separated by, read under the control.
-    /// </param>
+    /// <summary>How likely the best candidate's separation is by chance, before correction.</summary>
+    /// <param name="z">How many standard errors it separated by, read under the control.</param>
     /// <param name="seen">How often that candidate was present in each of the two.</param>
     /// <param name="hits">The parent's hits.</param>
     /// <param name="misses">The parent's misses.</param>
+    /// <param name="dials">The gate's numbers.</param>
+    /// <remarks>
+    /// <b>One number both arms rank and admit on</b>, so the search cannot maximise something
+    /// the gate does not test. See <see cref="Testing"/> for why the two must be the same.
+    /// </remarks>
+    private static double Weight(
+        double z, Separation seen, long hits, long misses, CommittingSettings dials) =>
+        dials.Testing == Testing.Exact
+            ? Hypergeometric.AtLeast(seen.InHits, hits, seen.InMisses, misses)
+            : Normal.Tail(z);
+
+    /// <summary>Whether a separation survives being paid for.</summary>
+    /// <param name="weight">How likely it is by chance, from <see cref="Weight"/>.</param>
     /// <param name="candidates">How many codes this parent's table offered.</param>
     /// <param name="dials">The gate's numbers.</param>
     /// <param name="gates">How many parents the round was going to search.</param>
@@ -1261,11 +1282,8 @@ internal static class Conditions
     /// </para>
     /// </remarks>
     private static bool Clears(
-        double z, Separation seen, long hits, long misses,
-        int candidates, CommittingSettings dials, int gates) =>
-        (dials.Testing == Testing.Exact
-            ? Hypergeometric.AtLeast(seen.InHits, hits, seen.InMisses, misses)
-            : Normal.Tail(z))
+        double weight, int candidates, CommittingSettings dials, int gates) =>
+        weight
             * candidates
             * (dials.Correcting == Correcting.Gates ? Math.Max(1, gates) : 1)
         <= dials.Alpha;
@@ -1309,7 +1327,7 @@ internal static class Conditions
         if (parent.Misses < dials.Floor || parent.Hits == 0) return null;
 
         Code? best = null, second = null;
-        double strongest = 0.0, next = 0.0;
+        double slightest = 1.0, next = 1.0;
         var candidates = 0;
 
         foreach (var (code, seen) in parent.Separations)
@@ -1318,23 +1336,23 @@ internal static class Conditions
 
             var z = Divergence(seen.InHits, parent.Hits, seen.InMisses, parent.Misses);
 
-            if (z > strongest)
+            if (z <= 0.0) continue;
+
+            // The same one number the gate ranks and admits on, for the same reason.
+            var weight = Weight(z, seen, parent.Hits, parent.Misses, dials);
+
+            if (weight < slightest)
             {
-                (second, next) = (best, strongest);
-                (best, strongest) = (code, z);
+                (second, next) = (best, slightest);
+                (best, slightest) = (code, weight);
             }
-            else if (z > next)
+            else if (weight < next)
             {
-                (second, next) = (code, z);
+                (second, next) = (code, weight);
             }
         }
 
-        return second is not null
-            && Clears(
-                next, parent.Separations[second.Value], parent.Hits, parent.Misses,
-                candidates, dials, gates)
-            ? second
-            : null;
+        return second is not null && Clears(next, candidates, dials, gates) ? second : null;
     }
 
 
@@ -1387,7 +1405,7 @@ internal static class Conditions
         if (parent.Misses < dials.Floor || parent.Hits == 0) return null;
 
         Code? best = null;
-        var strongest = 0.0;
+        var slightest = 1.0;
         var candidates = 0;
 
         foreach (var (code, seen) in parent.Separations)
@@ -1399,9 +1417,20 @@ internal static class Conditions
 
             var z = Divergence(seen.InMisses, parent.Misses, seen.InHits, parent.Hits);
 
-            if (z <= strongest) continue;
+            if (z <= 0.0) continue;
 
-            strongest = z;
+            // The two are the other way round here, an ABSENCE separating: the code is
+            // commoner in the misses, so both the rank and the bar are asked of that side.
+            var weight = Weight(
+                z,
+                new Separation { InHits = seen.InMisses, InMisses = seen.InHits },
+                parent.Misses,
+                parent.Hits,
+                dials);
+
+            if (weight >= slightest) continue;
+
+            slightest = weight;
             best = code;
         }
 
@@ -1412,20 +1441,7 @@ internal static class Conditions
         // exactly where the conjunctive bar had just been tightened -- the rung-two demand
         // rising because its own control got stricter, which is a reading about the bar and
         // not about the language.
-        // And the two are the other way round here, an ABSENCE separating: the code is
-        // commoner in the misses, so the exact bound is asked of that side.
-        var absent = parent.Separations[best.Value];
-
-        return Clears(
-            strongest,
-            new Separation { InHits = absent.InMisses, InMisses = absent.InHits },
-            parent.Misses,
-            parent.Hits,
-            candidates,
-            dials,
-            gates)
-            ? best
-            : null;
+        return Clears(slightest, candidates, dials, gates) ? best : null;
     }
 
     /// <summary>

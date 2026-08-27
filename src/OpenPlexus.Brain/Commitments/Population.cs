@@ -1426,9 +1426,17 @@ internal sealed class Population
     /// mint count that has been printed all along.
     /// </para>
     /// <para>
-    /// <b>It counts a refusal rather than a lucky advocate</b>, which is the narrower claim
-    /// and the one that is decidable here. Whether the advocate was RIGHT to be trusted is
-    /// what the gate cannot see and what an arm would have to change.
+    /// <b>And it answers fork 135's open half rather than pricing it.</b> That fork asks
+    /// whether a sound rule fires and loses, and genesis is reached only where the vote
+    /// MISSED — <c>Council</c> returns before it otherwise. So every round counted here is a
+    /// round where the vote was wrong and something firing had already named what arrived:
+    /// an advocate that was right and was outvoted, which is the fork's question with no
+    /// inference in between.
+    /// </para>
+    /// <para>
+    /// <b>What it still cannot see is whether that advocate deserved the seat.</b> A rule
+    /// right once and a rule right every time are one event here, and telling them apart is
+    /// what an arm would have to do.
     /// </para>
     /// </remarks>
     public long Accounted { get; private set; }

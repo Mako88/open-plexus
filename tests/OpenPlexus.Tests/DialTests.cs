@@ -1057,6 +1057,59 @@ public sealed class DialTests
     {
     };
 
+
+    /// <summary>
+    /// No brain dial is a parameter with a DEFAULT — <b>a default is how a substrate gets
+    /// the shipped arm.</b> Without being asked.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Found by a review.</b> The instance was three call sites rather than one.
+    /// <c>Population.Decide</c> took <c>Deciding</c> with a default of
+    /// <see cref="Deciding.Grounded"/>. <c>Gathering</c> holds no dials, so the fleet path
+    /// took the default; <c>Drives</c> had the population in hand and took it anyway; and the
+    /// withheld examination in <c>Bench</c> took it too. A brain built on
+    /// <see cref="Deciding.Anyway"/> was therefore a <see cref="Deciding.Grounded"/> brain on
+    /// the wire, in a chooser, and in the exam that scores it.
+    /// </para>
+    /// <para>
+    /// <b>Which is this repo's one-brain rule broken from the inside.</b> The rule was written
+    /// against a WORLD reaching in and <c>SeparationTests</c> guards that seam; nothing
+    /// guarded a SUBSTRATE reaching in, and the two are the same fault. An arm crossed with
+    /// the fleet would have been one arm run twice, which is the trap the plan already names.
+    /// </para>
+    /// <para>
+    /// <b>The check is the default rather than the passing</b>, because that is the part a
+    /// build can read. Whether a caller passes the RIGHT dial is a judgement; whether the
+    /// language will let it forget is arithmetic. Remove the default and the compiler asks
+    /// every caller the question, which is what turned one reported site into three.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_brain_dial_is_a_parameter_with_a_default()
+    {
+        var dials = Arms().Select(one => one.Kind).ToHashSet();
+
+        var lax = new List<string>();
+
+        foreach (var type in typeof(CommittingSettings).Assembly.GetTypes())
+        foreach (var method in type.GetMethods(
+            System.Reflection.BindingFlags.Public
+            | System.Reflection.BindingFlags.NonPublic
+            | System.Reflection.BindingFlags.Instance
+            | System.Reflection.BindingFlags.Static
+            | System.Reflection.BindingFlags.DeclaredOnly))
+        foreach (var one in method.GetParameters())
+            if (dials.Contains(one.ParameterType) && one.HasDefaultValue)
+                lax.Add($"{type.Name}.{method.Name}({one.Name})");
+
+        Assert.True(lax.Count == 0,
+            $"brain dial(s) defaulted at a parameter: {string.Join(", ", lax.Order())}. A "
+            + "default here is a substrate quietly choosing how the brain thinks -- the "
+            + "one-brain rule broken from the inside rather than by a world. Make it "
+            + "required and let the compiler ask every caller.");
+    }
+
     /// <summary>
     /// A dial shipping in its DO-NOTHING position is named in the plan's refutation table —
     /// <b>the budget for building something better and leaving it switched off.</b>

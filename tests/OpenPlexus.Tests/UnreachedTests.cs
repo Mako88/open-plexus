@@ -1,4 +1,4 @@
-using OpenPlexus.Bus;
+﻿using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -202,7 +202,7 @@ public sealed class UnreachedTests(ITestOutputHelper output)
         using (var living = await fleet.Asker.AskAsync(Wanted.Vote, moment))
         {
             Assert.True(await Wired.ArrivedAsync(living.Everyone), "the living fleet never answered");
-            Assert.NotNull(living.Decide().Expects);
+            Assert.NotNull(living.Decide(Deciding.Grounded).Expects);
         }
 
         for (var at = 0; at < Holders; at++) await fleet.KillAsync(at);
@@ -217,7 +217,7 @@ public sealed class UnreachedTests(ITestOutputHelper output)
         Assert.Equal(Holders, bereaved.Asked);
         Assert.Equal(0, bereaved.Heard);
         Assert.Equal(Holders, bereaved.Unreached);
-        Assert.Null(bereaved.Decide().Expects);
+        Assert.Null(bereaved.Decide(Deciding.Grounded).Expects);
 
         output.WriteLine(
             $"every one of {Holders} holders gone | {bereaved.Unreached} written off, "

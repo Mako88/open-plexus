@@ -1067,7 +1067,10 @@ internal sealed class Bench
                     held.Firing(held.Moment(question.Codes), question.Grouping)))
                 .ToList();
 
-            var vote = Population.Decide(heard);
+            // The brain's own dial, so the examination votes the way the run votes. It read
+            // the default here, which made a withheld score a reading on a machine the run
+            // was not using wherever the dial was turned.
+            var vote = Population.Decide(heard, _brain.Dials.Deciding);
 
             if (vote.Expects is not { } said) continue;
 

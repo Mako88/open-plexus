@@ -277,7 +277,7 @@ public sealed class Alternating
     /// </param>
     /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
     public IReadOnlyList<IReadOnlySet<Code>> BySpace(
-        double company, int floor, Meeting meeting = Meeting.Never)
+        double company, int floor, Meeting meeting)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
 
@@ -320,7 +320,7 @@ public sealed class Alternating
     /// </remarks>
     /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
     public IReadOnlyList<IReadOnlySet<Code>> ByLikeness(
-        double alike, int floor, Meeting meeting = Meeting.Never)
+        double alike, int floor, Meeting meeting)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
 
@@ -385,7 +385,7 @@ public sealed class Alternating
     /// <param name="counting"><inheritdoc cref="Counting" path="/summary"/></param>
     /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
     public IReadOnlyList<IReadOnlySet<Code>> ByChance(
-        Counting counting, int floor, Meeting meeting = Meeting.Never)
+        Counting counting, int floor, Meeting meeting)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
 
@@ -656,7 +656,7 @@ public sealed class Alternating
     /// </remarks>
     /// <param name="meeting"><inheritdoc cref="Meeting" path="/summary"/></param>
     public IReadOnlyList<IReadOnlySet<Code>> ByCompany(
-        double alike, int floor, Meeting meeting = Meeting.Never)
+        double alike, int floor, Meeting meeting)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(floor);
 
@@ -782,7 +782,7 @@ public sealed class Alternating
 
         foreach (var moment in moments) watching.Watch(moment);
 
-        return watching.BySpace(company, floor);
+        return watching.BySpace(company, floor, Meeting.Never);
     }
 
     /// <summary>
@@ -834,7 +834,7 @@ public sealed class Alternating
         // ways of driving the same counts.
         watching.Settle();
 
-        return watching.ByChance(Counting.Time, floor);
+        return watching.ByChance(Counting.Time, floor, Meeting.Never);
     }
 
     /// <summary>The greedy grouping both derivations share.</summary>

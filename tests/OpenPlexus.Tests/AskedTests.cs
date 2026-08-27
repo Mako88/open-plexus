@@ -275,7 +275,7 @@ public sealed class AskedTests(ITestOutputHelper output)
                 await Wired.ArrivedAsync(gathering.Everyone),
                 $"only {gathering.Heard} of {gathering.Asked} holders answered");
 
-            var there = gathering.Decide();
+            var there = gathering.Decide(Deciding.Grounded);
 
             Assert.Equal(here.Expects, there.Expects);
             Assert.Equal(here.By, there.By);
@@ -464,7 +464,7 @@ public sealed class AskedTests(ITestOutputHelper output)
                 $"only {living.Heard} of {living.Asked} answered before the deaths");
 
             Assert.Equal(advocating.Count, living.Spoke);
-            Assert.NotNull(living.Decide().Expects);
+            Assert.NotNull(living.Decide(Deciding.Grounded).Expects);
         }
 
         foreach (var gone in advocating) await fleet.KillAsync(gone);
@@ -480,7 +480,7 @@ public sealed class AskedTests(ITestOutputHelper output)
             $"{bereaved.Heard} of {bereaved.Asked} answered after the deaths, and "
             + $"{surviving} were expected");
 
-        var vote = bereaved.Decide();
+        var vote = bereaved.Decide(Deciding.Grounded);
 
         // THE THIRD OUTCOME. Every surviving holder answered, none of them had anything to
         // advocate, and the vote comes back with no expectation at all -- which is not a

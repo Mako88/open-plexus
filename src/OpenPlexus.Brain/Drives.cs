@@ -257,8 +257,11 @@ internal sealed class Drives
         {
             if (_already.Contains(doing)) continue;
 
+            // The BRAIN'S dial and never this chooser's. A vote taken here under a different
+            // rule from the one the round votes under would make the chooser a second brain,
+            // which is the fault `SeparationTests` guards one seam over.
             var vote = Population.Decide(
-                [_held.Weigh([.. advocates[doing]])]);
+                [_held.Weigh([.. advocates[doing]])], _held.Dials.Deciding);
 
             if (vote.Expects is not Code expects) continue;
 

@@ -1030,8 +1030,7 @@ internal sealed class Population
     /// approximately. A maximum of maxima is a maximum exactly, at any number of holders.
     /// </para>
     /// </remarks>
-    public static Vote Decide(
-        IReadOnlyCollection<Weights> heard, Deciding deciding = Deciding.Grounded)
+    public static Vote Decide(IReadOnlyCollection<Weights> heard, Deciding deciding)
     {
         ArgumentNullException.ThrowIfNull(heard);
 

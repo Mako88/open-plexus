@@ -376,7 +376,7 @@ public sealed class BabiTests(ITestOutputHelper output)
 
         foreach (var alike in new[] { 0.50, 0.40, 0.30, 0.20, 0.10 })
         {
-            var groups = watching.ByCompany(alike, floor: 20)
+            var groups = watching.ByCompany(alike, floor: 20, meeting: Meeting.Never)
                 .Select(group => group.Select(code => word.GetValueOrDefault(code, "?")).ToHashSet())
                 .ToList();
 
@@ -418,8 +418,8 @@ public sealed class BabiTests(ITestOutputHelper output)
 
         // One accumulator and one set of counts, so the only thing that differs between the
         // two rows is whether a partner's count is read or discarded.
-        var bare = watching.BySpace(company: 0.5, floor: 20);
-        var weighed = watching.ByLikeness(alike: 0.9, floor: 20);
+        var bare = watching.BySpace(company: 0.5, floor: 20, meeting: Meeting.Never);
+        var weighed = watching.ByLikeness(alike: 0.9, floor: 20, meeting: Meeting.Never);
 
         static string Said(IReadOnlySet<Code> group, IReadOnlyDictionary<Code, string> word) =>
             string.Join(" ", group.Select(code => word.GetValueOrDefault(code, "?")).Order());
@@ -502,12 +502,12 @@ public sealed class BabiTests(ITestOutputHelper output)
 
             foreach (var (label, at, groups) in
                 new[] { 0.3, 0.4, 0.5, 0.6, 0.7 }
-                    .Select(one => ("a set  ", one, watching.BySpace(one, floor: 20)))
+                    .Select(one => ("a set  ", one, watching.BySpace(one, floor: 20, meeting: Meeting.Never)))
                     .Concat(new[] { 0.7, 0.8, 0.9, 0.95, 0.99 }
-                        .Select(one => ("weighed", one, watching.ByLikeness(one, floor: 20))))
+                        .Select(one => ("weighed", one, watching.ByLikeness(one, floor: 20, meeting: Meeting.Never))))
                     .Concat([
-                        ("chance ", double.NaN, watching.ByChance(Counting.Company, floor: 20)),
-                        ("lifted ", double.NaN, watching.ByChance(Counting.Weighed, floor: 20))]))
+                        ("chance ", double.NaN, watching.ByChance(Counting.Company, floor: 20, meeting: Meeting.Never)),
+                        ("lifted ", double.NaN, watching.ByChance(Counting.Weighed, floor: 20, meeting: Meeting.Never))]))
             {
                 var said = groups
                     .Select(group => group

@@ -255,7 +255,7 @@ public sealed class UnifyingYieldTests(ITestOutputHelper output)
 
         watching.Settle();
 
-        var sorts = new Categories(watching.ByChance(Counting.Company, floor: 20));
+        var sorts = new Categories(watching.ByChance(Counting.Company, floor: 20, meeting: Meeting.Never));
 
         output.WriteLine($"{sorts.Count} categories derived over the same {moments.Count} moments");
 

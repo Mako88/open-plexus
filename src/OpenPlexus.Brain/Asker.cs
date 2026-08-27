@@ -301,6 +301,14 @@ internal sealed class Gathering : IDisposable
     }
 
     /// <summary>The vote over whoever answered.</summary>
+    /// <param name="deciding">
+    /// Whether the machine answers with nothing behind the answer, which is the BRAIN's dial
+    /// and is passed in because a gathering holds no dials of its own. It had a default here
+    /// and the default was the bug: a brain built on <see cref="Deciding.Anyway"/> became a
+    /// <see cref="Deciding.Grounded"/> one the moment it was deployed, so an arm measured
+    /// in-process was a different arm on the wire. The parameter is required so that the
+    /// compiler asks the question rather than a comment promising somebody will.
+    /// </param>
     /// <remarks>
     /// <b>A vote with nothing in it comes back with no expectation</b>, and that is the third
     /// outcome arriving. The plan records <c>Abstain</c> as unarmed in any run because
@@ -308,7 +316,7 @@ internal sealed class Gathering : IDisposable
     /// that has gone is the case it was written for, and it is reachable here for the first
     /// time.
     /// </remarks>
-    public Vote Decide()
+    public Vote Decide(Deciding deciding)
     {
         List<Weights> said;
 
@@ -320,7 +328,7 @@ internal sealed class Gathering : IDisposable
                     .Select(one => one.Said!.Value),
             ];
 
-        return Population.Decide(said);
+        return Population.Decide(said, deciding);
     }
 
     /// <summary>What every answering holder added, added up.</summary>

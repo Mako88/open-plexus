@@ -809,12 +809,12 @@ public sealed class ReturningTests(ITestOutputHelper output)
 
         // Read before the ending is declared, because that is the state a brain is always in
         // and the space clause has to be readable there.
-        var runningSpace = live.BySpace(company: 0.5, floor: 20);
+        var runningSpace = live.BySpace(company: 0.5, floor: 20, meeting: Meeting.Never);
 
         live.Settle();
 
-        var space = live.BySpace(company: 0.5, floor: 20);
-        var time = live.ByChance(Counting.Time, floor: 20);
+        var space = live.BySpace(company: 0.5, floor: 20, meeting: Meeting.Never);
+        var time = live.ByChance(Counting.Time, floor: 20, meeting: Meeting.Never);
 
         var listSpace = Alternating.From(stream, company: 0.5, floor: 20);
         var listTime = Alternating.Over(stream, floor: 20, span: 1);
@@ -888,7 +888,7 @@ public sealed class ReturningTests(ITestOutputHelper output)
 
             if ((at + 1) % Step != 0) continue;
 
-            var groups = live.ByChance(Counting.Time, floor: 20);
+            var groups = live.ByChance(Counting.Time, floor: 20, meeting: Meeting.Never);
 
             reached.Add((
                 at + 1,

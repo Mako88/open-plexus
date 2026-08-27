@@ -167,7 +167,7 @@ public sealed class SplitTests(ITestOutputHelper output)
 
             foreach (var holders in new[] { 2, 3, 5, 12 })
             {
-                var split = Population.Decide(Spread(firing, held, holders));
+                var split = Population.Decide(Spread(firing, held, holders), Deciding.Grounded);
 
                 Assert.Equal(whole.Expects, split.Expects);
                 Assert.Equal(whole.By, split.By);
@@ -226,8 +226,8 @@ public sealed class SplitTests(ITestOutputHelper output)
             // says the members survived; the same VOTE coming out says the arithmetic did,
             // and that is the thing a machine on the far side actually acts on.
             Assert.Equal(
-                Population.Decide(heard),
-                Population.Decide(arrived));
+                Population.Decide(heard, Deciding.Grounded),
+                Population.Decide(arrived, Deciding.Grounded));
 
             compared++;
         }
@@ -292,7 +292,7 @@ public sealed class SplitTests(ITestOutputHelper output)
             for (var lost = 0; lost < Holders; lost++)
             {
                 var without = Population.Decide(
-                    Spread(firing, held, Holders, missing: lost));
+                    Spread(firing, held, Holders, missing: lost), Deciding.Grounded);
 
                 asked[bucket]++;
 

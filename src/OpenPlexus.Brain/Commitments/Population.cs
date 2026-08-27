@@ -1452,6 +1452,35 @@ internal sealed class Population
     public long Barren { get; private set; }
 
     /// <summary>
+    /// Repairs admitted on a code present in fewer of the parent's HITS than the floor —
+    /// <b>what the separation bar's normal approximation cannot price.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The two-proportion z is an approximation and it breaks at one.</b> A parent with a
+    /// single hit, whose candidate was present in that hit and absent from five hundred
+    /// misses, reads z = 22.4 and a tail of 3e-111. Fisher's exact test on the same table
+    /// gives one in five hundred and one. The approximation is wrong by a hundred and eight
+    /// orders of magnitude, and no correction repairs a mis-calibrated statistic — a
+    /// Bonferroni over five hundred parents moves a bar that the candidate cleared by a
+    /// hundred and eight.
+    /// </para>
+    /// <para>
+    /// <b>Which is the account the coin-answered house was missing.</b> Paying for the round's
+    /// gates tightened the bar five hundredfold and removed a fifth of the children. A bar
+    /// tightened that far removing that little means the children were never near it, and this
+    /// says how they got there.
+    /// </para>
+    /// <para>
+    /// <b>It counts exactly what <see cref="Admitting.Testable"/> refuses</b>, so it prices
+    /// that arm without running it. That dial has been an arm for the life of the branch on
+    /// the grounds that costing no score is a corner rather than a property; this is a reason
+    /// to turn it on that is about the statistic rather than about a score.
+    /// </para>
+    /// </remarks>
+    public long Thin { get; private set; }
+
+    /// <summary>
     /// Of the rounds nothing separated, how many an ABSENCE would have separated.
     /// </summary>
     /// <remarks>
@@ -1619,6 +1648,13 @@ internal sealed class Population
                     if (predicted == added) _agreed++;
                     else _differed++;
                 }
+
+                // Counted where the child is DECIDED rather than where it is born, so a
+                // collision with a scope the population already holds is still a repair the
+                // bar admitted. What is being priced is the gate, not the birth.
+                if (culprit.Separations.TryGetValue(added, out var chosen)
+                    && chosen.InHits < _dials.Floor)
+                    Thin++;
 
                 var child = new Commitment([.. culprit.Scope, added], culprit.Expects);
 

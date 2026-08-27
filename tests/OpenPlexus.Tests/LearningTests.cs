@@ -129,6 +129,10 @@ public sealed class LearningTests(ITestOutputHelper output)
         var accounted = 0L;
         var barren = 0L;
 
+        // And how many repairs were admitted on a code the parent had seen in fewer hits than
+        // the floor, which is where the bar's normal approximation is not calibrated.
+        var thin = 0L;
+
         for (var round = 0; round < rounds; round++)
         {
             if (input.Push() is { } pushed)
@@ -157,12 +161,14 @@ public sealed class LearningTests(ITestOutputHelper output)
             growth.Add(
                 $"{loop.Minted - minted}/{loop.Repaired - repaired}"
                 + $"of{brain.Held.Searched - searched}@{brain.Held.Count}"
-                + $"~{brain.Held.Accounted - accounted}+{brain.Held.Barren - barren}");
+                + $"~{brain.Held.Accounted - accounted}+{brain.Held.Barren - barren}"
+                + $"!{brain.Held.Thin - thin}");
 
             (hits, asked) = (0, 0);
             (minted, repaired, searched) =
                 (loop.Minted, loop.Repaired, brain.Held.Searched);
-            (accounted, barren) = (brain.Held.Accounted, brain.Held.Barren);
+            (accounted, barren, thin) =
+                (brain.Held.Accounted, brain.Held.Barren, brain.Held.Thin);
         }
 
         return (curve, growth);
@@ -339,7 +345,7 @@ public sealed class LearningTests(ITestOutputHelper output)
         output.WriteLine($"{Rounds} rounds a seed over {Seeds} seeds, {Slices} slices");
         output.WriteLine(
             $"{"world",-14}{"answers",-9}{"bar",-11}{"curve",-44}{"rise",8}{"held",7}"
-            + "   minted/repaired-of-searched@held~accounted+barren, per slice");
+            + "   minted/repaired-of-searched@held~accounted+barren!thin, per slice");
 
         var rises = new Dictionary<(string World, bool Coined, Correcting Bar), List<double>>();
         var holds = new Dictionary<(string World, bool Coined, Correcting Bar), List<int>>();

@@ -263,7 +263,8 @@ jobs:
           - "(FullyQualifiedName~ArrangedTests|FullyQualifiedName~SensesTests|FullyQualifiedName~GradedTests|FullyQualifiedName~MotifTests|FullyQualifiedName~RhythmTests)"
           - "(FullyQualifiedName~AskedTests|FullyQualifiedName~FleetTests|FullyQualifiedName~UnreachedTests|FullyQualifiedName~SlotTests|FullyQualifiedName~PostedTests|FullyQualifiedName~HostedTests)"
           - "(FullyQualifiedName~ExercisedTests|FullyQualifiedName~OutstandingTests)"
-          - "(FullyQualifiedName!~BindingTests&FullyQualifiedName!~ClevrTests&FullyQualifiedName!~HomeostatTests&FullyQualifiedName!~EncodedTests&FullyQualifiedName!~ArrangedTests&FullyQualifiedName!~SensesTests&FullyQualifiedName!~GradedTests&FullyQualifiedName!~MotifTests&FullyQualifiedName!~RhythmTests&FullyQualifiedName!~AskedTests&FullyQualifiedName!~FleetTests&FullyQualifiedName!~UnreachedTests&FullyQualifiedName!~SlotTests&FullyQualifiedName!~RecalledTests&FullyQualifiedName!~PostedTests&FullyQualifiedName!~HostedTests&FullyQualifiedName!~ExercisedTests&FullyQualifiedName!~OutstandingTests)"
+          - "(FullyQualifiedName~LearningTests)"
+          - "(FullyQualifiedName!~BindingTests&FullyQualifiedName!~ClevrTests&FullyQualifiedName!~HomeostatTests&FullyQualifiedName!~EncodedTests&FullyQualifiedName!~ArrangedTests&FullyQualifiedName!~SensesTests&FullyQualifiedName!~GradedTests&FullyQualifiedName!~MotifTests&FullyQualifiedName!~RhythmTests&FullyQualifiedName!~AskedTests&FullyQualifiedName!~FleetTests&FullyQualifiedName!~UnreachedTests&FullyQualifiedName!~SlotTests&FullyQualifiedName!~RecalledTests&FullyQualifiedName!~PostedTests&FullyQualifiedName!~HostedTests&FullyQualifiedName!~ExercisedTests&FullyQualifiedName!~OutstandingTests&FullyQualifiedName!~LearningTests)"
 
     steps:
       # THE WHOLE HISTORY, BECAUSE ONE CHECK READS A CLOCK OFF IT. `ProseTests` has a decay

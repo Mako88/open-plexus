@@ -1,5 +1,28 @@
 ﻿# Working in this repo
 
+## The state of this branch, 2026-08-27
+
+**This branch is empty on purpose and most of what follows is not true here yet.** The
+`commitments` implementation was deleted in one commit and the tree holds four files. There
+is no `docs/plan.md`, no suite, no guard, no world and no source. Everything deleted is
+reachable at `git show commitments:<path>`.
+
+**What survives is the doctrine and not the mechanics.** The epistemics below, the writing
+rules and the reasons each guard existed are what this branch is being rebuilt on. The
+fourteen named guards, the sweep list, `THE ORDER`, `OutstandingTests` and the shard filters
+describe a repository that is no longer here, so a session must not follow those paragraphs
+as instructions until the things they name exist again.
+
+**The order of work is `README.md`, then the guard set, then the class design, then the
+skeleton.** The README states the goal, the constraints and the architecture, and its
+architecture list is meant to be machine-readable, because a guard that asks whether every
+entry is exercised needs a list to read. That is why the README comes before any code.
+
+**Rewrite this file once the shape is settled**, rather than patching it entry by entry as
+things come back.
+
+---
+
 Read `docs/plan.md` first. It is the only doc and it holds nothing finished; findings live in
 the commit that produced them and in the test that asserts them, never here and never there.
 Its `THE ORDER` section is what to work on and in what order, and it is the only list that

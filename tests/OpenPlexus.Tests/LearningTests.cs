@@ -123,6 +123,12 @@ public sealed class LearningTests(ITestOutputHelper output)
         var repaired = 0L;
         var searched = 0L;
 
+        // And WHY genesis was quiet, which the mint count alone cannot say. A slice minting
+        // nothing is either a gate refusing to let genesis look or genesis looking and
+        // finding no code left to root on, and those two want opposite work.
+        var accounted = 0L;
+        var barren = 0L;
+
         for (var round = 0; round < rounds; round++)
         {
             if (input.Push() is { } pushed)
@@ -150,11 +156,13 @@ public sealed class LearningTests(ITestOutputHelper output)
             // of what the gate is for.
             growth.Add(
                 $"{loop.Minted - minted}/{loop.Repaired - repaired}"
-                + $"of{brain.Held.Searched - searched}@{brain.Held.Count}");
+                + $"of{brain.Held.Searched - searched}@{brain.Held.Count}"
+                + $"~{brain.Held.Accounted - accounted}+{brain.Held.Barren - barren}");
 
             (hits, asked) = (0, 0);
             (minted, repaired, searched) =
                 (loop.Minted, loop.Repaired, brain.Held.Searched);
+            (accounted, barren) = (brain.Held.Accounted, brain.Held.Barren);
         }
 
         return (curve, growth);
@@ -295,7 +303,7 @@ public sealed class LearningTests(ITestOutputHelper output)
         output.WriteLine($"{Rounds} rounds a seed over {Seeds} seeds, {Slices} slices");
         output.WriteLine(
             $"{"world",-14}{"answers",-9}{"bar",-11}{"curve",-44}{"rise",8}{"held",7}"
-            + "   minted/repaired-of-searched@held, per slice");
+            + "   minted/repaired-of-searched@held~accounted+barren, per slice");
 
         var rises = new Dictionary<(string World, bool Coined, Correcting Bar), List<double>>();
         var holds = new Dictionary<(string World, bool Coined, Correcting Bar), List<int>>();

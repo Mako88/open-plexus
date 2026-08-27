@@ -1157,7 +1157,10 @@ internal sealed class Population
         if (_dials.Surprising == Surprising.Unaccounted
             && !firing.IsDefaultOrEmpty
             && firing.Any(one => one.Expects == arrived))
+        {
+            Accounted++;
             return 0;
+        }
 
         var minted = 0;
 
@@ -1240,6 +1243,10 @@ internal sealed class Population
             && _dials.Spanning is Spanning.Thing
             && grouping is { Count: > 0 })
             minted += Things(moment, arrived, eligible, grouping);
+
+        // And the round that was allowed to look and found nothing, which is what says the
+        // silence above is a world running out of roots rather than a gate refusing.
+        if (minted == 0) Barren++;
 
         return minted;
     }
@@ -1399,6 +1406,43 @@ internal sealed class Population
     /// </para>
     /// </remarks>
     public long Unseparated { get; private set; }
+
+    /// <summary>
+    /// Failures where genesis was refused because something that fired had already proposed
+    /// what arrived — <b>fork 135's claim, as a count rather than an argument.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Genesis stops early on every world here.</b> Nothing said which gate stopped it.
+    /// The curve reads 37 mints in a run's first fifth and then nought four times on the
+    /// multiplexer, and 372 then single digits on the house. Two accounts fit that equally:
+    /// the accounting gate refusing because some advocate among the hundreds firing happened
+    /// to name the right answer, or genesis running and finding nothing left to root on.
+    /// </para>
+    /// <para>
+    /// <b>They want opposite work.</b> The first is fork 135 and the fix is in the gate; the
+    /// second is a world whose codes are exhausted and the fix is nowhere near it. This
+    /// counter and <see cref="Barren"/> separate them, and neither can be inferred from the
+    /// mint count that has been printed all along.
+    /// </para>
+    /// <para>
+    /// <b>It counts a refusal rather than a lucky advocate</b>, which is the narrower claim
+    /// and the one that is decidable here. Whether the advocate was RIGHT to be trusted is
+    /// what the gate cannot see and what an arm would have to change.
+    /// </para>
+    /// </remarks>
+    public long Accounted { get; private set; }
+
+    /// <summary>Failures where genesis ran and minted nothing.</summary>
+    /// <remarks>
+    /// <b>The other half of <see cref="Accounted"/>.</b> It is not one number split two ways:
+    /// a round reaching here passed the accounting gate and still found no code to
+    /// root on — every live code refused for never having varied, or for being a precedence
+    /// or an intervention, or placed on another holder, or already the scope of something
+    /// held. High here says the world's roots are used up; high on the counter above says
+    /// genesis was never allowed to look.
+    /// </remarks>
+    public long Barren { get; private set; }
 
     /// <summary>
     /// Of the rounds nothing separated, how many an ABSENCE would have separated.

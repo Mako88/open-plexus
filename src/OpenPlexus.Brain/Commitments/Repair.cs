@@ -676,6 +676,30 @@ internal enum Testing
 /// refutation of a fixed bar was that searching enough candidates clears one on noise alone;
 /// searching enough PARENTS is that sentence with a different noun.
 /// </para>
+/// <para>
+/// <b>And it does not ship, because it costs the SPINE.</b> The curve chose it — 382 rules
+/// against 518 on the multiplexer at an identical 0.985, and 1,236 against 1,823 on the house
+/// inside what two seeds can see. Then
+/// <c>RoamingTests.What_a_learner_scores_on_the_survey_against_the_wrong_houses_exam</c>
+/// separated the paired exam from another house's by 1.8 standard errors under it and cleared
+/// the bar without it, on the identical one-line control. That check is what says the survey
+/// is reading the walk rather than the alphabet, so failing it is the target world losing the
+/// thing it exists to demonstrate.
+/// </para>
+/// <para>
+/// <b>Which makes the noise LOAD-BEARING, and that is the finding.</b> Nearly every repair on
+/// the house is admitted on a candidate too thin to test, the population falls by a third when
+/// they are refused, and the exam falls with it. Either those rules carry the score, in which
+/// case the score was partly memorisation, or a correction of five hundredfold refuses good
+/// candidates along with the bad — which is the cost <see cref="Admitting"/> already carries,
+/// a uniform tightening blocking repair while a population is young.
+/// </para>
+/// <para>
+/// <b>And that is the case for <see cref="Testing.Exact"/> rather than for this.</b> A bound
+/// refuses only what no arrangement of the data could have earned, so it does not trade a
+/// young population's good candidates for its bad ones. Whether it escapes this cost is the
+/// open question and the reason both arms are still here.
+/// </para>
 /// </remarks>
 internal enum Correcting
 {
@@ -865,11 +889,11 @@ internal sealed record CommittingSettings
 
     /// <summary>What the separation bar is paid for out of.</summary>
     /// <remarks>
-    /// <b>Gates SHIPS and Candidates is the control</b>, which is every reading recorded
-    /// before this existed. See <see cref="Correcting"/> for what one parent's correction
-    /// leaves unpaid for, and <c>LearningTests</c> for the table that chose between them.
+    /// <b>Candidates ships and Gates COSTS THE SPINE</b>, which took back a default this repo
+    /// shipped on a coarser instrument. See <see cref="Correcting"/> for the reading and what
+    /// it leaves open.
     /// </remarks>
-    public Correcting Correcting { get; init; } = Correcting.Gates;
+    public Correcting Correcting { get; init; } = Correcting.Candidates;
 
     /// <summary>Which test the separation bar admits a candidate on.</summary>
     /// <remarks>
@@ -1601,7 +1625,45 @@ internal static class Hypergeometric
     private static double Choose(long n, long k) =>
         k < 0 || k > n
             ? double.NegativeInfinity
-            : LogGamma(n + 1) - LogGamma(k + 1) - LogGamma(n - k + 1);
+            : Factorial(n) - Factorial(k) - Factorial(n - k);
+
+    /// <summary>The log of a factorial, from a table where the count is small enough.</summary>
+    /// <param name="n">Which factorial.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>Every argument here is a COUNT</b>, so the function is only ever asked about
+    /// integers and a table answers it. Without one the bound is nine
+    /// <see cref="LogGamma"/> calls of eight divisions and two logarithms each, against the
+    /// single exponential the normal tail costs -- and the exact arm ran a whole learning
+    /// curve at more than twice the control's clock.
+    /// </para>
+    /// <para>
+    /// <b>And it falls back rather than growing.</b> A commitment's misses run without bound
+    /// over a long run, so a table that covered every reachable count would be a table sized
+    /// by how long somebody left the machine on. Past the cap the call is what it was.
+    /// </para>
+    /// </remarks>
+    private static double Factorial(long n) =>
+        n < Tabled.Length ? Tabled[n] : LogGamma(n + 1);
+
+    /// <summary>The log of every factorial up to the cap, built once.</summary>
+    /// <remarks>
+    /// <b>Summed rather than evaluated</b>, so the table costs one logarithm an entry and is
+    /// exact to the accumulation. It is also why the entries agree with each other to the last
+    /// bit, which a per-entry approximation would not guarantee across a merge.
+    /// </remarks>
+    private static readonly double[] Tabled = Table(1 << 16);
+
+    /// <summary>Builds the table.</summary>
+    /// <param name="upto">How many entries.</param>
+    private static double[] Table(int upto)
+    {
+        var built = new double[upto];
+
+        for (var i = 2; i < upto; i++) built[i] = built[i - 1] + Math.Log(i);
+
+        return built;
+    }
 
     /// <summary>The log of the gamma function, by the Lanczos approximation.</summary>
     /// <param name="x">Where to evaluate it, at least one here.</param>

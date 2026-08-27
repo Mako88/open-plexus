@@ -353,7 +353,7 @@ public sealed class LearningTests(ITestOutputHelper output)
             ("the house", Walked),
         })
         foreach (var coined in new[] { false, true })
-        foreach (var bar in new[] { Testing.Approximated, Testing.Exact })
+        foreach (var bar in new[] { new CommittingSettings().Testing })
         {
             foreach (var seed in Enumerable.Range(1, Seeds))
             {

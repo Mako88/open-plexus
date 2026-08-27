@@ -37,7 +37,10 @@ that is finished LEAVES, so this is only ever what is still to do.
   house by construction. So it wants a spine world with variables to be in trouble about, a
   deletion, or a waiting list of its own — and the third is the answer only if the first two
   are refused.
-- **First a separation bar valid at every stopping time**, and CALIBRATED. Fork **152**.
+- **First whether a CALIBRATED bar escapes what a tightened one costs.** Paying for the
+  round's gates cut the house a third and cost the spine its check that the survey reads the
+  walk, so the noise is LOAD-BEARING. A bound refuses only the unattainable, and a bar valid
+  at every stopping time is the other half. Fork **152**.
 - **Then which advocate may block a proposal**, genesis being refused. Fork **135**.
 - **Then what a scope may be ABOUT**, a wider moment costing the score where the same crowd
   of equally tested rules fires. Capacity, what is held and how the vote weighs it are all
@@ -406,8 +409,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       conceptless, and the ladder's ORDER is a bias over when a construct is tried.
     - **OPEN** — one hit is too few for the normal approximation the bar is, and no
       correction repairs a mis-calibrated statistic; the same table is then read once a round
-      for ever. A confidence sequence answers both and needs no episode boundary, so C4
-      permits it where a run-wide correction it does not. Fork **152**.
+      for ever. A confidence sequence answers both and needs no episode boundary. Fork **152**.
     - **OPEN** — a total is a lifetime, which C4 refuses, and the earned rate replacing it
       reads as free on `Arranged` rather than as a budget.
     - **OPEN** — the curve is `Curved`, that rate capped by the parent's hits, and it is

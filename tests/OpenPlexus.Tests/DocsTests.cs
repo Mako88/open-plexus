@@ -841,7 +841,19 @@ public sealed class DocsTests
     //
     // Raised rather than paid for by a deletion, which is this file's own rule: a guard must
     // not cost information. The two items it makes room for close two it was raised for.
-    private const int Whole = 13_455;
+    //
+    // And 13,485 for the noise being LOAD-BEARING, which is a default taken back rather than a
+    // question opened. Paying for the round's gates cut the house's population by a third at
+    // no cost the learning curve could see, so it shipped; the spine's own check that the
+    // survey reads the walk rather than the alphabet then fell to 1.8 standard errors under
+    // it and cleared without it, on a one-line control. So the rules the machine admits on
+    // evidence too thin to test are carrying the exam, and that sentence is the whole reason
+    // the next mechanism is a calibrated bar rather than a tighter one.
+    //
+    // It is one line in `THE ORDER` and it replaces two. The rise is what the sentence costs
+    // over the two entries it merges, and a session that could not write it down would be a
+    // session that shipped the default again.
+    private const int Whole = 13_485;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -272,6 +272,32 @@ public sealed class LearningTests(ITestOutputHelper output)
     /// it is the hit counts of the parents that pass.
     /// </para>
     /// <para>
+    /// <b>Every repair on a coin-answered house is a thin one.</b> 1,818 of 1,817 in the first
+    /// slice, 1,001 of 997, 862 of 862, and the same to the end — the count of thin admissions
+    /// runs a hair above the count of births because it is taken where the child is decided
+    /// and a collision is still an admission. So the population that world fills with is not
+    /// mostly small-sample; it is entirely small-sample.
+    /// </para>
+    /// <para>
+    /// <b>And the world that learns repairs on thick evidence.</b> The multiplexer's own
+    /// answers give 194 thin of 865 in the first slice and 6 of 210 in the last, a fifth
+    /// falling to a thirtieth. The house on its own answers gives 927 of 926 falling to 101 of
+    /// 124. One world's repair is mostly well-tested and climbs; the other's is mostly
+    /// untestable and does not.
+    /// </para>
+    /// <para>
+    /// <b>Which is why paying for the round's gates removed only a fifth.</b> A correction
+    /// over 485 parents moves the bar three orders of magnitude and a candidate seen in one
+    /// hit clears it by a hundred. The family was never the binding constraint on that world.
+    /// </para>
+    /// <para>
+    /// <b>And this counts <see cref="Admitting.Testable"/>'s criterion rather than the exact
+    /// bound's.</b> Thin means the code was in fewer of the parent's hits than the floor, which
+    /// is twenty; the bound refuses only what no arrangement could earn, which is nearer two.
+    /// So this is an upper bound on what <see cref="Testing.Exact"/> will refuse and an exact
+    /// price for what <c>Testable</c> would.
+    /// </para>
+    /// <para>
     /// <b>Genesis is refused rather than exhausted, on both worlds.</b> After the first fifth
     /// the census reads <c>barren</c> at nought in every slice, and <c>accounted</c> at every
     /// failure there was: 22 of 22 on the multiplexer's last slice and 1,675 of 1,675 on the

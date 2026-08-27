@@ -1434,6 +1434,14 @@ internal sealed class Population
         // excludes. This walks every wrong commitment once, in the gate order, so each is
         // charged to its FIRST refusal and the expensive tests still run only for the
         // handful that reach them.
+        //
+        // And it counts the round's search. How many parents this round is going to search, which is the second level of the
+        // separation bar under `Correcting.Gates`. It comes off this walk rather than a walk
+        // of its own because this walk already asks the identical question of every wrong
+        // commitment, and the chain below asks it of a prefix -- so counting there would
+        // charge the last culprit for the round and the first for nothing.
+        var gates = 0;
+
         foreach (var one in firing)
         {
             if (one.Expects == arrived) continue;
@@ -1449,6 +1457,7 @@ internal sealed class Population
             else
             {
                 _reached++;
+                gates++;
                 searched = true;
             }
 
@@ -1499,7 +1508,7 @@ internal sealed class Population
                 // empty set are the same answer and neither needs a branch here.
                 _minted.TryGetValue(culprit.Identity, out var ledger);
 
-                if (Conditions.Discriminator(culprit, _dials, _blind, ledger?.Codes)
+                if (Conditions.Discriminator(culprit, _dials, _blind, ledger?.Codes, gates)
                     is not { } added)
                 {
                     // And a refusal by the arm is not a ceiling in the language, which is the
@@ -1521,7 +1530,8 @@ internal sealed class Population
                     if (ledger is not null
                         && _dials.Forking == Forking.Distinct
                         && _dials.Choosing == Choosing.Separating
-                        && Conditions.Discriminator(culprit, _dials, _blind) is not null)
+                        && Conditions.Discriminator(culprit, _dials, _blind, null, gates)
+                            is not null)
                     {
                         separated = true;
                         continue;
@@ -1531,7 +1541,8 @@ internal sealed class Population
                     // present-code search came back empty, so it costs a second walk of one
                     // table on a small share of a small share of rounds -- and it may not
                     // change what this method does, or the instrument would be the rung.
-                    if (!absent && Conditions.Absent(culprit, _dials) is not null) absent = true;
+                    if (!absent && Conditions.Absent(culprit, _dials, gates) is not null)
+                        absent = true;
 
                     continue;
                 }
@@ -1560,7 +1571,7 @@ internal sealed class Population
 
                 var child = new Commitment([.. culprit.Scope, added], culprit.Expects);
 
-                if (Conditions.Runner(culprit, _dials) is { } runner)
+                if (Conditions.Runner(culprit, _dials, gates) is { } runner)
                     _runners[child.Identity] = runner;
 
                 if (ledger is null) _minted[culprit.Identity] = ledger = new Forks();

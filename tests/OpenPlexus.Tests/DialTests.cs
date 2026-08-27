@@ -156,6 +156,18 @@ public sealed class DialTests
             + "property of the TEST rather than of the world -- below it no "
             + "statistic has power, and that is arithmetic rather than a level",
 
+        ["Correcting"] =
+            "what the separation bar is paid for out of, and it is an ARM rather than a "
+            + "level -- a gate either pays for the other gates the round ran or it does not, "
+            + "and there is no third value between one parent's candidate set and the "
+            + "round's parents. Nothing could drive it either, because the thing a "
+            + "controller would hunt is a standard of proof and that is `Alpha` one line "
+            + "down. `LearningTests` runs both arms on the multiplexer and the house, each "
+            + "with its answers replaced by a coin, and the entry leaves when one arm has "
+            + "won -- the reading it was built for is whether a false-positive rate that is "
+            + "honest per parent stops filling a population once the round's other parents "
+            + "are paid for too",
+
         ["Alpha"] =
             "how much noise the separation bar admits. A choice about what counts "
             + "as evidence, and the correction beside it is what makes the number "
@@ -723,7 +735,19 @@ public sealed class DialTests
         // It ships ON, on the gated arm. At five tellings it reads 1.000 stated and 0.150
         // implied against a control's 1.000 and nought, and at twenty it costs the stated half
         // a quarter -- so the entry is open on a diagnosis rather than on a preference.
-        Assert.Equal(20, HandSet.Count);
+        //
+        // AND TWENTY-ONE FOR `Correcting`, which is a rise and is written as one. The
+        // separation bar is a significance test and a significance test has a FAMILY -- the
+        // set of tests one alpha is spread over. It was one parent's candidate table, and a
+        // round runs the whole gate once per blamed parent, so the rate a population
+        // experiences is the per-gate rate times however many parents fired and were wrong.
+        // On the house that is 350 a round.
+        //
+        // What the knob holds open is a comparison rather than a level. There is no third
+        // value between paying for one table and paying for the round's tables, and the
+        // control is what every reading in this tree was taken under -- so deleting either
+        // arm before the reading is in would delete the comparison the mechanism exists for.
+        Assert.Equal(21, HandSet.Count);
     }
 
     /// <summary>

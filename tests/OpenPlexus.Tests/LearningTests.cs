@@ -163,11 +163,14 @@ public sealed class LearningTests(ITestOutputHelper output)
     /// <summary>The eleven-bit multiplexer, whose rules are conjunctions and enumerable.</summary>
     /// <param name="seed">What draws it.</param>
     /// <param name="coined">Whether its answers are replaced by a draw.</param>
+    /// <param name="correcting">What the separation bar is paid for out of.</param>
     private static (IInput Input, Brain Brain, Func<bool>? Counting) Multiplexed(
-        int seed, bool coined)
+        int seed, bool coined, Correcting correcting)
     {
         var world = new Multiplexer(new MultiplexerSettings { Address = 3 }, seed);
-        var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed);
+
+        var brain = new Brain(
+            new CommittingSettings { Capacity = 20_000, Correcting = correcting }, seed);
 
         IInput input = new Watching<IReadOnlyList<int>>(world, new Bits(Multiplexer.Bit));
 
@@ -178,11 +181,14 @@ public sealed class LearningTests(ITestOutputHelper output)
     /// <summary>The walked house, at the composition the terminal ships.</summary>
     /// <param name="seed">What draws it.</param>
     /// <param name="coined">Whether its answers are replaced by a draw.</param>
+    /// <param name="correcting">What the separation bar is paid for out of.</param>
     private static (IInput Input, Brain Brain, Func<bool>? Counting) Walked(
-        int seed, bool coined)
+        int seed, bool coined, Correcting correcting)
     {
         var world = new Roaming(Fixture.House(asked: 6), seed);
-        var brain = new Brain(new CommittingSettings { Capacity = 20_000 }, seed);
+
+        var brain = new Brain(
+            new CommittingSettings { Capacity = 20_000, Correcting = correcting }, seed);
 
         IInput input = new Watching<Coded>(
             world,
@@ -288,57 +294,66 @@ public sealed class LearningTests(ITestOutputHelper output)
 
         output.WriteLine($"{Rounds} rounds a seed over {Seeds} seeds, {Slices} slices");
         output.WriteLine(
-            $"{"world",-14}{"answers",-9}{"curve",-44}{"rise",8}"
+            $"{"world",-14}{"answers",-9}{"bar",-11}{"curve",-44}{"rise",8}{"held",7}"
             + "   minted/repaired-of-searched@held, per slice");
 
-        var rises = new Dictionary<(string World, bool Coined), List<double>>();
+        var rises = new Dictionary<(string World, bool Coined, Correcting Bar), List<double>>();
+        var holds = new Dictionary<(string World, bool Coined, Correcting Bar), List<int>>();
 
         foreach (var (name, build) in
-            new (string Name, Func<int, bool, (IInput, Brain, Func<bool>?)> Build)[]
+            new (string Name, Func<int, bool, Correcting, (IInput, Brain, Func<bool>?)> Build)[]
         {
             ("multiplexer", Multiplexed),
             ("the house", Walked),
         })
         foreach (var coined in new[] { false, true })
+        foreach (var bar in new[] { Correcting.Candidates, Correcting.Gates })
         {
             foreach (var seed in Enumerable.Range(1, Seeds))
             {
-                var (input, brain, counting) = build(seed, coined);
+                var (input, brain, counting) = build(seed, coined, bar);
 
                 var (curve, growth) = await Curve(input, brain, Rounds, counting);
 
                 var rise = curve[^1] - curve[0];
 
-                if (!rises.TryGetValue((name, coined), out var all))
-                    rises[(name, coined)] = all = [];
+                if (!rises.TryGetValue((name, coined, bar), out var all))
+                    rises[(name, coined, bar)] = all = [];
+
+                if (!holds.TryGetValue((name, coined, bar), out var kept))
+                    holds[(name, coined, bar)] = kept = [];
 
                 all.Add(rise);
+                kept.Add(brain.Held.Count);
 
                 output.WriteLine(
-                    $"{name,-14}{(coined ? "a coin" : "its own"),-9}"
+                    $"{name,-14}{(coined ? "a coin" : "its own"),-9}{bar,-11}"
                     + $"{string.Join("  ", curve.Select(one => one.ToString("F3"))),-44}"
-                    + $"{rise,8:F3}   {string.Join(" ", growth)}");
+                    + $"{rise,8:F3}{brain.Held.Count,7}   {string.Join(" ", growth)}");
             }
         }
 
-        foreach (var ((name, coined), all) in rises)
+        foreach (var ((name, coined, bar), all) in rises)
             output.WriteLine(
-                $"{name} on {(coined ? "a coin" : "its own answers")} rises "
+                $"{name} on {(coined ? "a coin" : "its own answers")} under {bar} rises "
                 + $"{all.Average():F3} on average, on {all.Count(one => one > 0)} seeds of "
-                + $"{all.Count}");
+                + $"{all.Count}, holding {holds[(name, coined, bar)].Average():F0}");
 
         // The MULTIPLEXER calibrates the instrument, and it is the only world asserted on.
         // Its rules are conjunctions and enumerable, so a machine that cannot climb there
         // cannot climb anywhere and a curve that cannot show it climbing is broken. A tenth is
         // a wide bar for a world that goes from a coin's 0.5 to nearly 1.0.
+        var shipped = new CommittingSettings().Correcting;
+
         Assert.True(
-            rises[("multiplexer", false)].Average()
-                > rises[("multiplexer", true)].Average() + 0.1,
-            $"the multiplexer's curve rises {rises[("multiplexer", false)].Average():F3} "
-            + $"against {rises[("multiplexer", true)].Average():F3} when its answers are a "
-            + "coin. A world whose rules are conjunctions is the one this machine is known to "
-            + "learn, so either it has stopped learning or this curve cannot see it -- and "
-            + "every other row here is unreadable until that is settled.");
+            rises[("multiplexer", false, shipped)].Average()
+                > rises[("multiplexer", true, shipped)].Average() + 0.1,
+            $"the multiplexer's curve rises {rises[("multiplexer", false, shipped)].Average():F3} "
+            + $"against {rises[("multiplexer", true, shipped)].Average():F3} when its answers "
+            + "are a coin, under the bar that ships. A world whose rules are conjunctions is "
+            + "the one this machine is known to learn, so either it has stopped learning or "
+            + "this curve cannot see it -- and every other row here is unreadable until that "
+            + "is settled.");
 
         // And the house is PRINTED rather than asserted. A world where the curve cannot
         // separate the machine from a coin is a reading about that world, not a failure of

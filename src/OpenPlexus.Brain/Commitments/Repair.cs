@@ -597,6 +597,69 @@ internal enum Budgeting
     Curved,
 }
 
+/// <summary>What the separation bar is paid for out of.</summary>
+/// <remarks>
+/// <para>
+/// <b>The bar is Bonferroni over one parent's candidates.</b> Nothing pays for the other
+/// parents. A round blames every commitment that fired and was wrong, and each of those
+/// runs <see cref="Conditions.Discriminator"/> over its own table. So the corrected rate is
+/// per PARENT, and the rate a population experiences is per ROUND, over however many parents
+/// were eligible.
+/// </para>
+/// <para>
+/// <b>Measured, and the threshold was cleared of suspicion first.</b> On a world whose answers
+/// are a coin the per-gate pass rate is 0.03 per cent on the multiplexer and 0.13 on the
+/// house, both far under an alpha of five per cent. What differs is the count: the house runs
+/// 3.5 million gates in ten thousand rounds where the multiplexer runs 75 thousand. A
+/// thousandth of 350 gates a round is a false child every other round, for ever, and the
+/// house ends a coin-answered run holding 4,922 rules against the 1,833 it holds on its own
+/// answers.
+/// </para>
+/// <para>
+/// <b>It is the same statistic the bar already respects, one level out.</b> This repo's own
+/// refutation of a fixed bar was that searching enough candidates clears one on noise alone;
+/// searching enough PARENTS is that sentence with a different noun.
+/// </para>
+/// </remarks>
+internal enum Correcting
+{
+    /// <summary>
+    /// Alpha over the candidates this parent offered. <b>The control</b>, and what every
+    /// number recorded before this existed was taken under.
+    /// </summary>
+    Candidates,
+
+    /// <summary>
+    /// That, and alpha divided again by how many parents the round was going to search.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Two levels of Bonferroni rather than one flat one.</b> Each eligible parent gets an
+    /// equal share of alpha and spends that share over its own table, so the family-wise rate
+    /// over the whole round is what alpha names. Correcting over the round's summed candidates
+    /// is the flat version of the identical family; the split one needs no second walk of
+    /// every table, because the counting pass already knows how many parents are eligible.
+    /// </para>
+    /// <para>
+    /// <b>Counted before the chain rather than inside it</b>, for the reason the census walk
+    /// is: the chain stops at the first child it manages to add, so a count taken from within
+    /// it would charge a parent for the parents examined BEFORE it and charge the first one
+    /// nothing. The search a round is allowed to make is the same search whichever culprit it
+    /// happens to succeed on.
+    /// </para>
+    /// <para>
+    /// <b>And the family is the ROUND rather than the run</b>, which is a bound rather than an
+    /// oversight. Alpha over a run's gates is alpha over a lifetime, and C4 says there is no
+    /// episode boundary for a lifetime to be measured from — the same argument that keeps a
+    /// lifetime average out of a rule's fitness. So a round is the widest family this design
+    /// may charge for, and what survives it is one false child per round per alpha, which over
+    /// ten thousand rounds is still hundreds. Cutting that further wants a gate that is not a
+    /// significance test.
+    /// </para>
+    /// </remarks>
+    Gates,
+}
+
 /// <summary>Whether a parent may propose a fork it has already made.</summary>
 /// <remarks>
 /// <para>
@@ -743,6 +806,13 @@ internal sealed record CommittingSettings
 
     /// <summary>How much noise the separation bar admits, before correction.</summary>
     public double Alpha { get; init; } = 0.05;
+
+    /// <summary>What the separation bar is paid for out of.</summary>
+    /// <remarks>
+    /// <b>Candidates is the control and is every earlier reading.</b> See
+    /// <see cref="Correcting"/> for what one parent's correction leaves unpaid for.
+    /// </remarks>
+    public Correcting Correcting { get; init; } = Correcting.Candidates;
 
     /// <summary>How many times one commitment may ever separate.</summary>
     /// <remarks>
@@ -988,6 +1058,10 @@ internal static class Conditions
     /// Codes this parent has already forked on, refused under
     /// <see cref="Forking.Distinct"/> — and nothing at all under the rule that ships.
     /// </param>
+    /// <param name="gates">
+    /// How many parents this round was going to search, which alpha is divided by again
+    /// under <see cref="Correcting.Gates"/> and ignored under the control.
+    /// </param>
     /// <remarks>
     /// <para>
     /// <b>The condition must be more present in the hits</b>, which is the opposite of
@@ -1007,7 +1081,8 @@ internal static class Conditions
         Commitment parent,
         CommittingSettings dials,
         Random? blind,
-        IReadOnlySet<Code>? spent = null)
+        IReadOnlySet<Code>? spent = null,
+        int gates = 1)
     {
         ArgumentNullException.ThrowIfNull(parent);
         ArgumentNullException.ThrowIfNull(dials);
@@ -1084,8 +1159,39 @@ internal static class Conditions
         // less conservative and harder to argue about; what this has to survive is
         // somebody asking whether the bar was paid for, and the blunt answer is the
         // one that is obviously yes.
-        return Normal.Tail(strongest) * candidates <= dials.Alpha ? best : null;
+        //
+        // And the ROUND's parents are the second level, where the arm asks. The caller
+        // counts them before the chain runs, so every culprit in one round faces the
+        // identical bar -- the search a round is allowed to make does not get cheaper for
+        // the parent it happens to reach last. One is the control's multiplier and costs a
+        // multiplication rather than a branch.
+        return Clears(strongest, candidates, dials, gates) ? best : null;
     }
+
+    /// <summary>Whether a separation survives being paid for.</summary>
+    /// <param name="z">How many standard errors the best candidate separated by.</param>
+    /// <param name="candidates">How many codes this parent's table offered.</param>
+    /// <param name="dials">The gate's numbers.</param>
+    /// <param name="gates">How many parents the round was going to search.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>Written once and read by three callers</b>, one of which decides and two of which
+    /// are instruments. An instrument reading this table at a different bar from the gate that
+    /// ships measures a machine that is not running, which is a fault this repo has already
+    /// paid for once.
+    /// </para>
+    /// <para>
+    /// <b>The round's share is one under the control</b>, so the shipped arithmetic is the old
+    /// arithmetic multiplied by one rather than a second code path. A round that counted no
+    /// eligible parent and then searched one is a caller that did not count, and clamping to
+    /// one keeps the bar from LOOSENING there — a zero would divide the correction away.
+    /// </para>
+    /// </remarks>
+    private static bool Clears(double z, int candidates, CommittingSettings dials, int gates) =>
+        Normal.Tail(z)
+            * candidates
+            * (dials.Correcting == Correcting.Gates ? Math.Max(1, gates) : 1)
+        <= dials.Alpha;
 
     /// <summary>
     /// The code this parent's table would have picked SECOND — <b>an instrument for fork 74
@@ -1093,6 +1199,9 @@ internal static class Conditions
     /// </summary>
     /// <param name="parent">The commitment being asked about.</param>
     /// <param name="dials">Every number the machinery is allowed to have.</param>
+    /// <param name="gates">
+    /// How many parents this round was going to search, at the bar the gate that ships uses.
+    /// </param>
     /// <remarks>
     /// <para>
     /// <b>Fork 74 asks whether a chain could be walked in one pass</b>, and this is the half of
@@ -1115,7 +1224,7 @@ internal static class Conditions
     /// candidate count, because the search that found the runner-up is the same search.
     /// </para>
     /// </remarks>
-    public static Code? Runner(Commitment parent, CommittingSettings dials)
+    public static Code? Runner(Commitment parent, CommittingSettings dials, int gates = 1)
     {
         ArgumentNullException.ThrowIfNull(parent);
         ArgumentNullException.ThrowIfNull(dials);
@@ -1143,9 +1252,7 @@ internal static class Conditions
             }
         }
 
-        return second is not null && Normal.Tail(next) * candidates <= dials.Alpha
-            ? second
-            : null;
+        return second is not null && Clears(next, candidates, dials, gates) ? second : null;
     }
 
 
@@ -1155,6 +1262,9 @@ internal static class Conditions
     /// </summary>
     /// <param name="parent">The commitment being asked about.</param>
     /// <param name="dials">Every number the machinery is allowed to have.</param>
+    /// <param name="gates">
+    /// How many parents this round was going to search, at the bar the gate that ships uses.
+    /// </param>
     /// <remarks>
     /// <para>
     /// <b>Nothing calls this to mint anything, and that is the point.</b> The plan's rule
@@ -1187,7 +1297,7 @@ internal static class Conditions
     /// </para>
     /// </remarks>
     /// <returns>The code whose absence separates, or nothing.</returns>
-    public static Code? Absent(Commitment parent, CommittingSettings dials)
+    public static Code? Absent(Commitment parent, CommittingSettings dials, int gates = 1)
     {
         ArgumentNullException.ThrowIfNull(parent);
         ArgumentNullException.ThrowIfNull(dials);
@@ -1215,8 +1325,12 @@ internal static class Conditions
 
         if (best is null || candidates == 0) return null;
 
-        // the same blunt correction, over the admissible set rather than the whole table.
-        return Normal.Tail(strongest) * candidates <= dials.Alpha ? best : null;
+        // The same bar, over the admissible set rather than the whole table. An instrument
+        // reading this at a LOOSER bar than the gate that ships would say an absence separates
+        // exactly where the conjunctive bar had just been tightened -- the rung-two demand
+        // rising because its own control got stricter, which is a reading about the bar and
+        // not about the language.
+        return Clears(strongest, candidates, dials, gates) ? best : null;
     }
 
     /// <summary>

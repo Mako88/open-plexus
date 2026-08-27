@@ -340,7 +340,7 @@ public sealed class LearningTests(ITestOutputHelper output)
 
         output.WriteLine($"{Rounds} rounds a seed over {Seeds} seeds, {Slices} slices");
         output.WriteLine(
-            $"{"world",-14}{"answers",-9}{"bar",-11}{"curve",-44}{"rise",8}{"held",7}"
+            $"{"world",-14}{"answers",-9}{"bar",-14}{"curve",-44}{"rise",8}{"held",7}"
             + "   minted/repaired-of-searched@held~accounted+barren!thin, per slice");
 
         var rises = new Dictionary<(string World, bool Coined, Testing Bar), List<double>>();
@@ -373,7 +373,7 @@ public sealed class LearningTests(ITestOutputHelper output)
                 kept.Add(brain.Held.Count);
 
                 output.WriteLine(
-                    $"{name,-14}{(coined ? "a coin" : "its own"),-9}{bar,-11}"
+                    $"{name,-14}{(coined ? "a coin" : "its own"),-9}{bar,-14}"
                     + $"{string.Join("  ", curve.Select(one => one.ToString("F3"))),-44}"
                     + $"{rise,8:F3}{brain.Held.Count,7}   {string.Join(" ", growth)}");
             }

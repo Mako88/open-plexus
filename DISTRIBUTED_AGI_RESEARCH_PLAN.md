@@ -306,6 +306,145 @@ knowledge without evidence.
 A developmental curriculum supplies increasingly rich environments without installing their
 solutions. The same learner and dials cross every stage.
 
+### 4.9 Lessons that transfer from Persistence
+
+The separate Persistence project implements continuity infrastructure around language models.
+Its language model supplies most interpretation, summarization, and judgment, so its complete design
+cannot serve as the cognitive substrate proposed here. Several of its distinctions are independent of
+that substrate and should be retained.
+
+#### Memory intrinsic properties are separate from activation
+
+Persistence stores a fragment once while allowing its relevance, order, and collapsed state to differ
+between working contexts. The analogous rule here is:
+
+- provenance, evidence, semantic identity, and learned content belong to a memory artifact;
+- salience, retrieval score, presentation grain, and coalition membership belong to the artifact's
+  relationship with a current task or context.
+
+This prevents a fact that is currently irrelevant from becoming intrinsically unimportant. It also
+allows different agents or working coalitions to activate one shared artifact differently without
+giving it several semantic identities.
+
+#### Artifact identity is separate from storage and delivery identity
+
+Persistence discovered that a database row identifier could not identify an utterance across peer
+stores. It now uses an originator-minted message identifier that remains constant across relays, while
+the local row identifier and per-copy relay depth keep their separate jobs.
+
+Generalize that distinction throughout this architecture:
+
+- a concept, commitment, observation, procedure, or utterance has stable semantic identity;
+- each replica has local storage identity and version state;
+- each delivery has path, hop, time, and trust metadata;
+- each derivation has its own identity and points to the artifacts it used.
+
+Conflating any two of these makes deduplication, provenance, replay protection, and causal audit
+unreliable.
+
+#### Each peer owns its memory; a room owns no minds
+
+Persistence's federated shape is one single-owner runtime and continuity store per peer, with rooms as
+message channels. Each peer records its own experience of the shared conversation. The room does not
+own or merge their private memories.
+
+That is a sound default for the proposed federation of brains. Shared infrastructure transports
+artifacts and establishes common referents. It does not become the authoritative world model. Peers
+can disagree, miss different observations, assign different trust, and later converge through evidence.
+
+Within one distributed brain, single-owner storage is too restrictive; evidence must replicate. The
+principle that still transfers is semantic ownership: a transport, index, cache, or coalition must not
+silently become the authority that decides what the brain believes.
+
+#### Provenance travels with the claim
+
+Persistence attaches named and typed sources to fragments and preserves attribution through relay.
+The proposed system should go further by making provenance recursively derivational:
+
+```text
+claim -> observations / testimony / prior claims -> instruments and agents -> conditions
+```
+
+A human report, another brain's conclusion, a sensor observation, and a locally derived prediction can
+express the same content while carrying different evidence. Relaying must never reattribute the content
+to the relayer. Trust modifies how evidence is used; it does not alter the content's identity.
+
+#### Important self-change is proposed before it is adopted
+
+Persistence protects selected identity fragments and changes them through first-class proposals. A
+proposal cannot be created and accepted in the same turn, and acceptance applies the proposal and its
+status atomically.
+
+The non-LLM analogue should apply to core goals, identity commitments, trust policy, safety boundaries,
+and changes to the learning architecture. A proposed change carries:
+
+- the exact old and proposed state;
+- supporting and contradicting evidence;
+- the expected consequence and rollback condition;
+- who or what may authorize it;
+- a deliberation interval or independent evaluation;
+- an atomic adoption record.
+
+This is not a rule that important beliefs never change. It gives high-impact revision a slower,
+inspectable path than ordinary learning.
+
+#### Memory operations are visible and recoverable
+
+Persistence exposes the context budget to the peer and provides explicit operations to summarize,
+detach, archive, restore, and reprioritize memory. Its default is archive rather than erase, with an
+append-only audit record.
+
+The transferable requirement is metacognitive legibility: the agent can observe its memory and compute
+limits, predict what a consolidation will discard, and inspect what actually changed. Episodic source
+material should remain recoverable until a declared retention or privacy policy permits deletion.
+
+At large scale, keeping everything forever is neither physically nor ethically viable. Reversibility
+therefore needs explicit retention classes, privacy deletion, cryptographic erasure where required, and
+measured consolidation loss. Preserve-by-default is a development posture, not an unlimited storage
+claim.
+
+#### Wakes are temporal intentions, not merely timers
+
+Persistence lets a peer schedule an autonomous wake with a note to its future runtime. The equivalent
+here is a durable temporal intention containing a trigger, purpose, relevant context keys, expiry,
+authority, and cancellation condition. When it fires, it competes for a working coalition like any
+other event; it does not automatically gain permission to act.
+
+#### Attention gates belong before expensive cognition
+
+Persistence's multi-peer work moved its addressing and wake filter ahead of the language-model call.
+That prevents every room message from waking every peer and producing quadratic cost.
+
+This becomes a general distributed rule: cheap, inspectable routing based on identity, subscription,
+causal relevance, and resource policy occurs before coalition assembly and remote retrieval. The gate
+must be allowed to abstain and its misses must be measured, because a cheap gate can save nearly all
+compute by silently excluding what the agent needed to notice.
+
+#### Private state and deliberate sharing are distinct
+
+Persistence distinguishes a peer's private working material from what it intentionally says or shares
+with a room. A distributed brain likewise needs private per-agent memory, restricted internal state,
+and explicit publication. Provenance and privacy labels must survive summarization, derivation, caching,
+and relay.
+
+#### Persistence mechanisms that do not transfer directly
+
+The following are useful controls or prototypes, but they currently rely on capabilities supplied by a
+language model:
+
+- natural-language fragments as the primary semantic representation;
+- model-authored summaries as consolidation;
+- self-assigned scalar importance and confidence;
+- lexical full-text retrieval over recent conversation;
+- a prompt as the complete working coalition;
+- tagged model output as the source of memory operations and actions;
+- a model deciding in prose what constitutes identity or relationship memory.
+
+For this program, consolidation must preserve tested relational structure, confidence must derive from
+evidence, retrieval must operate on learned concepts and decision relevance, and memory actions must be
+available to the native policy. Persistence's implementations can serve as behavioral baselines while
+those replacements are developed.
+
 ---
 
 ## 5. Physical distribution

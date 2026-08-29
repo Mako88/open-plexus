@@ -212,6 +212,34 @@ fi
 
 encoders="$here/encoders"
 
+# all-MiniLM-L6-v2, sentence encoder -- Reimers & Gurevych 2019, sentence-transformers.
+# Apache 2.0; this ONNX export is the one published in the model repository.
+#
+# WHY A TEXT ENCODER IS HERE AT ALL: the two encoders above are vision towers, and a world
+# whose things are words needs a tower that reads words. `Unseen` is exactly that world -- the
+# machine sees a noun, never the letters of it, and only the frozen vector.
+#
+# NINETY MEGABYTES, WHICH IS THE FP32 EXPORT. There is an int8 build in the same repository
+# at about a quarter the size. Do not switch to it without measuring: quantisation moves every
+# vector slightly, and the whole experiment is about whether a direction through that space
+# separates two kinds of thing.
+#
+# THE VOCABULARY COMES WITH IT because the spike does no word-piece splitting. It looks a word
+# up whole and drops it from the study if the vocabulary does not hold it, which is a stated
+# restriction rather than an approximation.
+minilm_dir="$encoders/all-minilm-l6-v2"
+minilm_repo="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main"
+
+if [ -f "$minilm_dir/model.onnx" ]; then
+  echo "MiniLM: already at $minilm_dir"
+else
+  echo "MiniLM: fetching 90 MB from $minilm_repo"
+  mkdir -p "$minilm_dir"
+  grab --max-time 600 -o "$minilm_dir/model.onnx" "$minilm_repo/onnx/model.onnx"
+  grab --max-time 120 -o "$minilm_dir/vocab.txt" "$minilm_repo/vocab.txt"
+  echo "MiniLM: fetched to $minilm_dir"
+fi
+
 # CLIP ViT-B/32, vision tower only — Radford et al. 2021, "Learning Transferable
 # Visual Models From Natural Language Supervision". Original weights MIT, (c)
 # 2021 OpenAI; this ONNX export by Qdrant.

@@ -90,22 +90,21 @@ public sealed class Commitment(int[] scope, int consequent)
 /// about one step of one mechanism and everything else would only make the reading harder to
 /// attribute.
 /// </remarks>
-public sealed class Learner(Proposing proposing, int seed)
+/// <param name="proposing">Where the condition a repair adds is drawn from.</param>
+/// <param name="seed">The generator behind the chance arm.</param>
+/// <param name="maxChildren">
+/// How many children any arm may make in a whole run, and a dial rather than a constant
+/// because the control's score moves with it. The first reading of this spike did not have it
+/// and was not a comparison: a child minted from a chance direction usually has a mixed
+/// record, so it is repairable and has children of its own, while a child minted from the
+/// encoder is right about everything and stops. The control ran 12,933 candidates against the
+/// arm's 50 and scored 0.750 by searching, which is the multiple-comparisons problem wearing
+/// an experiment's clothes.
+/// </param>
+public sealed class Learner(Proposing proposing, int seed, int maxChildren = 200)
 {
     private const int Floor = 20;
     private const int ChildrenPerParent = 40;
-
-    /// <summary>
-    /// How many children any arm may make in a whole run.
-    /// </summary>
-    /// <remarks>
-    /// The first reading did not have this and was not a comparison. A child minted from a
-    /// chance direction usually has a mixed record, so it is repairable, so it has children of
-    /// its own; a child minted from the encoder is right about everything and stops. The
-    /// control therefore ran 12,933 candidates against the arm's 50 and scored 0.750 by
-    /// searching, which is the multiple-comparisons problem wearing an experiment's clothes.
-    /// </remarks>
-    private const int MaxChildren = 200;
 
     private readonly List<Commitment> _population = [];
     private readonly List<Region> _regions = [];
@@ -191,7 +190,7 @@ public sealed class Learner(Proposing proposing, int seed)
     {
         foreach (var parent in _population.ToList())
         {
-            if (_children >= MaxChildren) return;
+            if (_children >= maxChildren) return;
             if (parent.Fired < Floor) continue;
             if (parent.Hits == 0 || parent.Misses == 0) continue;
             if (parent.Spent.Count >= ChildrenPerParent) continue;

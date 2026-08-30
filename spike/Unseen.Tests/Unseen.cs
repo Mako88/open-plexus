@@ -18,8 +18,16 @@ public enum Labelling
 /// <summary>One thing in the world: a code, a vector, and whether it pours.</summary>
 public sealed record Thing(int Code, string Word, float[] Vector, bool Pours);
 
-/// <summary>One step of the world, as the set of codes that were true.</summary>
-public sealed record Step(int[] Now, int Next, Thing Subject);
+/// <summary>
+/// One step of the world, as the set of codes that were true.
+/// </summary>
+/// <remarks>
+/// <see cref="Other"/> is the second argument where the world has one, and it is carried
+/// beside the moment rather than inside it on purpose. The moment is a set of codes and a set
+/// cannot say which of two things was the subject; a mechanism that needs to know has to be
+/// handed it, and needing to be handed it is the finding rather than a convenience.
+/// </remarks>
+public sealed record Step(int[] Now, int Next, Thing Subject, Thing? Other = null);
 
 /// <summary>
 /// A world where what happens depends on an unstated property of the thing.

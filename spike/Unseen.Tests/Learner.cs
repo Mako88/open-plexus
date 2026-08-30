@@ -16,6 +16,15 @@ public enum Proposing
 
     /// <summary>A region of a direction drawn from nothing, minted the same way.</summary>
     ByChance,
+
+    /// <summary>
+    /// A region of the encoder's space, over the difference between the two arguments.
+    /// </summary>
+    /// <remarks>
+    /// The arm that needs roles. A difference is only defined once something says which
+    /// argument is subtracted from which, and a moment that is a set of codes cannot say it.
+    /// </remarks>
+    ByPair,
 }
 
 /// <summary>A code the machine made, standing for a region rather than a list.</summary>
@@ -24,14 +33,25 @@ public enum Proposing
 /// never met. A region covers things nobody has seen yet by construction, which is what lets a
 /// repaired rule transfer and is also why it cannot memorise.
 /// </remarks>
-public sealed record Region(int Code, float[] Direction, float Threshold, bool Above)
+public sealed record Region(
+    int Code,
+    float[] Direction,
+    float Threshold,
+    bool Above,
+    bool OnDifference = false)
 {
-    public bool Fires(Thing thing)
+    public bool Fires(Thing subject, Thing? other)
     {
-        ArgumentNullException.ThrowIfNull(thing);
+        ArgumentNullException.ThrowIfNull(subject);
+
+        if (OnDifference && other is null) return false;
 
         var projection = 0f;
-        for (var d = 0; d < Direction.Length; d++) projection += Direction[d] * thing.Vector[d];
+        for (var d = 0; d < Direction.Length; d++)
+        {
+            var value = OnDifference ? subject.Vector[d] - other!.Vector[d] : subject.Vector[d];
+            projection += Direction[d] * value;
+        }
 
         return Above ? projection > Threshold : projection < Threshold;
     }
@@ -52,29 +72,33 @@ public sealed class Commitment(int[] scope, int consequent)
 
     public double Rate => Fired == 0 ? 0 : (double)Hits / Fired;
 
-    /// <summary>The subjects it was right and wrong about, bounded.</summary>
-    public List<Thing> Right { get; } = [];
+    /// <summary>The steps it was right and wrong about, bounded.</summary>
+    /// <remarks>
+    /// The whole step rather than its subject, because an arm that reads the pair needs the
+    /// second argument and an arm that reads the codes needs the moment.
+    /// </remarks>
+    public List<Step> Right { get; } = [];
 
-    public List<Thing> Wrong { get; } = [];
+    public List<Step> Wrong { get; } = [];
 
     /// <summary>Codes already spent on a child, so repair enumerates rather than repeating.</summary>
     public HashSet<int> Spent { get; } = [];
 
     public bool Applies(HashSet<int> moment) => Scope.All(moment.Contains);
 
-    public void Saw(bool hit, Thing subject)
+    public void Saw(bool hit, Step step)
     {
         const int Keep = 400;
 
         if (hit)
         {
             Hits++;
-            if (Right.Count < Keep) Right.Add(subject);
+            if (Right.Count < Keep) Right.Add(step);
         }
         else
         {
             Misses++;
-            if (Wrong.Count < Keep) Wrong.Add(subject);
+            if (Wrong.Count < Keep) Wrong.Add(step);
         }
     }
 
@@ -101,7 +125,19 @@ public sealed class Commitment(int[] scope, int consequent)
 /// arm's 50 and scored 0.750 by searching, which is the multiple-comparisons problem wearing
 /// an experiment's clothes.
 /// </param>
-public sealed class Learner(Proposing proposing, int seed, int maxChildren = 200)
+/// <param name="maxScope">
+/// How many conditions a rule may carry. Two is genesis plus one repair, so a learner capped
+/// there can use one region and no more; leaving it open lets repair condition on its own
+/// earlier condition. The difference between the two is the only direct measurement of whether
+/// composing regions buys anything, since a task that needs it cannot be built by hand -- four
+/// well-separated clusters in three hundred and eighty-four dimensions can be split any way at
+/// all by one hyperplane.
+/// </param>
+public sealed class Learner(
+    Proposing proposing,
+    int seed,
+    int maxChildren = 200,
+    int maxScope = 99)
 {
     private const int Floor = 20;
     private const int ChildrenPerParent = 40;
@@ -128,10 +164,10 @@ public sealed class Learner(Proposing proposing, int seed, int maxChildren = 200
         {
             at++;
 
-            var moment = Moment(step.Subject, step.Now);
+            var moment = Moment(step);
 
             foreach (var one in _population.Where(one => one.Applies(moment)).ToList())
-                one.Saw(one.Consequent == step.Next, step.Subject);
+                one.Saw(one.Consequent == step.Next, step);
 
             Seed(step.Next);
 
@@ -143,28 +179,40 @@ public sealed class Learner(Proposing proposing, int seed, int maxChildren = 200
 
     /// <summary>What the machine says about one step it has never met.</summary>
     /// <returns>The predicted code, or nothing where no rule it trusts applies.</returns>
-    public int? Says(Step step)
+    public int? Says(Step step) => Chose(step)?.Consequent;
+
+    /// <summary>
+    /// Which rule answered, so the report can say how deep the answer was.
+    /// </summary>
+    /// <remarks>
+    /// A scope of one is the rule genesis made. Two is one repair, and it is the whole result
+    /// of the ladder so far. Three or more would mean repair conditioned on its own earlier
+    /// condition, which is the only route the mechanism has to a property no single direction
+    /// separates.
+    /// </remarks>
+    public Commitment? Chose(Step step)
     {
         ArgumentNullException.ThrowIfNull(step);
 
-        var moment = Moment(step.Subject, step.Now);
+        var moment = Moment(step);
 
-        var best = _population
+        return _population
             .Where(one => one.Fired >= Floor && one.Applies(moment))
             .OrderByDescending(one => one.Rate)
             .ThenByDescending(one => one.Scope.Length)
             .ThenByDescending(one => one.Fired)
             .ThenBy(one => one.Consequent)
             .FirstOrDefault();
-
-        return best?.Consequent;
     }
 
     /// <summary>The codes true of this step, including every region that fires.</summary>
-    private HashSet<int> Moment(Thing subject, int[] now)
+    private HashSet<int> Moment(Step step)
     {
-        var moment = new HashSet<int>(now);
-        foreach (var region in _regions.Where(one => one.Fires(subject))) moment.Add(region.Code);
+        var moment = new HashSet<int>(step.Now);
+
+        foreach (var region in _regions.Where(one => one.Fires(step.Subject, step.Other)))
+            moment.Add(region.Code);
+
         return moment;
     }
 
@@ -194,12 +242,14 @@ public sealed class Learner(Proposing proposing, int seed, int maxChildren = 200
             if (parent.Fired < Floor) continue;
             if (parent.Hits == 0 || parent.Misses == 0) continue;
             if (parent.Spent.Count >= ChildrenPerParent) continue;
+            if (parent.Scope.Length >= maxScope) continue;
 
             var condition = proposing switch
             {
                 Proposing.Present => FromPresent(parent),
-                Proposing.ByEncoder => FromDirection(parent, Separating(parent)),
-                Proposing.ByChance => FromDirection(parent, Random()),
+                Proposing.ByEncoder => FromDirection(parent, Separating(parent, false), false),
+                Proposing.ByPair => FromDirection(parent, Separating(parent, true), true),
+                Proposing.ByChance => FromDirection(parent, Random(), false),
                 _ => null,
             };
 
@@ -215,8 +265,8 @@ public sealed class Learner(Proposing proposing, int seed, int maxChildren = 200
     /// <summary>The code that best marks out where the parent was right.</summary>
     private int? FromPresent(Commitment parent)
     {
-        var right = parent.Right.CountBy(one => one.Code).ToDictionary();
-        var wrong = parent.Wrong.CountBy(one => one.Code).ToDictionary();
+        var right = parent.Right.SelectMany(one => one.Now).CountBy(one => one).ToDictionary();
+        var wrong = parent.Wrong.SelectMany(one => one.Now).CountBy(one => one).ToDictionary();
 
         var best = right.Keys
             .Where(code => !parent.Scope.Contains(code) && !parent.Spent.Contains(code))
@@ -232,28 +282,41 @@ public sealed class Learner(Proposing proposing, int seed, int maxChildren = 200
         return best.Code == 0 ? null : best.Code;
     }
 
-    /// <summary>The direction from what it got wrong towards what it got right.</summary>
-    private float[]? Separating(Commitment parent)
+    /// <summary>
+    /// The direction from what it got wrong towards what it got right.
+    /// </summary>
+    /// <param name="parent">The rule whose record is being read.</param>
+    /// <param name="paired">
+    /// Whether to read the difference between the two arguments rather than the subject alone.
+    /// This is the whole of what roles buy: the same arithmetic over a value that only exists
+    /// once something says which argument comes first.
+    /// </param>
+    private static float[]? Separating(Commitment parent, bool paired)
     {
         if (parent.Right.Count == 0 || parent.Wrong.Count == 0) return null;
+        if (paired && parent.Right.Concat(parent.Wrong).Any(one => one.Other is null)) return null;
 
-        var width = parent.Right[0].Vector.Length;
+        var width = parent.Right[0].Subject.Vector.Length;
         var direction = new float[width];
 
         foreach (var one in parent.Right)
-            for (var d = 0; d < width; d++) direction[d] += one.Vector[d] / parent.Right.Count;
+            for (var d = 0; d < width; d++) direction[d] += Read(one, d, paired) / parent.Right.Count;
 
         foreach (var one in parent.Wrong)
-            for (var d = 0; d < width; d++) direction[d] -= one.Vector[d] / parent.Wrong.Count;
+            for (var d = 0; d < width; d++) direction[d] -= Read(one, d, paired) / parent.Wrong.Count;
 
         return Encoder.Unit(direction);
     }
+
+    /// <summary>One coordinate of what a step looks like to an arm.</summary>
+    private static float Read(Step step, int at, bool paired) =>
+        paired ? step.Subject.Vector[at] - step.Other!.Vector[at] : step.Subject.Vector[at];
 
     /// <summary>A direction drawn from nothing, which is the floor the encoder must beat.</summary>
     private float[]? Random()
     {
         var width = _population.SelectMany(one => one.Right.Concat(one.Wrong))
-            .Select(one => one.Vector.Length)
+            .Select(one => one.Subject.Vector.Length)
             .FirstOrDefault();
 
         if (width == 0) return null;
@@ -273,13 +336,13 @@ public sealed class Learner(Proposing proposing, int seed, int maxChildren = 200
     /// chance direction, and an arm that beats its control by a cleverer threshold has not
     /// shown what it claims to.
     /// </remarks>
-    private int? FromDirection(Commitment parent, float[]? direction)
+    private int? FromDirection(Commitment parent, float[]? direction, bool paired)
     {
         if (direction is null) return null;
         if (parent.Right.Count == 0 || parent.Wrong.Count == 0) return null;
 
-        var right = parent.Right.Average(one => Project(direction, one));
-        var wrong = parent.Wrong.Average(one => Project(direction, one));
+        var right = parent.Right.Average(one => Project(direction, one, paired));
+        var wrong = parent.Wrong.Average(one => Project(direction, one, paired));
 
         if (Math.Abs(right - wrong) < 1e-6) return null;
 
@@ -287,16 +350,17 @@ public sealed class Learner(Proposing proposing, int seed, int maxChildren = 200
             Code: _nextRegion++,
             Direction: direction,
             Threshold: (float)((right + wrong) / 2.0),
-            Above: right > wrong);
+            Above: right > wrong,
+            OnDifference: paired);
 
         _regions.Add(region);
         return region.Code;
     }
 
-    private static double Project(float[] direction, Thing thing)
+    private static double Project(float[] direction, Step step, bool paired)
     {
         var total = 0.0;
-        for (var d = 0; d < direction.Length; d++) total += direction[d] * thing.Vector[d];
+        for (var d = 0; d < direction.Length; d++) total += direction[d] * Read(step, d, paired);
         return total;
     }
 }

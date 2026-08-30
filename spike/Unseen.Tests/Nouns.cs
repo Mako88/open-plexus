@@ -11,7 +11,17 @@ namespace Unseen;
 /// <param name="Positive">Things the first outcome happens to.</param>
 /// <param name="Negative">Things the second outcome happens to.</param>
 /// <param name="HeldOutEach">How many of each side never appear in the stream.</param>
-public sealed record Study(string Name, string[] Positive, string[] Negative, int HeldOutEach);
+/// <param name="Groups">
+/// The sub-populations the held-out set must be balanced across, where the study has any.
+/// Without this a split can hold out four living things and no lifeless ones, and a direction
+/// reading only one of two properties then scores well on an exam built to defeat it.
+/// </param>
+public sealed record Study(
+    string Name,
+    string[] Positive,
+    string[] Negative,
+    int HeldOutEach,
+    string[][]? Groups = null);
 
 /// <summary>
 /// The ladder of properties, ordered by how much of one English has in a word.
@@ -114,7 +124,122 @@ public static class Nouns
     /// </remarks>
     public static readonly Study Arbitrary = Split(Mixed, "arbitrary", 90210);
 
+    /// <summary>Living things, big and small, and lifeless things, big and small.</summary>
+    /// <remarks>
+    /// One pool carrying two properties that have nothing to do with each other. Three studies
+    /// are drawn over it: each property alone, which the encoder should read, and the exclusive
+    /// or of the two, which no single direction can.
+    /// </remarks>
+    private static readonly string[] AliveBig =
+        ["horse", "cow", "bear", "lion", "tiger", "whale", "elephant", "camel"];
+
+    private static readonly string[] AliveSmall =
+        ["mouse", "ant", "bee", "frog", "spider", "worm", "moth", "mole"];
+
+    private static readonly string[] DeadBig =
+        ["truck", "ship", "house", "mountain", "bridge", "tower", "train", "castle"];
+
+    private static readonly string[] DeadSmall =
+        ["coin", "pin", "key", "ring", "button", "nail", "screw", "seed"];
+
+    /// <summary>Alive, over the pool the exclusive or is drawn from.</summary>
+    public static readonly Study Living = new(
+        "living",
+        [.. AliveBig, .. AliveSmall],
+        [.. DeadBig, .. DeadSmall],
+        HeldOutEach: 4,
+        Groups: [AliveBig, AliveSmall, DeadBig, DeadSmall]);
+
+    /// <summary>Big, over the same pool.</summary>
+    public static readonly Study Large = new(
+        "large",
+        [.. AliveBig, .. DeadBig],
+        [.. AliveSmall, .. DeadSmall],
+        HeldOutEach: 4,
+        Groups: [AliveBig, AliveSmall, DeadBig, DeadSmall]);
+
+    /// <summary>
+    /// Alive or big, but not both.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The composition test the earlier `thin` reading failed to be. Its two sides are each a
+    /// union of two opposite corners, so their centroids sit almost on top of each other and no
+    /// single direction separates them -- the probe should read chance while the two properties
+    /// it is built from each read well.
+    /// </para>
+    /// <para>
+    /// The only route the mechanism has is to condition. A first region splits the pool
+    /// somewhere, and within one side of that split the remaining question is no longer
+    /// symmetric, so a second region can find it. Whether repair actually walks that ladder is
+    /// the reading.
+    /// </para>
+    /// </remarks>
+    public static readonly Study Either = new(
+        "either",
+        [.. AliveSmall, .. DeadBig],
+        [.. AliveBig, .. DeadSmall],
+        HeldOutEach: 4,
+        Groups: [AliveBig, AliveSmall, DeadBig, DeadSmall]);
+
+    /// <summary>
+    /// Sixteen things in size order, for the world where the answer belongs to a pair.
+    /// </summary>
+    /// <remarks>
+    /// The code is the rank, because the list is written in order. Nothing tells the machine
+    /// that, and the codes are opaque integers to it exactly as every other code is.
+    /// </remarks>
+    private static readonly string[] BySize =
+    [
+        "pin", "seed", "coin", "button", "key", "spoon", "cup", "bowl",
+        "hat", "shoe", "box", "chair", "table", "door", "truck", "house",
+    ];
+
+    /// <summary>The size-ordered pool, in order.</summary>
+    public static IReadOnlyList<Thing> Sized(Encoder encoder, Sense sense = Sense.Meaning)
+    {
+        ArgumentNullException.ThrowIfNull(encoder);
+
+        return [.. BySize.Select((word, at) =>
+            new Thing(100 + at, word, encoder.Of(word, sense), at * 2 >= BySize.Length))];
+    }
+
+    /// <summary>
+    /// Which things are kept back, drawn from the middle so each has partners on both sides.
+    /// </summary>
+    /// <remarks>
+    /// The largest thing is over everything and the smallest is under everything, so holding
+    /// either back leaves a subject that cannot be asked a balanced question.
+    /// </remarks>
+    public static (IReadOnlyList<Thing> Train, IReadOnlyList<Thing> Test) Middle(
+        IReadOnlyList<Thing> things,
+        int heldOut,
+        int seed)
+    {
+        ArgumentNullException.ThrowIfNull(things);
+
+        var rng = new Random(seed);
+
+        var held = things.Skip(3).Take(things.Count - 6)
+            .OrderBy(one => rng.Next())
+            .Take(heldOut)
+            .ToHashSet();
+
+        return ([.. things.Where(one => !held.Contains(one))], [.. things.Where(held.Contains)]);
+    }
+
     public static IReadOnlyList<Study> Ladder() => [Pours, Alive, Thin, Letter, Arbitrary];
+
+    /// <summary>The three studies over one pool that make the composition test.</summary>
+    public static IReadOnlyList<Study> Composed() => [Living, Large, Either];
+
+    /// <summary>Every word any study names, for the check that none is dropped.</summary>
+    public static IEnumerable<string> Every() =>
+        Ladder().Concat(Composed())
+            .SelectMany(one => one.Positive.Concat(one.Negative))
+            .Concat(Containers)
+            .Concat(BySize)
+            .Distinct(StringComparer.Ordinal);
 
     /// <summary>
     /// Every thing in one study, with the vector the chosen labelling gives it.
@@ -126,7 +251,11 @@ public static class Nouns
     /// dropped and both sides are then trimmed to the same length, so the exam stays balanced
     /// and chance stays one half.
     /// </remarks>
-    public static IReadOnlyList<Thing> All(Encoder encoder, Study study, Labelling labelling)
+    public static IReadOnlyList<Thing> All(
+        Encoder encoder,
+        Study study,
+        Labelling labelling,
+        Sense sense = Sense.Meaning)
     {
         ArgumentNullException.ThrowIfNull(encoder);
         ArgumentNullException.ThrowIfNull(study);
@@ -144,7 +273,9 @@ public static class Nouns
             things.Add(new Thing(
                 code++,
                 word,
-                labelling == Labelling.Real ? encoder.Of(word) : Arbitrarily(word, encoder.Width),
+                labelling == Labelling.Real
+                    ? encoder.Of(word, sense)
+                    : Arbitrarily(word, encoder.Width),
                 side));
         }
 
@@ -155,22 +286,45 @@ public static class Nouns
     public static IReadOnlyList<int> ContainerCodes() =>
         [.. Enumerable.Range(10, Containers.Length)];
 
-    /// <summary>Split so that no thing in the exam was ever in the stream.</summary>
+    /// <summary>
+    /// Split so that no thing in the exam was ever in the stream.
+    /// </summary>
+    /// <remarks>
+    /// Where the study names sub-populations the exam is balanced across all of them, and not
+    /// merely across the two sides. On a study built to defeat a single direction, a held-out
+    /// set drawn only from two of four corners can be answered by the very direction the study
+    /// exists to rule out.
+    /// </remarks>
     public static (IReadOnlyList<Thing> Train, IReadOnlyList<Thing> Test) Held(
         IReadOnlyList<Thing> things,
-        int heldOutEach,
+        Study study,
         int seed)
     {
         ArgumentNullException.ThrowIfNull(things);
+        ArgumentNullException.ThrowIfNull(study);
 
         var rng = new Random(seed);
 
-        var positive = things.Where(one => one.Pours).OrderBy(one => rng.Next()).ToList();
-        var negative = things.Where(one => !one.Pours).OrderBy(one => rng.Next()).ToList();
+        var sides = study.Groups is null
+            ? [things.Where(one => one.Pours), things.Where(one => !one.Pours)]
+            : study.Groups.Select(group =>
+                things.Where(one => group.Contains(one.Word, StringComparer.Ordinal)));
 
-        return (
-            Train: [.. positive.Skip(heldOutEach), .. negative.Skip(heldOutEach)],
-            Test: [.. positive.Take(heldOutEach), .. negative.Take(heldOutEach)]);
+        var each = study.Groups is null
+            ? study.HeldOutEach
+            : (study.HeldOutEach * 2) / study.Groups.Length;
+
+        var test = new List<Thing>();
+        var train = new List<Thing>();
+
+        foreach (var side in sides)
+        {
+            var shuffled = side.OrderBy(one => rng.Next()).ToList();
+            test.AddRange(shuffled.Take(each));
+            train.AddRange(shuffled.Skip(each));
+        }
+
+        return (train, test);
     }
 
     /// <summary>A partition of one pool that carries no meaning, fixed by its seed.</summary>

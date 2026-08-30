@@ -3,6 +3,25 @@ using Microsoft.ML.OnnxRuntime.Tensors;
 
 namespace Unseen;
 
+/// <summary>Which sense a thing is seen with.</summary>
+/// <remarks>
+/// A machine is bounded by what its senses carry, and the point of having more than one here
+/// is to show that the bound moves when a sense is added and not when what one sense already
+/// gave is recombined. Information absent from a vector cannot be recovered from that vector,
+/// however cleverly it is sliced.
+/// </remarks>
+public enum Sense
+{
+    /// <summary>The frozen sentence encoder: what English knows about the word.</summary>
+    Meaning,
+
+    /// <summary>The letters: what the word looks like, and nothing about what it means.</summary>
+    Spelling,
+
+    /// <summary>Both, each normalised first so neither drowns the other.</summary>
+    Both,
+}
+
 /// <summary>
 /// A frozen published sentence encoder, asked for one word at a time.
 /// </summary>
@@ -105,6 +124,38 @@ public sealed class Encoder : IDisposable
                 pooled[d] += hidden[0, at, d];
 
         return Unit(pooled);
+    }
+
+    /// <summary>One word through the chosen sense.</summary>
+    public float[] Of(string word, Sense sense) => sense switch
+    {
+        Sense.Meaning => Of(word),
+        Sense.Spelling => Spelling(word),
+        Sense.Both => Unit([.. Of(word), .. Spelling(word)]),
+        _ => throw new ArgumentOutOfRangeException(nameof(sense)),
+    };
+
+    /// <summary>
+    /// A word as its letters: how many of each, and which one it starts with.
+    /// </summary>
+    /// <remarks>
+    /// A sense rather than a label. A machine that can see the shape of a word can see its
+    /// first letter, the same way one that can see a ball can see that it is round. It says
+    /// nothing whatever about what the word means, which is what makes it a clean second
+    /// channel rather than a hint.
+    /// </remarks>
+    public static float[] Spelling(string word)
+    {
+        ArgumentNullException.ThrowIfNull(word);
+
+        var vector = new float[52];
+
+        foreach (var letter in word.Where(char.IsAsciiLetterLower))
+            vector[letter - 'a']++;
+
+        if (word.Length > 0 && char.IsAsciiLetterLower(word[0])) vector[26 + word[0] - 'a'] = 1;
+
+        return Unit(vector);
     }
 
     /// <summary>The same vector scaled to length one, or left alone where it has no length.</summary>

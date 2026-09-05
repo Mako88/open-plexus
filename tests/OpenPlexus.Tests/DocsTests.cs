@@ -910,7 +910,18 @@ public sealed class DocsTests
     // clears the blind bar on the population `Deciding.Grounded` itself grew, so the loss is
     // the ranking rather than the rules, and the item says which arm to run rather than which
     // question to ask.
-    private const int Whole = 13_865;
+    //
+    // And 13,925 for the answer coming out the other way and for the trap that hid it. No
+    // ranking of the firing set clears the blind bar: accuracy is the best of four and is what
+    // ships, a bound that discounts thin evidence is worse, and the most TESTED advocate is
+    // worst of all. So the well-tested rules are the general wrong ones and the right ones are
+    // thin, which is a fact about the population rather than about the vote.
+    //
+    // The trap is what let a commit say the opposite. A commitment is mutable and an immutable
+    // array of them is immutable in its membership alone, so a rank read after the step ranks a
+    // population that has been settled and handed a rule minted on the round's own answer. Two
+    // lines, and without them the next session re-runs the same readout and believes it.
+    private const int Whole = 13_925;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

@@ -815,6 +815,9 @@ them. **A class earning a check moves out of here into the check.**
 - **Arm anything that has always read zero.** `Surprise` and `Abstain` were both found wired
   and unable to fire, and *promiscuous on purpose* meant EXHAUSTIVE for the life of the repo
   because its gate was mounted nowhere.
+- **A readout over the brain must SNAPSHOT, a commitment being mutable.** An immutable array
+  of them is immutable in its membership alone, so a rank read after the step ranks a
+  population already settled and already given a rule minted on this round's answer.
 - **An instrument built beside a run is a different run.** A parts count taken over the same
   lesson with no learner speaking read one part a moment where the scored stream reaches two,
   so a null result read as a mechanism that could not fire.

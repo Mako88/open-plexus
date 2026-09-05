@@ -1,4 +1,4 @@
-﻿using OpenPlexus.Codes;
+using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -43,24 +43,27 @@ public sealed class ReachingTests(ITestOutputHelper output)
     /// <param name="Accuracy">Its merged accuracy.</param>
     /// <param name="Seen">How often it has fired.</param>
     /// <param name="Hits">How often it was right.</param>
-    private readonly record struct Advocate(Code Expects, double Accuracy, long Seen, long Hits);
+    /// <param name="Deep">How many codes its scope names.</param>
+    private readonly record struct Advocate(
+        Code Expects, double Accuracy, long Seen, long Hits, int Deep);
+
+    /// <summary>One exam round, as it stood when the vote was taken.</summary>
+    /// <param name="Advocates">Everything that fired, snapshotted.</param>
+    /// <param name="Answer">What actually followed.</param>
+    /// <param name="Voted">Whether the machine got it right.</param>
+    private readonly record struct Round_(
+        IReadOnlyList<Advocate> Advocates, Code Answer, bool Voted);
 
     /// <summary>
-    /// What the population holds at the vote, and what any honest ranking of it could reach.
+    /// Every exam round of a run, snapshotted at the instant the vote was taken.
     /// </summary>
-    [Fact]
-    public async Task Whether_a_ranking_of_the_firing_set_can_clear_the_blind_bar()
+    /// <remarks>
+    /// One run for both readings below, because a shape and a ranking read off two runs are
+    /// two populations and the pair would say nothing about each other.
+    /// </remarks>
+    private static async Task<List<Round_>> Rounds()
     {
-        output.WriteLine(
-            $"{CeilingTests.Houses} houses a seed over {CeilingTests.Seeds} seeds, "
-            + "the machine saying nothing, every column read BEFORE the step");
-
-        output.WriteLine(
-            $"{"seed",-6}{"asked",8}{"voted",9}{"strong",9}{"plural",9}{"tested",9}"
-            + $"{"bounded",9}{"reached",9}{"distinct",10}");
-
-        var total = (Asked: 0, Voted: 0, Strong: 0, Plural: 0, Tested: 0, Bounded: 0,
-            Reached: 0, Distinct: 0L);
+        var sat = new List<Round_>();
 
         for (var seed = 1; seed <= CeilingTests.Seeds; seed++)
         {
@@ -73,23 +76,20 @@ public sealed class ReachingTests(ITestOutputHelper output)
             var rounds = CeilingTests.Houses * 46;
             var loop = new Round(brain, rounds, sweep: 500, target: 0.9, window: 500);
 
-            var seen = (Asked: 0, Voted: 0, Strong: 0, Plural: 0, Tested: 0, Bounded: 0,
-                Reached: 0, Distinct: 0L);
-
             for (var round = 0; round < rounds; round++)
             {
                 if (watching.Push() is not { } pushed) continue;
 
                 var scoring = house.Sat && pushed.Followed is not null;
 
-                // Copied out rather than held by reference, which is the whole point. The
-                // step settles every one of these and mints new ones, so a reference read
-                // afterwards is a different population.
+                // Copied out rather than held by reference, which is the whole point. The step
+                // settles every one of these and mints new ones, so a reference read afterwards
+                // is a different population.
                 var advocates = scoring
                     ? brain.Held
                         .Firing(brain.Held.Moment(pushed.Codes), pushed.Grouping)
                         .Select(one => new Advocate(
-                            one.Expects, one.Accuracy, one.Seen, one.Hits))
+                            one.Expects, one.Accuracy, one.Seen, one.Hits, one.Scope.Length))
                         .ToList()
                     : [];
 
@@ -97,88 +97,216 @@ public sealed class ReachingTests(ITestOutputHelper output)
 
                 await loop.StepAsync(pushed);
 
-                if (!scoring) continue;
-                if (pushed.Followed is not { } answer) continue;
+                if (!scoring || pushed.Followed is not { } answer) continue;
 
-                seen.Asked++;
-                seen.Distinct += advocates.Select(one => one.Expects).Distinct().Count();
-
-                if (loop.Right > was) seen.Voted++;
-                if (advocates.Any(one => one.Expects == answer)) seen.Reached++;
-
-                if (advocates.Count == 0) continue;
-
-                // What the vote takes: an expectation is worth its best advocate's accuracy,
-                // the highest wins, ties by code.
-                if (Best(advocates, one => one.Accuracy) == answer) seen.Strong++;
-
-                // A crowd counted rather than weighed, which needs no evidence at all.
-                if (advocates
-                        .GroupBy(one => one.Expects)
-                        .OrderByDescending(one => one.Count())
-                        .ThenBy(one => one.Key)
-                        .First().Key == answer)
-                    seen.Plural++;
-
-                // The most TESTED advocate, ignoring whether it is any good. A rule that has
-                // fired a thousand times is a different bet from one that has fired twice.
-                if (Best(advocates, one => one.Seen) == answer) seen.Tested++;
-
-                // Accuracy discounted by how little is behind it -- the lower end of a Wilson
-                // interval at roughly two standard errors. A rule right once out of once
-                // reads near a half where one right ninety-nine times of a hundred reads near
-                // ninety-five, so evidence enters the ranking without a second dial.
-                if (Best(advocates, Bounded) == answer) seen.Bounded++;
+                sat.Add(new Round_(advocates, answer, loop.Right > was));
             }
-
-            output.WriteLine(
-                $"{seed,-6}{seen.Asked,8}{seen.Voted / (double)seen.Asked,9:F3}"
-                + $"{seen.Strong / (double)seen.Asked,9:F3}"
-                + $"{seen.Plural / (double)seen.Asked,9:F3}"
-                + $"{seen.Tested / (double)seen.Asked,9:F3}"
-                + $"{seen.Bounded / (double)seen.Asked,9:F3}"
-                + $"{seen.Reached / (double)seen.Asked,9:F3}"
-                + $"{seen.Distinct / (double)seen.Asked,10:F1}");
-
-            total = (
-                total.Asked + seen.Asked, total.Voted + seen.Voted,
-                total.Strong + seen.Strong, total.Plural + seen.Plural,
-                total.Tested + seen.Tested, total.Bounded + seen.Bounded,
-                total.Reached + seen.Reached, total.Distinct + seen.Distinct);
         }
 
-        var voted = total.Voted / (double)total.Asked;
-        var strong = total.Strong / (double)total.Asked;
-        var bounded = total.Bounded / (double)total.Asked;
+        return sat;
+    }
+
+    /// <summary>
+    /// How DEEP the rules that fire are, how good they are, and where the answer lives.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The shape behind the ranking's failure. A short scope is a subset of nearly every
+    /// moment, so it fires constantly and can only ever expect something common; a long one
+    /// fires rarely and is where a specific answer would have to live. If the firing set is
+    /// mostly short scopes then the population covers by construction and no ranking over it
+    /// could do better.
+    /// </para>
+    /// <para>
+    /// The right column is the one that decides it: among the rules expecting the ANSWER, how
+    /// deep are they and how well tested. A population whose correct advocates are deep and
+    /// thin is one whose knowledge is real and unfindable; one with no correct advocate worth
+    /// ranking has not learnt the answer at all.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task How_deep_the_rules_that_fire_are_and_where_the_answer_lives()
+    {
+        var sat = await Rounds();
 
         output.WriteLine(
-            $"{"all",-6}{total.Asked,8}{voted,9:F3}{strong,9:F3}"
-            + $"{total.Plural / (double)total.Asked,9:F3}"
-            + $"{total.Tested / (double)total.Asked,9:F3}"
-            + $"{bounded,9:F3}{total.Reached / (double)total.Asked,9:F3}"
-            + $"{total.Distinct / (double)total.Asked,10:F1}");
+            $"{sat.Count} exam rounds over {CeilingTests.Seeds} seeds, snapshotted at the vote");
 
         output.WriteLine(
-            $"a blind rule reads {CeilingTests.Bars().Noun:F3} on the same stream");
+            $"{"depth",-8}{"firing",10}{"share",9}{"accuracy",10}{"seen",9}{"right",9}");
 
-        Assert.True(total.Asked > 100);
+        var buckets = sat
+            .SelectMany(one => one.Advocates.Select(each => (Round: one, Each: each)))
+            .GroupBy(one => Math.Min(one.Each.Deep, 5))
+            .OrderBy(one => one.Key)
+            .ToList();
 
-        // The snapshot reproduces the machine, which is what says every other column here is
-        // a thing that machine could have done instead. A `strong` above the vote would mean
-        // the readout is reading a population the vote never saw -- which is exactly the fault
-        // this file was rewritten to remove.
-        Assert.True(Math.Abs(strong - voted) < 0.02,
-            $"the vote's own rule replayed on the snapshot reads {strong:F3} where the machine "
-            + $"scored {voted:F3}. Those are the same rule on the same rounds, so the snapshot "
-            + "is not the population that voted and no column here is a mechanism");
+        var firing = buckets.Sum(one => one.Count());
 
-        // And the reached column is coverage rather than a ceiling, asserted in the direction
-        // it was found so a firing set that became selective would fail here and the column
-        // would start meaning something.
-        Assert.True(total.Distinct / (double)total.Asked > 8.0,
-            $"the firing set now expects {total.Distinct / (double)total.Asked:F1} different "
-            + "answers a round, where it expected most of the exam's alphabet when this was "
-            + "written -- so the reached column may now mean something and wants re-reading");
+        foreach (var bucket in buckets)
+        {
+            var deep = bucket.Key == 5 ? "5+" : bucket.Key.ToString();
+
+            output.WriteLine(
+                $"{deep,-8}{bucket.Count(),10}{bucket.Count() / (double)firing,9:F3}"
+                + $"{bucket.Average(one => one.Each.Accuracy),10:F3}"
+                + $"{bucket.Average(one => (double)one.Each.Seen),9:F1}"
+                + $"{bucket.Count(one => one.Each.Expects == one.Round.Answer)
+                    / (double)bucket.Count(),9:F3}");
+        }
+
+        // And the same question asked only of the advocates that were RIGHT, which is where a
+        // population that knows the answer would keep it.
+        var correct = sat
+            .SelectMany(one => one.Advocates.Where(each => each.Expects == one.Answer))
+            .ToList();
+
+        output.WriteLine(
+            $"the {correct.Count} advocates that expected the answer sit at depth "
+            + $"{correct.Average(one => (double)one.Deep):F2}, accuracy "
+            + $"{correct.Average(one => one.Accuracy):F3}, seen "
+            + $"{correct.Average(one => (double)one.Seen):F1}");
+
+        var wrong = sat
+            .SelectMany(one => one.Advocates.Where(each => each.Expects != one.Answer))
+            .ToList();
+
+        output.WriteLine(
+            $"the {wrong.Count} that did not sit at depth "
+            + $"{wrong.Average(one => (double)one.Deep):F2}, accuracy "
+            + $"{wrong.Average(one => one.Accuracy):F3}, seen "
+            + $"{wrong.Average(one => (double)one.Seen):F1}");
+
+        // Whether the population holds a RELIABLE rule at all. The blind bar is a rule this
+        // language can say -- a scope naming the question's noun, expecting the commonest
+        // answer for it -- so if nothing well-tested is as accurate as that bar, the machine
+        // has failed to learn a regularity it could express and no ranking was ever going to
+        // save it.
+        var tested = sat
+            .SelectMany(one => one.Advocates)
+            .Where(one => one.Seen >= 50)
+            .ToList();
+
+        output.WriteLine(
+            $"of {tested.Count} well-tested firings, "
+            + $"{tested.Count(one => one.Accuracy >= 0.41) / (double)Math.Max(tested.Count, 1):F3} "
+            + $"are as accurate as the blind bar, best {tested.Max(one => one.Accuracy):F3}");
+
+        // And a ranker that will only listen to a well-tested advocate, which is the last
+        // obvious one left after a maximum, a mean, a plurality, a bound and the most tested.
+        var settled = sat.Count(one =>
+            one.Advocates.Any(each => each.Seen >= 50)
+            && one.Advocates
+                .Where(each => each.Seen >= 50)
+                .GroupBy(each => each.Expects)
+                .Select(each => (Expects: each.Key, Weight: each.Max(a => a.Accuracy)))
+                .OrderByDescending(each => each.Weight)
+                .ThenBy(each => each.Expects)
+                .First().Expects == one.Answer) / (double)sat.Count;
+
+        output.WriteLine($"ranking only well-tested advocates reads {settled:F3}");
+
+        Assert.True(sat.Count > 100);
+
+        // The two sets have to differ somewhere, or nothing about an advocate says whether it
+        // is about to be right and no ranking over them could ever work. That is the finding
+        // this reading exists to make falsifiable.
+        Assert.True(
+            Math.Abs(correct.Average(one => one.Accuracy) - wrong.Average(one => one.Accuracy))
+                > 0.01
+            || Math.Abs(correct.Average(one => (double)one.Deep)
+                - wrong.Average(one => (double)one.Deep)) > 0.05,
+            "the advocates that expect the answer and the ones that do not are alike in depth "
+            + "and in accuracy, so nothing a ranking can see separates them and the vote is "
+            + "choosing at chance among things it cannot tell apart");
+    }
+
+    /// <summary>
+    /// What the population holds at the vote, and what any honest ranking of it could reach.
+    /// </summary>
+    [Fact]
+    public async Task Whether_a_ranking_of_the_firing_set_can_clear_the_blind_bar()
+    {
+        var sat = await Rounds();
+
+        output.WriteLine(
+            $"{sat.Count} exam rounds over {CeilingTests.Seeds} seeds, every column read "
+            + "off the snapshot taken when the vote was");
+
+        output.WriteLine(
+            $"{"ranker",-12}{"score",9}");
+
+        (string Name, Func<IReadOnlyList<Advocate>, Code> Pick)[] rankers =
+        [
+            // What the vote takes: an expectation is worth its best advocate's accuracy.
+            ("strong", one => Best(one, each => each.Accuracy)),
+
+            // A crowd counted rather than weighed, needing no evidence at all.
+            ("plural", one => one
+                .GroupBy(each => each.Expects)
+                .OrderByDescending(each => each.Count())
+                .ThenBy(each => each.Key)
+                .First().Key),
+
+            // The most TESTED advocate, ignoring whether it is any good.
+            ("tested", one => Best(one, each => (double)each.Seen)),
+
+            // Accuracy with the evidence behind it priced in.
+            ("bounded", one => Best(one, Bounded)),
+
+            // Best ON AVERAGE rather than at its best. A maximum is an extreme value, so an
+            // expectation with more advocates wins it more often whatever they are worth; a
+            // mean is not a sum and does not scale with the crowd either.
+            ("meaned", one => one
+                .GroupBy(each => each.Expects)
+                .Select(each => (Expects: each.Key, Weight: each.Average(a => a.Accuracy)))
+                .OrderByDescending(each => each.Weight)
+                .ThenBy(each => each.Expects)
+                .First().Expects),
+        ];
+
+        var voted = sat.Count(one => one.Voted) / (double)sat.Count;
+
+        output.WriteLine($"{"the machine",-12}{voted,9:F3}");
+
+        var scored = new Dictionary<string, double>(StringComparer.Ordinal);
+
+        foreach (var (name, pick) in rankers)
+        {
+            var hits = sat.Count(one => one.Advocates.Count > 0 && pick(one.Advocates) == one.Answer);
+
+            scored[name] = hits / (double)sat.Count;
+
+            output.WriteLine($"{name,-12}{scored[name],9:F3}");
+        }
+
+        var blind = CeilingTests.Bars().Noun;
+
+        output.WriteLine($"{"blind",-12}{blind,9:F3}");
+
+        output.WriteLine(
+            $"{"reached",-12}{sat.Count(one => one.Advocates.Any(each => each.Expects == one.Answer))
+                / (double)sat.Count,9:F3} over "
+            + $"{sat.Average(one => one.Advocates.Select(each => each.Expects).Distinct().Count()):F1} "
+            + "distinct expectations a round, which is why it is coverage");
+
+        Assert.True(sat.Count > 100);
+
+        // The snapshot reproduces the machine, which is what says every other row here is a
+        // thing that machine could have done instead. A `strong` away from the vote would mean
+        // the readout is reading a population the vote never saw, which is the fault this file
+        // was rewritten to remove.
+        Assert.True(Math.Abs(scored["strong"] - voted) < 0.02,
+            $"the vote's own rule replayed on the snapshot reads {scored["strong"]:F3} where "
+            + $"the machine scored {voted:F3}. Those are the same rule on the same rounds, so "
+            + "the snapshot is not the population that voted and no row here is a mechanism");
+
+        // And none of them clears the blind bar, which is the finding. It is asserted in the
+        // direction it was found: a ranker that started clearing it would fail here and fork
+        // 155's answer would move back to the ranking.
+        Assert.All(scored, one => Assert.True(one.Value < blind,
+            $"`{one.Key}` reads {one.Value:F3} against a blind {blind:F3}, so a ranking of the "
+            + "firing set now clears the bar and the loss is no longer the rules"));
     }
 
     /// <summary>The expectation of the advocate that leads on one reading.</summary>

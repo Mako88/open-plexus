@@ -209,19 +209,8 @@ public sealed class WordedTests(ITestOutputHelper output)
         using var encoder = new Worded(Encoders);
 
         var house = House();
-
-        var kind = new Dictionary<Code, string>();
-
-        foreach (var one in house.Named) kind[one] = "room";
-        foreach (var one in house.Called) kind[one] = "thing";
-        foreach (var one in house.Walking) kind[one] = "person";
-
-        var spelling = new Dictionary<Code, string>();
-
-        for (var at = 0; at < house.Vocabulary.Count; at++)
-            if (house.Meaning(at) is { } code) spelling[code] = house.Vocabulary[at];
-
-        foreach (var one in spelling.Keys) kind.TryAdd(one, "grammar");
+        var spelling = Spelling(house);
+        var kind = Kinds(house, spelling, everything: true);
 
         var drawn = new Random(1);
 
@@ -245,33 +234,15 @@ public sealed class WordedTests(ITestOutputHelper output)
 
             var near = Cells(vectors, seed: 1);
 
-            var together = 0;
-            var shared = 0;
-            var same = 0;
-            var pairs = 0;
+            var counted = Sharing(
+                [.. words.Select(one => one.Key)], one => near[one], kind);
 
-            for (var one = 0; one < words.Count; one++)
-            for (var two = one + 1; two < words.Count; two++)
-            {
-                var alike = kind[words[one].Key] == kind[words[two].Key];
-
-                pairs++;
-                if (alike) same++;
-
-                if (!near[words[one].Key].Intersect(near[words[two].Key]).Any()) continue;
-
-                shared++;
-                if (alike) together++;
-            }
-
-            var rate = together / (double)shared;
-
-            baseline = same / (double)pairs;
+            baseline = counted.Base;
 
             output.WriteLine(
-                $"{arm,-10}{rate,10:F3}{shared,10}{baseline,10:F3}");
+                $"{arm,-10}{counted.Together,10:F3}{counted.Shared,10}{baseline,10:F3}");
 
-            togethers[arm] = rate;
+            togethers[arm] = counted.Together;
         }
 
         // The finding, asserted so it cannot quietly stop being true. Sharing a cell has to
@@ -360,6 +331,172 @@ public sealed class WordedTests(ITestOutputHelper output)
         for (var d = 0; d < left.Length; d++) total += left[d] * right[d];
 
         return total;
+    }
+
+    /// <summary>
+    /// A cell of a codebook CLUSTERED over English does predict the kind of word in it, where
+    /// one cut by drawn hyperplanes does not.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The other half of the reading above, and the arm it licenses. The refutation table
+    /// refuses a quantiser fitted per machine and names its revival: a codebook reaching the
+    /// same answer from any sample order. <see cref="Codebook"/> is that, computed once over
+    /// the commonest few thousand words of the encoder's own vocabulary from a fixed seed.
+    /// </para>
+    /// <para>
+    /// It is fitted to English and never to this world. The house's alphabet is a few dozen of
+    /// six thousand words, so no centroid moves when the world does, and the same file codes
+    /// the same word on every machine forever.
+    /// </para>
+    /// <para>
+    /// The measure is the same one the drawn partition failed: two words sharing a cell being
+    /// the same kind, against the base rate among the words the question is asked of. The
+    /// words that hold a sentence together are left out for the reason they are there.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_codebook_clustered_over_english_predicts_the_kind_of_word_in_a_cell()
+    {
+        using var encoder = new Worded(Encoders);
+
+        var book = new Codebook(encoder, Path.Combine(Encoders, "all-minilm-l6-v2", "cells.txt"));
+
+        var house = House();
+        var spelling = Spelling(house);
+        var kind = Kinds(house, spelling, everything: false);
+
+        var words = kind.Keys
+            .Where(one => encoder.Knows(spelling[one]))
+            .OrderBy(one => spelling[one], StringComparer.Ordinal)
+            .ToList();
+
+        var cells = words.ToDictionary(
+            one => one, one => book.Cells(encoder.Of(spelling[one])));
+
+        var counted = Sharing(words, one => cells[one], kind);
+
+        var baseline = kind.Values.GroupBy(one => one).Max(one => one.Count())
+            / (double)kind.Count;
+
+        output.WriteLine($"{Codebook.Words} words clustered at {string.Join(", ", Codebook.Grains)}");
+
+        // Per grain, because the grains are not interchangeable and a coarse cell holding a
+        // hundred words could be lumping two kinds together while a fine one separates them.
+        // The whole-codebook number below cannot tell those apart.
+        output.WriteLine($"{"grain",-10}{"pairs",8}{"same kind",12}");
+
+        for (var grain = 0; grain < Codebook.Grains.Count; grain++)
+        {
+            var alike = 0;
+            var met = 0;
+
+            for (var one = 0; one < words.Count; one++)
+            for (var two = one + 1; two < words.Count; two++)
+            {
+                if (cells[words[one]][grain] != cells[words[two]][grain]) continue;
+
+                met++;
+                if (kind[words[one]] == kind[words[two]]) alike++;
+            }
+
+            output.WriteLine(
+                $"{Codebook.Grains[grain],-10}{met,8}"
+                + $"{(met == 0 ? 0.0 : alike / (double)met),12:F3}");
+        }
+
+
+        output.WriteLine($"{"measure",-26}{"value",10}");
+        output.WriteLine($"{"pairs sharing a cell",-26}{counted.Shared,10}");
+        output.WriteLine($"{"of those, same kind",-26}{counted.Together,10:F3}");
+        output.WriteLine($"{"any two words, same kind",-26}{counted.Base,10:F3}");
+        output.WriteLine($"{"commonest kind",-26}{baseline,10:F3}");
+
+        // Words have to share cells at all, or the grains are finer than the alphabet and
+        // every word is its own cell -- which is the hash again by a longer road and would
+        // read as a perfect score.
+        Assert.True(counted.Shared >= words.Count,
+            $"only {counted.Shared} pairs of {words.Count} words share a cell, so the codebook "
+            + "giving nearly every word one of its own and nothing generalises across it");
+
+        // And sharing has to mean something. This is the bar the drawn partition failed by
+        // landing on the base rate, and it is the whole reason a clustered codebook is worth
+        // shipping where drawn hyperplanes are not.
+        Assert.True(counted.Together > counted.Base + 0.15,
+            $"words sharing a cell are the same kind {counted.Together:F3} of the time against "
+            + $"{counted.Base:F3} for any two, so clustering reaches no more of the alphabet "
+            + "than drawing did");
+    }
+
+    /// <summary>Which word each of this house's codes is.</summary>
+    /// <param name="house">The house whose alphabet it is.</param>
+    private static Dictionary<Code, string> Spelling(Roaming house)
+    {
+        var spelling = new Dictionary<Code, string>();
+
+        for (var at = 0; at < house.Vocabulary.Count; at++)
+            if (house.Meaning(at) is { } code) spelling[code] = house.Vocabulary[at];
+
+        return spelling;
+    }
+
+    /// <summary>
+    /// What kind of word each of the house's codes is, on <c>Roaming.Named</c>'s standing.
+    /// </summary>
+    /// <param name="house">The house.</param>
+    /// <param name="spelling">Its alphabet.</param>
+    /// <param name="everything">
+    /// Whether the words that hold a sentence together count as a fourth kind. They are two
+    /// thirds of the alphabet, so including them lets a partition that admits them
+    /// indiscriminately score two thirds pure for free.
+    /// </param>
+    private static Dictionary<Code, string> Kinds(
+        Roaming house, Dictionary<Code, string> spelling, bool everything)
+    {
+        var kind = new Dictionary<Code, string>();
+
+        foreach (var one in house.Named) kind[one] = "room";
+        foreach (var one in house.Called) kind[one] = "thing";
+        foreach (var one in house.Walking) kind[one] = "person";
+
+        if (everything)
+            foreach (var one in spelling.Keys) kind.TryAdd(one, "grammar");
+
+        return kind;
+    }
+
+    /// <summary>
+    /// How often two words sharing a code are the same kind, and how often any two are.
+    /// </summary>
+    /// <param name="words">The words, as codes.</param>
+    /// <param name="carried">What codes each one carries.</param>
+    /// <param name="kind">What kind each one is.</param>
+    private static (double Together, int Shared, double Base) Sharing(
+        IReadOnlyList<Code> words,
+        Func<Code, IReadOnlyList<Code>> carried,
+        IReadOnlyDictionary<Code, string> kind)
+    {
+        var together = 0;
+        var shared = 0;
+        var same = 0;
+        var pairs = 0;
+
+        for (var one = 0; one < words.Count; one++)
+        for (var two = one + 1; two < words.Count; two++)
+        {
+            var alike = kind[words[one]] == kind[words[two]];
+
+            pairs++;
+            if (alike) same++;
+
+            if (!carried(words[one]).Intersect(carried(words[two])).Any()) continue;
+
+            shared++;
+            if (alike) together++;
+        }
+
+        return (
+            together / (double)Math.Max(shared, 1), shared, same / (double)Math.Max(pairs, 1));
     }
 
     /// <summary>How many hyperplanes deep the finest cell is cut.</summary>

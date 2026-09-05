@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -620,13 +620,14 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// empty, and it is the deadline.
     /// </para>
     /// <para>
-    /// <b>One, and it is <c>Worded</c>.</b> The frozen word encoder is fetched, and what it
-    /// reads is measured rather than assumed: a direction through its space tells the house's
-    /// rooms from its things on words it was never shown, and a partition of that space drawn
-    /// from nothing does not. The front-end arm built on the second half is refuted and gone,
-    /// so what is left is a mechanism choosing its direction from a commitment's own hits and
-    /// misses. That is repair's and is unbuilt, which is why the encoder sits here rather than
-    /// having been deleted with it.
+    /// <b>Two, and they are the encoder and its codebook.</b> Both are built and what they
+    /// read is measured rather than assumed: a direction through the encoder's space tells the
+    /// house's rooms from its things on words it was never shown, and a cell of the codebook
+    /// holds one kind of word almost purely at every grain. Two front ends putting that
+    /// resemblance in the moment are both refuted, the second while carrying it nearly
+    /// perfectly, so the alphabet is not what the learner was short of. They sit here rather
+    /// than being deleted with the arms because what is owed is a mechanism that DOES something
+    /// with a resemblance, and no run reaches one.
     /// </para>
     /// <para>
     /// <b>The groups that closed came off the same road</b>: a

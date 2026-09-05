@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Reflection.Emit;
 using System.Text.RegularExpressions;
 using OpenPlexus.Commitments;
@@ -113,6 +113,14 @@ public sealed class DrivenTests(ITestOutputHelper output)
     private static readonly IReadOnlyDictionary<string, string> Waiting =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["Codebook"] =
+                "a published quantisation of the encoder's space, clustered once over English "
+                + "from a fixed seed. Its reading is in `WordedTests`: two words in one cell "
+                + "are the same kind almost always, at every grain. Putting those cells in the "
+                + "moment is refuted -- the survey is level with the same cells dealt out "
+                + "again -- so what reaches a run has to be a mechanism that does something "
+                + "with a resemblance rather than a front end that hands one over.",
+
             ["Worded"] =
                 "the frozen word encoder. What it reads is measured and the reading is in "
                 + "`WordedTests`: a direction through its space tells the house's kinds of "

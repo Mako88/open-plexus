@@ -37,10 +37,11 @@ that is finished LEAVES, so this is only ever what is still to do.
   house by construction. So it wants a spine world with variables to be in trouble about, a
   deletion, or a waiting list of its own — and the third is the answer only if the first two
   are refused.
-- **First a repair condition minted from an ENCODER**, its direction taken from the parent's
-  own hits and misses, which is measured to concentrate on a KIND. `Worded` is fetched and
-  waiting; what is unbuilt is a front-end channel carrying vectors, a region store and a gate.
-  Fork **153**.
+- **First whether the learner can use a RESEMBLANCE at all**, an alphabet carrying a nearly
+  pure one having bought nothing. Both front-end shapes are refuted below, so what is open is
+  the learner rather than the codes. Fork **154**.
+- **Then a repair condition minted from an ENCODER**, its direction taken from the parent's own
+  hits and misses. `Worded` and `Codebook` are built and waiting. Fork **153**.
 - **Then whether a CALIBRATED bar escapes what a tightened one costs.** Paying for the
   round's gates cut the house a third and cost the spine its check that the survey reads the
   walk, so the noise is LOAD-BEARING. A bound refuses only the unattainable, and a bar valid
@@ -414,6 +415,10 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — one hit is too few for the normal approximation the bar is, and no
       correction repairs a mis-calibrated statistic; the same table is then read once a round
       for ever. A confidence sequence answers both and needs no episode boundary. Fork **152**.
+    - **OPEN** — what the learner does with a resemblance it is HANDED. Two front ends put one
+      in the moment and neither paid, the second carrying it almost perfectly, so the open
+      question is what a scope over a kind could win where the answer is an individual. Fork
+      **154**.
     - **OPEN** — a condition minted as a REGION of a frozen encoder's space, so a repair says
       *a word like these* where the alphabet has only hashes. The direction comes off the tally
       already held, so nothing remembers a moment. What NAMES one is fork **143**'s again, a
@@ -761,6 +766,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | `Weighing.Assured` — discounting an advocate by what searching that many candidates could find by chance | The winners it would unseat are better TESTED than the ones it favours, so no bound reaches them | A vote whose winner is a THIN estimate rather than a well-tested wrong one |
 | `Wanting.Trying` — refusing a pick whose advocates have stopped moving | It explored far more and lost the exam on every seed. Its bar was NOT POSITIVE, which is every untested rule's state, so it refused to exploit where it had something to exploit | A reading that says the acting channel pays at all |
 | `Saying.Part` — a chooser saying the part of a SCOPE it can | Identical asking and a lower exam, saying one code of a scope having never been blocked: two commitments each naming one word already put the pair | A world where no two commitments hold the halves of a question separately |
+| A word's cell of a CLUSTERED published codebook, as codes in the moment | Cells almost perfectly pure at every grain, and a survey level with the same cells dealt out again. The alphabet carried the resemblance and the learner took nothing from it | A world whose questions have KINDS for answers, the target's having individuals |
 | A drawn partition of a frozen encoder's space, as codes in the moment | Its cells track an alphabet's kinds no better than the base rate, where a DIRECTION through that same space separates them on unseen words | An alphabet whose vectors are not in one narrow cone |
 | A refusal as a CODE in the moment, fork **127** | Level on both shapes for a larger population, the chooser already refusing to repeat itself, so the fact was acted on before the code arrived | The exclusion having to SURVIVE the moment, which is a store's job rather than a code's |
 

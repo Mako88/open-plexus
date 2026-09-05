@@ -38,6 +38,7 @@ public sealed class Worded : IDisposable
     private readonly Dictionary<string, int> _vocabulary;
     private readonly string _output;
     private readonly Dictionary<string, float[]> _memo = [];
+    private readonly List<string> _tokens = [];
 
     /// <param name="encoders">The <c>corpora/encoders</c> directory.</param>
     /// <exception cref="FileNotFoundException">The encoder was not fetched.</exception>
@@ -72,6 +73,7 @@ public sealed class Worded : IDisposable
         foreach (var token in File.ReadLines(Path.Combine(directory, "vocab.txt")))
         {
             _vocabulary.TryAdd(token, line);
+            _tokens.Add(token);
             line++;
         }
     }
@@ -82,6 +84,16 @@ public sealed class Worded : IDisposable
     /// <summary>Whether the published vocabulary holds this word as one token.</summary>
     /// <param name="word">The word, lowercase.</param>
     public bool Knows(string word) => _vocabulary.ContainsKey(word);
+
+    /// <summary>
+    /// Every token of the published vocabulary, in the order the file gives them.
+    /// </summary>
+    /// <remarks>
+    /// The file's order rather than sorted, because WordPiece builds a vocabulary by frequency
+    /// and that order is the only thing here that says which words are common. A caller
+    /// wanting the common few thousand takes a prefix.
+    /// </remarks>
+    public IReadOnlyList<string> Tokens => _tokens;
 
     /// <summary>
     /// One word as a unit vector.

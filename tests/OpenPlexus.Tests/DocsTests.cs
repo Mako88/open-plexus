@@ -883,7 +883,18 @@ public sealed class DocsTests
     // records. Naming it by the words it admits is canonical and moves as the population
     // learns, so it is fork 143 over again. Sixteen words here save a session finding it at
     // the point the code will not converge.
-    private const int Whole = 13_655;
+    //
+    // And 13,770, the fifty-first raise, for a refutation that changes what is believed rather
+    // than adding a row to the pile. A codebook clustered once over English puts a word in a
+    // cell holding one kind of word almost purely, at every grain -- so the second front end
+    // carried the resemblance the first was refuted for missing, and the survey still landed on
+    // the same cells dealt out again among the same words.
+    //
+    // That is worth more than the row it costs. The first null had an account, which was that
+    // drawn cells carry nothing; this one kills that account and leaves the learner holding
+    // it. An alphabet is not what the machine was short of, and the item that opens `THE
+    // ORDER` says so rather than a session spending another day on the front end.
+    private const int Whole = 13_770;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

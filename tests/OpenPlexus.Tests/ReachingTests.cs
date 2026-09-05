@@ -61,9 +61,10 @@ public sealed class ReachingTests(ITestOutputHelper output)
     /// One run for both readings below, because a shape and a ranking read off two runs are
     /// two populations and the pair would say nothing about each other.
     /// </remarks>
-    private static async Task<List<Round_>> Rounds()
+    private static async Task<(List<Round_> Sat, List<(int Deep, Birth By)> Held)> Rounds()
     {
         var sat = new List<Round_>();
+        var held = new List<(int, Birth)>();
 
         for (var seed = 1; seed <= CeilingTests.Seeds; seed++)
         {
@@ -101,9 +102,17 @@ public sealed class ReachingTests(ITestOutputHelper output)
 
                 sat.Add(new Round_(advocates, answer, loop.Right > was));
             }
+
+            // The population as it ends, crossed against what minted each of it. A firing
+            // count says which rules the moments reach; this says which the machine BUILT,
+            // and the two come apart exactly when short scopes fire far above their share.
+            var born = brain.Held.Births;
+
+            held.AddRange(brain.Held.All.Select(
+                one => (one.Scope.Length, born.GetValueOrDefault(one.Identity))));
         }
 
-        return sat;
+        return (sat, held);
     }
 
     /// <summary>
@@ -127,7 +136,7 @@ public sealed class ReachingTests(ITestOutputHelper output)
     [Fact]
     public async Task How_deep_the_rules_that_fire_are_and_where_the_answer_lives()
     {
-        var sat = await Rounds();
+        var (sat, held) = await Rounds();
 
         output.WriteLine(
             $"{sat.Count} exam rounds over {CeilingTests.Seeds} seeds, snapshotted at the vote");
@@ -206,6 +215,17 @@ public sealed class ReachingTests(ITestOutputHelper output)
 
         output.WriteLine($"ranking only well-tested advocates reads {settled:F3}");
 
+        // And what MINTED the population, crossed against how deep it is. A machine whose
+        // one-code scopes come from genesis is one whose covering step is the fault; one whose
+        // come from repair is narrowing to nothing, and the two want opposite repairs.
+        output.WriteLine($"{"born",-10}{"held",9}{"share",9}{"depth 1",10}");
+
+        foreach (var by in held.GroupBy(one => one.By).OrderByDescending(one => one.Count()))
+            output.WriteLine(
+                $"{by.Key.ToString().ToLowerInvariant(),-10}{by.Count(),9}"
+                + $"{by.Count() / (double)held.Count,9:F3}"
+                + $"{by.Count(one => one.Deep == 1) / (double)by.Count(),10:F3}");
+
         Assert.True(sat.Count > 100);
 
         // The two sets have to differ somewhere, or nothing about an advocate says whether it
@@ -227,7 +247,7 @@ public sealed class ReachingTests(ITestOutputHelper output)
     [Fact]
     public async Task Whether_a_ranking_of_the_firing_set_can_clear_the_blind_bar()
     {
-        var sat = await Rounds();
+        var (sat, _) = await Rounds();
 
         output.WriteLine(
             $"{sat.Count} exam rounds over {CeilingTests.Seeds} seeds, every column read "
@@ -253,6 +273,24 @@ public sealed class ReachingTests(ITestOutputHelper output)
 
             // Accuracy with the evidence behind it priced in.
             ("bounded", one => Best(one, Bounded)),
+
+            // The DEEPEST advocate that fired, which the depth reading points straight at: a
+            // four-code scope is four times as accurate as a one-code scope and fires on under
+            // one round in a hundred, so a round it does fire on is one where something
+            // specific applies. This is not the refuted row: that one deferred to a GENERAL
+            // advocate unless a narrower earned it, and this prefers the narrow one outright.
+            ("deepest", one => Best(one, each => each.Deep)),
+
+            // Deepest, then most accurate among that depth, so a tie between two specific
+            // rules is broken by which has been right more rather than by a code's order.
+            ("deepAcc", one => one
+                .GroupBy(each => each.Expects)
+                .Select(each => (
+                    Expects: each.Key,
+                    Weight: each.Max(a => (a.Deep * 1000.0) + a.Accuracy)))
+                .OrderByDescending(each => each.Weight)
+                .ThenBy(each => each.Expects)
+                .First().Expects),
 
             // Best ON AVERAGE rather than at its best. A maximum is an extreme value, so an
             // expectation with more advocates wins it more often whatever they are worth; a

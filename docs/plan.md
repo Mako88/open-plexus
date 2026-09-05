@@ -414,10 +414,10 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — one hit is too few for the normal approximation the bar is, and no
       correction repairs a mis-calibrated statistic; the same table is then read once a round
       for ever. A confidence sequence answers both and needs no episode boundary. Fork **152**.
-    - **OPEN** — a condition minted as a REGION of a frozen encoder's space, so a repair can
-      say *a word like these* where the alphabet has only hashes. The direction comes off the
-      tally already held, so nothing remembers a moment; a drawn partition is refuted below.
-      Fork **153**.
+    - **OPEN** — a condition minted as a REGION of a frozen encoder's space, so a repair says
+      *a word like these* where the alphabet has only hashes. The direction comes off the tally
+      already held, so nothing remembers a moment. What NAMES one is fork **143**'s again, a
+      float being no identity. Fork **153**.
     - **OPEN** — a total is a lifetime, which C4 refuses, and the earned rate replacing it
       reads as free on `Arranged` rather than as a budget.
     - **OPEN** — the curve is `Curved`, that rate capped by the parent's hits, and it is

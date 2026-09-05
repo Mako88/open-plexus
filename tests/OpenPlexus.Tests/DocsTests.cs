@@ -875,7 +875,15 @@ public sealed class DocsTests
     // and the leaf say what is unbuilt, which is a session's worth of seam, and a session that
     // could not read that off `THE ORDER` would price the mechanism before knowing it had a
     // signal to work with.
-    private const int Whole = 13_635;
+    //
+    // And 13,655, sixteen words, for what NAMES a region, which is the blocker found while
+    // scoping the seam rather than while building it. A direction is floats and floats are no
+    // identity, so two machines reaching one region by different routes would hold it under
+    // two names -- which is the fault `Parent-plus-condition gave one scope two` already
+    // records. Naming it by the words it admits is canonical and moves as the population
+    // learns, so it is fork 143 over again. Sixteen words here save a session finding it at
+    // the point the code will not converge.
+    private const int Whole = 13_655;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

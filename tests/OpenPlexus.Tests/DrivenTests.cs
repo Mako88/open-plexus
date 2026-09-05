@@ -111,7 +111,16 @@ public sealed class DrivenTests(ITestOutputHelper output)
     /// </para>
     /// </remarks>
     private static readonly IReadOnlyDictionary<string, string> Waiting =
-        new Dictionary<string, string>(StringComparer.Ordinal);
+        new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["Worded"] =
+                "the frozen word encoder. What it reads is measured and the reading is in "
+                + "`WordedTests`: a direction through its space tells the house's kinds of "
+                + "word apart on words it was never shown, and a partition of that space "
+                + "drawn from nothing does not. So the mechanism that uses it has to choose "
+                + "its direction from a commitment's own hits and misses, which is repair's "
+                + "and is unbuilt. This comes off when a run mints one.",
+        };
 
     /// <summary>
     /// The apparatus rather than the machine, each with why a test is its right driver.

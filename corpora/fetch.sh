@@ -310,3 +310,33 @@ else
   echo "             package. Install it and re-run, or the cheap arm will be"
   echo "             stuck emitting 1000 class scores instead of a reading."
 fi
+
+# all-MiniLM-L6-v2, sentence encoder -- Reimers & Gurevych 2019,
+# sentence-transformers. Apache 2.0; this ONNX export is the one published in the
+# model repository.
+#
+# WHY A TEXT ENCODER: the two above are vision towers, and the spine world's
+# things are WORDS. `Worded` asks it for one word at a time and `WordedTests`
+# prices what it knows about the house's alphabet before any learner is asked to
+# use it.
+#
+# NINETY MEGABYTES, WHICH IS THE FP32 EXPORT. There is an int8 build in the same
+# repository at about a quarter the size. Do not switch without measuring:
+# quantisation moves every vector slightly, and what is being asked is whether a
+# direction through that space separates two kinds of word.
+#
+# THE VOCABULARY COMES WITH IT because nothing here splits word-pieces. A word is
+# looked up whole and refused if the vocabulary does not hold it, which is a
+# stated restriction rather than an approximation.
+minilm_dir="$encoders/all-minilm-l6-v2"
+minilm_repo="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main"
+
+if [ -f "$minilm_dir/model.onnx" ]; then
+  echo "MiniLM: already at $minilm_dir"
+else
+  echo "MiniLM: fetching 90 MB from $minilm_repo"
+  mkdir -p "$minilm_dir"
+  grab --max-time 600 -o "$minilm_dir/model.onnx" "$minilm_repo/onnx/model.onnx"
+  grab --max-time 120 -o "$minilm_dir/vocab.txt" "$minilm_repo/vocab.txt"
+  echo "MiniLM: fetched to $minilm_dir"
+fi

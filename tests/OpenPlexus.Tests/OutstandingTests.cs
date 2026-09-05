@@ -620,7 +620,16 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// empty, and it is the deadline.
     /// </para>
     /// <para>
-    /// <b>Nought, and this entry is green.</b> Every group came off the same road: a
+    /// <b>One, and it is <c>Worded</c>.</b> The frozen word encoder is fetched, and what it
+    /// reads is measured rather than assumed: a direction through its space tells the house's
+    /// rooms from its things on words it was never shown, and a partition of that space drawn
+    /// from nothing does not. The front-end arm built on the second half is refuted and gone,
+    /// so what is left is a mechanism choosing its direction from a commitment's own hits and
+    /// misses. That is repair's and is unbuilt, which is why the encoder sits here rather than
+    /// having been deleted with it.
+    /// </para>
+    /// <para>
+    /// <b>The groups that closed came off the same road</b>: a
     /// deployment composing the mechanism rather than a fixture calling it.
     /// `OpenPlexus.Host` runs a holder and an asker over peers, which took eighteen of the
     /// fleet's twenty; <c>HybridBus</c> and its dial are apparatus and moved to

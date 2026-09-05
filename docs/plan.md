@@ -1,4 +1,4 @@
-﻿# Where this is going
+# Where this is going
 
 A different bet from `csharp`, on purpose. That branch counts co-occurrences and
 walks them. This one counts CONDITIONED ON A PREDICTION, so what is counted is
@@ -37,7 +37,9 @@ that is finished LEAVES, so this is only ever what is still to do.
   house by construction. So it wants a spine world with variables to be in trouble about, a
   deletion, or a waiting list of its own — and the third is the answer only if the first two
   are refused.
-- **First whether a CALIBRATED bar escapes what a tightened one costs.** Paying for the
+- **First a repair condition minted from an ENCODER**, its direction taken from the parent's
+  own hits and misses. `Worded` is fetched and waiting. Fork **153**.
+- **Then whether a CALIBRATED bar escapes what a tightened one costs.** Paying for the
   round's gates cut the house a third and cost the spine its check that the survey reads the
   walk, so the noise is LOAD-BEARING. A bound refuses only the unattainable, and a bar valid
   at every stopping time is the other half. Fork **152**.
@@ -410,6 +412,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — one hit is too few for the normal approximation the bar is, and no
       correction repairs a mis-calibrated statistic; the same table is then read once a round
       for ever. A confidence sequence answers both and needs no episode boundary. Fork **152**.
+    - **OPEN** — a condition minted as a REGION of a frozen encoder's space, so a repair can
+      say *a word like these* where the alphabet has only hashes. The direction has to come
+      from the parent's hits and misses; a drawn partition is refuted below. Fork **153**.
     - **OPEN** — a total is a lifetime, which C4 refuses, and the earned rate replacing it
       reads as free on `Arranged` rather than as a budget.
     - **OPEN** — the curve is `Curved`, that rate capped by the parent's hits, and it is
@@ -753,6 +758,7 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
 | `Weighing.Assured` — discounting an advocate by what searching that many candidates could find by chance | The winners it would unseat are better TESTED than the ones it favours, so no bound reaches them | A vote whose winner is a THIN estimate rather than a well-tested wrong one |
 | `Wanting.Trying` — refusing a pick whose advocates have stopped moving | It explored far more and lost the exam on every seed. Its bar was NOT POSITIVE, which is every untested rule's state, so it refused to exploit where it had something to exploit | A reading that says the acting channel pays at all |
 | `Saying.Part` — a chooser saying the part of a SCOPE it can | Identical asking and a lower exam, saying one code of a scope having never been blocked: two commitments each naming one word already put the pair | A world where no two commitments hold the halves of a question separately |
+| A drawn partition of a frozen encoder's space, as codes in the moment | Its cells track an alphabet's kinds no better than the base rate, where a DIRECTION through that same space separates them on unseen words | An alphabet whose vectors are not in one narrow cone |
 | A refusal as a CODE in the moment, fork **127** | Level on both shapes for a larger population, the chooser already refusing to repeat itself, so the fact was acted on before the code arrived | The exclusion having to SURVIVE the moment, which is a store's job rather than a code's |
 
 ---

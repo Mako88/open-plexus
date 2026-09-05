@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace OpenPlexus.Tests;
@@ -853,7 +853,21 @@ public sealed class DocsTests
     // It is one line in `THE ORDER` and it replaces two. The rise is what the sentence costs
     // over the two entries it merges, and a session that could not write it down would be a
     // session that shipped the default again.
-    private const int Whole = 13_485;
+    //
+    // And 13,610 for a frozen word ENCODER, which buys a refutation row, a leaf and the item
+    // that names them. A published sentence encoder is legal here for the reason a fixed
+    // projection is -- a file of constants gives the same numbers on every machine forever and
+    // nothing fits it -- so what a word MEANS can reach an alphabet of hashes for the first
+    // time. The direction is measured: it tells the house's rooms from its things on words it
+    // was never shown.
+    //
+    // The row is the half that had to be written down. Putting cells of that space in the
+    // moment is refuted, and refuted with the diagnosis rather than only the number -- a
+    // partition that does not look at the data misses the one direction that separates,
+    // because a drawn hyperplane in three hundred and eighty-four dimensions is very nearly at
+    // right angles to it. Without the row the next session tries the cheap shape again, which
+    // is exactly what the table exists to stop.
+    private const int Whole = 13_610;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

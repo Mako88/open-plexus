@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
@@ -17,40 +17,50 @@ namespace OpenPlexus.Tests;
 /// until it is known which.
 /// </para>
 /// <para>
-/// The split is one call. Every commitment firing on an exam round is asked what it expects,
-/// and the share of rounds where ANY of them expects the right answer is the ceiling a perfect
-/// ranker over this population would reach. Against the vote's own score that separates a
-/// population which does not hold the answer from a ranking that fails to find it.
+/// Every ranker here is scored on a SNAPSHOT taken before the round is stepped, holding each
+/// firing commitment's expectation and what was known about it at the instant the vote was
+/// taken. That is the whole discipline of this file. A commitment is a mutable object and an
+/// immutable array of them is immutable in its membership alone, so reading an accuracy after
+/// the step reads a population that has been settled and has had genesis mint a rule on the
+/// round it was just shown the answer to.
 /// </para>
 /// <para>
-/// It is an upper bound rather than an achievable score, and the difference matters. A
-/// ranker choosing among the firing set with hindsight is not a mechanism; what the number
-/// says is whether there is anything for a mechanism to reach.
+/// The first shape of this did exactly that and read a ranker at 0.500 against the vote's
+/// 0.326, which is hindsight wearing a mechanism's clothes. The snapshot is what makes a
+/// column here a thing a machine could actually run.
+/// </para>
+/// <para>
+/// The reached column is the other half of the discipline. Hundreds of rules fire on an exam
+/// round and the exam has a couple of dozen answers, so a firing set expecting nearly all of
+/// them holds the right one always and carries no information. It is coverage rather than a
+/// ceiling, and the distinct count beside it is what says so.
 /// </para>
 /// </remarks>
 public sealed class ReachingTests(ITestOutputHelper output)
 {
+    /// <summary>What was known about one advocate at the instant the vote was taken.</summary>
+    /// <param name="Expects">What it says will follow.</param>
+    /// <param name="Accuracy">Its merged accuracy.</param>
+    /// <param name="Seen">How often it has fired.</param>
+    /// <param name="Hits">How often it was right.</param>
+    private readonly record struct Advocate(Code Expects, double Accuracy, long Seen, long Hits);
+
     /// <summary>
-    /// How often the answer is reachable, how often the vote reaches it, and how often
-    /// nothing fires at all.
+    /// What the population holds at the vote, and what any honest ranking of it could reach.
     /// </summary>
-    /// <remarks>
-    /// The same settings, seeds and chooser every other reading on this world uses, so the
-    /// numbers here sit beside the bar without a second run having to be taken.
-    /// </remarks>
     [Fact]
-    public async Task Whether_the_answer_is_in_the_firing_set_at_all()
+    public async Task Whether_a_ranking_of_the_firing_set_can_clear_the_blind_bar()
     {
         output.WriteLine(
             $"{CeilingTests.Houses} houses a seed over {CeilingTests.Seeds} seeds, "
-            + "the machine saying nothing");
+            + "the machine saying nothing, every column read BEFORE the step");
 
         output.WriteLine(
-            $"{"seed",-6}{"asked",8}{"reached",9}{"voted",9}{"plural",9}{"strong",9}"
-            + $"{"distinct",10}{"firing",9}");
+            $"{"seed",-6}{"asked",8}{"voted",9}{"strong",9}{"plural",9}{"tested",9}"
+            + $"{"bounded",9}{"reached",9}{"distinct",10}");
 
-        var total = (Asked: 0, Reached: 0, Voted: 0, Plural: 0, Strong: 0,
-            Distinct: 0L, Firing: 0L);
+        var total = (Asked: 0, Voted: 0, Strong: 0, Plural: 0, Tested: 0, Bounded: 0,
+            Reached: 0, Distinct: 0L);
 
         for (var seed = 1; seed <= CeilingTests.Seeds; seed++)
         {
@@ -63,121 +73,150 @@ public sealed class ReachingTests(ITestOutputHelper output)
             var rounds = CeilingTests.Houses * 46;
             var loop = new Round(brain, rounds, sweep: 500, target: 0.9, window: 500);
 
-            var seen = (Asked: 0, Reached: 0, Voted: 0, Plural: 0, Strong: 0,
-                Distinct: 0L, Firing: 0L);
+            var seen = (Asked: 0, Voted: 0, Strong: 0, Plural: 0, Tested: 0, Bounded: 0,
+                Reached: 0, Distinct: 0L);
 
             for (var round = 0; round < rounds; round++)
             {
                 if (watching.Push() is not { } pushed) continue;
 
-                var was = loop.Right;
+                var scoring = house.Sat && pushed.Followed is not null;
 
-                // Read BEFORE the step, because what is wanted is the population that
-                // decided this round rather than the one repair left behind it. Read-only,
-                // and it is the same call the vote makes.
-                var alight = house.Sat && pushed.Followed is not null
-                    ? brain.Held.Firing(brain.Held.Moment(pushed.Codes), pushed.Grouping)
+                // Copied out rather than held by reference, which is the whole point. The
+                // step settles every one of these and mints new ones, so a reference read
+                // afterwards is a different population.
+                var advocates = scoring
+                    ? brain.Held
+                        .Firing(brain.Held.Moment(pushed.Codes), pushed.Grouping)
+                        .Select(one => new Advocate(
+                            one.Expects, one.Accuracy, one.Seen, one.Hits))
+                        .ToList()
                     : [];
+
+                var was = loop.Right;
 
                 await loop.StepAsync(pushed);
 
-                if (!house.Sat) continue;
+                if (!scoring) continue;
                 if (pushed.Followed is not { } answer) continue;
 
                 seen.Asked++;
-                seen.Firing += alight.Length;
-                seen.Distinct += alight.Select(one => one.Expects).Distinct().Count();
+                seen.Distinct += advocates.Select(one => one.Expects).Distinct().Count();
 
-                if (alight.Any(one => one.Expects == answer)) seen.Reached++;
                 if (loop.Right > was) seen.Voted++;
+                if (advocates.Any(one => one.Expects == answer)) seen.Reached++;
 
-                if (alight.Length == 0) continue;
+                if (advocates.Count == 0) continue;
 
-                // The commonest expectation among the rules that fired, which is a ranker
-                // needing no accuracy and no evidence -- a crowd counted rather than weighed.
-                var plural = alight
-                    .GroupBy(one => one.Expects)
-                    .OrderByDescending(one => one.Count())
-                    .ThenBy(one => one.Key)
-                    .First().Key;
+                // What the vote takes: an expectation is worth its best advocate's accuracy,
+                // the highest wins, ties by code.
+                if (Best(advocates, one => one.Accuracy) == answer) seen.Strong++;
 
-                if (plural == answer) seen.Plural++;
+                // A crowd counted rather than weighed, which needs no evidence at all.
+                if (advocates
+                        .GroupBy(one => one.Expects)
+                        .OrderByDescending(one => one.Count())
+                        .ThenBy(one => one.Key)
+                        .First().Key == answer)
+                    seen.Plural++;
 
-                // And the most accurate rule that fired, which is roughly what the shipped
-                // vote takes. Ties by identity, so the pick does not depend on a walk order.
-                var strong = alight
-                    .OrderByDescending(one => one.Accuracy)
-                    .ThenBy(one => one.Identity)
-                    .First().Expects;
+                // The most TESTED advocate, ignoring whether it is any good. A rule that has
+                // fired a thousand times is a different bet from one that has fired twice.
+                if (Best(advocates, one => one.Seen) == answer) seen.Tested++;
 
-                if (strong == answer) seen.Strong++;
+                // Accuracy discounted by how little is behind it -- the lower end of a Wilson
+                // interval at roughly two standard errors. A rule right once out of once
+                // reads near a half where one right ninety-nine times of a hundred reads near
+                // ninety-five, so evidence enters the ranking without a second dial.
+                if (Best(advocates, Bounded) == answer) seen.Bounded++;
             }
 
             output.WriteLine(
-                $"{seed,-6}{seen.Asked,8}{seen.Reached / (double)seen.Asked,9:F3}"
-                + $"{seen.Voted / (double)seen.Asked,9:F3}"
-                + $"{seen.Plural / (double)seen.Asked,9:F3}"
+                $"{seed,-6}{seen.Asked,8}{seen.Voted / (double)seen.Asked,9:F3}"
                 + $"{seen.Strong / (double)seen.Asked,9:F3}"
-                + $"{seen.Distinct / (double)seen.Asked,10:F1}"
-                + $"{seen.Firing / (double)seen.Asked,9:F1}");
+                + $"{seen.Plural / (double)seen.Asked,9:F3}"
+                + $"{seen.Tested / (double)seen.Asked,9:F3}"
+                + $"{seen.Bounded / (double)seen.Asked,9:F3}"
+                + $"{seen.Reached / (double)seen.Asked,9:F3}"
+                + $"{seen.Distinct / (double)seen.Asked,10:F1}");
 
             total = (
-                total.Asked + seen.Asked,
-                total.Reached + seen.Reached,
-                total.Voted + seen.Voted,
-                total.Plural + seen.Plural,
-                total.Strong + seen.Strong,
-                total.Distinct + seen.Distinct,
-                total.Firing + seen.Firing);
+                total.Asked + seen.Asked, total.Voted + seen.Voted,
+                total.Strong + seen.Strong, total.Plural + seen.Plural,
+                total.Tested + seen.Tested, total.Bounded + seen.Bounded,
+                total.Reached + seen.Reached, total.Distinct + seen.Distinct);
         }
 
-        var reached = total.Reached / (double)total.Asked;
         var voted = total.Voted / (double)total.Asked;
+        var strong = total.Strong / (double)total.Asked;
+        var bounded = total.Bounded / (double)total.Asked;
 
         output.WriteLine(
-            $"{"all",-6}{total.Asked,8}{reached,9:F3}{voted,9:F3}"
+            $"{"all",-6}{total.Asked,8}{voted,9:F3}{strong,9:F3}"
             + $"{total.Plural / (double)total.Asked,9:F3}"
-            + $"{total.Strong / (double)total.Asked,9:F3}"
-            + $"{total.Distinct / (double)total.Asked,10:F1}"
-            + $"{total.Firing / (double)total.Asked,9:F1}");
+            + $"{total.Tested / (double)total.Asked,9:F3}"
+            + $"{bounded,9:F3}{total.Reached / (double)total.Asked,9:F3}"
+            + $"{total.Distinct / (double)total.Asked,10:F1}");
 
         output.WriteLine(
             $"a blind rule reads {CeilingTests.Bars().Noun:F3} on the same stream");
 
         Assert.True(total.Asked > 100);
 
-        // The reached column is COVERAGE and is recorded as worthless rather than read as a
-        // ceiling. Hundreds of rules fire and they expect most of the answers the exam can
-        // ask for between them, so holding the right one is what a bag of everything does.
-        // Asserted in the direction it was found, so a change that made the firing set
-        // selective would fail here and the column would become worth reading.
+        // The snapshot reproduces the machine, which is what says every other column here is
+        // a thing that machine could have done instead. A `strong` above the vote would mean
+        // the readout is reading a population the vote never saw -- which is exactly the fault
+        // this file was rewritten to remove.
+        Assert.True(Math.Abs(strong - voted) < 0.02,
+            $"the vote's own rule replayed on the snapshot reads {strong:F3} where the machine "
+            + $"scored {voted:F3}. Those are the same rule on the same rounds, so the snapshot "
+            + "is not the population that voted and no column here is a mechanism");
+
+        // And the reached column is coverage rather than a ceiling, asserted in the direction
+        // it was found so a firing set that became selective would fail here and the column
+        // would start meaning something.
         Assert.True(total.Distinct / (double)total.Asked > 8.0,
             $"the firing set now expects {total.Distinct / (double)total.Asked:F1} different "
             + "answers a round, where it expected most of the exam's alphabet when this was "
             + "written -- so the reached column may now mean something and wants re-reading");
+    }
 
-        // The finding. A ranker a machine could actually run, taking the most accurate rule
-        // that fired, beats the shipped vote on the same population and the same rounds. So
-        // the fault is the RANKING rather than the rules: the population holds enough for a
-        // simpler rule over it to do better than what decides today.
-        var strongest = total.Strong / (double)total.Asked;
+    /// <summary>The expectation of the advocate that leads on one reading.</summary>
+    /// <param name="advocates">What fired.</param>
+    /// <param name="by">What to lead on.</param>
+    /// <remarks>
+    /// Ties break by the expectation's own code, which is what <c>Population.Decide</c> does,
+    /// so a tie comes out the same on every machine rather than however a list was walked.
+    /// </remarks>
+    private static Code Best(
+        IReadOnlyList<Advocate> advocates, Func<Advocate, double> by) =>
+        advocates
+            .GroupBy(one => one.Expects)
+            .Select(one => (Expects: one.Key, Weight: one.Max(by)))
+            .OrderByDescending(one => one.Weight)
+            .ThenBy(one => one.Expects)
+            .First().Expects;
 
-        Assert.True(strongest > voted,
-            $"the most accurate firing rule reads {strongest:F3} against the vote's {voted:F3}, "
-            + "so the ranking is no longer leaving anything on the table and fork 155's "
-            + "answer has changed");
+    /// <summary>
+    /// Accuracy with the evidence behind it priced in, as a Wilson lower bound.
+    /// </summary>
+    /// <param name="one">The advocate.</param>
+    /// <remarks>
+    /// The arm the refutation table's own row points at. A lifetime average is refused as the
+    /// deciding statistic because it cannot track; what is being asked here is the other
+    /// complaint, that it says the same thing after one firing as after a thousand.
+    /// </remarks>
+    private static double Bounded(Advocate one)
+    {
+        if (one.Seen == 0) return 0.0;
 
-        // And it is a readout rather than a shipped arm, which is the one thing this must not
-        // be read as. The vote decides what repair runs on, so a machine deciding this way
-        // would grow a different population and this number is not what it would score. What
-        // is measured is that the population it GREW holds more than the vote takes from it.
-        Assert.True(reached >= strongest);
+        const double Z = 2.0;
 
-        // The ceiling is a ceiling, or the reading is arithmetically impossible and the two
-        // halves are counting different rounds.
-        Assert.True(reached >= voted,
-            $"the vote reaches {voted:F3} where the firing set holds the answer {reached:F3} "
-            + "of the time, which cannot happen: it would mean the vote answered correctly on "
-            + "rounds where nothing firing expected the answer");
+        var n = (double)one.Seen;
+        var p = one.Hits / n;
+        var z = (Z * Z) / n;
+
+        return ((p + (z / 2.0)) - (Z * Math.Sqrt(((p * (1.0 - p)) + (z / 4.0)) / n)))
+            / (1.0 + z);
     }
 }

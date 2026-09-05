@@ -37,9 +37,9 @@ that is finished LEAVES, so this is only ever what is still to do.
   house by construction. So it wants a spine world with variables to be in trouble about, a
   deletion, or a waiting list of its own — and the third is the answer only if the first two
   are refused.
-- **First the RANKING, where a readout says the loss is** — the most accurate rule that fired
-  beats `Deciding.Grounded` on the same rounds and clears the blind bar. Shipping it is a
-  search arm as well, so it is an arm. Fork **155**.
+- **First why the population COVERS rather than discriminates** — 268 rules fire on an exam
+  round expecting fourteen answers between them, and no ranking of them clears the blind bar.
+  So the loss is the rules rather than the ranking. Fork **155**.
 - **Then whether the learner can use a RESEMBLANCE at all**, an alphabet carrying a nearly
   pure one having bought nothing. Both front-end shapes are refuted below, so what is open is
   the learner rather than the codes. Fork **154**.
@@ -418,10 +418,10 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — one hit is too few for the normal approximation the bar is, and no
       correction repairs a mis-calibrated statistic; the same table is then read once a round
       for ever. A confidence sequence answers both and needs no episode boundary. Fork **152**.
-    - **OPEN** — `Deciding.Grounded` loses to the commonest answer while the most accurate
-      rule that fired would clear it, read off the population it grew. So the loss is the
-      RANKING, and what is unmeasured is whether it survives being shipped, a vote deciding
-      what repair runs on. Fork **155**.
+    - **OPEN** — no ranking of the firing set clears the blind bar: accuracy is the best of
+      four and is what ships, a Wilson bound on it is worse, and the most TESTED advocate is
+      worst of all. So the well-tested rules are the wrong ones and the right ones are thin.
+      Fork **155**.
     - **OPEN** — what the learner does with a resemblance it is HANDED. Two front ends put one
       in the moment and neither paid, the second carrying it almost perfectly, so the open
       question is what a scope over a kind could win where the answer is an individual. Fork

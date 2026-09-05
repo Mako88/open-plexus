@@ -37,9 +37,9 @@ that is finished LEAVES, so this is only ever what is still to do.
   house by construction. So it wants a spine world with variables to be in trouble about, a
   deletion, or a waiting list of its own — and the third is the answer only if the first two
   are refused.
-- **First why a VOTE loses to the commonest answer**, the learner reading under a rule that
-  never looked at the house on all four kinds of question. Every other reading here is an arm
-  against an arm, so nothing asked this. Fork **155**.
+- **First the RANKING, where a readout says the loss is** — the most accurate rule that fired
+  beats `Deciding.Grounded` on the same rounds and clears the blind bar. Shipping it is a
+  search arm as well, so it is an arm. Fork **155**.
 - **Then whether the learner can use a RESEMBLANCE at all**, an alphabet carrying a nearly
   pure one having bought nothing. Both front-end shapes are refuted below, so what is open is
   the learner rather than the codes. Fork **154**.
@@ -418,9 +418,10 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — one hit is too few for the normal approximation the bar is, and no
       correction repairs a mis-calibrated statistic; the same table is then read once a round
       for ever. A confidence sequence answers both and needs no episode boundary. Fork **152**.
-    - **OPEN** — the vote loses to the commonest answer for the kind and the noun, so the
-      rules it ranks are worth less when they fire than ignoring them. Open on which half:
-      the rules, or the ranking over them. Fork **155**.
+    - **OPEN** — `Deciding.Grounded` loses to the commonest answer while the most accurate
+      rule that fired would clear it, read off the population it grew. So the loss is the
+      RANKING, and what is unmeasured is whether it survives being shipped, a vote deciding
+      what repair runs on. Fork **155**.
     - **OPEN** — what the learner does with a resemblance it is HANDED. Two front ends put one
       in the moment and neither paid, the second carrying it almost perfectly, so the open
       question is what a scope over a kind could win where the answer is an individual. Fork

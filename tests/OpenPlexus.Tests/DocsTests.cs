@@ -905,7 +905,12 @@ public sealed class DocsTests
     // anything, and the wrong-house control asks a different question again. So two arms that
     // differ under the bar differ below the floor, and the item and the leaf say to find out
     // which half is at fault before another mechanism is priced here.
-    private const int Whole = 13_860;
+    //
+    // And 13,865, five words, for the half being ANSWERED. The most accurate rule that fired
+    // clears the blind bar on the population `Deciding.Grounded` itself grew, so the loss is
+    // the ranking rather than the rules, and the item says which arm to run rather than which
+    // question to ask.
+    private const int Whole = 13_865;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

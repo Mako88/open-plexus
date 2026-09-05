@@ -675,6 +675,54 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// <b>The machine beats a rule that never looked.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>John's project, stated so it can be FAILED</b>, and the target world is a microcosm and
+    /// a score on it is what the machine is worth, so the first thing it owes is beating a
+    /// rule with no model at all: say the commonest answer for this kind of question and this
+    /// noun. It does not. On 720 questions over three seeds it reads under that bar on all
+    /// four kinds and under it in total, and silence accounts for one question in forty.
+    /// </para>
+    /// <para>
+    /// <b>And the reason this was not caught</b> is the shape of every other reading here.
+    /// The suite is arms against arms at one instant, which answers <i>which mechanism is
+    /// better</i> and never <i>is any of them worth anything</i>. The wrong-house control is
+    /// the closest thing to a bar and it asks a different question — that the exam reads the
+    /// walk rather than the alphabet — so a machine below the blind rule passes it by walking
+    /// the right house badly.
+    /// </para>
+    /// <para>
+    /// <b>Which puts a floor under every arm comparison</b> on this world. Two arms that
+    /// differ under the bar differ below the floor, and a null between them says nothing about
+    /// the mechanism. That is the reading to carry into any grid taken here before this
+    /// closes.
+    /// </para>
+    /// <para>
+    /// <b>It closes by the machine beating the bar</b>, and by nothing else. The bar is
+    /// computed from the same stream in the same run, so it cannot be satisfied by editing
+    /// this file, and it is the noun-conditioned one because that is the sharper of the two a
+    /// blind rule can reach.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task The_machine_beats_a_rule_that_never_looked_at_the_house()
+    {
+        var (blind, learner, silent) = await CeilingTests.Against();
+
+        output.WriteLine(
+            $"the learner reads {learner:F3} against a blind {blind:F3}, silent on {silent}");
+
+        Assert.True(learner > blind,
+            $"the machine scores {learner:F3} on the walked house against {blind:F3} for a "
+            + "rule that never looked at it and says the commonest answer for the kind and the "
+            + "noun. Until this closes, an arm comparison on this world is two machines "
+            + "differing below the floor. This test is red on purpose and closes on the "
+            + "machine, not on this file.");
+    }
+
+    /// <summary>
     /// <b>The learning trend is read by something that chooses.</b>
     /// </summary>
     /// <remarks>

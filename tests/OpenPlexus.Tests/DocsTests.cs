@@ -894,7 +894,18 @@ public sealed class DocsTests
     // drawn cells carry nothing; this one kills that account and leaves the learner holding
     // it. An alphabet is not what the machine was short of, and the item that opens `THE
     // ORDER` says so rather than a session spending another day on the front end.
-    private const int Whole = 13_770;
+    //
+    // And 13,860, the fifty-second raise, for the reading that puts a floor under every grid
+    // taken on this world. The learner scores under a rule that never looked at the house --
+    // say the commonest answer for the question's kind and the noun it names -- on all four
+    // kinds and in total, with silence accounting for one question in forty.
+    //
+    // Nothing here had asked it. Every reading in this repo is an arm against an arm at one
+    // instant, which answers which mechanism is better and never whether any of them is worth
+    // anything, and the wrong-house control asks a different question again. So two arms that
+    // differ under the bar differ below the floor, and the item and the leaf say to find out
+    // which half is at fault before another mechanism is priced here.
+    private const int Whole = 13_860;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

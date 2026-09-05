@@ -1,4 +1,4 @@
-﻿# Working in this repo
+# Working in this repo
 
 Read `docs/plan.md` first. It is the only doc and it holds nothing finished; findings live in
 the commit that produced them and in the test that asserts them, never here and never there.
@@ -81,13 +81,17 @@ green without doing it. Do not delete them, do not weaken them, and do not read 
 regression. Each computes the state rather than asserting a constant, so none can be satisfied
 by editing that file; an entry closes when the work closes.
 
-**The red set is TWO, and anything else red is yours.**
+**The red set is THREE, and anything else red is yours.**
 `OutstandingTests.Every_dial_is_measured_on_a_world_whose_score_counts` names seven dials no
 test building the spine world turns.
 `OutstandingTests.Every_mechanism_in_the_brain_is_reached_by_something_that_drives_it` names
-`Worded`, the frozen word encoder, which is fetched and read and which no run mints a
-condition from. Check the failures against those before assuming a run is clean — a stable red
-set is the only kind you can read a new failure against.
+`Worded` and `Codebook`, the frozen word encoder and its quantisation, both read and neither
+reached by a run.
+`OutstandingTests.The_machine_beats_a_rule_that_never_looked_at_the_house` is the third and
+the one that matters: on the target world the learner scores under a rule that says the
+commonest answer for the question's kind and noun, on every kind. Until it closes, two arms
+compared here differ below the floor. Check the failures against those three before assuming a
+run is clean — a stable red set is the only kind you can read a new failure against.
 
 **The seven went from four when the spine became ONE world.** `Rooting`, `Spanning` and
 `Subsuming` had been named beside the conversation, so they read as measured on a world whose

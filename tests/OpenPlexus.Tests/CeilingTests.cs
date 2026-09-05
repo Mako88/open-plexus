@@ -1,4 +1,5 @@
-﻿using OpenPlexus.Codes;
+using OpenPlexus.Codes;
+using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -342,37 +343,16 @@ public sealed class CeilingTests(ITestOutputHelper output)
         output.WriteLine(
             $"{"kind",-6}{"asked",8}{"marginal",10}{"by noun",10}{"present",10}{"latest",10}");
 
-        var priced = new Dictionary<string, (int Asked, double Present, double Latest)>();
+        var priced = Priced(sat);
 
-        foreach (var kind in sat.Select(one => one.Kind).Distinct().Order(StringComparer.Ordinal))
+        foreach (var kind in priced.Keys.Order(StringComparer.Ordinal))
         {
-            var these = sat.Where(one => one.Kind == kind).ToList();
-
-            // The answer alphabet of this kind, read off what was asked rather than declared
-            // here. A list written into the test would be the world's own answer key copied
-            // into a second place for the two to drift apart.
-            var alphabet = new HashSet<Code>(these.Select(one => one.Answer));
-
-            var marginal = these
-                .GroupBy(one => one.Answer)
-                .Max(one => one.Count()) / (double)these.Count;
-
-            var noun = these
-                .GroupBy(one => one.About)
-                .Sum(group => group.GroupBy(one => one.Answer).Max(one => one.Count()))
-                / (double)these.Count;
-
-            var present = these.Count(one => one.Seen.Codes.Contains(one.Answer))
-                / (double)these.Count;
-
-            var latest = these.Count(one => Latest(one.Seen, alphabet) == one.Answer)
-                / (double)these.Count;
+            var one = priced[kind];
 
             output.WriteLine(
-                $"{kind,-6}{these.Count,8}{marginal,10:F3}{noun,10:F3}{present,10:F3}"
-                + $"{latest,10:F3}");
+                $"{kind,-6}{one.Asked,8}{one.Marginal,10:F3}{one.Noun,10:F3}{one.Present,10:F3}"
+                + $"{one.Latest,10:F3}");
 
-            priced[kind] = (these.Count, present, latest);
         }
 
         // Four kinds, or the survey is one question wearing four names. What makes an exam
@@ -395,6 +375,311 @@ public sealed class CeilingTests(ITestOutputHelper output)
             + "survey is recency wearing an exam's clothes");
     }
 
+    /// <summary>What one kind of question is worth to a rule that never looked.</summary>
+    /// <param name="Asked">How many were put.</param>
+    /// <param name="Marginal">The commonest answer of the kind.</param>
+    /// <param name="Noun">The commonest answer for the noun the question names.</param>
+    /// <param name="Present">How often the answer is somewhere in the moment.</param>
+    /// <param name="Latest">The most recent word of the answer's own kind.</param>
+    public readonly record struct Blind(
+        int Asked, double Marginal, double Noun, double Present, double Latest);
+
+    /// <summary>
+    /// The blind rules priced per kind, off the questions a run put.
+    /// </summary>
+    /// <param name="sat">Each question's kind, the noun it named, its answer and its moment.</param>
+    /// <remarks>
+    /// One computation for both readings here, because two copies of a bar are two bars that
+    /// drift. The answer alphabet of a kind is read off what was asked rather than declared,
+    /// since a list written into a test is the world's answer key copied somewhere it can go
+    /// stale.
+    /// </remarks>
+    private static IReadOnlyDictionary<string, Blind> Priced(
+        IReadOnlyList<(string Kind, Code About, Code Answer, Coded Seen)> sat)
+    {
+        var priced = new Dictionary<string, Blind>(StringComparer.Ordinal);
+
+        foreach (var kind in sat.Select(one => one.Kind).Distinct().Order(StringComparer.Ordinal))
+        {
+            var these = sat.Where(one => one.Kind == kind).ToList();
+            var alphabet = new HashSet<Code>(these.Select(one => one.Answer));
+
+            priced[kind] = new Blind(
+                these.Count,
+                these.GroupBy(one => one.Answer).Max(one => one.Count())
+                    / (double)these.Count,
+                these.GroupBy(one => one.About)
+                    .Sum(group => group.GroupBy(one => one.Answer).Max(one => one.Count()))
+                    / (double)these.Count,
+                these.Count(one => one.Seen.Codes.Contains(one.Answer)) / (double)these.Count,
+                these.Count(one => Latest(one.Seen, alphabet) == one.Answer)
+                    / (double)these.Count);
+        }
+
+        return priced;
+    }
+
+    /// <summary>The settings every arm comparison on the walked house runs at.</summary>
+    /// <remarks>
+    /// Named once, because the reading above is taken on <c>Fixture.House</c> — four people
+    /// for a hundred and twenty steps — and the arms run two people for forty. The number of
+    /// people is the size of the answer alphabet for half the exam, so those are different
+    /// worlds, and a score from one read against a bar from the other is the mistake this file
+    /// exists to prevent made one level up.
+    /// </remarks>
+    public static RoamingSettings Arming(int steps = 40, int asked = 6) =>
+        new()
+        {
+            Rooms = 6,
+            Props = 4,
+            People = 2,
+            Steps = steps,
+            Asked = asked,
+            Chatting = 0,
+        };
+
+    /// <summary>How many houses a seed, and how many seeds, every reading here uses.</summary>
+    public const int Houses = 40;
+
+    /// <summary>How many seeds.</summary>
+    public const int Seeds = 3;
+
+    /// <summary>
+    /// What a machine that never looked at this house can reach, per kind and weighted.
+    /// </summary>
+    /// <remarks>
+    /// Three rules, none of which learns anything: say the commonest answer of the kind, say
+    /// the commonest answer for the noun the question names, and say the most recent word of
+    /// the answer's own kind. An arm is worth reading only above the highest of them.
+    /// </remarks>
+    public static (double Marginal, double Noun, double Latest,
+        IReadOnlyDictionary<string, Blind> Kinds) Bars()
+    {
+        var sat = new List<(string Kind, Code About, Code Answer, Coded Seen)>();
+
+        for (var seed = 1; seed <= Seeds; seed++)
+        {
+            var world = new Roaming(Arming(), seed);
+
+            var words = new Dictionary<Code, string>();
+
+            for (var one = 0; one < world.Vocabulary.Count; one++)
+                words[world.Meaning(one)!.Value] = world.Vocabulary[one];
+
+            for (var round = 0; round < Houses * (40 + 6); round++)
+            {
+                var turn = world.Next();
+
+                if (turn.Seen.Asked is not { } question) continue;
+                if (!world.Sat) continue;
+
+                sat.Add((
+                    words[question.Codes[0]],
+                    question.Codes[^1],
+                    world.Meaning(turn.Outcome!.Value)!.Value,
+                    turn.Seen));
+            }
+        }
+
+        var kinds = Priced(sat);
+
+        var weighted = (Marginal: 0.0, Noun: 0.0, Latest: 0.0);
+
+        foreach (var one in kinds.Values)
+            weighted = (
+                weighted.Marginal + (one.Marginal * one.Asked),
+                weighted.Noun + (one.Noun * one.Asked),
+                weighted.Latest + (one.Latest * one.Asked));
+
+        return (
+            weighted.Marginal / sat.Count,
+            weighted.Noun / sat.Count,
+            weighted.Latest / sat.Count,
+            kinds);
+    }
+
+    /// <summary>
+    /// What the learner scores on the same stream, per kind, with its silence counted.
+    /// </summary>
+    /// <remarks>
+    /// The machine says nothing to the house, which is the arm measured best on this world, so
+    /// the acting channel is out of the comparison and the transcript is the world's alone.
+    /// </remarks>
+    public static async Task<(double Score, double Spoken, int Asked, int Silent,
+        IReadOnlyDictionary<string, (int Asked, int Right)> Kinds)> Scored()
+    {
+        var total = (Asked: 0, Right: 0, Silent: 0);
+        var kinds = new Dictionary<string, (int Asked, int Right)>(StringComparer.Ordinal);
+
+        for (var seed = 1; seed <= Seeds; seed++)
+        {
+            var house = new Roaming(Arming(), seed);
+            var brain = new Brain(new CommittingSettings { Capacity = 4_000 }, seed);
+
+            var words = new Dictionary<Code, string>();
+
+            for (var one = 0; one < house.Vocabulary.Count; one++)
+                words[house.Meaning(one)!.Value] = house.Vocabulary[one];
+
+            var watching = new Watching<Coded>(
+                house, new Joined(Joining.Bagged), acting: Chooses.From(_ => null));
+
+            var rounds = Houses * (40 + 6);
+            var loop = new Round(brain, rounds, sweep: 500, target: 0.9, window: 500);
+
+            for (var round = 0; round < rounds; round++)
+            {
+                // Read BEFORE the push, because `Roaming.Now` builds the moment about to be
+                // shown rather than the one just answered. Reading it after attributed every
+                // answer to the NEXT question and dropped a sixth of them, which flipped this
+                // grid's per-kind ordering while the total stayed put.
+                var question = house.Now.Asked;
+
+                if (watching.Push() is not { } pushed) continue;
+
+                var was = (loop.Right, loop.Silent);
+
+                await loop.StepAsync(pushed);
+
+                if (!house.Sat) continue;
+
+                total.Asked++;
+
+                var hit = loop.Right > was.Right;
+
+                if (hit) total.Right++;
+                if (loop.Silent > was.Silent) total.Silent++;
+
+                if (question is not { } put) continue;
+
+                var kind = words[put.Codes[0]];
+                var had = kinds.GetValueOrDefault(kind);
+
+                kinds[kind] = (had.Asked + 1, had.Right + (hit ? 1 : 0));
+            }
+        }
+
+        return (
+            total.Right / (double)total.Asked,
+            total.Right / (double)Math.Max(total.Asked - total.Silent, 1),
+            total.Asked,
+            total.Silent,
+            kinds);
+    }
+
+    /// <summary>
+    /// The blind bar and the learner's score on one stream, for whoever needs the pair.
+    /// </summary>
+    /// <remarks>
+    /// Read by <see cref="OutstandingTests"/>'s deadline as well as printed here, because a
+    /// bar written down in two places is two bars that drift apart.
+    /// </remarks>
+    public static async Task<(double Blind, double Learner, int Silent)> Against()
+    {
+        var scored = await Scored();
+
+        return (Bars().Noun, scored.Score, scored.Silent);
+    }
+
+    /// <summary>
+    /// The blind bars on the settings the arms run at, printed per kind.
+    /// </summary>
+    [Fact]
+    public void What_the_survey_is_worth_on_the_settings_the_arms_run_at()
+    {
+        var bars = Bars();
+
+        output.WriteLine(
+            $"{Houses} houses a seed over {Seeds} seeds, 40 steps and 6 asked");
+
+        output.WriteLine(
+            $"{"kind",-6}{"asked",8}{"marginal",10}{"by noun",10}{"latest",10}");
+
+        foreach (var kind in bars.Kinds.Keys.Order(StringComparer.Ordinal))
+        {
+            var one = bars.Kinds[kind];
+
+            output.WriteLine(
+                $"{kind,-6}{one.Asked,8}{one.Marginal,10:F3}{one.Noun,10:F3}{one.Latest,10:F3}");
+        }
+
+        output.WriteLine(
+            $"{"all",-6}{bars.Kinds.Values.Sum(one => one.Asked),8}"
+            + $"{bars.Marginal,10:F3}{bars.Noun,10:F3}{bars.Latest,10:F3}");
+
+        Assert.Equal(4, bars.Kinds.Count);
+
+        // The by-noun bar is the sharper of the two blind ones, or the pair is computed
+        // wrongly. Arithmetic rather than a finding: knowing the noun cannot make a guess
+        // worse, and this is asserted so the two cannot drift.
+        Assert.True(bars.Noun >= bars.Marginal,
+            $"the noun-conditioned bar is {bars.Noun:F3} against a marginal of "
+            + $"{bars.Marginal:F3}, so one of the two is computed wrongly");
+    }
+
+    /// <summary>
+    /// What the learner scores against those bars, per kind, on one stream.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The comparison this project has not had. Every reading here is an arm against another
+    /// arm at one instant, and the question a bar answers is a different one: is the machine
+    /// worth more than a rule that never looked at the house.
+    /// </para>
+    /// <para>
+    /// Silence is the confound and is why the spoken half is printed. A blind rule always
+    /// answers; the machine may decline, and a declined round scores nothing. So a score under
+    /// the bar means one of two things and the split says which.
+    /// </para>
+    /// <para>
+    /// Per kind as well, because a total hides which question the machine loses on and one of
+    /// the four is at the language's ceiling before anything runs — a conjunction of codes
+    /// cannot say <i>two of these</i>.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task What_the_learner_scores_against_a_rule_that_never_looked()
+    {
+        var bars = Bars();
+        var scored = await Scored();
+
+        output.WriteLine(
+            $"{Houses} houses a seed over {Seeds} seeds, 40 steps and 6 asked");
+
+        output.WriteLine(
+            $"{"kind",-6}{"asked",8}{"learner",10}{"marginal",10}{"by noun",10}");
+
+        foreach (var kind in scored.Kinds.Keys.Order(StringComparer.Ordinal))
+        {
+            var mine = scored.Kinds[kind];
+            var bar = bars.Kinds[kind];
+
+            output.WriteLine(
+                $"{kind,-6}{mine.Asked,8}{mine.Right / (double)mine.Asked,10:F3}"
+                + $"{bar.Marginal,10:F3}{bar.Noun,10:F3}");
+        }
+
+        output.WriteLine(
+            $"{"all",-6}{scored.Asked,8}{scored.Score,10:F3}{bars.Marginal,10:F3}"
+            + $"{bars.Noun,10:F3}");
+
+        output.WriteLine(
+            $"silent on {scored.Silent} of {scored.Asked}, so {scored.Spoken:F3} where it spoke");
+
+        Assert.Equal(4, scored.Kinds.Count);
+
+        // Every question the exam put is attributed to a kind, or the split is about whichever
+        // ones the reader caught. This is what found the misattribution: reading the kind after
+        // the step lost 120 of 720 and inverted the ordering.
+        Assert.Equal(scored.Asked, scored.Kinds.Values.Sum(one => one.Asked));
+
+        // And silence has to be small enough that the two halves answer one question, or the
+        // learner and the bar are not comparable and the deadline reading this is about
+        // abstention rather than about accuracy.
+        Assert.True(scored.Silent < scored.Asked / 10,
+            $"the machine declined {scored.Silent} of {scored.Asked}, so its score and a rule "
+            + "that always answers are not the same measurement");
+    }
     /// <summary>The most recent code of one alphabet in a moment's statements.</summary>
     /// <param name="seen">The moment.</param>
     /// <param name="alphabet">The codes that could be an answer of this kind.</param>

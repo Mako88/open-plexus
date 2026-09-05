@@ -419,24 +419,109 @@ public sealed class CeilingTests(ITestOutputHelper output)
         return priced;
     }
 
-    /// <summary>The settings every arm comparison on the walked house runs at.</summary>
+    /// <summary>
+    /// The world the SPINE runs, named once so a reading cannot be taken on another.
+    /// </summary>
     /// <remarks>
-    /// Named once, because the reading above is taken on <c>Fixture.House</c> — four people
-    /// for a hundred and twenty steps — and the arms run two people for forty. The number of
-    /// people is the size of the answer alphabet for half the exam, so those are different
-    /// worlds, and a score from one read against a bar from the other is the mistake this file
-    /// exists to prevent made one level up.
+    /// <para>
+    /// A hundred and twenty steps, six questions and six rounds of conversation nobody takes
+    /// up, which is what <c>RoamingTests</c>'s dial grid walks and what the deployment talks
+    /// to. Named here for the reason <see cref="Fronting"/> is: a session's readings were taken
+    /// at forty steps with no conversation and a doubled capacity, and every one of them was
+    /// about a machine nobody runs.
+    /// </para>
+    /// <para>
+    /// The person is quiet, so the conversation is six moments of an invitation nobody
+    /// answers. That is the arm this world is watched under, and it keeps the acting channel
+    /// out of a reading about the population.
+    /// </para>
     /// </remarks>
-    public static RoamingSettings Arming(int steps = 40, int asked = 6) =>
-        new()
+    public static RoamingSettings Arming()
+    {
+        var quiet = new Person();
+
+        return new RoamingSettings
         {
             Rooms = 6,
             Props = 4,
             People = 2,
-            Steps = steps,
-            Asked = asked,
-            Chatting = 0,
+            Steps = 120,
+            Asked = 6,
+            Chatting = 6,
+            Typed = quiet,
+            Printed = quiet.Printed,
         };
+    }
+
+    /// <summary>The brain the spine runs, which is its own defaults and nothing else.</summary>
+    /// <remarks>
+    /// A capacity written into a test is a dial the deployment does not turn, and a population
+    /// cap decides how much of what repair mints survives — so a reading taken at twice the
+    /// default is a reading about a different machine.
+    /// </remarks>
+    internal static CommittingSettings Dialling() => new();
+
+    /// <summary>How many rounds the spine is run for.</summary>
+    public const int Running = 10_000;
+
+    /// <summary>
+    /// The front end the spine SHIPS, named once so a reading cannot be taken on another.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// `OpenPlexus.Talk` composes this and it is what the deployment runs. Naming it here is
+    /// the same discipline <see cref="Arming"/> carries for the world's size, and it is here
+    /// for the same reason: a whole session's readings were taken on <c>Bagged</c>, copied out
+    /// of a control that uses it deliberately, and every number was about a machine nobody
+    /// ships.
+    /// </para>
+    /// <para>
+    /// The resolution and the freshest flag are part of it. A store read at depth nought is a
+    /// different mechanism from one read at three, so a front end named without them is half
+    /// a name.
+    /// </para>
+    /// </remarks>
+    public static Joined Fronting() =>
+        new(Joining.Resolved, resolution: 3, freshest: true);
+
+    /// <summary>
+    /// The front end named here is the one the deployment composes.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The check this file needed and did not have. A whole session's target-world readings
+    /// were taken on <c>Bagged</c>, copied out of a control that uses it deliberately, while
+    /// the terminal ships <c>Resolved</c> at depth three — so the machine that was measured
+    /// and the machine that runs were two machines, and the headline moved when they were made
+    /// one.
+    /// </para>
+    /// <para>
+    /// It reads the terminal's own source, which is what <c>ExercisedTests.BrainsApart</c>
+    /// already does for the brain's dials. That guard covers a dial the terminal turns and the
+    /// walk defaults; this covers the seam one step out, where the front end is composed.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_front_end_measured_here_is_the_one_the_terminal_ships()
+    {
+        var source = File.ReadAllText(
+            Path.Combine(Tree.Repo(), "src", "OpenPlexus.Talk", "Program.cs"));
+
+        var shipped = source.Contains(
+            "new Joined(joining, resolution: 3, freshest: true)", StringComparison.Ordinal)
+            && source.Contains(": Joining.Resolved;", StringComparison.Ordinal);
+
+        output.WriteLine(
+            shipped
+                ? "the terminal composes Resolved at depth three, freshest, and so does this"
+                : "the terminal composes something else");
+
+        Assert.True(shipped,
+            "`OpenPlexus.Talk` no longer composes `Joining.Resolved` at resolution three with "
+            + "`freshest`, which is what `Fronting` returns and what every reading in this file "
+            + "is taken on. A measurement on a front end the deployment does not run is a "
+            + "measurement of a machine nobody has. Move `Fronting` to whatever ships.");
+    }
 
     /// <summary>How many houses a seed, and how many seeds, every reading here uses.</summary>
     public const int Houses = 40;
@@ -466,7 +551,7 @@ public sealed class CeilingTests(ITestOutputHelper output)
             for (var one = 0; one < world.Vocabulary.Count; one++)
                 words[world.Meaning(one)!.Value] = world.Vocabulary[one];
 
-            for (var round = 0; round < Houses * (40 + 6); round++)
+            for (var round = 0; round < Running; round++)
             {
                 var turn = world.Next();
 
@@ -514,7 +599,7 @@ public sealed class CeilingTests(ITestOutputHelper output)
         for (var seed = 1; seed <= Seeds; seed++)
         {
             var house = new Roaming(Arming(), seed);
-            var brain = new Brain(new CommittingSettings { Capacity = 4_000 }, seed);
+            var brain = new Brain(Dialling(), seed);
 
             var words = new Dictionary<Code, string>();
 
@@ -522,12 +607,11 @@ public sealed class CeilingTests(ITestOutputHelper output)
                 words[house.Meaning(one)!.Value] = house.Vocabulary[one];
 
             var watching = new Watching<Coded>(
-                house, new Joined(Joining.Bagged), acting: Chooses.From(_ => null));
+                house, Fronting(), acting: Chooses.From(_ => null));
 
-            var rounds = Houses * (40 + 6);
-            var loop = new Round(brain, rounds, sweep: 500, target: 0.9, window: 500);
+            var loop = new Round(brain, Running, sweep: 1000, target: 0.9, window: 2000);
 
-            for (var round = 0; round < rounds; round++)
+            for (var round = 0; round < Running; round++)
             {
                 // Read BEFORE the push, because `Roaming.Now` builds the moment about to be
                 // shown rather than the one just answered. Reading it after attributed every
@@ -590,7 +674,7 @@ public sealed class CeilingTests(ITestOutputHelper output)
         var bars = Bars();
 
         output.WriteLine(
-            $"{Houses} houses a seed over {Seeds} seeds, 40 steps and 6 asked");
+            $"{Running} rounds a seed over {Seeds} seeds, the spine's own world");
 
         output.WriteLine(
             $"{"kind",-6}{"asked",8}{"marginal",10}{"by noun",10}{"latest",10}");
@@ -644,7 +728,7 @@ public sealed class CeilingTests(ITestOutputHelper output)
         var scored = await Scored();
 
         output.WriteLine(
-            $"{Houses} houses a seed over {Seeds} seeds, 40 steps and 6 asked");
+            $"{Running} rounds a seed over {Seeds} seeds, the spine's own world");
 
         output.WriteLine(
             $"{"kind",-6}{"asked",8}{"learner",10}{"marginal",10}{"by noun",10}");

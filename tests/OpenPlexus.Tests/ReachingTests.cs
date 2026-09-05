@@ -69,15 +69,15 @@ public sealed class ReachingTests(ITestOutputHelper output)
         for (var seed = 1; seed <= CeilingTests.Seeds; seed++)
         {
             var house = new Roaming(CeilingTests.Arming(), seed);
-            var brain = new Brain(new CommittingSettings { Capacity = 4_000 }, seed);
+            var brain = new Brain(CeilingTests.Dialling(), seed);
 
             var watching = new Watching<Coded>(
-                house, new Joined(Joining.Bagged), acting: Chooses.From(_ => null));
+                house, CeilingTests.Fronting(), acting: Chooses.From(_ => null));
 
-            var rounds = CeilingTests.Houses * 46;
-            var loop = new Round(brain, rounds, sweep: 500, target: 0.9, window: 500);
+            var loop = new Round(
+                brain, CeilingTests.Running, sweep: 1000, target: 0.9, window: 2000);
 
-            for (var round = 0; round < rounds; round++)
+            for (var round = 0; round < CeilingTests.Running; round++)
             {
                 if (watching.Push() is not { } pushed) continue;
 

@@ -682,8 +682,17 @@ public sealed class OutstandingTests(ITestOutputHelper output)
     /// <b>John's project, stated so it can be FAILED</b>, and the target world is a microcosm and
     /// a score on it is what the machine is worth, so the first thing it owes is beating a
     /// rule with no model at all: say the commonest answer for this kind of question and this
-    /// noun. It does not. On 720 questions over three seeds it reads under that bar on all
-    /// four kinds and under it in total, and silence accounts for one question in forty.
+    /// noun. It does not. Over three seeds of the spine's own ten thousand rounds it reads
+    /// 0.319 against 0.354, which is under three standard errors, and silence is one question
+    /// in seventy-five.
+    /// </para>
+    /// <para>
+    /// <b>The gap is modest and the per-kind picture is mixed</b>, which is worth saying because
+    /// the first version of this entry claimed a loss on every kind and was measured on a front
+    /// end the deployment does not run. Against the plain marginal the machine leads on two
+    /// kinds of four and is level in total; it is the noun-conditioned bar it misses. The
+    /// counting question is where it loses most and is at the language's ceiling before
+    /// anything runs.
     /// </para>
     /// <para>
     /// <b>And the reason this was not caught</b> is the shape of every other reading here.

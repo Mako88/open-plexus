@@ -37,9 +37,10 @@ that is finished LEAVES, so this is only ever what is still to do.
   house by construction. So it wants a spine world with variables to be in trouble about, a
   deletion, or a waiting list of its own — and the third is the answer only if the first two
   are refused.
-- **First COVERAGE, which is what the population lacks** — repair holds five sixths of it and
-  fires on one exam round in fifty, so the vote falls back on genesis's one-code scopes, which
-  are right one time in sixteen. Eight rankings of that clear nothing. Fork **155**.
+- **First COVERAGE, which is what the population lacks** — repair holds six sevenths of it and
+  each of its rules reaches an exam round rarely, so the vote falls back on genesis's one-code
+  scopes, which are right one time in fourteen. Eight rankings of that clear nothing. Fork
+  **155**.
 - **Then whether the learner can use a RESEMBLANCE at all**, an alphabet carrying a nearly
   pure one having bought nothing. Both front-end shapes are refuted below, so what is open is
   the learner rather than the codes. Fork **154**.
@@ -418,10 +419,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
     - **OPEN** — one hit is too few for the normal approximation the bar is, and no
       correction repairs a mis-calibrated statistic; the same table is then read once a round
       for ever. A confidence sequence answers both and needs no episode boundary. Fork **152**.
-    - **OPEN** — eight rankings of the firing set and none clears the blind bar. Genesis is
-      a seventh of what is HELD and seven tenths of what FIRES, being one code deep; repair
-      holds the rest, is deeper and never covers. Ranking by depth is among the worst of the
-      eight. Fork **155**.
+    - **OPEN** — eight rankings of the firing set clear no blind bar, the vote's own rule
+      leading them. Genesis is a seventh of what is HELD and seven tenths of what FIRES, one
+      code deep; repair holds the rest and rarely covers. Fork **155**.
     - **OPEN** — what the learner does with a resemblance it is HANDED. Two front ends put one
       in the moment and neither paid, the second carrying it almost perfectly, so the open
       question is what a scope over a kind could win where the answer is an individual. Fork

@@ -88,8 +88,8 @@ test building the spine world turns.
 `Worded` and `Codebook`, the frozen word encoder and its quantisation, both read and neither
 reached by a run.
 `OutstandingTests.The_machine_beats_a_rule_that_never_looked_at_the_house` is the third and
-the one that matters: on the target world the learner scores under a rule that says the
-commonest answer for the question's kind and noun, on every kind. Until it closes, two arms
+the one that matters: on the target world the learner scores 0.319 against 0.354 for a rule
+that says the commonest answer for the question's kind and noun. Until it closes, two arms
 compared here differ below the floor. Check the failures against those three before assuming a
 run is clean — a stable red set is the only kind you can read a new failure against.
 

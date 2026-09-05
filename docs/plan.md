@@ -38,7 +38,9 @@ that is finished LEAVES, so this is only ever what is still to do.
   deletion, or a waiting list of its own — and the third is the answer only if the first two
   are refused.
 - **First a repair condition minted from an ENCODER**, its direction taken from the parent's
-  own hits and misses. `Worded` is fetched and waiting. Fork **153**.
+  own hits and misses, which is measured to concentrate on a KIND. `Worded` is fetched and
+  waiting; what is unbuilt is a front-end channel carrying vectors, a region store and a gate.
+  Fork **153**.
 - **Then whether a CALIBRATED bar escapes what a tightened one costs.** Paying for the
   round's gates cut the house a third and cost the spine its check that the survey reads the
   walk, so the noise is LOAD-BEARING. A bound refuses only the unattainable, and a bar valid
@@ -413,8 +415,9 @@ rather than a leaf, and a question that closes is a finding that belongs in its 
       correction repairs a mis-calibrated statistic; the same table is then read once a round
       for ever. A confidence sequence answers both and needs no episode boundary. Fork **152**.
     - **OPEN** — a condition minted as a REGION of a frozen encoder's space, so a repair can
-      say *a word like these* where the alphabet has only hashes. The direction has to come
-      from the parent's hits and misses; a drawn partition is refuted below. Fork **153**.
+      say *a word like these* where the alphabet has only hashes. The direction comes off the
+      tally already held, so nothing remembers a moment; a drawn partition is refuted below.
+      Fork **153**.
     - **OPEN** — a total is a lifetime, which C4 refuses, and the earned rate replacing it
       reads as free on `Arranged` rather than as a budget.
     - **OPEN** — the curve is `Curved`, that rate capped by the parent's hits, and it is

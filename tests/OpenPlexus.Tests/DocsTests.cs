@@ -867,7 +867,15 @@ public sealed class DocsTests
     // because a drawn hyperplane in three hundred and eighty-four dimensions is very nearly at
     // right angles to it. Without the row the next session tries the cheap shape again, which
     // is exactly what the table exists to stop.
-    private const int Whole = 13_610;
+    //
+    // And 13,635, twenty-five words, for the ceiling that de-risks what replaces it. The
+    // direction a repair would aim comes off the tally a commitment already keeps, so nothing
+    // has to remember a moment and the counters go on merging -- and the words it admits
+    // concentrate on a KIND rather than listing the ones the parent was right about. The item
+    // and the leaf say what is unbuilt, which is a session's worth of seam, and a session that
+    // could not read that off `THE ORDER` would price the mechanism before knowing it had a
+    // signal to work with.
+    private const int Whole = 13_635;
 
     /// <summary>
     /// Every section the plan is allowed to have, in order.

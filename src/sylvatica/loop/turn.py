@@ -95,27 +95,85 @@ class Answered:
 # instruction to decline what it was not told is what makes the exam's negatives
 # a fair question rather than a trick.
 #
-# IT IS A DIAL AND EVERY READING RECORDS IT. Standing objection 2 says this
-# format was never verified against the G1 tune, and that objection is now
-# sharper rather than settled -- the preamble helps, and nobody has measured
-# which of its clauses is carrying the result.
-PREAMBLE = (
-    "User: I am going to tell you things about my home and the people in it. "
-    "Remember them. When I ask you a question, answer in a few words. "
-    "If I have not told you the answer, say that you do not know."
-    f"{SEPARATOR}{CORE_PREFIX} Understood. I will remember what you tell me, "
-    f"answer briefly, and say when I do not know.{SEPARATOR}"
-)
+# AND THE FIRST VERSION OF IT TAUGHT THE CORE TO ECHO, which cost a whole set of
+# Phase 1 readings and is the reason this is now a named, swappable dial with an
+# experiment behind it.
+#
+# `v1-restating` below is what was written first. Its Assistant turn is a
+# PARAPHRASE OF ITS OWN USER TURN -- "Remember them... answer in a few words...
+# say that you do not know" answered by "I will remember what you tell me,
+# answer briefly, and say when I do not know". That is the ONLY example of an
+# Assistant turn the core has when the conversation starts, and a recurrent
+# model learns in context from what it is given. So it learned that an Assistant
+# turn restates the User turn, and it began answering questions by repeating
+# them.
+#
+# THE EVIDENCE IS THE SHAPE OF THE CURVE, not the plausibility of the story. On
+# the worst house, echo rate by position in the conversation ran 95, 100, 100,
+# 98, 89, 63, 68, 64, 55, 22 percent, while the correct rate climbed 5 -> 56.
+# THE CORE GOT BETTER AS THE CONVERSATION WENT ON. No account of memory decay
+# produces that; a bad one-shot example being diluted by real replies does.
+#
+# The exam had been reading this as forgetting, and reading it seed by seed as
+# noise: 4 echoes on one house, 231 on another, out of 270 questions.
+PREAMBLES: dict[str, str] = {
+    # The control. Nothing at all -- this is what Phase 1's very first reading
+    # ran under, the one that scored 0.008 and did literary criticism.
+    "none": "",
+    # The version that taught echoing. Kept so the experiment can be re-run and
+    # so nobody reinvents it.
+    "v1-restating": (
+        "User: I am going to tell you things about my home and the people in it. "
+        "Remember them. When I ask you a question, answer in a few words. "
+        "If I have not told you the answer, say that you do not know."
+        f"{SEPARATOR}{CORE_PREFIX} Understood. I will remember what you tell me, "
+        f"answer briefly, and say when I do not know.{SEPARATOR}"
+    ),
+    # THE REPLACEMENT, and the two rules it is built to obey:
+    #
+    #   1. No Assistant turn restates its User turn. The acknowledgements are
+    #      two words and carry none of the instruction's content, so there is
+    #      nothing for the core to pattern-match into an echo.
+    #   2. It DEMONSTRATES the wanted behaviour instead of describing it -- a
+    #      fact told and acknowledged, then asked and answered with the fact
+    #      alone. Describing brevity in a sentence that is itself long was
+    #      always going to lose to an example.
+    #
+    # THE EXAMPLE'S VOCABULARY IS DELIBERATELY OUTSIDE THE GENERATOR'S. A kettle
+    # on a shelf is not a room, an object, a colour, a trade or a name that
+    # `exam/world.py` can produce, so it cannot leak into an answer and be
+    # scored as a hit. `tests/guards/test_preamble.py` asserts that, because the
+    # generator's word lists will change and this constraint is invisible.
+    "v2-example": (
+        "User: I am going to tell you things about my home. Remember them. "
+        "Answer questions in a few words, and say so if I have not told you."
+        f"{SEPARATOR}{CORE_PREFIX} Ready.{SEPARATOR}"
+        "User: The kettle lives on the third shelf."
+        f"{SEPARATOR}{CORE_PREFIX} Noted.{SEPARATOR}"
+        "User: Where does the kettle live?"
+        f"{SEPARATOR}{CORE_PREFIX} On the third shelf.{SEPARATOR}"
+        "User: Where does the ladder live?"
+        f"{SEPARATOR}{CORE_PREFIX} You have not told me.{SEPARATOR}"
+    ),
+}
+
+PREAMBLE = PREAMBLES["v2-example"]
 
 
-def prime(core: Any, state: Any | None = None) -> tuple[Any, Cost]:
+def prime(core: Any, state: Any | None = None, preamble: str | None = None) -> tuple[Any, Cost]:
     """Feed the preamble into a fresh state. Called once, when a thread begins.
 
     Not on every turn. The whole claim of this branch is that what was said
     stays in the state without being re-sent, and a preamble re-sent each turn
     would be the first crack in it.
+
+    `preamble` is settable so the choice can be swept on an exam rather than
+    argued about. See `scripts/phase1_preamble.py`.
     """
-    return core.feed(core.encode(PREAMBLE), state)
+    text = PREAMBLE if preamble is None else preamble
+    if not text:
+        return state, Cost(0, 0, 0.0, 0.0)
+    return core.feed(core.encode(text), state)
 
 
 def format_prompt(text: str) -> str:

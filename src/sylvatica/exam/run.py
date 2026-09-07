@@ -199,6 +199,7 @@ def run_exam(
     answer_budget: int = 32,
     state_path: Path | None = None,
     progress: bool = True,
+    preamble: str | None = None,
 ) -> ExamResult:
     """Hold the conversation, ask every question at its delay, score it.
 
@@ -224,7 +225,7 @@ def run_exam(
 
     # ONCE, INTO THE FRESH STATE, AND NEVER AGAIN. See `loop.turn.PREAMBLE` for
     # why this exists and what it cost to find out that it was missing.
-    state, prime_cost = prime(core)
+    state, prime_cost = prime(core, preamble=preamble)
     meter.add(prime_cost)
 
     for turn, line in enumerate(house.turns):
@@ -303,6 +304,7 @@ def run_full_context(
     house: Generated,
     answer_budget: int = 32,
     progress: bool = True,
+    preamble: str | None = None,
 ) -> ExamResult:
     """The same core, fed the user lines only, from a fresh state.
 
@@ -370,9 +372,9 @@ def run_full_context(
     meter = Meter()
     started = time.perf_counter()
 
-    state, cost = prime(core)
+    state, cost = prime(core, preamble=preamble)
     meter.add(cost)
-    preamble_tokens = len(core.encode(PREAMBLE))
+    preamble_tokens = len(core.encode(PREAMBLE if preamble is None else preamble))
     transcript_tokens = 0
     charged_in = 0
     charged_out = 0

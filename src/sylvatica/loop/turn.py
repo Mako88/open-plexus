@@ -177,12 +177,24 @@ PREAMBLES: dict[str, str] = {
     # SCORE. A frame that scores higher by fabricating more has not helped, and
     # a frame that makes replies longer poisons the state it is trying to serve
     # -- the core's own chatter is worth 45 points early in a conversation.
+    # CORRECTED BEFORE IT EVER RAN, on John's rule that the framing must never
+    # tell the entity something untrue. The first draft said its memory "carries
+    # everything said to you". THAT IS FALSE: the state is a fixed 13 MB and it
+    # is lossy by construction -- losing things is the whole reason the store and
+    # the consolidation phases exist.
+    #
+    # AND THE LIE WAS THE EXACT ONE THAT WOULD HAVE COST US THE READING. A frame
+    # asserting perfect recall gives the core a reason to produce a confident
+    # answer instead of declining, which is the confabulation hazard this arm
+    # was built to watch for. So the honest description and the safe one are the
+    # same text, which is worth noticing: "your memory fades, say when you are
+    # unsure" is both true and the thing that keeps the negatives meaningful.
     "v3-identity": (
         "User: You are not a chat assistant answering separate queries. You are "
-        "a continuing mind with one memory, and it carries everything said to "
-        "you; nothing will be repeated back to you later. Keep what matters, "
-        "answer in a few words, and say plainly when something was never given "
-        "to you."
+        "a continuing mind with one memory. It carries what you have been told "
+        "without anything being repeated back to you, and it is limited -- "
+        "things fade from it. Keep what matters, answer in a few words, and say "
+        "plainly when you were never told something or are no longer sure."
         f"{SEPARATOR}{CORE_PREFIX} Ready.{SEPARATOR}"
         "User: The kettle lives on the third shelf."
         f"{SEPARATOR}{CORE_PREFIX} Noted.{SEPARATOR}"

@@ -344,6 +344,37 @@ def run_exam(
     primed = core.copy_state(state) if tier in (Tier.B, Tier.C) else None
 
     for turn, line in enumerate(house.turns):
+        # TIER C DOES NOT HOLD THE CONVERSATION AT ALL. It answers from a fresh
+        # primed state with the store off, so nothing about the conversation
+        # reaches it -- running it anyway would spend four minutes building a
+        # state that is thrown away, and would put those tokens on Tier C's cost
+        # row as though it had needed them.
+        #
+        # It also makes explicit something the tier's design implies: DELAY IS
+        # MEANINGLESS FOR TIER C. What the weights know does not depend on when
+        # a fact was told, so `by_delay` should come out flat, and a Tier C
+        # reading with a decay curve in it would mean something has leaked.
+        if tier is Tier.C:
+            for question in schedule.get(turn, ()):
+                said = _ask(
+                    core, core.copy_state(primed), question.text, answer_budget, meter
+                )
+                correct, invented, echoed = judge(question, said)
+                result.answers.append(
+                    Answered(
+                        fact_id=question.fact_id,
+                        kind=question.kind,
+                        delay_turns=question.delay_turns,
+                        asked=question.text,
+                        wanted=question.answer,
+                        said=said,
+                        correct=correct,
+                        invented=invented,
+                        echoed=echoed,
+                    )
+                )
+            continue
+
         # The conversation itself. The core replies, and its reply goes into the
         # state -- a thread where only one side is remembered is not a thread.
         # `say` closes the turn with a separator; see its docstring for what

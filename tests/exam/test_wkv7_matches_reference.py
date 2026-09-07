@@ -188,3 +188,92 @@ def test_the_chunked_gradient_is_finite(core):
         )
         assert float(knob.grad.abs()) > 0, f"chunk {chunk}: gradient is exactly zero"
         print(f"\nchunk {chunk:3d}: d(loss)/d(scale) = {float(knob.grad):.6f}")
+
+
+def test_training_through_the_chunked_path_goes_where_the_loop_goes(core):
+    """Not "matches at a point" -- "optimises to the same place over steps".
+
+    WHY THIS IS A SEPARATE TEST FROM THE ONES ABOVE. Every Phase 3 reading taken
+    before the chunked recurrence existed was produced by the loop, and every one
+    taken after will be produced by chunks. Somebody will compare them. Agreement
+    on one forward and one gradient does not establish that, because an optimiser
+    compounds: a 1e-6 disagreement per step, if it were biased rather than
+    random, is a different adapter after a few hundred steps.
+
+    So this runs the real training path -- LoRA, AdamW, gradient checkpointing --
+    from an identical seed down both roads and compares the LOSS TRAJECTORY and
+    the resulting weight deltas, which is the thing Phase 3 actually depends on.
+    """
+    from sylvatica.core.wkv7 import DifferentiableRwkv7
+    from sylvatica.learn.lora import LoraAdapter
+
+    tokens = list(core.encode(TEXT))
+    target = torch.tensor(tokens[1:], device="cuda")
+
+    def run(chunk: int) -> tuple[list[float], dict[str, torch.Tensor]]:
+        # THE SEED IS RESET INSIDE, not once outside. The adapter's B matrix is
+        # randomly initialised, and two runs from different inits would diverge
+        # for a reason that has nothing to do with the recurrence.
+        torch.manual_seed(20260907)
+        adapter = LoraAdapter(core._model.z, rank=8)
+        model = DifferentiableRwkv7(core, adapter=adapter)
+        model.chunk = chunk
+        opt = torch.optim.AdamW(adapter.parameters(), lr=1e-4)
+
+        losses = []
+        for _ in range(6):
+            opt.zero_grad(set_to_none=True)
+            logits, _ = model.forward(tokens, None, checkpoint=True)
+            loss = torch.nn.functional.cross_entropy(logits[:-1].float(), target)
+            loss.backward()
+            opt.step()
+            losses.append(float(loss))
+        return losses, {n: adapter.delta(n).detach().clone() for n in adapter.names}
+
+    loop_losses, loop_delta = run(0)
+    chunk_losses, chunk_delta = run(DifferentiableRwkv7.chunk)
+
+    print(f"\nloop   {['%.5f' % x for x in loop_losses]}")
+    print(f"chunk  {['%.5f' % x for x in chunk_losses]}")
+
+    # The loss must FALL, or this compares two ways of not training.
+    assert loop_losses[-1] < loop_losses[0], "the loop did not learn; nothing to compare"
+
+    worst = max(abs(a - b) for a, b in zip(loop_losses, chunk_losses))
+    print(f"worst per-step loss gap = {worst:.3e}")
+    assert worst < 1e-3, (
+        f"the chunked path optimises differently: loss gap {worst:.3e}. Phase 3 "
+        "readings taken before and after the kernel would not be comparable."
+    )
+
+    # AND THE WEIGHTS, because two paths can track on a scalar loss and still
+    # arrive at different adapters.
+    #
+    # ON NORM AND DIRECTION, NOT ON THE WORST ELEMENT, and the reason is Adam
+    # rather than convenience. This assertion was first written as a max-element
+    # ratio and it failed at 1.57e-2 while the relative Frobenius norm was
+    # 7.8e-5 and the cosine similarity was 0.99999994 -- six nines. AdamW
+    # normalises its step to roughly `lr` whatever the gradient's size, so an
+    # element whose gradient sits near zero takes a step decided by numerical
+    # noise; the max-element ratio then divides that worst element by the
+    # LARGEST element, which is fourteen times the typical one. It measures
+    # Adam's behaviour near zero, not whether two adapters are the same map.
+    # The max is still printed, because it is the number that would move first
+    # if the chunked path ever developed a real bias.
+    flat_loop = torch.cat([loop_delta[n].flatten() for n in loop_delta])
+    flat_chunk = torch.cat([chunk_delta[n].flatten() for n in loop_delta])
+
+    norm = float(flat_loop.norm())
+    relative = float((flat_loop - flat_chunk).norm()) / norm
+    cosine = float(torch.nn.functional.cosine_similarity(flat_loop, flat_chunk, dim=0))
+    worst_element = max(
+        float((loop_delta[n] - chunk_delta[n]).abs().max()) for n in loop_delta
+    ) / max(float(v.abs().max()) for v in loop_delta.values())
+
+    print(
+        f"relative Frobenius {relative:.3e}  cosine {cosine:.9f}  "
+        f"max-element {worst_element:.3e}"
+    )
+    assert norm > 0, "the optimiser never moved the weights"
+    assert relative < 1e-3, f"adapters diverged by {relative:.2e} of their own norm"
+    assert cosine > 0.9999, f"adapters point in different directions: cosine {cosine}"

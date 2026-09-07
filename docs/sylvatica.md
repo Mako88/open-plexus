@@ -51,6 +51,13 @@ and every phase should be able to say which of these it serves.
    Specialists where depth is wanted.
 7. **It is sequential and centralised.** The rest of computing scaled by going parallel and
    distributed over many weak machines; this should too.
+8. **It cannot see itself.** It has no channel to its own state, so it cannot tell when its
+   memory is degrading, when it has started repeating itself, or when it does not know. It
+   should monitor its own state and manage its own context — and be TAUGHT how, the way a child
+   is taught to use their body. Added 2026-09-07. Note the asymmetry this creates: everything
+   here that looks like introspection has to be BUILT, because nothing in a fixed-size state
+   tensor is visible to the core as tokens. Awareness is a channel somebody constructs, not a
+   faculty that arrives with scale.
 
 ---
 
@@ -323,6 +330,25 @@ depends on has its exit.
   can be recalled rather than reconstructed.
 - **Brevity as a trained target**, per complaint 5, once Tier C works at all.
 - **The core scoring its own confidence** so retrieval fires only when the state is unsure.
+- **Asked confidence against measured confidence**, per complaint 8, and this one comes FIRST
+  because everything else about awareness depends on the answer. Does what the core SAYS about
+  its certainty track whether it is right, and does the entropy of its own logits track it
+  better? There is already a reason to doubt the first: the core invents an answer to 15 to 20
+  of every 20 questions it was never told the answer to, fluently and without hedging. If asked
+  confidence is uncorrelated, self-monitoring must be INSTRUMENTED rather than requested, and
+  every design that asks the core how it is doing is dead on arrival.
+- **State telemetry as tokens**, per complaint 8. Serialise cheap statistics of the state —
+  drift since last turn, norm, how much has been written since a fact was told — and feed them
+  back each turn so the core has an actual channel to itself. This is the honest form of
+  "awareness": a thing built, not a faculty waited for. Measured against the same exam.
+- **Context hygiene as taught behaviour**, per complaint 8. Tell the core that repeating itself
+  and padding its replies degrade its own memory, and see whether being told changes what it
+  does. NOTE THE TRAP THIS FORK EXISTS TO AVOID: echoing was never a choice the core made, it
+  was in-context pattern completion from a bad example, and no instruction would have stopped
+  it. A failure that is structural cannot be taught away, and writing instructions against one
+  wastes the instruction budget and hides the real cause. The fork is worth running because ONE
+  instance already works — "answer in a few words" is context hygiene, and the core's own
+  chatter is worth about 45 points over the first fifty turns.
 
 ---
 

@@ -234,8 +234,15 @@ def say(
     text: str,
     budget: int,
     sampling: Sampling | None = None,
+    repair: bool = False,
+    seen: dict | None = None,
 ) -> tuple[str, Any, Cost]:
     """One exchange against a state: prompt, generate, and CLOSE THE TURN.
+
+    `repair` is OFF by default on purpose. It is a candidate fix for the residual
+    echoing, and turning it on before the truncation counter says truncation is
+    the cause would be fixing a thing nobody has shown is broken -- and it costs
+    an extra prefill on every overrunning turn. `seen` collects the counter.
 
     THE CLOSE IS THE PART THAT WAS MISSING AND IT COST A WHOLE READING.
     `generate` stops at a budget or a stop string, and in neither case does the
@@ -258,11 +265,65 @@ def say(
     one component the exam cannot see inside.
     """
     sampling = sampling or Sampling(stop_strings=STOP_STRINGS)
-    tokens = core.encode(format_prompt(text))
-    out, state, cost = core.generate(tokens, state, budget, sampling)
-    answer = trim_at_stop(core.decode(out), sampling.stop_strings)
+    prompt = format_prompt(text)
+    before = state
+    out, state, cost = core.generate(core.encode(prompt), state, budget, sampling)
+    raw = core.decode(out)
+    answer = trim_at_stop(raw, sampling.stop_strings)
+
+    # DID IT RUN OUT OF BUDGET RATHER THAN FINISHING?
+    #
+    # THE SUSPECTED SECOND HALF OF THE ECHO BUG, and it is instrumented here
+    # rather than assumed. The turn separator being missing put `Assistant: text
+    # that stops abruptly midUser:` into the state and taught the core to repeat
+    # questions back. That is fixed. But a reply that hits the budget is still
+    # cut MID-WORD before the separator goes in, so the state still accumulates
+    # `Assistant: a sentence that stops half way\n\n` -- a milder version of the
+    # same malformed pattern, three hundred times over.
+    #
+    # Under the fixed preamble the echo rate is 1 and 2 on the good houses and 53
+    # on the worst, so SOMETHING still varies by house. Whether it is this is a
+    # measurement, and `truncated` is the column that makes it one. If truncation
+    # rate tracks echo rate across houses, `repair` below earns its cost; if it
+    # does not, this is the wrong suspect and the counter says so cheaply.
+    truncated = len(out) >= budget and answer == raw.strip()
+    if seen is not None:
+        seen["turns"] = seen.get("turns", 0) + 1
+        seen["truncated"] = seen.get("truncated", 0) + int(truncated)
+
+    if truncated and repair:
+        # REBUILD FROM THE STATE AS IT WAS, with only well-formed text in it.
+        # `generate` copies the state it is given, so `before` is untouched and
+        # can be replayed onto. Costs one extra prefill of the turn, and only on
+        # the turns that actually overran.
+        answer = trim_to_sentence(answer)
+        state, redo = core.feed(
+            core.encode(f"{prompt} {answer}{SEPARATOR}"), before
+        )
+        return answer, state, cost + redo
+
     state, closing = core.feed(core.encode(SEPARATOR), state)
     return answer, state, cost + closing
+
+
+def trim_to_sentence(text: str) -> str:
+    """Cut back to the last finished sentence, or failing that the last whole word.
+
+    WHAT GOES INTO A STATE SHOULD BE SOMETHING SOMEBODY COULD HAVE SAID. A
+    fragment ending mid-word is not, and a recurrent core reads whatever is in
+    there as a pattern to continue.
+
+    Falls back to a word boundary rather than to nothing: a reply with no
+    sentence end inside the budget is one long run-on, and dropping it entirely
+    would delete a turn that did happen. A whole word is well-formed enough that
+    the next turn does not begin mid-syllable, which is the property that
+    matters.
+    """
+    cut = max(text.rfind(c) for c in ".!?")
+    if cut != -1:
+        return text[: cut + 1].strip()
+    cut = text.rfind(" ")
+    return text[:cut].strip() if cut > 0 else text.strip()
 
 
 def trim_at_stop(text: str, stop_strings: tuple[str, ...]) -> str:

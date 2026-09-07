@@ -100,6 +100,8 @@ def main() -> int:
                 "tier_a_by_kind": score.by_kind,
                 "invented": score.invented,
                 "echoed": score.echoed,
+                "truncated_replies": arm.truncated_replies,
+                "conversation_turns": arm.conversation_turns,
                 "negatives": len([a for a in arm.answers if a.fact_id is None]),
                 "seconds": round(arm.seconds, 1),
             }

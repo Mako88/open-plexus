@@ -97,6 +97,13 @@ class ExamResult:
     # the memory it is meant to serve, however good its answers look.
     reply_tokens: int = 0
 
+    # HOW MANY OF THE CORE'S REPLIES RAN OUT OF BUDGET rather than finishing.
+    # A truncated reply goes into the state cut off mid-word, which is a milder
+    # form of the malformed pattern that taught the core to echo. Whether it is
+    # what still varies between houses is a measurement, and this is it.
+    truncated_replies: int = 0
+    conversation_turns: int = 0
+
     def score(self) -> Score:
         positives = [a for a in self.answers if a.fact_id is not None]
         negatives = [a for a in self.answers if a.fact_id is None]
@@ -207,6 +214,7 @@ def run_exam(
     state_path: Path | None = None,
     progress: bool = True,
     preamble: str | None = None,
+    repair: bool = False,
 ) -> ExamResult:
     """Hold the conversation, ask every question at its delay, score it.
 
@@ -240,9 +248,12 @@ def run_exam(
         # state -- a thread where only one side is remembered is not a thread.
         # `say` closes the turn with a separator; see its docstring for what
         # omitting that did to the first two Tier A readings.
-        _, state, cost = say(core, state, line, reply_budget)
+        seen: dict = {}
+        _, state, cost = say(core, state, line, reply_budget, repair=repair, seen=seen)
         meter.add(cost)
         result.reply_tokens += cost.tokens_out
+        result.truncated_replies += seen.get("truncated", 0)
+        result.conversation_turns += 1
 
         due = schedule.get(turn)
         if not due:

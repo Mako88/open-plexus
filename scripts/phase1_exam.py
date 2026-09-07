@@ -81,6 +81,11 @@ def result_rows(result, label: str) -> dict:
         "by_delay": score.by_delay,
         "by_kind": score.by_kind,
         "seconds": round(result.seconds, 1),
+        # THE SUSPECT FOR THE RESIDUAL ECHOING, reported so it can be correlated
+        # rather than argued about. A reply that runs out of budget goes into the
+        # state cut mid-word.
+        "truncated_replies": result.truncated_replies,
+        "conversation_turns": result.conversation_turns,
         "cost": result.cost.row() if result.cost else None,
         # Present only on the full-context baseline, and it is NOT that
         # baseline's cost -- see `ExamResult.charged`. It is what an attention

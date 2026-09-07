@@ -78,4 +78,24 @@ class Consolidator(Protocol):
     def merge(self) -> None: ...
 
 
-__all__ = ["Arm", "Consolidator", "Cycle", "GateResult"]
+# At the bottom: these import the types above.
+from .gate import Gate, Measurement, calibrate, measure
+from .heldout import GENERAL_QA, PERPLEXITY_TEXT, fingerprint
+from .lora import DEFAULT_TARGETS, LoraAdapter, adapter_for
+
+__all__ = [
+    "DEFAULT_TARGETS",
+    "GENERAL_QA",
+    "PERPLEXITY_TEXT",
+    "Arm",
+    "Consolidator",
+    "Cycle",
+    "Gate",
+    "GateResult",
+    "LoraAdapter",
+    "Measurement",
+    "adapter_for",
+    "calibrate",
+    "fingerprint",
+    "measure",
+]

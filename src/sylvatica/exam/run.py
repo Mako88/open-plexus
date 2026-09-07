@@ -323,6 +323,17 @@ def run_exam(
     state, prime_cost = prime(core, preamble=preamble)
     meter.add(prime_cost)
 
+    # AND KEPT, because Tier B needs a fresh primed state for EVERY question and
+    # the preamble is the same text every time. Re-feeding it 270 times would be
+    # 27,000 tokens of prefill to recompute a state that cannot differ. Forking
+    # the one already computed is what a fixed-size state is for.
+    #
+    # The cost meter is NOT credited for the saving. `prime` was charged once,
+    # which is what actually ran; charging it 270 times to make the arm look
+    # expensive, or crediting a saving that no honest implementation would pay,
+    # would both be putting a number in a reading that nothing produced.
+    primed = core.copy_state(state) if tier is Tier.B else None
+
     for turn, line in enumerate(house.turns):
         # The conversation itself. The core replies, and its reply goes into the
         # state -- a thread where only one side is remembered is not a thread.
@@ -357,8 +368,7 @@ def run_exam(
                 # A FRESH STATE. Nothing the core knows here was carried; it all
                 # arrived through retrieval, which is what Tier B is for.
                 hits = store.search(question.text, k=k, deadline=time.monotonic() + 5.0)
-                answering, cost = prime(core, preamble=preamble)
-                meter.add(cost)
+                answering = core.copy_state(primed)
                 if hits:
                     answering, cost = core.feed(core.encode(inject(hits)), answering)
                     meter.add(cost)

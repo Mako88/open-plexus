@@ -138,7 +138,39 @@ def test_the_store_exists_and_tier_b_has_been_read():
     """
     missing = has("sylvatica.store", "Fragment", "Store", "SqliteStore")
     assert not missing, f"sylvatica.store is missing {missing}"
-    assert readings_of("exam", phase=2), "no phase-2 (Tier B) exam reading committed"
+
+    readings = readings_of("exam", phase=2)
+    assert readings, "no phase-2 (Tier B) exam reading committed"
+    latest = readings[-1]
+    rows = {r["label"]: r for r in latest["rows"]}
+
+    # WRITTEN BEFORE THE FIRST READING LANDED, deliberately. Phase 1's test went
+    # GREEN for a phase that was not done, because it asked only that a reading
+    # exist. The exit is a measurement, so the test has to be the measurement.
+
+    # ALL THREE RANKERS, or standing objection 7 is unaddressed. The exam's
+    # questions share every content word with the sentences that told the facts,
+    # so FTS5 alone can find them -- a Tier B score that is really the lexical
+    # ranker's would pass a task easier than the one the store is for.
+    arms = {name for name in rows if name.startswith("tier-b-")}
+    assert arms >= {"tier-b-hybrid", "tier-b-lexical", "tier-b-vector"}, (
+        f"only {sorted(arms)} ran; all three rankers are needed to tell whether "
+        "retrieval or mere word overlap produced the score"
+    )
+
+    assert "tier-a" in rows, "no Tier A beside Tier B; the exit is a comparison"
+    a, b = rows["tier-a"], rows["tier-b-hybrid"]
+    assert b["precision"]["at_k"] is not None, "retrieval precision was not read"
+
+    # THE DOC'S EXIT: Tier B beats Tier A at every delay past 20 turns.
+    long_delays = [d for d in a["by_delay"] if int(d) > 20]
+    assert long_delays, "the house has no delays past 20; the exit cannot be read"
+    losses = [
+        f"delay {d}: B {b['by_delay'][d]} vs A {a['by_delay'][d]}"
+        for d in long_delays
+        if b["by_delay"][d] <= a["by_delay"][d]
+    ]
+    assert not losses, "Tier B does not beat Tier A past delay 20: " + "; ".join(losses)
 
 
 # ---------------------------------------------------------------------------

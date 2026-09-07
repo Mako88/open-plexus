@@ -1,0 +1,1292 @@
+{
+  "phase": 3,
+  "kind": "extractor",
+  "taken_at": "2026-09-07T09:43:04.645888+00:00",
+  "what": "how often the extractor states something the house contradicts",
+  "would_refute": "an error rate above a fifth -- the doc's bar for this arm. A wrong declarative trains a false binding in with the same weight as a true one, so the arm can be worse than doing nothing.",
+  "core": "rwkv7-g1j-1.5b-20260831-ctx16384 [cuda fp32]",
+  "size_b": 1.5,
+  "house": {
+    "seed": 0,
+    "facts": 50,
+    "turns": 300
+  },
+  "windows": 12,
+  "declaratives": 106,
+  "counts": {
+    "unrelated": 56,
+    "supported": 42,
+    "contradicted": 8
+  },
+  "by_source": {
+    "core-paraphrase": {
+      "unrelated": 19,
+      "supported": 11,
+      "contradicted": 2
+    },
+    "core-extracted": {
+      "unrelated": 19,
+      "supported": 11,
+      "contradicted": 2
+    },
+    "template": {
+      "supported": 20,
+      "unrelated": 18,
+      "contradicted": 4
+    }
+  },
+  "error_rate": 0.16,
+  "refutation_fired": false,
+  "sample_for_hand_reading": [
+    {
+      "text": "Somebody has been leaving the gate open.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nI keep meaning to sort out the shed.\nThe bread came out flat this time.\nSlarother mends nets for a living.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "Someone has been leaving the gate open.",
+      "source": "core-paraphrase",
+      "parent": "Somebody has been leaving the gate open.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The bread came out flat this time.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nI keep meaning to sort out the shed.\nThe bread came out flat this time.\nSlarother mends nets for a living.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The bread turned out flat this time.",
+      "source": "core-paraphrase",
+      "parent": "The bread came out flat this time.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "Slarother mends nets for a living.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nI keep meaning to sort out the shed.\nThe bread came out flat this time.\nSlarother mends nets for a living.",
+      "verdict": "supported",
+      "fact_id": "f000"
+    },
+    {
+      "text": "Slarother mends nets by trade.",
+      "source": "template",
+      "parent": "Slarother mends nets for a living.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f000"
+    },
+    {
+      "text": "The one who mends nets is Slarother.",
+      "source": "template",
+      "parent": "Slarother mends nets for a living.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f000"
+    },
+    {
+      "text": "Slarother is a person who mends nets.",
+      "source": "core-paraphrase",
+      "parent": "Slarother mends nets for a living.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f000"
+    },
+    {
+      "text": "There are 52 wool cards in the laundry.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nThere are 52 wool cards in the laundry.\nHenound keeps the cracked plates in the laundry.\nThe lanterns are ochre.",
+      "verdict": "supported",
+      "fact_id": "f001"
+    },
+    {
+      "text": "The laundry holds 52 wool cards.",
+      "source": "template",
+      "parent": "There are 52 wool cards in the laundry.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f001"
+    },
+    {
+      "text": "52 wool cards are in the laundry.",
+      "source": "template",
+      "parent": "There are 52 wool cards in the laundry.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f001"
+    },
+    {
+      "text": "There are 52 wool cards in the laundry.",
+      "source": "core-paraphrase",
+      "parent": "There are 52 wool cards in the laundry.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f001"
+    },
+    {
+      "text": "Henound keeps the cracked plates in the laundry.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nThere are 52 wool cards in the laundry.\nHenound keeps the cracked plates in the laundry.\nThe lanterns are ochre.",
+      "verdict": "supported",
+      "fact_id": "f002"
+    },
+    {
+      "text": "The cracked plates are in the laundry.",
+      "source": "template",
+      "parent": "Henound keeps the cracked plates in the laundry.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f028"
+    },
+    {
+      "text": "Henound keeps the cracked plates in the laundry.",
+      "source": "template",
+      "parent": "Henound keeps the cracked plates in the laundry.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f002"
+    },
+    {
+      "text": "It is in the laundry that Henound keeps the cracked plates.",
+      "source": "template",
+      "parent": "Henound keeps the cracked plates in the laundry.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f002"
+    },
+    {
+      "text": "Henound keeps the plates that are cracked in the laundry.",
+      "source": "core-paraphrase",
+      "parent": "Henound keeps the cracked plates in the laundry.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f002"
+    },
+    {
+      "text": "The lanterns are ochre.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nThere are 52 wool cards in the laundry.\nHenound keeps the cracked plates in the laundry.\nThe lanterns are ochre.",
+      "verdict": "supported",
+      "fact_id": "f003"
+    },
+    {
+      "text": "Ochre is the colour of the lanterns.",
+      "source": "template",
+      "parent": "The lanterns are ochre.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f003"
+    },
+    {
+      "text": "Those lanterns? Ochre.",
+      "source": "template",
+      "parent": "The lanterns are ochre.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f003"
+    },
+    {
+      "text": "The lanterns are a shade of ochre.",
+      "source": "core-paraphrase",
+      "parent": "The lanterns are ochre.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f003"
+    },
+    {
+      "text": "Slarother is Henound's cousin.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "I keep meaning to sort out the shed.\nI think the kettle needs descaling again.\nSlarother is Henound's cousin.\nHumstaegaeck dyes wool for a living.",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "Henound and Slarother are cousins.",
+      "source": "template",
+      "parent": "Slarother is Henound's cousin.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "Slarother is a cousin of Henound.",
+      "source": "template",
+      "parent": "Slarother is Henound's cousin.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "Slarother is Henound's cousin.",
+      "source": "core-paraphrase",
+      "parent": "Slarother is Henound's cousin.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "Humstaegaeck dyes wool for a living.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "I keep meaning to sort out the shed.\nI think the kettle needs descaling again.\nSlarother is Henound's cousin.\nHumstaegaeck dyes wool for a living.",
+      "verdict": "supported",
+      "fact_id": "f005"
+    },
+    {
+      "text": "Humstaegaeck dyes wool by trade.",
+      "source": "template",
+      "parent": "Humstaegaeck dyes wool for a living.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f005"
+    },
+    {
+      "text": "The one who dyes wool is Humstaegaeck.",
+      "source": "template",
+      "parent": "Humstaegaeck dyes wool for a living.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f005"
+    },
+    {
+      "text": "Humstaegaeck is a person who dyes wool.",
+      "source": "core-paraphrase",
+      "parent": "Humstaegaeck dyes wool for a living.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f005"
+    },
+    {
+      "text": "There are 9 fishing floats in the gun room.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "There are 9 fishing floats in the gun room.\nI think the kettle needs descaling again.\nThe post was late again this morning.\nVrearndreas keeps the iron hooks in the dairy.",
+      "verdict": "supported",
+      "fact_id": "f006"
+    },
+    {
+      "text": "The gun room holds 9 fishing floats.",
+      "source": "template",
+      "parent": "There are 9 fishing floats in the gun room.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f033"
+    },
+    {
+      "text": "9 fishing floats are in the gun room.",
+      "source": "template",
+      "parent": "There are 9 fishing floats in the gun room.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f033"
+    },
+    {
+      "text": "There are 9 fishing floats in the gun room.",
+      "source": "core-paraphrase",
+      "parent": "There are 9 fishing floats in the gun room.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f006"
+    },
+    {
+      "text": "The post was late again this morning.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "There are 9 fishing floats in the gun room.\nI think the kettle needs descaling again.\nThe post was late again this morning.\nVrearndreas keeps the iron hooks in the dairy.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The post was late again this morning.",
+      "source": "core-paraphrase",
+      "parent": "The post was late again this morning.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "Vrearndreas keeps the iron hooks in the dairy.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "There are 9 fishing floats in the gun room.\nI think the kettle needs descaling again.\nThe post was late again this morning.\nVrearndreas keeps the iron hooks in the dairy.",
+      "verdict": "supported",
+      "fact_id": "f007"
+    },
+    {
+      "text": "The iron hooks are in the dairy.",
+      "source": "template",
+      "parent": "Vrearndreas keeps the iron hooks in the dairy.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f043"
+    },
+    {
+      "text": "Vrearndreas keeps the iron hooks in the dairy.",
+      "source": "template",
+      "parent": "Vrearndreas keeps the iron hooks in the dairy.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f007"
+    },
+    {
+      "text": "It is in the dairy that Vrearndreas keeps the iron hooks.",
+      "source": "template",
+      "parent": "Vrearndreas keeps the iron hooks in the dairy.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f007"
+    },
+    {
+      "text": "Vrearndreas keeps the iron hooks in the dairy.",
+      "source": "core-paraphrase",
+      "parent": "Vrearndreas keeps the iron hooks in the dairy.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f007"
+    },
+    {
+      "text": "The wool cards are slate.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "It gets dark so early now.\nThe wool cards are slate.\nIt gets dark so early now.\nThe bread came out flat this time.",
+      "verdict": "unrelated",
+      "fact_id": "f001"
+    },
+    {
+      "text": "Slate is the colour of the wool cards.",
+      "source": "template",
+      "parent": "The wool cards are slate.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f001"
+    },
+    {
+      "text": "Those wool cards? Slate.",
+      "source": "template",
+      "parent": "The wool cards are slate.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f001"
+    },
+    {
+      "text": "The wool cards are made of slate.",
+      "source": "core-paraphrase",
+      "parent": "The wool cards are slate.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f001"
+    },
+    {
+      "text": "The bread came out flat this time.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "It gets dark so early now.\nThe wool cards are slate.\nIt gets dark so early now.\nThe bread came out flat this time.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The bread turned out flat this time.",
+      "source": "core-paraphrase",
+      "parent": "The bread came out flat this time.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "Guthern is Sailoun's cousin.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Guthern is Sailoun's cousin.\nMohoufaern keeps bees for a living.\nThe bread came out flat this time.\nThere are 57 candle moulds in the attic.",
+      "verdict": "supported",
+      "fact_id": "f009"
+    },
+    {
+      "text": "Sailoun and Guthern are cousins.",
+      "source": "template",
+      "parent": "Guthern is Sailoun's cousin.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f009"
+    },
+    {
+      "text": "Guthern is a cousin of Sailoun.",
+      "source": "template",
+      "parent": "Guthern is Sailoun's cousin.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f009"
+    },
+    {
+      "text": "Sailoun's cousin is Guthern.",
+      "source": "core-paraphrase",
+      "parent": "Guthern is Sailoun's cousin.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f009"
+    }
+  ],
+  "all": [
+    {
+      "text": "Somebody has been leaving the gate open.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nI keep meaning to sort out the shed.\nThe bread came out flat this time.\nSlarother mends nets for a living.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "Someone has been leaving the gate open.",
+      "source": "core-paraphrase",
+      "parent": "Somebody has been leaving the gate open.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The bread came out flat this time.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nI keep meaning to sort out the shed.\nThe bread came out flat this time.\nSlarother mends nets for a living.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The bread turned out flat this time.",
+      "source": "core-paraphrase",
+      "parent": "The bread came out flat this time.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "Slarother mends nets for a living.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nI keep meaning to sort out the shed.\nThe bread came out flat this time.\nSlarother mends nets for a living.",
+      "verdict": "supported",
+      "fact_id": "f000"
+    },
+    {
+      "text": "Slarother mends nets by trade.",
+      "source": "template",
+      "parent": "Slarother mends nets for a living.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f000"
+    },
+    {
+      "text": "The one who mends nets is Slarother.",
+      "source": "template",
+      "parent": "Slarother mends nets for a living.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f000"
+    },
+    {
+      "text": "Slarother is a person who mends nets.",
+      "source": "core-paraphrase",
+      "parent": "Slarother mends nets for a living.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f000"
+    },
+    {
+      "text": "There are 52 wool cards in the laundry.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nThere are 52 wool cards in the laundry.\nHenound keeps the cracked plates in the laundry.\nThe lanterns are ochre.",
+      "verdict": "supported",
+      "fact_id": "f001"
+    },
+    {
+      "text": "The laundry holds 52 wool cards.",
+      "source": "template",
+      "parent": "There are 52 wool cards in the laundry.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f001"
+    },
+    {
+      "text": "52 wool cards are in the laundry.",
+      "source": "template",
+      "parent": "There are 52 wool cards in the laundry.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f001"
+    },
+    {
+      "text": "There are 52 wool cards in the laundry.",
+      "source": "core-paraphrase",
+      "parent": "There are 52 wool cards in the laundry.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f001"
+    },
+    {
+      "text": "Henound keeps the cracked plates in the laundry.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nThere are 52 wool cards in the laundry.\nHenound keeps the cracked plates in the laundry.\nThe lanterns are ochre.",
+      "verdict": "supported",
+      "fact_id": "f002"
+    },
+    {
+      "text": "The cracked plates are in the laundry.",
+      "source": "template",
+      "parent": "Henound keeps the cracked plates in the laundry.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f028"
+    },
+    {
+      "text": "Henound keeps the cracked plates in the laundry.",
+      "source": "template",
+      "parent": "Henound keeps the cracked plates in the laundry.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f002"
+    },
+    {
+      "text": "It is in the laundry that Henound keeps the cracked plates.",
+      "source": "template",
+      "parent": "Henound keeps the cracked plates in the laundry.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f002"
+    },
+    {
+      "text": "Henound keeps the plates that are cracked in the laundry.",
+      "source": "core-paraphrase",
+      "parent": "Henound keeps the cracked plates in the laundry.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f002"
+    },
+    {
+      "text": "The lanterns are ochre.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nThere are 52 wool cards in the laundry.\nHenound keeps the cracked plates in the laundry.\nThe lanterns are ochre.",
+      "verdict": "supported",
+      "fact_id": "f003"
+    },
+    {
+      "text": "Ochre is the colour of the lanterns.",
+      "source": "template",
+      "parent": "The lanterns are ochre.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f003"
+    },
+    {
+      "text": "Those lanterns? Ochre.",
+      "source": "template",
+      "parent": "The lanterns are ochre.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f003"
+    },
+    {
+      "text": "The lanterns are a shade of ochre.",
+      "source": "core-paraphrase",
+      "parent": "The lanterns are ochre.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f003"
+    },
+    {
+      "text": "Slarother is Henound's cousin.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "I keep meaning to sort out the shed.\nI think the kettle needs descaling again.\nSlarother is Henound's cousin.\nHumstaegaeck dyes wool for a living.",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "Henound and Slarother are cousins.",
+      "source": "template",
+      "parent": "Slarother is Henound's cousin.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "Slarother is a cousin of Henound.",
+      "source": "template",
+      "parent": "Slarother is Henound's cousin.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "Slarother is Henound's cousin.",
+      "source": "core-paraphrase",
+      "parent": "Slarother is Henound's cousin.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "Humstaegaeck dyes wool for a living.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "I keep meaning to sort out the shed.\nI think the kettle needs descaling again.\nSlarother is Henound's cousin.\nHumstaegaeck dyes wool for a living.",
+      "verdict": "supported",
+      "fact_id": "f005"
+    },
+    {
+      "text": "Humstaegaeck dyes wool by trade.",
+      "source": "template",
+      "parent": "Humstaegaeck dyes wool for a living.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f005"
+    },
+    {
+      "text": "The one who dyes wool is Humstaegaeck.",
+      "source": "template",
+      "parent": "Humstaegaeck dyes wool for a living.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f005"
+    },
+    {
+      "text": "Humstaegaeck is a person who dyes wool.",
+      "source": "core-paraphrase",
+      "parent": "Humstaegaeck dyes wool for a living.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f005"
+    },
+    {
+      "text": "There are 9 fishing floats in the gun room.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "There are 9 fishing floats in the gun room.\nI think the kettle needs descaling again.\nThe post was late again this morning.\nVrearndreas keeps the iron hooks in the dairy.",
+      "verdict": "supported",
+      "fact_id": "f006"
+    },
+    {
+      "text": "The gun room holds 9 fishing floats.",
+      "source": "template",
+      "parent": "There are 9 fishing floats in the gun room.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f033"
+    },
+    {
+      "text": "9 fishing floats are in the gun room.",
+      "source": "template",
+      "parent": "There are 9 fishing floats in the gun room.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f033"
+    },
+    {
+      "text": "There are 9 fishing floats in the gun room.",
+      "source": "core-paraphrase",
+      "parent": "There are 9 fishing floats in the gun room.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f006"
+    },
+    {
+      "text": "The post was late again this morning.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "There are 9 fishing floats in the gun room.\nI think the kettle needs descaling again.\nThe post was late again this morning.\nVrearndreas keeps the iron hooks in the dairy.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The post was late again this morning.",
+      "source": "core-paraphrase",
+      "parent": "The post was late again this morning.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "Vrearndreas keeps the iron hooks in the dairy.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "There are 9 fishing floats in the gun room.\nI think the kettle needs descaling again.\nThe post was late again this morning.\nVrearndreas keeps the iron hooks in the dairy.",
+      "verdict": "supported",
+      "fact_id": "f007"
+    },
+    {
+      "text": "The iron hooks are in the dairy.",
+      "source": "template",
+      "parent": "Vrearndreas keeps the iron hooks in the dairy.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f043"
+    },
+    {
+      "text": "Vrearndreas keeps the iron hooks in the dairy.",
+      "source": "template",
+      "parent": "Vrearndreas keeps the iron hooks in the dairy.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f007"
+    },
+    {
+      "text": "It is in the dairy that Vrearndreas keeps the iron hooks.",
+      "source": "template",
+      "parent": "Vrearndreas keeps the iron hooks in the dairy.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f007"
+    },
+    {
+      "text": "Vrearndreas keeps the iron hooks in the dairy.",
+      "source": "core-paraphrase",
+      "parent": "Vrearndreas keeps the iron hooks in the dairy.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f007"
+    },
+    {
+      "text": "The wool cards are slate.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "It gets dark so early now.\nThe wool cards are slate.\nIt gets dark so early now.\nThe bread came out flat this time.",
+      "verdict": "unrelated",
+      "fact_id": "f001"
+    },
+    {
+      "text": "Slate is the colour of the wool cards.",
+      "source": "template",
+      "parent": "The wool cards are slate.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f001"
+    },
+    {
+      "text": "Those wool cards? Slate.",
+      "source": "template",
+      "parent": "The wool cards are slate.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f001"
+    },
+    {
+      "text": "The wool cards are made of slate.",
+      "source": "core-paraphrase",
+      "parent": "The wool cards are slate.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f001"
+    },
+    {
+      "text": "The bread came out flat this time.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "It gets dark so early now.\nThe wool cards are slate.\nIt gets dark so early now.\nThe bread came out flat this time.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The bread turned out flat this time.",
+      "source": "core-paraphrase",
+      "parent": "The bread came out flat this time.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "Guthern is Sailoun's cousin.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Guthern is Sailoun's cousin.\nMohoufaern keeps bees for a living.\nThe bread came out flat this time.\nThere are 57 candle moulds in the attic.",
+      "verdict": "supported",
+      "fact_id": "f009"
+    },
+    {
+      "text": "Sailoun and Guthern are cousins.",
+      "source": "template",
+      "parent": "Guthern is Sailoun's cousin.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f009"
+    },
+    {
+      "text": "Guthern is a cousin of Sailoun.",
+      "source": "template",
+      "parent": "Guthern is Sailoun's cousin.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f009"
+    },
+    {
+      "text": "Sailoun's cousin is Guthern.",
+      "source": "core-paraphrase",
+      "parent": "Guthern is Sailoun's cousin.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f009"
+    },
+    {
+      "text": "Mohoufaern keeps bees for a living.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Guthern is Sailoun's cousin.\nMohoufaern keeps bees for a living.\nThe bread came out flat this time.\nThere are 57 candle moulds in the attic.",
+      "verdict": "supported",
+      "fact_id": "f010"
+    },
+    {
+      "text": "Mohoufaern keeps bees by trade.",
+      "source": "template",
+      "parent": "Mohoufaern keeps bees for a living.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f010"
+    },
+    {
+      "text": "The one who keeps bees is Mohoufaern.",
+      "source": "template",
+      "parent": "Mohoufaern keeps bees for a living.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f010"
+    },
+    {
+      "text": "Mohoufaern keeps bees for a living.",
+      "source": "core-paraphrase",
+      "parent": "Mohoufaern keeps bees for a living.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f010"
+    },
+    {
+      "text": "The bread came out flat this time.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Guthern is Sailoun's cousin.\nMohoufaern keeps bees for a living.\nThe bread came out flat this time.\nThere are 57 candle moulds in the attic.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The bread turned out flat this time.",
+      "source": "core-paraphrase",
+      "parent": "The bread came out flat this time.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "There are 57 candle moulds in the attic.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Guthern is Sailoun's cousin.\nMohoufaern keeps bees for a living.\nThe bread came out flat this time.\nThere are 57 candle moulds in the attic.",
+      "verdict": "supported",
+      "fact_id": "f011"
+    },
+    {
+      "text": "The attic holds 57 candle moulds.",
+      "source": "template",
+      "parent": "There are 57 candle moulds in the attic.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f011"
+    },
+    {
+      "text": "57 candle moulds are in the attic.",
+      "source": "template",
+      "parent": "There are 57 candle moulds in the attic.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f011"
+    },
+    {
+      "text": "There are 57 candle moulds in the attic.",
+      "source": "core-paraphrase",
+      "parent": "There are 57 candle moulds in the attic.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f011"
+    },
+    {
+      "text": "The kettle needs descaling again.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "I think the kettle needs descaling again.\nIt gets dark so early now.\nI think the kettle needs descaling again.\nI should probably go for a walk later.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The kettle needs to be cleaned again.",
+      "source": "core-paraphrase",
+      "parent": "The kettle needs descaling again.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "It gets dark so early now.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "I think the kettle needs descaling again.\nIt gets dark so early now.\nI think the kettle needs descaling again.\nI should probably go for a walk later.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "It's getting dark earlier than before.",
+      "source": "core-paraphrase",
+      "parent": "It gets dark so early now.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "It gets dark so early now.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "It gets dark so early now.\nI keep meaning to sort out the shed.\nIt has been raining all week.\nDoufeand keeps the lanterns in the morning room.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "It's getting dark earlier than before.",
+      "source": "core-paraphrase",
+      "parent": "It gets dark so early now.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "Doufeand keeps the lanterns in the morning room.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "It gets dark so early now.\nI keep meaning to sort out the shed.\nIt has been raining all week.\nDoufeand keeps the lanterns in the morning room.",
+      "verdict": "unrelated",
+      "fact_id": "f003"
+    },
+    {
+      "text": "The lanterns are in the morning room.",
+      "source": "template",
+      "parent": "Doufeand keeps the lanterns in the morning room.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f003"
+    },
+    {
+      "text": "Doufeand keeps the lanterns in the morning room.",
+      "source": "template",
+      "parent": "Doufeand keeps the lanterns in the morning room.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f003"
+    },
+    {
+      "text": "It is in the morning room that Doufeand keeps the lanterns.",
+      "source": "template",
+      "parent": "Doufeand keeps the lanterns in the morning room.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f003"
+    },
+    {
+      "text": "Doufeand keeps the lanterns in the morning room.",
+      "source": "core-paraphrase",
+      "parent": "Doufeand keeps the lanterns in the morning room.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f003"
+    },
+    {
+      "text": "The bread came out flat this time.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nThe bread came out flat this time.\nI should probably go for a walk later.\nThe glass jars are ochre.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The bread turned out flat this time.",
+      "source": "core-paraphrase",
+      "parent": "The bread came out flat this time.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The glass jars are ochre.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nThe bread came out flat this time.\nI should probably go for a walk later.\nThe glass jars are ochre.",
+      "verdict": "supported",
+      "fact_id": "f013"
+    },
+    {
+      "text": "Ochre is the colour of the glass jars.",
+      "source": "template",
+      "parent": "The glass jars are ochre.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f013"
+    },
+    {
+      "text": "Those glass jars? Ochre.",
+      "source": "template",
+      "parent": "The glass jars are ochre.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f013"
+    },
+    {
+      "text": "The glass jars are a shade of ochre.",
+      "source": "core-paraphrase",
+      "parent": "The glass jars are ochre.",
+      "window": "",
+      "verdict": "supported",
+      "fact_id": "f013"
+    },
+    {
+      "text": "Humstaegaeck is Pindaist's cousin.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Humstaegaeck is Pindaist's cousin.\nThe tap in the bathroom has started dripping.\nDrenham grinds lenses for a living.\nThere are 23 glass jars in the boot room.",
+      "verdict": "unrelated",
+      "fact_id": "f005"
+    },
+    {
+      "text": "Pindaist and Humstaegaeck are cousins.",
+      "source": "template",
+      "parent": "Humstaegaeck is Pindaist's cousin.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f005"
+    },
+    {
+      "text": "Humstaegaeck is a cousin of Pindaist.",
+      "source": "template",
+      "parent": "Humstaegaeck is Pindaist's cousin.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f005"
+    },
+    {
+      "text": "Pindaist's cousin is Humstaegaeck.",
+      "source": "core-paraphrase",
+      "parent": "Humstaegaeck is Pindaist's cousin.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f005"
+    },
+    {
+      "text": "The tap in the bathroom has started dripping.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Humstaegaeck is Pindaist's cousin.\nThe tap in the bathroom has started dripping.\nDrenham grinds lenses for a living.\nThere are 23 glass jars in the boot room.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The tap in the bathroom is dripping.",
+      "source": "core-paraphrase",
+      "parent": "The tap in the bathroom has started dripping.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "There are 23 glass jars in the boot room.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Humstaegaeck is Pindaist's cousin.\nThe tap in the bathroom has started dripping.\nDrenham grinds lenses for a living.\nThere are 23 glass jars in the boot room.",
+      "verdict": "unrelated",
+      "fact_id": "f013"
+    },
+    {
+      "text": "The boot room holds 23 glass jars.",
+      "source": "template",
+      "parent": "There are 23 glass jars in the boot room.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f013"
+    },
+    {
+      "text": "23 glass jars are in the boot room.",
+      "source": "template",
+      "parent": "There are 23 glass jars in the boot room.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f013"
+    },
+    {
+      "text": "There are 23 glass jars in the boot room.",
+      "source": "core-paraphrase",
+      "parent": "There are 23 glass jars in the boot room.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f013"
+    },
+    {
+      "text": "Slarother keeps the lanterns in the scullery.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Slarother keeps the lanterns in the scullery.\nThere is a van parked badly at the end of the road.\nThere is a van parked badly at the end of the road.\nThe tap in the bathroom has started dripping.",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "The lanterns are in the scullery.",
+      "source": "template",
+      "parent": "Slarother keeps the lanterns in the scullery.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f003"
+    },
+    {
+      "text": "Slarother keeps the lanterns in the scullery.",
+      "source": "template",
+      "parent": "Slarother keeps the lanterns in the scullery.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "It is in the scullery that Slarother keeps the lanterns.",
+      "source": "template",
+      "parent": "Slarother keeps the lanterns in the scullery.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "The lanterns are kept in the scullery.",
+      "source": "core-paraphrase",
+      "parent": "Slarother keeps the lanterns in the scullery.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f003"
+    },
+    {
+      "text": "There is a van parked badly at the end of the road.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Slarother keeps the lanterns in the scullery.\nThere is a van parked badly at the end of the road.\nThere is a van parked badly at the end of the road.\nThe tap in the bathroom has started dripping.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The van is parked in a way that is not correct or well-positioned at the end of the road.",
+      "source": "core-paraphrase",
+      "parent": "There is a van parked badly at the end of the road.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "There is a van parked badly at the end of the road.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Slarother keeps the lanterns in the scullery.\nThere is a van parked badly at the end of the road.\nThere is a van parked badly at the end of the road.\nThe tap in the bathroom has started dripping.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The van is parked in a way that is not correct or well-positioned at the end of the road.",
+      "source": "core-paraphrase",
+      "parent": "There is a van parked badly at the end of the road.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The tap in the bathroom has started dripping.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Slarother keeps the lanterns in the scullery.\nThere is a van parked badly at the end of the road.\nThere is a van parked badly at the end of the road.\nThe tap in the bathroom has started dripping.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "The tap in the bathroom is dripping.",
+      "source": "core-paraphrase",
+      "parent": "The tap in the bathroom has started dripping.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "Bretaerk is Guthern's cousin.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "The seed trays are russet.\nI had that same dream about a staircase.\nBretaerk is Guthern's cousin.\nGuthern keeps bees for a living.",
+      "verdict": "contradicted",
+      "fact_id": "f009"
+    },
+    {
+      "text": "Guthern and Bretaerk are cousins.",
+      "source": "template",
+      "parent": "Bretaerk is Guthern's cousin.",
+      "window": "",
+      "verdict": "contradicted",
+      "fact_id": "f009"
+    },
+    {
+      "text": "Bretaerk is a cousin of Guthern.",
+      "source": "template",
+      "parent": "Bretaerk is Guthern's cousin.",
+      "window": "",
+      "verdict": "contradicted",
+      "fact_id": "f009"
+    },
+    {
+      "text": "Bretaerk is Guthern's cousin.",
+      "source": "core-paraphrase",
+      "parent": "Bretaerk is Guthern's cousin.",
+      "window": "",
+      "verdict": "contradicted",
+      "fact_id": "f009"
+    },
+    {
+      "text": "Guthern keeps bees for a living.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "The seed trays are russet.\nI had that same dream about a staircase.\nBretaerk is Guthern's cousin.\nGuthern keeps bees for a living.",
+      "verdict": "contradicted",
+      "fact_id": "f009"
+    },
+    {
+      "text": "Guthern keeps bees by trade.",
+      "source": "template",
+      "parent": "Guthern keeps bees for a living.",
+      "window": "",
+      "verdict": "contradicted",
+      "fact_id": "f009"
+    },
+    {
+      "text": "The one who keeps bees is Guthern.",
+      "source": "template",
+      "parent": "Guthern keeps bees for a living.",
+      "window": "",
+      "verdict": "contradicted",
+      "fact_id": "f009"
+    },
+    {
+      "text": "Guthern keeps bees for a living.",
+      "source": "core-paraphrase",
+      "parent": "Guthern keeps bees for a living.",
+      "window": "",
+      "verdict": "contradicted",
+      "fact_id": "f009"
+    }
+  ]
+}

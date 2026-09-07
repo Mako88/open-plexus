@@ -1,0 +1,454 @@
+{
+  "phase": 3,
+  "kind": "extractor",
+  "taken_at": "2026-09-07T09:38:13.103420+00:00",
+  "what": "how often the extractor states something the house contradicts",
+  "would_refute": "an error rate above a fifth -- the doc's bar for this arm. A wrong declarative trains a false binding in with the same weight as a true one, so the arm can be worse than doing nothing.",
+  "core": "rwkv7-g1j-1.5b-20260831-ctx16384 [cuda fp32]",
+  "size_b": 1.5,
+  "house": {
+    "seed": 0,
+    "facts": 50,
+    "turns": 300
+  },
+  "windows": 12,
+  "declaratives": 26,
+  "counts": {
+    "unrelated": 25,
+    "supported": 1
+  },
+  "by_source": {
+    "core-extracted": {
+      "unrelated": 14,
+      "supported": 1
+    },
+    "template": {
+      "unrelated": 3
+    },
+    "core-paraphrase": {
+      "unrelated": 8
+    }
+  },
+  "error_rate": 0.0,
+  "refutation_fired": false,
+  "sample_for_hand_reading": [
+    {
+      "text": "First, looking at the conversation:",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nI keep meaning to sort out the shed.\nThe bread came out flat this time.\nSlarother mends nets for a living.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "I'm sorry, but I can't assist with that request.",
+      "source": "core-paraphrase",
+      "parent": "First, looking at the conversation:",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"Somebody has been leaving the gate open.\" \u2013 This is a statement made by someone (probably the speaker). So that's a fact.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nI keep meaning to sort out the shed.\nThe bread came out flat this time.\nSlarother mends nets for a living.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"I heard someone say that.\" \u2013 This is a statement made by someone else (the listener). So that's also a fact.",
+      "source": "core-paraphrase",
+      "parent": "\"Somebody has been leaving the gate open.\" \u2013 This is a statement made by someone (probably the speaker). So that's a fact.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"I keep meaning to sort",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nI keep meaning to sort out the shed.\nThe bread came out flat this time.\nSlarother mends nets for a living.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "First, looking at the conversation:",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "I keep meaning to sort out the shed.\nI think the kettle needs descaling again.\nSlarother is Henound's cousin.\nHumstaegaeck dyes wool for a living.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "I'm sorry, but I can't assist with that request.",
+      "source": "core-paraphrase",
+      "parent": "First, looking at the conversation:",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"I keep meaning to sort out the shed.\" \u2013 This is a statement made by someone (probably the speaker). So that's a fact.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "I keep meaning to sort out the shed.\nI think the kettle needs descaling again.\nSlarother is Henound's cousin.\nHumstaegaeck dyes wool for a living.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"I keep meaning to sort out the shed.\" \u2013 This is a statement made by someone (probably the speaker). So that's a fact.",
+      "source": "core-paraphrase",
+      "parent": "\"I keep meaning to sort out the shed.\" \u2013 This is a statement made by someone (probably the speaker). So that's a fact.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"I think the kettle needs descaling",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "I keep meaning to sort out the shed.\nI think the kettle needs descaling again.\nSlarother is Henound's cousin.\nHumstaegaeck dyes wool for a living.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "First line: \"Guthern is Sailoun's cousin.\" That's a direct statement, so that's one fact. Then \"Mohou",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Guthern is Sailoun's cousin.\nMohoufaern keeps bees for a living.\nThe bread came out flat this time.\nThere are 57 candle moulds in the attic.",
+      "verdict": "supported",
+      "fact_id": "f009"
+    },
+    {
+      "text": "First, I need to parse each line of the conversation and identify which ones are statements made by either person. Let's go through each line:",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "I think the kettle needs descaling again.\nIt gets dark so early now.\nI think the kettle needs descaling again.\nI should probably go for a walk later.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"I'm sorry, I don't understand.\"",
+      "source": "core-paraphrase",
+      "parent": "First, I need to parse each line of the conversation and identify which ones are statements made by either person. Let's go through each line:",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"I think the ket",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "I think the kettle needs descaling again.\nIt gets dark so early now.\nI think the kettle needs descaling again.\nI should probably go for a walk later.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "First, the user mentioned \"Somebody has been leaving the gate open.\" That's a direct quote from the assistant's response. So that's one fact.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nThe bread came out flat this time.\nI should probably go for a walk later.\nThe glass jars are ochre.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"I'm sorry, I don't have access to that information.\" That's another direct quote.",
+      "source": "core-paraphrase",
+      "parent": "First, the user mentioned \"Somebody has been leaving the gate open.\" That's a direct quote from the assistant's response. So that's one fact.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "Next, \"The bread came out flat this time.\" Again, that's a direct",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nThe bread came out flat this time.\nI should probably go for a walk later.\nThe glass jars are ochre.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "First, there's a mention of Pindaist's cousin named Humstaegaeck. That's one fact: \"Pindaist's cousin is named Humstaegaeck.\"",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Humstaegaeck is Pindaist's cousin.\nThe tap in the bathroom has started dripping.\nDrenham grinds lenses for a living.\nThere are 23 glass jars in the boot room.",
+      "verdict": "unrelated",
+      "fact_id": "f005"
+    },
+    {
+      "text": "Next, there's a tap in the bathroom that started",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Humstaegaeck is Pindaist's cousin.\nThe tap in the bathroom has started dripping.\nDrenham grinds lenses for a living.\nThere are 23 glass jars in the boot room.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "First, looking at the conversation:",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Slarother keeps the lanterns in the scullery.\nThere is a van parked badly at the end of the road.\nThere is a van parked badly at the end of the road.\nThe tap in the bathroom has started dripping.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "I'm sorry, but I can't assist with that request.",
+      "source": "core-paraphrase",
+      "parent": "First, looking at the conversation:",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"Slarother keeps the lanterns in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Slarother keeps the lanterns in the scullery.\nThere is a van parked badly at the end of the road.\nThere is a van parked badly at the end of the road.\nThe tap in the bathroom has started dripping.",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "The lanterns are in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact.",
+      "source": "template",
+      "parent": "\"Slarother keeps the lanterns in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "\"Slarother keeps the lanterns in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact.",
+      "source": "template",
+      "parent": "\"Slarother keeps the lanterns in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "It is in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact that \"Slarother keeps the lanterns.",
+      "source": "template",
+      "parent": "\"Slarother keeps the lanterns in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "\"Slarother keeps the lanterns in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact.",
+      "source": "core-paraphrase",
+      "parent": "\"Slarother keeps the lanterns in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    }
+  ],
+  "all": [
+    {
+      "text": "First, looking at the conversation:",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nI keep meaning to sort out the shed.\nThe bread came out flat this time.\nSlarother mends nets for a living.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "I'm sorry, but I can't assist with that request.",
+      "source": "core-paraphrase",
+      "parent": "First, looking at the conversation:",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"Somebody has been leaving the gate open.\" \u2013 This is a statement made by someone (probably the speaker). So that's a fact.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nI keep meaning to sort out the shed.\nThe bread came out flat this time.\nSlarother mends nets for a living.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"I heard someone say that.\" \u2013 This is a statement made by someone else (the listener). So that's also a fact.",
+      "source": "core-paraphrase",
+      "parent": "\"Somebody has been leaving the gate open.\" \u2013 This is a statement made by someone (probably the speaker). So that's a fact.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"I keep meaning to sort",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nI keep meaning to sort out the shed.\nThe bread came out flat this time.\nSlarother mends nets for a living.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "First, looking at the conversation:",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "I keep meaning to sort out the shed.\nI think the kettle needs descaling again.\nSlarother is Henound's cousin.\nHumstaegaeck dyes wool for a living.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "I'm sorry, but I can't assist with that request.",
+      "source": "core-paraphrase",
+      "parent": "First, looking at the conversation:",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"I keep meaning to sort out the shed.\" \u2013 This is a statement made by someone (probably the speaker). So that's a fact.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "I keep meaning to sort out the shed.\nI think the kettle needs descaling again.\nSlarother is Henound's cousin.\nHumstaegaeck dyes wool for a living.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"I keep meaning to sort out the shed.\" \u2013 This is a statement made by someone (probably the speaker). So that's a fact.",
+      "source": "core-paraphrase",
+      "parent": "\"I keep meaning to sort out the shed.\" \u2013 This is a statement made by someone (probably the speaker). So that's a fact.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"I think the kettle needs descaling",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "I keep meaning to sort out the shed.\nI think the kettle needs descaling again.\nSlarother is Henound's cousin.\nHumstaegaeck dyes wool for a living.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "First line: \"Guthern is Sailoun's cousin.\" That's a direct statement, so that's one fact. Then \"Mohou",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Guthern is Sailoun's cousin.\nMohoufaern keeps bees for a living.\nThe bread came out flat this time.\nThere are 57 candle moulds in the attic.",
+      "verdict": "supported",
+      "fact_id": "f009"
+    },
+    {
+      "text": "First, I need to parse each line of the conversation and identify which ones are statements made by either person. Let's go through each line:",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "I think the kettle needs descaling again.\nIt gets dark so early now.\nI think the kettle needs descaling again.\nI should probably go for a walk later.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"I'm sorry, I don't understand.\"",
+      "source": "core-paraphrase",
+      "parent": "First, I need to parse each line of the conversation and identify which ones are statements made by either person. Let's go through each line:",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"I think the ket",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "I think the kettle needs descaling again.\nIt gets dark so early now.\nI think the kettle needs descaling again.\nI should probably go for a walk later.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "First, the user mentioned \"Somebody has been leaving the gate open.\" That's a direct quote from the assistant's response. So that's one fact.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nThe bread came out flat this time.\nI should probably go for a walk later.\nThe glass jars are ochre.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"I'm sorry, I don't have access to that information.\" That's another direct quote.",
+      "source": "core-paraphrase",
+      "parent": "First, the user mentioned \"Somebody has been leaving the gate open.\" That's a direct quote from the assistant's response. So that's one fact.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "Next, \"The bread came out flat this time.\" Again, that's a direct",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Somebody has been leaving the gate open.\nThe bread came out flat this time.\nI should probably go for a walk later.\nThe glass jars are ochre.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "First, there's a mention of Pindaist's cousin named Humstaegaeck. That's one fact: \"Pindaist's cousin is named Humstaegaeck.\"",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Humstaegaeck is Pindaist's cousin.\nThe tap in the bathroom has started dripping.\nDrenham grinds lenses for a living.\nThere are 23 glass jars in the boot room.",
+      "verdict": "unrelated",
+      "fact_id": "f005"
+    },
+    {
+      "text": "Next, there's a tap in the bathroom that started",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Humstaegaeck is Pindaist's cousin.\nThe tap in the bathroom has started dripping.\nDrenham grinds lenses for a living.\nThere are 23 glass jars in the boot room.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "First, looking at the conversation:",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Slarother keeps the lanterns in the scullery.\nThere is a van parked badly at the end of the road.\nThere is a van parked badly at the end of the road.\nThe tap in the bathroom has started dripping.",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "I'm sorry, but I can't assist with that request.",
+      "source": "core-paraphrase",
+      "parent": "First, looking at the conversation:",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": null
+    },
+    {
+      "text": "\"Slarother keeps the lanterns in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact.",
+      "source": "core-extracted",
+      "parent": "",
+      "window": "Slarother keeps the lanterns in the scullery.\nThere is a van parked badly at the end of the road.\nThere is a van parked badly at the end of the road.\nThe tap in the bathroom has started dripping.",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "The lanterns are in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact.",
+      "source": "template",
+      "parent": "\"Slarother keeps the lanterns in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "\"Slarother keeps the lanterns in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact.",
+      "source": "template",
+      "parent": "\"Slarother keeps the lanterns in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "It is in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact that \"Slarother keeps the lanterns.",
+      "source": "template",
+      "parent": "\"Slarother keeps the lanterns in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    },
+    {
+      "text": "\"Slarother keeps the lanterns in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact.",
+      "source": "core-paraphrase",
+      "parent": "\"Slarother keeps the lanterns in the scullery.\" That's a direct statement about where Slarother keeps the lanterns. So that's one fact.",
+      "window": "",
+      "verdict": "unrelated",
+      "fact_id": "f000"
+    }
+  ]
+}

@@ -62,6 +62,17 @@ def main() -> int:
 
     mine = DifferentiableRwkv7(core)
 
+    # PINNED TO THE LOOP, AND THE PIN IS THE WHOLE POINT OF THIS LINE. This
+    # script answers "is the token-at-a-time loop worth replacing", so it has to
+    # measure the loop; `DifferentiableRwkv7.chunk` now defaults to 32 because
+    # the answer was yes. Without the pin the split below is taken on the
+    # chunked path, whose `time_mix` never reaches the `torch.stack` the spy
+    # watches for -- so `t_loop_s` would stay 0.0, `t_loop_share_of_forward`
+    # would read 0.0, and this script's own named refutation ("the t-loop is a
+    # minority of forward time") would appear to FIRE. A rerun would report the
+    # chunking work as refuted by the chunking work.
+    mine.chunk = 0
+
     # -- the reference, which is the speed the package manages ------------
     ref = _time(lambda: core._model.forward(list(tokens), None))
 
@@ -131,6 +142,19 @@ def main() -> int:
     finally:
         wkv7_mod.time_mix = real_time_mix
 
+    # AND THE PIN IS CHECKED RATHER THAN TRUSTED. A spy that measured nothing
+    # reports 0.0, and 0.0 here is not a small number -- it is this script's
+    # refutation clause firing on an instrument that was pointed at the wrong
+    # path. Refuse to write a reading rather than write one that reads as a
+    # verdict.
+    if spent["loop"] <= 0.0:
+        raise SystemExit(
+            "the t-loop spy recorded no time, which means `time_mix` never took "
+            "the loop path -- the split was measured on the chunked recurrence "
+            "and would have been written down as 'the loop is 0% of the "
+            "forward'. Check that `mine.chunk` is 0."
+        )
+
     row = {
         "phase": 3,
         "kind": "where-training-time-goes",
@@ -140,6 +164,9 @@ def main() -> int:
         "core": core.name,
         "size_b": args.size,
         "tokens": T,
+        # Recorded so no future reader has to infer which path was timed. Every
+        # number in this row is the token-at-a-time loop.
+        "chunk": mine.chunk,
         "reference_forward_s": round(ref, 4),
         "our_forward_s": round(ours, 4),
         "training_step_s": round(train, 4),

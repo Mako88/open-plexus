@@ -38,10 +38,14 @@ OBJECTIONS: list[Objection] = [
             "`RWKV.forward` writes into the list it is given, and a caller who "
             "re-feeds a state it thought it still had would get a wrong number "
             "rather than an exception -- so the clone is defensive and correct. "
-            "It is also a GPU allocation and copy of the entire state on EVERY "
-            "call, which at 1.5B is tens of megabytes per generated token, since "
-            "`generate` calls forward once per token. This may be a large part "
-            "of the decode rate and nobody has looked."
+            "It is also a GPU allocation and copy of 13 MB at 1.5B on every "
+            "call. CORRECTED 2026-09-07: this entry used to say 'per generated "
+            "token, since generate calls forward once per token'. That is wrong. "
+            "`generate` clones ONCE at entry and then feeds tokens into its own "
+            "copy, so the cost is per call, not per token -- which makes it far "
+            "smaller than this entry originally claimed. The exam does pay it "
+            "once per question, though, and decode runs at a third of the card's "
+            "bandwidth ceiling, so where that time actually goes is still unread."
         ),
         settled_by=(
             "A cost reading with the clone and with an explicit `feed_in_place` "

@@ -90,6 +90,13 @@ class ExamResult:
     # verdict can be read off it.
     charged: Cost | None = None
 
+    # HOW MANY TOKENS THE CORE SPENT TALKING, as opposed to answering questions.
+    # Separate because it is the quantity that pollutes the state: the same core
+    # given a transcript with none of its own replies in it scored 45 points
+    # higher over the first fifty turns. A framing that raises this is poisoning
+    # the memory it is meant to serve, however good its answers look.
+    reply_tokens: int = 0
+
     def score(self) -> Score:
         positives = [a for a in self.answers if a.fact_id is not None]
         negatives = [a for a in self.answers if a.fact_id is None]
@@ -235,6 +242,7 @@ def run_exam(
         # omitting that did to the first two Tier A readings.
         _, state, cost = say(core, state, line, reply_budget)
         meter.add(cost)
+        result.reply_tokens += cost.tokens_out
 
         due = schedule.get(turn)
         if not due:

@@ -137,7 +137,46 @@ def test_every_named_preamble_is_a_well_formed_dialogue():
         )
 
 
-@pytest.mark.parametrize("name", ["none", "v1-restating", "v2-example"])
+@pytest.mark.parametrize("name", ["none", "v1-restating", "v2-example", "v3-identity"])
 def test_the_named_preambles_are_all_present(name):
     """A reading names its preamble. If the name stops resolving, so does the reading."""
     assert name in PREAMBLES
+
+
+# `v1-restating` is the one preamble allowed to fail the echo check: it is kept
+# deliberately as the negative control, and a test above asserts the guard still
+# fires on it.
+KNOWN_BAD = {"v1-restating"}
+
+
+@pytest.mark.parametrize("name", sorted(set(PREAMBLES) - KNOWN_BAD - {"none"}))
+def test_no_candidate_preamble_demonstrates_echoing(name):
+    """EVERY arm, not just the one that ships.
+
+    A preamble variant is written to be swept, which means it goes on the card
+    and produces a reading. If it teaches echoing the way `v1-restating` did,
+    that reading measures the framing bug rather than the thing the arm is
+    about -- and the arm would be reported as having failed on its own merits.
+    """
+    for user, assistant in _turns(PREAMBLES[name]):
+        share = overlap(user, assistant)
+        assert share <= MAX_OVERLAP, (
+            f"{name}: {share:.0%} of {assistant!r} is borrowed from {user!r}"
+        )
+
+
+@pytest.mark.parametrize("name", sorted(set(PREAMBLES) - {"none"}))
+def test_no_preamble_leaks_an_answer_the_exam_can_score(name):
+    """Applies to every variant, because a leak is scored as memory.
+
+    A word that is both in a preamble and in the generator's answer sets can be
+    produced from the example rather than from the state, and the exam has no
+    way to tell the difference.
+    """
+    answerable = set()
+    for words in (world._ROOMS, world._OBJECTS, world._COLOURS):
+        answerable |= {w.lower() for w in words}
+    answerable |= {t.split()[1].lower() for t in world._TRADES}
+
+    collisions = sorted(w for w in answerable if w in _content(PREAMBLES[name]))
+    assert not collisions, f"{name} contains scoreable answers: {collisions}"

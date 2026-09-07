@@ -155,6 +155,42 @@ PREAMBLES: dict[str, str] = {
         "User: Where does the ladder live?"
         f"{SEPARATOR}{CORE_PREFIX} You have not told me.{SEPARATOR}"
     ),
+    # JOHN'S ARM, 2026-09-07. The premise: an LLM continues whatever situation it
+    # is seeded with, so a system meant to be a continuing mind should be seeded
+    # as one rather than as a chat assistant answering queries.
+    #
+    # IT CHANGES EXACTLY ONE THING FROM `v2-example`: who the replying party is
+    # told it is. Same `User:`/`Assistant:` scaffolding, same worked example,
+    # same declining example, same kettle. The role format is what the G1 tune
+    # was trained on, and moving identity and format together would confound the
+    # two -- an identity arm that also broke the format would fail for the wrong
+    # reason and be read as identity not mattering.
+    #
+    # THE PREDICTION, ON RECORD BEFORE THE RUN, and it is not the one the arm is
+    # hoping for: this moves the INVENTION RATE more than it moves the score. A
+    # frame asserting that the replying party remembers gives it a reason to
+    # produce a confident answer instead of "you have not told me", and the exam
+    # already measures 20 of 20 invented answers on some houses. That would read
+    # as an improvement on the positives while destroying the honesty signal.
+    #
+    # WHICH IS WHY THE READING REPORTS INVENTION RATE AND REPLY LENGTH BESIDE THE
+    # SCORE. A frame that scores higher by fabricating more has not helped, and
+    # a frame that makes replies longer poisons the state it is trying to serve
+    # -- the core's own chatter is worth 45 points early in a conversation.
+    "v3-identity": (
+        "User: You are not a chat assistant answering separate queries. You are "
+        "a continuing mind with one memory, and it carries everything said to "
+        "you; nothing will be repeated back to you later. Keep what matters, "
+        "answer in a few words, and say plainly when something was never given "
+        "to you."
+        f"{SEPARATOR}{CORE_PREFIX} Ready.{SEPARATOR}"
+        "User: The kettle lives on the third shelf."
+        f"{SEPARATOR}{CORE_PREFIX} Noted.{SEPARATOR}"
+        "User: Where does the kettle live?"
+        f"{SEPARATOR}{CORE_PREFIX} On the third shelf.{SEPARATOR}"
+        "User: Where does the ladder live?"
+        f"{SEPARATOR}{CORE_PREFIX} You have not told me.{SEPARATOR}"
+    ),
 }
 
 PREAMBLE = PREAMBLES["v2-example"]

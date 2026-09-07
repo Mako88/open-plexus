@@ -117,6 +117,7 @@ def main() -> int:
             )
             score = arm.score()
             positives = [a for a in arm.answers if a.fact_id is not None]
+            negatives = len(arm.answers) - len(positives)
             row = {
                 "preamble": name,
                 "seed": seed,
@@ -126,7 +127,23 @@ def main() -> int:
                 "echo_by_position": echo_by_position(arm, house),
                 "by_delay": score.by_delay,
                 "invented": score.invented,
-                "negatives": len(arm.answers) - len(positives),
+                "negatives": negatives,
+                # THE TWO COLUMNS THE IDENTITY ARM IS ACTUALLY ABOUT.
+                #
+                # `invention_rate`: a frame that tells the core it remembers
+                # gives it a reason to answer confidently instead of declining.
+                # That would raise the score on the positives while destroying
+                # the honesty signal, and it would read as an improvement.
+                #
+                # `mean_reply_tokens`: a frame that makes the core more
+                # talkative poisons its own state. The same core given a
+                # transcript with none of its replies in it scored 45 points
+                # higher over the first fifty turns.
+                #
+                # A preamble is only better if it moves the score WITHOUT moving
+                # these, and neither is visible in a score.
+                "invention_rate": round(score.invented / negatives, 4) if negatives else None,
+                "mean_reply_tokens": round(arm.reply_tokens / len(house.turns), 2),
                 "seconds": round(arm.seconds, 1),
             }
             runs.append(row)
@@ -144,6 +161,16 @@ def main() -> int:
         name: {
             "mean_echo_rate": by_preamble[name]["echo_rate"]["mean"],
             "mean_score": by_preamble[name]["score"]["mean"],
+            "mean_invention_rate": round(
+                sum(r["invention_rate"] for r in runs if r["preamble"] == name)
+                / max(1, len([r for r in runs if r["preamble"] == name])),
+                4,
+            ),
+            "mean_reply_tokens": round(
+                sum(r["mean_reply_tokens"] for r in runs if r["preamble"] == name)
+                / max(1, len([r for r in runs if r["preamble"] == name])),
+                2,
+            ),
         }
         for name in args.preambles
     }

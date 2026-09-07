@@ -21,7 +21,7 @@ from dataclasses import dataclass
 
 # The count is asserted. Change it in the same commit that changes the list, and
 # say in the message which entry left and what settled it.
-COUNT = 7
+COUNT = 6
 
 
 @dataclass(frozen=True)
@@ -100,24 +100,6 @@ OBJECTIONS: list[Objection] = [
         ),
     ),
     Objection(
-        what="The blind baseline answers the commonest answer for a question's kind.",
-        why=(
-            "On a GENERATED house, how strong that is depends entirely on how "
-            "the generator distributes its answers. A generator that draws "
-            "numbers from a small set hands blind a large free score and makes "
-            "every arm look bad; one that draws from a huge set makes blind "
-            "trivial and every arm look good. The blind rule is what killed the "
-            "two earlier branches, so its strength here must be a property of "
-            "the exam that is reported, not an accident of the generator."
-        ),
-        settled_by=(
-            "Report, beside every exam reading, the blind score PER QUESTION "
-            "KIND and the entropy of the generator's answer distribution for "
-            "that kind. Then a blind score is interpretable rather than just low "
-            "or high."
-        ),
-    ),
-    Objection(
         what="The state is saved and fsynced to disk after every single turn.",
         why=(
             "It is what makes a kill safe, and it is measured at 6.5 MB for "
@@ -161,7 +143,20 @@ OBJECTIONS: list[Objection] = [
     ),
 ]
 
-# SETTLED, AND KEPT HERE AS A NOTE RATHER THAN AS AN ENTRY.
+# SETTLED, AND KEPT HERE AS NOTES RATHER THAN AS ENTRIES.
+#
+# "The blind baseline answers the commonest answer for a question's kind, and how
+# strong that is depends entirely on how the generator distributes its answers."
+# Settled 2026-09-06 by the reporting the entry itself asked for. Every exam
+# reading now carries `answer_entropy_bits` per kind beside the blind score per
+# kind, and two guards in `tests/guards/test_exam.py` keep both there. The
+# numbers on the doc's own house make the point: blind takes 0.30 on colours
+# (2.45 bits) and 0.10 on numbers (3.32 bits) for 0.24 overall. That is now a
+# readable fact about the exam rather than an accident nobody can see.
+#
+# WHAT THIS DOES NOT SETTLE, said plainly: reporting blind's strength does not
+# make it the RIGHT strength. If a later session wants the generator's answer
+# sets widened or narrowed, that is a new entry and a new argument.
 #
 # "Nothing outside `core` may index into a state, and nothing enforces it."
 # Settled 2026-09-06 by `tests/guards/test_state_is_opaque.py`, which walks the

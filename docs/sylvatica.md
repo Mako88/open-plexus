@@ -54,10 +54,21 @@ and every phase should be able to say which of these it serves.
 8. **It cannot see itself.** It has no channel to its own state, so it cannot tell when its
    memory is degrading, when it has started repeating itself, or when it does not know. It
    should monitor its own state and manage its own context — and be TAUGHT how, the way a child
-   is taught to use their body. Added 2026-09-07. Note the asymmetry this creates: everything
-   here that looks like introspection has to be BUILT, because nothing in a fixed-size state
-   tensor is visible to the core as tokens. Awareness is a channel somebody constructs, not a
-   faculty that arrives with scale.
+   is taught to use their body. Added 2026-09-07.
+
+   Nothing in a fixed-size state tensor is visible to the core as tokens, so this has to be
+   BUILT — and John's correction, which is the right one: that is not a downgrade. Bodily
+   awareness in a human is not derived from consciousness either. Muscle spindles, the
+   vestibular system and the interoceptors are hardwired sensors reporting upward; nobody
+   introspects their own blood pressure. A telemetry channel into the state is the SAME
+   architecture, not a substitute for a missing one.
+
+   The distinction that survives is not constructed-versus-innate. It is SENSOR VERSUS
+   SELF-REPORT. Proprioception works because a spindle actually measures muscle length. The
+   entropy of the core's own logits actually measures its uncertainty. What the core SAYS about
+   how sure it is measures nothing — it is generated text with no causal path back to the
+   quantity it claims to describe, which is why it can invent an answer to 15 of 20 questions
+   it was never told and sound certain doing it. Build sensors; do not ask.
 
 ---
 

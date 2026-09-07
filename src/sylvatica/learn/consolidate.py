@@ -39,7 +39,7 @@ is what the anchor exists to prevent.
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 from ..core.base import training_flops
@@ -166,9 +166,34 @@ def run_cycle(
     The adapter's parameters are snapshotted before training and restored if the
     gate trips. Restoring is cheap because the adapter is the only thing that
     moved -- which is the reason the base is frozen and the merge is separate.
+
+    EVERY CYCLE DRAWS A DIFFERENT REPLAY SAMPLE, and the first Phase 3 run is why
+    this is spelled out. `ReplaySpec` carries a seed so a reading is
+    reproducible; passing the SAME spec to every cycle made every cycle train on
+    the identical 48 fragments, and the output proved it -- ten cycles reporting
+    perplexity 27.559 and QA 0.800 to three decimal places, ten times. That was
+    not ten cycles. It was one cycle run ten times, and "the gate tripped on 10
+    of 10" would have been reported as a finding about consolidation.
     """
     spec = spec or ReplaySpec()
+    if spec.seed is not None:
+        spec = replace(spec, seed=spec.seed + index)
     before = {k: v.clone() for k, v in adapter.state_dict().items()}
+
+    if general is None:
+        # THE ANCHOR IS NOT OPTIONAL. Without it the adapter sees only invented
+        # people in invented rooms, and one cycle of that moved held-out
+        # perplexity 20% in the first Phase 3 run. Refusing is better than
+        # quietly running the arm the doc did not describe.
+        from .general import available, load
+
+        if not available():
+            raise FileNotFoundError(
+                "no general corpus for the replay anchor. Run "
+                "`uv run python corpora/fetch.py`. Consolidating on house text "
+                "alone is not the arm the doc describes -- see learn/general.py."
+            )
+        general = load(seed=spec.seed)
 
     training = build_training_set(store, spec, arm=arm, general=general)
     _loss, tokens, seconds = train(core, adapter, training, lr=lr, seq_len=seq_len)

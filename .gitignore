@@ -36,3 +36,7 @@ checkpoints/
 # Thread state and transcripts. A run's own memory, machine-local by
 # definition -- a state file is meaningless beside a different checkpoint.
 state/
+
+# The general corpus the replay mix is anchored to. Somebody else's words,
+# public domain, and megabytes of them; `corpora/fetch.py` is ours and stays.
+corpora/*.txt

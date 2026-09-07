@@ -157,3 +157,39 @@ def test_greedy_is_off_by_default_everywhere_else():
     from sylvatica.core.base import Sampling
 
     assert Sampling().greedy is False
+
+
+def test_the_replay_anchor_is_never_the_gates_own_yardstick():
+    """THE MOST FLATTERING CORRUPTION AVAILABLE TO A GATE.
+
+    The general slice anchors the adapter to language the house did not produce.
+    If it were the gate's held-out text, perplexity would IMPROVE on the very
+    text used to decide whether the model had got worse -- so a cycle that
+    damaged the model everywhere else would sail through, and every gate reading
+    would be meaningless in the direction nobody checks.
+    """
+    import pytest
+
+    from sylvatica.learn.general import check_disjoint
+    from sylvatica.learn.heldout import PERPLEXITY_TEXT
+
+    check_disjoint(["Entirely unrelated prose about entirely unrelated things."])
+
+    with pytest.raises(ValueError, match="overlaps the gate's held-out text"):
+        check_disjoint([PERPLEXITY_TEXT[:600]])
+
+
+def test_a_cycle_cannot_silently_train_on_house_text_alone():
+    """The anchor is a named ingredient of the doc's replay mix, and the first
+    Phase 3 run showed what its absence does: one cycle of ~700 tokens of house
+    text moved held-out perplexity from 22.94 to 27.56. The gate rolled it back
+    correctly, and the reading would have blamed consolidation for a mix that was
+    missing a third of itself. `run_cycle` raises rather than proceeding."""
+    import inspect
+
+    from sylvatica.learn import consolidate
+
+    source = inspect.getsource(consolidate.run_cycle)
+    assert "FileNotFoundError" in source and "general" in source, (
+        "run_cycle no longer insists on the general anchor"
+    )

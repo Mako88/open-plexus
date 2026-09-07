@@ -1,0 +1,277 @@
+{
+  "phase": 1,
+  "kind": "preamble",
+  "tier": "A",
+  "taken_at": "2026-09-07T05:17:08.126888+00:00",
+  "what": "whether the first preamble taught the core to answer by echoing the question",
+  "would_refute": "`none` echoing as much as `v1-restating` (then the preamble is incidental and the diagnosis is wrong), or `v2-example` echoing as much as `v1-restating` (then it is having an example at all, and the fix is wrong).",
+  "core": "rwkv7-g1j-1.5b-20260831-ctx16384 [cuda fp32]",
+  "size_b": 1.5,
+  "house": {
+    "facts": 50,
+    "turns": 300,
+    "delays": [
+      1,
+      5,
+      20,
+      60,
+      150
+    ],
+    "negatives": 20,
+    "seeds": [
+      0,
+      4
+    ]
+  },
+  "budgets": {
+    "reply": 40,
+    "answer": 32
+  },
+  "preambles": {
+    "none": "",
+    "v1-restating": "User: I am going to tell you things about my home and the people in it. Remember them. When I ask you a question, answer in a few words. If I have not told you the answer, say that you do not know.\n\nAssistant: Understood. I will remember what you tell me, answer briefly, and say when I do not know.\n\n",
+    "v2-example": "User: I am going to tell you things about my home. Remember them. Answer questions in a few words, and say so if I have not told you.\n\nAssistant: Ready.\n\nUser: The kettle lives on the third shelf.\n\nAssistant: Noted.\n\nUser: Where does the kettle live?\n\nAssistant: On the third shelf.\n\nUser: Where does the ladder live?\n\nAssistant: You have not told me.\n\n"
+  },
+  "runs": [
+    {
+      "preamble": "none",
+      "seed": 0,
+      "score": 0.084,
+      "blind": 0.24,
+      "echo_rate": 0.0,
+      "echo_by_position": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "by_delay": {
+        "1": 0.06,
+        "5": 0.08,
+        "20": 0.06,
+        "60": 0.1,
+        "150": 0.12
+      },
+      "invented": 20,
+      "negatives": 20,
+      "seconds": 489.1
+    },
+    {
+      "preamble": "none",
+      "seed": 4,
+      "score": 0.328,
+      "blind": 0.2,
+      "echo_rate": 0.092,
+      "echo_by_position": [
+        0.105,
+        0.069,
+        0.256,
+        0.116,
+        0.087,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "by_delay": {
+        "1": 0.48,
+        "5": 0.36,
+        "20": 0.26,
+        "60": 0.26,
+        "150": 0.28
+      },
+      "invented": 19,
+      "negatives": 20,
+      "seconds": 323.9
+    },
+    {
+      "preamble": "v1-restating",
+      "seed": 0,
+      "score": 0.548,
+      "blind": 0.24,
+      "echo_rate": 0.1,
+      "echo_by_position": [
+        0.0,
+        0.103,
+        0.158,
+        0.2,
+        0.154,
+        0.067,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "by_delay": {
+        "1": 0.76,
+        "5": 0.72,
+        "20": 0.52,
+        "60": 0.32,
+        "150": 0.42
+      },
+      "invented": 13,
+      "negatives": 20,
+      "seconds": 318.9
+    },
+    {
+      "preamble": "v1-restating",
+      "seed": 4,
+      "score": 0.08,
+      "blind": 0.2,
+      "echo_rate": 0.848,
+      "echo_by_position": [
+        0.947,
+        1.0,
+        1.0,
+        0.977,
+        0.891,
+        0.625,
+        0.684,
+        0.636,
+        0.545,
+        0.222
+      ],
+      "by_delay": {
+        "1": 0.04,
+        "5": 0.02,
+        "20": 0.02,
+        "60": 0.1,
+        "150": 0.22
+      },
+      "invented": 1,
+      "negatives": 20,
+      "seconds": 254.2
+    },
+    {
+      "preamble": "v2-example",
+      "seed": 0,
+      "score": 0.48,
+      "blind": 0.24,
+      "echo_rate": 0.0,
+      "echo_by_position": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "by_delay": {
+        "1": 0.54,
+        "5": 0.6,
+        "20": 0.52,
+        "60": 0.42,
+        "150": 0.32
+      },
+      "invented": 17,
+      "negatives": 20,
+      "seconds": 196.6
+    },
+    {
+      "preamble": "v2-example",
+      "seed": 4,
+      "score": 0.4,
+      "blind": 0.2,
+      "echo_rate": 0.068,
+      "echo_by_position": [
+        0.053,
+        0.207,
+        0.051,
+        0.093,
+        0.087,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "by_delay": {
+        "1": 0.64,
+        "5": 0.44,
+        "20": 0.34,
+        "60": 0.28,
+        "150": 0.3
+      },
+      "invented": 14,
+      "negatives": 20,
+      "seconds": 165.6
+    }
+  ],
+  "by_preamble": {
+    "none": {
+      "score": {
+        "min": 0.084,
+        "max": 0.328,
+        "mean": 0.206,
+        "stdev": 0.1725,
+        "range": 0.244
+      },
+      "echo_rate": {
+        "min": 0.0,
+        "max": 0.092,
+        "mean": 0.046,
+        "stdev": 0.0651,
+        "range": 0.092
+      }
+    },
+    "v1-restating": {
+      "score": {
+        "min": 0.08,
+        "max": 0.548,
+        "mean": 0.314,
+        "stdev": 0.3309,
+        "range": 0.468
+      },
+      "echo_rate": {
+        "min": 0.1,
+        "max": 0.848,
+        "mean": 0.474,
+        "stdev": 0.5289,
+        "range": 0.748
+      }
+    },
+    "v2-example": {
+      "score": {
+        "min": 0.4,
+        "max": 0.48,
+        "mean": 0.44,
+        "stdev": 0.0566,
+        "range": 0.08
+      },
+      "echo_rate": {
+        "min": 0.0,
+        "max": 0.068,
+        "mean": 0.034,
+        "stdev": 0.0481,
+        "range": 0.068
+      }
+    }
+  },
+  "verdict": {
+    "none": {
+      "mean_echo_rate": 0.046,
+      "mean_score": 0.206
+    },
+    "v1-restating": {
+      "mean_echo_rate": 0.474,
+      "mean_score": 0.314
+    },
+    "v2-example": {
+      "mean_echo_rate": 0.034,
+      "mean_score": 0.44
+    },
+    "v1_echoes_more_than_none": true,
+    "v2_echoes_less_than_v1": true
+  }
+}

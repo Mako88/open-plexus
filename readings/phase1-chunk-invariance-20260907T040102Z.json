@@ -1,0 +1,49 @@
+{
+  "phase": 1,
+  "kind": "chunk-invariance",
+  "taken_at": "2026-09-07T04:01:02.093627+00:00",
+  "what": "whether feeding a transcript in pieces lands on the same state as feeding it whole, which decides whether the full-context baseline costs O(N) or O(N-squared)",
+  "would_refute": "a state difference large enough to change the argmax of the logits",
+  "core": "rwkv7-g1j-1.5b-20260831-ctx16384 [cuda fp32]",
+  "size_b": 1.5,
+  "tokens": 1547,
+  "results": [
+    {
+      "split": "halves",
+      "pieces": 2,
+      "max_abs_state_diff": 0.00176239013671875,
+      "max_rel_state_diff": 1.856533344835043e-05,
+      "max_abs_logit_diff": 9.5367431640625e-05,
+      "same_argmax": true,
+      "same_top5": true
+    },
+    {
+      "split": "thirds",
+      "pieces": 3,
+      "max_abs_state_diff": 0.0017852783203125,
+      "max_rel_state_diff": 1.8806442312779836e-05,
+      "max_abs_logit_diff": 9.918212890625e-05,
+      "same_argmax": true,
+      "same_top5": true
+    },
+    {
+      "split": "one-token-tail",
+      "pieces": 2,
+      "max_abs_state_diff": 0.0017852783203125,
+      "max_rel_state_diff": 1.8806442312779836e-05,
+      "max_abs_logit_diff": 9.822845458984375e-05,
+      "same_argmax": true,
+      "same_top5": true
+    },
+    {
+      "split": "token-at-a-time-tail",
+      "pieces": 6,
+      "max_abs_state_diff": 0.0017852783203125,
+      "max_rel_state_diff": 1.8806442312779836e-05,
+      "max_abs_logit_diff": 0.0001068115234375,
+      "same_argmax": true,
+      "same_top5": true
+    }
+  ],
+  "invariant": true
+}

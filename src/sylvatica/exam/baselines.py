@@ -78,16 +78,23 @@ def blind_baseline(house: Generated) -> BlindBaseline:
     return BlindBaseline(house)
 
 
-def estimate_full_context_tokens(core: Any, house: Generated, reply_tokens: int = 40) -> int:
-    """How many tokens the full-context baseline will re-feed, before running it.
+def estimate_full_context_tokens(core: Any, house: Generated) -> int:
+    """Tokens an ATTENTION model would re-read to answer this house's questions.
 
-    STANDING OBJECTION 8 IN EXECUTABLE FORM. The answer for the doc's own Phase 1
-    house -- 50 facts over 300 turns -- is millions, which is hours on this card.
-    Knowing that before the run is what stops a session from quietly dropping the
-    baseline when it turns out to be slow, which is the exact failure that let a
-    blind rule beat two branches unnoticed.
+    NOT WHAT THE FULL-CONTEXT BASELINE COSTS. That baseline is the same RWKV
+    core, and on a recurrent core re-reading and carrying the state are the same
+    function, so it costs O(N). This is the projection for a control that does
+    not exist yet -- a same-size attention model, for which re-reading really is
+    a different computation. See `run.run_full_context`.
+
+    IT USED TO ADD 40 REPLY TOKENS A TURN AND WAS WRONG BY A FACTOR OF FOUR.
+    The baseline is fed the user lines ONLY; the core's replies never enter its
+    transcript. Counting them put the doc's own house at 1.51 million tokens
+    when the real figure is 401 thousand. An estimate that overstates a cost by
+    4x is not a safe error: it is exactly the kind of number that talks a session
+    out of running a control.
     """
-    per_turn = [len(core.encode(t)) + reply_tokens for t in house.turns]
+    per_turn = [len(core.encode(t)) for t in house.turns]
     running, total = 0, 0
     from .world import questions_at
 

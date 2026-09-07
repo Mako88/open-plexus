@@ -1,0 +1,56 @@
+{
+  "phase": 1,
+  "kind": "baseline-equivalence",
+  "taken_at": "2026-09-07T04:08:19.283296+00:00",
+  "what": "whether the O(N) full-context baseline answers like the O(N-squared) one, against how much sampling alone moves a score",
+  "would_refute": "the method change moving the score further than running the same method twice does. Then the optimisation is not free and reverts.",
+  "core": "rwkv7-g1j-1.5b-20260831-ctx16384 [cuda fp32]",
+  "size_b": 1.5,
+  "house": {
+    "seed": 11,
+    "facts": 15,
+    "turns": 80,
+    "delays": [
+      1,
+      5,
+      20
+    ],
+    "negatives": 5,
+    "questions": 50
+  },
+  "old_vs_new": {
+    "n": 50,
+    "identical_answers": 0.92,
+    "same_correct_verdict": 0.96,
+    "score_a": 0.8889,
+    "score_b": 0.8889,
+    "score_gap": 0.0
+  },
+  "new_vs_new": {
+    "n": 50,
+    "identical_answers": 0.84,
+    "same_correct_verdict": 0.92,
+    "score_a": 0.8889,
+    "score_b": 0.8889,
+    "score_gap": 0.0
+  },
+  "cost_spent_new": {
+    "tokens_in": 1836,
+    "tokens_out": 533,
+    "seconds": 41.600680401781574,
+    "flops": 7236842729472.0,
+    "tokens_per_second": 56.946183983532784
+  },
+  "cost_charged_new": {
+    "tokens_in": 26404,
+    "tokens_out": 533,
+    "seconds": 0.0,
+    "flops": 82287392403456.0,
+    "tokens_per_second": 0.0
+  },
+  "verdict": {
+    "method_change_moved_score_by": 0.0,
+    "sampling_alone_moves_score_by": 0.0,
+    "method_change_within_sampling_noise": true
+  }
+}

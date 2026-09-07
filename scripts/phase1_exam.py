@@ -8,16 +8,21 @@ the state holds nothing usable and a recurrent core was the wrong part. That is
 named here, before the run, because a threshold written after a number is not a
 threshold.
 
-  uv run python scripts/phase1_exam.py --size 1.5 --facts 50 --turns 300
-  uv run python scripts/phase1_exam.py --size 0.4 --facts 12 --turns 60   # a rehearsal
-  uv run python scripts/phase1_exam.py --baseline full-context            # hours; see below
+  uv run python scripts/phase1_exam.py --size 1.5 --baseline both      # ~7 minutes
+  uv run python scripts/phase1_exam.py --size 0.4 --facts 12 --turns 60 --delays 1 5 20
 
-THE FULL-CONTEXT BASELINE IS NOT RUN BY DEFAULT AND THAT IS STANDING OBJECTION
-8, handled in the open rather than by omission. It re-feeds millions of tokens
-and costs hours on this card; `--estimate` prints the number before anything
-runs. A Tier A reading committed without it is INCOMPLETE and says so in its own
-`baselines` field, so nothing downstream can mistake a partial reading for the
-comparison the doc asked for.
+THE FULL-CONTEXT BASELINE USED TO COST 2.5 HOURS AND NOW COSTS TWO MINUTES,
+because on a recurrent core re-reading a transcript and carrying the state
+through it are the same function. That is measured, not assumed --
+`readings/phase1-chunk-invariance-*.json` and
+`readings/phase1-baseline-equivalence-*.json`.
+
+AND IT IS NOT THE CONTROL THE DOC THINKS IT IS. The same fact that made it cheap
+means it is not a STATELESS baseline: it differs from Tier A only in what text
+went into the state, never in how the memory works. Refutation 1 needs a
+same-size attention model and does not have one, so every reading here carries
+`refutation_1_tested: false`. See `exam.run.run_full_context` and standing
+objection 8.
 """
 
 from __future__ import annotations
@@ -72,6 +77,11 @@ def result_rows(result, label: str) -> dict:
         "by_kind": score.by_kind,
         "seconds": round(result.seconds, 1),
         "cost": result.cost.row() if result.cost else None,
+        # Present only on the full-context baseline, and it is NOT that
+        # baseline's cost -- see `ExamResult.charged`. It is what an attention
+        # model would have paid for the same answers, a projection for a
+        # control nobody has built.
+        "charged": result.charged.row() if result.charged else None,
     }
 
 
@@ -95,7 +105,7 @@ def main() -> int:
         "--baseline",
         choices=["blind", "full-context", "both"],
         default="blind",
-        help="full-context costs hours; --estimate says how many tokens first",
+        help="both is ~7 minutes; the full-context control is cheap now, see the docstring",
     )
     parser.add_argument("--estimate", action="store_true", help="print costs and exit")
     parser.add_argument("--out", type=Path, default=Path("readings"))
@@ -124,8 +134,9 @@ def main() -> int:
 
     fc_tokens = estimate_full_context_tokens(core, house)
     print(
-        f"full-context baseline would re-feed {fc_tokens:,} tokens "
-        f"(~{fc_tokens / 157 / 3600:.1f} h at 157 tok/s)"
+        f"an attention control would re-read {fc_tokens:,} tokens "
+        f"(~{fc_tokens / 157 / 3600:.1f} h at 157 tok/s); the recurrent "
+        f"full-context baseline below does not pay this"
     )
     if args.estimate:
         return 0
@@ -159,7 +170,10 @@ def main() -> int:
         "kind": "exam",
         "tier": "A",
         "taken_at": datetime.now(UTC).isoformat(),
-        "what": "how fast the bare state forgets, against blind and full-context",
+        "what": (
+            "how fast the bare state forgets, against blind and against the "
+            "same core given a transcript with none of its own replies in it"
+        ),
         "would_refute": REFUTES,
         "core": core.name,
         "params": core.params,
@@ -183,7 +197,11 @@ def main() -> int:
         # WHICH BASELINES ACTUALLY RAN, so a partial reading cannot be mistaken
         # for the comparison the doc asked for. Standing objection 8.
         "baselines": baselines_run,
-        "full_context_tokens_if_run": fc_tokens,
+        # NOT what the full-context baseline cost -- that is in its own row and is
+        # small. This is the projection for an ATTENTION control that does not
+        # exist yet, and it is the number refutation 1 would need on that side.
+        "attention_baseline_projected_tokens": fc_tokens,
+        "refutation_1_tested": False,
         "rows": rows,
         "machine": {"gpu": "GTX 1080 Ti", "torch": torch.__version__},
     }

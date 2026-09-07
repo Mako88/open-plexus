@@ -117,33 +117,50 @@ OBJECTIONS: list[Objection] = [
     ),
     Objection(
         what=(
-            "The full-context baseline re-sends the whole transcript every turn, "
-            "and the doc says it runs beside EVERY arm."
+            "The full-context baseline is not a stateless control, so refutation "
+            "1 is untested and currently untestable."
         ),
         why=(
-            "It is the right control and the arithmetic is measured, not "
-            "assumed. `estimate_full_context_tokens` on the doc's own Phase 1 "
-            "house -- 50 facts, 300 turns, 270 questions -- says 1.51 million "
-            "tokens, about 2.7 GPU-hours at the measured 157 tok/s. The Tier A "
-            "arm on the same house is roughly two minutes of core time. EIGHTY "
-            "TIMES THE ARM, on a card that is shared and is also wanted for "
-            "consolidation. The risk is not that it is expensive; it is that a "
-            "session under time pressure quietly runs the arm without it, which "
-            "is precisely how the two earlier branches came to be beaten by a "
-            "rule nobody had plotted against."
+            "The doc calls it 'the same core fed the whole transcript every "
+            "turn, which is how a transformer would do it', and refutation 1 is "
+            "'state plus store loses to a same-size STATELESS model given the "
+            "whole conversation as context, at equal flops'. On a recurrent "
+            "core there is no such thing: feeding a transcript whole and "
+            "carrying the state through it are THE SAME FUNCTION, measured to "
+            "the same argmax and top-5 down to token-at-a-time splits. So this "
+            "baseline differs from Tier A only in what text went into the state "
+            "-- no core replies -- and not in how the memory works. It is a "
+            "useful ablation and it is not the control the doc thinks it is. "
+            "The branch's headline claim currently has nothing arguing against "
+            "it, which is the condition the last two branches died in."
         ),
         settled_by=(
-            "Run it once at 1.5B on the real Phase 1 house and record the wall "
-            "clock. Then decide, in the open, between three options and record "
-            "which: a shorter house, the baseline evaluated at a subsample of "
-            "delays with the subsample named in every reading, or six hours a "
-            "run accepted as the price. Any of the three closes this; running "
-            "arms without it does not."
+            "A same-size ATTENTION model on the same house -- Qwen3-1.7B class "
+            "-- given the whole conversation as context, scored on the same "
+            "questions with the same judge, with flops for both. Then refutation "
+            "1 has a real control and this closes. Adding a comparison model is "
+            "not reopening the DECIDED choice of substrate; it is buying an "
+            "instrument. Deciding NOT to build it also closes this, provided the "
+            "branch stops listing refutation 1 as something it tests."
         ),
     ),
 ]
 
 # SETTLED, AND KEPT HERE AS NOTES RATHER THAN AS ENTRIES.
+#
+# "The full-context baseline costs 2.7 GPU-hours a house against two minutes for
+# the arm, and the risk is a session quietly running arms without it."
+# Settled 2026-09-06, and by the cost turning out not to exist. A recurrent core
+# makes re-reading and carrying the same function, so the baseline's answers cost
+# O(N) instead of O(N-squared): the doc's own house went from 1.51M tokens and
+# 2.5 hours to about 7k tokens and under two minutes. Nothing was traded away to
+# get it -- no shorter house, no subsampled delays. The entry's real worry, that
+# expense would push somebody into skipping the control, is gone because the
+# expense is gone.
+#
+# IT WAS REPLACED BY A WORSE PROBLEM RATHER THAN CLOSING CLEANLY, which is why
+# the count did not drop: the same measurement showed this baseline is not a
+# stateless control at all. That is the new entry above.
 #
 # "The blind baseline answers the commonest answer for a question's kind, and how
 # strong that is depends entirely on how the generator distributes its answers."

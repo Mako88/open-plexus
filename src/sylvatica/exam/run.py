@@ -73,6 +73,23 @@ class ExamResult:
     cost: Cost | None = None
     seconds: float = 0.0
 
+    # WHAT AN ATTENTION MODEL WOULD HAVE PAID to produce these same answers:
+    # the transcript re-read from nothing, once per question.
+    #
+    # READ THIS CAREFULLY, BECAUSE THE OBVIOUS READING IS WRONG. This is NOT
+    # "the full-context baseline's cost". The full-context baseline is the same
+    # RWKV core, and on a recurrent core re-reading and carrying are the same
+    # function -- measured, `readings/phase1-chunk-invariance-*.json`. Its real
+    # cost is `cost`, and it is small.
+    #
+    # This number is a PROJECTION for a control that does not exist yet: a
+    # same-size attention model, for which re-reading genuinely is a different
+    # computation. Refutation 1 is an equal-flops comparison against such a
+    # model, and until one is run this is an estimate of one side of a comparison
+    # nobody has made. It is here so the arithmetic is on the record, not so a
+    # verdict can be read off it.
+    charged: Cost | None = None
+
     def score(self) -> Score:
         positives = [a for a in self.answers if a.fact_id is not None]
         negatives = [a for a in self.answers if a.fact_id is None]
@@ -287,29 +304,102 @@ def run_full_context(
     answer_budget: int = 32,
     progress: bool = True,
 ) -> ExamResult:
-    """The re-sending baseline: the whole transcript, from scratch, per question.
+    """The same core, fed the user lines only, from a fresh state.
+
+    WHAT THIS IS NOT, AND THE DOC CALLS IT SOMETHING IT IS NOT. The design doc
+    lists this as "*Full-context*: the same core fed the whole transcript every
+    turn, which is how a transformer would do it", and treats it as the
+    STATELESS control for refutation 1 -- "state plus store loses to a same-size
+    stateless model given the whole conversation as context".
+
+    ON A RECURRENT CORE THERE IS NO SUCH CONTROL. `S_t = f(S_{t-1}, x_t)` means
+    feeding a transcript whole and feeding it in pieces land on the same state,
+    so "give it the whole conversation as context" and "carry the state" are the
+    same function, not two. Measured, not argued:
+    `readings/phase1-chunk-invariance-*.json` (same argmax and top-5 down to
+    token-at-a-time splits) and `readings/phase1-baseline-equivalence-*.json`
+    (the method change moved the score less than re-running one method twice).
+
+    SO WHAT THIS ACTUALLY MEASURES is an ABLATION, and a useful one: the same
+    memory mechanism as Tier A, differing only in what went into it. Tier A's
+    state carries the preamble, the user lines AND the core's own replies. This
+    carries the preamble and the user lines. It answers "how much does the core's
+    own chatter in its state cost it?" -- which is worth knowing and is not the
+    question the doc asked.
+
+    REFUTATION 1 IS THEREFORE UNTESTED, and testing it needs a same-size
+    ATTENTION model, where re-reading really is a different computation from
+    carrying. That is a new instrument rather than a change of substrate, and it
+    is John's call. Standing objection 8.
 
     THE TRANSCRIPT IT IS GIVEN IS THE USER LINES ONLY, not the core's replies.
     That is a deviation from "the whole transcript" and it favours the BASELINE:
     the replies carry no facts, so dropping them removes tokens without removing
     information, and this control therefore gets a denser context per token than
-    a real transformer chat would. A baseline should be given every advantage
-    that does not cost it information, because the claim being tested is that
-    the arm beats it.
-    """
-    from .baselines import FullContextBaseline
+    a real transformer chat would.
 
-    baseline = FullContextBaseline(core, answer_budget)
+    WHY IT NO LONGER TAKES 2.5 HOURS, and this is a fact about the substrate
+    rather than a trick. A transformer must re-read the whole context for every
+    question because attention recomputes over all positions; there is no carry.
+    A RECURRENCE HAS NO SUCH REQUIREMENT. `S_t = f(S_{t-1}, x_t)` means feeding
+    [1..N] from zero and feeding [1..k] then [k+1..N] from `S_k` land on the same
+    state. So the baseline advances ONE state through the transcript and forks it
+    at each question, and it sees exactly the same tokens it saw before.
+
+    MEASURED, NOT ASSUMED: `readings/phase1-chunk-invariance-*.json`. Splitting a
+    1,548-token transcript into halves, thirds, and finally token-at-a-time moved
+    the state by 1.9e-5 relative and the logits by 1e-4 absolute, with the same
+    argmax and the same top five every time. The tokenizer agrees too -- the
+    per-line encodings concatenate to exactly the whole-transcript encoding, so
+    not one token differs.
+
+    AND THE COST IS STILL CHARGED IN FULL, which is the part that must not be
+    quietly dropped. Refutation 1 is that state plus store loses to a stateless
+    model given the whole conversation AT EQUAL FLOPS. What a stateless model
+    would pay is the O(N-squared) number, and it is arithmetic -- it does not
+    have to be spent to be known. `result.cost` is what this run actually spent;
+    `result.charged` is what the baseline it stands for would have cost, and that
+    is the number a flops comparison uses. Reporting the cheap one as the
+    baseline's cost would hand the arm a win it did not earn.
+    """
+    from ..core.base import forward_flops
+    from ..loop.turn import PREAMBLE, SEPARATOR, USER_PREFIX
+
     schedule = questions_at(house)
     result = ExamResult(tier=Tier.A)
     meter = Meter()
     started = time.perf_counter()
 
-    for turn in sorted(schedule):
-        transcript = house.turns[: turn + 1]
-        for question in schedule[turn]:
-            said, cost = baseline.answer_at(transcript, question)
-            meter.add(cost)
+    state, cost = prime(core)
+    meter.add(cost)
+    preamble_tokens = len(core.encode(PREAMBLE))
+    transcript_tokens = 0
+    charged_in = 0
+    charged_out = 0
+
+    for turn, line in enumerate(house.turns):
+        chunk = core.encode(f"{USER_PREFIX}{line}{SEPARATOR}")
+        state, cost = core.feed(chunk, state)
+        meter.add(cost)
+        transcript_tokens += len(chunk)
+
+        for question in schedule.get(turn, ()):
+            asked = core.encode(format_prompt(question.text))
+            # The fork. The question never enters the transcript, exactly as in
+            # `run_exam` -- see this module's docstring for why.
+            out, _, ask_cost = core.generate(
+                asked, core.copy_state(state), answer_budget,
+                Sampling(stop_strings=STOP_STRINGS),
+            )
+            meter.add(ask_cost)
+            said = trim_at_stop(core.decode(out), STOP_STRINGS)
+
+            # WHAT A STATELESS MODEL WOULD HAVE PAID for this one question: the
+            # preamble, the whole transcript so far, and the question, read from
+            # nothing.
+            charged_in += preamble_tokens + transcript_tokens + len(asked)
+            charged_out += len(out)
+
             correct, invented, echoed = judge(question, said)
             result.answers.append(
                 Answered(
@@ -324,13 +414,23 @@ def run_full_context(
                     echoed=echoed,
                 )
             )
-        if progress:
+        if progress and turn in schedule:
             print(
-                f"  full-context turn {turn}  asked {len(result.answers)}  "
-                f"{meter.total.seconds:.0f}s  {baseline.tokens_fed} tokens fed",
+                f"  full-context turn {turn + 1}/{len(house.turns)}  "
+                f"asked {len(result.answers)}  {meter.total.seconds:.0f}s  "
+                f"charged {charged_in:,} tokens",
                 flush=True,
             )
 
     result.cost = meter.total
+    result.charged = Cost(
+        tokens_in=charged_in,
+        tokens_out=charged_out,
+        # SECONDS ARE NOT EXTRAPOLATED. Tokens and flops are arithmetic; wall
+        # clock is a measurement, and inventing one for a run that did not happen
+        # would put a number in a reading that nothing produced.
+        seconds=0.0,
+        flops=forward_flops(core.params, charged_in + charged_out),
+    )
     result.seconds = time.perf_counter() - started
     return result

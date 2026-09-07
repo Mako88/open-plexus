@@ -1,0 +1,570 @@
+{
+  "phase": 1,
+  "kind": "exam-noise",
+  "tier": "A",
+  "taken_at": "2026-09-07T09:31:54.023995+00:00",
+  "what": "how far a Tier A score moves between houses, so a gap can be read",
+  "would_refute": "A Tier A spread at delay 20 wider than the gap between Tier A and blind. Then one house cannot settle Phase 1 and the exit needs several.",
+  "core": "rwkv7-g1j-1.5b-20260831-ctx16384 [cuda fp32]",
+  "size_b": 1.5,
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "house": {
+    "facts": 50,
+    "turns": 300,
+    "negatives": 20,
+    "delays": [
+      1,
+      5,
+      20,
+      60,
+      150
+    ]
+  },
+  "budgets": {
+    "reply": 40,
+    "answer": 32
+  },
+  "preamble": "User: I am going to tell you things about my home. Remember them. Answer questions in a few words, and say so if I have not told you.\n\nAssistant: Ready.\n\nUser: The kettle lives on the third shelf.\n\nAssistant: Noted.\n\nUser: Where does the kettle live?\n\nAssistant: On the third shelf.\n\nUser: Where does the ladder live?\n\nAssistant: You have not told me.\n\n",
+  "full_context_spread": null,
+  "runs": [
+    {
+      "seed": 0,
+      "entropy_bits": {
+        "trade": 2.371,
+        "number": 3.322,
+        "place": 2.446,
+        "colour": 2.446,
+        "relation": 2.922
+      },
+      "blind": 0.24,
+      "blind_by_delay": {
+        "1": 0.24,
+        "5": 0.24,
+        "20": 0.24,
+        "60": 0.24,
+        "150": 0.24
+      },
+      "tier_a": 0.48,
+      "tier_a_by_delay": {
+        "1": 0.58,
+        "5": 0.58,
+        "20": 0.52,
+        "60": 0.42,
+        "150": 0.3
+      },
+      "tier_a_by_kind": {
+        "colour": 0.86,
+        "number": 0.66,
+        "place": 0.36,
+        "relation": 0.08,
+        "trade": 0.44
+      },
+      "invented": 17,
+      "echoed": 0,
+      "truncated_replies": 0,
+      "conversation_turns": 300,
+      "negatives": 20,
+      "seconds": 228.0
+    },
+    {
+      "seed": 1,
+      "entropy_bits": {
+        "trade": 2.446,
+        "number": 2.846,
+        "place": 2.722,
+        "colour": 2.922,
+        "relation": 2.922
+      },
+      "blind": 0.24,
+      "blind_by_delay": {
+        "1": 0.24,
+        "5": 0.24,
+        "20": 0.24,
+        "60": 0.24,
+        "150": 0.24
+      },
+      "tier_a": 0.596,
+      "tier_a_by_delay": {
+        "1": 0.84,
+        "5": 0.76,
+        "20": 0.48,
+        "60": 0.52,
+        "150": 0.38
+      },
+      "tier_a_by_kind": {
+        "colour": 0.56,
+        "number": 0.72,
+        "place": 0.62,
+        "relation": 0.52,
+        "trade": 0.56
+      },
+      "invented": 18,
+      "echoed": 6,
+      "truncated_replies": 0,
+      "conversation_turns": 300,
+      "negatives": 20,
+      "seconds": 173.5
+    },
+    {
+      "seed": 2,
+      "entropy_bits": {
+        "trade": 1.685,
+        "number": 3.122,
+        "place": 2.722,
+        "colour": 2.171,
+        "relation": 2.922
+      },
+      "blind": 0.28,
+      "blind_by_delay": {
+        "1": 0.28,
+        "5": 0.28,
+        "20": 0.28,
+        "60": 0.28,
+        "150": 0.28
+      },
+      "tier_a": 0.652,
+      "tier_a_by_delay": {
+        "1": 0.9,
+        "5": 0.84,
+        "20": 0.56,
+        "60": 0.44,
+        "150": 0.52
+      },
+      "tier_a_by_kind": {
+        "colour": 0.82,
+        "number": 0.62,
+        "place": 0.38,
+        "relation": 0.76,
+        "trade": 0.68
+      },
+      "invented": 17,
+      "echoed": 2,
+      "truncated_replies": 0,
+      "conversation_turns": 300,
+      "negatives": 20,
+      "seconds": 178.1
+    },
+    {
+      "seed": 3,
+      "entropy_bits": {
+        "trade": 3.122,
+        "number": 3.322,
+        "place": 3.122,
+        "colour": 2.646,
+        "relation": 2.846
+      },
+      "blind": 0.22,
+      "blind_by_delay": {
+        "1": 0.22,
+        "5": 0.22,
+        "20": 0.22,
+        "60": 0.22,
+        "150": 0.22
+      },
+      "tier_a": 0.504,
+      "tier_a_by_delay": {
+        "1": 0.72,
+        "5": 0.68,
+        "20": 0.42,
+        "60": 0.36,
+        "150": 0.34
+      },
+      "tier_a_by_kind": {
+        "colour": 0.62,
+        "number": 0.58,
+        "place": 0.32,
+        "relation": 0.46,
+        "trade": 0.54
+      },
+      "invented": 17,
+      "echoed": 10,
+      "truncated_replies": 0,
+      "conversation_turns": 300,
+      "negatives": 20,
+      "seconds": 170.2
+    },
+    {
+      "seed": 4,
+      "entropy_bits": {
+        "trade": 2.722,
+        "number": 3.122,
+        "place": 2.722,
+        "colour": 2.522,
+        "relation": 2.922
+      },
+      "blind": 0.2,
+      "blind_by_delay": {
+        "1": 0.2,
+        "5": 0.2,
+        "20": 0.2,
+        "60": 0.2,
+        "150": 0.2
+      },
+      "tier_a": 0.38,
+      "tier_a_by_delay": {
+        "1": 0.6,
+        "5": 0.5,
+        "20": 0.28,
+        "60": 0.22,
+        "150": 0.3
+      },
+      "tier_a_by_kind": {
+        "colour": 0.42,
+        "number": 0.3,
+        "place": 0.1,
+        "relation": 0.56,
+        "trade": 0.52
+      },
+      "invented": 15,
+      "echoed": 18,
+      "truncated_replies": 0,
+      "conversation_turns": 300,
+      "negatives": 20,
+      "seconds": 160.9
+    },
+    {
+      "seed": 5,
+      "entropy_bits": {
+        "trade": 2.246,
+        "number": 3.122,
+        "place": 2.322,
+        "colour": 2.722,
+        "relation": 3.122
+      },
+      "blind": 0.26,
+      "blind_by_delay": {
+        "1": 0.26,
+        "5": 0.26,
+        "20": 0.26,
+        "60": 0.26,
+        "150": 0.26
+      },
+      "tier_a": 0.512,
+      "tier_a_by_delay": {
+        "1": 0.68,
+        "5": 0.66,
+        "20": 0.44,
+        "60": 0.38,
+        "150": 0.4
+      },
+      "tier_a_by_kind": {
+        "colour": 0.74,
+        "number": 0.6,
+        "place": 0.32,
+        "relation": 0.5,
+        "trade": 0.4
+      },
+      "invented": 11,
+      "echoed": 14,
+      "truncated_replies": 0,
+      "conversation_turns": 300,
+      "negatives": 20,
+      "seconds": 169.0
+    },
+    {
+      "seed": 6,
+      "entropy_bits": {
+        "trade": 2.646,
+        "number": 3.322,
+        "place": 2.446,
+        "colour": 2.446,
+        "relation": 3.122
+      },
+      "blind": 0.24,
+      "blind_by_delay": {
+        "1": 0.24,
+        "5": 0.24,
+        "20": 0.24,
+        "60": 0.24,
+        "150": 0.24
+      },
+      "tier_a": 0.436,
+      "tier_a_by_delay": {
+        "1": 0.66,
+        "5": 0.52,
+        "20": 0.38,
+        "60": 0.24,
+        "150": 0.38
+      },
+      "tier_a_by_kind": {
+        "colour": 0.52,
+        "number": 0.38,
+        "place": 0.16,
+        "relation": 0.56,
+        "trade": 0.56
+      },
+      "invented": 18,
+      "echoed": 2,
+      "truncated_replies": 0,
+      "conversation_turns": 300,
+      "negatives": 20,
+      "seconds": 158.3
+    },
+    {
+      "seed": 7,
+      "entropy_bits": {
+        "trade": 2.646,
+        "number": 3.322,
+        "place": 2.446,
+        "colour": 2.522,
+        "relation": 2.722
+      },
+      "blind": 0.22,
+      "blind_by_delay": {
+        "1": 0.22,
+        "5": 0.22,
+        "20": 0.22,
+        "60": 0.22,
+        "150": 0.22
+      },
+      "tier_a": 0.612,
+      "tier_a_by_delay": {
+        "1": 0.72,
+        "5": 0.7,
+        "20": 0.62,
+        "60": 0.5,
+        "150": 0.52
+      },
+      "tier_a_by_kind": {
+        "colour": 0.86,
+        "number": 0.8,
+        "place": 0.46,
+        "relation": 0.28,
+        "trade": 0.66
+      },
+      "invented": 17,
+      "echoed": 0,
+      "truncated_replies": 0,
+      "conversation_turns": 300,
+      "negatives": 20,
+      "seconds": 189.7
+    },
+    {
+      "seed": 8,
+      "entropy_bits": {
+        "trade": 2.922,
+        "number": 3.322,
+        "place": 2.446,
+        "colour": 2.122,
+        "relation": 2.922
+      },
+      "blind": 0.24,
+      "blind_by_delay": {
+        "1": 0.24,
+        "5": 0.24,
+        "20": 0.24,
+        "60": 0.24,
+        "150": 0.24
+      },
+      "tier_a": 0.412,
+      "tier_a_by_delay": {
+        "1": 0.52,
+        "5": 0.48,
+        "20": 0.4,
+        "60": 0.34,
+        "150": 0.32
+      },
+      "tier_a_by_kind": {
+        "colour": 0.84,
+        "number": 0.68,
+        "place": 0.12,
+        "relation": 0.16,
+        "trade": 0.26
+      },
+      "invented": 18,
+      "echoed": 0,
+      "truncated_replies": 0,
+      "conversation_turns": 300,
+      "negatives": 20,
+      "seconds": 168.1
+    },
+    {
+      "seed": 9,
+      "entropy_bits": {
+        "trade": 3.122,
+        "number": 3.322,
+        "place": 2.722,
+        "colour": 2.246,
+        "relation": 2.922
+      },
+      "blind": 0.2,
+      "blind_by_delay": {
+        "1": 0.2,
+        "5": 0.2,
+        "20": 0.2,
+        "60": 0.2,
+        "150": 0.2
+      },
+      "tier_a": 0.632,
+      "tier_a_by_delay": {
+        "1": 0.72,
+        "5": 0.84,
+        "20": 0.62,
+        "60": 0.44,
+        "150": 0.54
+      },
+      "tier_a_by_kind": {
+        "colour": 0.78,
+        "number": 0.54,
+        "place": 0.48,
+        "relation": 0.68,
+        "trade": 0.68
+      },
+      "invented": 15,
+      "echoed": 4,
+      "truncated_replies": 0,
+      "conversation_turns": 300,
+      "negatives": 20,
+      "seconds": 163.9
+    }
+  ],
+  "tier_a_spread_by_delay": {
+    "1": {
+      "min": 0.52,
+      "max": 0.9,
+      "mean": 0.694,
+      "stdev": 0.1151,
+      "range": 0.38
+    },
+    "5": {
+      "min": 0.48,
+      "max": 0.84,
+      "mean": 0.656,
+      "stdev": 0.1336,
+      "range": 0.36
+    },
+    "20": {
+      "min": 0.28,
+      "max": 0.62,
+      "mean": 0.472,
+      "stdev": 0.1096,
+      "range": 0.34
+    },
+    "60": {
+      "min": 0.22,
+      "max": 0.52,
+      "mean": 0.386,
+      "stdev": 0.0998,
+      "range": 0.3
+    },
+    "150": {
+      "min": 0.3,
+      "max": 0.54,
+      "mean": 0.4,
+      "stdev": 0.0938,
+      "range": 0.24
+    }
+  },
+  "blind_spread_by_delay": {
+    "1": {
+      "min": 0.2,
+      "max": 0.28,
+      "mean": 0.234,
+      "stdev": 0.025,
+      "range": 0.08
+    },
+    "5": {
+      "min": 0.2,
+      "max": 0.28,
+      "mean": 0.234,
+      "stdev": 0.025,
+      "range": 0.08
+    },
+    "20": {
+      "min": 0.2,
+      "max": 0.28,
+      "mean": 0.234,
+      "stdev": 0.025,
+      "range": 0.08
+    },
+    "60": {
+      "min": 0.2,
+      "max": 0.28,
+      "mean": 0.234,
+      "stdev": 0.025,
+      "range": 0.08
+    },
+    "150": {
+      "min": 0.2,
+      "max": 0.28,
+      "mean": 0.234,
+      "stdev": 0.025,
+      "range": 0.08
+    }
+  },
+  "verdict": {
+    "1": {
+      "gap_to_blind": 0.46,
+      "tier_a_range": 0.38,
+      "gap_exceeds_noise": true
+    },
+    "5": {
+      "gap_to_blind": 0.422,
+      "tier_a_range": 0.36,
+      "gap_exceeds_noise": true
+    },
+    "20": {
+      "gap_to_blind": 0.238,
+      "tier_a_range": 0.34,
+      "gap_exceeds_noise": false
+    },
+    "60": {
+      "gap_to_blind": 0.152,
+      "tier_a_range": 0.3,
+      "gap_exceeds_noise": false
+    },
+    "150": {
+      "gap_to_blind": 0.166,
+      "tier_a_range": 0.24,
+      "gap_exceeds_noise": false
+    }
+  },
+  "paired": {
+    "1": {
+      "n_houses": 10,
+      "mean_difference": 0.46,
+      "standard_error": 0.0343,
+      "houses_above_blind": 10,
+      "beats_blind": true
+    },
+    "5": {
+      "n_houses": 10,
+      "mean_difference": 0.422,
+      "standard_error": 0.0417,
+      "houses_above_blind": 10,
+      "beats_blind": true
+    },
+    "20": {
+      "n_houses": 10,
+      "mean_difference": 0.238,
+      "standard_error": 0.0347,
+      "houses_above_blind": 10,
+      "beats_blind": true
+    },
+    "60": {
+      "n_houses": 10,
+      "mean_difference": 0.152,
+      "standard_error": 0.0309,
+      "houses_above_blind": 9,
+      "beats_blind": true
+    },
+    "150": {
+      "n_houses": 10,
+      "mean_difference": 0.166,
+      "standard_error": 0.03,
+      "houses_above_blind": 10,
+      "beats_blind": true
+    }
+  }
+}

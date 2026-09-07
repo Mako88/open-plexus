@@ -298,6 +298,9 @@ The old first north star did not have it. Phase 4's exit is that line, measured.
 Every one is a number read on an exam, never a constant chosen once. Named here so a session
 knows what is tunable and does not invent a second knob for the same thing.
 
+- The turn format and the PREAMBLE, both in `loop/turn.py`. Added Phase 1: the framing fed
+  once into a fresh state. Every exam reading records it verbatim, because a score taken
+  under one framing is not comparable to a score taken under another.
 - `k` hits injected; the injection format; the hybrid rank weights.
 - The replay mix: recent, rehearsal, general.
 - The generation budget per turn.

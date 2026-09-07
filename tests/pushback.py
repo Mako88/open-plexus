@@ -21,7 +21,7 @@ from dataclasses import dataclass
 
 # The count is asserted. Change it in the same commit that changes the list, and
 # say in the message which entry left and what settled it.
-COUNT = 8
+COUNT = 7
 
 
 @dataclass(frozen=True)
@@ -159,24 +159,16 @@ OBJECTIONS: list[Objection] = [
             "arms without it does not."
         ),
     ),
-    Objection(
-        what="Nothing outside `core` may index into a state, and nothing enforces it.",
-        why=(
-            "The rule is what lets the core be swapped for a bigger one without "
-            "anything above it changing -- the doc's whole justification for a "
-            "protocol. It is currently a docstring. The open fork 'state as a "
-            "fragment' would have the STORE handling states, which is exactly "
-            "where the rule gets broken first and where breaking it would be "
-            "least visible."
-        ),
-        settled_by=(
-            "A guard that greps the non-`core` packages for indexing into "
-            "anything named `state`, or an opaque wrapper type that makes it "
-            "impossible. Cheap either way; the entry is open because neither "
-            "has been done, not because it is hard."
-        ),
-    ),
 ]
+
+# SETTLED, AND KEPT HERE AS A NOTE RATHER THAN AS AN ENTRY.
+#
+# "Nothing outside `core` may index into a state, and nothing enforces it."
+# Settled 2026-09-06 by `tests/guards/test_state_is_opaque.py`, which walks the
+# AST of every module outside `core` and fails on a subscript or a `for` over
+# anything named like a state. The entry predicted the rule would break first in
+# the store, where it would be least visible; the guard now runs on the store
+# before the store exists.
 
 
 def report() -> str:

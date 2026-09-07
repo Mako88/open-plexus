@@ -1,15 +1,10 @@
-"""`store` -- the slow memory. PROTOCOL ONLY; `SqliteStore` is Phase 2.
+"""`store` -- the slow memory. The types are here; the implementation is in `sqlite`.
 
-WHAT IS HERE AND WHY IT IS HERE NOW. The design doc's shape says every part has
-a protocol at its top and no part reaches into another's internals. Writing the
-protocol in Phase 0 costs nothing and settles the question a Phase 2 session
-would otherwise answer under time pressure: what does the rest of the system get
-to assume about a store?
-
-WHAT IS DELIBERATELY ABSENT. `SqliteStore`, FTS5, the embeddings, the hybrid
-rank. `tests/outstanding/test_the_order.py` is red until they land. Nothing here
-should grow an implementation; a store that appears before its exam has one is a
-store nobody can say anything about.
+The protocol was written in Phase 0, before anything used it, so that the
+question a Phase 2 session would otherwise answer under time pressure was
+already settled: what does the rest of the system get to assume about a store?
+`SqliteStore`, FTS5, the embedder and the hybrid rank landed in Phase 2 and
+answer to exactly that shape.
 
 THE ONE RULE THAT IS NOT NEGOTIABLE: nothing is ever deleted. `archived_at` is
 the strongest thing that happens to a row. Forgetting in this branch is what
@@ -116,4 +111,22 @@ class Store(Protocol):
     def tiers(self) -> dict[str, int]: ...
 
 
-__all__ = ["Fragment", "Hit", "Kind", "ReplaySpec", "Store"]
+# AT THE BOTTOM, because `sqlite` and `embed` import the types above from this
+# module. The types are the protocol layer and the implementations depend on
+# them, so the cycle resolves in one direction only.
+from .embed import Embedder, HashEmbedder, MiniLmEmbedder
+from .sqlite import SqliteStore, episode, fragment_id
+
+__all__ = [
+    "Embedder",
+    "Fragment",
+    "HashEmbedder",
+    "Hit",
+    "Kind",
+    "MiniLmEmbedder",
+    "ReplaySpec",
+    "SqliteStore",
+    "Store",
+    "episode",
+    "fragment_id",
+]

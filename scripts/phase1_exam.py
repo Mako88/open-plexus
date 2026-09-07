@@ -19,10 +19,14 @@ through it are the same function. That is measured, not assumed --
 
 AND IT IS NOT THE CONTROL THE DOC THINKS IT IS. The same fact that made it cheap
 means it is not a STATELESS baseline: it differs from Tier A only in what text
-went into the state, never in how the memory works. Refutation 1 needs a
-same-size attention model and does not have one, so every reading here carries
-`refutation_1_tested: false`. See `exam.run.run_full_context` and standing
-objection 8.
+went into the state, never in how the memory works.
+
+SO `--baseline all` ADDS THE ONE THAT IS. Qwen3-1.7B, same size, re-reading the
+whole transcript for every question, because attention has no choice. That is
+the control refutation 1 asks for, and `refutation_1_tested` in the reading is
+true only when it ran. See `exam/attention.py`.
+
+  uv run python scripts/phase1_exam.py --size 1.5 --baseline all
 """
 
 from __future__ import annotations
@@ -30,6 +34,7 @@ from __future__ import annotations
 import argparse
 import json
 import platform
+import types
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -103,9 +108,9 @@ def main() -> int:
     parser.add_argument("--answer-budget", type=int, default=32)
     parser.add_argument(
         "--baseline",
-        choices=["blind", "full-context", "both"],
+        choices=["blind", "full-context", "attention", "both", "all"],
         default="blind",
-        help="both is ~7 minutes; the full-context control is cheap now, see the docstring",
+        help="'all' adds the Qwen3-1.7B attention control, which is the one refutation 1 needs",
     )
     parser.add_argument("--estimate", action="store_true", help="print costs and exit")
     parser.add_argument("--out", type=Path, default=Path("readings"))
@@ -157,13 +162,35 @@ def main() -> int:
     rows = [result_rows(blind_result, "blind"), result_rows(arm, "tier-a")]
     baselines_run = ["blind"]
 
-    if args.baseline in ("full-context", "both"):
-        print("\n-- full-context --", flush=True)
+    if args.baseline in ("full-context", "both", "all"):
+        print("\n-- full-context (same core, no replies) --", flush=True)
         fc = run_full_context(core, house, answer_budget=args.answer_budget)
         rows.append(result_rows(fc, "full-context"))
         baselines_run.append("full-context")
 
     import torch
+
+    attention_model = None
+    if args.baseline in ("attention", "all"):
+        # THE CARD IS HANDED OVER, NOT SHARED. RWKV-7 1.5B and Qwen3-1.7B are
+        # both about seven gigabytes in fp32 and do not fit together on eleven.
+        # Forgetting this is not an error -- it is a run that swaps and reads as
+        # slow, which is the kind of number that gets believed.
+        import gc
+
+        core_name, core_params = core.name, core.params
+        del core
+        gc.collect()
+        torch.cuda.empty_cache()
+
+        print("\n-- attention control (Qwen3-1.7B, re-reads everything) --", flush=True)
+        from sylvatica.exam.attention import MODEL, run_attention_baseline
+
+        att = run_attention_baseline(house, answer_budget=args.answer_budget)
+        rows.append(result_rows(att, "attention"))
+        baselines_run.append("attention")
+        attention_model = MODEL
+        core = types.SimpleNamespace(name=core_name, params=core_params)
 
     reading = {
         "phase": 1,
@@ -197,11 +224,15 @@ def main() -> int:
         # WHICH BASELINES ACTUALLY RAN, so a partial reading cannot be mistaken
         # for the comparison the doc asked for. Standing objection 8.
         "baselines": baselines_run,
+        "attention_model": attention_model,
         # NOT what the full-context baseline cost -- that is in its own row and is
         # small. This is the projection for an ATTENTION control that does not
         # exist yet, and it is the number refutation 1 would need on that side.
         "attention_baseline_projected_tokens": fc_tokens,
-        "refutation_1_tested": False,
+        # TRUE only when a genuine attention control ran. The `full-context`
+        # arm is the same recurrent core and cannot test it; see
+        # `exam/attention.py`.
+        "refutation_1_tested": "attention" in baselines_run,
         "rows": rows,
         "machine": {"gpu": "GTX 1080 Ti", "torch": torch.__version__},
     }

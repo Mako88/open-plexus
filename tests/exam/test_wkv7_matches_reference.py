@@ -120,3 +120,71 @@ def test_it_resumes_from_a_state_the_inference_path_wrote(core):
     gap = float((logits[-1].float() - reference.float()).abs().max())
     print(f"\nresumed max |dlogit| = {gap:.3e}")
     assert int(logits[-1].argmax()) == int(reference.argmax())
+
+
+def test_the_chunked_path_agrees_with_the_token_at_a_time_loop(core):
+    """The fast path must be the same forward, not merely a plausible one.
+
+    `_recurrence_chunked` replaces the loop with a triangular solve over C
+    tokens at a time. It is 7x faster at the shipped C=32 and it is a hundred
+    lines of algebra that no error message would catch: a wrong anchoring, a
+    wrong tril, a state scaled by the wrong factor all produce a model that runs
+    and answers slightly worse. So the loop stays, and this is what it is for.
+    """
+    from sylvatica.core.wkv7 import DifferentiableRwkv7
+
+    tokens = core.encode(TEXT)
+    mine = DifferentiableRwkv7(core)
+
+    mine.chunk = 0
+    loop, loop_state = mine.forward(list(tokens), None)
+
+    scale = float(loop.float().abs().max())
+    for chunk in (8, 16, 32, 64):
+        mine.chunk = chunk
+        out, state = mine.forward(list(tokens), None)
+        gap = float((out[-1].float() - loop[-1].float()).abs().max()) / scale
+        print(f"\nchunk {chunk:3d}: |dlogit| {gap:.3e} relative")
+        assert gap < 1e-4, f"chunk {chunk} disagrees with the loop by {gap:.3e}"
+        assert int(out[-1].argmax()) == int(loop[-1].argmax())
+
+        worst = max(
+            float((a.float() - b.float()).abs().max())
+            for a, b in zip(state, loop_state)
+        )
+        assert worst < 1e-2, f"chunk {chunk} state diverged by {worst:.3e}"
+
+
+def test_the_chunked_gradient_is_finite(core):
+    """THE CHECK A FORWARD-ONLY TEST DOES NOT MAKE, and the reason it exists.
+
+    At C=128 the chunked forward agrees with the loop to 1.1e-6 and its BACKWARD
+    produces a non-finite gradient, because the anchored ratios reach 3.9e16 and
+    fp32 has seven digits. A forward-only check passes that dial and Phase 3
+    then spends GPU-hours training on NaN. Every chunk size this repository
+    ships has to be checked here, not only there.
+    """
+    from sylvatica.core.wkv7 import DifferentiableRwkv7
+
+    mine = DifferentiableRwkv7(core)
+    tokens = core.encode(TEXT)
+    name = "blocks.0.att.key.weight"
+
+    for chunk in (16, 32, DifferentiableRwkv7.chunk):
+        knob = torch.ones(1, device="cuda", requires_grad=True)
+        mine.chunk = chunk
+        mine.adapter = lambda n, base: base * knob if n == name else base
+
+        logits, _ = mine.forward(list(tokens), None, checkpoint=True)
+        loss = torch.nn.functional.cross_entropy(
+            logits[:-1].float(), torch.tensor(tokens[1:], device=logits.device)
+        )
+        loss.backward()
+
+        assert knob.grad is not None, f"chunk {chunk}: no gradient reached the adapter"
+        assert torch.isfinite(knob.grad).all(), (
+            f"chunk {chunk}: gradient is not finite ({knob.grad}) -- the anchored "
+            "ratios have outrun fp32 and this dial must not ship"
+        )
+        assert float(knob.grad.abs()) > 0, f"chunk {chunk}: gradient is exactly zero"
+        print(f"\nchunk {chunk:3d}: d(loss)/d(scale) = {float(knob.grad):.6f}")

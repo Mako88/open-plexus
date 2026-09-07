@@ -1,0 +1,113 @@
+{
+  "phase": 3,
+  "kind": "chunked-wkv7",
+  "taken_at": "2026-09-07T15:32:59.994454+00:00",
+  "what": "whether the chunked recurrence is the same forward, and how much faster",
+  "would_refute": "the chunked path disagreeing with the token-at-a-time loop by more than the loop's own disagreement with the rwkv package's reference; or a training step that is not several times faster, since Phase 3 needs an order of magnitude and not a factor",
+  "core": "rwkv7-g1d-0.4b-20260210-ctx8192 [cuda fp32]",
+  "size_b": 0.4,
+  "tokens": 512,
+  "loop_forward_s": 3.7583,
+  "loop_vs_reference_relative": 1.9067229238909617e-06,
+  "loop_state_vs_reference": 0.0,
+  "chunks": [
+    {
+      "chunk": 8,
+      "forward_s": 2.1375,
+      "speedup_vs_loop": 1.76,
+      "vs_loop_relative": 9.533614619454808e-07,
+      "vs_reference_relative": 2.00205907008551e-06,
+      "state_vs_reference": 0.000225067138671875,
+      "argmax_agrees": true,
+      "worst_amplification": 6.169349193572998,
+      "smallest_anchor": 0.048187505453825,
+      "inside_the_loops_own_error": true
+    },
+    {
+      "chunk": 16,
+      "forward_s": 1.0879,
+      "speedup_vs_loop": 3.45,
+      "vs_loop_relative": 1.001029535042755e-06,
+      "vs_reference_relative": 1.6207144853073175e-06,
+      "state_vs_reference": 0.00017547607421875,
+      "argmax_agrees": true,
+      "worst_amplification": 69.80584716796875,
+      "smallest_anchor": 0.004258748609572649,
+      "inside_the_loops_own_error": true
+    },
+    {
+      "chunk": 32,
+      "forward_s": 0.5729,
+      "speedup_vs_loop": 6.56,
+      "vs_loop_relative": 9.533614619454808e-07,
+      "vs_reference_relative": 2.097395216280058e-06,
+      "state_vs_reference": 0.0001678466796875,
+      "argmax_agrees": true,
+      "worst_amplification": 8937.099609375,
+      "smallest_anchor": 3.326420846860856e-05,
+      "inside_the_loops_own_error": true
+    },
+    {
+      "chunk": 64,
+      "forward_s": 0.3172,
+      "speedup_vs_loop": 11.85,
+      "vs_loop_relative": 9.056933888482068e-07,
+      "vs_reference_relative": 1.6207144853073175e-06,
+      "state_vs_reference": 0.0001678466796875,
+      "argmax_agrees": true,
+      "worst_amplification": 146489408.0,
+      "smallest_anchor": 2.029399759351236e-09,
+      "inside_the_loops_own_error": true
+    },
+    {
+      "chunk": 128,
+      "forward_s": 0.1859,
+      "speedup_vs_loop": 20.22,
+      "vs_loop_relative": 1.096365681237303e-06,
+      "vs_reference_relative": 1.3347060467236732e-06,
+      "state_vs_reference": 0.000164031982421875,
+      "argmax_agrees": true,
+      "worst_amplification": 3.935734083878912e+16,
+      "smallest_anchor": 7.553510605730054e-18,
+      "inside_the_loops_own_error": true
+    }
+  ],
+  "training": [
+    {
+      "chunk": 0,
+      "step_s": 31.691,
+      "tokens_per_s": 16.2,
+      "gradient_finite": true
+    },
+    {
+      "chunk": 8,
+      "step_s": 16.065,
+      "tokens_per_s": 31.9,
+      "gradient_finite": true
+    },
+    {
+      "chunk": 16,
+      "step_s": 8.694,
+      "tokens_per_s": 58.9,
+      "gradient_finite": true
+    },
+    {
+      "chunk": 32,
+      "step_s": 4.324,
+      "tokens_per_s": 118.4,
+      "gradient_finite": true
+    },
+    {
+      "chunk": 64,
+      "step_s": 2.831,
+      "tokens_per_s": 180.9,
+      "gradient_finite": true
+    },
+    {
+      "chunk": 128,
+      "step_s": 1.653,
+      "tokens_per_s": 309.8,
+      "gradient_finite": false
+    }
+  ]
+}

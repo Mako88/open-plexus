@@ -151,13 +151,25 @@ class DifferentiableRwkv7:
         return self.adapter(name, base) if self.adapter else base
 
     def forward(
-        self, tokens: list[int], state: list[torch.Tensor] | None = None
+        self,
+        tokens: list[int],
+        state: list[torch.Tensor] | None = None,
+        checkpoint: bool = False,
     ) -> tuple[torch.Tensor, list[torch.Tensor]]:
         """Logits for every position, and the state after. Graph intact.
 
         Returns ALL positions rather than only the last, because a training loss
         is over the whole sequence and recomputing it would double the cost of
         the thing Phase 3 spends its time on.
+
+        `checkpoint` TRADES COMPUTE FOR MEMORY AND PHASE 3 WILL NEED IT. The
+        recurrence is a loop over T and autograd keeps every intermediate state:
+        at 1.5B that is 32 heads x 64 x 64 floats per token per layer, about 6 GB
+        for a 512-token sequence over 24 layers, which does not fit beside the
+        model on an 11 GB card. With this on, each layer is recomputed during the
+        backward pass instead of stored -- roughly double the forward cost for a
+        graph that fits. Off by default because inference does not need it and
+        paying it there would be free money burned.
         """
         z = {name: self._w(name) for name in self.z}
         x = z["emb.weight"][tokens]
@@ -172,10 +184,20 @@ class DifferentiableRwkv7:
             xx = F.layer_norm(
                 x, (self.n_embd,), weight=z[bbb + "ln1.weight"], bias=z[bbb + "ln1.bias"]
             )
-            xx, xp, s, v_first = time_mix(
-                xx, state[i * 3 + 0], v_first, state[i * 3 + 1],
-                z, att, i, self.n_head, self.head_size,
-            )
+            if checkpoint and torch.is_grad_enabled():
+                from torch.utils.checkpoint import checkpoint as _ckpt
+
+                xx, xp, s, v_first = _ckpt(
+                    time_mix,
+                    xx, state[i * 3 + 0], v_first, state[i * 3 + 1],
+                    z, att, i, self.n_head, self.head_size,
+                    use_reentrant=False,
+                )
+            else:
+                xx, xp, s, v_first = time_mix(
+                    xx, state[i * 3 + 0], v_first, state[i * 3 + 1],
+                    z, att, i, self.n_head, self.head_size,
+                )
             new_state[i * 3 + 0], new_state[i * 3 + 1] = xp, s
             x = x + xx
 

@@ -203,6 +203,40 @@ PREAMBLES: dict[str, str] = {
         "User: Where does the ladder live?"
         f"{SEPARATOR}{CORE_PREFIX} You have not told me.{SEPARATOR}"
     ),
+    # THE CONTROL `v3-identity` SHOULD HAVE BEEN, written after it was refuted
+    # on all five seeds and after its own comment turned out to be wrong: `v3`
+    # claimed to change only who the replying party is told it is, and in fact
+    # also dropped the concrete task framing and tripled the instruction from 25
+    # words to 62. Either of those predicts the result on its own.
+    #
+    # THIS ONE REALLY DOES CHANGE ONE THING. It is `v2-example` verbatim -- same
+    # task framing, same brevity instruction, same honesty instruction, same
+    # four-turn worked example, same kettle outside the generator's vocabulary --
+    # with ONE CLAUSE ADDED and nothing removed. Thirteen words, not thirty-seven.
+    #
+    # WHAT EACH OUTCOME MEANS, before it runs. Landing with `v2-example` means
+    # the identity framing is free and `v3`'s collapse was instruction load, so
+    # John can have the framing for nothing. Landing with `v3-identity` means the
+    # framing itself costs about a quarter of the score and eleven points of
+    # invention, which is a real trade and his to weigh rather than mine.
+    #
+    # THE CLAUSE IS TRUE, which is the constraint that governs every word here.
+    # It says what the thing is and does not say its memory is complete, because
+    # the memory is a fixed-size state that loses things -- and the false version
+    # of that sentence is exactly what would drive the invention rate up.
+    "v4-identity-minimal": (
+        "User: You are a continuing mind with one memory, not a chat assistant "
+        "answering separate queries. I am going to tell you things about my "
+        "home. Remember them. Answer questions in a few words, and say so if I "
+        "have not told you."
+        f"{SEPARATOR}{CORE_PREFIX} Ready.{SEPARATOR}"
+        "User: The kettle lives on the third shelf."
+        f"{SEPARATOR}{CORE_PREFIX} Noted.{SEPARATOR}"
+        "User: Where does the kettle live?"
+        f"{SEPARATOR}{CORE_PREFIX} On the third shelf.{SEPARATOR}"
+        "User: Where does the ladder live?"
+        f"{SEPARATOR}{CORE_PREFIX} You have not told me.{SEPARATOR}"
+    ),
 }
 
 PREAMBLE = PREAMBLES["v2-example"]

@@ -80,7 +80,20 @@ def test_the_exam_exists_and_has_taken_the_first_reading():
     missing = has("sylvatica.exam", "House", "Tier", "run_exam", "blind_baseline",
                   "full_context_baseline")
     assert not missing, f"sylvatica.exam is missing {missing}"
-    assert readings_of("exam", phase=1), "no phase-1 exam reading committed"
+
+    readings = readings_of("exam", phase=1)
+    assert readings, "no phase-1 exam reading committed"
+
+    # BOTH BASELINES, OR IT IS NOT THE READING THE DOC ASKED FOR. Standing
+    # objection 8 says the full-context control costs hours and that the real
+    # risk is a session quietly running arms without it. This is where that gets
+    # caught: a Tier A reading against blind alone leaves Phase 1 red, and says
+    # so, instead of closing the phase on half a comparison.
+    complete = [r for r in readings if "full-context" in r.get("baselines", [])]
+    assert complete, (
+        f"{len(readings)} phase-1 reading(s) committed, none with the "
+        "full-context baseline run beside the arm"
+    )
 
 
 # ---------------------------------------------------------------------------

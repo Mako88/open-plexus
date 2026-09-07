@@ -13,6 +13,6 @@ test has not escaped it. `tests/outstanding` asks for `IdleScheduler` and for a
 24-hour unattended reading, in that order.
 """
 
-from .turn import Answered, take_turn
+from .turn import PREAMBLE, Answered, prime, take_turn
 
-__all__ = ["Answered", "take_turn"]
+__all__ = ["PREAMBLE", "Answered", "prime", "take_turn"]

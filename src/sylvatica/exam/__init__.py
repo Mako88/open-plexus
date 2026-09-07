@@ -1,4 +1,9 @@
-"""`exam` -- the instrument. PROTOCOL ONLY; the worlds and the tiers are Phase 1.
+"""`exam` -- the instrument. The types are here; the machinery is in the modules below.
+
+`world` generates a house, `baselines` holds the two controls, `run` holds the
+conversation and scores it. Tier A runs today. Tiers B and C RAISE rather than
+falling back to A, because a Tier B reading that was secretly Tier A is the most
+expensive wrong number this branch could produce.
 
 THE INSTRUMENT IS BUILT BEFORE THE THING IT MEASURES, and that ordering is the
 whole of Phase 1. The two earlier branches lost to a rule that never looked at
@@ -92,7 +97,8 @@ class Score:
     tier: Tier
     correct: int
     asked: int
-    invented: int  # answers given to negatives
+    invented: int  # answers made up for questions nobody was told the answer to
+    echoed: int  # the question handed back instead of answered
     by_delay: dict[int, float] = field(default_factory=dict)
     by_kind: dict[str, float] = field(default_factory=dict)
 
@@ -107,4 +113,40 @@ class Baseline(Protocol):
     def answer(self, question: Question, house: House) -> str: ...
 
 
-__all__ = ["Baseline", "Fact", "House", "Question", "Score", "Tier"]
+# IMPORTED AT THE BOTTOM BECAUSE `world`, `baselines` AND `run` IMPORT THE TYPES
+# ABOVE FROM THIS MODULE. The types are the protocol layer and the three modules
+# are what implement against it, so the cycle only resolves in this direction.
+from .baselines import (
+    BlindBaseline,
+    FullContextBaseline,
+    blind_baseline,
+    estimate_full_context_tokens,
+    full_context_baseline,
+    is_refusal,
+)
+from .run import ExamResult, judge, run_blind, run_exam, run_full_context
+from .world import DEFAULT_DELAYS, Generated, generate_house, questions_at
+
+__all__ = [
+    "DEFAULT_DELAYS",
+    "Baseline",
+    "BlindBaseline",
+    "ExamResult",
+    "Fact",
+    "FullContextBaseline",
+    "Generated",
+    "House",
+    "Question",
+    "Score",
+    "Tier",
+    "blind_baseline",
+    "estimate_full_context_tokens",
+    "full_context_baseline",
+    "generate_house",
+    "is_refusal",
+    "judge",
+    "questions_at",
+    "run_blind",
+    "run_exam",
+    "run_full_context",
+]

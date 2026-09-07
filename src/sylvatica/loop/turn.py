@@ -73,8 +73,90 @@ class Answered:
     core_turn: Turn
 
 
+# THE PREAMBLE IS FED ONCE INTO A FRESH STATE AND IS NEVER RE-SENT.
+#
+# WHY IT EXISTS, AND IT IS A FINDING RATHER THAN A PREFERENCE. The first Tier A
+# reading on the doc's own house -- 50 facts, 300 turns, 1.5B -- scored 0.008,
+# including 0.00 at delay ONE, which is a fact told a single turn earlier. That
+# is not a memory result; it is a framing fault. Reading the answers showed the
+# core had decided it was doing literary criticism: "Vrearndreas is a character
+# from the text, but it's not clear what his profession is", and, asked how many
+# lanterns were in the cellar, "the number of lanterns can symbolize various
+# things". A stream of unattributed statements looks like a passage to analyse,
+# so that is what it analysed.
+#
+# THE SCORE WAS THEREFORE MEASURING THE HARNESS AND REPORTING IT AS THE CORE.
+# Its verdict field said the core choice was refuted. It was not: nothing about
+# a recurrent state had been tested.
+#
+# TWO SENTENCES DO THE WORK, and each is doing a job named in the design doc:
+# telling it these are things it is being TOLD serves complaint 4; asking for a
+# few words serves complaint 5, where time is cheap and words are not; and the
+# instruction to decline what it was not told is what makes the exam's negatives
+# a fair question rather than a trick.
+#
+# IT IS A DIAL AND EVERY READING RECORDS IT. Standing objection 2 says this
+# format was never verified against the G1 tune, and that objection is now
+# sharper rather than settled -- the preamble helps, and nobody has measured
+# which of its clauses is carrying the result.
+PREAMBLE = (
+    "User: I am going to tell you things about my home and the people in it. "
+    "Remember them. When I ask you a question, answer in a few words. "
+    "If I have not told you the answer, say that you do not know."
+    f"{SEPARATOR}{CORE_PREFIX} Understood. I will remember what you tell me, "
+    f"answer briefly, and say when I do not know.{SEPARATOR}"
+)
+
+
+def prime(core: Any, state: Any | None = None) -> tuple[Any, Cost]:
+    """Feed the preamble into a fresh state. Called once, when a thread begins.
+
+    Not on every turn. The whole claim of this branch is that what was said
+    stays in the state without being re-sent, and a preamble re-sent each turn
+    would be the first crack in it.
+    """
+    return core.feed(core.encode(PREAMBLE), state)
+
+
 def format_prompt(text: str) -> str:
     return f"{USER_PREFIX}{text.strip()}{SEPARATOR}{CORE_PREFIX}"
+
+
+def say(
+    core: Any,
+    state: Any | None,
+    text: str,
+    budget: int,
+    sampling: Sampling | None = None,
+) -> tuple[str, Any, Cost]:
+    """One exchange against a state: prompt, generate, and CLOSE THE TURN.
+
+    THE CLOSE IS THE PART THAT WAS MISSING AND IT COST A WHOLE READING.
+    `generate` stops at a budget or a stop string, and in neither case does the
+    separator that ends an assistant's turn get fed back. So the state ended
+    mid-utterance, and the next turn appended "User: ..." directly onto it. What
+    the core's memory actually contained, after forty turns, was:
+
+        Assistant: an answer that stops abruptly midUser: the next thing said
+
+    A MALFORMED DIALOGUE IS A PATTERN, AND A RECURRENT MODEL LEARNS PATTERNS IN
+    CONTEXT. By the end of a short house the core had inferred that what follows
+    "Assistant:" is a User line, and it began answering questions by REPEATING
+    THEM BACK VERBATIM: asked "What colour are the cracked plates?", it replied
+    "What colour are the cracked plates?". Scored 0.0, and it looks exactly like
+    a state that has forgotten everything.
+
+    THE FAILURE GREW WITH THE CONVERSATION, which is why nothing caught it
+    earlier: three turns in the Phase 0 restart demo were fine, forty turns were
+    ruined. A defect that only appears at the length the exam runs at, in the
+    one component the exam cannot see inside.
+    """
+    sampling = sampling or Sampling(stop_strings=STOP_STRINGS)
+    tokens = core.encode(format_prompt(text))
+    out, state, cost = core.generate(tokens, state, budget, sampling)
+    answer = trim_at_stop(core.decode(out), sampling.stop_strings)
+    state, closing = core.feed(core.encode(SEPARATOR), state)
+    return answer, state, cost + closing
 
 
 def trim_at_stop(text: str, stop_strings: tuple[str, ...]) -> str:
@@ -116,13 +198,10 @@ def take_turn(
     """
     sampling = sampling or Sampling(stop_strings=STOP_STRINGS)
     index = thread.next_index
-
-    prompt = format_prompt(text)
-    prompt_tokens = core.encode(prompt)
+    prompt_tokens = core.encode(format_prompt(text))
 
     started = time.time()
-    out_tokens, state, cost = core.generate(prompt_tokens, state, budget, sampling)
-    answer = trim_at_stop(core.decode(out_tokens), sampling.stop_strings)
+    answer, state, cost = say(core, state, text, budget, sampling)
 
     user_turn = thread.append(
         Turn(
@@ -138,7 +217,7 @@ def take_turn(
             index=index + 1,
             role="core",
             text=answer,
-            tokens=len(out_tokens),
+            tokens=cost.tokens_out,
             at=time.time(),
             seconds=cost.seconds,
             flops=cost.flops,

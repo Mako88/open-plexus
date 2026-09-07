@@ -139,17 +139,16 @@ OBJECTIONS: list[Objection] = [
             "and the doc says it runs beside EVERY arm."
         ),
         why=(
-            "It is the right control and the arithmetic is now measured rather "
-            "than assumed. Prefill runs 157 tok/s at 1.5B. A 300-turn house at "
-            "roughly 70 tokens a turn makes the baseline re-feed the sum of "
-            "1..300 turns of transcript -- about 3.2 million tokens, near six "
-            "GPU-hours, against about ten minutes for the Tier A arm it is a "
-            "control for. THIRTY-FOUR TIMES THE ARM, on a card that is also "
-            "wanted for consolidation, and one that is shared. The risk is not "
-            "that it is expensive; it is that a session under time pressure "
-            "quietly runs the arm without it, which is precisely how the two "
-            "earlier branches came to be beaten by a rule nobody had plotted "
-            "against."
+            "It is the right control and the arithmetic is measured, not "
+            "assumed. `estimate_full_context_tokens` on the doc's own Phase 1 "
+            "house -- 50 facts, 300 turns, 270 questions -- says 1.51 million "
+            "tokens, about 2.7 GPU-hours at the measured 157 tok/s. The Tier A "
+            "arm on the same house is roughly two minutes of core time. EIGHTY "
+            "TIMES THE ARM, on a card that is shared and is also wanted for "
+            "consolidation. The risk is not that it is expensive; it is that a "
+            "session under time pressure quietly runs the arm without it, which "
+            "is precisely how the two earlier branches came to be beaten by a "
+            "rule nobody had plotted against."
         ),
         settled_by=(
             "Run it once at 1.5B on the real Phase 1 house and record the wall "

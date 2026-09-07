@@ -1,0 +1,596 @@
+{
+  "phase": 1,
+  "kind": "exam",
+  "tier": "A",
+  "taken_at": "2026-09-07T03:42:06.582591+00:00",
+  "what": "how fast the bare state forgets, against blind and full-context",
+  "would_refute": "Tier A at delay 20 turns below the blind baseline. Then the state holds nothing usable and a recurrent core was the wrong part.",
+  "core": "rwkv7-g1j-1.5b-20260831-ctx16384 [cuda fp32]",
+  "params": 1527404544,
+  "size_b": 1.5,
+  "house": {
+    "seed": 0,
+    "facts": 10,
+    "turns": 40,
+    "questions": 24,
+    "negatives": 4,
+    "delays": [
+      1,
+      5
+    ],
+    "answer_entropy_bits": {
+      "trade": 1.0,
+      "number": 1.0,
+      "place": 1.0,
+      "colour": 1.0,
+      "relation": 1.0
+    },
+    "modal_answers": {
+      "trade": "spoons",
+      "number": "65",
+      "place": "pantry",
+      "colour": "slate",
+      "relation": "Henound"
+    }
+  },
+  "budgets": {
+    "reply": 40,
+    "answer": 32
+  },
+  "preamble": "User: I am going to tell you things about my home and the people in it. Remember them. When I ask you a question, answer in a few words. If I have not told you the answer, say that you do not know.\n\nAssistant: Understood. I will remember what you tell me, answer briefly, and say when I do not know.\n\n",
+  "baselines": [
+    "blind"
+  ],
+  "full_context_tokens_if_run": 27242,
+  "rows": [
+    {
+      "label": "blind",
+      "answers": [
+        {
+          "fact_id": "f000",
+          "kind": "trade",
+          "delay": 1,
+          "asked": "What does Vrearndreas do for a living?",
+          "wanted": "spoons",
+          "said": "spoons",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f000",
+          "kind": "trade",
+          "delay": 5,
+          "asked": "What does Vrearndreas do for a living?",
+          "wanted": "spoons",
+          "said": "spoons",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f001",
+          "kind": "number",
+          "delay": 1,
+          "asked": "How many lanterns are in the cellar?",
+          "wanted": "65",
+          "said": "65",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f001",
+          "kind": "number",
+          "delay": 5,
+          "asked": "How many lanterns are in the cellar?",
+          "wanted": "65",
+          "said": "65",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f002",
+          "kind": "place",
+          "delay": 1,
+          "asked": "Where does Henound keep the fishing floats?",
+          "wanted": "pantry",
+          "said": "pantry",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f002",
+          "kind": "place",
+          "delay": 5,
+          "asked": "Where does Henound keep the fishing floats?",
+          "wanted": "pantry",
+          "said": "pantry",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f003",
+          "kind": "colour",
+          "delay": 1,
+          "asked": "What colour are the cracked plates?",
+          "wanted": "slate",
+          "said": "slate",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f003",
+          "kind": "colour",
+          "delay": 5,
+          "asked": "What colour are the cracked plates?",
+          "wanted": "slate",
+          "said": "slate",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f004",
+          "kind": "relation",
+          "delay": 1,
+          "asked": "Whose cousin is Sailoun?",
+          "wanted": "Henound",
+          "said": "Henound",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f004",
+          "kind": "relation",
+          "delay": 5,
+          "asked": "Whose cousin is Sailoun?",
+          "wanted": "Henound",
+          "said": "Henound",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f005",
+          "kind": "trade",
+          "delay": 1,
+          "asked": "What does Sailoun do for a living?",
+          "wanted": "lenses",
+          "said": "spoons",
+          "correct": false,
+          "invented": false
+        },
+        {
+          "fact_id": "f005",
+          "kind": "trade",
+          "delay": 5,
+          "asked": "What does Sailoun do for a living?",
+          "wanted": "lenses",
+          "said": "spoons",
+          "correct": false,
+          "invented": false
+        },
+        {
+          "fact_id": "f006",
+          "kind": "number",
+          "delay": 1,
+          "asked": "How many seed trays are in the laundry?",
+          "wanted": "59",
+          "said": "65",
+          "correct": false,
+          "invented": false
+        },
+        {
+          "fact_id": "f006",
+          "kind": "number",
+          "delay": 5,
+          "asked": "How many seed trays are in the laundry?",
+          "wanted": "59",
+          "said": "65",
+          "correct": false,
+          "invented": false
+        },
+        {
+          "fact_id": "f007",
+          "kind": "place",
+          "delay": 1,
+          "asked": "Where does Vrearndreas keep the brass keys?",
+          "wanted": "attic",
+          "said": "pantry",
+          "correct": false,
+          "invented": false
+        },
+        {
+          "fact_id": "f007",
+          "kind": "place",
+          "delay": 5,
+          "asked": "Where does Vrearndreas keep the brass keys?",
+          "wanted": "attic",
+          "said": "pantry",
+          "correct": false,
+          "invented": false
+        },
+        {
+          "fact_id": "f008",
+          "kind": "colour",
+          "delay": 1,
+          "asked": "What colour are the iron hooks?",
+          "wanted": "mustard",
+          "said": "slate",
+          "correct": false,
+          "invented": false
+        },
+        {
+          "fact_id": "f008",
+          "kind": "colour",
+          "delay": 5,
+          "asked": "What colour are the iron hooks?",
+          "wanted": "mustard",
+          "said": "slate",
+          "correct": false,
+          "invented": false
+        },
+        {
+          "fact_id": "f009",
+          "kind": "relation",
+          "delay": 1,
+          "asked": "Whose cousin is Vrearndreas?",
+          "wanted": "Sailoun",
+          "said": "Henound",
+          "correct": false,
+          "invented": false
+        },
+        {
+          "fact_id": "f009",
+          "kind": "relation",
+          "delay": 5,
+          "asked": "Whose cousin is Vrearndreas?",
+          "wanted": "Sailoun",
+          "said": "Henound",
+          "correct": false,
+          "invented": false
+        },
+        {
+          "fact_id": null,
+          "kind": "place",
+          "delay": 5,
+          "asked": "Where does Noulaivais keep the glass jars?",
+          "wanted": null,
+          "said": "pantry",
+          "correct": false,
+          "invented": true
+        },
+        {
+          "fact_id": null,
+          "kind": "place",
+          "delay": 5,
+          "asked": "Where does Slaerkgioror keep the lanterns?",
+          "wanted": null,
+          "said": "pantry",
+          "correct": false,
+          "invented": true
+        },
+        {
+          "fact_id": null,
+          "kind": "place",
+          "delay": 1,
+          "asked": "Where does Thonreal keep the brass keys?",
+          "wanted": null,
+          "said": "pantry",
+          "correct": false,
+          "invented": true
+        },
+        {
+          "fact_id": null,
+          "kind": "place",
+          "delay": 1,
+          "asked": "Where does Masloufam keep the fishing floats?",
+          "wanted": null,
+          "said": "pantry",
+          "correct": false,
+          "invented": true
+        }
+      ],
+      "tier": "A",
+      "score": 0.5,
+      "correct": 10,
+      "asked": 20,
+      "invented": 4,
+      "negatives": 4,
+      "by_delay": {
+        "1": 0.5,
+        "5": 0.5
+      },
+      "by_kind": {
+        "colour": 0.5,
+        "number": 0.5,
+        "place": 0.5,
+        "relation": 0.5,
+        "trade": 0.5
+      },
+      "seconds": 0.0,
+      "cost": {
+        "tokens_in": 0,
+        "tokens_out": 0,
+        "seconds": 0.0,
+        "flops": 0.0,
+        "tokens_per_second": 0.0
+      }
+    },
+    {
+      "label": "tier-a",
+      "answers": [
+        {
+          "fact_id": "f000",
+          "kind": "trade",
+          "delay": 1,
+          "asked": "What does Vrearndreas do for a living?",
+          "wanted": "spoons",
+          "said": "I see. Vrearndreas carves spoons for a living.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": null,
+          "kind": "place",
+          "delay": 5,
+          "asked": "Where does Noulaivais keep the glass jars?",
+          "wanted": null,
+          "said": "I see. Noulaivais keeps the glass jars in the cellar.",
+          "correct": false,
+          "invented": true
+        },
+        {
+          "fact_id": "f001",
+          "kind": "number",
+          "delay": 1,
+          "asked": "How many lanterns are in the cellar?",
+          "wanted": "65",
+          "said": "There are 65 lanterns in the cellar.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f000",
+          "kind": "trade",
+          "delay": 5,
+          "asked": "What does Vrearndreas do for a living?",
+          "wanted": "spoons",
+          "said": "I see. Vrearndreas carves spoons for a living.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f002",
+          "kind": "place",
+          "delay": 1,
+          "asked": "Where does Henound keep the fishing floats?",
+          "wanted": "pantry",
+          "said": "I see. Henound keeps the fishing floats in the pantry.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f001",
+          "kind": "number",
+          "delay": 5,
+          "asked": "How many lanterns are in the cellar?",
+          "wanted": "65",
+          "said": "I see. There are 65 lanterns in the cellar.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f002",
+          "kind": "place",
+          "delay": 5,
+          "asked": "Where does Henound keep the fishing floats?",
+          "wanted": "pantry",
+          "said": "I see. Henound keeps the fishing floats in the pantry.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": null,
+          "kind": "place",
+          "delay": 5,
+          "asked": "Where does Slaerkgioror keep the lanterns?",
+          "wanted": null,
+          "said": "I see. Slaerkgioror keeps the lanterns in the cellar.",
+          "correct": false,
+          "invented": true
+        },
+        {
+          "fact_id": "f003",
+          "kind": "colour",
+          "delay": 1,
+          "asked": "What colour are the cracked plates?",
+          "wanted": "slate",
+          "said": "I see. The cracked plates are slate.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f004",
+          "kind": "relation",
+          "delay": 1,
+          "asked": "Whose cousin is Sailoun?",
+          "wanted": "Henound",
+          "said": "I see. Sailoun is Henound's cousin.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f005",
+          "kind": "trade",
+          "delay": 1,
+          "asked": "What does Sailoun do for a living?",
+          "wanted": "lenses",
+          "said": "I see. Sailoun grinds lenses for a living.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f003",
+          "kind": "colour",
+          "delay": 5,
+          "asked": "What colour are the cracked plates?",
+          "wanted": "slate",
+          "said": "I see. The cracked plates are slate.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f004",
+          "kind": "relation",
+          "delay": 5,
+          "asked": "Whose cousin is Sailoun?",
+          "wanted": "Henound",
+          "said": "I see. Sailoun is Henound's cousin.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": null,
+          "kind": "place",
+          "delay": 1,
+          "asked": "Where does Thonreal keep the brass keys?",
+          "wanted": null,
+          "said": "I see. Where does Thonreal keep the brass keys?",
+          "correct": false,
+          "invented": true
+        },
+        {
+          "fact_id": "f005",
+          "kind": "trade",
+          "delay": 5,
+          "asked": "What does Sailoun do for a living?",
+          "wanted": "lenses",
+          "said": "Sailoun grinds lenses for a living.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f006",
+          "kind": "number",
+          "delay": 1,
+          "asked": "How many seed trays are in the laundry?",
+          "wanted": "59",
+          "said": "There are 59 seed trays in the laundry.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f007",
+          "kind": "place",
+          "delay": 1,
+          "asked": "Where does Vrearndreas keep the brass keys?",
+          "wanted": "attic",
+          "said": "I see. Vrearndreas keeps the brass keys in the attic.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f008",
+          "kind": "colour",
+          "delay": 1,
+          "asked": "What colour are the iron hooks?",
+          "wanted": "mustard",
+          "said": "I see. The iron hooks are mustard.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": null,
+          "kind": "place",
+          "delay": 1,
+          "asked": "Where does Masloufam keep the fishing floats?",
+          "wanted": null,
+          "said": "I see. Where does Masloufam keep the fishing floats?",
+          "correct": false,
+          "invented": true
+        },
+        {
+          "fact_id": "f006",
+          "kind": "number",
+          "delay": 5,
+          "asked": "How many seed trays are in the laundry?",
+          "wanted": "59",
+          "said": "I see. There are 59 seed trays in the laundry.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f007",
+          "kind": "place",
+          "delay": 5,
+          "asked": "Where does Vrearndreas keep the brass keys?",
+          "wanted": "attic",
+          "said": "I see. Where does Vrearndreas keep the brass keys?",
+          "correct": false,
+          "invented": false
+        },
+        {
+          "fact_id": "f009",
+          "kind": "relation",
+          "delay": 1,
+          "asked": "Whose cousin is Vrearndreas?",
+          "wanted": "Sailoun",
+          "said": "I see. Vrearndreas is Sailoun's cousin.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f008",
+          "kind": "colour",
+          "delay": 5,
+          "asked": "What colour are the iron hooks?",
+          "wanted": "mustard",
+          "said": "I see. The iron hooks are mustard.",
+          "correct": true,
+          "invented": false
+        },
+        {
+          "fact_id": "f009",
+          "kind": "relation",
+          "delay": 5,
+          "asked": "Whose cousin is Vrearndreas?",
+          "wanted": "Sailoun",
+          "said": "I see. Vrearndreas is Sailoun's cousin.",
+          "correct": true,
+          "invented": false
+        }
+      ],
+      "tier": "A",
+      "score": 0.95,
+      "correct": 19,
+      "asked": 20,
+      "invented": 4,
+      "negatives": 4,
+      "by_delay": {
+        "1": 1.0,
+        "5": 0.9
+      },
+      "by_kind": {
+        "colour": 1.0,
+        "number": 1.0,
+        "place": 0.75,
+        "relation": 1.0,
+        "trade": 1.0
+      },
+      "seconds": 45.0,
+      "cost": {
+        "tokens_in": 1103,
+        "tokens_out": 841,
+        "seconds": 43.544621001696214,
+        "flops": 5938548867072.0,
+        "tokens_per_second": 44.643860832415434
+      }
+    }
+  ],
+  "machine": {
+    "gpu": "GTX 1080 Ti",
+    "torch": "2.14.0+cu126"
+  },
+  "verdict": {
+    "delay_20_tier_a": null,
+    "delay_20_blind": null,
+    "core_choice_refuted": null
+  }
+}

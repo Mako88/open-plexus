@@ -25,7 +25,7 @@ from ..core.base import Meter
 from ..core.checkpoints import ensure
 from ..core.rwkv_core import RwkvCore
 from ..core.thread import DEFAULT_THREAD, Thread
-from .turn import DEFAULT_BUDGET, take_turn
+from .turn import DEFAULT_BUDGET, prime, take_turn
 
 
 def build(size: float, thread_name: str, fresh: bool) -> tuple[RwkvCore, Thread, object]:
@@ -35,8 +35,12 @@ def build(size: float, thread_name: str, fresh: bool) -> tuple[RwkvCore, Thread,
     thread = Thread(thread_name)
 
     if fresh or not thread.exists:
-        state = None
-        where = "fresh state"
+        # A FRESH STATE IS PRIMED ONCE AND A RESUMED ONE IS NOT. The preamble is
+        # already inside a state that was saved after any turn, and feeding it
+        # again on every start would be re-sending -- in miniature, the exact
+        # thing this branch exists to stop doing.
+        state, _ = prime(core)
+        where = "fresh state, primed"
     else:
         state = thread.load(core)
         where = f"resumed {thread.state_path} ({core.state_bytes(state) / 1e6:.1f} MB)"

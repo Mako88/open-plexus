@@ -24,12 +24,27 @@ WOULD REFUTE THE PHASE 1 VERDICT AS READABLE AT ALL: a Tier A spread at delay 20
 wider than the gap between Tier A and blind. Then one house cannot settle the
 question and the exit needs several, which is a finding about the INSTRUMENT and
 belongs in the commit that finds it.
+
+THE SECOND CRITERION IS PAIRED AND IS PRE-REGISTERED HERE, which the first one
+was not. Blind and Tier A are measured on THE SAME houses, so their difference is
+paired and the pairing removes most of the between-house variance -- comparing a
+mean gap to the full min-max range, as the criterion above does, throws that
+away. I noticed it only after the range criterion had already failed, which is
+exactly how a threshold becomes a prediction dressed as a check, so the range
+criterion was left standing and this went in beside it as an extra column.
+
+ITS BAR, NAMED BEFORE THE RUN IT WILL JUDGE: Tier A beats blind at a delay if
+the mean per-house difference is positive AND larger than the standard error of
+that difference. In words: more houses agreed than disagreed, by more than they
+disagreed among themselves.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import math
+import statistics
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -132,6 +147,39 @@ def main() -> int:
             "gap_exceeds_noise": abs(gap) > by_delay[d]["range"],
         }
 
+    # AND THE PAIRED TEST, PRE-REGISTERED THIS TIME.
+    #
+    # The criterion above compares a mean gap to the full min-max RANGE, which is
+    # crude: blind and Tier A are measured on THE SAME HOUSES, so the difference
+    # is paired and the pairing removes most of the between-house variance. I
+    # noticed that after the first run failed it, which is how a threshold turns
+    # into a prediction dressed as a check -- so it went in as an extra column
+    # and the original criterion kept standing.
+    #
+    # THIS IS THE HONEST VERSION: the paired statistic is written here BEFORE the
+    # run it will judge, with its bar named. Tier A beats blind at a delay if the
+    # mean per-house difference is positive and larger than the standard error of
+    # that difference -- which is what "more houses agreed than disagreed, by more
+    # than they disagreed among themselves" means arithmetically.
+    paired = {}
+    for d in delays:
+        diffs = [
+            r["tier_a_by_delay"][d] - r["blind_by_delay"][d]
+            for r in runs
+            if d in r["tier_a_by_delay"] and d in r["blind_by_delay"]
+        ]
+        if len(diffs) < 2:
+            continue
+        mean = statistics.fmean(diffs)
+        sem = statistics.stdev(diffs) / math.sqrt(len(diffs))
+        paired[d] = {
+            "n_houses": len(diffs),
+            "mean_difference": round(mean, 4),
+            "standard_error": round(sem, 4),
+            "houses_above_blind": sum(x > 0 for x in diffs),
+            "beats_blind": mean > sem > 0,
+        }
+
     reading = {
         "phase": 1,
         "kind": "exam-noise",
@@ -159,6 +207,7 @@ def main() -> int:
         "tier_a_spread_by_delay": by_delay,
         "blind_spread_by_delay": blind_by_delay,
         "verdict": readable,
+        "paired": paired,
     }
 
     args.out.mkdir(parents=True, exist_ok=True)

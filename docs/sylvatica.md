@@ -19,9 +19,9 @@ begins, and what reading would refute each bet. It says how only where a how was
 The one list a session edits at both ends. Strike what got done; write the handoff from what is
 left. Each phase has an exit that is a measurement, never a feeling.
 
-- ~~**Phase 0 — Ground.**~~ Struck 2026-09-06. Exit met: `readings/phase0-cost-*.json` and
-  `readings/phase0-restart-*.json`. One item of it is NOT done and is not Phase 0's — the old
-  C# tree is still in the working copy; see the handoff.
+- ~~**Phase 0 — Ground.**~~ Struck 2026-09-06, and its last item closed 2026-09-07 when the
+  old C# tree was deleted on John's say-so. Exit met: `readings/phase0-cost-*.json` and
+  `readings/phase0-restart-*.json`.
 - ~~**Phase 1 — Exam.**~~ Struck 2026-09-07. `readings/phase1-noise-*.json`, ten houses at
   1.5B: Tier A beats blind at EVERY delay on the pre-registered paired test, 10/10 houses at
   delays 1, 5, 20 and 150 and 9/10 at 60. Not struck on five houses, where the crude
@@ -32,6 +32,12 @@ left. Each phase has an exit that is a measurement, never a feeling.
   where all three rankers scored precision 1.000 — see the handoff.
 - **Phase 3 — Consolidation.** Replay out of the store into a LoRA adapter, regression gate,
   rollback, merge. Tier C exam. This is the bet; everything before it is scaffolding.
+  IN PROGRESS 2026-09-07. Built and verified: a differentiable RWKV-7 forward (the pip package
+  is inference-only, which the doc did not know), the LoRA, the gate, the replay mix, the
+  extractor. Measured: the machinery learns; the raw arm teaches FORM and not BINDING; the
+  extractor errs 16% and paraphrase amplifies its mistakes fourfold. NOT met: Tier C is still
+  0.0000 on every scheduled run, because at the doc's replay volume each fact is seen once or
+  twice. The open question is exposures, not plumbing.
 - **Phase 4 — Idle.** The machine runs with no input. Reflection fragments, hot and cold tiers,
   the forgetting policy.
 - **Phase 5 — Fleet.** Many nodes on one box, sharded store, deadlines, nodes vanishing. Then

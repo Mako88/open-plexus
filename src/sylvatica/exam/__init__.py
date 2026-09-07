@@ -124,7 +124,7 @@ from .baselines import (
     full_context_baseline,
     is_refusal,
 )
-from .run import ExamResult, judge, run_blind, run_exam, run_full_context
+from .run import ExamResult, is_echo, judge, run_blind, run_exam, run_full_context, spread
 from .world import DEFAULT_DELAYS, Generated, generate_house, questions_at
 
 __all__ = [
@@ -143,10 +143,12 @@ __all__ = [
     "estimate_full_context_tokens",
     "full_context_baseline",
     "generate_house",
+    "is_echo",
     "is_refusal",
     "judge",
     "questions_at",
     "run_blind",
     "run_exam",
     "run_full_context",
+    "spread",
 ]

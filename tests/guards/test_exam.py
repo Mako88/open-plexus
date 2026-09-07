@@ -299,3 +299,25 @@ def test_the_full_context_estimate_grows_with_the_house():
     small = generate_house(seed=1, n_facts=10, n_turns=60, delays=(1, 5, 20), negatives=2)
     big = generate_house(seed=1, n_facts=30, n_turns=200, delays=(1, 5, 20), negatives=2)
     assert estimate_full_context_tokens(core, big) > estimate_full_context_tokens(core, small)
+
+
+def test_spread_reports_the_range_a_gap_must_beat():
+    """The arithmetic a Phase 1 verdict rests on.
+
+    Phase 1's refutation is "Tier A at delay 20 below blind". Whether a gap of
+    0.06 counts depends on how far a Tier A score moves between houses, and that
+    comparison is made against the RANGE rather than the deviation -- a standard
+    deviation over five samples is itself noisy enough to mislead.
+    """
+    from sylvatica.exam import spread
+
+    s = spread([0.30, 0.34, 0.28, 0.31, 0.33])
+    assert s["min"] == 0.28 and s["max"] == 0.34
+    assert s["range"] == pytest.approx(0.06, abs=1e-9)
+    assert s["mean"] == pytest.approx(0.312, abs=1e-9)
+    assert s["stdev"] > 0
+
+    # One sample has no spread, and must not raise -- a single-seed run is a
+    # legitimate thing to ask for, it just cannot support a threshold.
+    one = spread([0.5])
+    assert one["range"] == 0.0 and one["stdev"] == 0.0

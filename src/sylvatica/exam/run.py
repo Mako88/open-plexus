@@ -23,6 +23,7 @@ thirty seconds of model loading each.
 
 from __future__ import annotations
 
+import statistics
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -99,6 +100,31 @@ class ExamResult:
             by_delay=by_delay,
             by_kind=by_kind,
         )
+
+
+def spread(values: list[float]) -> dict[str, float]:
+    """Min, max, mean, deviation and range over repeated runs of the same thing.
+
+    WHAT A THRESHOLD HAS TO BE COMPARED AGAINST. Phase 1's refutation is "Tier A
+    at delay 20 below blind", and blind scores 0.24 on the doc's house. Whether a
+    Tier A score of 0.30 clears that bar depends entirely on how far a Tier A
+    score moves between houses, and a verdict read off one house is a verdict
+    read off one sample. The doc already applies this rule to the regression
+    gate -- calibrate on noise first, because a threshold chosen before the noise
+    is known is a prediction dressed as a check -- and an exam threshold is no
+    different.
+
+    THE RANGE IS THE NUMBER TO COMPARE A GAP AGAINST, not the deviation. A
+    standard deviation over five samples is itself noisy enough to mislead;
+    reporting it without the min and max would hide that.
+    """
+    return {
+        "min": round(min(values), 4),
+        "max": round(max(values), 4),
+        "mean": round(statistics.fmean(values), 4),
+        "stdev": round(statistics.stdev(values), 4) if len(values) > 1 else 0.0,
+        "range": round(max(values) - min(values), 4),
+    }
 
 
 def is_echo(question_text: str, said: str) -> bool:

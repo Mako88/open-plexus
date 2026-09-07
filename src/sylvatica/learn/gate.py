@@ -86,14 +86,21 @@ def general_qa(
     only property a gate needs. A cleverer judge would be a second model whose
     own drift nobody is watching.
     """
-    import torch
-
     from ..core.base import Sampling
-    from ..core.wkv7 import DifferentiableRwkv7
     from ..loop.turn import PREAMBLE, STOP_STRINGS, format_prompt, trim_at_stop
 
-    if adapter is None:
-        # No adapter: the fast inference path, which is what the base is.
+    # ONE CODE PATH FOR BOTH, which matters more here than anywhere else in the
+    # branch. The gate compares a measurement of the base against a measurement
+    # of the adapted model; if those two numbers came from DIFFERENT
+    # implementations -- the fast inference path and the differentiable one --
+    # then any difference between the implementations would read as a
+    # regression, and the gate would roll back cycles for a reason that has
+    # nothing to do with the adapter. So the adapter is folded into the weights,
+    # both measurements run on the same fast path, and it is folded back out.
+    applied = adapter is not None
+    if applied:
+        adapter.apply_to(core._model.z)
+    try:
         state, _ = core.feed(core.encode(PREAMBLE), None)
         correct = 0
         for question, answers in GENERAL_QA:
@@ -105,27 +112,9 @@ def general_qa(
             )
             said = trim_at_stop(core.decode(out), STOP_STRINGS).lower()
             correct += any(a in said for a in answers)
-        return correct / len(GENERAL_QA), correct, len(GENERAL_QA)
-
-    model = DifferentiableRwkv7(core, adapter=adapter)
-    correct = 0
-    with torch.no_grad():
-        for question, answers in GENERAL_QA:
-            tokens = core.encode(PREAMBLE + format_prompt(question))
-            said = ""
-            state = None
-            fed = list(tokens)
-            for _ in range(budget):
-                logits, state = model.forward(fed, state)
-                nxt = int(logits[-1].argmax())
-                if nxt == 0:
-                    break
-                said += core.decode([nxt])
-                if any(s in said for s in STOP_STRINGS):
-                    break
-                fed = [nxt]
-            lowered = trim_at_stop(said, STOP_STRINGS).lower()
-            correct += any(a in lowered for a in answers)
+    finally:
+        if applied:
+            adapter.revert_from(core._model.z)
     return correct / len(GENERAL_QA), correct, len(GENERAL_QA)
 
 

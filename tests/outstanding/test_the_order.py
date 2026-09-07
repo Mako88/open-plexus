@@ -190,6 +190,36 @@ def test_the_gate_was_calibrated_on_noise_before_a_threshold_was_chosen():
     )
 
 
+def test_the_declaratives_arm_can_actually_be_run():
+    """OWED: an extractor that turns an episode window into paraphrased facts.
+
+    The doc names three training shapes and EXPECTS this one to win -- "the
+    literature says models learn facts from a handful of raw exposures badly and
+    from paraphrased declaratives much better". An expectation written in a
+    design document is not a reading, and an arm that cannot be run cannot refute
+    it.
+
+    `build_training_set(arm="declaratives")` raises today, deliberately: building
+    the expected winner before the `raw` arm has a reading would be choosing the
+    result before running the race. This closes when the extractor exists AND its
+    own refutation has been checked -- the doc's is that the extractor at 1.5B
+    produces facts wrong more than a fifth of the time, read by hand on a sample
+    of fifty.
+    """
+    import inspect
+
+    from sylvatica.learn.consolidate import build_training_set
+    from sylvatica.store import ReplaySpec, SqliteStore  # noqa: F401
+
+    source = inspect.getsource(build_training_set)
+    assert "NotImplementedError" not in source, (
+        "the declaratives arm is still a raise; the extractor is owed"
+    )
+    assert readings_of("extractor", phase=3), (
+        "no reading of the extractor's error rate on a hand-checked sample"
+    )
+
+
 def test_consolidation_exists_and_tier_c_is_above_blind():
     """OWED: LoRA over time-mix and channel-mix, replay sampling, the regression
     gate, rollback, merge every K cycles, `consolidated_at`.
@@ -198,8 +228,7 @@ def test_consolidation_exists_and_tier_c_is_above_blind():
     the store OFF, and the gate has not tripped in its last five cycles. This is
     the branch's bet and complaint 4's bar.
     """
-    missing = has("sylvatica.learn", "sample_for_replay", "LoraAdapter", "regression_gate",
-                  "merge")
+    missing = has("sylvatica.learn", "LoraAdapter", "Gate", "calibrate", "run_cycle")
     assert not missing, f"sylvatica.learn is missing {missing}"
 
     tier_c = [r for r in readings_of("exam", phase=3) if r.get("tier") == "C"]

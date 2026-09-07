@@ -21,7 +21,7 @@ from dataclasses import dataclass
 
 # The count is asserted. Change it in the same commit that changes the list, and
 # say in the message which entry left and what settled it.
-COUNT = 5
+COUNT = 6
 
 
 @dataclass(frozen=True)
@@ -32,6 +32,35 @@ class Objection:
 
 
 OBJECTIONS: list[Objection] = [
+    Objection(
+        what=(
+            "Every arm is read from ONE run per (preamble, seed), and the "
+            "readings compare those single numbers."
+        ),
+        why=(
+            "Measured 2026-09-07 while re-running `v2-example` on the same five "
+            "seeds inside one invocation: four seeds reproduced within 0.056 "
+            "and seed 1 moved 0.212, with its invention rate going from 0.80 to "
+            "0.00 -- the core declined every negative instead of fabricating. "
+            "That is a MODE FLIP, not drift, and it lands on roughly a fifth of "
+            "runs. It is the same bimodality the echo attractor showed. A single "
+            "run per cell is therefore an unbiased but very noisy estimate, and "
+            "the branch has been reading gaps of 0.05 to 0.25 off exactly such "
+            "single runs. The `v3-identity` verdict survives only because five "
+            "of five seeds moved the same way on two measures at once; a "
+            "narrower result read this way would not be safe."
+        ),
+        settled_by=(
+            "Three repeats of `v2-example` on each of five seeds, same "
+            "invocation. Report the within-cell standard deviation beside the "
+            "between-seed spread, and the fraction of runs whose invention rate "
+            "sits below 0.1 -- that fraction IS the flip rate. If within-cell "
+            "spread is small next to between-seed spread the objection closes "
+            "and single runs stand; if it is comparable, every arm in "
+            "`readings/` needs repeats and the exam harness should take a "
+            "`--repeats` argument that reports a median rather than a value."
+        ),
+    ),
     Objection(
         what="Every `feed` and `generate` clones the whole state before touching it.",
         why=(

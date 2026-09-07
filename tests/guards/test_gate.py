@@ -193,3 +193,45 @@ def test_a_cycle_cannot_silently_train_on_house_text_alone():
     assert "FileNotFoundError" in source and "general" in source, (
         "run_cycle no longer insists on the general anchor"
     )
+
+
+def test_the_replay_mix_is_by_tokens_and_not_by_list_length():
+    """A DISTINCTION THAT COST A RUN.
+
+    `ReplaySpec` names three shares -- recent 0.4, rehearsal 0.4, general 0.2 --
+    and the first two are counted in FRAGMENTS while a general chunk is a
+    hundred-odd words. Thirty-two chunks beside forty-eight fragments looks
+    balanced and is 87% general by token. The adapter would have spent every
+    cycle on English it already knew, barely seen the house, and Tier C landing
+    at blind would have read as the doc's named refutation of the `raw` arm
+    rather than as a mixing error.
+    """
+    import tempfile
+    from pathlib import Path
+
+    from sylvatica.learn.consolidate import build_training_set
+    from sylvatica.store import HashEmbedder, ReplaySpec, SqliteStore
+
+    class Counter:
+        """Just enough core to count tokens: words, roughly."""
+
+        def encode(self, text: str) -> list[int]:
+            return [0] * max(1, len(text.split()))
+
+    with tempfile.TemporaryDirectory() as d:
+        store = SqliteStore(Path(d) / "s.db", embedder=HashEmbedder(dims=32))
+        for i in range(60):
+            store.write_turn(f"Fact number {i} about a room and a thing.", f"t#turn:{i}")
+
+        spec = ReplaySpec(n=40, recent=0.5, rehearsal=0.3, general=0.2, seed=1)
+        training = build_training_set(store, spec, core=Counter())
+
+        counter = Counter()
+        house = sum(len(counter.encode(t)) for t in training.texts[: -training.general])
+        anchor = sum(len(counter.encode(t)) for t in training.texts[-training.general :])
+        share = anchor / (house + anchor)
+        assert 0.08 < share < 0.45, (
+            f"the general slice is {share:.0%} of the training tokens; the spec "
+            f"asked for {spec.general:.0%}"
+        )
+        store.close()

@@ -69,13 +69,25 @@ class TrainingSet:
 
 
 def build_training_set(
-    store: Any, spec: ReplaySpec, arm: Arm = "raw", general: list[str] | None = None
+    store: Any,
+    spec: ReplaySpec,
+    arm: Arm = "raw",
+    general: list[str] | None = None,
+    core: Any = None,
 ) -> TrainingSet:
     """Turn a replay sample into text to train on.
 
-    The general slice is passed IN rather than fetched here, because what counts
-    as "language this house did not produce" is a decision about the corpus and
-    not about consolidation.
+    THE MIX IS BY TOKENS, NOT BY LIST LENGTH, and that distinction cost a run.
+    `ReplaySpec` names three shares -- recent 0.4, rehearsal 0.4, general 0.2 --
+    and the first two are counted in FRAGMENTS while a general chunk is a
+    hundred-odd words. Passing 32 chunks beside 48 fragments looked balanced and
+    was 87% general by token: the adapter would have spent its cycles on English
+    it already knew and barely seen the house, and Tier C landing at blind would
+    have read as the doc's named refutation of the `raw` arm rather than as a
+    mixing error.
+
+    So when `core` is given, the general slice is sized from the house half's
+    actual token count to hit `spec.general`.
     """
     if arm == "declaratives":
         raise NotImplementedError(
@@ -87,7 +99,23 @@ def build_training_set(
 
     fragments = store.sample_for_replay(spec)
     texts = [f.text for f in fragments]
-    general = list(general or [])
+
+    if general is None:
+        from .general import load
+
+        house_tokens = (
+            sum(len(core.encode(t)) for t in texts) if core is not None else 20 * len(texts)
+        )
+        share = min(max(spec.general, 0.0), 0.9)
+        want_tokens = house_tokens * share / max(1e-6, 1.0 - share)
+        # A hundred and twenty words is roughly a hundred and sixty tokens for
+        # this vocabulary; the chunk size is a passage worth of context rather
+        # than a sentence, so the anchor is prose and not fragments of prose.
+        chunk_words = 120
+        n_chunks = max(1, round(want_tokens / 160))
+        general = load(n_chunks=n_chunks, chunk_words=chunk_words, seed=spec.seed)
+
+    general = list(general)
     return TrainingSet(
         texts=texts + general, arm=arm, fragments=len(fragments), general=len(general)
     )
@@ -180,22 +208,20 @@ def run_cycle(
         spec = replace(spec, seed=spec.seed + index)
     before = {k: v.clone() for k, v in adapter.state_dict().items()}
 
-    if general is None:
-        # THE ANCHOR IS NOT OPTIONAL. Without it the adapter sees only invented
-        # people in invented rooms, and one cycle of that moved held-out
-        # perplexity 20% in the first Phase 3 run. Refusing is better than
-        # quietly running the arm the doc did not describe.
-        from .general import available, load
+    # THE ANCHOR IS NOT OPTIONAL. Without it the adapter sees only invented
+    # people in invented rooms, and one cycle of that moved held-out perplexity
+    # 20% in the first Phase 3 run. Refusing is better than quietly running the
+    # arm the doc did not describe.
+    from .general import available
 
-        if not available():
-            raise FileNotFoundError(
-                "no general corpus for the replay anchor. Run "
-                "`uv run python corpora/fetch.py`. Consolidating on house text "
-                "alone is not the arm the doc describes -- see learn/general.py."
-            )
-        general = load(seed=spec.seed)
+    if general is None and not available():
+        raise FileNotFoundError(
+            "no general corpus for the replay anchor. Run "
+            "`uv run python corpora/fetch.py`. Consolidating on house text "
+            "alone is not the arm the doc describes -- see learn/general.py."
+        )
 
-    training = build_training_set(store, spec, arm=arm, general=general)
+    training = build_training_set(store, spec, arm=arm, general=general, core=core)
     _loss, tokens, seconds = train(core, adapter, training, lr=lr, seq_len=seq_len)
 
     after = measure(core, adapter)

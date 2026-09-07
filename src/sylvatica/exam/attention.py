@@ -77,14 +77,25 @@ class AttentionBaseline:
         return f"{self.model_id} [{next(self.model.parameters()).dtype}]"
 
     def _prompt(self, transcript: list[str], question: str) -> str:
-        messages = [{"role": "system", "content": SYSTEM}]
-        # The transcript as it was actually said. The core's replies are not in
-        # it, exactly as they are not in the RWKV full-context arm -- so both
-        # controls see the same information.
-        for line in transcript:
-            messages.append({"role": "user", "content": line})
-            messages.append({"role": "assistant", "content": "Noted."})
-        messages.append({"role": "user", "content": question})
+        # ONE USER TURN CARRYING THE WHOLE TRANSCRIPT, then the question.
+        #
+        # The first version alternated a user line with a fabricated "Noted."
+        # from the assistant, to keep the roles strictly alternating. That was
+        # wrong twice over: it invented content the model never said, and it
+        # roughly DOUBLED the tokens it had to re-read -- so the control would
+        # have been charged for turns it never took, on the one arm whose whole
+        # point is that re-reading is expensive.
+        #
+        # The RWKV full-context arm is given the user lines and none of its own
+        # replies. This is the same information in this model's own template.
+        conversation = "\n".join(transcript)
+        messages = [
+            {"role": "system", "content": SYSTEM},
+            {
+                "role": "user",
+                "content": f"{conversation}\n\nQuestion: {question}",
+            },
+        ]
         return self.tokenizer.apply_chat_template(
             messages,
             tokenize=False,

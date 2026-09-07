@@ -67,6 +67,16 @@ def main() -> int:
     parser.add_argument("--replay", type=int, default=64, help="fragments per cycle")
     parser.add_argument("--calibrate-repeats", type=int, default=3)
     parser.add_argument("--exam-every", type=int, default=5)
+    parser.add_argument(
+        "--no-rollback",
+        action="store_true",
+        help=(
+            "record the gate's verdict but keep the adapter. An EXPERIMENT, never "
+            "how consolidation ships: it separates 'does replay teach' from 'does "
+            "it cost the base too much', which a run that rolls back everything "
+            "cannot, because its Tier C is measuring the untouched base."
+        ),
+    )
     parser.add_argument("--out", type=Path, default=Path("readings"))
     args = parser.parse_args()
 
@@ -123,6 +133,7 @@ def main() -> int:
         cycle, after, training = run_cycle(
             core, adapter, store, gate, index=i, arm=args.arm,
             spec=spec, lr=args.lr, seq_len=args.seq_len,
+            rollback=not args.no_rollback,
         )
         row = {
             "index": i,
@@ -141,7 +152,8 @@ def main() -> int:
         print(
             f"cycle {i}: ppl {after.perplexity:.3f} (base {base.perplexity:.3f})  "
             f"qa {after.qa_score:.3f} (base {base.qa_score:.3f})  "
-            f"{'TRIPPED, rolled back' if cycle.gate.tripped else 'kept'}  "
+            f"{'TRIPPED' if cycle.gate.tripped else 'clean'}"
+            f"{', rolled back' if cycle.gate.rolled_back else ', KEPT'}  "
             f"{cycle.seconds:.0f}s",
             flush=True,
         )
@@ -208,6 +220,9 @@ def main() -> int:
             "rank": args.rank, "lr": args.lr, "seq_len": args.seq_len,
             "replay_fragments": args.replay, "cycles": args.cycles,
         },
+        # TRUE means the gate's verdicts were recorded and IGNORED. Any Tier C
+        # number in this reading came from a model the gate would have rejected.
+        "rollback_disabled": args.no_rollback,
         "preamble": PREAMBLE,
         "heldout_fingerprint": fingerprint(),
         "gate_calibration": noise,

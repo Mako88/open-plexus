@@ -188,6 +188,7 @@ def run_cycle(
     general: list[str] | None = None,
     lr: float = 1e-4,
     seq_len: int = 256,
+    rollback: bool = True,
 ) -> tuple[Cycle, Measurement, TrainingSet]:
     """One full cycle, gated, with rollback. THE ROLLBACK IS A READING.
 
@@ -227,8 +228,25 @@ def run_cycle(
     after = measure(core, adapter)
     result = gate.check(after)
 
-    if result.tripped:
+    # `rollback=False` RECORDS THE GATE'S VERDICT AND IGNORES IT, which is an
+    # experiment rather than a policy and must never be how consolidation ships.
+    #
+    # The reason it exists: with rollback on, a run where every cycle trips
+    # produces an adapter that never accumulates anything, so Tier C measures the
+    # untouched base and says nothing about whether replay TEACHES. That
+    # conflates two questions the branch needs separated -- does the adapter
+    # learn the house, and does it cost the base too much -- and answers only the
+    # second. Turning rollback off lets both be read off one run, at the price of
+    # a model nobody would deploy.
+    rolled_back = bool(result.tripped and rollback)
+    if rolled_back:
         adapter.load_state_dict(before)
+
+    # `Gate.check` sets `rolled_back = tripped` because that is the POLICY. What
+    # actually happened is a different fact, and a reading that recorded the
+    # policy as the event would claim an adapter had been restored when it had
+    # not -- and every Tier C number after it would be unexplainable.
+    result = replace(result, rolled_back=rolled_back)
 
     cycle = Cycle(
         index=index,

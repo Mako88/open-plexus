@@ -141,7 +141,19 @@ def test_the_store_exists_and_tier_b_has_been_read():
 
     readings = readings_of("exam", phase=2)
     assert readings, "no phase-2 (Tier B) exam reading committed"
-    latest = readings[-1]
+
+    # ON THE OBLIQUE QUESTIONS, and this clause is written before the first
+    # oblique reading exists. The direct questions share every content word with
+    # the sentences that told the facts, and the measured consequence was that
+    # all three rankers scored precision 1.000 -- a keyword index, an embedding,
+    # and their fusion. A task all three solve perfectly is not measuring which
+    # of them works. Phase 2 cannot be struck on it.
+    oblique = [r for r in readings if r.get("house", {}).get("phrasing") == "oblique"]
+    assert oblique, (
+        f"{len(readings)} phase-2 reading(s), none on the oblique questions. The "
+        "direct ones are answerable by word overlap alone."
+    )
+    latest = oblique[-1]
     rows = {r["label"]: r for r in latest["rows"]}
 
     # WRITTEN BEFORE THE FIRST READING LANDED, deliberately. Phase 1's test went

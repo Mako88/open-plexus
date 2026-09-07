@@ -1,0 +1,45 @@
+{
+  "phase": 0,
+  "kind": "restart",
+  "taken_at": "2026-09-07T03:22:12.788609+00:00",
+  "what": "a thread continued across a process restart: told in one process, asked in another, with nothing about the facts in the second prompt",
+  "size_b": 1.5,
+  "budget": 80,
+  "thread": "phase0-restart",
+  "told": [
+    "My name is Osric and I keep eleven beehives behind the shed on Ferrin Lane.",
+    "The roof was replaced last spring after a storm took half the tiles off.",
+    "My sister Marta repairs clocks in the front room and hates the smell of beeswax."
+  ],
+  "state_bytes_on_disk": 12995993,
+  "turns_after_first_process": 6,
+  "results": [
+    {
+      "question": "What is my name, and how many beehives do I keep?",
+      "answer": "Your name is Osric, and you keep eleven beehives behind the shed on Ferrin Lane.",
+      "wanted": [
+        "osric",
+        "eleven"
+      ],
+      "correct": true
+    },
+    {
+      "question": "What happened to the roof?",
+      "answer": "The roof was replaced last spring after a storm took half the tiles off.",
+      "wanted": [
+        "storm"
+      ],
+      "correct": true
+    },
+    {
+      "question": "What does Marta do?",
+      "answer": "Marta repairs clocks in the front room and hates the smell of beeswax.",
+      "wanted": [
+        "clock"
+      ],
+      "correct": true
+    }
+  ],
+  "correct": 3,
+  "asked": 3
+}

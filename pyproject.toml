@@ -1,0 +1,56 @@
+[project]
+name = "sylvatica"
+version = "0.1.0"
+description = "State, store, consolidation. A recurrent core that is told once and knows it tomorrow."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "torch",
+    "numpy",
+    "rwkv",
+    "tokenizers",
+    "huggingface-hub",
+    "pytest",
+]
+
+[project.scripts]
+sylvatica = "sylvatica.loop.repl:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sylvatica"]
+
+# PASCAL IS THE CONSTRAINT AND IT PICKS THE WHEEL INDEX.
+#
+# The card is a GTX 1080 Ti: compute capability 6.1, 11 GB, fp32 fine, fp16 slow,
+# no bf16. PyTorch's cu128 and later wheels dropped the sm_61 target, so a build
+# from the default index loads, reports a CUDA device, and then dies on the first
+# kernel launch with "no kernel image is available for execution on the device".
+# THAT FAILURE LOOKS LIKE A BUG IN THIS CODE AND IS NOT ONE, which is why the
+# index is pinned here rather than discovered by whoever hits it.
+#
+# `tests/guards/test_toolchain.py` asserts `sm_61` is in `torch.cuda.get_arch_list()`,
+# so a wheel that drops Pascal fails in seconds instead of mid-exam.
+[tool.uv.sources]
+torch = { index = "pytorch-cu126" }
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# `pushback.py` IS COLLECTED ON PURPOSE. It is not named `test_*` because it is
+# a list first and a test second, and the count assertion is what stops an
+# objection being dropped in silence.
+python_files = ["test_*.py", "pushback.py"]
+# EXAMS ARE DISPATCHED BY HAND AND NEVER RUN UNDER PYTEST BY DEFAULT.
+# They take a GPU and minutes; the suite takes seconds and runs every commit.
+addopts = "-q --ignore=tests/exam"

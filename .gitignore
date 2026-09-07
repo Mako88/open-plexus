@@ -24,3 +24,15 @@ out/
 # fetches it is ours and small, so that one file stays.
 corpora/*
 !corpora/fetch.sh
+
+# Sylvatica. `uv.lock` is NOT here on purpose: the cu126 pin is the whole
+# reason the card works, and a lockfile nobody commits is a pin nobody has.
+.venv/
+
+# Somebody else's weights, gigabytes of them. `core/checkpoints.py` fetches
+# them and says which; the repository carries the name, never the bytes.
+checkpoints/
+
+# Thread state and transcripts. A run's own memory, machine-local by
+# definition -- a state file is meaningless beside a different checkpoint.
+state/

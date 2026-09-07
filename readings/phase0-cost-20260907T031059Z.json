@@ -1,0 +1,58 @@
+{
+  "phase": 0,
+  "kind": "cost",
+  "taken_at": "2026-09-07T03:10:58.270006+00:00",
+  "what": "tokens a second and state size per checkpoint, inference only",
+  "budget": 64,
+  "repeats": 3,
+  "machine": {
+    "gpu": "NVIDIA GeForce GTX 1080 Ti",
+    "torch": "2.14.0+cu126",
+    "arch_list": [
+      "sm_50",
+      "sm_60",
+      "sm_61",
+      "sm_70",
+      "sm_75",
+      "sm_80",
+      "sm_86",
+      "sm_90"
+    ],
+    "capability": [
+      6,
+      1
+    ],
+    "platform": "Windows-10-10.0.19045-SP0",
+    "rwkv_cuda_kernel": false
+  },
+  "rows": [
+    {
+      "size_b": 0.4,
+      "checkpoint": "rwkv7-g1d-0.4b-20260210-ctx8192.pth",
+      "params": 450767872,
+      "n_layer": 24,
+      "n_embd": 1024,
+      "load_seconds": 13.63,
+      "prefill_tokens_per_second": 124.7,
+      "decode_tokens_per_second": 55.5,
+      "state_bytes": 6488064,
+      "state_mb": 6.49,
+      "weights_mb": 901.8,
+      "cuda_max_allocated_mb": 2072.3
+    },
+    {
+      "size_b": 1.5,
+      "checkpoint": "rwkv7-g1j-1.5b-20260831-ctx16384.pth",
+      "params": 1527404544,
+      "n_layer": 24,
+      "n_embd": 2048,
+      "load_seconds": 34.11,
+      "prefill_tokens_per_second": 156.5,
+      "decode_tokens_per_second": 25.8,
+      "state_bytes": 12976128,
+      "state_mb": 12.98,
+      "weights_mb": 3055.4,
+      "cuda_max_allocated_mb": 6656.6
+    }
+  ]
+}

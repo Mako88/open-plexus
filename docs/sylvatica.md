@@ -19,8 +19,9 @@ begins, and what reading would refute each bet. It says how only where a how was
 The one list a session edits at both ends. Strike what got done; write the handoff from what is
 left. Each phase has an exit that is a measurement, never a feeling.
 
-- **Phase 0 — Ground.** Clear the old tree, stand up the toolchain, load a core, talk to it,
-  kill it, restart it, and have it continue the thread from saved state.
+- ~~**Phase 0 — Ground.**~~ Struck 2026-09-06. Exit met: `readings/phase0-cost-*.json` and
+  `readings/phase0-restart-*.json`. One item of it is NOT done and is not Phase 0's — the old
+  C# tree is still in the working copy; see the handoff.
 - **Phase 1 — Exam.** Build the told-then-asked worlds and the cost meter. Take the FIRST
   reading: how fast the bare state forgets, against the full-context baseline.
 - **Phase 2 — Store.** Every turn to SQLite, hybrid retrieval, automatic injection. Tier B exam.
@@ -195,21 +196,11 @@ reaches into another's internals. The names below are the names in the code.
 
 ## THE PHASES IN FULL
 
-### Phase 0 — Ground
+### Phase 0 — Ground — STRUCK 2026-09-06
 
-- Move `src/`, `tests/`, `corpora/`, `OpenPlexus.slnx` out of the tree. They are in history.
-- Toolchain: Python 3.12 via `uv`; PyTorch from the cu126 wheel index. The card is a GTX 1080 Ti,
-  Pascal, compute capability 6.1, 11 GB, fp32 fine, fp16 slow, no bf16. Recent cu128+ wheels
-  have dropped Pascal, so the first command that matters is `torch.cuda.get_arch_list()` and
-  it must contain `sm_61`; pin torch to the last version that does if not. The machine has
-  neither `uv` nor `nvcc` today (system Python is 3.9); install `uv`, and only install a CUDA
-  toolkit if the RWKV kernel spike below needs it.
-- Load RWKV-7 0.4B on the GPU. Use the `rwkv` pip package for inference first. Spike whether
-  the training-side WKV7 kernel compiles for sm_61; if it does not, the fallback is the
-  pure-PyTorch chunked path and the reading is how many tokens a second it costs.
-- Build the REPL: talk, save state per turn, kill the process, restart, continue.
-- **Exit:** a saved transcript showing a thread continued across a restart, and a first cost
-  row: tokens a second at 0.4B and at 1.5B.
+Done, so the plan for it is gone. What was built is in `src/sylvatica/core`, `loop` and
+`scripts/`, and what it does is in those docstrings. The numbers are in `readings/`. One item
+that was written here is still owed and it is in the handoff, not here: the old C# tree.
 
 ### Phase 1 — Exam
 

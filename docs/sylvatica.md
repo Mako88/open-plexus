@@ -22,8 +22,10 @@ left. Each phase has an exit that is a measurement, never a feeling.
 - ~~**Phase 0 — Ground.**~~ Struck 2026-09-06. Exit met: `readings/phase0-cost-*.json` and
   `readings/phase0-restart-*.json`. One item of it is NOT done and is not Phase 0's — the old
   C# tree is still in the working copy; see the handoff.
-- **Phase 1 — Exam.** Build the told-then-asked worlds and the cost meter. Take the FIRST
-  reading: how fast the bare state forgets, against the full-context baseline.
+- ~~**Phase 1 — Exam.**~~ Struck 2026-09-07. `readings/phase1-noise-*.json`, ten houses at
+  1.5B: Tier A beats blind at EVERY delay on the pre-registered paired test, 10/10 houses at
+  delays 1, 5, 20 and 150 and 9/10 at 60. Not struck on five houses, where the crude
+  range criterion failed and two houses fell below blind — see the handoff.
 - ~~**Phase 2 — Store.**~~ Struck 2026-09-07. Exit met on the OBLIQUE exam:
   `readings/phase2-exam-oblique-*.json`. Tier B 0.644 against Tier A 0.228, flat across delays
   where the state decays, retrieval precision 0.924 at k=5. Not struck on the direct questions,

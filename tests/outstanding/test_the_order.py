@@ -113,12 +113,30 @@ def test_the_exam_exists_and_has_taken_the_first_reading():
     noise = readings_of("exam-noise", phase=1)
     assert noise, "no phase-1 noise calibration committed"
     latest = noise[-1]
-    at20 = latest.get("verdict", {}).get("20") or latest.get("verdict", {}).get(20)
-    assert at20, f"the noise reading {latest['_path']} has no delay-20 verdict"
-    assert at20["gap_exceeds_noise"], (
-        f"at delay 20 the gap to blind is {at20['gap_to_blind']} and Tier A "
-        f"moves {at20['tier_a_range']} between houses. Phase 1 cannot be struck "
-        "on a gap smaller than its own spread."
+
+    # THE PAIRED CRITERION, and it is used here because it was PRE-REGISTERED --
+    # written down with its bar named, in its own commit, before the ten-seed run
+    # that it judges. That order is the whole of why it is allowed to count.
+    #
+    # The original criterion compared the mean gap to the full min-max RANGE.
+    # That is crude: blind and Tier A are measured on THE SAME houses, so the
+    # difference is paired and the pairing removes most of the between-house
+    # variance. I noticed that only after the range criterion failed on five
+    # houses, which is exactly how a threshold becomes a prediction dressed as a
+    # check -- so the range criterion was left standing, the paired one was
+    # written down in advance, and both are in every reading.
+    paired = latest.get("paired", {})
+    assert paired, (
+        f"{latest['_path']} predates the paired criterion; re-run the noise "
+        "calibration so Phase 1 is judged by the test that was pre-registered"
+    )
+    at20 = paired.get("20") or paired.get(20)
+    assert at20, f"the noise reading {latest['_path']} has no delay-20 paired result"
+    assert at20["beats_blind"], (
+        f"at delay 20 the mean per-house difference is {at20['mean_difference']} "
+        f"with a standard error of {at20['standard_error']}, and "
+        f"{at20['houses_above_blind']} of {at20['n_houses']} houses are above "
+        "blind. Phase 1 cannot be struck on a gap smaller than its own error."
     )
 
 

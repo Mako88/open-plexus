@@ -34,16 +34,42 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
-# ASKING FOR ONE FACT A LINE, IN THE HOUSE'S OWN REGISTER. A general "summarise
-# this" produces prose, and prose trains the model on prose. The exam scores
-# short canonical answers, so the training signal should be short sentences.
+# FEW-SHOT, BECAUSE INSTRUCTIONS ALONE DO NOT WORK AT THIS SIZE. The first
+# version of these prompts described the task, and a 1.5B core answered with
+# "First, looking at the conversation:" and commentary like "-- This is a
+# statement made by someone else". Twenty-six declaratives out of twelve windows,
+# exactly one of which was a fact. An error rate measured on that would have been
+# meaningless: the extractor was not WRONG, it was ABSENT, and 0.0% error would
+# have read as a pass.
+#
+# The worked example does what the instruction could not: it shows filler being
+# DROPPED and a fact being kept in the house's own register, which is the entire
+# transformation being asked for.
 EXTRACT_PROMPT = (
+    "Here is part of a conversation:\n\n"
+    "It has been raining all week.\n"
+    "Marta keeps the glass jars in the pantry.\n"
+    "I should probably go for a walk later.\n"
+    "There are 40 iron hooks in the dairy.\n\n"
+    "Write only the facts, one per line. Skip small talk."
+)
+EXTRACT_ANSWER = (
+    "Marta keeps the glass jars in the pantry.\n"
+    "There are 40 iron hooks in the dairy."
+)
+EXTRACT_FOLLOWUP = (
     "Here is part of a conversation:\n\n{window}\n\n"
-    "List the specific facts it states, one per line, as short plain sentences. "
-    "Only facts that were actually said."
+    "Write only the facts, one per line. Skip small talk."
 )
 
-PARAPHRASE_PROMPT = "Say this exactly once more, in different words, keeping every detail:\n\n{fact}"
+# AND THE PARAPHRASE PROMPT WAS TRIGGERING REFUSALS. "Say this exactly once more,
+# in different words, keeping every detail" read to the core as a suspicious
+# request, and it answered "I'm sorry, but I can't assist with that request" --
+# about a sentence concerning a kettle. A worked example removes the ambiguity
+# that an instruction created.
+PARAPHRASE_PROMPT = "The kettle lives on the third shelf.\nSay that again in different words."
+PARAPHRASE_ANSWER = "On the third shelf is where the kettle lives."
+PARAPHRASE_FOLLOWUP = "{fact}\nSay that again in different words."
 
 
 @dataclass
@@ -162,10 +188,20 @@ def extract(
     a copy -- which is the raw arm again.
     """
     from ..core.base import Sampling
-    from ..loop.turn import STOP_STRINGS, format_prompt, trim_at_stop
+    from ..loop.turn import (
+        CORE_PREFIX,
+        SEPARATOR,
+        STOP_STRINGS,
+        USER_PREFIX,
+        format_prompt,
+        trim_at_stop,
+    )
 
     text = "\n".join(window)
-    prompt = format_prompt(EXTRACT_PROMPT.format(window=text))
+    prompt = (
+        f"{USER_PREFIX}{EXTRACT_PROMPT}{SEPARATOR}{CORE_PREFIX} {EXTRACT_ANSWER}"
+        f"{SEPARATOR}" + format_prompt(EXTRACT_FOLLOWUP.format(window=text))
+    )
     out, _, _ = core.generate(
         core.encode(prompt), None, budget,
         # GREEDY, because this is extraction and not conversation: the same
@@ -191,8 +227,14 @@ def paraphrase(
     out = [
         Declarative(text=t, source="template", parent=fact) for t in templates(fact)
     ]
+    from ..loop.turn import CORE_PREFIX, SEPARATOR, USER_PREFIX
+
     for _ in range(n_core):
-        prompt = format_prompt(PARAPHRASE_PROMPT.format(fact=fact))
+        prompt = (
+            f"{USER_PREFIX}{PARAPHRASE_PROMPT}{SEPARATOR}{CORE_PREFIX} "
+            f"{PARAPHRASE_ANSWER}{SEPARATOR}"
+            + format_prompt(PARAPHRASE_FOLLOWUP.format(fact=fact))
+        )
         got, _, _ = core.generate(
             core.encode(prompt), None, budget,
             Sampling(stop_strings=STOP_STRINGS, greedy=True),

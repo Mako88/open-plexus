@@ -107,6 +107,31 @@ def main() -> int:
     noise = calibrate(core, repeats=args.calibrate_repeats)
     print(json.dumps({k: v for k, v in noise.items() if k != "runs"}, indent=2), flush=True)
 
+    # THE CALIBRATION IS ITS OWN READING, not a field inside another one. The
+    # doc asks for it as a distinct step taken FIRST, and a reading that only
+    # exists nested inside a consolidation run cannot be pointed at when someone
+    # asks what the thresholds were derived from.
+    args.out.mkdir(parents=True, exist_ok=True)
+    noise_reading = {
+        "phase": 3,
+        "kind": "gate-noise",
+        "taken_at": datetime.now(UTC).isoformat(),
+        "what": "the spread of the untouched base on the two fixed held-out sets",
+        "would_refute": (
+            "a spread wide enough that a threshold derived from it sits below one "
+            "standard deviation of its own measurement -- which is what the first "
+            "calibration found when the QA half was sampled rather than greedy."
+        ),
+        "core": core.name,
+        "size_b": args.size,
+        "heldout_fingerprint": fingerprint(),
+        **noise,
+    }
+    noise_stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    (args.out / f"phase3-gate-noise-{noise_stamp}.json").write_text(
+        json.dumps(noise_reading, indent=2) + "\n", encoding="utf-8"
+    )
+
     base = measure(core)
     gate = Gate(
         base,

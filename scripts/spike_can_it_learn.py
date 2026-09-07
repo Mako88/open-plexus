@@ -49,6 +49,10 @@ def main() -> int:
     parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--lr", type=float, default=3e-4)
     parser.add_argument("--rank", type=int, default=8)
+    parser.add_argument(
+        "--arm", choices=["raw", "declaratives"], default="raw",
+        help="raw trains on the told sentence; declaratives trains on paraphrases of it",
+    )
     parser.add_argument("--out", type=Path, default=Path("readings"))
     args = parser.parse_args()
 
@@ -91,8 +95,24 @@ def main() -> int:
     print(f"before training: {before}/{len(facts)}")
 
     adapter = LoraAdapter(core._model.z, rank=args.rank)
+
+    if args.arm == "raw":
+        texts = [f.told for f in facts]
+    else:
+        # THE ARM'S CLAIM, TESTED DIRECTLY: varying the surface while holding the
+        # binding fixed. Templates only, no core paraphrases -- a template cannot
+        # introduce a falsehood, so this measures the PARAPHRASE IDEA rather than
+        # the extractor's error rate, which has its own reading.
+        from sylvatica.learn.extract import templates
+
+        texts = []
+        for f in facts:
+            texts.append(f.told)
+            texts.extend(templates(f.told))
+    print(f"arm={args.arm}: {len(texts)} training sentences for {len(facts)} facts")
+
     training = TrainingSet(
-        texts=[f.told for f in facts], arm="raw", fragments=len(facts), general=0
+        texts=texts, arm=args.arm, fragments=len(facts), general=0
     )
     loss, tokens, seconds = train(
         core, adapter, training, lr=args.lr, seq_len=128, epochs=args.epochs
@@ -123,6 +143,8 @@ def main() -> int:
         "core": core.name,
         "size_b": args.size,
         "facts": len(facts),
+        "arm": args.arm,
+        "training_sentences": len(texts),
         "epochs": args.epochs,
         "lr": args.lr,
         "rank": args.rank,
@@ -141,7 +163,7 @@ def main() -> int:
     }
     args.out.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
-    path = args.out / f"phase3-can-it-learn-{stamp}.json"
+    path = args.out / f"phase3-can-it-learn-{args.arm}-{stamp}.json"
     path.write_text(json.dumps(reading, indent=2) + "\n", encoding="utf-8")
     print(f"\nmax |delta| {delta:.5f}  gradients finite {grad_ok}")
     print(json.dumps(reading["verdict"], indent=2))

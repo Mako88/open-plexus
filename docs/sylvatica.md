@@ -24,7 +24,10 @@ left. Each phase has an exit that is a measurement, never a feeling.
   C# tree is still in the working copy; see the handoff.
 - **Phase 1 — Exam.** Build the told-then-asked worlds and the cost meter. Take the FIRST
   reading: how fast the bare state forgets, against the full-context baseline.
-- **Phase 2 — Store.** Every turn to SQLite, hybrid retrieval, automatic injection. Tier B exam.
+- ~~**Phase 2 — Store.**~~ Struck 2026-09-07. Exit met on the OBLIQUE exam:
+  `readings/phase2-exam-oblique-*.json`. Tier B 0.644 against Tier A 0.228, flat across delays
+  where the state decays, retrieval precision 0.924 at k=5. Not struck on the direct questions,
+  where all three rankers scored precision 1.000 — see the handoff.
 - **Phase 3 — Consolidation.** Replay out of the store into a LoRA adapter, regression gate,
   rollback, merge. Tier C exam. This is the bet; everything before it is scaffolding.
 - **Phase 4 — Idle.** The machine runs with no input. Reflection fragments, hot and cold tiers,

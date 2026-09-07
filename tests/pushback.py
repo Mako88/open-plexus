@@ -21,7 +21,7 @@ from dataclasses import dataclass
 
 # The count is asserted. Change it in the same commit that changes the list, and
 # say in the message which entry left and what settled it.
-COUNT = 7
+COUNT = 6
 
 
 @dataclass(frozen=True)
@@ -121,32 +121,6 @@ OBJECTIONS: list[Objection] = [
     ),
     Objection(
         what=(
-            "The exam's questions are near-paraphrases of the sentences that "
-            "told the facts, so retrieval is mostly a lexical-overlap task."
-        ),
-        why=(
-            "'There are 65 lanterns in the cellar' is asked as 'How many "
-            "lanterns are in the cellar?'. Every content word is shared, so "
-            "FTS5 alone finds it -- on a first wiring check the store scored "
-            "precision 1.000 at k=4 using an embedder with NO SEMANTICS AT ALL, "
-            "which is the giveaway. Tier B will therefore look excellent for a "
-            "reason that has nothing to do with memory and will not survive "
-            "contact with a real conversation, where somebody asks 'how many of "
-            "those did you say there were?' three days later. THE RISK IS THAT "
-            "PHASE 2 PASSES ITS EXIT ON A TASK EASIER THAN THE ONE IT IS FOR, "
-            "and Phase 3 is then built on a store nobody has actually stressed."
-        ),
-        settled_by=(
-            "Two readings on the same house. Tier B with the lexical ranker "
-            "disabled, vector only -- if precision barely moves, the embeddings "
-            "are carrying nothing and the score is FTS5's. And a question "
-            "variant that shares no content words with the told sentence, which "
-            "the generator can produce for every kind. If precision holds on "
-            "both, this closes and the exam is harder than it looked."
-        ),
-    ),
-    Objection(
-        what=(
             "The full-context baseline is not a stateless control, so refutation "
             "1 is untested and currently untestable."
         ),
@@ -177,6 +151,25 @@ OBJECTIONS: list[Objection] = [
 ]
 
 # SETTLED, AND KEPT HERE AS NOTES RATHER THAN AS ENTRIES.
+#
+# "The exam's questions are near-paraphrases of the sentences that told the
+# facts, so retrieval is mostly a lexical-overlap task."
+# Settled 2026-09-07 by both readings its settlement clause asked for, and the
+# entry was RIGHT. On the direct questions all three rankers scored precision
+# 1.000 and lexical alone beat the hybrid -- the embeddings were contributing
+# nothing and the store was passing a keyword lookup. On oblique questions, which
+# share no content words with the telling sentence, the ordering inverts:
+#
+#   ranker     direct score / precision     oblique score / precision
+#   lexical    0.988 / 1.000                0.596 / 0.728
+#   hybrid     0.972 / 1.000                0.644 / 0.924
+#   vector     0.980 / 1.000                0.652 / 0.960
+#
+# The exam is harder than it was and the arms now separate, which is what the
+# entry wanted. It leaves behind a new question rather than a doubt: the LEXICAL
+# HALF NOW HURTS THE FUSION -- vector alone beats the hybrid on both score and
+# precision. The doc already calls the hybrid weights an arm rather than a
+# decision, so that is a dial to sweep and not a standing objection.
 #
 # "The full-context baseline costs 2.7 GPU-hours a house against two minutes for
 # the arm, and the risk is a session quietly running arms without it."

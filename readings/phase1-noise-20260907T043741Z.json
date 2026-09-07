@@ -1,0 +1,323 @@
+{
+  "phase": 1,
+  "kind": "exam-noise",
+  "tier": "A",
+  "taken_at": "2026-09-07T04:37:41.469983+00:00",
+  "what": "how far a Tier A score moves between houses, so a gap can be read",
+  "would_refute": "A Tier A spread at delay 20 wider than the gap between Tier A and blind. Then one house cannot settle Phase 1 and the exit needs several.",
+  "core": "rwkv7-g1j-1.5b-20260831-ctx16384 [cuda fp32]",
+  "size_b": 1.5,
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "house": {
+    "facts": 50,
+    "turns": 300,
+    "negatives": 20,
+    "delays": [
+      1,
+      5,
+      20,
+      60,
+      150
+    ]
+  },
+  "budgets": {
+    "reply": 40,
+    "answer": 32
+  },
+  "preamble": "User: I am going to tell you things about my home and the people in it. Remember them. When I ask you a question, answer in a few words. If I have not told you the answer, say that you do not know.\n\nAssistant: Understood. I will remember what you tell me, answer briefly, and say when I do not know.\n\n",
+  "full_context_spread": null,
+  "runs": [
+    {
+      "seed": 0,
+      "entropy_bits": {
+        "trade": 2.371,
+        "number": 3.322,
+        "place": 2.446,
+        "colour": 2.446,
+        "relation": 2.922
+      },
+      "blind": 0.24,
+      "blind_by_delay": {
+        "1": 0.24,
+        "5": 0.24,
+        "20": 0.24,
+        "60": 0.24,
+        "150": 0.24
+      },
+      "tier_a": 0.66,
+      "tier_a_by_delay": {
+        "1": 0.86,
+        "5": 0.84,
+        "20": 0.62,
+        "60": 0.46,
+        "150": 0.52
+      },
+      "tier_a_by_kind": {
+        "colour": 0.84,
+        "number": 0.68,
+        "place": 0.74,
+        "relation": 0.42,
+        "trade": 0.62
+      },
+      "invented": 17,
+      "echoed": 13,
+      "negatives": 20,
+      "seconds": 259.3
+    },
+    {
+      "seed": 1,
+      "entropy_bits": {
+        "trade": 2.446,
+        "number": 2.846,
+        "place": 2.722,
+        "colour": 2.922,
+        "relation": 2.922
+      },
+      "blind": 0.24,
+      "blind_by_delay": {
+        "1": 0.24,
+        "5": 0.24,
+        "20": 0.24,
+        "60": 0.24,
+        "150": 0.24
+      },
+      "tier_a": 0.156,
+      "tier_a_by_delay": {
+        "1": 0.1,
+        "5": 0.12,
+        "20": 0.12,
+        "60": 0.16,
+        "150": 0.28
+      },
+      "tier_a_by_kind": {
+        "colour": 0.06,
+        "number": 0.1,
+        "place": 0.18,
+        "relation": 0.12,
+        "trade": 0.32
+      },
+      "invented": 2,
+      "echoed": 184,
+      "negatives": 20,
+      "seconds": 258.8
+    },
+    {
+      "seed": 2,
+      "entropy_bits": {
+        "trade": 1.685,
+        "number": 3.122,
+        "place": 2.722,
+        "colour": 2.171,
+        "relation": 2.922
+      },
+      "blind": 0.28,
+      "blind_by_delay": {
+        "1": 0.28,
+        "5": 0.28,
+        "20": 0.28,
+        "60": 0.28,
+        "150": 0.28
+      },
+      "tier_a": 0.3,
+      "tier_a_by_delay": {
+        "1": 0.26,
+        "5": 0.28,
+        "20": 0.24,
+        "60": 0.28,
+        "150": 0.44
+      },
+      "tier_a_by_kind": {
+        "colour": 0.14,
+        "number": 0.16,
+        "place": 0.24,
+        "relation": 0.52,
+        "trade": 0.44
+      },
+      "invented": 9,
+      "echoed": 163,
+      "negatives": 20,
+      "seconds": 259.6
+    },
+    {
+      "seed": 3,
+      "entropy_bits": {
+        "trade": 3.122,
+        "number": 3.322,
+        "place": 3.122,
+        "colour": 2.646,
+        "relation": 2.846
+      },
+      "blind": 0.22,
+      "blind_by_delay": {
+        "1": 0.22,
+        "5": 0.22,
+        "20": 0.22,
+        "60": 0.22,
+        "150": 0.22
+      },
+      "tier_a": 0.444,
+      "tier_a_by_delay": {
+        "1": 0.46,
+        "5": 0.58,
+        "20": 0.42,
+        "60": 0.36,
+        "150": 0.4
+      },
+      "tier_a_by_kind": {
+        "colour": 0.82,
+        "number": 0.6,
+        "place": 0.1,
+        "relation": 0.24,
+        "trade": 0.46
+      },
+      "invented": 20,
+      "echoed": 4,
+      "negatives": 20,
+      "seconds": 170.9
+    },
+    {
+      "seed": 4,
+      "entropy_bits": {
+        "trade": 2.722,
+        "number": 3.122,
+        "place": 2.722,
+        "colour": 2.522,
+        "relation": 2.922
+      },
+      "blind": 0.2,
+      "blind_by_delay": {
+        "1": 0.2,
+        "5": 0.2,
+        "20": 0.2,
+        "60": 0.2,
+        "150": 0.2
+      },
+      "tier_a": 0.076,
+      "tier_a_by_delay": {
+        "1": 0.04,
+        "5": 0.02,
+        "20": 0.02,
+        "60": 0.08,
+        "150": 0.22
+      },
+      "tier_a_by_kind": {
+        "colour": 0.0,
+        "number": 0.06,
+        "place": 0.06,
+        "relation": 0.18,
+        "trade": 0.08
+      },
+      "invented": 1,
+      "echoed": 231,
+      "negatives": 20,
+      "seconds": 256.4
+    }
+  ],
+  "tier_a_spread_by_delay": {
+    "1": {
+      "min": 0.04,
+      "max": 0.86,
+      "mean": 0.344,
+      "stdev": 0.3312,
+      "range": 0.82
+    },
+    "5": {
+      "min": 0.02,
+      "max": 0.84,
+      "mean": 0.368,
+      "stdev": 0.3384,
+      "range": 0.82
+    },
+    "20": {
+      "min": 0.02,
+      "max": 0.62,
+      "mean": 0.284,
+      "stdev": 0.2397,
+      "range": 0.6
+    },
+    "60": {
+      "min": 0.08,
+      "max": 0.46,
+      "mean": 0.268,
+      "stdev": 0.1521,
+      "range": 0.38
+    },
+    "150": {
+      "min": 0.22,
+      "max": 0.52,
+      "mean": 0.372,
+      "stdev": 0.1213,
+      "range": 0.3
+    }
+  },
+  "blind_spread_by_delay": {
+    "1": {
+      "min": 0.2,
+      "max": 0.28,
+      "mean": 0.236,
+      "stdev": 0.0297,
+      "range": 0.08
+    },
+    "5": {
+      "min": 0.2,
+      "max": 0.28,
+      "mean": 0.236,
+      "stdev": 0.0297,
+      "range": 0.08
+    },
+    "20": {
+      "min": 0.2,
+      "max": 0.28,
+      "mean": 0.236,
+      "stdev": 0.0297,
+      "range": 0.08
+    },
+    "60": {
+      "min": 0.2,
+      "max": 0.28,
+      "mean": 0.236,
+      "stdev": 0.0297,
+      "range": 0.08
+    },
+    "150": {
+      "min": 0.2,
+      "max": 0.28,
+      "mean": 0.236,
+      "stdev": 0.0297,
+      "range": 0.08
+    }
+  },
+  "verdict": {
+    "1": {
+      "gap_to_blind": 0.108,
+      "tier_a_range": 0.82,
+      "gap_exceeds_noise": false
+    },
+    "5": {
+      "gap_to_blind": 0.132,
+      "tier_a_range": 0.82,
+      "gap_exceeds_noise": false
+    },
+    "20": {
+      "gap_to_blind": 0.048,
+      "tier_a_range": 0.6,
+      "gap_exceeds_noise": false
+    },
+    "60": {
+      "gap_to_blind": 0.032,
+      "tier_a_range": 0.38,
+      "gap_exceeds_noise": false
+    },
+    "150": {
+      "gap_to_blind": 0.136,
+      "tier_a_range": 0.3,
+      "gap_exceeds_noise": false
+    }
+  }
+}

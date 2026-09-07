@@ -166,7 +166,7 @@ def train(
             loss = torch.nn.functional.cross_entropy(logits[:-1].float(), targets)
             loss.backward()
             opt.step()
-            total_loss += float(loss) * (len(chunk) - 1)
+            total_loss += loss.detach().item() * (len(chunk) - 1)
             total_tokens += len(chunk) - 1
 
     training.tokens = total_tokens

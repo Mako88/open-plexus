@@ -171,7 +171,16 @@ class Gate:
             )
         ppl_ratio = after.perplexity / self.base.perplexity
         qa_drop = self.base.qa_score - after.qa_score
-        tripped = ppl_ratio > self.perplexity_threshold or qa_drop > self.qa_threshold
+        # A HAIR OF TOLERANCE, BECAUSE THE THRESHOLD IS A COUNT IN DISGUISE. The
+        # QA floor of 0.04 means "one question of twenty-five may go". In floats,
+        # 0.88 - 0.84 is 0.040000000000000036, which is greater than 0.04 -- so
+        # exactly the drop the threshold was chosen to permit tripped the gate,
+        # on every cycle of a run where nothing else had gone wrong.
+        eps = 1e-9
+        tripped = (
+            ppl_ratio > self.perplexity_threshold + eps
+            or qa_drop > self.qa_threshold + eps
+        )
         return GateResult(
             perplexity=after.perplexity,
             qa_score=after.qa_score,

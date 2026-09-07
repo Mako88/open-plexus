@@ -235,3 +235,25 @@ def test_the_replay_mix_is_by_tokens_and_not_by_list_length():
             f"asked for {spec.general:.0%}"
         )
         store.close()
+
+
+def test_the_qa_threshold_permits_exactly_the_drop_it_names():
+    """A THRESHOLD THAT IS A COUNT IN DISGUISE, and floats do not respect that.
+
+    The QA floor of 0.04 means "one question of twenty-five may go". But
+    0.88 - 0.84 is 0.040000000000000036 in floats, which is greater than 0.04 --
+    so exactly the drop the threshold was chosen to permit tripped the gate, on
+    every cycle of a run where nothing else had gone wrong. The trips looked like
+    a finding about consolidation and were a rounding error.
+    """
+    gate = Gate(_m(20.0, 0.88), perplexity_threshold=1.02, qa_threshold=0.04)
+    assert not gate.check(_m(20.0, 0.84)).tripped, (
+        "a one-question drop tripped a threshold that is one question wide"
+    )
+    assert gate.check(_m(20.0, 0.80)).tripped, "a two-question drop must still trip"
+
+
+def test_the_perplexity_threshold_permits_exactly_its_ratio():
+    gate = Gate(_m(20.0, 0.88), perplexity_threshold=1.02, qa_threshold=0.04)
+    assert not gate.check(_m(20.4, 0.88)).tripped, "exactly 2% must not trip"
+    assert gate.check(_m(20.5, 0.88)).tripped

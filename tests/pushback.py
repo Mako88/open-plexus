@@ -21,7 +21,7 @@ from dataclasses import dataclass
 
 # The count is asserted. Change it in the same commit that changes the list, and
 # say in the message which entry left and what settled it.
-COUNT = 6
+COUNT = 5
 
 
 @dataclass(frozen=True)
@@ -119,38 +119,26 @@ OBJECTIONS: list[Objection] = [
             "turn, this closes and the cost meter stays as it is."
         ),
     ),
-    Objection(
-        what=(
-            "The full-context baseline is not a stateless control, so refutation "
-            "1 is untested and currently untestable."
-        ),
-        why=(
-            "The doc calls it 'the same core fed the whole transcript every "
-            "turn, which is how a transformer would do it', and refutation 1 is "
-            "'state plus store loses to a same-size STATELESS model given the "
-            "whole conversation as context, at equal flops'. On a recurrent "
-            "core there is no such thing: feeding a transcript whole and "
-            "carrying the state through it are THE SAME FUNCTION, measured to "
-            "the same argmax and top-5 down to token-at-a-time splits. So this "
-            "baseline differs from Tier A only in what text went into the state "
-            "-- no core replies -- and not in how the memory works. It is a "
-            "useful ablation and it is not the control the doc thinks it is. "
-            "The branch's headline claim currently has nothing arguing against "
-            "it, which is the condition the last two branches died in."
-        ),
-        settled_by=(
-            "A same-size ATTENTION model on the same house -- Qwen3-1.7B class "
-            "-- given the whole conversation as context, scored on the same "
-            "questions with the same judge, with flops for both. Then refutation "
-            "1 has a real control and this closes. Adding a comparison model is "
-            "not reopening the DECIDED choice of substrate; it is buying an "
-            "instrument. Deciding NOT to build it also closes this, provided the "
-            "branch stops listing refutation 1 as something it tests."
-        ),
-    ),
 ]
 
 # SETTLED, AND KEPT HERE AS NOTES RATHER THAN AS ENTRIES.
+#
+# "The full-context baseline is not a stateless control, so refutation 1 is
+# untested and currently untestable."
+# Settled 2026-09-07 by building the control the entry asked for. Qwen3-1.7B
+# against the RWKV-7 1.53B, same house, same questions, same judge, flops for
+# both: `readings/phase1-exam-*.json` with `refutation_1_tested: true`.
+#
+# THE ANSWER IS UNCOMFORTABLE AND THE ENTRY CLOSES ANYWAY, because it asked for a
+# measurement rather than for a result. The stateless model scored 0.908 against
+# Tier A's 0.492 and stayed nearly flat across delays where the state decayed. It
+# paid 25x the flops to do it, so refutation 1's "at equal flops" clause is not
+# satisfied and the branch is not formally refuted -- but the accuracy gap is
+# large and the branch's answer to it is Phase 2's store, which closed it (Tier B
+# 0.644 against Tier A 0.228 on the hard exam).
+#
+# What replaces this entry is not a doubt but a standing comparison: every future
+# Tier B and Tier C reading has a same-size attention number to be held against.
 #
 # "The exam's questions are near-paraphrases of the sentences that told the
 # facts, so retrieval is mostly a lexical-overlap task."

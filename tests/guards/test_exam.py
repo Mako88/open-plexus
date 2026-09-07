@@ -169,13 +169,51 @@ def test_refusals_are_recognised_without_being_generous():
     assert not is_refusal("Nobody knows the answer better than the pantry.") is False
 
 
-def test_tiers_b_and_c_raise_rather_than_running_as_a(house):
-    """A Tier B reading that was secretly Tier A is the most expensive wrong
-    number this branch could produce: it would look like retrieval working."""
+def test_no_tier_can_be_run_as_another_one_in_disguise(house):
+    """A tier reading that was secretly another tier is the most expensive wrong
+    number this branch could produce: it would look like the phase working.
+
+    Tier C has no adapter and raises. Tier B WITHOUT A STORE raises too, and
+    that case is the one worth guarding -- it is the one that would otherwise
+    run happily, because a Tier B with no store is just Tier A with extra steps
+    and would score like it.
+    """
     core = StubCore()
-    for tier in (Tier.B, Tier.C):
-        with pytest.raises(NotImplementedError, match="Phase"):
-            run_exam(core, house, tier)
+
+    with pytest.raises(NotImplementedError, match="Phase 3"):
+        run_exam(core, house, Tier.C)
+
+    with pytest.raises(ValueError, match="no store was given"):
+        run_exam(core, house, Tier.B)
+
+
+def test_tier_b_answers_from_the_store_and_not_from_the_conversation(tmp_path, house):
+    """The claim Tier B makes: everything it knows arrived through retrieval.
+
+    `StubCore`'s state counts tokens fed, so an answering state built from a
+    fresh prime plus injected hits is far smaller than one that carried three
+    hundred turns. If Tier B were quietly reusing the conversation state, this
+    would be the size of Tier A's.
+    """
+    from sylvatica.store import HashEmbedder, SqliteStore
+
+    core = StubCore()
+    store = SqliteStore(tmp_path / "b.db", embedder=HashEmbedder(dims=64))
+    result = run_exam(
+        core, house, Tier.B, reply_budget=2, answer_budget=2,
+        state_path=tmp_path / "b.pt", progress=False, store=store, k=4,
+    )
+    assert result.answers
+    assert len(result.retrieved) == len(result.answers)
+
+    # Every turn was written, in and out.
+    assert store.tiers()["total"] >= len(house.turns)
+
+    # And the retrieval rows say whether the answering fragment was in front of
+    # the core -- without which a bad Tier B is unattributable.
+    positives = [r for r in result.retrieved if r["wanted_fragment"]]
+    assert positives and all(isinstance(r["hit"], bool) for r in positives)
+    store.close()
 
 
 def test_a_question_does_not_enter_the_conversation(tmp_path, house):

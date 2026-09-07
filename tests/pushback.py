@@ -21,7 +21,7 @@ from dataclasses import dataclass
 
 # The count is asserted. Change it in the same commit that changes the list, and
 # say in the message which entry left and what settled it.
-COUNT = 6
+COUNT = 7
 
 
 @dataclass(frozen=True)
@@ -117,6 +117,32 @@ OBJECTIONS: list[Objection] = [
             "Time a turn with the save, with the save unsynced, and with it "
             "skipped, at both sizes. If the save is under a few percent of a "
             "turn, this closes and the cost meter stays as it is."
+        ),
+    ),
+    Objection(
+        what=(
+            "The exam's questions are near-paraphrases of the sentences that "
+            "told the facts, so retrieval is mostly a lexical-overlap task."
+        ),
+        why=(
+            "'There are 65 lanterns in the cellar' is asked as 'How many "
+            "lanterns are in the cellar?'. Every content word is shared, so "
+            "FTS5 alone finds it -- on a first wiring check the store scored "
+            "precision 1.000 at k=4 using an embedder with NO SEMANTICS AT ALL, "
+            "which is the giveaway. Tier B will therefore look excellent for a "
+            "reason that has nothing to do with memory and will not survive "
+            "contact with a real conversation, where somebody asks 'how many of "
+            "those did you say there were?' three days later. THE RISK IS THAT "
+            "PHASE 2 PASSES ITS EXIT ON A TASK EASIER THAN THE ONE IT IS FOR, "
+            "and Phase 3 is then built on a store nobody has actually stressed."
+        ),
+        settled_by=(
+            "Two readings on the same house. Tier B with the lexical ranker "
+            "disabled, vector only -- if precision barely moves, the embeddings "
+            "are carrying nothing and the score is FTS5's. And a question "
+            "variant that shares no content words with the told sentence, which "
+            "the generator can produce for every kind. If precision holds on "
+            "both, this closes and the exam is harder than it looked."
         ),
     ),
     Objection(

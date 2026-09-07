@@ -30,7 +30,16 @@ from pathlib import Path
 from typing import Any
 
 from ..core.base import Cost, Meter, Sampling
-from ..loop.turn import STOP_STRINGS, format_prompt, prime, say, trim_at_stop
+from ..loop.turn import (
+    CORE_PREFIX,
+    SEPARATOR,
+    STOP_STRINGS,
+    USER_PREFIX,
+    format_prompt,
+    prime,
+    say,
+    trim_at_stop,
+)
 from . import Score, Tier
 from .baselines import BlindBaseline, is_refusal
 from .world import Generated, questions_at
@@ -103,6 +112,12 @@ class ExamResult:
     # what still varies between houses is a measurement, and this is it.
     truncated_replies: int = 0
     conversation_turns: int = 0
+
+    # ONE ROW PER TIER B QUESTION: whether the fragment holding the answer was in
+    # the injected set, and at what rank. The doc's named Phase 2 reading, and
+    # what makes a bad Tier B attributable -- the store failing to find a fact
+    # and the core ignoring a found fact need opposite fixes.
+    retrieved: list[dict] = field(default_factory=list)
 
     def score(self) -> Score:
         positives = [a for a in self.answers if a.fact_id is not None]
@@ -195,6 +210,53 @@ def judge(question: Any, said: str) -> tuple[bool, bool, bool]:
     return (bool(wanted) and wanted in said.lower(), False, echoed)
 
 
+# THE INJECTION FORMAT IS A DIAL and every reading records it. It is deliberately
+# plain: a short header, one hit a line, and a two-word acknowledgement so the
+# core sees a completed turn rather than a fragment. The acknowledgement matters
+# for the reason the whole preamble saga did -- what the core's own turns look
+# like is what it learns to produce.
+INJECT_HEADER = "Some things you were told earlier:"
+
+
+def inject(hits: list[Any]) -> str:
+    """The retrieved fragments, in the fixed compact format, as a completed turn."""
+    lines = "\n".join(f"- {h.fragment.text}" for h in hits)
+    return (
+        f"{USER_PREFIX}{INJECT_HEADER}\n{lines}"
+        f"{SEPARATOR}{CORE_PREFIX} Noted.{SEPARATOR}"
+    )
+
+
+def _precision_row(question: Any, hits: list[Any], house: Generated, provenance: str) -> dict:
+    """Did retrieval actually put the answer in front of the core?
+
+    THE DOC'S NAMED PHASE 2 READING: "retrieval precision at k: how often the
+    fragment holding the answer is in the injected set." Without it, a bad Tier B
+    is unattributable -- the store might have failed to find the fact, or found
+    it and the core ignored it, and those need opposite fixes.
+
+    A negative has no answering fragment, so `wanted` is None and the row records
+    only what came back.
+    """
+    from ..store.sqlite import fragment_id
+
+    wanted = None
+    if question.fact_id is not None:
+        fact = next(f for f in house.facts if f.id == question.fact_id)
+        turn = house.told_at[question.fact_id]
+        wanted = fragment_id("episode", fact.told, f"{provenance}#turn:{turn}:in")
+
+    got = [h.fragment.id for h in hits]
+    return {
+        "fact_id": question.fact_id,
+        "delay": question.delay_turns,
+        "wanted_fragment": wanted,
+        "hit": wanted in got if wanted else None,
+        "rank": got.index(wanted) if wanted and wanted in got else None,
+        "returned": len(got),
+    }
+
+
 def _ask(core: Any, state: Any, text: str, budget: int, meter: Meter) -> str:
     """One question on a state that is thrown away afterwards."""
     tokens = core.encode(format_prompt(text))
@@ -215,22 +277,40 @@ def run_exam(
     progress: bool = True,
     preamble: str | None = None,
     repair: bool = False,
+    store: Any = None,
+    k: int = 5,
+    provenance: str = "exam",
 ) -> ExamResult:
     """Hold the conversation, ask every question at its delay, score it.
 
-    Tier A is the only tier this can run. B needs the store (Phase 2) and C
-    needs the adapter (Phase 3); both raise rather than silently running as A,
-    because a Tier B reading that was secretly Tier A would be the most
+    TIER A answers from the STATE: the conversation is carried forward, saved to
+    disk, and each question is asked on a fork of it.
+
+    TIER B answers from the STORE: the same conversation happens and every turn
+    is written, but each question starts from a FRESH PRIMED STATE with the top
+    `k` retrieved fragments injected. Nothing the core knows at that moment came
+    from carrying the conversation -- which is the point, because it isolates
+    retrieval from the state entirely.
+
+    THE TWO TIERS RUN THE SAME CONVERSATION ON PURPOSE. They differ only in what
+    the ANSWERING state contains, so the comparison is about where a memory came
+    from and not about what was said.
+
+    Tier C needs the adapter and raises. It is not run as A or B in disguise,
+    because a tier reading that was secretly another tier would be the most
     expensive kind of wrong number this branch could produce.
     """
-    if tier is not Tier.A:
+    if tier is Tier.C:
         raise NotImplementedError(
-            f"Tier {tier.value} needs "
-            + ("the store (Phase 2)" if tier is Tier.B else "the adapter (Phase 3)")
-            + ". It is not run as Tier A in disguise."
+            "Tier C needs the adapter (Phase 3). It is not run as Tier A in disguise."
+        )
+    if tier is Tier.B and store is None:
+        raise ValueError(
+            "Tier B is the STORE tier and no store was given. Running it without "
+            "one would silently be Tier A with extra steps."
         )
 
-    state_path = Path(state_path or Path("state") / "exam" / "tier-a.pt")
+    state_path = Path(state_path or Path("state") / "exam" / f"tier-{tier.value.lower()}.pt")
     state_path.parent.mkdir(parents=True, exist_ok=True)
 
     schedule = questions_at(house)
@@ -249,11 +329,19 @@ def run_exam(
         # `say` closes the turn with a separator; see its docstring for what
         # omitting that did to the first two Tier A readings.
         seen: dict = {}
-        _, state, cost = say(core, state, line, reply_budget, repair=repair, seen=seen)
+        reply, state, cost = say(core, state, line, reply_budget, repair=repair, seen=seen)
         meter.add(cost)
         result.reply_tokens += cost.tokens_out
         result.truncated_replies += seen.get("truncated", 0)
         result.conversation_turns += 1
+
+        # EVERY TURN IS WRITTEN, IN AND OUT, BEFORE ANYTHING ELSE. The store is
+        # the lossless record; forgetting is what falls out of the STATE and out
+        # of the hot tier, never what fails to be written.
+        if store is not None:
+            store.write_turn(line, f"{provenance}#turn:{turn}:in")
+            if reply:
+                store.write_turn(reply, f"{provenance}#turn:{turn}:out", importance=0.3)
 
         due = schedule.get(turn)
         if not due:
@@ -265,7 +353,23 @@ def run_exam(
         asking = core.load_state(state_path)
 
         for question in due:
-            said = _ask(core, core.copy_state(asking), question.text, answer_budget, meter)
+            if tier is Tier.B:
+                # A FRESH STATE. Nothing the core knows here was carried; it all
+                # arrived through retrieval, which is what Tier B is for.
+                hits = store.search(question.text, k=k, deadline=time.monotonic() + 5.0)
+                answering, cost = prime(core, preamble=preamble)
+                meter.add(cost)
+                if hits:
+                    answering, cost = core.feed(core.encode(inject(hits)), answering)
+                    meter.add(cost)
+                    store.mark_recalled([h.fragment.id for h in hits])
+                result.retrieved.append(
+                    _precision_row(question, hits, house, provenance)
+                )
+            else:
+                answering = core.copy_state(asking)
+
+            said = _ask(core, answering, question.text, answer_budget, meter)
             correct, invented, echoed = judge(question, said)
             result.answers.append(
                 Answered(

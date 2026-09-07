@@ -80,6 +80,7 @@ class Consolidator(Protocol):
 
 # At the bottom: these import the types above.
 from .consolidate import TrainingSet, build_training_set, run_cycle, train
+from .extract import Declarative, declaratives_from, paraphrase, templates
 from .gate import Gate, Measurement, calibrate, measure
 from .heldout import GENERAL_QA, PERPLEXITY_TEXT, fingerprint
 from .lora import DEFAULT_TARGETS, LoraAdapter, adapter_for
@@ -91,6 +92,7 @@ __all__ = [
     "Arm",
     "Consolidator",
     "Cycle",
+    "Declarative",
     "Gate",
     "GateResult",
     "LoraAdapter",
@@ -99,8 +101,11 @@ __all__ = [
     "adapter_for",
     "build_training_set",
     "calibrate",
+    "declaratives_from",
     "fingerprint",
     "measure",
+    "paraphrase",
     "run_cycle",
+    "templates",
     "train",
 ]

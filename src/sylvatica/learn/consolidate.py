@@ -89,16 +89,22 @@ def build_training_set(
     So when `core` is given, the general slice is sized from the house half's
     actual token count to hit `spec.general`.
     """
-    if arm == "declaratives":
-        raise NotImplementedError(
-            "The declaratives arm needs an extractor that turns an episode "
-            "window into paraphrased facts. It is owed work -- see "
-            "tests/outstanding -- and building it before `raw` has a reading "
-            "would be choosing the expected winner before running the race."
-        )
-
     fragments = store.sample_for_replay(spec)
-    texts = [f.text for f in fragments]
+
+    if arm == "raw":
+        texts = [f.text for f in fragments]
+    else:
+        # DECLARATIVES: the core reads a window of episodes and states the facts,
+        # then each fact is said several ways. See `learn/extract.py` for why
+        # varying the surface while holding the binding fixed is the whole point.
+        if core is None:
+            raise ValueError("the declaratives arm needs a core to extract with")
+        from .extract import declaratives_from
+
+        extraction = declaratives_from(core, fragments)
+        texts = extraction.texts()
+        if arm == "both":
+            texts = [f.text for f in fragments] + texts
 
     if general is None:
         from .general import load

@@ -1,0 +1,269 @@
+{
+  "phase": 3,
+  "kind": "can-it-learn",
+  "taken_at": "2026-09-07T10:14:08.115337+00:00",
+  "what": "whether the adapter can put any fact into the weights at all",
+  "would_refute": "overfitting these facts for these epochs and still answering none",
+  "core": "rwkv7-g1d-0.4b-20260210-ctx8192 [cuda fp32]",
+  "size_b": 0.4,
+  "facts": 20,
+  "arm": "declaratives",
+  "training_sentences": 64,
+  "epochs": 20,
+  "lr": 0.0003,
+  "rank": 8,
+  "tokens_trained": 11800,
+  "final_loss": 0.5011,
+  "max_abs_delta": 0.04709188640117645,
+  "gradients_finite": true,
+  "correct_before": 0,
+  "correct_after": 11,
+  "before": [
+    {
+      "asked": "What does Sailoun do for a living?",
+      "wanted": "books",
+      "said": "Sailoun lives on the third shelf.",
+      "correct": false
+    },
+    {
+      "asked": "How many iron hooks are in the pantry?",
+      "wanted": "13",
+      "said": "There are three.",
+      "correct": false
+    },
+    {
+      "asked": "Where does Vrearndreas keep the cracked plates?",
+      "wanted": "still room",
+      "said": "You have not told me.",
+      "correct": false
+    },
+    {
+      "asked": "What colour are the glass jars?",
+      "wanted": "slate",
+      "said": "They are blue.",
+      "correct": false
+    },
+    {
+      "asked": "Whose cousin is Henound?",
+      "wanted": "Plodriorn",
+      "said": "I do not know.",
+      "correct": false
+    },
+    {
+      "asked": "What does Henound do for a living?",
+      "wanted": "bees",
+      "said": "Henound is a cook.",
+      "correct": false
+    },
+    {
+      "asked": "How many iron hooks are in the laundry?",
+      "wanted": "71",
+      "said": "There are three.",
+      "correct": false
+    },
+    {
+      "asked": "Where does Sailoun keep the wool cards?",
+      "wanted": "still room",
+      "said": "You have not told me.",
+      "correct": false
+    },
+    {
+      "asked": "What colour are the wool cards?",
+      "wanted": "oxblood",
+      "said": "They are blue.",
+      "correct": false
+    },
+    {
+      "asked": "Whose cousin is Humstaegaeck?",
+      "wanted": "Vrearndreas",
+      "said": "I do not know.",
+      "correct": false
+    },
+    {
+      "asked": "What does Plodriorn do for a living?",
+      "wanted": "spoons",
+      "said": "He is a plumber.",
+      "correct": false
+    },
+    {
+      "asked": "How many cracked plates are in the scullery?",
+      "wanted": "32",
+      "said": "There are three.",
+      "correct": false
+    },
+    {
+      "asked": "Where does Henound keep the seed trays?",
+      "wanted": "coach house",
+      "said": "You have not told me.",
+      "correct": false
+    },
+    {
+      "asked": "What colour are the seed trays?",
+      "wanted": "ochre",
+      "said": "They are green.",
+      "correct": false
+    },
+    {
+      "asked": "Whose cousin is Plodriorn?",
+      "wanted": "Henound",
+      "said": "I do not know.",
+      "correct": false
+    },
+    {
+      "asked": "What does Humstaegaeck do for a living?",
+      "wanted": "bees",
+      "said": "He is a carpenter.",
+      "correct": false
+    },
+    {
+      "asked": "How many flour sacks are in the nursery?",
+      "wanted": "18",
+      "said": "There are three.",
+      "correct": false
+    },
+    {
+      "asked": "Where does Sailoun keep the lanterns?",
+      "wanted": "attic",
+      "said": "You have not told me.",
+      "correct": false
+    },
+    {
+      "asked": "What colour are the iron hooks?",
+      "wanted": "indigo",
+      "said": "They are red.",
+      "correct": false
+    },
+    {
+      "asked": "Whose cousin is Doufeand?",
+      "wanted": "Plodriorn",
+      "said": "Doufeand is my cousin.",
+      "correct": false
+    }
+  ],
+  "after": [
+    {
+      "asked": "What does Sailoun do for a living?",
+      "wanted": "books",
+      "said": "Sailoun keeps the lanterns in the attic.",
+      "correct": false
+    },
+    {
+      "asked": "How many iron hooks are in the pantry?",
+      "wanted": "13",
+      "said": "13 iron hooks.",
+      "correct": true
+    },
+    {
+      "asked": "Where does Vrearndreas keep the cracked plates?",
+      "wanted": "still room",
+      "said": "In the still room.",
+      "correct": true
+    },
+    {
+      "asked": "What colour are the glass jars?",
+      "wanted": "slate",
+      "said": "Ochre.",
+      "correct": false
+    },
+    {
+      "asked": "Whose cousin is Henound?",
+      "wanted": "Plodriorn",
+      "said": "Henound is a cousin of Plodriorn.",
+      "correct": true
+    },
+    {
+      "asked": "What does Henound do for a living?",
+      "wanted": "bees",
+      "said": "Henound keeps the seed trays in the coach house.",
+      "correct": false
+    },
+    {
+      "asked": "How many iron hooks are in the laundry?",
+      "wanted": "71",
+      "said": "13 iron hooks.",
+      "correct": false
+    },
+    {
+      "asked": "Where does Sailoun keep the wool cards?",
+      "wanted": "still room",
+      "said": "In the still room.",
+      "correct": true
+    },
+    {
+      "asked": "What colour are the wool cards?",
+      "wanted": "oxblood",
+      "said": "In the still room.",
+      "correct": false
+    },
+    {
+      "asked": "Whose cousin is Humstaegaeck?",
+      "wanted": "Vrearndreas",
+      "said": "Humstaegaeck is a cousin of Vrearndreas.",
+      "correct": true
+    },
+    {
+      "asked": "What does Plodriorn do for a living?",
+      "wanted": "spoons",
+      "said": "Plodriorn keeps the seed trays in the coach house.",
+      "correct": false
+    },
+    {
+      "asked": "How many cracked plates are in the scullery?",
+      "wanted": "32",
+      "said": "13 iron hooks are in the pantry.",
+      "correct": false
+    },
+    {
+      "asked": "Where does Henound keep the seed trays?",
+      "wanted": "coach house",
+      "said": "In the coach house.",
+      "correct": true
+    },
+    {
+      "asked": "What colour are the seed trays?",
+      "wanted": "ochre",
+      "said": "Ochre.",
+      "correct": true
+    },
+    {
+      "asked": "Whose cousin is Plodriorn?",
+      "wanted": "Henound",
+      "said": "Henound.",
+      "correct": true
+    },
+    {
+      "asked": "What does Humstaegaeck do for a living?",
+      "wanted": "bees",
+      "said": "Humstaegaeck keeps bees.",
+      "correct": true
+    },
+    {
+      "asked": "How many flour sacks are in the nursery?",
+      "wanted": "18",
+      "said": "13.",
+      "correct": false
+    },
+    {
+      "asked": "Where does Sailoun keep the lanterns?",
+      "wanted": "attic",
+      "said": "In the attic.",
+      "correct": true
+    },
+    {
+      "asked": "What colour are the iron hooks?",
+      "wanted": "indigo",
+      "said": "Ochre.",
+      "correct": false
+    },
+    {
+      "asked": "Whose cousin is Doufeand?",
+      "wanted": "Plodriorn",
+      "said": "Plodriorn.",
+      "correct": true
+    }
+  ],
+  "verdict": {
+    "machinery_can_learn": true,
+    "weights_moved": true
+  }
+}

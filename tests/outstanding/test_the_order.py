@@ -84,15 +84,41 @@ def test_the_exam_exists_and_has_taken_the_first_reading():
     readings = readings_of("exam", phase=1)
     assert readings, "no phase-1 exam reading committed"
 
-    # BOTH BASELINES, OR IT IS NOT THE READING THE DOC ASKED FOR. Standing
-    # objection 8 says the full-context control costs hours and that the real
-    # risk is a session quietly running arms without it. This is where that gets
-    # caught: a Tier A reading against blind alone leaves Phase 1 red, and says
-    # so, instead of closing the phase on half a comparison.
+    # BOTH BASELINES, OR IT IS NOT THE READING THE DOC ASKED FOR.
     complete = [r for r in readings if "full-context" in r.get("baselines", [])]
     assert complete, (
         f"{len(readings)} phase-1 reading(s) committed, none with the "
         "full-context baseline run beside the arm"
+    )
+
+    # TAKEN UNDER THE PREAMBLE THAT SHIPS, and this clause exists because the
+    # test went GREEN on 2026-09-06 for a phase that was not done. Every Tier A
+    # number that day was taken under a preamble whose one example of a reply
+    # restated the user's turn, so the core answered by echoing questions back
+    # and the exam scored that as forgetting. A reading taken under a superseded
+    # framing is not a reading of this branch.
+    from sylvatica.loop.turn import PREAMBLE
+
+    current = [r for r in complete if r.get("preamble") == PREAMBLE]
+    assert current, (
+        f"{len(complete)} complete phase-1 reading(s), none taken under the "
+        "preamble that currently ships. Re-run the exam."
+    )
+
+    # AND THE GAP MUST BEAT THE NOISE, which is the clause that would have
+    # stopped the whole mistake. One house said Tier A 0.456 against blind 0.240
+    # at delay 20 and read as a comfortable win; five houses said the Tier A
+    # range at that delay is 0.60 and that two houses of five fall BELOW blind.
+    # A verdict smaller than its own spread is not a verdict.
+    noise = readings_of("exam-noise", phase=1)
+    assert noise, "no phase-1 noise calibration committed"
+    latest = noise[-1]
+    at20 = latest.get("verdict", {}).get("20") or latest.get("verdict", {}).get(20)
+    assert at20, f"the noise reading {latest['_path']} has no delay-20 verdict"
+    assert at20["gap_exceeds_noise"], (
+        f"at delay 20 the gap to blind is {at20['gap_to_blind']} and Tier A "
+        f"moves {at20['tier_a_range']} between houses. Phase 1 cannot be struck "
+        "on a gap smaller than its own spread."
     )
 
 

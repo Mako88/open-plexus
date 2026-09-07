@@ -371,6 +371,18 @@ depends on has its exit.
   wastes the instruction budget and hides the real cause. The fork is worth running because ONE
   instance already works — "answer in a few words" is context hygiene, and the core's own
   chatter is worth about 45 points over the first fifty turns.
+- **A predicted adapter in place of a trained one.** John's, and it depends on Phase 3 having an
+  exit first — there is no point learning to predict a delta before the delta is known to be
+  worth having. Train a hypernetwork on (fragments in, adapter out) pairs, which the
+  consolidation loop already produces as a byproduct, and consolidation becomes a forward pass
+  instead of a training run. WHY THIS IS WELL-POSED WHERE PREDICTING BASE WEIGHTS IS NOT: a
+  network's hidden units can be permuted, with the inverse permutation applied downstream, to
+  give an identical function at completely different weights — so "the weights for this corpus"
+  is a set of size d! per layer, not a point, and anything fit by regression predicts their
+  average, which is mush. A LoRA delta over a FROZEN base has no such freedom: the basis is
+  fixed and the delta is anchored to it. The cost argument follows the same line — a thousand
+  training pairs here is a thousand consolidation cycles, which is hours on this card, against
+  the thousands of full pretraining runs the base-weight version would need.
 
 ---
 

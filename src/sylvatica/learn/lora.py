@@ -69,6 +69,7 @@ class LoraAdapter(nn.Module):
         self.scaling = alpha / rank
         self.targets = targets
         self.names: list[str] = []
+        self._applied: dict[str, torch.Tensor] = {}
 
         self.a = nn.ParameterDict()
         self.b = nn.ParameterDict()
@@ -108,6 +109,47 @@ class LoraAdapter(nn.Module):
         d = self.delta(name)
         return base if d is None else base + d.to(base.dtype)
 
+    # -- applying it temporarily, so an exam can run on the fast path -------
+
+    @torch.no_grad()
+    def apply_to(self, z: dict[str, torch.Tensor]) -> None:
+        """Fold the deltas into the base and REMEMBER them, so it can be undone.
+
+        WHY THIS EXISTS AND WHY IT IS NOT `merge_into`. Tier C asks 270 questions
+        of an adapted model. Answering them through the differentiable forward
+        means a Python loop over every generated token, which is hours. The fast
+        inference path has no notion of an adapter -- so the adapter is folded
+        in, the exam runs at full speed, and then it is folded back out.
+
+        REVERSIBLE IS THE WHOLE POINT. `merge_into` is the doc's "sleep" and is
+        irreversible by design: it zeroes the adapter afterwards, which is
+        correct for consolidation and would destroy an experiment. Keeping the
+        applied deltas costs one copy of a few million numbers and makes the
+        difference between an evaluation and a commitment.
+        """
+        if self._applied:
+            raise RuntimeError("already applied; call revert_from first")
+        for name in self.names:
+            d = self.delta(name)
+            if d is None:
+                continue
+            d = d.to(z[name].dtype)
+            self._applied[name] = d.clone()
+            z[name] += d
+
+    @torch.no_grad()
+    def revert_from(self, z: dict[str, torch.Tensor]) -> None:
+        """Undo `apply_to`, exactly, using the deltas it kept.
+
+        Subtracting a RECOMPUTED delta would be subtly wrong: the adapter may
+        have trained between the two calls, and the difference would be silently
+        baked into the base -- an irreversible change nobody asked for, in a
+        model that would still run.
+        """
+        for name, d in self._applied.items():
+            z[name] -= d
+        self._applied.clear()
+
     # -- the merge, which the doc calls "the sleep" -------------------------
 
     @torch.no_grad()
@@ -121,6 +163,11 @@ class LoraAdapter(nn.Module):
         adapter; a merge cannot, and Phase 3 must take the regression gate's
         verdict before doing one rather than after.
         """
+        if self._applied:
+            raise RuntimeError(
+                "the adapter is temporarily applied for an exam; merging now "
+                "would fold the same delta in twice. Call revert_from first."
+            )
         merged = 0
         for name in self.names:
             d = self.delta(name)

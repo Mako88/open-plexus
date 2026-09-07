@@ -187,6 +187,23 @@ def test_no_tier_can_be_run_as_another_one_in_disguise(house):
         run_exam(core, house, Tier.B)
 
 
+def test_tier_c_refuses_to_run_with_the_store_on(tmp_path, house):
+    """THE MOST FLATTERING WRONG NUMBER AVAILABLE TO THIS BRANCH.
+
+    Tier C measures what got into the WEIGHTS -- that is the whole of complaint
+    4's bar and the first north star's added line. Run with retrieval on, it
+    would be Tier B wearing a different label, and Tier B already scores 0.97.
+    A Tier C reading of 0.97 would look like the bet paying off.
+    """
+    from sylvatica.store import HashEmbedder, SqliteStore
+
+    core = StubCore()
+    store = SqliteStore(tmp_path / "c.db", embedder=HashEmbedder(dims=64))
+    with pytest.raises(ValueError, match="store DISABLED"):
+        run_exam(core, house, Tier.C, store=store, adapter=object())
+    store.close()
+
+
 def test_tier_b_answers_from_the_store_and_not_from_the_conversation(tmp_path, house):
     """The claim Tier B makes: everything it knows arrived through retrieval.
 

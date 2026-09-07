@@ -280,6 +280,7 @@ def run_exam(
     store: Any = None,
     k: int = 5,
     provenance: str = "exam",
+    adapter: Any = None,
 ) -> ExamResult:
     """Hold the conversation, ask every question at its delay, score it.
 
@@ -300,9 +301,17 @@ def run_exam(
     because a tier reading that was secretly another tier would be the most
     expensive kind of wrong number this branch could produce.
     """
-    if tier is Tier.C:
+    if tier is Tier.C and adapter is None:
         raise NotImplementedError(
-            "Tier C needs the adapter (Phase 3). It is not run as Tier A in disguise."
+            "Tier C is the WEIGHTS tier and no adapter was given (Phase 3). "
+            "It is not run as Tier A in disguise."
+        )
+    if tier is Tier.C and store is not None:
+        raise ValueError(
+            "Tier C runs with the store DISABLED -- that is what makes it a "
+            "measurement of the weights. A Tier C reading taken with retrieval "
+            "on would be Tier B wearing a different label, and would be the most "
+            "flattering wrong number this branch could produce."
         )
     if tier is Tier.B and store is None:
         raise ValueError(
@@ -332,7 +341,7 @@ def run_exam(
     # which is what actually ran; charging it 270 times to make the arm look
     # expensive, or crediting a saving that no honest implementation would pay,
     # would both be putting a number in a reading that nothing produced.
-    primed = core.copy_state(state) if tier is Tier.B else None
+    primed = core.copy_state(state) if tier in (Tier.B, Tier.C) else None
 
     for turn, line in enumerate(house.turns):
         # The conversation itself. The core replies, and its reply goes into the
@@ -364,7 +373,11 @@ def run_exam(
         asking = core.load_state(state_path)
 
         for question in due:
-            if tier is Tier.B:
+            if tier is Tier.C:
+                # A FRESH STATE AND NO RETRIEVAL. Everything the core knows here
+                # is in its weights, which is the only thing Tier C measures.
+                answering = core.copy_state(primed)
+            elif tier is Tier.B:
                 # A FRESH STATE. Nothing the core knows here was carried; it all
                 # arrived through retrieval, which is what Tier B is for.
                 hits = store.search(question.text, k=k, deadline=time.monotonic() + 5.0)

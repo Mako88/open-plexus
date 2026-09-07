@@ -129,6 +129,12 @@ def main() -> int:
         help="which halves of the hybrid to run; all three settles objection 7",
     )
     parser.add_argument("--tier-a", action="store_true", help="run Tier A beside it")
+    parser.add_argument(
+        "--phrasing",
+        choices=["direct", "oblique"],
+        default="direct",
+        help="oblique questions share no content words with the telling sentence",
+    )
     parser.add_argument("--out", type=Path, default=Path("readings"))
     args = parser.parse_args()
 
@@ -138,6 +144,7 @@ def main() -> int:
         n_turns=args.turns,
         delays=tuple(args.delays),
         negatives=args.negatives,
+        phrasing=args.phrasing,
     )
     blind_score = round(run_blind(house).score().score, 4)
     print(
@@ -168,7 +175,7 @@ def main() -> int:
         # would already hold this house's fragments, so the second arm would be
         # searching a store the first one filled -- same rows, different ranker,
         # and no way to tell that from a fair run.
-        db = Path("state/exam") / f"p2-{ranker}-{args.seed}.db"
+        db = Path("state/exam") / f"p2-{args.phrasing}-{ranker}-{args.seed}.db"
         if db.exists():
             db.unlink()
         store = OneRanker(db, embedder=embedder, ranker=ranker)
@@ -208,6 +215,7 @@ def main() -> int:
             "turns": args.turns,
             "delays": args.delays,
             "negatives": args.negatives,
+            "phrasing": args.phrasing,
         },
         "dials": {
             "k": args.k,
@@ -230,7 +238,7 @@ def main() -> int:
 
     args.out.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
-    path = args.out / f"phase2-exam-{stamp}.json"
+    path = args.out / f"phase2-exam-{args.phrasing}-{stamp}.json"
     path.write_text(json.dumps(reading, indent=2) + "\n", encoding="utf-8")
 
     print("\n" + "-" * 60)

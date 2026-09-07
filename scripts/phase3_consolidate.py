@@ -77,6 +77,16 @@ def main() -> int:
             "cannot, because its Tier C is measuring the untouched base."
         ),
     )
+    parser.add_argument(
+        "--reuse-store",
+        action="store_true",
+        help=(
+            "skip refilling the store if one for this house already exists. Nine "
+            "minutes a run, which matters when sweeping a dial -- and it is "
+            "checked rather than trusted: the fragment count must match the "
+            "conversation, or it refills."
+        ),
+    )
     parser.add_argument("--out", type=Path, default=Path("readings"))
     args = parser.parse_args()
 
@@ -185,7 +195,7 @@ def main() -> int:
     verdict = {
         "tier_c": last_c,
         "tier_a": round(tier_a.score().score, 4),
-        "tier_b": round(tier_b.score().score, 4),
+        "tier_b": round(tier_b.score().score, 4) if tier_b else None,
         "blind": blind,
         "tier_c_above_blind": (last_c > blind) if last_c is not None else None,
         "tier_c_above_tier_a": (

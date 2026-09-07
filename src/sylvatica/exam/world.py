@@ -46,7 +46,7 @@ _ROOMS = [
     "gun room", "still room", "laundry", "coach house", "dairy", "nursery",
 ]
 _OBJECTS = [
-    "lanterns", "brass keys", "seed trays", "fishing floats", "candle moulds",
+    "lanterns", "flour sacks", "seed trays", "fishing floats", "candle moulds",
     "cracked plates", "walking sticks", "glass jars", "iron hooks", "wool cards",
 ]
 _TRADES = [
@@ -56,6 +56,42 @@ _TRADES = [
 _COLOURS = [
     "ochre", "slate", "russet", "verdigris", "oxblood", "bone", "indigo", "mustard",
 ]
+
+# OBLIQUE PHRASINGS: the same question with none of the telling sentence's words.
+#
+# WHY THIS EXISTS, AND IT IS A MEASURED FAULT RATHER THAN A PRECAUTION. The
+# direct questions are near-copies of the sentences that told the facts -- "How
+# many lanterns are in the cellar?" about "There are 65 lanterns in the cellar"
+# -- so every content word is shared and FTS5 alone finds the answer. Phase 2's
+# first reading proved it: Tier B scored 0.988 with the LEXICAL RANKER ALONE and
+# precision 1.000, slightly BETTER than the hybrid. The embeddings were
+# contributing nothing, and the store was passing a keyword-lookup task while
+# being credited with retrieval.
+#
+# So an oblique question keeps the ENTITY -- without it the question is
+# unanswerable rather than merely harder -- and replaces every other content word
+# with something a lexical index cannot match. "How many lamps are kept
+# downstairs?" needs the store to know that lamps are lanterns and downstairs is
+# the cellar, which is what an embedding is for and what nothing has yet tested.
+_ROOM_SYNONYMS = {
+    "scullery": "wash-up room", "boot room": "muddy porch", "morning room": "sunny sitting room",
+    "cellar": "space downstairs", "attic": "loft", "pantry": "larder",
+    "gun room": "shooting store", "still room": "preserving room", "laundry": "wash house",
+    "coach house": "cart shed", "dairy": "milk store", "nursery": "children's room",
+}
+_OBJECT_SYNONYMS = {
+    "lanterns": "lamps", "flour sacks": "grain bags", "seed trays": "planting flats",
+    "fishing floats": "bobbers", "candle moulds": "wax forms", "cracked plates": "chipped dishes",
+    "walking sticks": "canes", "glass jars": "preserving pots", "iron hooks": "metal pegs",
+    "wool cards": "fleece combs",
+}
+_TRADE_SYNONYMS = {
+    "repairs clocks": "mends timepieces", "keeps bees": "tends hives",
+    "binds books": "sews volumes", "grinds lenses": "shapes optics",
+    "shoes horses": "fits hooves", "thatches roofs": "lays reed",
+    "carves spoons": "whittles utensils", "dyes wool": "colours fleece",
+    "sets type": "arranges letterpress", "mends nets": "patches trawls",
+}
 
 # NUMBERS ARE DRAWN FROM A WIDE RANGE ON PURPOSE, and the range is a dial the
 # reading records. A narrow range hands the blind baseline a large free score on
@@ -101,6 +137,7 @@ class Generated(House):
     """A `House` plus the bookkeeping a reading needs about how it was made."""
 
     n_turns: int = 0
+    phrasing: str = "direct"
     delays: tuple[int, ...] = field(default=())
     told_at: dict[str, int] = field(default_factory=dict)  # fact id -> turn index
 
@@ -158,6 +195,7 @@ def _make_facts(rng: random.Random, n_facts: int) -> list[Fact]:
                     kind=kind,
                     told=f"{who} {what} for a living.",
                     question=f"What does {who} do for a living?",
+                    oblique=f"How does {who} earn a wage?",
                     answer=what.split()[1],  # "repairs clocks" -> "clocks"
                 )
             )
@@ -174,6 +212,10 @@ def _make_facts(rng: random.Random, n_facts: int) -> list[Fact]:
                     kind=kind,
                     told=f"There are {n} {thing} in the {room}.",
                     question=f"How many {thing} are in the {room}?",
+                    oblique=(
+                        f"How many {_OBJECT_SYNONYMS.get(thing, thing)} sit in the "
+                        f"{_ROOM_SYNONYMS.get(room, room)}?"
+                    ),
                     answer=str(n),
                 )
             )
@@ -190,6 +232,10 @@ def _make_facts(rng: random.Random, n_facts: int) -> list[Fact]:
                     kind=kind,
                     told=f"{who} keeps the {thing} in the {room}.",
                     question=f"Where does {who} keep the {thing}?",
+                    oblique=(
+                        f"Which part of the house holds "
+                        f"{who}'s {_OBJECT_SYNONYMS.get(thing, thing)}?"
+                    ),
                     answer=room,
                 )
             )
@@ -205,6 +251,7 @@ def _make_facts(rng: random.Random, n_facts: int) -> list[Fact]:
                     kind=kind,
                     told=f"The {thing} are {colour}.",
                     question=f"What colour are the {thing}?",
+                    oblique=f"What shade are the {_OBJECT_SYNONYMS.get(thing, thing)}?",
                     answer=colour,
                 )
             )
@@ -219,6 +266,7 @@ def _make_facts(rng: random.Random, n_facts: int) -> list[Fact]:
                     kind=kind,
                     told=f"{a} is {b}'s cousin.",
                     question=f"Whose cousin is {a}?",
+                    oblique=f"To whom is {a} related?",
                     answer=b,
                 )
             )
@@ -231,6 +279,7 @@ def generate_house(
     n_turns: int = 300,
     delays: tuple[int, ...] = DEFAULT_DELAYS,
     negatives: int = 20,
+    phrasing: str = "direct",
 ) -> Generated:
     """A house of `n_facts` invented facts told across `n_turns` of conversation.
 
@@ -273,7 +322,8 @@ def generate_house(
             questions.append(
                 Question(
                     fact_id=fact.id,
-                    text=fact.question,
+                    text=(fact.oblique or fact.question) if phrasing == "oblique"
+                    else fact.question,
                     answer=fact.answer,
                     kind=fact.kind,
                     delay_turns=delay,
@@ -304,6 +354,7 @@ def generate_house(
         )
 
     house = Generated(seed=seed, facts=facts, turns=turns, questions=questions)
+    house.phrasing = phrasing
     house.n_turns = n_turns
     house.delays = tuple(delays)
     house.told_at = told_at

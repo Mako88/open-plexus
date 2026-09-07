@@ -56,6 +56,15 @@ class Fact:
     told: str  # the natural sentence that delivers it
     question: str
     answer: str
+    # THE SAME QUESTION WITH NONE OF THE TELLING SENTENCE'S WORDS.
+    #
+    # Phase 2's first reading showed the direct questions are near-copies of the
+    # sentences that told the facts, so Tier B scored 0.988 on the LEXICAL ranker
+    # alone with precision 1.000 -- better than the hybrid. The store was passing
+    # a keyword lookup and being credited with retrieval. The oblique phrasing
+    # keeps the entity, because without it the question is unanswerable rather
+    # than harder, and changes everything else.
+    oblique: str = ""
 
 
 @dataclass(frozen=True)

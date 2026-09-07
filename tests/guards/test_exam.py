@@ -359,3 +359,54 @@ def test_spread_reports_the_range_a_gap_must_beat():
     # legitimate thing to ask for, it just cannot support a threshold.
     one = spread([0.5])
     assert one["range"] == 0.0 and one["stdev"] == 0.0
+
+
+def test_an_oblique_question_shares_no_content_words_with_its_telling():
+    """THE PROPERTY THAT MAKES RETRIEVAL HARD, asserted rather than eyeballed.
+
+    Phase 2's first reading found Tier B scoring 0.988 on the LEXICAL ranker
+    alone with precision 1.000 -- better than the hybrid. The embeddings were
+    contributing nothing, because "How many lanterns are in the cellar?" shares
+    every content word with "There are 65 lanterns in the cellar" and FTS5 alone
+    finds it. The store was passing a keyword lookup while being credited with
+    retrieval.
+
+    An oblique question keeps the ENTITY -- a person's name, without which the
+    question is unanswerable rather than harder -- and must share nothing else.
+    This is what says so when a synonym map goes stale as the word lists grow,
+    which is the way this quietly stops working.
+    """
+    import re
+
+    STOP = {
+        "the", "a", "an", "is", "are", "in", "of", "to", "does", "do", "what",
+        "where", "how", "many", "whose", "which", "for", "and", "at", "his",
+        "her", "part", "house", "holds", "sit", "sits", "earn", "wage", "shade",
+        "colour", "related", "whom", "living", "keep", "keeps", "there", "that",
+    }
+
+    def content(text: str) -> set[str]:
+        return {
+            w for w in re.findall(r"[a-z]+", text.lower())
+            if w not in STOP and len(w) > 2
+        }
+
+    house = generate_house(
+        seed=0, n_facts=40, n_turns=250, delays=(1, 5, 20), negatives=0,
+        phrasing="oblique",
+    )
+
+    offenders = []
+    for fact in house.facts:
+        assert fact.oblique, f"{fact.kind} has no oblique phrasing"
+        # Proper nouns are the entity and are allowed through; they are the key.
+        names = {w.lower() for w in re.findall(r"[A-Z][a-z]+", fact.told)}
+        shared = (content(fact.oblique) & content(fact.told)) - names
+        if shared:
+            offenders.append((fact.told, fact.oblique, sorted(shared)))
+
+    assert not offenders, (
+        "oblique questions still share content words with their telling, so a "
+        "lexical index can shortcut them:\n"
+        + "\n".join(f"  {t}\n  -> {o}   shared={sh}" for t, o, sh in offenders[:6])
+    )

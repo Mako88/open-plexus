@@ -243,3 +243,59 @@ def test_the_blind_table_is_the_modal_answer(house):
     for kind, answer in blind.table.items():
         of_kind = [f.answer for f in house.facts if f.kind == kind]
         assert of_kind.count(answer) == max(of_kind.count(a) for a in set(of_kind))
+
+
+def test_the_full_context_baseline_runs_end_to_end(house):
+    """CHECKED ON THE STUB BECAUSE ON THE REAL CORE IT IS 2.7 HOURS.
+
+    The full-context baseline runs LAST in an exam, after the arm. A crash in it
+    costs the whole run -- the arm's numbers included -- and it would be found
+    at the end of the longest job this branch runs. So the code path is walked
+    here in milliseconds: every question answered, every answer scored, the cost
+    meter accumulating, and the same preamble the arm gets.
+    """
+    from sylvatica.exam import run_full_context
+
+    core = StubCore()
+    result = run_full_context(core, house, answer_budget=2, progress=False)
+
+    assert len(result.answers) == len(house.questions)
+    assert result.cost is not None and result.cost.tokens_in > 0
+    score = result.score()
+    assert score.asked == len([q for q in house.questions if q.fact_id is not None])
+
+
+def test_the_full_context_baseline_gets_the_same_preamble_as_the_arm(house):
+    """Or the comparison is between two instructions rather than two memories."""
+    from sylvatica.exam.baselines import FullContextBaseline
+    from sylvatica.loop.turn import PREAMBLE
+
+    core = StubCore()
+    baseline = FullContextBaseline(core, budget=2)
+
+    # EVERY call, not the last one: the stub's `generate` also calls `encode`,
+    # for the reply it invents. Keeping only the most recent would assert on the
+    # string "ok" and pass for the wrong reason.
+    seen: list[str] = []
+    original = core.encode
+
+    def watching(text: str):
+        seen.append(text)
+        return original(text)
+
+    core.encode = watching  # type: ignore[method-assign]
+    baseline.answer_at(["a line", "another line"], house.questions[0])
+
+    prompt = seen[0]
+    assert prompt.startswith(PREAMBLE)
+    assert "a line" in prompt and "another line" in prompt
+
+
+def test_the_full_context_estimate_grows_with_the_house():
+    """The number standing objection 8 is about. It must respond to the house."""
+    from sylvatica.exam import estimate_full_context_tokens
+
+    core = StubCore()
+    small = generate_house(seed=1, n_facts=10, n_turns=60, delays=(1, 5, 20), negatives=2)
+    big = generate_house(seed=1, n_facts=30, n_turns=200, delays=(1, 5, 20), negatives=2)
+    assert estimate_full_context_tokens(core, big) > estimate_full_context_tokens(core, small)

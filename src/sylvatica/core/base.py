@@ -164,6 +164,23 @@ class Sampling:
     that is the reading's problem to name.
     """
 
+    # GREEDY IS FOR MEASUREMENT, NOT FOR TALKING.
+    #
+    # The regression gate compares a QA score before and after a cycle. Sampled
+    # at temperature 1.0 over 25 questions, that score has a standard deviation
+    # of about 0.10 from the sampler alone -- binomial noise at p around 0.55.
+    # The first calibration made the problem visible: three repeats spread 0.60
+    # to 0.64, and the very next measurement of the SAME untouched model came in
+    # at 0.480, outside its own calibrated range. A threshold derived from that
+    # spread would have been below one standard deviation of its own measurement,
+    # so the gate would have rolled back cycles at random and the adapter's
+    # trajectory would have been decided by a die.
+    #
+    # Greedy decoding removes the sampler from the measurement entirely, which is
+    # what a yardstick needs. It is wrong for conversation -- argmax text is flat
+    # and repetitive -- so it is off by default and on only where something is
+    # being measured.
+    greedy: bool = False
     temperature: float = 1.0
     top_p: float = 0.3
     presence_penalty: float = 0.5

@@ -124,3 +124,36 @@ def test_the_qa_set_is_answerable_and_unambiguous():
         assert answers and all(a == a.lower() for a in answers), (
             f"{question!r} has answers that are not lowercase; the judge lowercases"
         )
+
+
+def test_the_gate_measures_the_model_and_not_the_sampler():
+    """GREEDY, and this is a fault that was caught by its own calibration.
+
+    Sampled at temperature 1.0, the QA score over 25 questions carries about 0.10
+    of standard deviation from the sampler alone. The first calibration made it
+    visible: three repeats spread 0.60 to 0.64, and the very next measurement of
+    the SAME untouched model came in at 0.480 -- outside its own calibrated
+    range. A threshold from that spread sits below one standard deviation of its
+    own measurement, so the gate would have rolled back cycles at random and
+    every rollback would have been recorded as a finding about consolidation.
+
+    Greedy makes it deterministic: 0.88, 0.88, 0.88 on repeated runs.
+    """
+    import inspect
+
+    from sylvatica.learn import gate as module
+
+    source = inspect.getsource(module.general_qa)
+    assert "greedy=True" in source, (
+        "the gate's QA measurement is sampled again; its own noise will exceed "
+        "any threshold derived from it"
+    )
+
+
+def test_greedy_is_off_by_default_everywhere_else():
+    """It is right for a yardstick and wrong for a conversation: argmax text is
+    flat and repetitive. A default of greedy would quietly change what the REPL
+    and every exam sound like."""
+    from sylvatica.core.base import Sampling
+
+    assert Sampling().greedy is False

@@ -238,11 +238,14 @@ class RwkvCore:
                     logits[token] -= sampling.presence_penalty + count * sampling.frequency_penalty
                 logits[0] -= 1e38  # Never sample end-of-text as the first thing.
 
-                token = int(
-                    self._pipeline.sample_logits(
-                        logits, temperature=sampling.temperature, top_p=sampling.top_p
+                if sampling.greedy:
+                    token = int(logits.argmax())
+                else:
+                    token = int(
+                        self._pipeline.sample_logits(
+                            logits, temperature=sampling.temperature, top_p=sampling.top_p
+                        )
                     )
-                )
                 if token in sampling.stop_tokens:
                     break
 

@@ -108,7 +108,9 @@ def general_qa(
                 core.encode(format_prompt(question)),
                 core.copy_state(state),
                 budget,
-                Sampling(stop_strings=STOP_STRINGS),
+                # GREEDY: the gate measures the model, not the sampler.
+                # See `Sampling.greedy` for the calibration that forced this.
+                Sampling(stop_strings=STOP_STRINGS, greedy=True),
             )
             said = trim_at_stop(core.decode(out), STOP_STRINGS).lower()
             correct += any(a in said for a in answers)
@@ -185,16 +187,28 @@ def calibrate(
 ) -> dict[str, Any]:
     """Read the noise BEFORE choosing a threshold. The doc's rule, executed.
 
-    Measures the untouched base several times. Perplexity under `no_grad` is
-    deterministic, so its spread should be near zero and a non-zero one is
-    itself a finding. QA generation is SAMPLED, so its spread is real and is the
-    thing a threshold has to clear.
+    AND THE FIRST RUN OF IT CHANGED WHAT THE MEASUREMENT IS. Sampled at
+    temperature 1.0, the QA score over 25 questions carries about 0.10 of
+    standard deviation from the sampler alone -- binomial noise at p near 0.55.
+    Three repeats spread 0.60 to 0.64, and the very next measurement of the SAME
+    untouched model came in at 0.480, outside its own calibrated range. A
+    threshold from that spread would have sat below one standard deviation of its
+    own measurement, and the gate would have rolled back cycles at random: the
+    adapter's whole trajectory decided by a die, and every rollback recorded as
+    a finding about consolidation.
 
-    The returned thresholds are the observed spread times `safety`. That
-    multiplier is a judgement and it is recorded in the reading rather than
-    buried here -- but a judgement applied to a measured spread is a different
-    animal from a number chosen before any measurement, which is what the rule
-    forbids.
+    SO THE MEASUREMENT IS GREEDY NOW and both halves are deterministic --
+    repeated runs give 0.88, 0.88, 0.88. Which means this function's honest
+    output has changed shape: there is no noise left to calibrate against, the
+    observed spread is zero, and THE FLOORS BELOW ARE THE THRESHOLD.
+
+    THAT MAKES THEM A POLICY RATHER THAN A CALIBRATION, and saying so is the
+    point. The doc's rule was written for a noisy yardstick: do not invent a
+    threshold, measure the spread. With a deterministic yardstick the spread is
+    nothing and the only remaining question is how much regression is
+    acceptable -- 2% of perplexity, and one question of twenty-five. Those are
+    judgements, they are recorded in every reading, and they are not disguised as
+    measurements.
     """
     runs = [measure(core) for _ in range(repeats)]
     ppls = [m.perplexity for m in runs]

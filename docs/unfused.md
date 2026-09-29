@@ -44,10 +44,12 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   filler in a slot of its own: Qwen3.5-2B at 0.96 recall and 1.00 precision.
 - **Phase 4 — The system answers.** IN PROGRESS 2026-09-29. Built, with three faculty roles
   that can each be a different model: the ear reads every sentence, the planner writes a
-  plan once per question shape, and the judge says whether two wordings mean the same. With
-  the 0.8B as ear and the 9B as planner, seed 2 beats the 0.8B given everything on all three
-  composing forms and loses count to blind. Next, in order: the judge moved to the planner
-  (running); search over the store; settle relation vocabulary at write time; seed 3.
+  plan once per question shape, and the judge says whether two wordings mean the same;
+  wordings of one owner and one thing heard in turn are joined without a judge (kin). With
+  the 0.8B as ear and the 9B as planner and judge, seeds 1 and 3 meet the exit and seed 2's
+  count does not (possessive owners, a Phase 5 rule). Next, in order: search reshaped
+  (running); the 0.8B alone with questions read as one fact and search (arm `asked`); a
+  second house with relations the system was never built around.
 - **Phase 5 — Learning rules, and operations over facts.** Properties of relations induced
   from what was heard; comparison, before and after, and absence.
 - **Phase 6 — Importance and forgetting.**

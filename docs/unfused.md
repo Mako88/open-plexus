@@ -42,17 +42,18 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - ~~**Phase 2 — Small mouth.**~~ Struck 2026-09-29. 2B on seeds 0 to 2, 0.8B on seed 0.
 - ~~**Phase 3 — Ears.**~~ Struck 2026-09-29 under the strict scorer, which wants each gold
   filler in a slot of its own: Qwen3.5-2B at 0.96 recall and 1.00 precision.
-- **Phase 4 — The system answers.** IN PROGRESS 2026-09-29. Built, with three faculty roles
-  that can each be a different model: the ear reads every sentence, the planner writes a
-  plan once per question shape, and the judge says whether two wordings mean the same;
-  wordings of one owner and one thing heard in turn are joined without a judge (kin). With
+- **Phase 4 — The system answers.** PAUSED 2026-09-29 for Phase 5, John's call. Built, with
+  three faculty roles (ear, planner, judge) that can each be a different model, and kin. With
   the 0.8B as ear and the 9B as planner and judge, seeds 1 and 3 meet the exit and seed 2's
-  count does not. With no planner (arm `asked`), the 0.8B reading and the 9B judging only
-  reach 0.436 on seed 1, the gap in count and update. bAbI is the second world. Next, in
-  order: meaning as properties; concepts formed from shared properties; correction as an
-  input. Then a second house.
-- **Phase 5 — Learning rules, and operations over facts.** Properties of relations induced
-  from what was heard; comparison, before and after, and absence.
+  count does not; on bAbI the same system is below the 0.8B reading each story (0.105 against
+  0.175). Both failures are rules: belonging plus being somewhere is keeping, a move changes
+  where a thing is, a carried thing goes with its carrier. The exit is taken again once
+  Phase 5 has them.
+- **Phase 5 — Learning rules, and operations over facts.** IN PROGRESS 2026-09-29, on the
+  0.8B only; the 9B is off the card. Next, in order: plans and rules learnt from taught
+  examples (a question with its answer, the chain that links them, generalised); pronouns
+  bound by the system to what is in focus, compared with the ear shown the sentences before;
+  meaning as properties and concepts; correction as an input.
 - **Phase 6 — Importance and forgetting.**
 - **Phase 7 — Other senses.** A moment arrives across every modality, and what a sense
   perceives is kept beside what it asserts.
@@ -202,7 +203,7 @@ Datalog engine does. The planner then says what is asked and never how to find i
   relations the system was never built around is answered at no worse than half the first
   house's score.
 
-### Meaning, concepts and correction (Phase 4, next)
+### Meaning, concepts and correction (Phase 5)
 
 Each symbol and each relation wording has a set of properties: the slots it fills, the kinds
 of thing it links, the relations it takes part in, and the verdicts the faculty gave about it.
@@ -217,6 +218,20 @@ meaning, which is the signal the exam has lacked.
   bAbI task 2 does not rise, with property overlap in place of per-pair judging.
 
 ### Phase 5 — Learning rules, and operations over facts
+
+A taught example is a question with its answer. The system searches its facts for the
+chains that link the question's anchors to the answer, generalises each by putting slots
+where the question's fillers were, and keeps the result as a plan for the question's shape
+and as a rule over the relations it passed through ('the place of whoever last got the
+thing'). A plan or rule is kept while its predictions on later taught examples hold, and
+dropped when they fail more often than they hold. bAbI's training split and practice
+questions on a house are the teaching; the test split and the house's exam stay unseen. This
+is explanation-based learning, and it takes planning from the faculty, which is the planner
+role's exit.
+
+Pronouns are bound by the system: the ear writes 'she' or 'there' as heard, and the system
+binds it to the entity most recently in focus that is consistent with what is known of it,
+as centering theory has it.
 
 The system meets relations it was not told the properties of: that cousin runs both ways,
 that a parent's parent is a grandparent, that moving a thing changes where it is. It induces

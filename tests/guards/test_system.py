@@ -247,3 +247,20 @@ def test_search_finds_a_chain_of_three_from_its_anchors_and_goal(tmp_path):
 def test_search_counts_and_refuses(tmp_path):
     assert searched(tmp_path, 4).answer(q("how many")) == "2"
     assert searched(tmp_path / "s", 7).answer(q("stranger")) == "I don't know."
+
+
+def test_a_chosen_fact_teaches_its_wording_once(tmp_path):
+    ear = TableEar()
+    chosen = []
+    ear.synonymous = lambda a, b, e="": False
+    ear.choose = lambda prompt, options: chosen.append(prompt) or 0
+    a = SystemArm(tmp_path, ear, HashEmbedder())
+    READINGS["Ada sets type for a living."] = [
+        {"subject": "Ada", "relation": "sets", "object": "type"}]
+    QUERIES["what does Ada do"] = {"steps": [
+        {"subject": "Ada", "relation": "works as", "object": "?a"}],
+        "answer": "?a", "count": False}
+    a.hear(0, "Ada sets type for a living.")
+    assert a.answer(q("what does Ada do")) == "type"
+    assert a.answer(q("what does Ada do")) == "type"
+    assert len(chosen) == 1

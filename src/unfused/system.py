@@ -343,6 +343,12 @@ class SystemArm:
                     candidates = [r for r in candidates if chosen == " ".join(
                         v for v in (r["subject"], r["relation"], r["object"], r["place"],
                                     r["quantity"]) if v)]
+                    # the choice says the chosen fact's wording means the asked one, so it
+                    # is kept as a pair and the next question worded so is matched directly
+                    for r in candidates:
+                        self.db.execute("INSERT OR REPLACE INTO synonyms VALUES (?, ?, 1)",
+                                        (relation, r["relation"]))
+                    self.db.commit()
             for r in candidates:
                 new = dict(bound)
                 used = {r[slot] for slot in SLOTS

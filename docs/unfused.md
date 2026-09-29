@@ -47,9 +47,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   plan once per question shape, and the judge says whether two wordings mean the same;
   wordings of one owner and one thing heard in turn are joined without a judge (kin). With
   the 0.8B as ear and the 9B as planner and judge, seeds 1 and 3 meet the exit and seed 2's
-  count does not (possessive owners, a Phase 5 rule). Next, in order: search reshaped
-  (running); the 0.8B alone with questions read as one fact and search (arm `asked`); a
-  second house with relations the system was never built around.
+  count does not. With no planner (arm `asked`), the 0.8B reading and the 9B judging only
+  reach 0.436 on seed 1, the gap in count and update. bAbI is the second world. Next, in
+  order: meaning as properties; concepts formed from shared properties; correction as an
+  input. Then a second house.
 - **Phase 5 — Learning rules, and operations over facts.** Properties of relations induced
   from what was heard; comparison, before and after, and absence.
 - **Phase 6 — Importance and forgetting.**
@@ -64,6 +65,22 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 
 With John, 2026-09-28 and 2026-09-29. Reopening one is a conversation with him, never a
 commit.
+
+- **The target shape is a child's core, taught for life.** John's, and the idea from the
+  start: the faculty needs about a five-year-old's grasp of language and no more. Everything
+  else is taught after deployment, by reading or by a person, the way a child is taught, and
+  the system runs continuously rather than in sessions. A sense's encoder needs only basic
+  cases for the same reason.
+- **Meaning is learnt by the system, not borrowed as vectors.** 2026-09-29. Off-the-shelf
+  vectors, MiniLM's and the 0.8B's own, do not carry relation meaning
+  (`readings/lexicon-*`). A thing's meaning is the set of what is known about it, differences
+  are the properties one has and the other lacks, analogy is the same relation on two pairs,
+  and concepts are formed from shared properties (formal concept analysis). Identities match
+  exactly and meanings match by overlap. What everyone knows comes from the faculty, asked
+  once and kept; what only this conversation knows is learnt from it.
+- **bAbI is the second world, and the house stays the target.** bAbI checks that the house is
+  a fair test. It is small and templated enough to be won by building to it, so a score there
+  is never the objective.
 
 - **The 1080 Ti is the hardware.** No rented compute. Anything that needs more than one
   11 GB Pascal card does not get built.
@@ -184,6 +201,20 @@ Datalog engine does. The planner then says what is asked and never how to find i
 - **Exit:** it beats it and blind on all three, on three seeds, and a second house with
   relations the system was never built around is answered at no worse than half the first
   house's score.
+
+### Meaning, concepts and correction (Phase 4, next)
+
+Each symbol and each relation wording has a set of properties: the slots it fills, the kinds
+of thing it links, the relations it takes part in, and the verdicts the faculty gave about it.
+Similarity is overlap of properties, so it is exact, inspectable and learnt from one hearing.
+Concepts are the lattice of things that share properties, formed as facts arrive; a verdict
+about one member of a concept is shared with the others until a member contradicts it. A
+correction ("no, that is not what I meant", "yes, that's right") is an input like any other
+and changes the properties it names: a learner that is never told it is wrong cannot fix a
+meaning, which is the signal the exam has lacked.
+
+- **Refutes:** judge calls do not fall and the score does not rise on the house seeds, and
+  bAbI task 2 does not rise, with property overlap in place of per-pair judging.
 
 ### Phase 5 — Learning rules, and operations over facts
 

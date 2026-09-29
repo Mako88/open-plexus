@@ -160,12 +160,18 @@ class Ear:
         choice = reply.get("choice")
         return choice if isinstance(choice, int) and 0 <= choice < len(options) else None
 
-    def synonymous(self, asked: str, stored: str) -> bool:
-        """Whether a fact stated with one relation answers a question asked with the other."""
+    def synonymous(self, asked: str, stored: str, example: str = "") -> bool:
+        """Whether a fact stated with one relation answers a question asked with the other.
+
+        Judged on an example of the stored relation in use, because out of context
+        'put' and 'keeps' are different words and in 'Ada put the kettle in the shed'
+        the kettle is kept in the shed."""
+        seen = f"\nFor example: '{example}'" if example else ""
         reply = self._call(
-            "Say whether a fact stated with the second relation answers a question asked "
-            "with the first, because they describe the same kind of thing.",
-            f"Asked: '{asked}'\nStated: '{stored}'", SAME_SCHEMA, 40)
+            "Say whether a fact stated with the second relation also tells you the first "
+            "relation holds between the same things, as 'put the kettle in the shed' tells "
+            "you the kettle is kept in the shed.",
+            f"First: '{asked}'\nSecond: '{stored}'{seen}", SAME_SCHEMA, 40)
         return bool(reply and reply.get("same"))
 
     def _call(self, system: str, user: str, schema: dict, budget: int) -> dict | None:

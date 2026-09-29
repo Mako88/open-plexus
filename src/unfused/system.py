@@ -198,7 +198,7 @@ class SystemArm:
             step.get("quantity") == answer for step in steps)
         return {"steps": steps, "answer": answer, "count": counted}
 
-    def means(self, asked: str, stored: str) -> bool:
+    def means(self, asked: str, stored: str, example: str = "") -> bool:
         """Whether a stored relation answers an asked one: the same words, or a pair the
         ear once judged to mean the same. Judged once and remembered, so the table is
         what the system has learnt about its own vocabulary; it only grows, and two
@@ -209,7 +209,7 @@ class SystemArm:
                               (asked, stored)).fetchone()
         if row is not None:
             return bool(row[0])
-        verdict = self.ear.synonymous(asked, stored)
+        verdict = self.ear.synonymous(asked, stored, example)
         self.db.execute("INSERT OR IGNORE INTO synonyms VALUES (?, ?, ?)",
                         (asked, stored, int(verdict)))
         self.db.commit()
@@ -239,7 +239,7 @@ class SystemArm:
             candidates = [r for r in rows if all(
                 any(r[slot] and same(k, r[slot]) for slot in SLOTS) for k in fixed)]
             worded = [r for r in candidates if relation and r["relation"]
-                      and self.means(relation, r["relation"])]
+                      and self.means(relation, r["relation"], r["heard"])]
             if worded:
                 candidates = worded
             elif len(fixed) < 2:

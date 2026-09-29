@@ -39,12 +39,14 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - ~~**Phase 0 — Ground.**~~ Struck 2026-09-29. `readings/exam-*-served-s0-*.json`.
 - ~~**Phase 1 — Text memory.**~~ Struck 2026-09-29. `readings/exam-*-Qwen3.5-9B-s0-*.json`
   on the final house. Best text arm: `linked`.
-- **Phase 2 — Small mouth.** The best text arm and full context under Qwen3.5-2B and 0.8B, to
-  price how much of every score so far was the 9B.
+- **Phase 2 — Small mouth.** Taken at 2B on seeds 0 to 2; the 0.8B is owed.
 - ~~**Phase 3 — Ears.**~~ Struck 2026-09-29 under the strict scorer, which wants each gold
   filler in a slot of its own: Qwen3.5-2B at 0.96 recall and 1.00 precision.
-- **Phase 4 — The system answers.** Assertions stored, questions read as queries, answers found
-  by matching and following chains, rendered by the mouth.
+- **Phase 4 — The system answers.** IN PROGRESS 2026-09-29. Built. Refuted at 2B on held-out
+  seeds (beats its faculty given everything on count only). At 9B, beats it on all three
+  composing forms of seed 1 and on none of seed 2. The rows put the failures in reading
+  questions and in relation vocabulary, not in the matching. Next, in order: settle relation
+  vocabulary at write time; plans learnt from question shapes (open fork below); seed 3.
 - **Phase 5 — Learning rules.** Properties of relations induced from what was heard.
 - **Phase 6 — Importance and forgetting.**
 - **Phase 7 — Fleet.** The memory on many processes, merged without coordination, with nodes
@@ -216,6 +218,13 @@ the store merges by id. Kill a third of the nodes mid-exam.
 
 ## OPEN FORKS
 
+- **Plans learnt from question shapes.** The faculty plans each lookup (which steps, which
+  unknowns) and the system executes it, as a query writer and a database. Questions come in a
+  limited number of shapes, so the system can keep shape-to-plan once a plan has found an
+  answer and reuse it with no faculty call, leaving the faculty only the shapes it has never
+  seen. This moves the planning into the system and is the next place a small faculty stops
+  being the limit. From the 2B-against-9B rows, 2026-09-29: the gap between them is almost
+  all in planning questions, not in reading statements.
 - **A thread's working notes as a fragment**: what surfaced for the last few turns is carried
   forward, the way attention holds a topic.
 - **Hyperdimensional vectors for symbols and assertions**, each symbol a random bipolar vector

@@ -61,7 +61,7 @@ class TableEar:
     def choose(self, prompt, options):
         return None
 
-    def synonymous(self, asked, stored):
+    def synonymous(self, asked, stored, example=""):
         return {asked, stored} == {"keeps", "put in"}
 
 
@@ -116,7 +116,7 @@ def test_a_relation_worded_differently_is_learnt_once_and_remembered(tmp_path):
     ear = TableEar()
     asked = []
     judge = ear.synonymous
-    ear.synonymous = lambda a, b: asked.append((a, b)) or judge(a, b)
+    ear.synonymous = lambda a, b, e="": asked.append((a, b)) or judge(a, b, e)
     a = SystemArm(tmp_path, ear, HashEmbedder())
     READINGS["Ada put the kettle in the shed."] = [
         {"subject": "Ada", "relation": "put in", "object": "kettle", "place": "shed"}]

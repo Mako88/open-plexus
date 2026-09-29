@@ -40,3 +40,7 @@ state/
 # The general corpus the replay mix is anchored to. Somebody else's words,
 # public domain, and megabytes of them; `corpora/fetch.py` is ours and stays.
 corpora/*.txt
+
+# bAbI, somebody else's data; scripts/fetch_babi.sh fetches it.
+data/babi/*.jsonl
+data/babi/README.md

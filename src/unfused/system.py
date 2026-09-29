@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS names (name TEXT PRIMARY KEY, embedding BLOB NOT NULL
 CREATE TABLE IF NOT EXISTS readings (text TEXT PRIMARY KEY, assertions TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS synonyms (asked TEXT NOT NULL, stored TEXT NOT NULL,
                                      same INTEGER NOT NULL, PRIMARY KEY (asked, stored));
+CREATE TABLE IF NOT EXISTS kin (a TEXT NOT NULL, b TEXT NOT NULL, PRIMARY KEY (a, b));
 CREATE TABLE IF NOT EXISTS plans (shape TEXT PRIMARY KEY, plan TEXT NOT NULL,
                                   used INTEGER NOT NULL DEFAULT 0);
 """
@@ -83,7 +84,7 @@ class SystemArm:
                  relations_shown: int = 30, plans: bool = False,
                  known_plans: dict | None = None, planner=None, judge=None,
                  searched: bool = False, depth: int = 3, frontier: int = 20000,
-                 asked: bool = False) -> None:
+                 asked: bool = False, kin: bool = False) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -97,6 +98,9 @@ class SystemArm:
         # whether a question is read like a statement, one fact with '?' for the answer,
         # and the chain to it left to search: no planner at all
         self.asked = asked
+        # whether two wordings of one owner and one thing count as one relation, learnt
+        # from hearing one follow the other rather than judged
+        self.kin = kin
         self.searched = searched or asked
         self.embedder = embedder
         self.names_shown = names_shown
@@ -115,7 +119,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "kin": self.kin, "depth": self.depth,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
                 "relations_shown": self.relations_shown, "plans": self.plans,
@@ -152,7 +156,7 @@ class SystemArm:
             relation = norm(a.get("relation"))
             if not row["subject"] or not relation:
                 continue
-            self.supersede(row, turn)
+            self.supersede(row, turn, relation)
             self.db.execute(
                 "INSERT INTO assertions (subject, relation, object, place, quantity, turn, heard)"
                 " VALUES (?,?,?,?,?,?,?)",
@@ -164,7 +168,7 @@ class SystemArm:
                     self.db.execute("INSERT INTO names VALUES (?, ?)", (name, vector.tobytes()))
         self.db.commit()
 
-    def supersede(self, row: dict, turn: int) -> None:
+    def supersede(self, row: dict, turn: int, relation: str = "") -> None:
         """A later assertion that the same subject's same thing is somewhere else
         replaces the earlier one. It is kept, marked, and no longer matched. Only
         where a thing is named: two counts of one kind of object in two rooms are
@@ -172,8 +176,8 @@ class SystemArm:
         if not row["object"] or not row["place"]:
             return
         pair = (row["subject"], row["object"])
-        for rid, subject, obj, place in self.db.execute(
-                "SELECT id, subject, object, place FROM assertions"
+        for rid, subject, obj, place, said in self.db.execute(
+                "SELECT id, subject, object, place, relation FROM assertions"
                 " WHERE superseded IS NULL AND object IS NOT NULL AND place IS NOT NULL"
         ).fetchall():
             # the pair in either order: "the cards are Ada's" and "Ada took the cards"
@@ -183,6 +187,12 @@ class SystemArm:
             if same_pair and not same(place, row["place"]):
                 self.db.execute("UPDATE assertions SET superseded = ? WHERE id = ?",
                                 (turn, rid))
+            # one owner and one thing told twice in two wordings ("keeps", then "took
+            # to") is one relation worded twice: the system's own evidence about its
+            # vocabulary, with no judge asked
+            if same_pair and relation and said and said != relation:
+                self.db.executemany("INSERT OR IGNORE INTO kin VALUES (?, ?)",
+                                    [(said, relation), (relation, said)])
 
     # -- answering -------------------------------------------------------------
 
@@ -319,6 +329,8 @@ class SystemArm:
         nodes' tables merge by union."""
         if same(asked, stored):
             return True
+        if self.kin and self.kindred(asked, stored):
+            return True
         row = self.db.execute("SELECT same FROM synonyms WHERE asked = ? AND stored = ?",
                               (asked, stored)).fetchone()
         if row is not None:
@@ -328,6 +340,21 @@ class SystemArm:
                         (asked, stored, int(verdict)))
         self.db.commit()
         return verdict
+
+    def kindred(self, asked: str, stored: str) -> bool:
+        """Whether two wordings are joined by a chain of kin: a heard "keeps" followed by
+        "took to", and a "took to" by "put", make all three one relation. A wording is
+        joined to its own words ("keeps" and "keeps in") before the chain is followed."""
+        pairs = self.db.execute("SELECT a, b FROM kin").fetchall()
+        seen = {w for pair in pairs for w in pair if same(asked, w)}
+        frontier = list(seen)
+        while frontier:
+            w = frontier.pop()
+            for a, b in pairs:
+                if a == w and b not in seen:
+                    seen.add(b)
+                    frontier.append(b)
+        return any(same(stored, w) for w in seen)
 
     def rows(self) -> list[dict]:
         cols = ("subject", "relation", "object", "place", "quantity", "turn", "heard")

@@ -262,3 +262,25 @@ def test_a_question_read_as_one_fact_is_answered_by_search_with_no_planner(tmp_p
                       "in the scullery?")) == "ochre"
     assert a.answer(q("What colour are the things Brael keeps in the scullery?")) == (
         "I don't know.")
+
+
+def test_two_wordings_of_one_owner_and_thing_become_one_relation(tmp_path):
+    ear = TableEar()
+    ear.synonymous = lambda a, b, e="": False
+    a = SystemArm(tmp_path, ear, HashEmbedder(), kin=True)
+    READINGS["Orrin put the rope in the attic for safekeeping."] = [
+        {"subject": "Orrin", "relation": "put for safekeeping", "object": "rope",
+         "place": "attic"}]
+    READINGS["Orrin keeps the rope in the attic."] = [
+        {"subject": "Orrin", "relation": "keeps", "object": "rope", "place": "attic"}]
+    READINGS["Ada put the kettle in the attic for safekeeping."] = [
+        {"subject": "Ada", "relation": "put for safekeeping", "object": "kettle",
+         "place": "attic"}]
+    QUERIES["who keeps things in the attic"] = {"steps": [
+        {"subject": "?p", "relation": "keeps", "object": "?t", "place": "attic"}],
+        "answer": "?p", "count": True}
+    for turn, s in enumerate(["Orrin put the rope in the attic for safekeeping.",
+                              "Orrin keeps the rope in the attic.",
+                              "Ada put the kettle in the attic for safekeeping."]):
+        a.hear(turn, s)
+    assert a.answer(q("who keeps things in the attic")) == "2"

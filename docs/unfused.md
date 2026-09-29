@@ -42,15 +42,18 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - ~~**Phase 2 — Small mouth.**~~ Struck 2026-09-29. 2B on seeds 0 to 2, 0.8B on seed 0.
 - ~~**Phase 3 — Ears.**~~ Struck 2026-09-29 under the strict scorer, which wants each gold
   filler in a slot of its own: Qwen3.5-2B at 0.96 recall and 1.00 precision.
-- **Phase 4 — The system answers.** IN PROGRESS 2026-09-29. Built. Refuted at 2B on held-out
-  seeds (beats its faculty given everything on count only). At 9B, beats it on all three
-  composing forms of seed 1 and on none of seed 2. The rows put the failures in reading
-  questions and in relation vocabulary, not in the matching. Next, in order: settle relation
-  vocabulary at write time; plans learnt from question shapes (arm `planned`, with the
-  planner a separate faculty from the ear); search over the store; seed 3.
-- **Phase 5 — Learning rules.** Properties of relations induced from what was heard.
+- **Phase 4 — The system answers.** IN PROGRESS 2026-09-29. Built, with three faculty roles
+  that can each be a different model: the ear reads every sentence, the planner writes a
+  plan once per question shape, and the judge says whether two wordings mean the same. With
+  the 0.8B as ear and the 9B as planner, seed 2 beats the 0.8B given everything on all three
+  composing forms and loses count to blind. Next, in order: the judge moved to the planner
+  (running); search over the store; settle relation vocabulary at write time; seed 3.
+- **Phase 5 — Learning rules, and operations over facts.** Properties of relations induced
+  from what was heard; comparison, before and after, and absence.
 - **Phase 6 — Importance and forgetting.**
-- **Phase 7 — Fleet.** The memory on many processes, merged without coordination, with nodes
+- **Phase 7 — Other senses.** A moment arrives across every modality, and what a sense
+  perceives is kept beside what it asserts.
+- **Phase 8 — Fleet.** The memory on many processes, merged without coordination, with nodes
   vanishing.
 
 ---
@@ -157,14 +160,30 @@ subject, relation and object are asserted again with a new place or quantity, th
 wins, which is how an update is heard. Nothing matching is an answer: "I don't know". The
 mouth renders the found filler.
 
+The faculty has three jobs here, and each can be a different model. The ear reads every
+sentence, so it is called most and is the one that has to be small. The planner turns a
+question into steps; a plan is kept by the question's shape once it finds an answer that is
+not a name the question gave and uses every filler the question named, and plans carry from
+one house to the next because they hold no facts. The judge says whether two wordings mean
+the same, once a pair, kept in a table. The planner and the judge are called per shape and
+per pair rather than per sentence, so a larger model there costs a few calls a house.
+
+Search replaces the planner's steps. The matcher already follows a chain of any length; what
+limits a chain is the planner writing every step up front. Given only the question's anchors
+(the fillers it names) and the relation it asks for, the system finds the shortest chain of
+stored assertions from an anchor to one with that relation, backward from the goal as a
+Datalog engine does. The planner then says what is asked and never how to find it.
+
+- **Refutes search:** it scores below `planned` with the same planner on the same seeds.
 - **Arms:** the system under each ear; the Phase 1 baseline and full context under the same
   small faculty; full context under the 9B.
 - **Refutes the branch's bet:** the system with a small faculty does not beat that small
   faculty given the whole transcript on `twohop`, `chain3` and `count`.
-- **Exit:** it beats it on all three, on three seeds, and a second house with relations the
-  system was never built around is answered at no worse than half the first house's score.
+- **Exit:** it beats it and blind on all three, on three seeds, and a second house with
+  relations the system was never built around is answered at no worse than half the first
+  house's score.
 
-### Phase 5 — Learning rules
+### Phase 5 — Learning rules, and operations over facts
 
 The system meets relations it was not told the properties of: that cousin runs both ways,
 that a parent's parent is a grandparent, that moving a thing changes where it is. It induces
@@ -174,6 +193,13 @@ working on assertions a model has read rather than on raw codes.
 
 - **Refutes:** induced rules add nothing over the Phase 4 system on a house whose questions
   need them.
+
+Operations over a set of facts sit beside the rules: counting exists; comparison (more,
+fewer, the largest), order in time (before, after, since) and absence (nothing heard says
+so, which differs from being told it is not so) do not. Each is a step kind a plan can name,
+and each enters the exam as a form when real conversation has it and the house does not.
+
+- **Refutes:** a step kind the planner never chooses when the question needs it.
 
 ### Phase 6 — Importance and forgetting
 
@@ -186,7 +212,21 @@ what falls below the recall floor, never a deletion.
 - **Refutes:** surprise-weighted recall does no better than uniform importance on a house long
   enough that uniform recall degrades.
 
-### Phase 7 — Fleet
+### Phase 7 — Other senses
+
+A world emits one moment across every modality, and a source is a world, never a sense. Any
+sense that can say what it perceived as a subject, relation and object is an ear, so an image
+read by a vision-language model writes the same assertions a sentence does. What that shape
+cannot hold (a face, a tune, where things sit relative to one another, a tone of voice) is
+lost at the ear, so every assertion keeps a pointer to the percept it came from, stored as an
+embedding in a space the senses share. A symbol is then its assertions and its exemplars:
+"kettle" resolves to a kettle seen as well as to the word, through the same embedding
+shortlist `resolve` already uses, and recall can reach a percept by likeness as well as by
+relation.
+
+- **Refutes:** questions whose answer was only ever perceived, never said, fall to blind.
+
+### Phase 8 — Fleet
 
 Several processes, each holding a shard of assertions and fragments. Tables merge by union and
 the store merges by id. Kill a third of the nodes mid-exam.
@@ -219,19 +259,15 @@ the store merges by id. Kill a third of the nodes mid-exam.
 
 ## OPEN FORKS
 
-- **Plans learnt from question shapes.** The faculty plans each lookup (which steps, which
-  unknowns) and the system executes it, as a query writer and a database. Questions come in a
-  limited number of shapes, so the system can keep shape-to-plan once a plan has found an
-  answer and reuse it with no faculty call, leaving the faculty only the shapes it has never
-  seen. This moves the planning into the system and is the next place a small faculty stops
-  being the limit. From the 2B-against-9B rows, 2026-09-29: the gap between them is almost
-  all in planning questions, not in reading statements.
+- **Shapes by likeness.** A shape matches only word for word, so an oblique question never
+  meets its plain twin's plan. Matching shapes by embedding would carry a plan across
+  wordings, at the risk of carrying it to a question that only looks alike.
 - **A thread's working notes as a fragment**: what surfaced for the last few turns is carried
   forward, the way attention holds a topic.
 - **Hyperdimensional vectors for symbols and assertions**, each symbol a random bipolar vector
   seeded by a hash of its name so every node agrees without coordinating. They buy a
   fixed-size memory that merges by addition and forgets by interference; they have to earn
-  that against the exact tables in Phase 7, or not be built.
+  that against the exact tables in Phase 8, or not be built.
 - **A reader and a typist**: Qwen reads a sentence into plain restatements and a
   schema-constrained extractor (Needle) types them. John's, 2026-09-29. Worth running only if
   a grammar-constrained Qwen reads measurably worse than the same Qwen reading freely, since

@@ -389,3 +389,16 @@ def test_the_system_binds_there_and_she_to_what_is_in_focus(tmp_path):
     a.hear(1, "She got the milk there.")
     got = [r for r in a.rows() if r["relation"] == "got"][0]
     assert (got["subject"], got["place"]) == ("mary", "kitchen")
+
+
+def test_an_assertion_is_held_to_the_words_of_its_sentence():
+    clean = SystemArm.clean
+    got = clean({"subject": "john", "object": "milk", "place": "house", "quantity": "1"},
+                "John left the milk.")
+    assert got == {"subject": "john", "object": "milk", "place": None, "quantity": None}
+    got = clean({"subject": "john", "object": "garden", "place": "to the garden",
+                 "quantity": None}, "John travelled to the garden.")
+    assert (got["object"], got["place"]) == (None, "garden")
+    got = clean({"subject": "jars", "object": None, "place": "cellar", "quantity": "35"},
+                "There are 35 jars in the cellar.")
+    assert got["quantity"] == "35"

@@ -95,7 +95,8 @@ class SystemArm:
                  searched: bool = False, depth: int = 3, frontier: int = 20000, hub: int = 4,
                  asked: bool = False, shares: float = 0.8, context: int = 0,
                  moves: bool = False, taught: bool = False,
-                 known_learnt: list | None = None, binds: bool = False) -> None:
+                 known_learnt: list | None = None, binds: bool = False,
+                 cleans: bool = False) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -122,6 +123,8 @@ class SystemArm:
         self.taught = taught
         # whether a pronoun the ear wrote as heard is bound by the system
         self.binds = binds
+        # whether the ear's assertions are held to the words of their sentence
+        self.cleans = cleans
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
@@ -141,7 +144,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "shares": self.shares, "context": self.context, "moves": self.moves, "taught": self.taught, "binds": self.binds, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "shares": self.shares, "context": self.context, "moves": self.moves, "taught": self.taught, "binds": self.binds, "cleans": self.cleans, "depth": self.depth,
                 "hub": self.hub,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
@@ -183,6 +186,8 @@ class SystemArm:
         for a in assertions:
             row = {s: norm(a.get(s)) for s in SLOTS}
             relation = norm(a.get("relation"))
+            if self.cleans:
+                row = self.clean(row, text)
             if self.binds:
                 row = self.bind(row)
             if not row["subject"] or not relation:
@@ -198,6 +203,28 @@ class SystemArm:
                     vector = self.embedder.encode([name])[0].astype(np.float32)
                     self.db.execute("INSERT INTO names VALUES (?, ?)", (name, vector.tobytes()))
         self.db.commit()
+
+    @staticmethod
+    def clean(row: dict, text: str) -> dict:
+        """The ear's assertion held to the sentence it came from. A filler none of whose
+        words were said is dropped ('left the milk' read with the place 'house'); a
+        quantity stays only where the sentence has a number; a place loses its leading
+        preposition; an object that repeats the place is dropped. The ear may be small
+        and careless, and the system does not have to believe it."""
+        said = set(re.findall(r"[a-z0-9']+", text.lower()))
+        numbers = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+                   "ten", "eleven", "twelve", "twenty"}
+        out = dict(row)
+        for k, v in row.items():
+            if v and not any(w in said for w in re.findall(r"[a-z0-9']+", v)):
+                out[k] = None
+        if out["quantity"] and not (said & numbers or any(w.isdigit() for w in said)):
+            out["quantity"] = None
+        if out["place"]:
+            out["place"] = norm(re.sub(r"^(back )?(to|into|in|at|on|from) ", "", out["place"]))
+        if out["object"] and out["place"] and same(out["object"], out["place"]):
+            out["object"] = None
+        return out
 
     def bind(self, row: dict) -> dict:
         """A pronoun the ear wrote as heard, bound to what is most recently in focus:
@@ -577,7 +604,7 @@ class SystemArm:
         names: dict[str, str] = {}
         steps = []
         for n, r in enumerate(chain):
-            step = {"filled": sorted(k for k in SLOTS if r[k])}
+            step = {"filled": sorted(k for k in SLOTS if r[k] and k != "quantity")}
             for k in SLOTS:
                 v = r[k]
                 if not v:
@@ -606,7 +633,7 @@ class SystemArm:
                 return
             s = plan["steps"][i]
             for r in rows:
-                if sorted(k for k in SLOTS if r[k]) != s["filled"]:
+                if sorted(k for k in SLOTS if r[k] and k != "quantity") != s["filled"]:
                     continue
                 new, ok = dict(bound), True
                 for k in SLOTS:

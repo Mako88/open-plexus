@@ -252,8 +252,8 @@ def test_search_counts_and_refuses(tmp_path):
 def test_a_question_read_as_one_fact_is_answered_by_search_with_no_planner(tmp_path):
     ear = TableEar()
     ear.rewrite = lambda question: (_ for _ in ()).throw(AssertionError(question))
-    ear.ask = lambda question: {"assertion": {
-        "subject": "things", "relation": "has colour", "object": "?", "place": None,
+    ear.ask = lambda question: {"asked": "object", "assertion": {
+        "subject": "things", "relation": "has colour", "object": "", "place": None,
         "quantity": None}, "count": False}
     a = SystemArm(tmp_path, ear, HashEmbedder(), asked=True)
     for turn, sentence in enumerate(list(READINGS)[:4]):

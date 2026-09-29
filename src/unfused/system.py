@@ -232,21 +232,16 @@ class SystemArm:
         return shape + question[at:], fillers
 
     def read_question(self, question: str) -> dict | None:
-        """The ear's one fact with '?' where the answer goes, as a goal for search, and
-        the question's own fillers, found by the system, as its anchors."""
+        """The ear's one fact with the slot it says is asked for, as a goal for search,
+        and the question's own fillers, found by the system, as its anchors."""
         read = self.ear.ask(question)
         if not read or not isinstance(read.get("assertion"), dict):
             return None
-        step, asked = {}, None
-        for k, v in read["assertion"].items():
-            if isinstance(v, str) and v.strip().startswith("?"):
-                if asked is None:
-                    asked = k
-                    step[k] = "?a"
-            else:
-                step[k] = v
-        if asked is None or asked == "relation":
+        asked = read.get("asked")
+        if asked not in SLOTS:
             return None
+        step = {k: v for k, v in read["assertion"].items() if k != asked}
+        step[asked] = "?a"
         return {"steps": [step], "answer": "?a", "count": bool(read.get("count")),
                 "anchors": self.shape(question)[1]}
 

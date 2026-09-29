@@ -106,26 +106,29 @@ REWRITE = (
 
 ASK_SCHEMA = {
     "type": "object",
-    "properties": {"assertion": ASSERTION, "count": {"type": "boolean"}},
-    "required": ["assertion", "count"],
+    "properties": {"asked": {"type": "string",
+                             "enum": ["subject", "object", "place", "quantity"]},
+                   "assertion": ASSERTION, "count": {"type": "boolean"}},
+    "required": ["asked", "assertion", "count"],
 }
 
 ASK = (
-    "Read a question from a conversation and write down the one fact it asks about, as an "
-    "assertion with '?' in the part that is asked for. An assertion has a subject, a "
+    "Read a question from a conversation. Say which part of the fact it asks for (asked: "
+    "subject, object, place or quantity), and write down the rest of that fact as an "
+    "assertion, leaving the asked part empty. An assertion has a subject, a "
     "relation (a short verb phrase in the present tense, such as 'keeps', 'is cousin of', "
     "'works as', 'has colour'), and what the relation takes: an object, a place, a quantity. "
     "Copy names and things from the question, without articles. 'count' is true if the "
     "question asks how many people or things. Examples:\n"
-    "'Where does Mira keep the kettle?' -> subject: Mira, relation: keeps, object: kettle, "
-    "place: ?\n"
-    "'What does Mira do for a living?' -> subject: Mira, relation: works as, object: ?\n"
-    "'Who mends the fences?' -> subject: ?, relation: mends, object: fences\n"
-    "'What colour is the gate?' -> subject: gate, relation: has colour, object: ?\n"
-    "'How many chairs are in the hall?' -> subject: chairs, relation: are in, place: hall, "
-    "quantity: ?\n"
-    "'How many people keep things in the shed?' -> subject: ?, relation: keeps, object: "
-    "things, place: shed, count: true"
+    "'Where does Mira keep the kettle?' -> asked: place; subject: Mira, relation: keeps, "
+    "object: kettle\n"
+    "'What does Mira do for a living?' -> asked: object; subject: Mira, relation: works as\n"
+    "'Who mends the fences?' -> asked: subject; relation: mends, object: fences\n"
+    "'What colour is the gate?' -> asked: object; subject: gate, relation: has colour\n"
+    "'How many chairs are in the hall?' -> asked: quantity; subject: chairs, relation: are "
+    "in, place: hall\n"
+    "'How many people keep things in the shed?' -> asked: subject; relation: keeps, place: "
+    "shed, count: true"
 )
 
 SAME_SCHEMA = {

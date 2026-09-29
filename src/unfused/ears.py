@@ -156,7 +156,7 @@ def score_reading(fact, assertions: list[dict]) -> dict:
     """
     wanted = [w.lower() for w in gold(fact)]
     whole = any(all(w in _fillers(a) for w in wanted) for a in assertions)
-    return {"whole": whole, "assertions": len(assertions)}
+    return {"whole": whole, "read": len(assertions)}
 
 
 def words(text: str) -> set[str]:

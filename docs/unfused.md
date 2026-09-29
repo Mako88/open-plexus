@@ -41,8 +41,8 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   answers. The context-reduction arms, kept as the baseline everything later must beat.
 - **Phase 2 — Small mouth.** The best text arm and full context under Qwen3.5-2B and 0.8B, to
   price how much of every score so far was the 9B.
-- **Phase 3 — Ears.** Typed reading: sentences to assertions under a schema, scored against the
-  house's ground truth.
+- ~~**Phase 3 — Ears.**~~ Struck 2026-09-29 on the first ear.
+  `readings/ears-Qwen3.5-2B-Q8_0-s0-*.json`.
 - **Phase 4 — The system answers.** Assertions stored, questions read as queries, answers found
   by matching and following chains, rendered by the mouth.
 - **Phase 5 — Learning rules.** Properties of relations induced from what was heard.
@@ -222,6 +222,12 @@ the store merges by id. Kill a third of the nodes mid-exam.
   seeded by a hash of its name so every node agrees without coordinating. They buy a
   fixed-size memory that merges by addition and forgets by interference; they have to earn
   that against the exact tables in Phase 7, or not be built.
+- **A reader and a typist**: Qwen reads a sentence into plain restatements and a
+  schema-constrained extractor (Needle) types them. John's, 2026-09-29. Worth running only if
+  a grammar-constrained Qwen reads measurably worse than the same Qwen reading freely, since
+  otherwise the pipeline ends on the weaker model.
+- **Needle fine-tuned on public relation data**, not on house sentences, so it learns to read
+  relations without being taught the answers.
 - **Calibrated ears**: an ear that returns a confidence with each assertion, so the system can
   weigh what it heard. Jev (TypeSafe AI) does this and is closed and paid; the fork is an open
   ear that does the same.

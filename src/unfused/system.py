@@ -93,7 +93,7 @@ class SystemArm:
                  relations_shown: int = 30, plans: bool = False,
                  known_plans: dict | None = None, planner=None, judge=None,
                  searched: bool = False, depth: int = 3, frontier: int = 20000, hub: int = 4,
-                 asked: bool = False, shares: float = 0.0, context: int = 0,
+                 asked: bool = False, shares: float = 0.8, context: int = 0,
                  moves: bool = False, taught: bool = False,
                  known_learnt: list | None = None, binds: bool = False) -> None:
         self.ear = ear

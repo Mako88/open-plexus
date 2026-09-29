@@ -45,7 +45,7 @@ def main() -> None:
     p.add_argument("--planner-served", default=None, help="which model that server runs")
     p.add_argument("--planner-judges", action="store_true",
                    help="the planner also says whether two wordings mean the same")
-    p.add_argument("--shares", type=float, default=0.0,
+    p.add_argument("--shares", type=float, default=0.8,
                    help="property overlap at which one wording's verdict answers for another")
     p.add_argument("--plans", default=None,
                    help="a JSON file of plans by shape: `planned` starts with them and adds "

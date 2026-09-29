@@ -2,7 +2,7 @@
 
 Each story is told a line at a time and each question is asked where it stands in the
 story, so an arm meets it exactly as it meets the house. The data is the 1000 test
-questions per task in `data/babi/babi_test.jsonl`, fetched by `scripts/fetch_babi.sh`;
+questions per task in `data/babi/babi_{split}.jsonl`, fetched by `scripts/fetch_babi.sh`;
 each row there carries the whole story up to its question, and rows whose stories
 continue one another are one story.
 """
@@ -16,7 +16,7 @@ from pathlib import Path
 
 from .world import House, Question
 
-DATA = Path(__file__).resolve().parents[3] / "data" / "babi" / "babi_test.jsonl"
+DATA = Path(__file__).resolve().parents[3] / "data" / "babi"
 
 TASKS = {
     1: "single supporting fact", 2: "two supporting facts", 3: "three supporting facts",
@@ -29,12 +29,12 @@ TASKS = {
 }
 
 
-def stories(task: int, limit: int | None = None) -> list[House]:
+def stories(task: int, limit: int | None = None, split: str = "test") -> list[House]:
     """The task's stories, each a world of its own lines and the questions asked in it."""
     out: list[House] = []
     lines: list[str] = []
     questions: list[Question] = []
-    with DATA.open(encoding="utf-8") as f:
+    with (DATA / f"babi_{split}.jsonl").open(encoding="utf-8") as f:
         for raw in f:
             row = json.loads(raw)
             if row["task"] != task:

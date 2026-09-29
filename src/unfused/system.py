@@ -48,6 +48,9 @@ CREATE TABLE IF NOT EXISTS readings (text TEXT PRIMARY KEY, assertions TEXT NOT 
 CREATE TABLE IF NOT EXISTS synonyms (asked TEXT NOT NULL, stored TEXT NOT NULL,
                                      same INTEGER NOT NULL, PRIMARY KEY (asked, stored));
 CREATE TABLE IF NOT EXISTS said (turn INTEGER PRIMARY KEY, text TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS learnt (shape TEXT NOT NULL, plan TEXT NOT NULL,
+                                  hits INTEGER NOT NULL, misses INTEGER NOT NULL,
+                                  PRIMARY KEY (shape, plan));
 CREATE TABLE IF NOT EXISTS kin (a TEXT NOT NULL, b TEXT NOT NULL, PRIMARY KEY (a, b));
 CREATE TABLE IF NOT EXISTS kinds (filler TEXT NOT NULL, kind TEXT NOT NULL,
                                   yes INTEGER NOT NULL, PRIMARY KEY (filler, kind));
@@ -88,7 +91,8 @@ class SystemArm:
                  known_plans: dict | None = None, planner=None, judge=None,
                  searched: bool = False, depth: int = 3, frontier: int = 20000, hub: int = 4,
                  asked: bool = False, shares: float = 0.0, context: int = 0,
-                 moves: bool = False) -> None:
+                 moves: bool = False, taught: bool = False,
+                 known_learnt: list | None = None) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -111,6 +115,8 @@ class SystemArm:
         self.context = context
         # whether a subject heard somewhere is no longer where it was heard before
         self.moves = moves
+        # whether a question is answered first by what was taught for its shape
+        self.taught = taught
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
@@ -118,6 +124,8 @@ class SystemArm:
         Path(directory).mkdir(parents=True, exist_ok=True)
         self.db = sqlite3.connect(str(Path(directory) / "system.db"))
         self.db.executescript(SCHEMA)
+        self.db.executemany("INSERT OR IGNORE INTO learnt VALUES (?, ?, ?, ?)",
+                            [tuple(x) for x in (known_learnt or [])])
         # plans learnt elsewhere hold no facts, only how a question is asked, so a
         # system may start with them the way a node starts with another's tables
         self.db.executemany("INSERT OR IGNORE INTO plans (shape, plan) VALUES (?, ?)",
@@ -128,7 +136,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "shares": self.shares, "context": self.context, "moves": self.moves, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "shares": self.shares, "context": self.context, "moves": self.moves, "taught": self.taught, "depth": self.depth,
                 "hub": self.hub,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
@@ -486,6 +494,134 @@ class SystemArm:
             step(0, {}, -1, [])
         return results
 
+    # -- learning from taught examples ---------------------------------------
+
+    def chains_to(self, anchors: list[str], answer: str) -> list[list[dict]]:
+        """The shortest chains of assertions, each sharing a filler with the next, that
+        touch every anchor and end on one holding the answer."""
+        rows = self.rows()
+        fill = [[r[k] for k in SLOTS if r[k]] for r in rows]
+        by_filler: dict[str, list[int]] = {}
+        for i, fs in enumerate(fill):
+            for f in set(fs):
+                by_filler.setdefault(f, []).append(i)
+        touching = {a: {i for i, fs in enumerate(fill) if any(same(a, f) for f in fs)}
+                    for a in anchors}
+        anchored = {f for a in anchors for f in by_filler if same(a, f)}
+        paths = [(i,) for i in sorted(set().union(*touching.values()))] if anchors else []
+        for _ in range(self.depth):
+            done = [p for p in paths if all(touching[a] & set(p) for a in anchors)
+                    and any(same(answer, f) and not any(same(a, f) for a in anchors)
+                            for f in fill[p[-1]])]
+            if done:
+                return [[rows[i] for i in p] for p in done]
+            grown = []
+            for p in paths:
+                links = [f for f in fill[p[-1]]
+                         if f in anchored or len(by_filler[f]) <= self.hub]
+                for j in sorted({j for f in links for j in by_filler[f]} - set(p)):
+                    grown.append(p + (j,))
+            if len(grown) > self.frontier:
+                return []
+            paths = grown
+        return []
+
+    @staticmethod
+    def generalise(chain: list[dict], fillers: list[str], answer: str) -> dict:
+        """A chain with the question's fillers made slots, the answer made '?ans', and each
+        filler that links two assertions made a variable. Every step keeps which slots
+        its assertion filled, which stands in for its relation: 'moved to' and
+        'travelled to' both put a subject in a place."""
+        lowered = [norm(f) or "" for f in fillers]
+        names: dict[str, str] = {}
+        steps = []
+        for n, r in enumerate(chain):
+            step = {"filled": sorted(k for k in SLOTS if r[k])}
+            for k in SLOTS:
+                v = r[k]
+                if not v:
+                    continue
+                hit = next((i for i, f in enumerate(lowered) if f and same(v, f)), None)
+                if hit is not None:
+                    step[k] = f"<{hit}>"
+                elif n == len(chain) - 1 and same(v, answer):
+                    step[k] = "?ans"
+                elif any(v in (x[j] for j in SLOTS) for x in chain if x is not r):
+                    step[k] = names.setdefault(v, f"?v{len(names)}")
+            steps.append(step)
+        return {"steps": steps}
+
+    def follow(self, plan: dict, fillers: list[str]) -> list[tuple[str, int]]:
+        """A taught plan run with this question's fillers: every answer it binds, with the
+        latest turn it rests on. Slots are strict: a step's assertion must fill exactly
+        the slots the taught one did, and each value sits in its own slot."""
+        rows = self.rows()
+        out: list[tuple[str, int]] = []
+
+        def step(i: int, bound: dict, latest: int) -> None:
+            if i == len(plan["steps"]):
+                if bound.get("?ans"):
+                    out.append((bound["?ans"], latest))
+                return
+            s = plan["steps"][i]
+            for r in rows:
+                if sorted(k for k in SLOTS if r[k]) != s["filled"]:
+                    continue
+                new, ok = dict(bound), True
+                for k in SLOTS:
+                    token = s.get(k)
+                    if token is None:
+                        continue
+                    if (m := SLOT.match(token)):
+                        idx = int(m.group(1))
+                        ok = idx < len(fillers) and same(norm(fillers[idx]) or "", r[k])
+                    elif token in new:
+                        ok = new[token] == r[k]
+                    else:
+                        new[token] = r[k]
+                    if not ok:
+                        break
+                if ok:
+                    step(i + 1, new, max(latest, r["turn"]))
+
+        step(0, {}, -1)
+        return out
+
+    def taught_answer(self, question: str) -> str | None:
+        """The answer of the best taught plan for the question's shape: the one whose
+        predictions on later taught examples held most often, if it held more often than
+        it failed."""
+        shape, fillers = self.shape(question)
+        best = self.db.execute(
+            "SELECT plan FROM learnt WHERE shape = ? AND hits > misses"
+            " ORDER BY hits - misses DESC, hits DESC LIMIT 1", (shape,)).fetchone()
+        if not best:
+            return None
+        found = self.follow(json.loads(best[0]), fillers)
+        if not found:
+            return "I don't know."
+        return max(found, key=lambda f: f[1])[0]
+
+    def teach(self, question: str, answer: str) -> None:
+        """A question told with its answer. Every plan already taught for the question's
+        shape is scored on it; then the chains from the question's fillers to the
+        answer are generalised and kept as plans, each counted as having held once."""
+        shape, fillers = self.shape(question)
+        want = norm(answer) or ""
+        for rid, plan in self.db.execute("SELECT rowid, plan FROM learnt WHERE shape = ?",
+                                         (shape,)).fetchall():
+            found = self.follow(json.loads(plan), fillers)
+            said = max(found, key=lambda f: f[1])[0] if found else ""
+            column = "hits" if said and same(norm(said) or "", want) else "misses"
+            self.db.execute(f"UPDATE learnt SET {column} = {column} + 1 WHERE rowid = ?",
+                            (rid,))
+        anchors = [norm(f) for f in fillers if norm(f)]
+        for chain in self.chains_to(anchors, want):
+            plan = json.dumps(self.generalise(chain, fillers, want), sort_keys=True)
+            self.db.execute("INSERT OR IGNORE INTO learnt (shape, plan, hits, misses)"
+                            " VALUES (?, ?, 1, 0)", (shape, plan))
+        self.db.commit()
+
     def search(self, query: dict) -> list[tuple[dict, int, list[str]]]:
         """The chain found by the system rather than written by the planner.
 
@@ -632,6 +768,11 @@ class SystemArm:
         return found
 
     def answer(self, question: Question) -> str:
+        if self.taught:
+            said = self.taught_answer(question.text)
+            if said is not None:
+                self.last_notes = ["(taught)"]
+                return said
         query = self.query(question.text)
         self.last_notes = [json.dumps(query)] if query else ["(unreadable)"]
         if not query:

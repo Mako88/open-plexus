@@ -58,6 +58,8 @@ def main() -> None:
     p.add_argument("--planner-judges", action="store_true")
     p.add_argument("--context", type=int, default=0)
     p.add_argument("--moves", action="store_true")
+    p.add_argument("--teach", type=int, default=0,
+                   help="training stories a task told with their answers before the test")
     p.add_argument("--note", default="")
     args = p.parse_args()
 
@@ -70,7 +72,7 @@ def main() -> None:
         from unfused.faculty import ServedFaculty
         faculty = ServedFaculty(model_id=f"{args.served} (llama.cpp)",
                                 url=f"http://127.0.0.1:{args.port}/v1/chat/completions")
-    if any(a in ("system", "planned", "asked") for a in arms):
+    if any(a in ("system", "planned", "asked", "taught") for a in arms):
         from unfused.ears import Ear
         from unfused.store import MiniLmEmbedder
         embedder = MiniLmEmbedder()
@@ -79,8 +81,37 @@ def main() -> None:
             planner = Ear(url=f"http://127.0.0.1:{args.planner_port}/v1/chat/completions",
                           name=f"{args.planner_served} (llama.cpp, planner)")
 
+    def system(work, name, plans, learnt):
+        from unfused.system import SystemArm
+        return SystemArm(work, ear, embedder, plans=name == "planned", known_plans=plans,
+                         planner=planner, judge=planner if args.planner_judges else None,
+                         asked=name == "asked", context=args.context, moves=args.moves,
+                         taught=name == "taught", known_learnt=learnt)
+
+    def export(work, table_sql):
+        import sqlite3
+        db = sqlite3.connect(str(work / "system.db"))
+        out = db.execute(table_sql).fetchall()
+        db.close()
+        return out
+
     for name in arms:
-        rows, dials, seconds, plans = [], None, 0.0, {}
+        rows, dials, seconds, plans, learnt = [], None, 0.0, {}, []
+        if name == "taught" and args.teach:
+            # the teaching: training stories heard a line at a time, each question told
+            # with its answer; what was learnt, with how often it held, carries on
+            for t in tasks:
+                for world in stories(t, args.teach, split="train"):
+                    work = Path(tempfile.mkdtemp(prefix="babi-teach-"))
+                    arm = system(work, name, plans, learnt)
+                    asked = world.questions_after()
+                    for turn, text in enumerate(world.turns):
+                        arm.hear(turn, text)
+                        for q in asked.get(turn, []):
+                            arm.teach(q.text, q.answer)
+                    arm.close()
+                    learnt = export(work, "SELECT shape, plan, hits, misses FROM learnt")
+                    shutil.rmtree(work, ignore_errors=True)
         for t in tasks:
             for world in worlds[t]:
                 work = Path(tempfile.mkdtemp(prefix=f"babi-{name}-"))
@@ -91,14 +122,8 @@ def main() -> None:
                     def open_arm(work=work):
                         return FullContext(work, faculty)
                 else:
-                    from unfused.system import SystemArm
-
                     def open_arm(work=work):
-                        return SystemArm(work, ear, embedder, plans=name == "planned",
-                                         known_plans=plans, planner=planner,
-                                         judge=planner if args.planner_judges else None,
-                                         asked=name == "asked", context=args.context,
-                                         moves=args.moves)
+                        return system(work, name, plans, learnt)
                 result = run(world, open_arm, reopen_every=10**9)
                 if name == "planned":
                     # plans carry from story to story, as they carry from house to house
@@ -121,7 +146,7 @@ def main() -> None:
             "faculty": faculty.name if faculty and name != "blind" else None,
             "planner": args.planner_served if args.planner_port else None,
             "planner_judges": args.planner_judges, "context": args.context,
-            "moves": args.moves,
+            "moves": args.moves, "teach": args.teach, "learnt": len(learnt),
             "world": {"tasks": {str(t): TASKS[t] for t in tasks}, "stories": args.stories,
                       "fingerprint": fingerprint([w for t in tasks for w in worlds[t]]),
                       "questions": len(rows)},

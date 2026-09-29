@@ -344,3 +344,34 @@ def test_the_ear_is_shown_the_sentences_before(tmp_path):
     for turn, s in enumerate(["one.", "two.", "three."]):
         a.hear(turn, s)
     assert seen == [[], ["one."], ["one.", "two."]]
+
+
+BABI = {
+    "Mary got the milk.": [{"subject": "Mary", "relation": "got", "object": "milk"}],
+    "Mary moved to the hallway.": [
+        {"subject": "Mary", "relation": "moved to", "place": "hallway"}],
+    "John got the football.": [{"subject": "John", "relation": "got", "object": "football"}],
+    "Sandra went to the garden.": [
+        {"subject": "Sandra", "relation": "went to", "place": "garden"}],
+    "John travelled to the kitchen.": [
+        {"subject": "John", "relation": "travelled to", "place": "kitchen"}],
+}
+
+
+def test_a_plan_taught_on_one_story_answers_another_with_other_words(tmp_path):
+    READINGS.update(BABI)
+    teacher = SystemArm(tmp_path / "taught", TableEar(), HashEmbedder(), taught=True)
+    for turn, s in enumerate(["Mary got the milk.", "Mary moved to the hallway."]):
+        teacher.hear(turn, s)
+    teacher.teach("Where is the milk?", "hallway")
+    learnt = teacher.db.execute("SELECT shape, plan, hits, misses FROM learnt").fetchall()
+    assert learnt and learnt[0][0] == "Where is the <0>?"
+
+    ear = TableEar()
+    ear.rewrite = lambda question: (_ for _ in ()).throw(AssertionError(question))
+    pupil = SystemArm(tmp_path / "pupil", ear, HashEmbedder(), taught=True,
+                      known_learnt=learnt)
+    for turn, s in enumerate(["John got the football.", "Sandra went to the garden.",
+                              "John travelled to the kitchen."]):
+        pupil.hear(turn, s)
+    assert pupil.answer(q("Where is the football?")) == "kitchen"

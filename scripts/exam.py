@@ -40,6 +40,9 @@ def main() -> None:
                    help="which model the llama-server is running, for the reading")
     p.add_argument("--port", type=int, default=8093)
     p.add_argument("--note", default="", help="what this run is for and what would refute it")
+    p.add_argument("--planner-port", type=int, default=None,
+                   help="a second llama-server that writes question plans; the ear reads")
+    p.add_argument("--planner-served", default=None, help="which model that server runs")
     p.add_argument("--plans", default=None,
                    help="a JSON file of plans by shape: `planned` starts with them and adds "
                         "what it learns")
@@ -75,12 +78,16 @@ def main() -> None:
             from unfused.system import SystemArm
 
             ear = Ear(url=faculty.url, name=faculty.name)
+            planner = (Ear(url=f"http://127.0.0.1:{args.planner_port}/v1/chat/completions",
+                           name=f"{args.planner_served} (llama.cpp, planner)")
+                       if args.planner_port else None)
 
             known = (json.loads(Path(args.plans).read_text(encoding="utf-8"))
                      if name == "planned" and args.plans and Path(args.plans).exists() else {})
 
             def open_arm(plans=name == "planned", known=known):
-                return SystemArm(work, ear, embedder, plans=plans, known_plans=known)
+                return SystemArm(work, ear, embedder, plans=plans, known_plans=known,
+                                 planner=planner)
         elif name == "linked":
             from unfused.linked import LinkedRecall
 

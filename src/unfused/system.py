@@ -81,8 +81,10 @@ class SystemArm:
 
     def __init__(self, directory: Path, ear, embedder, names_shown: int = 25,
                  relations_shown: int = 30, plans: bool = False,
-                 known_plans: dict | None = None) -> None:
+                 known_plans: dict | None = None, planner=None) -> None:
         self.ear = ear
+        # what writes a question's plan; the ear unless a different faculty is given
+        self.planner = planner or ear
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
@@ -99,7 +101,9 @@ class SystemArm:
         self.pending: tuple[str, dict] | None = None
 
     def dials(self) -> dict:
-        return {"ear": self.ear.name, "names_shown": self.names_shown,
+        return {"ear": self.ear.name, "planner": self.planner.name,
+                "planner_calls": getattr(self.planner, "calls", None) if self.planner
+                is not self.ear else None, "names_shown": self.names_shown,
                 "relations_shown": self.relations_shown, "plans": self.plans,
                 **dict(zip(("shapes", "plan_uses"), self.db.execute(
                     "SELECT COUNT(*), COALESCE(SUM(used), 0) FROM plans").fetchone())),
@@ -209,7 +213,7 @@ class SystemArm:
         fillers put in, or the ear's reading of it, held until it finds an answer."""
         self.pending = None
         if not self.plans:
-            return self.ear.rewrite(question)
+            return self.planner.rewrite(question)
         shape, fillers = self.shape(question)
         row = self.db.execute("SELECT plan FROM plans WHERE shape = ?", (shape,)).fetchone()
         if row:
@@ -222,7 +226,7 @@ class SystemArm:
                     {k: (fillers[int(m.group(1))] if isinstance(v, str)
                          and (m := SLOT.match(v)) else v) for k, v in st.items()}
                     for st in kept["steps"]]}
-        rewritten = self.ear.rewrite(question)
+        rewritten = self.planner.rewrite(question)
         if rewritten and fillers:
             lowered = [norm(f) for f in fillers]
             steps = [{k: (f"<{lowered.index(norm(v))}>" if isinstance(v, str)
@@ -350,7 +354,12 @@ class SystemArm:
         self.last_notes += sorted({x for _, _, h in found for x in h})
         if not found:
             return "I don't know."
-        if self.pending:
+        # a plan whose every answer is a name the question gave has read the question
+        # back rather than looked anything up, and is not kept
+        given = {norm(f) for f in self.shape(question.text)[1]}
+        echoes = all(any(same(norm(b[want]) or "", g) for g in given if g)
+                     for b, _, _ in found)
+        if self.pending and not echoes:
             self.db.execute("INSERT OR IGNORE INTO plans (shape, plan) VALUES (?, ?)",
                             (self.pending[0], json.dumps(self.pending[1])))
             self.db.commit()

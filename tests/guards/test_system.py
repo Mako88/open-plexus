@@ -375,3 +375,17 @@ def test_a_plan_taught_on_one_story_answers_another_with_other_words(tmp_path):
                               "John travelled to the kitchen."]):
         pupil.hear(turn, s)
     assert pupil.answer(q("Where is the football?")) == "kitchen"
+
+
+def test_the_system_binds_there_and_she_to_what_is_in_focus(tmp_path):
+    READINGS.update({
+        "Mary went to the kitchen.": [
+            {"subject": "Mary", "relation": "went to", "place": "kitchen"}],
+        "She got the milk there.": [
+            {"subject": "she", "relation": "got", "object": "milk", "place": "there"}],
+    })
+    a = SystemArm(tmp_path, TableEar(), HashEmbedder(), binds=True)
+    a.hear(0, "Mary went to the kitchen.")
+    a.hear(1, "She got the milk there.")
+    got = [r for r in a.rows() if r["relation"] == "got"][0]
+    assert (got["subject"], got["place"]) == ("mary", "kitchen")

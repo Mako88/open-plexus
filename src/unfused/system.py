@@ -37,6 +37,9 @@ from .exam.world import Question
 SLOTS = ("subject", "object", "place", "quantity")
 NULLS = {"", "none", "null", "n/a", "unknown", "nothing"}
 ARTICLES = ("the ", "a ", "an ", "some ", "all the ", "all ")
+PEOPLE = {"he", "she", "they", "him", "her", "them"}
+THINGS = {"it"}
+PRONOUNS = PEOPLE | THINGS | {"there"}
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS assertions (
@@ -92,7 +95,7 @@ class SystemArm:
                  searched: bool = False, depth: int = 3, frontier: int = 20000, hub: int = 4,
                  asked: bool = False, shares: float = 0.0, context: int = 0,
                  moves: bool = False, taught: bool = False,
-                 known_learnt: list | None = None) -> None:
+                 known_learnt: list | None = None, binds: bool = False) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -117,6 +120,8 @@ class SystemArm:
         self.moves = moves
         # whether a question is answered first by what was taught for its shape
         self.taught = taught
+        # whether a pronoun the ear wrote as heard is bound by the system
+        self.binds = binds
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
@@ -136,7 +141,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "shares": self.shares, "context": self.context, "moves": self.moves, "taught": self.taught, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "shares": self.shares, "context": self.context, "moves": self.moves, "taught": self.taught, "binds": self.binds, "depth": self.depth,
                 "hub": self.hub,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
@@ -167,7 +172,8 @@ class SystemArm:
                               (key,)).fetchone()
         if row:
             return json.loads(row[0])
-        assertions = self.ear.read(text, self.relations(), before)
+        assertions = (self.ear.read(text, self.relations(), before, literal=True)
+                      if self.binds else self.ear.read(text, self.relations(), before))
         self.db.execute("INSERT INTO readings VALUES (?, ?)", (key, json.dumps(assertions)))
         return assertions
 
@@ -177,6 +183,8 @@ class SystemArm:
         for a in assertions:
             row = {s: norm(a.get(s)) for s in SLOTS}
             relation = norm(a.get("relation"))
+            if self.binds:
+                row = self.bind(row)
             if not row["subject"] or not relation:
                 continue
             self.supersede(row, turn, relation)
@@ -190,6 +198,39 @@ class SystemArm:
                     vector = self.embedder.encode([name])[0].astype(np.float32)
                     self.db.execute("INSERT INTO names VALUES (?, ?)", (name, vector.tobytes()))
         self.db.commit()
+
+    def bind(self, row: dict) -> dict:
+        """A pronoun the ear wrote as heard, bound to what is most recently in focus:
+        'there' to the last place heard, 'he', 'she' or 'they' to the last named
+        subject, 'it' to the last object. The simplest form of what centering theory
+        calls the entity in focus, and the system's work rather than the ear's."""
+        def last(column: str, named: bool = False) -> str | None:
+            for (v,) in self.db.execute(
+                    f"SELECT {column} FROM assertions WHERE {column} IS NOT NULL"
+                    " ORDER BY turn DESC, id DESC"):
+                if v in PRONOUNS:
+                    continue
+                if not named or self.named(v):
+                    return v
+            return None
+
+        out = dict(row)
+        for k, v in row.items():
+            if v == "there":
+                out[k] = last("place") or v
+            elif v in PEOPLE:
+                out[k] = last("subject", named=True) or v
+            elif v in THINGS:
+                out[k] = last("object") or v
+        return out
+
+    def named(self, value: str) -> bool:
+        """Whether a filler was heard capitalised mid-sentence: a name."""
+        for (heard,) in self.db.execute("SELECT heard FROM assertions WHERE subject = ?"
+                                        " ORDER BY turn DESC LIMIT 1", (value,)):
+            m = re.search(rf"\b{re.escape(value)}\b", heard, re.I)
+            return bool(m and m.group(0)[:1].isupper())
+        return False
 
     def supersede(self, row: dict, turn: int, relation: str = "") -> None:
         """A later assertion that the same subject's same thing is somewhere else

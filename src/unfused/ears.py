@@ -169,11 +169,16 @@ class Ear:
     failures: list = field(default_factory=list)
 
     def read(self, sentence: str, relations: list[str] | None = None,
-             before: list[str] | None = None) -> list[dict]:
+             before: list[str] | None = None, literal: bool = False) -> list[dict]:
         """A sentence into assertions, reusing a known relation where it means the same.
         The sentences just before it are shown so that 'there', 'she' and 'it' can be
         written out, and only this sentence's facts are written down."""
         system = READ
+        if literal:
+            # the system binds pronouns itself, so the ear copies them as said
+            system = system.replace(
+                "Write out what a pronoun such as 'it', 'them' or 'she' refers to.",
+                "Copy a pronoun such as 'it', 'she' or 'there' exactly as said.")
         if relations:
             system += (" Where a relation means the same as a known one, use the known one "
                        "exactly.\n" + known_block(relations, []))

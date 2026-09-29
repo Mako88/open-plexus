@@ -1,0 +1,6980 @@
+{
+ "kind": "babi",
+ "arm": "planned",
+ "taken_at": "20260929T215128Z",
+ "note": "First bAbI reading: 0.8B given each story whole, against the system with the 0.8B reading and the 9B planning and judging. Refuted if planned does not beat full on tasks 2 and 3.",
+ "faculty": "Qwen3.5-0.8B-Q8_0 (llama.cpp) [served, frozen]",
+ "planner": "Qwen3.5-9B-Q6_K_L",
+ "planner_judges": true,
+ "world": {
+  "tasks": {
+   "1": "single supporting fact",
+   "2": "two supporting facts",
+   "3": "three supporting facts",
+   "7": "counting"
+  },
+  "stories": 20,
+  "fingerprint": "12761cca465574ff",
+  "questions": 400
+ },
+ "summary": {
+  "score": 0.105,
+  "by_task": {
+   "1": 0.15,
+   "2": 0.03,
+   "3": 0.0,
+   "7": 0.24
+  }
+ },
+ "dials": {
+  "ear": "Qwen3.5-0.8B-Q8_0 (llama.cpp) [served, frozen]",
+  "planner": "Qwen3.5-9B-Q6_K_L (llama.cpp, planner)",
+  "judge": "Qwen3.5-9B-Q6_K_L (llama.cpp, planner)",
+  "searched": false,
+  "asked": false,
+  "depth": 3,
+  "hub": 4,
+  "planner_calls": 853,
+  "names_shown": 25,
+  "relations_shown": 30,
+  "plans": true,
+  "shapes": 4,
+  "plan_uses": 5,
+  "ear_calls": 2062,
+  "ear_unparsed": 0
+ },
+ "seconds": 2871.8,
+ "cost": {
+  "calls": 400,
+  "tokens_in": 101242,
+  "tokens_out": 3814,
+  "seconds": 96.4
+ },
+ "rows": [
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is John?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is Mary?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is Sandra?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Sandra?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Sandra?",
+   "answer": "kitchen",
+   "said": "kitchen",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra journeyed to the kitchen."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is Sandra?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is Sandra?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is Daniel?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Sandra?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Daniel?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is Mary?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is Mary?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is Daniel?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Mary?",
+   "answer": "bedroom",
+   "said": "bedroom",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Mary travelled to the bedroom."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Mary?",
+   "answer": "bedroom",
+   "said": "bedroom",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Mary travelled to the bedroom."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is John?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is John?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is John?",
+   "answer": "kitchen",
+   "said": "kitchen",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John went to the kitchen."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Daniel?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is John?",
+   "answer": "kitchen",
+   "said": "kitchen",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John went to the kitchen."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is Mary?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is John?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is John?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Sandra?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Daniel?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is Sandra?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is Mary?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is Daniel?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Daniel?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Daniel?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is Sandra?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is John?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is Sandra?",
+   "answer": "kitchen",
+   "said": "kitchen",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra travelled to the kitchen."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Sandra?",
+   "answer": "kitchen",
+   "said": "kitchen",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra went to the kitchen."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Sandra?",
+   "answer": "bathroom",
+   "said": "kitchen",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra went to the kitchen."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is Mary?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is Mary?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is Mary?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Sandra?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Daniel?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is Sandra?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is Daniel?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is Sandra?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Daniel?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Daniel?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is Mary?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is Daniel?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is Sandra?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is John?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is John?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is John?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is John?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is John?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is John?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Daniel?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is Mary?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is Mary?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is Mary?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Daniel?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Sandra?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is Sandra?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is Daniel?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is Sandra?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Daniel?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Daniel?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is John?",
+   "answer": "kitchen",
+   "said": "to the kitchen",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John went back to the kitchen."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is John?",
+   "answer": "kitchen",
+   "said": "to the kitchen",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John went back to the kitchen."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is Daniel?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Daniel?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Daniel?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is Mary?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is Sandra?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is Mary?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Mary?",
+   "answer": "bedroom",
+   "said": "bedroom",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Mary went to the bedroom."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Mary?",
+   "answer": "bathroom",
+   "said": "bathroom",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Mary went to the bathroom."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is Daniel?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is John?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is Daniel?",
+   "answer": "kitchen",
+   "said": "kitchen",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Daniel moved to the kitchen."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Daniel?",
+   "answer": "hallway",
+   "said": "kitchen",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Daniel went back to the kitchen."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Daniel?",
+   "answer": "office",
+   "said": "kitchen",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Daniel went back to the kitchen."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is John?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is John?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is Sandra?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Mary?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Daniel?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is Sandra?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is Mary?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is John?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Sandra?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Daniel?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"daniel\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is Sandra?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is John?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is Sandra?",
+   "answer": "hallway",
+   "said": "bathroom",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra went back to the bathroom."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Sandra?",
+   "answer": "bathroom",
+   "said": "bathroom",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra went back to the bathroom."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Sandra?",
+   "answer": "bathroom",
+   "said": "bathroom",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra went back to the bathroom."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "Where is John?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"john\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is Sandra?",
+   "answer": "kitchen",
+   "said": "kitchen",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"sandra\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra moved to the kitchen."
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is Mary?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is Mary?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa1",
+   "kind": "qa1",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is Mary?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"mary\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 1
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is the milk?",
+   "answer": "hallway",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Mary got the milk there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is the football?",
+   "answer": "hallway",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John got the football there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is the football?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is the football?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "Where is the milk?",
+   "answer": "garden",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Mary got the milk there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is the milk?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 15,
+   "question": "Where is the football?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 17,
+   "question": "Where is the milk?",
+   "answer": "bedroom",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra put down the milk there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 19,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Daniel grabbed the football there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 21,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Daniel grabbed the football there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is the football?",
+   "answer": "bedroom",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John got the football there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is the football?",
+   "answer": "hallway",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John got the football there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "Where is the milk?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "Where is the milk?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 17,
+   "question": "Where is the apple?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 15,
+   "question": "Where is the milk?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 17,
+   "question": "Where is the milk?",
+   "answer": "garden",
+   "said": "where",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Mary dropped the milk."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 19,
+   "question": "Where is the milk?",
+   "answer": "garden",
+   "said": "where",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Mary dropped the milk."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 25,
+   "question": "Where is the apple?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 27,
+   "question": "Where is the apple?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "Where is the apple?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 15,
+   "question": "Where is the apple?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 19,
+   "question": "Where is the football?",
+   "answer": "bathroom",
+   "said": "ground",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Daniel put down the football."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 21,
+   "question": "Where is the football?",
+   "answer": "bathroom",
+   "said": "ground",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Daniel put down the football."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 23,
+   "question": "Where is the milk?",
+   "answer": "bedroom",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John grabbed the milk there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is the milk?",
+   "answer": "kitchen",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John grabbed the milk there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is the milk?",
+   "answer": "kitchen",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John grabbed the milk there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "Where is the apple?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "Where is the apple?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 15,
+   "question": "Where is the milk?",
+   "answer": "kitchen",
+   "said": "kitchen",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John put down the milk."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is the apple?",
+   "answer": "garden",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Daniel got the apple there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "Where is the apple?",
+   "answer": "garden",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Daniel got the apple there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 19,
+   "question": "Where is the apple?",
+   "answer": "kitchen",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra put down the apple there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 21,
+   "question": "Where is the apple?",
+   "answer": "kitchen",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra put down the apple there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is the milk?",
+   "answer": "office",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra got the milk there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 19,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 21,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 25,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 29,
+   "question": "Where is the milk?",
+   "answer": "bedroom",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra put down the milk there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is the milk?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is the milk?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "Where is the milk?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "Where is the milk?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 21,
+   "question": "Where is the apple?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is the milk?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is the football?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is the football?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is the football?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "Where is the milk?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is the milk?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is the apple?",
+   "answer": "hallway",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John grabbed the apple there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 17,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra got the football there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 19,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 21,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is at\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "Where is the apple?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 15,
+   "question": "Where is the milk?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 21,
+   "question": "Where is the milk?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 23,
+   "question": "Where is the milk?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 25,
+   "question": "Where is the apple?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "Where is the milk?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where is the milk?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Daniel grabbed the football there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 17,
+   "question": "Where is the milk?",
+   "answer": "bedroom",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Daniel got the milk there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 19,
+   "question": "Where is the milk?",
+   "answer": "bedroom",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Daniel got the milk there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 21,
+   "question": "Where is the football?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "Where is the apple?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 15,
+   "question": "Where is the apple?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 17,
+   "question": "Where is the apple?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 21,
+   "question": "Where is the apple?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 27,
+   "question": "Where is the apple?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is the apple?",
+   "answer": "office",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra got the apple there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is the milk?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "Where is the milk?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "Where is the milk?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 15,
+   "question": "Where is the milk?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is the football?",
+   "answer": "bathroom",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John got the football there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "Where is the football?",
+   "answer": "bathroom",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John got the football there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 35,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John got the football there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 37,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John got the football there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 39,
+   "question": "Where is the football?",
+   "answer": "kitchen",
+   "said": "ground",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John put down the football."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is the milk?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is the apple?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "Where is the milk?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "Where is the football?",
+   "answer": "bedroom",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra got the football there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 15,
+   "question": "Where is the apple?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"apple\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "Where is the milk?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 15,
+   "question": "Where is the milk?",
+   "answer": "kitchen",
+   "said": "kitchen",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Mary dropped the milk."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 17,
+   "question": "Where is the milk?",
+   "answer": "kitchen",
+   "said": "kitchen",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "Mary dropped the milk."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 19,
+   "question": "Where is the milk?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 21,
+   "question": "Where is the milk?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where is the football?",
+   "answer": "bathroom",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John got the football there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where is the football?",
+   "answer": "bathroom",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}",
+    "John got the football there."
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "Where is the football?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "Where is the football?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"football\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa2",
+   "kind": "qa2",
+   "delay": 0,
+   "asked_at": 15,
+   "question": "Where is the milk?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"is in\", \"subject\": \"milk\", \"place\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 2
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 37,
+   "question": "Where was the apple before the bathroom?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 39,
+   "question": "Where was the apple before the hallway?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"hallway\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 41,
+   "question": "Where was the apple before the hallway?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"hallway\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 51,
+   "question": "Where was the football before the garden?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"garden\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 53,
+   "question": "Where was the football before the garden?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"garden\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 39,
+   "question": "Where was the apple before the bathroom?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 57,
+   "question": "Where was the milk before the office?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was before\", \"subject\": \"milk\", \"place\": \"office\", \"quantity\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 71,
+   "question": "Where was the apple before the office?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"office\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 73,
+   "question": "Where was the apple before the office?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"office\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 87,
+   "question": "Where was the apple before the office?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"office\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 35,
+   "question": "Where was the apple before the bedroom?",
+   "answer": "garden",
+   "said": "daniel",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}",
+    "Daniel got the apple.",
+    "Daniel went to the bedroom."
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 37,
+   "question": "Where was the apple before the bedroom?",
+   "answer": "garden",
+   "said": "daniel",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}",
+    "Daniel got the apple.",
+    "Daniel went to the bedroom."
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 61,
+   "question": "Where was the milk before the bathroom?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 63,
+   "question": "Where was the milk before the bathroom?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 65,
+   "question": "Where was the milk before the bathroom?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 29,
+   "question": "Where was the football before the garden?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"garden\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 31,
+   "question": "Where was the football before the garden?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"garden\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 39,
+   "question": "Where was the milk before the bedroom?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 41,
+   "question": "Where was the milk before the bedroom?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 47,
+   "question": "Where was the football before the bathroom?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 37,
+   "question": "Where was the football before the hallway?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was before\", \"subject\": \"football\", \"place\": \"hallway\", \"quantity\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 39,
+   "question": "Where was the football before the office?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was at\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"office\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 41,
+   "question": "Where was the football before the garden?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"garden\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 59,
+   "question": "Where was the milk before the kitchen?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"kitchen\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 73,
+   "question": "Where was the milk before the bedroom?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 37,
+   "question": "Where was the football before the bedroom?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is\", \"subject\": \"?a\", \"object\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 71,
+   "question": "Where was the football before the bedroom?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is\", \"subject\": \"?a\", \"object\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 73,
+   "question": "Where was the football before the office?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was at\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"office\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 75,
+   "question": "Where was the football before the office?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was at\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"office\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 77,
+   "question": "Where was the apple before the office?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"office\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 27,
+   "question": "Where was the apple before the hallway?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"hallway\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 29,
+   "question": "Where was the apple before the kitchen?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"kitchen\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 31,
+   "question": "Where was the apple before the kitchen?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"kitchen\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 33,
+   "question": "Where was the milk before the bedroom?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 35,
+   "question": "Where was the milk before the garden?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was before\", \"subject\": \"milk\", \"place\": \"garden\", \"quantity\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 41,
+   "question": "Where was the apple before the bathroom?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 45,
+   "question": "Where was the football before the kitchen?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"kitchen\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 89,
+   "question": "Where was the apple before the kitchen?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"kitchen\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 93,
+   "question": "Where was the apple before the bathroom?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 95,
+   "question": "Where was the apple before the bathroom?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 57,
+   "question": "Where was the football before the hallway?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was before\", \"subject\": \"football\", \"place\": \"hallway\", \"quantity\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 59,
+   "question": "Where was the football before the hallway?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was before\", \"subject\": \"football\", \"place\": \"hallway\", \"quantity\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 61,
+   "question": "Where was the milk before the hallway?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was before\", \"subject\": \"milk\", \"place\": \"hallway\", \"quantity\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 63,
+   "question": "Where was the milk before the bathroom?",
+   "answer": "hallway",
+   "said": "sandra",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra moved to the bathroom.",
+    "Sandra took the milk.",
+    "Sandra went back to the bathroom.",
+    "Sandra went to the bathroom."
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 119,
+   "question": "Where was the football before the hallway?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"hallway\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 27,
+   "question": "Where was the apple before the bathroom?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 29,
+   "question": "Where was the apple before the bathroom?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 31,
+   "question": "Where was the apple before the bathroom?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 33,
+   "question": "Where was the apple before the bathroom?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 61,
+   "question": "Where was the milk before the hallway?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was before\", \"subject\": \"milk\", \"place\": \"hallway\", \"quantity\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 57,
+   "question": "Where was the apple before the garden?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"garden\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 59,
+   "question": "Where was the apple before the bedroom?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 67,
+   "question": "Where was the football before the kitchen?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"kitchen\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 73,
+   "question": "Where was the apple before the bedroom?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 75,
+   "question": "Where was the apple before the bedroom?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "Where was the football before the hallway?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"hallway\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 15,
+   "question": "Where was the apple before the office?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"office\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 21,
+   "question": "Where was the football before the garden?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"garden\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 23,
+   "question": "Where was the football before the bedroom?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 25,
+   "question": "Where was the apple before the hallway?",
+   "answer": "garden",
+   "said": "sandra",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"hallway\"}], \"answer\": \"?a\", \"count\": false}",
+    "Sandra moved to the hallway.",
+    "Sandra took the apple."
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 17,
+   "question": "Where was the football before the bedroom?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 19,
+   "question": "Where was the football before the hallway?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"hallway\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 21,
+   "question": "Where was the football before the kitchen?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"kitchen\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 41,
+   "question": "Where was the football before the bathroom?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 43,
+   "question": "Where was the football before the bathroom?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 45,
+   "question": "Where was the milk before the office?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"office\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 47,
+   "question": "Where was the milk before the office?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"office\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 49,
+   "question": "Where was the milk before the office?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"office\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 69,
+   "question": "Where was the football before the bedroom?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 83,
+   "question": "Where was the football before the bathroom?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 39,
+   "question": "Where was the football before the hallway?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"hallway\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 47,
+   "question": "Where was the apple before the garden?",
+   "answer": "hallway",
+   "said": "john",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"garden\"}], \"answer\": \"?a\", \"count\": false}",
+    "John got the apple.",
+    "John travelled to the garden."
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 49,
+   "question": "Where was the milk before the kitchen?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"kitchen\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 63,
+   "question": "Where was the apple before the bathroom?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 147,
+   "question": "Where was the apple before the bathroom?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 23,
+   "question": "Where was the milk before the hallway?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was before\", \"subject\": \"milk\", \"place\": \"hallway\", \"quantity\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 29,
+   "question": "Where was the milk before the office?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was before\", \"subject\": \"milk\", \"place\": \"office\", \"quantity\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 31,
+   "question": "Where was the milk before the hallway?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was before\", \"subject\": \"milk\", \"place\": \"hallway\", \"quantity\": \"?a\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 47,
+   "question": "Where was the apple before the bathroom?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 49,
+   "question": "Where was the apple before the bathroom?",
+   "answer": "office",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "Where was the milk before the office?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"office\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "Where was the milk before the office?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"office\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "Where was the milk before the office?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"office\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 61,
+   "question": "Where was the apple before the hallway?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"hallway\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 63,
+   "question": "Where was the milk before the bedroom?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 63,
+   "question": "Where was the apple before the bathroom?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 69,
+   "question": "Where was the milk before the kitchen?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"kitchen\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 71,
+   "question": "Where was the milk before the kitchen?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"kitchen\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 73,
+   "question": "Where was the milk before the bathroom?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 83,
+   "question": "Where was the football before the bedroom?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 41,
+   "question": "Where was the milk before the kitchen?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"kitchen\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 43,
+   "question": "Where was the milk before the kitchen?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"kitchen\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 51,
+   "question": "Where was the milk before the bedroom?",
+   "answer": "garden",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 57,
+   "question": "Where was the football before the kitchen?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"football\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"kitchen\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 89,
+   "question": "Where was the apple before the bedroom?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 27,
+   "question": "Where was the apple before the hallway?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"hallway\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 31,
+   "question": "Where was the apple before the hallway?",
+   "answer": "kitchen",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"hallway\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 33,
+   "question": "Where was the apple before the kitchen?",
+   "answer": "hallway",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"apple\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"kitchen\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 41,
+   "question": "Where was the milk before the bathroom?",
+   "answer": "bedroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bathroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa3",
+   "kind": "qa3",
+   "delay": 0,
+   "asked_at": 43,
+   "question": "Where was the milk before the bedroom?",
+   "answer": "bathroom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"was in\", \"subject\": \"milk\", \"place\": \"?a\"}, {\"relation\": \"is before\", \"subject\": \"?a\", \"place\": \"bedroom\"}], \"answer\": \"?a\", \"count\": false}"
+   ],
+   "task": 3
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary gave the milk to Sandra."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is John carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"john\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is John carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"john\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Sandra gave the milk to John."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "How many objects is Daniel carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"daniel\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Daniel took the milk there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "How many objects is Daniel carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"daniel\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is Daniel carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"daniel\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary got the football there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary got the football there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "one",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Sandra grabbed the apple there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "two",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Sandra grabbed the apple there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is John carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"john\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "John grabbed the apple there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is John carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"john\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary passed the apple to John."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "How many objects is John carrying?",
+   "answer": "none",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"john\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary passed the apple to John."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 15,
+   "question": "How many objects is Mary carrying?",
+   "answer": "two",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary picked up the apple there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary picked up the apple there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "How many objects is John carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"john\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "John got the apple there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary got the apple there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "How many objects is Mary carrying?",
+   "answer": "two",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "How many objects is Mary carrying?",
+   "answer": "two",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "How many objects is John carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"john\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "How many objects is John carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"john\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is John carrying?",
+   "answer": "none",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"john\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary passed the apple to John."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary passed the apple to Daniel."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "none",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Sandra picked up the apple there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 15,
+   "question": "How many objects is John carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"john\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 17,
+   "question": "How many objects is John carrying?",
+   "answer": "none",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"john\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "John picked up the football there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "How many objects is Daniel carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"daniel\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Daniel grabbed the milk there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is Daniel carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"daniel\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Daniel grabbed the milk there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Daniel carrying?",
+   "answer": "none",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"daniel\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Daniel grabbed the milk there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is Daniel carrying?",
+   "answer": "none",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"daniel\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Daniel grabbed the milk there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "How many objects is Daniel carrying?",
+   "answer": "none",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"daniel\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Daniel grabbed the milk there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary grabbed the football there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary handed the football to John."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "John handed the football to Mary."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "John handed the football to Mary."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "How many objects is John carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"john\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "John took the apple there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "How many objects is John carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"john\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "John took the apple there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is John carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"john\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary dropped the apple."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary dropped the apple."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "none",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Sandra handed the apple to Daniel."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Daniel gave the apple to Sandra."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Daniel carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"daniel\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Sandra passed the apple to John."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Sandra grabbed the milk there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "none",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Sandra grabbed the milk there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Sandra got the milk there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Daniel carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"daniel\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Daniel got the apple there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is Daniel carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"daniel\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Daniel got the apple there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "How many objects is John carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"john\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "How many objects is John carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"john\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "none",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Sandra took the milk there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "none",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Sandra took the milk there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary grabbed the milk there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "How many objects is Mary carrying?",
+   "answer": "two",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary grabbed the apple there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is Mary carrying?",
+   "answer": "two",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary grabbed the apple there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Mary carrying?",
+   "answer": "two",
+   "said": "1",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary grabbed the apple there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary took the apple there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary picked up the football there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Mary carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "How many objects is Mary carrying?",
+   "answer": "one",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"mary\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Mary grabbed the milk there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Daniel carrying?",
+   "answer": "one",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"daniel\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is Daniel carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"daniel\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Daniel took the milk there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 11,
+   "question": "How many objects is Daniel carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"daniel\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Daniel took the milk there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 13,
+   "question": "How many objects is Daniel carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"daniel\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 15,
+   "question": "How many objects is Daniel carrying?",
+   "answer": "none",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"daniel\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}"
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 1,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "one",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Sandra grabbed the football there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 3,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "one",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Sandra grabbed the football there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 5,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "one",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Sandra grabbed the football there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "two",
+   "said": "there",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Sandra grabbed the football there."
+   ],
+   "task": 7
+  },
+  {
+   "form": "qa7",
+   "kind": "qa7",
+   "delay": 0,
+   "asked_at": 9,
+   "question": "How many objects is Sandra carrying?",
+   "answer": "one",
+   "said": "1",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "{\"steps\": [{\"relation\": \"carrying\", \"subject\": \"sandra\", \"object\": \"?a\", \"quantity\": \"?b\"}], \"answer\": \"?b\", \"count\": false}",
+    "Sandra got the milk there."
+   ],
+   "task": 7
+  }
+ ],
+ "scorer": "numbers matched whole and in either form"
+}

@@ -228,11 +228,24 @@ class SystemArm:
                     for st in kept["steps"]]}
         rewritten = self.planner.rewrite(question)
         if rewritten and fillers:
-            lowered = [norm(f) for f in fillers]
-            steps = [{k: (f"<{lowered.index(norm(v))}>" if isinstance(v, str)
-                          and k != "relation" and norm(v) in lowered else v)
-                      for k, v in st.items()} for st in rewritten.get("steps", [])]
-            self.pending = (shape, {**rewritten, "steps": steps})
+            lowered = [norm(f) or "" for f in fillers]
+
+            def slot(k, v):
+                # a filler the planner wrote as part of what the question said ("dairy"
+                # for "in the dairy") is that filler: left literal, the kept plan would
+                # ask about the dairy for every room
+                if k == "relation" or not isinstance(v, str) or is_unknown(v) or not norm(v):
+                    return v
+                hit = next((i for i, f in enumerate(lowered) if f and same(norm(v), f)), None)
+                return v if hit is None else f"<{hit}>"
+
+            steps = [{k: slot(k, v) for k, v in st.items()}
+                     for st in rewritten.get("steps", [])]
+            used = {v for st in steps for v in st.values() if isinstance(v, str)}
+            # a plan that leaves out something the question named has dropped a
+            # constraint, and kept it would answer every question of the shape alike
+            if all(f"<{i}>" in used for i in range(len(fillers))):
+                self.pending = (shape, {**rewritten, "steps": steps})
         return rewritten
 
     def query(self, question: str) -> dict | None:

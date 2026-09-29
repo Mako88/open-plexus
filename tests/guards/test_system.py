@@ -195,3 +195,32 @@ def test_the_planner_can_be_another_faculty(tmp_path):
     for turn, sentence in enumerate(list(READINGS)[:4]):
         a.hear(turn, sentence)
     assert a.answer(q("Where does Vessarine keep the lanterns?")) == "scullery"
+
+
+def test_a_plan_that_drops_a_named_filler_is_not_kept(tmp_path):
+    ear = TableEar()
+    rewrites = []
+    ear.rewrite = lambda question: rewrites.append(question) or {"steps": [
+        {"subject": "?a", "relation": "keeps", "object": "?b", "place": "scullery"}],
+        "answer": "?a", "count": False}
+    a = SystemArm(tmp_path, ear, HashEmbedder(), plans=True)
+    for turn, sentence in enumerate(list(READINGS)[:4]):
+        a.hear(turn, sentence)
+    a.answer(q("Who keeps the lanterns in the scullery?"))
+    a.answer(q("Who keeps the jars in the scullery?"))
+    assert len(rewrites) == 2
+
+
+def test_a_filler_written_as_part_of_a_longer_one_becomes_its_slot(tmp_path):
+    ear = TableEar()
+    ear.rewrite = lambda question: {"steps": [
+        {"subject": "?a", "relation": "keeps", "object": "lanterns", "place": "scullery"}],
+        "answer": "?a", "count": False}
+    a = SystemArm(tmp_path, ear, HashEmbedder(), plans=True)
+    READINGS["Orrin keeps the rope in the scullery."] = [
+        {"subject": "Orrin", "relation": "keeps", "object": "rope", "place": "in the scullery"}]
+    for turn, sentence in enumerate(list(READINGS)[:4] + ["Orrin keeps the rope in the scullery."]):
+        a.hear(turn, sentence)
+    a.answer(q("Who keeps the lanterns in the scullery?"))
+    kept = a.db.execute("SELECT plan FROM plans").fetchone()[0]
+    assert "scullery" not in kept

@@ -52,7 +52,7 @@ class TableEar:
 
     name = "table"
 
-    def read(self, sentence, relations=None, before=None):
+    def read(self, sentence, relations=None, before=None, literal=False):
         return READINGS.get(sentence, [])
 
     def rewrite(self, question):

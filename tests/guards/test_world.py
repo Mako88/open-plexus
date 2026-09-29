@@ -12,7 +12,8 @@ def test_a_seed_makes_the_same_house():
 def test_every_house_has_every_form():
     for seed in range(5):
         forms = Counter(q.form for q in generate_house(seed).questions)
-        assert set(forms) == {"direct", "oblique", "reverse", "twohop", "update", "negative"}
+        assert set(forms) == {"direct", "oblique", "reverse", "twohop", "update", "chain3",
+                              "count", "negative"}
 
 
 def test_no_question_is_asked_before_what_it_needs_was_told():
@@ -51,3 +52,14 @@ def test_every_telling_states_its_fact():
     for seed in range(5):
         for fact in generate_house(seed).facts:
             assert not fact.told.rstrip().endswith("?"), fact.told
+
+
+def test_a_count_is_asked_after_every_move_that_changes_it():
+    house = generate_house(0)
+    moves = [t for t, text in enumerate(house.turns) if "moved" in text or "old spot" in text]
+    for q in (q for q in house.questions if q.form == "count"):
+        room = q.text.rsplit("the ", 1)[1].rstrip("?")
+        for t in moves:
+            text = house.turns[t]
+            if room in text:
+                assert q.asked_at > t

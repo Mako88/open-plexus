@@ -74,3 +74,9 @@ def test_linked_recall_reaches_a_fragment_through_a_shared_name(tmp_path):
     notes = arm.recall("What does Vessarine's cousin do for a living?")
     assert any("binds books" in n for n in notes)
     assert notes == sorted(notes, key=lambda n: int(n.split("]")[0].split()[-1]))
+
+
+def test_a_number_is_matched_whole():
+    count = Question("How many people keep things in the attic?", "2", "count", "count", 5, 9)
+    assert judge(count, "2 people.")["correct"]
+    assert not judge(count, "12 people.")["correct"]

@@ -365,6 +365,64 @@ def generate_house(
         for delay in delays[1::2]:
             ask(text, answer, kind, "twohop", since, delay, (fact.id, second.id))
 
+    # Three in a row: found from a trade, through the person, to something about
+    # what they keep or who they are related to.
+    cousin_of = {f.subject: f for f in facts if f.kind == "relation"}
+    for trade in facts:
+        if trade.kind != "trade" or trade_count[trade.fields["what"]] != 1:
+            continue
+        who, what = trade.subject, trade.fields["what"]
+        for place in facts:
+            if (place.kind != "place" or place.subject != who or place.id in updates
+                    or place.fields["thing"] not in colour_of):
+                continue
+            colour = colour_of[place.fields["thing"]]
+            text = (f"What colour are the things the person who {what} keeps in the "
+                    f"{place.answer}?")
+            needs = (trade.id, place.id, colour.id)
+            since = max(told_at[n] for n in needs)
+            for delay in delays:
+                ask(text, colour.answer, "colour", "chain3", since, delay, needs)
+        if who in cousin_of and cousin_of[who].answer in trade_of:
+            relation = cousin_of[who]
+            second = trade_of[relation.answer]
+            text = f"What does the cousin of the person who {what} do for a living?"
+            needs = (trade.id, relation.id, second.id)
+            since = max(told_at[n] for n in needs)
+            for delay in delays:
+                ask(text, second.answer, "trade", "chain3", since, delay, needs)
+    for relation in (f for f in facts if f.kind == "relation"):
+        for place in facts:
+            if (place.kind != "place" or place.subject != relation.answer
+                    or place.id in updates or place.fields["thing"] not in colour_of):
+                continue
+            colour = colour_of[place.fields["thing"]]
+            text = (f"What colour are the things {relation.subject}'s cousin keeps in the "
+                    f"{place.answer}?")
+            needs = (relation.id, place.id, colour.id)
+            since = max(told_at[n] for n in needs)
+            for delay in delays:
+                ask(text, colour.answer, "colour", "chain3", since, delay, needs)
+
+    # Counting: how many people keep something in a room once every move is told.
+    holders: dict[str, set[str]] = {}
+    touched: dict[str, list[int]] = {}
+    for fact in (f for f in facts if f.kind == "place"):
+        room = updates[fact.id][0] if fact.id in updates else fact.answer
+        holders.setdefault(room, set()).add(fact.subject)
+        touched.setdefault(fact.answer, []).append(told_at[fact.id])
+        if fact.id in updates:
+            # a move changes the count of the room left as well as the room reached
+            touched.setdefault(room, []).append(updates[fact.id][1])
+            touched[fact.answer].append(updates[fact.id][1])
+    for room, people_there in sorted(holders.items()):
+        needs = tuple(f.id for f in facts if f.kind == "place"
+                      and room in (f.answer, updates.get(f.id, ("",))[0]))
+        since = max(touched[room])
+        for delay in delays[1::2]:
+            ask(f"How many people keep things in the {room}?", str(len(people_there)),
+                "count", "count", since, delay, needs)
+
     # Negatives, in three of the house's shapes, spread over the conversation.
     asked_turns = sorted({q.asked_at for q in questions})
     strangers = _people(rng, negatives + len(people))

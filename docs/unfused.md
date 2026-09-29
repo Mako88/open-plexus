@@ -97,11 +97,12 @@ commit.
 ## THE EXAM
 
 A generated house: invented people, rooms and objects, told once each as ordinary sentences
-among filler, across 300 turns. Every question is asked at delays from 1 to 150 turns, in six
+among filler, across 300 turns. Every question is asked at delays from 1 to 150 turns, in eight
 forms: `direct`, `oblique` (no shared content words), `reverse` (asked from the other end),
-`twohop` (needs two facts told at different times), `update` (a fact that changed; naming the
-old answer is scored as stale), and negatives about people never mentioned (the answer is a
-refusal; anything else is scored as invented).
+`twohop` (needs two facts told at different times), `chain3` (needs three), `count` (how many
+people keep things in a room once every move is told), `update` (a fact that changed; naming
+the old answer is scored as stale), and negatives about people never mentioned (the answer is
+a refusal; anything else is scored as invented). A number is matched whole.
 
 The house has a size and no switches. Every house has all its forms in fixed proportions. A
 form is added when real conversation has it and the exam does not; a form is never removed
@@ -152,9 +153,6 @@ was heard at. A query is matched against it, and a chain is matched link by link
 subject, relation and object are asserted again with a new place or quantity, the latest turn
 wins, which is how an update is heard. Nothing matching is an answer: "I don't know". The
 mouth renders the found filler.
-
-The house gains two forms a conversation has and one read of notes cannot do: `chain3` (three
-facts in a row) and `count` (how many things are so).
 
 - **Arms:** the system under each ear; the Phase 1 baseline and full context under the same
   small faculty; full context under the 9B.

@@ -11,6 +11,7 @@ from wrong, because averaging them in hides each:
 
 from __future__ import annotations
 
+import re
 import time
 from collections import defaultdict
 from collections.abc import Callable
@@ -36,7 +37,11 @@ def judge(q: Question, said: str) -> dict:
     if q.answer is None:
         return {"correct": False, "invented": not is_refusal(said) and not echoed,
                 "stale": False, "echoed": echoed}
-    correct = q.answer.lower() in lowered
+    if q.answer.isdigit():
+        # a number is matched whole, or "2" would be found in "12"
+        correct = re.search(rf"(?<!\d){q.answer}(?!\d)", lowered) is not None
+    else:
+        correct = q.answer.lower() in lowered
     stale = bool(q.stale) and q.stale.lower() in lowered and not correct
     return {"correct": correct, "invented": False, "stale": stale, "echoed": echoed}
 

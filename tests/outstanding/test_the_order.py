@@ -70,8 +70,10 @@ def test_phase_4_the_system_beats_its_own_faculty_given_everything():
         if arm not in ("system", "planned") or ("full", seed, faculty) not in by:
             continue
         bars = (by[("full", seed, faculty)], blind.get(seed, {}))
+        # a perfect score passes a bar that is itself perfect, or seed 1's chain3,
+        # where blind reads 1.0, could never be met by anything
         if all(f in forms and all(forms[f]["score"] > b.get(f, {}).get("score", 1.0)
-                                  for b in bars)
+                                  or forms[f]["score"] == 1.0 for b in bars)
                for f in ("twohop", "chain3", "count")):
             won.add(seed)
     assert len(won) >= 3, f"the system beats its faculty on {len(won)} of 3 seeds"

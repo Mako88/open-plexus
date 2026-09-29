@@ -82,7 +82,7 @@ class SystemArm:
     def __init__(self, directory: Path, ear, embedder, names_shown: int = 25,
                  relations_shown: int = 30, plans: bool = False,
                  known_plans: dict | None = None, planner=None, judge=None,
-                 searched: bool = False, depth: int = 3) -> None:
+                 searched: bool = False, depth: int = 3, frontier: int = 20000) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -92,6 +92,7 @@ class SystemArm:
         # and goal, instead of following the plan's steps
         self.searched = searched
         self.depth = depth
+        self.frontier = frontier
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
@@ -391,33 +392,47 @@ class SystemArm:
         anchors = {norm(v) for s in query["steps"] for k, v in s.items()
                    if k != "relation" and isinstance(v, str) and not is_unknown(v) and norm(v)}
         rows = self.rows()
+        fill = [[r[k] for k in SLOTS if r[k]] for r in rows]
+        # which assertions each filler links, by the exact filler: a chain passes from
+        # one assertion to the next through a thing both name
+        by_filler: dict[str, list[int]] = {}
+        for i, fs in enumerate(fill):
+            for f in set(fs):
+                by_filler.setdefault(f, []).append(i)
+        touching = {a: {i for i, fs in enumerate(fill) if any(same(a, f) for f in fs)}
+                    for a in anchors}
+        ending: dict[str, bool] = {}
 
-        def fillers(r):
-            return [r[k] for k in SLOTS if r[k]]
+        def ends(i):
+            stored = rows[i]["relation"]
+            if not relation or not stored:
+                return False
+            if stored not in ending:
+                ending[stored] = self.means(relation, stored, rows[i]["heard"])
+            return ending[stored]
 
-        def touches(r, name):
-            return any(same(name, f) for f in fillers(r))
-
-        def ends(r):
-            return bool(relation and r["relation"]
-                        and self.means(relation, r["relation"], r["heard"]))
-
-        def answer_of(r):
-            free = [f for f in fillers(r) if not any(same(a, f) for a in anchors)]
-            if slot and r[slot] in free:
-                return r[slot]
+        def answer_of(i):
+            free = [f for f in fill[i] if not any(same(a, f) for a in anchors)]
+            if slot and rows[i][slot] in free:
+                return rows[i][slot]
             return free[0] if free else None
 
-        paths = [[r] for r in rows if any(touches(r, a) for a in anchors)]
+        paths = [(i,) for i in sorted(set().union(*touching.values()))] if anchors else []
         for _ in range(self.depth):
-            done = [p for p in paths if ends(p[-1])
-                    and all(any(touches(r, a) for r in p) for a in anchors)
-                    and answer_of(p[-1])]
+            done = [p for p in paths if ends(p[-1]) and answer_of(p[-1])
+                    and all(touching[a] & set(p) for a in anchors)]
             if done:
-                return [({want: answer_of(p[-1])}, max(r["turn"] for r in p),
-                         [r["heard"] for r in p]) for p in done]
-            paths = [p + [r] for p in paths for r in rows if r not in p
-                     and any(touches(r, f) for f in fillers(p[-1]))]
+                return [({want: answer_of(p[-1])}, max(rows[i]["turn"] for i in p),
+                         [rows[i]["heard"] for i in p]) for p in done]
+            grown = []
+            for p in paths:
+                for j in sorted({j for f in fill[p[-1]] for j in by_filler[f]} - set(p)):
+                    grown.append(p + (j,))
+            # a filler named in hundreds of assertions makes the frontier explode
+            # without making a chain likelier; past the cap the search gives up
+            if len(grown) > self.frontier:
+                return []
+            paths = grown
         return []
 
     def answer(self, question: Question) -> str:

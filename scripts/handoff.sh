@@ -32,7 +32,7 @@ out="state/handoff.md"
   echo
   echo "## Do these before anything else"
   echo
-  echo "- Read \`CLAUDE.md\` and \`docs/sylvatica.md\` whole. THE ORDER lives in the doc,"
+  echo "- Read \`CLAUDE.md\` and \`docs/unfused.md\` whole. THE ORDER lives in the doc,"
   echo "  not here, and this file deliberately carries no second copy of it."
   echo "- Re-arm the five-minute \`Monitor\` heartbeat. Compaction does not carry it,"
   echo "  and a session without it stops being a session that continues itself."
@@ -90,7 +90,7 @@ print(json.dumps({
         "hookEventName": "PreCompact",
         "additionalContext":
             "A pre-compaction handoff was written to state/handoff.md. Its "
-            "contents follow. Re-read CLAUDE.md and docs/sylvatica.md, re-arm "
+            "contents follow. Re-read CLAUDE.md and docs/unfused.md, re-arm "
             "the five-minute Monitor heartbeat, and carry on from here.\n\n"
             + body,
     },

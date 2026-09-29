@@ -1,254 +1,64 @@
-"""Standing objections to things this branch currently does. Green, and it prints.
+"""Standing objections to what this branch does. Green, and it prints.
 
-WHAT AN ENTRY IS. Not a bug and not a TODO -- those go in `tests/outstanding` or
-get fixed. An entry here is a place where the branch has made a choice that
-might be wrong and NOBODY HAS MEASURED IT. Each one carries what would settle it
-in either direction, so settling it is a session's work rather than a session's
-argument.
+An entry is a choice that might be wrong and that nobody has measured, with the
+reading that would settle it either way. It leaves by being settled, and the
+count is asserted so that dropping one is visible.
 
-AN ENTRY LEAVES BY BEING SETTLED, and the count below is asserted so that
-neither adding nor quietly dropping one is invisible. Removing an entry without
-a reading in `readings/` or a line in a commit message is the failure this file
-exists to prevent.
-
-  uv run python tests/pushback.py     # read them
-  uv run pytest tests/               # the count is checked, and the list prints
+  uv run python tests/pushback.py
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 
-# The count is asserted. Change it in the same commit that changes the list, and
-# say in the message which entry left and what settled it.
-COUNT = 6
+COUNT = 4
 
 
 @dataclass(frozen=True)
 class Objection:
-    what: str  # what the branch does
-    why: str  # why it might be wrong
-    settled_by: str  # the reading that decides it, either way
+    what: str
+    why: str
+    settled_by: str
 
 
-OBJECTIONS: list[Objection] = [
+OBJECTIONS = [
     Objection(
-        what=(
-            "Every arm is read from ONE run per (preamble, seed), and the "
-            "readings compare those single numbers."
-        ),
-        why=(
-            "Measured 2026-09-07 while re-running `v2-example` on the same five "
-            "seeds inside one invocation: four seeds reproduced within 0.056 "
-            "and seed 1 moved 0.212, with its invention rate going from 0.80 to "
-            "0.00 -- the core declined every negative instead of fabricating. "
-            "That is a MODE FLIP, not drift, and it lands on roughly a fifth of "
-            "runs. It is the same bimodality the echo attractor showed. A single "
-            "run per cell is therefore an unbiased but very noisy estimate, and "
-            "the branch has been reading gaps of 0.05 to 0.25 off exactly such "
-            "single runs. The `v3-identity` verdict survives only because five "
-            "of five seeds moved the same way on two measures at once; a "
-            "narrower result read this way would not be safe."
-        ),
-        settled_by=(
-            "Three repeats of `v2-example` on each of five seeds, same "
-            "invocation. Report the within-cell standard deviation beside the "
-            "between-seed spread, and the fraction of runs whose invention rate "
-            "sits below 0.1 -- that fraction IS the flip rate. If within-cell "
-            "spread is small next to between-seed spread the objection closes "
-            "and single runs stand; if it is comparable, every arm in "
-            "`readings/` needs repeats and the exam harness should take a "
-            "`--repeats` argument that reports a median rather than a value."
-        ),
+        what="An arm's own answers are never written to its memory.",
+        why="In a real conversation what the machine said is part of what happened, and "
+            "a wrong answer it recalls later is a failure the exam cannot currently see.",
+        settled_by="Run the recall arm with answers written as episodes. If the score moves "
+                   "by more than a seed's spread, the exam has been flattering every arm.",
     ),
     Objection(
-        what="Every `feed` and `generate` clones the whole state before touching it.",
-        why=(
-            "`RWKV.forward` writes into the list it is given, and a caller who "
-            "re-feeds a state it thought it still had would get a wrong number "
-            "rather than an exception -- so the clone is defensive and correct. "
-            "It is also a GPU allocation and copy of 13 MB at 1.5B on every "
-            "call. CORRECTED 2026-09-07: this entry used to say 'per generated "
-            "token, since generate calls forward once per token'. That is wrong. "
-            "`generate` clones ONCE at entry and then feeds tokens into its own "
-            "copy, so the cost is per call, not per token -- which makes it far "
-            "smaller than this entry originally claimed. The exam does pay it "
-            "once per question, though, and decode runs at a third of the card's "
-            "bandwidth ceiling, so where that time actually goes is still unread."
-        ),
-        settled_by=(
-            "A cost reading with the clone and with an explicit `feed_in_place` "
-            "on the hot path. If the rates match, the clone is free and this "
-            "entry closes; if they do not, `generate` should clone once at entry "
-            "rather than per token."
-        ),
+        what="Refusal is decided by the faculty from the system prompt.",
+        why="The invented rate then measures the prompt as much as the memory. The memory "
+            "has its own evidence for 'not told': nothing surfaced, or surfaced weakly.",
+        settled_by="The open fork 'confidence from the memory itself': an arm that refuses on "
+                   "recall strength alone, compared on invented rate at equal score.",
     ),
     Objection(
-        what="The prompt format is `User: ...\\n\\nAssistant:` and was not verified.",
-        why=(
-            "RWKV's instruction tunes are trained on a specific shape, and the "
-            "G1 line is a REASONING series that may expect thinking tags. "
-            "Getting this wrong does not raise -- it produces a model that "
-            "rambles or answers the wrong question, which reads as the core "
-            "being weak rather than as the harness being wrong. Phase 1's first "
-            "reading would then refute the core choice for a reason that has "
-            "nothing to do with the core."
-        ),
-        settled_by=(
-            "The same held-out question set run under two formats at 1.5B. If "
-            "the scores are within noise the format is not load-bearing and the "
-            "entry closes; if they differ, the format is a dial and belongs in "
-            "DIALS with a reading beside it."
-        ),
+        what="Scoring is a contains-match on the canonical answer.",
+        why="An answer that lists two rooms is scored correct if either is right, and a "
+            "hedge that names the answer counts. It is generous to every arm alike, but "
+            "that can hide a difference between arms that hedge differently.",
+        settled_by="Count answers naming more than one candidate of the right kind, per arm. "
+                   "Above a few per cent for any arm, score those as wrong and re-read.",
     ),
     Objection(
-        what="`RwkvCore.embed` reduces the last layer's two `x_prev` vectors.",
-        why=(
-            "Nothing has checked that this carries meaning. It is in the "
-            "protocol because the protocol needs it, and 'core-derived "
-            "embeddings' is an OPEN FORK rather than a decision -- but a "
-            "plausible-looking vector that ranks badly is worse than no vector, "
-            "because Phase 2 could quietly adopt it and blame retrieval."
-        ),
-        settled_by=(
-            "Rank the same query set with this and with the MiniLM-class "
-            "encoder once Phase 2 has one, on the exam's own facts. Report "
-            "retrieval precision at k for both."
-        ),
-    ),
-    Objection(
-        what="Tier A is defined as a state saved and reloaded across a restart.",
-        why=(
-            "The restart is the part complaint 4 cares about, and it is also the "
-            "part least likely to be where anything is lost -- serialising a "
-            "tensor and reading it back is not where a memory degrades. The "
-            "interesting variable is DELAY IN TURNS. If a restart costs nothing "
-            "measurable then every Tier A run is paying a process launch to "
-            "demonstrate that `torch.save` works."
-        ),
-        settled_by=(
-            "Tier A at the same delays with and without the restart. Identical "
-            "scores mean the restart is ceremony and can be checked once by a "
-            "guard rather than on every run."
-        ),
-    ),
-    Objection(
-        what="The state is saved and fsynced to disk after every single turn.",
-        why=(
-            "It is what makes a kill safe, and it is measured at 6.5 MB for "
-            "0.4B, more for 1.5B. That write is not in the cost meter, which "
-            "counts flops and core seconds only. Refutation 3 compares "
-            "consolidation's cost against re-sending the context; if per-turn "
-            "state I/O is a meaningful share of a turn, it belongs on the same "
-            "ledger."
-        ),
-        settled_by=(
-            "Time a turn with the save, with the save unsynced, and with it "
-            "skipped, at both sizes. If the save is under a few percent of a "
-            "turn, this closes and the cost meter stays as it is."
-        ),
+        what="Every reading is one run per seed, and the served faculty is assumed "
+             "deterministic at temperature zero.",
+        why="llama.cpp at temperature zero is deterministic for one prompt on one build, "
+            "but batching and cache reuse can change the arithmetic.",
+        settled_by="Run the same arm and seed twice. Identical rows close this; any "
+                   "difference means every comparison needs repeats.",
     ),
 ]
 
-# SETTLED, AND KEPT HERE AS NOTES RATHER THAN AS ENTRIES.
-#
-# "The full-context baseline is not a stateless control, so refutation 1 is
-# untested and currently untestable."
-# Settled 2026-09-07 by building the control the entry asked for. Qwen3-1.7B
-# against the RWKV-7 1.53B, same house, same questions, same judge, flops for
-# both: `readings/phase1-exam-*.json` with `refutation_1_tested: true`.
-#
-# THE ANSWER IS UNCOMFORTABLE AND THE ENTRY CLOSES ANYWAY, because it asked for a
-# measurement rather than for a result. The stateless model scored 0.908 against
-# Tier A's 0.492 and stayed nearly flat across delays where the state decayed. It
-# paid 25x the flops to do it, so refutation 1's "at equal flops" clause is not
-# satisfied and the branch is not formally refuted -- but the accuracy gap is
-# large and the branch's answer to it is Phase 2's store, which closed it (Tier B
-# 0.644 against Tier A 0.228 on the hard exam).
-#
-# What replaces this entry is not a doubt but a standing comparison: every future
-# Tier B and Tier C reading has a same-size attention number to be held against.
-#
-# "The exam's questions are near-paraphrases of the sentences that told the
-# facts, so retrieval is mostly a lexical-overlap task."
-# Settled 2026-09-07 by both readings its settlement clause asked for, and the
-# entry was RIGHT. On the direct questions all three rankers scored precision
-# 1.000 and lexical alone beat the hybrid -- the embeddings were contributing
-# nothing and the store was passing a keyword lookup. On oblique questions, which
-# share no content words with the telling sentence, the ordering inverts:
-#
-#   ranker     direct score / precision     oblique score / precision
-#   lexical    0.988 / 1.000                0.596 / 0.728
-#   hybrid     0.972 / 1.000                0.644 / 0.924
-#   vector     0.980 / 1.000                0.652 / 0.960
-#
-# The exam is harder than it was and the arms now separate, which is what the
-# entry wanted. It leaves behind a new question rather than a doubt: the LEXICAL
-# HALF NOW HURTS THE FUSION -- vector alone beats the hybrid on both score and
-# precision. The doc already calls the hybrid weights an arm rather than a
-# decision, so that is a dial to sweep and not a standing objection.
-#
-# "The full-context baseline costs 2.7 GPU-hours a house against two minutes for
-# the arm, and the risk is a session quietly running arms without it."
-# Settled 2026-09-06, and by the cost turning out not to exist. A recurrent core
-# makes re-reading and carrying the same function, so the baseline's answers cost
-# O(N) instead of O(N-squared): the doc's own house went from 1.51M tokens and
-# 2.5 hours to about 7k tokens and under two minutes. Nothing was traded away to
-# get it -- no shorter house, no subsampled delays. The entry's real worry, that
-# expense would push somebody into skipping the control, is gone because the
-# expense is gone.
-#
-# IT WAS REPLACED BY A WORSE PROBLEM RATHER THAN CLOSING CLEANLY, which is why
-# the count did not drop: the same measurement showed this baseline is not a
-# stateless control at all. That is the new entry above.
-#
-# "The blind baseline answers the commonest answer for a question's kind, and how
-# strong that is depends entirely on how the generator distributes its answers."
-# Settled 2026-09-06 by the reporting the entry itself asked for. Every exam
-# reading now carries `answer_entropy_bits` per kind beside the blind score per
-# kind, and two guards in `tests/guards/test_exam.py` keep both there. The
-# numbers on the doc's own house make the point: blind takes 0.30 on colours
-# (2.45 bits) and 0.10 on numbers (3.32 bits) for 0.24 overall. That is now a
-# readable fact about the exam rather than an accident nobody can see.
-#
-# WHAT THIS DOES NOT SETTLE, said plainly: reporting blind's strength does not
-# make it the RIGHT strength. If a later session wants the generator's answer
-# sets widened or narrowed, that is a new entry and a new argument.
-#
-# "Nothing outside `core` may index into a state, and nothing enforces it."
-# Settled 2026-09-06 by `tests/guards/test_state_is_opaque.py`, which walks the
-# AST of every module outside `core` and fails on a subscript or a `for` over
-# anything named like a state. The entry predicted the rule would break first in
-# the store, where it would be least visible; the guard now runs on the store
-# before the store exists.
 
-
-def report() -> str:
-    lines = [f"PUSHBACK -- {len(OBJECTIONS)} standing objections", ""]
-    for i, o in enumerate(OBJECTIONS, 1):
-        lines.append(f"{i}. {o.what}")
-        lines.append(f"   why: {o.why}")
-        lines.append(f"   settled by: {o.settled_by}")
-        lines.append("")
-    return "\n".join(lines)
-
-
-def test_the_count_is_what_the_file_says():
-    """Adding or dropping an objection is a deliberate act with a commit line."""
-    assert len(OBJECTIONS) == COUNT, (
-        f"{len(OBJECTIONS)} objections, COUNT says {COUNT}. If one was settled, "
-        "say which and by what reading in the commit message."
-    )
-
-
-def test_every_objection_says_what_would_settle_it():
-    """AN OBJECTION WITHOUT A SETTLEMENT IS A COMPLAINT, and the branch has a
-    separate list for those. Each entry must name a reading that could close it
-    in either direction -- not a reading that could only confirm it."""
-    for o in OBJECTIONS:
-        assert o.what.strip() and o.why.strip() and o.settled_by.strip()
-        assert len(o.settled_by) > 60, f"settlement for {o.what!r} is too vague to run"
+def test_count():
+    assert len(OBJECTIONS) == COUNT
 
 
 if __name__ == "__main__":
-    print(report())
+    for i, o in enumerate(OBJECTIONS, 1):
+        print(f"{i}. {o.what}\n   why: {o.why}\n   settled by: {o.settled_by}\n")

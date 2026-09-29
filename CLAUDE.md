@@ -1,90 +1,91 @@
-# Working in this repo — the `sylvatica` branch
+# Working in this repo — the `unfused` branch
 
-Read `docs/sylvatica.md` first and whole. It is the only design doc, it holds THE ORDER, and it
-says what to build, in what order, and what reading would refute each bet. Nothing finished is
-written there; what a built thing does lives in the code and its docstrings, and findings live
-in the commit that produced them, in the test that asserts them, and in `readings/`.
+Read `docs/unfused.md` first and whole. It is the only design doc and it holds THE ORDER.
+Nothing finished is written there: what a built thing does is in its code, and findings live in
+the commit that produced them, in a test that asserts them, and in `readings/`.
 
-`docs/history/` holds the two earlier branches' plan and review. They tried a gradient-free
-learner and lost to a blind rule. Their refutations still hold for what they measured; read
-them before repeating anything they tried. Everything under `docs/history/` is read-only.
+`docs/history/` holds the earlier branches' plans and one review, read-only. Read them before
+repeating anything they tried.
 
 ## How a session runs
 
-John's standing instruction, written down so a new session starts itself. Orient, read the
-handoff in the last commit message, then do all of the following without asking.
+John's standing instruction. Orient, read the handoff in the last commit message, then do all of
+the following without asking.
 
-**Arm a five-minute `Monitor` and keep it armed.** Not `/loop`, not `schedule`, not a cron —
-those have misfired here and the Monitor tick has not. It is a heartbeat: each tick is
-permission to carry on, so `persistent: true` around a sleep loop is the shape wanted.
+**Arm a five-minute `Monitor` and keep it armed.** Not `/loop`, `schedule` or a cron; those have
+misfired here. It is a heartbeat: each tick is permission to carry on.
 
 ```bash
 i=0; while true; do i=$((i+1)); echo "tick $i — next step or stop"; sleep 300; done
 ```
 
 **Then work, and take forks yourself.** Where two routes are open, take the one likelier to
-pay; if it does not pay, revert it and take the other. Do not stop to ask which. A DECIDED item
-in the design doc is not a fork; reopening one is John's conversation, so say so in the handoff
-and carry on with the rest.
+pay; if it does not, revert it and take the other. A DECIDED item in the design doc is not a
+fork; reopening one is John's conversation.
 
-**Stop the monitor when any of these is true** — do not let it tick on:
+**Stop the monitor** when there is no obvious next step, when the next one needs John, when you
+are blocked, or when context is filling. Then strike what got done from THE ORDER and leave the
+handoff in the last commit message and the final reply: where the branch is, what was refuted,
+what is open.
 
-- there is no obvious next step, or the next one genuinely needs John;
-- you are truly blocked;
-- context is filling and it is time to write the handoff.
+## The rules
 
-Stopping is a normal ending. Strike from THE ORDER whatever got done, and leave the handoff in
-the last commit message and in the final reply: where the branch is against THE ORDER, what
-was refuted, what is open. It does not carry a second copy of the ordering.
+- **Say what would refute an arm before running it**, in one line, in the commit and in the
+  run's `--note`. Not the number you expect; a prediction anchors how the result is read.
+- **Correct the record in a sentence** when a reading refutes something said earlier, and carry
+  on.
+- **Push back** the moment an approach looks wrong. John owns the systems side and leans on
+  you for the learning theory; hedging is the failure mode here, not overstepping.
+- **A control beats an argument.** Before shipping an explanation that names a mechanism, run
+  the arm that isolates it.
+- **Findings never go in the doc.** A reading is a JSON file under `readings/`, committed with
+  the commit that took it.
+- **An arm lives only while it is compared.** The winner becomes the code; the loser is
+  deleted, and the commit that deletes it says what would bring it back.
+- **Never change the world to fix the machine.** A form of question is never removed because
+  an arm does badly on it.
+- **A red test is how an intent survives a session.** `tests/outstanding/` fails until owed
+  work is done; do not delete or weaken one. `tests/pushback.py` holds standing objections,
+  each with what would settle it, and its count is asserted.
 
-## The rules that carry over
+## Commands
 
-- **Say what would refute an arm before you run it**, in one line, in the commit. Not what
-  number you expect: predicting a value invites anchoring and has fired wrongly here before.
-- **Say so and carry on** when a reading refutes something you said an hour ago. Correct the
-  record in a sentence, no apology, no preamble. A session spent hedging is worse than a
-  session spent being wrong quickly.
-- **Pushing back is part of the job.** John is a senior engineer and owns the distributed and
-  systems side; on the model, the learning theory and the biology he is leaning on you
-  deliberately. Say it the moment you see it — an approach that will not work, a premise that
-  is wrong. Do not soften it into a question.
-- **Findings never go in the doc.** A reading is a JSON row under `readings/`, committed with
-  the commit that took it. The commit message carries the verdict.
-- **A red test is how an intent survives a session.** `tests/outstanding/` holds tests that
-  fail until owed work is done. Each computes its state rather than asserting a constant. Do not
-  delete or weaken one; it closes when the work closes. Anything red outside that directory is
-  yours to fix.
-- **`tests/pushback.py` is green and prints.** Each entry is a standing objection to something
-  the branch currently does, with what would settle it either way. An entry leaves by being
-  settled, and the count is asserted.
-- **The GPU is one card and it is shared.** Never two GPU jobs at once. Kill a REPL before a
-  training cycle.
-- **Verify before claiming done.** `uv run pytest tests/guards` is seconds and runs every
-  commit. `uv run pytest tests/outstanding` is the red set and is read, not fixed, unless the
-  work closes. Exams are dispatched by hand and never run under `pytest` by default.
-- **Push whenever.** Commits are the record and CI is not a gate on pushing. Put `[checkpoint]`
-  in the message on a state worth returning to.
+```bash
+uv run pytest tests/guards          # seconds, every commit, as its own command
+uv run pytest tests/outstanding     # the red set; read it, do not fix it unless the work is done
+uv run python tests/pushback.py     # the objections
+uv run python scripts/exam.py --faculty served --arms blind,recall,full --seed 0 --note "..."
+```
+
+Readings with the reference faculty need llama-server running Qwen3.5-9B on port 8093
+(port 8080 belongs to something else of John's):
+
+```bash
+llama-server -m <Qwen_Qwen3.5-9B-Q6_K_L.gguf> -ngl 99 -c 8192 --parallel 1 --jinja \
+  --reasoning-budget 0 --host 127.0.0.1 --port 8093
+```
+
+The card is one GTX 1080 Ti, 11 GB. The served 9B takes about 9 GB of it, so the in-process
+1.7B faculty cannot load beside it; stop the server first. Never two GPU jobs at once.
 
 ## The stack
 
-Python 3.12 via `uv`. PyTorch from the cu126 wheel index, pinned to the last release whose
-`torch.cuda.get_arch_list()` contains `sm_61`; the card is a GTX 1080 Ti and newer CUDA builds
-have dropped Pascal. SQLite via the standard library. Tests are `pytest`. Formatting is `ruff`.
-No secrets exist here yet; if one appears, it is gitignored before it is created.
+Python 3.12 via `uv`. PyTorch from the cu126 index, pinned because newer builds dropped
+Pascal (`sm_61`). SQLite from the standard library. The HF cache is used offline
+(`HF_HUB_OFFLINE=1` in the scripts). `ruff` for formatting.
 
 ## Layout
 
 ```
-docs/sylvatica.md        the design, THE ORDER, what refutes it
-docs/history/            the two earlier branches, read-only
-src/sylvatica/core       Core protocol, RwkvCore, Thread, state save/load
-src/sylvatica/store      Fragment, Store protocol, SqliteStore, retrieval
-src/sylvatica/learn      replay sampling, extraction, LoRA, regression gate, merge
-src/sylvatica/loop       the turn, the idle scheduler
-src/sylvatica/exam       worlds, tiers, baselines, cost meter
-src/sylvatica/node       Node, gossip, FanoutStore (protocol only before Phase 5)
-tests/guards             fast structural tests, every commit
-tests/outstanding        the red set
-tests/pushback.py        standing objections
-readings/                one JSON per run, committed
+docs/unfused.md        the design, THE ORDER, what refutes it
+docs/history/          earlier branches, read-only
+src/unfused/faculty.py the frozen language model, in-process or served
+src/unfused/store/     fragments, hybrid recall
+src/unfused/arms.py    what an exam compares
+src/unfused/exam/      the house and the runner
+scripts/exam.py        runs arms and writes readings
+tests/guards           fast structural tests
+tests/outstanding      the red set
+tests/pushback.py      standing objections
+readings/              one JSON per arm per run, committed
 ```

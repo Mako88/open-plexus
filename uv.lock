@@ -571,18 +571,6 @@ wheels = [
 ]
 
 [[package]]
-name = "rwkv"
-version = "0.8.32"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "tokenizers" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/38/f0/18038fc78f380f0329aa1d3c5488462e743c9274fbc316e2aff86e9755aa/rwkv-0.8.32.tar.gz", hash = "sha256:a7941f38d40a55cfb4d38cee72c572ba65eb2f6314988d5c2568411aaced8031", size = 409926, upload-time = "2026-02-11T01:37:07.099Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/5b/61/d7c764f01da87145342a8cdc3a86690e03cda4dfc2cf20377bdf5dc86b05/rwkv-0.8.32-py3-none-any.whl", hash = "sha256:d3f0594810a4a7e91569f177003ec22294c3eabc91c5f8d0ff3511702d4b67c1", size = 411388, upload-time = "2026-02-11T01:37:05.679Z" },
-]
-
-[[package]]
 name = "safetensors"
 version = "0.8.0"
 source = { registry = "https://pypi.org/simple" }
@@ -622,31 +610,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/58/15/8b3609fd3830ef7b27b655beb4b4e9c62313a4e8da8c676e142cc210d58e/shellingham-1.5.4.tar.gz", hash = "sha256:8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de", size = 10310, upload-time = "2023-10-24T04:13:40.426Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e0/f9/0595336914c5619e5f28a1fb793285925a8cd4b432c9da0a987836c7f822/shellingham-1.5.4-py2.py3-none-any.whl", hash = "sha256:7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686", size = 9755, upload-time = "2023-10-24T04:13:38.866Z" },
-]
-
-[[package]]
-name = "sylvatica"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "huggingface-hub" },
-    { name = "numpy" },
-    { name = "pytest" },
-    { name = "rwkv" },
-    { name = "tokenizers" },
-    { name = "torch" },
-    { name = "transformers" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "huggingface-hub" },
-    { name = "numpy" },
-    { name = "pytest" },
-    { name = "rwkv" },
-    { name = "tokenizers" },
-    { name = "torch", index = "https://download.pytorch.org/whl/cu126" },
-    { name = "transformers", specifier = ">=5.16.1" },
 ]
 
 [[package]]
@@ -778,4 +741,27 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f6/cc/6253133b5bb138fc3306cebfbda2c520f545d36b5be2c7255cc528bb45d6/typing_extensions-4.16.0.tar.gz", hash = "sha256:dc983d19a509c94dba722ee6abd33940f7c05a89e243c47e907eb4db6f1a43e5", size = 113555, upload-time = "2026-07-02T08:40:05.92Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/49/d3/b8441a820a491ddfc024b0b0cf0393375b75ea13866d9c66727e54c2fc80/typing_extensions-4.16.0-py3-none-any.whl", hash = "sha256:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8", size = 45571, upload-time = "2026-07-02T08:40:04.659Z" },
+]
+
+[[package]]
+name = "unfused"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "huggingface-hub" },
+    { name = "numpy" },
+    { name = "pytest" },
+    { name = "tokenizers" },
+    { name = "torch" },
+    { name = "transformers" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "huggingface-hub" },
+    { name = "numpy" },
+    { name = "pytest" },
+    { name = "tokenizers" },
+    { name = "torch", index = "https://download.pytorch.org/whl/cu126" },
+    { name = "transformers", specifier = ">=5.16.1" },
 ]

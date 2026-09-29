@@ -1,23 +1,9 @@
-"""The small encoder that turns a fragment into a vector.
+"""Text to a unit vector, for the store's meaning-side ranker.
 
-WHY AN EXTERNAL ENCODER AND NOT THE CORE. The doc: "a small off-the-shelf
-sentence encoder (MiniLM-class, ~22M params, runs on CPU and on a phone)". Two
-reasons, and the second is the one that matters. It is small enough to run on the
-weak nodes Phase 5 is about, which the core is not. And it is INDEPENDENT of the
-core, so a retrieval failure and a core failure cannot be confused -- if
-embeddings came from the core, a core that had drifted would silently degrade
-recall and the exam would read it as forgetting. This branch has already spent a
-day on failures of exactly that shape.
-
-"Core-derived embeddings in place of the external encoder" is an open fork and
-`RwkvCore.embed` exists for it. It is a fork precisely because nobody has checked
-that it ranks anything.
-
-ON CPU BY DEFAULT, AND THAT IS NOT A COMPROMISE. The GPU is one card and it is
-shared; an encoder that competed with a consolidation cycle for it would be a
-scheduling problem for 22M parameters' worth of work. It also means the store
-keeps working while the card is busy, which is what Phase 4's idle scheduler
-needs.
+MiniLM-L6 is 22M parameters, runs on a CPU and on a phone, and is independent of
+the language faculty, so a retrieval failure and a faculty failure cannot be
+confused. It stays on the CPU so it never competes with the faculty for the card.
+`HashEmbedder` is for tests: character trigrams, no semantics at all.
 """
 
 from __future__ import annotations
@@ -42,15 +28,7 @@ class Embedder(Protocol):
 
 
 class MiniLmEmbedder:
-    """MiniLM-L6 with mean pooling, which is what its training expects.
-
-    MEAN POOLING AND NOT THE CLS TOKEN. This checkpoint was trained with mean
-    pooling over the non-padding tokens; taking `last_hidden_state[:, 0]`
-    instead produces vectors that look fine, normalise fine, and rank badly. It
-    is the kind of mistake that shows up as "retrieval is weak" three phases
-    later, so it is written down here rather than left to whoever reads the
-    model card next.
-    """
+    """Mean pooling over non-padding tokens, which is what this checkpoint was trained with."""
 
     def __init__(self, model_id: str = MODEL, device: str = "cpu") -> None:
         from transformers import AutoModel, AutoTokenizer
@@ -84,18 +62,7 @@ class MiniLmEmbedder:
 
 
 class HashEmbedder:
-    """A deterministic, dependency-free stand-in. FOR TESTS, NEVER FOR A READING.
-
-    Hashes character trigrams into a fixed number of buckets. It gives the store
-    something with the right shape and the right determinism so the schema, the
-    ranking arithmetic and the fusion can be tested in milliseconds without a
-    model download.
-
-    IT HAS NO SEMANTICS AT ALL. Two ways of saying the same thing land nowhere
-    near each other. Any retrieval number taken with this is a number about
-    string overlap, so the store records which embedder produced its vectors and
-    a reading that names this one is a reading about plumbing.
-    """
+    """Deterministic trigram hashing. For tests; a reading taken with it is about plumbing."""
 
     def __init__(self, dims: int = 128) -> None:
         self._dims = dims

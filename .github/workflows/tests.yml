@@ -1,10 +1,7 @@
 # The guards, on every push. Seconds, and they are the only thing CI runs.
 #
-# WHY THIS IS SO MUCH SMALLER THAN THE ONE IT REPLACES. The `commitments` branch
-# ran a sharded six-minute C# suite here and needed six hundred megabytes of
-# cached corpora to do it. This branch's fast tests take three seconds and need
-# no data, because everything expensive is either an EXAM -- dispatched by hand,
-# on a GPU, never under pytest -- or a reading that is already committed as JSON.
+# Everything expensive is an exam, dispatched by hand on the card and
+# committed as a reading, so CI needs no GPU and no data.
 #
 # CI IS NOT A GATE ON PUSHING and the culture note says so. Push whenever; put
 # `[checkpoint]` in the message on a state worth returning to.
@@ -40,12 +37,6 @@ jobs:
         with:
           enable-cache: true
 
-      # THE RUNNER HAS NO NVIDIA CARD, AND THE PIN IS STILL WHAT IS BEING
-      # CHECKED. `test_toolchain.py` asserts `sm_61` is in
-      # `torch.cuda.get_arch_list()`, which is a property of the WHEEL and not of
-      # the machine -- a cu128 wheel fails that check on a runner with no GPU at
-      # all, which is exactly the regression worth catching here. The tests that
-      # need a device skip themselves.
       - name: Install
         run: uv sync --frozen
 

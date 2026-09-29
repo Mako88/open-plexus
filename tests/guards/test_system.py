@@ -157,3 +157,15 @@ def test_a_plan_that_found_nothing_is_not_kept(tmp_path):
     assert a.answer(q("Where does Brael keep the lanterns?")) == "I don't know."
     a.answer(q("Where does Orrin keep the lanterns?"))
     assert len(rewrites) == 2
+
+
+def test_a_plan_learnt_elsewhere_is_used_without_the_ear(tmp_path):
+    ear = TableEar()
+    ear.rewrite = lambda question: (_ for _ in ()).throw(AssertionError(question))
+    known = {"Where does <0> keep the <1>?": {"steps": [
+        {"subject": "<0>", "relation": "keeps", "object": "<1>", "place": "?r"}],
+        "answer": "?r", "count": False}}
+    a = SystemArm(tmp_path, ear, HashEmbedder(), plans=True, known_plans=known)
+    for turn, sentence in enumerate(list(READINGS)[:4]):
+        a.hear(turn, sentence)
+    assert a.answer(q("Where does Tolmick keep the jars?")) == "scullery"

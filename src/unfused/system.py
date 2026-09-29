@@ -80,7 +80,8 @@ class SystemArm:
     name = "system"
 
     def __init__(self, directory: Path, ear, embedder, names_shown: int = 25,
-                 relations_shown: int = 30, plans: bool = False) -> None:
+                 relations_shown: int = 30, plans: bool = False,
+                 known_plans: dict | None = None) -> None:
         self.ear = ear
         self.embedder = embedder
         self.names_shown = names_shown
@@ -89,6 +90,10 @@ class SystemArm:
         Path(directory).mkdir(parents=True, exist_ok=True)
         self.db = sqlite3.connect(str(Path(directory) / "system.db"))
         self.db.executescript(SCHEMA)
+        # plans learnt elsewhere hold no facts, only how a question is asked, so a
+        # system may start with them the way a node starts with another's tables
+        self.db.executemany("INSERT OR IGNORE INTO plans (shape, plan) VALUES (?, ?)",
+                            [(k, json.dumps(v)) for k, v in (known_plans or {}).items()])
         self.db.commit()
         self.last_notes: list[str] = []
         self.pending: tuple[str, dict] | None = None

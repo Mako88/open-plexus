@@ -40,6 +40,9 @@ def main() -> None:
                    help="which model the llama-server is running, for the reading")
     p.add_argument("--port", type=int, default=8093)
     p.add_argument("--note", default="", help="what this run is for and what would refute it")
+    p.add_argument("--plans", default=None,
+                   help="a JSON file of plans by shape: `planned` starts with them and adds "
+                        "what it learns")
     args = p.parse_args()
 
     house = generate_house(seed=args.seed, n_facts=args.facts, n_turns=args.turns)
@@ -73,8 +76,11 @@ def main() -> None:
 
             ear = Ear(url=faculty.url, name=faculty.name)
 
-            def open_arm(plans=name == "planned"):
-                return SystemArm(work, ear, embedder, plans=plans)
+            known = (json.loads(Path(args.plans).read_text(encoding="utf-8"))
+                     if name == "planned" and args.plans and Path(args.plans).exists() else {})
+
+            def open_arm(plans=name == "planned", known=known):
+                return SystemArm(work, ear, embedder, plans=plans, known_plans=known)
         elif name == "linked":
             from unfused.linked import LinkedRecall
 
@@ -86,6 +92,16 @@ def main() -> None:
         if faculty is not None:
             faculty.cost.__init__()
         result = run(house, open_arm, limit=args.limit)
+        if name == "planned":
+            import sqlite3
+
+            db = sqlite3.connect(str(work / "system.db"))
+            learnt = {k: json.loads(v) for k, v in db.execute("SELECT shape, plan FROM plans")}
+            db.close()
+            result["dials"]["plans_known_at_start"] = len(known)
+            result["dials"]["plans_from"] = args.plans
+            if args.plans:
+                Path(args.plans).write_text(json.dumps(learnt, indent=1), encoding="utf-8")
         shutil.rmtree(work, ignore_errors=True)
 
         taken = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")

@@ -1,0 +1,9 @@
+{
+ "kind": "lexicon",
+ "question": "does a relation wording's argument profile (which slots it fills, whether its objects are themselves agents elsewhere) group wordings of the same kind of fact, with no model",
+ "source": "ears-Qwen3.5-0.8B-Q8_0-s0-20260929T132354Z.json: 14 wordings over 5 kinds of fact",
+ "refutes_if": "same-kind pairs rank closer than different-kind pairs no more often than chance (AUC 0.5)",
+ "auc": 0.764,
+ "pairs": {"same_kind": 17, "different_kind": 74},
+ "note": "trade verbs (sets, binds, grinds, carves) have identical profiles; the 0.8B's quantity '1' on most assertions blurs keeps against put and colour against number"
+}

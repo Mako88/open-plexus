@@ -284,3 +284,21 @@ def test_two_wordings_of_one_owner_and_thing_become_one_relation(tmp_path):
                               "Ada put the kettle in the attic for safekeeping."]):
         a.hear(turn, s)
     assert a.answer(q("who keeps things in the attic")) == "2"
+
+
+def test_search_ends_on_the_asked_kind_past_a_junk_anchor(tmp_path):
+    ear = TableEar()
+    ear.ask = lambda question: {"asked": "object", "kind": "colour", "assertion": {
+        "subject": "things", "relation": "keeps", "object": "", "place": None,
+        "quantity": None}, "count": False}
+    ear.is_a = lambda filler, kind, example="": filler in ("ochre",)
+    a = SystemArm(tmp_path, ear, HashEmbedder(), asked=True)
+    READINGS["Nothing is the same now."] = [
+        {"subject": "nothing", "relation": "is", "object": "same", "place": "now"}]
+    for turn, sentence in enumerate(list(READINGS)[:4] + ["Nothing is the same now."]):
+        a.hear(turn, sentence)
+    # 'now' was heard as a name, so it is an anchor here, and no chain touches it
+    assert a.answer(q("What colour are the things the person who repairs clocks keeps "
+                      "in the scullery now?")) == "ochre"
+    assert a.answer(q("What colour are the things Brael keeps in the scullery?")) == (
+        "I don't know.")

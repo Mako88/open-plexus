@@ -108,27 +108,32 @@ ASK_SCHEMA = {
     "type": "object",
     "properties": {"asked": {"type": "string",
                              "enum": ["subject", "object", "place", "quantity"]},
+                   "kind": {"type": "string"},
                    "assertion": ASSERTION, "count": {"type": "boolean"}},
-    "required": ["asked", "assertion", "count"],
+    "required": ["asked", "kind", "assertion", "count"],
 }
 
 ASK = (
     "Read a question from a conversation. Say which part of the fact it asks for (asked: "
-    "subject, object, place or quantity), and write down the rest of that fact as an "
-    "assertion, leaving the asked part empty. An assertion has a subject, a "
+    "subject, object, place or quantity), what kind of thing the answer is, in one word "
+    "(kind: such as person, place, number, colour, job), and write down the rest of that "
+    "fact as an assertion, leaving the asked part empty. An assertion has a subject, a "
     "relation (a short verb phrase in the present tense, such as 'keeps', 'is cousin of', "
     "'works as', 'has colour'), and what the relation takes: an object, a place, a quantity. "
     "Copy names and things from the question, without articles. 'count' is true if the "
     "question asks how many people or things. Examples:\n"
-    "'Where does Mira keep the kettle?' -> asked: place; subject: Mira, relation: keeps, "
-    "object: kettle\n"
-    "'What does Mira do for a living?' -> asked: object; subject: Mira, relation: works as\n"
-    "'Who mends the fences?' -> asked: subject; relation: mends, object: fences\n"
-    "'What colour is the gate?' -> asked: object; subject: gate, relation: has colour\n"
-    "'How many chairs are in the hall?' -> asked: quantity; subject: chairs, relation: are "
-    "in, place: hall\n"
-    "'How many people keep things in the shed?' -> asked: subject; relation: keeps, place: "
-    "shed, count: true"
+    "'Where does Mira keep the kettle?' -> asked: place; kind: place; subject: Mira, "
+    "relation: keeps, object: kettle\n"
+    "'What does Mira do for a living?' -> asked: object; kind: job; subject: Mira, "
+    "relation: works as\n"
+    "'Who mends the fences?' -> asked: subject; kind: person; relation: mends, object: "
+    "fences\n"
+    "'What colour is the gate?' -> asked: object; kind: colour; subject: gate, relation: "
+    "has colour\n"
+    "'How many chairs are in the hall?' -> asked: quantity; kind: number; subject: chairs, "
+    "relation: are in, place: hall\n"
+    "'How many people keep things in the shed?' -> asked: subject; kind: person; relation: "
+    "keeps, place: shed, count: true"
 )
 
 SAME_SCHEMA = {
@@ -181,6 +186,14 @@ class Ear:
         '?' where the answer goes, and whether it asks how many. No steps and no
         chain: finding the way to that fact is the system's."""
         return self._call(ASK, question, ASK_SCHEMA, 120)
+
+    def is_a(self, filler: str, kind: str, example: str = "") -> bool:
+        """Whether a filler is a thing of a kind: 'ochre' a colour, 'the nursery' a place.
+        Word knowledge about one word, asked once per pair and kept by the system."""
+        seen = f"\nIt was heard in: '{example}'" if example else ""
+        reply = self._call("Say whether the word or phrase names a thing of the given kind.",
+                           f"Phrase: '{filler}'\nKind: {kind}{seen}", SAME_SCHEMA, 40)
+        return bool(reply and reply.get("same"))
 
     def choose(self, prompt: str, options: list[str]) -> int | None:
         """Which option `prompt` means, or None. Word meaning, and nothing composed."""

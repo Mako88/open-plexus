@@ -48,6 +48,8 @@ CREATE TABLE IF NOT EXISTS readings (text TEXT PRIMARY KEY, assertions TEXT NOT 
 CREATE TABLE IF NOT EXISTS synonyms (asked TEXT NOT NULL, stored TEXT NOT NULL,
                                      same INTEGER NOT NULL, PRIMARY KEY (asked, stored));
 CREATE TABLE IF NOT EXISTS kin (a TEXT NOT NULL, b TEXT NOT NULL, PRIMARY KEY (a, b));
+CREATE TABLE IF NOT EXISTS kinds (filler TEXT NOT NULL, kind TEXT NOT NULL,
+                                  yes INTEGER NOT NULL, PRIMARY KEY (filler, kind));
 CREATE TABLE IF NOT EXISTS plans (shape TEXT PRIMARY KEY, plan TEXT NOT NULL,
                                   used INTEGER NOT NULL DEFAULT 0);
 """
@@ -242,8 +244,12 @@ class SystemArm:
             return None
         step = {k: v for k, v in read["assertion"].items() if k != asked}
         step[asked] = "?a"
+        fillers = self.shape(question)[1]
         return {"steps": [step], "answer": "?a", "count": bool(read.get("count")),
-                "anchors": self.shape(question)[1]}
+                "anchors": fillers, "kind": norm(read.get("kind")),
+                # a capitalised filler is a name, and a name never heard of must still
+                # pin the answer to nothing
+                "names": [norm(f) for f in fillers if f[:1].isupper() and norm(f)]}
 
     def plan(self, question: str) -> dict | None:
         """The steps for a question: the plan kept for its shape with this question's
@@ -314,7 +320,8 @@ class SystemArm:
             step.get("quantity") == answer for step in steps)
         anchors = [norm(f) for f in rewritten.get("anchors", []) if norm(f)]
         return {"steps": steps, "answer": answer, "count": counted,
-                **({"anchors": anchors} if "anchors" in rewritten else {})}
+                **({"anchors": anchors} if "anchors" in rewritten else {}),
+                **{k: rewritten[k] for k in ("kind", "names") if rewritten.get(k)}}
 
     def means(self, asked: str, stored: str, example: str = "") -> bool:
         """Whether a stored relation answers an asked one: the same words, or a pair the
@@ -495,6 +502,71 @@ class SystemArm:
             paths = grown
         return []
 
+    def is_kind(self, filler: str, kind: str, example: str = "") -> bool:
+        row = self.db.execute("SELECT yes FROM kinds WHERE filler = ? AND kind = ?",
+                              (filler, kind)).fetchone()
+        if row is not None:
+            return bool(row[0])
+        verdict = self.judge.is_a(filler, kind, example)
+        self.db.execute("INSERT OR IGNORE INTO kinds VALUES (?, ?, ?)",
+                        (filler, kind, int(verdict)))
+        self.db.commit()
+        return verdict
+
+    def search_kind(self, query: dict) -> list[tuple[dict, int, list[str]]]:
+        """The chain found from the question's anchors to a thing of the kind it asks for.
+
+        No relation is matched. The question's names must all be on the chain; its other
+        anchors are covered as far as any chain covers them, since a word the ear heard
+        in small talk ('now') can be an anchor and touch nothing that matters. Of the
+        chains that cover the most anchors, the shortest end on the answers: a filler of
+        the asked kind that is not itself an anchor."""
+        want = str(query.get("answer", "")).strip()
+        kind = query["kind"]
+        anchors = set(query.get("anchors") or [])
+        names = {n for n in query.get("names", []) if n in anchors}
+        rows = self.rows()
+        fill = [[r[k] for k in SLOTS if r[k]] for r in rows]
+        by_filler: dict[str, list[int]] = {}
+        for i, fs in enumerate(fill):
+            for f in set(fs):
+                by_filler.setdefault(f, []).append(i)
+        touching = {a: {i for i, fs in enumerate(fill) if any(same(a, f) for f in fs)}
+                    for a in anchors}
+        anchored = {f for a in anchors for f in by_filler if same(a, f)}
+
+        def answers(i):
+            return [f for f in fill[i] if not any(same(a, f) for a in anchors)
+                    and self.is_kind(f, kind, rows[i]["heard"])]
+
+        best, found = (0, 0), []
+        paths = [(i,) for i in sorted(set().union(*touching.values()))] if anchors else []
+        for depth in range(1, self.depth + 1):
+            for p in paths:
+                on = set(p)
+                if not all(touching[n] & on for n in names):
+                    continue
+                covered = sum(bool(touching[a] & on) for a in anchors)
+                if (covered, -depth) < best:
+                    continue
+                got = answers(p[-1])
+                if not got:
+                    continue
+                if (covered, -depth) > best:
+                    best, found = (covered, -depth), []
+                found += [({want: f}, max(rows[i]["turn"] for i in p),
+                           [rows[i]["heard"] for i in p]) for f in got]
+            grown = []
+            for p in paths:
+                links = [f for f in fill[p[-1]]
+                         if f in anchored or len(by_filler[f]) <= self.hub]
+                for j in sorted({j for f in links for j in by_filler[f]} - set(p)):
+                    grown.append(p + (j,))
+            if len(grown) > self.frontier:
+                break
+            paths = grown
+        return found
+
     def answer(self, question: Question) -> str:
         query = self.query(question.text)
         self.last_notes = [json.dumps(query)] if query else ["(unreadable)"]
@@ -502,7 +574,8 @@ class SystemArm:
             return "I don't know."
         want = str(query.get("answer", "")).strip()
         found = [(b, t, h) for b, t, h in
-                 (self.search(query) if self.searched else self.solve(query)) if b.get(want)]
+                 (self.search_kind(query) if self.searched and query.get("kind") else
+                  self.search(query) if self.searched else self.solve(query)) if b.get(want)]
         self.last_notes += sorted({x for _, _, h in found for x in h})
         if not found:
             return "I don't know."

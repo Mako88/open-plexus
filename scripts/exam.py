@@ -58,7 +58,7 @@ def main() -> None:
         faculty = (ServedFaculty(model_id=f"{args.served} (llama.cpp)",
                                  url=f"http://127.0.0.1:{args.port}/v1/chat/completions")
                    if args.faculty == "served" else Faculty())
-    if any(a.startswith("recall") or a in ("linked", "system", "planned", "searched") for a in arms):
+    if any(a.startswith("recall") or a in ("linked", "system", "planned", "searched", "asked") for a in arms):
         from unfused.store import MiniLmEmbedder
         embedder = MiniLmEmbedder()
 
@@ -75,7 +75,7 @@ def main() -> None:
 
             def open_arm(hops=hops):
                 return Recall(work, faculty, embedder, k=args.k, hops=hops)
-        elif name in ("system", "planned", "searched"):
+        elif name in ("system", "planned", "searched", "asked"):
             from unfused.ears import Ear
             from unfused.system import SystemArm
 
@@ -88,11 +88,11 @@ def main() -> None:
                      if name in ("planned", "searched") and args.plans and Path(args.plans).exists() else {})
 
             def open_arm(plans=name in ("planned", "searched"), known=known,
-                         searched=name == "searched"):
+                         searched=name == "searched", asked=name == "asked"):
                 return SystemArm(work, ear, embedder, plans=plans, known_plans=known,
                                  planner=planner,
                                  judge=planner if args.planner_judges else None,
-                                 searched=searched)
+                                 searched=searched, asked=asked)
         elif name == "linked":
             from unfused.linked import LinkedRecall
 

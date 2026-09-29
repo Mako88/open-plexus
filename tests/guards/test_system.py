@@ -247,3 +247,18 @@ def test_search_finds_a_chain_of_three_from_its_anchors_and_goal(tmp_path):
 def test_search_counts_and_refuses(tmp_path):
     assert searched(tmp_path, 4).answer(q("how many")) == "2"
     assert searched(tmp_path / "s", 7).answer(q("stranger")) == "I don't know."
+
+
+def test_a_question_read_as_one_fact_is_answered_by_search_with_no_planner(tmp_path):
+    ear = TableEar()
+    ear.rewrite = lambda question: (_ for _ in ()).throw(AssertionError(question))
+    ear.ask = lambda question: {"assertion": {
+        "subject": "things", "relation": "has colour", "object": "?", "place": None,
+        "quantity": None}, "count": False}
+    a = SystemArm(tmp_path, ear, HashEmbedder(), asked=True)
+    for turn, sentence in enumerate(list(READINGS)[:4]):
+        a.hear(turn, sentence)
+    assert a.answer(q("What colour are the things the person who repairs clocks keeps "
+                      "in the scullery?")) == "ochre"
+    assert a.answer(q("What colour are the things Brael keeps in the scullery?")) == (
+        "I don't know.")

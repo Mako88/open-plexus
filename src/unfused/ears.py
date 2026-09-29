@@ -104,6 +104,30 @@ REWRITE = (
     '"keeps", "object": "?b", "place": "shed"}], "answer": "?a", "count": true}'
 )
 
+ASK_SCHEMA = {
+    "type": "object",
+    "properties": {"assertion": ASSERTION, "count": {"type": "boolean"}},
+    "required": ["assertion", "count"],
+}
+
+ASK = (
+    "Read a question from a conversation and write down the one fact it asks about, as an "
+    "assertion with '?' in the part that is asked for. An assertion has a subject, a "
+    "relation (a short verb phrase in the present tense, such as 'keeps', 'is cousin of', "
+    "'works as', 'has colour'), and what the relation takes: an object, a place, a quantity. "
+    "Copy names and things from the question, without articles. 'count' is true if the "
+    "question asks how many people or things. Examples:\n"
+    "'Where does Mira keep the kettle?' -> subject: Mira, relation: keeps, object: kettle, "
+    "place: ?\n"
+    "'What does Mira do for a living?' -> subject: Mira, relation: works as, object: ?\n"
+    "'Who mends the fences?' -> subject: ?, relation: mends, object: fences\n"
+    "'What colour is the gate?' -> subject: gate, relation: has colour, object: ?\n"
+    "'How many chairs are in the hall?' -> subject: chairs, relation: are in, place: hall, "
+    "quantity: ?\n"
+    "'How many people keep things in the shed?' -> subject: ?, relation: keeps, object: "
+    "things, place: shed, count: true"
+)
+
 SAME_SCHEMA = {
     "type": "object",
     "properties": {"same": {"type": "boolean"}},
@@ -148,6 +172,12 @@ class Ear:
     def rewrite(self, question: str) -> dict | None:
         """A question as the statements that would answer it, with unknowns."""
         return self._call(REWRITE, question, REWRITE_SCHEMA, 200)
+
+    def ask(self, question: str) -> dict | None:
+        """A question read the way a statement is: the one fact it asks about, with
+        '?' where the answer goes, and whether it asks how many. No steps and no
+        chain: finding the way to that fact is the system's."""
+        return self._call(ASK, question, ASK_SCHEMA, 120)
 
     def choose(self, prompt: str, options: list[str]) -> int | None:
         """Which option `prompt` means, or None. Word meaning, and nothing composed."""

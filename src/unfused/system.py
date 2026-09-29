@@ -82,7 +82,8 @@ class SystemArm:
     def __init__(self, directory: Path, ear, embedder, names_shown: int = 25,
                  relations_shown: int = 30, plans: bool = False,
                  known_plans: dict | None = None, planner=None, judge=None,
-                 searched: bool = False, depth: int = 3, frontier: int = 20000) -> None:
+                 searched: bool = False, depth: int = 3, frontier: int = 20000,
+                 asked: bool = False) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -93,6 +94,10 @@ class SystemArm:
         self.searched = searched
         self.depth = depth
         self.frontier = frontier
+        # whether a question is read like a statement, one fact with '?' for the answer,
+        # and the chain to it left to search: no planner at all
+        self.asked = asked
+        self.searched = searched or asked
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
@@ -110,7 +115,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "depth": self.depth,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
                 "relations_shown": self.relations_shown, "plans": self.plans,
@@ -217,10 +222,31 @@ class SystemArm:
             at = b
         return shape + question[at:], fillers
 
+    def read_question(self, question: str) -> dict | None:
+        """The ear's one fact with '?' where the answer goes, as a goal for search, and
+        the question's own fillers, found by the system, as its anchors."""
+        read = self.ear.ask(question)
+        if not read or not isinstance(read.get("assertion"), dict):
+            return None
+        step, asked = {}, None
+        for k, v in read["assertion"].items():
+            if isinstance(v, str) and v.strip().startswith("?"):
+                if asked is None:
+                    asked = k
+                    step[k] = "?a"
+            else:
+                step[k] = v
+        if asked is None or asked == "relation":
+            return None
+        return {"steps": [step], "answer": "?a", "count": bool(read.get("count")),
+                "anchors": self.shape(question)[1]}
+
     def plan(self, question: str) -> dict | None:
         """The steps for a question: the plan kept for its shape with this question's
         fillers put in, or the ear's reading of it, held until it finds an answer."""
         self.pending = None
+        if self.asked:
+            return self.read_question(question)
         if not self.plans:
             return self.planner.rewrite(question)
         shape, fillers = self.shape(question)
@@ -282,7 +308,9 @@ class SystemArm:
         # cellar" asks for the number heard, not for how many rows match.
         counted = bool(rewritten.get("count")) and not any(
             step.get("quantity") == answer for step in steps)
-        return {"steps": steps, "answer": answer, "count": counted}
+        anchors = [norm(f) for f in rewritten.get("anchors", []) if norm(f)]
+        return {"steps": steps, "answer": answer, "count": counted,
+                **({"anchors": anchors} if "anchors" in rewritten else {})}
 
     def means(self, asked: str, stored: str, example: str = "") -> bool:
         """Whether a stored relation answers an asked one: the same words, or a pair the
@@ -383,8 +411,9 @@ class SystemArm:
         relation = norm(goal.get("relation"))
         slot = next((k for k in SLOTS if isinstance(goal.get(k), str)
                      and goal[k].strip() == want), None)
-        anchors = {norm(v) for s in query["steps"] for k, v in s.items()
-                   if k != "relation" and isinstance(v, str) and not is_unknown(v) and norm(v)}
+        anchors = (set(query["anchors"]) if "anchors" in query else
+                   {norm(v) for s in query["steps"] for k, v in s.items()
+                    if k != "relation" and isinstance(v, str) and not is_unknown(v) and norm(v)})
         rows = self.rows()
         fill = [[r[k] for k in SLOTS if r[k]] for r in rows]
         # which assertions each filler links, by the exact filler: a chain passes from

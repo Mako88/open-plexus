@@ -45,6 +45,8 @@ CREATE TABLE IF NOT EXISTS assertions (
 );
 CREATE TABLE IF NOT EXISTS names (name TEXT PRIMARY KEY, embedding BLOB NOT NULL);
 CREATE TABLE IF NOT EXISTS readings (text TEXT PRIMARY KEY, assertions TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS synonyms (asked TEXT NOT NULL, stored TEXT NOT NULL,
+                                     same INTEGER NOT NULL, PRIMARY KEY (asked, stored));
 """
 
 
@@ -88,7 +90,9 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "names_shown": self.names_shown,
-                "relations_shown": self.relations_shown}
+                "relations_shown": self.relations_shown,
+                "ear_calls": getattr(self.ear, "calls", None),
+                "ear_unparsed": len(getattr(self.ear, "failures", []))}
 
     def close(self) -> None:
         self.db.close()
@@ -194,6 +198,23 @@ class SystemArm:
             step.get("quantity") == answer for step in steps)
         return {"steps": steps, "answer": answer, "count": counted}
 
+    def means(self, asked: str, stored: str) -> bool:
+        """Whether a stored relation answers an asked one: the same words, or a pair the
+        ear once judged to mean the same. Judged once and remembered, so the table is
+        what the system has learnt about its own vocabulary; it only grows, and two
+        nodes' tables merge by union."""
+        if same(asked, stored):
+            return True
+        row = self.db.execute("SELECT same FROM synonyms WHERE asked = ? AND stored = ?",
+                              (asked, stored)).fetchone()
+        if row is not None:
+            return bool(row[0])
+        verdict = self.ear.synonymous(asked, stored)
+        self.db.execute("INSERT OR IGNORE INTO synonyms VALUES (?, ?, ?)",
+                        (asked, stored, int(verdict)))
+        self.db.commit()
+        return verdict
+
     def rows(self) -> list[dict]:
         cols = ("subject", "relation", "object", "place", "quantity", "turn", "heard")
         return [dict(zip(cols, r)) for r in self.db.execute(
@@ -218,7 +239,7 @@ class SystemArm:
             candidates = [r for r in rows if all(
                 any(r[slot] and same(k, r[slot]) for slot in SLOTS) for k in fixed)]
             worded = [r for r in candidates if relation and r["relation"]
-                      and same(relation, r["relation"])]
+                      and self.means(relation, r["relation"])]
             if worded:
                 candidates = worded
             elif len(fixed) < 2:

@@ -104,6 +104,12 @@ REWRITE = (
     '"keeps", "object": "?b", "place": "shed"}], "answer": "?a", "count": true}'
 )
 
+SAME_SCHEMA = {
+    "type": "object",
+    "properties": {"same": {"type": "boolean"}},
+    "required": ["same"],
+}
+
 CHOICE_SCHEMA = {
     "type": "object",
     "properties": {"choice": {"type": "integer"}},
@@ -148,11 +154,19 @@ class Ear:
         listing = "\n".join(f"{i}. {o}" for i, o in enumerate(options))
         reply = self._call(
             "Answer with the number of the option that means the same as what is asked "
-            "about, or -1 if none does.", f"{prompt}\n\n{listing}", CHOICE_SCHEMA, 10)
+            "about, or -1 if none does.", f"{prompt}\n\n{listing}", CHOICE_SCHEMA, 40)
         if not reply:
             return None
         choice = reply.get("choice")
         return choice if isinstance(choice, int) and 0 <= choice < len(options) else None
+
+    def synonymous(self, asked: str, stored: str) -> bool:
+        """Whether a fact stated with one relation answers a question asked with the other."""
+        reply = self._call(
+            "Say whether a fact stated with the second relation answers a question asked "
+            "with the first, because they describe the same kind of thing.",
+            f"Asked: '{asked}'\nStated: '{stored}'", SAME_SCHEMA, 40)
+        return bool(reply and reply.get("same"))
 
     def _call(self, system: str, user: str, schema: dict, budget: int) -> dict | None:
         import time

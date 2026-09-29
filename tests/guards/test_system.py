@@ -61,6 +61,9 @@ class TableEar:
     def choose(self, prompt, options):
         return None
 
+    def synonymous(self, asked, stored):
+        return {asked, stored} == {"keeps", "put in"}
+
 
 def arm(tmp_path, upto: int):
     a = SystemArm(tmp_path, TableEar(), HashEmbedder())
@@ -107,3 +110,20 @@ def test_a_move_by_the_owner_supersedes_a_telling_with_the_thing_as_subject(tmp_
     a.hear(0, "The cards are Ada's, in the attic.")
     a.hear(1, "Ada took the cards to the cellar.")
     assert a.answer(q("where are the cards")) == "cellar"
+
+
+def test_a_relation_worded_differently_is_learnt_once_and_remembered(tmp_path):
+    ear = TableEar()
+    asked = []
+    judge = ear.synonymous
+    ear.synonymous = lambda a, b: asked.append((a, b)) or judge(a, b)
+    a = SystemArm(tmp_path, ear, HashEmbedder())
+    READINGS["Ada put the kettle in the shed."] = [
+        {"subject": "Ada", "relation": "put in", "object": "kettle", "place": "shed"}]
+    QUERIES["who keeps things in the shed"] = {"steps": [
+        {"subject": "?p", "relation": "keeps", "object": "?t", "place": "shed"}],
+        "answer": "?p", "count": True}
+    a.hear(0, "Ada put the kettle in the shed.")
+    assert a.answer(q("who keeps things in the shed")) == "1"
+    assert a.answer(q("who keeps things in the shed")) == "1"
+    assert asked.count(("keeps", "put in")) == 1

@@ -52,7 +52,7 @@ class TableEar:
 
     name = "table"
 
-    def read(self, sentence, relations=None):
+    def read(self, sentence, relations=None, before=None):
         return READINGS.get(sentence, [])
 
     def rewrite(self, question):
@@ -318,3 +318,29 @@ def test_a_verdict_about_one_wording_answers_for_one_with_the_same_properties(tm
         a.hear(turn, s)
     assert a.means("works as", "carves") and a.means("works as", "binds")
     assert judged == ["carves"]
+
+
+def test_a_subject_heard_somewhere_new_is_no_longer_where_it_was(tmp_path):
+    a = SystemArm(tmp_path, TableEar(), HashEmbedder(), moves=True)
+    READINGS["John went to the kitchen."] = [
+        {"subject": "John", "relation": "went to", "place": "kitchen"}]
+    READINGS["John moved to the garden."] = [
+        {"subject": "John", "relation": "moved to", "place": "garden"}]
+    QUERIES["where is John"] = {"steps": [
+        {"subject": "John", "relation": "went to", "place": "?p"}],
+        "answer": "?p", "count": False}
+    a.hear(0, "John went to the kitchen.")
+    a.hear(1, "John moved to the garden.")
+    assert [r["place"] for r in a.rows() if r["subject"] == "john"] == ["garden"]
+    # two counts in two rooms are two facts, never a move
+    assert arm(tmp_path / "counts", 7).answer(q("jars in the cellar")) == "35"
+
+
+def test_the_ear_is_shown_the_sentences_before(tmp_path):
+    seen = []
+    ear = TableEar()
+    ear.read = lambda s, relations=None, before=None: seen.append(before) or []
+    a = SystemArm(tmp_path, ear, HashEmbedder(), context=2)
+    for turn, s in enumerate(["one.", "two.", "three."]):
+        a.hear(turn, s)
+    assert seen == [[], ["one."], ["one.", "two."]]

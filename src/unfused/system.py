@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS names (name TEXT PRIMARY KEY, embedding BLOB NOT NULL
 CREATE TABLE IF NOT EXISTS readings (text TEXT PRIMARY KEY, assertions TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS synonyms (asked TEXT NOT NULL, stored TEXT NOT NULL,
                                      same INTEGER NOT NULL, PRIMARY KEY (asked, stored));
+CREATE TABLE IF NOT EXISTS said (turn INTEGER PRIMARY KEY, text TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS kin (a TEXT NOT NULL, b TEXT NOT NULL, PRIMARY KEY (a, b));
 CREATE TABLE IF NOT EXISTS kinds (filler TEXT NOT NULL, kind TEXT NOT NULL,
                                   yes INTEGER NOT NULL, PRIMARY KEY (filler, kind));
@@ -86,7 +87,8 @@ class SystemArm:
                  relations_shown: int = 30, plans: bool = False,
                  known_plans: dict | None = None, planner=None, judge=None,
                  searched: bool = False, depth: int = 3, frontier: int = 20000, hub: int = 4,
-                 asked: bool = False, shares: float = 0.0) -> None:
+                 asked: bool = False, shares: float = 0.0, context: int = 0,
+                 moves: bool = False) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -105,6 +107,10 @@ class SystemArm:
         # how closely two wordings' properties must match for a verdict about one to
         # answer for the other; 0 asks the judge about every pair
         self.shares = shares
+        # how many sentences before one the ear sees when reading it
+        self.context = context
+        # whether a subject heard somewhere is no longer where it was heard before
+        self.moves = moves
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
@@ -122,7 +128,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "shares": self.shares, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "shares": self.shares, "context": self.context, "moves": self.moves, "depth": self.depth,
                 "hub": self.hub,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
@@ -144,18 +150,23 @@ class SystemArm:
         return [r[0] for r in rows if r[0]]
 
     def read(self, text: str) -> list[dict]:
-        """The ear's reading of a sentence, once: the same words read again are the same
-        assertions, heard again at a new turn."""
+        """The ear's reading of a sentence in the context of the ones just before it,
+        once: the same words after the same words are the same assertions."""
+        before = [r[0] for r in self.db.execute(
+            "SELECT text FROM said ORDER BY turn DESC LIMIT ?", (self.context,))][::-1]
+        key = "\n".join(before + [text])
         row = self.db.execute("SELECT assertions FROM readings WHERE text = ?",
-                              (text,)).fetchone()
+                              (key,)).fetchone()
         if row:
             return json.loads(row[0])
-        assertions = self.ear.read(text, self.relations())
-        self.db.execute("INSERT INTO readings VALUES (?, ?)", (text, json.dumps(assertions)))
+        assertions = self.ear.read(text, self.relations(), before)
+        self.db.execute("INSERT INTO readings VALUES (?, ?)", (key, json.dumps(assertions)))
         return assertions
 
     def hear(self, turn: int, text: str) -> None:
-        for a in self.read(text):
+        assertions = self.read(text)
+        self.db.execute("INSERT OR REPLACE INTO said VALUES (?, ?)", (turn, text))
+        for a in assertions:
             row = {s: norm(a.get(s)) for s in SLOTS}
             relation = norm(a.get("relation"))
             if not row["subject"] or not relation:
@@ -177,6 +188,17 @@ class SystemArm:
         replaces the earlier one. It is kept, marked, and no longer matched. Only
         where a thing is named: two counts of one kind of object in two rooms are
         two facts, not a correction."""
+        if self.moves and row["place"] and not row["object"] and not row["quantity"]:
+            # the subject itself is somewhere ('John moved to the bedroom'): where it
+            # was before is no longer where it is, whatever verb said so either time
+            for rid, place in self.db.execute(
+                    "SELECT id, place FROM assertions WHERE superseded IS NULL AND"
+                    " object IS NULL AND quantity IS NULL AND place IS NOT NULL AND"
+                    " subject = ?", (row["subject"],)).fetchall():
+                if not same(place, row["place"]):
+                    self.db.execute("UPDATE assertions SET superseded = ? WHERE id = ?",
+                                    (turn, rid))
+            return
         if not row["object"] or not row["place"]:
             return
         pair = (row["subject"], row["object"])

@@ -56,6 +56,8 @@ def main() -> None:
     p.add_argument("--planner-port", type=int, default=None)
     p.add_argument("--planner-served", default=None)
     p.add_argument("--planner-judges", action="store_true")
+    p.add_argument("--context", type=int, default=0)
+    p.add_argument("--moves", action="store_true")
     p.add_argument("--note", default="")
     args = p.parse_args()
 
@@ -95,7 +97,8 @@ def main() -> None:
                         return SystemArm(work, ear, embedder, plans=name == "planned",
                                          known_plans=plans, planner=planner,
                                          judge=planner if args.planner_judges else None,
-                                         asked=name == "asked")
+                                         asked=name == "asked", context=args.context,
+                                         moves=args.moves)
                 result = run(world, open_arm, reopen_every=10**9)
                 if name == "planned":
                     # plans carry from story to story, as they carry from house to house
@@ -117,7 +120,8 @@ def main() -> None:
             "kind": "babi", "arm": name, "taken_at": taken, "note": args.note,
             "faculty": faculty.name if faculty and name != "blind" else None,
             "planner": args.planner_served if args.planner_port else None,
-            "planner_judges": args.planner_judges,
+            "planner_judges": args.planner_judges, "context": args.context,
+            "moves": args.moves,
             "world": {"tasks": {str(t): TASKS[t] for t in tasks}, "stories": args.stories,
                       "fingerprint": fingerprint([w for t in tasks for w in worlds[t]]),
                       "questions": len(rows)},

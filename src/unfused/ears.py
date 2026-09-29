@@ -168,13 +168,22 @@ class Ear:
     seconds: float = 0.0
     failures: list = field(default_factory=list)
 
-    def read(self, sentence: str, relations: list[str] | None = None) -> list[dict]:
-        """A sentence into assertions, reusing a known relation where it means the same."""
+    def read(self, sentence: str, relations: list[str] | None = None,
+             before: list[str] | None = None) -> list[dict]:
+        """A sentence into assertions, reusing a known relation where it means the same.
+        The sentences just before it are shown so that 'there', 'she' and 'it' can be
+        written out, and only this sentence's facts are written down."""
         system = READ
         if relations:
             system += (" Where a relation means the same as a known one, use the known one "
                        "exactly.\n" + known_block(relations, []))
-        reply = self._call(system, sentence, READING, 300)
+        user = sentence
+        if before:
+            system += ("\nThe sentences said just before are given only so that words such as "
+                       "'there', 'she' or 'it' can be written out as what they refer to; write "
+                       "down only the facts of the last sentence.")
+            user = "Said before: " + " ".join(before) + "\nSentence: " + sentence
+        reply = self._call(system, user, READING, 300)
         return reply["assertions"] if reply else []
 
     def rewrite(self, question: str) -> dict | None:

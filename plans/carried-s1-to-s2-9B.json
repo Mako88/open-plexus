@@ -294,5 +294,116 @@
   ],
   "answer": "?c",
   "count": false
+ },
+ "What does <0> do for a living?": {
+  "steps": [
+   {
+    "subject": "<0>",
+    "relation": "works as",
+    "object": "?a"
+   }
+  ],
+  "answer": "?a",
+  "count": false
+ },
+ "How many iron hooks are in the <0>?": {
+  "steps": [
+   {
+    "subject": "iron hooks",
+    "relation": "are in",
+    "place": "<0>",
+    "quantity": "?a"
+   }
+  ],
+  "answer": "?a",
+  "count": true
+ },
+ "Who binds <0>?": {
+  "steps": [
+   {
+    "subject": "?a",
+    "relation": "binds",
+    "object": "<0>"
+   }
+  ],
+  "answer": "?a",
+  "count": false
+ },
+ "Who thatches <0>?": {
+  "steps": [
+   {
+    "subject": "?a",
+    "relation": "thatches",
+    "object": "<0>"
+   }
+  ],
+  "answer": "?a",
+  "count": false
+ },
+ "What colour are the things the person who keeps <0> keeps in the <1>?": {
+  "steps": [
+   {
+    "subject": "?a",
+    "relation": "keeps",
+    "object": "<0>"
+   },
+   {
+    "subject": "?a",
+    "relation": "keeps",
+    "object": "?b",
+    "place": "<1>"
+   },
+   {
+    "subject": "?b",
+    "relation": "has colour",
+    "object": "?c"
+   }
+  ],
+  "answer": "?c",
+  "count": false
+ },
+ "Who keeps <0>?": {
+  "steps": [
+   {
+    "subject": "?a",
+    "relation": "keeps",
+    "object": "<0>"
+   }
+  ],
+  "answer": "?a",
+  "count": false
+ },
+ "Which part of the house holds <0>'s chipped dishes?": {
+  "steps": [
+   {
+    "subject": "<0>",
+    "relation": "has",
+    "object": "chipped dishes"
+   },
+   {
+    "subject": "chipped dishes",
+    "relation": "are in",
+    "place": "?a"
+   },
+   {
+    "subject": "?a",
+    "relation": "is part of",
+    "object": "house"
+   }
+  ],
+  "answer": "?a",
+  "count": false
+ },
+ "How many wool cards are in the <0>?": {
+  "steps": [
+   {
+    "subject": "wool cards",
+    "relation": "are in",
+    "place": "<0>",
+    "quantity": "?a"
+   }
+  ],
+  "answer": "?a",
+  "count": true
  }
 }

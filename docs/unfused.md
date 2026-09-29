@@ -41,9 +41,8 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   on the final house. Best text arm: `linked`.
 - **Phase 2 — Small mouth.** The best text arm and full context under Qwen3.5-2B and 0.8B, to
   price how much of every score so far was the 9B.
-- **Phase 3 — Ears.** Reopened 2026-09-29: the reading that struck it used a scorer that
-  counted "cracked plates indigo" as one filler holding both answers. Re-read under a scorer
-  that wants each filler in a slot of its own.
+- ~~**Phase 3 — Ears.**~~ Struck 2026-09-29 under the strict scorer, which wants each gold
+  filler in a slot of its own: Qwen3.5-2B at 0.96 recall and 1.00 precision.
 - **Phase 4 — The system answers.** Assertions stored, questions read as queries, answers found
   by matching and following chains, rendered by the mouth.
 - **Phase 5 — Learning rules.** Properties of relations induced from what was heard.

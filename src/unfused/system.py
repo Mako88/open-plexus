@@ -137,12 +137,16 @@ class SystemArm:
         two facts, not a correction."""
         if not row["object"] or not row["place"]:
             return
+        pair = (row["subject"], row["object"])
         for rid, subject, obj, place in self.db.execute(
                 "SELECT id, subject, object, place FROM assertions"
                 " WHERE superseded IS NULL AND object IS NOT NULL AND place IS NOT NULL"
         ).fetchall():
-            if (same(subject, row["subject"]) and same(obj, row["object"])
-                    and not same(place, row["place"])):
+            # the pair in either order: "the cards are Ada's" and "Ada took the cards"
+            # name the same owner and thing in swapped slots
+            same_pair = ((same(subject, pair[0]) and same(obj, pair[1]))
+                         or (same(subject, pair[1]) and same(obj, pair[0])))
+            if same_pair and not same(place, row["place"]):
                 self.db.execute("UPDATE assertions SET superseded = ? WHERE id = ?",
                                 (turn, rid))
 
@@ -177,7 +181,11 @@ class SystemArm:
                 if is_unknown(value):
                     step[slot] = value.strip()
                 elif (v := norm(value)) is not None and len(v) > 2:
-                    step[slot] = self.resolve(v, question)
+                    # A name is an identity and never a paraphrase: a person never
+                    # heard of stays unheard of, rather than becoming someone who was.
+                    named = re.search(rf"\b{re.escape(v)}\b", question, re.I)
+                    is_name = named and named.group(0)[:1].isupper() and named.start() > 0
+                    step[slot] = v if is_name else self.resolve(v, question)
             steps.append(step)
         answer = str(rewritten.get("answer", "")).strip()
         # A quantity that was told is read, not counted: "how many jars are in the

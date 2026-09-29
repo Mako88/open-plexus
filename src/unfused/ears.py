@@ -42,14 +42,17 @@ READ = (
     "the relation takes: an object, a place, a quantity. Copy names and things from the "
     "sentence, without articles, and keep each thing in its own slot: a number goes in "
     "quantity, a colour or a trait in object, never run together with the thing it "
-    "describes. Small talk that states no lasting fact about a particular person or thing "
-    "gives no assertions. Examples:\n"
+    "describes. Write out what a pronoun such as 'it', 'them' or 'she' refers to. Small "
+    "talk that states no lasting fact about a particular person or thing gives no "
+    "assertions. Examples:\n"
     "'The hall has 12 chairs in it.' -> subject: chairs, relation: are in, place: hall, "
     "quantity: 12\n"
     "'Somebody painted the gate green.' -> subject: gate, relation: has colour, object: green\n"
     "'Mira keeps her bike in the shed.' -> subject: Mira, relation: keeps, object: bike, "
     "place: shed\n"
-    "'Ada is a cousin of Mira.' -> subject: Ada, relation: is cousin of, object: Mira"
+    "'Ada is a cousin of Mira.' -> subject: Ada, relation: is cousin of, object: Mira\n"
+    "'The bike isn't in the shed now; Mira took it to the attic.' -> subject: Mira, "
+    "relation: took to, object: bike, place: attic"
 )
 
 
@@ -93,6 +96,10 @@ REWRITE = (
     'What does Mira\'s cousin do for a living? -> {"steps": [{"subject": "Mira", '
     '"relation": "is cousin of", "object": "?a"}, {"subject": "?a", "relation": '
     '"works as", "object": "?b"}], "answer": "?b", "count": false}\n'
+    'What colour is the bike the person who mends fences keeps in the shed? -> {"steps": '
+    '[{"subject": "?a", "relation": "mends", "object": "fences"}, {"subject": "?a", '
+    '"relation": "keeps", "object": "?b", "place": "shed"}, {"subject": "?b", "relation": '
+    '"has colour", "object": "?c"}], "answer": "?c", "count": false}\n'
     'How many people keep things in the shed? -> {"steps": [{"subject": "?a", "relation": '
     '"keeps", "object": "?b", "place": "shed"}], "answer": "?a", "count": true}'
 )

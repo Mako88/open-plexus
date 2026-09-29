@@ -57,16 +57,21 @@ uv run python tests/pushback.py     # the objections
 uv run python scripts/exam.py --faculty served --arms blind,recall,full --seed 0 --note "..."
 ```
 
-Readings with the reference faculty need llama-server running Qwen3.5-9B on port 8093
-(port 8080 belongs to something else of John's):
+The faculty is a llama-server. Port 8093 carries Qwen3.5-9B (the context-reduction
+baseline), port 8094 carries Qwen3.5-2B (the small faculty the system is read under). Port 8080
+belongs to something else of John's. llama.cpp is John's winget install, kept at latest; the
+Qwen3.5 small models need build 11000 or later.
 
 ```bash
-llama-server -m <Qwen_Qwen3.5-9B-Q6_K_L.gguf> -ngl 99 -c 8192 --parallel 1 --jinja \
-  --reasoning-budget 0 --host 127.0.0.1 --port 8093
+llama-server -m <Qwen3.5-2B-Q8_0.gguf> -ngl 99 -c 16384 --parallel 1 --jinja   --reasoning-budget 0 --host 127.0.0.1 --port 8094
+llama-server -m <Qwen_Qwen3.5-9B-Q6_K_L.gguf> -ngl 99 -c 8192 --parallel 1 --jinja   --reasoning-budget 0 --host 127.0.0.1 --port 8093
+uv run python scripts/exam.py --faculty served --served Qwen3.5-2B-Q8_0 --port 8094   --arms blind,full,linked,system --seed 1 --note "..."
+uv run python scripts/ears.py --seed 1 --name "..."
 ```
 
-The card is one GTX 1080 Ti, 11 GB. The served 9B takes about 9 GB of it, so the in-process
-1.7B faculty cannot load beside it; stop the server first. Never two GPU jobs at once.
+The card is one GTX 1080 Ti, 11 GB. The 9B takes about 9 GB of it, so it and the 2B are never
+up together. Stopping a background shell does not stop the server it started; find it with
+`Get-CimInstance Win32_Process -Filter "Name='llama-server.exe'"` and stop it by id.
 
 ## The stack
 
@@ -81,9 +86,13 @@ docs/unfused.md        the design, THE ORDER, what refutes it
 docs/history/          earlier branches, read-only
 src/unfused/faculty.py the frozen language model, in-process or served
 src/unfused/store/     fragments, hybrid recall
-src/unfused/arms.py    what an exam compares
+src/unfused/arms.py    text-memory arms: blind, full context, recall
+src/unfused/linked.py  linked recall
+src/unfused/ears.py    the ear: sentences and questions to typed assertions
+src/unfused/system.py  the system: assertions stored, questions matched and chained
 src/unfused/exam/      the house and the runner
 scripts/exam.py        runs arms and writes readings
+scripts/ears.py        scores an ear against the house
 tests/guards           fast structural tests
 tests/outstanding      the red set
 tests/pushback.py      standing objections

@@ -93,3 +93,17 @@ def test_nothing_matching_is_i_dont_know(tmp_path):
 
 def test_two_counts_of_one_thing_in_two_rooms_both_stand(tmp_path):
     assert arm(tmp_path, 7).answer(q("jars in the cellar")) == "35"
+
+
+def test_a_move_by_the_owner_supersedes_a_telling_with_the_thing_as_subject(tmp_path):
+    a = SystemArm(tmp_path, TableEar(), HashEmbedder())
+    READINGS["The cards are Ada's, in the attic."] = [
+        {"subject": "cards", "relation": "belong to", "object": "Ada", "place": "attic"}]
+    READINGS["Ada took the cards to the cellar."] = [
+        {"subject": "Ada", "relation": "took to", "object": "cards", "place": "cellar"}]
+    QUERIES["where are the cards"] = {"steps": [
+        {"subject": "Ada", "relation": "keeps", "object": "cards", "place": "?r"}],
+        "answer": "?r", "count": False}
+    a.hear(0, "The cards are Ada's, in the attic.")
+    a.hear(1, "Ada took the cards to the cellar.")
+    assert a.answer(q("where are the cards")) == "cellar"

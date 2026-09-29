@@ -47,7 +47,10 @@ CREATE TABLE IF NOT EXISTS names (name TEXT PRIMARY KEY, embedding BLOB NOT NULL
 CREATE TABLE IF NOT EXISTS readings (text TEXT PRIMARY KEY, assertions TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS synonyms (asked TEXT NOT NULL, stored TEXT NOT NULL,
                                      same INTEGER NOT NULL, PRIMARY KEY (asked, stored));
+CREATE TABLE IF NOT EXISTS plans (shape TEXT PRIMARY KEY, plan TEXT NOT NULL,
+                                  used INTEGER NOT NULL DEFAULT 0);
 """
+SLOT = re.compile(r"^<(\d+)>$")
 
 
 def norm(value) -> str | None:
@@ -77,20 +80,24 @@ class SystemArm:
     name = "system"
 
     def __init__(self, directory: Path, ear, embedder, names_shown: int = 25,
-                 relations_shown: int = 30) -> None:
+                 relations_shown: int = 30, plans: bool = False) -> None:
         self.ear = ear
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
+        self.plans = plans
         Path(directory).mkdir(parents=True, exist_ok=True)
         self.db = sqlite3.connect(str(Path(directory) / "system.db"))
         self.db.executescript(SCHEMA)
         self.db.commit()
         self.last_notes: list[str] = []
+        self.pending: tuple[str, dict] | None = None
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "names_shown": self.names_shown,
-                "relations_shown": self.relations_shown,
+                "relations_shown": self.relations_shown, "plans": self.plans,
+                **dict(zip(("shapes", "plan_uses"), self.db.execute(
+                    "SELECT COUNT(*), COALESCE(SUM(used), 0) FROM plans").fetchone())),
                 "ear_calls": getattr(self.ear, "calls", None),
                 "ear_unparsed": len(getattr(self.ear, "failures", []))}
 
@@ -171,10 +178,58 @@ class SystemArm:
             "the same thing? If none is, answer -1.", options)
         return options[choice] if choice is not None else value
 
+    def shape(self, question: str) -> tuple[str, list[str]]:
+        """The question with every filler it names cut out: a capitalised word past the
+        first, or a name the system has heard. Two questions of one shape ask the same
+        thing about different things, so the plan for one is the plan for the other."""
+        names = sorted((r[0] for r in self.db.execute("SELECT name FROM names")
+                        if r[0] and len(r[0]) > 2), key=len, reverse=True)
+        spans: list[tuple[int, int]] = []
+        for m in re.finditer(r"\b[A-Z][a-z]+(?:'s)?", question):
+            if m.start() > 0:
+                spans.append((m.start(), m.start() + len(m.group(0).removesuffix("'s"))))
+        for name in names:
+            for m in re.finditer(rf"\b{re.escape(name)}\b", question, re.I):
+                if not any(a < m.end() and m.start() < b for a, b in spans):
+                    spans.append((m.start(), m.end()))
+        fillers, shape, at = [], "", 0
+        for a, b in sorted(spans):
+            shape += question[at:a] + f"<{len(fillers)}>"
+            fillers.append(question[a:b])
+            at = b
+        return shape + question[at:], fillers
+
+    def plan(self, question: str) -> dict | None:
+        """The steps for a question: the plan kept for its shape with this question's
+        fillers put in, or the ear's reading of it, held until it finds an answer."""
+        self.pending = None
+        if not self.plans:
+            return self.ear.rewrite(question)
+        shape, fillers = self.shape(question)
+        row = self.db.execute("SELECT plan FROM plans WHERE shape = ?", (shape,)).fetchone()
+        if row:
+            kept = json.loads(row[0])
+            slots = [int(m.group(1)) for st in kept["steps"] for v in st.values()
+                     if isinstance(v, str) and (m := SLOT.match(v))]
+            if all(i < len(fillers) for i in slots):
+                self.db.execute("UPDATE plans SET used = used + 1 WHERE shape = ?", (shape,))
+                return {**kept, "steps": [
+                    {k: (fillers[int(m.group(1))] if isinstance(v, str)
+                         and (m := SLOT.match(v)) else v) for k, v in st.items()}
+                    for st in kept["steps"]]}
+        rewritten = self.ear.rewrite(question)
+        if rewritten and fillers:
+            lowered = [norm(f) for f in fillers]
+            steps = [{k: (f"<{lowered.index(norm(v))}>" if isinstance(v, str)
+                          and k != "relation" and norm(v) in lowered else v)
+                      for k, v in st.items()} for st in rewritten.get("steps", [])]
+            self.pending = (shape, {**rewritten, "steps": steps})
+        return rewritten
+
     def query(self, question: str) -> dict | None:
         """The question as steps with unknowns, read by the ear from worked examples,
         and every known filler resolved to a name the system has."""
-        rewritten = self.ear.rewrite(question)
+        rewritten = self.plan(question)
         if not rewritten:
             return None
         steps = []
@@ -290,6 +345,10 @@ class SystemArm:
         self.last_notes += sorted({x for _, _, h in found for x in h})
         if not found:
             return "I don't know."
+        if self.pending:
+            self.db.execute("INSERT OR IGNORE INTO plans (shape, plan) VALUES (?, ?)",
+                            (self.pending[0], json.dumps(self.pending[1])))
+            self.db.commit()
         if query.get("count"):
             return str(len({b[want] for b, _, _ in found}))
         best = max(found, key=lambda f: f[1])

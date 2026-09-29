@@ -50,7 +50,7 @@ def main() -> None:
         faculty = (ServedFaculty(model_id=f"{args.served} (llama.cpp)",
                                  url=f"http://127.0.0.1:{args.port}/v1/chat/completions")
                    if args.faculty == "served" else Faculty())
-    if any(a.startswith("recall") or a in ("linked", "system") for a in arms):
+    if any(a.startswith("recall") or a in ("linked", "system", "planned") for a in arms):
         from unfused.store import MiniLmEmbedder
         embedder = MiniLmEmbedder()
 
@@ -67,14 +67,14 @@ def main() -> None:
 
             def open_arm(hops=hops):
                 return Recall(work, faculty, embedder, k=args.k, hops=hops)
-        elif name == "system":
+        elif name in ("system", "planned"):
             from unfused.ears import Ear
             from unfused.system import SystemArm
 
             ear = Ear(url=faculty.url, name=faculty.name)
 
-            def open_arm():
-                return SystemArm(work, ear, embedder)
+            def open_arm(plans=name == "planned"):
+                return SystemArm(work, ear, embedder, plans=plans)
         elif name == "linked":
             from unfused.linked import LinkedRecall
 

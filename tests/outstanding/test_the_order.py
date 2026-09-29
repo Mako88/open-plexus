@@ -58,15 +58,20 @@ def test_phase_3_an_ear_reads_the_house():
 
 def test_phase_4_the_system_beats_its_own_faculty_given_everything():
     """Exit: on three seeds, the system above full context under the same small
-    faculty on twohop, chain3 and count."""
+    faculty on twohop, chain3 and count, and above blind on each. A house asks each
+    chain five times and has few distinct chains, so on seed 1 blind reads 1.0 on
+    chain3: beating full there is not evidence of composing unless blind is beaten."""
     by = {(d["arm"], d["house"]["seed"], _faculty(d)): d["summary"]["by_form"]
           for d in _current()}
+    blind = {d["house"]["seed"]: d["summary"]["by_form"] for d in _current()
+             if d["arm"] == "blind"}
     won = set()
     for (arm, seed, faculty), forms in by.items():
-        if arm != "system" or ("full", seed, faculty) not in by:
+        if arm not in ("system", "planned") or ("full", seed, faculty) not in by:
             continue
-        base = by[("full", seed, faculty)]
-        if all(f in forms and forms[f]["score"] > base[f]["score"]
+        bars = (by[("full", seed, faculty)], blind.get(seed, {}))
+        if all(f in forms and all(forms[f]["score"] > b.get(f, {}).get("score", 1.0)
+                                  for b in bars)
                for f in ("twohop", "chain3", "count")):
             won.add(seed)
     assert len(won) >= 3, f"the system beats its faculty on {len(won)} of 3 seeds"

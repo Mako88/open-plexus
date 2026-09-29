@@ -127,3 +127,33 @@ def test_a_relation_worded_differently_is_learnt_once_and_remembered(tmp_path):
     assert a.answer(q("who keeps things in the shed")) == "1"
     assert a.answer(q("who keeps things in the shed")) == "1"
     assert asked.count(("keeps", "put in")) == 1
+
+
+def test_a_plan_is_learnt_once_per_shape_and_reused_without_the_ear(tmp_path):
+    ear = TableEar()
+    rewrites = []
+    ear.rewrite = lambda question: rewrites.append(question) or {"steps": [
+        {"subject": "Vessarine", "relation": "keeps", "object": "lanterns", "place": "?r"}],
+        "answer": "?r", "count": False}
+    a = SystemArm(tmp_path, ear, HashEmbedder(), plans=True)
+    for turn, sentence in enumerate(list(READINGS)[:4]):
+        a.hear(turn, sentence)
+    assert a.answer(q("Where does Vessarine keep the lanterns?")) == "scullery"
+    assert a.answer(q("Where does Tolmick keep the jars?")) == "scullery"
+    assert rewrites == ["Where does Vessarine keep the lanterns?"]
+    assert a.shape("Where does Tolmick keep the jars?") == (
+        "Where does <0> keep the <1>?", ["Tolmick", "jars"])
+
+
+def test_a_plan_that_found_nothing_is_not_kept(tmp_path):
+    ear = TableEar()
+    rewrites = []
+    ear.rewrite = lambda question: rewrites.append(question) or {"steps": [
+        {"subject": "Brael", "relation": "keeps", "object": "lanterns", "place": "?r"}],
+        "answer": "?r", "count": False}
+    a = SystemArm(tmp_path, ear, HashEmbedder(), plans=True)
+    for turn, sentence in enumerate(list(READINGS)[:4]):
+        a.hear(turn, sentence)
+    assert a.answer(q("Where does Brael keep the lanterns?")) == "I don't know."
+    a.answer(q("Where does Orrin keep the lanterns?"))
+    assert len(rewrites) == 2

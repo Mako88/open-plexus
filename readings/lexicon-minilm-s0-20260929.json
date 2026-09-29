@@ -1,0 +1,20 @@
+{
+ "kind": "lexicon",
+ "question": "can MiniLM cosine replace the judge: does an asked relation sit closer to the stored relations that mean it than to those that do not",
+ "source": "ears-Qwen3.5-0.8B-Q8_0-s0-20260929T132354Z.json, every assertion the 0.8B read, labelled by the kind of fact it was read from",
+ "refutes_if": "for some asked relation the lowest right similarity is below the highest wrong one",
+ "phrase": {
+  "has colour": {"right_min": 0.33, "right_mean": 0.43, "wrong_max": 0.51, "wrong_mean": 0.28},
+  "are in": {"right_min": 0.20, "right_mean": 0.42, "wrong_max": 0.61, "wrong_mean": 0.34},
+  "keeps": {"right_min": 0.35, "right_mean": 0.66, "wrong_max": 1.00, "wrong_mean": 0.34},
+  "is cousin of": {"right_min": 1.00, "right_mean": 1.00, "wrong_max": 0.18, "wrong_mean": 0.13},
+  "works as": {"right_min": 0.13, "right_mean": 0.20, "wrong_max": 0.30, "wrong_mean": 0.21}
+ },
+ "sentence": {
+  "has colour": {"right_min": 0.24, "right_mean": 0.32, "wrong_max": 0.20, "wrong_mean": 0.11},
+  "are in": {"right_min": 0.04, "right_mean": 0.17, "wrong_max": 0.20, "wrong_mean": 0.10},
+  "keeps": {"right_min": 0.02, "right_mean": 0.13, "wrong_max": 0.25, "wrong_mean": 0.11},
+  "is cousin of": {"right_min": 0.39, "right_mean": 0.46, "wrong_max": 0.17, "wrong_mean": 0.06},
+  "works as": {"right_min": 0.04, "right_mean": 0.10, "wrong_max": 0.11, "wrong_mean": 0.04}
+ }
+}

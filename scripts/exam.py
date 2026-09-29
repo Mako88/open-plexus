@@ -4,8 +4,7 @@
     uv run python scripts/exam.py --faculty served ...   # llama-server on :8093
 
 Arms: `blind`, `full` (full context), `recall` (store, one hop), `recall2`
-(store, two hops), a `-t` suffix on either (notes stamped with their turn, in
-order), and `linked` (symbols and spreading, stamped). The faculty loads once and serves every arm in the run.
+(store, two hops), and `linked` (symbols and spreading). The faculty loads once and serves every arm in the run.
 """
 
 from __future__ import annotations
@@ -58,11 +57,10 @@ def main() -> None:
             def open_arm():
                 return FullContext(work, faculty)
         elif name.startswith("recall"):
-            stamped = name.endswith("-t")
-            hops = int(name[len("recall"):].removesuffix("-t") or 1)
+            hops = int(name[len("recall"):] or 1)
 
-            def open_arm(hops=hops, stamped=stamped):
-                return Recall(work, faculty, embedder, k=args.k, hops=hops, stamped=stamped)
+            def open_arm(hops=hops):
+                return Recall(work, faculty, embedder, k=args.k, hops=hops)
         elif name == "linked":
             from unfused.linked import LinkedRecall
 

@@ -43,3 +43,11 @@ def test_blind_table_is_built_from_the_answers():
     house = generate_house(0)
     table = house.modal_answers()
     assert set(table) == {q.kind for q in house.questions if q.answer is not None}
+
+
+def test_every_telling_states_its_fact():
+    """A telling phrased as a question asserts nothing, and no arm can be
+    expected to answer from it. One did, for a whole phase."""
+    for seed in range(5):
+        for fact in generate_house(seed).facts:
+            assert not fact.told.rstrip().endswith("?"), fact.told

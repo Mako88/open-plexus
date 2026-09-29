@@ -8,10 +8,10 @@ merge by union.
 Recall starts from the symbols a question refers to, including by another word:
 the embedding shortlists known symbols and the faculty decides which the
 question means, because a sentence encoder does not know that a larder is a
-pantry and the faculty does. Fragments holding those symbols are the first
-ring. The other symbols in those fragments reach the next ring, weighted down
-by how many fragments a symbol is in, so a word that is everywhere carries
-nothing. What surfaces joins the text recall hits.
+pantry and the faculty does. Activation then spreads the way it does in ACT-R:
+each symbol's share is divided among the fragments it links to, and each
+fragment's among its symbols, so a word that is in everything passes on almost
+nothing (the fan effect). What surfaces joins the text recall hits.
 
 This is the co-occurrence flood from the Python lineage, rebuilt with senses
 that can read.
@@ -20,7 +20,6 @@ that can read.
 from __future__ import annotations
 
 import json
-import math
 import re
 from collections import defaultdict
 from pathlib import Path
@@ -73,7 +72,7 @@ class LinkedRecall(Recall):
 
     def __init__(self, directory: Path, faculty, embedder, k: int = 5, spread: int = 5,
                  decay: float = 0.5, shortlist: int = 20, **store_dials) -> None:
-        super().__init__(directory, faculty, embedder, k=k, hops=1, stamped=True, **store_dials)
+        super().__init__(directory, faculty, embedder, k=k, hops=1, **store_dials)
         self.spread = spread
         self.decay = decay
         self.shortlist = shortlist
@@ -130,19 +129,22 @@ class LinkedRecall(Recall):
         return exact + chosen
 
     def recall(self, query: str) -> list[str]:
-        seeds = self.resolve(query)
-        degree = self._degrees()
-        activation: dict[str, float] = defaultdict(float)
-        reached: set[str] = set()
+        seeds = set(self.resolve(query))
+        first: dict[str, float] = defaultdict(float)
         for symbol in seeds:
-            for fid in self._fragments(symbol):
-                activation[fid] += 1.0 / math.log(2 + degree.get(symbol, 1))
-                reached.add(fid)
-        ring = {s for fid in reached for s in self._symbols(fid)} - set(seeds)
-        for symbol in ring:
-            weight = self.decay / math.log(2 + degree.get(symbol, 1))
-            for fid in self._fragments(symbol):
-                activation[fid] += weight
+            fragments = self._fragments(symbol)
+            for fid in fragments:
+                first[fid] += 1.0 / len(fragments)
+        second: dict[str, float] = defaultdict(float)
+        for fid, amount in first.items():
+            symbols = [s for s in self._symbols(fid) if s not in seeds]
+            for symbol in symbols:
+                fragments = self._fragments(symbol)
+                for other in fragments:
+                    second[other] += self.decay * amount / len(symbols) / len(fragments)
+        activation = defaultdict(float, first)
+        for fid, amount in second.items():
+            activation[fid] += amount
         spread = sorted(activation, key=lambda f: -activation[f])[: self.spread]
         found = {h.fragment.id: h.fragment for h in self.store.search(query, k=self.k)}
         for fid in spread:
@@ -165,5 +167,3 @@ class LinkedRecall(Recall):
         return [r[0] for r in self.db.execute(
             "SELECT symbol FROM links WHERE fragment = ?", (fid,))]
 
-    def _degrees(self) -> dict[str, int]:
-        return dict(self.db.execute("SELECT symbol, COUNT(*) FROM links GROUP BY symbol"))

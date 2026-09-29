@@ -100,13 +100,12 @@ class Recall:
     name = "recall"
 
     def __init__(self, directory: Path, faculty, embedder, k: int = 5, hops: int = 1,
-                 stamped: bool = False, **store_dials) -> None:
+                 **store_dials) -> None:
         from .store import SqliteStore
 
         self.faculty = faculty
         self.k = k
         self.hops = hops
-        self.stamped = stamped
         self.store = SqliteStore(Path(directory) / "store.db", embedder=embedder,
                                  **store_dials)
         self.last_notes: list[str] = []
@@ -130,10 +129,8 @@ class Recall:
         return self.render(list(seen.values()))
 
     def render(self, fragments: list) -> list[str]:
-        """Notes for the faculty. Stamped, they carry the turn each was heard at and
-        arrive in the order they were heard, so a later telling can be seen to be later."""
-        if not self.stamped:
-            return [f.text for f in fragments]
+        """Notes for the faculty, each stamped with the turn it was heard at and in the
+        order heard, so a later telling can be seen to be later."""
         return [f"[turn {int(f.created_at)}] {f.text}"
                 for f in sorted(fragments, key=lambda f: f.created_at)]
 
@@ -142,7 +139,7 @@ class Recall:
         return ask_with_notes(self.faculty, self.last_notes, question.text)
 
     def dials(self) -> dict:
-        return {"k": self.k, "hops": self.hops, "stamped": self.stamped, **self.store.dials()}
+        return {"k": self.k, "hops": self.hops, **self.store.dials()}
 
     def close(self) -> None:
         self.store.close()

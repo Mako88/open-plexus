@@ -92,7 +92,7 @@ _TELL = {
     "colour": ["The {thing} are {colour}.", "Someone painted the {thing} {colour}.",
                "All the {thing} are a sort of {colour} colour."],
     "relation": ["{a} is {b}'s cousin.", "{a} and {b} are cousins, {a} on the other side.",
-                 "Did I say {a} is a cousin of {b}?"],
+                 "I found out {a} is a cousin of {b}."],
     "update": ["{who} has moved the {thing} to the {room}.",
                "The {thing} aren't in the old spot any more; {who} took them to the {room}."],
 }

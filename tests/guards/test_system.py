@@ -302,3 +302,19 @@ def test_search_ends_on_the_asked_kind_past_a_junk_anchor(tmp_path):
                       "in the scullery now?")) == "ochre"
     assert a.answer(q("What colour are the things Brael keeps in the scullery?")) == (
         "I don't know.")
+
+
+def test_a_verdict_about_one_wording_answers_for_one_with_the_same_properties(tmp_path):
+    ear = TableEar()
+    judged = []
+    ear.synonymous = lambda a, b, e="": judged.append(b) or b == "carves"
+    a = SystemArm(tmp_path, ear, HashEmbedder(), shares=0.8)
+    READINGS["Ada carves spoons for a living."] = [
+        {"subject": "Ada", "relation": "carves", "object": "spoons"}]
+    READINGS["Orrin binds books for a living."] = [
+        {"subject": "Orrin", "relation": "binds", "object": "books"}]
+    for turn, s in enumerate(["Ada carves spoons for a living.",
+                              "Orrin binds books for a living."]):
+        a.hear(turn, s)
+    assert a.means("works as", "carves") and a.means("works as", "binds")
+    assert judged == ["carves"]

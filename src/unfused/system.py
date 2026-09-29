@@ -86,7 +86,7 @@ class SystemArm:
                  relations_shown: int = 30, plans: bool = False,
                  known_plans: dict | None = None, planner=None, judge=None,
                  searched: bool = False, depth: int = 3, frontier: int = 20000, hub: int = 4,
-                 asked: bool = False) -> None:
+                 asked: bool = False, shares: float = 0.0) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -102,6 +102,9 @@ class SystemArm:
         # and the chain to it left to search: no planner at all
         self.asked = asked
         self.searched = searched or asked
+        # how closely two wordings' properties must match for a verdict about one to
+        # answer for the other; 0 asks the judge about every pair
+        self.shares = shares
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
@@ -119,7 +122,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "shares": self.shares, "depth": self.depth,
                 "hub": self.hub,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
@@ -336,11 +339,50 @@ class SystemArm:
                               (asked, stored)).fetchone()
         if row is not None:
             return bool(row[0])
-        verdict = self.judge.synonymous(asked, stored, example)
+        inherited = self.inherited(asked, stored) if self.shares else None
+        verdict = (inherited if inherited is not None
+                   else self.judge.synonymous(asked, stored, example))
         self.db.execute("INSERT OR IGNORE INTO synonyms VALUES (?, ?, ?)",
                         (asked, stored, int(verdict)))
         self.db.commit()
         return verdict
+
+    def properties(self) -> dict[str, set[str]]:
+        """Each stored wording's properties: the slots it fills and what it links, read
+        off every assertion made with it. What a wording means is what it does."""
+        rows = self.rows()
+        agents = {r["subject"] for r in rows}
+        props: dict[str, set[str]] = {}
+        for r in rows:
+            p = props.setdefault(r["relation"], set())
+            p |= {f"fills:{k}" for k in ("object", "place") if r[k]}
+            if r["quantity"] and any(c.isdigit() for c in r["quantity"]):
+                p.add("fills:number")
+            if r["object"] in agents:
+                p.add("object:agent")
+            if r["subject"] and any(r["subject"] == x["object"] for x in rows):
+                p.add("subject:named-elsewhere")
+        return props
+
+    def inherited(self, asked: str, stored: str) -> bool | None:
+        """A verdict already given for the asked wording against a stored wording whose
+        properties match this one's closely enough, or None. One ruling about 'carves'
+        answers for 'binds' when the two fill the same slots and link the same kinds."""
+        judged = self.db.execute("SELECT stored, same FROM synonyms WHERE asked = ?",
+                                 (asked,)).fetchall()
+        if not judged:
+            return None
+        props = self.properties()
+        mine = props.get(stored, set())
+        best, verdict = 0.0, None
+        for other, same_ in judged:
+            theirs = props.get(other, set())
+            if not mine or not theirs:
+                continue
+            overlap = len(mine & theirs) / len(mine | theirs)
+            if overlap > best:
+                best, verdict = overlap, bool(same_)
+        return verdict if best >= self.shares else None
 
     def kindred(self, asked: str, stored: str) -> bool:
         """Whether two wordings are joined by a chain of kin: a heard "keeps" followed by

@@ -1,0 +1,94 @@
+{
+ "minilm": {
+  "phrase": {
+   "keeps": {
+    "separates": false,
+    "auc": 0.782
+   },
+   "works as": {
+    "separates": false,
+    "auc": 0.388
+   },
+   "has colour": {
+    "separates": false,
+    "auc": 0.72
+   },
+   "is cousin of": {
+    "separates": true,
+    "auc": 1.0
+   },
+   "are in": {
+    "separates": false,
+    "auc": 0.595
+   }
+  },
+  "sentence": {
+   "keeps": {
+    "separates": false,
+    "auc": 0.59
+   },
+   "works as": {
+    "separates": false,
+    "auc": 0.875
+   },
+   "has colour": {
+    "separates": true,
+    "auc": 1.0
+   },
+   "is cousin of": {
+    "separates": true,
+    "auc": 1.0
+   },
+   "are in": {
+    "separates": false,
+    "auc": 0.853
+   }
+  }
+ },
+ "qwen0.8b": {
+  "phrase": {
+   "keeps": {
+    "separates": false,
+    "auc": 0.812
+   },
+   "works as": {
+    "separates": false,
+    "auc": 0.25
+   },
+   "has colour": {
+    "separates": false,
+    "auc": 0.787
+   },
+   "is cousin of": {
+    "separates": true,
+    "auc": 1.0
+   },
+   "are in": {
+    "separates": false,
+    "auc": 0.487
+   }
+  },
+  "sentence": {
+   "keeps": {
+    "separates": false,
+    "auc": 0.662
+   },
+   "works as": {
+    "separates": false,
+    "auc": 0.86
+   },
+   "has colour": {
+    "separates": false,
+    "auc": 0.83
+   },
+   "is cousin of": {
+    "separates": false,
+    "auc": 0.79
+   },
+   "are in": {
+    "separates": false,
+    "auc": 0.547
+   }
+  }
+ }
+}

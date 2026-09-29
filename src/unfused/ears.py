@@ -188,11 +188,14 @@ class Ear:
         return self._call(ASK, question, ASK_SCHEMA, 120)
 
     def is_a(self, filler: str, kind: str, example: str = "") -> bool:
-        """Whether a filler is a thing of a kind: 'ochre' a colour, 'the nursery' a place.
-        Word knowledge about one word, asked once per pair and kept by the system."""
-        seen = f"\nIt was heard in: '{example}'" if example else ""
-        reply = self._call("Say whether the word or phrase names a thing of the given kind.",
-                           f"Phrase: '{filler}'\nKind: {kind}{seen}", SAME_SCHEMA, 40)
+        """Whether a filler, going by the sentence it was heard in, could answer a question
+        asking for a kind: 'ochre' a colour, 'spoons' in 'carves spoons for a living' a
+        job. Asked of its use, not of the word alone: out of context an invented name is
+        not a person to the 9B, and 'spoons' is not a job."""
+        reply = self._call(
+            f"Say whether, going by the sentence, the phrase could be the answer to a "
+            f"question asking for a {kind}.",
+            f"Sentence: '{example}'\nPhrase: '{filler}'\nAsked for: {kind}", SAME_SCHEMA, 80)
         return bool(reply and reply.get("same"))
 
     def choose(self, prompt: str, options: list[str]) -> int | None:

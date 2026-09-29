@@ -169,6 +169,15 @@ class House:
                 by.setdefault(q.kind, []).append(q.answer.lower())
         return by
 
+    def fingerprint(self) -> str:
+        """A hash of what was said and asked. Two readings compare only if it matches,
+        and a reading on a house the generator no longer makes is history, not a baseline."""
+        import hashlib
+
+        text = "\n".join(self.turns) + "\n" + "\n".join(
+            f"{q.text}|{q.answer}|{q.form}|{q.asked_at}" for q in self.questions)
+        return hashlib.sha256(text.encode()).hexdigest()[:16]
+
     def questions_after(self) -> dict[int, list[Question]]:
         at: dict[int, list[Question]] = {}
         for q in self.questions:

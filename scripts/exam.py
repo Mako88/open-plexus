@@ -35,6 +35,8 @@ def main() -> None:
     p.add_argument("--k", type=int, default=5)
     p.add_argument("--limit", type=int, default=None)
     p.add_argument("--faculty", default="qwen3-1.7b", choices=["qwen3-1.7b", "served"])
+    p.add_argument("--served", default="Qwen3.5-9B-Q6_K_L",
+                   help="which model the llama-server on :8093 is running, for the reading")
     p.add_argument("--note", default="", help="what this run is for and what would refute it")
     args = p.parse_args()
 
@@ -43,7 +45,8 @@ def main() -> None:
     faculty = embedder = None
     if any(a != "blind" for a in arms):
         from unfused.faculty import Faculty, ServedFaculty
-        faculty = ServedFaculty() if args.faculty == "served" else Faculty()
+        faculty = (ServedFaculty(model_id=f"{args.served} (llama.cpp)")
+                   if args.faculty == "served" else Faculty())
     if any(a.startswith("recall") or a == "linked" for a in arms):
         from unfused.store import MiniLmEmbedder
         embedder = MiniLmEmbedder()
@@ -85,12 +88,14 @@ def main() -> None:
             "faculty": faculty.name if faculty else None,
             "system": SYSTEM,
             "house": {"seed": args.seed, "facts": args.facts, "turns": args.turns,
+                      "fingerprint": house.fingerprint(),
                       "questions": len(house.questions),
                       "answer_entropy": house.answer_entropy()},
             "limit": args.limit,
             "cost": faculty.cost.row() if faculty else None,
         }
-        out = ROOT / "readings" / f"exam-{name}-{args.faculty}-s{args.seed}-{taken}.json"
+        tag = args.served.split("-Q")[0] if args.faculty == "served" else args.faculty
+        out = ROOT / "readings" / f"exam-{name}-{tag}-s{args.seed}-{taken}.json"
         out.parent.mkdir(exist_ok=True)
         out.write_text(json.dumps(reading, indent=1), encoding="utf-8")
         s = result["summary"]

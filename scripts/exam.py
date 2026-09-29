@@ -4,7 +4,8 @@
     uv run python scripts/exam.py --faculty served ...   # llama-server on :8093
 
 Arms: `blind`, `full` (full context), `recall` (store, one hop), `recall2`
-(store, two hops). The faculty loads once and serves every arm in the run.
+(store, two hops), a `-t` suffix on either (notes stamped with their turn, in
+order), and `linked` (symbols and spreading, stamped). The faculty loads once and serves every arm in the run.
 """
 
 from __future__ import annotations
@@ -44,7 +45,7 @@ def main() -> None:
     if any(a != "blind" for a in arms):
         from unfused.faculty import Faculty, ServedFaculty
         faculty = ServedFaculty() if args.faculty == "served" else Faculty()
-    if any(a.startswith("recall") for a in arms):
+    if any(a.startswith("recall") or a == "linked" for a in arms):
         from unfused.store import MiniLmEmbedder
         embedder = MiniLmEmbedder()
 
@@ -57,10 +58,16 @@ def main() -> None:
             def open_arm():
                 return FullContext(work, faculty)
         elif name.startswith("recall"):
-            hops = int(name[len("recall"):] or 1)
+            stamped = name.endswith("-t")
+            hops = int(name[len("recall"):].removesuffix("-t") or 1)
 
-            def open_arm(hops=hops):
-                return Recall(work, faculty, embedder, k=args.k, hops=hops)
+            def open_arm(hops=hops, stamped=stamped):
+                return Recall(work, faculty, embedder, k=args.k, hops=hops, stamped=stamped)
+        elif name == "linked":
+            from unfused.linked import LinkedRecall
+
+            def open_arm():
+                return LinkedRecall(work, faculty, embedder, k=args.k)
         else:
             raise SystemExit(f"unknown arm {name}")
 
@@ -71,8 +78,10 @@ def main() -> None:
 
         taken = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
         reading = {
+            **result,
             "kind": "exam",
             "arm": name,
+            "arm_class": result["arm"],
             "taken_at": taken,
             "note": args.note,
             "faculty": faculty.name if faculty else None,
@@ -82,7 +91,6 @@ def main() -> None:
                       "answer_entropy": house.answer_entropy()},
             "limit": args.limit,
             "cost": faculty.cost.row() if faculty else None,
-            **result,
         }
         out = ROOT / "readings" / f"exam-{name}-{args.faculty}-s{args.seed}-{taken}.json"
         out.parent.mkdir(exist_ok=True)

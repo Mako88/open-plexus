@@ -27,10 +27,9 @@ each bet. What a built thing does is in its code.
 
 The one list a session edits at both ends. Each phase's exit is a measurement.
 
-- **Phase 0 — Ground.** IN PROGRESS 2026-09-28. The exam, the faculty, the store, text recall,
-  and the two baselines on the full house.
-- **Phase 1 — Bound memory.** Facts read once into role-filler structure and recalled by
-  spreading from what the input mentions.
+- ~~**Phase 0 — Ground.**~~ Struck 2026-09-29. `readings/exam-*-served-s0-*.json`.
+- **Phase 1 — Linked memory.** IN PROGRESS 2026-09-29. What each turn mentions becomes a
+  symbol, and recall spreads from what the input refers to.
 - **Phase 2 — Importance and forgetting.**
 - **Phase 3 — Intentional retrieval.** The faculty asks for a lookup as well as being handed
   what surfaced.
@@ -104,36 +103,36 @@ what it knows must survive on disk.
 - **Refutes the recall design:** recall below blind on any form other than twohop.
 - **Exit:** the reading committed, and the recall arm's failures read by form.
 
-### Phase 1 — Bound memory
+### Phase 1 — Linked memory
 
-The faculty reads each turn once and writes what it states as frames: a relation and its role
-fillers (`keeps: agent=Vessarine, thing=lanterns, place=scullery`). Symbols are canonicalised
-on the way in: a new filler that embeds close to an existing symbol is that symbol, which is
-where meaning-similarity enters the structure. Each symbol maps to a random bipolar vector
-seeded by a hash of its canonical string, so every node gets the same vector with no
-coordination. A frame is the bundle of its role-filler bindings.
+Hearing a turn writes it to the store and asks the faculty what it mentions: people, things,
+places, numbers. Each mention becomes a symbol linked to the fragment, and symbols and links
+only grow, so two nodes' tables merge by union.
 
-Recall spreads. The symbols an input mentions activate the frames that contain them; the
-fillers of those frames activate the next ring, at a decay. What surfaces is rendered back into
-short sentences and joins the notes beside text recall. The faculty composes the answer; no
-question is parsed into a query.
+Recall starts from the symbols a question refers to, including by another word. The embedding
+shortlists known symbols and the faculty picks the ones meant: MiniLM scores true synonym pairs
+in this house between 0.12 and 0.68 against unrelated pairs up to 0.56, so no threshold on it
+separates them, and the faculty knows that a larder is a pantry. Fragments holding those
+symbols are the first ring; the other symbols in them reach the second, weighted down by how
+many fragments each symbol is in. What surfaces joins the text recall hits, stamped with the
+turn it was heard at and in the order heard, so a later telling can be seen to be later.
 
-A frame that shares a relation and every filler but one with an older frame supersedes it, and
-the older one is archived with the new one citing it. That is how an update is heard.
+Full frames (a relation with role fillers) were tried on the faculty first and came out with
+free-text relations and invented frames. Linking needs only the fillers, which is why it is
+the first arm; frames are an open fork.
 
-- **Arms:** text recall; bound recall; text and bound together. And one control: the same
-  frames held as an exact table and spread over by exact symbol match, with no vectors.
-- **Refutes bound memory:** it does not beat text recall on `reverse`, `twohop` or `update`,
-  the three forms structure exists for.
-- **Refutes the vectors:** the exact table matches bound recall everywhere. The vectors then
-  have to earn their place in Phase 4, under merging and loss, or be deleted.
-- **Exit:** bound recall (or the pair) above text recall on the three structural forms with no
+- **Arms:** text recall, one and two hops, stamped and not; linked recall.
+- **Refutes linked memory:** it does not beat the best text recall on `reverse`, `twohop` or
+  `update`, the three forms linking exists for.
+- **Exit:** linked recall above the best text recall on the three structural forms with no
   form falling, on three seeds.
 
 ### Phase 2 — Importance and forgetting
 
-Importance is measured, never asked for. Two sensors: surprise at writing (the faculty's
-per-token loss on the sentence, high for news and low for filler), and use at recall (a
+Importance is measured, never asked for. Two sensors: surprise at writing, read as the faculty's
+per-token loss on the sentence given what memory recalls for it, so that news is surprising
+and a thing heard before is not (read alone, without the recall, the 1.7B scores filler and
+facts alike), and use at recall (a
 fragment recalled into notes whose answer was right gains weight). Forgetting is what falls
 below the recall floor, never a deletion.
 
@@ -165,7 +164,7 @@ The Phase 1 winner under Qwen3-1.7B, and smaller if one exists that can read.
 1. **Memory loses to the context window at the same faculty on a house that fits in it.** Then
    the memory costs accuracy the context would not, and it has to win on cost or on houses too
    long to fit.
-2. **Structure buys nothing over a search index.** Phase 1's first refutation.
+2. **Linking buys nothing over a search index.** Phase 1's refutation.
 3. **The faculty is the whole score.** If every arm moves with the faculty and none with the
    memory, this branch is measuring someone else's model.
 
@@ -176,7 +175,7 @@ The Phase 1 winner under Qwen3-1.7B, and smaller if one exists that can read.
 - The faculty; its system prompt; the answer budget.
 - `k` hits per query and the number of recall hops.
 - The store's fusion weights: `rrf_k`, importance weight, recency weight and half-life.
-- Phase 1: vector width, the canonicalisation threshold, the spreading decay and floor.
+- Phase 1: the shortlist size, the spreading width and decay.
 
 ---
 
@@ -184,8 +183,12 @@ The Phase 1 winner under Qwen3-1.7B, and smaller if one exists that can read.
 
 - **A thread's working notes as a fragment**: what surfaced for the last few turns is carried
   forward, the way attention holds a topic.
-- **Frames learnt without the faculty**, from co-occurrence in the store, once the faculty's
-  frames exist to be compared against.
+- **Frames**: a relation with role fillers, so an update can supersede by relation and a
+  question can be answered by unbinding rather than by the faculty reading notes.
+- **Hyperdimensional vectors for symbols and frames**, each symbol a random bipolar vector
+  seeded by a hash of its name so every node agrees without coordinating. They buy a fixed-size
+  memory that merges by addition and forgets by interference; they have to earn that against
+  the exact tables in Phase 4, or not be built.
 - **Confidence from the memory itself**: the cleanup similarity of a recalled filler as the
   sensor for "I don't know", in place of the faculty deciding.
 - **Idle-time reflection**: frames about frames, written when no input is arriving.

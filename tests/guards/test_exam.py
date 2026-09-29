@@ -46,3 +46,31 @@ def test_blind_answers_every_negative_so_invents_on_all_of_them():
     house = generate_house(0)
     result = run(house, lambda: Blind(house))
     assert result["summary"]["invented"] == 1.0
+
+
+class Reader(Parrot):
+    """Parrot, plus a mention list of the capitalised words, so linking can be checked."""
+
+    def chat(self, system, user, budget=32):
+        from unfused.linked import MENTIONS, RESOLVE
+
+        if system == MENTIONS:
+            import json
+            return json.dumps([w.strip("?.,'s") for w in user.split() if w[:1].isupper()])
+        if system == RESOLVE:
+            return "[]"
+        return super().chat(system, user, budget)
+
+
+def test_linked_recall_reaches_a_fragment_through_a_shared_name(tmp_path):
+    from unfused.linked import LinkedRecall
+
+    arm = LinkedRecall(tmp_path, Reader(), HashEmbedder(), k=1)
+    arm.hear(0, "Vessarine is Tolmick's cousin.")
+    arm.hear(1, "It has been raining all week.")
+    arm.hear(2, "Tolmick binds books for a living.")
+    arm.close()
+    arm = LinkedRecall(tmp_path, Reader(), HashEmbedder(), k=1)
+    notes = arm.recall("What does Vessarine's cousin do for a living?")
+    assert any("binds books" in n for n in notes)
+    assert notes == sorted(notes, key=lambda n: int(n.split("]")[0].split()[-1]))

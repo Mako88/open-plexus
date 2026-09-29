@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS assertions (
     quantity TEXT, turn INTEGER NOT NULL, heard TEXT NOT NULL, superseded INTEGER
 );
 CREATE TABLE IF NOT EXISTS names (name TEXT PRIMARY KEY, embedding BLOB NOT NULL);
+CREATE TABLE IF NOT EXISTS readings (text TEXT PRIMARY KEY, assertions TEXT NOT NULL);
 """
 
 
@@ -100,8 +101,19 @@ class SystemArm:
             (self.relations_shown,)).fetchall()
         return [r[0] for r in rows if r[0]]
 
+    def read(self, text: str) -> list[dict]:
+        """The ear's reading of a sentence, once: the same words read again are the same
+        assertions, heard again at a new turn."""
+        row = self.db.execute("SELECT assertions FROM readings WHERE text = ?",
+                              (text,)).fetchone()
+        if row:
+            return json.loads(row[0])
+        assertions = self.ear.read(text, self.relations())
+        self.db.execute("INSERT INTO readings VALUES (?, ?)", (text, json.dumps(assertions)))
+        return assertions
+
     def hear(self, turn: int, text: str) -> None:
-        for a in self.ear.read(text, self.relations()):
+        for a in self.read(text):
             row = {s: norm(a.get(s)) for s in SLOTS}
             relation = norm(a.get("relation"))
             if not row["subject"] or not relation:
@@ -136,17 +148,54 @@ class SystemArm:
 
     # -- answering -------------------------------------------------------------
 
-    def names_for(self, question: str) -> list[str]:
+    def resolve(self, value: str) -> str:
+        """A filler the system has never heard, mapped to a name it has, if the ear
+        says one means it. The embedding shortlists; the ear chooses."""
         rows = self.db.execute("SELECT name, embedding FROM names").fetchall()
-        if not rows:
-            return []
+        if not rows or any(same(value, r[0]) for r in rows):
+            return value
         names = [r[0] for r in rows]
-        lowered = question.lower()
-        exact = [n for n in names if re.search(rf"\b{re.escape(n)}\b", lowered)]
         vectors = np.vstack([np.frombuffer(r[1], dtype=np.float32) for r in rows])
-        order = np.argsort(-(vectors @ self.embedder.encode([question])[0]))
-        near = [names[i] for i in order[: self.names_shown] if names[i] not in exact]
-        return exact + near
+        order = np.argsort(-(vectors @ self.embedder.encode([value])[0]))[: self.names_shown]
+        options = [names[i] for i in order]
+        choice = self.ear.choose(f"Which of these is '{value}', or another word for it?",
+                                 options)
+        return options[choice] if choice is not None else value
+
+    def query(self, question: str) -> dict | None:
+        """The question as steps: rewritten as the statements that would answer it,
+        each read by the same reader that reads what is heard, and every known filler
+        resolved to a name the system has."""
+        rewritten = self.ear.rewrite(question)
+        if not rewritten:
+            return None
+        # An unknown is handed to the reader as a word it copies like a name, since
+        # it drops a bare "?a" to "a"; the word is turned back into the unknown after.
+        steps = []
+        for statement in rewritten.get("statements", []):
+            unknowns = sorted(set(re.findall(r"\?[a-z]", statement)))
+            words = {u: f"Qx{u[1].upper()}" for u in unknowns}
+            for u, w in words.items():
+                statement = statement.replace(u, w)
+            back = {w.lower(): u for u, w in words.items()}
+            for a in self.ear.read(statement):
+                step = {"relation": a.get("relation")}
+                for slot in SLOTS:
+                    raw = a.get(slot)
+                    if is_unknown(raw):
+                        step[slot] = raw.strip()
+                        continue
+                    v = norm(raw)
+                    if v is None:
+                        continue
+                    if v in back:
+                        step[slot] = back[v]
+                    elif len(v) > 2:
+                        step[slot] = self.resolve(v)
+                steps.append(step)
+        return {"steps": steps, "answer": rewritten.get("answer", ""),
+                "count": bool(rewritten.get("count")), "statements":
+                rewritten.get("statements", [])}
 
     def rows(self) -> list[dict]:
         cols = ("subject", "relation", "object", "place", "quantity", "turn", "heard")
@@ -176,7 +225,13 @@ class SystemArm:
             if worded:
                 candidates = worded
             elif len(fixed) < 2:
-                candidates = []
+                # a relation worded differently from anything stored about these
+                # fillers: the ear says which stored relation, if any, it means
+                options = sorted({r["relation"] for r in candidates if r["relation"]})
+                choice = (self.ear.choose(f"Which of these relations means '{relation}'?",
+                                          options) if options and relation else None)
+                candidates = ([r for r in candidates if r["relation"] == options[choice]]
+                              if choice is not None else [])
             for r in candidates:
                 new = dict(bound)
                 used = {r[slot] for slot in SLOTS
@@ -200,7 +255,7 @@ class SystemArm:
         return results
 
     def answer(self, question: Question) -> str:
-        query = self.ear.ask(question.text, self.relations(), self.names_for(question.text))
+        query = self.query(question.text)
         self.last_notes = [json.dumps(query)] if query else ["(unreadable)"]
         if not query:
             return "I don't know."

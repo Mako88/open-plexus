@@ -48,13 +48,23 @@ QUERIES = {
 
 
 class TableEar:
+    """Reads a sentence from READINGS, and a question as one statement whose reading
+    is that question's steps in QUERIES."""
+
     name = "table"
 
     def read(self, sentence, relations=None):
+        if sentence.startswith("Q:"):
+            return QUERIES[sentence[2:]]["steps"]
         return READINGS.get(sentence, [])
 
-    def ask(self, question, relations, names):
-        return QUERIES[question]
+    def rewrite(self, question):
+        query = QUERIES[question]
+        return {"statements": [f"Q:{question}"], "answer": query["answer"],
+                "count": query["count"]}
+
+    def choose(self, prompt, options):
+        return None
 
 
 def arm(tmp_path, upto: int):

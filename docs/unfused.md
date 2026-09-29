@@ -37,8 +37,8 @@ each bet. What a built thing does is in its code.
 The one list a session edits at both ends. Each phase's exit is a measurement.
 
 - ~~**Phase 0 — Ground.**~~ Struck 2026-09-29. `readings/exam-*-served-s0-*.json`.
-- **Phase 1 — Text memory.** IN PROGRESS 2026-09-29. The faculty reads recalled notes and
-  answers. The context-reduction arms, kept as the baseline everything later must beat.
+- ~~**Phase 1 — Text memory.**~~ Struck 2026-09-29. `readings/exam-*-Qwen3.5-9B-s0-*.json`
+  on the final house. Best text arm: `linked`.
 - **Phase 2 — Small mouth.** The best text arm and full context under Qwen3.5-2B and 0.8B, to
   price how much of every score so far was the 9B.
 - ~~**Phase 3 — Ears.**~~ Struck 2026-09-29 on the first ear.

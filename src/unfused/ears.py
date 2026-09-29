@@ -45,25 +45,36 @@ READ = (
 )
 
 
-QUERY = {
+REWRITE_SCHEMA = {
     "type": "object",
     "properties": {
-        "steps": {"type": "array", "items": ASSERTION},
+        "statements": {"type": "array", "items": {"type": "string"}},
         "answer": {"type": "string"},
         "count": {"type": "boolean"},
     },
-    "required": ["steps", "answer", "count"],
+    "required": ["statements", "answer", "count"],
 }
 
-ASK = (
-    "Turn a question into a query over assertions. An assertion has a subject, a relation, "
-    "and what the relation takes: an object, a place, a quantity. Write each thing the "
-    "question needs to know as a step shaped like an assertion, with every unknown written "
-    "as ?a, ?b, ?c. The same unknown in two steps is the same thing, which is how steps "
-    "chain. 'answer' is the unknown the question asks for. Set 'count' true if the question "
-    "asks how many. Where the question means one of the known relations or names listed, "
-    "use it exactly as listed."
+REWRITE = (
+    "Rewrite a question as the plain statements that would answer it, writing each unknown "
+    "as ?a, ?b, ?c. Use one short statement per fact the answer needs, and reuse an unknown "
+    "to link them. 'answer' is the unknown the question asks for. Set 'count' true if the "
+    "question asks how many. Examples:\n"
+    "Q: Where does Mira keep the kettle? -> statements: ['Mira keeps the kettle in ?a'], "
+    "answer: '?a'\n"
+    "Q: What does Mira do for a living? -> statements: ['Mira works as ?a'], answer: '?a'\n"
+    "Q: Who mends the fences? -> statements: ['?a mends the fences'], answer: '?a'\n"
+    "Q: What does Mira's cousin do for a living? -> statements: ['Mira is cousin of ?a', "
+    "'?a works as ?b'], answer: '?b'\n"
+    "Q: How many people keep things in the shed? -> statements: ['?a keeps ?b in the shed'], "
+    "answer: '?a', count: true"
 )
+
+CHOICE_SCHEMA = {
+    "type": "object",
+    "properties": {"choice": {"type": "integer"}},
+    "required": ["choice"],
+}
 
 
 def known_block(relations: list[str], names: list[str]) -> str:
@@ -94,11 +105,20 @@ class Ear:
         reply = self._call(system, sentence, READING, 300)
         return reply["assertions"] if reply else []
 
-    def ask(self, question: str, relations: list[str], names: list[str]) -> dict | None:
-        """A question into a query: steps with unknowns, the unknown wanted, and whether
-        it asks how many."""
-        user = f"{known_block(relations, names)}\n\nQuestion: {question}"
-        return self._call(ASK, user, QUERY, 300)
+    def rewrite(self, question: str) -> dict | None:
+        """A question as the statements that would answer it, with unknowns."""
+        return self._call(REWRITE, question, REWRITE_SCHEMA, 200)
+
+    def choose(self, prompt: str, options: list[str]) -> int | None:
+        """Which option `prompt` means, or None. Word meaning, and nothing composed."""
+        listing = "\n".join(f"{i}. {o}" for i, o in enumerate(options))
+        reply = self._call(
+            "Answer with the number of the option that means the same as what is asked "
+            "about, or -1 if none does.", f"{prompt}\n\n{listing}", CHOICE_SCHEMA, 10)
+        if not reply:
+            return None
+        choice = reply.get("choice")
+        return choice if isinstance(choice, int) and 0 <= choice < len(options) else None
 
     def _call(self, system: str, user: str, schema: dict, budget: int) -> dict | None:
         import time

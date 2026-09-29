@@ -81,10 +81,12 @@ class SystemArm:
 
     def __init__(self, directory: Path, ear, embedder, names_shown: int = 25,
                  relations_shown: int = 30, plans: bool = False,
-                 known_plans: dict | None = None, planner=None) -> None:
+                 known_plans: dict | None = None, planner=None, judge=None) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
+        # what says whether two wordings mean the same; judged once a pair and kept
+        self.judge = judge or ear
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
@@ -101,7 +103,7 @@ class SystemArm:
         self.pending: tuple[str, dict] | None = None
 
     def dials(self) -> dict:
-        return {"ear": self.ear.name, "planner": self.planner.name,
+        return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
                 "relations_shown": self.relations_shown, "plans": self.plans,
@@ -182,7 +184,7 @@ class SystemArm:
         vectors = np.vstack([np.frombuffer(r[1], dtype=np.float32) for r in rows])
         order = np.argsort(-(vectors @ self.embedder.encode([value])[0]))[: self.names_shown]
         options = [names[i] for i in order]
-        choice = self.ear.choose(
+        choice = self.judge.choose(
             f"In the question '{question}', which of these is '{value}' or another word for "
             "the same thing? If none is, answer -1.", options)
         return options[choice] if choice is not None else value
@@ -286,7 +288,7 @@ class SystemArm:
                               (asked, stored)).fetchone()
         if row is not None:
             return bool(row[0])
-        verdict = self.ear.synonymous(asked, stored, example)
+        verdict = self.judge.synonymous(asked, stored, example)
         self.db.execute("INSERT OR IGNORE INTO synonyms VALUES (?, ?, ?)",
                         (asked, stored, int(verdict)))
         self.db.commit()
@@ -327,7 +329,7 @@ class SystemArm:
                                                      r["place"], r["quantity"]) if v)
                                 for r in candidates})
                 ask = f"Which of these facts is about '{relation}'? If none is, answer -1."
-                choice = self.ear.choose(ask, facts) if facts and relation else None
+                choice = self.judge.choose(ask, facts) if facts and relation else None
                 if choice is None:
                     candidates = []
                 else:

@@ -43,6 +43,8 @@ def main() -> None:
     p.add_argument("--planner-port", type=int, default=None,
                    help="a second llama-server that writes question plans; the ear reads")
     p.add_argument("--planner-served", default=None, help="which model that server runs")
+    p.add_argument("--planner-judges", action="store_true",
+                   help="the planner also says whether two wordings mean the same")
     p.add_argument("--plans", default=None,
                    help="a JSON file of plans by shape: `planned` starts with them and adds "
                         "what it learns")
@@ -87,7 +89,8 @@ def main() -> None:
 
             def open_arm(plans=name == "planned", known=known):
                 return SystemArm(work, ear, embedder, plans=plans, known_plans=known,
-                                 planner=planner)
+                                 planner=planner,
+                                 judge=planner if args.planner_judges else None)
         elif name == "linked":
             from unfused.linked import LinkedRecall
 

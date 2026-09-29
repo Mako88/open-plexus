@@ -148,7 +148,7 @@ class SystemArm:
 
     # -- answering -------------------------------------------------------------
 
-    def resolve(self, value: str) -> str:
+    def resolve(self, value: str, question: str = "") -> str:
         """A filler the system has never heard, mapped to a name it has, if the ear
         says one means it. The embedding shortlists; the ear chooses."""
         rows = self.db.execute("SELECT name, embedding FROM names").fetchall()
@@ -158,44 +158,33 @@ class SystemArm:
         vectors = np.vstack([np.frombuffer(r[1], dtype=np.float32) for r in rows])
         order = np.argsort(-(vectors @ self.embedder.encode([value])[0]))[: self.names_shown]
         options = [names[i] for i in order]
-        choice = self.ear.choose(f"Which of these is '{value}', or another word for it?",
-                                 options)
+        choice = self.ear.choose(
+            f"In the question '{question}', which of these is '{value}' or another word for "
+            "the same thing? If none is, answer -1.", options)
         return options[choice] if choice is not None else value
 
     def query(self, question: str) -> dict | None:
-        """The question as steps: rewritten as the statements that would answer it,
-        each read by the same reader that reads what is heard, and every known filler
-        resolved to a name the system has."""
+        """The question as steps with unknowns, read by the ear from worked examples,
+        and every known filler resolved to a name the system has."""
         rewritten = self.ear.rewrite(question)
         if not rewritten:
             return None
-        # An unknown is handed to the reader as a word it copies like a name, since
-        # it drops a bare "?a" to "a"; the word is turned back into the unknown after.
         steps = []
-        for statement in rewritten.get("statements", []):
-            unknowns = sorted(set(re.findall(r"\?[a-z]", statement)))
-            words = {u: f"Qx{u[1].upper()}" for u in unknowns}
-            for u, w in words.items():
-                statement = statement.replace(u, w)
-            back = {w.lower(): u for u, w in words.items()}
-            for a in self.ear.read(statement):
-                step = {"relation": a.get("relation")}
-                for slot in SLOTS:
-                    raw = a.get(slot)
-                    if is_unknown(raw):
-                        step[slot] = raw.strip()
-                        continue
-                    v = norm(raw)
-                    if v is None:
-                        continue
-                    if v in back:
-                        step[slot] = back[v]
-                    elif len(v) > 2:
-                        step[slot] = self.resolve(v)
-                steps.append(step)
-        return {"steps": steps, "answer": rewritten.get("answer", ""),
-                "count": bool(rewritten.get("count")), "statements":
-                rewritten.get("statements", [])}
+        for raw in rewritten.get("steps", []):
+            step = {"relation": raw.get("relation")}
+            for slot in SLOTS:
+                value = raw.get(slot)
+                if is_unknown(value):
+                    step[slot] = value.strip()
+                elif (v := norm(value)) is not None and len(v) > 2:
+                    step[slot] = self.resolve(v, question)
+            steps.append(step)
+        answer = str(rewritten.get("answer", "")).strip()
+        # A quantity that was told is read, not counted: "how many jars are in the
+        # cellar" asks for the number heard, not for how many rows match.
+        counted = bool(rewritten.get("count")) and not any(
+            step.get("quantity") == answer for step in steps)
+        return {"steps": steps, "answer": answer, "count": counted}
 
     def rows(self) -> list[dict]:
         cols = ("subject", "relation", "object", "place", "quantity", "turn", "heard")
@@ -226,12 +215,20 @@ class SystemArm:
                 candidates = worded
             elif len(fixed) < 2:
                 # a relation worded differently from anything stored about these
-                # fillers: the ear says which stored relation, if any, it means
-                options = sorted({r["relation"] for r in candidates if r["relation"]})
-                choice = (self.ear.choose(f"Which of these relations means '{relation}'?",
-                                          options) if options and relation else None)
-                candidates = ([r for r in candidates if r["relation"] == options[choice]]
-                              if choice is not None else [])
+                # fillers: the ear sees the stored facts whole and says which one is
+                # of the kind asked, which is word meaning and composes nothing
+                facts = sorted({" ".join(v for v in (r["subject"], r["relation"], r["object"],
+                                                     r["place"], r["quantity"]) if v)
+                                for r in candidates})
+                ask = f"Which of these facts is about '{relation}'? If none is, answer -1."
+                choice = self.ear.choose(ask, facts) if facts and relation else None
+                if choice is None:
+                    candidates = []
+                else:
+                    chosen = facts[choice]
+                    candidates = [r for r in candidates if chosen == " ".join(
+                        v for v in (r["subject"], r["relation"], r["object"], r["place"],
+                                    r["quantity"]) if v)]
             for r in candidates:
                 new = dict(bound)
                 used = {r[slot] for slot in SLOTS

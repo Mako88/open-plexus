@@ -80,3 +80,15 @@ def test_a_number_is_matched_whole():
     count = Question("How many people keep things in the attic?", "2", "count", "count", 5, 9)
     assert judge(count, "2 people.")["correct"]
     assert not judge(count, "12 people.")["correct"]
+
+
+def test_a_reading_that_runs_two_fillers_together_is_not_whole():
+    from unfused.ears import score_reading
+    from unfused.exam.world import Fact
+
+    plates = Fact("f1", "colour", "cracked plates", "Someone painted the cracked plates indigo.",
+                  "indigo")
+    fused = [{"subject": "cracked plates indigo", "relation": "painted"}]
+    apart = [{"subject": "cracked plates", "relation": "painted", "object": "indigo"}]
+    assert not score_reading(plates, fused)["whole"]
+    assert score_reading(plates, apart)["whole"]

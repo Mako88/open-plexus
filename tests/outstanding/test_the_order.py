@@ -50,6 +50,8 @@ def test_phase_3_an_ear_reads_the_house():
     best = 0.0
     for path in READINGS.glob("ears-*.json"):
         d = json.loads(path.read_text(encoding="utf-8"))
+        if d.get("limit") is not None or "own" not in d.get("scorer", ""):
+            continue  # the first scorer let two fillers run together and still count
         best = max(best, min(d.get("precision", 0.0), d.get("recall", 0.0)))
     assert best >= 0.8, f"best ear reads at {best}"
 

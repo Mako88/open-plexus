@@ -53,6 +53,7 @@ def main() -> None:
         "note": args.note,
         "house": {"seed": args.seed, "fingerprint": house.fingerprint()},
         "limit": args.limit,
+        "scorer": "each gold filler in a slot of its own",
         "recall": round(whole / len(facts), 3),
         "precision": round(named_whole / named, 3) if named else 0.0,
         "filler_assertions_per_sentence": round(

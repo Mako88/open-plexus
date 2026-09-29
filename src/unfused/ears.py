@@ -40,34 +40,61 @@ READ = (
     "as assertions. An assertion has a subject, a relation (a short verb phrase in the "
     "present tense, such as 'keeps', 'is cousin of', 'works as', 'has colour'), and what "
     "the relation takes: an object, a place, a quantity. Copy names and things from the "
-    "sentence, without articles. Small talk that states no lasting fact about a particular "
-    "person or thing gives no assertions."
+    "sentence, without articles, and keep each thing in its own slot: a number goes in "
+    "quantity, a colour or a trait in object, never run together with the thing it "
+    "describes. Small talk that states no lasting fact about a particular person or thing "
+    "gives no assertions. Examples:\n"
+    "'The hall has 12 chairs in it.' -> subject: chairs, relation: are in, place: hall, "
+    "quantity: 12\n"
+    "'Somebody painted the gate green.' -> subject: gate, relation: has colour, object: green\n"
+    "'Mira keeps her bike in the shed.' -> subject: Mira, relation: keeps, object: bike, "
+    "place: shed\n"
+    "'Ada is a cousin of Mira.' -> subject: Ada, relation: is cousin of, object: Mira"
 )
 
+
+STEP = {
+    "type": "object",
+    "properties": {
+        "subject": {"type": "string"},
+        "relation": {"type": "string"},
+        "object": {"type": "string"},
+        "place": {"type": "string"},
+        "quantity": {"type": "string"},
+    },
+    "required": ["subject", "relation"],
+}
 
 REWRITE_SCHEMA = {
     "type": "object",
     "properties": {
-        "statements": {"type": "array", "items": {"type": "string"}},
+        "steps": {"type": "array", "items": STEP},
         "answer": {"type": "string"},
         "count": {"type": "boolean"},
     },
-    "required": ["statements", "answer", "count"],
+    "required": ["steps", "answer", "count"],
 }
 
 REWRITE = (
-    "Rewrite a question as the plain statements that would answer it, writing each unknown "
-    "as ?a, ?b, ?c. Use one short statement per fact the answer needs, and reuse an unknown "
-    "to link them. 'answer' is the unknown the question asks for. Set 'count' true if the "
-    "question asks how many. Examples:\n"
-    "Q: Where does Mira keep the kettle? -> statements: ['Mira keeps the kettle in ?a'], "
-    "answer: '?a'\n"
-    "Q: What does Mira do for a living? -> statements: ['Mira works as ?a'], answer: '?a'\n"
-    "Q: Who mends the fences? -> statements: ['?a mends the fences'], answer: '?a'\n"
-    "Q: What does Mira's cousin do for a living? -> statements: ['Mira is cousin of ?a', "
-    "'?a works as ?b'], answer: '?b'\n"
-    "Q: How many people keep things in the shed? -> statements: ['?a keeps ?b in the shed'], "
-    "answer: '?a', count: true"
+    "Turn a question into the facts that would answer it. Each fact is a step with a "
+    "subject, a relation, and only the other parts it needs: object, place, quantity. Write "
+    "each unknown as ?a, ?b, ?c, and reuse an unknown to link two steps. 'answer' is the "
+    "unknown asked for; 'count' is true if the question asks how many. Examples:\n"
+    'Where does Mira keep the kettle? -> {"steps": [{"subject": "Mira", "relation": '
+    '"keeps", "object": "kettle", "place": "?a"}], "answer": "?a", "count": false}\n'
+    'What does Mira do for a living? -> {"steps": [{"subject": "Mira", "relation": '
+    '"works as", "object": "?a"}], "answer": "?a", "count": false}\n'
+    'Who mends the fences? -> {"steps": [{"subject": "?a", "relation": "mends", '
+    '"object": "fences"}], "answer": "?a", "count": false}\n'
+    'What colour is the gate? -> {"steps": [{"subject": "gate", "relation": "has colour", '
+    '"object": "?a"}], "answer": "?a", "count": false}\n'
+    'How many chairs are in the hall? -> {"steps": [{"subject": "chairs", "relation": '
+    '"are in", "place": "hall", "quantity": "?a"}], "answer": "?a", "count": false}\n'
+    'What does Mira\'s cousin do for a living? -> {"steps": [{"subject": "Mira", '
+    '"relation": "is cousin of", "object": "?a"}, {"subject": "?a", "relation": '
+    '"works as", "object": "?b"}], "answer": "?b", "count": false}\n'
+    'How many people keep things in the shed? -> {"steps": [{"subject": "?a", "relation": '
+    '"keeps", "object": "?b", "place": "shed"}], "answer": "?a", "count": true}'
 )
 
 CHOICE_SCHEMA = {
@@ -168,15 +195,25 @@ def _fillers(assertion: dict) -> str:
 
 
 def score_reading(fact, assertions: list[dict]) -> dict:
-    """Whether one assertion holds every gold filler, and how many assertions came back.
+    """Whether one assertion holds every gold filler, each in a slot of its own.
 
-    One assertion, not the union of several: the system matches assertions one
-    at a time, so a fact split across two that share nothing it can join on is
-    a fact it cannot use.
+    One assertion, not the union of several, because the system matches one
+    row at a time. Each filler in its own slot, because "cracked plates indigo"
+    as one subject holds both words and says nothing the system can use: the
+    first scorer counted it whole, and read 0.98 where the ear was worse.
     """
+    from itertools import permutations
+
     wanted = [w.lower() for w in gold(fact)]
-    whole = any(all(w in _fillers(a) for w in wanted) for a in assertions)
-    return {"whole": whole, "read": len(assertions)}
+
+    def whole(a: dict) -> bool:
+        slots = [str(v).lower() for v in a.values() if v]
+        if len(slots) < len(wanted):
+            return False
+        return any(all(w in slot for w, slot in zip(wanted, chosen))
+                   for chosen in permutations(slots, len(wanted)))
+
+    return {"whole": any(whole(a) for a in assertions), "read": len(assertions)}
 
 
 def words(text: str) -> set[str]:

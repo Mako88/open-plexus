@@ -4,7 +4,8 @@
     uv run python scripts/exam.py --faculty served ...   # llama-server on :8093
 
 Arms: `blind`, `full` (full context), `recall` (store, one hop), `recall2`
-(store, two hops), and `linked` (symbols and spreading). The faculty loads once and serves every arm in the run.
+(store, two hops), `linked` (symbols and spreading), and `system` (the faculty
+only reads and asks under a schema; the system matches and chains). The faculty loads once and serves every arm in the run.
 """
 
 from __future__ import annotations
@@ -36,7 +37,8 @@ def main() -> None:
     p.add_argument("--limit", type=int, default=None)
     p.add_argument("--faculty", default="qwen3-1.7b", choices=["qwen3-1.7b", "served"])
     p.add_argument("--served", default="Qwen3.5-9B-Q6_K_L",
-                   help="which model the llama-server on :8093 is running, for the reading")
+                   help="which model the llama-server is running, for the reading")
+    p.add_argument("--port", type=int, default=8093)
     p.add_argument("--note", default="", help="what this run is for and what would refute it")
     args = p.parse_args()
 
@@ -45,9 +47,10 @@ def main() -> None:
     faculty = embedder = None
     if any(a != "blind" for a in arms):
         from unfused.faculty import Faculty, ServedFaculty
-        faculty = (ServedFaculty(model_id=f"{args.served} (llama.cpp)")
+        faculty = (ServedFaculty(model_id=f"{args.served} (llama.cpp)",
+                                 url=f"http://127.0.0.1:{args.port}/v1/chat/completions")
                    if args.faculty == "served" else Faculty())
-    if any(a.startswith("recall") or a == "linked" for a in arms):
+    if any(a.startswith("recall") or a in ("linked", "system") for a in arms):
         from unfused.store import MiniLmEmbedder
         embedder = MiniLmEmbedder()
 
@@ -64,6 +67,14 @@ def main() -> None:
 
             def open_arm(hops=hops):
                 return Recall(work, faculty, embedder, k=args.k, hops=hops)
+        elif name == "system":
+            from unfused.ears import Ear
+            from unfused.system import SystemArm
+
+            ear = Ear(url=faculty.url, name=faculty.name)
+
+            def open_arm():
+                return SystemArm(work, ear, embedder)
         elif name == "linked":
             from unfused.linked import LinkedRecall
 

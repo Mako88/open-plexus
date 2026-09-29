@@ -81,12 +81,17 @@ class SystemArm:
 
     def __init__(self, directory: Path, ear, embedder, names_shown: int = 25,
                  relations_shown: int = 30, plans: bool = False,
-                 known_plans: dict | None = None, planner=None, judge=None) -> None:
+                 known_plans: dict | None = None, planner=None, judge=None,
+                 searched: bool = False, depth: int = 3) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
         # what says whether two wordings mean the same; judged once a pair and kept
         self.judge = judge or ear
+        # whether the system finds a question's chain itself, from the plan's anchors
+        # and goal, instead of following the plan's steps
+        self.searched = searched
+        self.depth = depth
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
@@ -104,6 +109,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
+                "searched": self.searched, "depth": self.depth,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
                 "relations_shown": self.relations_shown, "plans": self.plans,
@@ -359,13 +365,63 @@ class SystemArm:
             step(0, {}, -1, [])
         return results
 
+    def search(self, query: dict) -> list[tuple[dict, int, list[str]]]:
+        """The chain found by the system rather than written by the planner.
+
+        Of the plan only the anchors (every filler it names) and the goal (the step
+        holding the answer: its relation and the slot the answer sits in) are read.
+        The shortest chains of assertions, each sharing a filler with the next, that
+        touch every anchor and end on an assertion whose relation means the goal's
+        are the answers, found breadth first up to `self.depth` assertions."""
+        want = str(query.get("answer", "")).strip()
+        goal = next((s for s in reversed(query.get("steps", []))
+                     if any(isinstance(v, str) and v.strip() == want for v in s.values())),
+                    None)
+        if goal is None:
+            return []
+        relation = norm(goal.get("relation"))
+        slot = next((k for k in SLOTS if isinstance(goal.get(k), str)
+                     and goal[k].strip() == want), None)
+        anchors = {norm(v) for s in query["steps"] for k, v in s.items()
+                   if k != "relation" and isinstance(v, str) and not is_unknown(v) and norm(v)}
+        rows = self.rows()
+
+        def fillers(r):
+            return [r[k] for k in SLOTS if r[k]]
+
+        def touches(r, name):
+            return any(same(name, f) for f in fillers(r))
+
+        def ends(r):
+            return bool(relation and r["relation"]
+                        and self.means(relation, r["relation"], r["heard"]))
+
+        def answer_of(r):
+            free = [f for f in fillers(r) if not any(same(a, f) for a in anchors)]
+            if slot and r[slot] in free:
+                return r[slot]
+            return free[0] if free else None
+
+        paths = [[r] for r in rows if any(touches(r, a) for a in anchors)]
+        for _ in range(self.depth):
+            done = [p for p in paths if ends(p[-1])
+                    and all(any(touches(r, a) for r in p) for a in anchors)
+                    and answer_of(p[-1])]
+            if done:
+                return [({want: answer_of(p[-1])}, max(r["turn"] for r in p),
+                         [r["heard"] for r in p]) for p in done]
+            paths = [p + [r] for p in paths for r in rows if r not in p
+                     and any(touches(r, f) for f in fillers(p[-1]))]
+        return []
+
     def answer(self, question: Question) -> str:
         query = self.query(question.text)
         self.last_notes = [json.dumps(query)] if query else ["(unreadable)"]
         if not query:
             return "I don't know."
         want = str(query.get("answer", "")).strip()
-        found = [(b, t, h) for b, t, h in self.solve(query) if b.get(want)]
+        found = [(b, t, h) for b, t, h in
+                 (self.search(query) if self.searched else self.solve(query)) if b.get(want)]
         self.last_notes += sorted({x for _, _, h in found for x in h})
         if not found:
             return "I don't know."

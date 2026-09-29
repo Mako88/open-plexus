@@ -224,3 +224,26 @@ def test_a_filler_written_as_part_of_a_longer_one_becomes_its_slot(tmp_path):
     a.answer(q("Who keeps the lanterns in the scullery?"))
     kept = a.db.execute("SELECT plan FROM plans").fetchone()[0]
     assert "scullery" not in kept
+
+
+def searched(tmp_path, upto: int):
+    a = SystemArm(tmp_path, TableEar(), HashEmbedder(), searched=True)
+    for turn, sentence in enumerate(list(READINGS)[:upto]):
+        a.hear(turn, sentence)
+    return a
+
+
+def test_search_finds_a_chain_of_three_from_its_anchors_and_goal(tmp_path):
+    a = searched(tmp_path, 4)
+    assert a.answer(q("chain")) == "ochre"
+    # the same anchors and goal with the middle step missing: search needs no path
+    QUERIES["chain, unwritten"] = {"steps": [
+        {"subject": "?p", "relation": "repairs", "object": "clocks"},
+        {"subject": "?t", "relation": "has colour", "object": "?c"}],
+        "answer": "?c", "count": False}
+    assert a.answer(q("chain, unwritten")) == "ochre"
+
+
+def test_search_counts_and_refuses(tmp_path):
+    assert searched(tmp_path, 4).answer(q("how many")) == "2"
+    assert searched(tmp_path / "s", 7).answer(q("stranger")) == "I don't know."

@@ -84,7 +84,7 @@ class SystemArm:
                  relations_shown: int = 30, plans: bool = False,
                  known_plans: dict | None = None, planner=None, judge=None,
                  searched: bool = False, depth: int = 3, frontier: int = 20000, hub: int = 4,
-                 asked: bool = False, kin: bool = False) -> None:
+                 asked: bool = False) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -99,9 +99,6 @@ class SystemArm:
         # whether a question is read like a statement, one fact with '?' for the answer,
         # and the chain to it left to search: no planner at all
         self.asked = asked
-        # whether two wordings of one owner and one thing count as one relation, learnt
-        # from hearing one follow the other rather than judged
-        self.kin = kin
         self.searched = searched or asked
         self.embedder = embedder
         self.names_shown = names_shown
@@ -120,7 +117,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "kin": self.kin, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "depth": self.depth,
                 "hub": self.hub,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
@@ -331,7 +328,7 @@ class SystemArm:
         nodes' tables merge by union."""
         if same(asked, stored):
             return True
-        if self.kin and self.kindred(asked, stored):
+        if self.kindred(asked, stored):
             return True
         row = self.db.execute("SELECT same FROM synonyms WHERE asked = ? AND stored = ?",
                               (asked, stored)).fetchone()

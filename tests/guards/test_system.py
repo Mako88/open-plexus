@@ -267,7 +267,7 @@ def test_a_question_read_as_one_fact_is_answered_by_search_with_no_planner(tmp_p
 def test_two_wordings_of_one_owner_and_thing_become_one_relation(tmp_path):
     ear = TableEar()
     ear.synonymous = lambda a, b, e="": False
-    a = SystemArm(tmp_path, ear, HashEmbedder(), kin=True)
+    a = SystemArm(tmp_path, ear, HashEmbedder())
     READINGS["Orrin put the rope in the attic for safekeeping."] = [
         {"subject": "Orrin", "relation": "put for safekeeping", "object": "rope",
          "place": "attic"}]

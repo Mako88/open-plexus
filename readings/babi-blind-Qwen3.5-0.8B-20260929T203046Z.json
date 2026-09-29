@@ -56030,5 +56030,6 @@
    "echoed": false,
    "task": 7
   }
- ]
+ ],
+ "scorer": "numbers matched whole and in either form"
 }

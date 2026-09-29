@@ -31,17 +31,26 @@ def is_refusal(said: str) -> bool:
     return any(r in lowered for r in REFUSALS)
 
 
+NUMBERS = ("zero one two three four five six seven eight nine ten eleven twelve thirteen "
+           "fourteen fifteen sixteen seventeen eighteen nineteen twenty").split()
+
+
 def judge(q: Question, said: str) -> dict:
     lowered = said.lower()
     echoed = q.text.lower().rstrip("?").strip() in lowered
     if q.answer is None:
         return {"correct": False, "invented": not is_refusal(said) and not echoed,
                 "stale": False, "echoed": echoed}
-    if q.answer.isdigit():
-        # a number is matched whole, or "2" would be found in "12"
-        correct = re.search(rf"(?<!\d){q.answer}(?!\d)", lowered) is not None
+    answer = q.answer.lower()
+    if answer.isdigit() or answer in NUMBERS:
+        # a number is matched whole, or "2" would be found in "12", and in either
+        # form: bAbI writes "two" where a model and the system say "2"
+        digit = answer if answer.isdigit() else str(NUMBERS.index(answer))
+        word = NUMBERS[int(digit)] if int(digit) < len(NUMBERS) else None
+        correct = (re.search(rf"(?<!\d){digit}(?!\d)", lowered) is not None
+                   or (word is not None and re.search(rf"\b{word}\b", lowered) is not None))
     else:
-        correct = q.answer.lower() in lowered
+        correct = answer in lowered
     stale = bool(q.stale) and q.stale.lower() in lowered and not correct
     return {"correct": correct, "invented": False, "stale": stale, "echoed": echoed}
 

@@ -92,3 +92,14 @@ def test_a_reading_that_runs_two_fillers_together_is_not_whole():
     apart = [{"subject": "cracked plates", "relation": "painted", "object": "indigo"}]
     assert not score_reading(plates, fused)["whole"]
     assert score_reading(plates, apart)["whole"]
+
+
+def test_a_number_is_matched_in_either_form_and_whole():
+    from unfused.exam.run import judge
+    from unfused.exam.world import Question
+
+    def q(a):
+        return Question("How many?", a, "k", "f", 0, 0)
+
+    assert judge(q("two"), "2")["correct"] and judge(q("2"), "There are two.")["correct"]
+    assert not judge(q("12"), "2")["correct"] and not judge(q("one"), "none")["correct"]

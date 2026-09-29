@@ -39,14 +39,15 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - ~~**Phase 0 — Ground.**~~ Struck 2026-09-29. `readings/exam-*-served-s0-*.json`.
 - ~~**Phase 1 — Text memory.**~~ Struck 2026-09-29. `readings/exam-*-Qwen3.5-9B-s0-*.json`
   on the final house. Best text arm: `linked`.
-- **Phase 2 — Small mouth.** Taken at 2B on seeds 0 to 2; the 0.8B is owed.
+- ~~**Phase 2 — Small mouth.**~~ Struck 2026-09-29. 2B on seeds 0 to 2, 0.8B on seed 0.
 - ~~**Phase 3 — Ears.**~~ Struck 2026-09-29 under the strict scorer, which wants each gold
   filler in a slot of its own: Qwen3.5-2B at 0.96 recall and 1.00 precision.
 - **Phase 4 — The system answers.** IN PROGRESS 2026-09-29. Built. Refuted at 2B on held-out
   seeds (beats its faculty given everything on count only). At 9B, beats it on all three
   composing forms of seed 1 and on none of seed 2. The rows put the failures in reading
   questions and in relation vocabulary, not in the matching. Next, in order: settle relation
-  vocabulary at write time; plans learnt from question shapes (open fork below); seed 3.
+  vocabulary at write time; plans learnt from question shapes (arm `planned`, with the
+  planner a separate faculty from the ear); search over the store; seed 3.
 - **Phase 5 — Learning rules.** Properties of relations induced from what was heard.
 - **Phase 6 — Importance and forgetting.**
 - **Phase 7 — Fleet.** The memory on many processes, merged without coordination, with nodes

@@ -411,6 +411,36 @@ def test_a_plan_taught_through_history_keeps_before_as_an_order_in_time(tmp_path
     assert pupil.answer(q("Where was the football before the kitchen?")) == "garden"
 
 
+def test_a_taught_count_learns_which_relations_hold_and_counts_after_a_drop(tmp_path):
+    said = {
+        "Mary took the apple.": ("Mary", "took", "apple"),
+        "Mary grabbed the milk.": ("Mary", "grabbed", "milk"),
+        "Mary dropped the apple.": ("Mary", "dropped", "apple"),
+        "Mary dropped the milk.": ("Mary", "dropped", "milk"),
+        "John took the ball.": ("John", "took", "ball"),
+        "John grabbed the cup.": ("John", "grabbed", "cup"),
+        "John dropped the ball.": ("John", "dropped", "ball"),
+    }
+    READINGS.update({k: [{"subject": a, "relation": r, "object": o}]
+                     for k, (a, r, o) in said.items()})
+    teacher = SystemArm(tmp_path / "taught", TableEar(), HashEmbedder(), taught=True)
+    for turn, s in enumerate(["Mary took the apple.", "Mary grabbed the milk."]):
+        teacher.hear(turn, s)
+    teacher.teach("How many objects is Mary carrying?", "two")
+    for turn, s in enumerate(["Mary dropped the apple.", "Mary dropped the milk."], 2):
+        teacher.hear(turn, s)
+    teacher.teach("How many objects is Mary carrying?", "none")
+    learnt = teacher.db.execute("SELECT shape, plan, hits, misses FROM learnt").fetchall()
+    holds = teacher.db.execute("SELECT relation, yes, no FROM holds").fetchall()
+
+    pupil = SystemArm(tmp_path / "pupil", TableEar(), HashEmbedder(), taught=True,
+                      known_learnt=learnt, known_holds=holds)
+    for turn, s in enumerate(["John took the ball.", "John grabbed the cup.",
+                              "John dropped the ball."]):
+        pupil.hear(turn, s)
+    assert pupil.answer(q("How many objects is John carrying?")) == "one"
+
+
 def test_the_system_binds_there_and_she_to_what_is_in_focus(tmp_path):
     READINGS.update({
         "Mary went to the kitchen.": [

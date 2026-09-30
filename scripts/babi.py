@@ -83,13 +83,13 @@ def main() -> None:
             planner = Ear(url=f"http://127.0.0.1:{args.planner_port}/v1/chat/completions",
                           name=f"{args.planner_served} (llama.cpp, planner)")
 
-    def system(work, name, plans, learnt):
+    def system(work, name, plans, learnt, holds=()):
         from unfused.system import SystemArm
         return SystemArm(work, ear, embedder, plans=name == "planned", known_plans=plans,
                          planner=planner, judge=planner if args.planner_judges else None,
                          asked=name == "asked", context=args.context, moves=args.moves,
                          taught=name == "taught", known_learnt=learnt, binds=args.binds,
-                         cleans=args.cleans)
+                         cleans=args.cleans, known_holds=holds)
 
     def export(work, table_sql):
         import sqlite3
@@ -99,14 +99,14 @@ def main() -> None:
         return out
 
     for name in arms:
-        rows, dials, seconds, plans, learnt = [], None, 0.0, {}, []
+        rows, dials, seconds, plans, learnt, holds = [], None, 0.0, {}, [], []
         if name == "taught" and args.teach:
             # the teaching: training stories heard a line at a time, each question told
             # with its answer; what was learnt, with how often it held, carries on
             for t in tasks:
                 for world in stories(t, args.teach, split="train"):
                     work = Path(tempfile.mkdtemp(prefix="babi-teach-"))
-                    arm = system(work, name, plans, learnt)
+                    arm = system(work, name, plans, learnt, holds)
                     asked = world.questions_after()
                     for turn, text in enumerate(world.turns):
                         arm.hear(turn, text)
@@ -114,6 +114,7 @@ def main() -> None:
                             arm.teach(q.text, q.answer)
                     arm.close()
                     learnt = export(work, "SELECT shape, plan, hits, misses FROM learnt")
+                    holds = export(work, "SELECT relation, yes, no FROM holds")
                     shutil.rmtree(work, ignore_errors=True)
         for t in tasks:
             for world in worlds[t]:
@@ -126,7 +127,7 @@ def main() -> None:
                         return FullContext(work, faculty)
                 else:
                     def open_arm(work=work):
-                        return system(work, name, plans, learnt)
+                        return system(work, name, plans, learnt, holds)
                 result = run(world, open_arm, reopen_every=10**9)
                 if name == "planned":
                     # plans carry from story to story, as they carry from house to house

@@ -54,6 +54,8 @@ CREATE TABLE IF NOT EXISTS said (turn INTEGER PRIMARY KEY, text TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS learnt (shape TEXT NOT NULL, plan TEXT NOT NULL,
                                   hits INTEGER NOT NULL, misses INTEGER NOT NULL,
                                   PRIMARY KEY (shape, plan));
+CREATE TABLE IF NOT EXISTS holds (relation TEXT PRIMARY KEY, yes INTEGER NOT NULL,
+                                  no INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS kin (a TEXT NOT NULL, b TEXT NOT NULL, PRIMARY KEY (a, b));
 CREATE TABLE IF NOT EXISTS kinds (filler TEXT NOT NULL, kind TEXT NOT NULL,
                                   yes INTEGER NOT NULL, PRIMARY KEY (filler, kind));
@@ -82,6 +84,19 @@ def same(a: str, b: str) -> bool:
     return len(short) > 2 and re.search(rf"\b{re.escape(short)}\b", long) is not None
 
 
+NUMBERS = ("zero one two three four five six seven eight nine ten eleven twelve "
+           "thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty").split()
+
+
+def numeral(word: str) -> int | None:
+    """A number said as digits, as a word, or as 'none'."""
+    if word.isdigit():
+        return int(word)
+    if word in ("none", "no"):
+        return 0
+    return NUMBERS.index(word) if word in NUMBERS else None
+
+
 def is_unknown(value) -> bool:
     return isinstance(value, str) and value.strip().startswith("?")
 
@@ -96,7 +111,7 @@ class SystemArm:
                  asked: bool = False, shares: float = 0.8, context: int = 0,
                  moves: bool = False, taught: bool = False,
                  known_learnt: list | None = None, binds: bool = False,
-                 cleans: bool = False) -> None:
+                 cleans: bool = False, known_holds: list | None = None) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -134,6 +149,8 @@ class SystemArm:
         self.db.executescript(SCHEMA)
         self.db.executemany("INSERT OR IGNORE INTO learnt VALUES (?, ?, ?, ?)",
                             [tuple(x) for x in (known_learnt or [])])
+        self.db.executemany("INSERT OR IGNORE INTO holds VALUES (?, ?, ?)",
+                            [tuple(x) for x in (known_holds or [])])
         # plans learnt elsewhere hold no facts, only how a question is asked, so a
         # system may start with them the way a node starts with another's tables
         self.db.executemany("INSERT OR IGNORE INTO plans (shape, plan) VALUES (?, ?)",
@@ -641,6 +658,8 @@ class SystemArm:
         is the order answers are preferred in. Slots are strict: a step's assertion must
         fill exactly the slots the taught one did, and each value sits in its own slot.
         A plan taught through history runs on it and keeps its steps' order in time."""
+        if plan.get("count"):
+            return self.count(fillers)
         history = plan.get("history", False)
         rows = self.rows(history)
         out: list[tuple[str, tuple[int, int]]] = []
@@ -682,6 +701,44 @@ class SystemArm:
         step(0, {}, -1)
         return out
 
+    def last_relations(self, anchor: str) -> dict[str, str]:
+        """Each thing the anchor was heard with as subject, and the last relation heard."""
+        last: dict[str, str] = {}
+        for r in self.rows():
+            if r["subject"] and r["object"] and same(anchor, r["subject"]):
+                last[r["object"]] = r["relation"]
+        return last
+
+    def held(self, anchor: str) -> list[str]:
+        """The things an anchor was last heard with as subject by a relation taught to
+        mean holding: a thing taken and then dropped is last heard dropped."""
+        last = self.last_relations(anchor)
+        holds = {r: y > n for r, y, n in self.db.execute("SELECT * FROM holds")}
+        return [o for o, rel in last.items() if holds.get(rel)]
+
+    def count(self, fillers: list[str]) -> list[tuple[str, tuple[int, int]]]:
+        """How many things the question's one filler holds, as a word."""
+        anchors = [norm(f) for f in fillers if norm(f)]
+        if len(anchors) != 1:
+            return []
+        n = len(self.held(anchors[0]))
+        return [("none" if n == 0 else NUMBERS[n] if n < len(NUMBERS) else str(n), (0, 0))]
+
+    def learn_holding(self, anchors: list[str], n: int) -> None:
+        """A taught count is evidence about which relations mean holding, where it is
+        unambiguous: a count of none says every relation the anchor was last heard with
+        lets go, and a count of all of them says every one holds."""
+        if len(anchors) != 1:
+            return
+        last = self.last_relations(anchors[0])
+        if not last or n not in (0, len(last)):
+            return
+        column = "yes" if n else "no"
+        for relation in set(last.values()):
+            self.db.execute("INSERT OR IGNORE INTO holds VALUES (?, 0, 0)", (relation,))
+            self.db.execute(f"UPDATE holds SET {column} = {column} + 1 WHERE relation = ?",
+                            (relation,))
+
     def taught_answer(self, question: str) -> str | None:
         """The answer of the best taught plan for the question's shape: the one whose
         predictions on later taught examples held most often, if it held more often than
@@ -714,6 +771,12 @@ class SystemArm:
         chains, history = self.chains_to(anchors, want), False
         if not chains:
             chains, history = self.chains_to(anchors, want, history=True), True
+        n = numeral(want)
+        if not chains and n is not None:
+            # an answer that is a number no fact holds is a count of something
+            self.learn_holding(anchors, n)
+            self.db.execute("INSERT OR IGNORE INTO learnt (shape, plan, hits, misses)"
+                            " VALUES (?, ?, 1, 0)", (shape, json.dumps({"count": True})))
         for chain in chains:
             plan = json.dumps(self.generalise(chain, fillers, want, history), sort_keys=True)
             self.db.execute("INSERT OR IGNORE INTO learnt (shape, plan, hits, misses)"

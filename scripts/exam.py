@@ -98,7 +98,7 @@ def main() -> None:
             known = (json.loads(Path(args.plans).read_text(encoding="utf-8"))
                      if name in ("planned", "searched") and args.plans and Path(args.plans).exists() else {})
 
-            def system(work, learnt, plans=name in ("planned", "searched"), known=known,
+            def system(work, learnt, holds=(), plans=name in ("planned", "searched"), known=known,
                        searched=name == "searched", asked=name == "asked"):
                 return SystemArm(work, ear, embedder, plans=plans, known_plans=known,
                                  planner=planner,
@@ -106,9 +106,9 @@ def main() -> None:
                                  searched=searched, asked=asked,
                                  shares=args.shares, context=args.context, moves=args.moves,
                                  taught=name == "taught", known_learnt=learnt,
-                                 binds=args.binds, cleans=args.cleans)
+                                 binds=args.binds, cleans=args.cleans, known_holds=holds)
 
-            learnt = []
+            learnt, holds = [], []
             if name == "taught":
                 # the teaching: practice houses heard a turn at a time, each question with
                 # an answer told with it; a negative has no answer to chain to and is not
@@ -116,7 +116,7 @@ def main() -> None:
                 for s in range(PRACTICE, PRACTICE + args.teach):
                     practice = generate_house(seed=s, n_facts=args.facts, n_turns=args.turns)
                     taught = Path(tempfile.mkdtemp(prefix="unfused-teach-"))
-                    arm = system(taught, learnt)
+                    arm = system(taught, learnt, holds)
                     asked_after = practice.questions_after()
                     for turn, text in enumerate(practice.turns):
                         arm.hear(turn, text)
@@ -128,11 +128,12 @@ def main() -> None:
 
                     db = sqlite3.connect(str(taught / "system.db"))
                     learnt = db.execute("SELECT shape, plan, hits, misses FROM learnt").fetchall()
+                    holds = db.execute("SELECT relation, yes, no FROM holds").fetchall()
                     db.close()
                     shutil.rmtree(taught, ignore_errors=True)
 
-            def open_arm(learnt=learnt):
-                return system(work, learnt)
+            def open_arm(learnt=learnt, holds=holds):
+                return system(work, learnt, holds)
         elif name == "linked":
             from unfused.linked import LinkedRecall
 

@@ -271,12 +271,13 @@ class SystemArm:
     def named(self, value: str) -> bool:
         """Whether a filler is a name: heard capitalised past a sentence's first word, or
         never heard in lower case. A sentence's first word is capitalised whatever it
-        is, so 'Candle moulds are in the attic' says nothing either way."""
+        is, so 'Candle moulds are in the attic' says nothing either way, and a number
+        has no case and is never a name."""
         pattern = re.compile(rf"\b{re.escape(value)}\b", re.I)
         seen = False
         for (text,) in self.db.execute("SELECT text FROM said"):
             for m in pattern.finditer(text):
-                if m.group(0)[:1].islower():
+                if not m.group(0)[:1].isupper():
                     return False
                 seen = True
                 if m.start() > 0:
@@ -791,7 +792,11 @@ class SystemArm:
                                          (shape,)).fetchall():
             found = self.follow(json.loads(plan), fillers)
             said = max(found, key=lambda f: f[1])[0] if found else ""
-            column = "hits" if said and same(norm(said) or "", want) else "misses"
+            # a number is the same number in either form: '1' is taught, 'one' is said
+            held = said and (same(norm(said) or "", want) or (
+                numeral(norm(said) or "") is not None
+                and numeral(norm(said) or "") == numeral(want)))
+            column = "hits" if held else "misses"
             self.db.execute(f"UPDATE learnt SET {column} = {column} + 1 WHERE rowid = ?",
                             (rid,))
         anchors = [norm(f) for f in fillers if norm(f)]

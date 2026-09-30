@@ -445,6 +445,7 @@ def test_a_count_of_people_counts_names_and_not_things_the_ear_made_subjects(tmp
     said = {
         "Hosior put the lanterns in the attic.": ("Hosior", "put", "lanterns", "attic"),
         "Candle moulds are in the attic.": ("candle moulds", "are", None, "attic"),
+        "There are 97 in the attic.": ("97", "in", None, "attic"),
         "Daleth put the candle moulds in the attic.": ("Daleth", "put", "candle moulds",
                                                        "attic"),
         "Rakrim put the jars in the dairy.": ("Rakrim", "put", "jars", "dairy"),
@@ -454,16 +455,18 @@ def test_a_count_of_people_counts_names_and_not_things_the_ear_made_subjects(tmp
     READINGS.update({k: [{"subject": a, "relation": r, "object": o, "place": p}]
                      for k, (a, r, o, p) in said.items()})
     teacher = SystemArm(tmp_path / "taught", TableEar(), HashEmbedder(), taught=True)
-    for turn, s in enumerate(list(said)[:3]):
+    for turn, s in enumerate(list(said)[:4]):
         teacher.hear(turn, s)
     teacher.teach("How many people keep things in the attic?", "2")
+    # told again, the plan says 'two' where '2' is taught, and that is a hit
+    teacher.teach("How many people keep things in the attic?", "2")
     learnt = teacher.db.execute("SELECT shape, plan, hits, misses FROM learnt").fetchall()
-    assert [p for _, p, _, _ in learnt if '"named": true' in p]
+    assert [p for _, p, h, m in learnt if '"named": true' in p and (h, m) == (2, 0)]
 
     pupil = SystemArm(tmp_path / "pupil", TableEar(), HashEmbedder(), taught=True,
                       known_learnt=[(s, p, h, m) for s, p, h, m in learnt
                                     if '"named": true' in p and '"holding": false' in p])
-    for turn, s in enumerate(list(said)[3:]):
+    for turn, s in enumerate(list(said)[4:]):
         pupil.hear(turn, s)
     assert pupil.answer(q("How many people keep things in the dairy?")) == "two"
 

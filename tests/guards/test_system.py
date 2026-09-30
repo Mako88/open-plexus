@@ -493,3 +493,26 @@ def test_a_step_naming_a_quantity_does_not_match_an_assertion_without_one(tmp_pa
     plan = {"steps": [{"filled": ["object", "subject"], "subject": "<0>", "quantity": "<1>",
                        "object": "?ans"}]}
     assert a.follow(plan, ["Mary", "3"]) == []
+
+
+COUSINS = {
+    "Ivo is Bren's cousin.": [{"subject": "Ivo", "relation": "is cousin of", "place": "Bren"}],
+    "Tam is Oda's cousin.": [{"subject": "Tam", "relation": "is cousin of", "object": "Oda"}],
+}
+
+
+def test_a_loose_step_meets_a_filler_the_ear_put_in_another_slot(tmp_path):
+    READINGS.update(COUSINS)
+    teacher = SystemArm(tmp_path / "taught", TableEar(), HashEmbedder(), taught=True)
+    teacher.hear(0, "Ivo is Bren's cousin.")
+    teacher.teach("Who is Ivo's cousin?", "Bren")
+    learnt = teacher.db.execute("SELECT shape, plan, hits, misses FROM learnt").fetchall()
+
+    def pupil(name, loose):
+        a = SystemArm(tmp_path / name, TableEar(), HashEmbedder(), taught=True,
+                      known_learnt=learnt, loose=loose)
+        a.hear(0, "Tam is Oda's cousin.")
+        return a.answer(q("Who is Tam's cousin?"))
+
+    assert pupil("strict", False) != "oda"
+    assert pupil("loose", True) == "oda"

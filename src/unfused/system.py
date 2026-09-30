@@ -108,7 +108,8 @@ class SystemArm:
                  asked: bool = False, shares: float = 0.8,
                  moves: bool = False, taught: bool = False,
                  known_learnt: list | None = None,
-                 cleans: bool = False, known_holds: list | None = None) -> None:
+                 cleans: bool = False, known_holds: list | None = None,
+                 loose: bool = False) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -133,6 +134,8 @@ class SystemArm:
         self.taught = taught
         # whether the ear's assertions are held to the words of their sentence
         self.cleans = cleans
+        # whether a taught step matches without depending on which slot the ear chose
+        self.loose = loose
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
@@ -154,7 +157,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "loose": self.loose, "depth": self.depth,
                 "hub": self.hub,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
@@ -626,6 +629,8 @@ class SystemArm:
         latest turn it rests on and then the turn of the step holding the answer, which
         is the order answers are preferred in. Slots are strict: a step's assertion must
         fill exactly the slots the taught one did, and each value sits in its own slot.
+        Loose, it must fill as many slots, a question's filler may sit in any of them,
+        and an unknown takes its taught slot or else the one slot left over.
         A plan taught through history runs on it and keeps its steps' order in time."""
         if plan.get("count"):
             return self.count(plan, fillers)
@@ -646,7 +651,14 @@ class SystemArm:
                 return
             s = plan["steps"][i]
             for r in rows:
-                if sorted(k for k in SLOTS if r[k] and k != "quantity") != s["filled"]:
+                filled = sorted(k for k in SLOTS if r[k] and k != "quantity")
+                if self.loose:
+                    if len(filled) == len(s["filled"]) and (new := self.loosely(s, r, bound, fillers)) is not None:
+                        turns.append(r["turn"])
+                        step(i + 1, new, max(latest, r["turn"]))
+                        turns.pop()
+                    continue
+                if filled != s["filled"]:
                     continue
                 new, ok = dict(bound), True
                 for k in SLOTS:
@@ -673,6 +685,58 @@ class SystemArm:
 
         step(0, {}, -1)
         return out
+
+    @staticmethod
+    def loosely(s: dict, r: dict, bound: dict, fillers: list[str]) -> dict | None:
+        """One taught step matched against a row without caring which slot the ear chose,
+        or None. A quantity stays in its slot, since a number is never a person or a
+        place. What is known (a question's filler, a variable already bound) takes the
+        slot holding it, its taught slot first; what is not takes its taught slot, or
+        the one slot nothing else took."""
+        new = dict(bound)
+        free = [k for k in SLOTS if r[k] and k != "quantity"]
+        tokens = [(k, t) for k, t in s.items() if k in SLOTS and isinstance(t, str)]
+
+        def value(t: str) -> str | None:
+            if (m := SLOT.match(t)):
+                idx = int(m.group(1))
+                return (norm(fillers[idx]) or "") if idx < len(fillers) else None
+            return new.get(t)
+
+        def holds(t: str, v: str) -> bool:
+            return same(value(t) or "", v) if SLOT.match(t) else new[t] == v
+
+        if (q := s.get("quantity")) is not None:
+            if r["quantity"] is None:
+                return None
+            if SLOT.match(q) or q in new:
+                if value(q) is None or not holds(q, r["quantity"]):
+                    return None
+            else:
+                new[q] = r["quantity"]
+        known = [(k, t) for k, t in tokens if k != "quantity" and (SLOT.match(t) or t in new)]
+        unknown = [(k, t) for k, t in tokens if k != "quantity" and (k, t) not in known]
+        for k, t in known:
+            if value(t) is None:
+                return None
+            hit = next((x for x in [k, *free] if x in free and holds(t, r[x])), None)
+            if hit is None:
+                return None
+            free.remove(hit)
+        for k, t in unknown:
+            if t in new:
+                # the same unknown in two slots of one step: the second must agree
+                hit = next((x for x in free if holds(t, r[x])), None)
+                if hit is None:
+                    return None
+                free.remove(hit)
+                continue
+            hit = k if k in free else free[0] if len(free) == 1 else None
+            if hit is None:
+                return None
+            new[t] = r[hit]
+            free.remove(hit)
+        return new
 
     def last_relations(self, anchor: str, at: str, counted: str) -> dict[str, str]:
         """Each value heard in slot `counted` of an assertion with the anchor in slot

@@ -1,0 +1,144 @@
+{
+ "kinds": {
+  "trade": {
+   "so": 27,
+   "sp": 2,
+   "s-": 1
+  },
+  "number": {
+   "ops": 10,
+   "opo": 7,
+   "osq": 6,
+   "spq": 4,
+   "oso": 2,
+   "sps": 1
+  },
+  "place": {
+   "sop": 21,
+   "-sp": 9
+  },
+  "colour": {
+   "so": 27,
+   "sp": 2,
+   "op": 1
+  },
+  "relation": {
+   "so-": 19,
+   "s--": 10,
+   "sp-": 1
+  }
+ },
+ "relations": {
+  "trade": {
+   "keeps": {
+    "so": 12,
+    "sp": 1,
+    "s-": 1
+   },
+   "sets": {
+    "so": 2
+   },
+   "grinds": {
+    "so": 3
+   },
+   "thatches": {
+    "so": 3
+   },
+   "dyes": {
+    "so": 4
+   },
+   "binds": {
+    "so": 2
+   },
+   "carves": {
+    "so": 1
+   },
+   "is a sort of": {
+    "sp": 1
+   }
+  },
+  "number": {
+   "in": {
+    "ops": 4
+   },
+   "are": {
+    "spq": 4,
+    "ops": 1,
+    "sps": 1
+   },
+   "has": {
+    "osq": 6,
+    "oso": 2,
+    "ops": 1
+   },
+   "counted": {
+    "opo": 7,
+    "ops": 2
+   },
+   "counts": {
+    "ops": 1
+   },
+   "is": {
+    "ops": 1
+   }
+  },
+  "place": {
+   "are": {
+    "-sp": 7
+   },
+   "keeps": {
+    "sop": 8
+   },
+   "put": {
+    "sop": 13,
+    "-sp": 1
+   },
+   "are daleth": {
+    "-sp": 1
+   }
+  },
+  "colour": {
+   "has colour": {
+    "so": 10
+   },
+   "painted": {
+    "op": 1
+   },
+   "are": {
+    "so": 13,
+    "sp": 1
+   },
+   "is a sort of ochre colour": {
+    "so": 1
+   },
+   "is": {
+    "so": 1
+   },
+   "is indigo": {
+    "sp": 1
+   },
+   "is indigo colour": {
+    "so": 1
+   },
+   "is a sort of": {
+    "so": 1
+   }
+  },
+  "relation": {
+   "is cousin of": {
+    "so-": 19,
+    "s--": 10,
+    "sp-": 1
+   }
+  }
+ },
+ "roles": {
+  "trade": "who, what",
+  "number": "thing, room, n",
+  "place": "who, thing, room",
+  "colour": "thing, colour",
+  "relation": "a, b, cousin"
+ },
+ "seeds": "1000,1001,1002",
+ "ear": "Qwen3.5-0.8B-Q8_0 (llama.cpp)"
+}

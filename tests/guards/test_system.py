@@ -484,3 +484,19 @@ def test_an_assertion_is_held_to_the_words_of_its_sentence():
     got = clean({"subject": "jars", "object": None, "place": "cellar", "quantity": "35"},
                 "There are 35 jars in the cellar.")
     assert got["quantity"] == "35"
+
+
+def test_a_thing_named_in_unheard_words_is_cut_from_the_shape_as_what_it_means(tmp_path):
+    READINGS["The walking sticks are verdigris."] = [
+        {"subject": "walking sticks", "relation": "has colour", "object": "verdigris"}]
+    ear = TableEar()
+    ear.ask = lambda question: {"asked": "object", "kind": "colour", "count": False,
+                                "assertion": {"subject": "canes", "relation": "has colour"}}
+    ear.choose = lambda prompt, options: options.index("walking sticks")
+    a = SystemArm(tmp_path, ear, HashEmbedder(), worded=True)
+    a.hear(0, "The walking sticks are verdigris.")
+    assert a.shape("What shade are the canes?") == ("What shade are the <0>?",
+                                                    ["walking sticks"])
+    # read once a question: the ear is not asked again
+    ear.ask = lambda question: (_ for _ in ()).throw(AssertionError(question))
+    assert a.shape("What shade are the canes?")[1] == ["walking sticks"]

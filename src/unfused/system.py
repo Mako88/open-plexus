@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS learnt (shape TEXT NOT NULL, plan TEXT NOT NULL,
                                   PRIMARY KEY (shape, plan));
 CREATE TABLE IF NOT EXISTS holds (relation TEXT PRIMARY KEY, yes INTEGER NOT NULL,
                                   no INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS marked (question TEXT PRIMARY KEY, fillers TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS kin (a TEXT NOT NULL, b TEXT NOT NULL, PRIMARY KEY (a, b));
 CREATE TABLE IF NOT EXISTS kinds (filler TEXT NOT NULL, kind TEXT NOT NULL,
                                   yes INTEGER NOT NULL, PRIMARY KEY (filler, kind));
@@ -108,7 +109,8 @@ class SystemArm:
                  asked: bool = False, shares: float = 0.8,
                  moves: bool = False, taught: bool = False,
                  known_learnt: list | None = None,
-                 cleans: bool = False, known_holds: list | None = None) -> None:
+                 cleans: bool = False, known_holds: list | None = None,
+                 worded: bool = False) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -133,6 +135,9 @@ class SystemArm:
         self.taught = taught
         # whether the ear's assertions are held to the words of their sentence
         self.cleans = cleans
+        # whether a question's things named in unheard words are marked by the ear and
+        # cut out of its shape as the heard names they mean
+        self.worded = worded
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
@@ -154,7 +159,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "worded": self.worded, "depth": self.depth,
                 "hub": self.hub,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
@@ -299,15 +304,49 @@ class SystemArm:
             "the same thing? If none is, answer -1.", options)
         return options[choice] if choice is not None else value
 
+    def marked(self, question: str) -> dict[str, str]:
+        """The things a question names in words the system has not heard, as the ear
+        reads them, each with the heard name it means: 'the canes' is the walking
+        sticks. Read and resolved once a question."""
+        row = self.db.execute("SELECT fillers FROM marked WHERE question = ?",
+                              (question,)).fetchone()
+        if row:
+            return json.loads(row[0])
+        read = self.ear.ask(question) or {}
+        fact = read.get("assertion") if isinstance(read.get("assertion"), dict) else {}
+        out = {}
+        for slot in SLOTS:
+            v = fact.get(slot)
+            if slot == read.get("asked") or not isinstance(v, str) or is_unknown(v):
+                continue
+            words = re.sub(r"^(the|a|an) ", "", v.strip(), flags=re.I)
+            if not words or not re.search(rf"\b{re.escape(words)}\b", question, re.I):
+                continue
+            meant = self.resolve(norm(words) or words, question)
+            if meant != (norm(words) or words):
+                out[words] = meant
+        self.db.execute("INSERT OR REPLACE INTO marked VALUES (?, ?)",
+                        (question, json.dumps(out)))
+        return out
+
     def shape(self, question: str) -> tuple[str, list[str]]:
         """The question with every filler it names cut out: a capitalised word past the
         first, or a name the system has heard. Two questions of one shape ask the same
-        thing about different things, so the plan for one is the plan for the other."""
+        thing about different things, so the plan for one is the plan for the other.
+        With `worded`, a thing named in words never heard ('the canes') is cut out too
+        where the ear marks it and it means a heard name, which stands in for it."""
         names = sorted((r[0] for r in self.db.execute("SELECT name FROM names")
                         if r[0] and len(r[0]) > 2), key=len, reverse=True)
         spans: list[tuple[int, int]] = []
+        meant: dict[tuple[int, int], str] = {}
+        if self.worded:
+            for words, name in self.marked(question).items():
+                m = re.search(rf"\b{re.escape(words)}\b", question, re.I)
+                if m:
+                    spans.append((m.start(), m.end()))
+                    meant[(m.start(), m.end())] = name
         for m in re.finditer(r"\b[A-Z][a-z]+(?:'s)?", question):
-            if m.start() > 0:
+            if m.start() > 0 and not any(a < m.end() and m.start() < b for a, b in spans):
                 spans.append((m.start(), m.start() + len(m.group(0).removesuffix("'s"))))
         for name in names:
             for m in re.finditer(rf"\b{re.escape(name)}\b", question, re.I):
@@ -316,7 +355,7 @@ class SystemArm:
         fillers, shape, at = [], "", 0
         for a, b in sorted(spans):
             shape += question[at:a] + f"<{len(fillers)}>"
-            fillers.append(question[a:b])
+            fillers.append(meant.get((a, b), question[a:b]))
             at = b
         return shape + question[at:], fillers
 

@@ -568,3 +568,15 @@ def test_a_relation_said_before_a_filler_joins_it_in_the_shape(tmp_path):
     assert shapes[False][0][0] != shapes[False][1][0]
     assert shapes[True] == [("Who is the cousin of the person who <0>?", ["clocks"]),
                             ("Who is the cousin of the person who <0>?", ["books"])]
+
+
+def test_a_loose_pass_never_overrules_a_strict_match(tmp_path):
+    READINGS.update(BABI)
+    READINGS["John got the milk."] = [{"subject": "John", "relation": "got", "object": "milk"}]
+    where = {"steps": [{"filled": ["place", "subject"], "subject": "<0>", "place": "?ans"}]}
+    learnt = [("Where is <0>?", json.dumps(where, sort_keys=True), 3, 0)]
+    a = SystemArm(tmp_path, TableEar(), HashEmbedder(), taught=True, known_learnt=learnt,
+                  loose=True)
+    a.hear(0, "John travelled to the kitchen.")
+    a.hear(1, "John got the milk.")
+    assert a.answer(q("Where is John?")) == "kitchen"

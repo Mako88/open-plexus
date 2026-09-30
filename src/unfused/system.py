@@ -649,11 +649,22 @@ class SystemArm:
         latest turn it rests on and then the turn of the step holding the answer, which
         is the order answers are preferred in. Slots are strict: a step's assertion must
         fill exactly the slots the taught one did, and each value sits in its own slot.
-        Loose, it must fill as many slots, a question's filler may sit in any of them,
-        and an unknown takes its taught slot or else the one slot left over.
+        Loose, a plan that binds nothing strictly is followed again with each step's
+        assertion filling as many slots, a question's filler in any of them, and an
+        unknown in its taught slot or else the one slot left over. Only then, because
+        a count of slots does not carry the relation: 'got the milk' and 'went to the
+        kitchen' both fill two.
         A plan taught through history runs on it and keeps its steps' order in time."""
         if plan.get("count"):
             return self.count(plan, fillers)
+        found = self.followed(plan, fillers, loosely=False)
+        if not found and self.loose:
+            found = self.followed(plan, fillers, loosely=True)
+        return found
+
+    def followed(self, plan: dict, fillers: list[str],
+                 loosely: bool) -> list[tuple[str, tuple[int, int]]]:
+        """One pass of `follow`, strict or loose."""
         history = plan.get("history", False)
         rows = self.rows(history)
         out: list[tuple[str, tuple[int, int]]] = []
@@ -672,8 +683,9 @@ class SystemArm:
             s = plan["steps"][i]
             for r in rows:
                 filled = sorted(k for k in SLOTS if r[k] and k != "quantity")
-                if self.loose:
-                    if len(filled) == len(s["filled"]) and (new := self.loosely(s, r, bound, fillers)) is not None:
+                if loosely:
+                    if (len(filled) == len(s["filled"])
+                            and (new := self.loosely(s, r, bound, fillers)) is not None):
                         turns.append(r["turn"])
                         step(i + 1, new, max(latest, r["turn"]))
                         turns.pop()

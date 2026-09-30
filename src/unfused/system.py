@@ -269,12 +269,19 @@ class SystemArm:
         return out
 
     def named(self, value: str) -> bool:
-        """Whether a filler was heard capitalised mid-sentence: a name."""
-        for (heard,) in self.db.execute("SELECT heard FROM assertions WHERE subject = ?"
-                                        " ORDER BY turn DESC LIMIT 1", (value,)):
-            m = re.search(rf"\b{re.escape(value)}\b", heard, re.I)
-            return bool(m and m.group(0)[:1].isupper())
-        return False
+        """Whether a filler is a name: heard capitalised past a sentence's first word, or
+        never heard in lower case. A sentence's first word is capitalised whatever it
+        is, so 'Candle moulds are in the attic' says nothing either way."""
+        pattern = re.compile(rf"\b{re.escape(value)}\b", re.I)
+        seen = False
+        for (text,) in self.db.execute("SELECT text FROM said"):
+            for m in pattern.finditer(text):
+                if m.group(0)[:1].islower():
+                    return False
+                seen = True
+                if m.start() > 0:
+                    return True
+        return seen
 
     def supersede(self, row: dict, turn: int, relation: str = "") -> None:
         """A later assertion that the same subject's same thing is somewhere else
@@ -714,7 +721,8 @@ class SystemArm:
         """How many values fill the plan's counted slot beside the question's one
         filler in its anchor slot, as a word. A plan that counts holding keeps only
         the values last heard with a relation taught to mean holding: a thing taken and
-        then dropped is last heard dropped."""
+        then dropped is last heard dropped. A plan that counts names keeps only values
+        heard capitalised: a small ear writes things where people should be."""
         anchors = [norm(f) for f in fillers if norm(f)]
         if len(anchors) != 1:
             return []
@@ -722,6 +730,8 @@ class SystemArm:
         if plan["holding"]:
             holds = {r: y > n for r, y, n in self.db.execute("SELECT * FROM holds")}
             last = {v: rel for v, rel in last.items() if holds.get(rel)}
+        if plan.get("named"):
+            last = {v: rel for v, rel in last.items() if self.named(v)}
         n = len(last)
         return [("none" if n == 0 else NUMBERS[n] if n < len(NUMBERS) else str(n), (0, 0))]
 
@@ -730,7 +740,8 @@ class SystemArm:
         first evidence about which relations mean holding, where it is unambiguous: none
         says every last relation lets go, and all of them says every one holds. Then
         every pair of slots, one holding the question's filler and one counted, becomes
-        a count plan wherever it counts `n`, with holding and without."""
+        a count plan wherever it counts `n`, with holding and without, and counting
+        names only and everything."""
         if len(anchors) != 1:
             return
         pairs = [(at, counted) for at in SLOTS for counted in SLOTS
@@ -747,8 +758,9 @@ class SystemArm:
         for at, counted in pairs:
             if not self.last_relations(anchors[0], at, counted):
                 continue
-            for holding in (False, True):
-                plan = {"count": True, "anchor": at, "counted": counted, "holding": holding}
+            for holding, named in ((False, False), (True, False), (False, True), (True, True)):
+                plan = {"count": True, "anchor": at, "counted": counted, "holding": holding,
+                        "named": named}
                 if numeral(self.count(plan, anchors)[0][0]) == n:
                     self.db.execute("INSERT OR IGNORE INTO learnt (shape, plan, hits, misses)"
                                     " VALUES (?, ?, 1, 0)",

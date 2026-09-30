@@ -367,6 +367,18 @@ def test_a_plan_taught_on_one_story_answers_another_with_other_words(tmp_path):
     assert pupil.answer(q("Where is the football?")) == "kitchen"
 
 
+def test_a_plan_that_binds_nothing_is_not_charged_a_miss(tmp_path):
+    READINGS.update(BABI)
+    teacher = SystemArm(tmp_path, TableEar(), HashEmbedder(), taught=True)
+    for turn, s in enumerate(["Mary got the milk.", "Mary moved to the hallway."]):
+        teacher.hear(turn, s)
+    teacher.teach("Where is the milk?", "hallway")
+    # John was never heard anywhere, so the plan binds nothing and says nothing
+    teacher.hear(2, "John got the football.")
+    teacher.teach("Where is the football?", "kitchen")
+    assert teacher.db.execute("SELECT hits, misses FROM learnt").fetchall() == [(1, 0)]
+
+
 def test_a_plan_taught_through_history_keeps_before_as_an_order_in_time(tmp_path):
     READINGS.update(BABI)
     READINGS.update({

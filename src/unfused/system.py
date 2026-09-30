@@ -108,8 +108,7 @@ class SystemArm:
                  asked: bool = False, shares: float = 0.8,
                  moves: bool = False, taught: bool = False,
                  known_learnt: list | None = None,
-                 cleans: bool = False, known_holds: list | None = None,
-                 hubs_taught: bool = False) -> None:
+                 cleans: bool = False, known_holds: list | None = None) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -134,8 +133,6 @@ class SystemArm:
         self.taught = taught
         # whether the ear's assertions are held to the words of their sentence
         self.cleans = cleans
-        # whether a taught example's chain may pass through a hub
-        self.hubs_taught = hubs_taught
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
@@ -157,7 +154,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "hubs_taught": self.hubs_taught, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "depth": self.depth,
                 "hub": self.hub,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
@@ -555,14 +552,13 @@ class SystemArm:
 
     # -- learning from taught examples ---------------------------------------
 
-    def chains_to(self, anchors: list[str], answer: str, history: bool = False,
-                  hub: int | None = None) -> list[list[dict]]:
+    def chains_to(self, anchors: list[str], answer: str,
+                  history: bool = False) -> list[list[dict]]:
         """The shortest chains of assertions, each sharing a filler with the next, that
         touch every anchor and end on one holding the answer. With `history` the chain
         may pass through what has been replaced; a filler is still a hub by how many
         things it is in now, since everyone's past visits to a room are no evidence
-        that the room links them. `hub` overrides the system's own limit on it."""
-        hub = self.hub if hub is None else hub
+        that the room links them."""
         rows = self.rows(history)
         fill = [[r[k] for k in SLOTS if r[k]] for r in rows]
         by_filler: dict[str, list[int]] = {}
@@ -586,7 +582,7 @@ class SystemArm:
             grown = []
             for p in paths:
                 links = [f for f in fill[p[-1]]
-                         if f in anchored or degree.get(f, 0) <= hub]
+                         if f in anchored or degree.get(f, 0) <= self.hub]
                 for j in sorted({j for f in links for j in by_filler[f]} - set(p)):
                     grown.append(p + (j,))
             if len(grown) > self.frontier:
@@ -769,12 +765,9 @@ class SystemArm:
             self.db.execute(f"UPDATE learnt SET {column} = {column} + 1 WHERE rowid = ?",
                             (rid,))
         anchors = [norm(f) for f in fillers if norm(f)]
-        # the answer is known, so a chain through a hub that ends on it is kept and
-        # later teaching judges it; only the frontier bounds the search
-        hub = self.frontier if self.hubs_taught else self.hub
-        chains, history = self.chains_to(anchors, want, hub=hub), False
+        chains, history = self.chains_to(anchors, want), False
         if not chains:
-            chains, history = self.chains_to(anchors, want, history=True, hub=hub), True
+            chains, history = self.chains_to(anchors, want, history=True), True
         n = numeral(want)
         if not chains and n is not None:
             self.learn_count(shape, anchors, n)

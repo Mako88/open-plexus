@@ -54,8 +54,6 @@ def main() -> None:
                         "what it learns")
     p.add_argument("--moves", action="store_true")
     p.add_argument("--cleans", action="store_true")
-    p.add_argument("--hubs-taught", action="store_true",
-                   help="a taught example's chain may pass through a hub")
     p.add_argument("--teach", type=int, default=0,
                    help="practice houses, other seeds than any tested, told with their "
                         "answers before the test: `taught` learns plans from them")
@@ -106,8 +104,7 @@ def main() -> None:
                                  searched=searched, asked=asked,
                                  shares=args.shares, moves=args.moves,
                                  taught=name == "taught", known_learnt=learnt,
-                                 cleans=args.cleans, known_holds=holds,
-                                 hubs_taught=args.hubs_taught)
+                                 cleans=args.cleans, known_holds=holds)
 
             learnt, holds = [], []
             if name == "taught":

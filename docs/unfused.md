@@ -50,10 +50,13 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   where a thing is, a carried thing goes with its carrier. The exit is taken again once
   Phase 5 has them.
 - **Phase 5 — Learning rules, and operations over facts.** IN PROGRESS 2026-09-29, on the
-  0.8B only; the 9B is off the card. Next, in order: plans and rules learnt from taught
-  examples (a question with its answer, the chain that links them, generalised); pronouns
-  bound by the system to what is in focus, compared with the ear shown the sentences before;
-  meaning as properties and concepts; correction as an input.
+  0.8B only; the 9B is off the card. Plans learnt from taught examples are built (arm
+  `taught`), and on facts held to their sentence (`cleans`) they answer bAbI tasks 1 and 2 at
+  0.93 and 0.77 with no model planning. Next, in order: order in time ('where was X before
+  Y', task 3) and counting over gives and drops (task 7), as step kinds a taught plan can
+  hold; pronouns bound by the system (`binds`, built, unmeasured) against the ear shown
+  context (`context`, built, unmeasured); `cleans` and `moves` on the house; taught plans on
+  the house from practice questions; correction as an input.
 - **Phase 6 — Importance and forgetting.**
 - **Phase 7 — Other senses.** A moment arrives across every modality, and what a sense
   perceives is kept beside what it asserts.

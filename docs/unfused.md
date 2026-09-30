@@ -53,13 +53,13 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   0.8B only; the 9B is off the card. Plans learnt from taught examples (arm `taught`) on
   facts held to their sentence (`cleans`), with order in time and learnt counts as step
   kinds, answer bAbI tasks 1, 2, 3 and 7 with no model planning, and on the house they are
-  taught from practice houses and beat the system's own planning on seeds 1 to 3. Next, in
-  order: a taught step matched without depending on which slot the ear chose for a filler
-  (the house's `chain3` cousin plan is learnt with the cousin as a place and meets it as an
-  object), kept from splitting plans on noise, which is why slots were made strict; a trade
-  kept out of a question's shape, so the person who repairs clocks and the person who binds
-  books share a plan; oblique questions naming things in unheard words; correction as an
-  input.
+  taught from practice houses and beat the system's own planning on seeds 1 to 3. A plan
+  that binds nothing strictly is followed loosely, so a filler meets its step in whichever
+  slot the ear chose. Next, in order: a taught plan that binds nothing hands the question to
+  the next best (`--falls`); a trade kept out of a question's shape, so the person who
+  repairs clocks and the person who binds books share a plan (`--joins`); a count read
+  wherever the ear put the number, which it puts outside `quantity` in two tellings of
+  three; oblique questions naming things in unheard words; correction as an input.
 - **Phase 6 — Importance and forgetting.**
 - **Phase 7 — Other senses.** A moment arrives across every modality, and what a sense
   perceives is kept beside what it asserts.

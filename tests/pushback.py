@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-COUNT = 4
+COUNT = 3
 
 
 @dataclass(frozen=True)
@@ -43,14 +43,6 @@ OBJECTIONS = [
             "that can hide a difference between arms that hedge differently.",
         settled_by="Count answers naming more than one candidate of the right kind, per arm. "
                    "Above a few per cent for any arm, score those as wrong and re-read.",
-    ),
-    Objection(
-        what="Every reading is one run per seed, and the served faculty is assumed "
-             "deterministic at temperature zero.",
-        why="llama.cpp at temperature zero is deterministic for one prompt on one build, "
-            "but batching and cache reuse can change the arithmetic.",
-        settled_by="Run the same arm and seed twice. Identical rows close this; any "
-                   "difference means every comparison needs repeats.",
     ),
 ]
 

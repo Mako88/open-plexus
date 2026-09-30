@@ -58,7 +58,6 @@ def main() -> None:
     p.add_argument("--planner-judges", action="store_true")
     p.add_argument("--moves", action="store_true")
     p.add_argument("--cleans", action="store_true")
-    p.add_argument("--loose", action="store_true")
     p.add_argument("--falls", action="store_true")
     p.add_argument("--joins", action="store_true")
     p.add_argument("--teach", type=int, default=0,
@@ -90,7 +89,7 @@ def main() -> None:
                          planner=planner, judge=planner if args.planner_judges else None,
                          asked=name == "asked", moves=args.moves,
                          taught=name == "taught", known_learnt=learnt,
-                         cleans=args.cleans, known_holds=holds, loose=args.loose,
+                         cleans=args.cleans, known_holds=holds,
                                  falls=args.falls, joins=args.joins)
 
     def export(work, table_sql):
@@ -152,7 +151,7 @@ def main() -> None:
             "faculty": faculty.name if faculty and name != "blind" else None,
             "planner": args.planner_served if args.planner_port else None,
             "planner_judges": args.planner_judges,
-            "moves": args.moves, "teach": args.teach, "cleans": args.cleans, "loose": args.loose, "falls": args.falls, "joins": args.joins, "learnt": len(learnt),
+            "moves": args.moves, "teach": args.teach, "cleans": args.cleans, "falls": args.falls, "joins": args.joins, "learnt": len(learnt),
             "world": {"tasks": {str(t): TASKS[t] for t in tasks}, "stories": args.stories,
                       "fingerprint": fingerprint([w for t in tasks for w in worlds[t]]),
                       "questions": len(rows)},

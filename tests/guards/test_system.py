@@ -510,14 +510,10 @@ def test_a_loose_step_meets_a_filler_the_ear_put_in_another_slot(tmp_path):
     teacher.teach("Who is Ivo's cousin?", "Bren")
     learnt = teacher.db.execute("SELECT shape, plan, hits, misses FROM learnt").fetchall()
 
-    def pupil(name, loose):
-        a = SystemArm(tmp_path / name, TableEar(), HashEmbedder(), taught=True,
-                      known_learnt=learnt, loose=loose)
-        a.hear(0, "Tam is Oda's cousin.")
-        return a.answer(q("Who is Tam's cousin?"))
-
-    assert pupil("strict", False) != "oda"
-    assert pupil("loose", True) == "oda"
+    pupil = SystemArm(tmp_path / "pupil", TableEar(), HashEmbedder(), taught=True,
+                      known_learnt=learnt)
+    pupil.hear(0, "Tam is Oda's cousin.")
+    assert pupil.answer(q("Who is Tam's cousin?")) == "oda"
 
 
 def test_cleaning_keeps_a_name_said_in_the_possessive():
@@ -531,8 +527,9 @@ def test_cleaning_keeps_a_name_said_in_the_possessive():
 def test_a_falling_plan_that_binds_nothing_hands_the_question_to_the_next(tmp_path):
     READINGS.update(COUSINS)
     shape = "Who is <0>'s cousin?"
-    as_object = {"steps": [{"filled": ["object", "subject"], "subject": "<0>",
-                            "object": "?ans"}]}
+    # three slots: binds nothing on a two-slot telling, strictly or loosely
+    as_object = {"steps": [{"filled": ["object", "place", "subject"], "subject": "<0>",
+                            "object": "?ans", "place": "?v0"}]}
     as_place = {"steps": [{"filled": ["place", "subject"], "subject": "<0>",
                            "place": "?ans"}]}
     learnt = [(shape, json.dumps(as_object, sort_keys=True), 3, 0),
@@ -575,8 +572,7 @@ def test_a_loose_pass_never_overrules_a_strict_match(tmp_path):
     READINGS["John got the milk."] = [{"subject": "John", "relation": "got", "object": "milk"}]
     where = {"steps": [{"filled": ["place", "subject"], "subject": "<0>", "place": "?ans"}]}
     learnt = [("Where is <0>?", json.dumps(where, sort_keys=True), 3, 0)]
-    a = SystemArm(tmp_path, TableEar(), HashEmbedder(), taught=True, known_learnt=learnt,
-                  loose=True)
+    a = SystemArm(tmp_path, TableEar(), HashEmbedder(), taught=True, known_learnt=learnt)
     a.hear(0, "John travelled to the kitchen.")
     a.hear(1, "John got the milk.")
     assert a.answer(q("Where is John?")) == "kitchen"

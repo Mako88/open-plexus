@@ -109,7 +109,7 @@ class SystemArm:
                  moves: bool = False, taught: bool = False,
                  known_learnt: list | None = None,
                  cleans: bool = False, known_holds: list | None = None,
-                 loose: bool = False, falls: bool = False,
+                 falls: bool = False,
                  joins: bool = False) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
@@ -135,8 +135,6 @@ class SystemArm:
         self.taught = taught
         # whether the ear's assertions are held to the words of their sentence
         self.cleans = cleans
-        # whether a taught step matches without depending on which slot the ear chose
-        self.loose = loose
         # whether a taught plan that binds nothing hands the question to the next best
         self.falls = falls
         # whether a relation said just before a question's filler is cut with it
@@ -162,7 +160,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "loose": self.loose, "falls": self.falls, "joins": self.joins, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "falls": self.falls, "joins": self.joins, "depth": self.depth,
                 "hub": self.hub,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
@@ -649,7 +647,7 @@ class SystemArm:
         latest turn it rests on and then the turn of the step holding the answer, which
         is the order answers are preferred in. Slots are strict: a step's assertion must
         fill exactly the slots the taught one did, and each value sits in its own slot.
-        Loose, a plan that binds nothing strictly is followed again with each step's
+        A plan that binds nothing strictly is followed again with each step's
         assertion filling as many slots, a question's filler in any of them, and an
         unknown in its taught slot or else the one slot left over. Only then, because
         a count of slots does not carry the relation: 'got the milk' and 'went to the
@@ -658,7 +656,7 @@ class SystemArm:
         if plan.get("count"):
             return self.count(plan, fillers)
         found = self.followed(plan, fillers, loosely=False)
-        if not found and self.loose:
+        if not found:
             found = self.followed(plan, fillers, loosely=True)
         return found
 
@@ -724,7 +722,7 @@ class SystemArm:
         or None. A quantity stays in its slot, since a number is never a person or a
         place. What is known (a question's filler, a variable already bound) takes the
         slot holding it, its taught slot first; what is not takes its taught slot, or
-        the one slot nothing else took."""
+        the one slot nothing else took, and never a value the plan already names."""
         new = dict(bound)
         free = [k for k in SLOTS if r[k] and k != "quantity"]
         tokens = [(k, t) for k, t in s.items() if k in SLOTS and isinstance(t, str)]
@@ -755,6 +753,9 @@ class SystemArm:
             if hit is None:
                 return None
             free.remove(hit)
+        # an unknown never binds what the plan already names: loosely, 'John got the
+        # football' would answer where John went with the football
+        named = [v for v in [*(norm(f) or "" for f in fillers), *new.values()] if v]
         for k, t in unknown:
             if t in new:
                 # the same unknown in two slots of one step: the second must agree
@@ -764,7 +765,7 @@ class SystemArm:
                 free.remove(hit)
                 continue
             hit = k if k in free else free[0] if len(free) == 1 else None
-            if hit is None:
+            if hit is None or any(same(v, r[hit]) for v in named):
                 return None
             new[t] = r[hit]
             free.remove(hit)

@@ -109,7 +109,7 @@ class SystemArm:
                  moves: bool = False, taught: bool = False,
                  known_learnt: list | None = None,
                  cleans: bool = False, known_holds: list | None = None,
-                 loose: bool = False) -> None:
+                 loose: bool = False, falls: bool = False) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -136,6 +136,8 @@ class SystemArm:
         self.cleans = cleans
         # whether a taught step matches without depending on which slot the ear chose
         self.loose = loose
+        # whether a taught plan that binds nothing hands the question to the next best
+        self.falls = falls
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
@@ -157,7 +159,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "loose": self.loose, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "loose": self.loose, "falls": self.falls, "depth": self.depth,
                 "hub": self.hub,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
@@ -801,17 +803,19 @@ class SystemArm:
     def taught_answer(self, question: str) -> str | None:
         """The answer of the best taught plan for the question's shape: the one whose
         predictions on later taught examples held most often, if it held more often than
-        it failed."""
+        it failed. Falling, a plan that binds nothing says nothing, and the next best
+        is asked."""
         shape, fillers = self.shape(question)
-        best = self.db.execute(
+        ranked = self.db.execute(
             "SELECT plan FROM learnt WHERE shape = ? AND hits > misses"
-            " ORDER BY hits - misses DESC, hits DESC LIMIT 1", (shape,)).fetchone()
-        if not best:
+            " ORDER BY hits - misses DESC, hits DESC", (shape,)).fetchall()
+        if not ranked:
             return None
-        found = self.follow(json.loads(best[0]), fillers)
-        if not found:
-            return "I don't know."
-        return max(found, key=lambda f: f[1])[0]
+        for (plan,) in ranked if self.falls else ranked[:1]:
+            found = self.follow(json.loads(plan), fillers)
+            if found:
+                return max(found, key=lambda f: f[1])[0]
+        return "I don't know."
 
     def teach(self, question: str, answer: str) -> None:
         """A question told with its answer. Every plan already taught for the question's

@@ -4,6 +4,8 @@ No model runs here: each sentence's assertions and each question's query are
 written out by hand, so a failure is the matcher's and never an ear's.
 """
 
+import json
+
 from unfused.exam.world import Question
 from unfused.store import HashEmbedder
 from unfused.system import SystemArm
@@ -524,3 +526,23 @@ def test_cleaning_keeps_a_name_said_in_the_possessive():
     row = {"subject": "lanterns", "object": "drael", "place": "pantry", "quantity": None}
     assert SystemArm.clean(row, "The lanterns are Drael's, and they live in the pantry.")[
         "object"] == "drael"
+
+
+def test_a_falling_plan_that_binds_nothing_hands_the_question_to_the_next(tmp_path):
+    READINGS.update(COUSINS)
+    shape = "Who is <0>'s cousin?"
+    as_object = {"steps": [{"filled": ["object", "subject"], "subject": "<0>",
+                            "object": "?ans"}]}
+    as_place = {"steps": [{"filled": ["place", "subject"], "subject": "<0>",
+                           "place": "?ans"}]}
+    learnt = [(shape, json.dumps(as_object, sort_keys=True), 3, 0),
+              (shape, json.dumps(as_place, sort_keys=True), 2, 0)]
+
+    def pupil(name, falls):
+        a = SystemArm(tmp_path / name, TableEar(), HashEmbedder(), taught=True,
+                      known_learnt=learnt, falls=falls)
+        a.hear(0, "Ivo is Bren's cousin.")
+        return a.answer(q("Who is Ivo's cousin?"))
+
+    assert pupil("first", False) != "bren"
+    assert pupil("falls", True) == "bren"

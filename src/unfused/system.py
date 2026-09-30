@@ -37,9 +37,6 @@ from .exam.world import Question
 SLOTS = ("subject", "object", "place", "quantity")
 NULLS = {"", "none", "null", "n/a", "unknown", "nothing"}
 ARTICLES = ("the ", "a ", "an ", "some ", "all the ", "all ")
-PEOPLE = {"he", "she", "they", "him", "her", "them"}
-THINGS = {"it"}
-PRONOUNS = PEOPLE | THINGS | {"there"}
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS assertions (
@@ -108,9 +105,9 @@ class SystemArm:
                  relations_shown: int = 30, plans: bool = False,
                  known_plans: dict | None = None, planner=None, judge=None,
                  searched: bool = False, depth: int = 3, frontier: int = 20000, hub: int = 4,
-                 asked: bool = False, shares: float = 0.8, context: int = 0,
+                 asked: bool = False, shares: float = 0.8,
                  moves: bool = False, taught: bool = False,
-                 known_learnt: list | None = None, binds: bool = False,
+                 known_learnt: list | None = None,
                  cleans: bool = False, known_holds: list | None = None) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
@@ -130,14 +127,10 @@ class SystemArm:
         # how closely two wordings' properties must match for a verdict about one to
         # answer for the other; 0 asks the judge about every pair
         self.shares = shares
-        # how many sentences before one the ear sees when reading it
-        self.context = context
         # whether a subject heard somewhere is no longer where it was heard before
         self.moves = moves
         # whether a question is answered first by what was taught for its shape
         self.taught = taught
-        # whether a pronoun the ear wrote as heard is bound by the system
-        self.binds = binds
         # whether the ear's assertions are held to the words of their sentence
         self.cleans = cleans
         self.embedder = embedder
@@ -161,7 +154,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "shares": self.shares, "context": self.context, "moves": self.moves, "taught": self.taught, "binds": self.binds, "cleans": self.cleans, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "depth": self.depth,
                 "hub": self.hub,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
@@ -183,18 +176,13 @@ class SystemArm:
         return [r[0] for r in rows if r[0]]
 
     def read(self, text: str) -> list[dict]:
-        """The ear's reading of a sentence in the context of the ones just before it,
-        once: the same words after the same words are the same assertions."""
-        before = [r[0] for r in self.db.execute(
-            "SELECT text FROM said ORDER BY turn DESC LIMIT ?", (self.context,))][::-1]
-        key = "\n".join(before + [text])
+        """The ear's reading of a sentence, once: the same words are the same assertions."""
         row = self.db.execute("SELECT assertions FROM readings WHERE text = ?",
-                              (key,)).fetchone()
+                              (text,)).fetchone()
         if row:
             return json.loads(row[0])
-        assertions = (self.ear.read(text, self.relations(), before, literal=True)
-                      if self.binds else self.ear.read(text, self.relations(), before))
-        self.db.execute("INSERT INTO readings VALUES (?, ?)", (key, json.dumps(assertions)))
+        assertions = self.ear.read(text, self.relations())
+        self.db.execute("INSERT INTO readings VALUES (?, ?)", (text, json.dumps(assertions)))
         return assertions
 
     def hear(self, turn: int, text: str) -> None:
@@ -205,8 +193,6 @@ class SystemArm:
             relation = norm(a.get("relation"))
             if self.cleans:
                 row = self.clean(row, text)
-            if self.binds:
-                row = self.bind(row)
             if not row["subject"] or not relation:
                 continue
             self.supersede(row, turn, relation)
@@ -241,31 +227,6 @@ class SystemArm:
             out["place"] = norm(re.sub(r"^(back )?(to|into|in|at|on|from) ", "", out["place"]))
         if out["object"] and out["place"] and same(out["object"], out["place"]):
             out["object"] = None
-        return out
-
-    def bind(self, row: dict) -> dict:
-        """A pronoun the ear wrote as heard, bound to what is most recently in focus:
-        'there' to the last place heard, 'he', 'she' or 'they' to the last named
-        subject, 'it' to the last object. The simplest form of what centering theory
-        calls the entity in focus, and the system's work rather than the ear's."""
-        def last(column: str, named: bool = False) -> str | None:
-            for (v,) in self.db.execute(
-                    f"SELECT {column} FROM assertions WHERE {column} IS NOT NULL"
-                    " ORDER BY turn DESC, id DESC"):
-                if v in PRONOUNS:
-                    continue
-                if not named or self.named(v):
-                    return v
-            return None
-
-        out = dict(row)
-        for k, v in row.items():
-            if v == "there":
-                out[k] = last("place") or v
-            elif v in PEOPLE:
-                out[k] = last("subject", named=True) or v
-            elif v in THINGS:
-                out[k] = last("object") or v
         return out
 
     def named(self, value: str) -> bool:

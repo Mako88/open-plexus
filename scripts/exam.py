@@ -52,9 +52,7 @@ def main() -> None:
     p.add_argument("--plans", default=None,
                    help="a JSON file of plans by shape: `planned` starts with them and adds "
                         "what it learns")
-    p.add_argument("--context", type=int, default=0)
     p.add_argument("--moves", action="store_true")
-    p.add_argument("--binds", action="store_true")
     p.add_argument("--cleans", action="store_true")
     p.add_argument("--teach", type=int, default=0,
                    help="practice houses, other seeds than any tested, told with their "
@@ -104,9 +102,9 @@ def main() -> None:
                                  planner=planner,
                                  judge=planner if args.planner_judges else None,
                                  searched=searched, asked=asked,
-                                 shares=args.shares, context=args.context, moves=args.moves,
+                                 shares=args.shares, moves=args.moves,
                                  taught=name == "taught", known_learnt=learnt,
-                                 binds=args.binds, cleans=args.cleans, known_holds=holds)
+                                 cleans=args.cleans, known_holds=holds)
 
             learnt, holds = [], []
             if name == "taught":

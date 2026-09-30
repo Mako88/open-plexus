@@ -53,9 +53,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   0.8B only; the 9B is off the card. Plans learnt from taught examples (arm `taught`) on
   facts held to their sentence (`cleans`), with order in time and learnt counts as step
   kinds, answer bAbI tasks 1, 2, 3 and 7 with no model planning, and on the house they are
-  taught from practice houses and beat the system's own planning. Next, in order: pronouns
-  bound by the system (`binds`) against the ear shown context (`context`), both measured on
-  the house; why no taught plan holds for the house's `chain3`; correction as an input.
+  taught from practice houses and beat the system's own planning. Next, in order: why no
+  taught plan holds for the house's `chain3`, whose cousin shape is taught fifty times in
+  five practice houses; a trade kept out of a question's shape, so the person who repairs
+  clocks and the person who binds books share a plan; correction as an input.
 - **Phase 6 — Importance and forgetting.**
 - **Phase 7 — Other senses.** A moment arrives across every modality, and what a sense
   perceives is kept beside what it asserts.

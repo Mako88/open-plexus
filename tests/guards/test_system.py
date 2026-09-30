@@ -52,7 +52,7 @@ class TableEar:
 
     name = "table"
 
-    def read(self, sentence, relations=None, before=None, literal=False):
+    def read(self, sentence, relations=None):
         return READINGS.get(sentence, [])
 
     def rewrite(self, question):
@@ -336,16 +336,6 @@ def test_a_subject_heard_somewhere_new_is_no_longer_where_it_was(tmp_path):
     assert arm(tmp_path / "counts", 7).answer(q("jars in the cellar")) == "35"
 
 
-def test_the_ear_is_shown_the_sentences_before(tmp_path):
-    seen = []
-    ear = TableEar()
-    ear.read = lambda s, relations=None, before=None: seen.append(before) or []
-    a = SystemArm(tmp_path, ear, HashEmbedder(), context=2)
-    for turn, s in enumerate(["one.", "two.", "three."]):
-        a.hear(turn, s)
-    assert seen == [[], ["one."], ["one.", "two."]]
-
-
 BABI = {
     "Mary got the milk.": [{"subject": "Mary", "relation": "got", "object": "milk"}],
     "Mary moved to the hallway.": [
@@ -469,20 +459,6 @@ def test_a_count_of_people_counts_names_and_not_things_the_ear_made_subjects(tmp
     for turn, s in enumerate(list(said)[4:]):
         pupil.hear(turn, s)
     assert pupil.answer(q("How many people keep things in the dairy?")) == "two"
-
-
-def test_the_system_binds_there_and_she_to_what_is_in_focus(tmp_path):
-    READINGS.update({
-        "Mary went to the kitchen.": [
-            {"subject": "Mary", "relation": "went to", "place": "kitchen"}],
-        "She got the milk there.": [
-            {"subject": "she", "relation": "got", "object": "milk", "place": "there"}],
-    })
-    a = SystemArm(tmp_path, TableEar(), HashEmbedder(), binds=True)
-    a.hear(0, "Mary went to the kitchen.")
-    a.hear(1, "She got the milk there.")
-    got = [r for r in a.rows() if r["relation"] == "got"][0]
-    assert (got["subject"], got["place"]) == ("mary", "kitchen")
 
 
 def test_an_assertion_is_held_to_the_words_of_its_sentence():

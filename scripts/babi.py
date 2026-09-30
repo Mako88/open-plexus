@@ -56,9 +56,7 @@ def main() -> None:
     p.add_argument("--planner-port", type=int, default=None)
     p.add_argument("--planner-served", default=None)
     p.add_argument("--planner-judges", action="store_true")
-    p.add_argument("--context", type=int, default=0)
     p.add_argument("--moves", action="store_true")
-    p.add_argument("--binds", action="store_true")
     p.add_argument("--cleans", action="store_true")
     p.add_argument("--teach", type=int, default=0,
                    help="training stories a task told with their answers before the test")
@@ -87,8 +85,8 @@ def main() -> None:
         from unfused.system import SystemArm
         return SystemArm(work, ear, embedder, plans=name == "planned", known_plans=plans,
                          planner=planner, judge=planner if args.planner_judges else None,
-                         asked=name == "asked", context=args.context, moves=args.moves,
-                         taught=name == "taught", known_learnt=learnt, binds=args.binds,
+                         asked=name == "asked", moves=args.moves,
+                         taught=name == "taught", known_learnt=learnt,
                          cleans=args.cleans, known_holds=holds)
 
     def export(work, table_sql):
@@ -149,8 +147,8 @@ def main() -> None:
             "kind": "babi", "arm": name, "taken_at": taken, "note": args.note,
             "faculty": faculty.name if faculty and name != "blind" else None,
             "planner": args.planner_served if args.planner_port else None,
-            "planner_judges": args.planner_judges, "context": args.context,
-            "moves": args.moves, "teach": args.teach, "binds": args.binds, "cleans": args.cleans, "learnt": len(learnt),
+            "planner_judges": args.planner_judges,
+            "moves": args.moves, "teach": args.teach, "cleans": args.cleans, "learnt": len(learnt),
             "world": {"tasks": {str(t): TASKS[t] for t in tasks}, "stories": args.stories,
                       "fingerprint": fingerprint([w for t in tasks for w in worlds[t]]),
                       "questions": len(rows)},

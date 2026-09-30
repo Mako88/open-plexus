@@ -54,8 +54,6 @@ def main() -> None:
                         "what it learns")
     p.add_argument("--moves", action="store_true")
     p.add_argument("--cleans", action="store_true")
-    p.add_argument("--worded", action="store_true",
-                   help="things a question names in unheard words are cut from its shape")
     p.add_argument("--teach", type=int, default=0,
                    help="practice houses, other seeds than any tested, told with their "
                         "answers before the test: `taught` learns plans from them")
@@ -106,8 +104,7 @@ def main() -> None:
                                  searched=searched, asked=asked,
                                  shares=args.shares, moves=args.moves,
                                  taught=name == "taught", known_learnt=learnt,
-                                 cleans=args.cleans, known_holds=holds,
-                                 worded=args.worded)
+                                 cleans=args.cleans, known_holds=holds)
 
             learnt, holds = [], []
             if name == "taught":

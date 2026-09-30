@@ -692,7 +692,11 @@ class SystemArm:
                     token = s.get(k)
                     if token is None:
                         continue
-                    if (m := SLOT.match(token)):
+                    if r[k] is None:
+                        # the quantity is not among the filled slots, so a step naming
+                        # one can meet an assertion without it
+                        ok = False
+                    elif (m := SLOT.match(token)):
                         idx = int(m.group(1))
                         ok = idx < len(fillers) and same(norm(fillers[idx]) or "", r[k])
                     elif token in new:

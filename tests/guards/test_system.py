@@ -500,3 +500,12 @@ def test_a_thing_named_in_unheard_words_is_cut_from_the_shape_as_what_it_means(t
     # read once a question: the ear is not asked again
     ear.ask = lambda question: (_ for _ in ()).throw(AssertionError(question))
     assert a.shape("What shade are the canes?")[1] == ["walking sticks"]
+
+
+def test_a_step_naming_a_quantity_does_not_match_an_assertion_without_one(tmp_path):
+    READINGS.update(BABI)
+    a = SystemArm(tmp_path, TableEar(), HashEmbedder(), taught=True)
+    a.hear(0, "Mary got the milk.")
+    plan = {"steps": [{"filled": ["object", "subject"], "subject": "<0>", "quantity": "<1>",
+                       "object": "?ans"}]}
+    assert a.follow(plan, ["Mary", "3"]) == []

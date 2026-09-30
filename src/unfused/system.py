@@ -109,7 +109,8 @@ class SystemArm:
                  moves: bool = False, taught: bool = False,
                  known_learnt: list | None = None,
                  cleans: bool = False, known_holds: list | None = None,
-                 loose: bool = False, falls: bool = False) -> None:
+                 loose: bool = False, falls: bool = False,
+                 joins: bool = False) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -138,6 +139,8 @@ class SystemArm:
         self.loose = loose
         # whether a taught plan that binds nothing hands the question to the next best
         self.falls = falls
+        # whether a relation said just before a question's filler is cut with it
+        self.joins = joins
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
@@ -159,7 +162,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "loose": self.loose, "falls": self.falls, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "loose": self.loose, "falls": self.falls, "joins": self.joins, "depth": self.depth,
                 "hub": self.hub,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
@@ -322,10 +325,23 @@ class SystemArm:
                     spans.append((m.start(), m.end()))
         fillers, shape, at = [], "", 0
         for a, b in sorted(spans):
-            shape += question[at:a] + f"<{len(fillers)}>"
+            start = self.joined(question, a, b) if self.joins else a
+            shape += question[at:start] + f"<{len(fillers)}>"
             fillers.append(question[a:b])
             at = b
         return shape + question[at:], fillers
+
+    def joined(self, question: str, a: int, b: int) -> int:
+        """Where a filler's cut starts once a relation heard with it, said just before it,
+        joins it: 'the person who repairs clocks' is cut to 'the person who <0>', so the
+        clock mender and the bookbinder ask one thing."""
+        value = norm(question[a:b])
+        before = question[:a].lower()
+        for (relation,) in self.db.execute(
+                "SELECT DISTINCT relation FROM assertions WHERE object = ?", (value,)):
+            if relation and (m := re.search(rf"\b{re.escape(relation)}\s+$", before)):
+                return m.start()
+        return a
 
     def read_question(self, question: str) -> dict | None:
         """The ear's one fact with the slot it says is asked for, as a goal for search,

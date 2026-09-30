@@ -546,3 +546,25 @@ def test_a_falling_plan_that_binds_nothing_hands_the_question_to_the_next(tmp_pa
 
     assert pupil("first", False) != "bren"
     assert pupil("falls", True) == "bren"
+
+
+TRADES = {
+    "Ivo repairs clocks for a living.": [
+        {"subject": "Ivo", "relation": "repairs", "object": "clocks"}],
+    "Tam binds books for a living.": [
+        {"subject": "Tam", "relation": "binds", "object": "books"}],
+}
+
+
+def test_a_relation_said_before_a_filler_joins_it_in_the_shape(tmp_path):
+    READINGS.update(TRADES)
+    shapes = {}
+    for joins in (False, True):
+        a = SystemArm(tmp_path / str(joins), TableEar(), HashEmbedder(), joins=joins)
+        a.hear(0, "Ivo repairs clocks for a living.")
+        a.hear(1, "Tam binds books for a living.")
+        shapes[joins] = [a.shape(f"Who is the cousin of the person who {t}?")
+                         for t in ("repairs clocks", "binds books")]
+    assert shapes[False][0][0] != shapes[False][1][0]
+    assert shapes[True] == [("Who is the cousin of the person who <0>?", ["clocks"]),
+                            ("Who is the cousin of the person who <0>?", ["books"])]

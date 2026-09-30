@@ -56,6 +56,7 @@ def main() -> None:
     p.add_argument("--cleans", action="store_true")
     p.add_argument("--loose", action="store_true")
     p.add_argument("--falls", action="store_true")
+    p.add_argument("--joins", action="store_true")
     p.add_argument("--teach", type=int, default=0,
                    help="practice houses, other seeds than any tested, told with their "
                         "answers before the test: `taught` learns plans from them")
@@ -107,7 +108,7 @@ def main() -> None:
                                  shares=args.shares, moves=args.moves,
                                  taught=name == "taught", known_learnt=learnt,
                                  cleans=args.cleans, known_holds=holds, loose=args.loose,
-                                 falls=args.falls)
+                                 falls=args.falls, joins=args.joins)
 
             learnt, holds = [], []
             if name == "taught":

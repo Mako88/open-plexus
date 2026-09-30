@@ -25,6 +25,8 @@ from unfused.exam.run import run  # noqa: E402
 from unfused.exam.world import generate_house  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
+# practice houses are seeded from here, far from any seed a reading tests
+PRACTICE = 1000
 
 
 def main() -> None:
@@ -50,6 +52,13 @@ def main() -> None:
     p.add_argument("--plans", default=None,
                    help="a JSON file of plans by shape: `planned` starts with them and adds "
                         "what it learns")
+    p.add_argument("--context", type=int, default=0)
+    p.add_argument("--moves", action="store_true")
+    p.add_argument("--binds", action="store_true")
+    p.add_argument("--cleans", action="store_true")
+    p.add_argument("--teach", type=int, default=0,
+                   help="practice houses, other seeds than any tested, told with their "
+                        "answers before the test: `taught` learns plans from them")
     args = p.parse_args()
 
     house = generate_house(seed=args.seed, n_facts=args.facts, n_turns=args.turns)
@@ -60,7 +69,7 @@ def main() -> None:
         faculty = (ServedFaculty(model_id=f"{args.served} (llama.cpp)",
                                  url=f"http://127.0.0.1:{args.port}/v1/chat/completions")
                    if args.faculty == "served" else Faculty())
-    if any(a.startswith("recall") or a in ("linked", "system", "planned", "searched", "asked") for a in arms):
+    if any(a.startswith("recall") or a in ("linked", "system", "planned", "searched", "asked", "taught") for a in arms):
         from unfused.store import MiniLmEmbedder
         embedder = MiniLmEmbedder()
 
@@ -77,7 +86,7 @@ def main() -> None:
 
             def open_arm(hops=hops):
                 return Recall(work, faculty, embedder, k=args.k, hops=hops)
-        elif name in ("system", "planned", "searched", "asked"):
+        elif name in ("system", "planned", "searched", "asked", "taught"):
             from unfused.ears import Ear
             from unfused.system import SystemArm
 
@@ -89,13 +98,41 @@ def main() -> None:
             known = (json.loads(Path(args.plans).read_text(encoding="utf-8"))
                      if name in ("planned", "searched") and args.plans and Path(args.plans).exists() else {})
 
-            def open_arm(plans=name in ("planned", "searched"), known=known,
-                         searched=name == "searched", asked=name == "asked"):
+            def system(work, learnt, plans=name in ("planned", "searched"), known=known,
+                       searched=name == "searched", asked=name == "asked"):
                 return SystemArm(work, ear, embedder, plans=plans, known_plans=known,
                                  planner=planner,
                                  judge=planner if args.planner_judges else None,
                                  searched=searched, asked=asked,
-                                 shares=args.shares)
+                                 shares=args.shares, context=args.context, moves=args.moves,
+                                 taught=name == "taught", known_learnt=learnt,
+                                 binds=args.binds, cleans=args.cleans)
+
+            learnt = []
+            if name == "taught":
+                # the teaching: practice houses heard a turn at a time, each question with
+                # an answer told with it; a negative has no answer to chain to and is not
+                # told. What was learnt, with how often it held, carries to the test house
+                for s in range(PRACTICE, PRACTICE + args.teach):
+                    practice = generate_house(seed=s, n_facts=args.facts, n_turns=args.turns)
+                    taught = Path(tempfile.mkdtemp(prefix="unfused-teach-"))
+                    arm = system(taught, learnt)
+                    asked_after = practice.questions_after()
+                    for turn, text in enumerate(practice.turns):
+                        arm.hear(turn, text)
+                        for q in asked_after.get(turn, []):
+                            if q.answer is not None:
+                                arm.teach(q.text, q.answer)
+                    arm.close()
+                    import sqlite3
+
+                    db = sqlite3.connect(str(taught / "system.db"))
+                    learnt = db.execute("SELECT shape, plan, hits, misses FROM learnt").fetchall()
+                    db.close()
+                    shutil.rmtree(taught, ignore_errors=True)
+
+            def open_arm(learnt=learnt):
+                return system(work, learnt)
         elif name == "linked":
             from unfused.linked import LinkedRecall
 
@@ -134,6 +171,7 @@ def main() -> None:
                       "questions": len(house.questions),
                       "answer_entropy": house.answer_entropy()},
             "limit": args.limit,
+            "teach": args.teach if name == "taught" else 0,
             "cost": faculty.cost.row() if faculty else None,
         }
         tag = args.served.split("-Q")[0] if args.faculty == "served" else args.faculty

@@ -377,6 +377,40 @@ def test_a_plan_taught_on_one_story_answers_another_with_other_words(tmp_path):
     assert pupil.answer(q("Where is the football?")) == "kitchen"
 
 
+def test_a_plan_taught_through_history_keeps_before_as_an_order_in_time(tmp_path):
+    READINGS.update(BABI)
+    READINGS.update({
+        "Mary moved to the kitchen.": [
+            {"subject": "Mary", "relation": "moved to", "place": "kitchen"}],
+        "John went to the hallway.": [
+            {"subject": "John", "relation": "went to", "place": "hallway"}],
+        "John went to the garden.": [
+            {"subject": "John", "relation": "went to", "place": "garden"}],
+        "John went to the office.": [
+            {"subject": "John", "relation": "went to", "place": "office"}],
+    })
+    teacher = SystemArm(tmp_path / "taught", TableEar(), HashEmbedder(), taught=True,
+                        moves=True)
+    for turn, s in enumerate(["Mary got the milk.", "Mary moved to the hallway.",
+                              "Mary moved to the kitchen."]):
+        teacher.hear(turn, s)
+    teacher.teach("Where was the milk before the kitchen?", "hallway")
+    learnt = teacher.db.execute("SELECT shape, plan, hits, misses FROM learnt").fetchall()
+    assert learnt and all('"history": true' in plan for _, plan, _, _ in learnt)
+
+    ear = TableEar()
+    ear.rewrite = lambda question: (_ for _ in ()).throw(AssertionError(question))
+    pupil = SystemArm(tmp_path / "pupil", ear, HashEmbedder(), taught=True, moves=True,
+                      known_learnt=learnt)
+    for turn, s in enumerate(["John got the football.", "John went to the hallway.",
+                              "John went to the garden.", "John travelled to the kitchen.",
+                              "John went to the office."]):
+        pupil.hear(turn, s)
+    # the garden is the place nearest before the kitchen; the hallway is earlier and
+    # the office is after
+    assert pupil.answer(q("Where was the football before the kitchen?")) == "garden"
+
+
 def test_the_system_binds_there_and_she_to_what_is_in_focus(tmp_path):
     READINGS.update({
         "Mary went to the kitchen.": [

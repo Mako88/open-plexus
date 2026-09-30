@@ -497,10 +497,12 @@ class SystemArm:
                     frontier.append(b)
         return any(same(stored, w) for w in seen)
 
-    def rows(self) -> list[dict]:
+    def rows(self, history: bool = False) -> list[dict]:
+        """What is asserted now; with `history`, also what was and has been replaced."""
         cols = ("subject", "relation", "object", "place", "quantity", "turn", "heard")
+        where = "" if history else " WHERE superseded IS NULL"
         return [dict(zip(cols, r)) for r in self.db.execute(
-            f"SELECT {', '.join(cols)} FROM assertions WHERE superseded IS NULL")]
+            f"SELECT {', '.join(cols)} FROM assertions{where} ORDER BY turn, id")]
 
     def solve(self, query: dict) -> list[tuple[dict, int, list[str]]]:
         """Every binding of the query's unknowns, with the latest turn it rests on and
@@ -564,15 +566,23 @@ class SystemArm:
 
     # -- learning from taught examples ---------------------------------------
 
-    def chains_to(self, anchors: list[str], answer: str) -> list[list[dict]]:
+    def chains_to(self, anchors: list[str], answer: str,
+                  history: bool = False) -> list[list[dict]]:
         """The shortest chains of assertions, each sharing a filler with the next, that
-        touch every anchor and end on one holding the answer."""
-        rows = self.rows()
+        touch every anchor and end on one holding the answer. With `history` the chain
+        may pass through what has been replaced; a filler is still a hub by how many
+        things it is in now, since everyone's past visits to a room are no evidence
+        that the room links them."""
+        rows = self.rows(history)
         fill = [[r[k] for k in SLOTS if r[k]] for r in rows]
         by_filler: dict[str, list[int]] = {}
         for i, fs in enumerate(fill):
             for f in set(fs):
                 by_filler.setdefault(f, []).append(i)
+        degree: dict[str, int] = {}
+        for r in self.rows() if history else rows:
+            for f in {r[k] for k in SLOTS if r[k]}:
+                degree[f] = degree.get(f, 0) + 1
         touching = {a: {i for i, fs in enumerate(fill) if any(same(a, f) for f in fs)}
                     for a in anchors}
         anchored = {f for a in anchors for f in by_filler if same(a, f)}
@@ -586,7 +596,7 @@ class SystemArm:
             grown = []
             for p in paths:
                 links = [f for f in fill[p[-1]]
-                         if f in anchored or len(by_filler[f]) <= self.hub]
+                         if f in anchored or degree.get(f, 0) <= self.hub]
                 for j in sorted({j for f in links for j in by_filler[f]} - set(p)):
                     grown.append(p + (j,))
             if len(grown) > self.frontier:
@@ -595,11 +605,13 @@ class SystemArm:
         return []
 
     @staticmethod
-    def generalise(chain: list[dict], fillers: list[str], answer: str) -> dict:
+    def generalise(chain: list[dict], fillers: list[str], answer: str,
+                   history: bool = False) -> dict:
         """A chain with the question's fillers made slots, the answer made '?ans', and each
         filler that links two assertions made a variable. Every step keeps which slots
         its assertion filled, which stands in for its relation: 'moved to' and
-        'travelled to' both put a subject in a place."""
+        'travelled to' both put a subject in a place. A chain through what was replaced
+        keeps the order in time of every pair of its steps, which is all 'before' says."""
         lowered = [norm(f) or "" for f in fillers]
         names: dict[str, str] = {}
         steps = []
@@ -617,19 +629,32 @@ class SystemArm:
                 elif any(v in (x[j] for j in SLOTS) for x in chain if x is not r):
                     step[k] = names.setdefault(v, f"?v{len(names)}")
             steps.append(step)
-        return {"steps": steps}
+        if not history:
+            return {"steps": steps}
+        order = ["<" if a["turn"] < b["turn"] else ">" if a["turn"] > b["turn"] else "="
+                 for i, a in enumerate(chain) for b in chain[i + 1:]]
+        return {"steps": steps, "history": True, "order": order}
 
-    def follow(self, plan: dict, fillers: list[str]) -> list[tuple[str, int]]:
+    def follow(self, plan: dict, fillers: list[str]) -> list[tuple[str, tuple[int, int]]]:
         """A taught plan run with this question's fillers: every answer it binds, with the
-        latest turn it rests on. Slots are strict: a step's assertion must fill exactly
-        the slots the taught one did, and each value sits in its own slot."""
-        rows = self.rows()
-        out: list[tuple[str, int]] = []
+        latest turn it rests on and then the turn of the step holding the answer, which
+        is the order answers are preferred in. Slots are strict: a step's assertion must
+        fill exactly the slots the taught one did, and each value sits in its own slot.
+        A plan taught through history runs on it and keeps its steps' order in time."""
+        history = plan.get("history", False)
+        rows = self.rows(history)
+        out: list[tuple[str, tuple[int, int]]] = []
+        turns: list[int] = []
+
+        def ordered() -> bool:
+            signs = iter(plan["order"])
+            return all(next(signs) == ("<" if a < b else ">" if a > b else "=")
+                       for i, a in enumerate(turns) for b in turns[i + 1:])
 
         def step(i: int, bound: dict, latest: int) -> None:
             if i == len(plan["steps"]):
-                if bound.get("?ans"):
-                    out.append((bound["?ans"], latest))
+                if bound.get("?ans") and (not history or ordered()):
+                    out.append((bound["?ans"], (latest, turns[-1])))
                 return
             s = plan["steps"][i]
             for r in rows:
@@ -650,7 +675,9 @@ class SystemArm:
                     if not ok:
                         break
                 if ok:
+                    turns.append(r["turn"])
                     step(i + 1, new, max(latest, r["turn"]))
+                    turns.pop()
 
         step(0, {}, -1)
         return out
@@ -684,8 +711,11 @@ class SystemArm:
             self.db.execute(f"UPDATE learnt SET {column} = {column} + 1 WHERE rowid = ?",
                             (rid,))
         anchors = [norm(f) for f in fillers if norm(f)]
-        for chain in self.chains_to(anchors, want):
-            plan = json.dumps(self.generalise(chain, fillers, want), sort_keys=True)
+        chains, history = self.chains_to(anchors, want), False
+        if not chains:
+            chains, history = self.chains_to(anchors, want, history=True), True
+        for chain in chains:
+            plan = json.dumps(self.generalise(chain, fillers, want, history), sort_keys=True)
             self.db.execute("INSERT OR IGNORE INTO learnt (shape, plan, hits, misses)"
                             " VALUES (?, ?, 1, 0)", (shape, plan))
         self.db.commit()

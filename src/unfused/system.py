@@ -659,7 +659,7 @@ class SystemArm:
         fill exactly the slots the taught one did, and each value sits in its own slot.
         A plan taught through history runs on it and keeps its steps' order in time."""
         if plan.get("count"):
-            return self.count(fillers)
+            return self.count(plan, fillers)
         history = plan.get("history", False)
         rows = self.rows(history)
         out: list[tuple[str, tuple[int, int]]] = []
@@ -701,43 +701,58 @@ class SystemArm:
         step(0, {}, -1)
         return out
 
-    def last_relations(self, anchor: str) -> dict[str, str]:
-        """Each thing the anchor was heard with as subject, and the last relation heard."""
+    def last_relations(self, anchor: str, at: str, counted: str) -> dict[str, str]:
+        """Each value heard in slot `counted` of an assertion with the anchor in slot
+        `at`, and the last relation it was heard with."""
         last: dict[str, str] = {}
         for r in self.rows():
-            if r["subject"] and r["object"] and same(anchor, r["subject"]):
-                last[r["object"]] = r["relation"]
+            if r[at] and r[counted] and same(anchor, r[at]):
+                last[r[counted]] = r["relation"]
         return last
 
-    def held(self, anchor: str) -> list[str]:
-        """The things an anchor was last heard with as subject by a relation taught to
-        mean holding: a thing taken and then dropped is last heard dropped."""
-        last = self.last_relations(anchor)
-        holds = {r: y > n for r, y, n in self.db.execute("SELECT * FROM holds")}
-        return [o for o, rel in last.items() if holds.get(rel)]
-
-    def count(self, fillers: list[str]) -> list[tuple[str, tuple[int, int]]]:
-        """How many things the question's one filler holds, as a word."""
+    def count(self, plan: dict, fillers: list[str]) -> list[tuple[str, tuple[int, int]]]:
+        """How many values fill the plan's counted slot beside the question's one
+        filler in its anchor slot, as a word. A plan that counts holding keeps only
+        the values last heard with a relation taught to mean holding: a thing taken and
+        then dropped is last heard dropped."""
         anchors = [norm(f) for f in fillers if norm(f)]
         if len(anchors) != 1:
             return []
-        n = len(self.held(anchors[0]))
+        last = self.last_relations(anchors[0], plan["anchor"], plan["counted"])
+        if plan["holding"]:
+            holds = {r: y > n for r, y, n in self.db.execute("SELECT * FROM holds")}
+            last = {v: rel for v, rel in last.items() if holds.get(rel)}
+        n = len(last)
         return [("none" if n == 0 else NUMBERS[n] if n < len(NUMBERS) else str(n), (0, 0))]
 
-    def learn_holding(self, anchors: list[str], n: int) -> None:
-        """A taught count is evidence about which relations mean holding, where it is
-        unambiguous: a count of none says every relation the anchor was last heard with
-        lets go, and a count of all of them says every one holds."""
+    def learn_count(self, shape: str, anchors: list[str], n: int) -> None:
+        """A taught answer that is a number no fact holds is a count of something. It is
+        first evidence about which relations mean holding, where it is unambiguous: none
+        says every last relation lets go, and all of them says every one holds. Then
+        every pair of slots, one holding the question's filler and one counted, becomes
+        a count plan wherever it counts `n`, with holding and without."""
         if len(anchors) != 1:
             return
-        last = self.last_relations(anchors[0])
-        if not last or n not in (0, len(last)):
-            return
-        column = "yes" if n else "no"
-        for relation in set(last.values()):
-            self.db.execute("INSERT OR IGNORE INTO holds VALUES (?, 0, 0)", (relation,))
-            self.db.execute(f"UPDATE holds SET {column} = {column} + 1 WHERE relation = ?",
-                            (relation,))
+        pairs = [(at, counted) for at in SLOTS for counted in SLOTS
+                 if counted not in (at, "quantity")]
+        for at, counted in pairs:
+            last = self.last_relations(anchors[0], at, counted)
+            if not last or n not in (0, len(last)):
+                continue
+            column = "yes" if n else "no"
+            for relation in set(last.values()):
+                self.db.execute("INSERT OR IGNORE INTO holds VALUES (?, 0, 0)", (relation,))
+                self.db.execute(f"UPDATE holds SET {column} = {column} + 1 WHERE relation = ?",
+                                (relation,))
+        for at, counted in pairs:
+            if not self.last_relations(anchors[0], at, counted):
+                continue
+            for holding in (False, True):
+                plan = {"count": True, "anchor": at, "counted": counted, "holding": holding}
+                if numeral(self.count(plan, anchors)[0][0]) == n:
+                    self.db.execute("INSERT OR IGNORE INTO learnt (shape, plan, hits, misses)"
+                                    " VALUES (?, ?, 1, 0)",
+                                    (shape, json.dumps(plan, sort_keys=True)))
 
     def taught_answer(self, question: str) -> str | None:
         """The answer of the best taught plan for the question's shape: the one whose
@@ -773,10 +788,7 @@ class SystemArm:
             chains, history = self.chains_to(anchors, want, history=True), True
         n = numeral(want)
         if not chains and n is not None:
-            # an answer that is a number no fact holds is a count of something
-            self.learn_holding(anchors, n)
-            self.db.execute("INSERT OR IGNORE INTO learnt (shape, plan, hits, misses)"
-                            " VALUES (?, ?, 1, 0)", (shape, json.dumps({"count": True})))
+            self.learn_count(shape, anchors, n)
         for chain in chains:
             plan = json.dumps(self.generalise(chain, fillers, want, history), sort_keys=True)
             self.db.execute("INSERT OR IGNORE INTO learnt (shape, plan, hits, misses)"

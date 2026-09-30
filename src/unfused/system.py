@@ -218,6 +218,8 @@ class SystemArm:
         preposition; an object that repeats the place is dropped. The ear may be small
         and careless, and the system does not have to believe it."""
         said = set(re.findall(r"[a-z0-9']+", text.lower()))
+        # 'Bren's cousin' says Bren
+        said |= {re.sub(r"'s?$", "", w) for w in said}
         numbers = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
                    "ten", "eleven", "twelve", "twenty"}
         out = dict(row)

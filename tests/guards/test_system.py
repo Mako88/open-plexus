@@ -516,3 +516,11 @@ def test_a_loose_step_meets_a_filler_the_ear_put_in_another_slot(tmp_path):
 
     assert pupil("strict", False) != "oda"
     assert pupil("loose", True) == "oda"
+
+
+def test_cleaning_keeps_a_name_said_in_the_possessive():
+    row = {"subject": "ivo", "object": "bren", "place": None, "quantity": None}
+    assert SystemArm.clean(row, "Ivo is Bren's cousin.")["object"] == "bren"
+    row = {"subject": "lanterns", "object": "drael", "place": "pantry", "quantity": None}
+    assert SystemArm.clean(row, "The lanterns are Drael's, and they live in the pantry.")[
+        "object"] == "drael"

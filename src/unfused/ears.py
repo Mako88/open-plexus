@@ -173,6 +173,8 @@ class Ear:
     name: str = "Qwen3.5-2B-Q8_0 (llama.cpp, schema)"
     calls: int = 0
     seconds: float = 0.0
+    # tokens the server generated, which is most of what a call costs
+    tokens: int = 0
     failures: list = field(default_factory=list)
     # replies answered from the cache rather than the server
     cached: int = 0
@@ -274,6 +276,7 @@ class Ear:
         with urllib.request.urlopen(request, timeout=600) as response:
             reply = json.loads(response.read())
         self.calls += 1
+        self.tokens += reply.get("usage", {}).get("completion_tokens", 0)
         self.seconds += time.perf_counter() - started
         return reply["choices"][0]["message"].get("content") or ""
 

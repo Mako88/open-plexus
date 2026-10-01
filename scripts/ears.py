@@ -62,6 +62,7 @@ def main() -> None:
                              / max(1, sum(r["kind"] == k for r in rows)), 3)
                     for k in sorted({r["kind"] for r in rows})},
         "calls": ear.calls,
+        "tokens": ear.tokens,
         "seconds": round(ear.seconds, 1),
         "unparsed": len(ear.failures),
         "rows": rows,

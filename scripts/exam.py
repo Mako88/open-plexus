@@ -54,8 +54,6 @@ def main() -> None:
                         "what it learns")
     p.add_argument("--moves", action="store_true")
     p.add_argument("--cleans", action="store_true")
-    p.add_argument("--falls", action="store_true")
-    p.add_argument("--joins", action="store_true")
     p.add_argument("--taught-only", action="store_true")
     p.add_argument("--teach", type=int, default=0,
                    help="practice houses, other seeds than any tested, told with their "
@@ -108,7 +106,6 @@ def main() -> None:
                                  shares=args.shares, moves=args.moves,
                                  taught=name == "taught", known_learnt=learnt,
                                  cleans=args.cleans, known_holds=holds,
-                                 falls=args.falls, joins=args.joins,
                                  taught_only=args.taught_only)
 
             learnt, holds = [], []

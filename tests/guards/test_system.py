@@ -535,14 +535,9 @@ def test_a_falling_plan_that_binds_nothing_hands_the_question_to_the_next(tmp_pa
     learnt = [(shape, json.dumps(as_object, sort_keys=True), 3, 0),
               (shape, json.dumps(as_place, sort_keys=True), 2, 0)]
 
-    def pupil(name, falls):
-        a = SystemArm(tmp_path / name, TableEar(), HashEmbedder(), taught=True,
-                      known_learnt=learnt, falls=falls)
-        a.hear(0, "Ivo is Bren's cousin.")
-        return a.answer(q("Who is Ivo's cousin?"))
-
-    assert pupil("first", False) != "bren"
-    assert pupil("falls", True) == "bren"
+    a = SystemArm(tmp_path, TableEar(), HashEmbedder(), taught=True, known_learnt=learnt)
+    a.hear(0, "Ivo is Bren's cousin.")
+    assert a.answer(q("Who is Ivo's cousin?")) == "bren"
 
 
 TRADES = {
@@ -555,16 +550,13 @@ TRADES = {
 
 def test_a_relation_said_before_a_filler_joins_it_in_the_shape(tmp_path):
     READINGS.update(TRADES)
-    shapes = {}
-    for joins in (False, True):
-        a = SystemArm(tmp_path / str(joins), TableEar(), HashEmbedder(), joins=joins)
-        a.hear(0, "Ivo repairs clocks for a living.")
-        a.hear(1, "Tam binds books for a living.")
-        shapes[joins] = [a.shape(f"Who is the cousin of the person who {t}?")
-                         for t in ("repairs clocks", "binds books")]
-    assert shapes[False][0][0] != shapes[False][1][0]
-    assert shapes[True] == [("Who is the cousin of the person who <0>?", ["clocks"]),
-                            ("Who is the cousin of the person who <0>?", ["books"])]
+    a = SystemArm(tmp_path, TableEar(), HashEmbedder())
+    a.hear(0, "Ivo repairs clocks for a living.")
+    a.hear(1, "Tam binds books for a living.")
+    shapes = [a.shape(f"Who is the cousin of the person who {t}?")
+              for t in ("repairs clocks", "binds books")]
+    assert shapes == [("Who is the cousin of the person who <0>?", ["clocks"]),
+                      ("Who is the cousin of the person who <0>?", ["books"])]
 
 
 def test_a_loose_pass_never_overrules_a_strict_match(tmp_path):

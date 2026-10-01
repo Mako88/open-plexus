@@ -109,8 +109,7 @@ class SystemArm:
                  moves: bool = False, taught: bool = False,
                  known_learnt: list | None = None,
                  cleans: bool = False, known_holds: list | None = None,
-                 falls: bool = False,
-                 joins: bool = False, taught_only: bool = False) -> None:
+                 taught_only: bool = False) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -135,10 +134,6 @@ class SystemArm:
         self.taught = taught
         # whether the ear's assertions are held to the words of their sentence
         self.cleans = cleans
-        # whether a taught plan that binds nothing hands the question to the next best
-        self.falls = falls
-        # whether a relation said just before a question's filler is cut with it
-        self.joins = joins
         # whether a question with no taught plan is not answered, so the faculty only reads
         self.taught_only = taught_only
         self.embedder = embedder
@@ -162,7 +157,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "falls": self.falls, "joins": self.joins, "taught_only": self.taught_only, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "taught_only": self.taught_only, "depth": self.depth,
                 "hub": self.hub,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
@@ -326,7 +321,7 @@ class SystemArm:
                     spans.append((m.start(), m.end()))
         fillers, shape, at = [], "", 0
         for a, b in sorted(spans):
-            start = self.joined(question, a, b) if self.joins else a
+            start = self.joined(question, a, b)
             shape += question[at:start] + f"<{len(fillers)}>"
             fillers.append(question[a:b])
             at = b
@@ -835,15 +830,14 @@ class SystemArm:
     def taught_answer(self, question: str) -> str | None:
         """The answer of the best taught plan for the question's shape: the one whose
         predictions on later taught examples held most often, if it held more often than
-        it failed. Falling, a plan that binds nothing says nothing, and the next best
-        is asked."""
+        it failed. A plan that binds nothing says nothing, and the next best is asked."""
         shape, fillers = self.shape(question)
         ranked = self.db.execute(
             "SELECT plan FROM learnt WHERE shape = ? AND hits > misses"
             " ORDER BY hits - misses DESC, hits DESC", (shape,)).fetchall()
         if not ranked:
             return None
-        for (plan,) in ranked if self.falls else ranked[:1]:
+        for (plan,) in ranked:
             found = self.follow(json.loads(plan), fillers)
             if found:
                 return max(found, key=lambda f: f[1])[0]

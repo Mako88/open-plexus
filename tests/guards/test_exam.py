@@ -103,3 +103,22 @@ def test_a_number_is_matched_in_either_form_and_whole():
 
     assert judge(q("two"), "2")["correct"] and judge(q("2"), "There are two.")["correct"]
     assert not judge(q("12"), "2")["correct"] and not judge(q("one"), "none")["correct"]
+
+
+def test_a_faculty_reply_is_kept_for_the_same_model_and_build_only(tmp_path):
+    from unfused.ears import Ear
+
+    sent = []
+
+    def ear(identity):
+        e = Ear(cache=tmp_path / "replies.sqlite")
+        e._identity = identity
+        e._send = lambda body: sent.append(body) or '{"assertions": []}'
+        return e
+
+    ear("q08|b1").read("Ivo keeps bees.")
+    again = ear("q08|b1")
+    again.read("Ivo keeps bees.")
+    assert len(sent) == 1 and again.cached == 1
+    ear("q08|b2").read("Ivo keeps bees.")
+    assert len(sent) == 2

@@ -12,7 +12,7 @@ from unfused.exam.world import generate_house
 
 READINGS = Path(__file__).resolve().parents[2] / "readings"
 # what a run counted rather than how it was set
-COUNTERS = {"ear_calls", "ear_unparsed", "planner_calls", "shapes", "plan_uses"}
+COUNTERS = {"ear_calls", "ear_cached", "ear_unparsed", "planner_calls", "shapes", "plan_uses"}
 
 
 def _current():

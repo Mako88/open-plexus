@@ -168,6 +168,7 @@ class SystemArm:
                 **dict(zip(("shapes", "plan_uses"), self.db.execute(
                     "SELECT COUNT(*), COALESCE(SUM(used), 0) FROM plans").fetchone())),
                 "ear_calls": getattr(self.ear, "calls", None),
+                "ear_cached": getattr(self.ear, "cached", None),
                 "ear_unparsed": len(getattr(self.ear, "failures", []))}
 
     def close(self) -> None:

@@ -12,10 +12,17 @@ well-formed and wrong, which is why `score_reading` exists.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
+import sqlite3
 import urllib.request
 from dataclasses import dataclass, field
+from pathlib import Path
+
+# every reply the faculty gave, kept across runs: the server is deterministic at
+# temperature zero, so a request it has answered need not be sent again
+CACHE = Path(__file__).resolve().parents[2] / "state" / "faculty-replies.sqlite"
 
 ASSERTION = {
     "type": "object",
@@ -167,6 +174,9 @@ class Ear:
     calls: int = 0
     seconds: float = 0.0
     failures: list = field(default_factory=list)
+    # replies answered from the cache rather than the server
+    cached: int = 0
+    cache: Path | None = CACHE
 
     def read(self, sentence: str, relations: list[str] | None = None) -> list[dict]:
         """A sentence into assertions, reusing a known relation where it means the same."""
@@ -223,9 +233,17 @@ class Ear:
             f"First: '{asked}'\nSecond: '{stored}'{seen}", SAME_SCHEMA, 40)
         return bool(reply and reply.get("same"))
 
-    def _call(self, system: str, user: str, schema: dict, budget: int) -> dict | None:
-        import time
+    def _served(self) -> str:
+        """The model file and llama.cpp build the server is running, as the server says:
+        a label can stay the same while the weights under it change."""
+        if not hasattr(self, "_identity"):
+            props = self.url.split("/v1/")[0] + "/props"
+            with urllib.request.urlopen(props, timeout=30) as response:
+                d = json.loads(response.read())
+            self._identity = f"{d.get('model_path')}|{d.get('build_info')}"
+        return self._identity
 
+    def _call(self, system: str, user: str, schema: dict, budget: int) -> dict | None:
         body = json.dumps({
             "messages": [{"role": "system", "content": system},
                          {"role": "user", "content": user}],
@@ -233,18 +251,47 @@ class Ear:
             "response_format": {"type": "json_schema",
                                 "json_schema": {"name": "out", "schema": schema}},
         }).encode()
+        key = (hashlib.sha256(self._served().encode() + b"|" + body).hexdigest()
+               if self.cache else None)
+        text = self._kept(key) if key else None
+        if text is None:
+            text = self._send(body)
+            if key:
+                self._keep(key, text)
+        else:
+            self.cached += 1
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            self.failures.append(text)
+            return None
+
+    def _send(self, body: bytes) -> str:
+        import time
+
         request = urllib.request.Request(self.url, body, {"Content-Type": "application/json"})
         started = time.perf_counter()
         with urllib.request.urlopen(request, timeout=600) as response:
             reply = json.loads(response.read())
         self.calls += 1
         self.seconds += time.perf_counter() - started
-        text = reply["choices"][0]["message"].get("content") or ""
-        try:
-            return json.loads(text)
-        except json.JSONDecodeError:
-            self.failures.append(text)
-            return None
+        return reply["choices"][0]["message"].get("content") or ""
+
+    def _db(self) -> sqlite3.Connection:
+        if not hasattr(self, "_conn"):
+            self.cache.parent.mkdir(parents=True, exist_ok=True)
+            self._conn = sqlite3.connect(str(self.cache))
+            self._conn.execute("CREATE TABLE IF NOT EXISTS replies "
+                               "(key TEXT PRIMARY KEY, text TEXT NOT NULL)")
+        return self._conn
+
+    def _kept(self, key: str) -> str | None:
+        row = self._db().execute("SELECT text FROM replies WHERE key = ?", (key,)).fetchone()
+        return row[0] if row else None
+
+    def _keep(self, key: str, text: str) -> None:
+        self._db().execute("INSERT OR REPLACE INTO replies VALUES (?, ?)", (key, text))
+        self._db().commit()
 
 
 def gold(fact) -> list[str]:

@@ -26,6 +26,7 @@ than the faculty's judgement.
 from __future__ import annotations
 
 import json
+from collections import Counter
 import re
 import sqlite3
 from pathlib import Path
@@ -170,6 +171,9 @@ class SystemArm:
                             [(k, json.dumps(v)) for k, v in (known_plans or {}).items()])
         self.db.commit()
         self.last_notes: list[str] = []
+        # the judge's calls by what they decide, which is where meaning built from the
+        # tables would stand in for the faculty
+        self.judged: Counter = Counter()
         self.pending: tuple[str, dict] | None = None
 
     def dials(self) -> dict:
@@ -183,7 +187,8 @@ class SystemArm:
                     "SELECT COUNT(*), COALESCE(SUM(used), 0) FROM plans").fetchone())),
                 "ear_calls": getattr(self.ear, "calls", None),
                 "ear_cached": getattr(self.ear, "cached", None),
-                "ear_unparsed": len(getattr(self.ear, "failures", []))}
+                "ear_unparsed": len(getattr(self.ear, "failures", [])),
+                "judged": dict(self.judged)}
 
     def close(self) -> None:
         self.db.close()
@@ -339,6 +344,7 @@ class SystemArm:
         vectors = np.vstack([np.frombuffer(r[1], dtype=np.float32) for r in rows])
         order = np.argsort(-(vectors @ self.embedder.encode([value])[0]))[: self.names_shown]
         options = [names[i] for i in order]
+        self.judged["name"] += 1
         choice = self.judge.choose(
             f"In the question '{question}', which of these is '{value}' or another word for "
             "the same thing? If none is, answer -1.", options)
@@ -482,6 +488,8 @@ class SystemArm:
         if row is not None:
             return bool(row[0])
         inherited = self.inherited(asked, stored) if self.shares else None
+        if inherited is None:
+            self.judged["synonym"] += 1
         verdict = (inherited if inherited is not None
                    else self.judge.synonymous(asked, stored, example))
         self.db.execute("INSERT OR IGNORE INTO synonyms VALUES (?, ?, ?)",
@@ -578,6 +586,8 @@ class SystemArm:
                                                      r["place"], r["quantity"]) if v)
                                 for r in candidates})
                 ask = f"Which of these facts is about '{relation}'? If none is, answer -1."
+                if facts and relation:
+                    self.judged["fact"] += 1
                 choice = self.judge.choose(ask, facts) if facts and relation else None
                 if choice is None:
                     candidates = []
@@ -1022,6 +1032,7 @@ class SystemArm:
                 # these chains end on and says which is of the kind asked, as the step
                 # solver's fallback does, or none, and the search goes one link further
                 facts = sorted({rows[p[-1]]["heard"] for p in covering})
+                self.judged["sentence"] += 1
                 choice = self.judge.choose(
                     f"Which of these tells you '{relation}'? If none does, answer -1.", facts)
                 if choice is not None:
@@ -1050,6 +1061,7 @@ class SystemArm:
                               (filler, kind)).fetchone()
         if row is not None:
             return bool(row[0])
+        self.judged["kind"] += 1
         verdict = self.judge.is_a(filler, kind, example)
         self.db.execute("INSERT OR IGNORE INTO kinds VALUES (?, ?, ?)",
                         (filler, kind, int(verdict)))

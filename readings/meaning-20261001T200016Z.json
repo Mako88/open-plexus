@@ -1,0 +1,46 @@
+{
+ "kind": "meaning",
+ "taken_at": "20261001T200016Z",
+ "note": "slots kept apart: each slot's fillers averaged and the slots concatenated, because summed the shared subjects drown the objects. Refuted if neither built arm beats the profile on every source.",
+ "question": "can a relation's meaning be built from the rows it sits in",
+ "refutes_if": "a built arm's AUC is not above the profile's on every source",
+ "dims": 2048,
+ "readings": [
+  {
+   "source": "readings/ears-Qwen3.5-0.8B-Q8_0-s0-20261001T180605Z.json",
+   "wordings": 14,
+   "kinds": 5,
+   "auc": {
+    "profile": 0.747,
+    "identity": 0.649,
+    "borrowed": 0.762,
+    "identity by slot": 0.744,
+    "borrowed by slot": 0.796
+   }
+  },
+  {
+   "source": "readings/ears-Qwen3.5-0.8B-Q8_0-s1-20261001T180724Z.json",
+   "wordings": 14,
+   "kinds": 5,
+   "auc": {
+    "profile": 0.675,
+    "identity": 0.589,
+    "borrowed": 0.687,
+    "identity by slot": 0.602,
+    "borrowed by slot": 0.711
+   }
+  },
+  {
+   "source": "readings/ears-Qwen3.5-0.8B-Q8_0-s2-20261001T194646Z.json",
+   "wordings": 14,
+   "kinds": 5,
+   "auc": {
+    "profile": 0.717,
+    "identity": 0.607,
+    "borrowed": 0.697,
+    "identity by slot": 0.626,
+    "borrowed by slot": 0.709
+   }
+  }
+ ]
+}

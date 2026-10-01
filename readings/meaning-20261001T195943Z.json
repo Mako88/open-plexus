@@ -1,0 +1,50 @@
+{
+ "kind": "meaning",
+ "taken_at": "20261001T195943Z",
+ "note": "first look: relation meaning from slot-bound filler vectors, identity against borrowed, against the profile's Jaccard. Refuted if neither built arm beats the profile on every source.",
+ "question": "can a relation's meaning be built from the rows it sits in",
+ "refutes_if": "a built arm's AUC is not above the profile's on every source",
+ "dims": 2048,
+ "readings": [
+  {
+   "source": "readings/ears-Qwen3.5-0.8B-Q8_0-s0-20260929T132354Z.json",
+   "wordings": 14,
+   "kinds": 5,
+   "auc": {
+    "profile": 0.747,
+    "identity": 0.649,
+    "borrowed": 0.762
+   }
+  },
+  {
+   "source": "readings/ears-Qwen3.5-0.8B-Q8_0-s0-20261001T180605Z.json",
+   "wordings": 14,
+   "kinds": 5,
+   "auc": {
+    "profile": 0.747,
+    "identity": 0.649,
+    "borrowed": 0.762
+   }
+  },
+  {
+   "source": "readings/ears-Qwen3.5-0.8B-Q8_0-s1-20261001T180724Z.json",
+   "wordings": 14,
+   "kinds": 5,
+   "auc": {
+    "profile": 0.675,
+    "identity": 0.589,
+    "borrowed": 0.687
+   }
+  },
+  {
+   "source": "readings/ears-Qwen3.5-0.8B-Q8_0-s2-20261001T194646Z.json",
+   "wordings": 14,
+   "kinds": 5,
+   "auc": {
+    "profile": 0.717,
+    "identity": 0.607,
+    "borrowed": 0.697
+   }
+  }
+ ]
+}

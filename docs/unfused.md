@@ -56,12 +56,13 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   planning: a shape nobody taught goes unanswered, so the faculty only reads. Every faculty
   reply is kept across runs, so a repeat run sends only what the server has not answered.
   Next, in order:
-  1. The second house's lendings (`--world second`, agreed with John 2026-09-30). It holds
-     the checkpoint's half; its count and update fail. Two pieces, in order: an ear that
-     keeps a second party (a ditransitive's recipient) in a slot of its own and reads a
-     second clause, then supersession learnt from taught answers rather than written by
-     hand, since `moves` knows only a pair changing place. The first house and bAbI MUST
-     NOT fall by more than 0.02 under either.
+  1. The second house's lendings (`--world second`, agreed with John 2026-09-30). Count
+     reads 0 on every seed, and the loan chains mostly answer "I don't know". The cause
+     for both is the recipient: the 0.8B puts it in `place` for "lent to", in `subject`
+     for "borrowed from", and loses it for "passed on to" (5 of 28 tellings). A slot of
+     its own was refuted (`fd14a059`). Next: recover the lost recipient, then a count
+     across the slots a recipient lands in, then supersession learnt from taught
+     answers. The first house and bAbI MUST NOT fall by more than 0.02 under any.
   2. A count read wherever the ear put the number, which it puts outside `quantity` in two
      tellings of three; oblique questions naming things in unheard words; correction as an
      input.

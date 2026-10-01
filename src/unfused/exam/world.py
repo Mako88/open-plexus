@@ -158,9 +158,8 @@ class House:
         return out
 
     def modal_answers(self) -> dict[str, str]:
-        """The commonest answer per kind of answer. This is the blind rule's table."""
-        return {kind: Counter(a).most_common(1)[0][0]
-                for kind, a in self._answers_by_kind().items()}
+        """The commonest answer per kind of answer in this house."""
+        return modal_answers([self])
 
     def _answers_by_kind(self) -> dict[str, list[str]]:
         by: dict[str, list[str]] = {}
@@ -183,6 +182,17 @@ class House:
         for q in self.questions:
             at.setdefault(q.asked_at, []).append(q)
         return at
+
+
+def modal_answers(houses: list[House]) -> dict[str, str]:
+    """The commonest answer per kind across houses: the blind rule's table, built from
+    houses other than the one it is examined on."""
+    by: dict[str, Counter] = {}
+    for h in houses:
+        for q in h.questions:
+            if q.answer is not None:
+                by.setdefault(q.kind, Counter())[q.answer.lower()] += 1
+    return {k: c.most_common(1)[0][0] for k, c in by.items()}
 
 
 def _name(rng: random.Random) -> str:

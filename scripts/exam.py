@@ -80,8 +80,12 @@ def main() -> None:
     for name in arms:
         work = Path(tempfile.mkdtemp(prefix=f"unfused-{name}-"))
         if name == "blind":
-            def open_arm():
-                return Blind(house)
+            n = max(args.teach, 5)
+            practice = [generate(seed=s, n_facts=args.facts, n_turns=args.turns)
+                        for s in range(PRACTICE, PRACTICE + n)]
+
+            def open_arm(practice=practice, n=n):
+                return Blind(practice, f"practice {PRACTICE}-{PRACTICE + n - 1}")
         elif name == "full":
             def open_arm():
                 return FullContext(work, faculty)

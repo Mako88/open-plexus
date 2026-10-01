@@ -60,14 +60,15 @@ def test_phase_3_an_ear_reads_the_house():
 
 def test_phase_4_the_system_beats_its_own_faculty_given_everything():
     """Exit: on three seeds, the system above full context under the same small
-    faculty on twohop, chain3 and count, and above blind on each. A house asks each
-    chain five times and has few distinct chains, so on seed 1 blind reads 1.0 on
-    chain3: beating full there is not evidence of composing unless blind is beaten."""
+    faculty on twohop, chain3 and count, and above blind on each. Blind's table is
+    the practice houses' (John's, 2026-10-01): built from the test house it read 1.0 on
+    seed 1's chain3, whose questions share one answer."""
     current = _current()
     full = {(d["house"]["seed"], _faculty(d)): d["summary"]["by_form"] for d in current
             if d["arm"] == "full"}
     blind = {d["house"]["seed"]: d["summary"]["by_form"] for d in current
-             if d["arm"] == "blind"}
+             if d["arm"] == "blind" and d.get("dials", {}).get("table", "").startswith(
+                 "practice")}
     # one configuration must win every seed: seeds won by different dials are
     # different brains, and summing them says nothing about either
     won: dict[tuple, set] = {}

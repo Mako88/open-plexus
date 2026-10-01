@@ -11,10 +11,9 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections import Counter
 from pathlib import Path
 
-from .world import House, Question
+from .world import House, Question, modal_answers  # noqa: F401
 
 DATA = Path(__file__).resolve().parents[3] / "data" / "babi"
 
@@ -57,15 +56,6 @@ def stories(task: int, limit: int | None = None, split: str = "test") -> list[Ho
 def _house(task: int, index: int, lines: list[str], questions: list[Question]) -> House:
     return House(seed=task * 10000 + index, n_turns=len(lines), facts=[], turns=list(lines),
                  questions=list(questions), told_at={})
-
-
-def modal_answers(worlds: list[House]) -> dict[str, str]:
-    """The blind rule's table over a task: its commonest answer."""
-    by: dict[str, Counter] = {}
-    for w in worlds:
-        for q in w.questions:
-            by.setdefault(q.kind, Counter())[q.answer.lower()] += 1
-    return {k: c.most_common(1)[0][0] for k, c in by.items()}
 
 
 def fingerprint(worlds: list[House]) -> str:

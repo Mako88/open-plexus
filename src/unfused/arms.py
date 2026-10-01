@@ -6,7 +6,9 @@ from disk. The faculty is frozen and shared; it holds nothing between calls.
 
 `Blind` and `FullContext` are the two baselines every reading carries. `Blind`
 answers the commonest answer for the kind of question and reads nothing; the
-earlier branches lost to it. `FullContext` hands the faculty the whole
+earlier branches lost to it. Its table comes from houses it is not examined on,
+the practice houses the system is taught from: built from the test house, it read
+the answer key's marginals, and scored 1.0 on a form whose answers bunch. `FullContext` hands the faculty the whole
 transcript, which is how a stateless model would do it and what the memory has
 to be worth against.
 """
@@ -16,7 +18,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Protocol
 
-from .exam.world import House, Question
+from .exam.world import House, Question, modal_answers
 
 SYSTEM = (
     "You answer questions about a household from the notes given with each question. "
@@ -46,8 +48,9 @@ def ask_with_notes(faculty, notes: list[str], question: str) -> str:
 class Blind:
     name = "blind"
 
-    def __init__(self, house: House) -> None:
-        self.table = house.modal_answers()
+    def __init__(self, houses: list[House], source: str = "") -> None:
+        self.table = modal_answers(houses)
+        self.source = source
 
     def hear(self, turn: int, text: str) -> None:
         pass
@@ -56,7 +59,7 @@ class Blind:
         return self.table.get(question.kind, "")
 
     def dials(self) -> dict:
-        return {}
+        return {"table": self.source}
 
     def close(self) -> None:
         pass

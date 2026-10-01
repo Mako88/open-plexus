@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-COUNT = 4
+COUNT = 3
 
 
 @dataclass(frozen=True)
@@ -43,20 +43,6 @@ OBJECTIONS = [
             "that can hide a difference between arms that hedge differently.",
         settled_by="Count answers naming more than one candidate of the right kind, per arm. "
                    "Above a few per cent for any arm, score those as wrong and re-read.",
-    ),
-    Objection(
-        what="Blind's table is the commonest answer among the test house's own answers.",
-        why="So it has read the answer key's distribution, and on a form whose answers "
-            "bunch it scores what the key gives it: seed 1's chain3 is 20 questions, 4 "
-            "distinct, one answer, and blind reads 1.0 there and 0.0 with a table taken "
-            "from the five practice houses the taught system learns from. Count is not "
-            "affected ('1' is commonest everywhere), and it is the half of the checkpoint "
-            "that is a real bar.",
-        settled_by="John's call, since the checkpoint is his: if blind should be what can be "
-                   "said without hearing the test house, its table comes from the practice "
-                   "houses and the checkpoint is re-read against that. If blind is meant to "
-                   "know the test's answer marginals, the docstring's account of it changes "
-                   "and this entry goes.",
     ),
 ]
 

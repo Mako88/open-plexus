@@ -66,7 +66,9 @@ def main() -> None:
 
     tasks = [int(t) for t in args.tasks.split(",")]
     worlds = {t: stories(t, args.stories) for t in tasks}
-    table = {k: v for t in tasks for k, v in modal_answers(worlds[t]).items()}
+    # from the training stories: built from the test split, it read the key's marginals
+    table = {k: v for t in tasks
+             for k, v in modal_answers(stories(t, args.teach or 20, split="train")).items()}
     arms = args.arms.split(",")
     faculty = embedder = ear = planner = None
     if any(a != "blind" for a in arms):

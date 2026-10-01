@@ -44,7 +44,7 @@ def test_recall_answers_from_disk_after_reopening(tmp_path):
 
 def test_blind_answers_every_negative_so_invents_on_all_of_them():
     house = generate_house(0)
-    result = run(house, lambda: Blind(house))
+    result = run(house, lambda: Blind([house]))
     assert result["summary"]["invented"] == 1.0
 
 

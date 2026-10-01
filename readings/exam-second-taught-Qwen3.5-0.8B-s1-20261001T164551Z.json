@@ -1,0 +1,6124 @@
+{
+ "arm": "taught",
+ "dials": {
+  "ear": "Qwen3.5-0.8B-Q8_0 (llama.cpp) [served, frozen]",
+  "planner": "Qwen3.5-0.8B-Q8_0 (llama.cpp, planner)",
+  "judge": "Qwen3.5-0.8B-Q8_0 (llama.cpp, planner)",
+  "searched": false,
+  "asked": false,
+  "shares": 0.8,
+  "moves": true,
+  "taught": true,
+  "cleans": true,
+  "depth": 3,
+  "hub": 4,
+  "planner_calls": 0,
+  "names_shown": 25,
+  "relations_shown": 30,
+  "plans": false,
+  "shapes": 0,
+  "plan_uses": 0,
+  "ear_calls": 0,
+  "ear_cached": 396,
+  "ear_unparsed": 0
+ },
+ "seconds": 7.4,
+ "summary": {
+  "score": 0.633,
+  "asked": 354,
+  "invented": 0.0,
+  "negatives": 20,
+  "stale": 0.0,
+  "echoed": 0.0,
+  "by_form": {
+   "chain3": {
+    "score": 0.333,
+    "n": 30
+   },
+   "count": {
+    "score": 0.0,
+    "n": 14
+   },
+   "direct": {
+    "score": 0.8,
+    "n": 115
+   },
+   "oblique": {
+    "score": 0.652,
+    "n": 115
+   },
+   "reverse": {
+    "score": 0.7,
+    "n": 40
+   },
+   "twohop": {
+    "score": 0.45,
+    "n": 20
+   },
+   "update": {
+    "score": 0.5,
+    "n": 20
+   }
+  },
+  "by_delay": {
+   "1": {
+    "score": 0.679,
+    "n": 56
+   },
+   "150": {
+    "score": 0.625,
+    "n": 56
+   },
+   "20": {
+    "score": 0.679,
+    "n": 56
+   },
+   "5": {
+    "score": 0.634,
+    "n": 93
+   },
+   "60": {
+    "score": 0.581,
+    "n": 93
+   }
+  },
+  "by_kind": {
+   "age": {
+    "score": 1.0,
+    "n": 50
+   },
+   "count": {
+    "score": 0.0,
+    "n": 14
+   },
+   "material": {
+    "score": 0.415,
+    "n": 82
+   },
+   "person": {
+    "score": 0.657,
+    "n": 140
+   },
+   "workplace": {
+    "score": 0.706,
+    "n": 68
+   }
+  }
+ },
+ "rows": [
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 1,
+   "asked_at": 7,
+   "question": "Where does Stounfleath work?",
+   "answer": "pottery",
+   "said": "pottery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "workplace",
+   "delay": 0,
+   "asked_at": 7,
+   "question": "Where does Ploucknupuff work?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 1,
+   "asked_at": 9,
+   "question": "What age has Fligrodioth reached?",
+   "answer": "42",
+   "said": "42",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 5,
+   "asked_at": 11,
+   "question": "Which place employs Stounfleath?",
+   "answer": "pottery",
+   "said": "pottery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 11,
+   "question": "Who works at the pottery?",
+   "answer": "Stounfleath",
+   "said": "stounfleath",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 5,
+   "asked_at": 13,
+   "question": "How old is Fligrodioth?",
+   "answer": "42",
+   "said": "42",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 1,
+   "asked_at": 14,
+   "question": "What stuff went into the aviary?",
+   "answer": "cork",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 18,
+   "question": "What is the birdcage made of?",
+   "answer": "cork",
+   "said": "cork",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 18,
+   "question": "Who is Kreffvrioff's godparent?",
+   "answer": "Pudrouck",
+   "said": "pudrouck",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 22,
+   "question": "Who stood sponsor at Kreffvrioff's christening?",
+   "answer": "Pudrouck",
+   "said": "pudrouck",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 1,
+   "asked_at": 22,
+   "question": "Which place employs Bouffdrourstoff?",
+   "answer": "mill",
+   "said": "mill",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 22,
+   "question": "Whose godparent is Pudrouck?",
+   "answer": "Kreffvrioff",
+   "said": "kreffvrioff",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 20,
+   "asked_at": 26,
+   "question": "Where does Stounfleath work?",
+   "answer": "pottery",
+   "said": "pottery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 5,
+   "asked_at": 26,
+   "question": "Where does Bouffdrourstoff work?",
+   "answer": "mill",
+   "said": "mill",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 1,
+   "asked_at": 26,
+   "question": "How old is Beagren?",
+   "answer": "75",
+   "said": "75",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 20,
+   "asked_at": 28,
+   "question": "What age has Fligrodioth reached?",
+   "answer": "42",
+   "said": "42",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 1,
+   "asked_at": 28,
+   "question": "What is the ladder made of?",
+   "answer": "cork",
+   "said": "cork",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "age",
+   "delay": 0,
+   "asked_at": 28,
+   "question": "How old is Draemaen?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 5,
+   "asked_at": 30,
+   "question": "What age has Beagren reached?",
+   "answer": "75",
+   "said": "75",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 31,
+   "question": "Who stood sponsor at Trapairk's christening?",
+   "answer": "Plimkis",
+   "said": "plimkis",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 32,
+   "question": "What stuff went into the steps?",
+   "answer": "cork",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 20,
+   "asked_at": 33,
+   "question": "What stuff went into the aviary?",
+   "answer": "cork",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 35,
+   "question": "Who is Trapairk's godparent?",
+   "answer": "Plimkis",
+   "said": "plimkis",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 1,
+   "asked_at": 35,
+   "question": "Where does Fligrodioth work?",
+   "answer": "mill",
+   "said": "mill",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 35,
+   "question": "Whose godparent is Plimkis?",
+   "answer": "Trapairk",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 1,
+   "asked_at": 36,
+   "question": "What age has Stounfleath reached?",
+   "answer": "34",
+   "said": "34",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 37,
+   "question": "Who is Kreffvrioff's godparent?",
+   "answer": "Pudrouck",
+   "said": "pudrouck",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 5,
+   "asked_at": 39,
+   "question": "Which place employs Fligrodioth?",
+   "answer": "mill",
+   "said": "mill",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "person",
+   "delay": 0,
+   "asked_at": 39,
+   "question": "Who is Vrikriodouth's godparent?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 5,
+   "asked_at": 40,
+   "question": "How old is Stounfleath?",
+   "answer": "34",
+   "said": "34",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 40,
+   "question": "Who did Tolteavrand lend the wheelbarrow to?",
+   "answer": "Stounfleath",
+   "said": "stounfleath",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 20,
+   "asked_at": 41,
+   "question": "Which place employs Bouffdrourstoff?",
+   "answer": "mill",
+   "said": "mill",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 1,
+   "asked_at": 42,
+   "question": "What stuff went into the spyglass?",
+   "answer": "birch",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 43,
+   "question": "Who is Fligrodioth's godparent?",
+   "answer": "Beagren",
+   "said": "beagren",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 44,
+   "question": "Who is minding Tolteavrand's barrow?",
+   "answer": "Stounfleath",
+   "said": "stounfleath",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 44,
+   "question": "Who lent Stounfleath the wheelbarrow?",
+   "answer": "Tolteavrand",
+   "said": "tolteavrand",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 5,
+   "asked_at": 44,
+   "question": "How many borrowed things does Stounfleath have?",
+   "answer": "1",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 20,
+   "asked_at": 45,
+   "question": "How old is Beagren?",
+   "answer": "75",
+   "said": "75",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 46,
+   "question": "What is the telescope made of?",
+   "answer": "birch",
+   "said": "birch",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 1,
+   "asked_at": 46,
+   "question": "Which place employs Diockvindvraem?",
+   "answer": "tannery",
+   "said": "tannery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 20,
+   "asked_at": 47,
+   "question": "What is the ladder made of?",
+   "answer": "cork",
+   "said": "cork",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 47,
+   "question": "Who stood sponsor at Fligrodioth's christening?",
+   "answer": "Beagren",
+   "said": "beagren",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 1,
+   "asked_at": 47,
+   "question": "How old is Branos?",
+   "answer": "22",
+   "said": "22",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 47,
+   "question": "Whose godparent is Beagren?",
+   "answer": "Fligrodioth",
+   "said": "fligrodioth",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 49,
+   "question": "Who is minding Truthtrouvoust's tool chest?",
+   "answer": "Plimkis",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "workplace",
+   "delay": 0,
+   "asked_at": 49,
+   "question": "Where does Thilaedraem work?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 50,
+   "question": "Who stood sponsor at Trapairk's christening?",
+   "answer": "Plimkis",
+   "said": "plimkis",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 5,
+   "asked_at": 50,
+   "question": "Where does Diockvindvraem work?",
+   "answer": "tannery",
+   "said": "tannery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 50,
+   "question": "Who works at the tannery?",
+   "answer": "Diockvindvraem",
+   "said": "diockvindvraem",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 5,
+   "asked_at": 51,
+   "question": "What age has Branos reached?",
+   "answer": "22",
+   "said": "22",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 1,
+   "asked_at": 51,
+   "question": "What is the sewing box made of?",
+   "answer": "tin",
+   "said": "tin",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 53,
+   "question": "Who did Truthtrouvoust lend the toolbox to?",
+   "answer": "Plimkis",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 53,
+   "question": "Who lent Plimkis the toolbox?",
+   "answer": "Truthtrouvoust",
+   "said": "truthtrouvoust",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 20,
+   "asked_at": 54,
+   "question": "Where does Fligrodioth work?",
+   "answer": "mill",
+   "said": "mill",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 54,
+   "question": "Who stood sponsor at Bouckstock's christening?",
+   "answer": "Grairiomirn",
+   "said": "grairiomirn",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 20,
+   "asked_at": 55,
+   "question": "What age has Stounfleath reached?",
+   "answer": "34",
+   "said": "34",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 55,
+   "question": "What stuff went into the needlework case?",
+   "answer": "tin",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 1,
+   "asked_at": 55,
+   "question": "Where does Saisstoutrack work?",
+   "answer": "brewery",
+   "said": "brewery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 58,
+   "question": "Who is Bouckstock's godparent?",
+   "answer": "Grairiomirn",
+   "said": "grairiomirn",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 58,
+   "question": "Whose godparent is Grairiomirn?",
+   "answer": "Bouckstock",
+   "said": "bouckstock",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 59,
+   "question": "Who did Tolteavrand lend the wheelbarrow to?",
+   "answer": "Stounfleath",
+   "said": "stounfleath",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 5,
+   "asked_at": 59,
+   "question": "Which place employs Saisstoutrack?",
+   "answer": "brewery",
+   "said": "brewery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 20,
+   "asked_at": 61,
+   "question": "What stuff went into the spyglass?",
+   "answer": "birch",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "age",
+   "delay": 0,
+   "asked_at": 61,
+   "question": "How old is Hustgrark?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 62,
+   "question": "Who is Fligrodioth's godparent?",
+   "answer": "Beagren",
+   "said": "beagren",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 1,
+   "asked_at": 64,
+   "question": "What age has Grairiomirn reached?",
+   "answer": "20",
+   "said": "20",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 20,
+   "asked_at": 65,
+   "question": "Which place employs Diockvindvraem?",
+   "answer": "tannery",
+   "said": "tannery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 60,
+   "asked_at": 66,
+   "question": "Which place employs Stounfleath?",
+   "answer": "pottery",
+   "said": "pottery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 20,
+   "asked_at": 66,
+   "question": "How old is Branos?",
+   "answer": "22",
+   "said": "22",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 66,
+   "question": "Who works at the pottery?",
+   "answer": "Stounfleath",
+   "said": "stounfleath",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 60,
+   "asked_at": 68,
+   "question": "How old is Fligrodioth?",
+   "answer": "42",
+   "said": "42",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 68,
+   "question": "Who is minding Truthtrouvoust's tool chest?",
+   "answer": "Plimkis",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 5,
+   "asked_at": 68,
+   "question": "How old is Grairiomirn?",
+   "answer": "20",
+   "said": "20",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 68,
+   "question": "Who did Kupiodriom lend the telescope to?",
+   "answer": "Saisstoutrack",
+   "said": "saisstoutrack",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 20,
+   "asked_at": 70,
+   "question": "What is the sewing box made of?",
+   "answer": "tin",
+   "said": "tin",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 1,
+   "asked_at": 70,
+   "question": "What stuff went into the angling pole?",
+   "answer": "brass",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 72,
+   "question": "Who is minding Kupiodriom's spyglass?",
+   "answer": "Saisstoutrack",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 72,
+   "question": "Who lent Saisstoutrack the telescope?",
+   "answer": "Kupiodriom",
+   "said": "kupiodriom",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 72,
+   "question": "What is the thing Kupiodriom lent to Saisstoutrack made of?",
+   "answer": "birch",
+   "said": "birch",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 5,
+   "asked_at": 72,
+   "question": "How many borrowed things does Saisstoutrack have?",
+   "answer": "1",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 73,
+   "question": "What is the birdcage made of?",
+   "answer": "cork",
+   "said": "cork",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 73,
+   "question": "Who stood sponsor at Bouckstock's christening?",
+   "answer": "Grairiomirn",
+   "said": "grairiomirn",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 20,
+   "asked_at": 74,
+   "question": "Where does Saisstoutrack work?",
+   "answer": "brewery",
+   "said": "brewery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 74,
+   "question": "What is the fishing rod made of?",
+   "answer": "brass",
+   "said": "brass",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "person",
+   "delay": 0,
+   "asked_at": 74,
+   "question": "Who is Sterflaist's godparent?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 75,
+   "question": "Who is Branos's godparent?",
+   "answer": "Tirbogrock",
+   "said": "tirbogrock",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 1,
+   "asked_at": 76,
+   "question": "Which place employs Branos?",
+   "answer": "ropewalk",
+   "said": "these days",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 77,
+   "question": "Who stood sponsor at Kreffvrioff's christening?",
+   "answer": "Pudrouck",
+   "said": "pudrouck",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 77,
+   "question": "Whose godparent is Pudrouck?",
+   "answer": "Kreffvrioff",
+   "said": "kreffvrioff",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 79,
+   "question": "Who stood sponsor at Branos's christening?",
+   "answer": "Tirbogrock",
+   "said": "tirbogrock",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 1,
+   "asked_at": 79,
+   "question": "How old is Tolteavrand?",
+   "answer": "28",
+   "said": "28",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 79,
+   "question": "Whose godparent is Tirbogrock?",
+   "answer": "Branos",
+   "said": "branos",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 5,
+   "asked_at": 80,
+   "question": "Where does Branos work?",
+   "answer": "ropewalk",
+   "said": "these days",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 80,
+   "question": "Who works at the ropewalk?",
+   "answer": "Branos",
+   "said": "branos",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 60,
+   "asked_at": 81,
+   "question": "Where does Bouffdrourstoff work?",
+   "answer": "mill",
+   "said": "mill",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 82,
+   "question": "Who is minding Diockvindvraem's aviary?",
+   "answer": "Trapairk",
+   "said": "trapairk",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 1,
+   "asked_at": 82,
+   "question": "What is the thing the person who works at the tannery lent to Trapairk made of?",
+   "answer": "cork",
+   "said": "cork",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 20,
+   "asked_at": 83,
+   "question": "What age has Grairiomirn reached?",
+   "answer": "20",
+   "said": "20",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 5,
+   "asked_at": 83,
+   "question": "What age has Tolteavrand reached?",
+   "answer": "28",
+   "said": "28",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "workplace",
+   "delay": 0,
+   "asked_at": 83,
+   "question": "Where does Vaelpair work?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 84,
+   "question": "Who has the sewing box now?",
+   "answer": "Branos",
+   "said": "branos",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 60,
+   "asked_at": 85,
+   "question": "What age has Beagren reached?",
+   "answer": "75",
+   "said": "75",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 1,
+   "asked_at": 85,
+   "question": "What is the bread tin made of?",
+   "answer": "pewter",
+   "said": "sewing box",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 86,
+   "question": "Who did Diockvindvraem lend the birdcage to?",
+   "answer": "Trapairk",
+   "said": "trapairk",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 86,
+   "question": "Who stood sponsor at Saisstoutrack's christening?",
+   "answer": "Nogael",
+   "said": "nogael",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 86,
+   "question": "Who lent Trapairk the birdcage?",
+   "answer": "Diockvindvraem",
+   "said": "diockvindvraem",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 86,
+   "question": "What is the thing Diockvindvraem lent to Trapairk made of?",
+   "answer": "cork",
+   "said": "cork",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 86,
+   "question": "What is the thing the person who works at the tannery lent to Trapairk made of?",
+   "answer": "cork",
+   "said": "cork",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 87,
+   "question": "What stuff went into the steps?",
+   "answer": "cork",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 87,
+   "question": "Who did Kupiodriom lend the telescope to?",
+   "answer": "Saisstoutrack",
+   "said": "saisstoutrack",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 1,
+   "asked_at": 88,
+   "question": "Where does Kupiodriom work?",
+   "answer": "printworks",
+   "said": "printworks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 88,
+   "question": "Who has the sewing box now?",
+   "answer": "Branos",
+   "said": "branos",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 20,
+   "asked_at": 89,
+   "question": "What stuff went into the angling pole?",
+   "answer": "brass",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 89,
+   "question": "What stuff went into the loaf box?",
+   "answer": "pewter",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 90,
+   "question": "Who is Trapairk's godparent?",
+   "answer": "Plimkis",
+   "said": "diockvindvraem",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 90,
+   "question": "Who is Saisstoutrack's godparent?",
+   "answer": "Nogael",
+   "said": "nogael",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 90,
+   "question": "Whose godparent is Plimkis?",
+   "answer": "Trapairk",
+   "said": "loan",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 90,
+   "question": "Whose godparent is Nogael?",
+   "answer": "Saisstoutrack",
+   "said": "saisstoutrack",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 5,
+   "asked_at": 92,
+   "question": "Which place employs Kupiodriom?",
+   "answer": "printworks",
+   "said": "printworks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "age",
+   "delay": 0,
+   "asked_at": 92,
+   "question": "How old is Trostrurk?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 60,
+   "asked_at": 94,
+   "question": "Which place employs Fligrodioth?",
+   "answer": "mill",
+   "said": "mill",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 94,
+   "question": "Who is Branos's godparent?",
+   "answer": "Tirbogrock",
+   "said": "tirbogrock",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 60,
+   "asked_at": 95,
+   "question": "How old is Stounfleath?",
+   "answer": "34",
+   "said": "34",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 20,
+   "asked_at": 95,
+   "question": "Which place employs Branos?",
+   "answer": "ropewalk",
+   "said": "now",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 1,
+   "asked_at": 97,
+   "question": "What age has Nogael reached?",
+   "answer": "88",
+   "said": "88",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 20,
+   "asked_at": 98,
+   "question": "How old is Tolteavrand?",
+   "answer": "28",
+   "said": "28",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 99,
+   "question": "Who is minding Tolteavrand's barrow?",
+   "answer": "Stounfleath",
+   "said": "stounfleath",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 99,
+   "question": "Who did Kreffvrioff lend the rocking chair to?",
+   "answer": "Nogael",
+   "said": "loan",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 99,
+   "question": "Who lent Stounfleath the wheelbarrow?",
+   "answer": "Tolteavrand",
+   "said": "tolteavrand",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 60,
+   "asked_at": 99,
+   "question": "How many borrowed things does Stounfleath have?",
+   "answer": "1",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 101,
+   "question": "What is the telescope made of?",
+   "answer": "birch",
+   "said": "birch",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 101,
+   "question": "Who is minding Diockvindvraem's aviary?",
+   "answer": "Trapairk",
+   "said": "trapairk",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 5,
+   "asked_at": 101,
+   "question": "How old is Nogael?",
+   "answer": "88",
+   "said": "88",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 20,
+   "asked_at": 101,
+   "question": "What is the thing the person who works at the tannery lent to Trapairk made of?",
+   "answer": "cork",
+   "said": "cork",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 102,
+   "question": "Who stood sponsor at Fligrodioth's christening?",
+   "answer": "Beagren",
+   "said": "beagren",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 1,
+   "asked_at": 102,
+   "question": "What stuff went into the barrow?",
+   "answer": "horn",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 102,
+   "question": "Whose godparent is Beagren?",
+   "answer": "Fligrodioth",
+   "said": "fligrodioth",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 103,
+   "question": "Who is minding Kreffvrioff's rocker?",
+   "answer": "Nogael",
+   "said": "rocking chair",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 103,
+   "question": "Who has the sewing box now?",
+   "answer": "Branos",
+   "said": "branos",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 103,
+   "question": "Who lent Nogael the rocking chair?",
+   "answer": "Kreffvrioff",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 20,
+   "asked_at": 104,
+   "question": "What is the bread tin made of?",
+   "answer": "pewter",
+   "said": "sewing box",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 104,
+   "question": "Who is Groviovael's godparent?",
+   "answer": "Kupiodriom",
+   "said": "kupiodriom",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 1,
+   "asked_at": 104,
+   "question": "What is the thing Groviovael's godparent lent to Saisstoutrack made of?",
+   "answer": "birch",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "person",
+   "delay": 0,
+   "asked_at": 104,
+   "question": "Who is Fleathsinstail's godparent?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 60,
+   "asked_at": 105,
+   "question": "Where does Diockvindvraem work?",
+   "answer": "tannery",
+   "said": "tannery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 105,
+   "question": "Who stood sponsor at Saisstoutrack's christening?",
+   "answer": "Nogael",
+   "said": "nogael",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 105,
+   "question": "Who works at the tannery?",
+   "answer": "Diockvindvraem",
+   "said": "diockvindvraem",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 60,
+   "asked_at": 106,
+   "question": "What age has Branos reached?",
+   "answer": "22",
+   "said": "22",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 106,
+   "question": "What is the wheelbarrow made of?",
+   "answer": "horn",
+   "said": "horn",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 1,
+   "asked_at": 106,
+   "question": "Which place employs Tirbogrock?",
+   "answer": "brewery",
+   "said": "brewery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 106,
+   "question": "What is the thing Tolteavrand lent to Stounfleath made of?",
+   "answer": "horn",
+   "said": "horn",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "workplace",
+   "delay": 1,
+   "asked_at": 106,
+   "question": "Where does the godparent of the person who works at the ropewalk work?",
+   "answer": "brewery",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 20,
+   "asked_at": 107,
+   "question": "Where does Kupiodriom work?",
+   "answer": "printworks",
+   "said": "printworks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 108,
+   "question": "Who did Truthtrouvoust lend the toolbox to?",
+   "answer": "Plimkis",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 108,
+   "question": "Who stood sponsor at Groviovael's christening?",
+   "answer": "Kupiodriom",
+   "said": "kupiodriom",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 108,
+   "question": "Who lent Plimkis the toolbox?",
+   "answer": "Truthtrouvoust",
+   "said": "truthtrouvoust",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 108,
+   "question": "Whose godparent is Kupiodriom?",
+   "answer": "Groviovael",
+   "said": "groviovael",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "workplace",
+   "delay": 5,
+   "asked_at": 108,
+   "question": "Where does Groviovael's godparent work?",
+   "answer": "printworks",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 108,
+   "question": "What is the thing Groviovael's godparent lent to Saisstoutrack made of?",
+   "answer": "birch",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 1,
+   "asked_at": 109,
+   "question": "How old is Pudrouck?",
+   "answer": "64",
+   "said": "64",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 110,
+   "question": "What stuff went into the needlework case?",
+   "answer": "tin",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 5,
+   "asked_at": 110,
+   "question": "Where does Tirbogrock work?",
+   "answer": "brewery",
+   "said": "brewery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "workplace",
+   "delay": 5,
+   "asked_at": 110,
+   "question": "Where does Branos's godparent work?",
+   "answer": "brewery",
+   "said": "brewery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "workplace",
+   "delay": 5,
+   "asked_at": 110,
+   "question": "Where does the godparent of the person who works at the ropewalk work?",
+   "answer": "brewery",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 113,
+   "question": "Who is Bouckstock's godparent?",
+   "answer": "Grairiomirn",
+   "said": "grairiomirn",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 5,
+   "asked_at": 113,
+   "question": "What age has Pudrouck reached?",
+   "answer": "64",
+   "said": "64",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 113,
+   "question": "Whose godparent is Grairiomirn?",
+   "answer": "Bouckstock",
+   "said": "bouckstock",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 60,
+   "asked_at": 114,
+   "question": "Which place employs Saisstoutrack?",
+   "answer": "brewery",
+   "said": "brewery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 1,
+   "asked_at": 114,
+   "question": "What is the rocking chair made of?",
+   "answer": "pewter",
+   "said": "kreffvrioff",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "workplace",
+   "delay": 0,
+   "asked_at": 114,
+   "question": "Where does Feguth work?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 20,
+   "asked_at": 116,
+   "question": "What age has Nogael reached?",
+   "answer": "88",
+   "said": "88",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 116,
+   "question": "Who stood sponsor at Bouffdrourstoff's christening?",
+   "answer": "Stounfleath",
+   "said": "stounfleath",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 118,
+   "question": "Who did Kreffvrioff lend the rocking chair to?",
+   "answer": "Nogael",
+   "said": "loan",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 118,
+   "question": "What stuff went into the rocker?",
+   "answer": "pewter",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 118,
+   "question": "What is the thing Kreffvrioff lent to Nogael made of?",
+   "answer": "pewter",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 120,
+   "question": "Who is Bouffdrourstoff's godparent?",
+   "answer": "Stounfleath",
+   "said": "stounfleath",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 120,
+   "question": "Whose godparent is Stounfleath?",
+   "answer": "Bouffdrourstoff",
+   "said": "bouffdrourstoff",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "workplace",
+   "delay": 5,
+   "asked_at": 120,
+   "question": "Where does Bouffdrourstoff's godparent work?",
+   "answer": "pottery",
+   "said": "now",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 20,
+   "asked_at": 121,
+   "question": "What stuff went into the barrow?",
+   "answer": "horn",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 1,
+   "asked_at": 122,
+   "question": "Where does Tolteavrand work?",
+   "answer": "chandlery",
+   "said": "chandlery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 1,
+   "asked_at": 122,
+   "question": "What is the thing the person who works at the chandlery lent to Stounfleath made of?",
+   "answer": "horn",
+   "said": "horn",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 60,
+   "asked_at": 123,
+   "question": "How old is Grairiomirn?",
+   "answer": "20",
+   "said": "20",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 123,
+   "question": "Who is Groviovael's godparent?",
+   "answer": "Kupiodriom",
+   "said": "kupiodriom",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 1,
+   "asked_at": 123,
+   "question": "What age has Truthtrouvoust reached?",
+   "answer": "40",
+   "said": "40",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 20,
+   "asked_at": 123,
+   "question": "What is the thing Groviovael's godparent lent to Saisstoutrack made of?",
+   "answer": "birch",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 20,
+   "asked_at": 125,
+   "question": "Which place employs Tirbogrock?",
+   "answer": "brewery",
+   "said": "brewery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "workplace",
+   "delay": 20,
+   "asked_at": 125,
+   "question": "Where does the godparent of the person who works at the ropewalk work?",
+   "answer": "brewery",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 5,
+   "asked_at": 126,
+   "question": "Which place employs Tolteavrand?",
+   "answer": "chandlery",
+   "said": "chandlery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 126,
+   "question": "Who has the kite now?",
+   "answer": "Nogael",
+   "said": "nogael",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 126,
+   "question": "Who works at the chandlery?",
+   "answer": "Tolteavrand",
+   "said": "tolteavrand",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 126,
+   "question": "What is the thing the person who works at the chandlery lent to Stounfleath made of?",
+   "answer": "horn",
+   "said": "horn",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 127,
+   "question": "Who is minding Kupiodriom's spyglass?",
+   "answer": "Saisstoutrack",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 5,
+   "asked_at": 127,
+   "question": "How old is Truthtrouvoust?",
+   "answer": "40",
+   "said": "40",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 127,
+   "question": "Who lent Saisstoutrack the telescope?",
+   "answer": "Kupiodriom",
+   "said": "kupiodriom",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 127,
+   "question": "What is the thing Kupiodriom lent to Saisstoutrack made of?",
+   "answer": "birch",
+   "said": "birch",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 60,
+   "asked_at": 127,
+   "question": "How many borrowed things does Saisstoutrack have?",
+   "answer": "1",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "age",
+   "delay": 0,
+   "asked_at": 127,
+   "question": "How old is Noulfick?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 20,
+   "asked_at": 128,
+   "question": "How old is Pudrouck?",
+   "answer": "64",
+   "said": "64",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 1,
+   "asked_at": 128,
+   "question": "What stuff went into the tool chest?",
+   "answer": "cork",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 129,
+   "question": "What is the fishing rod made of?",
+   "answer": "brass",
+   "said": "brass",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 130,
+   "question": "Who is Truthtrouvoust's godparent?",
+   "answer": "Kenastem",
+   "said": "toolbox",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 130,
+   "question": "Who has the kite now?",
+   "answer": "Nogael",
+   "said": "nogael",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 5,
+   "asked_at": 130,
+   "question": "How many borrowed things does Nogael have?",
+   "answer": "2",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 132,
+   "question": "What is the toolbox made of?",
+   "answer": "cork",
+   "said": "cork",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 1,
+   "asked_at": 132,
+   "question": "Which place employs Groviovael?",
+   "answer": "printworks",
+   "said": "printworks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 132,
+   "question": "What is the thing Truthtrouvoust lent to Plimkis made of?",
+   "answer": "cork",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 20,
+   "asked_at": 133,
+   "question": "What is the rocking chair made of?",
+   "answer": "pewter",
+   "said": "kreffvrioff",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 133,
+   "question": "Who has the bread tin now?",
+   "answer": "Groviovael",
+   "said": "to",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 134,
+   "question": "Who stood sponsor at Branos's christening?",
+   "answer": "Tirbogrock",
+   "said": "tirbogrock",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 134,
+   "question": "Who stood sponsor at Truthtrouvoust's christening?",
+   "answer": "Kenastem",
+   "said": "toolbox",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 134,
+   "question": "Whose godparent is Tirbogrock?",
+   "answer": "Branos",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 134,
+   "question": "Whose godparent is Kenastem?",
+   "answer": "Truthtrouvoust",
+   "said": "truthtrouvoust",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 60,
+   "asked_at": 135,
+   "question": "Where does Branos work?",
+   "answer": "ropewalk",
+   "said": "now",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 135,
+   "question": "Who stood sponsor at Bouffdrourstoff's christening?",
+   "answer": "Stounfleath",
+   "said": "stounfleath",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 1,
+   "asked_at": 135,
+   "question": "How old is Bouckstock?",
+   "answer": "83",
+   "said": "83",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 135,
+   "question": "Who works at the ropewalk?",
+   "answer": "Branos",
+   "said": "branos",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 5,
+   "asked_at": 136,
+   "question": "Where does Groviovael work?",
+   "answer": "printworks",
+   "said": "printworks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "person",
+   "delay": 0,
+   "asked_at": 136,
+   "question": "Who is Trothnarn's godparent?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 137,
+   "question": "Who has the fishing rod now?",
+   "answer": "Trapairk",
+   "said": "any more",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 137,
+   "question": "Who has the bread tin now?",
+   "answer": "Groviovael",
+   "said": "to",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 5,
+   "asked_at": 137,
+   "question": "How many borrowed things does Groviovael have?",
+   "answer": "1",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 60,
+   "asked_at": 138,
+   "question": "What age has Tolteavrand reached?",
+   "answer": "28",
+   "said": "28",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 5,
+   "asked_at": 139,
+   "question": "What age has Bouckstock reached?",
+   "answer": "83",
+   "said": "83",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 139,
+   "question": "Who is minding Groviovael's steps?",
+   "answer": "Plimkis",
+   "said": "saisstoutrack",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 141,
+   "question": "Who did Diockvindvraem lend the birdcage to?",
+   "answer": "Trapairk",
+   "said": "trapairk",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 20,
+   "asked_at": 141,
+   "question": "Where does Tolteavrand work?",
+   "answer": "chandlery",
+   "said": "chandlery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 141,
+   "question": "Who has the fishing rod now?",
+   "answer": "Trapairk",
+   "said": "any more",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 141,
+   "question": "Who lent Trapairk the birdcage?",
+   "answer": "Diockvindvraem",
+   "said": "diockvindvraem",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 141,
+   "question": "What is the thing Diockvindvraem lent to Trapairk made of?",
+   "answer": "cork",
+   "said": "cork",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 141,
+   "question": "What is the thing the person who works at the tannery lent to Trapairk made of?",
+   "answer": "cork",
+   "said": "cork",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 20,
+   "asked_at": 141,
+   "question": "What is the thing the person who works at the chandlery lent to Stounfleath made of?",
+   "answer": "horn",
+   "said": "horn",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 5,
+   "asked_at": 141,
+   "question": "How many borrowed things does Branos have?",
+   "answer": "1",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 5,
+   "asked_at": 141,
+   "question": "How many borrowed things does Trapairk have?",
+   "answer": "2",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 20,
+   "asked_at": 142,
+   "question": "What age has Truthtrouvoust reached?",
+   "answer": "40",
+   "said": "40",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 143,
+   "question": "Who did Groviovael lend the ladder to?",
+   "answer": "Plimkis",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 143,
+   "question": "Who has the sewing box now?",
+   "answer": "Branos",
+   "said": "branos",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 143,
+   "question": "Who lent Plimkis the ladder?",
+   "answer": "Groviovael",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 143,
+   "question": "What is the thing Groviovael lent to Plimkis made of?",
+   "answer": "cork",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 5,
+   "asked_at": 143,
+   "question": "How many borrowed things does Plimkis have?",
+   "answer": "2",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 144,
+   "question": "What stuff went into the loaf box?",
+   "answer": "pewter",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 145,
+   "question": "Who is Saisstoutrack's godparent?",
+   "answer": "Nogael",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 145,
+   "question": "Who has the kite now?",
+   "answer": "Nogael",
+   "said": "nogael",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 145,
+   "question": "Whose godparent is Nogael?",
+   "answer": "Saisstoutrack",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "workplace",
+   "delay": 0,
+   "asked_at": 145,
+   "question": "Where does Gaeslirk work?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 60,
+   "asked_at": 147,
+   "question": "Which place employs Kupiodriom?",
+   "answer": "printworks",
+   "said": "printworks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 20,
+   "asked_at": 147,
+   "question": "What stuff went into the tool chest?",
+   "answer": "cork",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 1,
+   "asked_at": 147,
+   "question": "What is the kite made of?",
+   "answer": "tin",
+   "said": "tin",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 148,
+   "question": "Who stood sponsor at Diockvindvraem's christening?",
+   "answer": "Tolteavrand",
+   "said": "tolteavrand",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "workplace",
+   "delay": 1,
+   "asked_at": 148,
+   "question": "Where does the godparent of the person who works at the tannery work?",
+   "answer": "chandlery",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 1,
+   "asked_at": 148,
+   "question": "What is the thing Diockvindvraem's godparent lent to Stounfleath made of?",
+   "answer": "horn",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 149,
+   "question": "Who is Truthtrouvoust's godparent?",
+   "answer": "Kenastem",
+   "said": "toolbox",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 20,
+   "asked_at": 151,
+   "question": "Which place employs Groviovael?",
+   "answer": "printworks",
+   "said": "printworks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 151,
+   "question": "What stuff went into the flying toy?",
+   "answer": "tin",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 152,
+   "question": "Who is Diockvindvraem's godparent?",
+   "answer": "Tolteavrand",
+   "said": "tolteavrand",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 152,
+   "question": "Who has the bread tin now?",
+   "answer": "Groviovael",
+   "said": "to",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 152,
+   "question": "Whose godparent is Tolteavrand?",
+   "answer": "Diockvindvraem",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "workplace",
+   "delay": 5,
+   "asked_at": 152,
+   "question": "Where does Diockvindvraem's godparent work?",
+   "answer": "chandlery",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "workplace",
+   "delay": 5,
+   "asked_at": 152,
+   "question": "Where does the godparent of the person who works at the tannery work?",
+   "answer": "chandlery",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 5,
+   "asked_at": 152,
+   "question": "What is the thing Diockvindvraem's godparent lent to Stounfleath made of?",
+   "answer": "horn",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 20,
+   "asked_at": 154,
+   "question": "How old is Bouckstock?",
+   "answer": "83",
+   "said": "83",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 150,
+   "asked_at": 156,
+   "question": "Where does Stounfleath work?",
+   "answer": "pottery",
+   "said": "pottery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 60,
+   "asked_at": 156,
+   "question": "How old is Nogael?",
+   "answer": "88",
+   "said": "88",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 156,
+   "question": "Who has the fishing rod now?",
+   "answer": "Trapairk",
+   "said": "any more",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 150,
+   "asked_at": 158,
+   "question": "What age has Fligrodioth reached?",
+   "answer": "42",
+   "said": "42",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 158,
+   "question": "Who is minding Kreffvrioff's rocker?",
+   "answer": "Nogael",
+   "said": "rocking chair",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 158,
+   "question": "Who is minding Groviovael's steps?",
+   "answer": "Plimkis",
+   "said": "saisstoutrack",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 158,
+   "question": "Who lent Nogael the rocking chair?",
+   "answer": "Kreffvrioff",
+   "said": "pewter",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 161,
+   "question": "What is the wheelbarrow made of?",
+   "answer": "horn",
+   "said": "horn",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 161,
+   "question": "What is the thing Tolteavrand lent to Stounfleath made of?",
+   "answer": "horn",
+   "said": "horn",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "age",
+   "delay": 0,
+   "asked_at": 161,
+   "question": "How old is Teplouff?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 150,
+   "asked_at": 163,
+   "question": "What stuff went into the aviary?",
+   "answer": "cork",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 163,
+   "question": "Who stood sponsor at Groviovael's christening?",
+   "answer": "Kupiodriom",
+   "said": "kupiodriom",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 163,
+   "question": "Whose godparent is Kupiodriom?",
+   "answer": "Groviovael",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "workplace",
+   "delay": 60,
+   "asked_at": 163,
+   "question": "Where does Groviovael's godparent work?",
+   "answer": "printworks",
+   "said": "printworks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 163,
+   "question": "What is the thing Groviovael's godparent lent to Saisstoutrack made of?",
+   "answer": "birch",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 60,
+   "asked_at": 165,
+   "question": "Where does Tirbogrock work?",
+   "answer": "brewery",
+   "said": "brewery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "workplace",
+   "delay": 60,
+   "asked_at": 165,
+   "question": "Where does Branos's godparent work?",
+   "answer": "brewery",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "workplace",
+   "delay": 60,
+   "asked_at": 165,
+   "question": "Where does the godparent of the person who works at the ropewalk work?",
+   "answer": "brewery",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 20,
+   "asked_at": 166,
+   "question": "What is the kite made of?",
+   "answer": "tin",
+   "said": "tin",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 167,
+   "question": "Who is Kreffvrioff's godparent?",
+   "answer": "Pudrouck",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 167,
+   "question": "Who stood sponsor at Diockvindvraem's christening?",
+   "answer": "Tolteavrand",
+   "said": "tolteavrand",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "workplace",
+   "delay": 20,
+   "asked_at": 167,
+   "question": "Where does the godparent of the person who works at the tannery work?",
+   "answer": "chandlery",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 20,
+   "asked_at": 167,
+   "question": "What is the thing Diockvindvraem's godparent lent to Stounfleath made of?",
+   "answer": "horn",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 60,
+   "asked_at": 168,
+   "question": "What age has Pudrouck reached?",
+   "answer": "64",
+   "said": "64",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 150,
+   "asked_at": 171,
+   "question": "Which place employs Bouffdrourstoff?",
+   "answer": "mill",
+   "said": "mill",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 173,
+   "question": "What stuff went into the rocker?",
+   "answer": "pewter",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 173,
+   "question": "What is the thing Kreffvrioff lent to Nogael made of?",
+   "answer": "pewter",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 150,
+   "asked_at": 175,
+   "question": "How old is Beagren?",
+   "answer": "75",
+   "said": "75",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 175,
+   "question": "Who is Bouffdrourstoff's godparent?",
+   "answer": "Stounfleath",
+   "said": "stounfleath",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 175,
+   "question": "Whose godparent is Stounfleath?",
+   "answer": "Bouffdrourstoff",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "workplace",
+   "delay": 60,
+   "asked_at": 175,
+   "question": "Where does Bouffdrourstoff's godparent work?",
+   "answer": "pottery",
+   "said": "pottery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "person",
+   "delay": 0,
+   "asked_at": 175,
+   "question": "Who is Voupogril's godparent?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 150,
+   "asked_at": 177,
+   "question": "What is the ladder made of?",
+   "answer": "cork",
+   "said": "groviovael",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 180,
+   "question": "Who stood sponsor at Trapairk's christening?",
+   "answer": "Plimkis",
+   "said": "plimkis",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 60,
+   "asked_at": 181,
+   "question": "Which place employs Tolteavrand?",
+   "answer": "chandlery",
+   "said": "chandlery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 181,
+   "question": "Who works at the chandlery?",
+   "answer": "Tolteavrand",
+   "said": "tolteavrand",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 181,
+   "question": "What is the thing the person who works at the chandlery lent to Stounfleath made of?",
+   "answer": "horn",
+   "said": "horn",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 60,
+   "asked_at": 182,
+   "question": "How old is Truthtrouvoust?",
+   "answer": "40",
+   "said": "40",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 150,
+   "asked_at": 184,
+   "question": "Where does Fligrodioth work?",
+   "answer": "mill",
+   "said": "mill",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 150,
+   "asked_at": 185,
+   "question": "What age has Stounfleath reached?",
+   "answer": "34",
+   "said": "34",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 185,
+   "question": "Who has the kite now?",
+   "answer": "Nogael",
+   "said": "nogael",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 60,
+   "asked_at": 185,
+   "question": "How many borrowed things does Nogael have?",
+   "answer": "2",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 187,
+   "question": "What is the toolbox made of?",
+   "answer": "cork",
+   "said": "cork",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 187,
+   "question": "What is the thing Truthtrouvoust lent to Plimkis made of?",
+   "answer": "cork",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 189,
+   "question": "Who did Tolteavrand lend the wheelbarrow to?",
+   "answer": "Stounfleath",
+   "said": "stounfleath",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 189,
+   "question": "Who stood sponsor at Truthtrouvoust's christening?",
+   "answer": "Kenastem",
+   "said": "toolbox",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 189,
+   "question": "Whose godparent is Kenastem?",
+   "answer": "Truthtrouvoust",
+   "said": "truthtrouvoust",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 150,
+   "asked_at": 191,
+   "question": "What stuff went into the spyglass?",
+   "answer": "birch",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 60,
+   "asked_at": 191,
+   "question": "Where does Groviovael work?",
+   "answer": "printworks",
+   "said": "printworks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "workplace",
+   "delay": 0,
+   "asked_at": 191,
+   "question": "Where does Flervunous work?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 192,
+   "question": "Who is Fligrodioth's godparent?",
+   "answer": "Beagren",
+   "said": "beagren",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 192,
+   "question": "Who has the bread tin now?",
+   "answer": "Groviovael",
+   "said": "to",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 60,
+   "asked_at": 192,
+   "question": "How many borrowed things does Groviovael have?",
+   "answer": "1",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 60,
+   "asked_at": 194,
+   "question": "What age has Bouckstock reached?",
+   "answer": "83",
+   "said": "83",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 150,
+   "asked_at": 195,
+   "question": "Which place employs Diockvindvraem?",
+   "answer": "tannery",
+   "said": "tannery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 150,
+   "asked_at": 196,
+   "question": "How old is Branos?",
+   "answer": "22",
+   "said": "22",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 196,
+   "question": "Who has the fishing rod now?",
+   "answer": "Trapairk",
+   "said": "any more",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 60,
+   "asked_at": 196,
+   "question": "How many borrowed things does Branos have?",
+   "answer": "1",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 60,
+   "asked_at": 196,
+   "question": "How many borrowed things does Trapairk have?",
+   "answer": "2",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 198,
+   "question": "Who is minding Truthtrouvoust's tool chest?",
+   "answer": "Plimkis",
+   "said": "kenastem",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 198,
+   "question": "Who did Groviovael lend the ladder to?",
+   "answer": "Plimkis",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 198,
+   "question": "Who lent Plimkis the ladder?",
+   "answer": "Groviovael",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 198,
+   "question": "What is the thing Groviovael lent to Plimkis made of?",
+   "answer": "cork",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 60,
+   "asked_at": 198,
+   "question": "How many borrowed things does Plimkis have?",
+   "answer": "2",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 150,
+   "asked_at": 200,
+   "question": "What is the sewing box made of?",
+   "answer": "tin",
+   "said": "tin",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 203,
+   "question": "Who stood sponsor at Bouckstock's christening?",
+   "answer": "Grairiomirn",
+   "said": "grairiomirn",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 150,
+   "asked_at": 204,
+   "question": "Where does Saisstoutrack work?",
+   "answer": "brewery",
+   "said": "brewery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "age",
+   "delay": 0,
+   "asked_at": 204,
+   "question": "How old is Niondgaernsourn?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 206,
+   "question": "What stuff went into the flying toy?",
+   "answer": "tin",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 207,
+   "question": "Who is Diockvindvraem's godparent?",
+   "answer": "Tolteavrand",
+   "said": "tolteavrand",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 207,
+   "question": "Whose godparent is Tolteavrand?",
+   "answer": "Diockvindvraem",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "workplace",
+   "delay": 60,
+   "asked_at": 207,
+   "question": "Where does Diockvindvraem's godparent work?",
+   "answer": "chandlery",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "workplace",
+   "delay": 60,
+   "asked_at": 207,
+   "question": "Where does the godparent of the person who works at the tannery work?",
+   "answer": "chandlery",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 60,
+   "asked_at": 207,
+   "question": "What is the thing Diockvindvraem's godparent lent to Stounfleath made of?",
+   "answer": "horn",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 150,
+   "asked_at": 213,
+   "question": "What age has Grairiomirn reached?",
+   "answer": "20",
+   "said": "20",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 217,
+   "question": "Who did Kupiodriom lend the telescope to?",
+   "answer": "Saisstoutrack",
+   "said": "saisstoutrack",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 150,
+   "asked_at": 219,
+   "question": "What stuff went into the angling pole?",
+   "answer": "brass",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 224,
+   "question": "Who is Branos's godparent?",
+   "answer": "Tirbogrock",
+   "said": "tirbogrock",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 150,
+   "asked_at": 225,
+   "question": "Which place employs Branos?",
+   "answer": "ropewalk",
+   "said": "now",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 150,
+   "asked_at": 228,
+   "question": "How old is Tolteavrand?",
+   "answer": "28",
+   "said": "28",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "person",
+   "delay": 0,
+   "asked_at": 228,
+   "question": "Who is Flaisbrirkhoff's godparent?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 231,
+   "question": "Who is minding Diockvindvraem's aviary?",
+   "answer": "Trapairk",
+   "said": "trapairk",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 150,
+   "asked_at": 231,
+   "question": "What is the thing the person who works at the tannery lent to Trapairk made of?",
+   "answer": "cork",
+   "said": "cork",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 233,
+   "question": "Who has the sewing box now?",
+   "answer": "Branos",
+   "said": "branos",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 150,
+   "asked_at": 234,
+   "question": "What is the bread tin made of?",
+   "answer": "pewter",
+   "said": "kite",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 235,
+   "question": "Who stood sponsor at Saisstoutrack's christening?",
+   "answer": "Nogael",
+   "said": "nogael",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 150,
+   "asked_at": 237,
+   "question": "Where does Kupiodriom work?",
+   "answer": "printworks",
+   "said": "printworks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 150,
+   "asked_at": 246,
+   "question": "What age has Nogael reached?",
+   "answer": "88",
+   "said": "88",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 248,
+   "question": "Who did Kreffvrioff lend the rocking chair to?",
+   "answer": "Nogael",
+   "said": "loan",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 150,
+   "asked_at": 251,
+   "question": "What stuff went into the barrow?",
+   "answer": "horn",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 253,
+   "question": "Who is Groviovael's godparent?",
+   "answer": "Kupiodriom",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 150,
+   "asked_at": 253,
+   "question": "What is the thing Groviovael's godparent lent to Saisstoutrack made of?",
+   "answer": "birch",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "workplace",
+   "delay": 0,
+   "asked_at": 253,
+   "question": "Where does Suckbream work?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 150,
+   "asked_at": 255,
+   "question": "Which place employs Tirbogrock?",
+   "answer": "brewery",
+   "said": "brewery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "workplace",
+   "delay": 150,
+   "asked_at": 255,
+   "question": "Where does the godparent of the person who works at the ropewalk work?",
+   "answer": "brewery",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 150,
+   "asked_at": 258,
+   "question": "How old is Pudrouck?",
+   "answer": "64",
+   "said": "64",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 150,
+   "asked_at": 263,
+   "question": "What is the rocking chair made of?",
+   "answer": "pewter",
+   "said": "kreffvrioff",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 265,
+   "question": "Who stood sponsor at Bouffdrourstoff's christening?",
+   "answer": "Stounfleath",
+   "said": "stounfleath",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "workplace",
+   "delay": 150,
+   "asked_at": 271,
+   "question": "Where does Tolteavrand work?",
+   "answer": "chandlery",
+   "said": "chandlery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 150,
+   "asked_at": 271,
+   "question": "What is the thing the person who works at the chandlery lent to Stounfleath made of?",
+   "answer": "horn",
+   "said": "horn",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "age",
+   "delay": 150,
+   "asked_at": 272,
+   "question": "What age has Truthtrouvoust reached?",
+   "answer": "40",
+   "said": "40",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 275,
+   "question": "Who has the kite now?",
+   "answer": "Nogael",
+   "said": "nogael",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "material",
+   "delay": 150,
+   "asked_at": 277,
+   "question": "What stuff went into the tool chest?",
+   "answer": "cork",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "age",
+   "delay": 0,
+   "asked_at": 277,
+   "question": "How old is Hustslaigrast?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 279,
+   "question": "Who is Truthtrouvoust's godparent?",
+   "answer": "Kenastem",
+   "said": "toolbox",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "workplace",
+   "delay": 150,
+   "asked_at": 281,
+   "question": "Which place employs Groviovael?",
+   "answer": "printworks",
+   "said": "printworks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 282,
+   "question": "Who has the bread tin now?",
+   "answer": "Groviovael",
+   "said": "to",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "age",
+   "delay": 150,
+   "asked_at": 284,
+   "question": "How old is Bouckstock?",
+   "answer": "83",
+   "said": "83",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 286,
+   "question": "Who has the fishing rod now?",
+   "answer": "Trapairk",
+   "said": "any more",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 288,
+   "question": "Who is minding Groviovael's steps?",
+   "answer": "Plimkis",
+   "said": "saisstoutrack",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "material",
+   "delay": 150,
+   "asked_at": 296,
+   "question": "What is the kite made of?",
+   "answer": "tin",
+   "said": "tin",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 297,
+   "question": "Who stood sponsor at Diockvindvraem's christening?",
+   "answer": "Tolteavrand",
+   "said": "tolteavrand",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "workplace",
+   "delay": 150,
+   "asked_at": 297,
+   "question": "Where does the godparent of the person who works at the tannery work?",
+   "answer": "chandlery",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "material",
+   "delay": 150,
+   "asked_at": 297,
+   "question": "What is the thing Diockvindvraem's godparent lent to Stounfleath made of?",
+   "answer": "horn",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  }
+ ],
+ "kind": "exam",
+ "command": "scripts/exam.py --faculty served --served Qwen3.5-0.8B-Q8_0 --port 8094 --planner-port 8094 --planner-served Qwen3.5-0.8B-Q8_0 --planner-judges --moves --cleans --teach 5 --arms taught --world second --seed 1 --note an answer its question said is kept only for a shape taught with one; replaces the hard rule. Refuted if any world moves by more than 0.02, since none asks a choice.",
+ "arm_class": "system",
+ "taken_at": "20261001T164551Z",
+ "note": "an answer its question said is kept only for a shape taught with one; replaces the hard rule. Refuted if any world moves by more than 0.02, since none asks a choice.",
+ "faculty": "Qwen3.5-0.8B-Q8_0 (llama.cpp) [served, frozen]",
+ "system": "You answer questions about a household from the notes given with each question. The notes may use different words for the same thing: a lamp may be called a lantern, a job may be described instead of named. Answer in a few words. Only if nothing in the notes answers the question, answer: I don't know.",
+ "house": {
+  "world": "second",
+  "seed": 1,
+  "facts": 50,
+  "turns": 300,
+  "fingerprint": "48a6485f3e06db0c",
+  "questions": 374,
+  "answer_entropy": {
+   "workplace": 2.681,
+   "age": 3.322,
+   "material": 2.424,
+   "person": 4.103,
+   "count": 0.985
+  }
+ },
+ "limit": null,
+ "teach": 5,
+ "cost": {
+  "calls": 0,
+  "tokens_in": 0,
+  "tokens_out": 0,
+  "seconds": 0.0
+ }
+}

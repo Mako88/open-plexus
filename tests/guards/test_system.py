@@ -593,12 +593,31 @@ def test_a_pronoun_is_bound_within_its_sentence(tmp_path):
     assert held[0]["subject"] == "quill" and held[0]["object"] == "kite"
 
 
-def test_an_answer_the_question_said_is_not_an_answer():
+def test_an_answer_the_question_said_is_not_an_answer_unless_taught_so():
     from unfused.system import unsaid
 
     found = [("now", (5, 5)), ("quill", (3, 3))]
     assert unsaid(found, "Who has the kite now?") == [("quill", (3, 3))]
     assert unsaid([("kit", (1, 1))], "Who has the kite now?") == [("kit", (1, 1))]
+    assert unsaid(found, "Who has the kite now?", echoes=True) == found
+
+
+def test_a_shape_taught_an_answer_its_question_said_is_marked_so(tmp_path):
+    # the mark lifts the filter; a choice ('Is the gate red or blue?') is still not
+    # answered, because a taught chain must touch every filler the question names
+    told = {"The gate is blue.": [{"subject": "gate", "relation": "has colour",
+                                   "object": "blue"}]}
+    READINGS.update(told)
+    try:
+        teacher = SystemArm(tmp_path, TableEar(), HashEmbedder(), taught=True)
+        teacher.hear(0, "The gate is blue.")
+        teacher.teach("What colour is the gate?", "blue")
+        assert not teacher.db.execute("SELECT shape FROM echoes").fetchall()
+        teacher.teach("Is the gate red or blue?", "blue")
+        assert teacher.db.execute("SELECT shape FROM echoes").fetchall()
+    finally:
+        for k in told:
+            del READINGS[k]
 
 
 def test_a_plan_taught_on_one_relation_does_not_answer_from_another(tmp_path):

@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS learnt (shape TEXT NOT NULL, plan TEXT NOT NULL,
                                   PRIMARY KEY (shape, plan));
 CREATE TABLE IF NOT EXISTS holds (relation TEXT PRIMARY KEY, yes INTEGER NOT NULL,
                                   no INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS echoes (shape TEXT PRIMARY KEY);
 CREATE TABLE IF NOT EXISTS kin (a TEXT NOT NULL, b TEXT NOT NULL, PRIMARY KEY (a, b));
 CREATE TABLE IF NOT EXISTS kinds (filler TEXT NOT NULL, kind TEXT NOT NULL,
                                   yes INTEGER NOT NULL, PRIMARY KEY (filler, kind));
@@ -96,11 +97,17 @@ def numeral(word: str) -> int | None:
     return NUMBERS.index(word) if word in NUMBERS else None
 
 
-def unsaid(found: list, question: str) -> list:
-    """The answers a question did not say itself: 'now' was heard as a place in 'it
-    gets dark so early now', and 'Who has the kite now?' never asks for 'now'."""
-    return [f for f in found
-            if not (f[0] and re.search(rf"\b{re.escape(f[0])}\b", question, re.I))]
+def said_in(answer: str, question: str) -> bool:
+    return bool(answer) and re.search(rf"\b{re.escape(answer)}\b", question, re.I) is not None
+
+
+def unsaid(found: list, question: str, echoes: bool = False) -> list:
+    """The answers a question did not say itself, unless its shape was taught with one:
+    'now' was heard as a place in 'it gets dark so early now', and 'Who has the kite
+    now?' never asks for 'now', while 'Is it the red one or the blue one?' does."""
+    if echoes:
+        return found
+    return [f for f in found if not said_in(f[0], question)]
 
 
 def is_unknown(value) -> bool:
@@ -117,7 +124,8 @@ class SystemArm:
                  asked: bool = False, shares: float = 0.8,
                  moves: bool = False, taught: bool = False,
                  known_learnt: list | None = None,
-                 cleans: bool = False, known_holds: list | None = None) -> None:
+                 cleans: bool = False, known_holds: list | None = None,
+                 known_echoes: list | None = None) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -154,6 +162,8 @@ class SystemArm:
                             [tuple(x) for x in (known_learnt or [])])
         self.db.executemany("INSERT OR IGNORE INTO holds VALUES (?, ?, ?)",
                             [tuple(x) for x in (known_holds or [])])
+        self.db.executemany("INSERT OR IGNORE INTO echoes VALUES (?)",
+                            [tuple(x) for x in (known_echoes or [])])
         # plans learnt elsewhere hold no facts, only how a question is asked, so a
         # system may start with them the way a node starts with another's tables
         self.db.executemany("INSERT OR IGNORE INTO plans (shape, plan) VALUES (?, ?)",
@@ -878,7 +888,8 @@ class SystemArm:
         # one plan is what places the football in another
         for worded in (self.worded(shape), None):
             for (plan,) in ranked:
-                found = unsaid(self.follow(json.loads(plan), fillers, worded), question)
+                found = unsaid(self.follow(json.loads(plan), fillers, worded), question,
+                               self.echoes(shape))
                 if found:
                     return max(found, key=lambda f: f[1])[0]
         return "I don't know."
@@ -889,11 +900,15 @@ class SystemArm:
         answer are generalised and kept as plans, each counted as having held once."""
         shape, fillers = self.shape(question)
         want = norm(answer) or ""
+        if said_in(want, question):
+            # this shape's answer can be a word of its question: a choice between two
+            self.db.execute("INSERT OR IGNORE INTO echoes VALUES (?)", (shape,))
+        echoes = self.echoes(shape)
         taught = self.worded(shape)
         for rid, plan in self.db.execute("SELECT rowid, plan FROM learnt WHERE shape = ?",
                                          (shape,)).fetchall():
-            found = (unsaid(self.follow(json.loads(plan), fillers, taught), question)
-                     or unsaid(self.follow(json.loads(plan), fillers), question))
+            found = (unsaid(self.follow(json.loads(plan), fillers, taught), question, echoes)
+                     or unsaid(self.follow(json.loads(plan), fillers), question, echoes))
             if not found:
                 # a plan that binds nothing says nothing: the facts it needs were not
                 # heard, or not read, which is no evidence that it asks the wrong thing
@@ -916,6 +931,11 @@ class SystemArm:
         for chain in chains:
             self.keep(shape, self.generalise(chain, fillers, want, history))
         self.db.commit()
+
+    def echoes(self, shape: str) -> bool:
+        """Whether a taught answer of this shape was a word its question said."""
+        return self.db.execute("SELECT 1 FROM echoes WHERE shape = ?",
+                               (shape,)).fetchone() is not None
 
     def worded(self, shape: str) -> set[str]:
         """Every relation a plan for the shape was taught through."""

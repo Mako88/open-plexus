@@ -322,6 +322,13 @@ the store merges by id. Kill a third of the nodes mid-exam.
 - **Shapes by likeness.** A shape matches only word for word, so an oblique question never
   meets its plain twin's plan. Matching shapes by embedding would carry a plan across
   wordings, at the risk of carrying it to a question that only looks alike.
+- **Vectors as a property of every symbol**, John's, 2026-10-01: the word stays the identity
+  and what the mouth says, and a vector beside it is where likeness may be used, each use
+  an arm of its own. Borrowed vectors put "lent" beside "borrowed", which point opposite
+  ways; vectors the system builds from what it knows of a symbol would not reopen the
+  DECIDED item on meaning.
+- **Choice questions** ("Is the gate red or blue?"). A taught chain must touch every filler
+  the question names, and "red" sits in no fact about the gate, so no plan is learnt.
 - **A thread's working notes as a fragment**: what surfaced for the last few turns is carried
   forward, the way attention holds a topic.
 - **Hyperdimensional vectors for symbols and assertions**, each symbol a random bipolar vector

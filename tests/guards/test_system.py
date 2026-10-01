@@ -599,3 +599,27 @@ def test_an_answer_the_question_said_is_not_an_answer():
     found = [("now", (5, 5)), ("quill", (3, 3))]
     assert unsaid(found, "Who has the kite now?") == [("quill", (3, 3))]
     assert unsaid([("kit", (1, 1))], "Who has the kite now?") == [("kit", (1, 1))]
+
+
+def test_a_plan_taught_on_one_relation_does_not_answer_from_another(tmp_path):
+    told = {
+        "Ada works at the mill.": [{"subject": "Ada", "relation": "works at", "object": "mill"}],
+        "Bren works at the forge.": [{"subject": "Bren", "relation": "works at",
+                                      "object": "forge"}],
+        "Bren is Cael's godparent.": [{"subject": "Bren", "relation": "is godparent of",
+                                       "object": "Cael"}],
+    }
+    READINGS.update(told)
+    try:
+        teacher = SystemArm(tmp_path / "taught", TableEar(), HashEmbedder(), taught=True)
+        teacher.hear(0, "Ada works at the mill.")
+        teacher.teach("Where does Ada work?", "mill")
+        learnt = teacher.db.execute("SELECT shape, plan, hits, misses FROM learnt").fetchall()
+        pupil = SystemArm(tmp_path / "pupil", TableEar(), HashEmbedder(), taught=True,
+                          known_learnt=learnt)
+        pupil.hear(0, "Bren works at the forge.")
+        pupil.hear(1, "Bren is Cael's godparent.")
+        assert pupil.answer(q("Where does Bren work?")) == "forge"
+    finally:
+        for k in told:
+            del READINGS[k]

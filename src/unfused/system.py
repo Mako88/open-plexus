@@ -642,15 +642,17 @@ class SystemArm:
     def generalise(chain: list[dict], fillers: list[str], answer: str,
                    history: bool = False) -> dict:
         """A chain with the question's fillers made slots, the answer made '?ans', and each
-        filler that links two assertions made a variable. Every step keeps which slots
-        its assertion filled, which stands in for its relation: 'moved to' and
-        'travelled to' both put a subject in a place. A chain through what was replaced
+        filler that links two assertions made a variable. Every step keeps its relation
+        and which slots its assertion filled, which stands in for the relation where a
+        wording was never taught: 'moved to' and 'travelled to' both put a subject in a
+        place. A chain through what was replaced
         keeps the order in time of every pair of its steps, which is all 'before' says."""
         lowered = [norm(f) or "" for f in fillers]
         names: dict[str, str] = {}
         steps = []
         for n, r in enumerate(chain):
-            step = {"filled": sorted(k for k in SLOTS if r[k] and k != "quantity")}
+            step = {"filled": sorted(k for k in SLOTS if r[k] and k != "quantity"),
+                    "relations": [r["relation"]]}
             for k in SLOTS:
                 v = r[k]
                 if not v:
@@ -669,7 +671,8 @@ class SystemArm:
                  for i, a in enumerate(chain) for b in chain[i + 1:]]
         return {"steps": steps, "history": True, "order": order}
 
-    def follow(self, plan: dict, fillers: list[str]) -> list[tuple[str, tuple[int, int]]]:
+    def follow(self, plan: dict, fillers: list[str],
+               worded: set[str] | None = None) -> list[tuple[str, tuple[int, int]]]:
         """A taught plan run with this question's fillers: every answer it binds, with the
         latest turn it rests on and then the turn of the step holding the answer, which
         is the order answers are preferred in. Slots are strict: a step's assertion must
@@ -678,17 +681,18 @@ class SystemArm:
         assertion filling as many slots, a question's filler in any of them, and an
         unknown in its taught slot or else the one slot left over. Only then, because
         a count of slots does not carry the relation: 'got the milk' and 'went to the
-        kitchen' both fill two.
+        kitchen' both fill two. `worded` holds every step to the relations taught for
+        the question's shape, so 'is godparent of' never answers where someone works.
         A plan taught through history runs on it and keeps its steps' order in time."""
         if plan.get("count"):
             return self.count(plan, fillers)
-        found = self.followed(plan, fillers, loosely=False)
+        found = self.followed(plan, fillers, loosely=False, worded=worded)
         if not found:
-            found = self.followed(plan, fillers, loosely=True)
+            found = self.followed(plan, fillers, loosely=True, worded=worded)
         return found
 
-    def followed(self, plan: dict, fillers: list[str],
-                 loosely: bool) -> list[tuple[str, tuple[int, int]]]:
+    def followed(self, plan: dict, fillers: list[str], loosely: bool,
+                 worded: set[str] | None = None) -> list[tuple[str, tuple[int, int]]]:
         """One pass of `follow`, strict or loose."""
         history = plan.get("history", False)
         rows = self.rows(history)
@@ -707,6 +711,9 @@ class SystemArm:
                 return
             s = plan["steps"][i]
             for r in rows:
+                if worded is not None and not (r["relation"] and any(
+                        same(w, r["relation"]) for w in worded)):
+                    continue
                 filled = sorted(k for k in SLOTS if r[k] and k != "quantity")
                 if loosely:
                     if (len(filled) == len(s["filled"])
@@ -866,10 +873,14 @@ class SystemArm:
             " ORDER BY hits - misses DESC, hits DESC", (shape,)).fetchall()
         if not ranked:
             return None
-        for (plan,) in ranked:
-            found = unsaid(self.follow(json.loads(plan), fillers), question)
-            if found:
-                return max(found, key=lambda f: f[1])[0]
+        # every plan held to the relations taught for the shape before any is followed
+        # without them: a step's own relations are too few, since 'dropped' taught in
+        # one plan is what places the football in another
+        for worded in (self.worded(shape), None):
+            for (plan,) in ranked:
+                found = unsaid(self.follow(json.loads(plan), fillers, worded), question)
+                if found:
+                    return max(found, key=lambda f: f[1])[0]
         return "I don't know."
 
     def teach(self, question: str, answer: str) -> None:
@@ -878,9 +889,11 @@ class SystemArm:
         answer are generalised and kept as plans, each counted as having held once."""
         shape, fillers = self.shape(question)
         want = norm(answer) or ""
+        taught = self.worded(shape)
         for rid, plan in self.db.execute("SELECT rowid, plan FROM learnt WHERE shape = ?",
                                          (shape,)).fetchall():
-            found = unsaid(self.follow(json.loads(plan), fillers), question)
+            found = (unsaid(self.follow(json.loads(plan), fillers, taught), question)
+                     or unsaid(self.follow(json.loads(plan), fillers), question))
             if not found:
                 # a plan that binds nothing says nothing: the facts it needs were not
                 # heard, or not read, which is no evidence that it asks the wrong thing
@@ -901,10 +914,36 @@ class SystemArm:
         if not chains and n is not None:
             self.learn_count(shape, anchors, n)
         for chain in chains:
-            plan = json.dumps(self.generalise(chain, fillers, want, history), sort_keys=True)
-            self.db.execute("INSERT OR IGNORE INTO learnt (shape, plan, hits, misses)"
-                            " VALUES (?, ?, 1, 0)", (shape, plan))
+            self.keep(shape, self.generalise(chain, fillers, want, history))
         self.db.commit()
+
+    def worded(self, shape: str) -> set[str]:
+        """Every relation a plan for the shape was taught through."""
+        return {w for (text,) in self.db.execute("SELECT plan FROM learnt WHERE shape = ?",
+                                                 (shape,))
+                for st in json.loads(text).get("steps", []) for w in st.get("relations", [])}
+
+    def keep(self, shape: str, plan: dict) -> None:
+        """A plan kept under its shape. One already kept with the same steps but other
+        relations is the same plan heard in other words: its relations gain these, and
+        its record of holding and failing stays its own."""
+        def bare(p: dict) -> str:
+            return json.dumps({**p, "steps": [{k: v for k, v in st.items() if k != "relations"}
+                                              for st in p["steps"]]}, sort_keys=True)
+
+        for rid, text in self.db.execute("SELECT rowid, plan FROM learnt WHERE shape = ?",
+                                         (shape,)).fetchall():
+            kept = json.loads(text)
+            if kept.get("count") or bare(kept) != bare(plan):
+                continue
+            for mine, theirs in zip(kept["steps"], plan["steps"]):
+                mine["relations"] = sorted(set(mine.get("relations", []))
+                                           | set(theirs["relations"]))
+            self.db.execute("UPDATE learnt SET plan = ? WHERE rowid = ?",
+                            (json.dumps(kept, sort_keys=True), rid))
+            return
+        self.db.execute("INSERT OR IGNORE INTO learnt (shape, plan, hits, misses)"
+                        " VALUES (?, ?, 1, 0)", (shape, json.dumps(plan, sort_keys=True)))
 
     def search(self, query: dict) -> list[tuple[dict, int, list[str]]]:
         """The chain found by the system rather than written by the planner.

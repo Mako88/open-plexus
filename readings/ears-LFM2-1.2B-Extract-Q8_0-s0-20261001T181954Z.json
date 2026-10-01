@@ -1,0 +1,2487 @@
+{
+ "kind": "ears",
+ "ear": "LFM2-1.2B-Extract-Q8_0 (llama.cpp, schema)",
+ "taken_at": "20261001T181954Z",
+ "note": "a model built for extraction, beside the 0.8B's 1.00 and 0.98. Refuted as the ear if recall or precision falls under the 0.8B's by more than 0.02",
+ "house": {
+  "seed": 0,
+  "fingerprint": "393fdefb29f5e2bf"
+ },
+ "limit": null,
+ "scorer": "each gold filler in a slot of its own",
+ "recall": 0.02,
+ "precision": 1.0,
+ "filler_assertions_per_sentence": 4.08,
+ "by_kind": {
+  "colour": 0.0,
+  "number": 0.1,
+  "place": 0.0,
+  "relation": 0.0,
+  "trade": 0.0
+ },
+ "calls": 62,
+ "seconds": 127.1,
+ "unparsed": 9,
+ "rows": [
+  {
+   "kind": "trade",
+   "told": "Vrearndreas sets type for a living.",
+   "gold": [
+    "Vrearndreas",
+    "type"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "hall",
+     "quantity": ": 12  // Small talk about chairs without lasting facts"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "gate",
+     "quantity": ": 1  // Small talk about the gate's colour"
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "shed",
+     "quantity": ": 1  // Small talk about Mira keeping her bike"
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "shed",
+     "quantity": ": 1  // Small talk about Ada being a cousin"
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "attic",
+     "quantity": ": 1  // Small talk about Mira taking the bike to the attic"
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "number",
+   "told": "I counted 35 wool cards in the boot room.",
+   "gold": [
+    "wool cards",
+    "boot room",
+    "35"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "room",
+     "quantity": "I counted 35 wool cards in the boot room."
+    }
+   ],
+   "whole": false,
+   "read": 1
+  },
+  {
+   "kind": "place",
+   "told": "Mohoufaern keeps the flour sacks in the dairy.",
+   "gold": [
+    "Mohoufaern",
+    "flour sacks",
+    "dairy"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "colour",
+   "told": "Someone painted the cracked plates indigo.",
+   "gold": [
+    "cracked plates",
+    "indigo"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "relation",
+   "told": "Sailoun is Dethol's cousin.",
+   "gold": [
+    "Sailoun",
+    "Dethol",
+    "cousin"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "trade",
+   "told": "These days Sailoun mends nets.",
+   "gold": [
+    "Sailoun",
+    "nets"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "number",
+   "told": "There are 35 walking sticks in the cellar.",
+   "gold": [
+    "walking sticks",
+    "cellar",
+    "35"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "hall",
+     "quantity": "I have 12 chairs in it."
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "gate",
+     "quantity": "I painted the gate green."
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "shed",
+     "quantity": "I keep my bike in the shed."
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "shed",
+     "quantity": "I am a cousin of Mira."
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "attic",
+     "quantity": "I took my bike to the attic."
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "place",
+   "told": "The wool cards are Rondnesith's, and they live in the morning room.",
+   "gold": [
+    "Rondnesith",
+    "wool cards",
+    "morning room"
+   ],
+   "assertions": [],
+   "whole": false,
+   "read": 0
+  },
+  {
+   "kind": "colour",
+   "told": "All the fishing floats are a sort of ochre colour.",
+   "gold": [
+    "fishing floats",
+    "ochre"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "relation",
+   "told": "I found out Doufeand is a cousin of Lidrond.",
+   "gold": [
+    "Doufeand",
+    "Lidrond",
+    "cousin"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "trade",
+   "told": "These days Dethol shoes horses.",
+   "gold": [
+    "Dethol",
+    "horses"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "number",
+   "told": "There are 87 wool cards in the still room.",
+   "gold": [
+    "wool cards",
+    "still room",
+    "87"
+   ],
+   "assertions": [],
+   "whole": false,
+   "read": 0
+  },
+  {
+   "kind": "place",
+   "told": "Vrearndreas keeps the glass jars in the dairy.",
+   "gold": [
+    "Vrearndreas",
+    "glass jars",
+    "dairy"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "colour",
+   "told": "Someone painted the wool cards oxblood.",
+   "gold": [
+    "wool cards",
+    "oxblood"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "relation",
+   "told": "I found out Pindaist is a cousin of Drenham.",
+   "gold": [
+    "Pindaist",
+    "Drenham",
+    "cousin"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "trade",
+   "told": "You know Guthern? Guthern binds books, that's the work.",
+   "gold": [
+    "Guthern",
+    "books"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "number",
+   "told": "The still room has 96 lanterns in it now.",
+   "gold": [
+    "lanterns",
+    "still room",
+    "96"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "room",
+     "quantity": null
+    }
+   ],
+   "whole": false,
+   "read": 1
+  },
+  {
+   "kind": "place",
+   "told": "Bretaerk keeps the lanterns in the laundry.",
+   "gold": [
+    "Bretaerk",
+    "lanterns",
+    "laundry"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "colour",
+   "told": "Someone painted the seed trays verdigris.",
+   "gold": [
+    "seed trays",
+    "verdigris"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "relation",
+   "told": "I found out Greaflumost is a cousin of Henound.",
+   "gold": [
+    "Greaflumost",
+    "Henound",
+    "cousin"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "trade",
+   "told": "Lidrond grinds lenses for a living.",
+   "gold": [
+    "Lidrond",
+    "lenses"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "number",
+   "told": "The morning room has 32 cracked plates in it now.",
+   "gold": [
+    "cracked plates",
+    "morning room",
+    "32"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "room",
+     "quantity": null
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "door",
+     "quantity": null
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "shed",
+     "quantity": null
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "room",
+     "quantity": null
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "attic",
+     "quantity": null
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "place",
+   "told": "Vaiffstaerkgiork keeps the walking sticks in the nursery.",
+   "gold": [
+    "Vaiffstaerkgiork",
+    "walking sticks",
+    "nursery"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "nursery",
+     "quantity": null
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "nursery",
+     "quantity": null
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "shed",
+     "quantity": null
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "nursery",
+     "quantity": null
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "attic",
+     "quantity": null
+    },
+    {
+     "subject": "The bike",
+     "relation": "isn't in",
+     "object": "shed",
+     "place": "nursery",
+     "quantity": null
+    }
+   ],
+   "whole": false,
+   "read": 6
+  },
+  {
+   "kind": "colour",
+   "told": "The walking sticks are indigo.",
+   "gold": [
+    "walking sticks",
+    "indigo"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "relation",
+   "told": "I found out Rondnesith is a cousin of Sloufarplaim.",
+   "gold": [
+    "Rondnesith",
+    "Sloufarplaim",
+    "cousin"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "trade",
+   "told": "These days Bretaerk shoes horses.",
+   "gold": [
+    "Bretaerk",
+    "horses"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "number",
+   "told": "I counted 26 lanterns in the gun room.",
+   "gold": [
+    "lanterns",
+    "gun room",
+    "26"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "hall",
+     "quantity": "I counted 26 lanterns in the gun room."
+    }
+   ],
+   "whole": false,
+   "read": 1
+  },
+  {
+   "kind": "place",
+   "told": "Henound put the seed trays in the scullery for safekeeping.",
+   "gold": [
+    "Henound",
+    "seed trays",
+    "scullery"
+   ],
+   "assertions": [],
+   "whole": false,
+   "read": 0
+  },
+  {
+   "kind": "colour",
+   "told": "All the lanterns are a sort of slate colour.",
+   "gold": [
+    "lanterns",
+    "slate"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "relation",
+   "told": "Humstaegaeck is Slarother's cousin.",
+   "gold": [
+    "Humstaegaeck",
+    "Slarother",
+    "cousin"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "trade",
+   "told": "Rondnesith carves spoons for a living.",
+   "gold": [
+    "Rondnesith",
+    "spoons"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "number",
+   "told": "The scullery has 37 flour sacks in it now.",
+   "gold": [
+    "flour sacks",
+    "scullery",
+    "37"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "place",
+   "told": "The candle moulds are Humstaegaeck's, and they live in the morning room.",
+   "gold": [
+    "Humstaegaeck",
+    "candle moulds",
+    "morning room"
+   ],
+   "assertions": [],
+   "whole": false,
+   "read": 0
+  },
+  {
+   "kind": "colour",
+   "told": "All the iron hooks are a sort of bone colour.",
+   "gold": [
+    "iron hooks",
+    "bone"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "relation",
+   "told": "Plodriorn is Guthern's cousin.",
+   "gold": [
+    "Plodriorn",
+    "Guthern",
+    "cousin"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "trade",
+   "told": "These days Pindaist mends nets.",
+   "gold": [
+    "Pindaist",
+    "nets"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "number",
+   "told": "There are 65 wool cards in the dairy.",
+   "gold": [
+    "wool cards",
+    "dairy",
+    "65"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "room",
+     "quantity": "]."
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "door",
+     "quantity": "]."
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "shed",
+     "quantity": "]."
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "room",
+     "quantity": "]."
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "attic",
+     "quantity": "]."
+    },
+    {
+     "subject": "The bike",
+     "relation": "isn't in",
+     "object": "shed",
+     "place": "room",
+     "quantity": "]."
+    }
+   ],
+   "whole": false,
+   "read": 6
+  },
+  {
+   "kind": "place",
+   "told": "Doufeand put the fishing floats in the gun room for safekeeping.",
+   "gold": [
+    "Doufeand",
+    "fishing floats",
+    "gun room"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "hall",
+     "quantity": ": 12  // Small talk about chairs without lasting fact about them"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "gate",
+     "quantity": ": 1  // Small talk about the gate without lasting fact"
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "shed",
+     "quantity": ": 1  // Small talk about Mira without lasting fact"
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "shed",
+     "quantity": ": 1  // Small talk about Ada without lasting fact"
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "attic",
+     "quantity": ": 1  // Small talk about Mira without lasting fact"
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "colour",
+   "told": "All the candle moulds are a sort of ochre colour.",
+   "gold": [
+    "candle moulds",
+    "ochre"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "relation",
+   "told": "Bretaerk and Groplourk are cousins, Bretaerk on the other side.",
+   "gold": [
+    "Bretaerk",
+    "Groplourk",
+    "cousin"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "trade",
+   "told": "These days Humstaegaeck keeps bees.",
+   "gold": [
+    "Humstaegaeck",
+    "bees"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "number",
+   "told": "The still room has 45 glass jars in it now.",
+   "gold": [
+    "glass jars",
+    "still room",
+    "45"
+   ],
+   "assertions": [
+    {
+     "subject": "glass jars",
+     "relation": "are in",
+     "object": "hall",
+     "place": "still room",
+     "quantity": "No more than 45"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "still room",
+     "quantity": "No more than 1"
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "shed",
+     "quantity": "No more than 1"
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "still room",
+     "quantity": "No more than 1"
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "attic",
+     "quantity": "No more than 1"
+    }
+   ],
+   "whole": true,
+   "read": 5
+  },
+  {
+   "kind": "place",
+   "told": "The glass jars are Humstaegaeck's, and they live in the boot room.",
+   "gold": [
+    "Humstaegaeck",
+    "glass jars",
+    "boot room"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "colour",
+   "told": "All the glass jars are a sort of indigo colour.",
+   "gold": [
+    "glass jars",
+    "indigo"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "relation",
+   "told": "I found out Mohoufaern is a cousin of Vrearndreas.",
+   "gold": [
+    "Mohoufaern",
+    "Vrearndreas",
+    "cousin"
+   ],
+   "assertions": [],
+   "whole": false,
+   "read": 0
+  },
+  {
+   "kind": "trade",
+   "told": "These days Faegark shoes horses.",
+   "gold": [
+    "Faegark",
+    "horses"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "number",
+   "told": "The boot room has 12 glass jars in it now.",
+   "gold": [
+    "glass jars",
+    "boot room",
+    "12"
+   ],
+   "assertions": [],
+   "whole": false,
+   "read": 0
+  },
+  {
+   "kind": "place",
+   "told": "Sailoun put the flour sacks in the cellar for safekeeping.",
+   "gold": [
+    "Sailoun",
+    "flour sacks",
+    "cellar"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "hall",
+     "quantity": ": 12  // Small talk about the number of chairs, not the chairs themselves."
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "gate",
+     "quantity": ": 1  // Small talk about the color of the gate."
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "shed",
+     "quantity": ": 1  // Small talk about the bike being kept."
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "shed",
+     "quantity": ": 1  // Small talk about Ada's relationship to Mira."
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "attic",
+     "quantity": ": 1  // Small talk about where the bike went."
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "colour",
+   "told": "All the flour sacks are a sort of slate colour.",
+   "gold": [
+    "flour sacks",
+    "slate"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  },
+  {
+   "kind": "relation",
+   "told": "Faegark and Vaiffstaerkgiork are cousins, Faegark on the other side.",
+   "gold": [
+    "Faegark",
+    "Vaiffstaerkgiork",
+    "cousin"
+   ],
+   "assertions": [
+    {
+     "subject": "chairs",
+     "relation": "are in",
+     "object": "hall",
+     "place": "The hall has 12 chairs in it.",
+     "quantity": ": 12"
+    },
+    {
+     "subject": "gate",
+     "relation": "has colour",
+     "object": "green",
+     "place": "Somebody painted the gate green.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "keeps",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    },
+    {
+     "subject": "Ada",
+     "relation": "is cousin of",
+     "object": "Mira",
+     "place": "Ada is a cousin of Mira.",
+     "quantity": ""
+    },
+    {
+     "subject": "Mira",
+     "relation": "takes to",
+     "object": "bike",
+     "place": "The bike isn't in the shed now; Mira took it to the attic.",
+     "quantity": ""
+    }
+   ],
+   "whole": false,
+   "read": 5
+  }
+ ],
+ "filler": {
+  "It has been raining all week.": [
+   {
+    "subject": "chairs",
+    "relation": "are in",
+    "object": "hall",
+    "place": "hall",
+    "quantity": "I have 12 chairs"
+   },
+   {
+    "subject": "gate",
+    "relation": "has colour",
+    "object": "green",
+    "place": "door",
+    "quantity": "one"
+   },
+   {
+    "subject": "Mira",
+    "relation": "keeps",
+    "object": "bike",
+    "place": "shed",
+    "quantity": "her bike"
+   },
+   {
+    "subject": "Ada",
+    "relation": "is cousin of",
+    "object": "Mira",
+    "place": "door",
+    "quantity": "one"
+   },
+   {
+    "subject": "Mira",
+    "relation": "takes to",
+    "object": "bike",
+    "place": "attic",
+    "quantity": "to the attic"
+   }
+  ],
+  "I think the kettle needs descaling again.": [
+   {
+    "subject": "chairs",
+    "relation": "are in",
+    "object": "hall",
+    "place": "The hall has 12 chairs in it.",
+    "quantity": ": 12"
+   },
+   {
+    "subject": "gate",
+    "relation": "has colour",
+    "object": "green",
+    "place": "Somebody painted the gate green.",
+    "quantity": ""
+   },
+   {
+    "subject": "Mira",
+    "relation": "keeps",
+    "object": "bike",
+    "place": "The bike isn't in the shed now; Mira took it to the attic.",
+    "quantity": ""
+   },
+   {
+    "subject": "Ada",
+    "relation": "is cousin of",
+    "object": "Mira",
+    "place": "Ada is a cousin of Mira.",
+    "quantity": ""
+   },
+   {
+    "subject": "Mira",
+    "relation": "takes to",
+    "object": "bike",
+    "place": "The bike isn't in the shed now; Mira took it to the attic.",
+    "quantity": ""
+   }
+  ],
+  "There is a van parked badly at the end of the road.": [],
+  "I slept badly and I blame the wind.": [
+   {
+    "subject": "chairs",
+    "relation": "are in",
+    "object": "hall",
+    "place": "hall",
+    "quantity": "I slept badly and I blame the wind."
+   },
+   {
+    "subject": "gate",
+    "relation": "has colour",
+    "object": "green",
+    "place": "hall",
+    "quantity": ""
+   },
+   {
+    "subject": "Mira",
+    "relation": "keeps",
+    "object": "bike",
+    "place": "shed",
+    "quantity": ""
+   },
+   {
+    "subject": "Ada",
+    "relation": "is cousin of",
+    "object": "Mira",
+    "place": "",
+    "quantity": ""
+   },
+   {
+    "subject": "Mira",
+    "relation": "takes to",
+    "object": "bike",
+    "place": "attic",
+    "quantity": ""
+   },
+   {
+    "subject": "The bike",
+    "relation": "isn't in",
+    "object": "shed",
+    "place": "",
+    "quantity": ""
+   }
+  ],
+  "Somebody has been leaving the gate open.": [
+   {
+    "subject": "chairs",
+    "relation": "are in",
+    "object": "hall",
+    "place": "hall",
+    "quantity": "I have 12 chairs"
+   },
+   {
+    "subject": "gate",
+    "relation": "has colour",
+    "object": "green",
+    "place": "gate",
+    "quantity": ""
+   },
+   {
+    "subject": "Mira",
+    "relation": "keeps",
+    "object": "bike",
+    "place": "shed",
+    "quantity": ""
+   },
+   {
+    "subject": "Ada",
+    "relation": "is cousin of",
+    "object": "Mira",
+    "place": "",
+    "quantity": ""
+   },
+   {
+    "subject": "Mira",
+    "relation": "takes to",
+    "object": "bike",
+    "place": "attic",
+    "quantity": ""
+   },
+   {
+    "subject": "The bike",
+    "relation": "isn't in",
+    "object": "shed",
+    "place": "",
+    "quantity": ""
+   }
+  ],
+  "The bread came out flat this time.": [
+   {
+    "subject": "chairs",
+    "relation": "are in",
+    "object": "hall",
+    "place": "The hall has 12 chairs in it.",
+    "quantity": ": 12"
+   },
+   {
+    "subject": "gate",
+    "relation": "has colour",
+    "object": "green",
+    "place": "Somebody painted the gate green.",
+    "quantity": ""
+   },
+   {
+    "subject": "Mira",
+    "relation": "keeps",
+    "object": "bike",
+    "place": "The bike isn't in the shed now; Mira took it to the attic.",
+    "quantity": ""
+   },
+   {
+    "subject": "Ada",
+    "relation": "is cousin of",
+    "object": "Mira",
+    "place": "Ada is a cousin of Mira.",
+    "quantity": ""
+   },
+   {
+    "subject": "Mira",
+    "relation": "takes to",
+    "object": "bike",
+    "place": "The bike isn't in the shed now; Mira took it to the attic.",
+    "quantity": ""
+   }
+  ],
+  "I keep meaning to sort out the shed.": [],
+  "It gets dark so early now.": [],
+  "The post was late again this morning.": [
+   {
+    "subject": "chairs",
+    "relation": "are in",
+    "object": "hall",
+    "place": "hall",
+    "quantity": "I have 12 chairs"
+   },
+   {
+    "subject": "gate",
+    "relation": "has colour",
+    "object": "green",
+    "place": "gate",
+    "quantity": "I painted the gate green"
+   },
+   {
+    "subject": "Mira",
+    "relation": "keeps",
+    "object": "bike",
+    "place": "shed",
+    "quantity": "I keep my bike in the shed"
+   },
+   {
+    "subject": "Ada",
+    "relation": "is cousin of",
+    "object": "Mira",
+    "place": "shed",
+    "quantity": "I am a cousin of Mira"
+   },
+   {
+    "subject": "Mira",
+    "relation": "takes to",
+    "object": "bike",
+    "place": "attic",
+    "quantity": "I took my bike to the attic"
+   }
+  ],
+  "I had that same dream about a staircase.": [
+   {
+    "subject": "chairs",
+    "relation": "are in",
+    "object": "hall",
+    "place": "staircase",
+    "quantity": null
+   },
+   {
+    "subject": "gate",
+    "relation": "has colour",
+    "object": "green",
+    "place": "staircase",
+    "quantity": null
+   },
+   {
+    "subject": "Mira",
+    "relation": "keeps",
+    "object": "bike",
+    "place": "shed",
+    "quantity": null
+   },
+   {
+    "subject": "Ada",
+    "relation": "is cousin of",
+    "object": "Mira",
+    "place": "staircase",
+    "quantity": null
+   },
+   {
+    "subject": "Mira",
+    "relation": "takes to",
+    "object": "bike",
+    "place": "attic",
+    "quantity": null
+   },
+   {
+    "subject": "The bike",
+    "relation": "isn't in",
+    "object": "shed",
+    "place": "attic",
+    "quantity": null
+   }
+  ],
+  "The tap in the bathroom has started dripping.": [
+   {
+    "subject": "chairs",
+    "relation": "are in",
+    "object": "hall",
+    "place": "bathroom",
+    "quantity": null
+   },
+   {
+    "subject": "gate",
+    "relation": "has colour",
+    "object": "green",
+    "place": "bathroom",
+    "quantity": null
+   },
+   {
+    "subject": "Mira",
+    "relation": "keeps",
+    "object": "bike",
+    "place": "shed",
+    "quantity": null
+   },
+   {
+    "subject": "Ada",
+    "relation": "is cousin of",
+    "object": "Mira",
+    "place": "bathroom",
+    "quantity": null
+   },
+   {
+    "subject": "Mira",
+    "relation": "takes to",
+    "object": "bike",
+    "place": "attic",
+    "quantity": null
+   },
+   {
+    "subject": "bathroom tap",
+    "relation": "has dripped",
+    "object": "tap",
+    "place": "bathroom",
+    "quantity": null
+   }
+  ],
+  "I should probably go for a walk later.": [
+   {
+    "subject": "chairs",
+    "relation": "are in",
+    "object": "hall",
+    "place": "hall",
+    "quantity": "I have 12 chairs"
+   },
+   {
+    "subject": "gate",
+    "relation": "has colour",
+    "object": "green",
+    "place": "gate",
+    "quantity": "I painted the gate green"
+   },
+   {
+    "subject": "Mira",
+    "relation": "keeps",
+    "object": "bike",
+    "place": "shed",
+    "quantity": "I keep my bike in the shed"
+   },
+   {
+    "subject": "Ada",
+    "relation": "is cousin of",
+    "object": "Mira",
+    "place": "shed",
+    "quantity": "I am a cousin of Mira"
+   },
+   {
+    "subject": "Mira",
+    "relation": "takes to",
+    "object": "bike",
+    "place": "attic",
+    "quantity": "I took my bike to the attic"
+   }
+  ]
+ }
+}

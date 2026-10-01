@@ -1,0 +1,1758 @@
+{
+ "kind": "unheard",
+ "taken_at": "20261001T205133Z",
+ "note": "bare MiniLM against picks that must fit the rest of the question in one stored row. Refuted if fitted is not right more often than bare on every seed.",
+ "question": "which stored filler does a word the house never used stand for",
+ "embedder": "all-MiniLM-L6-v2",
+ "seeds": [
+  {
+   "seed": 1,
+   "summary": {
+    "bare": {
+     "right": 28,
+     "of": 40,
+     "margin_right": 0.122,
+     "margin_wrong": 0.033
+    },
+    "fitted": {
+     "right": 33,
+     "of": 40,
+     "margin_right": 0.207,
+     "margin_wrong": 0.018
+    }
+   },
+   "picks": {
+    "bare": [
+     {
+      "word": "canes",
+      "gold": "walking sticks",
+      "pick": "walking sticks",
+      "right": true,
+      "margin": 0.093
+     },
+     {
+      "word": "space downstairs",
+      "gold": "cellar",
+      "pick": "still room",
+      "right": false,
+      "margin": 0.033
+     },
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "spoons",
+      "right": false,
+      "margin": 0.026
+     },
+     {
+      "word": "canes",
+      "gold": "walking sticks",
+      "pick": "walking sticks",
+      "right": true,
+      "margin": 0.093
+     },
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "spoons",
+      "right": false,
+      "margin": 0.026
+     },
+     {
+      "word": "milk store",
+      "gold": "dairy",
+      "pick": "dairy",
+      "right": true,
+      "margin": 0.194
+     },
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "spoons",
+      "right": false,
+      "margin": 0.026
+     },
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "spoons",
+      "right": false,
+      "margin": 0.026
+     },
+     {
+      "word": "wax forms",
+      "gold": "candle moulds",
+      "pick": "candle moulds",
+      "right": true,
+      "margin": 0.209
+     },
+     {
+      "word": "sunny sitting room",
+      "gold": "morning room",
+      "pick": "morning room",
+      "right": true,
+      "margin": 0.171
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.203
+     },
+     {
+      "word": "wax forms",
+      "gold": "candle moulds",
+      "pick": "candle moulds",
+      "right": true,
+      "margin": 0.209
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.203
+     },
+     {
+      "word": "space downstairs",
+      "gold": "cellar",
+      "pick": "still room",
+      "right": false,
+      "margin": 0.033
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.048
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.203
+     },
+     {
+      "word": "wax forms",
+      "gold": "candle moulds",
+      "pick": "candle moulds",
+      "right": true,
+      "margin": 0.209
+     },
+     {
+      "word": "wash-up room",
+      "gold": "scullery",
+      "pick": "morning room",
+      "right": false,
+      "margin": 0.101
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.048
+     },
+     {
+      "word": "chipped dishes",
+      "gold": "cracked plates",
+      "pick": "cracked plates",
+      "right": true,
+      "margin": 0.139
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "Bouckstock",
+      "right": false,
+      "margin": 0.035
+     },
+     {
+      "word": "loft",
+      "gold": "attic",
+      "pick": "attic",
+      "right": true,
+      "margin": 0.126
+     },
+     {
+      "word": "wax forms",
+      "gold": "candle moulds",
+      "pick": "candle moulds",
+      "right": true,
+      "margin": 0.209
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "Bouckstock",
+      "right": false,
+      "margin": 0.035
+     },
+     {
+      "word": "preserving pots",
+      "gold": "glass jars",
+      "pick": "glass jars",
+      "right": true,
+      "margin": 0.032
+     },
+     {
+      "word": "loft",
+      "gold": "attic",
+      "pick": "attic",
+      "right": true,
+      "margin": 0.126
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.085
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.085
+     },
+     {
+      "word": "planting flats",
+      "gold": "seed trays",
+      "pick": "seed trays",
+      "right": true,
+      "margin": 0.119
+     },
+     {
+      "word": "muddy porch",
+      "gold": "boot room",
+      "pick": "cellar",
+      "right": false,
+      "margin": 0.08
+     },
+     {
+      "word": "planting flats",
+      "gold": "seed trays",
+      "pick": "seed trays",
+      "right": true,
+      "margin": 0.119
+     },
+     {
+      "word": "preserving pots",
+      "gold": "glass jars",
+      "pick": "glass jars",
+      "right": true,
+      "margin": 0.032
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.203
+     },
+     {
+      "word": "loft",
+      "gold": "attic",
+      "pick": "attic",
+      "right": true,
+      "margin": 0.126
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.048
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.048
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.085
+     },
+     {
+      "word": "larder",
+      "gold": "pantry",
+      "pick": "bone",
+      "right": false,
+      "margin": 0.028
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "Bouckstock",
+      "right": false,
+      "margin": 0.035
+     },
+     {
+      "word": "planting flats",
+      "gold": "seed trays",
+      "pick": "seed trays",
+      "right": true,
+      "margin": 0.119
+     }
+    ],
+    "fitted": [
+     {
+      "word": "canes",
+      "gold": "walking sticks",
+      "pick": "walking sticks",
+      "right": true,
+      "margin": 0.207
+     },
+     {
+      "word": "space downstairs",
+      "gold": "cellar",
+      "pick": "cellar",
+      "right": true,
+      "margin": 0.207
+     },
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "iron hooks",
+      "right": true,
+      "margin": 0.346
+     },
+     {
+      "word": "canes",
+      "gold": "walking sticks",
+      "pick": "walking sticks",
+      "right": true,
+      "margin": 0.093
+     },
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "iron hooks",
+      "right": true,
+      "margin": 0.287
+     },
+     {
+      "word": "milk store",
+      "gold": "dairy",
+      "pick": "dairy",
+      "right": true,
+      "margin": 0.287
+     },
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "iron hooks",
+      "right": true,
+      "margin": 0.228
+     },
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "iron hooks",
+      "right": true,
+      "margin": 0.054
+     },
+     {
+      "word": "wax forms",
+      "gold": "candle moulds",
+      "pick": "candle moulds",
+      "right": true,
+      "margin": 0.383
+     },
+     {
+      "word": "sunny sitting room",
+      "gold": "morning room",
+      "pick": "morning room",
+      "right": true,
+      "margin": 0.383
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.33
+     },
+     {
+      "word": "wax forms",
+      "gold": "candle moulds",
+      "pick": "candle moulds",
+      "right": true,
+      "margin": 0.209
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.007
+     },
+     {
+      "word": "space downstairs",
+      "gold": "cellar",
+      "pick": "attic",
+      "right": false,
+      "margin": 0.007
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.218
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.252
+     },
+     {
+      "word": "wax forms",
+      "gold": "candle moulds",
+      "pick": "candle moulds",
+      "right": true,
+      "margin": 0.452
+     },
+     {
+      "word": "wash-up room",
+      "gold": "scullery",
+      "pick": "morning room",
+      "right": false,
+      "margin": 0.452
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.191
+     },
+     {
+      "word": "chipped dishes",
+      "gold": "cracked plates",
+      "pick": "cracked plates",
+      "right": true,
+      "margin": 0.139
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "flour sacks",
+      "right": false,
+      "margin": 0.044
+     },
+     {
+      "word": "loft",
+      "gold": "attic",
+      "pick": "attic",
+      "right": true,
+      "margin": 0.044
+     },
+     {
+      "word": "wax forms",
+      "gold": "candle moulds",
+      "pick": "candle moulds",
+      "right": true,
+      "margin": 0.503
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "walking sticks",
+      "right": false,
+      "margin": 0.029
+     },
+     {
+      "word": "preserving pots",
+      "gold": "glass jars",
+      "pick": "glass jars",
+      "right": true,
+      "margin": 0.238
+     },
+     {
+      "word": "loft",
+      "gold": "attic",
+      "pick": "attic",
+      "right": true,
+      "margin": 0.238
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.322
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.085
+     },
+     {
+      "word": "planting flats",
+      "gold": "seed trays",
+      "pick": "flour sacks",
+      "right": false,
+      "margin": 0.004
+     },
+     {
+      "word": "muddy porch",
+      "gold": "boot room",
+      "pick": "cellar",
+      "right": false,
+      "margin": 0.004
+     },
+     {
+      "word": "planting flats",
+      "gold": "seed trays",
+      "pick": "seed trays",
+      "right": true,
+      "margin": 0.124
+     },
+     {
+      "word": "preserving pots",
+      "gold": "glass jars",
+      "pick": "glass jars",
+      "right": true,
+      "margin": 0.032
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.126
+     },
+     {
+      "word": "loft",
+      "gold": "attic",
+      "pick": "attic",
+      "right": true,
+      "margin": 0.126
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.276
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.048
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.018
+     },
+     {
+      "word": "larder",
+      "gold": "pantry",
+      "pick": "81",
+      "right": false,
+      "margin": 0.018
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "fishing floats",
+      "right": true,
+      "margin": 0.026
+     },
+     {
+      "word": "planting flats",
+      "gold": "seed trays",
+      "pick": "seed trays",
+      "right": true,
+      "margin": 0.119
+     }
+    ]
+   }
+  },
+  {
+   "seed": 2,
+   "summary": {
+    "bare": {
+     "right": 25,
+     "of": 40,
+     "margin_right": 0.139,
+     "margin_wrong": 0.009
+    },
+    "fitted": {
+     "right": 30,
+     "of": 40,
+     "margin_right": 0.197,
+     "margin_wrong": 0.056
+    }
+   },
+   "picks": {
+    "bare": [
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "spoons",
+      "right": false,
+      "margin": 0.026
+     },
+     {
+      "word": "sunny sitting room",
+      "gold": "morning room",
+      "pick": "morning room",
+      "right": true,
+      "margin": 0.143
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.085
+     },
+     {
+      "word": "planting flats",
+      "gold": "seed trays",
+      "pick": "seed trays",
+      "right": true,
+      "margin": 0.053
+     },
+     {
+      "word": "preserving pots",
+      "gold": "glass jars",
+      "pick": "glass jars",
+      "right": true,
+      "margin": 0.032
+     },
+     {
+      "word": "muddy porch",
+      "gold": "boot room",
+      "pick": "thatches roofs",
+      "right": false,
+      "margin": 0.009
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "bees",
+      "right": false,
+      "margin": 0.003
+     },
+     {
+      "word": "chipped dishes",
+      "gold": "cracked plates",
+      "pick": "cracked plates",
+      "right": true,
+      "margin": 0.139
+     },
+     {
+      "word": "canes",
+      "gold": "walking sticks",
+      "pick": "walking sticks",
+      "right": true,
+      "margin": 0.042
+     },
+     {
+      "word": "shooting store",
+      "gold": "gun room",
+      "pick": "gun room",
+      "right": true,
+      "margin": 0.274
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.203
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.203
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "bees",
+      "right": false,
+      "margin": 0.003
+     },
+     {
+      "word": "children's room",
+      "gold": "nursery",
+      "pick": "morning room",
+      "right": false,
+      "margin": 0.017
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.085
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.085
+     },
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "spoons",
+      "right": false,
+      "margin": 0.026
+     },
+     {
+      "word": "muddy porch",
+      "gold": "boot room",
+      "pick": "thatches roofs",
+      "right": false,
+      "margin": 0.009
+     },
+     {
+      "word": "chipped dishes",
+      "gold": "cracked plates",
+      "pick": "cracked plates",
+      "right": true,
+      "margin": 0.139
+     },
+     {
+      "word": "canes",
+      "gold": "walking sticks",
+      "pick": "walking sticks",
+      "right": true,
+      "margin": 0.042
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.203
+     },
+     {
+      "word": "wash-up room",
+      "gold": "scullery",
+      "pick": "laundry",
+      "right": false,
+      "margin": 0.052
+     },
+     {
+      "word": "wax forms",
+      "gold": "candle moulds",
+      "pick": "candle moulds",
+      "right": true,
+      "margin": 0.209
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "bees",
+      "right": false,
+      "margin": 0.003
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.203
+     },
+     {
+      "word": "cart shed",
+      "gold": "coach house",
+      "pick": "cellar",
+      "right": false,
+      "margin": 0.053
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "bees",
+      "right": false,
+      "margin": 0.003
+     },
+     {
+      "word": "preserving pots",
+      "gold": "glass jars",
+      "pick": "glass jars",
+      "right": true,
+      "margin": 0.032
+     },
+     {
+      "word": "chipped dishes",
+      "gold": "cracked plates",
+      "pick": "cracked plates",
+      "right": true,
+      "margin": 0.139
+     },
+     {
+      "word": "preserving room",
+      "gold": "still room",
+      "pick": "morning room",
+      "right": false,
+      "margin": 0.0
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.203
+     },
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "spoons",
+      "right": false,
+      "margin": 0.026
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.048
+     },
+     {
+      "word": "space downstairs",
+      "gold": "cellar",
+      "pick": "still room",
+      "right": false,
+      "margin": 0.033
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.085
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.048
+     },
+     {
+      "word": "wax forms",
+      "gold": "candle moulds",
+      "pick": "candle moulds",
+      "right": true,
+      "margin": 0.209
+     },
+     {
+      "word": "wash house",
+      "gold": "laundry",
+      "pick": "laundry",
+      "right": true,
+      "margin": 0.164
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "bees",
+      "right": false,
+      "margin": 0.003
+     },
+     {
+      "word": "wax forms",
+      "gold": "candle moulds",
+      "pick": "candle moulds",
+      "right": true,
+      "margin": 0.209
+     }
+    ],
+    "fitted": [
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "iron hooks",
+      "right": true,
+      "margin": 0.197
+     },
+     {
+      "word": "sunny sitting room",
+      "gold": "morning room",
+      "pick": "morning room",
+      "right": true,
+      "margin": 0.197
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.335
+     },
+     {
+      "word": "planting flats",
+      "gold": "seed trays",
+      "pick": "seed trays",
+      "right": true,
+      "margin": 0.119
+     },
+     {
+      "word": "preserving pots",
+      "gold": "glass jars",
+      "pick": "candle moulds",
+      "right": false,
+      "margin": 0.06
+     },
+     {
+      "word": "muddy porch",
+      "gold": "boot room",
+      "pick": "laundry",
+      "right": false,
+      "margin": 0.06
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "coach house",
+      "right": false,
+      "margin": 0.066
+     },
+     {
+      "word": "chipped dishes",
+      "gold": "cracked plates",
+      "pick": "cracked plates",
+      "right": true,
+      "margin": 0.139
+     },
+     {
+      "word": "canes",
+      "gold": "walking sticks",
+      "pick": "walking sticks",
+      "right": true,
+      "margin": 0.258
+     },
+     {
+      "word": "shooting store",
+      "gold": "gun room",
+      "pick": "gun room",
+      "right": true,
+      "margin": 0.258
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.33
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.252
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "walking sticks",
+      "right": false,
+      "margin": 0.054
+     },
+     {
+      "word": "children's room",
+      "gold": "nursery",
+      "pick": "gun room",
+      "right": false,
+      "margin": 0.054
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.322
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.085
+     },
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "iron hooks",
+      "right": true,
+      "margin": 0.006
+     },
+     {
+      "word": "muddy porch",
+      "gold": "boot room",
+      "pick": "morning room",
+      "right": false,
+      "margin": 0.006
+     },
+     {
+      "word": "chipped dishes",
+      "gold": "cracked plates",
+      "pick": "cracked plates",
+      "right": true,
+      "margin": 0.139
+     },
+     {
+      "word": "canes",
+      "gold": "walking sticks",
+      "pick": "walking sticks",
+      "right": true,
+      "margin": 0.042
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.129
+     },
+     {
+      "word": "wash-up room",
+      "gold": "scullery",
+      "pick": "coach house",
+      "right": false,
+      "margin": 0.129
+     },
+     {
+      "word": "wax forms",
+      "gold": "candle moulds",
+      "pick": "candle moulds",
+      "right": true,
+      "margin": 0.4
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "walking sticks",
+      "right": false,
+      "margin": 0.038
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.118
+     },
+     {
+      "word": "cart shed",
+      "gold": "coach house",
+      "pick": "coach house",
+      "right": true,
+      "margin": 0.118
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "lanterns",
+      "right": false,
+      "margin": 0.017
+     },
+     {
+      "word": "preserving pots",
+      "gold": "glass jars",
+      "pick": "glass jars",
+      "right": true,
+      "margin": 0.032
+     },
+     {
+      "word": "chipped dishes",
+      "gold": "cracked plates",
+      "pick": "cracked plates",
+      "right": true,
+      "margin": 0.298
+     },
+     {
+      "word": "preserving room",
+      "gold": "still room",
+      "pick": "still room",
+      "right": true,
+      "margin": 0.298
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.311
+     },
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "iron hooks",
+      "right": true,
+      "margin": 0.054
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.147
+     },
+     {
+      "word": "space downstairs",
+      "gold": "cellar",
+      "pick": "cellar",
+      "right": true,
+      "margin": 0.147
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.323
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.048
+     },
+     {
+      "word": "wax forms",
+      "gold": "candle moulds",
+      "pick": "candle moulds",
+      "right": true,
+      "margin": 0.439
+     },
+     {
+      "word": "wash house",
+      "gold": "laundry",
+      "pick": "laundry",
+      "right": true,
+      "margin": 0.439
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "Dankirn",
+      "right": false,
+      "margin": 0.058
+     },
+     {
+      "word": "wax forms",
+      "gold": "candle moulds",
+      "pick": "candle moulds",
+      "right": true,
+      "margin": 0.209
+     }
+    ]
+   }
+  },
+  {
+   "seed": 3,
+   "summary": {
+    "bare": {
+     "right": 24,
+     "of": 40,
+     "margin_right": 0.119,
+     "margin_wrong": 0.009
+    },
+    "fitted": {
+     "right": 37,
+     "of": 40,
+     "margin_right": 0.139,
+     "margin_wrong": 0.053
+    }
+   },
+   "picks": {
+    "bare": [
+     {
+      "word": "planting flats",
+      "gold": "seed trays",
+      "pick": "seed trays",
+      "right": true,
+      "margin": 0.119
+     },
+     {
+      "word": "loft",
+      "gold": "attic",
+      "pick": "attic",
+      "right": true,
+      "margin": 0.093
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "wool",
+      "right": false,
+      "margin": 0.007
+     },
+     {
+      "word": "canes",
+      "gold": "walking sticks",
+      "pick": "walking sticks",
+      "right": true,
+      "margin": 0.042
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.203
+     },
+     {
+      "word": "larder",
+      "gold": "pantry",
+      "pick": "attic",
+      "right": false,
+      "margin": 0.013
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool",
+      "right": false,
+      "margin": 0.009
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "wool",
+      "right": false,
+      "margin": 0.007
+     },
+     {
+      "word": "chipped dishes",
+      "gold": "cracked plates",
+      "pick": "cracked plates",
+      "right": true,
+      "margin": 0.139
+     },
+     {
+      "word": "milk store",
+      "gold": "dairy",
+      "pick": "dairy",
+      "right": true,
+      "margin": 0.194
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool",
+      "right": false,
+      "margin": 0.009
+     },
+     {
+      "word": "wax forms",
+      "gold": "candle moulds",
+      "pick": "candle moulds",
+      "right": true,
+      "margin": 0.209
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.085
+     },
+     {
+      "word": "shooting store",
+      "gold": "gun room",
+      "pick": "gun room",
+      "right": true,
+      "margin": 0.274
+     },
+     {
+      "word": "preserving pots",
+      "gold": "glass jars",
+      "pick": "glass jars",
+      "right": true,
+      "margin": 0.032
+     },
+     {
+      "word": "preserving pots",
+      "gold": "glass jars",
+      "pick": "glass jars",
+      "right": true,
+      "margin": 0.032
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool",
+      "right": false,
+      "margin": 0.009
+     },
+     {
+      "word": "wash-up room",
+      "gold": "scullery",
+      "pick": "laundry",
+      "right": false,
+      "margin": 0.052
+     },
+     {
+      "word": "planting flats",
+      "gold": "seed trays",
+      "pick": "seed trays",
+      "right": true,
+      "margin": 0.119
+     },
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "spoons",
+      "right": false,
+      "margin": 0.026
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "wool",
+      "right": false,
+      "margin": 0.007
+     },
+     {
+      "word": "space downstairs",
+      "gold": "cellar",
+      "pick": "still room",
+      "right": false,
+      "margin": 0.033
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.085
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool",
+      "right": false,
+      "margin": 0.009
+     },
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "spoons",
+      "right": false,
+      "margin": 0.026
+     },
+     {
+      "word": "preserving room",
+      "gold": "still room",
+      "pick": "morning room",
+      "right": false,
+      "margin": 0.0
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.203
+     },
+     {
+      "word": "planting flats",
+      "gold": "seed trays",
+      "pick": "seed trays",
+      "right": true,
+      "margin": 0.119
+     },
+     {
+      "word": "canes",
+      "gold": "walking sticks",
+      "pick": "walking sticks",
+      "right": true,
+      "margin": 0.042
+     },
+     {
+      "word": "space downstairs",
+      "gold": "cellar",
+      "pick": "still room",
+      "right": false,
+      "margin": 0.033
+     },
+     {
+      "word": "chipped dishes",
+      "gold": "cracked plates",
+      "pick": "cracked plates",
+      "right": true,
+      "margin": 0.139
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.203
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.085
+     },
+     {
+      "word": "larder",
+      "gold": "pantry",
+      "pick": "attic",
+      "right": false,
+      "margin": 0.013
+     },
+     {
+      "word": "preserving pots",
+      "gold": "glass jars",
+      "pick": "glass jars",
+      "right": true,
+      "margin": 0.032
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.085
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool",
+      "right": false,
+      "margin": 0.009
+     },
+     {
+      "word": "shooting store",
+      "gold": "gun room",
+      "pick": "gun room",
+      "right": true,
+      "margin": 0.274
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.203
+     },
+     {
+      "word": "chipped dishes",
+      "gold": "cracked plates",
+      "pick": "cracked plates",
+      "right": true,
+      "margin": 0.139
+     }
+    ],
+    "fitted": [
+     {
+      "word": "planting flats",
+      "gold": "seed trays",
+      "pick": "seed trays",
+      "right": true,
+      "margin": 0.32
+     },
+     {
+      "word": "loft",
+      "gold": "attic",
+      "pick": "attic",
+      "right": true,
+      "margin": 0.32
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "fishing floats",
+      "right": true,
+      "margin": 0.005
+     },
+     {
+      "word": "canes",
+      "gold": "walking sticks",
+      "pick": "walking sticks",
+      "right": true,
+      "margin": 0.042
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.012
+     },
+     {
+      "word": "larder",
+      "gold": "pantry",
+      "pick": "pantry",
+      "right": true,
+      "margin": 0.012
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.3
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "walking sticks",
+      "right": false,
+      "margin": 0.038
+     },
+     {
+      "word": "chipped dishes",
+      "gold": "cracked plates",
+      "pick": "cracked plates",
+      "right": true,
+      "margin": 0.333
+     },
+     {
+      "word": "milk store",
+      "gold": "dairy",
+      "pick": "dairy",
+      "right": true,
+      "margin": 0.333
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.246
+     },
+     {
+      "word": "wax forms",
+      "gold": "candle moulds",
+      "pick": "candle moulds",
+      "right": true,
+      "margin": 0.209
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.274
+     },
+     {
+      "word": "shooting store",
+      "gold": "gun room",
+      "pick": "gun room",
+      "right": true,
+      "margin": 0.274
+     },
+     {
+      "word": "preserving pots",
+      "gold": "glass jars",
+      "pick": "glass jars",
+      "right": true,
+      "margin": 0.139
+     },
+     {
+      "word": "preserving pots",
+      "gold": "glass jars",
+      "pick": "glass jars",
+      "right": true,
+      "margin": 0.032
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.168
+     },
+     {
+      "word": "wash-up room",
+      "gold": "scullery",
+      "pick": "gun room",
+      "right": false,
+      "margin": 0.168
+     },
+     {
+      "word": "planting flats",
+      "gold": "seed trays",
+      "pick": "seed trays",
+      "right": true,
+      "margin": 0.124
+     },
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "iron hooks",
+      "right": true,
+      "margin": 0.054
+     },
+     {
+      "word": "bobbers",
+      "gold": "fishing floats",
+      "pick": "walking sticks",
+      "right": false,
+      "margin": 0.053
+     },
+     {
+      "word": "space downstairs",
+      "gold": "cellar",
+      "pick": "cellar",
+      "right": true,
+      "margin": 0.053
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.374
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.048
+     },
+     {
+      "word": "metal pegs",
+      "gold": "iron hooks",
+      "pick": "iron hooks",
+      "right": true,
+      "margin": 0.05
+     },
+     {
+      "word": "preserving room",
+      "gold": "still room",
+      "pick": "still room",
+      "right": true,
+      "margin": 0.05
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.203
+     },
+     {
+      "word": "planting flats",
+      "gold": "seed trays",
+      "pick": "seed trays",
+      "right": true,
+      "margin": 0.119
+     },
+     {
+      "word": "canes",
+      "gold": "walking sticks",
+      "pick": "walking sticks",
+      "right": true,
+      "margin": 0.138
+     },
+     {
+      "word": "space downstairs",
+      "gold": "cellar",
+      "pick": "cellar",
+      "right": true,
+      "margin": 0.138
+     },
+     {
+      "word": "chipped dishes",
+      "gold": "cracked plates",
+      "pick": "cracked plates",
+      "right": true,
+      "margin": 0.212
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.252
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.03
+     },
+     {
+      "word": "larder",
+      "gold": "pantry",
+      "pick": "pantry",
+      "right": true,
+      "margin": 0.03
+     },
+     {
+      "word": "preserving pots",
+      "gold": "glass jars",
+      "pick": "glass jars",
+      "right": true,
+      "margin": 0.032
+     },
+     {
+      "word": "lamps",
+      "gold": "lanterns",
+      "pick": "lanterns",
+      "right": true,
+      "margin": 0.085
+     },
+     {
+      "word": "fleece combs",
+      "gold": "wool cards",
+      "pick": "wool cards",
+      "right": true,
+      "margin": 0.168
+     },
+     {
+      "word": "shooting store",
+      "gold": "gun room",
+      "pick": "gun room",
+      "right": true,
+      "margin": 0.168
+     },
+     {
+      "word": "grain bags",
+      "gold": "flour sacks",
+      "pick": "flour sacks",
+      "right": true,
+      "margin": 0.377
+     },
+     {
+      "word": "chipped dishes",
+      "gold": "cracked plates",
+      "pick": "cracked plates",
+      "right": true,
+      "margin": 0.139
+     }
+    ]
+   }
+  }
+ ]
+}

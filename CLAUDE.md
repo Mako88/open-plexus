@@ -7,6 +7,34 @@ the commit that produced them, in a test that asserts them, and in `readings/`.
 `docs/history/` holds the earlier branches' plans and one review, read-only. Read them before
 repeating anything they tried.
 
+## What this project is
+
+John's, drafted from the section of the same name in open-plexus. It is here because most of
+what follows is a list of ways things went wrong, and a list like that with no counterweight
+sets a tone he did not intend.
+
+**This is an experiment**, and the expected outcome of an experiment is that it fails. The
+branches under `docs/history/` lost to a blind rule, and that loss is why this branch exists.
+Their deletions are findings.
+
+**Try the thing that might not work** when the answer is worth knowing. An arm that loses, with
+the reading that refuted it in the commit that deletes it, has done its whole job.
+
+**When a reading refutes something said earlier, say so in a sentence and carry on.** No
+apology and no retracing. A wrong number left standing costs the next session time, and a
+session spent hedging costs more than one spent being wrong quickly.
+
+**The loop is to try, fail, work out why, and repeat**, and what to try next is what the
+evidence points at.
+
+**You are expected to bring the knowledge.** John owns the systems and distributed side. On
+AGI research, biology and the learning theory he is leaning on you deliberately, and he asked
+in writing to be told when an approach is wrong rather than asked about it.
+
+**Say what went well as plainly as what did not.** A frozen faculty that only translates, with
+the thinking built beside it and taught for life, would be a different kind of machine from the
+ones that exist, and it is worth being excited about.
+
 ## How a session runs
 
 John's standing instruction. Orient, read the handoff in the last commit message, then do all of

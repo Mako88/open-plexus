@@ -90,3 +90,32 @@ def test_phase_4_the_system_beats_its_own_faculty_given_everything():
             won.setdefault(config, set()).add(seed)
     most = max((len(s) for s in won.values()), default=0)
     assert most >= 3, f"one configuration beats its faculty on {most} of 3 seeds"
+
+
+def test_the_second_house_scores_at_least_half_the_first():
+    """The checkpoint's second half: on a house sharing no relation with the first,
+    taught from its own practice houses, one configuration scores at least half what
+    the same configuration scores on the first house, seed by seed, on seeds 1 to 3."""
+    from unfused.exam.second import generate_second_house
+
+    def config(d):
+        return (d["arm"], _faculty(d), json.dumps(
+            {k: v for k, v in d.get("dials", {}).items() if k not in COUNTERS},
+            sort_keys=True))
+
+    first = {(config(d), d["house"]["seed"]): d["summary"]["score"] for d in _current()}
+    held: dict[tuple, set] = {}
+    for path in READINGS.glob("exam-second-*.json"):
+        d = json.loads(path.read_text(encoding="utf-8"))
+        house = d["house"]
+        if d.get("limit") is not None or house["fingerprint"] != generate_second_house(
+                seed=house["seed"], n_facts=house["facts"],
+                n_turns=house["turns"]).fingerprint():
+            continue
+        if d["arm"] not in ("system", "planned", "taught"):
+            continue  # blind reads alike on any house, and would pass for nothing
+        key = (config(d), house["seed"])
+        if key in first and d["summary"]["score"] >= first[key] / 2:
+            held.setdefault(key[0], set()).add(house["seed"])
+    most = max((len(s & {1, 2, 3}) for s in held.values()), default=0)
+    assert most >= 3, f"one configuration holds half its first-house score on {most} of 3 seeds"

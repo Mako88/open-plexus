@@ -71,6 +71,21 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   back to the encoder. Built from rows alone and borrowed vectors on relation words are
   refuted (`586338f8`, `b33d2422`). Bare MiniLM gets 14 of 22 oblique words right, which
   is the bar. The house and bAbI MUST NOT fall by more than 0.02.
+- **The ear reads without the known relations.** John's question, 2026-10-01. Every read
+  sends the 30 commonest stored relations so the 0.8B reuses a wording, which has been so
+  since `1d18547b` and was never compared. It puts vocabulary consistency in the frozen
+  faculty, and makes the same sentence a new request whenever the list moves: bAbI is up
+  to 4,818 reads where 349 sentences would do. The arm reads each sentence alone and
+  leaves "stores" against "keeps" to the system's kin, synonyms and symbols. Refuted if
+  either house or bAbI falls by more than 0.02.
+- **The parser reading, before the state rules.** John's, 2026-10-01. The learner's
+  principles carry to a general ear (plans induced from taught examples and kept while
+  they hold, abstention, facts over time, symbols); its structures do not (five slots,
+  shapes as question templates, plans as chains over five-slot rows). Phase 5's state
+  rules would be built on those structures, so first the house's tellings are parsed
+  (spaCy), mapped plainly to facts and scored on `scripts/ears.py`'s scorer against the
+  ear's 1.00, with the time a read takes. If a parse with a learnt mapping looks able to
+  carry the house, the state rules are built on it. See OPEN FORKS, a generic ear.
 - **Phase 5 — Learning rules, and operations over facts.** IN PROGRESS, 0.8B only. Plans
   learnt from taught examples answer bAbI tasks 1, 2, 3 and 7 and the house with no model
   planning: a shape nobody taught goes unanswered, so the faculty only reads. Every faculty
@@ -347,6 +362,14 @@ the store merges by id. Kill a third of the nodes mid-exam.
   mention in any text and the roles joining them, with roles left open (open information
   extraction, semantic role labelling). Every loosening of the 0.8B's output on
   2026-10-01 cost recall, so it is taken after the symbol encoder is shown to learn.
+  John's sharper form: a frozen part that only tags every word with its grammatical role,
+  dropping none, and the system learns what each pattern states. A dependency parser
+  (spaCy, Stanza) is that: milliseconds a sentence, every sentence type parses, and
+  nothing in it knows that "lent to" and "borrowed from" state one fact, which the
+  system would have to learn from teaching or later questions. First reading: the
+  house's tellings parsed, the plain mapping (subject, verb, object, prepositional
+  object) scored by `scripts/ears.py`'s scorer against the ear's 1.00. The SRL labeller
+  of `034cfe25` was refuted for one job, a dropped recipient, not as an ear.
 - **Where the encoder learns.** Two places, wanted both. Rows: aliases and confirmed
   sameness kept per symbol, which is memory and does not carry to a new word. Weights:
   the encoder's own function, which carries what it learnt about one unknown word to the

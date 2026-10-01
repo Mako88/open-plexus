@@ -51,13 +51,21 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   few distinct chains five times each and its counts bunch. The second house, with
   relations the system was never built around, at no worse than half the first house's
   score; met on seeds 1 to 3 by the taught arm.
-- **The ear's speed.** First, because every run waits on it: an uncached read is about
-  0.85 s, 70-odd tokens at 10 ms, the grammar about 4 ms of each. The format and the
-  grammar engine are spent: every shorter reply and llguidance itself cost recall.
-  Untried: reads sent concurrently to a server with `--parallel 4`, which batches them
-  on the card, and the 0.8B's own multi-token-prediction head (`blk.24.nextn.*`, which
-  llama.cpp loads as unused) for speculative decoding. Refuted routes: `ff946ca7`,
-  `5d121bc2`, `7d881a9e`, and the llguidance commit after it.
+- ~~**The ear's speed.**~~ Parked by John 2026-10-01 at about 0.85 s a read. The format
+  and the grammar engine are spent (`ff946ca7`, `5d121bc2`, `7d881a9e`, `e7113f11`).
+  Concurrent reads are ruled out because each read is told the relations known so far;
+  speculative decoding needs llama.cpp to use the 0.8B's `blk.24.nextn.*` head.
+- **The tables in vectors.** John's, promoted from OPEN FORKS 2026-10-01, ahead of Phase
+  5's state rules. The rows stay one fact each, and a cell points at a symbol; a symbol
+  carries its word, an identity vector seeded from the word that decodes back to it
+  exactly, and a meaning vector built from the rows it sits in and rebuildable from them.
+  Lookup by identity is today's exact match; lookup by meaning is where likeness enters,
+  and which slots may use it is an arm each. Built meaning keeps "lent" and "borrowed"
+  apart by the roles their fillers play, so it does not reopen the DECIDED item on
+  meaning. First arm: meaning built from rows alone. Second arm: built
+  and the borrowed vector together, which MUST beat the first to stay, since borrowed
+  vectors put "lent" beside "borrowed" (`readings/lexicon-*`). The house and bAbI MUST NOT
+  fall by more than 0.02.
 - **Phase 5 — Learning rules, and operations over facts.** IN PROGRESS, 0.8B only. Plans
   learnt from taught examples answer bAbI tasks 1, 2, 3 and 7 and the house with no model
   planning: a shape nobody taught goes unanswered, so the faculty only reads. Every faculty
@@ -332,14 +340,6 @@ the store merges by id. Kill a third of the nodes mid-exam.
 - **Shapes by likeness.** A shape matches only word for word, so an oblique question never
   meets its plain twin's plan. Matching shapes by embedding would carry a plan across
   wordings, at the risk of carrying it to a question that only looks alike.
-- **The tables in vectors**, John's, 2026-10-01. The rows stay as they are, one fact each,
-  and a cell points at a symbol rather than holding a word. A symbol carries its word, an
-  identity vector seeded from the word, which decodes back to it exactly, and a meaning
-  vector the system builds from the symbol's rows, rebuildable from them at any time.
-  Lookup by identity is today's exact match; lookup by meaning is where likeness enters,
-  and which slots may use it is an arm each. Borrowed vectors put "lent" beside
-  "borrowed", which point opposite ways; built ones keep them apart by the roles their
-  fillers play, and do not reopen the DECIDED item on meaning.
 - **Choice questions** ("Is the gate red or blue?"). A taught chain must touch every filler
   the question names, and "red" sits in no fact about the gate, so no plan is learnt.
 - **A thread's working notes as a fragment**: what surfaced for the last few turns is carried

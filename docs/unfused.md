@@ -57,10 +57,15 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      shown, so a repeat run reads only what it has not heard.
   3. The fallback to model planning switched off for shapes with no taught plan: it answers
      about 66 questions a house at 0.05 to 0.08, and without it the faculty only encodes.
-  4. The second house. A world change, so its contents are agreed with John first. This is
-     where rules induced from co-occurring facts, rather than plans copied from practice,
-     are needed.
-  5. A count read wherever the ear put the number, which it puts outside `quantity` in two
+  4. Needle as the ear (John's, 2026-09-30): its `scripts/ears.py` reading against the
+     0.8B's on the house, then the system under it if it reads within a few points. It is
+     tens of millions of parameters, so the gain is speed.
+  5. The second house, agreed with John 2026-09-30: the first house's skeleton and forms,
+     with five kinds it shares no relation with (an asymmetric kin, a three-place lending
+     whose thing is then held by the borrower, employment with a place, material, age),
+     taught from its own practice houses, and no code changed for it. This is where rules
+     induced from co-occurring facts, rather than plans copied from practice, are needed.
+  6. A count read wherever the ear put the number, which it puts outside `quantity` in two
      tellings of three; oblique questions naming things in unheard words; correction as an
      input.
 - **Phase 6 — Importance and forgetting.**

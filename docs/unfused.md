@@ -46,26 +46,27 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   with Phase 4's alone: John's, 2026-09-30, because Phase 4 failed on missing rules and is
   being met by Phase 5's taught plans. Two halves. The first house: the system with the 0.8B
   beats the 0.8B given the whole transcript on `twohop`, `chain3` and `count`, and blind, on
-  seeds 1 to 3. `twohop` holds on all three; `chain3` and `count` lose to blind, which asks
-  few distinct chains five times each and whose counts bunch. The second house, with relations the
-  system was never built around, at no worse than half the first house's score; not built.
+  seeds 1 to 3. The system now beats full context on all three seeds overall and on
+  `twohop`; on `chain3` and `count` it loses to blind on seeds 1 and 2, because blind asks
+  few distinct chains five times each and its counts bunch. The second house, with
+  relations the system was never built around, at no worse than half the first house's
+  score; not built.
 - **Phase 5 — Learning rules, and operations over facts.** IN PROGRESS, 0.8B only. Plans
   learnt from taught examples answer bAbI tasks 1, 2, 3 and 7 with no model planning and
-  most house questions with no model at question time. Next, in order:
-  1. Settle `--falls` and `--joins` (bAbI, then the pair on the house).
-  2. Each ear reading kept across runs, keyed by model, prompt, sentence and the relations
-     shown, so a repeat run reads only what it has not heard.
-  3. The fallback to model planning switched off for shapes with no taught plan: it answers
-     about 66 questions a house at 0.05 to 0.08, and without it the faculty only encodes.
-  4. Needle as the ear (John's, 2026-09-30): its `scripts/ears.py` reading against the
+  most house questions with no model at question time. Every faculty reply is kept across
+  runs, so a repeat run sends only what the server has not answered. Next, in order:
+  1. `--taught-only` (built, not measured): the fallback to model planning switched off for
+     shapes with no taught plan. It answers about 66 questions a house at 0.05 to 0.08, and
+     without it the faculty only encodes.
+  2. Needle as the ear (John's, 2026-09-30): its `scripts/ears.py` reading against the
      0.8B's on the house, then the system under it if it reads within a few points. It is
      tens of millions of parameters, so the gain is speed.
-  5. The second house, agreed with John 2026-09-30: the first house's skeleton and forms,
+  3. The second house, agreed with John 2026-09-30: the first house's skeleton and forms,
      with five kinds it shares no relation with (an asymmetric kin, a three-place lending
      whose thing is then held by the borrower, employment with a place, material, age),
      taught from its own practice houses, and no code changed for it. This is where rules
      induced from co-occurring facts, rather than plans copied from practice, are needed.
-  6. A count read wherever the ear put the number, which it puts outside `quantity` in two
+  4. A count read wherever the ear put the number, which it puts outside `quantity` in two
      tellings of three; oblique questions naming things in unheard words; correction as an
      input.
 - **Phase 6 — Importance and forgetting.**

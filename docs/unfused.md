@@ -50,18 +50,18 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   `twohop`; on `chain3` and `count` it loses to blind on seeds 1 and 2, because blind asks
   few distinct chains five times each and its counts bunch. The second house, with
   relations the system was never built around, at no worse than half the first house's
-  score; not built.
+  score; met on seeds 1 to 3 by the taught arm.
 - **Phase 5 — Learning rules, and operations over facts.** IN PROGRESS, 0.8B only. Plans
   learnt from taught examples answer bAbI tasks 1, 2, 3 and 7 and the house with no model
   planning: a shape nobody taught goes unanswered, so the faculty only reads. Every faculty
   reply is kept across runs, so a repeat run sends only what the server has not answered.
   Next, in order:
-  1. The second house, agreed with John 2026-09-30: the first house's skeleton and forms,
-     with five kinds it shares no relation with (an asymmetric kin, a three-place lending
-     whose thing is then held by the borrower, employment with a place, material, age),
-     taught from its own practice houses, and no code changed for it. Built
-     (`--world second`), not yet read. This is where rules
-     induced from co-occurring facts, rather than plans copied from practice, are needed.
+  1. The second house's lendings (`--world second`, agreed with John 2026-09-30). It holds
+     the checkpoint's half; its count and update fail. Two pieces, in order: an ear that
+     keeps a second party (a ditransitive's recipient) in a slot of its own and reads a
+     second clause, then supersession learnt from taught answers rather than written by
+     hand, since `moves` knows only a pair changing place. The first house and bAbI MUST
+     NOT fall by more than 0.02 under either.
   2. A count read wherever the ear put the number, which it puts outside `quantity` in two
      tellings of three; oblique questions naming things in unheard words; correction as an
      input.

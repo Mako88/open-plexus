@@ -60,9 +60,12 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      reads 0 on every seed, and the loan chains mostly answer "I don't know". The cause
      for both is the recipient: the 0.8B puts it in `place` for "lent to", in `subject`
      for "borrowed from", and loses it for "passed on to" (5 of 28 tellings). A slot of
-     its own was refuted (`fd14a059`). Next: recover the lost recipient, then a count
-     across the slots a recipient lands in, then supersession learnt from taught
-     answers. The first house and bAbI MUST NOT fall by more than 0.02 under any.
+     its own was refuted (`fd14a059`), and so was a role labeller recovering it alone
+     (`034cfe25`): a borrowed thing is a state several verbs make and one unmakes, so a
+     consistent slot does not add up to a count. Next: rules induced from co-occurring
+     facts ("lent X to Y" then Y has X; "passed X on" then no longer), kept while their
+     predictions hold, with the labeller brought back to read the recipients the ear
+     drops. The first house and bAbI MUST NOT fall by more than 0.02 under any.
   2. A count read wherever the ear put the number, which it puts outside `quantity` in two
      tellings of three; oblique questions naming things in unheard words; correction as an
      input.

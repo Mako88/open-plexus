@@ -21,17 +21,56 @@ from unfused.exam.world import _FILLER, generate_house
 ROOT = Path(__file__).resolve().parents[1]
 
 
+class NeedleEar:
+    """Needle (Cactus Compute) as the ear, untuned. It is a tool caller trained on flat
+    arguments, so one assertion is the tool's parameters and each call is one."""
+
+    SLOTS = {"subject": "who or what the fact is about",
+             "relation": "a short verb phrase, such as keeps, is cousin of, works as, "
+                         "has colour",
+             "object": "the thing or trait the relation takes, if any",
+             "place": "the place, if any", "quantity": "a number, if any"}
+
+    def __init__(self) -> None:
+        import os
+
+        os.environ["NEEDLE_TELEMETRY"] = "0"
+        self.tool = {"name": "record", "description": "Record a lasting fact a sentence states.",
+                     "parameters": {"type": "object",
+                                    "properties": {k: {"type": "string", "description": d}
+                                                   for k, d in self.SLOTS.items()},
+                                    "required": ["subject", "relation"]}}
+        self.calls, self.seconds, self.failures = 0, 0.0, []
+
+    def read(self, sentence: str) -> list[dict]:
+        import time
+
+        from needle import Needle
+
+        start = time.time()
+        agent = Needle(tools=[self.tool])
+        try:
+            reply = agent._complete(sentence, 300)
+        finally:
+            agent.close()
+        self.calls += 1
+        self.seconds += time.time() - start
+        calls = reply.get("function_calls") or reply.get("suppressed_calls") or []
+        return [{k: (c.get("arguments") or {}).get(k) for k in self.SLOTS} for c in calls]
+
+
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--url", default="http://127.0.0.1:8094/v1/chat/completions")
     p.add_argument("--name", required=True)
+    p.add_argument("--needle", action="store_true", help="Needle, in-process, as the ear")
     p.add_argument("--limit", type=int, default=None)
     p.add_argument("--note", default="")
     args = p.parse_args()
 
     house = generate_house(args.seed)
-    ear = Ear(url=args.url, name=args.name)
+    ear = NeedleEar() if args.needle else Ear(url=args.url, name=args.name)
     facts = house.facts[: args.limit] if args.limit else house.facts
     rows, whole, named, named_whole = [], 0, 0, 0
     for fact in facts:

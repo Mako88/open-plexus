@@ -56,7 +56,6 @@ def main() -> None:
                         "what it learns")
     p.add_argument("--moves", action="store_true")
     p.add_argument("--cleans", action="store_true")
-    p.add_argument("--taught-only", action="store_true")
     p.add_argument("--world", default="first", choices=["first", "second"],
                    help="which house: the second shares no relation with the first, and is "
                         "taught from practice houses of its own")
@@ -111,8 +110,7 @@ def main() -> None:
                                  searched=searched, asked=asked,
                                  shares=args.shares, moves=args.moves,
                                  taught=name == "taught", known_learnt=learnt,
-                                 cleans=args.cleans, known_holds=holds,
-                                 taught_only=args.taught_only)
+                                 cleans=args.cleans, known_holds=holds)
 
             learnt, holds = [], []
             if name == "taught":

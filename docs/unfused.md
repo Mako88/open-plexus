@@ -52,18 +52,17 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   relations the system was never built around, at no worse than half the first house's
   score; not built.
 - **Phase 5 — Learning rules, and operations over facts.** IN PROGRESS, 0.8B only. Plans
-  learnt from taught examples answer bAbI tasks 1, 2, 3 and 7 with no model planning and
-  most house questions with no model at question time. Every faculty reply is kept across
-  runs, so a repeat run sends only what the server has not answered. Next, in order:
-  1. `--taught-only` (built, not measured): the fallback to model planning switched off for
-     shapes with no taught plan. It answers about 66 questions a house at 0.05 to 0.08, and
-     without it the faculty only encodes.
-  2. The second house, agreed with John 2026-09-30: the first house's skeleton and forms,
+  learnt from taught examples answer bAbI tasks 1, 2, 3 and 7 and the house with no model
+  planning: a shape nobody taught goes unanswered, so the faculty only reads. Every faculty
+  reply is kept across runs, so a repeat run sends only what the server has not answered.
+  Next, in order:
+  1. The second house, agreed with John 2026-09-30: the first house's skeleton and forms,
      with five kinds it shares no relation with (an asymmetric kin, a three-place lending
      whose thing is then held by the borrower, employment with a place, material, age),
-     taught from its own practice houses, and no code changed for it. This is where rules
+     taught from its own practice houses, and no code changed for it. Built
+     (`--world second`), not yet read. This is where rules
      induced from co-occurring facts, rather than plans copied from practice, are needed.
-  3. A count read wherever the ear put the number, which it puts outside `quantity` in two
+  2. A count read wherever the ear put the number, which it puts outside `quantity` in two
      tellings of three; oblique questions naming things in unheard words; correction as an
      input.
 - **Phase 6 — Importance and forgetting.**

@@ -108,8 +108,7 @@ class SystemArm:
                  asked: bool = False, shares: float = 0.8,
                  moves: bool = False, taught: bool = False,
                  known_learnt: list | None = None,
-                 cleans: bool = False, known_holds: list | None = None,
-                 taught_only: bool = False) -> None:
+                 cleans: bool = False, known_holds: list | None = None) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -130,12 +129,11 @@ class SystemArm:
         self.shares = shares
         # whether a subject heard somewhere is no longer where it was heard before
         self.moves = moves
-        # whether a question is answered first by what was taught for its shape
+        # whether a question is answered by what was taught for its shape, and only by
+        # that: a shape nobody taught goes unanswered, so the faculty only reads
         self.taught = taught
         # whether the ear's assertions are held to the words of their sentence
         self.cleans = cleans
-        # whether a question with no taught plan is not answered, so the faculty only reads
-        self.taught_only = taught_only
         self.embedder = embedder
         self.names_shown = names_shown
         self.relations_shown = relations_shown
@@ -157,7 +155,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "taught_only": self.taught_only, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "depth": self.depth,
                 "hub": self.hub,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
@@ -1028,9 +1026,8 @@ class SystemArm:
             if said is not None:
                 self.last_notes = ["(taught)"]
                 return said
-            if self.taught_only:
-                self.last_notes = ["(untaught)"]
-                return "I don't know."
+            self.last_notes = ["(untaught)"]
+            return "I don't know."
         query = self.query(question.text)
         self.last_notes = [json.dumps(query)] if query else ["(unreadable)"]
         if not query:

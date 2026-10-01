@@ -570,10 +570,10 @@ def test_a_loose_pass_never_overrules_a_strict_match(tmp_path):
     assert a.answer(q("Where is John?")) == "kitchen"
 
 
-def test_taught_only_never_asks_the_faculty_to_plan(tmp_path):
+def test_the_taught_arm_never_asks_the_faculty_to_plan(tmp_path):
     READINGS.update(BABI)
     ear = TableEar()
     ear.rewrite = lambda question: (_ for _ in ()).throw(AssertionError(question))
-    a = SystemArm(tmp_path, ear, HashEmbedder(), taught=True, taught_only=True)
+    a = SystemArm(tmp_path, ear, HashEmbedder(), taught=True)
     a.hear(0, "John got the football.")
     assert a.answer(q("Where is the football?")) == "I don't know."

@@ -14,6 +14,7 @@ import argparse
 import json
 import os
 import shutil
+import sys
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
@@ -166,6 +167,8 @@ def main() -> None:
         reading = {
             **result,
             "kind": "exam",
+            # the command that took it, so a comparison copies it rather than rebuilds it
+            "command": " ".join(sys.argv),
             "arm": name,
             "arm_class": result["arm"],
             "taken_at": taken,

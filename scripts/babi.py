@@ -14,6 +14,7 @@ import argparse
 import json
 import os
 import shutil
+import sys
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
@@ -147,6 +148,8 @@ def main() -> None:
         taken = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
         reading = {
             "kind": "babi", "arm": name, "taken_at": taken, "note": args.note,
+            # the command that took it, so a comparison copies it rather than rebuilds it
+            "command": " ".join(sys.argv),
             "faculty": faculty.name if faculty and name != "blind" else None,
             "planner": args.planner_served if args.planner_port else None,
             "planner_judges": args.planner_judges,

@@ -42,24 +42,27 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - ~~**Phase 2 — Small mouth.**~~ Struck 2026-09-29. 2B on seeds 0 to 2, 0.8B on seed 0.
 - ~~**Phase 3 — Ears.**~~ Struck 2026-09-29 under the strict scorer, which wants each gold
   filler in a slot of its own: Qwen3.5-2B at 0.96 recall and 1.00 precision.
-- **Phase 4 — The system answers.** PAUSED 2026-09-29 for Phase 5, John's call. Built, with
-  three faculty roles (ear, planner, judge) that can each be a different model, and kin. With
-  the 0.8B as ear and the 9B as planner and judge, seeds 1 and 3 meet the exit and seed 2's
-  count does not; on bAbI the same system is below the 0.8B reading each story (0.105 against
-  0.175). Both failures are rules: belonging plus being somewhere is keeping, a move changes
-  where a thing is, a carried thing goes with its carrier. The exit is taken again once
-  Phase 5 has them.
-- **Phase 5 — Learning rules, and operations over facts.** IN PROGRESS 2026-09-29, on the
-  0.8B only; the 9B is off the card. Plans learnt from taught examples (arm `taught`) on
-  facts held to their sentence (`cleans`), with order in time and learnt counts as step
-  kinds, answer bAbI tasks 1, 2, 3 and 7 with no model planning, and on the house they are
-  taught from practice houses and beat the system's own planning on seeds 1 to 3. A plan
-  that binds nothing strictly is followed loosely, so a filler meets its step in whichever
-  slot the ear chose. Next, in order: a taught plan that binds nothing hands the question to
-  the next best (`--falls`); a trade kept out of a question's shape, so the person who
-  repairs clocks and the person who binds books share a plan (`--joins`); a count read
-  wherever the ear put the number, which it puts outside `quantity` in two tellings of
-  three; oblique questions naming things in unheard words; correction as an input.
+- **The bet's checkpoint.** Phase 4's exit, taken with whatever mechanisms exist rather than
+  with Phase 4's alone: John's, 2026-09-30, because Phase 4 failed on missing rules and is
+  being met by Phase 5's taught plans. Two halves. The first house: the system with the 0.8B
+  beats the 0.8B given the whole transcript on `twohop`, `chain3` and `count`, and blind, on
+  seeds 1 to 3. `twohop` holds on all three; `chain3` and `count` lose to blind, which asks
+  few distinct chains five times each and whose counts bunch. The second house, with relations the
+  system was never built around, at no worse than half the first house's score; not built.
+- **Phase 5 — Learning rules, and operations over facts.** IN PROGRESS, 0.8B only. Plans
+  learnt from taught examples answer bAbI tasks 1, 2, 3 and 7 with no model planning and
+  most house questions with no model at question time. Next, in order:
+  1. Settle `--falls` and `--joins` (bAbI, then the pair on the house).
+  2. Each ear reading kept across runs, keyed by model, prompt, sentence and the relations
+     shown, so a repeat run reads only what it has not heard.
+  3. The fallback to model planning switched off for shapes with no taught plan: it answers
+     about 66 questions a house at 0.05 to 0.08, and without it the faculty only encodes.
+  4. The second house. A world change, so its contents are agreed with John first. This is
+     where rules induced from co-occurring facts, rather than plans copied from practice,
+     are needed.
+  5. A count read wherever the ear put the number, which it puts outside `quantity` in two
+     tellings of three; oblique questions naming things in unheard words; correction as an
+     input.
 - **Phase 6 — Importance and forgetting.**
 - **Phase 7 — Other senses.** A moment arrives across every modality, and what a sense
   perceives is kept beside what it asserts.

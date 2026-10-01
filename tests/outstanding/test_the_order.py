@@ -11,6 +11,8 @@ from pathlib import Path
 from unfused.exam.world import generate_house
 
 READINGS = Path(__file__).resolve().parents[2] / "readings"
+# what a run counted rather than how it was set
+COUNTERS = {"ear_calls", "ear_unparsed", "planner_calls", "shapes", "plan_uses"}
 
 
 def _current():
@@ -61,19 +63,30 @@ def test_phase_4_the_system_beats_its_own_faculty_given_everything():
     faculty on twohop, chain3 and count, and above blind on each. A house asks each
     chain five times and has few distinct chains, so on seed 1 blind reads 1.0 on
     chain3: beating full there is not evidence of composing unless blind is beaten."""
-    by = {(d["arm"], d["house"]["seed"], _faculty(d)): d["summary"]["by_form"]
-          for d in _current()}
-    blind = {d["house"]["seed"]: d["summary"]["by_form"] for d in _current()
+    current = _current()
+    full = {(d["house"]["seed"], _faculty(d)): d["summary"]["by_form"] for d in current
+            if d["arm"] == "full"}
+    blind = {d["house"]["seed"]: d["summary"]["by_form"] for d in current
              if d["arm"] == "blind"}
-    won = set()
-    for (arm, seed, faculty), forms in by.items():
-        if arm not in ("system", "planned") or ("full", seed, faculty) not in by:
+    # one configuration must win every seed: seeds won by different dials are
+    # different brains, and summing them says nothing about either
+    won: dict[tuple, set] = {}
+    for d in current:
+        arm, seed, faculty = d["arm"], d["house"]["seed"], _faculty(d)
+        # any arm of the system counts, taught plans included: the checkpoint is the
+        # bet's, taken with whatever mechanisms exist (John's, 2026-09-30)
+        if arm not in ("system", "planned", "taught") or (seed, faculty) not in full:
             continue
-        bars = (by[("full", seed, faculty)], blind.get(seed, {}))
+        forms = d["summary"]["by_form"]
+        bars = (full[(seed, faculty)], blind.get(seed, {}))
         # a perfect score passes a bar that is itself perfect, or seed 1's chain3,
         # where blind reads 1.0, could never be met by anything
         if all(f in forms and all(forms[f]["score"] > b.get(f, {}).get("score", 1.0)
                                   or forms[f]["score"] == 1.0 for b in bars)
                for f in ("twohop", "chain3", "count")):
-            won.add(seed)
-    assert len(won) >= 3, f"the system beats its faculty on {len(won)} of 3 seeds"
+            config = (arm, faculty, json.dumps(
+                {k: v for k, v in d.get("dials", {}).items() if k not in COUNTERS},
+                sort_keys=True))
+            won.setdefault(config, set()).add(seed)
+    most = max((len(s) for s in won.values()), default=0)
+    assert most >= 3, f"one configuration beats its faculty on {most} of 3 seeds"

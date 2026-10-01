@@ -341,6 +341,16 @@ the store merges by id. Kill a third of the nodes mid-exam.
 
 ## OPEN FORKS
 
+- **A generic ear.** John's, 2026-10-01. The symbol layer works only on what the ear hands
+  it, and the ear forces every sentence into subject, relation, object, place and
+  quantity, so what does not fit never becomes a symbol. The general form marks every
+  mention in any text and the roles joining them, with roles left open (open information
+  extraction, semantic role labelling). Every loosening of the 0.8B's output on
+  2026-10-01 cost recall, so it is taken after the symbol encoder is shown to learn.
+- **Where the encoder learns.** Two places, wanted both. Rows: aliases and confirmed
+  sameness kept per symbol, which is memory and does not carry to a new word. Weights:
+  the encoder's own function, which carries what it learnt about one unknown word to the
+  next. Rows first, because they are what the house can measure.
 - **Shapes by likeness.** A shape matches only word for word, so an oblique question never
   meets its plain twin's plan. Matching shapes by embedding would carry a plan across
   wordings, at the risk of carrying it to a question that only looks alike.

@@ -51,6 +51,11 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   few distinct chains five times each and its counts bunch. The second house, with
   relations the system was never built around, at no worse than half the first house's
   score; met on seeds 1 to 3 by the taught arm.
+- **The ear's speed.** First, because every run waits on it: an uncached read is about
+  0.8 s, 70-odd tokens at 10 ms, the grammar about 4 ms of each. Build llama.cpp with
+  `-DLLAMA_LLGUIDANCE=ON` (Vulkan backend, as fast here as CUDA; needs Rust and the
+  Vulkan SDK beside the installed Visual Studio 2026), whose grammar is cheaper and whose
+  JSON is compact. Agreed with John 2026-10-01. Refuted routes: `ff946ca7`, `5d121bc2`.
 - **Phase 5 — Learning rules, and operations over facts.** IN PROGRESS, 0.8B only. Plans
   learnt from taught examples answer bAbI tasks 1, 2, 3 and 7 and the house with no model
   planning: a shape nobody taught goes unanswered, so the faculty only reads. Every faculty

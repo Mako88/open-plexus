@@ -55,17 +55,22 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   and the grammar engine are spent (`ff946ca7`, `5d121bc2`, `7d881a9e`, `e7113f11`).
   Concurrent reads are ruled out because each read is told the relations known so far;
   speculative decoding needs llama.cpp to use the 0.8B's `blk.24.nextn.*` head.
-- **The tables in vectors.** John's, promoted from OPEN FORKS 2026-10-01, ahead of Phase
-  5's state rules. The rows stay one fact each, and a cell points at a symbol; a symbol
-  carries its word, an identity vector seeded from the word that decodes back to it
-  exactly, and a meaning vector built from the rows it sits in and rebuildable from them.
-  Lookup by identity is today's exact match; lookup by meaning is where likeness enters,
-  and which slots may use it is an arm each. Built meaning keeps "lent" and "borrowed"
-  apart by the roles their fillers play, so it does not reopen the DECIDED item on
-  meaning. First arm: meaning built from rows alone. Second arm: built
-  and the borrowed vector together, which MUST beat the first to stay, since borrowed
-  vectors put "lent" beside "borrowed" (`readings/lexicon-*`). The house and bAbI MUST NOT
-  fall by more than 0.02.
+- **Symbols, and words never heard.** John's, 2026-10-01; this merges the vectors fork
+  with Phase 5's oblique questions, and goes ahead of the state rules. An encoder of the
+  system's own sits between the ear and the tables. It takes whatever helps: the word, its
+  sentence (the 0.8B's contextual state), the slots and neighbours it has in the rows,
+  and borrowed vectors as raw material only. It writes a symbol: the word, an identity
+  part that decodes back to it exactly, and a meaning vector. Lookup by identity is
+  today's exact match. The encoder learns from every same-or-different the system
+  establishes: kin, the judge's kept verdicts, supersessions, confirmed inferences. It
+  starts as a pass-through of its borrowed inputs, so it begins no worse than them, and
+  whether learning improves it is measured as a run going on. Its first use is a word the
+  house never used ("canes", "milk store"). The candidates are the nearest symbols that
+  also fit the rest of the question. The answer is given when the best clears the next by
+  a margin, and "I don't know" otherwise. A confirmed reading is kept as a fact and fed
+  back to the encoder. Built from rows alone and borrowed vectors on relation words are
+  refuted (`586338f8`, `b33d2422`). Bare MiniLM gets 14 of 22 oblique words right, which
+  is the bar. The house and bAbI MUST NOT fall by more than 0.02.
 - **Phase 5 — Learning rules, and operations over facts.** IN PROGRESS, 0.8B only. Plans
   learnt from taught examples answer bAbI tasks 1, 2, 3 and 7 and the house with no model
   planning: a shape nobody taught goes unanswered, so the faculty only reads. Every faculty
@@ -82,8 +87,7 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      predictions hold, with the labeller brought back to read the recipients the ear
      drops. The first house and bAbI MUST NOT fall by more than 0.02 under any.
   2. A count read wherever the ear put the number, which it puts outside `quantity` in two
-     tellings of three; oblique questions naming things in unheard words; correction as an
-     input.
+     tellings of three; correction as an input.
 - **Phase 6 — Importance and forgetting.**
 - **Phase 7 — Other senses.** A moment arrives across every modality, and what a sense
   perceives is kept beside what it asserts.

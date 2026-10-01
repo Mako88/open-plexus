@@ -37,6 +37,8 @@ from .exam.world import Question
 SLOTS = ("subject", "object", "place", "quantity")
 NULLS = {"", "none", "null", "n/a", "unknown", "nothing"}
 ARTICLES = ("the ", "a ", "an ", "some ", "all the ", "all ")
+THING_PRONOUNS = {"it", "them"}
+PERSON_PRONOUNS = {"he", "she", "him", "her"}
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS assertions (
@@ -92,6 +94,13 @@ def numeral(word: str) -> int | None:
     if word in ("none", "no"):
         return 0
     return NUMBERS.index(word) if word in NUMBERS else None
+
+
+def unsaid(found: list, question: str) -> list:
+    """The answers a question did not say itself: 'now' was heard as a place in 'it
+    gets dark so early now', and 'Who has the kite now?' never asks for 'now'."""
+    return [f for f in found
+            if not (f[0] and re.search(rf"\b{re.escape(f[0])}\b", question, re.I))]
 
 
 def is_unknown(value) -> bool:
@@ -190,13 +199,16 @@ class SystemArm:
     def hear(self, turn: int, text: str) -> None:
         assertions = self.read(text)
         self.db.execute("INSERT OR REPLACE INTO said VALUES (?, ?)", (turn, text))
+        heard: list[dict] = []
         for a in assertions:
             row = {s: norm(a.get(s)) for s in SLOTS}
             relation = norm(a.get("relation"))
             if self.cleans:
                 row = self.clean(row, text)
+            row = self.bind(row, heard)
             if not row["subject"] or not relation:
                 continue
+            heard.append(row)
             self.supersede(row, turn, relation)
             self.db.execute(
                 "INSERT INTO assertions (subject, relation, object, place, quantity, turn, heard)"
@@ -231,6 +243,25 @@ class SystemArm:
             out["place"] = norm(re.sub(r"^(back )?(to|into|in|at|on|from) ", "", out["place"]))
         if out["object"] and out["place"] and same(out["object"], out["place"]):
             out["object"] = None
+        return out
+
+    def bind(self, row: dict, heard: list[dict]) -> dict:
+        """A pronoun the ear wrote as heard, bound to what is in focus: the latest
+        assertion of the same sentence, its subject first, as centering theory ranks
+        them. 'It' and 'them' take a thing, never a name; 'she' and 'him' take a name.
+        Only within the sentence: across turns, the 'it' of 'it gets dark' is nothing."""
+        out = dict(row)
+        for k, v in row.items():
+            want = (False if v in THING_PRONOUNS else True if v in PERSON_PRONOUNS
+                    else None)
+            if want is None:
+                continue
+            others = [x for j, x in row.items() if x and j != k]
+            focus = (r[j] for r in reversed(heard) for j in SLOTS if j != "quantity")
+            out[k] = next((f for f in focus
+                           if f and f not in THING_PRONOUNS | PERSON_PRONOUNS
+                           and self.named(f) == want
+                           and not any(same(f, x) for x in others)), v)
         return out
 
     def named(self, value: str) -> bool:
@@ -836,7 +867,7 @@ class SystemArm:
         if not ranked:
             return None
         for (plan,) in ranked:
-            found = self.follow(json.loads(plan), fillers)
+            found = unsaid(self.follow(json.loads(plan), fillers), question)
             if found:
                 return max(found, key=lambda f: f[1])[0]
         return "I don't know."
@@ -849,7 +880,7 @@ class SystemArm:
         want = norm(answer) or ""
         for rid, plan in self.db.execute("SELECT rowid, plan FROM learnt WHERE shape = ?",
                                          (shape,)).fetchall():
-            found = self.follow(json.loads(plan), fillers)
+            found = unsaid(self.follow(json.loads(plan), fillers), question)
             if not found:
                 # a plan that binds nothing says nothing: the facts it needs were not
                 # heard, or not read, which is no evidence that it asks the wrong thing

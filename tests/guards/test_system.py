@@ -577,3 +577,25 @@ def test_the_taught_arm_never_asks_the_faculty_to_plan(tmp_path):
     a = SystemArm(tmp_path, ear, HashEmbedder(), taught=True)
     a.hear(0, "John got the football.")
     assert a.answer(q("Where is the football?")) == "I don't know."
+
+
+def test_a_pronoun_is_bound_within_its_sentence(tmp_path):
+    a = SystemArm(tmp_path, TableEar(), HashEmbedder())
+    said = "The kite isn't with Brannoth any more; Quill has it now."
+    READINGS[said] = [
+        {"subject": "kite", "relation": "is not", "object": "with Brannoth"},
+        {"subject": "Quill", "relation": "has", "object": "it"}]
+    try:
+        a.hear(0, said)
+    finally:
+        del READINGS[said]
+    held = [r for r in a.rows() if r["relation"] == "has"]
+    assert held[0]["subject"] == "quill" and held[0]["object"] == "kite"
+
+
+def test_an_answer_the_question_said_is_not_an_answer():
+    from unfused.system import unsaid
+
+    found = [("now", (5, 5)), ("quill", (3, 3))]
+    assert unsaid(found, "Who has the kite now?") == [("quill", (3, 3))]
+    assert unsaid([("kit", (1, 1))], "Who has the kite now?") == [("kit", (1, 1))]

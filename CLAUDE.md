@@ -87,8 +87,12 @@ uv run python scripts/exam.py --faculty served --arms blind,recall,full --seed 0
 
 The faculty is a llama-server. Port 8093 carries Qwen3.5-9B (the context-reduction
 baseline), port 8094 carries Qwen3.5-2B (the small faculty the system is read under). Port 8080
-belongs to something else of John's. llama.cpp is John's winget install, kept at latest; the
-Qwen3.5 small models need build 11000 or later.
+belongs to something else of John's. llama.cpp is built from source in
+`D:\tools\llama.cpp-src` (Vulkan, `LLAMA_LLGUIDANCE=ON`, `build-llg.cmd` there), and its
+`build\bin\Release` is on John's PATH. Update it with `git pull` and that script. With
+`--jinja` a `response_format` schema goes through llama.cpp's own grammar engine; a raw
+`grammar` starting `%llguidance` goes through llguidance and needs
+`chat_template_kwargs.enable_thinking` false.
 
 ```bash
 llama-server -m <Qwen3.5-2B-Q8_0.gguf> -ngl 99 -c 16384 --parallel 1 --jinja   --reasoning-budget 0 --host 127.0.0.1 --port 8094

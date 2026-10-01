@@ -58,15 +58,12 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   1. `--taught-only` (built, not measured): the fallback to model planning switched off for
      shapes with no taught plan. It answers about 66 questions a house at 0.05 to 0.08, and
      without it the faculty only encodes.
-  2. Needle as the ear (John's, 2026-09-30): its `scripts/ears.py` reading against the
-     0.8B's on the house, then the system under it if it reads within a few points. It is
-     tens of millions of parameters, so the gain is speed.
-  3. The second house, agreed with John 2026-09-30: the first house's skeleton and forms,
+  2. The second house, agreed with John 2026-09-30: the first house's skeleton and forms,
      with five kinds it shares no relation with (an asymmetric kin, a three-place lending
      whose thing is then held by the borrower, employment with a place, material, age),
      taught from its own practice houses, and no code changed for it. This is where rules
      induced from co-occurring facts, rather than plans copied from practice, are needed.
-  4. A count read wherever the ear put the number, which it puts outside `quantity` in two
+  3. A count read wherever the ear put the number, which it puts outside `quantity` in two
      tellings of three; oblique questions naming things in unheard words; correction as an
      input.
 - **Phase 6 — Importance and forgetting.**
@@ -336,7 +333,8 @@ the store merges by id. Kill a third of the nodes mid-exam.
   a grammar-constrained Qwen reads measurably worse than the same Qwen reading freely, since
   otherwise the pipeline ends on the weaker model.
 - **Needle fine-tuned on public relation data**, not on house sentences, so it learns to read
-  relations without being taught the answers.
+  relations without being taught the answers. Untuned it lost to the 0.8B as the ear
+  (`2ac4ad5c`); worth tuning only where the 0.8B is too slow, such as a phone.
 - **Calibrated ears**: an ear that returns a confidence with each assertion, so the system can
   weigh what it heard. Jev (TypeSafe AI) does this and is closed and paid; the fork is an open
   ear that does the same.

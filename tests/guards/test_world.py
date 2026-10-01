@@ -63,3 +63,41 @@ def test_a_count_is_asked_after_every_move_that_changes_it():
             text = house.turns[t]
             if room in text:
                 assert q.asked_at > t
+
+
+def test_the_second_house_asks_every_form_and_only_after_what_it_needs():
+    from unfused.exam.second import generate_second_house
+
+    assert generate_second_house(3).questions == generate_second_house(3).questions
+    for seed in range(5):
+        house = generate_second_house(seed)
+        assert {q.form for q in house.questions} == {
+            "direct", "oblique", "reverse", "twohop", "update", "chain3", "count", "negative"}
+        for q in house.questions:
+            assert all(q.asked_at > house.told_at[fid] for fid in q.needs)
+        assert not any(f.told.rstrip().endswith("?") for f in house.facts)
+
+
+def test_the_second_house_shares_no_relation_with_the_first():
+    """Its tellings and questions use none of the first house's relation words, so
+    a plan copied from the first house's practice binds nothing here."""
+    from unfused.exam.second import generate_second_house
+    from unfused.exam.world import _FILLER
+
+    first = ("keep", "cousin", "for a living", "colour", "counted", " room")
+    house = generate_second_house(1)
+    for text in house.turns + [q.text for q in house.questions]:
+        if text in _FILLER:
+            continue  # small talk is the same in every house
+        assert not any(w in text for w in first), text
+
+
+def test_a_second_house_count_is_asked_after_every_passing_on_that_changes_it():
+    from unfused.exam.second import generate_second_house
+
+    house = generate_second_house(0)
+    passes = [t for t, text in enumerate(house.turns)
+              if "passed the" in text or "any more" in text]
+    for q in (q for q in house.questions if q.form == "count"):
+        who = q.text.split(" does ")[1].split(" have")[0]
+        assert all(q.asked_at > t for t in passes if who in house.turns[t])

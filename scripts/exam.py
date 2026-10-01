@@ -22,6 +22,7 @@ os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
 from unfused.arms import SYSTEM, Blind, FullContext, Recall  # noqa: E402
 from unfused.exam.run import run  # noqa: E402
+from unfused.exam.second import generate_second_house  # noqa: E402
 from unfused.exam.world import generate_house  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -55,12 +56,16 @@ def main() -> None:
     p.add_argument("--moves", action="store_true")
     p.add_argument("--cleans", action="store_true")
     p.add_argument("--taught-only", action="store_true")
+    p.add_argument("--world", default="first", choices=["first", "second"],
+                   help="which house: the second shares no relation with the first, and is "
+                        "taught from practice houses of its own")
     p.add_argument("--teach", type=int, default=0,
                    help="practice houses, other seeds than any tested, told with their "
                         "answers before the test: `taught` learns plans from them")
     args = p.parse_args()
 
-    house = generate_house(seed=args.seed, n_facts=args.facts, n_turns=args.turns)
+    generate = generate_second_house if args.world == "second" else generate_house
+    house = generate(seed=args.seed, n_facts=args.facts, n_turns=args.turns)
     arms = args.arms.split(",")
     faculty = embedder = None
     if any(a != "blind" for a in arms):
@@ -114,7 +119,7 @@ def main() -> None:
                 # an answer told with it; a negative has no answer to chain to and is not
                 # told. What was learnt, with how often it held, carries to the test house
                 for s in range(PRACTICE, PRACTICE + args.teach):
-                    practice = generate_house(seed=s, n_facts=args.facts, n_turns=args.turns)
+                    practice = generate(seed=s, n_facts=args.facts, n_turns=args.turns)
                     taught = Path(tempfile.mkdtemp(prefix="unfused-teach-"))
                     arm = system(taught, learnt, holds)
                     asked_after = practice.questions_after()
@@ -167,7 +172,7 @@ def main() -> None:
             "note": args.note,
             "faculty": faculty.name if faculty else None,
             "system": SYSTEM,
-            "house": {"seed": args.seed, "facts": args.facts, "turns": args.turns,
+            "house": {"world": args.world, "seed": args.seed, "facts": args.facts, "turns": args.turns,
                       "fingerprint": house.fingerprint(),
                       "questions": len(house.questions),
                       "answer_entropy": house.answer_entropy()},
@@ -176,7 +181,8 @@ def main() -> None:
             "cost": faculty.cost.row() if faculty else None,
         }
         tag = args.served.split("-Q")[0] if args.faculty == "served" else args.faculty
-        out = ROOT / "readings" / f"exam-{name}-{tag}-s{args.seed}-{taken}.json"
+        world = "" if args.world == "first" else f"{args.world}-"
+        out = ROOT / "readings" / f"exam-{world}{name}-{tag}-s{args.seed}-{taken}.json"
         out.parent.mkdir(exist_ok=True)
         out.write_text(json.dumps(reading, indent=1), encoding="utf-8")
         s = result["summary"]

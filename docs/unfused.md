@@ -325,11 +325,14 @@ the store merges by id. Kill a third of the nodes mid-exam.
 - **Shapes by likeness.** A shape matches only word for word, so an oblique question never
   meets its plain twin's plan. Matching shapes by embedding would carry a plan across
   wordings, at the risk of carrying it to a question that only looks alike.
-- **Vectors as a property of every symbol**, John's, 2026-10-01: the word stays the identity
-  and what the mouth says, and a vector beside it is where likeness may be used, each use
-  an arm of its own. Borrowed vectors put "lent" beside "borrowed", which point opposite
-  ways; vectors the system builds from what it knows of a symbol would not reopen the
-  DECIDED item on meaning.
+- **The tables in vectors**, John's, 2026-10-01. The rows stay as they are, one fact each,
+  and a cell points at a symbol rather than holding a word. A symbol carries its word, an
+  identity vector seeded from the word, which decodes back to it exactly, and a meaning
+  vector the system builds from the symbol's rows, rebuildable from them at any time.
+  Lookup by identity is today's exact match; lookup by meaning is where likeness enters,
+  and which slots may use it is an arm each. Borrowed vectors put "lent" beside
+  "borrowed", which point opposite ways; built ones keep them apart by the roles their
+  fillers play, and do not reopen the DECIDED item on meaning.
 - **Choice questions** ("Is the gate red or blue?"). A taught chain must touch every filler
   the question names, and "red" sits in no fact about the gate, so no plan is learnt.
 - **A thread's working notes as a fragment**: what surfaced for the last few turns is carried

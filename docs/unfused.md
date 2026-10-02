@@ -64,27 +64,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - **The graphed arm, next.** John's, 2026-10-01 and 2026-10-02: what a conversation will
   need anyway comes before tuning to either world, and the system goes generic as soon as
   it can, then iterates there. Each enters the exam as a form when it does. In order:
-  1. Relations never heard, ahead of counts since 2026-10-02 because counts wait on
-     it. Nouns never heard are aliased from lessons (`alias`, 2026-10-02), so what is
-     left is wordings of a relation: question frames no lesson used ('What is the
-     number of X in the Y?', 'X's line of work'), now the commonest miss; trades asked
-     by their verb ('Who repairs clocks?' is one shape per trade verb); moves told with
-     a verb no lesson used ('carried the lanterns across to'). It is also why counts
-     fail: 'X's jars are in the attic now' is not known to replace 'X keeps the jars in
-     the cellar'. The mechanism is the nouns' one level up: two wordings are one
-     relation where their solutions agree, here on what the house holds rather than on
-     a lesson's answer, since a reworded question is never taught.
-  2. Counts, which hold phase 4 of the red set: count is below blind on every seed. A
-     count plan counts one walk's ends, so one wording of the place. Counting a
-     relation's solutions instead was tried and dropped (see the commit that says so),
-     for two reasons, each of which would bring it back once met. A move told in another
-     wording does not replace the keeping, since `replaced` wants the same arguments, so
-     the room left still counts the person: what is still so must be decided by
-     relation, the later solution for the same person and thing, which item 1 enables.
-     And most rooms hold one person, so many relations count a lesson's 1 rightly and
-     the one chosen is chosen on too few lessons.
-  3. A mouth of the system's own. An answer is one node of the graph or "I don't know.";
-     it cannot say yes or no, list, or say what it is sure of. The mouth renders the
+  1. A mouth of the system's own, first since 2026-10-02 (John's): conversation needs
+     a reply more than another point on the house, and counts are not quick, since they
+     wait on item 2. An answer is one node of the graph or "I don't know."; it cannot
+     say yes or no, list, or say what it is sure of. The mouth renders the
      answer's path from fragments of parses it has heard: each edge of the path is said
      in the words of a heard sentence that has that edge, its nodes replaced, and
      fragments join where they share a node, as data-oriented parsing builds new
@@ -93,6 +76,30 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      yes-or-no questions by finding or failing to find the fact asked. The form: yes-or-no
      questions, half true. Refuted if the rendered answer scores below the bare node, or
      if no reply joins two fragments when the path has two edges.
+  2. Tellings and relations never heard, measured first. Two forms enter the exam, as
+     real conversation has both: a fact told in a wording no practice house uses, asked
+     in a taught frame, and an oblique synonym no practice house uses, taught inside the
+     test house's own conversation. And the first house is read after one, two and five
+     practice houses, for how many lessons a relation needs. These settle three entries
+     of `tests/pushback.py` and say how much of today's score is the practice houses'
+     templates. Counts wait on this item. Nouns never heard are aliased from lessons
+     (`alias`, 2026-10-02), so what is left is wordings of a relation: question frames no lesson used ('What is the
+     number of X in the Y?', 'X's line of work'), now the commonest miss; trades asked
+     by their verb ('Who repairs clocks?' is one shape per trade verb); moves told with
+     a verb no lesson used ('carried the lanterns across to'). It is also why counts
+     fail: 'X's jars are in the attic now' is not known to replace 'X keeps the jars in
+     the cellar'. The mechanism is the nouns' one level up: two wordings are one
+     relation where their solutions agree, here on what the house holds rather than on
+     a lesson's answer, since a reworded question is never taught.
+  3. Counts, which hold phase 4 of the red set: count is below blind on every seed. A
+     count plan counts one walk's ends, so one wording of the place. Counting a
+     relation's solutions instead was tried and dropped (see the commit that says so),
+     for two reasons, each of which would bring it back once met. A move told in another
+     wording does not replace the keeping, since `replaced` wants the same arguments, so
+     the room left still counts the person: what is still so must be decided by
+     relation, the later solution for the same person and thing, which item 2 enables.
+     And most rooms hold one person, so many relations count a lesson's 1 rightly and
+     the one chosen is chosen on too few lessons.
   4. Chains of three, and joins. A clause about something is a join now (`solve`,
      `related`, `joined`); seed 2's chain3 is below the 0.8B's. Colour asked through a
      clause ('the stuff X keeps in the dairy') is the largest miss left, 35 over seeds 1
@@ -103,7 +110,11 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      loose end, a name's kind being the events it takes part in, as DECIDED's meaning
      section has it (`f827f42e` tried kinds on borrowed ends, before plans were
      relations).
-  5. The edges `SKIP` drops (determiners, auxiliaries, conjunctions, `advmod`,
+  5. Pronouns across sentences, and size. A pronoun is bound to the entity in focus as
+     Phase 5 has it, and the first house is read at 3,000 and 30,000 turns, a size the
+     house already has, for seconds a question as well as score (`tests/pushback.py`).
+     Both are needed before the primer fork.
+  6. The edges `SKIP` drops (determiners, auxiliaries, conjunctions, `advmod`,
      particles) are kept and plans learn which matter, as negation, modals and 'before'
      were pulled out of it one at a time. Last because no miss traced on the
      many-worded house came from a dropped function word. A function word is an edge's

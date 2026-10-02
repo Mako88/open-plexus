@@ -126,6 +126,14 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   2. A count read wherever the ear put the number, which it puts outside `quantity` in two
      tellings of three; correction as an input.
 - **Phase 6 — Importance and forgetting.**
+  - **A body of its own.** John's, 2026-10-02. Emotion is a feedback loop: signals about
+    the self that the self cares about, sensed as input and turned by what happens. Here
+    that is interoception plus neuromodulation: the signals the system already makes
+    (surprise, how often it said 'I don't know', corrections received, plans dropped)
+    arrive as a sense beside the conversation, and some of them set how fast it learns
+    and what it keeps, as dopamine and noradrenaline set plasticity and attention. It
+    MUST be measured as a learner: refuted if a system steering its own learning rate by
+    them learns no faster from corrections than one with a fixed rate.
 - **Phase 7 — Other senses.** A moment arrives across every modality, and what a sense
   perceives is kept beside what it asserts.
 - **Phase 8 — Fleet.** The memory on many processes, merged without coordination, with nodes

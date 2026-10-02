@@ -644,7 +644,13 @@ class GraphArm:
         for strict in (True, False):
             found = []
             for (plan,) in ranked:
-                found += self.said(json.loads(plan), fillers, strict, question)
+                plan = json.loads(plan)
+                said = self.said(plan, fillers, strict, question)
+                if said and plan.get("count"):
+                    # a count is of a set, not of one latest event, so the plan that held
+                    # most often answers it rather than whichever passed the latest turn
+                    return said
+                found += said
             if found:
                 return found
         return []

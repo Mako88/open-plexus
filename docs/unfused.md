@@ -91,9 +91,9 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   of it on bAbI. John's, 2026-10-01: what a conversation will need anyway comes before
   tuning to either world, so these come first, each entering the exam as a form when it
   does:
-  1. Negation and tense kept. `neg` and `aux` are dropped by the parse, so 'Mary did not
-     go to the kitchen' is stored as her going there, and 'might' and 'will' vanish. The
-     form: tellings negated or hedged, and questions whose answer turns on it.
+  1. ~~Negation and tense kept.~~ Struck 2026-10-02: `denied` and `hedged` are forms,
+     and an event's mood is in its lemma. Hedged reads 0.5 on two seeds as 'I don't
+     know', since the plan for 'now' never learnt that nothing moved: item 4's.
   2. Shapes matched by the parse, not the string. A plan is kept under the question's text
      with its names cut out, so any rewording is a shape with no plan. The form: a
      question asked in a wording no lesson used, which `oblique` only half covers.

@@ -27,7 +27,7 @@ from pathlib import Path
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, turn INTEGER NOT NULL,
-    lemma TEXT NOT NULL, heard TEXT NOT NULL);
+    lemma TEXT NOT NULL, heard TEXT NOT NULL, mood TEXT NOT NULL DEFAULT '');
 CREATE TABLE IF NOT EXISTS edges (event INTEGER NOT NULL, label TEXT NOT NULL,
     node TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS edges_event ON edges (event);
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS positions (template TEXT NOT NULL, pos INTEGER NOT NU
 # every extraction kept across runs: the parser is deterministic, and the version is in
 # the key so a change to what is extracted re-reads every sentence
 CACHE = Path(__file__).resolve().parents[2] / "state" / "parses.sqlite"
-VERSION = "graph-4"
+VERSION = "graph-6"
 
 # a clause's links that are not arguments
 SKIP = {"punct", "det", "aux", "auxpass", "cc", "mark", "neg", "intj", "case", "dep",
@@ -85,9 +85,14 @@ def extract(doc) -> list[dict]:
     for tok in doc:
         if heads(tok):
             index[tok.i] = len(events)
-            lemma = " ".join([tok.lemma_.lower()] + [c.lower_ for c in tok.children
-                                                     if c.dep_ == "prt"])
-            events.append({"lemma": lemma, "edges": []})
+            # what did not happen, and what only might or will, is a different event from
+            # what did: 'might move' and 'not keep' are lemmas of their own, and plans
+            # learn from lessons which ones they follow
+            modal = [c.lemma_.lower() for c in tok.children if c.dep_ == "aux" and c.tag_ == "MD"]
+            neg = ["not"] if any(c.dep_ == "neg" for c in tok.children) else []
+            lemma = " ".join(modal + neg + [tok.lemma_.lower()] + [
+                c.lower_ for c in tok.children if c.dep_ == "prt"])
+            events.append({"lemma": lemma, "mood": " ".join(modal + neg), "edges": []})
 
     def target(tok) -> str | None:
         if tok.i in index:
@@ -145,7 +150,7 @@ def extract(doc) -> list[dict]:
     for i in kept:
         edges = [[label, renumber.get(t, t)] for label, t in events[i]["edges"]
                  if not t.startswith("e:") or t in renumber]
-        out.append({"lemma": events[i]["lemma"], "edges": edges})
+        out.append({"lemma": events[i]["lemma"], "mood": events[i]["mood"], "edges": edges})
     return out
 
 
@@ -223,8 +228,8 @@ class GraphArm:
         events = self.read(text)
         ids = []
         for ev in events:
-            cur = self.db.execute("INSERT INTO events (turn, lemma, heard) VALUES (?, ?, ?)",
-                                  (turn, ev["lemma"], text))
+            cur = self.db.execute("INSERT INTO events (turn, lemma, heard, mood) VALUES "
+                                  "(?, ?, ?, ?)", (turn, ev["lemma"], text, ev["mood"]))
             ids.append(cur.lastrowid)
         for ev, eid in zip(events, ids):
             for label, t in ev["edges"]:
@@ -261,6 +266,10 @@ class GraphArm:
         lemma, turn = self.db.execute("SELECT lemma, turn FROM events WHERE id = ?",
                                       (int(node[2:]),)).fetchone()
         return lemma, turn
+
+    def mood(self, node: str) -> str:
+        return self.db.execute("SELECT mood FROM events WHERE id = ?",
+                               (int(node[2:]),)).fetchone()[0]
 
     def paths(self, start: str, goal: str, limit: int = 8,
               avoid: set | None = None) -> list[list]:
@@ -355,12 +364,13 @@ class GraphArm:
         name of the question hangs off an event of it."""
         steps = [list(s) for s in path[1::2]]
         nodes = path[::2]
-        lemmas, attach, order = {}, [], {}
+        lemmas, moods, attach, order = {}, {}, [], {}
         events = [(i, node, *self.event(node)) for i, node in enumerate(nodes)
                   if node.startswith("e:")]
         evidence = {}
-        for i, _, lemma, _ in events:
+        for i, node, lemma, _ in events:
             lemmas[str(i)] = [lemma]
+            moods[str(i)] = [self.mood(node)]
         # whether each event came before or after the one before it on the path, by that
         # one's lemma: after 'got' the answer's move came later, after 'put down' earlier.
         # The two events are kept beside it, so a pair seen again is not counted again
@@ -379,8 +389,8 @@ class GraphArm:
             if hook is None:
                 return None
             attach.append(hook)
-        return {"steps": steps, "lemmas": lemmas, "attach": attach, "order": order,
-                "evidence": evidence}
+        return {"steps": steps, "lemmas": lemmas, "moods": moods, "attach": attach,
+                "order": order, "evidence": evidence}
 
     def reaches(self, node: str, steps: list, goal: str) -> bool:
         """Whether a way of these steps leads from a node to a goal."""
@@ -465,9 +475,16 @@ class GraphArm:
                         pos = str(i + 1)
                         if strict and lemma not in plan["lemmas"].get(pos, [lemma]):
                             continue
+                        # loosely, any verb will do, but never one that did not happen
+                        # where the lessons' did, or the other way round
+                        mood = self.mood(nxt)
+                        if mood not in plan.get("moods", {}).get(pos, [mood]):
+                            continue
                         if not ordered(last, i + 1, et):
                             continue
-                        t, now = turns + (et,), (i + 1, lemma, et)
+                        # what did not happen, or only might, changed nothing, so it is
+                        # walked through and never makes an answer the latest
+                        t, now = turns + ((0 if mood else et),), (i + 1, lemma, et)
                     if not hooked(nxt, i + 1):
                         continue
                     nxt_walks.append((nodes + [nxt], t, now))
@@ -539,6 +556,9 @@ class GraphArm:
                 rid, kept = same
                 for pos, lemmas in plan["lemmas"].items():
                     kept["lemmas"][pos] = sorted(set(kept["lemmas"].get(pos, [])) | set(lemmas))
+                for pos, moods in plan["moods"].items():
+                    into = kept.setdefault("moods", {})
+                    into[pos] = sorted(set(into.get(pos, [])) | set(moods))
                 for pair, by_lemma in plan.get("order", {}).items():
                     # one pair of events is one piece of evidence, however often a lesson
                     # asks about it: a house asks of one fact several times

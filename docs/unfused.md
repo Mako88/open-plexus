@@ -69,7 +69,15 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      of 2026-10-02T14). Two misses lead. A wording no lesson used borrows a taught shape
      that asks for another kind of thing ('what colour are the things X keeps in the
      cellar' answered with a room), and a move told with a verb no lesson used ('carried
-     the lanterns across to') is not read as a move, which is item 3's. Beside it, the
+     the lanterns across to') is not read as a move, which is item 3's. Under both: a
+     plan is a whole path through one telling's wording, so a fact told nine ways and
+     another told nine ways give a two-hop question 81 paths, and five practice houses
+     teach a few of them. The mechanism: a plan becomes a relation, the subgraph pattern
+     a lesson's path traces with each named thing a variable, and a shape's plans its
+     disjuncts. A relation is matched with any variable free, and a question the parse
+     takes apart is a join of relations, solved backward from what is asked as the
+     Phase 4 search says. Refuted if twohop and chain3 do not rise on the many-worded
+     house. Beside it, the
      edges `SKIP` drops (determiners, auxiliaries, conjunctions, `advmod`, particles) are
      kept and plans learn which matter, as negation, modals and 'before' were pulled out
      of it one at a time. A function word is an edge's label or a node's mark, never a

@@ -64,16 +64,16 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - **The graphed arm, next.** John's, 2026-10-01 and 2026-10-02: what a conversation will
   need anyway comes before tuning to either world, and the system goes generic as soon as
   it can, then iterates there. Each enters the exam as a form when it does. In order:
-  1. Words never heard, ahead of counts since 2026-10-02 because counts wait on it.
-     'What is X's line of work?' shares no grammar with 'do for a living', and on the
-     many-worded house this is the commonest miss: trades asked by their verb ('Who
-     repairs clocks?' is one shape per trade verb), moves told with a verb no lesson
-     used ('carried the lanterns across to'), and oblique near 0.5 on every seed. It is
-     also why counts fail: 'X's jars are in the attic now' is not known to replace 'X
-     keeps the jars in the cellar'. The symbol encoder of the DECIDED meaning section is
-     the mechanism: a word's meaning as what is known about it, learnt from every
-     same-or-different the system establishes, with borrowed vectors as raw material
-     only. Two wordings are one relation where their solutions agree.
+  1. Relations never heard, ahead of counts since 2026-10-02 because counts wait on
+     it. Nouns never heard are aliased from lessons (`alias`, 2026-10-02), so what is
+     left is wordings of a relation: question frames no lesson used ('What is the
+     number of X in the Y?', 'X's line of work'), now the commonest miss; trades asked
+     by their verb ('Who repairs clocks?' is one shape per trade verb); moves told with
+     a verb no lesson used ('carried the lanterns across to'). It is also why counts
+     fail: 'X's jars are in the attic now' is not known to replace 'X keeps the jars in
+     the cellar'. The mechanism is the nouns' one level up: two wordings are one
+     relation where their solutions agree, here on what the house holds rather than on
+     a lesson's answer, since a reworded question is never taught.
   2. Counts, which hold phase 4 of the red set: count is below blind on every seed. A
      count plan counts one walk's ends, so one wording of the place. Counting a
      relation's solutions instead was tried and dropped (see the commit that says so),

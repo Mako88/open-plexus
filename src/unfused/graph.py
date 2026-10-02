@@ -849,29 +849,33 @@ class GraphArm:
 
     def related(self, phrase: str, names: list[str]) -> list[str]:
         """What a phrase's clause leaves open, from the taught shapes with a variable for
-        every name and one more, nearest the phrase first: each way of binding the names
-        to its variables with the rest free, and what the first binding to reach anything
-        finds, latest first."""
-        from itertools import permutations
+        some of its names and one more, nearest the phrase first. Some, because a name
+        the graph knows may be the shape's frame ('cousin' in "X's cousin"). Each way of
+        binding the names to its variables with the rest free, and what the first binding
+        to reach anything finds, latest first."""
+        from itertools import combinations, permutations
 
-        mine = set(self.signature(phrase, names))
         rows: dict[str, list] = {}
         for shape, plan in self.db.execute(
                 "SELECT shape, plan FROM learnt WHERE hits > misses "
                 "ORDER BY hits - misses DESC, hits DESC").fetchall():
-            if shape.count("<") == len(names):
-                rows.setdefault(shape, []).append(json.loads(plan))
+            rows.setdefault(shape, []).append(json.loads(plan))
+        sigs = {shape: next((set(p["sig"]) for p in plans if p.get("sig")), set())
+                for shape, plans in rows.items()}
         shapes = []
-        for shape, plans in rows.items():
-            sig = next((set(p["sig"]) for p in plans if p.get("sig")), set())
-            shapes.append((len(mine & sig) / max(1, len(mine | sig)), shape))
+        for k in range(len(names), 0, -1):
+            for chosen in combinations(names, k):
+                mine = set(self.signature(phrase, list(chosen)))
+                for shape, sig in sigs.items():
+                    if shape.count("<") == k:
+                        shapes.append((len(mine & sig) / max(1, len(mine | sig)), chosen, shape))
         shapes.sort(key=lambda r: -r[0])
-        variables = list(range(len(names))) + ["a"]
-        for _, shape in shapes[:5]:
+        for _, chosen, shape in shapes[:8]:
             plans = [p for p in rows[shape] if not p.get("count")]
+            variables = list(range(len(chosen))) + ["a"]
             for free in variables:
                 rest = [v for v in variables if v != free]
-                for order in permutations(names):
+                for order in permutations(chosen):
                     bound = dict(zip(rest, order))
                     found = [f for plan in plans for f in self.solve(plan, bound, free)
                              if f[0] not in names]

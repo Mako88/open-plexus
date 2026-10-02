@@ -66,9 +66,6 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   it can, then iterates there. Each enters the exam as a form when it does. In order:
   1. The many-worded house, answered. A clause about something is a join now: a plan
      is a relation matched with any variable free (`solve`, `related`, `joined`). Next:
-     - Joins inside joins. 'The things X's cousin keeps in the cellar' holds 'X's
-       cousin', and seed 2's chain3 reads 0 on it; a one-name phrase whose head the
-       graph also knows as a name ('cousin') is bound as two names.
      - A join that answers the wrong kind still beats borrowing, which could answer
        right: the answer-kinds check (see `f827f42e`) is where that would be caught.
      - The edges `SKIP` drops (determiners, auxiliaries, conjunctions, `advmod`,

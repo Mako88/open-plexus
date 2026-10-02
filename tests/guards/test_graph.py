@@ -130,9 +130,13 @@ def test_a_clause_about_something_is_a_relation_solved_for_it(tmp_path):
     a.hear(1, "The jars are ochre.")
     a.hear(2, "Bren's lamps are kept in the attic.")
     a.hear(3, "The lamps are green.")
+    a.hear(4, "Cara is Bren's cousin.")
     a.teach("Where does Ada keep the jars?", "cellar")
     a.teach("Where does Bren keep the lamps?", "attic")
     a.teach("What colour are the jars?", "ochre")
     # the place relation was taught in two wordings; the clause is solved for the thing
     # through the one this fact was told in, then the thing's colour asked
     assert a.answer(q("What colour are the things Bren keeps in the attic?")) == "green"
+    # and a clause inside a clause, 'cousin' the frame of the inner one and not a name
+    a.teach("Whose cousin is Cara?", "Bren")
+    assert a.answer(q("What colour are the things Cara's cousin keeps in the attic?")) == "green"

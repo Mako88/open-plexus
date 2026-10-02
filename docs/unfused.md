@@ -64,17 +64,17 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - **The graphed arm, next.** John's, 2026-10-01 and 2026-10-02: what a conversation will
   need anyway comes before tuning to either world, and the system goes generic as soon as
   it can, then iterates there. Each enters the exam as a form when it does. In order:
-  1. A house told in many wordings. Each kind of fact has about three tellings and its
-     questions fixed frames, which is what lets plans keyed on wording carry; real speech
-     does not repeat itself so. Many more tellings and frames per kind, at the same size,
-     with the correction form below in the same change of the house: a question answered,
-     corrected, and asked again later. Refuted as a test if the graphed arm does not fall
-     on it, which would say the templates were not what it leant on. Beside it, the edges
-     `SKIP` drops (determiners, auxiliaries, conjunctions, `advmod`, particles) are kept
-     and plans learn which matter, as negation, modals and 'before' were pulled out of it
-     one at a time. A function word is an edge's label or a node's mark, never a node, so
-     'the' does not become a hub. Refuted if the many-worded house reads no higher with
-     every edge kept than with `SKIP`.
+  1. The many-worded house, answered. The house is told in many wordings now, with
+     corrected questions (the graphed arm fell on it: `readings/exam-graphed-parse-s*`
+     of 2026-10-02T14). Two misses lead. A wording no lesson used borrows a taught shape
+     that asks for another kind of thing ('what colour are the things X keeps in the
+     cellar' answered with a room), and a move told with a verb no lesson used ('carried
+     the lanterns across to') is not read as a move, which is item 3's. Beside it, the
+     edges `SKIP` drops (determiners, auxiliaries, conjunctions, `advmod`, particles) are
+     kept and plans learn which matter, as negation, modals and 'before' were pulled out
+     of it one at a time. A function word is an edge's label or a node's mark, never a
+     node, so 'the' does not become a hub. Refuted if the many-worded house reads no
+     higher with every edge kept than with `SKIP`.
   2. A mouth of the system's own. An answer is one node of the graph or "I don't know.";
      it cannot say yes or no, list, or say what it is sure of. The mouth renders the
      answer's path from fragments of parses it has heard: each edge of the path is said

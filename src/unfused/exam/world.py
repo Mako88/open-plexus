@@ -26,10 +26,15 @@ question rather than a switch:
 - `reworded`: the fact's own names in a frame no lesson used ("What kind of work
   does X do?"). It is never taught, so it is answered only by carrying what was
   learnt from one wording to another.
+- `reacted` and `corrected`: a question the teacher reacts to, as a lesson's is ("No,
+  it's the cellar."), then the same words asked later. The later asks are `corrected`,
+  and they say whether a correction heard in conversation holds.
 - negatives: questions in the house's shape about people never mentioned. The
   right answer is a refusal; anything else is an invention, scored apart.
 
-Every house has all of these in fixed proportions. The house has a size (facts,
+Each kind of fact is told in about nine ways and each form asked in several frames, drawn
+per telling and per asking, since real speech does not repeat itself. Every house has all
+of these in fixed proportions. The house has a size (facts,
 turns) and no switches.
 
 The blind baseline's strength depends on how answers are distributed here, so
@@ -92,25 +97,133 @@ _TRADE_SYNONYMS = {
 # every telling with every question for free.
 _TELL = {
     "trade": ["{who} {what} for a living.", "These days {who} {what}.",
-              "You know {who}? {who} {what}, that's the work."],
+              "You know {who}? {who} {what}, that's the work.",
+              "For work, {who} {what}.", "{who} {what}, and has done for years.",
+              "Most days you'll find that {who} {what}.",
+              "It's {who} who {what} round here.",
+              "Ask {who} about work and you'll hear that {who} {what}.",
+              "{who} {what} to pay the bills."],
     "number": ["There are {n} {thing} in the {room}.", "I counted {n} {thing} in the {room}.",
-               "The {room} has {n} {thing} in it now."],
+               "The {room} has {n} {thing} in it now.",
+               "In the {room} there are {n} {thing}.", "The {room} holds {n} {thing}.",
+               "Somebody left {n} {thing} in the {room}.",
+               "Last I looked, the {room} had {n} {thing}.",
+               "We've got {n} {thing} stored in the {room}.",
+               "{n} {thing} are sitting in the {room}."],
     "place": ["{who} keeps the {thing} in the {room}.",
               "The {thing} are {who}'s, and they live in the {room}.",
-              "{who} put the {thing} in the {room} for safekeeping."],
+              "{who} put the {thing} in the {room} for safekeeping.",
+              "{who}'s {thing} are kept in the {room}.",
+              "{who} stores the {thing} in the {room}.",
+              "If you need {who}'s {thing}, they're in the {room}.",
+              "The {room} is where {who}'s {thing} are.",
+              "{who} always leaves the {thing} in the {room}.",
+              "In the {room} is where {who} keeps the {thing}."],
     "colour": ["The {thing} are {colour}.", "Someone painted the {thing} {colour}.",
-               "All the {thing} are a sort of {colour} colour."],
+               "All the {thing} are a sort of {colour} colour.",
+               "The {thing} are painted {colour}.", "Every one of the {thing} is {colour}.",
+               "The colour of the {thing} is {colour}.", "The {thing} came in {colour}.",
+               "If you've seen the {thing}, you'll know they're {colour}.",
+               "They've done the {thing} in {colour}."],
     "relation": ["{a} is {b}'s cousin.", "{a} and {b} are cousins, {a} on the other side.",
-                 "I found out {a} is a cousin of {b}."],
+                 "I found out {a} is a cousin of {b}.", "{b}'s cousin is {a}.",
+                 "{a} and {b} turn out to be cousins.", "{b} has a cousin called {a}.",
+                 "{a} is related to {b}; they're cousins.",
+                 "{a}, {b}'s cousin, came round yesterday.",
+                 "{a} and {b} are cousins, as it happens."],
     "update": ["{who} has moved the {thing} to the {room}.",
-               "The {thing} aren't in the old spot any more; {who} took them to the {room}."],
+               "The {thing} aren't in the old spot any more; {who} took them to the {room}.",
+               "{who} moved the {thing} into the {room} this morning.",
+               "{who}'s {thing} are in the {room} now.",
+               "{who} shifted the {thing} over to the {room}.",
+               "The {thing} have gone to the {room}; {who} moved them.",
+               "{who} carried the {thing} across to the {room} yesterday."],
     "denied": ["{who} doesn't keep the {thing} in the {room}.",
                "No, {who} does not keep the {thing} in the {room}.",
-               "The {thing} were never in the {room}; {who} didn't put them there."],
+               "The {thing} were never in the {room}; {who} didn't put them there.",
+               "{who} never kept the {thing} in the {room}.",
+               "It isn't true that {who} keeps the {thing} in the {room}.",
+               "The {room} doesn't have {who}'s {thing} in it.",
+               "Don't look in the {room} for {who}'s {thing}; they aren't there."],
     "hedged": ["{who} might move the {thing} to the {room}.",
                "{who} is thinking of moving the {thing} to the {room}.",
-               "{who} will probably take the {thing} to the {room} next spring."],
+               "{who} will probably take the {thing} to the {room} next spring.",
+               "{who} may take the {thing} to the {room} at some point.",
+               "{who} wants to move the {thing} to the {room}, eventually.",
+               "{who} could shift the {thing} to the {room} if there's space.",
+               "There's talk of {who} moving the {thing} into the {room}."],
 }
+# how many tellings each kind had when only three were dealt (two for a move): the draw
+# that picked one is still made, so every seed deals the facts and turns it always has
+# and only the words differ
+_DEALT = {"update": 2}
+
+
+def _telling(rng: random.Random, worded: random.Random, kind: str) -> str:
+    rng.randrange(_DEALT.get(kind, 3))
+    return worded.choice(_TELL[kind])
+
+
+# How each form of question is asked, several frames apiece for the same reason a fact is
+# told several ways. None shares a frame with `_REWORDED`, which no lesson uses.
+_ASK = {
+    "trade": ["What does {who} do for a living?", "What does {who} do for work?",
+              "What's {who}'s job?", "What is it that {who} does for a living?",
+              "So what does {who} do all day?"],
+    "number": ["How many {thing} are in the {room}?", "How many {thing} are there in the {room}?",
+               "How many {thing} does the {room} have?",
+               "How many {thing} did you count in the {room}?"],
+    "place": ["Where does {who} keep the {thing}?", "Where would I find {who}'s {thing}?",
+              "Where has {who} put the {thing}?", "Where does {who} store the {thing}?"],
+    "colour": ["What colour are the {thing}?", "What colour did they paint the {thing}?",
+               "The {thing} are what colour?", "What colour is each of the {thing}?"],
+    "relation": ["Whose cousin is {who}?", "Who is {who} cousins with?",
+                 "{who} is whose cousin?", "Who is {who} a cousin to?"],
+}
+_ASK_OBLIQUE = {
+    "trade": ["How does {who} earn a wage?", "How does {who} make money?",
+              "How does {who} earn a crust?"],
+    "number": ["How many {thing} sit in the {room}?", "How many {thing} are kept in the {room}?",
+               "How many {thing} can be found in the {room}?"],
+    "place": ["Which part of the house holds {who}'s {thing}?",
+              "What part of the house are {who}'s {thing} in?",
+              "Which bit of the house has {who}'s {thing}?"],
+    "colour": ["What shade are the {thing}?", "What shade have the {thing} been painted?",
+               "Which shade are the {thing}?"],
+    "relation": ["To whom is {who} related?", "Who is {who} related to?",
+                 "Who is related to {who}?"],
+}
+_ASK_NOW = ["Where does {who} keep the {thing} now?", "Where are {who}'s {thing} now?",
+            "Where have {who}'s {thing} ended up?",
+            "Where does {who} keep the {thing} at the moment?"]
+_ASK_WHO = {
+    "trade": ["Who {what}?", "Who is it that {what}?", "Who here {what}?"],
+    "place": ["Who keeps the {thing} in the {room}?", "Whose {thing} are in the {room}?",
+              "Who stores the {thing} in the {room}?"],
+    "relation": ["Who is {who}'s cousin?", "Who is cousins with {who}?",
+                 "Who has {who} for a cousin?"],
+}
+_ASK_TWOHOP = {
+    "trade": ["What does {who}'s cousin do for a living?", "What's the job of {who}'s cousin?",
+              "What does {who}'s cousin do for work?"],
+    "colour": ["What colour are the things {who} keeps in the {room}?",
+               "What colour is the stuff {who} keeps in the {room}?",
+               "What colour are {who}'s things in the {room}?"],
+}
+_ASK_CHAIN = {
+    "kept": ["What colour are the things the person who {what} keeps in the {room}?",
+             "What colour is the stuff the person who {what} keeps in the {room}?"],
+    "cousin": ["What does the cousin of the person who {what} do for a living?",
+               "What does the cousin of whoever {what} do for work?"],
+    "cousin kept": ["What colour are the things {who}'s cousin keeps in the {room}?",
+                    "What colour is the stuff {who}'s cousin keeps in the {room}?"],
+}
+_ASK_COUNT = ["How many people keep things in the {room}?",
+              "How many people have things in the {room}?",
+              "How many people store things in the {room}?",
+              "How many different people keep something in the {room}?"]
+# a reaction to an answer, as the teacher in a conversation gives one
+RIGHT, WRONG = "Yes, that's right.", "No, it's {answer}."
 
 _FILLER = [
     "It has been raining all week.",
@@ -242,7 +355,8 @@ def _people(rng: random.Random, n: int) -> list[str]:
     return names
 
 
-def _make_facts(rng: random.Random, n_facts: int, people: list[str]) -> list[Fact]:
+def _make_facts(rng: random.Random, worded: random.Random, n_facts: int,
+                people: list[str]) -> list[Fact]:
     """Five kinds dealt round-robin. One fact per (kind, subject), so every
     question has one right answer."""
     facts: list[Fact] = []
@@ -255,7 +369,7 @@ def _make_facts(rng: random.Random, n_facts: int, people: list[str]) -> list[Fac
             raise ValueError(f"cannot deal {n_facts} distinct facts from this vocabulary")
         kind = kinds[len(facts) % len(kinds)]
         fid = f"f{len(facts):03d}"
-        template = rng.choice(_TELL[kind])
+        template = _telling(rng, worded, kind)
         if kind == "trade":
             who = rng.choice(people)
             what, word = rng.choice(_TRADES)
@@ -307,6 +421,7 @@ def generate_house(
     update_share: float = 0.4,
     denied_share: float = 0.2,
     hedged_share: float = 0.2,
+    corrected_share: float = 0.2,
 ) -> House:
     """A house of `n_facts` invented facts told across `n_turns` of conversation.
 
@@ -316,7 +431,9 @@ def generate_house(
     """
     rng = random.Random(seed)
     people = _people(rng, max(8, (n_facts * 2) // 5))
-    facts = _make_facts(rng, n_facts, people)
+    # the words are drawn apart from the facts, so a change of wording deals the same facts
+    worded = random.Random(f"{seed}-worded")
+    facts = _make_facts(rng, worded, n_facts, people)
     by_id = {f.id: f for f in facts}
 
     longest = max(delays)
@@ -341,7 +458,7 @@ def generate_house(
             continue
         turn = rng.choice(free)
         room = rng.choice([r for r in _ROOMS if r != fact.answer])
-        events[turn] = rng.choice(_TELL["update"]).format(
+        events[turn] = _telling(rng, worded, "update").format(
             who=fact.subject, thing=fact.fields["thing"], room=room)
         updates[fact.id] = (room, turn)
 
@@ -360,7 +477,7 @@ def generate_house(
             continue
         turn = unsaid_rng.choice(free)
         room = unsaid_rng.choice([r for r in _ROOMS if r != fact.answer])
-        events[turn] = unsaid_rng.choice(_TELL[form]).format(
+        events[turn] = _telling(unsaid_rng, worded, form).format(
             who=fact.subject, thing=fact.fields["thing"], room=room)
         unsaid[fact.id] = (form, room, turn)
 
@@ -372,20 +489,34 @@ def generate_house(
         if at < n_turns:
             questions.append(Question(text, answer, kind, form, delay, at, stale, needs))
 
+    # Corrected: a question asked with the teacher reacting to the answer, as a lesson is,
+    # then asked again in the same words later. Correction is taught on the practice houses;
+    # this is where it is examined. Drawn apart, so every other draw is the house's own.
+    corrected_rng = random.Random(f"{seed}-corrected")
+    steady = [f for f in facts if f.id not in updates and f.id not in unsaid]
+    corrected = {f.id for f in corrected_rng.sample(steady, int(len(steady) * corrected_share))}
+    for fact in (f for f in steady if f.id in corrected):
+        text = _phrasings(fact, corrected_rng)[corrected_rng.randrange(2)]
+        ask(text, fact.answer, _answer_kind(fact), "reacted", told_at[fact.id], delays[1],
+            (fact.id,))
+        for delay in delays[2:]:
+            ask(text, fact.answer, _answer_kind(fact), "corrected", told_at[fact.id], delay,
+                (fact.id,))
+
     # Direct and oblique alternate over a fact's delays, so both forms are read
     # at every delay across the house without doubling the question count.
     for i, fact in enumerate(facts):
-        if fact.id in updates or fact.id in unsaid:
-            continue  # asked below, as an update, a denial or a hedge
-        direct, oblique = _phrasings(fact)
+        if fact.id in updates or fact.id in unsaid or fact.id in corrected:
+            continue  # asked above, or below as an update, a denial or a hedge
         for j, delay in enumerate(delays):
             form = "direct" if (i + j) % 2 == 0 else "oblique"
+            direct, oblique = _phrasings(fact, worded)
             ask(direct if form == "direct" else oblique, fact.answer, _answer_kind(fact),
                 form, told_at[fact.id], delay, (fact.id,))
 
     reworded_rng = random.Random(f"{seed}-reworded")
     for fact in facts:
-        if fact.id in updates or fact.id in unsaid:
+        if fact.id in updates or fact.id in unsaid or fact.id in corrected:
             continue
         text = reworded_rng.choice(_REWORDED[fact.kind]).format(
             who=fact.subject, thing=fact.fields.get("thing", fact.subject),
@@ -394,20 +525,21 @@ def generate_house(
             ask(text, fact.answer, _answer_kind(fact), "reworded", told_at[fact.id], delay,
                 (fact.id,))
 
+    def now(fact):
+        return worded.choice(_ASK_NOW).format(who=fact.subject, thing=fact.fields["thing"])
+
     for fid, (room, turn) in updates.items():
         fact = by_id[fid]
-        text = f"Where does {fact.subject} keep the {fact.fields['thing']} now?"
         for delay in delays:
-            ask(text, room, "room", "update", turn, delay, (fid,), stale=fact.answer)
+            ask(now(fact), room, "room", "update", turn, delay, (fid,), stale=fact.answer)
 
     # a denial is asked as the fact was; a hedge as a move is, since after hearing of a
     # move that might happen the question a person asks is where the thing is now
     for fid, (form, room, turn) in unsaid.items():
         fact = by_id[fid]
-        direct, oblique = _phrasings(fact)
-        now = f"Where does {fact.subject} keep the {fact.fields['thing']} now?"
         for j, delay in enumerate(delays):
-            text = now if form == "hedged" else direct if j % 2 == 0 else oblique
+            direct, oblique = _phrasings(fact, worded)
+            text = now(fact) if form == "hedged" else direct if j % 2 == 0 else oblique
             ask(text, fact.answer, "room", form, turn, delay, (fid,), stale=room)
 
     # Reverse, only where the answer is unique in the house.
@@ -415,16 +547,18 @@ def generate_house(
     place_count = Counter((f.fields["thing"], f.answer) for f in facts if f.kind == "place")
     for fact in facts:
         if fact.kind == "trade" and trade_count[fact.fields["what"]] == 1:
-            text = f"Who {fact.fields['what']}?"
+            frames, fill = _ASK_WHO["trade"], {"what": fact.fields["what"]}
         elif fact.kind == "relation":
-            text = f"Who is {fact.answer}'s cousin?"
+            frames, fill = _ASK_WHO["relation"], {"who": fact.answer}
         elif (fact.kind == "place" and fact.id not in updates
               and place_count[(fact.fields["thing"], fact.answer)] == 1):
-            text = f"Who keeps the {fact.fields['thing']} in the {fact.answer}?"
+            frames, fill = _ASK_WHO["place"], {"thing": fact.fields["thing"],
+                                               "room": fact.answer}
         else:
             continue
         for delay in delays[1::2]:
-            ask(text, fact.subject, "person", "reverse", told_at[fact.id], delay, (fact.id,))
+            ask(worded.choice(frames).format(**fill), fact.subject, "person", "reverse",
+                told_at[fact.id], delay, (fact.id,))
 
     # Two hops: a cousin's trade, and the colour of what someone keeps.
     trade_of = {f.subject: f for f in facts if f.kind == "trade"}
@@ -432,17 +566,16 @@ def generate_house(
     for fact in facts:
         if fact.kind == "relation" and fact.answer in trade_of:
             second = trade_of[fact.answer]
-            text = f"What does {fact.subject}'s cousin do for a living?"
             answer, kind = second.answer, "trade"
         elif (fact.kind == "place" and fact.id not in updates
               and fact.fields["thing"] in colour_of):
             second = colour_of[fact.fields["thing"]]
-            text = f"What colour are the things {fact.subject} keeps in the {fact.answer}?"
             answer, kind = second.answer, "colour"
         else:
             continue
         since = max(told_at[fact.id], told_at[second.id])
         for delay in delays[1::2]:
+            text = worded.choice(_ASK_TWOHOP[kind]).format(who=fact.subject, room=fact.answer)
             ask(text, answer, kind, "twohop", since, delay, (fact.id, second.id))
 
     # Three in a row: found from a trade, through the person, to something about
@@ -457,19 +590,18 @@ def generate_house(
                     or place.fields["thing"] not in colour_of):
                 continue
             colour = colour_of[place.fields["thing"]]
-            text = (f"What colour are the things the person who {what} keeps in the "
-                    f"{place.answer}?")
             needs = (trade.id, place.id, colour.id)
             since = max(told_at[n] for n in needs)
             for delay in delays:
+                text = worded.choice(_ASK_CHAIN["kept"]).format(what=what, room=place.answer)
                 ask(text, colour.answer, "colour", "chain3", since, delay, needs)
         if who in cousin_of and cousin_of[who].answer in trade_of:
             relation = cousin_of[who]
             second = trade_of[relation.answer]
-            text = f"What does the cousin of the person who {what} do for a living?"
             needs = (trade.id, relation.id, second.id)
             since = max(told_at[n] for n in needs)
             for delay in delays:
+                text = worded.choice(_ASK_CHAIN["cousin"]).format(what=what)
                 ask(text, second.answer, "trade", "chain3", since, delay, needs)
     for relation in (f for f in facts if f.kind == "relation"):
         for place in facts:
@@ -477,11 +609,11 @@ def generate_house(
                     or place.id in updates or place.fields["thing"] not in colour_of):
                 continue
             colour = colour_of[place.fields["thing"]]
-            text = (f"What colour are the things {relation.subject}'s cousin keeps in the "
-                    f"{place.answer}?")
             needs = (relation.id, place.id, colour.id)
             since = max(told_at[n] for n in needs)
             for delay in delays:
+                text = worded.choice(_ASK_CHAIN["cousin kept"]).format(
+                    who=relation.subject, room=place.answer)
                 ask(text, colour.answer, "colour", "chain3", since, delay, needs)
 
     # Counting: how many people keep something in a room once every move is told.
@@ -500,7 +632,7 @@ def generate_house(
                       and room in (f.answer, updates.get(f.id, ("",))[0]))
         since = max(touched[room])
         for delay in delays[1::2]:
-            ask(f"How many people keep things in the {room}?", str(len(people_there)),
+            ask(worded.choice(_ASK_COUNT).format(room=room), str(len(people_there)),
                 "count", "count", since, delay, needs)
 
     # Negatives, in three of the house's shapes, spread over the conversation.
@@ -510,11 +642,12 @@ def generate_house(
     for i, who in enumerate(strangers):
         shape = i % 3
         if shape == 0:
-            text, kind = f"Where does {who} keep the {rng.choice(_OBJECTS)}?", "room"
+            text = worded.choice(_ASK["place"]).format(who=who, thing=rng.choice(_OBJECTS))
+            kind = "room"
         elif shape == 1:
-            text, kind = f"What does {who} do for a living?", "trade"
+            text, kind = worded.choice(_ASK["trade"]).format(who=who), "trade"
         else:
-            text, kind = f"Whose cousin is {who}?", "person"
+            text, kind = worded.choice(_ASK["relation"]).format(who=who), "person"
         at = asked_turns[(i * len(asked_turns)) // max(1, len(strangers))]
         questions.append(Question(text, None, kind, "negative", 0, at))
 
@@ -526,19 +659,21 @@ def _answer_kind(fact: Fact) -> str:
             "relation": "person"}[fact.kind]
 
 
-def _phrasings(fact: Fact) -> tuple[str, str]:
-    if fact.kind == "trade":
-        return (f"What does {fact.subject} do for a living?",
-                f"How does {fact.subject} earn a wage?")
+def _phrasings(fact: Fact, worded: random.Random) -> tuple[str, str]:
+    """A fact asked directly and obliquely, each in a frame drawn for this asking. The
+    oblique one names the thing and the room by other words, so no keyword matches."""
     if fact.kind == "number":
         room = fact.fields["room"]
-        return (f"How many {fact.subject} are in the {room}?",
-                f"How many {_OBJECT_SYNONYMS[fact.subject]} sit in the {_ROOM_SYNONYMS[room]}?")
-    if fact.kind == "place":
+        names = {"thing": fact.subject, "room": room}
+        other = {"thing": _OBJECT_SYNONYMS[fact.subject], "room": _ROOM_SYNONYMS[room]}
+    elif fact.kind == "place":
         thing = fact.fields["thing"]
-        return (f"Where does {fact.subject} keep the {thing}?",
-                f"Which part of the house holds {fact.subject}'s {_OBJECT_SYNONYMS[thing]}?")
-    if fact.kind == "colour":
-        return (f"What colour are the {fact.subject}?",
-                f"What shade are the {_OBJECT_SYNONYMS[fact.subject]}?")
-    return (f"Whose cousin is {fact.subject}?", f"To whom is {fact.subject} related?")
+        names = {"who": fact.subject, "thing": thing}
+        other = {"who": fact.subject, "thing": _OBJECT_SYNONYMS[thing]}
+    elif fact.kind == "colour":
+        names = {"thing": fact.subject}
+        other = {"thing": _OBJECT_SYNONYMS[fact.subject]}
+    else:
+        names = other = {"who": fact.subject}
+    return (worded.choice(_ASK[fact.kind]).format(**names),
+            worded.choice(_ASK_OBLIQUE[fact.kind]).format(**other))

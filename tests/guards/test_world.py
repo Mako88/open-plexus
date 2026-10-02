@@ -13,7 +13,8 @@ def test_every_house_has_every_form():
     for seed in range(5):
         forms = Counter(q.form for q in generate_house(seed).questions)
         assert set(forms) == {"direct", "oblique", "reverse", "twohop", "update", "chain3",
-                              "count", "denied", "hedged", "reworded", "negative"}
+                              "count", "denied", "hedged", "reworded", "reacted", "corrected",
+                              "negative"}
 
 
 def test_a_denial_or_hedge_is_told_before_it_is_asked_and_names_another_room():
@@ -34,20 +35,36 @@ def test_no_question_is_asked_before_what_it_needs_was_told():
             assert q.asked_at > house.told_at[fid]
 
 
+def _moves(house):
+    """The turn of every move, read off the update questions, which are asked their
+    delay after it."""
+    return {q.asked_at - q.delay for q in house.questions if q.form == "update"}
+
+
 def test_an_update_is_told_before_it_is_asked_and_changes_the_answer():
     house = generate_house(2)
     for q in (q for q in house.questions if q.form == "update"):
         assert q.stale and q.stale != q.answer
-        told = [t for t, text in enumerate(house.turns)
-                if q.answer in text and ("moved" in text or "old spot" in text)]
-        assert told and min(told) < q.asked_at
+        moved = house.turns[q.asked_at - q.delay]
+        fact = next(f for f in house.facts if f.id == q.needs[0])
+        assert q.answer in moved and fact.subject in moved
+        assert house.told_at[fact.id] < q.asked_at - q.delay
+
+
+def test_a_corrected_question_is_reacted_to_first_in_the_same_words():
+    for seed in range(5):
+        house = generate_house(seed)
+        first = {q.text: q.asked_at for q in house.questions if q.form == "reacted"}
+        later = [q for q in house.questions if q.form == "corrected"]
+        assert later and all(q.text in first and first[q.text] < q.asked_at for q in later)
 
 
 def test_negatives_name_nobody_in_the_house():
     house = generate_house(4)
     told = " ".join(house.turns)
+    asking = ("Where", "What", "Whose", "Who", "So", "To", "Which", "How", "The", "I")
     names = {w.strip("?.,'s") for q in house.questions if q.form == "negative"
-             for w in q.text.split() if w[:1].isupper() and w not in ("Where", "What", "Whose")}
+             for w in q.text.split() if w[:1].isupper() and w.strip("'s") not in asking}
     assert names and not any(n in told for n in names)
 
 
@@ -67,7 +84,8 @@ def test_every_telling_states_its_fact():
 
 def test_a_count_is_asked_after_every_move_that_changes_it():
     house = generate_house(0)
-    moves = [t for t, text in enumerate(house.turns) if "moved" in text or "old spot" in text]
+    moves = _moves(house)
+    assert moves
     for q in (q for q in house.questions if q.form == "count"):
         room = q.text.rsplit("the ", 1)[1].rstrip("?")
         for t in moves:

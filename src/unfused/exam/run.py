@@ -17,7 +17,7 @@ import time
 from collections import defaultdict
 from collections.abc import Callable
 
-from .world import House, Question
+from .world import RIGHT, WRONG, House, Question
 
 REFUSALS = (
     "don't know", "do not know", "not sure", "no idea", "unknown", "not mentioned",
@@ -67,6 +67,7 @@ def run(house: House, open_arm: Callable[[], object], reopen_every: int = 50,
     arm = open_arm()
     asked_after = house.questions_after()
     rows: list[dict] = []
+    reacted: dict[str, bool] = {}  # a reacted question's words, and whether it was right
     started = time.perf_counter()
     budget = limit if limit is not None else len(house.questions)
     for turn, text in enumerate(house.turns):
@@ -77,9 +78,11 @@ def run(house: House, open_arm: Callable[[], object], reopen_every: int = 50,
         for q in asked_after.get(turn, []):
             if len(rows) >= budget:
                 break
-            said = arm.answer(q)
+            said = react(arm, turn, q, reacted) if q.form == "reacted" else arm.answer(q)
             row = {"form": q.form, "kind": q.kind, "delay": q.delay, "asked_at": q.asked_at,
                    "question": q.text, "answer": q.answer, "said": said, **judge(q, said)}
+            if q.form == "corrected":
+                row["first_correct"] = reacted.get(q.text)
             notes = getattr(arm, "last_notes", None)
             if notes is not None:
                 row["notes"] = list(notes)
@@ -89,6 +92,25 @@ def run(house: House, open_arm: Callable[[], object], reopen_every: int = 50,
     arm.close()
     return {"arm": name, "dials": dials, "seconds": round(time.perf_counter() - started, 1),
             "summary": summarise(rows), "rows": rows}
+
+
+def react(arm, turn: int, q: Question, reacted: dict[str, bool]) -> str:
+    """A question asked as a lesson's is, the teacher reacting to the answer. An arm that
+    sorts its own turns hears the reaction as the turn after its answer; any other hears
+    the question, its answer and the reaction as three turns."""
+    if hasattr(arm, "turn"):
+        said = arm.turn(turn, q.text) or ""
+    else:
+        said = arm.answer(q)
+    right = judge(q, said)["correct"]
+    reaction = RIGHT if right else WRONG.format(answer=q.answer)
+    if hasattr(arm, "turn"):
+        arm.turn(turn, reaction)
+    else:
+        for text in (q.text, said, reaction):
+            arm.hear(turn, text)
+    reacted[q.text] = right
+    return said
 
 
 def converse(world: House, arm, untaught: set | frozenset = frozenset()) -> None:
@@ -103,7 +125,7 @@ def converse(world: House, arm, untaught: set | frozenset = frozenset()) -> None
                 continue
             said = arm.turn(turn, q.text)
             right = judge(q, said or "")["correct"]
-            arm.turn(turn, "Yes, that's right." if right else f"No, it's {q.answer}.")
+            arm.turn(turn, RIGHT if right else WRONG.format(answer=q.answer))
 
 
 def summarise(rows: list[dict]) -> dict:

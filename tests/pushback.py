@@ -139,7 +139,7 @@ OBJECTIONS = [
             "first. The contains-match scorer cannot see a list cut to one.",
         settled_by="A form with two places told for one thing and no move between them, "
                    "asked for both. Kept until the system says both, which is the mouth's "
-                   "lists in THE ORDER's first item.",
+                   "lists in the mouth's item of THE ORDER.",
     ),
 ]
 

@@ -26,6 +26,9 @@ question rather than a switch:
 - `reworded`: the fact's own names in a frame no lesson used ("What kind of work
   does X do?"). It is never taught, so it is answered only by carrying what was
   learnt from one wording to another.
+- `novel`: a fact told in a wording no lesson's fact is told in, asked in a taught
+  frame and never taught. Its people and pairs are named by no other fact, so every
+  other form keeps its answers. Colour has none, since every thing has its colour.
 - `reacted` and `corrected`: a question the teacher reacts to, as a lesson's is ("No,
   it's the cellar."), then the same words asked later. The later asks are `corrected`,
   and they say whether a correction heard in conversation holds.
@@ -153,6 +156,22 @@ _TELL = {
                "{who} could shift the {thing} to the {room} if there's space.",
                "There's talk of {who} moving the {thing} into the {room}."],
 }
+# Tellings of the `novel` form only, so no lesson's fact is told in one of these.
+_TELL_NOVEL = {
+    "trade": ["{who}'s trade? {who} {what}.",
+              "When {who} isn't at home, {who} {what}.",
+              "Everyone says {who} {what} better than anybody."],
+    "number": ["The {room} is home to {n} {thing}.",
+               "Someone stacked {n} {thing} up in the {room}.",
+               "I lined up {n} {thing} along the wall of the {room}."],
+    "place": ["{who} has the {thing} tucked away in the {room}.",
+              "Down in the {room} sit the {thing} that {who} owns.",
+              "{who} hides the {thing} in the {room}."],
+    "relation": ["{b} counts {a} as a cousin.",
+                 "{a} shares a grandmother with {b}; they're cousins.",
+                 "Through their mothers, {a} and {b} are cousins."],
+}
+
 # how many tellings each kind had when only three were dealt (two for a move): the draw
 # that picked one is still made, so every seed deals the facts and turns it always has
 # and only the words differ
@@ -241,7 +260,7 @@ _FILLER = [
 ]
 
 # frames no lesson uses: a form in here is asked and never taught
-UNTAUGHT = {"reworded"}
+UNTAUGHT = {"reworded", "novel"}
 _REWORDED = {
     "trade": ["What kind of work does {who} do?", "What is {who}'s line of work?"],
     "number": ["How many {thing} would I find in the {room}?",
@@ -650,6 +669,41 @@ def generate_house(
             text, kind = worded.choice(_ASK["relation"]).format(who=who), "person"
         at = asked_turns[(i * len(asked_turns)) // max(1, len(strangers))]
         questions.append(Question(text, None, kind, "negative", 0, at))
+
+    # Novel: facts told in a wording no lesson's fact is told in, asked in a taught frame.
+    # Each names people no other fact or negative names, a trade no one has, a room no one
+    # keeps things in, and a number of things in a room nobody counted, so every other
+    # question keeps its answer. Drawn apart, so every other draw is the house's own.
+    novel_rng = random.Random(f"{seed}-novel")
+    named = set(people) | set(strangers)
+    fresh = [p for p in _people(novel_rng, len(named) + 6) if p not in named][:6]
+    free_trades = [t for t in _TRADES if t[0] not in trade_count]
+    empty = [r for r in _ROOMS if r not in holders and r not in touched]
+    counted = {(f.subject, f.fields["room"]) for f in facts if f.kind == "number"}
+    uncounted = [(t, r) for t in _OBJECTS for r in _ROOMS if (t, r) not in counted]
+    novel: list[tuple[str, str, dict, str]] = []  # (kind, telling, fills, answer)
+    for who, (what, word) in zip(fresh[:2], novel_rng.sample(free_trades,
+                                                            min(2, len(free_trades)))):
+        novel.append(("trade", "", {"who": who, "what": what}, word))
+    for who, room in zip(fresh[2:4], novel_rng.sample(empty, min(2, len(empty)))):
+        novel.append(("place", "", {"who": who, "thing": novel_rng.choice(_OBJECTS),
+                                    "room": room}, room))
+    for thing, room in novel_rng.sample(uncounted, 2):
+        novel.append(("number", "", {"thing": thing, "room": room,
+                                     "n": novel_rng.randint(*_NUMBER_RANGE)}, ""))
+    novel.append(("relation", "", {"a": fresh[4], "b": fresh[5]}, fresh[5]))
+    free = [t for t in range(1, last_tellable) if t not in events]
+    for (kind, _, fills, answer), turn in zip(novel, sorted(novel_rng.sample(free,
+                                                                             len(novel)))):
+        turns[turn] = novel_rng.choice(_TELL_NOVEL[kind]).format(**fills)
+        if kind == "number":
+            answer = str(fills["n"])
+        asking = {"trade": {"who": fills.get("who")}, "place": fills,
+                  "number": fills, "relation": {"who": fills.get("a")}}[kind]
+        for delay in delays:
+            ask(novel_rng.choice(_ASK[kind]).format(**asking), answer,
+                {"trade": "trade", "number": "number", "place": "room",
+                 "relation": "person"}[kind], "novel", turn, delay, ())
 
     return House(seed, n_turns, facts, turns, questions, told_at)
 

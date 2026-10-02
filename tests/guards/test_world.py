@@ -1,6 +1,6 @@
 from collections import Counter
 
-from unfused.exam.world import generate_house
+from unfused.exam.world import _TELL, _TELL_NOVEL, generate_house
 
 
 def test_a_seed_makes_the_same_house():
@@ -14,7 +14,21 @@ def test_every_house_has_every_form():
         forms = Counter(q.form for q in generate_house(seed).questions)
         assert set(forms) == {"direct", "oblique", "reverse", "twohop", "update", "chain3",
                               "count", "denied", "hedged", "reworded", "reacted", "corrected",
-                              "negative"}
+                              "novel", "negative"}
+
+
+def test_a_novel_fact_is_told_in_no_wording_a_lesson_is_and_names_nobody_else():
+    """The form reads a wording no plan was learnt through, so no taught fact may be
+    told in one, and its people must be nobody another question asks about."""
+    told = {t for ts in _TELL.values() for t in ts}
+    assert not told & {t for ts in _TELL_NOVEL.values() for t in ts}
+    for seed in range(5):
+        house = generate_house(seed)
+        novel = [q for q in house.questions if q.form == "novel"]
+        others = " ".join(q.text for q in house.questions if q.form != "novel")
+        people = {w.strip("?.,'s") for q in novel for w in q.text.split()[1:]
+                  if w[:1].isupper() and w != "I"}
+        assert novel and people and not any(p in others for p in people)
 
 
 def test_a_denial_or_hedge_is_told_before_it_is_asked_and_names_another_room():

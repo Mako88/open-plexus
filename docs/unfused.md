@@ -62,8 +62,7 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   read, where an ear's reading answers more.
 - **The graphed arm, next.** John's, 2026-10-01: what a conversation will need anyway comes
   before tuning to either world, each entering the exam as a form when it does.
-  1. Hedged facts asked 'now' answer 'I don't know' on two seeds of three: the plan for
-     'now' learnt only moves, and never that nothing moved.
+  1. ~~Hedged facts asked 'now'.~~ Struck 2026-10-02: hedged reads 1.0 on every seed.
   2. A telling that follows a question is read as the reaction to it, and the test asks
      with no one reacting, so correction is taught and never examined.
   3. Words never heard, from the question's own parse: 'What is X's line of work?' shares

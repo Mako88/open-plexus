@@ -728,10 +728,15 @@ class GraphArm:
                                 (json.dumps(plan), rowid))
             # whether the plan asks about the present, counted on every lesson where
             # reading only what is still so and reading everything differ
-            now, then = holds(True), holds(False)
+            # right over no answer over wrong: reading the present and finding nothing
+            # beats reading history and naming a room no longer so
+            def worth(h: bool | None) -> int:
+                return 0 if h is None else (1 if h else -1)
+
+            now, then = worth(holds(True)), worth(holds(False))
             if now != then:
                 tally = plan.get("present", [0, 0])
-                tally[0 if now else 1] += 1
+                tally[0 if now > then else 1] += 1
                 plan["present"] = tally
                 self.db.execute("UPDATE learnt SET plan = ? WHERE rowid = ?",
                                 (json.dumps(plan), rowid))

@@ -45,15 +45,14 @@ OBJECTIONS = [
                    "Above a few per cent for any arm, score those as wrong and re-read.",
     ),
     Objection(
-        what="`System.clean` holds English words by hand: 'back', the prepositions, the "
-             "number words.",
-        why="John's, 2026-10-01: a rule for a word does not generalise. Each was added to "
-            "mend one reading ('went back to the bathroom' put 'back' in object and stopped a "
-            "move superseding, costing bAbI nine points unlisted), and the next sentence "
-            "with another particle or numeral will need another.",
-        settled_by="The parser reading in THE ORDER: if a dependency parse gives the role of "
-                   "each word, clean keeps a filler by its grammatical role and the lists go. "
-                   "Or a learnt test that a filler names a thing, scored on the same readings.",
+        what="`graph.py` holds English words by hand: the pronouns, 'no' and 'nope' in a "
+             "reaction, and the number words.",
+        why="John's, 2026-10-01: a rule for a word does not generalise. The list it replaced, "
+            "`System.clean`'s, went with the taught arm; these are what is left of the habit, "
+            "and the next pronoun, refusal or numeral will need another.",
+        settled_by="A learnt reading of each: a pronoun bound by centering as Phase 5 says, "
+                   "'no' learnt from reactions that came before a corrected lesson, numbers "
+                   "from counts a lesson taught. Each scored on the readings it touches.",
     ),
 ]
 

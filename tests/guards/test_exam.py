@@ -82,18 +82,6 @@ def test_a_number_is_matched_whole():
     assert not judge(count, "12 people.")["correct"]
 
 
-def test_a_reading_that_runs_two_fillers_together_is_not_whole():
-    from unfused.ears import score_reading
-    from unfused.exam.world import Fact
-
-    plates = Fact("f1", "colour", "cracked plates", "Someone painted the cracked plates indigo.",
-                  "indigo")
-    fused = [{"subject": "cracked plates indigo", "relation": "painted"}]
-    apart = [{"subject": "cracked plates", "relation": "painted", "object": "indigo"}]
-    assert not score_reading(plates, fused)["whole"]
-    assert score_reading(plates, apart)["whole"]
-
-
 def test_a_number_is_matched_in_either_form_and_whole():
     from unfused.exam.run import judge
     from unfused.exam.world import Question
@@ -104,21 +92,3 @@ def test_a_number_is_matched_in_either_form_and_whole():
     assert judge(q("two"), "2")["correct"] and judge(q("2"), "There are two.")["correct"]
     assert not judge(q("12"), "2")["correct"] and not judge(q("one"), "none")["correct"]
 
-
-def test_a_faculty_reply_is_kept_for_the_same_model_and_build_only(tmp_path):
-    from unfused.ears import Ear
-
-    sent = []
-
-    def ear(identity):
-        e = Ear(cache=tmp_path / "replies.sqlite")
-        e._identity = identity
-        e._send = lambda body: sent.append(body) or '{"assertions": []}'
-        return e
-
-    ear("q08|b1").read("Ivo keeps bees.")
-    again = ear("q08|b1")
-    again.read("Ivo keeps bees.")
-    assert len(sent) == 1 and again.cached == 1
-    ear("q08|b2").read("Ivo keeps bees.")
-    assert len(sent) == 2

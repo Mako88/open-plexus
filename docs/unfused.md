@@ -41,90 +41,41 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   on the final house. Best text arm: `linked`.
 - ~~**Phase 2 — Small mouth.**~~ Struck 2026-09-29. 2B on seeds 0 to 2, 0.8B on seed 0.
 - ~~**Phase 3 — Ears.**~~ Struck 2026-09-29 under the strict scorer, which wants each gold
-  filler in a slot of its own: Qwen3.5-2B at 0.96 recall and 1.00 precision.
-- **The bet's checkpoint.** Phase 4's exit, taken with whatever mechanisms exist rather than
-  with Phase 4's alone: John's, 2026-09-30, because Phase 4 failed on missing rules and is
-  being met by Phase 5's taught plans. Two halves. The first house: the system with the 0.8B
-  beats the 0.8B given the whole transcript on `twohop`, `chain3` and `count`, and blind, on
-  seeds 1 to 3. The system now beats full context on all three seeds overall and on
-  `twohop`; on `chain3` and `count` it loses to blind on seeds 1 and 2, because blind asks
-  few distinct chains five times each and its counts bunch. The second house, with
-  relations the system was never built around, at no worse than half the first house's
-  score; met on seeds 1 to 3 by the taught arm.
-- ~~**The ear's speed.**~~ Parked by John 2026-10-01 at about 0.85 s a read. The format
-  and the grammar engine are spent (`ff946ca7`, `5d121bc2`, `7d881a9e`, `e7113f11`).
-  Concurrent reads are ruled out because each read is told the relations known so far;
-  speculative decoding needs llama.cpp to use the 0.8B's `blk.24.nextn.*` head.
-- **Symbols, and words never heard.** John's, 2026-10-01; this merges the vectors fork
-  with Phase 5's oblique questions, and goes ahead of the state rules. An encoder of the
-  system's own sits between the ear and the tables. It takes whatever helps: the word, its
-  sentence (the 0.8B's contextual state), the slots and neighbours it has in the rows,
-  and borrowed vectors as raw material only. It writes a symbol: the word, an identity
-  part that decodes back to it exactly, and a meaning vector. Lookup by identity is
-  today's exact match. The encoder learns from every same-or-different the system
-  establishes: kin, the judge's kept verdicts, supersessions, confirmed inferences. It
-  starts as a pass-through of its borrowed inputs, so it begins no worse than them, and
-  whether learning improves it is measured as a run going on. Its first use, a word the
-  house never used resolved by fit and margin with frames learnt, is shipped (see the
-  commit after `2f0c416f`). Next: the encoder itself, standing in for the bare MiniLM
-  vector in that resolver and learning from what the resolver confirms, which MUST beat
-  the shipped resolver to stay. Built from rows alone and borrowed vectors on relation
-  words are refuted (`586338f8`, `b33d2422`). The house and bAbI MUST NOT fall by more
-  than 0.02.
-- ~~**The ear reads without the known relations.**~~ Refuted as it stands, 2026-10-02:
-  the second house and bAbI rise without the list, the first house falls on two seeds
-  of three, its colour plans failing once colour is worded several ways. The list does
-  work both ways, joining wordings that are one relation and joining some that are not,
-  so it comes out when the system joins wordings itself: the symbol encoder above,
-  applied to relations, has that as its first measurable job.
-- **Plans over the parse graph.** Proposed 2026-10-02, after the parser reading: the
-  transformer parse (`en_core_web_trf`) is reliable and fast, about 60 ms a sentence on the
-  CPU against the ear's 850, and a hand mapping from parse to five slots does not carry: it
-  reads 0.96 to 0.98 on the first house it was written against and 0.50 to 0.54 on the
-  held-out second house, where the ear reads 0.94. So the parse is kept as it is, words as
-  nodes and grammatical links as edges, and taught plans become paths through it from the
-  question's names to the answer, learnt from examples as chains over rows are now.
-  Chosen by John 2026-10-02 and built as `src/unfused/graph.py`, the `graphed` arm: it
-  beats the taught arm on all six house seeds, by 21 to 26 points on the second house,
-  and reads 0.802 on bAbI against 0.873 since plans learn the turn order of their events
-  (`44e1a894`). It replaces the taught arm when it leads both houses and is within 0.05
-  of it on bAbI. John's, 2026-10-01: what a conversation will need anyway comes before
-  tuning to either world, so these come first, each entering the exam as a form when it
-  does:
-  1. ~~Negation and tense kept.~~ Struck 2026-10-02: `denied` and `hedged` are forms,
-     and an event's mood is in its lemma. Hedged reads 0.5 on two seeds as 'I don't
-     know', since the plan for 'now' never learnt that nothing moved: item 4's.
-  2. ~~Shapes matched by the parse.~~ Struck 2026-10-02: `reworded` is a form, and a
-     wording no lesson used borrows the nearest taught shape's plans. What it cannot
-     reach is lexical ('line of work' for 'do for a living'): item 5's.
-  3. ~~Turns the system sorts itself.~~ Struck 2026-10-02: the graphed arm is taught in
-     conversation, its practice questions turns and its lessons the teacher's reactions.
-     Open: a telling that follows a question is read as the reaction to it, and the test
-     still asks with no one reacting.
-  4. State over time and counting a set that changes: 'where was it before', 'how many is
-     she carrying', and the house's `update` and `count`, measured on both. bAbI tasks 3
-     (0.69 against 0.91) and 7 (0.53 against 0.73) are where it shows. Order on a hook and
-     counting by votes both lost (`ba2e32e5` and the commit after `44e1a894`); see their
-     revival lines.
-  5. Words never heard, as the taught arm resolves them, from the question's own parse.
-  6. Chains of three, where the first house still trails.
-- **Phase 5 — Learning rules, and operations over facts.** IN PROGRESS, 0.8B only. Plans
-  learnt from taught examples answer bAbI tasks 1, 2, 3 and 7 and the house with no model
-  planning: a shape nobody taught goes unanswered, so the faculty only reads. Every faculty
-  reply is kept across runs, so a repeat run sends only what the server has not answered.
-  Next, in order:
-  1. The second house's lendings (`--world second`, agreed with John 2026-09-30). Count
-     reads 0 on every seed, and the loan chains mostly answer "I don't know". The cause
-     for both is the recipient: the 0.8B puts it in `place` for "lent to", in `subject`
-     for "borrowed from", and loses it for "passed on to" (5 of 28 tellings). A slot of
-     its own was refuted (`fd14a059`), and so was a role labeller recovering it alone
-     (`034cfe25`): a borrowed thing is a state several verbs make and one unmakes, so a
-     consistent slot does not add up to a count. Next: rules induced from co-occurring
-     facts ("lent X to Y" then Y has X; "passed X on" then no longer), kept while their
-     predictions hold, with the labeller brought back to read the recipients the ear
-     drops. The first house and bAbI MUST NOT fall by more than 0.02 under any.
-  2. A count read wherever the ear put the number, which it puts outside `quantity` in two
-     tellings of three; correction as an input.
+  filler in a slot of its own: Qwen3.5-2B at 0.96 recall and 1.00 precision. The ear was
+  deleted 2026-10-02, when the parse graph replaced it.
+- **Baselines on the house as it is now.** The forms `denied`, `hedged` and `reworded`
+  changed the first house on 2026-10-02, so every reading taken on it before is history and
+  phases 1, 2 and 4's tests are red until they are re-taken: `linked`, `recall`, `recall2`
+  and `full` under the 9B on seed 0, `full` and a recall arm under the 2B and the 0.8B, and
+  `full` under the 0.8B and `blind` on seeds 1 to 3.
+- **The bet's checkpoint.** Two halves. The first house: the system beats the 0.8B given
+  the whole transcript on `twohop`, `chain3` and `count`, and blind, on seeds 1 to 3. The
+  system is the graphed arm, which asks no faculty anything, so it is held to the smallest
+  faculty's full context. The second house at no worse than half the first house's score:
+  met by the graphed arm on seeds 1 to 3.
+- ~~**Plans over the parse graph.**~~ Struck 2026-10-02: the graphed arm
+  (`src/unfused/graph.py`) keeps the conversation as its dependency parse and learns plans
+  as paths in it, taught in conversation. It led the taught arm on both houses and on bAbI
+  (0.890 against 0.873), so the taught arm, the 0.8B ear and the instruments measuring the
+  ear were deleted; the ear's speed, its known relations and the second house's lendings
+  went with it. What would bring the ear back: a world whose sentences the parse cannot
+  read, where an ear's reading answers more.
+- **The graphed arm, next.** John's, 2026-10-01: what a conversation will need anyway comes
+  before tuning to either world, each entering the exam as a form when it does.
+  1. Hedged facts asked 'now' answer 'I don't know' on two seeds of three: the plan for
+     'now' learnt only moves, and never that nothing moved.
+  2. A telling that follows a question is read as the reaction to it, and the test asks
+     with no one reacting, so correction is taught and never examined.
+  3. Words never heard, from the question's own parse: 'What is X's line of work?' shares
+     no grammar with 'do for a living'. The symbol encoder of the DECIDED meaning section
+     is the mechanism: a word's meaning as what is known about it, learnt from every
+     same-or-different the system establishes, with borrowed vectors as raw material only.
+  4. Counts: the first house's seed 3 reads 0.2 on every arm since the forms were added.
+  5. Chains of three, where the first house trails (0.25 to 0.67).
+- **Phase 5 — Learning rules, and operations over facts.** Plans learnt from lessons
+  answer bAbI tasks 1, 2, 3 and 7. Order in time, the present against history, and a
+  visit before or after another are learnt per plan. Rules induced from co-occurring
+  facts ('lent X to Y' then Y has X) are next, kept while their predictions hold.
 - **Phase 6 — Importance and forgetting.**
   - **A body of its own.** John's, 2026-10-02. Emotion is a feedback loop: signals about
     the self that the self cares about, sensed as input and turned by what happens. Here
@@ -195,7 +146,9 @@ commit.
   BM25 and MiniLM cosine, weighted by importance and recency on a turn clock.
 - `arms` and `linked` — what an exam compares. `Blind`, `FullContext`, `Recall`,
   `LinkedRecall`.
-- `exam` — the house generator and the runner.
+- `graph` — `GraphArm`, the system: the conversation kept as its dependency parse, plans
+  learnt as paths in it from a teacher's reactions, and `turn`, which sorts a turn itself.
+- `exam` — the house generator, the runner, and `converse`, which teaches in conversation.
 
 ---
 
@@ -393,27 +346,10 @@ the store merges by id. Kill a third of the nodes mid-exam.
   and a mouth that composes. A first rung that would say something sooner: read a
   problem's givens as tellings and ask only for a named quantity it states, scored by
   whether the system finds the givens the derivation uses.
-- **A generic ear.** John's, 2026-10-01. The symbol layer works only on what the ear hands
-  it, and the ear forces every sentence into subject, relation, object, place and
-  quantity, so what does not fit never becomes a symbol. The general form marks every
-  mention in any text and the roles joining them, with roles left open (open information
-  extraction, semantic role labelling). Every loosening of the 0.8B's output on
-  2026-10-01 cost recall, so it is taken after the symbol encoder is shown to learn.
-  John's sharper form: a frozen part that only tags every word with its grammatical role,
-  dropping none, and the system learns what each pattern states. A dependency parser
-  (spaCy, Stanza) is that: milliseconds a sentence, every sentence type parses, and
-  nothing in it knows that "lent to" and "borrowed from" state one fact, which the
-  system would have to learn from teaching or later questions. First reading: the
-  house's tellings parsed, the plain mapping (subject, verb, object, prepositional
-  object) scored by `scripts/ears.py`'s scorer against the ear's 1.00. The SRL labeller
-  of `034cfe25` was refuted for one job, a dropped recipient, not as an ear.
 - **Where the encoder learns.** Two places, wanted both. Rows: aliases and confirmed
   sameness kept per symbol, which is memory and does not carry to a new word. Weights:
   the encoder's own function, which carries what it learnt about one unknown word to the
   next. Rows first, because they are what the house can measure.
-- **Shapes by likeness.** A shape matches only word for word, so an oblique question never
-  meets its plain twin's plan. Matching shapes by embedding would carry a plan across
-  wordings, at the risk of carrying it to a question that only looks alike.
 - **Choice questions** ("Is the gate red or blue?"). A taught chain must touch every filler
   the question names, and "red" sits in no fact about the gate, so no plan is learnt.
 - **A thread's working notes as a fragment**: what surfaced for the last few turns is carried
@@ -422,15 +358,5 @@ the store merges by id. Kill a third of the nodes mid-exam.
   seeded by a hash of its name so every node agrees without coordinating. They buy a
   fixed-size memory that merges by addition and forgets by interference; they have to earn
   that against the exact tables in Phase 8, or not be built.
-- **A reader and a typist**: Qwen reads a sentence into plain restatements and a
-  schema-constrained extractor (Needle) types them. John's, 2026-09-29. Worth running only if
-  a grammar-constrained Qwen reads measurably worse than the same Qwen reading freely, since
-  otherwise the pipeline ends on the weaker model.
-- **Needle fine-tuned on public relation data**, not on house sentences, so it learns to read
-  relations without being taught the answers. Untuned it lost to the 0.8B as the ear
-  (`2ac4ad5c`); worth tuning only where the 0.8B is too slow, such as a phone.
-- **Calibrated ears**: an ear that returns a confidence with each assertion, so the system can
-  weigh what it heard. Jev (TypeSafe AI) does this and is closed and paid; the fork is an open
-  ear that does the same.
 - **Idle-time inference**: the system composes and writes derived assertions when no input is
   arriving, so a chain is found once rather than per question.

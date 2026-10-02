@@ -97,8 +97,9 @@ belongs to something else of John's. llama.cpp is built from source in
 ```bash
 llama-server -m <Qwen3.5-2B-Q8_0.gguf> -ngl 99 -c 16384 --parallel 1 --jinja   --reasoning-budget 0 --host 127.0.0.1 --port 8094
 llama-server -m <Qwen_Qwen3.5-9B-Q6_K_L.gguf> -ngl 99 -c 8192 --parallel 1 --jinja   --reasoning-budget 0 --host 127.0.0.1 --port 8093
-uv run python scripts/exam.py --faculty served --served Qwen3.5-2B-Q8_0 --port 8094   --arms blind,full,linked,system --seed 1 --note "..."
-uv run python scripts/ears.py --seed 1 --name "..."
+uv run python scripts/exam.py --faculty served --served Qwen3.5-2B-Q8_0 --port 8094   --arms blind,full,linked --seed 1 --note "..."
+uv run python scripts/exam.py --arms graphed --teach 5 --world first --seed 1 --note "..."
+uv run python scripts/babi.py --tasks 1,2,3,7 --stories 20 --arms graphed --teach 20 --note "..."
 ```
 
 The card is one GTX 1080 Ti, 11 GB. The 9B takes about 9 GB of it, so it and the 2B are never
@@ -120,11 +121,10 @@ src/unfused/faculty.py the frozen language model, in-process or served
 src/unfused/store/     fragments, hybrid recall
 src/unfused/arms.py    text-memory arms: blind, full context, recall
 src/unfused/linked.py  linked recall
-src/unfused/ears.py    the ear: sentences and questions to typed assertions
-src/unfused/system.py  the system: assertions stored, questions matched and chained
+src/unfused/graph.py   the system: the conversation as its parse, plans as paths in it
 src/unfused/exam/      the house and the runner
 scripts/exam.py        runs arms and writes readings
-scripts/ears.py        scores an ear against the house
+scripts/babi.py        runs arms on bAbI and writes readings
 tests/guards           fast structural tests
 tests/outstanding      the red set
 tests/pushback.py      standing objections

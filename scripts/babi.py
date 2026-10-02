@@ -54,13 +54,8 @@ def main() -> None:
     p.add_argument("--arms", default="blind,full")
     p.add_argument("--served", default="Qwen3.5-0.8B-Q8_0")
     p.add_argument("--port", type=int, default=8094)
-    p.add_argument("--planner-port", type=int, default=None)
-    p.add_argument("--planner-served", default=None)
-    p.add_argument("--planner-judges", action="store_true")
-    p.add_argument("--moves", action="store_true")
-    p.add_argument("--cleans", action="store_true")
     p.add_argument("--teach", type=int, default=0,
-                   help="training stories a task told with their answers before the test")
+                   help="training stories a task held as a conversation before the test")
     p.add_argument("--note", default="")
     args = p.parse_args()
 
@@ -70,42 +65,15 @@ def main() -> None:
     table = {k: v for t in tasks
              for k, v in modal_answers(stories(t, args.teach or 20, split="train")).items()}
     arms = args.arms.split(",")
-    faculty = embedder = ear = planner = None
+    faculty = None
     if any(a not in ("blind", "graphed") for a in arms):
         from unfused.faculty import ServedFaculty
         faculty = ServedFaculty(model_id=f"{args.served} (llama.cpp)",
                                 url=f"http://127.0.0.1:{args.port}/v1/chat/completions")
-    if any(a in ("system", "planned", "asked", "taught") for a in arms):
-        from unfused.ears import Ear
-        from unfused.store import MiniLmEmbedder
-        embedder = MiniLmEmbedder()
-        ear = Ear(url=faculty.url, name=faculty.name)
-        if args.planner_port:
-            planner = Ear(url=f"http://127.0.0.1:{args.planner_port}/v1/chat/completions",
-                          name=f"{args.planner_served} (llama.cpp, planner)")
-
-    def system(work, name, plans, learnt, holds=(), echoes=(), frames=(), meant=()):
-        from unfused.system import SystemArm
-        return SystemArm(work, ear, embedder, plans=name == "planned", known_plans=plans,
-                         planner=planner, judge=planner if args.planner_judges else None,
-                         asked=name == "asked", moves=args.moves,
-                         taught=name == "taught", known_learnt=learnt,
-                         cleans=args.cleans, known_holds=holds,
-                         known_echoes=echoes, known_frames=frames,
-                         known_meant=meant)
-
-    def export(work, table_sql):
-        import sqlite3
-        db = sqlite3.connect(str(work / "system.db"))
-        out = db.execute(table_sql).fetchall()
-        db.close()
-        return out
-
     for name in arms:
-        rows, dials, seconds, plans, learnt, holds, echoes = [], None, 0.0, {}, [], [], []
-        frames, meant, positions = [], [], []
+        rows, dials, seconds, learnt, positions = [], None, 0.0, [], []
         if name == "graphed" and args.teach:
-            # taught as the taught arm is, on the same training stories, with no faculty
+            # taught on the training stories, with no faculty
             from unfused.graph import GraphArm
 
             for t in tasks:
@@ -116,25 +84,6 @@ def main() -> None:
                     converse(world, arm)
                     learnt, positions = arm.export()
                     arm.close()
-                    shutil.rmtree(work, ignore_errors=True)
-        if name == "taught" and args.teach:
-            # the teaching: training stories heard a line at a time, each question told
-            # with its answer; what was learnt, with how often it held, carries on
-            for t in tasks:
-                for world in stories(t, args.teach, split="train"):
-                    work = Path(tempfile.mkdtemp(prefix="babi-teach-"))
-                    arm = system(work, name, plans, learnt, holds, echoes, frames, meant)
-                    asked = world.questions_after()
-                    for turn, text in enumerate(world.turns):
-                        arm.hear(turn, text)
-                        for q in asked.get(turn, []):
-                            arm.teach(q.text, q.answer)
-                    arm.close()
-                    learnt = export(work, "SELECT shape, plan, hits, misses FROM learnt")
-                    holds = export(work, "SELECT relation, yes, no FROM holds")
-                    echoes = export(work, "SELECT shape FROM echoes")
-                    frames = export(work, "SELECT phrase FROM frames")
-                    meant = export(work, "SELECT phrase, name, n FROM meant")
                     shutil.rmtree(work, ignore_errors=True)
         for t in tasks:
             for world in worlds[t]:
@@ -151,16 +100,8 @@ def main() -> None:
                     def open_arm(work=work):
                         return GraphArm(work, known_learnt=learnt, known_positions=positions)
                 else:
-                    def open_arm(work=work):
-                        return system(work, name, plans, learnt, holds, echoes, frames, meant)
+                    raise SystemExit(f"unknown arm {name}")
                 result = run(world, open_arm, reopen_every=10**9)
-                if name == "planned":
-                    # plans carry from story to story, as they carry from house to house
-                    import sqlite3
-                    db = sqlite3.connect(str(work / "system.db"))
-                    plans.update({k: json.loads(v) for k, v in
-                                  db.execute("SELECT shape, plan FROM plans")})
-                    db.close()
                 shutil.rmtree(work, ignore_errors=True)
                 for r in result["rows"]:
                     r["task"] = t
@@ -175,9 +116,7 @@ def main() -> None:
             # the command that took it, so a comparison copies it rather than rebuilds it
             "command": " ".join(sys.argv),
             "faculty": faculty.name if faculty and name != "blind" else None,
-            "planner": args.planner_served if args.planner_port else None,
-            "planner_judges": args.planner_judges,
-            "moves": args.moves, "teach": args.teach, "cleans": args.cleans, "learnt": len(learnt),
+            "teach": args.teach, "learnt": len(learnt),
             "world": {"tasks": {str(t): TASKS[t] for t in tasks}, "stories": args.stories,
                       "fingerprint": fingerprint([w for t in tasks for w in worlds[t]]),
                       "questions": len(rows)},

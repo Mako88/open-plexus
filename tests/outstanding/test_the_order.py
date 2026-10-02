@@ -12,7 +12,8 @@ from unfused.exam.world import generate_house
 
 READINGS = Path(__file__).resolve().parents[2] / "readings"
 # what a run counted rather than how it was set
-COUNTERS = {"ear_calls", "ear_cached", "ear_unparsed", "planner_calls", "shapes", "plan_uses", "judged"}
+COUNTERS = {"ear_calls", "ear_cached", "ear_unparsed", "planner_calls", "shapes", "plan_uses", "judged",
+            "events", "edges", "parsed"}
 
 
 def _current():
@@ -74,9 +75,11 @@ def test_phase_4_the_system_beats_its_own_faculty_given_everything():
     won: dict[tuple, set] = {}
     for d in current:
         arm, seed, faculty = d["arm"], d["house"]["seed"], _faculty(d)
-        # any arm of the system counts, taught plans included: the checkpoint is the
-        # bet's, taken with whatever mechanisms exist (John's, 2026-09-30)
-        if arm not in ("system", "planned", "taught") or (seed, faculty) not in full:
+        # the system counts with whatever mechanisms exist (John's, 2026-09-30). The graphed
+        # arm asks no faculty anything, so it is held to the smallest faculty's full context
+        if arm == "graphed":
+            faculty = next((f for s, f in full if s == seed and "0.8B" in f), faculty)
+        if arm != "graphed" or (seed, faculty) not in full:
             continue
         forms = d["summary"]["by_form"]
         bars = (full[(seed, faculty)], blind.get(seed, {}))
@@ -113,7 +116,7 @@ def test_the_second_house_scores_at_least_half_the_first():
                 seed=house["seed"], n_facts=house["facts"],
                 n_turns=house["turns"]).fingerprint():
             continue
-        if d["arm"] not in ("system", "planned", "taught"):
+        if d["arm"] != "graphed":
             continue  # blind reads alike on any house, and would pass for nothing
         key = (config(d), house["seed"])
         if key in first and d["summary"]["score"] >= first[key] / 2:

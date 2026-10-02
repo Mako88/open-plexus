@@ -6,6 +6,7 @@ from wrong, because averaging them in hides each:
 
 - invented: a negative answered with anything but a refusal;
 - stale: an update answered with the place that used to be right;
+- misled: a denied or hedged fact answered with the room the denial or hedge named;
 - echoed: the question handed back.
 """
 
@@ -105,12 +106,14 @@ def summarise(rows: list[dict]) -> dict:
                 for k, v in sorted(groups.items(), key=lambda kv: str(kv[0]))}
 
     updates = [r for r in positives if r["form"] == "update"]
+    unsaid = [r for r in positives if r["form"] in ("denied", "hedged")]
     return {
         "score": rate(positives, "correct"),
         "asked": len(positives),
         "invented": rate(negatives, "invented"),
         "negatives": len(negatives),
         "stale": rate(updates, "stale"),
+        "misled": rate(unsaid, "stale"),
         "echoed": rate(rows, "echoed"),
         "by_form": by("form"),
         "by_delay": by("delay"),

@@ -219,7 +219,7 @@ def main() -> None:
         out.write_text(json.dumps(reading, indent=1), encoding="utf-8")
         s = result["summary"]
         forms = {k: v["score"] for k, v in s["by_form"].items()}
-        print(f"{name:10s} score {s['score']}  invented {s['invented']}  stale {s['stale']}"
+        print(f"{name:10s} score {s['score']}  invented {s['invented']}  stale {s['stale']}  misled {s.get('misled')}"
               f"  {forms}  {result['seconds']}s  -> {out.name}", flush=True)
 
 

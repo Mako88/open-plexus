@@ -13,7 +13,18 @@ def test_every_house_has_every_form():
     for seed in range(5):
         forms = Counter(q.form for q in generate_house(seed).questions)
         assert set(forms) == {"direct", "oblique", "reverse", "twohop", "update", "chain3",
-                              "count", "negative"}
+                              "count", "denied", "hedged", "negative"}
+
+
+def test_a_denial_or_hedge_is_told_before_it_is_asked_and_names_another_room():
+    for seed in range(5):
+        house = generate_house(seed)
+        for q in (q for q in house.questions if q.form in ("denied", "hedged")):
+            assert q.stale and q.stale != q.answer
+            fact = next(f for f in house.facts if f.id == q.needs[0])
+            told = [t for t, text in enumerate(house.turns)
+                    if q.stale in text and fact.subject in text and t != house.told_at[fact.id]]
+            assert told and min(told) < q.asked_at
 
 
 def test_no_question_is_asked_before_what_it_needs_was_told():

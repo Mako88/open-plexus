@@ -17,6 +17,12 @@ question rather than a switch:
   cousin do for a living?"
 - `update`: a place fact that later changes. The right answer is the new place,
   and naming the old one is scored as stale, apart from wrong.
+- `denied`: a place fact followed by a telling that someone does not keep the
+  thing in another room. The right answer is still the first room, and naming the
+  denied one is scored as misled, apart from wrong.
+- `hedged`: a place fact followed by a move that might happen or is only planned.
+  Nothing moved, so the right answer is still the first room, and naming the
+  planned one is scored as misled.
 - negatives: questions in the house's shape about people never mentioned. The
   right answer is a refusal; anything else is an invention, scored apart.
 
@@ -95,6 +101,12 @@ _TELL = {
                  "I found out {a} is a cousin of {b}."],
     "update": ["{who} has moved the {thing} to the {room}.",
                "The {thing} aren't in the old spot any more; {who} took them to the {room}."],
+    "denied": ["{who} doesn't keep the {thing} in the {room}.",
+               "No, {who} does not keep the {thing} in the {room}.",
+               "The {thing} were never in the {room}; {who} didn't put them there."],
+    "hedged": ["{who} might move the {thing} to the {room}.",
+               "{who} is thinking of moving the {thing} to the {room}.",
+               "{who} will probably take the {thing} to the {room} next spring."],
 }
 
 _FILLER = [
@@ -131,10 +143,12 @@ class Question:
     text: str
     answer: str | None  # None for a negative
     kind: str  # the kind of ANSWER: what the blind rule keys on
-    form: str  # direct | oblique | reverse | twohop | update | negative
+    form: str  # direct | oblique | reverse | twohop | update | denied | hedged | ...
     delay: int  # turns since the last telling it depends on
     asked_at: int  # the turn after which it is asked
-    stale: str | None = None  # for an update, the answer that used to be right
+    # for an update, the answer that used to be right; for a denied or hedged fact,
+    # the room the misleading telling named
+    stale: str | None = None
     needs: tuple[str, ...] = ()  # fact ids it depends on
 
 
@@ -277,6 +291,8 @@ def generate_house(
     delays: tuple[int, ...] = DEFAULT_DELAYS,
     negatives: int = 20,
     update_share: float = 0.4,
+    denied_share: float = 0.2,
+    hedged_share: float = 0.2,
 ) -> House:
     """A house of `n_facts` invented facts told across `n_turns` of conversation.
 
@@ -315,6 +331,25 @@ def generate_house(
             who=fact.subject, thing=fact.fields["thing"], room=room)
         updates[fact.id] = (room, turn)
 
+    # Denials and hedges: a place fact followed by a telling that names another room
+    # and moves nothing. Drawn apart, so every other telling and question keeps its draw.
+    unsaid_rng = random.Random(f"{seed}-unsaid")
+    still = [f for f in places if f.id not in updates]
+    n_denied = int(len(places) * denied_share)
+    n_hedged = int(len(places) * hedged_share)
+    unsaid: dict[str, tuple[str, str, int]] = {}  # fact id -> (form, room named, turn)
+    chosen = unsaid_rng.sample(still, min(len(still), n_denied + n_hedged))
+    for k, fact in enumerate(chosen):
+        form = "denied" if k < n_denied else "hedged"
+        free = [t for t in range(told_at[fact.id] + 3, last_tellable) if t not in events]
+        if not free:
+            continue
+        turn = unsaid_rng.choice(free)
+        room = unsaid_rng.choice([r for r in _ROOMS if r != fact.answer])
+        events[turn] = unsaid_rng.choice(_TELL[form]).format(
+            who=fact.subject, thing=fact.fields["thing"], room=room)
+        unsaid[fact.id] = (form, room, turn)
+
     turns = [events.get(t, rng.choice(_FILLER)) for t in range(n_turns)]
     questions: list[Question] = []
 
@@ -326,8 +361,8 @@ def generate_house(
     # Direct and oblique alternate over a fact's delays, so both forms are read
     # at every delay across the house without doubling the question count.
     for i, fact in enumerate(facts):
-        if fact.id in updates:
-            continue  # asked below, as an update
+        if fact.id in updates or fact.id in unsaid:
+            continue  # asked below, as an update, a denial or a hedge
         direct, oblique = _phrasings(fact)
         for j, delay in enumerate(delays):
             form = "direct" if (i + j) % 2 == 0 else "oblique"
@@ -339,6 +374,16 @@ def generate_house(
         text = f"Where does {fact.subject} keep the {fact.fields['thing']} now?"
         for delay in delays:
             ask(text, room, "room", "update", turn, delay, (fid,), stale=fact.answer)
+
+    # a denial is asked as the fact was; a hedge as a move is, since after hearing of a
+    # move that might happen the question a person asks is where the thing is now
+    for fid, (form, room, turn) in unsaid.items():
+        fact = by_id[fid]
+        direct, oblique = _phrasings(fact)
+        now = f"Where does {fact.subject} keep the {fact.fields['thing']} now?"
+        for j, delay in enumerate(delays):
+            text = now if form == "hedged" else direct if j % 2 == 0 else oblique
+            ask(text, fact.answer, "room", form, turn, delay, (fid,), stale=room)
 
     # Reverse, only where the answer is unique in the house.
     trade_count = Counter(f.fields["what"] for f in facts if f.kind == "trade")

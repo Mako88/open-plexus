@@ -167,6 +167,8 @@ class GraphArm:
         self.cache = cache
         self.last_notes: list[str] = []
         self.parsed = 0
+        # the pairs of events already counted towards a plan's order, this world
+        self.ordered: set = set()
 
     # -- reading ---------------------------------------------------------------
 
@@ -354,13 +356,17 @@ class GraphArm:
         steps = [list(s) for s in path[1::2]]
         nodes = path[::2]
         lemmas, attach, order = {}, [], {}
-        events = [(i, *self.event(node)) for i, node in enumerate(nodes) if node.startswith("e:")]
-        for i, lemma, _ in events:
+        events = [(i, node, *self.event(node)) for i, node in enumerate(nodes)
+                  if node.startswith("e:")]
+        evidence = {}
+        for i, _, lemma, _ in events:
             lemmas[str(i)] = [lemma]
         # whether each event came before or after the one before it on the path, by that
-        # one's lemma: after 'got' the answer's move came later, after 'put down' earlier
-        for (i, lemma_i, turn_i), (j, _, turn_j) in zip(events, events[1:]):
+        # one's lemma: after 'got' the answer's move came later, after 'put down' earlier.
+        # The two events are kept beside it, so a pair seen again is not counted again
+        for (i, node_i, lemma_i, turn_i), (j, node_j, _, turn_j) in zip(events, events[1:]):
             order[f"{i}-{j}"] = {lemma_i: [int(turn_j < turn_i), int(turn_j >= turn_i)]}
+            evidence[f"{i}-{j}"] = f"{node_i}>{node_j}"
         for k, name in enumerate(others):
             # the shortest way from any node of the path to the other name: 'I counted 35
             # walking sticks in the cellar' has the cellar on the counting, a step off the
@@ -373,7 +379,8 @@ class GraphArm:
             if hook is None:
                 return None
             attach.append(hook)
-        return {"steps": steps, "lemmas": lemmas, "attach": attach, "order": order}
+        return {"steps": steps, "lemmas": lemmas, "attach": attach, "order": order,
+                "evidence": evidence}
 
     def reaches(self, node: str, steps: list, goal: str) -> bool:
         """Whether a way of these steps leads from a node to a goal."""
@@ -436,9 +443,9 @@ class GraphArm:
                 return True
             i, lemma_i, turn_i = last
             before, after = plan.get("order", {}).get(f"{i}-{j}", {}).get(lemma_i, (0, 0))
-            if before > 2 * after:
+            if before >= 3 and before > 2 * after:
                 return turn_j <= turn_i
-            if after > 2 * before:
+            if after >= 3 and after > 2 * before:
                 return turn_j >= turn_i
             return True
 
@@ -533,6 +540,12 @@ class GraphArm:
                 for pos, lemmas in plan["lemmas"].items():
                     kept["lemmas"][pos] = sorted(set(kept["lemmas"].get(pos, [])) | set(lemmas))
                 for pair, by_lemma in plan.get("order", {}).items():
+                    # one pair of events is one piece of evidence, however often a lesson
+                    # asks about it: a house asks of one fact several times
+                    seen = (shape, k, pair, plan["evidence"].get(pair))
+                    if seen in self.ordered:
+                        continue
+                    self.ordered.add(seen)
                     into = kept.setdefault("order", {}).setdefault(pair, {})
                     for lemma, (b, a) in by_lemma.items():
                         was = into.get(lemma, [0, 0])
@@ -540,8 +553,11 @@ class GraphArm:
                 self.db.execute("UPDATE learnt SET plan = ?, hits = hits + 1 WHERE rowid = ?",
                                 (json.dumps(kept), rid))
             else:
+                for pair, ev in plan["evidence"].items():
+                    self.ordered.add((shape, k, pair, ev))
+                stored = {key: v for key, v in plan.items() if key != "evidence"}
                 self.db.execute("INSERT OR IGNORE INTO learnt VALUES (?, ?, 1, 0)",
-                                (shape, json.dumps(plan)))
+                                (shape, json.dumps(stored)))
         self.db.commit()
 
     def answer(self, question) -> str:

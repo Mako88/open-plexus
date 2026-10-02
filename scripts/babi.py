@@ -71,7 +71,7 @@ def main() -> None:
              for k, v in modal_answers(stories(t, args.teach or 20, split="train")).items()}
     arms = args.arms.split(",")
     faculty = embedder = ear = planner = None
-    if any(a != "blind" for a in arms):
+    if any(a not in ("blind", "graphed") for a in arms):
         from unfused.faculty import ServedFaculty
         faculty = ServedFaculty(model_id=f"{args.served} (llama.cpp)",
                                 url=f"http://127.0.0.1:{args.port}/v1/chat/completions")
@@ -103,7 +103,23 @@ def main() -> None:
 
     for name in arms:
         rows, dials, seconds, plans, learnt, holds, echoes = [], None, 0.0, {}, [], [], []
-        frames, meant = [], []
+        frames, meant, positions = [], [], []
+        if name == "graphed" and args.teach:
+            # taught as the taught arm is, on the same training stories, with no faculty
+            from unfused.graph import GraphArm
+
+            for t in tasks:
+                for world in stories(t, args.teach, split="train"):
+                    work = Path(tempfile.mkdtemp(prefix="babi-graph-teach-"))
+                    arm = GraphArm(work, known_learnt=learnt, known_positions=positions)
+                    asked = world.questions_after()
+                    for turn, text in enumerate(world.turns):
+                        arm.hear(turn, text)
+                        for q in asked.get(turn, []):
+                            arm.teach(q.text, q.answer)
+                    learnt, positions = arm.export()
+                    arm.close()
+                    shutil.rmtree(work, ignore_errors=True)
         if name == "taught" and args.teach:
             # the teaching: training stories heard a line at a time, each question told
             # with its answer; what was learnt, with how often it held, carries on
@@ -132,6 +148,11 @@ def main() -> None:
                 elif name == "full":
                     def open_arm(work=work):
                         return FullContext(work, faculty)
+                elif name == "graphed":
+                    from unfused.graph import GraphArm
+
+                    def open_arm(work=work):
+                        return GraphArm(work, known_learnt=learnt, known_positions=positions)
                 else:
                     def open_arm(work=work):
                         return system(work, name, plans, learnt, holds, echoes, frames, meant)
@@ -168,7 +189,7 @@ def main() -> None:
             "cost": faculty.cost.row() if faculty and name != "blind" else None,
             "rows": rows,
         }
-        tag = args.served.split("-Q")[0]
+        tag = "parse" if name == "graphed" else args.served.split("-Q")[0]
         out = ROOT / "readings" / f"babi-{name}-{tag}-{taken}.json"
         out.write_text(json.dumps(reading, indent=1), encoding="utf-8")
         print(f"{name:8s} score {summary['score']}  {by_task}  {round(seconds)}s -> {out.name}",

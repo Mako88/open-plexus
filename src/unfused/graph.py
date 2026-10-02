@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS positions (template TEXT NOT NULL, pos INTEGER NOT NU
 # every extraction kept across runs: the parser is deterministic, and the version is in
 # the key so a change to what is extracted re-reads every sentence
 CACHE = Path(__file__).resolve().parents[2] / "state" / "parses.sqlite"
-VERSION = "graph-2"
+VERSION = "graph-4"
 
 # a clause's links that are not arguments
 SKIP = {"punct", "det", "aux", "auxpass", "cc", "mark", "neg", "intj", "case", "dep",
@@ -138,7 +138,15 @@ def extract(doc) -> list[dict]:
             for label, t in events[index[tok.head.i]]["edges"]:
                 if label.startswith("nsubj"):
                     ev["edges"].append([label, t])
-    return [e for e in events if e["edges"]]
+    # an event left with no edges goes, and every reference to the rest is renumbered
+    kept = [i for i, e in enumerate(events) if e["edges"]]
+    renumber = {f"e:{old}": f"e:{new}" for new, old in enumerate(kept)}
+    out = []
+    for i in kept:
+        edges = [[label, renumber.get(t, t)] for label, t in events[i]["edges"]
+                 if not t.startswith("e:") or t in renumber]
+        out.append({"lemma": events[i]["lemma"], "edges": edges})
+    return out
 
 
 class GraphArm:
@@ -200,7 +208,12 @@ class GraphArm:
                     left = [t for t in tok.children if t.dep_ in ("compound", "amod")
                             and t.i < tok.i]
                     start = min([t.idx for t in left] + [tok.idx])
-                    kept.append([start, tok.idx + len(tok.text), phrase(tok)])
+                    verb = tok.head if tok.dep_ == "dobj" else None
+                    between = (doc[verb.i + 1:min([t.i for t in left] + [tok.i])]
+                               if verb is not None and verb.i < tok.i else None)
+                    governs = ([verb.idx, verb.lemma_.lower()] if between is not None
+                               and all(t.dep_ == "det" for t in between) else [None, None])
+                    kept.append([start, tok.idx + len(tok.text), phrase(tok), *governs])
             self._keep(key, kept)
         return [tuple(k) for k in kept]
 
@@ -280,7 +293,7 @@ class GraphArm:
         cut to the longest ending of it the graph knows: 'how many walking sticks' holds
         'walking sticks', with no list of words like 'many'."""
         spans = []
-        for a, b, name in sorted(self.names_in(question)):
+        for a, b, name, verb_at, verb in sorted(self.names_in(question)):
             words = name.split()
             for i in range(len(words)):
                 tail = " ".join(words[i:])
@@ -289,6 +302,13 @@ class GraphArm:
                     if at >= 0:
                         a, b, name = at, at + len(tail), tail
                     break
+            # 'the person who repairs clocks': a name's own verb, said just before it, is
+            # cut with it, as the taught arm's `joined` does, so every trade is one shape
+            if verb and self.db.execute(
+                    "SELECT 1 FROM edges JOIN events ON events.id = edges.event WHERE "
+                    "edges.node = ? AND events.lemma = ? LIMIT 1", (f"n:{name}", verb)
+            ).fetchone():
+                a = verb_at
             spans.append((a, b, name))
         out, at = "", 0
         for i, (a, b, _) in enumerate(spans):
@@ -361,7 +381,41 @@ class GraphArm:
 
     @staticmethod
     def key(plan: dict) -> str:
-        return json.dumps({"steps": plan["steps"], "attach": plan["attach"]})
+        return json.dumps({"steps": plan["steps"], "attach": plan["attach"],
+                           "count": plan.get("count", False)})
+
+    def walks(self, start: str, depth: int = 4, cap: int = 5000) -> dict:
+        """Every way of up to `depth` steps from a node to a name, grouped by its steps:
+        {steps: (ends, one path)}."""
+        out: dict = {}
+        frontier = [[start]]
+        for _ in range(depth):
+            nxt_frontier = []
+            for path in frontier:
+                for label, direction, nxt in self.around(path[-1]):
+                    if nxt in path[::2]:
+                        continue
+                    way = path + [(label, direction), nxt]
+                    if nxt.startswith("n:"):
+                        key = json.dumps([list(s) for s in way[1::2]])
+                        ends, rep = out.get(key, (set(), way))
+                        ends.add(nxt)
+                        out[key] = (ends, rep)
+                    nxt_frontier.append(way)
+            frontier = nxt_frontier[:cap]
+        return out
+
+    def counted(self, fillers: list[str], want: int) -> list[dict]:
+        """Plans that count: from the question's first name, every way whose distinct
+        ends number what was taught, shortest first."""
+        found = []
+        for key, (ends, rep) in self.walks(f"n:{fillers[0]}").items():
+            if len(ends) == want:
+                plan = self.plan_of(rep, fillers[1:])
+                if plan is not None:
+                    found.append({**plan, "count": True})
+        found.sort(key=lambda p: len(p["steps"]))
+        return [p for p in found if len(p["steps"]) == len(found[0]["steps"])] if found else []
 
     def follow(self, plan: dict, fillers: list[str], strict: bool) -> list[tuple[str, int]]:
         """Every end the plan reaches from the question's first name, with the latest turn
@@ -406,11 +460,17 @@ class GraphArm:
         for strict in (True, False):
             found = []
             for (plan,) in ranked:
-                found += [f for f in self.follow(json.loads(plan), fillers, strict)
-                          if not said_in(f[0], question)]
+                found += self.said(json.loads(plan), fillers, strict, question)
             if found:
                 return found
         return []
+
+    def said(self, plan: dict, fillers: list[str], strict: bool,
+             question: str) -> list[tuple[str, int]]:
+        ends = self.follow(plan, fillers, strict)
+        if plan.get("count"):
+            return [(str(len({e for e, _ in ends})), max(t for _, t in ends))] if ends else []
+        return [f for f in ends if not said_in(f[0], question)]
 
     def teach(self, question: str, answer: str) -> None:
         self.heard_at(question)
@@ -418,23 +478,29 @@ class GraphArm:
         want = answer.lower()
         for rowid, plan in self.db.execute("SELECT rowid, plan FROM learnt WHERE shape = ?",
                                            (shape,)).fetchall():
-            found = self.follow(json.loads(plan), fillers, True) or self.follow(
-                json.loads(plan), fillers, False)
-            found = [f for f in found if not said_in(f[0], question)]
+            plan = json.loads(plan)
+            found = (self.said(plan, fillers, True, question)
+                     or self.said(plan, fillers, False, question))
             if not found:
                 continue
             said = max(found, key=lambda f: f[1])[0]
-            column = "hits" if said_in(want, said) else "misses"
+            held = said_in(want, said) or (numeral(want) is not None
+                                           and numeral(said) == numeral(want))
+            column = "hits" if held else "misses"
             self.db.execute(f"UPDATE learnt SET {column} = {column} + 1 WHERE rowid = ?",
                             (rowid,))
         goals = self.holding(want)
-        if not fillers or not goals:
+        if not fillers:
             self.db.commit()
             return
         found = [p for g in goals[:5] for p in self.paths(f"n:{fillers[0]}", g)]
         shortest = min((len(p) for p in found), default=0)
-        for path in [p for p in found if len(p) == shortest][:20]:
-            plan = self.plan_of(path, fillers[1:])
+        plans = [self.plan_of(p, fillers[1:]) for p in found if len(p) == shortest][:20]
+        if not any(plans) and numeral(want) is not None:
+            # a number no telling said is a number of things: 'How many people keep
+            # things in the pantry?' taught 3
+            plans = self.counted(fillers, numeral(want))
+        for plan in plans:
             if plan is None:
                 continue
             k = self.key(plan)
@@ -477,6 +543,18 @@ class GraphArm:
         self.db.close()
         if hasattr(self, "_cdb"):
             self._cdb.close()
+
+
+WORDS = ["none", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+         "ten", "eleven", "twelve"]
+
+
+def numeral(text: str) -> int | None:
+    """A number said as digits or as a word, or None."""
+    t = text.strip().lower()
+    if t.isdigit():
+        return int(t)
+    return WORDS.index(t) if t in WORDS else None
 
 
 def said_in(answer: str, question: str) -> bool:

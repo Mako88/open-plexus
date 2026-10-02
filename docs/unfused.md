@@ -43,11 +43,12 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - ~~**Phase 3 — Ears.**~~ Struck 2026-09-29 under the strict scorer, which wants each gold
   filler in a slot of its own: Qwen3.5-2B at 0.96 recall and 1.00 precision. The ear was
   deleted 2026-10-02, when the parse graph replaced it.
-- **Baselines on the house as it is now.** The forms `denied`, `hedged` and `reworded`
-  changed the first house on 2026-10-02, so every reading taken on it before is history and
-  phases 1, 2 and 4's tests are red until they are re-taken: `linked`, `recall`, `recall2`
-  and `full` under the 9B on seed 0, `full` and a recall arm under the 2B and the 0.8B, and
-  `full` under the 0.8B and `blind` on seeds 1 to 3.
+- **The models are a milestone check, not a baseline.** John's, 2026-10-02: the system is
+  compared with its own last version on every change, and with `blind` (seconds, no GPU);
+  the language models given everything are run with `scripts/baselines.sh` now and then,
+  to say what size of model the system stands against. So phases 1, 2 and 4 of the red
+  set stop gating on today's house: next, they read the latest readings of their arms
+  whatever house they were taken on, and say which house that was.
 - **The bet's checkpoint.** Two halves. The first house: the system beats the 0.8B given
   the whole transcript on `twohop`, `chain3` and `count`, and blind, on seeds 1 to 3. The
   system is the graphed arm, which asks no faculty anything, so it is held to the smallest

@@ -87,12 +87,27 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   Chosen by John 2026-10-02 and built as `src/unfused/graph.py`, the `graphed` arm: it
   beats the taught arm on all six house seeds, by 21 to 26 points on the second house,
   and reads 0.802 on bAbI against 0.873 since plans learn the turn order of their events
-  (`44e1a894`). It replaces the taught arm when it holds bAbI too, and these come first:
-  1. bAbI task 3, 'where was it before X' (0.69 against 0.91), and task 7, 'how many is
-     she carrying' (0.53 against 0.73). Order on a hook and counting by votes both lost
-     (`ba2e32e5` and the commit after `44e1a894`); see their revival lines.
-  2. Words never heard, as the taught arm resolves them, from the question's own parse.
-  3. Chains of three, where the first house still trails.
+  (`44e1a894`). It replaces the taught arm when it leads both houses and is within 0.05
+  of it on bAbI. John's, 2026-10-01: what a conversation will need anyway comes before
+  tuning to either world, so these come first, each entering the exam as a form when it
+  does:
+  1. Negation and tense kept. `neg` and `aux` are dropped by the parse, so 'Mary did not
+     go to the kitchen' is stored as her going there, and 'might' and 'will' vanish. The
+     form: tellings negated or hedged, and questions whose answer turns on it.
+  2. Shapes matched by the parse, not the string. A plan is kept under the question's text
+     with its names cut out, so any rewording is a shape with no plan. The form: a
+     question asked in a wording no lesson used, which `oblique` only half covers.
+  3. Turns the system sorts itself. The runner tells the arm which turn is a telling, a
+     question and a lesson; a conversation labels none, and teaches by an answer turns
+     later or by 'no, that is wrong'. The form: an unlabelled stream, with lessons as
+     answers and corrections inside it.
+  4. State over time and counting a set that changes: 'where was it before', 'how many is
+     she carrying', and the house's `update` and `count`, measured on both. bAbI tasks 3
+     (0.69 against 0.91) and 7 (0.53 against 0.73) are where it shows. Order on a hook and
+     counting by votes both lost (`ba2e32e5` and the commit after `44e1a894`); see their
+     revival lines.
+  5. Words never heard, as the taught arm resolves them, from the question's own parse.
+  6. Chains of three, where the first house still trails.
 - **Phase 5 — Learning rules, and operations over facts.** IN PROGRESS, 0.8B only. Plans
   learnt from taught examples answer bAbI tasks 1, 2, 3 and 7 and the house with no model
   planning: a shape nobody taught goes unanswered, so the faculty only reads. Every faculty

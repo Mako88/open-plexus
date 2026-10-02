@@ -85,13 +85,12 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   nodes and grammatical links as edges, and taught plans become paths through it from the
   question's names to the answer, learnt from examples as chains over rows are now.
   Chosen by John 2026-10-02 and built as `src/unfused/graph.py`, the `graphed` arm: it
-  beats the taught arm on all six house seeds, by 21 to 27 points on the second house,
-  and reads 0.593 on bAbI against 0.873 (`be1859ae`). It replaces the taught arm when it
-  holds bAbI too, and these come first, in order:
-  1. State over time, learnt rather than written: a plan keeps the turn order of the
-     events it passed, and an event that broke a plan's prediction during teaching (a
-     'drop' between a 'pick up' and a 'go') is kept as one that breaks it. bAbI tasks 2,
-     3 and 7 are where it reads.
+  beats the taught arm on all six house seeds, by 21 to 26 points on the second house,
+  and reads 0.802 on bAbI against 0.873 since plans learn the turn order of their events
+  (`44e1a894`). It replaces the taught arm when it holds bAbI too, and these come first:
+  1. bAbI task 3, 'where was it before X' (0.69 against 0.91), and task 7, 'how many is
+     she carrying' (0.53 against 0.73). Order on a hook and counting by votes both lost
+     (`ba2e32e5` and the commit after `44e1a894`); see their revival lines.
   2. Words never heard, as the taught arm resolves them, from the question's own parse.
   3. Chains of three, where the first house still trails.
 - **Phase 5 — Learning rules, and operations over facts.** IN PROGRESS, 0.8B only. Plans

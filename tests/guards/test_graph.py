@@ -140,3 +140,21 @@ def test_a_clause_about_something_is_a_relation_solved_for_it(tmp_path):
     # and a clause inside a clause, 'cousin' the frame of the inner one and not a name
     a.teach("Whose cousin is Cara?", "Bren")
     assert a.answer(q("What colour are the things Cara's cousin keeps in the attic?")) == "green"
+
+
+def test_a_word_never_heard_is_learnt_as_the_name_it_stood_for(tmp_path):
+    a = arm(tmp_path)
+    a.hear(0, "The jars are ochre.")
+    a.hear(1, "The lamps are green.")
+    a.teach("What colour are the jars?", "ochre")
+    a.teach("What colour are the pots?", "ochre")
+    # one fact is one piece of evidence however often it is asked, and one is not enough
+    a.teach("What colour are the pots?", "ochre")
+    assert a.aliases("pots") == []
+    a.hear(2, "The jars are red.")
+    a.teach("What colour are the pots?", "red")
+    assert a.aliases("pots") == ["jars"]
+    a.hear(3, "The jars are blue.")
+    assert a.answer(q("What colour are the pots?")) == "blue"
+    # a person nobody told of is never taken for one somebody did
+    assert "edda" not in {n for _, _, n in a.unheard("Where does Edda keep the pots?")}

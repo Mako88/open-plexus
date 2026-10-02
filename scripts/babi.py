@@ -71,7 +71,7 @@ def main() -> None:
         faculty = ServedFaculty(model_id=f"{args.served} (llama.cpp)",
                                 url=f"http://127.0.0.1:{args.port}/v1/chat/completions")
     for name in arms:
-        rows, dials, seconds, learnt, positions = [], None, 0.0, [], []
+        rows, dials, seconds, known = [], None, 0.0, {}
         if name == "graphed" and args.teach:
             # taught on the training stories, with no faculty
             from unfused.graph import GraphArm
@@ -79,10 +79,10 @@ def main() -> None:
             for t in tasks:
                 for world in stories(t, args.teach, split="train"):
                     work = Path(tempfile.mkdtemp(prefix="babi-graph-teach-"))
-                    arm = GraphArm(work, known_learnt=learnt, known_positions=positions)
+                    arm = GraphArm(work, known=known)
                     # taught in conversation, as on the house
                     converse(world, arm)
-                    learnt, positions = arm.export()
+                    known = arm.export()
                     arm.close()
                     shutil.rmtree(work, ignore_errors=True)
         for t in tasks:
@@ -98,7 +98,7 @@ def main() -> None:
                     from unfused.graph import GraphArm
 
                     def open_arm(work=work):
-                        return GraphArm(work, known_learnt=learnt, known_positions=positions)
+                        return GraphArm(work, known=known)
                 else:
                     raise SystemExit(f"unknown arm {name}")
                 result = run(world, open_arm, reopen_every=10**9)
@@ -116,7 +116,7 @@ def main() -> None:
             # the command that took it, so a comparison copies it rather than rebuilds it
             "command": " ".join(sys.argv),
             "faculty": faculty.name if faculty and name != "blind" else None,
-            "teach": args.teach, "learnt": len(learnt),
+            "teach": args.teach, "learnt": len(known.get("learnt", [])),
             "world": {"tasks": {str(t): TASKS[t] for t in tasks}, "stories": args.stories,
                       "fingerprint": fingerprint([w for t in tasks for w in worlds[t]]),
                       "questions": len(rows)},

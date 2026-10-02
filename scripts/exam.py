@@ -86,20 +86,20 @@ def main() -> None:
             from unfused.graph import GraphArm
 
             # taught on practice houses, with no faculty
-            learnt, positions = [], []
+            known = {}
             for s in range(PRACTICE, PRACTICE + args.teach):
                 practice = generate(seed=s, n_facts=args.facts, n_turns=args.turns)
                 taught = Path(tempfile.mkdtemp(prefix="unfused-graph-teach-"))
-                arm = GraphArm(taught, known_learnt=learnt, known_positions=positions)
+                arm = GraphArm(taught, known=known)
                 # taught in conversation: nothing labels a turn, and a lesson is the
                 # teacher's reaction to what the arm answered
                 converse(practice, arm, UNTAUGHT)
-                learnt, positions = arm.export()
+                known = arm.export()
                 arm.close()
                 shutil.rmtree(taught, ignore_errors=True)
 
-            def open_arm(learnt=learnt, positions=positions):
-                return GraphArm(work, known_learnt=learnt, known_positions=positions)
+            def open_arm(known=known):
+                return GraphArm(work, known=known)
         elif name == "linked":
             from unfused.linked import LinkedRecall
 

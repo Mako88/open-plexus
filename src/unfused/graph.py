@@ -36,7 +36,11 @@ CREATE TABLE IF NOT EXISTS learnt (shape TEXT NOT NULL, plan TEXT NOT NULL,
     hits INTEGER NOT NULL, misses INTEGER NOT NULL, PRIMARY KEY (shape, plan));
 CREATE TABLE IF NOT EXISTS positions (template TEXT NOT NULL, pos INTEGER NOT NULL,
     filler TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (template, pos, filler));
+CREATE TABLE IF NOT EXISTS aliases (word TEXT NOT NULL, name TEXT NOT NULL,
+    hits REAL NOT NULL, misses INTEGER NOT NULL, PRIMARY KEY (word, name));
 """
+# what a taught arm carries to the next conversation: no facts, only how to read and ask
+CARRIED = ("learnt", "positions", "aliases")
 
 # every extraction kept across runs: the parser is deterministic, and the version is in
 # the key so a change to what is extracted re-reads every sentence
@@ -158,15 +162,13 @@ class GraphArm:
     name = "graphed"
 
     def __init__(self, directory: Path, model: str = "en_core_web_trf",
-                 known_learnt: list | None = None, known_positions: list | None = None,
-                 cache: Path | None = CACHE) -> None:
+                 known: dict | None = None, cache: Path | None = CACHE) -> None:
         directory.mkdir(parents=True, exist_ok=True)
         self.db = sqlite3.connect(str(directory / "graph.db"))
         self.db.executescript(SCHEMA)
-        self.db.executemany("INSERT OR IGNORE INTO learnt VALUES (?, ?, ?, ?)",
-                            [tuple(x) for x in (known_learnt or [])])
-        self.db.executemany("INSERT OR IGNORE INTO positions VALUES (?, ?, ?, ?)",
-                            [tuple(x) for x in (known_positions or [])])
+        for table, rows in (known or {}).items():
+            self.db.executemany(f"INSERT OR IGNORE INTO {table} VALUES (?, ?, ?, ?)",
+                                [tuple(x) for x in rows])
         self.db.commit()
         self.model = model
         self.cache = cache
@@ -176,6 +178,8 @@ class GraphArm:
         self.ordered: set = set()
         # a question this arm answered, waiting for the turn that reacts to it
         self.pending: tuple[str, str] | None = None
+        # the words never heard and answers already counted towards an alias, this world
+        self.aliased: set = set()
         # events already found replaced by a later one, cleared whenever one is heard
         self._replaced: dict = {}
         # taught shapes' signatures, rebuilt after a lesson; questions' parses
@@ -710,10 +714,15 @@ class GraphArm:
         return [f for f in ends if not said_in(f[0], question)]
 
     def teach(self, question: str, answer: str) -> None:
-        self._sigs = None
-        self.heard_at(question)
-        shape, fillers = self.shape(question)
         want = answer.lower()
+        # where each word sat is counted as heard, so a word held in its place is frame
+        self.heard_at(question)
+        put = self.alias(question, want)
+        if put != question:
+            self.heard_at(put)
+        question = put
+        self._sigs = None
+        shape, fillers = self.shape(question)
         for rowid, plan in self.db.execute("SELECT rowid, plan FROM learnt WHERE shape = ?",
                                            (shape,)).fetchall():
             plan = json.loads(plan)
@@ -809,8 +818,130 @@ class GraphArm:
                                 (shape, json.dumps(stored)))
         self.db.commit()
 
+    # -- words never heard ----------------------------------------------------
+
+    def unheard(self, question: str) -> list[tuple[int, int, str]]:
+        """The question's common nouns the conversation never used, no ending of them
+        either: 'the chipped dishes' where only cracked plates were told of. A proper
+        name is never one, since a person never mentioned is someone nobody told of; nor
+        is a word lessons held in its place every time ('do all day'), which is frame."""
+        template, spans = self.template(question)
+        out = []
+        for i, (a, b, name) in enumerate(spans):
+            words = name.split()
+            if question[a:a + 1].isupper() and a > 0:
+                continue
+            if any(self.known(" ".join(words[j:])) for j in range(len(words))):
+                continue
+            seen = self.db.execute("SELECT filler, n FROM positions WHERE template = ? AND"
+                                   " pos = ?", (template, i)).fetchall()
+            if len(seen) == 1 and seen[0][1] >= 2:
+                continue
+            out.append((a, b, name))
+        return out
+
+    def aliases(self, word: str) -> list[str]:
+        """The heard name a word stood for in lessons, if one: found more often than
+        missed, two facts' worth or more, since one fact cannot show two wordings agree,
+        and twice any other name's share. A word that is the question's frame ('shade',
+        'a wage') fits many names and none twice."""
+        rows = self.db.execute("SELECT name, hits, misses FROM aliases WHERE word = ? "
+                               "ORDER BY hits DESC", (word,)).fetchall()
+        if not rows:
+            return []
+        name, hits, misses = rows[0]
+        second = rows[1][1] if len(rows) > 1 else 0
+        return [name] if hits >= 2 and hits > misses and hits >= 2 * second else []
+
+    def unaliased(self, question: str) -> str:
+        """The question with each word never heard put as the name it stood for, where
+        lessons settled one and that name is heard here."""
+        out, at = "", 0
+        for a, b, w in self.unheard(question):
+            # by its longest ending lessons settled: 'chipped dishes' before 'dishes'. A
+            # name the question says already is never put again
+            ws = w.split()
+            for i in range(len(ws)):
+                tail = " ".join(ws[i:])
+                name = next((n for n in self.aliases(tail) if self.known(n)
+                             and not said_in(n, out + question[at:])), None)
+                if name is not None:
+                    out += question[at:b - len(tail)] + name
+                    at = b
+                    break
+        return out + question[at:]
+
+    def alias(self, question: str, want: str) -> str:
+        """A lesson naming words never heard: each is read as a slot of the nearest
+        taught shape, and that shape's plans are solved with the answer bound and the
+        word's slot free. Two wordings are one name where their solutions agree, so each
+        name found counts a share of one, and a lesson that many names fit says little.
+        A name found before and not this time counts against. The question comes back
+        with whatever lessons have settled put in."""
+        from itertools import combinations, permutations
+
+        spans = self.unheard(question)
+        goals = self.holding(want)[:1]
+        if not spans or not goals:
+            return question
+        names = [n for _, _, n in self.template(question)[1]][:4]
+        readings = []
+        for k in range(1, len(names) + 1):
+            for chosen in combinations(names, k):
+                if not any(w in chosen for _, _, w in spans):
+                    continue
+                for order in permutations(chosen):
+                    near, shapes = self.nearest(question, list(order))
+                    if shapes:
+                        readings.append((near, order, shapes))
+        # a slot left unbound claims less than one bound, so the readings with fewest
+        # unbound slots go first, nearest within that; each word is counted by the first
+        # reading whose solving finds anything for it, as borrowing reads a question
+        unheard = {u for _, _, u in spans}
+        readings.sort(key=lambda r: (sum(not self.known(n) for n in r[1]), -r[0]))
+        found: dict[str, set] = {}
+        for near, order, shapes in readings:
+            plans = [json.loads(p) for sh in shapes for (p,) in self.db.execute(
+                "SELECT plan FROM learnt WHERE shape = ? AND hits > misses", (sh,))]
+            for free, w in enumerate(order):
+                if w not in unheard or found.get(w):
+                    continue
+                bound = {i: n for i, n in enumerate(order) if i != free and self.known(n)}
+                bound["a"] = goals[0][2:]
+                # a name the question says is never what another of its words stands for
+                found[w] = {e for plan in plans if not plan.get("count")
+                            for e, _ in self.solve(plan, bound, free) if e not in names}
+        # a name two of the words found is not evidence for either
+        shared = [n for w, ends in found.items() for n in ends
+                  if any(n in other for v, other in found.items() if v != w)]
+        found = {w: ends - set(shared) for w, ends in found.items()}
+        for w, ends in found.items():
+            # one fact asked of several times is one piece of evidence
+            if (w, want) in self.aliased:
+                continue
+            self.aliased.add((w, want))
+            # credited to every ending of the word, so 'wax forms' learns from 'many wax
+            # forms'
+            for tail in (" ".join(w.split()[i:]) for i in range(len(w.split()))):
+                for n in ends:
+                    self.db.execute("INSERT INTO aliases VALUES (?, ?, ?, 0) ON CONFLICT("
+                                    "word, name) DO UPDATE SET hits = hits + excluded.hits",
+                                    (tail, n, 1 / len(ends)))
+                if ends:
+                    self.db.execute("UPDATE aliases SET misses = misses + 1 WHERE word = ? "
+                                    f"AND name NOT IN ({','.join('?' * len(ends))})",
+                                    (tail, *ends))
+        return self.unaliased(question)
+
     def answer(self, question) -> str:
-        said = self.answered(question.text)
+        # what the plans of either wording's own shape find comes before anything
+        # borrowed or joined: a wording taught before an alias settled holds the lessons
+        put = self.unaliased(question.text)
+        said = next((self.latest(found) for text in dict.fromkeys((put, question.text))
+                     if (found := self.answers(*self.shape(text), text, borrow=False))),
+                    None)
+        if said is None:
+            said = self.answered(put)
         self.last_notes = ["(nothing)"] if said is None else ["(found)"]
         return "I don't know." if said is None else said
 
@@ -823,7 +954,7 @@ class GraphArm:
         shape, fillers = self.shape(text)
         found = self.answers(shape, fillers, text, borrow=False)
         if found:
-            return max(found, key=lambda f: f[1])[0]
+            return self.latest(found)
         if depth < 3 and (said := self.joined(text, depth)) is not None:
             return said
         found = self.answers(shape, fillers, text)
@@ -834,6 +965,10 @@ class GraphArm:
         if depth >= 3 or not all(self.known(f) for f in fillers):
             return None
         return self.apart(text, depth)
+
+    @staticmethod
+    def latest(found: list) -> str:
+        return max(found, key=lambda f: f[1])[0]
 
     def joined(self, text: str, depth: int) -> str | None:
         """A question holding a clause about something ('the things X keeps in the
@@ -1058,9 +1193,9 @@ class GraphArm:
                 return name, negated
         return None, negated
 
-    def export(self) -> tuple[list, list]:
-        return (self.db.execute("SELECT shape, plan, hits, misses FROM learnt").fetchall(),
-                self.db.execute("SELECT template, pos, filler, n FROM positions").fetchall())
+    def export(self) -> dict:
+        return {table: self.db.execute(f"SELECT * FROM {table}").fetchall()
+                for table in CARRIED}
 
     def dials(self) -> dict:
         n_events, n_edges = (self.db.execute("SELECT COUNT(*) FROM events").fetchone()[0],

@@ -64,14 +64,17 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   before tuning to either world, each entering the exam as a form when it does.
   1. ~~Hedged facts asked 'now'.~~ Struck 2026-10-02: hedged reads 1.0 on every seed.
   2. Correction is taught and never examined: the test asks with no one reacting. The
-     form: a question answered, corrected, and asked again later. (A telling after a
-     question is heard as one since `ec2e074c`'s successor: a reaction has no named subject.)
+     form: a question answered, corrected, and asked again later. It changes the house,
+     so it waits until the baselines re-taken overnight are committed.
   3. Words never heard, from the question's own parse: 'What is X's line of work?' shares
      no grammar with 'do for a living'. The symbol encoder of the DECIDED meaning section
      is the mechanism: a word's meaning as what is known about it, learnt from every
      same-or-different the system establishes, with borrowed vectors as raw material only.
   4. Counts: the first house's seed 3 reads 0.2 on every arm since the forms were added.
-  5. Chains of three, where the first house trails (0.25 to 0.67).
+  5. Chains of three: taken apart by the question's parse where their plans find
+     nothing, they read 0.5 0.5 1.0 and 0.5 0.72 0.33. Open: an untaught chain wording
+     borrows a two-slot shape first and answers the middle link ('dov' for 'what does
+     Cara's cousin do'), since taking apart first cost the house more than it gained.
 - **Phase 5 — Learning rules, and operations over facts.** Plans learnt from lessons
   answer bAbI tasks 1, 2, 3 and 7. Order in time, the present against history, and a
   visit before or after another are learnt per plan. Rules induced from co-occurring

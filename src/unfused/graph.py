@@ -583,7 +583,8 @@ class GraphArm:
             self._tokens[question] = kept
         return self._tokens[question]
 
-    def nearest(self, question: str, fillers: list[str]) -> tuple[float, list[str]]:
+    def nearest(self, question: str, fillers: list[str],
+                skip: str | None = None) -> tuple[float, list[str]]:
         """The taught shapes nearest a question no lesson was worded as: those of its
         number of slots whose signature overlaps the question's most, and by how much."""
         mine = set(self.signature(question, fillers))
@@ -596,7 +597,7 @@ class GraphArm:
                     self._sigs.append((shape, set(sig)))
         best, shapes = 0.0, []
         for shape, sig in self._sigs:
-            if shape.count("<") != len(fillers):
+            if shape.count("<") != len(fillers) or shape == skip:
                 continue
             near = len(mine & sig) / len(mine | sig)
             if near > best:
@@ -605,7 +606,8 @@ class GraphArm:
                 shapes.append(shape)
         return best, shapes
 
-    def borrowed(self, question: str) -> list[tuple[list[str], list[str]]]:
+    def borrowed(self, question: str,
+                 skip: str | None = None) -> list[tuple[list[str], list[str]]]:
         """A wording no lesson used has no history saying which of its names are slots
         and which are frame ('cousin' in 'Which person is X's cousin?'), nor in what order
         its slots run. Every reading is scored, each name a slot or frame and the slots in
@@ -617,7 +619,7 @@ class GraphArm:
         for k in range(1, len(names) + 1):
             for chosen in combinations(names, k):
                 for order in permutations(chosen):
-                    near, shapes = self.nearest(question, list(order))
+                    near, shapes = self.nearest(question, list(order), skip)
                     if shapes:
                         readings.append((near, list(order), shapes))
         readings.sort(key=lambda r: -r[0])
@@ -628,10 +630,18 @@ class GraphArm:
             "SELECT plan FROM learnt WHERE shape = ? AND hits > misses "
             "ORDER BY hits - misses DESC, hits DESC", (shape,)).fetchall()
         if ranked:
-            return self.followed(ranked, fillers, question)
-        # a wording no lesson used borrows the plans of the nearest taught shape under the
-        # nearest reading of it that reaches anything in the graph
-        for fillers, nearest in self.borrowed(question)[:12]:
+            found = self.followed(ranked, fillers, question)
+            if found:
+                return found
+        if not all(self.known(f) for f in fillers):
+            # of a name the conversation never used nothing can be known, so its
+            # question is not borrowed for
+            return []
+        # a wording no lesson used, or one whose plans reach nothing here, borrows the
+        # plans of the nearest other taught shape under the nearest reading of it that
+        # reaches anything in the graph: 'Who is X's cousin?' learnt one direction, and
+        # 'Whose cousin is X?' holds the other
+        for fillers, nearest in self.borrowed(question, shape)[:12]:
             ranked = [r for near in nearest for r in self.db.execute(
                 "SELECT plan FROM learnt WHERE shape = ? AND hits > misses "
                 "ORDER BY hits - misses DESC, hits DESC", (near,)).fetchall()]
@@ -795,13 +805,87 @@ class GraphArm:
         self.db.commit()
 
     def answer(self, question) -> str:
-        shape, fillers = self.shape(question.text)
-        found = self.answers(shape, fillers, question.text)
-        if not found:
-            self.last_notes = ["(nothing)"]
-            return "I don't know."
-        self.last_notes = ["(found)"]
-        return max(found, key=lambda f: f[1])[0]
+        said = self.answered(question.text)
+        self.last_notes = ["(nothing)"] if said is None else ["(found)"]
+        return "I don't know." if said is None else said
+
+    def answered(self, text: str, depth: int = 0) -> str | None:
+        """An answer from the plans of the question's shape, or, where they find nothing,
+        from the question taken apart: its innermost noun phrase holding a name is asked
+        as a question of its own ('Who is Kroudroth's cousin?'), its answer put in its
+        place, and what is left asked again. Plans are whole paths and do not compose; a
+        question's grammar does."""
+        shape, fillers = self.shape(text)
+        found = self.answers(shape, fillers, text)
+        if found:
+            return max(found, key=lambda f: f[1])[0]
+        # borrowed before taken apart, by the first house: taking 'X's lanterns' apart
+        # first read 0.756 0.784 0.779 against 0.760 0.788 0.809
+        if depth >= 3 or not all(self.known(f) for f in fillers):
+            return None
+        return self.apart(text, depth)
+
+    def apart(self, text: str, depth: int) -> str | None:
+        for a, b in self.inner(text):
+            phrase = text[a:b]
+            for ask in (f"Who is {phrase}?", f"What is {phrase}?"):
+                named = self.answered(ask, depth + 1)
+                if named is None:
+                    continue
+                said = self.answered(text[:a] + named.title() + text[b:], depth + 1)
+                if said is not None:
+                    return said
+        return None
+
+    def inner(self, text: str) -> list[tuple[int, int]]:
+        """The noun phrases of a question that hold a name and something said of it, as
+        character spans, innermost first: 'the person who repairs clocks' before 'the
+        cousin of the person who repairs clocks'. A phrase is a noun's whole subtree, kept
+        where a possessor, a clause or a preposition hangs off it and the wh-word is not
+        inside it."""
+        rows = self.spans(text)
+        kids: dict[int, list[int]] = {}
+        for i, r in enumerate(rows):
+            if r[4] != i:
+                kids.setdefault(r[4], []).append(i)
+
+        def subtree(i: int) -> list[int]:
+            out = [i]
+            for k in kids.get(i, []):
+                out += subtree(k)
+            return out
+
+        found = []
+        for i, (_, _, tag, _, _, pos) in enumerate(rows):
+            if pos not in ("NOUN", "PROPN"):
+                continue
+            if not any(rows[k][3] in ("poss", "relcl", "acl", "prep") for k in kids.get(i, [])):
+                continue
+            span = sorted(subtree(i))
+            # the question's own wh-word, not a relative one ('the person who repairs')
+            if span[0] == 0:
+                continue
+            if len(span) >= len(rows) - 2 or not any(
+                    rows[k][1][:1].isupper() or self.known(rows[k][1].lower()) for k in span
+                    if k != i):
+                continue
+            a = rows[span[0]][0]
+            b = rows[span[-1]][0] + len(rows[span[-1]][1])
+            while text[a:b].lower().startswith(("the ", "a ")):
+                a = text.index(" ", a) + 1
+            found.append((b - a, a, b))
+        return [(a, b) for _, a, b in sorted(found)]
+
+    def spans(self, text: str) -> list:
+        """A sentence's parse with where each word sits: offset, word, tag, link, head, and
+        part of speech."""
+        key = hashlib.sha256(f"{VERSION}|{self.model}|spans|{text}".encode()).hexdigest()
+        kept = self._kept(key)
+        if kept is None:
+            kept = [[t.idx, t.text, t.tag_, t.dep_, t.head.i, t.pos_]
+                    for t in nlp(self.model)(text)]
+            self._keep(key, kept)
+        return kept
 
     # -- a conversation -------------------------------------------------------
 

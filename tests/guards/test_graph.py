@@ -108,3 +108,17 @@ def test_a_telling_after_a_question_is_heard_not_taken_as_its_answer(tmp_path):
     a.turn(2, "Bren keeps the rope in the attic.")
     assert not a.db.execute("SELECT 1 FROM learnt").fetchone()
     assert a.db.execute("SELECT 1 FROM events WHERE heard LIKE 'Bren%'").fetchone()
+
+
+def test_a_question_whose_plans_find_nothing_is_taken_apart(tmp_path):
+    a = arm(tmp_path)
+    a.hear(0, "Ada is Bren's cousin.")
+    a.hear(1, "Bren keeps bees.")
+    a.hear(2, "Cara is Dov's cousin.")
+    a.hear(3, "Dov sells apples.")
+    a.teach("Who is Ada's cousin?", "Bren")
+    a.teach("What does Bren do for a living?", "bees")
+    # never taught as a whole: the cousin first, then the trade
+    assert a.apart("What does Cara's cousin do for a living?", 0) == "apples"
+    # and of someone never mentioned, nothing
+    assert a.answer(q("What does Edda's cousin do for a living?")) == "I don't know."

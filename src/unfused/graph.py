@@ -353,10 +353,14 @@ class GraphArm:
         name of the question hangs off an event of it."""
         steps = [list(s) for s in path[1::2]]
         nodes = path[::2]
-        lemmas, attach = {}, []
-        for i, node in enumerate(nodes):
-            if node.startswith("e:"):
-                lemmas[str(i)] = [self.event(node)[0]]
+        lemmas, attach, order = {}, [], {}
+        events = [(i, *self.event(node)) for i, node in enumerate(nodes) if node.startswith("e:")]
+        for i, lemma, _ in events:
+            lemmas[str(i)] = [lemma]
+        # whether each event came before or after the one before it on the path, by that
+        # one's lemma: after 'got' the answer's move came later, after 'put down' earlier
+        for (i, lemma_i, turn_i), (j, _, turn_j) in zip(events, events[1:]):
+            order[f"{i}-{j}"] = {lemma_i: [int(turn_j < turn_i), int(turn_j >= turn_i)]}
         for k, name in enumerate(others):
             # the shortest way from any node of the path to the other name: 'I counted 35
             # walking sticks in the cellar' has the cellar on the counting, a step off the
@@ -369,7 +373,7 @@ class GraphArm:
             if hook is None:
                 return None
             attach.append(hook)
-        return {"steps": steps, "lemmas": lemmas, "attach": attach}
+        return {"steps": steps, "lemmas": lemmas, "attach": attach, "order": order}
 
     def reaches(self, node: str, steps: list, goal: str) -> bool:
         """Whether a way of these steps leads from a node to a goal."""
@@ -427,30 +431,46 @@ class GraphArm:
             return all(self.reaches(node, h[2], f"n:{fillers[h[0]]}")
                        for h in plan["attach"] if h[1] == pos and h[0] < len(fillers))
 
+        def ordered(last, j: int, turn_j: int) -> bool:
+            if last is None:
+                return True
+            i, lemma_i, turn_i = last
+            before, after = plan.get("order", {}).get(f"{i}-{j}", {}).get(lemma_i, (0, 0))
+            if before > 2 * after:
+                return turn_j <= turn_i
+            if after > 2 * before:
+                return turn_j >= turn_i
+            return True
+
         start = f"n:{fillers[0]}"
-        walks = [([start], -1)] if hooked(start, 0) else []
+        # a walk: its nodes, the turns of its events in order, and its last event
+        walks = [([start], (), None)] if hooked(start, 0) else []
         for i, (label, direction) in enumerate(plan["steps"]):
             nxt_walks = []
-            for nodes, turn in walks:
+            for nodes, turns, last in walks:
                 here = nodes[-1]
                 for lab, d, nxt in self.around(here):
                     if lab != label or d != direction or nxt in nodes:
                         continue
-                    t = turn
+                    t, now = turns, last
                     if nxt.startswith("e:"):
                         lemma, et = self.event(nxt)
                         pos = str(i + 1)
                         if strict and lemma not in plan["lemmas"].get(pos, [lemma]):
                             continue
-                        t = max(t, et)
+                        if not ordered(last, i + 1, et):
+                            continue
+                        t, now = turns + (et,), (i + 1, lemma, et)
                     if not hooked(nxt, i + 1):
                         continue
-                    nxt_walks.append((nodes + [nxt], t))
+                    nxt_walks.append((nodes + [nxt], t, now))
             walks = nxt_walks[:2000]
-        for nodes, turn in walks:
+        for nodes, turns, _ in walks:
             end = nodes[-1]
             if end.startswith("n:"):
-                out.append((end[2:], turn))
+                # the most recent thing that happened to the first name first, then what
+                # followed from it: the football's last event, then its carrier's move
+                out.append((end[2:], turns))
         return out
 
     def answers(self, shape: str, fillers: list[str], question: str) -> list[tuple[str, int]]:
@@ -512,6 +532,11 @@ class GraphArm:
                 rid, kept = same
                 for pos, lemmas in plan["lemmas"].items():
                     kept["lemmas"][pos] = sorted(set(kept["lemmas"].get(pos, [])) | set(lemmas))
+                for pair, by_lemma in plan.get("order", {}).items():
+                    into = kept.setdefault("order", {}).setdefault(pair, {})
+                    for lemma, (b, a) in by_lemma.items():
+                        was = into.get(lemma, [0, 0])
+                        into[lemma] = [was[0] + b, was[1] + a]
                 self.db.execute("UPDATE learnt SET plan = ?, hits = hits + 1 WHERE rowid = ?",
                                 (json.dumps(kept), rid))
             else:

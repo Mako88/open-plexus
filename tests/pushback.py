@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-COUNT = 9
+COUNT = 12
 
 
 @dataclass(frozen=True)
@@ -107,6 +107,39 @@ OBJECTIONS = [
         settled_by="bAbI-shaped stories with verbs that change nothing ('saw', 'looked at') "
                    "between the moves. If present-tense answers fall, which verbs replace "
                    "must be learnt from lessons, as the order of events already is.",
+    ),
+    Objection(
+        what="Every lesson is the teacher's reaction in one wording, the turn straight "
+             "after the question.",
+        why="`converse` always answers with 'Yes, that's right.' or 'No, it's X.', and "
+            "`turn` reads the next turn with no named subject as the reaction. A person "
+            "corrects later, in their own words, and often with a subject: 'No, Ada keeps "
+            "them in the shed' is read as a telling and teaches nothing.",
+        settled_by="A teacher whose reactions vary in wording, some with a named subject, "
+                   "some a few turns late. Settled if the first house scores within a "
+                   "seed's spread of today's; kept, with `turn`'s reading named, if not.",
+    ),
+    Objection(
+        what="Walks are cut to their first few hundred or thousand steps in the order "
+             "SQLite returns them, which is oldest first.",
+        why="`reaches` keeps 200, `follow` and `solve` 2000, `walks` 5000, and `around` "
+            "has no ORDER BY. At 300 turns no room has that many events. At 30,000 a room "
+            "everyone passes through does, and the cut keeps the oldest while an answer "
+            "is chosen as the latest, so a size reading would fall for a reason other "
+            "than the walk's speed.",
+        settled_by="The 3,000- and 30,000-turn reading counts how often each cut binds. "
+                   "Settled if none binds; if one does, the cut goes or keeps the latest "
+                   "before the reading is taken as the cost of size.",
+    ),
+    Objection(
+        what="Of several answers, the one resting on the latest event wins.",
+        why="On the house a second answer is always an update, so recency is right. In "
+            "conversation two can both be true ('Ada keeps jars in the cellar and in the "
+            "pantry'), and `replaced`, which ignores prepositions, and `latest` drop the "
+            "first. The contains-match scorer cannot see a list cut to one.",
+        settled_by="A form with two places told for one thing and no move between them, "
+                   "asked for both. Kept until the system says both, which is the mouth's "
+                   "lists in THE ORDER's first item.",
     ),
 ]
 

@@ -49,8 +49,12 @@ QUERIES = {
 }
 
 
+ASKED: dict = {}
+
+
 class TableEar:
-    """Reads a sentence from READINGS and a question from QUERIES."""
+    """Reads a sentence from READINGS and a question from QUERIES, or from ASKED read
+    as one fact."""
 
     name = "table"
 
@@ -59,6 +63,9 @@ class TableEar:
 
     def rewrite(self, question):
         return QUERIES[question]
+
+    def ask(self, question):
+        return ASKED.get(question)
 
     def choose(self, prompt, options):
         return None
@@ -642,3 +649,55 @@ def test_a_plan_taught_on_one_relation_does_not_answer_from_another(tmp_path):
     finally:
         for k in told:
             del READINGS[k]
+
+
+class WordEmbedder:
+    """MiniLM's part in resolving a word the house never used, played by a table: each
+    listed word a fixed direction, every other word one of its own."""
+
+    dims = 8
+    near = {"canes": 0, "walking sticks": 0, "cellar": 1, "space downstairs": 1}
+
+    def encode(self, texts):
+        import numpy as np
+
+        out = []
+        for t in texts:
+            v = np.zeros(self.dims, dtype=np.float32)
+            v[self.near.get(t, 2 + sum(map(ord, t)) % (self.dims - 2))] = 1.0
+            out.append(v)
+        return np.array(out)
+
+
+def test_a_word_the_house_never_used_is_taken_as_the_filler_it_stands_for(tmp_path):
+    told = "I counted 35 walking sticks in the cellar."
+    asked = "How many canes sit in the space downstairs?"
+    READINGS[told] = [{"subject": "walking sticks", "relation": "are in", "place": "cellar",
+                       "quantity": "35"}]
+    ASKED[asked] = {"asked": "quantity", "kind": "number", "count": False, "assertion": {
+        "subject": "canes", "relation": "sit in", "place": "space downstairs"}}
+    try:
+        a = SystemArm(tmp_path, TableEar(), WordEmbedder(), taught=True)
+        a.hear(0, told)
+        shape, fillers = a.shape(asked)
+        assert shape == "How many <0> sit in the <1>?"
+        assert fillers == ["walking sticks", "cellar"]
+    finally:
+        del READINGS[told], ASKED[asked]
+
+
+def test_a_word_taken_as_the_taught_answer_is_learnt_as_part_of_the_frame(tmp_path):
+    told = "I counted 35 walking sticks in the cellar."
+    asked = "How many canes sit in the space downstairs?"
+    READINGS[told] = [{"subject": "walking sticks", "relation": "are in", "place": "cellar",
+                       "quantity": "35"}]
+    # the reading puts "space downstairs" where only the answer's own row can take it
+    ASKED[asked] = {"asked": "quantity", "kind": "number", "count": False, "assertion": {
+        "subject": "canes", "relation": "sit in", "place": "space downstairs"}}
+    try:
+        a = SystemArm(tmp_path, TableEar(), WordEmbedder(), taught=True)
+        a.hear(0, told)
+        a.teach(asked, "cellar")
+        assert ("space downstairs",) in a.db.execute("SELECT phrase FROM frames").fetchall()
+    finally:
+        del READINGS[told], ASKED[asked]

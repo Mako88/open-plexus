@@ -25,6 +25,7 @@ than the faculty's judgement.
 
 from __future__ import annotations
 
+import itertools
 import json
 from collections import Counter
 import re
@@ -36,6 +37,9 @@ import numpy as np
 from .exam.world import Question
 
 SLOTS = ("subject", "object", "place", "quantity")
+# how far a word the house never used must be nearer one stored filler than the next
+# to be taken as it; below it the word stays as said and its question goes untaught
+UNHEARD = 0.08
 NULLS = {"", "none", "null", "n/a", "unknown", "nothing"}
 ARTICLES = ("the ", "a ", "an ", "some ", "all the ", "all ")
 THING_PRONOUNS = {"it", "them"}
@@ -57,6 +61,9 @@ CREATE TABLE IF NOT EXISTS learnt (shape TEXT NOT NULL, plan TEXT NOT NULL,
 CREATE TABLE IF NOT EXISTS holds (relation TEXT PRIMARY KEY, yes INTEGER NOT NULL,
                                   no INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS echoes (shape TEXT PRIMARY KEY);
+CREATE TABLE IF NOT EXISTS frames (phrase TEXT PRIMARY KEY);
+CREATE TABLE IF NOT EXISTS meant (phrase TEXT, name TEXT, n INTEGER NOT NULL,
+    PRIMARY KEY (phrase, name));
 CREATE TABLE IF NOT EXISTS kin (a TEXT NOT NULL, b TEXT NOT NULL, PRIMARY KEY (a, b));
 CREATE TABLE IF NOT EXISTS kinds (filler TEXT NOT NULL, kind TEXT NOT NULL,
                                   yes INTEGER NOT NULL, PRIMARY KEY (filler, kind));
@@ -126,7 +133,8 @@ class SystemArm:
                  moves: bool = False, taught: bool = False,
                  known_learnt: list | None = None,
                  cleans: bool = False, known_holds: list | None = None,
-                 known_echoes: list | None = None) -> None:
+                 known_echoes: list | None = None,
+                 known_frames: list | None = None, known_meant: list | None = None) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -145,6 +153,7 @@ class SystemArm:
         # how closely two wordings' properties must match for a verdict about one to
         # answer for the other; 0 asks the judge about every pair
         self.shares = shares
+        self._resolved: dict[str, list[tuple[int, int, str]]] = {}
         # whether a subject heard somewhere is no longer where it was heard before
         self.moves = moves
         # whether a question is answered by what was taught for its shape, and only by
@@ -165,6 +174,10 @@ class SystemArm:
                             [tuple(x) for x in (known_holds or [])])
         self.db.executemany("INSERT OR IGNORE INTO echoes VALUES (?)",
                             [tuple(x) for x in (known_echoes or [])])
+        self.db.executemany("INSERT OR IGNORE INTO frames VALUES (?)",
+                            [tuple(x) for x in (known_frames or [])])
+        self.db.executemany("INSERT OR IGNORE INTO meant VALUES (?, ?, ?)",
+                            [tuple(x) for x in (known_meant or [])])
         # plans learnt elsewhere hold no facts, only how a question is asked, so a
         # system may start with them the way a node starts with another's tables
         self.db.executemany("INSERT OR IGNORE INTO plans (shape, plan) VALUES (?, ?)",
@@ -364,13 +377,102 @@ class SystemArm:
             for m in re.finditer(rf"\b{re.escape(name)}\b", question, re.I):
                 if not any(a < m.end() and m.start() < b for a, b in spans):
                     spans.append((m.start(), m.end()))
+        stands: dict[tuple[int, int], str] = {}
+        for a, b, name in self.resolve_unheard(question, spans):
+            spans.append((a, b))
+            stands[(a, b)] = name
         fillers, shape, at = [], "", 0
         for a, b in sorted(spans):
-            start = self.joined(question, a, b)
+            start = self.joined(question, a, b) if (a, b) not in stands else a
             shape += question[at:start] + f"<{len(fillers)}>"
-            fillers.append(question[a:b])
+            fillers.append(stands.get((a, b), question[a:b]))
             at = b
         return shape + question[at:], fillers
+
+    def resolve_unheard(self, question: str,
+                        spans: list[tuple[int, int]]) -> list[tuple[int, int, str]]:
+        """The question's words the house never used, each taken as the stored filler it
+        most likely stands for, or none of them.
+
+        The ear finds the question's fillers; those that are no heard name and no
+        capitalised word are unheard. A pick for each is a stored filler, and the picks
+        are taken together: they and the question's heard fillers MUST sit in one stored
+        row, and the joint pick is scored by the sum of the words' cosines. The best is
+        taken only when it clears the next by `UNHEARD`: offline (b3708340) a gap of
+        0.08 answered 78 words of 120 and was wrong on 3. Below it the words stay as
+        said and the question goes unanswered, which is the system not knowing a word."""
+        if question in self._resolved:
+            return self._resolved[question]
+        self._resolved[question] = []
+        read = self.ear.ask(question) or {}
+        said = [str(v) for k, v in (read.get("assertion") or {}).items()
+                if k not in ("relation", read.get("asked")) and v]
+        vocabulary = {w for (text,) in self.db.execute("SELECT text FROM said")
+                      for w in re.findall(r"[a-z']+", text.lower())}
+        frames = {p for (p,) in self.db.execute("SELECT phrase FROM frames")}
+        words: list[tuple[int, int, str]] = []
+        for phrase in said:
+            m = re.search(rf"\b{re.escape(phrase)}\b", question, re.I)
+            if not m:
+                continue
+            a, b = m.start(), m.end()
+            # what of the phrase lies past a heard name ("Pudrouck's metal pegs") and past
+            # its leading small words ("in the space downstairs")
+            for x, y in spans:
+                if x < b and a < y:
+                    a = max(a, y)
+            lead = re.match(r"(?:'s\b|\s|\b(?:in|on|at|of|to|the|a|an)\b)*", question[a:b], re.I)
+            a += lead.end()
+            phrase = question[a:b]
+            # unheard is a word no statement has used: the 0.8B also hands back the
+            # question's own words ("colour", "house"), which are heard
+            if (a < b and not phrase[:1].isupper() and norm(phrase)
+                    and any(w not in vocabulary for w in re.findall(r"[a-z']+", phrase.lower()))
+                    and norm(phrase) not in frames
+                    and not any(x < b and a < y for x, y, _ in words)):
+                words.append((a, b, norm(phrase)))
+        if not words or len(words) > 2:
+            return []
+        rows = [{v for k, v in r.items() if k in SLOTS and v} for r in self.rows()]
+        heard = {norm(question[a:b]) for a, b in spans} - {None}
+        stored = self.db.execute("SELECT name, embedding FROM names").fetchall()
+        names = [n for n, _ in stored]
+        vectors = np.vstack([np.frombuffer(v, dtype=np.float32) for _, v in stored])
+        sims = [dict(zip(names, vectors @ self.embedder.encode([w])[0]))
+                for _, _, w in words]
+        scored = {}
+        for row in rows:
+            if not heard <= row:
+                continue
+            spare = sorted(row - heard)
+            for picks in itertools.permutations(spare, len(words)):
+                scored[picks] = sum(float(sim.get(n, 0.0)) for sim, n in zip(sims, picks))
+        ranked = sorted(scored.items(), key=lambda kv: -kv[1])
+        if not ranked or (len(ranked) > 1 and ranked[0][1] - ranked[1][1] < UNHEARD):
+            return []
+        picked = [(a, b, n) for (a, b, _), n in zip(words, ranked[0][0])]
+        # a word for a thing names mostly one thing, in every world it is heard in:
+        # "canes" is the walking sticks, where "objects" is the football once and the milk
+        # the next and "age" is every person's own number. A phrase taken three times or
+        # more with no one thing making up more than half of them is part of the
+        # question's frame. Counted, because one wrong pick of "canes" would otherwise
+        # bar it everywhere (first house seed 1, 0.740 to 0.679); and the counts carry
+        # from world to world, because one bAbI story asks too few questions to count
+        # "objects" in (bAbI 0.818)
+        clashes = []
+        for a, b, name in picked:
+            phrase = norm(question[a:b])
+            self.db.execute("INSERT INTO meant VALUES (?, ?, 1) ON CONFLICT(phrase, name) "
+                            "DO UPDATE SET n = n + 1", (phrase, name))
+            counts = [n for (n,) in self.db.execute("SELECT n FROM meant WHERE phrase = ?",
+                                                     (phrase,))]
+            if sum(counts) >= 3 and max(counts) * 2 <= sum(counts):
+                clashes.append(phrase)
+        if clashes:
+            self.db.executemany("INSERT OR IGNORE INTO frames VALUES (?)", [(p,) for p in clashes])
+            return []
+        self._resolved[question] = picked
+        return picked
 
     def joined(self, question: str, a: int, b: int) -> int:
         """Where a filler's cut starts once a relation heard with it, said just before it,
@@ -910,6 +1012,16 @@ class SystemArm:
         answer are generalised and kept as plans, each counted as having held once."""
         shape, fillers = self.shape(question)
         want = norm(answer) or ""
+        framed = [norm(question[a:b]) for a, b, name in self._resolved.get(question, [])
+                  if same(name, want)]
+        if framed:
+            # a word taken as the taught answer is a word of the question's frame
+            # ("what age", "which place"), never a name for a thing: kept as one, and
+            # the question is shaped again with it as said
+            self.db.executemany("INSERT OR IGNORE INTO frames VALUES (?)",
+                                [(p,) for p in framed if p])
+            del self._resolved[question]
+            shape, fillers = self.shape(question)
         if said_in(want, question):
             # this shape's answer can be a word of its question: a choice between two
             self.db.execute("INSERT OR IGNORE INTO echoes VALUES (?)", (shape,))

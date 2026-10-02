@@ -64,13 +64,13 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   today's exact match. The encoder learns from every same-or-different the system
   establishes: kin, the judge's kept verdicts, supersessions, confirmed inferences. It
   starts as a pass-through of its borrowed inputs, so it begins no worse than them, and
-  whether learning improves it is measured as a run going on. Its first use is a word the
-  house never used ("canes", "milk store"). The candidates are the nearest symbols that
-  also fit the rest of the question. The answer is given when the best clears the next by
-  a margin, and "I don't know" otherwise. A confirmed reading is kept as a fact and fed
-  back to the encoder. Built from rows alone and borrowed vectors on relation words are
-  refuted (`586338f8`, `b33d2422`). Bare MiniLM gets 14 of 22 oblique words right, which
-  is the bar. The house and bAbI MUST NOT fall by more than 0.02.
+  whether learning improves it is measured as a run going on. Its first use, a word the
+  house never used resolved by fit and margin with frames learnt, is shipped (see the
+  commit after `2f0c416f`). Next: the encoder itself, standing in for the bare MiniLM
+  vector in that resolver and learning from what the resolver confirms, which MUST beat
+  the shipped resolver to stay. Built from rows alone and borrowed vectors on relation
+  words are refuted (`586338f8`, `b33d2422`). The house and bAbI MUST NOT fall by more
+  than 0.02.
 - **The ear reads without the known relations.** John's question, 2026-10-01. Every read
   sends the 30 commonest stored relations so the 0.8B reuses a wording, which has been so
   since `1d18547b` and was never compared. It puts vocabulary consistency in the frozen

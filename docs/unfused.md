@@ -90,7 +90,15 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      commonest miss. The symbol encoder of the DECIDED meaning section is the mechanism: a
      word's meaning as what is known about it, learnt from every same-or-different the
      system establishes, with borrowed vectors as raw material only.
-  4. Counts: the first house's seed 3 reads 0.2 on every arm since the forms were added.
+  4. Counts, which hold phase 4 of the red set: count is below blind on every seed. A
+     count plan counts one walk's ends, so one wording of the place. Counting a
+     relation's solutions instead was tried and dropped (see the commit that says so),
+     for two reasons, each of which would bring it back once met. A move told in another
+     wording ('X's jars are in the attic now') does not replace the keeping, since
+     `replaced` wants the same arguments, so the room left still counts the person: what
+     is still so must be decided by relation, the later solution for the same person and
+     thing. And most rooms hold one person, so many relations count a lesson's 1 rightly
+     and the one chosen is chosen on too few lessons.
   5. Chains of three: taken apart by the question's parse where their plans find
      nothing, they read 0.5 0.5 1.0 and 0.5 0.72 0.33. Open: an untaught chain wording
      borrows a two-slot shape first and answers the middle link ('dov' for 'what does

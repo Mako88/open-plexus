@@ -386,6 +386,13 @@ the store merges by id. Kill a third of the nodes mid-exam.
 
 ## OPEN FORKS
 
+- **Spark-234K as a far world.** John's, 2026-10-02 (`OpenDataArena/Spark-234K` on Hugging
+  Face): 234K research-level science problems from recent papers, each self-contained,
+  each answer a worked derivation of 2.5K to 44K characters. Nothing here can attempt one:
+  it needs arithmetic and algebra as step kinds, knowledge the conversation never told,
+  and a mouth that composes. A first rung that would say something sooner: read a
+  problem's givens as tellings and ask only for a named quantity it states, scored by
+  whether the system finds the givens the derivation uses.
 - **A generic ear.** John's, 2026-10-01. The symbol layer works only on what the ear hands
   it, and the ear forces every sentence into subject, relation, object, place and
   quantity, so what does not fit never becomes a symbol. The general form marks every

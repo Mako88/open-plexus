@@ -64,49 +64,51 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - **The graphed arm, next.** John's, 2026-10-01 and 2026-10-02: what a conversation will
   need anyway comes before tuning to either world, and the system goes generic as soon as
   it can, then iterates there. Each enters the exam as a form when it does. In order:
-  1. Tellings and relations never heard, measured. John's, 2026-10-02: these readings
-     come before anything is built, and they decide whether item 2's mouth or its
-     mechanism goes first. If much of today's score is the practice houses' templates,
-     the mouth would voice answers to questions the system cannot read. Two forms enter
-     the exam, as real conversation has both: a fact told in a wording no practice house
-     uses, asked in a taught frame, and an oblique synonym no practice house uses,
-     taught inside the test house's own conversation. And the first house is read after
-     one, two and five practice houses, for how many lessons a relation needs. These
-     settle three entries of `tests/pushback.py`.
-  2. Conversation before counts (John's, 2026-10-02): a reply matters more than another
-     point on the house, and counts wait on the mechanism here anyway. Two parts, in
-     whichever order item 1 points to.
-     - A mouth of the system's own. An answer is one node of the graph or "I don't
-       know."; it cannot say yes or no, list, or say what it is sure of. The mouth
-       renders the answer's path from fragments of parses it has heard: each edge of the
-       path is said in the words of a heard sentence that has that edge, its nodes
-       replaced, and fragments join where they share a node, as data-oriented parsing
-       builds new sentences from pieces of old trees. A reply is therefore never limited
-       to sentences heard whole, and inflection comes from the parse's morphology. The
-       system answers yes-or-no questions by finding the fact asked, or the fact that
-       rules it out; finding neither is "I don't know.", since never told is not told it
-       is not so. The form: yes-or-no questions, half true, some about what was never
-       told. Refuted if yes-or-no accuracy is no better than half, or if no reply joins
-       two fragments when the path has two edges. The bare node cannot be the bar, since
-       the contains-match scorer gives a sentence holding it the same credit.
-     - Wordings of a relation never heard. Nouns never heard are aliased from lessons
-       (`alias`, 2026-10-02), so what is left is wordings of a relation: question frames
-       no lesson used ('What is the number of X in the Y?', 'X's line of work'), now the
-       commonest miss; trades asked by their verb ('Who repairs clocks?' is one shape per
-       trade verb); moves told with a verb no lesson used ('carried the lanterns across
-       to'). It is also why counts fail: 'X's jars are in the attic now' is not known to
-       replace 'X keeps the jars in the cellar'. The mechanism is the nouns' one level
-       up: two wordings are one relation where their solutions agree, here on what the
-       house holds rather than on a lesson's answer, since a reworded question is never
-       taught.
+  1. Wordings never heard, first. The readings at `f15479ba` chose it over the mouth: a
+     fact told in a shape no lesson's fact was told in reads 0.571 0.629 0.514 against
+     `direct`'s 0.880 0.893 0.905, so the mouth would voice answers to tellings the
+     system cannot read. Three things are missing, one diagnosis apiece.
+     - A telling of a new shape. A new verb on the taught edges is read, since a loose
+       walk ignores the lemma; a new shape is not ('has the plates tucked away in', 'sit
+       the hooks that X owns', 'counts A as a cousin'), since nothing ignores a path's
+       labels or length. A candidate that is also item 4's kind check: where no plan
+       reaches, the shortest path from the question's name to a node of the answer's
+       kind, a name's kind being the events it takes part in. Refuted if `novel` does not
+       rise or any taught form falls by more than a seed's spread.
+     - A synonym taught inside one conversation. With the practice houses' aliases left
+       behind, oblique reads 0.494 0.558 0.523, against about 0.85 with them, so the
+       alias gain was memory of the table every house shares and a conversation's own
+       lessons settle none. The bar is oblique under `--carry learnt,positions`.
+     - Question frames no lesson used, trades asked by their verb, and moves told with a
+       verb no lesson used, as before: two wordings are one relation where their
+       solutions agree, on what the house holds rather than a lesson's answer. Moves are
+       why counts fail: 'X's jars are in the attic now' is not known to replace 'X keeps
+       the jars in the cellar'.
+     Lessons are the price of all three: the first house reads 0.539 0.550 0.551 after
+     one practice house, 0.677 0.717 0.618 after two and 0.850 0.850 0.863 after five,
+     and `direct` is 0.62 at one because a plan is learnt per wording.
+  2. A mouth of the system's own, after item 1 (conversation before counts, John's,
+     2026-10-02). An answer is one node of the graph or "I don't know."; it cannot say
+     yes or no, list, or say what it is sure of. The mouth renders the answer's path
+     from fragments of parses it has heard: each edge of the path is said in the words
+     of a heard sentence that has that edge, its nodes replaced, and fragments join
+     where they share a node, as data-oriented parsing builds new sentences from pieces
+     of old trees. A reply is therefore never limited to sentences heard whole, and
+     inflection comes from the parse's morphology. The system answers yes-or-no
+     questions by finding the fact asked, or the fact that rules it out; finding neither
+     is "I don't know.", since never told is not told it is not so. The form: yes-or-no
+     questions, half true, some about what was never told. Refuted if yes-or-no accuracy
+     is no better than half, or if no reply joins two fragments when the path has two
+     edges. The bare node cannot be the bar, since the contains-match scorer gives a
+     sentence holding it the same credit.
   3. Counts, which hold phase 4 of the red set: count is below blind on every seed. A
      count plan counts one walk's ends, so one wording of the place. Counting a
      relation's solutions instead was tried and dropped (see the commit that says so),
      for two reasons, each of which would bring it back once met. A move told in another
      wording does not replace the keeping, since `replaced` wants the same arguments, so
      the room left still counts the person: what is still so must be decided by
-     relation, the later solution for the same person and thing, which item 2's
-     mechanism enables.
+     relation, the later solution for the same person and thing, which item 1
+     enables.
      And most rooms hold one person, so many relations count a lesson's 1 rightly and
      the one chosen is chosen on too few lessons.
   4. Chains of three, and joins. A clause about something is a join now (`solve`,

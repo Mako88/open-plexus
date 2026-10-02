@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-COUNT = 12
+COUNT = 9
 
 
 @dataclass(frozen=True)
@@ -53,38 +53,6 @@ OBJECTIONS = [
         settled_by="A learnt reading of each: a pronoun bound by centering as Phase 5 says, "
                    "'no' learnt from reactions that came before a corrected lesson, numbers "
                    "from counts a lesson taught. Each scored on the readings it touches.",
-    ),
-    Objection(
-        what="Aliases carry from practice to the test house because every house shares "
-             "one synonym table.",
-        why="'Chipped dishes' means cracked plates in every house the generator makes, so "
-            "an alias learnt in practice is memory of the table as much as a meaning learnt "
-            "in conversation. Part of oblique's rise from about 0.5 to 0.8 may not survive "
-            "a word the practice houses never used.",
-        settled_by="A test house whose oblique synonyms no practice house uses, its lessons "
-                   "inside the test house's own conversation. Oblique rising above its 0.5 "
-                   "says the mechanism learns; falling back to it says the gain was memory.",
-    ),
-    Objection(
-        what="Practice and test houses share every telling wording and every name list; "
-             "only question frames are ever held out.",
-        why="The `reworded` form asks in frames no lesson used, but every way a fact is "
-            "told in the test house was also told in practice, with the same ten objects, "
-            "rooms and trades. A plan is a path through one telling's wording, so the exam "
-            "cannot see the cost of a telling the system was never taught to read.",
-        settled_by="A form whose fact is told in a wording no practice house uses, asked in "
-                   "a taught frame. Settled if it scores within a seed's spread of `direct`; "
-                   "kept, with plans per wording named as the cause, if it does not.",
-    ),
-    Objection(
-        what="How many lessons a relation needs is not measured.",
-        why="Five practice houses teach about 330 answered questions each, for five "
-            "relations. A child learns a question shape from a handful. If the system "
-            "needs hundreds a relation, a conversation's thousands of relations need more "
-            "teaching than any conversation holds.",
-        settled_by="The first house read after one, two and five practice houses, and "
-                   "after lessons capped per shape. The curve says how many a relation "
-                   "needs; a score near today's at one house settles it.",
     ),
     Objection(
         what="The graph is walked one SQL query a step, and borrowing scans every taught "

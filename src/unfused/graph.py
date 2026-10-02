@@ -815,7 +815,11 @@ class GraphArm:
             said = self.answer(_Asked(text))
             self.pending = (text, said)
             return said
-        if self.pending is not None:
+        # a reaction is about the answer, not the world: no event in it has a named
+        # subject ('it's the shed', 'that's right'), where a telling has ('Ada keeps...')
+        about_world = any(label.startswith("nsubj") for ev in self.read(text)
+                          for label, _ in ev["edges"])
+        if self.pending is not None and not about_world:
             question, said = self.pending
             self.pending = None
             named, negated = self.reaction(text, question)
@@ -827,6 +831,7 @@ class GraphArm:
                 return None
             if negated:
                 return None
+        self.pending = None
         self.hear(turn, text)
         return None
 

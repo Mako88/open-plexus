@@ -99,3 +99,12 @@ def test_a_later_event_on_the_same_arguments_replaces_an_earlier_one(tmp_path):
     assert a.replaced(got) == 2
     # other arguments, or a later event that only might happen, replace nothing
     assert not a.replaced(went) and not a.replaced(dropped)
+
+
+def test_a_telling_after_a_question_is_heard_not_taken_as_its_answer(tmp_path):
+    a = arm(tmp_path)
+    a.turn(0, "Ada keeps the kettle in the shed.")
+    a.turn(1, "Where does Ada keep the kettle?")
+    a.turn(2, "Bren keeps the rope in the attic.")
+    assert not a.db.execute("SELECT 1 FROM learnt").fetchone()
+    assert a.db.execute("SELECT 1 FROM events WHERE heard LIKE 'Bren%'").fetchone()

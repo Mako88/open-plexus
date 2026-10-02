@@ -63,8 +63,9 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - **The graphed arm, next.** John's, 2026-10-01: what a conversation will need anyway comes
   before tuning to either world, each entering the exam as a form when it does.
   1. ~~Hedged facts asked 'now'.~~ Struck 2026-10-02: hedged reads 1.0 on every seed.
-  2. A telling that follows a question is read as the reaction to it, and the test asks
-     with no one reacting, so correction is taught and never examined.
+  2. Correction is taught and never examined: the test asks with no one reacting. The
+     form: a question answered, corrected, and asked again later. (A telling after a
+     question is heard as one since `ec2e074c`'s successor: a reaction has no named subject.)
   3. Words never heard, from the question's own parse: 'What is X's line of work?' shares
      no grammar with 'do for a living'. The symbol encoder of the DECIDED meaning section
      is the mechanism: a word's meaning as what is known about it, learnt from every

@@ -65,7 +65,7 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   1. ~~Hedged facts asked 'now'.~~ Struck 2026-10-02: hedged reads 1.0 on every seed.
   2. Correction is taught and never examined: the test asks with no one reacting. The
      form: a question answered, corrected, and asked again later. It changes the house,
-     so it waits until the baselines re-taken overnight are committed.
+     so `scripts/baselines.sh` runs after it.
   3. Words never heard, from the question's own parse: 'What is X's line of work?' shares
      no grammar with 'do for a living'. The symbol encoder of the DECIDED meaning section
      is the mechanism: a word's meaning as what is known about it, learnt from every

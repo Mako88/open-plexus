@@ -100,6 +100,7 @@ llama-server -m <Qwen_Qwen3.5-9B-Q6_K_L.gguf> -ngl 99 -c 8192 --parallel 1 --jin
 uv run python scripts/exam.py --faculty served --served Qwen3.5-2B-Q8_0 --port 8094   --arms blind,full,linked --seed 1 --note "..."
 uv run python scripts/exam.py --arms graphed --teach 5 --world first --seed 1 --note "..."
 uv run python scripts/babi.py --tasks 1,2,3,7 --stories 20 --arms graphed --teach 20 --note "..."
+bash scripts/baselines.sh "what changed the house"   # after any change to the house: ~1h45m GPU
 ```
 
 The card is one GTX 1080 Ti, 11 GB. The 9B takes about 9 GB of it, so it and the 2B are never

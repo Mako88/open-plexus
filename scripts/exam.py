@@ -24,7 +24,7 @@ os.environ.setdefault("HF_HUB_OFFLINE", "1")
 from unfused.arms import SYSTEM, Blind, FullContext, Recall  # noqa: E402
 from unfused.exam.run import run  # noqa: E402
 from unfused.exam.second import generate_second_house  # noqa: E402
-from unfused.exam.world import generate_house  # noqa: E402
+from unfused.exam.world import UNTAUGHT, generate_house  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 # practice houses are seeded from here, far from any seed a reading tests
@@ -131,7 +131,7 @@ def main() -> None:
                     for turn, text in enumerate(practice.turns):
                         arm.hear(turn, text)
                         for q in asked_after.get(turn, []):
-                            if q.answer is not None:
+                            if q.answer is not None and q.form not in UNTAUGHT:
                                 arm.teach(q.text, q.answer)
                     arm.close()
                     import sqlite3
@@ -161,7 +161,7 @@ def main() -> None:
                 for turn, text in enumerate(practice.turns):
                     arm.hear(turn, text)
                     for q in asked_after.get(turn, []):
-                        if q.answer is not None:
+                        if q.answer is not None and q.form not in UNTAUGHT:
                             arm.teach(q.text, q.answer)
                 learnt, positions = arm.export()
                 arm.close()

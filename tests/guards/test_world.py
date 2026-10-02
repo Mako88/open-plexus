@@ -13,7 +13,7 @@ def test_every_house_has_every_form():
     for seed in range(5):
         forms = Counter(q.form for q in generate_house(seed).questions)
         assert set(forms) == {"direct", "oblique", "reverse", "twohop", "update", "chain3",
-                              "count", "denied", "hedged", "negative"}
+                              "count", "denied", "hedged", "reworded", "negative"}
 
 
 def test_a_denial_or_hedge_is_told_before_it_is_asked_and_names_another_room():

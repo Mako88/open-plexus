@@ -23,6 +23,9 @@ question rather than a switch:
 - `hedged`: a place fact followed by a move that might happen or is only planned.
   Nothing moved, so the right answer is still the first room, and naming the
   planned one is scored as misled.
+- `reworded`: the fact's own names in a frame no lesson used ("What kind of work
+  does X do?"). It is never taught, so it is answered only by carrying what was
+  learnt from one wording to another.
 - negatives: questions in the house's shape about people never mentioned. The
   right answer is a refusal; anything else is an invention, scored apart.
 
@@ -123,6 +126,17 @@ _FILLER = [
     "The tap in the bathroom has started dripping.",
     "I should probably go for a walk later.",
 ]
+
+# frames no lesson uses: a form in here is asked and never taught
+UNTAUGHT = {"reworded"}
+_REWORDED = {
+    "trade": ["What kind of work does {who} do?", "What is {who}'s line of work?"],
+    "number": ["How many {thing} would I find in the {room}?",
+               "What is the number of {thing} in the {room}?"],
+    "place": ["Where are {who}'s {thing} kept?", "In which room does {who} keep the {thing}?"],
+    "colour": ["What colour would you call the {thing}?", "Which colour are the {thing}?"],
+    "relation": ["Who is {who} a cousin of?", "Which person is {who}'s cousin?"],
+}
 
 DEFAULT_DELAYS = (1, 5, 20, 60, 150)
 _NUMBER_RANGE = (2, 97)
@@ -368,6 +382,17 @@ def generate_house(
             form = "direct" if (i + j) % 2 == 0 else "oblique"
             ask(direct if form == "direct" else oblique, fact.answer, _answer_kind(fact),
                 form, told_at[fact.id], delay, (fact.id,))
+
+    reworded_rng = random.Random(f"{seed}-reworded")
+    for fact in facts:
+        if fact.id in updates or fact.id in unsaid:
+            continue
+        text = reworded_rng.choice(_REWORDED[fact.kind]).format(
+            who=fact.subject, thing=fact.fields.get("thing", fact.subject),
+            room=fact.fields.get("room", ""))
+        for delay in delays[1::2]:
+            ask(text, fact.answer, _answer_kind(fact), "reworded", told_at[fact.id], delay,
+                (fact.id,))
 
     for fid, (room, turn) in updates.items():
         fact = by_id[fid]

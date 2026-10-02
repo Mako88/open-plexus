@@ -655,9 +655,37 @@ class GraphArm:
                 return found
         return []
 
+    @staticmethod
+    def visits(ends: list, name: str) -> tuple[list, int | None]:
+        """A plan's ends as visits in turn order, and where the latest visit to a name
+        sits among them: the apple's rooms, and the bathroom's place in that list."""
+        seen = sorted({(t[-1] if t else 0, e) for e, t in ends})
+        at = max((i for i, (_, e) in enumerate(seen) if e == name), default=None)
+        return seen, at
+
+    def relative(self, plan: dict, ends: list, fillers: list[str]) -> list | None:
+        """Where lessons showed the answer one visit before or after another name of
+        the question ('where was it before the bathroom'), that visit."""
+        for k, (before, after) in plan.get("relative", {}).items():
+            k = int(k)
+            if k >= len(fillers):
+                continue
+            seen, at = self.visits(ends, fillers[k])
+            if at is None:
+                continue
+            step = -1 if before >= 3 and before > 2 * after else (
+                1 if after >= 3 and after > 2 * before else 0)
+            if step and 0 <= at + step < len(seen):
+                t, e = seen[at + step]
+                return [(e, (t,))]
+        return None
+
     def said(self, plan: dict, fillers: list[str], strict: bool,
              question: str, present: bool | None = None) -> list[tuple[str, int]]:
         ends = self.follow(plan, fillers, strict, present)
+        chosen = self.relative(plan, ends, fillers)
+        if chosen is not None:
+            return chosen
         if plan.get("count"):
             if ends:
                 return [(str(len({e for e, _ in ends})), max(t for _, t in ends))]
@@ -684,6 +712,20 @@ class GraphArm:
                 return said_in(want, said) or (numeral(want) is not None
                                                and numeral(said) == numeral(want))
 
+            # whether the answer is the visit just before or after another name of the
+            # question, counted wherever that name is among the plan's ends
+            ends = self.follow(plan, fillers, False)
+            for k in range(1, len(fillers)):
+                seen, at = self.visits(ends, fillers[k])
+                if at is None:
+                    continue
+                into = plan.setdefault("relative", {}).setdefault(str(k), [0, 0])
+                if at > 0 and said_in(want, seen[at - 1][1]):
+                    into[0] += 1
+                if at + 1 < len(seen) and said_in(want, seen[at + 1][1]):
+                    into[1] += 1
+                self.db.execute("UPDATE learnt SET plan = ? WHERE rowid = ?",
+                                (json.dumps(plan), rowid))
             # whether the plan asks about the present, counted on every lesson where
             # reading only what is still so and reading everything differ
             now, then = holds(True), holds(False)

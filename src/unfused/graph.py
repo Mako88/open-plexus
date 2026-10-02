@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS learnt (shape TEXT NOT NULL, plan TEXT NOT NULL,
 CREATE TABLE IF NOT EXISTS positions (template TEXT NOT NULL, pos INTEGER NOT NULL,
     filler TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (template, pos, filler));
 CREATE TABLE IF NOT EXISTS aliases (word TEXT NOT NULL, name TEXT NOT NULL,
-    hits REAL NOT NULL, misses INTEGER NOT NULL, PRIMARY KEY (word, name));
+    hits REAL NOT NULL, found INTEGER NOT NULL, PRIMARY KEY (word, name));
 """
 # what a taught arm carries to the next conversation: no facts, only how to read and ask
 CARRIED = ("learnt", "positions", "aliases")
@@ -841,17 +841,20 @@ class GraphArm:
         return out
 
     def aliases(self, word: str) -> list[str]:
-        """The heard name a word stood for in lessons, if one: found more often than
-        missed, two facts' worth or more, since one fact cannot show two wordings agree,
-        and twice any other name's share. A word that is the question's frame ('shade',
-        'a wage') fits many names and none twice."""
-        rows = self.db.execute("SELECT name, hits, misses FROM aliases WHERE word = ? "
-                               "ORDER BY hits DESC", (word,)).fetchall()
+        """The heard name a word stood for in lessons, if one: two facts' worth or more,
+        since one fact cannot show two wordings agree, twice any other name's share, and
+        found in more than half the lessons that found anything for the word. A word
+        that is the question's frame ('shade', 'a wage') fits many names and none that
+        often. The row named '' counts those lessons."""
+        rows = self.db.execute("SELECT name, hits, found FROM aliases WHERE word = ? "
+                               "ORDER BY name = '', hits DESC", (word,)).fetchall()
+        tried = next((f for n, _, f in rows if n == ""), 0)
+        rows = [r for r in rows if r[0] != ""]
         if not rows:
             return []
-        name, hits, misses = rows[0]
+        name, hits, found = rows[0]
         second = rows[1][1] if len(rows) > 1 else 0
-        return [name] if hits >= 2 and hits > misses and hits >= 2 * second else []
+        return [name] if hits >= 2 and hits >= 2 * second and 2 * found > tried else []
 
     def unaliased(self, question: str) -> str:
         """The question with each word never heard put as the name it stood for, where
@@ -876,7 +879,7 @@ class GraphArm:
         taught shape, and that shape's plans are solved with the answer bound and the
         word's slot free. Two wordings are one name where their solutions agree, so each
         name found counts a share of one, and a lesson that many names fit says little.
-        A name found before and not this time counts against. The question comes back
+        A lesson that found other names counts against one. The question comes back
         with whatever lessons have settled put in."""
         from itertools import combinations, permutations
 
@@ -922,15 +925,13 @@ class GraphArm:
             self.aliased.add((w, want))
             # credited to every ending of the word, so 'wax forms' learns from 'many wax
             # forms'
+            if not ends:
+                continue
             for tail in (" ".join(w.split()[i:]) for i in range(len(w.split()))):
-                for n in ends:
-                    self.db.execute("INSERT INTO aliases VALUES (?, ?, ?, 0) ON CONFLICT("
-                                    "word, name) DO UPDATE SET hits = hits + excluded.hits",
-                                    (tail, n, 1 / len(ends)))
-                if ends:
-                    self.db.execute("UPDATE aliases SET misses = misses + 1 WHERE word = ? "
-                                    f"AND name NOT IN ({','.join('?' * len(ends))})",
-                                    (tail, *ends))
+                for n, share in [(n, 1 / len(ends)) for n in ends] + [("", 0)]:
+                    self.db.execute("INSERT INTO aliases VALUES (?, ?, ?, 1) ON CONFLICT("
+                                    "word, name) DO UPDATE SET hits = hits + excluded.hits, "
+                                    "found = found + 1", (tail, n, share))
         return self.unaliased(question)
 
     def answer(self, question) -> str:

@@ -174,6 +174,9 @@ class GraphArm:
         self.parsed = 0
         # the pairs of events already counted towards a plan's order, this world
         self.ordered: set = set()
+        # taught shapes' signatures, rebuilt after a lesson; questions' parses
+        self._sigs: list | None = None
+        self._tokens: dict = {}
 
     # -- reading ---------------------------------------------------------------
 
@@ -497,10 +500,105 @@ class GraphArm:
                 out.append((end[2:], turns))
         return out
 
+    def signature(self, question: str, fillers: list[str]) -> list[str]:
+        """A question's parse as a set of (word, link, head) triples and words, each name
+        replaced by its slot and each wh-word kept as itself, so two wordings of one
+        question share what their grammar shares: 'Where are <0>'s <1> kept?' and 'Where
+        does <0> keep the <1>?' share 'keep', 'where' and 'where advmod keep'."""
+        tokens = self.tokens(question)
+        heads = {f.split()[-1]: i for i, f in enumerate(fillers)}
+        inside = {w for f in fillers for w in f.split()[:-1]}
+
+        def label(t) -> str | None:
+            lower, lemma, tag, dep, _ = t
+            if lower in heads:
+                return f"<{heads[lower]}>"
+            if lower in inside or dep in ("punct", "det", "aux", "case"):
+                return None
+            return lower if tag in ("WDT", "WP", "WP$", "WRB") else lemma
+
+        out = set()
+        for i, t in enumerate(tokens):
+            me = label(t)
+            if me is None:
+                continue
+            out.add(me)
+            head = label(tokens[t[4]]) if t[4] != i else "ROOT"
+            if head is not None:
+                out.add(f"{me} {t[3]} {head}")
+        return sorted(out)
+
+    def tokens(self, question: str) -> list:
+        """A question's parse, one row a token: its word, lemma, tag, link and head."""
+        if question not in self._tokens:
+            key = hashlib.sha256(f"{VERSION}|{self.model}|tokens|{question}".encode()
+                                 ).hexdigest()
+            kept = self._kept(key)
+            if kept is None:
+                kept = [[t.lower_, t.lemma_.lower(), t.tag_, t.dep_, t.head.i]
+                        for t in nlp(self.model)(question)]
+                self._keep(key, kept)
+            self._tokens[question] = kept
+        return self._tokens[question]
+
+    def nearest(self, question: str, fillers: list[str]) -> tuple[float, list[str]]:
+        """The taught shapes nearest a question no lesson was worded as: those of its
+        number of slots whose signature overlaps the question's most, and by how much."""
+        mine = set(self.signature(question, fillers))
+        if self._sigs is None:
+            self._sigs = []
+            for shape, plan in self.db.execute(
+                    "SELECT shape, plan FROM learnt WHERE hits > misses").fetchall():
+                sig = json.loads(plan).get("sig")
+                if sig:
+                    self._sigs.append((shape, set(sig)))
+        best, shapes = 0.0, []
+        for shape, sig in self._sigs:
+            if shape.count("<") != len(fillers):
+                continue
+            near = len(mine & sig) / len(mine | sig)
+            if near > best:
+                best, shapes = near, [shape]
+            elif near == best and shape not in shapes:
+                shapes.append(shape)
+        return best, shapes
+
+    def borrowed(self, question: str) -> list[tuple[list[str], list[str]]]:
+        """A wording no lesson used has no history saying which of its names are slots
+        and which are frame ('cousin' in 'Which person is X's cousin?'), nor in what order
+        its slots run. Every reading is scored, each name a slot or frame and the slots in
+        any order, nearest a taught shape first."""
+        from itertools import combinations, permutations
+
+        names = [n for _, _, n in self.template(question)[1]][:4]
+        readings = []
+        for k in range(1, len(names) + 1):
+            for chosen in combinations(names, k):
+                for order in permutations(chosen):
+                    near, shapes = self.nearest(question, list(order))
+                    if shapes:
+                        readings.append((near, list(order), shapes))
+        readings.sort(key=lambda r: -r[0])
+        return [(f, sh) for _, f, sh in readings]
+
     def answers(self, shape: str, fillers: list[str], question: str) -> list[tuple[str, int]]:
         ranked = self.db.execute(
             "SELECT plan FROM learnt WHERE shape = ? AND hits > misses "
             "ORDER BY hits - misses DESC, hits DESC", (shape,)).fetchall()
+        if ranked:
+            return self.followed(ranked, fillers, question)
+        # a wording no lesson used borrows the plans of the nearest taught shape under the
+        # nearest reading of it that reaches anything in the graph
+        for fillers, nearest in self.borrowed(question)[:12]:
+            ranked = [r for near in nearest for r in self.db.execute(
+                "SELECT plan FROM learnt WHERE shape = ? AND hits > misses "
+                "ORDER BY hits - misses DESC, hits DESC", (near,)).fetchall()]
+            found = self.followed(ranked, fillers, question)
+            if found:
+                return found
+        return []
+
+    def followed(self, ranked: list, fillers: list[str], question: str) -> list:
         for strict in (True, False):
             found = []
             for (plan,) in ranked:
@@ -517,6 +615,7 @@ class GraphArm:
         return [f for f in ends if not said_in(f[0], question)]
 
     def teach(self, question: str, answer: str) -> None:
+        self._sigs = None
         self.heard_at(question)
         shape, fillers = self.shape(question)
         want = answer.lower()
@@ -576,6 +675,7 @@ class GraphArm:
                 for pair, ev in plan["evidence"].items():
                     self.ordered.add((shape, k, pair, ev))
                 stored = {key: v for key, v in plan.items() if key != "evidence"}
+                stored["sig"] = self.signature(question, fillers)
                 self.db.execute("INSERT OR IGNORE INTO learnt VALUES (?, ?, 1, 0)",
                                 (shape, json.dumps(stored)))
         self.db.commit()

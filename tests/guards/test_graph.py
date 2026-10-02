@@ -66,3 +66,11 @@ def test_a_denial_or_a_hedge_never_makes_an_answer_the_latest(tmp_path):
     a.hear(1, "Ada doesn't keep the kettle in the attic.")
     a.hear(2, "Ada might keep the kettle in the cellar.")
     assert a.answer(q("Where does Ada keep the kettle?")) == "shed"
+
+
+def test_a_wording_no_lesson_used_borrows_the_nearest_taught_shape(tmp_path):
+    a = arm(tmp_path)
+    a.hear(0, "Ada keeps the kettle in the shed.")
+    a.hear(1, "Bren keeps the rope in the attic.")
+    a.teach("Where does Ada keep the kettle?", "shed")
+    assert a.answer(q("In which room does Bren keep the rope?")) == "attic"

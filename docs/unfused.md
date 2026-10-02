@@ -94,9 +94,9 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   1. ~~Negation and tense kept.~~ Struck 2026-10-02: `denied` and `hedged` are forms,
      and an event's mood is in its lemma. Hedged reads 0.5 on two seeds as 'I don't
      know', since the plan for 'now' never learnt that nothing moved: item 4's.
-  2. Shapes matched by the parse, not the string. A plan is kept under the question's text
-     with its names cut out, so any rewording is a shape with no plan. The form: a
-     question asked in a wording no lesson used, which `oblique` only half covers.
+  2. ~~Shapes matched by the parse.~~ Struck 2026-10-02: `reworded` is a form, and a
+     wording no lesson used borrows the nearest taught shape's plans. What it cannot
+     reach is lexical ('line of work' for 'do for a living'): item 5's.
   3. Turns the system sorts itself. The runner tells the arm which turn is a telling, a
      question and a lesson; a conversation labels none, and teaches by an answer turns
      later or by 'no, that is wrong'. The form: an unlabelled stream, with lessons as

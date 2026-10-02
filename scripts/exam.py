@@ -68,7 +68,7 @@ def main() -> None:
     house = generate(seed=args.seed, n_facts=args.facts, n_turns=args.turns)
     arms = args.arms.split(",")
     faculty = embedder = None
-    if any(a != "blind" for a in arms):
+    if any(a not in ("blind", "graphed") for a in arms):
         from unfused.faculty import Faculty, ServedFaculty
         faculty = (ServedFaculty(model_id=f"{args.served} (llama.cpp)",
                                  url=f"http://127.0.0.1:{args.port}/v1/chat/completions")
@@ -148,6 +148,27 @@ def main() -> None:
             def open_arm(learnt=learnt, holds=holds, echoes=echoes, frames=frames,
                          meant=meant):
                 return system(work, learnt, holds, echoes, frames, meant)
+        elif name == "graphed":
+            from unfused.graph import GraphArm
+
+            # taught as the taught arm is, on the same practice houses, with no faculty
+            learnt, positions = [], []
+            for s in range(PRACTICE, PRACTICE + args.teach):
+                practice = generate(seed=s, n_facts=args.facts, n_turns=args.turns)
+                taught = Path(tempfile.mkdtemp(prefix="unfused-graph-teach-"))
+                arm = GraphArm(taught, known_learnt=learnt, known_positions=positions)
+                asked_after = practice.questions_after()
+                for turn, text in enumerate(practice.turns):
+                    arm.hear(turn, text)
+                    for q in asked_after.get(turn, []):
+                        if q.answer is not None:
+                            arm.teach(q.text, q.answer)
+                learnt, positions = arm.export()
+                arm.close()
+                shutil.rmtree(taught, ignore_errors=True)
+
+            def open_arm(learnt=learnt, positions=positions):
+                return GraphArm(work, known_learnt=learnt, known_positions=positions)
         elif name == "linked":
             from unfused.linked import LinkedRecall
 
@@ -191,7 +212,7 @@ def main() -> None:
             "teach": args.teach if name == "taught" else 0,
             "cost": faculty.cost.row() if faculty else None,
         }
-        tag = args.served.split("-Q")[0] if args.faculty == "served" else args.faculty
+        tag = (args.served.split("-Q")[0] if args.faculty == "served" else args.faculty) if faculty else "parse"
         world = "" if args.world == "first" else f"{args.world}-"
         out = ROOT / "readings" / f"exam-{world}{name}-{tag}-s{args.seed}-{taken}.json"
         out.parent.mkdir(exist_ok=True)

@@ -1,0 +1,483 @@
+"""The graphed arm: the conversation kept as its parse, and plans learnt as paths in it.
+
+Every sentence is parsed, and nothing maps the parse to slots. A clause is an event: its
+verb's lemma, the turn it was heard, and an edge to each of its arguments labelled with
+the grammatical link (nsubj, dobj, attr, prep:in, prep:to, ...). A noun with dependents of
+its own ("Trapairk's godparent", "45 glass jars") is an event too, joined by `self` to the
+noun's name. Every other noun, number or adjective is a name, one node however often it is
+said, which is what joins one sentence to the next.
+
+A question told with its answer is a lesson. Its names are the noun phrases the graph
+already holds; the shortest path from the first name to the answer, with where each other
+name hangs off it, is kept as a plan under the question's shape, holding the lemmas met at
+each event. Plans are scored on every later lesson of their shape and only those that held
+more often than they failed are followed. An answer is the end of a followed path; of
+several, the one resting on the latest event, which is how a move or a correction wins.
+No path, no answer: "I don't know."
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+import sqlite3
+from collections import deque
+from pathlib import Path
+
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, turn INTEGER NOT NULL,
+    lemma TEXT NOT NULL, heard TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS edges (event INTEGER NOT NULL, label TEXT NOT NULL,
+    node TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS edges_event ON edges (event);
+CREATE INDEX IF NOT EXISTS edges_node ON edges (node);
+CREATE TABLE IF NOT EXISTS learnt (shape TEXT NOT NULL, plan TEXT NOT NULL,
+    hits INTEGER NOT NULL, misses INTEGER NOT NULL, PRIMARY KEY (shape, plan));
+CREATE TABLE IF NOT EXISTS positions (template TEXT NOT NULL, pos INTEGER NOT NULL,
+    filler TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (template, pos, filler));
+"""
+
+# every extraction kept across runs: the parser is deterministic, and the version is in
+# the key so a change to what is extracted re-reads every sentence
+CACHE = Path(__file__).resolve().parents[2] / "state" / "parses.sqlite"
+VERSION = "graph-2"
+
+# a clause's links that are not arguments
+SKIP = {"punct", "det", "aux", "auxpass", "cc", "mark", "neg", "intj", "case", "dep",
+        "advmod", "prt", "predet", "preconj", "expl", "attr_of"}
+PRONOUNS = {"it", "they", "them", "its", "their", "he", "she", "him", "her", "his"}
+
+_NLP: dict = {}
+
+
+def nlp(model: str):
+    if model not in _NLP:
+        import spacy
+
+        _NLP[model] = spacy.load(model)
+    return _NLP[model]
+
+
+def phrase(tok) -> str:
+    """A noun's name: its compounds and adjectives with it, no determiner or number."""
+    keep = [t for t in tok.children if t.dep_ in ("compound", "amod") and t.i < tok.i] + [tok]
+    return " ".join(t.text for t in sorted(keep, key=lambda t: t.i)).lower()
+
+
+def extract(doc) -> list[dict]:
+    """A sentence as events: [{"lemma", "edges": [[label, target], ...]}], a target being
+    "n:<name>" or "e:<index into this list>". "it" and "they" are the sentence's first
+    subject that is not a pronoun."""
+    first = next((t for t in doc if t.dep_ in ("nsubj", "nsubjpass") and t.pos_ != "PRON"
+                  and t.lower_ not in PRONOUNS), None)
+    events: list[dict] = []
+    index: dict[int, int] = {}
+
+    def heads(tok) -> bool:
+        # by structure, not by tag: 'Dethol shoes horses' is tagged a noun and has a
+        # subject and an object, and '22 years old' hangs a number off an adjective
+        # a preposition's object is its head's argument, never an event of its own
+        return tok.dep_ not in ("prep", "dative", "agent") and any(
+            c.dep_ not in SKIP and c.dep_ not in ("compound", "amod", "conj")
+            for c in tok.children)
+
+    for tok in doc:
+        if heads(tok):
+            index[tok.i] = len(events)
+            lemma = " ".join([tok.lemma_.lower()] + [c.lower_ for c in tok.children
+                                                     if c.dep_ == "prt"])
+            events.append({"lemma": lemma, "edges": []})
+
+    def target(tok) -> str | None:
+        if tok.i in index:
+            return f"e:{index[tok.i]}"
+        if tok.lower_ in PRONOUNS:
+            return f"n:{phrase(first)}" if first is not None else None
+        if tok.pos_ in ("NOUN", "PROPN", "NUM", "ADJ") or tok.like_num:
+            return f"n:{phrase(tok)}"
+        return None
+
+    for tok in doc:
+        if tok.i not in index:
+            continue
+        ev = events[index[tok.i]]
+        if tok.pos_ in ("NOUN", "PROPN", "ADJ") and not any(
+                c.dep_.startswith("nsubj") for c in tok.children):
+            ev["edges"].append(["self", f"n:{phrase(tok)}"])
+        for c in tok.children:
+            if c.dep_ in ("prep", "dative", "agent"):
+                for p in c.children:
+                    if p.dep_ == "pobj" and (t := target(p)):
+                        ev["edges"].append([f"prep:{c.lower_}", t])
+                        for cc in p.children:
+                            if cc.dep_ == "conj" and (t2 := target(cc)):
+                                ev["edges"].append([f"prep:{c.lower_}", t2])
+                if c.dep_ == "dative" and not any(p.dep_ == "pobj" for p in c.children):
+                    if t := target(c):
+                        ev["edges"].append(["dative", t])
+                continue
+            if c.dep_ in SKIP or c.dep_ == "compound" or c.dep_ == "amod":
+                # an adverb is not an argument, but a particle's object is reached through
+                # its own preposition, as in 'went back to the bathroom'
+                if c.dep_ == "advmod":
+                    for p in c.children:
+                        if p.dep_ == "prep":
+                            for o in p.children:
+                                if o.dep_ == "pobj" and (t := target(o)):
+                                    ev["edges"].append([f"prep:{p.lower_}", t])
+                continue
+            if t := target(c):
+                ev["edges"].append([c.dep_, t])
+                for cc in c.children:
+                    if cc.dep_ == "conj" and (t2 := target(cc)):
+                        ev["edges"].append([c.dep_, t2])
+        # a conjoined verb shares its head's subject: 'picked up the milk and went'
+        if tok.dep_ == "conj" and tok.head.i in index and not any(
+                e[0].startswith("nsubj") for e in ev["edges"]):
+            for label, t in events[index[tok.head.i]]["edges"]:
+                if label.startswith("nsubj"):
+                    ev["edges"].append([label, t])
+    return [e for e in events if e["edges"]]
+
+
+class GraphArm:
+    name = "graphed"
+
+    def __init__(self, directory: Path, model: str = "en_core_web_trf",
+                 known_learnt: list | None = None, known_positions: list | None = None,
+                 cache: Path | None = CACHE) -> None:
+        directory.mkdir(parents=True, exist_ok=True)
+        self.db = sqlite3.connect(str(directory / "graph.db"))
+        self.db.executescript(SCHEMA)
+        self.db.executemany("INSERT OR IGNORE INTO learnt VALUES (?, ?, ?, ?)",
+                            [tuple(x) for x in (known_learnt or [])])
+        self.db.executemany("INSERT OR IGNORE INTO positions VALUES (?, ?, ?, ?)",
+                            [tuple(x) for x in (known_positions or [])])
+        self.db.commit()
+        self.model = model
+        self.cache = cache
+        self.last_notes: list[str] = []
+        self.parsed = 0
+
+    # -- reading ---------------------------------------------------------------
+
+    def _kept(self, key: str):
+        if self.cache is None:
+            return None
+        if not hasattr(self, "_cdb"):
+            self.cache.parent.mkdir(parents=True, exist_ok=True)
+            self._cdb = sqlite3.connect(str(self.cache))
+            self._cdb.execute("CREATE TABLE IF NOT EXISTS parses (key TEXT PRIMARY KEY, "
+                              "value TEXT NOT NULL)")
+        row = self._cdb.execute("SELECT value FROM parses WHERE key = ?", (key,)).fetchone()
+        return json.loads(row[0]) if row else None
+
+    def _keep(self, key: str, value) -> None:
+        if self.cache is not None:
+            self._cdb.execute("INSERT OR REPLACE INTO parses VALUES (?, ?)",
+                              (key, json.dumps(value)))
+            self._cdb.commit()
+
+    def read(self, text: str) -> list[dict]:
+        key = hashlib.sha256(f"{VERSION}|{self.model}|events|{text}".encode()).hexdigest()
+        kept = self._kept(key)
+        if kept is None:
+            kept = extract(nlp(self.model)(text))
+            self.parsed += 1
+            self._keep(key, kept)
+        return kept
+
+    def names_in(self, question: str) -> list[tuple[int, int, str]]:
+        """The question's noun phrases, as spans with their names."""
+        key = hashlib.sha256(f"{VERSION}|{self.model}|names|{question}".encode()).hexdigest()
+        kept = self._kept(key)
+        if kept is None:
+            doc = nlp(self.model)(question)
+            kept = []
+            for tok in doc:
+                if tok.pos_ in ("NOUN", "PROPN") and tok.dep_ != "compound":
+                    left = [t for t in tok.children if t.dep_ in ("compound", "amod")
+                            and t.i < tok.i]
+                    start = min([t.idx for t in left] + [tok.idx])
+                    kept.append([start, tok.idx + len(tok.text), phrase(tok)])
+            self._keep(key, kept)
+        return [tuple(k) for k in kept]
+
+    def hear(self, turn: int, text: str) -> None:
+        events = self.read(text)
+        ids = []
+        for ev in events:
+            cur = self.db.execute("INSERT INTO events (turn, lemma, heard) VALUES (?, ?, ?)",
+                                  (turn, ev["lemma"], text))
+            ids.append(cur.lastrowid)
+        for ev, eid in zip(events, ids):
+            for label, t in ev["edges"]:
+                node = f"e:{ids[int(t[2:])]}" if t.startswith("e:") else t
+                self.db.execute("INSERT INTO edges VALUES (?, ?, ?)", (eid, label, node))
+        self.db.commit()
+
+    # -- the graph -------------------------------------------------------------
+
+    def holding(self, word: str) -> list[str]:
+        """The names that hold a word whole: 'ochre colour' for 'ochre'."""
+        return [n for (n,) in self.db.execute(
+            "SELECT DISTINCT node FROM edges WHERE node LIKE ?", (f"n:%{word}%",))
+            if said_in(word, n[2:])]
+
+    def known(self, name: str) -> bool:
+        return self.db.execute("SELECT 1 FROM edges WHERE node = ? LIMIT 1",
+                               (f"n:{name}",)).fetchone() is not None
+
+    def around(self, node: str) -> list[tuple[str, int, str]]:
+        """Every step from a node: (label, direction, next node). Direction 1 goes from an
+        event to its argument, -1 back from an argument to its event."""
+        if node.startswith("e:"):
+            eid = int(node[2:])
+            out = [(label, 1, n) for label, n in self.db.execute(
+                "SELECT label, node FROM edges WHERE event = ?", (eid,))]
+        else:
+            out = []
+        out += [(label, -1, f"e:{e}") for e, label in self.db.execute(
+            "SELECT event, label FROM edges WHERE node = ?", (node,))]
+        return out
+
+    def event(self, node: str) -> tuple[str, int]:
+        lemma, turn = self.db.execute("SELECT lemma, turn FROM events WHERE id = ?",
+                                      (int(node[2:]),)).fetchone()
+        return lemma, turn
+
+    def paths(self, start: str, goal: str, limit: int = 8,
+              avoid: set | None = None) -> list[list]:
+        """The shortest paths from one node to another, each a list of nodes and steps
+        alternating, at most `limit` steps."""
+        found, frontier, best = [], deque([[start]]), None
+        seen = {start: 0}
+        while frontier:
+            path = frontier.popleft()
+            steps = (len(path) - 1) // 2
+            if best is not None and steps >= best:
+                continue
+            if steps >= limit:
+                continue
+            for label, direction, nxt in self.around(path[-1]):
+                if nxt in path[::2] or (avoid and nxt in avoid and nxt != goal):
+                    continue
+                if nxt == goal:
+                    best = steps + 1
+                    found.append(path + [(label, direction), nxt])
+                    continue
+                if seen.get(nxt, 99) < steps + 1:
+                    continue
+                seen[nxt] = steps + 1
+                frontier.append(path + [(label, direction), nxt])
+        return found
+
+    # -- plans -----------------------------------------------------------------
+
+    def template(self, question: str) -> tuple[str, list]:
+        """The question with every noun phrase cut out, and the phrases. A phrase is
+        cut to the longest ending of it the graph knows: 'how many walking sticks' holds
+        'walking sticks', with no list of words like 'many'."""
+        spans = []
+        for a, b, name in sorted(self.names_in(question)):
+            words = name.split()
+            for i in range(len(words)):
+                tail = " ".join(words[i:])
+                if self.known(tail):
+                    at = question.lower().find(tail, a)
+                    if at >= 0:
+                        a, b, name = at, at + len(tail), tail
+                    break
+            spans.append((a, b, name))
+        out, at = "", 0
+        for i, (a, b, _) in enumerate(spans):
+            out += question[at:a] + f"<{i}>"
+            at = b
+        return out + question[at:], spans
+
+    def heard_at(self, question: str) -> None:
+        """A lesson's noun phrases counted by their place in its template."""
+        template, spans = self.template(question)
+        for i, (_, _, n) in enumerate(spans):
+            self.db.execute("INSERT INTO positions VALUES (?, ?, ?, 1) ON CONFLICT"
+                            "(template, pos, filler) DO UPDATE SET n = n + 1",
+                            (template, i, n))
+
+    def slot(self, template: str, pos: int, name: str, capital: bool) -> bool:
+        """Whether a noun phrase is a slot of its question or a word of its frame. A
+        place whose word varies across lessons of one template is a slot; one that held
+        the same word every time, twice or more, is frame ('Whose cousin is X?', 'do
+        for a living'); one never taught is a slot if the graph knows the name."""
+        seen = self.db.execute("SELECT filler, n FROM positions WHERE template = ? AND"
+                               " pos = ?", (template, pos)).fetchall()
+        if len(seen) == 1 and seen[0][1] >= 2:
+            return False
+        # a place that varies holds a slot only where its word names something here:
+        # 'colour' and 'shade' share a place across lessons and name nothing
+        return self.known(name) or capital
+
+    def shape(self, question: str) -> tuple[str, list[str]]:
+        template, every = self.template(question)
+        spans = [(a, b, n) for i, (a, b, n) in enumerate(every)
+                 if self.slot(template, i, n, question[a:a + 1].isupper() and a > 0)]
+        shape, fillers, at = "", [], 0
+        for a, b, n in sorted(spans):
+            shape += question[at:a] + f"<{len(fillers)}>"
+            fillers.append(n)
+            at = b
+        return shape + question[at:], fillers
+
+    def plan_of(self, path: list, others: list[str]) -> dict | None:
+        """A path as a plan: its steps, the lemma at each event on it, and where each other
+        name of the question hangs off an event of it."""
+        steps = [list(s) for s in path[1::2]]
+        nodes = path[::2]
+        lemmas, attach = {}, []
+        for i, node in enumerate(nodes):
+            if node.startswith("e:"):
+                lemmas[str(i)] = [self.event(node)[0]]
+        for k, name in enumerate(others):
+            # the shortest way from any node of the path to the other name: 'I counted 35
+            # walking sticks in the cellar' has the cellar on the counting, a step off the
+            # path from the sticks to their number
+            hook = None
+            for i, node in enumerate(nodes):
+                for way in self.paths(node, f"n:{name}", limit=3, avoid=set(nodes)):
+                    if hook is None or len(way) < len(hook[2]) * 2 + 1:
+                        hook = [k + 1, i, [list(st) for st in way[1::2]]]
+            if hook is None:
+                return None
+            attach.append(hook)
+        return {"steps": steps, "lemmas": lemmas, "attach": attach}
+
+    def reaches(self, node: str, steps: list, goal: str) -> bool:
+        """Whether a way of these steps leads from a node to a goal."""
+        here = [node]
+        for label, direction in steps:
+            here = [n for h in here for lab, d, n in self.around(h)
+                    if lab == label and d == direction][:200]
+        return goal in here
+
+    @staticmethod
+    def key(plan: dict) -> str:
+        return json.dumps({"steps": plan["steps"], "attach": plan["attach"]})
+
+    def follow(self, plan: dict, fillers: list[str], strict: bool) -> list[tuple[str, int]]:
+        """Every end the plan reaches from the question's first name, with the latest turn
+        of the events it passed."""
+        if not fillers:
+            return []
+        out = []
+        def hooked(node: str, pos: int) -> bool:
+            return all(self.reaches(node, h[2], f"n:{fillers[h[0]]}")
+                       for h in plan["attach"] if h[1] == pos and h[0] < len(fillers))
+
+        start = f"n:{fillers[0]}"
+        walks = [([start], -1)] if hooked(start, 0) else []
+        for i, (label, direction) in enumerate(plan["steps"]):
+            nxt_walks = []
+            for nodes, turn in walks:
+                here = nodes[-1]
+                for lab, d, nxt in self.around(here):
+                    if lab != label or d != direction or nxt in nodes:
+                        continue
+                    t = turn
+                    if nxt.startswith("e:"):
+                        lemma, et = self.event(nxt)
+                        pos = str(i + 1)
+                        if strict and lemma not in plan["lemmas"].get(pos, [lemma]):
+                            continue
+                        t = max(t, et)
+                    if not hooked(nxt, i + 1):
+                        continue
+                    nxt_walks.append((nodes + [nxt], t))
+            walks = nxt_walks[:2000]
+        for nodes, turn in walks:
+            end = nodes[-1]
+            if end.startswith("n:"):
+                out.append((end[2:], turn))
+        return out
+
+    def answers(self, shape: str, fillers: list[str], question: str) -> list[tuple[str, int]]:
+        ranked = self.db.execute(
+            "SELECT plan FROM learnt WHERE shape = ? AND hits > misses "
+            "ORDER BY hits - misses DESC, hits DESC", (shape,)).fetchall()
+        for strict in (True, False):
+            found = []
+            for (plan,) in ranked:
+                found += [f for f in self.follow(json.loads(plan), fillers, strict)
+                          if not said_in(f[0], question)]
+            if found:
+                return found
+        return []
+
+    def teach(self, question: str, answer: str) -> None:
+        self.heard_at(question)
+        shape, fillers = self.shape(question)
+        want = answer.lower()
+        for rowid, plan in self.db.execute("SELECT rowid, plan FROM learnt WHERE shape = ?",
+                                           (shape,)).fetchall():
+            found = self.follow(json.loads(plan), fillers, True) or self.follow(
+                json.loads(plan), fillers, False)
+            found = [f for f in found if not said_in(f[0], question)]
+            if not found:
+                continue
+            said = max(found, key=lambda f: f[1])[0]
+            column = "hits" if said_in(want, said) else "misses"
+            self.db.execute(f"UPDATE learnt SET {column} = {column} + 1 WHERE rowid = ?",
+                            (rowid,))
+        goals = self.holding(want)
+        if not fillers or not goals:
+            self.db.commit()
+            return
+        found = [p for g in goals[:5] for p in self.paths(f"n:{fillers[0]}", g)]
+        shortest = min((len(p) for p in found), default=0)
+        for path in [p for p in found if len(p) == shortest][:20]:
+            plan = self.plan_of(path, fillers[1:])
+            if plan is None:
+                continue
+            k = self.key(plan)
+            row = self.db.execute("SELECT rowid, plan FROM learnt WHERE shape = ?",
+                                  (shape,)).fetchall()
+            same = next(((r, json.loads(p)) for r, p in row if self.key(json.loads(p)) == k),
+                        None)
+            if same:
+                rid, kept = same
+                for pos, lemmas in plan["lemmas"].items():
+                    kept["lemmas"][pos] = sorted(set(kept["lemmas"].get(pos, [])) | set(lemmas))
+                self.db.execute("UPDATE learnt SET plan = ?, hits = hits + 1 WHERE rowid = ?",
+                                (json.dumps(kept), rid))
+            else:
+                self.db.execute("INSERT OR IGNORE INTO learnt VALUES (?, ?, 1, 0)",
+                                (shape, json.dumps(plan)))
+        self.db.commit()
+
+    def answer(self, question) -> str:
+        shape, fillers = self.shape(question.text)
+        found = self.answers(shape, fillers, question.text)
+        if not found:
+            self.last_notes = ["(nothing)"]
+            return "I don't know."
+        self.last_notes = ["(found)"]
+        return max(found, key=lambda f: f[1])[0]
+
+    def export(self) -> tuple[list, list]:
+        return (self.db.execute("SELECT shape, plan, hits, misses FROM learnt").fetchall(),
+                self.db.execute("SELECT template, pos, filler, n FROM positions").fetchall())
+
+    def dials(self) -> dict:
+        n_events, n_edges = (self.db.execute("SELECT COUNT(*) FROM events").fetchone()[0],
+                             self.db.execute("SELECT COUNT(*) FROM edges").fetchone()[0])
+        return {"model": self.model, "version": VERSION, "events": n_events, "edges": n_edges,
+                "shapes": self.db.execute("SELECT COUNT(DISTINCT shape) FROM learnt")
+                .fetchone()[0], "parsed": self.parsed}
+
+    def close(self) -> None:
+        self.db.close()
+        if hasattr(self, "_cdb"):
+            self._cdb.close()
+
+
+def said_in(answer: str, question: str) -> bool:
+    return re.search(rf"\b{re.escape(answer)}\b", question.lower()) is not None

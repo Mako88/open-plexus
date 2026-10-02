@@ -1,0 +1,3484 @@
+{
+ "kind": "parsed",
+ "taken_at": "20261002T014344Z",
+ "note": "first look: the house's tellings by a dependency parse and the plainest mapping, against the ear's 1.00/1.00, 0.98/0.98 and 0.96/0.98 at 0.85 s a read.",
+ "parser": "en_core_web_sm 3.8.0",
+ "scorer": "each gold filler in a slot of its own",
+ "seeds": [
+  {
+   "seed": 0,
+   "recall": 0.62,
+   "precision": 0.775,
+   "filler_assertions_per_sentence": 1.17,
+   "by_kind": {
+    "colour": 0.7,
+    "number": 0.6,
+    "place": 0.6,
+    "relation": 1.0,
+    "trade": 0.2
+   },
+   "ms_per_read": 8.3,
+   "rows": [
+    {
+     "kind": "trade",
+     "told": "Vrearndreas sets type for a living.",
+     "gold": [
+      "Vrearndreas",
+      "type"
+     ],
+     "assertions": [],
+     "whole": false,
+     "read": 0
+    },
+    {
+     "kind": "number",
+     "told": "I counted 35 wool cards in the boot room.",
+     "gold": [
+      "wool cards",
+      "boot room",
+      "35"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "counted",
+       "object": "wool cards",
+       "place": "boot room",
+       "quantity": "35"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Mohoufaern keeps the flour sacks in the dairy.",
+     "gold": [
+      "Mohoufaern",
+      "flour sacks",
+      "dairy"
+     ],
+     "assertions": [
+      {
+       "subject": "mohoufaern",
+       "relation": "keeps",
+       "object": "flour",
+       "place": "sacks",
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "Someone painted the cracked plates indigo.",
+     "gold": [
+      "cracked plates",
+      "indigo"
+     ],
+     "assertions": [
+      {
+       "subject": "someone",
+       "relation": "painted",
+       "object": "plates indigo",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Sailoun is Dethol's cousin.",
+     "gold": [
+      "Sailoun",
+      "Dethol",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "sailoun",
+       "relation": "is cousin",
+       "object": "dethol",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "trade",
+     "told": "These days Sailoun mends nets.",
+     "gold": [
+      "Sailoun",
+      "nets"
+     ],
+     "assertions": [],
+     "whole": false,
+     "read": 0
+    },
+    {
+     "kind": "number",
+     "told": "There are 35 walking sticks in the cellar.",
+     "gold": [
+      "walking sticks",
+      "cellar",
+      "35"
+     ],
+     "assertions": [
+      {
+       "subject": "walking sticks",
+       "relation": "are",
+       "object": null,
+       "place": null,
+       "quantity": "35"
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "The wool cards are Rondnesith's, and they live in the morning room.",
+     "gold": [
+      "Rondnesith",
+      "wool cards",
+      "morning room"
+     ],
+     "assertions": [
+      {
+       "subject": "wool cards",
+       "relation": "are",
+       "object": "rondnesith",
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "wool cards",
+       "relation": "live",
+       "object": null,
+       "place": "morning room",
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 2
+    },
+    {
+     "kind": "colour",
+     "told": "All the fishing floats are a sort of ochre colour.",
+     "gold": [
+      "fishing floats",
+      "ochre"
+     ],
+     "assertions": [
+      {
+       "subject": "fishing floats",
+       "relation": "are sort of",
+       "object": "ochre colour",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "I found out Doufeand is a cousin of Lidrond.",
+     "gold": [
+      "Doufeand",
+      "Lidrond",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "found out",
+       "object": null,
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "doufeand",
+       "relation": "is cousin of",
+       "object": "lidrond",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 2
+    },
+    {
+     "kind": "trade",
+     "told": "These days Dethol shoes horses.",
+     "gold": [
+      "Dethol",
+      "horses"
+     ],
+     "assertions": [],
+     "whole": false,
+     "read": 0
+    },
+    {
+     "kind": "number",
+     "told": "There are 87 wool cards in the still room.",
+     "gold": [
+      "wool cards",
+      "still room",
+      "87"
+     ],
+     "assertions": [
+      {
+       "subject": "wool cards",
+       "relation": "are",
+       "object": null,
+       "place": null,
+       "quantity": "87"
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Vrearndreas keeps the glass jars in the dairy.",
+     "gold": [
+      "Vrearndreas",
+      "glass jars",
+      "dairy"
+     ],
+     "assertions": [
+      {
+       "subject": "vrearndreas",
+       "relation": "keeps",
+       "object": "glass jars",
+       "place": "dairy",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "Someone painted the wool cards oxblood.",
+     "gold": [
+      "wool cards",
+      "oxblood"
+     ],
+     "assertions": [
+      {
+       "subject": "someone",
+       "relation": "painted",
+       "object": "wool cards",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "I found out Pindaist is a cousin of Drenham.",
+     "gold": [
+      "Pindaist",
+      "Drenham",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "found out",
+       "object": null,
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "pindaist",
+       "relation": "is cousin of",
+       "object": "drenham",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 2
+    },
+    {
+     "kind": "trade",
+     "told": "You know Guthern? Guthern binds books, that's the work.",
+     "gold": [
+      "Guthern",
+      "books"
+     ],
+     "assertions": [
+      {
+       "subject": "you",
+       "relation": "know",
+       "object": null,
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "that",
+       "relation": "'s",
+       "object": "work",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 2
+    },
+    {
+     "kind": "number",
+     "told": "The still room has 96 lanterns in it now.",
+     "gold": [
+      "lanterns",
+      "still room",
+      "96"
+     ],
+     "assertions": [
+      {
+       "subject": "still room",
+       "relation": "has",
+       "object": "lanterns",
+       "place": "still room",
+       "quantity": "96"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Bretaerk keeps the lanterns in the laundry.",
+     "gold": [
+      "Bretaerk",
+      "lanterns",
+      "laundry"
+     ],
+     "assertions": [
+      {
+       "subject": "bretaerk",
+       "relation": "keeps",
+       "object": "lanterns",
+       "place": "laundry",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "Someone painted the seed trays verdigris.",
+     "gold": [
+      "seed trays",
+      "verdigris"
+     ],
+     "assertions": [
+      {
+       "subject": "someone",
+       "relation": "painted",
+       "object": "seed",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "I found out Greaflumost is a cousin of Henound.",
+     "gold": [
+      "Greaflumost",
+      "Henound",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "found out",
+       "object": null,
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "greaflumost",
+       "relation": "is cousin of",
+       "object": "henound",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 2
+    },
+    {
+     "kind": "trade",
+     "told": "Lidrond grinds lenses for a living.",
+     "gold": [
+      "Lidrond",
+      "lenses"
+     ],
+     "assertions": [
+      {
+       "subject": "lidrond",
+       "relation": "grinds",
+       "object": "lenses",
+       "place": "living",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "number",
+     "told": "The morning room has 32 cracked plates in it now.",
+     "gold": [
+      "cracked plates",
+      "morning room",
+      "32"
+     ],
+     "assertions": [
+      {
+       "subject": "morning room",
+       "relation": "has",
+       "object": "cracked plates",
+       "place": "morning room",
+       "quantity": "32"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Vaiffstaerkgiork keeps the walking sticks in the nursery.",
+     "gold": [
+      "Vaiffstaerkgiork",
+      "walking sticks",
+      "nursery"
+     ],
+     "assertions": [
+      {
+       "subject": "vaiffstaerkgiork",
+       "relation": "keeps",
+       "object": "walking sticks",
+       "place": "nursery",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "The walking sticks are indigo.",
+     "gold": [
+      "walking sticks",
+      "indigo"
+     ],
+     "assertions": [
+      {
+       "subject": "walking sticks",
+       "relation": "are",
+       "object": "indigo",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "I found out Rondnesith is a cousin of Sloufarplaim.",
+     "gold": [
+      "Rondnesith",
+      "Sloufarplaim",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "found out",
+       "object": null,
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "rondnesith",
+       "relation": "is cousin of",
+       "object": "sloufarplaim",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 2
+    },
+    {
+     "kind": "trade",
+     "told": "These days Bretaerk shoes horses.",
+     "gold": [
+      "Bretaerk",
+      "horses"
+     ],
+     "assertions": [],
+     "whole": false,
+     "read": 0
+    },
+    {
+     "kind": "number",
+     "told": "I counted 26 lanterns in the gun room.",
+     "gold": [
+      "lanterns",
+      "gun room",
+      "26"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "counted",
+       "object": "lanterns",
+       "place": "gun room",
+       "quantity": "26"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Henound put the seed trays in the scullery for safekeeping.",
+     "gold": [
+      "Henound",
+      "seed trays",
+      "scullery"
+     ],
+     "assertions": [
+      {
+       "subject": "henound",
+       "relation": "put",
+       "object": "seed trays",
+       "place": "scullery",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "All the lanterns are a sort of slate colour.",
+     "gold": [
+      "lanterns",
+      "slate"
+     ],
+     "assertions": [
+      {
+       "subject": "lanterns",
+       "relation": "are sort of",
+       "object": "slate colour",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Humstaegaeck is Slarother's cousin.",
+     "gold": [
+      "Humstaegaeck",
+      "Slarother",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "humstaegaeck",
+       "relation": "is cousin",
+       "object": "slarother",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "trade",
+     "told": "Rondnesith carves spoons for a living.",
+     "gold": [
+      "Rondnesith",
+      "spoons"
+     ],
+     "assertions": [],
+     "whole": false,
+     "read": 0
+    },
+    {
+     "kind": "number",
+     "told": "The scullery has 37 flour sacks in it now.",
+     "gold": [
+      "flour sacks",
+      "scullery",
+      "37"
+     ],
+     "assertions": [
+      {
+       "subject": "scullery",
+       "relation": "has",
+       "object": "flour sacks",
+       "place": "scullery",
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "The candle moulds are Humstaegaeck's, and they live in the morning room.",
+     "gold": [
+      "Humstaegaeck",
+      "candle moulds",
+      "morning room"
+     ],
+     "assertions": [
+      {
+       "subject": "candle moulds",
+       "relation": "are",
+       "object": "humstaegaeck",
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "candle moulds",
+       "relation": "live",
+       "object": null,
+       "place": "morning room",
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 2
+    },
+    {
+     "kind": "colour",
+     "told": "All the iron hooks are a sort of bone colour.",
+     "gold": [
+      "iron hooks",
+      "bone"
+     ],
+     "assertions": [
+      {
+       "subject": "iron hooks",
+       "relation": "are sort of",
+       "object": "bone colour",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Plodriorn is Guthern's cousin.",
+     "gold": [
+      "Plodriorn",
+      "Guthern",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "plodriorn",
+       "relation": "is cousin",
+       "object": "guthern",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "trade",
+     "told": "These days Pindaist mends nets.",
+     "gold": [
+      "Pindaist",
+      "nets"
+     ],
+     "assertions": [],
+     "whole": false,
+     "read": 0
+    },
+    {
+     "kind": "number",
+     "told": "There are 65 wool cards in the dairy.",
+     "gold": [
+      "wool cards",
+      "dairy",
+      "65"
+     ],
+     "assertions": [
+      {
+       "subject": "wool cards",
+       "relation": "are",
+       "object": null,
+       "place": null,
+       "quantity": "65"
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Doufeand put the fishing floats in the gun room for safekeeping.",
+     "gold": [
+      "Doufeand",
+      "fishing floats",
+      "gun room"
+     ],
+     "assertions": [
+      {
+       "subject": "doufeand",
+       "relation": "put",
+       "object": "fishing floats",
+       "place": "gun room",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "All the candle moulds are a sort of ochre colour.",
+     "gold": [
+      "candle moulds",
+      "ochre"
+     ],
+     "assertions": [
+      {
+       "subject": "candle moulds",
+       "relation": "are sort of",
+       "object": "ochre colour",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Bretaerk and Groplourk are cousins, Bretaerk on the other side.",
+     "gold": [
+      "Bretaerk",
+      "Groplourk",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "bretaerk",
+       "relation": "are cousins",
+       "object": "groplourk",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "trade",
+     "told": "These days Humstaegaeck keeps bees.",
+     "gold": [
+      "Humstaegaeck",
+      "bees"
+     ],
+     "assertions": [
+      {
+       "subject": "humstaegaeck",
+       "relation": "keeps",
+       "object": "bees",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "number",
+     "told": "The still room has 45 glass jars in it now.",
+     "gold": [
+      "glass jars",
+      "still room",
+      "45"
+     ],
+     "assertions": [
+      {
+       "subject": "still room",
+       "relation": "has",
+       "object": "glass jars",
+       "place": "still room",
+       "quantity": "45"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "The glass jars are Humstaegaeck's, and they live in the boot room.",
+     "gold": [
+      "Humstaegaeck",
+      "glass jars",
+      "boot room"
+     ],
+     "assertions": [
+      {
+       "subject": "glass jars",
+       "relation": "are",
+       "object": "humstaegaeck",
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "glass jars",
+       "relation": "live",
+       "object": null,
+       "place": "boot room",
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 2
+    },
+    {
+     "kind": "colour",
+     "told": "All the glass jars are a sort of indigo colour.",
+     "gold": [
+      "glass jars",
+      "indigo"
+     ],
+     "assertions": [
+      {
+       "subject": "glass jars",
+       "relation": "are sort of",
+       "object": "indigo colour",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "I found out Mohoufaern is a cousin of Vrearndreas.",
+     "gold": [
+      "Mohoufaern",
+      "Vrearndreas",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "found out",
+       "object": null,
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "mohoufaern",
+       "relation": "is cousin of",
+       "object": "vrearndreas",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 2
+    },
+    {
+     "kind": "trade",
+     "told": "These days Faegark shoes horses.",
+     "gold": [
+      "Faegark",
+      "horses"
+     ],
+     "assertions": [],
+     "whole": false,
+     "read": 0
+    },
+    {
+     "kind": "number",
+     "told": "The boot room has 12 glass jars in it now.",
+     "gold": [
+      "glass jars",
+      "boot room",
+      "12"
+     ],
+     "assertions": [
+      {
+       "subject": "boot room",
+       "relation": "has",
+       "object": "glass jars",
+       "place": "boot room",
+       "quantity": "12"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Sailoun put the flour sacks in the cellar for safekeeping.",
+     "gold": [
+      "Sailoun",
+      "flour sacks",
+      "cellar"
+     ],
+     "assertions": [
+      {
+       "subject": "sailoun",
+       "relation": "put",
+       "object": "flour sacks",
+       "place": "cellar",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "All the flour sacks are a sort of slate colour.",
+     "gold": [
+      "flour sacks",
+      "slate"
+     ],
+     "assertions": [
+      {
+       "subject": "flour sacks",
+       "relation": "are sort of",
+       "object": "slate colour",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Faegark and Vaiffstaerkgiork are cousins, Faegark on the other side.",
+     "gold": [
+      "Faegark",
+      "Vaiffstaerkgiork",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "faegark",
+       "relation": "are cousins",
+       "object": "vaiffstaerkgiork",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    }
+   ],
+   "filler": {
+    "It has been raining all week.": [
+     {
+      "subject": "it",
+      "relation": "raining",
+      "object": null,
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "I think the kettle needs descaling again.": [
+     {
+      "subject": "i",
+      "relation": "think",
+      "object": null,
+      "place": null,
+      "quantity": null
+     },
+     {
+      "subject": "kettle",
+      "relation": "needs",
+      "object": null,
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "There is a van parked badly at the end of the road.": [
+     {
+      "subject": "van",
+      "relation": "is",
+      "object": null,
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "I slept badly and I blame the wind.": [
+     {
+      "subject": "i",
+      "relation": "slept",
+      "object": null,
+      "place": null,
+      "quantity": null
+     },
+     {
+      "subject": "i",
+      "relation": "blame",
+      "object": "wind",
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "Somebody has been leaving the gate open.": [
+     {
+      "subject": "somebody",
+      "relation": "leaving",
+      "object": "gate",
+      "place": "open",
+      "quantity": null
+     }
+    ],
+    "The bread came out flat this time.": [
+     {
+      "subject": "bread",
+      "relation": "came out",
+      "object": null,
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "I keep meaning to sort out the shed.": [
+     {
+      "subject": "i",
+      "relation": "keep",
+      "object": "meaning",
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "It gets dark so early now.": [
+     {
+      "subject": "it",
+      "relation": "gets",
+      "object": "dark",
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "The post was late again this morning.": [
+     {
+      "subject": "post",
+      "relation": "was",
+      "object": "late",
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "I had that same dream about a staircase.": [
+     {
+      "subject": "i",
+      "relation": "had",
+      "object": "same dream",
+      "place": "staircase",
+      "quantity": null
+     }
+    ],
+    "The tap in the bathroom has started dripping.": [
+     {
+      "subject": "tap",
+      "relation": "started",
+      "object": null,
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "I should probably go for a walk later.": [
+     {
+      "subject": "i",
+      "relation": "go",
+      "object": null,
+      "place": "walk",
+      "quantity": null
+     }
+    ]
+   }
+  },
+  {
+   "seed": 1,
+   "recall": 0.8,
+   "precision": 0.87,
+   "filler_assertions_per_sentence": 1.17,
+   "by_kind": {
+    "colour": 0.7,
+    "number": 0.9,
+    "place": 0.8,
+    "relation": 1.0,
+    "trade": 0.6
+   },
+   "ms_per_read": 6.6,
+   "rows": [
+    {
+     "kind": "trade",
+     "told": "Stounfleath carves spoons for a living.",
+     "gold": [
+      "Stounfleath",
+      "spoons"
+     ],
+     "assertions": [
+      {
+       "subject": "stounfleath",
+       "relation": "carves",
+       "object": "spoons",
+       "place": "living",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "number",
+     "told": "I counted 35 walking sticks in the cellar.",
+     "gold": [
+      "walking sticks",
+      "cellar",
+      "35"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "counted",
+       "object": "walking sticks",
+       "place": "cellar",
+       "quantity": "35"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Diockvindvraem keeps the iron hooks in the cellar.",
+     "gold": [
+      "Diockvindvraem",
+      "iron hooks",
+      "cellar"
+     ],
+     "assertions": [
+      {
+       "subject": "diockvindvraem",
+       "relation": "keeps",
+       "object": "iron hooks",
+       "place": "cellar",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "All the walking sticks are a sort of ochre colour.",
+     "gold": [
+      "walking sticks",
+      "ochre"
+     ],
+     "assertions": [
+      {
+       "subject": "walking sticks",
+       "relation": "are sort of",
+       "object": "ochre colour",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Kreffvrioff is Saisstoutrack's cousin.",
+     "gold": [
+      "Kreffvrioff",
+      "Saisstoutrack",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "kreffvrioff",
+       "relation": "is cousin",
+       "object": "saisstoutrack",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "trade",
+     "told": "Tolteavrand binds books for a living.",
+     "gold": [
+      "Tolteavrand",
+      "books"
+     ],
+     "assertions": [
+      {
+       "subject": "tolteavrand",
+       "relation": "binds",
+       "object": "books",
+       "place": "living",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "number",
+     "told": "I counted 56 iron hooks in the dairy.",
+     "gold": [
+      "iron hooks",
+      "dairy",
+      "56"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "counted",
+       "object": "iron hooks",
+       "place": "dairy",
+       "quantity": "56"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Pudrouck put the iron hooks in the still room for safekeeping.",
+     "gold": [
+      "Pudrouck",
+      "iron hooks",
+      "still room"
+     ],
+     "assertions": [
+      {
+       "subject": "pudrouck",
+       "relation": "put",
+       "object": "iron hooks",
+       "place": "still room",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "The iron hooks are ochre.",
+     "gold": [
+      "iron hooks",
+      "ochre"
+     ],
+     "assertions": [
+      {
+       "subject": "iron hooks",
+       "relation": "are",
+       "object": "ochre",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Plimkis and Trapairk are cousins, Plimkis on the other side.",
+     "gold": [
+      "Plimkis",
+      "Trapairk",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "plimkis",
+       "relation": "are cousins",
+       "object": "trapairk",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "trade",
+     "told": "You know Fligrodioth? Fligrodioth repairs clocks, that's the work.",
+     "gold": [
+      "Fligrodioth",
+      "clocks"
+     ],
+     "assertions": [
+      {
+       "subject": "you",
+       "relation": "know",
+       "object": "fligrodioth",
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "that",
+       "relation": "'s",
+       "object": "work",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 2
+    },
+    {
+     "kind": "number",
+     "told": "The morning room has 29 candle moulds in it now.",
+     "gold": [
+      "candle moulds",
+      "morning room",
+      "29"
+     ],
+     "assertions": [
+      {
+       "subject": "morning room",
+       "relation": "has",
+       "object": "candle moulds",
+       "place": "morning room",
+       "quantity": "29"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Stounfleath keeps the flour sacks in the boot room.",
+     "gold": [
+      "Stounfleath",
+      "flour sacks",
+      "boot room"
+     ],
+     "assertions": [
+      {
+       "subject": "stounfleath",
+       "relation": "keeps",
+       "object": "flour",
+       "place": "sacks",
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "Someone painted the candle moulds russet.",
+     "gold": [
+      "candle moulds",
+      "russet"
+     ],
+     "assertions": [
+      {
+       "subject": "someone",
+       "relation": "painted",
+       "object": "moulds russet",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "I found out Groviovael is a cousin of Beagren.",
+     "gold": [
+      "Groviovael",
+      "Beagren",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "found out",
+       "object": null,
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "groviovael",
+       "relation": "is cousin of",
+       "object": "beagren",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 2
+    },
+    {
+     "kind": "trade",
+     "told": "You know Kupiodriom? Kupiodriom sets type, that's the work.",
+     "gold": [
+      "Kupiodriom",
+      "type"
+     ],
+     "assertions": [
+      {
+       "subject": "you",
+       "relation": "know",
+       "object": "kupiodriom",
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "kupiodriom sets",
+       "relation": "type",
+       "object": null,
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "kupiodriom sets",
+       "relation": "'s",
+       "object": "work",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 3
+    },
+    {
+     "kind": "number",
+     "told": "I counted 75 flour sacks in the cellar.",
+     "gold": [
+      "flour sacks",
+      "cellar",
+      "75"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "counted",
+       "object": "flour sacks",
+       "place": "cellar",
+       "quantity": "75"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Fligrodioth put the wool cards in the cellar for safekeeping.",
+     "gold": [
+      "Fligrodioth",
+      "wool cards",
+      "cellar"
+     ],
+     "assertions": [
+      {
+       "subject": "fligrodioth",
+       "relation": "put",
+       "object": "wool cards",
+       "place": "cellar",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "Someone painted the flour sacks indigo.",
+     "gold": [
+      "flour sacks",
+      "indigo"
+     ],
+     "assertions": [
+      {
+       "subject": "someone",
+       "relation": "painted",
+       "object": "flour",
+       "place": "sacks indigo",
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Kenastem and Grairiomirn are cousins, Kenastem on the other side.",
+     "gold": [
+      "Kenastem",
+      "Grairiomirn",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "kenastem",
+       "relation": "are cousins",
+       "object": "grairiomirn",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "trade",
+     "told": "Trapairk mends nets for a living.",
+     "gold": [
+      "Trapairk",
+      "nets"
+     ],
+     "assertions": [],
+     "whole": false,
+     "read": 0
+    },
+    {
+     "kind": "number",
+     "told": "I counted 22 candle moulds in the scullery.",
+     "gold": [
+      "candle moulds",
+      "scullery",
+      "22"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "counted",
+       "object": "candle moulds",
+       "place": "scullery",
+       "quantity": "22"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Trapairk keeps the wool cards in the morning room.",
+     "gold": [
+      "Trapairk",
+      "wool cards",
+      "morning room"
+     ],
+     "assertions": [
+      {
+       "subject": "trapairk",
+       "relation": "keeps",
+       "object": "wool cards",
+       "place": "morning room",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "All the cracked plates are a sort of mustard colour.",
+     "gold": [
+      "cracked plates",
+      "mustard"
+     ],
+     "assertions": [
+      {
+       "subject": "cracked plates",
+       "relation": "are sort of",
+       "object": "mustard colour",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "I found out Pudrouck is a cousin of Nogael.",
+     "gold": [
+      "Pudrouck",
+      "Nogael",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "found out",
+       "object": null,
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "pudrouck",
+       "relation": "is cousin of",
+       "object": "nogael",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 2
+    },
+    {
+     "kind": "trade",
+     "told": "Beagren binds books for a living.",
+     "gold": [
+      "Beagren",
+      "books"
+     ],
+     "assertions": [
+      {
+       "subject": "beagren",
+       "relation": "binds",
+       "object": "books",
+       "place": "living",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "number",
+     "told": "The attic has 44 fishing floats in it now.",
+     "gold": [
+      "fishing floats",
+      "attic",
+      "44"
+     ],
+     "assertions": [
+      {
+       "subject": "attic",
+       "relation": "has",
+       "object": "fishing floats",
+       "place": "attic",
+       "quantity": "44"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Kenastem put the candle moulds in the pantry for safekeeping.",
+     "gold": [
+      "Kenastem",
+      "candle moulds",
+      "pantry"
+     ],
+     "assertions": [
+      {
+       "subject": "kenastem",
+       "relation": "put",
+       "object": "candle moulds",
+       "place": "pantry",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "Someone painted the fishing floats mustard.",
+     "gold": [
+      "fishing floats",
+      "mustard"
+     ],
+     "assertions": [
+      {
+       "subject": "someone",
+       "relation": "painted",
+       "object": "floats mustard",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Diockvindvraem is Tirbogrock's cousin.",
+     "gold": [
+      "Diockvindvraem",
+      "Tirbogrock",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "diockvindvraem",
+       "relation": "is cousin",
+       "object": "tirbogrock",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "trade",
+     "told": "These days Plimkis sets type.",
+     "gold": [
+      "Plimkis",
+      "type"
+     ],
+     "assertions": [],
+     "whole": false,
+     "read": 0
+    },
+    {
+     "kind": "number",
+     "told": "There are 15 glass jars in the attic.",
+     "gold": [
+      "glass jars",
+      "attic",
+      "15"
+     ],
+     "assertions": [
+      {
+       "subject": "glass jars",
+       "relation": "are",
+       "object": null,
+       "place": null,
+       "quantity": "15"
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Stounfleath keeps the lanterns in the coach house.",
+     "gold": [
+      "Stounfleath",
+      "lanterns",
+      "coach house"
+     ],
+     "assertions": [
+      {
+       "subject": "stounfleath",
+       "relation": "keeps",
+       "object": "lanterns",
+       "place": "coach house",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "All the lanterns are a sort of slate colour.",
+     "gold": [
+      "lanterns",
+      "slate"
+     ],
+     "assertions": [
+      {
+       "subject": "lanterns",
+       "relation": "are sort of",
+       "object": "slate colour",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Bouckstock and Tolteavrand are cousins, Bouckstock on the other side.",
+     "gold": [
+      "Bouckstock",
+      "Tolteavrand",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "bouckstock",
+       "relation": "are cousins",
+       "object": "tolteavrand",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "trade",
+     "told": "Pudrouck mends nets for a living.",
+     "gold": [
+      "Pudrouck",
+      "nets"
+     ],
+     "assertions": [
+      {
+       "subject": "pudrouck",
+       "relation": "mends",
+       "object": "nets",
+       "place": "living",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "number",
+     "told": "I counted 59 seed trays in the boot room.",
+     "gold": [
+      "seed trays",
+      "boot room",
+      "59"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "counted",
+       "object": "seed trays",
+       "place": "boot room",
+       "quantity": "59"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Pudrouck keeps the seed trays in the nursery.",
+     "gold": [
+      "Pudrouck",
+      "seed trays",
+      "nursery"
+     ],
+     "assertions": [
+      {
+       "subject": "pudrouck",
+       "relation": "keeps",
+       "object": "seed trays",
+       "place": "nursery",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "All the glass jars are a sort of bone colour.",
+     "gold": [
+      "glass jars",
+      "bone"
+     ],
+     "assertions": [
+      {
+       "subject": "glass jars",
+       "relation": "are sort of",
+       "object": "bone colour",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Branos is Truthtrouvoust's cousin.",
+     "gold": [
+      "Branos",
+      "Truthtrouvoust",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "branos",
+       "relation": "is cousin",
+       "object": "truthtrouvoust",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "trade",
+     "told": "These days Truthtrouvoust grinds lenses.",
+     "gold": [
+      "Truthtrouvoust",
+      "lenses"
+     ],
+     "assertions": [
+      {
+       "subject": "truthtrouvoust",
+       "relation": "grinds",
+       "object": "lenses",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "number",
+     "told": "I counted 13 flour sacks in the attic.",
+     "gold": [
+      "flour sacks",
+      "attic",
+      "13"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "counted",
+       "object": "flour sacks",
+       "place": "attic",
+       "quantity": "13"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "The wool cards are Nogael's, and they live in the dairy.",
+     "gold": [
+      "Nogael",
+      "wool cards",
+      "dairy"
+     ],
+     "assertions": [
+      {
+       "subject": "wool cards",
+       "relation": "are",
+       "object": "nogael",
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "wool cards",
+       "relation": "live",
+       "object": null,
+       "place": "dairy",
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 2
+    },
+    {
+     "kind": "colour",
+     "told": "All the wool cards are a sort of slate colour.",
+     "gold": [
+      "wool cards",
+      "slate"
+     ],
+     "assertions": [
+      {
+       "subject": "wool cards",
+       "relation": "are sort of",
+       "object": "slate colour",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "I found out Stounfleath is a cousin of Bouffdrourstoff.",
+     "gold": [
+      "Stounfleath",
+      "Bouffdrourstoff",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "found out",
+       "object": null,
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "stounfleath",
+       "relation": "is cousin of",
+       "object": "bouffdrourstoff",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 2
+    },
+    {
+     "kind": "trade",
+     "told": "Bouffdrourstoff sets type for a living.",
+     "gold": [
+      "Bouffdrourstoff",
+      "type"
+     ],
+     "assertions": [],
+     "whole": false,
+     "read": 0
+    },
+    {
+     "kind": "number",
+     "told": "The pantry has 81 lanterns in it now.",
+     "gold": [
+      "lanterns",
+      "pantry",
+      "81"
+     ],
+     "assertions": [
+      {
+       "subject": "pantry",
+       "relation": "has",
+       "object": "lanterns",
+       "place": "pantry",
+       "quantity": "81"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Branos put the fishing floats in the morning room for safekeeping.",
+     "gold": [
+      "Branos",
+      "fishing floats",
+      "morning room"
+     ],
+     "assertions": [
+      {
+       "subject": "branos",
+       "relation": "put",
+       "object": "fishing floats",
+       "place": "morning room",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "All the seed trays are a sort of russet colour.",
+     "gold": [
+      "seed trays",
+      "russet"
+     ],
+     "assertions": [
+      {
+       "subject": "seed trays",
+       "relation": "are sort of",
+       "object": "russet colour",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "I found out Kupiodriom is a cousin of Fligrodioth.",
+     "gold": [
+      "Kupiodriom",
+      "Fligrodioth",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "found out",
+       "object": null,
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "kupiodriom",
+       "relation": "is cousin of",
+       "object": "fligrodioth",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 2
+    }
+   ],
+   "filler": {
+    "It has been raining all week.": [
+     {
+      "subject": "it",
+      "relation": "raining",
+      "object": null,
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "I think the kettle needs descaling again.": [
+     {
+      "subject": "i",
+      "relation": "think",
+      "object": null,
+      "place": null,
+      "quantity": null
+     },
+     {
+      "subject": "kettle",
+      "relation": "needs",
+      "object": null,
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "There is a van parked badly at the end of the road.": [
+     {
+      "subject": "van",
+      "relation": "is",
+      "object": null,
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "I slept badly and I blame the wind.": [
+     {
+      "subject": "i",
+      "relation": "slept",
+      "object": null,
+      "place": null,
+      "quantity": null
+     },
+     {
+      "subject": "i",
+      "relation": "blame",
+      "object": "wind",
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "Somebody has been leaving the gate open.": [
+     {
+      "subject": "somebody",
+      "relation": "leaving",
+      "object": "gate",
+      "place": "open",
+      "quantity": null
+     }
+    ],
+    "The bread came out flat this time.": [
+     {
+      "subject": "bread",
+      "relation": "came out",
+      "object": null,
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "I keep meaning to sort out the shed.": [
+     {
+      "subject": "i",
+      "relation": "keep",
+      "object": "meaning",
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "It gets dark so early now.": [
+     {
+      "subject": "it",
+      "relation": "gets",
+      "object": "dark",
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "The post was late again this morning.": [
+     {
+      "subject": "post",
+      "relation": "was",
+      "object": "late",
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "I had that same dream about a staircase.": [
+     {
+      "subject": "i",
+      "relation": "had",
+      "object": "same dream",
+      "place": "staircase",
+      "quantity": null
+     }
+    ],
+    "The tap in the bathroom has started dripping.": [
+     {
+      "subject": "tap",
+      "relation": "started",
+      "object": null,
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "I should probably go for a walk later.": [
+     {
+      "subject": "i",
+      "relation": "go",
+      "object": null,
+      "place": "walk",
+      "quantity": null
+     }
+    ]
+   }
+  },
+  {
+   "seed": 2,
+   "recall": 0.74,
+   "precision": 0.712,
+   "filler_assertions_per_sentence": 1.17,
+   "by_kind": {
+    "colour": 0.8,
+    "number": 0.4,
+    "place": 0.7,
+    "relation": 1.0,
+    "trade": 0.8
+   },
+   "ms_per_read": 7.1,
+   "rows": [
+    {
+     "kind": "trade",
+     "told": "You know Silfem? Silfem repairs clocks, that's the work.",
+     "gold": [
+      "Silfem",
+      "clocks"
+     ],
+     "assertions": [
+      {
+       "subject": "you",
+       "relation": "know",
+       "object": null,
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "that",
+       "relation": "'s",
+       "object": "work",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 2
+    },
+    {
+     "kind": "number",
+     "told": "The morning room has 87 iron hooks in it now.",
+     "gold": [
+      "iron hooks",
+      "morning room",
+      "87"
+     ],
+     "assertions": [
+      {
+       "subject": "morning room",
+       "relation": "has",
+       "object": "iron hooks",
+       "place": "morning room",
+       "quantity": "87"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Kaiffputhourn keeps the lanterns in the morning room.",
+     "gold": [
+      "Kaiffputhourn",
+      "lanterns",
+      "morning room"
+     ],
+     "assertions": [
+      {
+       "subject": "kaiffputhourn",
+       "relation": "keeps",
+       "object": "lanterns",
+       "place": "morning room",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "The seed trays are slate.",
+     "gold": [
+      "seed trays",
+      "slate"
+     ],
+     "assertions": [
+      {
+       "subject": "seed trays",
+       "relation": "are",
+       "object": "slate",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Kroudroth and Treffbuvraind are cousins, Kroudroth on the other side.",
+     "gold": [
+      "Kroudroth",
+      "Treffbuvraind",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "kroudroth",
+       "relation": "are cousins",
+       "object": "treffbuvraind",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "trade",
+     "told": "You know Laistkeatrouth? Laistkeatrouth grinds lenses, that's the work.",
+     "gold": [
+      "Laistkeatrouth",
+      "lenses"
+     ],
+     "assertions": [
+      {
+       "subject": "you",
+       "relation": "know",
+       "object": "laistkeatrouth",
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "laistkeatrouth",
+       "relation": "grinds",
+       "object": "lenses",
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "laistkeatrouth",
+       "relation": "'s",
+       "object": "work",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 3
+    },
+    {
+     "kind": "number",
+     "told": "There are 34 glass jars in the boot room.",
+     "gold": [
+      "glass jars",
+      "boot room",
+      "34"
+     ],
+     "assertions": [
+      {
+       "subject": "glass jars",
+       "relation": "are",
+       "object": null,
+       "place": null,
+       "quantity": "34"
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Faebion keeps the fishing floats in the coach house.",
+     "gold": [
+      "Faebion",
+      "fishing floats",
+      "coach house"
+     ],
+     "assertions": [
+      {
+       "subject": "faebion",
+       "relation": "keeps",
+       "object": "fishing floats",
+       "place": "coach house",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "All the cracked plates are a sort of oxblood colour.",
+     "gold": [
+      "cracked plates",
+      "oxblood"
+     ],
+     "assertions": [
+      {
+       "subject": "cracked plates",
+       "relation": "are sort of",
+       "object": "oxblood colour",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "I found out Silfem is a cousin of Kaiffputhourn.",
+     "gold": [
+      "Silfem",
+      "Kaiffputhourn",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "found out",
+       "object": null,
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "silfem",
+       "relation": "is cousin of",
+       "object": "kaiffputhourn",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 2
+    },
+    {
+     "kind": "trade",
+     "told": "You know Fentrus? Fentrus binds books, that's the work.",
+     "gold": [
+      "Fentrus",
+      "books"
+     ],
+     "assertions": [
+      {
+       "subject": "you",
+       "relation": "know",
+       "object": "fentrus",
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "fentrus",
+       "relation": "binds",
+       "object": "books",
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "fentrus",
+       "relation": "'s",
+       "object": "work",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 3
+    },
+    {
+     "kind": "number",
+     "told": "There are 22 walking sticks in the gun room.",
+     "gold": [
+      "walking sticks",
+      "gun room",
+      "22"
+     ],
+     "assertions": [
+      {
+       "subject": "walking sticks",
+       "relation": "are",
+       "object": null,
+       "place": null,
+       "quantity": "22"
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Treffbuvraind keeps the flour sacks in the cellar.",
+     "gold": [
+      "Treffbuvraind",
+      "flour sacks",
+      "cellar"
+     ],
+     "assertions": [
+      {
+       "subject": "treffbuvraind",
+       "relation": "keeps",
+       "object": "flour",
+       "place": "sacks",
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "The flour sacks are ochre.",
+     "gold": [
+      "flour sacks",
+      "ochre"
+     ],
+     "assertions": [
+      {
+       "subject": "flour sacks",
+       "relation": "are",
+       "object": "ochre",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "I found out Dankirn is a cousin of Krearirus.",
+     "gold": [
+      "Dankirn",
+      "Krearirus",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "found out",
+       "object": null,
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "dankirn",
+       "relation": "is cousin of",
+       "object": "krearirus",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 2
+    },
+    {
+     "kind": "trade",
+     "told": "These days Neathiff carves spoons.",
+     "gold": [
+      "Neathiff",
+      "spoons"
+     ],
+     "assertions": [
+      {
+       "subject": "neathiff",
+       "relation": "carves",
+       "object": "spoons",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "number",
+     "told": "There are 57 fishing floats in the nursery.",
+     "gold": [
+      "fishing floats",
+      "nursery",
+      "57"
+     ],
+     "assertions": [
+      {
+       "subject": "fishing floats",
+       "relation": "are",
+       "object": null,
+       "place": null,
+       "quantity": "57"
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "The lanterns are Treffbuvraind's, and they live in the coach house.",
+     "gold": [
+      "Treffbuvraind",
+      "lanterns",
+      "coach house"
+     ],
+     "assertions": [
+      {
+       "subject": "lanterns",
+       "relation": "are",
+       "object": "treffbuvraind",
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "lanterns",
+       "relation": "live",
+       "object": null,
+       "place": "coach house",
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 2
+    },
+    {
+     "kind": "colour",
+     "told": "All the lanterns are a sort of indigo colour.",
+     "gold": [
+      "lanterns",
+      "indigo"
+     ],
+     "assertions": [
+      {
+       "subject": "lanterns",
+       "relation": "are sort of",
+       "object": "indigo colour",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "I found out Faebion is a cousin of Siockthiost.",
+     "gold": [
+      "Faebion",
+      "Siockthiost",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "found out",
+       "object": null,
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "faebion",
+       "relation": "is cousin of",
+       "object": "siockthiost",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 2
+    },
+    {
+     "kind": "trade",
+     "told": "Beamibaerk thatches roofs for a living.",
+     "gold": [
+      "Beamibaerk",
+      "roofs"
+     ],
+     "assertions": [
+      {
+       "subject": "beamibaerk",
+       "relation": "thatches",
+       "object": "roofs",
+       "place": "living",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "number",
+     "told": "There are 80 iron hooks in the boot room.",
+     "gold": [
+      "iron hooks",
+      "boot room",
+      "80"
+     ],
+     "assertions": [
+      {
+       "subject": "iron hooks",
+       "relation": "are",
+       "object": null,
+       "place": null,
+       "quantity": "80"
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "The cracked plates are Flaiposaim's, and they live in the attic.",
+     "gold": [
+      "Flaiposaim",
+      "cracked plates",
+      "attic"
+     ],
+     "assertions": [
+      {
+       "subject": "cracked plates",
+       "relation": "are",
+       "object": "flaiposaim",
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "cracked plates",
+       "relation": "live",
+       "object": null,
+       "place": "attic",
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 2
+    },
+    {
+     "kind": "colour",
+     "told": "The walking sticks are slate.",
+     "gold": [
+      "walking sticks",
+      "slate"
+     ],
+     "assertions": [
+      {
+       "subject": "walking sticks",
+       "relation": "are",
+       "object": "slate",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Flaiposaim is Mioffflousioff's cousin.",
+     "gold": [
+      "Flaiposaim",
+      "Mioffflousioff",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "flaiposaim",
+       "relation": "is cousin",
+       "object": "mioffflousioff",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "trade",
+     "told": "These days Mioffflousioff mends nets.",
+     "gold": [
+      "Mioffflousioff",
+      "nets"
+     ],
+     "assertions": [],
+     "whole": false,
+     "read": 0
+    },
+    {
+     "kind": "number",
+     "told": "The scullery has 38 flour sacks in it now.",
+     "gold": [
+      "flour sacks",
+      "scullery",
+      "38"
+     ],
+     "assertions": [
+      {
+       "subject": "scullery",
+       "relation": "has",
+       "object": "flour sacks",
+       "place": "scullery",
+       "quantity": "38"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Slarstehur keeps the candle moulds in the nursery.",
+     "gold": [
+      "Slarstehur",
+      "candle moulds",
+      "nursery"
+     ],
+     "assertions": [
+      {
+       "subject": "slarstehur",
+       "relation": "keeps",
+       "object": "candle moulds",
+       "place": "nursery",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "The fishing floats are mustard.",
+     "gold": [
+      "fishing floats",
+      "mustard"
+     ],
+     "assertions": [
+      {
+       "subject": "fishing floats",
+       "relation": "are",
+       "object": "mustard",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Slarstehur is Deavral's cousin.",
+     "gold": [
+      "Slarstehur",
+      "Deavral",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "slarstehur",
+       "relation": "is cousin",
+       "object": "deavral",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "trade",
+     "told": "Kaiffputhourn keeps bees for a living.",
+     "gold": [
+      "Kaiffputhourn",
+      "bees"
+     ],
+     "assertions": [
+      {
+       "subject": "kaiffputhourn",
+       "relation": "keeps",
+       "object": "bees",
+       "place": "living",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "number",
+     "told": "There are 44 flour sacks in the coach house.",
+     "gold": [
+      "flour sacks",
+      "coach house",
+      "44"
+     ],
+     "assertions": [
+      {
+       "subject": "flour sacks",
+       "relation": "are",
+       "object": null,
+       "place": null,
+       "quantity": "44"
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Deavral put the fishing floats in the nursery for safekeeping.",
+     "gold": [
+      "Deavral",
+      "fishing floats",
+      "nursery"
+     ],
+     "assertions": [
+      {
+       "subject": "deavral",
+       "relation": "put",
+       "object": "fishing floats",
+       "place": "nursery",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "The glass jars are oxblood.",
+     "gold": [
+      "glass jars",
+      "oxblood"
+     ],
+     "assertions": [
+      {
+       "subject": "glass jars",
+       "relation": "are",
+       "object": "oxblood",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Broulbaereack is Laistkeatrouth's cousin.",
+     "gold": [
+      "Broulbaereack",
+      "Laistkeatrouth",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "broulbaereack",
+       "relation": "is cousin",
+       "object": "laistkeatrouth",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "trade",
+     "told": "Flaiposaim carves spoons for a living.",
+     "gold": [
+      "Flaiposaim",
+      "spoons"
+     ],
+     "assertions": [
+      {
+       "subject": "flaiposaim",
+       "relation": "carves",
+       "object": "spoons",
+       "place": "living",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "number",
+     "told": "There are 24 cracked plates in the still room.",
+     "gold": [
+      "cracked plates",
+      "still room",
+      "24"
+     ],
+     "assertions": [
+      {
+       "subject": "cracked plates",
+       "relation": "are",
+       "object": null,
+       "place": null,
+       "quantity": "24"
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Flaiposaim put the flour sacks in the morning room for safekeeping.",
+     "gold": [
+      "Flaiposaim",
+      "flour sacks",
+      "morning room"
+     ],
+     "assertions": [
+      {
+       "subject": "flaiposaim",
+       "relation": "put",
+       "object": "flour sacks",
+       "place": "morning room",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "Someone painted the iron hooks verdigris.",
+     "gold": [
+      "iron hooks",
+      "verdigris"
+     ],
+     "assertions": [
+      {
+       "subject": "someone",
+       "relation": "painted",
+       "object": "iron hooks",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Neathiff and Tralel are cousins, Neathiff on the other side.",
+     "gold": [
+      "Neathiff",
+      "Tralel",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "neathiff",
+       "relation": "are cousins",
+       "object": "tralel",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "trade",
+     "told": "You know Broulbaereack? Broulbaereack grinds lenses, that's the work.",
+     "gold": [
+      "Broulbaereack",
+      "lenses"
+     ],
+     "assertions": [
+      {
+       "subject": "you",
+       "relation": "know",
+       "object": null,
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "broulbaereack",
+       "relation": "grinds",
+       "object": "lenses",
+       "place": null,
+       "quantity": null
+      },
+      {
+       "subject": "broulbaereack",
+       "relation": "'s",
+       "object": "work",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 3
+    },
+    {
+     "kind": "number",
+     "told": "The cellar has 53 wool cards in it now.",
+     "gold": [
+      "wool cards",
+      "cellar",
+      "53"
+     ],
+     "assertions": [
+      {
+       "subject": "cellar",
+       "relation": "has",
+       "object": "wool cards",
+       "place": "cellar",
+       "quantity": "53"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Deavral put the lanterns in the pantry for safekeeping.",
+     "gold": [
+      "Deavral",
+      "lanterns",
+      "pantry"
+     ],
+     "assertions": [
+      {
+       "subject": "deavral",
+       "relation": "put",
+       "object": "lanterns",
+       "place": "pantry",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "All the wool cards are a sort of indigo colour.",
+     "gold": [
+      "wool cards",
+      "indigo"
+     ],
+     "assertions": [
+      {
+       "subject": "wool cards",
+       "relation": "are sort of",
+       "object": "indigo colour",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Beamibaerk is Stouffvouvraerk's cousin.",
+     "gold": [
+      "Beamibaerk",
+      "Stouffvouvraerk",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "beamibaerk",
+       "relation": "is cousin",
+       "object": "stouffvouvraerk",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "trade",
+     "told": "Krearirus carves spoons for a living.",
+     "gold": [
+      "Krearirus",
+      "spoons"
+     ],
+     "assertions": [
+      {
+       "subject": "krearirus",
+       "relation": "carves",
+       "object": "spoons",
+       "place": "living",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "number",
+     "told": "I counted 74 candle moulds in the laundry.",
+     "gold": [
+      "candle moulds",
+      "laundry",
+      "74"
+     ],
+     "assertions": [
+      {
+       "subject": "i",
+       "relation": "counted",
+       "object": "candle moulds",
+       "place": "laundry",
+       "quantity": "74"
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "place",
+     "told": "Dankirn keeps the fishing floats in the boot room.",
+     "gold": [
+      "Dankirn",
+      "fishing floats",
+      "boot room"
+     ],
+     "assertions": [
+      {
+       "subject": "dankirn",
+       "relation": "keeps",
+       "object": "fishing floats",
+       "place": "boot room",
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    },
+    {
+     "kind": "colour",
+     "told": "Someone painted the candle moulds russet.",
+     "gold": [
+      "candle moulds",
+      "russet"
+     ],
+     "assertions": [
+      {
+       "subject": "someone",
+       "relation": "painted",
+       "object": "moulds russet",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": false,
+     "read": 1
+    },
+    {
+     "kind": "relation",
+     "told": "Fentrus is Kourbinflouth's cousin.",
+     "gold": [
+      "Fentrus",
+      "Kourbinflouth",
+      "cousin"
+     ],
+     "assertions": [
+      {
+       "subject": "fentrus",
+       "relation": "is cousin",
+       "object": "kourbinflouth",
+       "place": null,
+       "quantity": null
+      }
+     ],
+     "whole": true,
+     "read": 1
+    }
+   ],
+   "filler": {
+    "It has been raining all week.": [
+     {
+      "subject": "it",
+      "relation": "raining",
+      "object": null,
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "I think the kettle needs descaling again.": [
+     {
+      "subject": "i",
+      "relation": "think",
+      "object": null,
+      "place": null,
+      "quantity": null
+     },
+     {
+      "subject": "kettle",
+      "relation": "needs",
+      "object": null,
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "There is a van parked badly at the end of the road.": [
+     {
+      "subject": "van",
+      "relation": "is",
+      "object": null,
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "I slept badly and I blame the wind.": [
+     {
+      "subject": "i",
+      "relation": "slept",
+      "object": null,
+      "place": null,
+      "quantity": null
+     },
+     {
+      "subject": "i",
+      "relation": "blame",
+      "object": "wind",
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "Somebody has been leaving the gate open.": [
+     {
+      "subject": "somebody",
+      "relation": "leaving",
+      "object": "gate",
+      "place": "open",
+      "quantity": null
+     }
+    ],
+    "The bread came out flat this time.": [
+     {
+      "subject": "bread",
+      "relation": "came out",
+      "object": null,
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "I keep meaning to sort out the shed.": [
+     {
+      "subject": "i",
+      "relation": "keep",
+      "object": "meaning",
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "It gets dark so early now.": [
+     {
+      "subject": "it",
+      "relation": "gets",
+      "object": "dark",
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "The post was late again this morning.": [
+     {
+      "subject": "post",
+      "relation": "was",
+      "object": "late",
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "I had that same dream about a staircase.": [
+     {
+      "subject": "i",
+      "relation": "had",
+      "object": "same dream",
+      "place": "staircase",
+      "quantity": null
+     }
+    ],
+    "The tap in the bathroom has started dripping.": [
+     {
+      "subject": "tap",
+      "relation": "started",
+      "object": null,
+      "place": null,
+      "quantity": null
+     }
+    ],
+    "I should probably go for a walk later.": [
+     {
+      "subject": "i",
+      "relation": "go",
+      "object": null,
+      "place": "walk",
+      "quantity": null
+     }
+    ]
+   }
+  }
+ ]
+}

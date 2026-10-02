@@ -77,14 +77,16 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   work both ways, joining wordings that are one relation and joining some that are not,
   so it comes out when the system joins wordings itself: the symbol encoder above,
   applied to relations, has that as its first measurable job.
-- **The parser reading, before the state rules.** John's, 2026-10-01. The learner's
-  principles carry to a general ear (plans induced from taught examples and kept while
-  they hold, abstention, facts over time, symbols); its structures do not (five slots,
-  shapes as question templates, plans as chains over five-slot rows). Phase 5's state
-  rules would be built on those structures, so first the house's tellings are parsed
-  (spaCy), mapped plainly to facts and scored on `scripts/ears.py`'s scorer against the
-  ear's 1.00, with the time a read takes. If a parse with a learnt mapping looks able to
-  carry the house, the state rules are built on it. See OPEN FORKS, a generic ear.
+- **Plans over the parse graph.** Proposed 2026-10-02, after the parser reading: the
+  transformer parse (`en_core_web_trf`) is reliable and fast, about 60 ms a sentence on the
+  CPU against the ear's 850, and a hand mapping from parse to five slots does not carry: it
+  reads 0.96 to 0.98 on the first house it was written against and 0.50 to 0.54 on the
+  held-out second house, where the ear reads 0.94. So the parse is kept as it is, words as
+  nodes and grammatical links as edges, and taught plans become paths through it from the
+  question's names to the answer, learnt from examples as chains over rows are now. "Lent
+  X to Y" and "Y borrowed X from Z" then need no mapping. Needs John before it starts: it
+  replaces the five-slot store the learner is built on, and the state rules after it.
+  Refuted if it cannot match the taught arm on the first house.
 - **Phase 5 — Learning rules, and operations over facts.** IN PROGRESS, 0.8B only. Plans
   learnt from taught examples answer bAbI tasks 1, 2, 3 and 7 and the house with no model
   planning: a shape nobody taught goes unanswered, so the faculty only reads. Every faculty

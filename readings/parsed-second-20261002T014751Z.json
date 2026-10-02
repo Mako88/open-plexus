@@ -1,0 +1,4427 @@
+{
+ "kind": "parsed",
+ "world": "second",
+ "taken_at": "20261002T014751Z",
+ "note": "the second house's tellings, held out from the mapping's making, read by the 0.8B ear (no relations list, cached) and by en_core_web_trf with scripts/parsed.py's mapping; gold is the subject, the answer and any thing, each in a slot of its own",
+ "seeds": [
+  {
+   "seed": 1,
+   "summary": {
+    "ear": {
+     "recall": 0.94,
+     "by_kind": {
+      "age": 1.0,
+      "kin": 1.0,
+      "loan": 0.7,
+      "material": 1.0,
+      "work": 1.0
+     }
+    },
+    "parse": {
+     "recall": 0.5,
+     "by_kind": {
+      "age": 0.6,
+      "kin": 0.3,
+      "loan": 0.5,
+      "material": 0.1,
+      "work": 1.0
+     }
+    }
+   },
+   "rows": {
+    "ear": [
+     {
+      "kind": "work",
+      "told": "Stounfleath works at the pottery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Stounfleath",
+        "relation": "works as",
+        "object": "pottery",
+        "place": "pottery",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Fligrodioth turned 42 this spring.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Fligrodioth",
+        "relation": "turned",
+        "object": "42",
+        "place": "this spring",
+        "quantity": "42"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Diockvindvraem borrowed the kite from Bouckstock.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Diockvindvraem",
+        "relation": "borrowed",
+        "object": "kite",
+        "place": "Bouckstock",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The birdcage is made of cork.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "birdcage",
+        "relation": "made of",
+        "object": "cork",
+        "place": "none",
+        "quantity": "none"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Pudrouck is Kreffvrioff's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Pudrouck",
+        "relation": "is godparent of",
+        "object": "Kreffvrioff",
+        "place": "none",
+        "quantity": "none"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Bouffdrourstoff has a job at the mill these days.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Bouffdrourstoff",
+        "relation": "has",
+        "object": "job",
+        "place": "mill",
+        "quantity": "these days"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Beagren is 75 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Beagren",
+        "relation": "is",
+        "object": "75",
+        "place": "now",
+        "quantity": "75"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Kenastem lent the sewing box to Groviovael.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Kenastem",
+        "relation": "lent",
+        "object": "sewing box",
+        "place": "Groviovael",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The ladder is all cork, as far as I can tell.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "ladder",
+        "relation": "is",
+        "object": "cork",
+        "place": "all",
+        "quantity": "as far as I can tell."
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Trapairk's godparent is Plimkis.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Trapairk's godparent",
+        "relation": "is",
+        "object": "Plimkis",
+        "place": "trapairk's godparent",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Fligrodioth spends the working day at the mill.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Fligrodioth",
+        "relation": "spends",
+        "object": "working day",
+        "place": "at the mill",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Stounfleath is 34 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Stounfleath",
+        "relation": "is",
+        "object": "34",
+        "place": "now",
+        "quantity": "34"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Tolteavrand lent the wheelbarrow to Stounfleath.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Tolteavrand",
+        "relation": "lent",
+        "object": "wheelbarrow",
+        "place": "Stounfleath",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The telescope is made of birch.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "telescope",
+        "relation": "made of",
+        "object": "birch",
+        "place": "none",
+        "quantity": "none"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Fligrodioth's godparent is Beagren.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Fligrodioth",
+        "relation": "is godparent of",
+        "object": "Beagren",
+        "place": "none",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Diockvindvraem spends the working day at the tannery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Diockvindvraem",
+        "relation": "spends",
+        "object": "the working day",
+        "place": "the tannery",
+        "quantity": "the working day"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Branos is 22 years old.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Branos",
+        "relation": "is",
+        "object": "22 years old",
+        "place": "none",
+        "quantity": "22"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The toolbox is Truthtrouvoust's, but Plimkis has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "toolbox",
+        "relation": "is",
+        "object": "Truthtrouvoust's",
+        "place": "Truthtrouvoust's",
+        "quantity": "1"
+       },
+       {
+        "subject": "Plimkis",
+        "relation": "has",
+        "object": "on loan",
+        "place": "on loan",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "Somebody made the sewing box out of tin.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "sewing box",
+        "relation": "made",
+        "object": "tin",
+        "place": "none",
+        "quantity": "none"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Grairiomirn is Bouckstock's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Grairiomirn",
+        "relation": "is godparent of",
+        "object": "Bouckstock",
+        "place": "Bouckstock's",
+        "quantity": "godparent"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Saisstoutrack spends the working day at the brewery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Saisstoutrack",
+        "relation": "spends",
+        "object": "working day",
+        "place": "at the brewery",
+        "quantity": "the"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Grairiomirn is 20 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Grairiomirn",
+        "relation": "is",
+        "object": "20",
+        "place": "now",
+        "quantity": "20"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Saisstoutrack borrowed the telescope from Kupiodriom.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Saisstoutrack",
+        "relation": "borrowed",
+        "object": "telescope",
+        "place": "Kupiodriom",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The fishing rod is made of brass.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "fishing rod",
+        "relation": "made of",
+        "object": "brass",
+        "place": "none",
+        "quantity": "none"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Branos's godparent is Tirbogrock.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Branos's godparent",
+        "relation": "is",
+        "object": "Tirbogrock",
+        "place": "none",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Branos has a job at the ropewalk these days.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Branos",
+        "relation": "has",
+        "object": "job",
+        "place": "ropewalk",
+        "quantity": "these days"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Tolteavrand is 28 years old.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Tolteavrand",
+        "relation": "is",
+        "object": "28 years old",
+        "place": "Tolteavrand",
+        "quantity": "28"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Diockvindvraem lent the birdcage to Trapairk.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Diockvindvraem",
+        "relation": "lent",
+        "object": "birdcage",
+        "place": "trapairk",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "Somebody made the bread tin out of pewter.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Somebody",
+        "relation": "made",
+        "object": "bread tin",
+        "place": "out of",
+        "quantity": "pewter"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Nogael stood as godparent to Saisstoutrack.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Nogael",
+        "relation": "stood as",
+        "object": "godparent",
+        "place": "Saisstoutrack",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Kupiodriom works at the printworks.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Kupiodriom",
+        "relation": "works as",
+        "object": "printworks",
+        "place": "workplace",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Nogael turned 88 this spring.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Nogael",
+        "relation": "turned",
+        "object": "88",
+        "place": "this spring",
+        "quantity": "88"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The rocking chair is Kreffvrioff's, but Nogael has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "The rocking chair",
+        "relation": "is",
+        "object": "Kreffvrioff's",
+        "place": "loan",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The wheelbarrow is made of horn.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "wheelbarrow",
+        "relation": "made of",
+        "object": "horn",
+        "place": "none",
+        "quantity": "none"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Kupiodriom stood as godparent to Groviovael.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Kupiodriom",
+        "relation": "stood as",
+        "object": "godparent",
+        "place": "Groviovael",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Tirbogrock spends the working day at the brewery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Tirbogrock",
+        "relation": "spends",
+        "object": "working day",
+        "place": "brewery",
+        "quantity": "1 day"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Pudrouck is 64 years old.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Pudrouck",
+        "relation": "is",
+        "object": "64 years old",
+        "place": "Pudrouck",
+        "quantity": "64"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Tolteavrand borrowed the bread tin from Stounfleath.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Tolteavrand",
+        "relation": "borrowed",
+        "object": "bread tin",
+        "place": "Stounfleath",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The rocking chair is made of pewter.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "rocking chair",
+        "relation": "made of",
+        "object": "pewter",
+        "place": "none",
+        "quantity": "none"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Bouffdrourstoff's godparent is Stounfleath.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Bouffdrourstoff's godparent",
+        "relation": "is",
+        "object": "Stounfleath",
+        "place": "Godparent",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Tolteavrand spends the working day at the chandlery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Tolteavrand",
+        "relation": "spends",
+        "object": "working day",
+        "place": "chandlery",
+        "quantity": "1 day"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Truthtrouvoust is 40 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Truthtrouvoust",
+        "relation": "is",
+        "object": "40",
+        "place": "now",
+        "quantity": "40"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Branos borrowed the fishing rod from Fligrodioth.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Branos",
+        "relation": "borrowed",
+        "object": "fishing rod",
+        "place": "from Fligrodioth",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The toolbox is made of cork.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "The toolbox",
+        "relation": "is made of",
+        "object": "cork",
+        "place": "none",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Kenastem is Truthtrouvoust's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Kenastem",
+        "relation": "is godparent of",
+        "object": "Truthtrouvoust",
+        "place": "Godparent",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Groviovael spends the working day at the printworks.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Groviovael",
+        "relation": "spends",
+        "object": "the working day",
+        "place": "at the printworks",
+        "quantity": "1 day"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Bouckstock is 83 years old.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Bouckstock",
+        "relation": "is",
+        "object": "83 years old",
+        "place": "Bouckstock",
+        "quantity": "83"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The ladder is Groviovael's, but Plimkis has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "The ladder",
+        "relation": "is",
+        "object": "Groviovael's",
+        "place": "on loan",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The kite is made of tin.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "kite",
+        "relation": "made of",
+        "object": "tin",
+        "place": "none",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Tolteavrand stood as godparent to Diockvindvraem.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Tolteavrand",
+        "relation": "stood as godparent to",
+        "object": "Diockvindvraem",
+        "place": "Godparent",
+        "quantity": "1"
+       }
+      ]
+     }
+    ],
+    "parse": [
+     {
+      "kind": "work",
+      "told": "Stounfleath works at the pottery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "stounfleath",
+        "relation": "works",
+        "object": null,
+        "place": "pottery",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Fligrodioth turned 42 this spring.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "fligrodioth",
+        "relation": "turned",
+        "object": "42",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Diockvindvraem borrowed the kite from Bouckstock.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "diockvindvraem",
+        "relation": "borrowed",
+        "object": "kite",
+        "place": "bouckstock",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The birdcage is made of cork.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "birdcage",
+        "relation": "made",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Pudrouck is Kreffvrioff's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "pudrouck",
+        "relation": "is godparent",
+        "object": "kreffvrioff",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Bouffdrourstoff has a job at the mill these days.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "bouffdrourstoff",
+        "relation": "has",
+        "object": "job",
+        "place": "mill",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Beagren is 75 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "beagren",
+        "relation": "is",
+        "object": "75",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Kenastem lent the sewing box to Groviovael.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "kenastem",
+        "relation": "lent",
+        "object": "sewing box",
+        "place": "groviovael",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The ladder is all cork, as far as I can tell.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "ladder",
+        "relation": "is",
+        "object": "cork",
+        "place": null,
+        "quantity": null
+       },
+       {
+        "subject": "i",
+        "relation": "tell",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Trapairk's godparent is Plimkis.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "godparent",
+        "relation": "is",
+        "object": "plimkis",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Fligrodioth spends the working day at the mill.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "fligrodioth",
+        "relation": "spends",
+        "object": "working day",
+        "place": "mill",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Stounfleath is 34 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "stounfleath",
+        "relation": "is",
+        "object": "34",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Tolteavrand lent the wheelbarrow to Stounfleath.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "tolteavrand",
+        "relation": "lent",
+        "object": "wheelbarrow",
+        "place": "to",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The telescope is made of birch.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "telescope",
+        "relation": "made",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Fligrodioth's godparent is Beagren.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "godparent",
+        "relation": "is",
+        "object": "beagren",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Diockvindvraem spends the working day at the tannery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "diockvindvraem",
+        "relation": "spends",
+        "object": "working day",
+        "place": "tannery",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Branos is 22 years old.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "branos",
+        "relation": "is",
+        "object": "old",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The toolbox is Truthtrouvoust's, but Plimkis has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "toolbox",
+        "relation": "is",
+        "object": "truthtrouvoust",
+        "place": null,
+        "quantity": null
+       },
+       {
+        "subject": "plimkis",
+        "relation": "has",
+        "object": "it",
+        "place": "loan",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "Somebody made the sewing box out of tin.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "somebody",
+        "relation": "made",
+        "object": "sewing box",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Grairiomirn is Bouckstock's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "grairiomirn",
+        "relation": "is godparent",
+        "object": "bouckstock",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Saisstoutrack spends the working day at the brewery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "saisstoutrack",
+        "relation": "spends",
+        "object": "working day",
+        "place": "brewery",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Grairiomirn is 20 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "grairiomirn",
+        "relation": "is",
+        "object": "20",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Saisstoutrack borrowed the telescope from Kupiodriom.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "saisstoutrack",
+        "relation": "borrowed",
+        "object": "telescope",
+        "place": "kupiodriom",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The fishing rod is made of brass.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "fishing rod",
+        "relation": "made",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Branos's godparent is Tirbogrock.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "godparent",
+        "relation": "is",
+        "object": "tirbogrock",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Branos has a job at the ropewalk these days.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "branos",
+        "relation": "has",
+        "object": "job",
+        "place": "ropewalk",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Tolteavrand is 28 years old.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "tolteavrand",
+        "relation": "is",
+        "object": "old",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Diockvindvraem lent the birdcage to Trapairk.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "diockvindvraem",
+        "relation": "lent",
+        "object": "birdcage",
+        "place": "to",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "Somebody made the bread tin out of pewter.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "somebody",
+        "relation": "made",
+        "object": "bread tin",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Nogael stood as godparent to Saisstoutrack.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "nogael",
+        "relation": "stood",
+        "object": null,
+        "place": "godparent",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Kupiodriom works at the printworks.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "kupiodriom",
+        "relation": "works",
+        "object": null,
+        "place": "printworks",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Nogael turned 88 this spring.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "nogael",
+        "relation": "turned",
+        "object": "88",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The rocking chair is Kreffvrioff's, but Nogael has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "rocking chair",
+        "relation": "is",
+        "object": "kreffvrioff",
+        "place": null,
+        "quantity": null
+       },
+       {
+        "subject": "nogael",
+        "relation": "has",
+        "object": "it",
+        "place": "loan",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The wheelbarrow is made of horn.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "wheelbarrow",
+        "relation": "made",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Kupiodriom stood as godparent to Groviovael.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "kupiodriom",
+        "relation": "stood",
+        "object": null,
+        "place": "godparent",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Tirbogrock spends the working day at the brewery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "tirbogrock",
+        "relation": "spends",
+        "object": "working day",
+        "place": "brewery",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Pudrouck is 64 years old.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "pudrouck",
+        "relation": "is",
+        "object": "old",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Tolteavrand borrowed the bread tin from Stounfleath.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "tolteavrand",
+        "relation": "borrowed",
+        "object": "bread tin",
+        "place": "stounfleath",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The rocking chair is made of pewter.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "rocking chair",
+        "relation": "made",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Bouffdrourstoff's godparent is Stounfleath.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "godparent",
+        "relation": "is",
+        "object": "stounfleath",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Tolteavrand spends the working day at the chandlery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "tolteavrand",
+        "relation": "spends",
+        "object": "working day",
+        "place": "chandlery",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Truthtrouvoust is 40 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "truthtrouvoust",
+        "relation": "is",
+        "object": "40",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Branos borrowed the fishing rod from Fligrodioth.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "branos",
+        "relation": "borrowed",
+        "object": "fishing rod",
+        "place": "fligrodioth",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The toolbox is made of cork.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "toolbox",
+        "relation": "made",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Kenastem is Truthtrouvoust's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "kenastem",
+        "relation": "is godparent",
+        "object": "truthtrouvoust",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Groviovael spends the working day at the printworks.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "groviovael",
+        "relation": "spends",
+        "object": "working day",
+        "place": "printworks",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Bouckstock is 83 years old.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "bouckstock",
+        "relation": "is",
+        "object": "old",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The ladder is Groviovael's, but Plimkis has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "ladder",
+        "relation": "is",
+        "object": "groviovael",
+        "place": null,
+        "quantity": null
+       },
+       {
+        "subject": "plimkis",
+        "relation": "has",
+        "object": "it",
+        "place": "loan",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The kite is made of tin.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "kite",
+        "relation": "made",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Tolteavrand stood as godparent to Diockvindvraem.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "tolteavrand",
+        "relation": "stood",
+        "object": null,
+        "place": "godparent",
+        "quantity": null
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "seed": 2,
+   "summary": {
+    "ear": {
+     "recall": 0.94,
+     "by_kind": {
+      "age": 1.0,
+      "kin": 1.0,
+      "loan": 0.7,
+      "material": 1.0,
+      "work": 1.0
+     }
+    },
+    "parse": {
+     "recall": 0.54,
+     "by_kind": {
+      "age": 0.5,
+      "kin": 0.4,
+      "loan": 0.4,
+      "material": 0.4,
+      "work": 1.0
+     }
+    }
+   },
+   "rows": {
+    "ear": [
+     {
+      "kind": "work",
+      "told": "Silfem spends the working day at the mill.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Silfem",
+        "relation": "spends",
+        "object": "working day",
+        "place": "mill",
+        "quantity": "day"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Neathiff is 35 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Neathiff",
+        "relation": "is",
+        "object": "35",
+        "place": "now",
+        "quantity": "35"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The ladder is Laistkeatrouth's, but Kaiffputhourn has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "The ladder",
+        "relation": "is",
+        "object": "Laistkeatrouth's",
+        "place": "on loan",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The fishing rod is made of wicker.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "fishing rod",
+        "relation": "made of",
+        "object": "wicker",
+        "place": "made of",
+        "quantity": "made of"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Dankirn is Kroudroth's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Dankirn",
+        "relation": "is godparent of",
+        "object": "Kroudroth",
+        "place": "none",
+        "quantity": "none"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Laistkeatrouth spends the working day at the ropewalk.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Laistkeatrouth",
+        "relation": "spends",
+        "object": "working day",
+        "place": "at the ropewalk",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Dankirn is 27 years old.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Dankirn",
+        "relation": "is",
+        "object": "27 years old",
+        "place": "none",
+        "quantity": "27"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Faebion borrowed the sewing box from Broulbaereack.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Faebion",
+        "relation": "borrowed",
+        "object": "sewing box",
+        "place": "Broulbaereack",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The birdcage is all tin, as far as I can tell.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "The birdcage",
+        "relation": "is",
+        "object": "tin",
+        "place": "all",
+        "quantity": "as far as I can tell."
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Silfem stood as godparent to Kaiffputhourn.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Silfem",
+        "relation": "stood as",
+        "object": "godparent",
+        "place": "Kaiffputhourn",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Fentrus spends the working day at the tannery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Fentrus",
+        "relation": "spends",
+        "object": "working day",
+        "place": "tannery",
+        "quantity": "day"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Deavral is 70 years old.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Deavral",
+        "relation": "is",
+        "object": "70 years old",
+        "place": "Deavral",
+        "quantity": "70"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Kourbinflouth lent the wheelbarrow to Treffbuvraind.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Kourbinflouth",
+        "relation": "lent",
+        "object": "wheelbarrow",
+        "place": "Treffbuvraind",
+        "quantity": "One"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The wheelbarrow is made of pewter.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "wheelbarrow",
+        "relation": "made of",
+        "object": "pewter",
+        "place": "none",
+        "quantity": "none"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Mioffflousioff is Fentrus's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Mioffflousioff",
+        "relation": "is godparent of",
+        "object": "Fentrus",
+        "place": "none",
+        "quantity": "none"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Dankirn spends the working day at the boatyard.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Dankirn",
+        "relation": "spends",
+        "object": "the working day",
+        "place": "the boatyard",
+        "quantity": "the working day"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Mioffflousioff is 73 years old.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Mioffflousioff",
+        "relation": "is",
+        "object": "73 years old",
+        "place": "Mioffflousioff",
+        "quantity": "73"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Fentrus borrowed the birdcage from Treffbuvraind.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Fentrus",
+        "relation": "borrowed",
+        "object": "birdcage",
+        "place": "Treffbuvraind",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The ladder is all cork, as far as I can tell.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "ladder",
+        "relation": "is",
+        "object": "cork",
+        "place": "all",
+        "quantity": "as far as I can tell."
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Siockthiost's godparent is Faebion.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Siockthiost",
+        "relation": "is godparent of",
+        "object": "Faebion",
+        "place": "none",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Beamibaerk works at the chandlery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Beamibaerk",
+        "relation": "works as",
+        "object": "chandlery",
+        "place": "chandlery",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Treffbuvraind is 33 years old.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Treffbuvraind",
+        "relation": "is",
+        "object": "33 years old",
+        "place": "Treffbuvraind",
+        "quantity": "33"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The bread tin is Slarstehur's, but Flaiposaim has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "bread tin",
+        "relation": "is",
+        "object": "Slarstehur's",
+        "place": "loan",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The rocking chair is made of horn.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "rocking chair",
+        "relation": "made of",
+        "object": "horn",
+        "place": "none",
+        "quantity": "none"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Deavral's godparent is Slarstehur.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Deavral's godparent",
+        "relation": "is",
+        "object": "Slarstehur",
+        "place": "Godparent",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Deavral has a job at the forge these days.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Deavral",
+        "relation": "has",
+        "object": "job",
+        "place": "forge",
+        "quantity": "these days"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Kourbinflouth turned 33 this spring.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Kourbinflouth",
+        "relation": "turned",
+        "object": "33",
+        "place": "this spring",
+        "quantity": "33"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Krearirus lent the rocking chair to Tralel.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Krearirus",
+        "relation": "lent",
+        "object": "rocking chair",
+        "place": "Tralel",
+        "quantity": "One"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The toolbox is all oak, as far as I can tell.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "The toolbox",
+        "relation": "is",
+        "object": "oak",
+        "place": "all",
+        "quantity": "as far as I can tell."
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Flaiposaim's godparent is Beamibaerk.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Flaiposaim's godparent",
+        "relation": "is",
+        "object": "Beamibaerk",
+        "place": "none",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Kaiffputhourn has a job at the boatyard these days.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Kaiffputhourn",
+        "relation": "has",
+        "object": "job",
+        "place": "boatyard",
+        "quantity": "these days"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Beamibaerk is 71 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Beamibaerk",
+        "relation": "is",
+        "object": "71",
+        "place": "now",
+        "quantity": "71"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Beamibaerk lent the kite to Kaiffputhourn.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Beamibaerk",
+        "relation": "lent",
+        "object": "kite",
+        "place": "Kaiffputhourn",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The bread tin is made of wicker.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "bread tin",
+        "relation": "made of",
+        "object": "wicker",
+        "place": "none",
+        "quantity": "none"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Broulbaereack is Laistkeatrouth's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Broulbaereack",
+        "relation": "is godparent of",
+        "object": "Laistkeatrouth",
+        "place": "Laistkeatrouth's",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Flaiposaim works at the pottery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Flaiposaim",
+        "relation": "works as",
+        "object": "pottery",
+        "place": "pottery",
+        "quantity": ""
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Tralel is 74 years old.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Tralel",
+        "relation": "is",
+        "object": "74 years old",
+        "place": "Tralel",
+        "quantity": "74"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Krearirus borrowed the toolbox from Siockthiost.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Krearirus",
+        "relation": "borrowed",
+        "object": "toolbox",
+        "place": "Siockthiost",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The sewing box is all cork, as far as I can tell.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "sewing box",
+        "relation": "is",
+        "object": "cork",
+        "place": "all",
+        "quantity": "as far as I can tell."
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Neathiff stood as godparent to Tralel.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Neathiff",
+        "relation": "stood as",
+        "object": "godparent",
+        "place": "Tralel",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Broulbaereack spends the working day at the ropewalk.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Broulbaereack",
+        "relation": "spends",
+        "object": "the working day",
+        "place": "at the ropewalk",
+        "quantity": "the working day"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Krearirus is 42 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Krearirus",
+        "relation": "is",
+        "object": "42",
+        "place": "now",
+        "quantity": "42"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Dankirn borrowed the fishing rod from Treffbuvraind.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Dankirn",
+        "relation": "borrowed",
+        "object": "fishing rod",
+        "place": "Treffbuvraind",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "Somebody made the telescope out of wicker.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Somebody",
+        "relation": "made",
+        "object": "the telescope",
+        "place": "out of wicker",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Krearirus stood as godparent to Treffbuvraind.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Krearirus",
+        "relation": "stood as",
+        "object": "godparent",
+        "place": "Treffbuvraind",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Treffbuvraind works at the forge.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Treffbuvraind",
+        "relation": "works at",
+        "object": "the forge",
+        "place": "the forge",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Laistkeatrouth turned 47 this spring.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Laistkeatrouth",
+        "relation": "turned",
+        "object": "47",
+        "place": "this spring",
+        "quantity": "47"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The telescope is Dankirn's, but Mioffflousioff has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "The telescope",
+        "relation": "is",
+        "object": "Dankirn's",
+        "place": "loan",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The kite is made of tin.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "kite",
+        "relation": "made of",
+        "object": "tin",
+        "place": "none",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Stouffvouvraerk is Kourbinflouth's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Stouffvouvraerk",
+        "relation": "is godparent of",
+        "object": "Kourbinflouth",
+        "place": "Godparent",
+        "quantity": "1"
+       }
+      ]
+     }
+    ],
+    "parse": [
+     {
+      "kind": "work",
+      "told": "Silfem spends the working day at the mill.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "silfem",
+        "relation": "spends",
+        "object": "working day",
+        "place": "mill",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Neathiff is 35 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "neathiff",
+        "relation": "is",
+        "object": "35",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The ladder is Laistkeatrouth's, but Kaiffputhourn has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "ladder",
+        "relation": "is",
+        "object": "laistkeatrouth",
+        "place": null,
+        "quantity": null
+       },
+       {
+        "subject": "kaiffputhourn",
+        "relation": "has",
+        "object": "it",
+        "place": "loan",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The fishing rod is made of wicker.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "fishing rod",
+        "relation": "made",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Dankirn is Kroudroth's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "dankirn",
+        "relation": "is godparent",
+        "object": "kroudroth",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Laistkeatrouth spends the working day at the ropewalk.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "laistkeatrouth",
+        "relation": "spends",
+        "object": "working day",
+        "place": "ropewalk",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Dankirn is 27 years old.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "dankirn",
+        "relation": "is",
+        "object": "old",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Faebion borrowed the sewing box from Broulbaereack.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "faebion",
+        "relation": "borrowed",
+        "object": "sewing box",
+        "place": "broulbaereack",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The birdcage is all tin, as far as I can tell.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "birdcage",
+        "relation": "is",
+        "object": "tin",
+        "place": null,
+        "quantity": null
+       },
+       {
+        "subject": "i",
+        "relation": "tell",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Silfem stood as godparent to Kaiffputhourn.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "silfem",
+        "relation": "stood",
+        "object": null,
+        "place": "godparent",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Fentrus spends the working day at the tannery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "fentrus",
+        "relation": "spends",
+        "object": "working day",
+        "place": "tannery",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Deavral is 70 years old.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "deavral",
+        "relation": "is",
+        "object": "old",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Kourbinflouth lent the wheelbarrow to Treffbuvraind.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "kourbinflouth",
+        "relation": "lent",
+        "object": "wheelbarrow",
+        "place": "to",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The wheelbarrow is made of pewter.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "wheelbarrow",
+        "relation": "made",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Mioffflousioff is Fentrus's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "mioffflousioff",
+        "relation": "is godparent",
+        "object": "fentrus",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Dankirn spends the working day at the boatyard.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "dankirn",
+        "relation": "spends",
+        "object": "working day",
+        "place": "boatyard",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Mioffflousioff is 73 years old.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "mioffflousioff",
+        "relation": "is",
+        "object": "old",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Fentrus borrowed the birdcage from Treffbuvraind.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "fentrus",
+        "relation": "borrowed",
+        "object": "birdcage",
+        "place": "treffbuvraind",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The ladder is all cork, as far as I can tell.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "ladder",
+        "relation": "is",
+        "object": "cork",
+        "place": null,
+        "quantity": null
+       },
+       {
+        "subject": "i",
+        "relation": "tell",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Siockthiost's godparent is Faebion.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "godparent",
+        "relation": "is",
+        "object": "faebion",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Beamibaerk works at the chandlery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "beamibaerk",
+        "relation": "works",
+        "object": null,
+        "place": "chandlery",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Treffbuvraind is 33 years old.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "treffbuvraind",
+        "relation": "is",
+        "object": "old",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The bread tin is Slarstehur's, but Flaiposaim has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "bread tin",
+        "relation": "is",
+        "object": "slarstehur",
+        "place": null,
+        "quantity": null
+       },
+       {
+        "subject": "flaiposaim",
+        "relation": "has",
+        "object": "it",
+        "place": "loan",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The rocking chair is made of horn.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "rocking chair",
+        "relation": "made",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Deavral's godparent is Slarstehur.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "godparent",
+        "relation": "is",
+        "object": "slarstehur",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Deavral has a job at the forge these days.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "deavral",
+        "relation": "has",
+        "object": "job",
+        "place": "forge",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Kourbinflouth turned 33 this spring.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "kourbinflouth",
+        "relation": "turned",
+        "object": "33",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Krearirus lent the rocking chair to Tralel.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "krearirus",
+        "relation": "lent",
+        "object": "rocking chair",
+        "place": "to",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The toolbox is all oak, as far as I can tell.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "toolbox",
+        "relation": "is",
+        "object": "oak",
+        "place": null,
+        "quantity": null
+       },
+       {
+        "subject": "i",
+        "relation": "tell",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Flaiposaim's godparent is Beamibaerk.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "godparent",
+        "relation": "is",
+        "object": "beamibaerk",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Kaiffputhourn has a job at the boatyard these days.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "kaiffputhourn",
+        "relation": "has",
+        "object": "job",
+        "place": "boatyard",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Beamibaerk is 71 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "beamibaerk",
+        "relation": "is",
+        "object": "71",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Beamibaerk lent the kite to Kaiffputhourn.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "beamibaerk",
+        "relation": "lent",
+        "object": "kite",
+        "place": "to",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The bread tin is made of wicker.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "bread tin",
+        "relation": "made",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Broulbaereack is Laistkeatrouth's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "broulbaereack",
+        "relation": "is godparent",
+        "object": "laistkeatrouth",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Flaiposaim works at the pottery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "flaiposaim",
+        "relation": "works",
+        "object": null,
+        "place": "pottery",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Tralel is 74 years old.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "tralel",
+        "relation": "is",
+        "object": "old",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Krearirus borrowed the toolbox from Siockthiost.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "krearirus",
+        "relation": "borrowed",
+        "object": "toolbox",
+        "place": "siockthiost",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The sewing box is all cork, as far as I can tell.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "sewing box",
+        "relation": "is",
+        "object": "cork",
+        "place": null,
+        "quantity": null
+       },
+       {
+        "subject": "i",
+        "relation": "tell",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Neathiff stood as godparent to Tralel.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "neathiff",
+        "relation": "stood",
+        "object": null,
+        "place": "godparent",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Broulbaereack spends the working day at the ropewalk.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "broulbaereack",
+        "relation": "spends",
+        "object": "working day",
+        "place": "ropewalk",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Krearirus is 42 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "krearirus",
+        "relation": "is",
+        "object": "42",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Dankirn borrowed the fishing rod from Treffbuvraind.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "dankirn",
+        "relation": "borrowed",
+        "object": "fishing rod",
+        "place": "treffbuvraind",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "Somebody made the telescope out of wicker.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "somebody",
+        "relation": "made",
+        "object": "telescope",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Krearirus stood as godparent to Treffbuvraind.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "krearirus",
+        "relation": "stood",
+        "object": null,
+        "place": "godparent",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Treffbuvraind works at the forge.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "treffbuvraind",
+        "relation": "works",
+        "object": null,
+        "place": "forge",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Laistkeatrouth turned 47 this spring.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "laistkeatrouth",
+        "relation": "turned",
+        "object": "47",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The telescope is Dankirn's, but Mioffflousioff has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "telescope",
+        "relation": "is",
+        "object": "dankirn",
+        "place": null,
+        "quantity": null
+       },
+       {
+        "subject": "mioffflousioff",
+        "relation": "has",
+        "object": "it",
+        "place": "loan",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The kite is made of tin.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "kite",
+        "relation": "made",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Stouffvouvraerk is Kourbinflouth's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "stouffvouvraerk",
+        "relation": "is godparent",
+        "object": "kourbinflouth",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "seed": 3,
+   "summary": {
+    "ear": {
+     "recall": 0.94,
+     "by_kind": {
+      "age": 1.0,
+      "kin": 1.0,
+      "loan": 0.7,
+      "material": 1.0,
+      "work": 1.0
+     }
+    },
+    "parse": {
+     "recall": 0.52,
+     "by_kind": {
+      "age": 0.8,
+      "kin": 0.2,
+      "loan": 0.4,
+      "material": 0.2,
+      "work": 1.0
+     }
+    }
+   },
+   "rows": {
+    "ear": [
+     {
+      "kind": "work",
+      "told": "Krourkdraim works at the printworks.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Krourkdraim",
+        "relation": "works as",
+        "object": "printworks",
+        "place": "workplace",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Kriohaendros is 57 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Kriohaendros",
+        "relation": "is",
+        "object": "57",
+        "place": "now",
+        "quantity": "57"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The sewing box is Graithost's, but Nuffsliomvil has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "sewing box",
+        "relation": "is",
+        "object": "Graithost's",
+        "place": "Graithost's",
+        "quantity": "1"
+       },
+       {
+        "subject": "Nuffsliomvil",
+        "relation": "has",
+        "object": "on loan",
+        "place": "Nuffsliomvil",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "Somebody made the fishing rod out of cork.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Somebody",
+        "relation": "made",
+        "object": "fishing rod",
+        "place": "out of cork",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Raenuck's godparent is Dunioteack.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Raenuck's godparent",
+        "relation": "is",
+        "object": "Dunioteack",
+        "place": "none",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Taisflol spends the working day at the chandlery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Taisflol",
+        "relation": "spends",
+        "object": "the working day",
+        "place": "the chandlery",
+        "quantity": "the working day"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Graithost is 74 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Graithost",
+        "relation": "is",
+        "object": "74",
+        "place": "now",
+        "quantity": "74"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Vutairkvair borrowed the telescope from Daniorkrith.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Vutairkvair",
+        "relation": "borrowed",
+        "object": "the telescope",
+        "place": "from Daniorkrith",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "Somebody made the wheelbarrow out of tin.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Somebody",
+        "relation": "made",
+        "object": "the wheelbarrow",
+        "place": "out of tin",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Teafleast's godparent is Kriohaendros.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Teafleast's",
+        "relation": "is",
+        "object": "godparent",
+        "place": "Kriohaendros",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Beaslil has a job at the brewery these days.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Beaslil",
+        "relation": "has",
+        "object": "job",
+        "place": "brewery",
+        "quantity": "these days"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Berndock turned 71 this spring.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Berndock",
+        "relation": "turned",
+        "object": "71",
+        "place": "this spring",
+        "quantity": "71"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Daniorkrith borrowed the rocking chair from Teafleast.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Daniorkrith",
+        "relation": "borrowed",
+        "object": "rocking chair",
+        "place": "Teafleast",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The rocking chair is made of wicker.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "rocking chair",
+        "relation": "made of",
+        "object": "wicker",
+        "place": "made of",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Krourkdraim is Nouthbeark's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Krourkdraim",
+        "relation": "is godparent of",
+        "object": "Nouthbeark",
+        "place": "Nouthbeark's",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Graithost spends the working day at the mill.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Graithost",
+        "relation": "spends",
+        "object": "working day",
+        "place": "at the mill",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Stournneathos is 84 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Stournneathos",
+        "relation": "is",
+        "object": "84",
+        "place": "now",
+        "quantity": "84"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Daniorkrith lent the wheelbarrow to Veadairk.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Daniorkrith",
+        "relation": "lent",
+        "object": "wheelbarrow",
+        "place": "Veadairk",
+        "quantity": "One"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The ladder is made of oak.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "ladder",
+        "relation": "made of",
+        "object": "oak",
+        "place": "none",
+        "quantity": "none"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Staplind's godparent is Beaslil.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Staplind's godparent",
+        "relation": "is",
+        "object": "Beaslil",
+        "place": "none",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Daniorkrith has a job at the mill these days.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Daniorkrith",
+        "relation": "has",
+        "object": "job",
+        "place": "mill",
+        "quantity": "these days"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Nouthbeark is 33 years old.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Nouthbeark",
+        "relation": "is",
+        "object": "33 years old",
+        "place": "Nouthbeark",
+        "quantity": "33"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The kite is Krourkdraim's, but Beaslil has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "kite",
+        "relation": "is",
+        "object": "Krourkdraim's",
+        "place": "loan",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The toolbox is all oak, as far as I can tell.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "The toolbox",
+        "relation": "is",
+        "object": "oak",
+        "place": "all",
+        "quantity": "as far as I can tell."
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Graithost is Nuffsliomvil's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Graithost",
+        "relation": "is godparent of",
+        "object": "Nuffsliomvil",
+        "place": "Nuffsliomvil's",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Nuffsliomvil works at the ropewalk.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Nuffsliomvil",
+        "relation": "works as",
+        "object": "ropewalk",
+        "place": "the ropewalk",
+        "quantity": ""
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Raenuck turned 85 this spring.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Raenuck",
+        "relation": "turned",
+        "object": "85",
+        "place": "this spring",
+        "quantity": "85"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The toolbox is Teafleast's, but Biorliogriock has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "The toolbox",
+        "relation": "is",
+        "object": "Teafleast's",
+        "place": "loan",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The bread tin is made of cork.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "bread tin",
+        "relation": "made of",
+        "object": "cork",
+        "place": "none",
+        "quantity": "none"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Daniorkrith's godparent is Plulraeth.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Daniorkrith",
+        "relation": "is godparent of",
+        "object": "Plulraeth",
+        "place": "Godparent",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Berndock has a job at the brewery these days.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Berndock",
+        "relation": "has",
+        "object": "job",
+        "place": "at the brewery",
+        "quantity": "these days"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Taisflol is 72 years old.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Taisflol",
+        "relation": "is",
+        "object": "72 years old",
+        "place": "Taisflol",
+        "quantity": "72"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Kriohaendros lent the ladder to Slaestaeniol.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Kriohaendros",
+        "relation": "lent",
+        "object": "ladder",
+        "place": "Slaestaeniol",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The sewing box is made of brass.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "sewing box",
+        "relation": "made of",
+        "object": "brass",
+        "place": "none",
+        "quantity": "none"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Berndock stood as godparent to Slaestaeniol.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Berndock",
+        "relation": "stood as",
+        "object": "godparent",
+        "place": "Slaestaeniol",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Dunioteack has a job at the boatyard these days.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Dunioteack",
+        "relation": "has",
+        "object": "job",
+        "place": "boatyard",
+        "quantity": "these days"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Dunioteack is 85 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Dunioteack",
+        "relation": "is",
+        "object": "85",
+        "place": "now",
+        "quantity": "85"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Taisflol borrowed the birdcage from Dunioteack.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Taisflol",
+        "relation": "borrowed",
+        "object": "birdcage",
+        "place": "Dunioteack",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The telescope is all pewter, as far as I can tell.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "telescope",
+        "relation": "is pewter",
+        "object": "all",
+        "place": "as far as I can tell",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Hofleasten's godparent is Vutairkvair.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Hofleasten's godparent",
+        "relation": "is",
+        "object": "Vutairkvair",
+        "place": "Hofleasten",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Vutairkvair works at the ropewalk.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Vutairkvair",
+        "relation": "works at",
+        "object": "the ropewalk",
+        "place": "the ropewalk",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Plulraeth is 50 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Plulraeth",
+        "relation": "is",
+        "object": "50",
+        "place": "now",
+        "quantity": "50"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Plulraeth borrowed the bread tin from Raenuck.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Plulraeth",
+        "relation": "borrowed",
+        "object": "bread tin",
+        "place": "Raenuck",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "Somebody made the kite out of brass.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "kite",
+        "relation": "made",
+        "object": "brass",
+        "place": "none",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Biorliogriock stood as godparent to Stournneathos.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Biorliogriock",
+        "relation": "stood as",
+        "object": "godparent",
+        "place": "Stournneathos",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Raenuck works at the mill.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Raenuck",
+        "relation": "works as",
+        "object": "at the mill",
+        "place": "the mill",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Vutairkvair turned 23 this spring.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Vutairkvair",
+        "relation": "turned",
+        "object": "23",
+        "place": "this spring",
+        "quantity": "23"
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Veadairk lent the fishing rod to Daniorkrith.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Veadairk",
+        "relation": "lent",
+        "object": "fishing rod",
+        "place": "Daniorkrith",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "Somebody made the birdcage out of cork.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Somebody",
+        "relation": "made",
+        "object": "the birdcage",
+        "place": "out of cork",
+        "quantity": "1"
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Veadairk's godparent is Taisflol.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "Veadairk's godparent",
+        "relation": "is",
+        "object": "Taisflol",
+        "place": "none",
+        "quantity": "1"
+       }
+      ]
+     }
+    ],
+    "parse": [
+     {
+      "kind": "work",
+      "told": "Krourkdraim works at the printworks.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "krourkdraim",
+        "relation": "works",
+        "object": null,
+        "place": "printworks",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Kriohaendros is 57 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "kriohaendros",
+        "relation": "is",
+        "object": "57",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The sewing box is Graithost's, but Nuffsliomvil has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "sewing box",
+        "relation": "is",
+        "object": "graithost",
+        "place": null,
+        "quantity": null
+       },
+       {
+        "subject": "nuffsliomvil",
+        "relation": "has",
+        "object": "it",
+        "place": "loan",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "Somebody made the fishing rod out of cork.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "somebody",
+        "relation": "made",
+        "object": "fishing rod",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Raenuck's godparent is Dunioteack.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "godparent",
+        "relation": "is",
+        "object": "dunioteack",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Taisflol spends the working day at the chandlery.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "taisflol",
+        "relation": "spends",
+        "object": "working day",
+        "place": "chandlery",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Graithost is 74 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "graithost",
+        "relation": "is",
+        "object": "74",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Vutairkvair borrowed the telescope from Daniorkrith.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "vutairkvair",
+        "relation": "borrowed",
+        "object": "telescope",
+        "place": "daniorkrith",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "Somebody made the wheelbarrow out of tin.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "somebody",
+        "relation": "made",
+        "object": "wheelbarrow",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Teafleast's godparent is Kriohaendros.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "godparent",
+        "relation": "is",
+        "object": "kriohaendros",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Beaslil has a job at the brewery these days.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "beaslil",
+        "relation": "has",
+        "object": "job",
+        "place": "brewery",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Berndock turned 71 this spring.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "berndock",
+        "relation": "turned",
+        "object": "71",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Daniorkrith borrowed the rocking chair from Teafleast.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "daniorkrith",
+        "relation": "borrowed",
+        "object": "rocking chair",
+        "place": "teafleast",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The rocking chair is made of wicker.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "rocking chair",
+        "relation": "made",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Krourkdraim is Nouthbeark's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "krourkdraim",
+        "relation": "is godparent",
+        "object": "nouthbeark",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Graithost spends the working day at the mill.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "graithost",
+        "relation": "spends",
+        "object": "working day",
+        "place": "mill",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Stournneathos is 84 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "stournneathos",
+        "relation": "is",
+        "object": "84",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Daniorkrith lent the wheelbarrow to Veadairk.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "daniorkrith",
+        "relation": "lent",
+        "object": "wheelbarrow",
+        "place": "to",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The ladder is made of oak.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "ladder",
+        "relation": "made",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Staplind's godparent is Beaslil.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "godparent",
+        "relation": "is",
+        "object": "beaslil",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Daniorkrith has a job at the mill these days.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "daniorkrith",
+        "relation": "has",
+        "object": "job",
+        "place": "mill",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Nouthbeark is 33 years old.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "nouthbeark",
+        "relation": "is",
+        "object": "old",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The kite is Krourkdraim's, but Beaslil has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "kite",
+        "relation": "is",
+        "object": "krourkdraim",
+        "place": null,
+        "quantity": null
+       },
+       {
+        "subject": "beaslil",
+        "relation": "has",
+        "object": "it",
+        "place": "loan",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The toolbox is all oak, as far as I can tell.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "toolbox",
+        "relation": "is",
+        "object": "oak",
+        "place": null,
+        "quantity": null
+       },
+       {
+        "subject": "i",
+        "relation": "tell",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Graithost is Nuffsliomvil's godparent.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "graithost",
+        "relation": "is godparent",
+        "object": "nuffsliomvil",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Nuffsliomvil works at the ropewalk.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "nuffsliomvil",
+        "relation": "works",
+        "object": null,
+        "place": "ropewalk",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Raenuck turned 85 this spring.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "raenuck",
+        "relation": "turned",
+        "object": "85",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "The toolbox is Teafleast's, but Biorliogriock has it on loan.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "toolbox",
+        "relation": "is",
+        "object": "teafleast",
+        "place": null,
+        "quantity": null
+       },
+       {
+        "subject": "biorliogriock",
+        "relation": "has",
+        "object": "it",
+        "place": "loan",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The bread tin is made of cork.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "bread tin",
+        "relation": "made",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Daniorkrith's godparent is Plulraeth.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "godparent",
+        "relation": "is",
+        "object": "plulraeth",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Berndock has a job at the brewery these days.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "berndock",
+        "relation": "has",
+        "object": "job",
+        "place": "brewery",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Taisflol is 72 years old.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "taisflol",
+        "relation": "is",
+        "object": "old",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Kriohaendros lent the ladder to Slaestaeniol.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "kriohaendros",
+        "relation": "lent",
+        "object": "ladder",
+        "place": "to",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The sewing box is made of brass.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "sewing box",
+        "relation": "made",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Berndock stood as godparent to Slaestaeniol.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "berndock",
+        "relation": "stood",
+        "object": null,
+        "place": "godparent",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Dunioteack has a job at the boatyard these days.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "dunioteack",
+        "relation": "has",
+        "object": "job",
+        "place": "boatyard",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Dunioteack is 85 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "dunioteack",
+        "relation": "is",
+        "object": "85",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Taisflol borrowed the birdcage from Dunioteack.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "taisflol",
+        "relation": "borrowed",
+        "object": "birdcage",
+        "place": "dunioteack",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "The telescope is all pewter, as far as I can tell.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "telescope",
+        "relation": "is",
+        "object": "pewter",
+        "place": null,
+        "quantity": null
+       },
+       {
+        "subject": "i",
+        "relation": "tell",
+        "object": null,
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Hofleasten's godparent is Vutairkvair.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "godparent",
+        "relation": "is",
+        "object": "vutairkvair",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Vutairkvair works at the ropewalk.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "vutairkvair",
+        "relation": "works",
+        "object": null,
+        "place": "ropewalk",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Plulraeth is 50 now, believe it or not.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "plulraeth",
+        "relation": "is",
+        "object": "50",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Plulraeth borrowed the bread tin from Raenuck.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "plulraeth",
+        "relation": "borrowed",
+        "object": "bread tin",
+        "place": "raenuck",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "Somebody made the kite out of brass.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "somebody",
+        "relation": "made",
+        "object": "kite",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Biorliogriock stood as godparent to Stournneathos.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "biorliogriock",
+        "relation": "stood",
+        "object": null,
+        "place": "godparent",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "work",
+      "told": "Raenuck works at the mill.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "raenuck",
+        "relation": "works",
+        "object": null,
+        "place": "mill",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "age",
+      "told": "Vutairkvair turned 23 this spring.",
+      "whole": true,
+      "read": [
+       {
+        "subject": "vutairkvair",
+        "relation": "turned",
+        "object": "23",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "loan",
+      "told": "Veadairk lent the fishing rod to Daniorkrith.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "veadairk",
+        "relation": "lent",
+        "object": "fishing rod",
+        "place": "to",
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "material",
+      "told": "Somebody made the birdcage out of cork.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "somebody",
+        "relation": "made",
+        "object": "birdcage",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     },
+     {
+      "kind": "kin",
+      "told": "Veadairk's godparent is Taisflol.",
+      "whole": false,
+      "read": [
+       {
+        "subject": "godparent",
+        "relation": "is",
+        "object": "taisflol",
+        "place": null,
+        "quantity": null
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

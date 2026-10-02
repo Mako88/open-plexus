@@ -64,18 +64,26 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - **The graphed arm, next.** John's, 2026-10-01 and 2026-10-02: what a conversation will
   need anyway comes before tuning to either world, and the system goes generic as soon as
   it can, then iterates there. Each enters the exam as a form when it does. In order:
-  1. The many-worded house, answered. A clause about something is a join now: a plan
-     is a relation matched with any variable free (`solve`, `related`, `joined`). Next:
-     - A join that answers the wrong kind still beats borrowing, which could answer
-       right: the answer-kinds check (see `f827f42e`) is where that would be caught.
-     - The edges `SKIP` drops (determiners, auxiliaries, conjunctions, `advmod`,
-       particles) are kept and plans learn which matter, as negation, modals and 'before'
-       were pulled out of it one at a time. A function word is an edge's label or a
-       node's mark, never a node, so 'the' does not become a hub. Refuted if the
-       many-worded house reads no higher with every edge kept than with `SKIP`.
-     A move told with a verb no lesson used ('carried the lanterns across to') is not
-     read as a move, which is item 3's.
-  2. A mouth of the system's own. An answer is one node of the graph or "I don't know.";
+  1. Words never heard, ahead of counts since 2026-10-02 because counts wait on it.
+     'What is X's line of work?' shares no grammar with 'do for a living', and on the
+     many-worded house this is the commonest miss: trades asked by their verb ('Who
+     repairs clocks?' is one shape per trade verb), moves told with a verb no lesson
+     used ('carried the lanterns across to'), and oblique near 0.5 on every seed. It is
+     also why counts fail: 'X's jars are in the attic now' is not known to replace 'X
+     keeps the jars in the cellar'. The symbol encoder of the DECIDED meaning section is
+     the mechanism: a word's meaning as what is known about it, learnt from every
+     same-or-different the system establishes, with borrowed vectors as raw material
+     only. Two wordings are one relation where their solutions agree.
+  2. Counts, which hold phase 4 of the red set: count is below blind on every seed. A
+     count plan counts one walk's ends, so one wording of the place. Counting a
+     relation's solutions instead was tried and dropped (see the commit that says so),
+     for two reasons, each of which would bring it back once met. A move told in another
+     wording does not replace the keeping, since `replaced` wants the same arguments, so
+     the room left still counts the person: what is still so must be decided by
+     relation, the later solution for the same person and thing, which item 1 enables.
+     And most rooms hold one person, so many relations count a lesson's 1 rightly and
+     the one chosen is chosen on too few lessons.
+  3. A mouth of the system's own. An answer is one node of the graph or "I don't know.";
      it cannot say yes or no, list, or say what it is sure of. The mouth renders the
      answer's path from fragments of parses it has heard: each edge of the path is said
      in the words of a heard sentence that has that edge, its nodes replaced, and
@@ -85,24 +93,18 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      yes-or-no questions by finding or failing to find the fact asked. The form: yes-or-no
      questions, half true. Refuted if the rendered answer scores below the bare node, or
      if no reply joins two fragments when the path has two edges.
-  3. Words never heard, from the question's own parse: 'What is X's line of work?' shares
-     no grammar with 'do for a living', and the many-worded house will make this the
-     commonest miss. The symbol encoder of the DECIDED meaning section is the mechanism: a
-     word's meaning as what is known about it, learnt from every same-or-different the
-     system establishes, with borrowed vectors as raw material only.
-  4. Counts, which hold phase 4 of the red set: count is below blind on every seed. A
-     count plan counts one walk's ends, so one wording of the place. Counting a
-     relation's solutions instead was tried and dropped (see the commit that says so),
-     for two reasons, each of which would bring it back once met. A move told in another
-     wording ('X's jars are in the attic now') does not replace the keeping, since
-     `replaced` wants the same arguments, so the room left still counts the person: what
-     is still so must be decided by relation, the later solution for the same person and
-     thing. And most rooms hold one person, so many relations count a lesson's 1 rightly
-     and the one chosen is chosen on too few lessons.
-  5. Chains of three: taken apart by the question's parse where their plans find
-     nothing, they read 0.5 0.5 1.0 and 0.5 0.72 0.33. Open: an untaught chain wording
-     borrows a two-slot shape first and answers the middle link ('dov' for 'what does
-     Cara's cousin do'), since taking apart first cost the house more than it gained.
+  4. Chains of three, and joins. A clause about something is a join now (`solve`,
+     `related`, `joined`); seed 2's chain3 is below the 0.8B's. Open: an untaught chain
+     wording borrows a two-slot shape first and answers the middle link, since taking
+     apart first cost the house more than it gained; and a join that answers the wrong
+     kind still beats borrowing, which the answer-kinds check (see `f827f42e`) would
+     catch.
+  5. The edges `SKIP` drops (determiners, auxiliaries, conjunctions, `advmod`,
+     particles) are kept and plans learn which matter, as negation, modals and 'before'
+     were pulled out of it one at a time. Last because no miss traced on the
+     many-worded house came from a dropped function word. A function word is an edge's
+     label or a node's mark, never a node, so 'the' does not become a hub. Refuted if
+     the many-worded house reads no higher with every edge kept than with `SKIP`.
 - **Phase 5 — Learning rules, and operations over facts.** Plans learnt from lessons
   answer bAbI tasks 1, 2, 3 and 7. Order in time, the present against history, and a
   visit before or after another are learnt per plan. Rules induced from co-occurring

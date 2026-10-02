@@ -212,7 +212,7 @@ class GraphArm:
 
     def names_in(self, question: str) -> list[tuple[int, int, str]]:
         """The question's noun phrases, as spans with their names."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|names|{question}".encode()).hexdigest()
+        key = hashlib.sha256(f"{VERSION}|{self.model}|names-2|{question}".encode()).hexdigest()
         kept = self._kept(key)
         if kept is None:
             doc = nlp(self.model)(question)
@@ -222,7 +222,11 @@ class GraphArm:
                     left = [t for t in tok.children if t.dep_ in ("compound", "amod")
                             and t.i < tok.i]
                     start = min([t.idx for t in left] + [tok.idx])
-                    verb = tok.head if tok.dep_ == "dobj" else None
+                    # never the question's own verb: 'keep' in 'Where does Ada keep the
+                    # jars?' is cut with the jars only where the graph holds Ada's keeping
+                    # told actively, so one relation would be two shapes by how its facts
+                    # were told
+                    verb = tok.head if tok.dep_ == "dobj" and tok.head.dep_ != "ROOT" else None
                     between = (doc[verb.i + 1:min([t.i for t in left] + [tok.i])]
                                if verb is not None and verb.i < tok.i else None)
                     governs = ([verb.idx, verb.lemma_.lower()] if between is not None

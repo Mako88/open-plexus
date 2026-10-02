@@ -83,10 +83,17 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   reads 0.96 to 0.98 on the first house it was written against and 0.50 to 0.54 on the
   held-out second house, where the ear reads 0.94. So the parse is kept as it is, words as
   nodes and grammatical links as edges, and taught plans become paths through it from the
-  question's names to the answer, learnt from examples as chains over rows are now. "Lent
-  X to Y" and "Y borrowed X from Z" then need no mapping. Needs John before it starts: it
-  replaces the five-slot store the learner is built on, and the state rules after it.
-  Refuted if it cannot match the taught arm on the first house.
+  question's names to the answer, learnt from examples as chains over rows are now.
+  Chosen by John 2026-10-02 and built as `src/unfused/graph.py`, the `graphed` arm: it
+  beats the taught arm on all six house seeds, by 21 to 27 points on the second house,
+  and reads 0.593 on bAbI against 0.873 (`be1859ae`). It replaces the taught arm when it
+  holds bAbI too, and these come first, in order:
+  1. State over time, learnt rather than written: a plan keeps the turn order of the
+     events it passed, and an event that broke a plan's prediction during teaching (a
+     'drop' between a 'pick up' and a 'go') is kept as one that breaks it. bAbI tasks 2,
+     3 and 7 are where it reads.
+  2. Words never heard, as the taught arm resolves them, from the question's own parse.
+  3. Chains of three, where the first house still trails.
 - **Phase 5 — Learning rules, and operations over facts.** IN PROGRESS, 0.8B only. Plans
   learnt from taught examples answer bAbI tasks 1, 2, 3 and 7 and the house with no model
   planning: a shape nobody taught goes unanswered, so the faculty only reads. Every faculty

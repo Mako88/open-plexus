@@ -22,7 +22,7 @@ from pathlib import Path
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
 from unfused.arms import SYSTEM, Blind, FullContext, Recall  # noqa: E402
-from unfused.exam.run import run  # noqa: E402
+from unfused.exam.run import converse, run  # noqa: E402
 from unfused.exam.second import generate_second_house  # noqa: E402
 from unfused.exam.world import UNTAUGHT, generate_house  # noqa: E402
 
@@ -157,12 +157,9 @@ def main() -> None:
                 practice = generate(seed=s, n_facts=args.facts, n_turns=args.turns)
                 taught = Path(tempfile.mkdtemp(prefix="unfused-graph-teach-"))
                 arm = GraphArm(taught, known_learnt=learnt, known_positions=positions)
-                asked_after = practice.questions_after()
-                for turn, text in enumerate(practice.turns):
-                    arm.hear(turn, text)
-                    for q in asked_after.get(turn, []):
-                        if q.answer is not None and q.form not in UNTAUGHT:
-                            arm.teach(q.text, q.answer)
+                # taught in conversation: nothing labels a turn, and a lesson is the
+                # teacher's reaction to what the arm answered
+                converse(practice, arm, UNTAUGHT)
                 learnt, positions = arm.export()
                 arm.close()
                 shutil.rmtree(taught, ignore_errors=True)

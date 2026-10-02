@@ -97,10 +97,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   2. ~~Shapes matched by the parse.~~ Struck 2026-10-02: `reworded` is a form, and a
      wording no lesson used borrows the nearest taught shape's plans. What it cannot
      reach is lexical ('line of work' for 'do for a living'): item 5's.
-  3. Turns the system sorts itself. The runner tells the arm which turn is a telling, a
-     question and a lesson; a conversation labels none, and teaches by an answer turns
-     later or by 'no, that is wrong'. The form: an unlabelled stream, with lessons as
-     answers and corrections inside it.
+  3. ~~Turns the system sorts itself.~~ Struck 2026-10-02: the graphed arm is taught in
+     conversation, its practice questions turns and its lessons the teacher's reactions.
+     Open: a telling that follows a question is read as the reaction to it, and the test
+     still asks with no one reacting.
   4. State over time and counting a set that changes: 'where was it before', 'how many is
      she carrying', and the house's `update` and `count`, measured on both. bAbI tasks 3
      (0.69 against 0.91) and 7 (0.53 against 0.73) are where it shows. Order on a hook and

@@ -91,6 +91,21 @@ def run(house: House, open_arm: Callable[[], object], reopen_every: int = 50,
             "summary": summarise(rows), "rows": rows}
 
 
+def converse(world: House, arm, untaught: set | frozenset = frozenset()) -> None:
+    """A world as a conversation that teaches: every turn handed to the arm unlabelled,
+    each question asked as a turn of its own, and the teacher's reaction to whatever the
+    arm said as the turn after it. Nothing tells the arm which turn is which."""
+    asked_after = world.questions_after()
+    for turn, text in enumerate(world.turns):
+        arm.turn(turn, text)
+        for q in asked_after.get(turn, []):
+            if q.answer is None or q.form in untaught:
+                continue
+            said = arm.turn(turn, q.text)
+            right = judge(q, said or "")["correct"]
+            arm.turn(turn, "Yes, that's right." if right else f"No, it's {q.answer}.")
+
+
 def summarise(rows: list[dict]) -> dict:
     positives = [r for r in rows if r["answer"] is not None]
     negatives = [r for r in rows if r["answer"] is None]

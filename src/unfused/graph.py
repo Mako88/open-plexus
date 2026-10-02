@@ -174,6 +174,8 @@ class GraphArm:
         self.parsed = 0
         # the pairs of events already counted towards a plan's order, this world
         self.ordered: set = set()
+        # a question this arm answered, waiting for the turn that reacts to it
+        self.pending: tuple[str, str] | None = None
         # taught shapes' signatures, rebuilt after a lesson; questions' parses
         self._sigs: list | None = None
         self._tokens: dict = {}
@@ -689,6 +691,57 @@ class GraphArm:
         self.last_notes = ["(found)"]
         return max(found, key=lambda f: f[1])[0]
 
+    # -- a conversation -------------------------------------------------------
+
+    def turn(self, turn: int, text: str) -> str | None:
+        """One turn of a conversation, sorted by the arm itself. A question is answered
+        and kept, never stored as a telling. The turn after a question is the reaction to
+        the answer given: what it names that the question did not is the answer, and a
+        reaction naming nothing and not negated confirms the answer given. Every other
+        turn is a telling."""
+        if asked(text):
+            said = self.answer(_Asked(text))
+            self.pending = (text, said)
+            return said
+        if self.pending is not None:
+            question, said = self.pending
+            self.pending = None
+            named, negated = self.reaction(text, question)
+            if named:
+                self.teach(question, named)
+                return None
+            if not negated and said != "I don't know.":
+                self.teach(question, said)
+                return None
+            if negated:
+                return None
+        self.hear(turn, text)
+        return None
+
+    def reaction(self, text: str, question: str) -> tuple[str | None, bool]:
+        """What a reaction names that the question did not, and whether it says no."""
+        key = hashlib.sha256(f"{VERSION}|{self.model}|reaction|{text}".encode()).hexdigest()
+        rows = self._kept(key)
+        if rows is None:
+            doc = nlp(self.model)(text)
+            # one row a token: no, whether it may name something, its name, and whether
+            # it is a number of things read as the arm reads one ('none')
+            rows = []
+            for t in doc:
+                no = t.dep_ == "neg" or (t.dep_ == "intj" and t.lower_ in ("no", "nope"))
+                part = t.dep_ in ("compound", "amod") and t.head.pos_ in ("NOUN", "PROPN")
+                number = t.like_num or numeral(t.lower_) is not None
+                names = not part and (t.pos_ in ("NOUN", "PROPN", "NUM", "ADJ") or number)
+                rows.append([no, names, t.lower_ if number else phrase(t), number])
+            self._keep(key, rows)
+        negated = any(no for no, _, _, _ in rows)
+        for _, names, name, number in rows:
+            # 'right' in 'that's right' is an adjective as a colour is, and names nothing
+            # here, so a name must be one the graph holds
+            if names and not said_in(name, question) and (number or self.holding(name)):
+                return name, negated
+        return None, negated
+
     def export(self) -> tuple[list, list]:
         return (self.db.execute("SELECT shape, plan, hits, misses FROM learnt").fetchall(),
                 self.db.execute("SELECT template, pos, filler, n FROM positions").fetchall())
@@ -704,6 +757,15 @@ class GraphArm:
         self.db.close()
         if hasattr(self, "_cdb"):
             self._cdb.close()
+
+
+def asked(text: str) -> bool:
+    return text.rstrip().endswith("?")
+
+
+class _Asked:
+    def __init__(self, text: str) -> None:
+        self.text = text
 
 
 WORDS = ["none", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",

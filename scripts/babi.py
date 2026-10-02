@@ -23,7 +23,7 @@ os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
 from unfused.arms import FullContext  # noqa: E402
 from unfused.exam.babi import TASKS, fingerprint, modal_answers, stories  # noqa: E402
-from unfused.exam.run import run, summarise  # noqa: E402
+from unfused.exam.run import converse, run, summarise  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -112,11 +112,8 @@ def main() -> None:
                 for world in stories(t, args.teach, split="train"):
                     work = Path(tempfile.mkdtemp(prefix="babi-graph-teach-"))
                     arm = GraphArm(work, known_learnt=learnt, known_positions=positions)
-                    asked = world.questions_after()
-                    for turn, text in enumerate(world.turns):
-                        arm.hear(turn, text)
-                        for q in asked.get(turn, []):
-                            arm.teach(q.text, q.answer)
+                    # taught in conversation, as on the house
+                    converse(world, arm)
                     learnt, positions = arm.export()
                     arm.close()
                     shutil.rmtree(work, ignore_errors=True)

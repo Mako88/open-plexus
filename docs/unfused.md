@@ -94,11 +94,15 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      questions, half true. Refuted if the rendered answer scores below the bare node, or
      if no reply joins two fragments when the path has two edges.
   4. Chains of three, and joins. A clause about something is a join now (`solve`,
-     `related`, `joined`); seed 2's chain3 is below the 0.8B's. Open: an untaught chain
-     wording borrows a two-slot shape first and answers the middle link, since taking
-     apart first cost the house more than it gained; and a join that answers the wrong
-     kind still beats borrowing, which the answer-kinds check (see `f827f42e`) would
-     catch.
+     `related`, `joined`); seed 2's chain3 is below the 0.8B's. Colour asked through a
+     clause ('the stuff X keeps in the dairy') is the largest miss left, 35 over seeds 1
+     to 3, answered with a room by a loose walk where the colour was told in a wording no
+     plan holds. Joining before walking loosely was refuted (see the commit that says
+     so): the join's free variable took a thing where a person was asked. Both faults
+     are a wrong kind, so the next arm is a kind check on a join's free variable and a
+     loose end, a name's kind being the events it takes part in, as DECIDED's meaning
+     section has it (`f827f42e` tried kinds on borrowed ends, before plans were
+     relations).
   5. The edges `SKIP` drops (determiners, auxiliaries, conjunctions, `advmod`,
      particles) are kept and plans learn which matter, as negation, modals and 'before'
      were pulled out of it one at a time. Last because no miss traced on the

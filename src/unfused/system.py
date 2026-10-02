@@ -134,7 +134,8 @@ class SystemArm:
                  known_learnt: list | None = None,
                  cleans: bool = False, known_holds: list | None = None,
                  known_echoes: list | None = None,
-                 known_frames: list | None = None, known_meant: list | None = None) -> None:
+                 known_frames: list | None = None, known_meant: list | None = None,
+                 listed: bool = True) -> None:
         self.ear = ear
         # what writes a question's plan; the ear unless a different faculty is given
         self.planner = planner or ear
@@ -153,6 +154,9 @@ class SystemArm:
         # how closely two wordings' properties must match for a verdict about one to
         # answer for the other; 0 asks the judge about every pair
         self.shares = shares
+        # whether the ear is told the stored relations with every sentence, so it reuses
+        # a wording, or reads each sentence alone and leaves wordings to the system
+        self.listed = listed
         self._resolved: dict[str, list[tuple[int, int, str]]] = {}
         # whether a subject heard somewhere is no longer where it was heard before
         self.moves = moves
@@ -191,7 +195,7 @@ class SystemArm:
 
     def dials(self) -> dict:
         return {"ear": self.ear.name, "planner": self.planner.name, "judge": self.judge.name,
-                "searched": self.searched, "asked": self.asked, "shares": self.shares, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "depth": self.depth,
+                "searched": self.searched, "asked": self.asked, "shares": self.shares, "listed": self.listed, "moves": self.moves, "taught": self.taught, "cleans": self.cleans, "depth": self.depth,
                 "hub": self.hub,
                 "planner_calls": getattr(self.planner, "calls", None) if self.planner
                 is not self.ear else None, "names_shown": self.names_shown,
@@ -220,7 +224,7 @@ class SystemArm:
                               (text,)).fetchone()
         if row:
             return json.loads(row[0])
-        assertions = self.ear.read(text, self.relations())
+        assertions = self.ear.read(text, self.relations() if self.listed else None)
         self.db.execute("INSERT INTO readings VALUES (?, ?)", (text, json.dumps(assertions)))
         return assertions
 

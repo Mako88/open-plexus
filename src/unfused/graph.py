@@ -176,6 +176,8 @@ class GraphArm:
         self.ordered: set = set()
         # a question this arm answered, waiting for the turn that reacts to it
         self.pending: tuple[str, str] | None = None
+        # events already found replaced by a later one, cleared whenever one is heard
+        self._replaced: dict = {}
         # taught shapes' signatures, rebuilt after a lesson; questions' parses
         self._sigs: list | None = None
         self._tokens: dict = {}
@@ -230,6 +232,7 @@ class GraphArm:
         return [tuple(k) for k in kept]
 
     def hear(self, turn: int, text: str) -> None:
+        self._replaced = {}
         events = self.read(text)
         ids = []
         for ev in events:
@@ -271,6 +274,33 @@ class GraphArm:
         lemma, turn = self.db.execute("SELECT lemma, turn FROM events WHERE id = ?",
                                       (int(node[2:]),)).fetchone()
         return lemma, turn
+
+    def replaced(self, node: str) -> int:
+        """Whether a later event that happened has exactly this one's arguments, the
+        prepositions aside: 'Mary dropped the football' replaces 'Mary picked up the
+        football', 'Mary went to the hallway' replaces 'Mary went to the kitchen', and
+        'Mary picked up the football' replaces neither, its arguments being others. The
+        turn of the latest that replaces it, or 0."""
+        if node not in self._replaced:
+            eid = int(node[2:])
+
+            def args(e: int) -> frozenset:
+                return frozenset(self.db.execute(
+                    "SELECT label, node FROM edges WHERE event = ? AND label NOT LIKE "
+                    "'prep:%'", (e,)).fetchall())
+
+            mine = args(eid)
+            turn = self.db.execute("SELECT turn FROM events WHERE id = ?", (eid,)).fetchone()[0]
+            later: dict = {}
+            if mine:
+                label, n = next(iter(mine))
+                later = dict(self.db.execute(
+                    "SELECT edges.event, events.turn FROM edges JOIN events ON events.id = "
+                    "edges.event WHERE edges.label = ? AND edges.node = ? AND events.turn > ?"
+                    " AND events.mood = ''", (label, n, turn)).fetchall())
+            self._replaced[node] = max((t for e, t in later.items() if args(e) == mine),
+                                       default=0)
+        return self._replaced[node]
 
     def mood(self, node: str) -> str:
         return self.db.execute("SELECT mood FROM events WHERE id = ?",
@@ -443,11 +473,17 @@ class GraphArm:
         found.sort(key=lambda p: len(p["steps"]))
         return [p for p in found if len(p["steps"]) == len(found[0]["steps"])] if found else []
 
-    def follow(self, plan: dict, fillers: list[str], strict: bool) -> list[tuple[str, int]]:
+    def follow(self, plan: dict, fillers: list[str], strict: bool,
+               present: bool | None = None) -> list[tuple[str, int]]:
         """Every end the plan reaches from the question's first name, with the latest turn
-        of the events it passed."""
+        of the events it passed. A plan that asks about the present passes no event a later
+        one replaced; whether it does is learnt from its lessons, since 'where was it
+        before' needs exactly those."""
         if not fillers:
             return []
+        if present is None:
+            now, then = plan.get("present", (0, 0))
+            present = now > then
         out = []
         def hooked(node: str, pos: int) -> bool:
             return all(self.reaches(node, h[2], f"n:{fillers[h[0]]}")
@@ -464,6 +500,7 @@ class GraphArm:
                 return turn_j >= turn_i
             return True
 
+        self.emptied = 0
         start = f"n:{fillers[0]}"
         # a walk: its nodes, the turns of its events in order, and its last event
         walks = [([start], (), None)] if hooked(start, 0) else []
@@ -486,6 +523,9 @@ class GraphArm:
                         if mood not in plan.get("moods", {}).get(pos, [mood]):
                             continue
                         if not ordered(last, i + 1, et):
+                            continue
+                        if present and (by := self.replaced(nxt)):
+                            self.emptied = max(self.emptied, by)
                             continue
                         # what did not happen, or only might, changed nothing, so it is
                         # walked through and never makes an answer the latest
@@ -610,10 +650,14 @@ class GraphArm:
         return []
 
     def said(self, plan: dict, fillers: list[str], strict: bool,
-             question: str) -> list[tuple[str, int]]:
-        ends = self.follow(plan, fillers, strict)
+             question: str, present: bool | None = None) -> list[tuple[str, int]]:
+        ends = self.follow(plan, fillers, strict, present)
         if plan.get("count"):
-            return [(str(len({e for e, _ in ends})), max(t for _, t in ends))] if ends else []
+            if ends:
+                return [(str(len({e for e, _ in ends})), max(t for _, t in ends))]
+            # nothing left to count is an answer, resting on what emptied the set: 'Mary
+            # dropped the football' is later than her picking it up
+            return [("none", (self.emptied,))] if self.emptied else []
         return [f for f in ends if not said_in(f[0], question)]
 
     def teach(self, question: str, answer: str) -> None:
@@ -624,13 +668,28 @@ class GraphArm:
         for rowid, plan in self.db.execute("SELECT rowid, plan FROM learnt WHERE shape = ?",
                                            (shape,)).fetchall():
             plan = json.loads(plan)
-            found = (self.said(plan, fillers, True, question)
-                     or self.said(plan, fillers, False, question))
-            if not found:
+
+            def holds(present: bool | None) -> bool | None:
+                found = (self.said(plan, fillers, True, question, present)
+                         or self.said(plan, fillers, False, question, present))
+                if not found:
+                    return None
+                said = max(found, key=lambda f: f[1])[0]
+                return said_in(want, said) or (numeral(want) is not None
+                                               and numeral(said) == numeral(want))
+
+            # whether the plan asks about the present, counted on every lesson where
+            # reading only what is still so and reading everything differ
+            now, then = holds(True), holds(False)
+            if now != then:
+                tally = plan.get("present", [0, 0])
+                tally[0 if now else 1] += 1
+                plan["present"] = tally
+                self.db.execute("UPDATE learnt SET plan = ? WHERE rowid = ?",
+                                (json.dumps(plan), rowid))
+            held = holds(None)
+            if held is None:
                 continue
-            said = max(found, key=lambda f: f[1])[0]
-            held = said_in(want, said) or (numeral(want) is not None
-                                           and numeral(said) == numeral(want))
             column = "hits" if held else "misses"
             self.db.execute(f"UPDATE learnt SET {column} = {column} + 1 WHERE rowid = ?",
                             (rowid,))

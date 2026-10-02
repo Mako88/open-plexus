@@ -86,3 +86,16 @@ def test_a_conversation_teaches_with_nothing_labelled(tmp_path):
     a.turn(5, "Yes, that's right.")
     # a question is never stored as a telling
     assert not a.db.execute("SELECT 1 FROM events WHERE heard LIKE '%?'").fetchone()
+
+
+def test_a_later_event_on_the_same_arguments_replaces_an_earlier_one(tmp_path):
+    a = arm(tmp_path)
+    a.hear(0, "Mary went to the kitchen.")
+    a.hear(1, "Mary got the football.")
+    a.hear(2, "Mary dropped the football.")
+    a.hear(3, "Mary might get the football.")
+    went, got, dropped, might = (f"e:{i}" for i, in a.db.execute(
+        "SELECT id FROM events ORDER BY turn"))
+    assert a.replaced(got) == 2
+    # other arguments, or a later event that only might happen, replace nothing
+    assert not a.replaced(went) and not a.replaced(dropped)

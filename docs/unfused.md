@@ -61,18 +61,29 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   ear were deleted; the ear's speed, its known relations and the second house's lendings
   went with it. What would bring the ear back: a world whose sentences the parse cannot
   read, where an ear's reading answers more.
-- **The graphed arm, next.** John's, 2026-10-01: what a conversation will need anyway comes
-  before tuning to either world, each entering the exam as a form when it does.
-  1. ~~Hedged facts asked 'now'.~~ Struck 2026-10-02: hedged reads 1.0 on every seed.
-  2. Correction is taught and never examined: the test asks with no one reacting. The
-     form: a question answered, corrected, and asked again later. It changes the house,
-     so `scripts/baselines.sh` runs after it.
-  3. Words never heard, from the question's own parse: 'What is X's line of work?' shares
-     no grammar with 'do for a living'. The symbol encoder of the DECIDED meaning section
-     is the mechanism: a word's meaning as what is known about it, learnt from every
-     same-or-different the system establishes, with borrowed vectors as raw material only.
-  4. Counts: the first house's seed 3 reads 0.2 on every arm since the forms were added.
-  5. Chains of three: taken apart by the question's parse where their plans find
+- **The graphed arm, next.** John's, 2026-10-01 and 2026-10-02: what a conversation will
+  need anyway comes before tuning to either world, and the system goes generic as soon as
+  it can, then iterates there. Each enters the exam as a form when it does. In order:
+  1. The red set reads the models' latest readings whatever house they were taken on (see
+     the milestone item above), so the house can change without a GPU night.
+  2. A house told in many wordings. Each kind of fact has about three tellings and its
+     questions fixed frames, which is what lets plans keyed on wording carry; real speech
+     does not repeat itself so. Many more tellings and frames per kind, at the same size,
+     with the correction form below in the same change of the house: a question answered,
+     corrected, and asked again later. Refuted as a test if the graphed arm does not fall
+     on it, which would say the templates were not what it leant on.
+  3. A mouth. An answer is one node of the graph or "I don't know."; it cannot say yes or
+     no, list, or say what it is sure of. The faculty renders a reply from the answer and
+     the path that found it, which is the job DECIDED gives it, and the system answers
+     yes-or-no questions by finding or failing to find the fact asked. The form: yes-or-no
+     questions, half true. Refuted if the rendered answer scores below the bare node.
+  4. Words never heard, from the question's own parse: 'What is X's line of work?' shares
+     no grammar with 'do for a living', and the many-worded house will make this the
+     commonest miss. The symbol encoder of the DECIDED meaning section is the mechanism: a
+     word's meaning as what is known about it, learnt from every same-or-different the
+     system establishes, with borrowed vectors as raw material only.
+  5. Counts: the first house's seed 3 reads 0.2 on every arm since the forms were added.
+  6. Chains of three: taken apart by the question's parse where their plans find
      nothing, they read 0.5 0.5 1.0 and 0.5 0.72 0.33. Open: an untaught chain wording
      borrows a two-slot shape first and answers the middle link ('dov' for 'what does
      Cara's cousin do'), since taking apart first cost the house more than it gained.
@@ -343,6 +354,15 @@ the store merges by id. Kill a third of the nodes mid-exam.
 
 ## OPEN FORKS
 
+- **A primer, and Simple English Wikipedia.** John's, 2026-10-02. The system learns from
+  examples, never from explanations: a lesson on what a noun is gives it nothing, while a
+  curriculum of many short tellings with questions about them, in every common wording,
+  teaches it question shapes in general, which is a primer that would help. Wikipedia read
+  alone gives knowledge and no skill, since nothing in it is asked; it could give a
+  word's meaning as what is known about it, which is the symbol encoder's raw material.
+  Needs first: pronouns bound across sentences, and a graph that walks at a million edges.
+  A first reading: a few hundred Simple English articles on one subject, read whole, then
+  asked questions in shapes the house taught.
 - **Spark-234K as a far world.** John's, 2026-10-02 (`OpenDataArena/Spark-234K` on Hugging
   Face): 234K research-level science problems from recent papers, each self-contained,
   each answer a worked derivation of 2.5K to 44K characters. Nothing here can attempt one:

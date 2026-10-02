@@ -591,11 +591,8 @@ class GraphArm:
             self._tokens[question] = kept
         return self._tokens[question]
 
-    def nearest(self, question: str, fillers: list[str],
-                skip: str | None = None) -> tuple[float, list[str]]:
-        """The taught shapes nearest a question no lesson was worded as: those of its
-        number of slots whose signature overlaps the question's most, and by how much."""
-        mine = set(self.signature(question, fillers))
+    def taught(self) -> list[tuple[str, set]]:
+        """Every taught shape's plans' signatures, rebuilt after a lesson."""
         if self._sigs is None:
             self._sigs = []
             for shape, plan in self.db.execute(
@@ -603,8 +600,15 @@ class GraphArm:
                 sig = json.loads(plan).get("sig")
                 if sig:
                     self._sigs.append((shape, set(sig)))
+        return self._sigs
+
+    def nearest(self, question: str, fillers: list[str],
+                skip: str | None = None) -> tuple[float, list[str]]:
+        """The taught shapes nearest a question no lesson was worded as: those of its
+        number of slots whose signature overlaps the question's most, and by how much."""
+        mine = set(self.signature(question, fillers))
         best, shapes = 0.0, []
-        for shape, sig in self._sigs:
+        for shape, sig in self.taught():
             if shape.count("<") != len(fillers) or shape == skip:
                 continue
             near = len(mine & sig) / len(mine | sig)
@@ -654,6 +658,36 @@ class GraphArm:
             ranked = [r for near in nearest for r in self.db.execute(
                 "SELECT plan FROM learnt WHERE shape = ? AND hits > misses "
                 "ORDER BY hits - misses DESC, hits DESC", (near,)).fetchall()]
+            found = self.followed(ranked, fillers, question)
+            if found:
+                return found
+        return []
+
+    def reaching(self, question: str, skip: str, tries: int = 60) -> list:
+        """Where the nearest shapes reach nothing, every taught shape with as many slots
+        as the question names known things, nearest first, read under each order of
+        those names: the first whose plans reach anything is the relation asked, a count
+        never, since a count of anything is a number. Last of all, after taking the
+        question apart, which reads it more closely. Two
+        wordings are one relation where the house holds a solution for both: 'What is
+        the number of X in the Y?' shares little grammar with 'How many X are in the
+        Y?' and the house relates X and Y by little else."""
+        from itertools import combinations, permutations
+
+        names = [n for _, _, n in self.template(question)[1] if self.known(n)][:4]
+        readings = []
+        for k in range(1, len(names) + 1):
+            for chosen in combinations(names, k):
+                for order in permutations(chosen):
+                    mine = set(self.signature(question, list(order)))
+                    readings += [(len(mine & sig) / len(mine | sig), list(order), shape)
+                                 for shape, sig in self.taught()
+                                 if shape != skip and shape.count("<") == k]
+        readings.sort(key=lambda r: -r[0])
+        for _, fillers, shape in readings[:tries]:
+            ranked = [(p,) for (p,) in self.db.execute(
+                "SELECT plan FROM learnt WHERE shape = ? AND hits > misses "
+                "ORDER BY hits - misses DESC, hits DESC", (shape,)) if not json.loads(p).get("count")]
             found = self.followed(ranked, fillers, question)
             if found:
                 return found
@@ -965,7 +999,10 @@ class GraphArm:
         # first read 0.756 0.784 0.779 against 0.760 0.788 0.809
         if depth >= 3 or not all(self.known(f) for f in fillers):
             return None
-        return self.apart(text, depth)
+        said = self.apart(text, depth)
+        if said is None and depth == 0 and (found := self.reaching(text, shape)):
+            said = self.latest(found)
+        return said
 
     @staticmethod
     def latest(found: list) -> str:

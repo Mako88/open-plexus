@@ -122,3 +122,17 @@ def test_a_question_whose_plans_find_nothing_is_taken_apart(tmp_path):
     assert a.apart("What does Cara's cousin do for a living?", 0) == "apples"
     # and of someone never mentioned, nothing
     assert a.answer(q("What does Edda's cousin do for a living?")) == "I don't know."
+
+
+def test_a_clause_about_something_is_a_relation_solved_for_it(tmp_path):
+    a = arm(tmp_path)
+    a.hear(0, "Ada keeps the jars in the cellar.")
+    a.hear(1, "The jars are ochre.")
+    a.hear(2, "Bren's lamps are kept in the attic.")
+    a.hear(3, "The lamps are green.")
+    a.teach("Where does Ada keep the jars?", "cellar")
+    a.teach("Where does Bren keep the lamps?", "attic")
+    a.teach("What colour are the jars?", "ochre")
+    # the place relation was taught in two wordings; the clause is solved for the thing
+    # through the one this fact was told in, then the thing's colour asked
+    assert a.answer(q("What colour are the things Bren keeps in the attic?")) == "green"

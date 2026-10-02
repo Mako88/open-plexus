@@ -64,25 +64,20 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - **The graphed arm, next.** John's, 2026-10-01 and 2026-10-02: what a conversation will
   need anyway comes before tuning to either world, and the system goes generic as soon as
   it can, then iterates there. Each enters the exam as a form when it does. In order:
-  1. The many-worded house, answered. The house is told in many wordings now, with
-     corrected questions (the graphed arm fell on it: `readings/exam-graphed-parse-s*`
-     of 2026-10-02T14). Two misses lead. A wording no lesson used borrows a taught shape
-     that asks for another kind of thing ('what colour are the things X keeps in the
-     cellar' answered with a room), and a move told with a verb no lesson used ('carried
-     the lanterns across to') is not read as a move, which is item 3's. Under both: a
-     plan is a whole path through one telling's wording, so a fact told nine ways and
-     another told nine ways give a two-hop question 81 paths, and five practice houses
-     teach a few of them. The mechanism: a plan becomes a relation, the subgraph pattern
-     a lesson's path traces with each named thing a variable, and a shape's plans its
-     disjuncts. A relation is matched with any variable free, and a question the parse
-     takes apart is a join of relations, solved backward from what is asked as the
-     Phase 4 search says. Refuted if twohop and chain3 do not rise on the many-worded
-     house. Beside it, the
-     edges `SKIP` drops (determiners, auxiliaries, conjunctions, `advmod`, particles) are
-     kept and plans learn which matter, as negation, modals and 'before' were pulled out
-     of it one at a time. A function word is an edge's label or a node's mark, never a
-     node, so 'the' does not become a hub. Refuted if the many-worded house reads no
-     higher with every edge kept than with `SKIP`.
+  1. The many-worded house, answered. A clause about something is a join now: a plan
+     is a relation matched with any variable free (`solve`, `related`, `joined`). Next:
+     - Joins inside joins. 'The things X's cousin keeps in the cellar' holds 'X's
+       cousin', and seed 2's chain3 reads 0 on it; a one-name phrase whose head the
+       graph also knows as a name ('cousin') is bound as two names.
+     - A join that answers the wrong kind still beats borrowing, which could answer
+       right: the answer-kinds check (see `f827f42e`) is where that would be caught.
+     - The edges `SKIP` drops (determiners, auxiliaries, conjunctions, `advmod`,
+       particles) are kept and plans learn which matter, as negation, modals and 'before'
+       were pulled out of it one at a time. A function word is an edge's label or a
+       node's mark, never a node, so 'the' does not become a hub. Refuted if the
+       many-worded house reads no higher with every edge kept than with `SKIP`.
+     A move told with a verb no lesson used ('carried the lanterns across to') is not
+     read as a move, which is item 3's.
   2. A mouth of the system's own. An answer is one node of the graph or "I don't know.";
      it cannot say yes or no, list, or say what it is sure of. The mouth renders the
      answer's path from fragments of parses it has heard: each edge of the path is said

@@ -625,7 +625,8 @@ class GraphArm:
         readings.sort(key=lambda r: -r[0])
         return [(f, sh) for _, f, sh in readings]
 
-    def answers(self, shape: str, fillers: list[str], question: str) -> list[tuple[str, int]]:
+    def answers(self, shape: str, fillers: list[str], question: str,
+                borrow: bool = True) -> list[tuple[str, int]]:
         ranked = self.db.execute(
             "SELECT plan FROM learnt WHERE shape = ? AND hits > misses "
             "ORDER BY hits - misses DESC, hits DESC", (shape,)).fetchall()
@@ -633,7 +634,7 @@ class GraphArm:
             found = self.followed(ranked, fillers, question)
             if found:
                 return found
-        if not all(self.known(f) for f in fillers):
+        if not borrow or not all(self.known(f) for f in fillers):
             # of a name the conversation never used nothing can be known, so its
             # question is not borrowed for
             return []
@@ -816,6 +817,11 @@ class GraphArm:
         place, and what is left asked again. Plans are whole paths and do not compose; a
         question's grammar does."""
         shape, fillers = self.shape(text)
+        found = self.answers(shape, fillers, text, borrow=False)
+        if found:
+            return max(found, key=lambda f: f[1])[0]
+        if depth < 3 and (said := self.joined(text, depth)) is not None:
+            return said
         found = self.answers(shape, fillers, text)
         if found:
             return max(found, key=lambda f: f[1])[0]
@@ -824,6 +830,107 @@ class GraphArm:
         if depth >= 3 or not all(self.known(f) for f in fillers):
             return None
         return self.apart(text, depth)
+
+    def joined(self, text: str, depth: int) -> str | None:
+        """A question holding a clause about something ('the things X keeps in the
+        cellar') answered as a join: the clause is a relation some taught shape holds,
+        solved for the thing with the clause's names bound, and the thing put in the
+        clause's place. A shape's plans are its relation's disjuncts, one a wording it was
+        taught in, so the clause is found however the fact was told."""
+        for a, b in self.inner(text):
+            names = [n for _, _, n in self.template(text[a:b])[1] if self.known(n)]
+            if not names:
+                continue
+            for thing in self.related(text[a:b], names):
+                said = self.answered(text[:a] + thing.title() + text[b:], depth + 1)
+                if said is not None:
+                    return said
+        return None
+
+    def related(self, phrase: str, names: list[str]) -> list[str]:
+        """What a phrase's clause leaves open, from the taught shapes with a variable for
+        every name and one more, nearest the phrase first: each way of binding the names
+        to its variables with the rest free, and what the first binding to reach anything
+        finds, latest first."""
+        from itertools import permutations
+
+        mine = set(self.signature(phrase, names))
+        rows: dict[str, list] = {}
+        for shape, plan in self.db.execute(
+                "SELECT shape, plan FROM learnt WHERE hits > misses "
+                "ORDER BY hits - misses DESC, hits DESC").fetchall():
+            if shape.count("<") == len(names):
+                rows.setdefault(shape, []).append(json.loads(plan))
+        shapes = []
+        for shape, plans in rows.items():
+            sig = next((set(p["sig"]) for p in plans if p.get("sig")), set())
+            shapes.append((len(mine & sig) / max(1, len(mine | sig)), shape))
+        shapes.sort(key=lambda r: -r[0])
+        variables = list(range(len(names))) + ["a"]
+        for _, shape in shapes[:5]:
+            plans = [p for p in rows[shape] if not p.get("count")]
+            for free in variables:
+                rest = [v for v in variables if v != free]
+                for order in permutations(names):
+                    bound = dict(zip(rest, order))
+                    found = [f for plan in plans for f in self.solve(plan, bound, free)
+                             if f[0] not in names]
+                    if found:
+                        return [e for e, _ in sorted(found, key=lambda f: f[1], reverse=True)]
+        return []
+
+    def solve(self, plan: dict, bound: dict, free) -> list[tuple[str, tuple]]:
+        """A plan read as a pattern and matched with any of its variables free: the
+        path's first node is variable 0, its end 'a', and each hook's end the slot it
+        names. Matched outward from a bound variable; the values found for `free`, each
+        with the latest turn of what happened on the way."""
+        steps = plan["steps"]
+        edges = [(("p", i), ("p", i + 1), lab, d) for i, (lab, d) in enumerate(steps)]
+        var = {0: ("p", 0), "a": ("p", len(steps))}
+        for h, (k, i, hsteps) in enumerate(plan["attach"]):
+            prev = ("p", i)
+            for j, (lab, d) in enumerate(hsteps):
+                edges.append((prev, ("h", h, j), lab, d))
+                prev = ("h", h, j)
+            var[k] = prev
+        if free not in var or not bound or not all(v in var for v in bound):
+            return []
+        want = {var[v]: f"n:{n}" for v, n in bound.items()}
+        root = next(iter(want))
+        moods = plan.get("moods", {})
+        partials = [{root: want[root]}]
+        todo = list(edges)
+        while todo and partials:
+            seen = partials[0]
+            edge = next((e for e in todo if (e[0] in seen) != (e[1] in seen)), None)
+            if edge is None:
+                break
+            todo.remove(edge)
+            u, v, lab, d = edge
+            here, there, way = (u, v, d) if u in seen else (v, u, -d)
+            nxt = []
+            for got in partials:
+                for label, direction, node in self.around(got[here]):
+                    if label != lab or direction != way or node in got.values():
+                        continue
+                    if there in want and node != want[there]:
+                        continue
+                    # never through what did not happen where the lessons' did, or the
+                    # other way round, as a plan is followed
+                    if node.startswith("e:") and there[0] == "p" and self.mood(node) not in \
+                            moods.get(str(there[1]), [self.mood(node)]):
+                        continue
+                    nxt.append({**got, there: node})
+            partials = nxt[:2000]
+        out = []
+        for got in partials:
+            end = got.get(var[free], "")
+            if not end.startswith("n:") or len(got) < len({n for e in edges for n in e[:2]}):
+                continue
+            turns = [self.event(n)[1] for n in got.values()
+                     if n.startswith("e:") and not self.mood(n)]
+            out.append((end[2:], (max(turns, default=0),)))
+        return out
 
     def apart(self, text: str, depth: int) -> str | None:
         for a, b in self.inner(text):

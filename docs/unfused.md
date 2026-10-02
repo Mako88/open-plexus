@@ -47,8 +47,8 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   compared with its own last version on every change, and with `blind` (seconds, no GPU);
   the language models given everything are run with `scripts/baselines.sh` now and then,
   to say what size of model the system stands against. So phases 1, 2 and 4 of the red
-  set stop gating on today's house: next, they read the latest readings of their arms
-  whatever house they were taken on, and say which house that was.
+  set read the latest readings of the models whatever house they were taken on, and say
+  which house that was; the system and blind are read on today's house.
 - **The bet's checkpoint.** Two halves. The first house: the system beats the 0.8B given
   the whole transcript on `twohop`, `chain3` and `count`, and blind, on seeds 1 to 3. The
   system is the graphed arm, which asks no faculty anything, so it is held to the smallest
@@ -64,9 +64,7 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - **The graphed arm, next.** John's, 2026-10-01 and 2026-10-02: what a conversation will
   need anyway comes before tuning to either world, and the system goes generic as soon as
   it can, then iterates there. Each enters the exam as a form when it does. In order:
-  1. The red set reads the models' latest readings whatever house they were taken on (see
-     the milestone item above), so the house can change without a GPU night.
-  2. A house told in many wordings. Each kind of fact has about three tellings and its
+  1. A house told in many wordings. Each kind of fact has about three tellings and its
      questions fixed frames, which is what lets plans keyed on wording carry; real speech
      does not repeat itself so. Many more tellings and frames per kind, at the same size,
      with the correction form below in the same change of the house: a question answered,
@@ -77,7 +75,7 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      one at a time. A function word is an edge's label or a node's mark, never a node, so
      'the' does not become a hub. Refuted if the many-worded house reads no higher with
      every edge kept than with `SKIP`.
-  3. A mouth of the system's own. An answer is one node of the graph or "I don't know.";
+  2. A mouth of the system's own. An answer is one node of the graph or "I don't know.";
      it cannot say yes or no, list, or say what it is sure of. The mouth renders the
      answer's path from fragments of parses it has heard: each edge of the path is said
      in the words of a heard sentence that has that edge, its nodes replaced, and
@@ -87,13 +85,13 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      yes-or-no questions by finding or failing to find the fact asked. The form: yes-or-no
      questions, half true. Refuted if the rendered answer scores below the bare node, or
      if no reply joins two fragments when the path has two edges.
-  4. Words never heard, from the question's own parse: 'What is X's line of work?' shares
+  3. Words never heard, from the question's own parse: 'What is X's line of work?' shares
      no grammar with 'do for a living', and the many-worded house will make this the
      commonest miss. The symbol encoder of the DECIDED meaning section is the mechanism: a
      word's meaning as what is known about it, learnt from every same-or-different the
      system establishes, with borrowed vectors as raw material only.
-  5. Counts: the first house's seed 3 reads 0.2 on every arm since the forms were added.
-  6. Chains of three: taken apart by the question's parse where their plans find
+  4. Counts: the first house's seed 3 reads 0.2 on every arm since the forms were added.
+  5. Chains of three: taken apart by the question's parse where their plans find
      nothing, they read 0.5 0.5 1.0 and 0.5 0.72 0.33. Open: an untaught chain wording
      borrows a two-slot shape first and answers the middle link ('dov' for 'what does
      Cara's cousin do'), since taking apart first cost the house more than it gained.

@@ -71,13 +71,12 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   the shipped resolver to stay. Built from rows alone and borrowed vectors on relation
   words are refuted (`586338f8`, `b33d2422`). The house and bAbI MUST NOT fall by more
   than 0.02.
-- **The ear reads without the known relations.** John's question, 2026-10-01. Every read
-  sends the 30 commonest stored relations so the 0.8B reuses a wording, which has been so
-  since `1d18547b` and was never compared. It puts vocabulary consistency in the frozen
-  faculty, and makes the same sentence a new request whenever the list moves: bAbI is up
-  to 4,818 reads where 349 sentences would do. The arm reads each sentence alone and
-  leaves "stores" against "keeps" to the system's kin, synonyms and symbols. Refuted if
-  either house or bAbI falls by more than 0.02.
+- ~~**The ear reads without the known relations.**~~ Refuted as it stands, 2026-10-02:
+  the second house and bAbI rise without the list, the first house falls on two seeds
+  of three, its colour plans failing once colour is worded several ways. The list does
+  work both ways, joining wordings that are one relation and joining some that are not,
+  so it comes out when the system joins wordings itself: the symbol encoder above,
+  applied to relations, has that as its first measurable job.
 - **The parser reading, before the state rules.** John's, 2026-10-01. The learner's
   principles carry to a general ear (plans induced from taught examples and kept while
   they hold, abstention, facts over time, symbols); its structures do not (five slots,

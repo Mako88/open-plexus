@@ -1,0 +1,5923 @@
+{
+ "arm": "taught",
+ "dials": {
+  "ear": "Qwen3.5-0.8B-Q8_0 (llama.cpp) [served, frozen]",
+  "planner": "Qwen3.5-0.8B-Q8_0 (llama.cpp, planner)",
+  "judge": "Qwen3.5-0.8B-Q8_0 (llama.cpp, planner)",
+  "searched": false,
+  "asked": false,
+  "shares": 0.8,
+  "listed": false,
+  "moves": true,
+  "taught": true,
+  "cleans": true,
+  "depth": 3,
+  "hub": 4,
+  "planner_calls": 0,
+  "names_shown": 25,
+  "relations_shown": 30,
+  "plans": false,
+  "shapes": 0,
+  "plan_uses": 0,
+  "ear_calls": 50,
+  "ear_cached": 1372,
+  "ear_unparsed": 1,
+  "judged": {}
+ },
+ "seconds": 79.2,
+ "summary": {
+  "score": 0.669,
+  "asked": 341,
+  "invented": 0.0,
+  "negatives": 20,
+  "stale": 0.5,
+  "echoed": 0.0,
+  "by_form": {
+   "chain3": {
+    "score": 0.333,
+    "n": 15
+   },
+   "count": {
+    "score": 0.4,
+    "n": 10
+   },
+   "direct": {
+    "score": 0.825,
+    "n": 114
+   },
+   "oblique": {
+    "score": 0.517,
+    "n": 116
+   },
+   "reverse": {
+    "score": 0.913,
+    "n": 46
+   },
+   "twohop": {
+    "score": 0.65,
+    "n": 20
+   },
+   "update": {
+    "score": 0.5,
+    "n": 20
+   }
+  },
+  "by_delay": {
+   "1": {
+    "score": 0.66,
+    "n": 53
+   },
+   "150": {
+    "score": 0.642,
+    "n": 53
+   },
+   "20": {
+    "score": 0.642,
+    "n": 53
+   },
+   "5": {
+    "score": 0.703,
+    "n": 91
+   },
+   "60": {
+    "score": 0.67,
+    "n": 91
+   }
+  },
+  "by_kind": {
+   "colour": {
+    "score": 0.625,
+    "n": 72
+   },
+   "count": {
+    "score": 0.4,
+    "n": 10
+   },
+   "number": {
+    "score": 0.7,
+    "n": 50
+   },
+   "person": {
+    "score": 0.802,
+    "n": 96
+   },
+   "room": {
+    "score": 0.66,
+    "n": 50
+   },
+   "trade": {
+    "score": 0.54,
+    "n": 63
+   }
+  }
+ },
+ "rows": [
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 1,
+   "asked_at": 2,
+   "question": "What does Krourkdraim do for a living?",
+   "answer": "nets",
+   "said": "nets",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "room",
+   "delay": 0,
+   "asked_at": 2,
+   "question": "Where does Stigreck keep the cracked plates?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 1,
+   "asked_at": 4,
+   "question": "How many planting flats sit in the loft?",
+   "answer": "66",
+   "said": "66",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 5,
+   "asked_at": 6,
+   "question": "How does Krourkdraim earn a wage?",
+   "answer": "nets",
+   "said": "nets",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 1,
+   "asked_at": 6,
+   "question": "What shade are the canes?",
+   "answer": "slate",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 5,
+   "asked_at": 8,
+   "question": "How many seed trays are in the attic?",
+   "answer": "66",
+   "said": "66",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 8,
+   "question": "Whose cousin is Raenuck?",
+   "answer": "Taisflol",
+   "said": "taisflol",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 1,
+   "asked_at": 9,
+   "question": "How does Graithost earn a wage?",
+   "answer": "wool",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 10,
+   "question": "What colour are the walking sticks?",
+   "answer": "slate",
+   "said": "slate",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 12,
+   "question": "To whom is Raenuck related?",
+   "answer": "Taisflol",
+   "said": "taisflol",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 12,
+   "question": "Who is Taisflol's cousin?",
+   "answer": "Raenuck",
+   "said": "raenuck",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 5,
+   "asked_at": 13,
+   "question": "What does Graithost do for a living?",
+   "answer": "wool",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 1,
+   "asked_at": 13,
+   "question": "How many flour sacks are in the pantry?",
+   "answer": "96",
+   "said": "96",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 13,
+   "question": "Who dyes wool?",
+   "answer": "Graithost",
+   "said": "graithost",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "room",
+   "delay": 1,
+   "asked_at": 15,
+   "question": "Which part of the house holds Staplind's fleece combs?",
+   "answer": "still room",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "trade",
+   "delay": 0,
+   "asked_at": 15,
+   "question": "What does Briosbrurn do for a living?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 1,
+   "asked_at": 16,
+   "question": "What colour are the fishing floats?",
+   "answer": "slate",
+   "said": "slate",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 5,
+   "asked_at": 17,
+   "question": "How many grain bags sit in the larder?",
+   "answer": "96",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "room",
+   "delay": 5,
+   "asked_at": 19,
+   "question": "Where does Staplind keep the wool cards?",
+   "answer": "still room",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 19,
+   "question": "Who keeps the wool cards in the still room?",
+   "answer": "Staplind",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 20,
+   "question": "What shade are the bobbers?",
+   "answer": "slate",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 20,
+   "asked_at": 21,
+   "question": "What does Krourkdraim do for a living?",
+   "answer": "nets",
+   "said": "nets",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 20,
+   "asked_at": 23,
+   "question": "How many planting flats sit in the loft?",
+   "answer": "66",
+   "said": "66",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 23,
+   "question": "To whom is Beaslil related?",
+   "answer": "Staplind",
+   "said": "staplind",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 20,
+   "asked_at": 25,
+   "question": "What shade are the canes?",
+   "answer": "slate",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 1,
+   "asked_at": 25,
+   "question": "What does Daniorkrith do for a living?",
+   "answer": "books",
+   "said": "books",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 1,
+   "asked_at": 26,
+   "question": "How many chipped dishes sit in the milk store?",
+   "answer": "12",
+   "said": "12",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 27,
+   "question": "Whose cousin is Raenuck?",
+   "answer": "Taisflol",
+   "said": "taisflol",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 27,
+   "question": "Whose cousin is Beaslil?",
+   "answer": "Staplind",
+   "said": "staplind",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "room",
+   "delay": 1,
+   "asked_at": 27,
+   "question": "Where does Berndock keep the wool cards?",
+   "answer": "morning room",
+   "said": "morning room",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 27,
+   "question": "Who is Staplind's cousin?",
+   "answer": "Beaslil",
+   "said": "beaslil",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "person",
+   "delay": 0,
+   "asked_at": 27,
+   "question": "Whose cousin is Kraelvior?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 20,
+   "asked_at": 28,
+   "question": "How does Graithost earn a wage?",
+   "answer": "wool",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 5,
+   "asked_at": 29,
+   "question": "How does Daniorkrith earn a wage?",
+   "answer": "books",
+   "said": "books",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 29,
+   "question": "Who binds books?",
+   "answer": "Daniorkrith",
+   "said": "daniorkrith",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 5,
+   "asked_at": 30,
+   "question": "How many cracked plates are in the dairy?",
+   "answer": "12",
+   "said": "12",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "room",
+   "delay": 5,
+   "asked_at": 31,
+   "question": "Which part of the house holds Berndock's fleece combs?",
+   "answer": "morning room",
+   "said": "morning room",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 1,
+   "asked_at": 31,
+   "question": "What shade are the wax forms?",
+   "answer": "oxblood",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 31,
+   "question": "Who keeps the wool cards in the morning room?",
+   "answer": "Berndock",
+   "said": "berndock",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 20,
+   "asked_at": 32,
+   "question": "How many flour sacks are in the pantry?",
+   "answer": "96",
+   "said": "96",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 33,
+   "question": "Whose cousin is Berndock?",
+   "answer": "Teafleast",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "room",
+   "delay": 20,
+   "asked_at": 34,
+   "question": "Which part of the house holds Staplind's fleece combs?",
+   "answer": "still room",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 20,
+   "asked_at": 35,
+   "question": "What colour are the fishing floats?",
+   "answer": "slate",
+   "said": "slate",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 35,
+   "question": "What colour are the candle moulds?",
+   "answer": "oxblood",
+   "said": "oxblood",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 37,
+   "question": "To whom is Berndock related?",
+   "answer": "Teafleast",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 37,
+   "question": "Who is Teafleast's cousin?",
+   "answer": "Berndock",
+   "said": "berndock",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "room",
+   "delay": 0,
+   "asked_at": 37,
+   "question": "Where does Kraithkrairn keep the glass jars?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 1,
+   "asked_at": 41,
+   "question": "Where does Nuffsliomvil keep the fishing floats now?",
+   "answer": "still room",
+   "said": "pantry",
+   "correct": false,
+   "invented": false,
+   "stale": true,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 42,
+   "question": "To whom is Beaslil related?",
+   "answer": "Staplind",
+   "said": "staplind",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 20,
+   "asked_at": 44,
+   "question": "What does Daniorkrith do for a living?",
+   "answer": "books",
+   "said": "books",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 1,
+   "asked_at": 44,
+   "question": "How does Teafleast earn a wage?",
+   "answer": "nets",
+   "said": "nets",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 20,
+   "asked_at": 45,
+   "question": "How many chipped dishes sit in the milk store?",
+   "answer": "12",
+   "said": "12",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 1,
+   "asked_at": 45,
+   "question": "How many lanterns are in the gun room?",
+   "answer": "21",
+   "said": "21",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 5,
+   "asked_at": 45,
+   "question": "Where does Nuffsliomvil keep the fishing floats now?",
+   "answer": "still room",
+   "said": "pantry",
+   "correct": false,
+   "invented": false,
+   "stale": true,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "room",
+   "delay": 20,
+   "asked_at": 46,
+   "question": "Where does Berndock keep the wool cards?",
+   "answer": "morning room",
+   "said": "morning room",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "room",
+   "delay": 1,
+   "asked_at": 46,
+   "question": "Which part of the house holds Krourkdraim's preserving pots?",
+   "answer": "coach house",
+   "said": "coach house",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 5,
+   "asked_at": 48,
+   "question": "What does Teafleast do for a living?",
+   "answer": "nets",
+   "said": "nets",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "trade",
+   "delay": 5,
+   "asked_at": 48,
+   "question": "What does Berndock's cousin do for a living?",
+   "answer": "nets",
+   "said": "nets",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 5,
+   "asked_at": 49,
+   "question": "How many lamps sit in the shooting store?",
+   "answer": "21",
+   "said": "21",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 20,
+   "asked_at": 50,
+   "question": "What shade are the wax forms?",
+   "answer": "oxblood",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "room",
+   "delay": 5,
+   "asked_at": 50,
+   "question": "Where does Krourkdraim keep the glass jars?",
+   "answer": "coach house",
+   "said": "coach house",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 1,
+   "asked_at": 50,
+   "question": "What colour are the glass jars?",
+   "answer": "oxblood",
+   "said": "oxblood",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 50,
+   "question": "Who keeps the glass jars in the coach house?",
+   "answer": "Krourkdraim",
+   "said": "krourkdraim",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 52,
+   "question": "Whose cousin is Berndock?",
+   "answer": "Teafleast",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "trade",
+   "delay": 0,
+   "asked_at": 52,
+   "question": "What does Drindvrum do for a living?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 54,
+   "question": "What shade are the preserving pots?",
+   "answer": "oxblood",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 54,
+   "question": "What colour are the things Krourkdraim keeps in the coach house?",
+   "answer": "oxblood",
+   "said": "oxblood",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 57,
+   "question": "To whom is Daniorkrith related?",
+   "answer": "Veadairk",
+   "said": "veadairk",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 20,
+   "asked_at": 60,
+   "question": "Where does Nuffsliomvil keep the fishing floats now?",
+   "answer": "still room",
+   "said": "pantry",
+   "correct": false,
+   "invented": false,
+   "stale": true,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 60,
+   "asked_at": 61,
+   "question": "How does Krourkdraim earn a wage?",
+   "answer": "nets",
+   "said": "glass jars",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 61,
+   "question": "Whose cousin is Daniorkrith?",
+   "answer": "Veadairk",
+   "said": "veadairk",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 61,
+   "question": "Who is Veadairk's cousin?",
+   "answer": "Daniorkrith",
+   "said": "daniorkrith",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 60,
+   "asked_at": 63,
+   "question": "How many seed trays are in the attic?",
+   "answer": "66",
+   "said": "66",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 20,
+   "asked_at": 63,
+   "question": "How does Teafleast earn a wage?",
+   "answer": "nets",
+   "said": "nets",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 1,
+   "asked_at": 63,
+   "question": "What does Beaslil do for a living?",
+   "answer": "lenses",
+   "said": "lenses",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 20,
+   "asked_at": 64,
+   "question": "How many lanterns are in the gun room?",
+   "answer": "21",
+   "said": "21",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 65,
+   "question": "What colour are the walking sticks?",
+   "answer": "slate",
+   "said": "slate",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "room",
+   "delay": 20,
+   "asked_at": 65,
+   "question": "Which part of the house holds Krourkdraim's preserving pots?",
+   "answer": "coach house",
+   "said": "coach house",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 1,
+   "asked_at": 65,
+   "question": "How many fleece combs sit in the wash-up room?",
+   "answer": "3",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 67,
+   "question": "To whom is Raenuck related?",
+   "answer": "Taisflol",
+   "said": "taisflol",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 5,
+   "asked_at": 67,
+   "question": "How does Beaslil earn a wage?",
+   "answer": "lenses",
+   "said": "lenses",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 1,
+   "asked_at": 67,
+   "question": "What shade are the metal pegs?",
+   "answer": "indigo",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 67,
+   "question": "Who is Taisflol's cousin?",
+   "answer": "Raenuck",
+   "said": "raenuck",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 67,
+   "question": "Who grinds lenses?",
+   "answer": "Beaslil",
+   "said": "beaslil",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 60,
+   "asked_at": 68,
+   "question": "What does Graithost do for a living?",
+   "answer": "wool",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 68,
+   "question": "Who dyes wool?",
+   "answer": "Graithost",
+   "said": "graithost",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "person",
+   "delay": 0,
+   "asked_at": 68,
+   "question": "Whose cousin is Sterndrior?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 20,
+   "asked_at": 69,
+   "question": "What colour are the glass jars?",
+   "answer": "oxblood",
+   "said": "oxblood",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 5,
+   "asked_at": 69,
+   "question": "How many wool cards are in the scullery?",
+   "answer": "3",
+   "said": "3",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 70,
+   "question": "Whose cousin is Kriohaendros?",
+   "answer": "Nuffsliomvil",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 71,
+   "question": "What colour are the iron hooks?",
+   "answer": "indigo",
+   "said": "indigo colour",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 60,
+   "asked_at": 72,
+   "question": "How many grain bags sit in the larder?",
+   "answer": "96",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 1,
+   "asked_at": 72,
+   "question": "How does Nouthbeark earn a wage?",
+   "answer": "clocks",
+   "said": "clocks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "room",
+   "delay": 60,
+   "asked_at": 74,
+   "question": "Where does Staplind keep the wool cards?",
+   "answer": "still room",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 74,
+   "question": "To whom is Kriohaendros related?",
+   "answer": "Nuffsliomvil",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 74,
+   "question": "Who keeps the wool cards in the still room?",
+   "answer": "Staplind",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 74,
+   "question": "Who is Nuffsliomvil's cousin?",
+   "answer": "Kriohaendros",
+   "said": "kriohaendros",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 75,
+   "question": "What shade are the bobbers?",
+   "answer": "slate",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 76,
+   "question": "To whom is Daniorkrith related?",
+   "answer": "Veadairk",
+   "said": "veadairk",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 5,
+   "asked_at": 76,
+   "question": "What does Nouthbeark do for a living?",
+   "answer": "clocks",
+   "said": "clocks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 1,
+   "asked_at": 76,
+   "question": "How many fishing floats are in the cellar?",
+   "answer": "17",
+   "said": "17",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 76,
+   "question": "Who repairs clocks?",
+   "answer": "Nouthbeark",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "room",
+   "delay": 1,
+   "asked_at": 77,
+   "question": "Which part of the house holds Kriohaendros's lamps?",
+   "answer": "still room",
+   "said": "still room",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 1,
+   "asked_at": 78,
+   "question": "What colour are the wool cards?",
+   "answer": "indigo",
+   "said": "indigo colour",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "colour",
+   "delay": 1,
+   "asked_at": 78,
+   "question": "What colour are the things Beaslil's cousin keeps in the still room?",
+   "answer": "indigo",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "room",
+   "delay": 0,
+   "asked_at": 78,
+   "question": "Where does Sitael keep the walking sticks?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 5,
+   "asked_at": 80,
+   "question": "How many bobbers sit in the space downstairs?",
+   "answer": "17",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "room",
+   "delay": 5,
+   "asked_at": 81,
+   "question": "Where does Kriohaendros keep the lanterns?",
+   "answer": "still room",
+   "said": "still room",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 81,
+   "question": "To whom is Biorliogriock related?",
+   "answer": "Hofleasten",
+   "said": "hofleasten",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 81,
+   "question": "Who keeps the lanterns in the still room?",
+   "answer": "Kriohaendros",
+   "said": "kriohaendros",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 5,
+   "asked_at": 81,
+   "question": "How many people keep things in the still room?",
+   "answer": "3",
+   "said": "two",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 82,
+   "question": "Whose cousin is Beaslil?",
+   "answer": "Staplind",
+   "said": "staplind",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 20,
+   "asked_at": 82,
+   "question": "What does Beaslil do for a living?",
+   "answer": "lenses",
+   "said": "lenses",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 82,
+   "question": "What shade are the fleece combs?",
+   "answer": "indigo",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 1,
+   "asked_at": 82,
+   "question": "Where does Dunioteack keep the seed trays now?",
+   "answer": "coach house",
+   "said": "laundry",
+   "correct": false,
+   "invented": false,
+   "stale": true,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 82,
+   "question": "Who is Staplind's cousin?",
+   "answer": "Beaslil",
+   "said": "beaslil",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 82,
+   "question": "What colour are the things Staplind keeps in the still room?",
+   "answer": "indigo",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 82,
+   "question": "What colour are the things Berndock keeps in the morning room?",
+   "answer": "indigo",
+   "said": "indigo colour",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 82,
+   "question": "What colour are the things Beaslil's cousin keeps in the still room?",
+   "answer": "indigo",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 1,
+   "asked_at": 83,
+   "question": "What does Biorliogriock do for a living?",
+   "answer": "bees",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 60,
+   "asked_at": 84,
+   "question": "How does Daniorkrith earn a wage?",
+   "answer": "books",
+   "said": "books",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 20,
+   "asked_at": 84,
+   "question": "How many fleece combs sit in the wash-up room?",
+   "answer": "3",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 84,
+   "question": "Who binds books?",
+   "answer": "Daniorkrith",
+   "said": "daniorkrith",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 60,
+   "asked_at": 85,
+   "question": "How many cracked plates are in the dairy?",
+   "answer": "12",
+   "said": "12",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 85,
+   "question": "Whose cousin is Biorliogriock?",
+   "answer": "Hofleasten",
+   "said": "hofleasten",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 1,
+   "asked_at": 85,
+   "question": "How many metal pegs sit in the preserving room?",
+   "answer": "42",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 85,
+   "question": "Who is Hofleasten's cousin?",
+   "answer": "Biorliogriock",
+   "said": "biorliogriock",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "room",
+   "delay": 60,
+   "asked_at": 86,
+   "question": "Which part of the house holds Berndock's fleece combs?",
+   "answer": "morning room",
+   "said": "morning room",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 20,
+   "asked_at": 86,
+   "question": "What shade are the metal pegs?",
+   "answer": "indigo",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 5,
+   "asked_at": 86,
+   "question": "Where does Dunioteack keep the seed trays now?",
+   "answer": "coach house",
+   "said": "laundry",
+   "correct": false,
+   "invented": false,
+   "stale": true,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 86,
+   "question": "Who keeps the wool cards in the morning room?",
+   "answer": "Berndock",
+   "said": "berndock",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 5,
+   "asked_at": 87,
+   "question": "How does Biorliogriock earn a wage?",
+   "answer": "bees",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 1,
+   "asked_at": 87,
+   "question": "What shade are the planting flats?",
+   "answer": "ochre",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 87,
+   "question": "Who keeps bees?",
+   "answer": "Biorliogriock",
+   "said": "biorliogriock",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "trade",
+   "delay": 0,
+   "asked_at": 87,
+   "question": "What does Laraick do for a living?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 88,
+   "question": "Whose cousin is Stournneathos?",
+   "answer": "Slaestaeniol",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 89,
+   "question": "Whose cousin is Kriohaendros?",
+   "answer": "Nuffsliomvil",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 5,
+   "asked_at": 89,
+   "question": "How many iron hooks are in the still room?",
+   "answer": "42",
+   "said": "42",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 1,
+   "asked_at": 89,
+   "question": "How does Nuffsliomvil earn a wage?",
+   "answer": "nets",
+   "said": "mends nets",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 90,
+   "question": "What colour are the candle moulds?",
+   "answer": "oxblood",
+   "said": "oxblood",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 1,
+   "asked_at": 90,
+   "question": "How many walking sticks are in the cellar?",
+   "answer": "56",
+   "said": "56",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 20,
+   "asked_at": 91,
+   "question": "How does Nouthbeark earn a wage?",
+   "answer": "clocks",
+   "said": "clocks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 91,
+   "question": "What colour are the seed trays?",
+   "answer": "ochre",
+   "said": "ochre colour",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 92,
+   "question": "To whom is Berndock related?",
+   "answer": "Teafleast",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 92,
+   "question": "To whom is Stournneathos related?",
+   "answer": "Slaestaeniol",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 92,
+   "question": "Who is Teafleast's cousin?",
+   "answer": "Berndock",
+   "said": "berndock",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 92,
+   "question": "Who is Slaestaeniol's cousin?",
+   "answer": "Stournneathos",
+   "said": "stournneathos",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 5,
+   "asked_at": 93,
+   "question": "What does Nuffsliomvil do for a living?",
+   "answer": "nets",
+   "said": "mends nets",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "trade",
+   "delay": 5,
+   "asked_at": 93,
+   "question": "What does Kriohaendros's cousin do for a living?",
+   "answer": "nets",
+   "said": "lenses",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 5,
+   "asked_at": 94,
+   "question": "How many canes sit in the space downstairs?",
+   "answer": "56",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 20,
+   "asked_at": 95,
+   "question": "How many fishing floats are in the cellar?",
+   "answer": "17",
+   "said": "17",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "room",
+   "delay": 20,
+   "asked_at": 96,
+   "question": "Which part of the house holds Kriohaendros's lamps?",
+   "answer": "still room",
+   "said": "still room",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "person",
+   "delay": 0,
+   "asked_at": 96,
+   "question": "Whose cousin is Pasvelend?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 20,
+   "asked_at": 97,
+   "question": "What colour are the wool cards?",
+   "answer": "indigo",
+   "said": "indigo colour",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "colour",
+   "delay": 20,
+   "asked_at": 97,
+   "question": "What colour are the things Beaslil's cousin keeps in the still room?",
+   "answer": "indigo",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "room",
+   "delay": 1,
+   "asked_at": 98,
+   "question": "Which part of the house holds Krourkdraim's chipped dishes?",
+   "answer": "pantry",
+   "said": "pantry",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 100,
+   "question": "To whom is Biorliogriock related?",
+   "answer": "Hofleasten",
+   "said": "hofleasten",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 60,
+   "asked_at": 100,
+   "question": "Where does Nuffsliomvil keep the fishing floats now?",
+   "answer": "still room",
+   "said": "pantry",
+   "correct": false,
+   "invented": false,
+   "stale": true,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 20,
+   "asked_at": 101,
+   "question": "Where does Dunioteack keep the seed trays now?",
+   "answer": "coach house",
+   "said": "laundry",
+   "correct": false,
+   "invented": false,
+   "stale": true,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 20,
+   "asked_at": 102,
+   "question": "What does Biorliogriock do for a living?",
+   "answer": "bees",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "room",
+   "delay": 5,
+   "asked_at": 102,
+   "question": "Where does Krourkdraim keep the cracked plates?",
+   "answer": "pantry",
+   "said": "pantry",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 102,
+   "question": "Who keeps the cracked plates in the pantry?",
+   "answer": "Krourkdraim",
+   "said": "krourkdraim",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 60,
+   "asked_at": 103,
+   "question": "What does Teafleast do for a living?",
+   "answer": "nets",
+   "said": "nets",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "trade",
+   "delay": 60,
+   "asked_at": 103,
+   "question": "What does Berndock's cousin do for a living?",
+   "answer": "nets",
+   "said": "lenses",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 60,
+   "asked_at": 104,
+   "question": "How many lamps sit in the shooting store?",
+   "answer": "21",
+   "said": "21",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 20,
+   "asked_at": 104,
+   "question": "How many metal pegs sit in the preserving room?",
+   "answer": "42",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "room",
+   "delay": 60,
+   "asked_at": 105,
+   "question": "Where does Krourkdraim keep the glass jars?",
+   "answer": "coach house",
+   "said": "coach house",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 1,
+   "asked_at": 105,
+   "question": "What colour are the flour sacks?",
+   "answer": "indigo",
+   "said": "indigo",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 105,
+   "question": "Who keeps the glass jars in the coach house?",
+   "answer": "Krourkdraim",
+   "said": "krourkdraim",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 20,
+   "asked_at": 106,
+   "question": "What shade are the planting flats?",
+   "answer": "ochre",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "room",
+   "delay": 0,
+   "asked_at": 106,
+   "question": "Where does Gebutheck keep the flour sacks?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 107,
+   "question": "Whose cousin is Stournneathos?",
+   "answer": "Slaestaeniol",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 20,
+   "asked_at": 108,
+   "question": "How does Nuffsliomvil earn a wage?",
+   "answer": "nets",
+   "said": "mends nets",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 109,
+   "question": "What shade are the preserving pots?",
+   "answer": "oxblood",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 20,
+   "asked_at": 109,
+   "question": "How many walking sticks are in the cellar?",
+   "answer": "56",
+   "said": "56",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 109,
+   "question": "What shade are the grain bags?",
+   "answer": "indigo",
+   "said": "indigo",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 109,
+   "question": "What colour are the things Krourkdraim keeps in the coach house?",
+   "answer": "oxblood",
+   "said": "oxblood",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 1,
+   "asked_at": 111,
+   "question": "Where does Taisflol keep the flour sacks now?",
+   "answer": "morning room",
+   "said": "morning room",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 113,
+   "question": "To whom is Krourkdraim related?",
+   "answer": "Nouthbeark",
+   "said": "nouthbeark",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 1,
+   "asked_at": 114,
+   "question": "What does Dunioteack do for a living?",
+   "answer": "spoons",
+   "said": "spoons",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 5,
+   "asked_at": 115,
+   "question": "Where does Taisflol keep the flour sacks now?",
+   "answer": "morning room",
+   "said": "morning room",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 5,
+   "asked_at": 115,
+   "question": "How many people keep things in the morning room?",
+   "answer": "2",
+   "said": "two",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 5,
+   "asked_at": 115,
+   "question": "How many people keep things in the pantry?",
+   "answer": "1",
+   "said": "two",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 116,
+   "question": "Whose cousin is Daniorkrith?",
+   "answer": "Veadairk",
+   "said": "veadairk",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 116,
+   "question": "Who is Veadairk's cousin?",
+   "answer": "Daniorkrith",
+   "said": "daniorkrith",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "room",
+   "delay": 20,
+   "asked_at": 117,
+   "question": "Which part of the house holds Krourkdraim's chipped dishes?",
+   "answer": "pantry",
+   "said": "pantry",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 117,
+   "question": "Whose cousin is Krourkdraim?",
+   "answer": "Nouthbeark",
+   "said": "nouthbeark",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 117,
+   "question": "Who is Nouthbeark's cousin?",
+   "answer": "Krourkdraim",
+   "said": "krourkdraim",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "trade",
+   "delay": 5,
+   "asked_at": 117,
+   "question": "What does Krourkdraim's cousin do for a living?",
+   "answer": "clocks",
+   "said": "clocks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "trade",
+   "delay": 0,
+   "asked_at": 117,
+   "question": "What does Driorngran do for a living?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 5,
+   "asked_at": 118,
+   "question": "How does Dunioteack earn a wage?",
+   "answer": "spoons",
+   "said": "spoons",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 118,
+   "question": "Who carves spoons?",
+   "answer": "Dunioteack",
+   "said": "dunioteack",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 1,
+   "asked_at": 121,
+   "question": "How many lamps sit in the larder?",
+   "answer": "17",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 60,
+   "asked_at": 122,
+   "question": "How does Beaslil earn a wage?",
+   "answer": "lenses",
+   "said": "lenses",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 122,
+   "question": "Who grinds lenses?",
+   "answer": "Beaslil",
+   "said": "beaslil",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "room",
+   "delay": 1,
+   "asked_at": 123,
+   "question": "Where does Dunioteack keep the glass jars?",
+   "answer": "nursery",
+   "said": "nursery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "colour",
+   "delay": 1,
+   "asked_at": 123,
+   "question": "What colour are the things the person who carves spoons keeps in the nursery?",
+   "answer": "oxblood",
+   "said": "oxblood",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 60,
+   "asked_at": 124,
+   "question": "How many wool cards are in the scullery?",
+   "answer": "3",
+   "said": "3",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 20,
+   "asked_at": 124,
+   "question": "What colour are the flour sacks?",
+   "answer": "indigo",
+   "said": "indigo",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 5,
+   "asked_at": 125,
+   "question": "How many lanterns are in the pantry?",
+   "answer": "17",
+   "said": "17",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 1,
+   "asked_at": 125,
+   "question": "What shade are the lamps?",
+   "answer": "verdigris",
+   "said": "verdigris",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 126,
+   "question": "What colour are the iron hooks?",
+   "answer": "indigo",
+   "said": "indigo colour",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 126,
+   "question": "Whose cousin is Graithost?",
+   "answer": "Vutairkvair",
+   "said": "vutairkvair",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "room",
+   "delay": 5,
+   "asked_at": 127,
+   "question": "Which part of the house holds Dunioteack's preserving pots?",
+   "answer": "nursery",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 1,
+   "asked_at": 127,
+   "question": "How does Plulraeth earn a wage?",
+   "answer": "horses",
+   "said": "shoes",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 127,
+   "question": "Who keeps the glass jars in the nursery?",
+   "answer": "Dunioteack",
+   "said": "dunioteack",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 127,
+   "question": "What colour are the things Dunioteack keeps in the nursery?",
+   "answer": "oxblood",
+   "said": "oxblood",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 127,
+   "question": "What colour are the things the person who carves spoons keeps in the nursery?",
+   "answer": "oxblood",
+   "said": "oxblood",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 5,
+   "asked_at": 127,
+   "question": "How many people keep things in the nursery?",
+   "answer": "1",
+   "said": "one",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 1,
+   "asked_at": 128,
+   "question": "How many wool cards are in the gun room?",
+   "answer": "46",
+   "said": "46",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "person",
+   "delay": 0,
+   "asked_at": 128,
+   "question": "Whose cousin is Drindkiost?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 129,
+   "question": "To whom is Kriohaendros related?",
+   "answer": "Nuffsliomvil",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 129,
+   "question": "What colour are the lanterns?",
+   "answer": "verdigris",
+   "said": "verdigris",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 129,
+   "question": "Who is Nuffsliomvil's cousin?",
+   "answer": "Kriohaendros",
+   "said": "kriohaendros",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 129,
+   "question": "What colour are the things Kriohaendros keeps in the still room?",
+   "answer": "verdigris",
+   "said": "verdigris",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 130,
+   "question": "To whom is Graithost related?",
+   "answer": "Vutairkvair",
+   "said": "vutairkvair",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 20,
+   "asked_at": 130,
+   "question": "Where does Taisflol keep the flour sacks now?",
+   "answer": "morning room",
+   "said": "morning room",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 130,
+   "question": "Who is Vutairkvair's cousin?",
+   "answer": "Graithost",
+   "said": "graithost",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 60,
+   "asked_at": 131,
+   "question": "What does Nouthbeark do for a living?",
+   "answer": "clocks",
+   "said": "clocks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 5,
+   "asked_at": 131,
+   "question": "What does Plulraeth do for a living?",
+   "answer": "horses",
+   "said": "shoes",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 131,
+   "question": "Who repairs clocks?",
+   "answer": "Nouthbeark",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 131,
+   "question": "Who shoes horses?",
+   "answer": "Plulraeth",
+   "said": "plulraeth",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 132,
+   "question": "To whom is Krourkdraim related?",
+   "answer": "Nouthbeark",
+   "said": "nouthbeark",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 5,
+   "asked_at": 132,
+   "question": "How many fleece combs sit in the shooting store?",
+   "answer": "46",
+   "said": "46",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 20,
+   "asked_at": 133,
+   "question": "What does Dunioteack do for a living?",
+   "answer": "spoons",
+   "said": "glass jars",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 60,
+   "asked_at": 135,
+   "question": "How many bobbers sit in the space downstairs?",
+   "answer": "17",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "room",
+   "delay": 60,
+   "asked_at": 136,
+   "question": "Where does Kriohaendros keep the lanterns?",
+   "answer": "still room",
+   "said": "still room",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 136,
+   "question": "Who keeps the lanterns in the still room?",
+   "answer": "Kriohaendros",
+   "said": "kriohaendros",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 60,
+   "asked_at": 136,
+   "question": "How many people keep things in the still room?",
+   "answer": "3",
+   "said": "two",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 137,
+   "question": "What shade are the fleece combs?",
+   "answer": "indigo",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 137,
+   "question": "What colour are the things Staplind keeps in the still room?",
+   "answer": "indigo",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 137,
+   "question": "What colour are the things Berndock keeps in the morning room?",
+   "answer": "indigo",
+   "said": "indigo colour",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 137,
+   "question": "What colour are the things Beaslil's cousin keeps in the still room?",
+   "answer": "indigo",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 140,
+   "question": "Whose cousin is Biorliogriock?",
+   "answer": "Hofleasten",
+   "said": "hofleasten",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 20,
+   "asked_at": 140,
+   "question": "How many lamps sit in the larder?",
+   "answer": "17",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 140,
+   "question": "Who is Hofleasten's cousin?",
+   "answer": "Biorliogriock",
+   "said": "biorliogriock",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "room",
+   "delay": 0,
+   "asked_at": 140,
+   "question": "Where does Slalkis keep the cracked plates?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 60,
+   "asked_at": 141,
+   "question": "Where does Dunioteack keep the seed trays now?",
+   "answer": "coach house",
+   "said": "laundry",
+   "correct": false,
+   "invented": false,
+   "stale": true,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 60,
+   "asked_at": 142,
+   "question": "How does Biorliogriock earn a wage?",
+   "answer": "bees",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "room",
+   "delay": 20,
+   "asked_at": 142,
+   "question": "Where does Dunioteack keep the glass jars?",
+   "answer": "nursery",
+   "said": "nursery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 142,
+   "question": "Who keeps bees?",
+   "answer": "Biorliogriock",
+   "said": "biorliogriock",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "colour",
+   "delay": 20,
+   "asked_at": 142,
+   "question": "What colour are the things the person who carves spoons keeps in the nursery?",
+   "answer": "oxblood",
+   "said": "oxblood",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 60,
+   "asked_at": 144,
+   "question": "How many iron hooks are in the still room?",
+   "answer": "42",
+   "said": "42",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 20,
+   "asked_at": 144,
+   "question": "What shade are the lamps?",
+   "answer": "verdigris",
+   "said": "verdigris",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 1,
+   "asked_at": 144,
+   "question": "What colour are the cracked plates?",
+   "answer": "mustard",
+   "said": "mustard",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 145,
+   "question": "Whose cousin is Graithost?",
+   "answer": "Vutairkvair",
+   "said": "vutairkvair",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 146,
+   "question": "What colour are the seed trays?",
+   "answer": "ochre",
+   "said": "ochre colour",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 20,
+   "asked_at": 146,
+   "question": "How does Plulraeth earn a wage?",
+   "answer": "horses",
+   "said": "shoes",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 147,
+   "question": "To whom is Stournneathos related?",
+   "answer": "Slaestaeniol",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 20,
+   "asked_at": 147,
+   "question": "How many wool cards are in the gun room?",
+   "answer": "46",
+   "said": "46",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 1,
+   "asked_at": 147,
+   "question": "To whom is Dunioteack related?",
+   "answer": "Plulraeth",
+   "said": "plulraeth",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 147,
+   "question": "Who is Slaestaeniol's cousin?",
+   "answer": "Stournneathos",
+   "said": "stournneathos",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "trade",
+   "delay": 1,
+   "asked_at": 147,
+   "question": "What does the cousin of the person who carves spoons do for a living?",
+   "answer": "horses",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 60,
+   "asked_at": 148,
+   "question": "What does Nuffsliomvil do for a living?",
+   "answer": "nets",
+   "said": "mends nets",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 148,
+   "question": "What shade are the chipped dishes?",
+   "answer": "mustard",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 1,
+   "asked_at": 148,
+   "question": "Where does Teafleast keep the flour sacks now?",
+   "answer": "coach house",
+   "said": "coach house",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "trade",
+   "delay": 60,
+   "asked_at": 148,
+   "question": "What does Kriohaendros's cousin do for a living?",
+   "answer": "nets",
+   "said": "lenses",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "colour",
+   "delay": 5,
+   "asked_at": 148,
+   "question": "What colour are the things Krourkdraim keeps in the pantry?",
+   "answer": "mustard",
+   "said": "mustard",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 60,
+   "asked_at": 149,
+   "question": "How many canes sit in the space downstairs?",
+   "answer": "56",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 150,
+   "asked_at": 151,
+   "question": "What does Krourkdraim do for a living?",
+   "answer": "nets",
+   "said": "nets",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 151,
+   "question": "Whose cousin is Dunioteack?",
+   "answer": "Plulraeth",
+   "said": "plulraeth",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 5,
+   "asked_at": 151,
+   "question": "Who is Plulraeth's cousin?",
+   "answer": "Dunioteack",
+   "said": "dunioteack",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "trade",
+   "delay": 5,
+   "asked_at": 151,
+   "question": "What does Dunioteack's cousin do for a living?",
+   "answer": "horses",
+   "said": "lenses",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "trade",
+   "delay": 5,
+   "asked_at": 151,
+   "question": "What does the cousin of the person who carves spoons do for a living?",
+   "answer": "horses",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "trade",
+   "delay": 0,
+   "asked_at": 151,
+   "question": "What does Slidoun do for a living?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 5,
+   "asked_at": 152,
+   "question": "Where does Teafleast keep the flour sacks now?",
+   "answer": "coach house",
+   "said": "coach house",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 5,
+   "asked_at": 152,
+   "question": "How many people keep things in the coach house?",
+   "answer": "3",
+   "said": "two",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 150,
+   "asked_at": 153,
+   "question": "How many planting flats sit in the loft?",
+   "answer": "66",
+   "said": "66",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 150,
+   "asked_at": 155,
+   "question": "What shade are the canes?",
+   "answer": "slate",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 157,
+   "question": "Whose cousin is Raenuck?",
+   "answer": "Taisflol",
+   "said": "taisflol",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "room",
+   "delay": 60,
+   "asked_at": 157,
+   "question": "Where does Krourkdraim keep the cracked plates?",
+   "answer": "pantry",
+   "said": "pantry",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 157,
+   "question": "Who keeps the cracked plates in the pantry?",
+   "answer": "Krourkdraim",
+   "said": "krourkdraim",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 150,
+   "asked_at": 158,
+   "question": "How does Graithost earn a wage?",
+   "answer": "wool",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 150,
+   "asked_at": 162,
+   "question": "How many flour sacks are in the pantry?",
+   "answer": "96",
+   "said": "96",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 20,
+   "asked_at": 163,
+   "question": "What colour are the cracked plates?",
+   "answer": "mustard",
+   "said": "mustard",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "room",
+   "delay": 150,
+   "asked_at": 164,
+   "question": "Which part of the house holds Staplind's fleece combs?",
+   "answer": "still room",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 164,
+   "question": "What shade are the grain bags?",
+   "answer": "indigo",
+   "said": "indigo",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "person",
+   "delay": 0,
+   "asked_at": 164,
+   "question": "Whose cousin is Leavealnen?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 150,
+   "asked_at": 165,
+   "question": "What colour are the fishing floats?",
+   "answer": "slate",
+   "said": "slate",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 20,
+   "asked_at": 166,
+   "question": "To whom is Dunioteack related?",
+   "answer": "Plulraeth",
+   "said": "plulraeth",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "trade",
+   "delay": 20,
+   "asked_at": 166,
+   "question": "What does the cousin of the person who carves spoons do for a living?",
+   "answer": "horses",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 20,
+   "asked_at": 167,
+   "question": "Where does Teafleast keep the flour sacks now?",
+   "answer": "coach house",
+   "said": "coach house",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 60,
+   "asked_at": 170,
+   "question": "Where does Taisflol keep the flour sacks now?",
+   "answer": "morning room",
+   "said": "morning room",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 60,
+   "asked_at": 170,
+   "question": "How many people keep things in the morning room?",
+   "answer": "2",
+   "said": "two",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 60,
+   "asked_at": 170,
+   "question": "How many people keep things in the pantry?",
+   "answer": "1",
+   "said": "two",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 172,
+   "question": "To whom is Beaslil related?",
+   "answer": "Staplind",
+   "said": "staplind",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 172,
+   "question": "Whose cousin is Krourkdraim?",
+   "answer": "Nouthbeark",
+   "said": "nouthbeark",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 172,
+   "question": "Who is Nouthbeark's cousin?",
+   "answer": "Krourkdraim",
+   "said": "krourkdraim",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "trade",
+   "delay": 60,
+   "asked_at": 172,
+   "question": "What does Krourkdraim's cousin do for a living?",
+   "answer": "clocks",
+   "said": "clocks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 60,
+   "asked_at": 173,
+   "question": "How does Dunioteack earn a wage?",
+   "answer": "spoons",
+   "said": "glass jars",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 173,
+   "question": "Who carves spoons?",
+   "answer": "Dunioteack",
+   "said": "dunioteack",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 150,
+   "asked_at": 174,
+   "question": "What does Daniorkrith do for a living?",
+   "answer": "books",
+   "said": "books",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 150,
+   "asked_at": 175,
+   "question": "How many chipped dishes sit in the milk store?",
+   "answer": "12",
+   "said": "12",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "room",
+   "delay": 150,
+   "asked_at": 176,
+   "question": "Where does Berndock keep the wool cards?",
+   "answer": "morning room",
+   "said": "morning room",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "room",
+   "delay": 0,
+   "asked_at": 176,
+   "question": "Where does Huthpler keep the walking sticks?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 150,
+   "asked_at": 180,
+   "question": "What shade are the wax forms?",
+   "answer": "oxblood",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 60,
+   "asked_at": 180,
+   "question": "How many lanterns are in the pantry?",
+   "answer": "17",
+   "said": "17",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 182,
+   "question": "Whose cousin is Berndock?",
+   "answer": "Teafleast",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "room",
+   "delay": 60,
+   "asked_at": 182,
+   "question": "Which part of the house holds Dunioteack's preserving pots?",
+   "answer": "nursery",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 182,
+   "question": "Who keeps the glass jars in the nursery?",
+   "answer": "Dunioteack",
+   "said": "dunioteack",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 182,
+   "question": "What colour are the things Dunioteack keeps in the nursery?",
+   "answer": "oxblood",
+   "said": "oxblood",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 182,
+   "question": "What colour are the things the person who carves spoons keeps in the nursery?",
+   "answer": "oxblood",
+   "said": "oxblood",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 60,
+   "asked_at": 182,
+   "question": "How many people keep things in the nursery?",
+   "answer": "1",
+   "said": "one",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 184,
+   "question": "What colour are the lanterns?",
+   "answer": "verdigris",
+   "said": "verdigris",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 184,
+   "question": "What colour are the things Kriohaendros keeps in the still room?",
+   "answer": "verdigris",
+   "said": "verdigris",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 185,
+   "question": "To whom is Graithost related?",
+   "answer": "Vutairkvair",
+   "said": "vutairkvair",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 185,
+   "question": "Who is Vutairkvair's cousin?",
+   "answer": "Graithost",
+   "said": "graithost",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 60,
+   "asked_at": 186,
+   "question": "What does Plulraeth do for a living?",
+   "answer": "horses",
+   "said": "shoes",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 186,
+   "question": "Who shoes horses?",
+   "answer": "Plulraeth",
+   "said": "plulraeth",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 60,
+   "asked_at": 187,
+   "question": "How many fleece combs sit in the shooting store?",
+   "answer": "46",
+   "said": "46",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 150,
+   "asked_at": 190,
+   "question": "Where does Nuffsliomvil keep the fishing floats now?",
+   "answer": "still room",
+   "said": "pantry",
+   "correct": false,
+   "invented": false,
+   "stale": true,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 150,
+   "asked_at": 193,
+   "question": "How does Teafleast earn a wage?",
+   "answer": "nets",
+   "said": "nets",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 150,
+   "asked_at": 194,
+   "question": "How many lanterns are in the gun room?",
+   "answer": "21",
+   "said": "21",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "trade",
+   "delay": 0,
+   "asked_at": 194,
+   "question": "What does Simeth do for a living?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "room",
+   "delay": 150,
+   "asked_at": 195,
+   "question": "Which part of the house holds Krourkdraim's preserving pots?",
+   "answer": "coach house",
+   "said": "coach house",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 150,
+   "asked_at": 199,
+   "question": "What colour are the glass jars?",
+   "answer": "oxblood",
+   "said": "oxblood",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 203,
+   "question": "What shade are the chipped dishes?",
+   "answer": "mustard",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "colour",
+   "delay": 60,
+   "asked_at": 203,
+   "question": "What colour are the things Krourkdraim keeps in the pantry?",
+   "answer": "mustard",
+   "said": "mustard",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 206,
+   "question": "To whom is Daniorkrith related?",
+   "answer": "Veadairk",
+   "said": "veadairk",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 206,
+   "question": "Whose cousin is Dunioteack?",
+   "answer": "Plulraeth",
+   "said": "plulraeth",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "reverse",
+   "kind": "person",
+   "delay": 60,
+   "asked_at": 206,
+   "question": "Who is Plulraeth's cousin?",
+   "answer": "Dunioteack",
+   "said": "dunioteack",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "twohop",
+   "kind": "trade",
+   "delay": 60,
+   "asked_at": 206,
+   "question": "What does Dunioteack's cousin do for a living?",
+   "answer": "horses",
+   "said": "lenses",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "trade",
+   "delay": 60,
+   "asked_at": 206,
+   "question": "What does the cousin of the person who carves spoons do for a living?",
+   "answer": "horses",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 60,
+   "asked_at": 207,
+   "question": "Where does Teafleast keep the flour sacks now?",
+   "answer": "coach house",
+   "said": "coach house",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "count",
+   "kind": "count",
+   "delay": 60,
+   "asked_at": 207,
+   "question": "How many people keep things in the coach house?",
+   "answer": "3",
+   "said": "two",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 150,
+   "asked_at": 212,
+   "question": "What does Beaslil do for a living?",
+   "answer": "lenses",
+   "said": "lenses",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 150,
+   "asked_at": 214,
+   "question": "How many fleece combs sit in the wash-up room?",
+   "answer": "3",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 150,
+   "asked_at": 216,
+   "question": "What shade are the metal pegs?",
+   "answer": "indigo",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 219,
+   "question": "Whose cousin is Kriohaendros?",
+   "answer": "Nuffsliomvil",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "person",
+   "delay": 0,
+   "asked_at": 219,
+   "question": "Whose cousin is Dreriothfliork?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 150,
+   "asked_at": 221,
+   "question": "How does Nouthbeark earn a wage?",
+   "answer": "clocks",
+   "said": "clocks",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 150,
+   "asked_at": 225,
+   "question": "How many fishing floats are in the cellar?",
+   "answer": "17",
+   "said": "17",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "room",
+   "delay": 150,
+   "asked_at": 226,
+   "question": "Which part of the house holds Kriohaendros's lamps?",
+   "answer": "still room",
+   "said": "still room",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 150,
+   "asked_at": 227,
+   "question": "What colour are the wool cards?",
+   "answer": "indigo",
+   "said": "indigo colour",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "colour",
+   "delay": 150,
+   "asked_at": 227,
+   "question": "What colour are the things Beaslil's cousin keeps in the still room?",
+   "answer": "indigo",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 230,
+   "question": "To whom is Biorliogriock related?",
+   "answer": "Hofleasten",
+   "said": "hofleasten",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 150,
+   "asked_at": 231,
+   "question": "Where does Dunioteack keep the seed trays now?",
+   "answer": "coach house",
+   "said": "laundry",
+   "correct": false,
+   "invented": false,
+   "stale": true,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 150,
+   "asked_at": 232,
+   "question": "What does Biorliogriock do for a living?",
+   "answer": "bees",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 150,
+   "asked_at": 234,
+   "question": "How many metal pegs sit in the preserving room?",
+   "answer": "42",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 150,
+   "asked_at": 236,
+   "question": "What shade are the planting flats?",
+   "answer": "ochre",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "room",
+   "delay": 0,
+   "asked_at": 236,
+   "question": "Where does Broubrirn keep the wool cards?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 237,
+   "question": "Whose cousin is Stournneathos?",
+   "answer": "Slaestaeniol",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 150,
+   "asked_at": 238,
+   "question": "How does Nuffsliomvil earn a wage?",
+   "answer": "nets",
+   "said": "mends nets",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 150,
+   "asked_at": 239,
+   "question": "How many walking sticks are in the cellar?",
+   "answer": "56",
+   "said": "56",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "room",
+   "delay": 150,
+   "asked_at": 247,
+   "question": "Which part of the house holds Krourkdraim's chipped dishes?",
+   "answer": "pantry",
+   "said": "pantry",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 150,
+   "asked_at": 254,
+   "question": "What colour are the flour sacks?",
+   "answer": "indigo",
+   "said": "indigo",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 150,
+   "asked_at": 260,
+   "question": "Where does Taisflol keep the flour sacks now?",
+   "answer": "morning room",
+   "said": "morning room",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 262,
+   "question": "To whom is Krourkdraim related?",
+   "answer": "Nouthbeark",
+   "said": "nouthbeark",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "trade",
+   "delay": 150,
+   "asked_at": 263,
+   "question": "What does Dunioteack do for a living?",
+   "answer": "spoons",
+   "said": "glass jars",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "number",
+   "delay": 150,
+   "asked_at": 270,
+   "question": "How many lamps sit in the larder?",
+   "answer": "17",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(untaught)"
+   ]
+  },
+  {
+   "form": "negative",
+   "kind": "trade",
+   "delay": 0,
+   "asked_at": 270,
+   "question": "What does Topis do for a living?",
+   "answer": null,
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "room",
+   "delay": 150,
+   "asked_at": 272,
+   "question": "Where does Dunioteack keep the glass jars?",
+   "answer": "nursery",
+   "said": "nursery",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "colour",
+   "delay": 150,
+   "asked_at": 272,
+   "question": "What colour are the things the person who carves spoons keeps in the nursery?",
+   "answer": "oxblood",
+   "said": "oxblood",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "colour",
+   "delay": 150,
+   "asked_at": 274,
+   "question": "What shade are the lamps?",
+   "answer": "verdigris",
+   "said": "verdigris",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 275,
+   "question": "Whose cousin is Graithost?",
+   "answer": "Vutairkvair",
+   "said": "vutairkvair",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "trade",
+   "delay": 150,
+   "asked_at": 276,
+   "question": "How does Plulraeth earn a wage?",
+   "answer": "horses",
+   "said": "shoes",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "number",
+   "delay": 150,
+   "asked_at": 277,
+   "question": "How many wool cards are in the gun room?",
+   "answer": "46",
+   "said": "46",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "direct",
+   "kind": "colour",
+   "delay": 150,
+   "asked_at": 293,
+   "question": "What colour are the cracked plates?",
+   "answer": "mustard",
+   "said": "mustard",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "oblique",
+   "kind": "person",
+   "delay": 150,
+   "asked_at": 296,
+   "question": "To whom is Dunioteack related?",
+   "answer": "Plulraeth",
+   "said": "plulraeth",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "chain3",
+   "kind": "trade",
+   "delay": 150,
+   "asked_at": 296,
+   "question": "What does the cousin of the person who carves spoons do for a living?",
+   "answer": "horses",
+   "said": "I don't know.",
+   "correct": false,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  },
+  {
+   "form": "update",
+   "kind": "room",
+   "delay": 150,
+   "asked_at": 297,
+   "question": "Where does Teafleast keep the flour sacks now?",
+   "answer": "coach house",
+   "said": "coach house",
+   "correct": true,
+   "invented": false,
+   "stale": false,
+   "echoed": false,
+   "notes": [
+    "(taught)"
+   ]
+  }
+ ],
+ "kind": "exam",
+ "command": "scripts/exam.py --faculty served --served Qwen3.5-0.8B-Q8_0 --port 8094 --planner-port 8094 --planner-served Qwen3.5-0.8B-Q8_0 --planner-judges --moves --cleans --teach 5 --arms taught --world first --seed 3 --unlisted --note with clean dropping 'back' beside a place; listed against unlisted, both re-taken. Unlisted refuted if any seed falls more than 0.02 below listed. --unlisted.",
+ "arm_class": "system",
+ "taken_at": "20261002T013347Z",
+ "note": "with clean dropping 'back' beside a place; listed against unlisted, both re-taken. Unlisted refuted if any seed falls more than 0.02 below listed. --unlisted.",
+ "faculty": "Qwen3.5-0.8B-Q8_0 (llama.cpp) [served, frozen]",
+ "system": "You answer questions about a household from the notes given with each question. The notes may use different words for the same thing: a lamp may be called a lantern, a job may be described instead of named. Answer in a few words. Only if nothing in the notes answers the question, answer: I don't know.",
+ "house": {
+  "world": "first",
+  "seed": 3,
+  "facts": 50,
+  "turns": 300,
+  "fingerprint": "63700245c8824595",
+  "questions": 361,
+  "answer_entropy": {
+   "trade": 2.78,
+   "number": 3.122,
+   "colour": 2.352,
+   "person": 4.26,
+   "room": 2.171,
+   "count": 1.522
+  }
+ },
+ "limit": null,
+ "teach": 5,
+ "cost": {
+  "calls": 0,
+  "tokens_in": 0,
+  "tokens_out": 0,
+  "seconds": 0.0
+ }
+}

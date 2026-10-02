@@ -54,8 +54,6 @@ def main() -> None:
     p.add_argument("--plans", default=None,
                    help="a JSON file of plans by shape: `planned` starts with them and adds "
                         "what it learns")
-    p.add_argument("--unlisted", action="store_true",
-                   help="the ear reads each sentence alone, without the stored relations")
     p.add_argument("--moves", action="store_true")
     p.add_argument("--cleans", action="store_true")
     p.add_argument("--world", default="first", choices=["first", "second"],
@@ -118,7 +116,7 @@ def main() -> None:
                                  taught=name == "taught", known_learnt=learnt,
                                  cleans=args.cleans, known_holds=holds,
                                  known_echoes=echoes, known_frames=frames,
-                                 known_meant=meant, listed=not args.unlisted)
+                                 known_meant=meant)
 
             learnt, holds, echoes, frames, meant = [], [], [], [], []
             if name == "taught":

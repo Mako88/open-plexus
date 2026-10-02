@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-COUNT = 3
+COUNT = 4
 
 
 @dataclass(frozen=True)
@@ -43,6 +43,17 @@ OBJECTIONS = [
             "that can hide a difference between arms that hedge differently.",
         settled_by="Count answers naming more than one candidate of the right kind, per arm. "
                    "Above a few per cent for any arm, score those as wrong and re-read.",
+    ),
+    Objection(
+        what="`System.clean` holds English words by hand: 'back', the prepositions, the "
+             "number words.",
+        why="John's, 2026-10-01: a rule for a word does not generalise. Each was added to "
+            "mend one reading ('went back to the bathroom' put 'back' in object and stopped a "
+            "move superseding, costing bAbI nine points unlisted), and the next sentence "
+            "with another particle or numeral will need another.",
+        settled_by="The parser reading in THE ORDER: if a dependency parse gives the role of "
+                   "each word, clean keeps a filler by its grammatical role and the lists go. "
+                   "Or a learnt test that a filler names a thing, scored on the same readings.",
     ),
 ]
 

@@ -6,8 +6,8 @@ ago). Only the first needs dense computation. Knowledge is sparse and tolerates 
 memory is what a model is worst at keeping. This branch keeps the three apart:
 
 - **Skill at language** is a small pretrained model, frozen, and it only translates. As the
-  ears it turns a sentence into typed assertions and a question into a query. As the mouth it
-  turns an answer into a sentence. It is called the faculty, and nothing here trains it.
+  ears it turns a sentence into its dependency parse. It is called the faculty, and nothing
+  here trains it. The mouth is the system's own (see DECIDED).
 - **Thinking** is built here and is not a neural network: storing what was asserted,
   following chains of it, knowing what changed and when, knowing what it was never told, and
   learning rules from what it hears. It learns from one hearing and keeps what it learnt
@@ -71,12 +71,22 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      does not repeat itself so. Many more tellings and frames per kind, at the same size,
      with the correction form below in the same change of the house: a question answered,
      corrected, and asked again later. Refuted as a test if the graphed arm does not fall
-     on it, which would say the templates were not what it leant on.
-  3. A mouth. An answer is one node of the graph or "I don't know."; it cannot say yes or
-     no, list, or say what it is sure of. The faculty renders a reply from the answer and
-     the path that found it, which is the job DECIDED gives it, and the system answers
+     on it, which would say the templates were not what it leant on. Beside it, the edges
+     `SKIP` drops (determiners, auxiliaries, conjunctions, `advmod`, particles) are kept
+     and plans learn which matter, as negation, modals and 'before' were pulled out of it
+     one at a time. A function word is an edge's label or a node's mark, never a node, so
+     'the' does not become a hub. Refuted if the many-worded house reads no higher with
+     every edge kept than with `SKIP`.
+  3. A mouth of the system's own. An answer is one node of the graph or "I don't know.";
+     it cannot say yes or no, list, or say what it is sure of. The mouth renders the
+     answer's path from fragments of parses it has heard: each edge of the path is said
+     in the words of a heard sentence that has that edge, its nodes replaced, and
+     fragments join where they share a node, as data-oriented parsing builds new
+     sentences from pieces of old trees. A reply is therefore never limited to sentences
+     heard whole, and inflection comes from the parse's morphology. The system answers
      yes-or-no questions by finding or failing to find the fact asked. The form: yes-or-no
-     questions, half true. Refuted if the rendered answer scores below the bare node.
+     questions, half true. Refuted if the rendered answer scores below the bare node, or
+     if no reply joins two fragments when the path has two edges.
   4. Words never heard, from the question's own parse: 'What is X's line of work?' shares
      no grammar with 'do for a living', and the many-worded house will make this the
      commonest miss. The symbol encoder of the DECIDED meaning section is the mechanism: a
@@ -130,12 +140,14 @@ commit.
 
 - **The 1080 Ti is the hardware.** No rented compute. Anything that needs more than one
   11 GB Pascal card does not get built.
-- **The faculty is a frozen pretrained language model, and it only translates.** John's,
-  2026-09-29: it is the ears and the mouth, and the thinking is the system's. "No LLM"
-  constrains the thinking, not the senses. Small faculties are preferred, because the bet is
-  only shown by a faculty too small to do the thinking itself, and because they iterate
-  faster. Qwen3.5 at 0.8B, 2B and 9B through llama.cpp; Needle (Cactus Compute, tens of
-  millions of parameters, schema-constrained) as an ear.
+- **No language model in the system.** John's, 2026-10-02, replacing 2026-09-29's faculty
+  as ears and mouth. The ear is a dependency parser and the mouth is the system's own,
+  built from the sentences it has heard. A language model that renders an answer from the
+  path that found it can compose that path, which puts thinking back in the faculty. An LLM
+  mouth is a last resort, taken only once the system's own mouth has been exhausted, and
+  the language models stay as the milestone check. Small faculties are still preferred
+  wherever one is used, because the bet is only shown by a faculty too small to do the
+  thinking itself.
 - **Typed output guarantees shape, never truth.** A schema-constrained ear always returns a
   well-formed assertion and can still return a wrong one, so every ear is scored on what it
   gets right against the house's ground truth, never on whether it parses.
@@ -345,7 +357,7 @@ the store merges by id. Kill a third of the nodes mid-exam.
 
 ## DIALS
 
-- The faculty for ears and for mouth, separately; the schema; the prompts.
+- The parser's model.
 - `k` hits per query and the number of recall hops.
 - The store's fusion weights: `rrf_k`, importance weight, recency weight and half-life.
 - The linked arm's shortlist size, spreading width and decay.

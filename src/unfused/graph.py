@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS positions (template TEXT NOT NULL, pos INTEGER NOT NU
     filler TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (template, pos, filler));
 CREATE TABLE IF NOT EXISTS aliases (word TEXT NOT NULL, name TEXT NOT NULL,
     hits REAL NOT NULL, found INTEGER NOT NULL, PRIMARY KEY (word, name));
+CREATE TABLE IF NOT EXISTS boundaries (turn INTEGER PRIMARY KEY);
 CREATE TABLE IF NOT EXISTS contexts (word TEXT PRIMARY KEY, names TEXT NOT NULL,
     heard INTEGER NOT NULL);
 """
@@ -60,9 +61,8 @@ _NLP: dict = {}
 # how much nearer a word's likest candidate must be than the next for a vote: right picks'
 # gaps sat at 0.14 to 0.21 and wrong ones' at 0.02 to 0.06 (readings/unheard-*)
 MARGIN = 0.08
-# how far back focus reaches, in turns, and how fast a hearing fades within it (ACT-R's
-# base-level decay)
-FOCUS, DECAY = 30, 0.5
+# how fast a hearing fades within an episode (ACT-R's base-level decay)
+DECAY = 0.5
 # how many of a node's steps of one label a walk follows, the latest first
 REACH = 100
 # how many nodes' steps one question may look at before its plans give up
@@ -225,6 +225,8 @@ class GraphArm:
         self._steps: dict = {}
         # steps looked at by the question being answered, or None outside answering
         self.spent: int | None = None
+        # the first event of the episode a question is answered within, or None for all
+        self.floor: int | None = None
 
     # -- reading ---------------------------------------------------------------
 
@@ -282,6 +284,12 @@ class GraphArm:
     def hear(self, turn: int, text: str) -> None:
         self._replaced = {}
         self._steps = {}
+        # a turn holding no words is a break in the text ('***', a new page): what is
+        # heard after it is another episode
+        if not any(ch.isalnum() for ch in text):
+            self.db.execute("INSERT OR IGNORE INTO boundaries VALUES (?)", (turn,))
+            self.db.commit()
+            return
         events = self.read(text)
         ids = []
         for ev in events:
@@ -318,8 +326,15 @@ class GraphArm:
             self.spent += 1
             if self.spent > EFFORT:
                 raise Spent
-        if node in self._steps:
-            return self._steps[node]
+        steps = self._steps.get(node)
+        if steps is None:
+            steps = self._steps[node] = self._around(node)
+        if self.floor is None:
+            return steps
+        # working memory: only what this episode told
+        return [s for s in steps if not s[2].startswith("e:") or int(s[2][2:]) >= self.floor]
+
+    def _around(self, node: str) -> list[tuple[str, int, str]]:
         if node.startswith("e:"):
             eid = int(node[2:])
             out = [(label, 1, n) for label, n in self.db.execute(
@@ -329,7 +344,6 @@ class GraphArm:
         # the latest first, so a walk cut short keeps what was heard most recently
         out += [(label, -1, f"e:{e}") for e, label in self.db.execute(
             "SELECT event, label FROM edges WHERE node = ? ORDER BY event DESC", (node,))]
-        self._steps[node] = out
         return out
 
     def event(self, node: str) -> tuple[str, int]:
@@ -1115,20 +1129,29 @@ class GraphArm:
         self.heard_in(question.text)
         put = self.unaliased(question.text)
         said, self.spent = None, 0
+        # working memory first, the episode since the last break; then everything
+        first = self.db.execute("SELECT MIN(id) FROM events WHERE turn > ?",
+                                (self.episode(),)).fetchone()[0]
+        floors = [first, None] if self.episode() >= 0 and first is not None else [None]
         try:
-            said = next((self.latest(found) for text in dict.fromkeys((put, question.text))
-                         if (found := self.answers(*self.shape(text), text, borrow=False))),
-                        None)
-            if said is None:
-                said = self.answered(put)
-            # a pin is used only where the question as heard finds nothing: frame words a
-            # question's names keep company with agree across hearings too ('What is the
-            # number of X in the cellar?' pinned 'number'), and they broke answers found
-            if said is None and (again := self.unaliased(question.text, heard=True)) != put:
-                said = self.answered(again)
+            for self.floor in floors:
+                said = next((self.latest(found) for text in dict.fromkeys((put, question.text))
+                             if (found := self.answers(*self.shape(text), text,
+                                                       borrow=False))), None)
+                if said is None:
+                    said = self.answered(put)
+                # a pin is used only where the question as heard finds nothing: frame
+                # words a question's names keep company with agree across hearings too
+                # ('What is the number of X in the cellar?' pinned 'number'), and they
+                # broke answers found
+                again = self.unaliased(question.text, heard=True) if said is None else put
+                if again != put:
+                    said = self.answered(again)
+                if said is not None:
+                    break
         except Spent:
             pass
-        given_up, self.spent = self.spent > EFFORT, None
+        given_up, self.spent, self.floor = self.spent > EFFORT, None, None
         # what the plans found from outside focus is another conversation's, as often as
         # not; what is in focus and fits the asked slot comes first
         if said is None or not self.in_focus(said):
@@ -1140,10 +1163,14 @@ class GraphArm:
     def now(self) -> int:
         return self.db.execute("SELECT COALESCE(MAX(turn), 0) FROM events").fetchone()[0]
 
+    def episode(self) -> int:
+        """The turn of the last break in the text: what was heard after it is in focus."""
+        return self.db.execute("SELECT COALESCE(MAX(turn), -1) FROM boundaries").fetchone()[0]
+
     def in_focus(self, name: str) -> bool:
         return self.db.execute(
             "SELECT 1 FROM edges JOIN events ON events.id = edges.event WHERE edges.node = ?"
-            " AND events.turn > ? LIMIT 1", (f"n:{name}", self.now() - FOCUS)).fetchone()             is not None
+            " AND events.turn > ? LIMIT 1", (f"n:{name}", self.episode())).fetchone() is not None
 
     def blank(self, question: str) -> tuple[str, str] | None:
         """The slot the question's wh-word stands in: ('eat', 'dobj') for 'Lily ate
@@ -1164,7 +1191,7 @@ class GraphArm:
         return tuple(kept) if kept else None
 
     def focused(self, question: str) -> str | None:
-        """The name in focus that best fits the asked slot: how strongly it is in focus,
+        """The name in this episode that best fits the asked slot: how strongly it is in focus,
         each hearing fading as ACT-R's base level does, times how often it has filled a
         slot of that label, out of everything it has filled."""
         slot = self.blank(question)
@@ -1176,7 +1203,7 @@ class GraphArm:
         for node, turn in self.db.execute(
                 "SELECT edges.node, events.turn FROM edges JOIN events ON events.id = "
                 "edges.event WHERE edges.node LIKE 'n:%' AND events.turn > ?",
-                (now - FOCUS,)):
+                (self.episode(),)):
             name = node[2:]
             act[name] = act.get(name, 0.0) + (now - turn + 1) ** -DECAY
         labels = self.db.execute("SELECT COUNT(DISTINCT label) FROM edges").fetchone()[0] or 1

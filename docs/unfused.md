@@ -551,5 +551,9 @@ the store merges by id. Kill a third of the nodes mid-exam.
   seeded by a hash of its name so every node agrees without coordinating. They buy a
   fixed-size memory that merges by addition and forgets by interference; they have to earn
   that against the exact tables in Phase 8, or not be built.
+- **Episode boundaries the system sets itself.** John's, 2026-10-03. A boundary is a turn
+  with no words in it, so once the system has input of its own it can mark one, and
+  manage its memory by where episodes end. Event segmentation theory sets them where
+  prediction fails, so Phase 6's surprise signal is the likely trigger.
 - **Idle-time inference**: the system composes and writes derived assertions when no input is
   arriving, so a chain is found once rather than per question.

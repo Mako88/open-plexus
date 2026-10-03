@@ -214,8 +214,24 @@ def test_a_blank_is_filled_from_what_is_in_focus(tmp_path):
     for i, text in enumerate(["Max had a kite.", "Max flew the kite in the park.",
                               "The kite went up high."]):
         a.hear(i, text)
+    a.hear(3, "***")
     for i, text in enumerate(["Lily had a ball.", "Lily threw the ball to her dog.",
-                              "The dog ran fast."], start=300):
+                              "The dog ran fast."], start=4):
         a.hear(i, text)
-    # the kite is a story ago; the ball and the dog are in focus, and a ball is thrown
+    # the kite is a story ago, past a break; the ball and the dog are this episode's,
+    # and a ball is thrown
+    assert a.episode() == 3
     assert a.answer(q("Then Lily threw what again?")) == "ball"
+
+
+def test_a_plan_answers_from_this_episode_before_the_rest(tmp_path):
+    a = arm(tmp_path)
+    a.hear(0, "Lily kept the ball in the box.")
+    a.teach("Where did Lily keep the ball?", "box")
+    a.hear(1, "***")
+    a.hear(2, "Tom kept the kite in the shed.")
+    # this episode holds Tom's kite and nothing of Lily's ball, so memory beyond it answers
+    assert a.answer(q("Where did Lily keep the ball?")) == "box"
+    a.hear(3, "Lily kept the ball in the bag.")
+    assert a.answer(q("Where did Lily keep the ball?")) == "bag"
+    assert a.floor is None

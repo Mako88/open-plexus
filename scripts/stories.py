@@ -27,6 +27,7 @@ from unfused.exam.stories import bucket, fingerprint, right, stream  # noqa: E40
 from unfused.exam.world import RIGHT, WRONG  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
+BREAK = "***"
 
 
 class Blind:
@@ -118,6 +119,10 @@ def _stream(arm, stories, reopen_every, rows, sizes) -> int:
     for s in stories:
         if s.index and s.index % reopen_every == 0 and hasattr(arm, "reopen"):
             arm.reopen()
+        # every story begins after a break, as a page or a title does; TinyStories marks
+        # each boundary itself
+        arm.tell(turn, BREAK)
+        turn += 1
         for text in s.told:
             arm.tell(turn, text)
             turn += 1

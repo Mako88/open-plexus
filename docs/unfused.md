@@ -94,11 +94,11 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
        in the question. A synonym said only in its question is one context, which is
        why the graph version of this, solving with the word's slot free, was refuted.
        The reading is `scripts/context.py`: a word's candidates are intersected over the
-       questions it is heard in; the graph does the same (`heard_in`). Next, kinds, so
-       one hearing leaves fewer candidates: by parse slots per name they were refuted
-       twice, and pooled they separate weakly (see the commits), so the next shape is
-       item 4's likeness by link labels in the graph, where a kind is what a name is
-       linked by rather than how its sentence was parsed.
+       questions it is heard in; the graph does the same (`heard_in`). Kinds are not the
+       lever for it: even the true kind leaves three or four candidates after one
+       hearing (`readings/context-oracle-*`). Kinds by link labels stay item 4's, where
+       a wrong kind is the fault. OPEN, for John: whether that ceiling meets DECIDED's
+       trigger for MiniLM as a vote at a word's first hearing.
        Once the graph's intersection and a form of kinds have landed, the curve is
        compared with the language models' in-context learning (John's, 2026-10-03): the
        house's synonyms swapped for made-up words in an instrument copy, so a model's

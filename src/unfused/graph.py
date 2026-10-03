@@ -1057,6 +1057,19 @@ class GraphArm:
         out.sort(key=lambda r: (sum(not self.known(n) for n in r[1]), -r[0]))
         return out
 
+    def starting(self, plans: list[dict]) -> list[str]:
+        """The names some plan can start from: a name's only steps go back to the events
+        it is an argument of, so a plan starts only from a name that has filled its first
+        step's label. Every name where a plan has no first step to go by."""
+        if any(not p["steps"] for p in plans):
+            return self.names()
+        labels = sorted({p["steps"][0][0] for p in plans if p["steps"][0][1] == -1})
+        if not labels:
+            return []
+        return [n[2:] for (n,) in self.db.execute(
+            f"SELECT DISTINCT node FROM edges WHERE node LIKE 'n:%' AND label IN "
+            f"({','.join('?' * len(labels))})", labels)]
+
     def heard_in(self, question: str) -> None:
         """A question holding a word never heard is one context of it, answered or not:
         the names its slot could take given the question's other names, by the plans of
@@ -1080,7 +1093,7 @@ class GraphArm:
                 if bound:
                     here = {e for p in plans for e, _ in self.solve(p, bound, free)}
                 else:
-                    here = {n for n in self.names()
+                    here = {n for n in self.starting(plans)
                             if any(self.solve(p, {free: n}, "a") for p in plans)}
                 here -= set(names)
                 if not here:

@@ -25,6 +25,7 @@ from unfused.arms import SYSTEM, Blind, FullContext, Recall  # noqa: E402
 from unfused.exam.run import converse, run  # noqa: E402
 from unfused.exam.second import generate_second_house  # noqa: E402
 from unfused.exam.world import UNTAUGHT, generate_house  # noqa: E402
+from unfused.graph import CARRIED  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 # practice houses are seeded from here, far from any seed a reading tests
@@ -50,9 +51,6 @@ def main() -> None:
     p.add_argument("--teach", type=int, default=0,
                    help="practice houses, other seeds than any tested, held as a "
                         "conversation before the test: `graphed` learns plans from them")
-    p.add_argument("--carry", default="learnt,positions,aliases",
-                   help="which of the tables `graphed` learnt in practice reach the test "
-                        "house: without aliases, every synonym is one no lesson used")
     args = p.parse_args()
 
     generate = generate_second_house if args.world == "second" else generate_house
@@ -101,9 +99,6 @@ def main() -> None:
                 arm.close()
                 shutil.rmtree(taught, ignore_errors=True)
 
-            carried = args.carry.split(",")
-            known = {table: rows for table, rows in known.items() if table in carried}
-
             def open_arm(known=known):
                 return GraphArm(work, known=known)
         elif name == "linked":
@@ -137,7 +132,9 @@ def main() -> None:
                       "answer_entropy": house.answer_entropy()},
             "limit": args.limit,
             "teach": args.teach if name == "graphed" else 0,
-            "carry": args.carry if name == "graphed" else None,
+            # what reached the test house from practice; a reading that carried the
+            # aliases had memorised the synonym table every house shares
+            "carry": ",".join(CARRIED) if name == "graphed" else None,
             "cost": faculty.cost.row() if faculty else None,
         }
         tag = (args.served.split("-Q")[0] if args.faculty == "served" else args.faculty) if faculty else "parse"

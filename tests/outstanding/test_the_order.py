@@ -18,6 +18,13 @@ COUNTERS = {"ear_calls", "ear_cached", "ear_unparsed", "planner_calls", "shapes"
             "events", "edges", "parsed"}
 
 
+def _carried_nothing_it_memorised(d):
+    """A graphed reading counts only where the aliases stayed behind: carried, they were
+    the synonym table every house shares, learnt in practice and read back on the test
+    (John's, 2026-10-03). Readings from before `carry` was recorded carried them."""
+    return d["arm"] != "graphed" or "aliases" not in (d.get("carry") or "aliases")
+
+
 def _first_house():
     """Every whole reading on the first house, each marked `today` when its house is
     the one the generator makes now."""
@@ -26,7 +33,8 @@ def _first_house():
         d = json.loads(path.read_text(encoding="utf-8"))
         house = d["house"]
         if (d.get("limit") is not None or "fingerprint" not in house
-                or house.get("world", "first") != "first"):
+                or house.get("world", "first") != "first"
+                or not _carried_nothing_it_memorised(d)):
             continue
         key = (house["seed"], house["facts"], house["turns"])
         if key not in prints:
@@ -144,7 +152,7 @@ def test_the_second_house_scores_at_least_half_the_first():
                 seed=house["seed"], n_facts=house["facts"],
                 n_turns=house["turns"]).fingerprint():
             continue
-        if d["arm"] != "graphed":
+        if d["arm"] != "graphed" or not _carried_nothing_it_memorised(d):
             continue  # blind reads alike on any house, and would pass for nothing
         key = (config(d), house["seed"])
         if key in first and d["summary"]["score"] >= first[key] / 2:

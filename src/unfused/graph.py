@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS contexts (word TEXT PRIMARY KEY, names TEXT NOT NULL,
     heard INTEGER NOT NULL);
 """
 # what a taught arm carries to the next conversation: no facts, only how to read and ask
-CARRIED = ("learnt", "positions", "aliases")
+CARRIED = ("learnt", "positions")
 
 # every extraction kept across runs: the parser is deterministic, and the version is in
 # the key so a change to what is extracted re-reads every sentence

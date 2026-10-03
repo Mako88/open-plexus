@@ -72,10 +72,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
        answers. What `novel` still misses is a wrong kind from a borrowed or loose plan
        ('Where would I find X's jars?' answered '15'), which is item 4, and 'shares a
        grandmother with B; they're cousins', where the relation is a clause apart.
-     - A synonym taught inside one conversation. With the practice houses' aliases left
-       behind, oblique reads 0.494 0.558 0.523, against about 0.85 with them, so the
-       alias gain was memory of the table every house shares and a conversation's own
-       lessons settle none. The bar is oblique under `--carry learnt,positions`.
+     - A synonym taught inside one conversation. Aliases are never carried from the
+       practice houses (John's, 2026-10-03): carried, they were memory of the synonym
+       table every house shares, read back as about 0.85 on oblique against 0.494 0.558
+       0.523 without. Only plans and positions reach a test house.
      - Question frames no lesson used, trades asked by their verb, and moves told with a
        verb no lesson used, as before: two wordings are one relation where their
        solutions agree, on what the house holds rather than a lesson's answer. Moves are

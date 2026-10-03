@@ -84,6 +84,15 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      Lessons are the price of all three: the first house reads 0.539 0.550 0.551 after
      one practice house, 0.677 0.717 0.618 after two and 0.850 0.850 0.863 after five,
      and `direct` is 0.62 at one because a plan is learnt per wording.
+     - Learning rate is the measure for all three (John's, 2026-10-03). Needing many
+       tellings is expected, as it is for a child; what the lessons buy is the question.
+       The reading: how many tellings inside one conversation it takes to pick up a new
+       word or a new shape, without practice on the same wordings. It starts with John's
+       idea of a word's meaning built from its context with the word itself left out:
+       over the house's oblique questions, how often the context alone leaves exactly
+       one candidate, and how that grows when the word appears in tellings as well as
+       in the question. A synonym said only in its question is one context, which is
+       why the graph version of this, solving with the word's slot free, was refuted.
   2. A mouth of the system's own, after item 1 (conversation before counts, John's,
      2026-10-02). An answer is one node of the graph or "I don't know."; it cannot say
      yes or no, list, or say what it is sure of. The mouth renders the answer's path
@@ -179,6 +188,11 @@ commit.
 - **bAbI is the second world, and the house stays the target.** bAbI checks that the house is
   a fair test. It is small and templated enough to be won by building to it, so a score there
   is never the objective.
+- **bAbI's milestone is transfer** (John's, 2026-10-03). A system that learns as it goes is
+  judged after teaching, as a model is judged after training rather than at its first
+  weights. The milestone reading is bAbI after a general curriculum (the primer fork) with no
+  bAbI lessons at all. Until a curriculum exists, the bAbI reading taught on its own 20
+  stories stays as the regression check.
 
 - **The 1080 Ti is the hardware.** No rented compute. Anything that needs more than one
   11 GB Pascal card does not get built.

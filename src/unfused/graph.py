@@ -1228,8 +1228,8 @@ class GraphArm:
 
     def focused(self, question: str) -> str | None:
         """The name in this episode that best fits the asked slot: how strongly it is in focus,
-        each hearing fading as ACT-R's base level does, times how often it has filled a
-        slot of that label, out of everything it has filled."""
+        each hearing fading as ACT-R's base level does, times how often it has filled the
+        asked verb's slot, out of everything it has filled."""
         slot = self.blank(question)
         # a question about someone never mentioned is not guessed at
         if slot is None or not all(self.known(f) for f in self.shape(question)[1]):
@@ -1245,9 +1245,16 @@ class GraphArm:
         labels = self.db.execute("SELECT COUNT(DISTINCT label) FROM edges").fetchone()[0] or 1
 
         def fit(name: str) -> float:
-            rows = dict(self.db.execute("SELECT label, COUNT(*) FROM edges WHERE node = ? "
-                                        "GROUP BY label", (f"n:{name}",)).fetchall())
-            return (rows.get(slot[1], 0) + 0.5) / (sum(rows.values()) + 0.5 * labels)
+            # a share of what the name filled: in the asked verb's slot, and, much less,
+            # by the link alone, so a slot no one here filled still ranks
+            rows = self.db.execute(
+                "SELECT edges.label, events.lemma = ?, COUNT(*) FROM edges JOIN events ON "
+                "events.id = edges.event WHERE edges.node = ? GROUP BY 1, 2",
+                (slot[0], f"n:{name}")).fetchall()
+            total = sum(n for _, _, n in rows)
+            here = sum(n for lab, verb, n in rows if lab == slot[1] and verb)
+            link = sum(n for lab, _, n in rows if lab == slot[1])
+            return here / (total or 1) + 0.1 * (link + 0.5) / (total + 0.5 * labels)
 
         scored = [(a * fit(n), n) for n, a in act.items()
                   if not said_in(n, question) and n not in ("what", "who")]

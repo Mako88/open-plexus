@@ -224,6 +224,14 @@ def test_a_blank_is_filled_from_what_is_in_focus(tmp_path):
     assert a.answer(q("Then Lily threw what again?")) == "ball"
 
 
+def test_a_blank_is_filled_by_what_filled_the_verb(tmp_path):
+    a = arm(tmp_path)
+    for i, text in enumerate(["Lily ate a cake.", "Then Lily hugged Max."]):
+        a.hear(i, text)
+    # both were objects, and Max is the later; only the cake was eaten
+    assert a.answer(q("Lily ate what again?")) == "cake"
+
+
 def test_a_pronoun_is_resolved_against_the_episode(tmp_path):
     a = arm(tmp_path)
     a.hear(0, "Tom found a red ball.")

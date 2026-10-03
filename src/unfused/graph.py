@@ -354,6 +354,13 @@ class GraphArm:
                 if self.known(tail):
                     at = question.lower().find(tail, a)
                     if at >= 0:
+                        # the words before it are a name of their own where the graph
+                        # knows them: 'Who is Silfem cousins with?' is parsed as one
+                        # compound, 'Silfem cousins', as 'the Smith cousins' would be
+                        head = " ".join(words[:i])
+                        if head and self.known(head) and (
+                                h := question.lower().find(head, a)) >= 0 and h < at:
+                            spans.append((h, h + len(head), head))
                         a, b, name = at, at + len(tail), tail
                     break
             # 'the person who repairs clocks': a name's own verb, said just before it, is

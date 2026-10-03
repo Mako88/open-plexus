@@ -158,3 +158,17 @@ def test_a_word_never_heard_is_learnt_as_the_name_it_stood_for(tmp_path):
     assert a.answer(q("What colour are the pots?")) == "blue"
     # a person nobody told of is never taken for one somebody did
     assert "edda" not in {n for _, _, n in a.unheard("Where does Edda keep the pots?")}
+
+
+def test_a_compound_whose_first_word_is_a_known_name_is_two_names(tmp_path):
+    """'Who is Ada cousins with?' is parsed as one compound, 'Ada cousins'. Cut whole
+    to its known ending, Ada stayed in the frame and every person was a shape of their
+    own, so a lesson about one taught nothing about another."""
+    a = arm(tmp_path)
+    a.hear(0, "Ada and Bren are cousins.")
+    a.hear(1, "Cal and Dot are cousins.")
+    template, spans = a.template("Who is Ada cousins with?")
+    assert [n for _, _, n in spans] == ["ada", "cousins"]
+    a.teach("Who is Ada cousins with?", "Bren")
+    a.teach("Who is Bren cousins with?", "Ada")
+    assert a.answer(q("Who is Cal cousins with?")) == "dot"
